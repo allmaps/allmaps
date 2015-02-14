@@ -1,11 +1,13 @@
-# perma
+# perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma)
+
 
 Generate perma-links from your long urls.
 
 ## Why?
 
 Most websites will never have more than a few dozen links,
-
+but some will have thousands (if not millions!)
+we want a way of shortening those links.
 
 ## What?
 
