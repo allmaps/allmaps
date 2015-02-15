@@ -30,7 +30,7 @@ test("Performance Test", function(t) {
   }
   var et = new Date().getTime(); // end time
   var took = et - st;            // elapsed time
-  console.log("Generated " + n + " (one million) random strings in " + took + " ms");
+  console.log("Generated " + n + " (one million) permalinks in " + took + " ms");
   t.true(took < 10000, " >> Performance: " + Math.floor(n/took*1000) + "/sec");
   t.end();
 });
