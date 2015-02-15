@@ -1,13 +1,32 @@
 # perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma)
 
+![permalink logo](http://i.imgur.com/DTFtLb1.png)
 
-Generate perma-links from your long urls.
+Generate **permalinks** for your web project and
+give your visitors ***short urls*** to ***share***!
+
+## Usage
+
+### Install
+
+```
+npm install perma --save
+```
+
+### Use in your Node Script
+
+```js
+var perma   = require('perma');
+var longurl = '/my-awesome-post-about-unicorns';
+var tinyurl = perma(longurl);
+console.log(tinyurl); // 89CkC
+```
 
 ## Why?
 
-Most websites will never have more than a few dozen links,
-but some will have thousands (if not millions!)
-we want a way of shortening those links.
+*Most* websites will never have more than a few dozen links,
+some of those links will be way *too* long for mortals to type!
+we want a way of shortening long links for sharing.
 
 ## What?
 
@@ -24,17 +43,68 @@ to [link rot](http://en.wikipedia.org/wiki/Link_rot).
 + A few alternatives:
 http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
 
-## How
+## How?
+
+We could just *hash* the url: e.g:
 
 ```js
-var upper  = "A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,T,U,V,W,X,Y,Z,",
-    number = "2,3,4,5,6,7,8,9,2,3,4,5,6,7,8,9",
-    lower  = "a,b,c,d,e,f,g,h,m,n,p,t,u,v,w,x,y,z";
+var hash = require('crypto').createHash('sha1');
+hash.update("/my-amazing-blog-post");
+console.log(hash.digest('base64')); // ExhijlsFTXLyVpfFgD3NQVwAfxU=
+```
+But the resulting string is **28 characters** long (*longer* than the original _**20** char_ url!)  
+If the length is the issue we can do what GitHub does with commit hashes in their UI (truncate them...):
 
+Use *only* the ***first 6 characters*** of the hash:
+```js
+var hash = require('crypto').createHash('sha1');
+hash.update("/my-amazing-blog-post");
+console.log(hash.digest('base64').substring(0, 6)); // Exhijl
 ```
 
-57 characters.
+Getting the [**base64**](http://en.wikipedia.org/wiki/Base64) "digest"
+of the url means we have a **64 character** population (potential characters):  
+```sh
+A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z
+0, 1, 2, 3, 4, 5, 6, 7, 8, 9, +, /
+```
+Which means we can have
+[64<sup>5</sup>](http://www.wolframalpha.com/input/?i=64+to+the+power+of+5)
+= 1,073,741,824 or ***1 Billion*** *possible* (*short*) urls.
+(way more than *most* websites will *ever* need!)
+
+***However*** there are a few characters in that set which can be *confusing*
+to people trying to *type* the url (*yes* people *still* do type urls!):
+
+```
+0 (zero) can look like O (capital o) in certain fonts (so o, 0 and O) should be excluded.
+I (capital i) and l (lowercase L) look identical in chrome's default font. exclude.
++ and / both have a special meaning in urls so exclude these too.
+```
+If we exclude the (*potentially*) "*confusing*" characters from our alphabet,
+we are left with ***57 characters***.  
 if each position in a string can be taken by one of these characters
 then there are
-[57 to the power of 4](http://www.wolframalpha.com/input/?i=57+to+the+power+of+4)
-4-character strings. or **10.5 Million**
+[57 <sup>5</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+5)
+5-character strings. 601,692,057 or **601 Million**  
+(still *more* than "*enough*" available strings)
+
+## *Optional*
+
+If you want to have *even* shorter urls you will need to have a
+**Datastore** for links (to check for duplicates)  
+(we recommend using **Redis** for *speed*, but you can use which ever Datastore
+  your project *already* uses e.g. Postgres, MySQL, MongoDB, CouchDB etc.)
+
+If you supply the **perma** method with a **length** parameter:
+```js
+var perma   = require('perma');
+var longurl = '/my-awesome-post-about-kittens';
+var length  = 3;
+var tinyurl = perma(longurl, length);
+console.log(tinyurl); // 89C
+```
+Given that there are
+[57 <sup>5</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+3)
+ = 185,193 **185k** possible urls we can easily

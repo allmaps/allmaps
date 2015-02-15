@@ -1,18 +1,10 @@
-// generate a random string of characters of length len
-function randomString(len) {
-  charSet = "ABCDEFGHJKLMNPQRTUVWXYZabcdefghmnptuvwxyz2345678923456789";
-  var randomString = '';
-  for (var i = 0; i < len; i++) {
-    var randomPoz = Math.floor(Math.random() * charSet.length);
-    randomString += charSet.substring(randomPoz,randomPoz+1);
-  }
-  return randomString;
+var crypto = require('crypto');
+// generate a
+function perma(url, length) {
+  var len = length || 5;
+  var hash = crypto.createHash('sha1');
+  hash.update(url.toString()); // exclude chars: Il0oO=/+ and return only the first len
+  return hash.digest('base64').replace(/[Il0oO=\/\+]/g,'').substring(0, len);
 }
 
-// console.log(randomString(4));
-
-module.exports = randomString;
-
-// for(var i = 1; i < 7; i++){
-//   console.log(i + " " + Math.pow(57, i))
-// }
+module.exports = perma;
