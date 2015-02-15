@@ -9,7 +9,7 @@ test("Create perma for url: 1234", function(t) {
 });
 
 test("Confirm string characters are in Allowed chars", function(t) {
-  charSet = "ABCDEFGHJKLMNPQRTUVWXYZabcdefghmnptuvwxyz2345678923456789";
+  var charSet = "ABCDEFGHJKLMNPQRTUVWXYZabcdefghmnptuvwxyz2345678923456789";
   var str = perma(Math.random());
   console.log("Our Random string is: " + str);
   var char;
