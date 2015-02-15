@@ -1,4 +1,4 @@
-# perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma)
+# perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Test Coverage][coveralls-image]][coveralls-url] [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma) [![NPM Version][npm-image]][npm-url]
 
 ![permalink logo](http://i.imgur.com/DTFtLb1.png)
 
@@ -108,3 +108,8 @@ console.log(tinyurl); // 89C
 Given that there are
 [57 <sup>5</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+3)
  = 185,193 **185k** possible urls we can easily
+
+[npm-image]: https://img.shields.io/npm/v/perma.svg?style=flat
+[npm-url]: https://npmjs.org/package/perma
+[coveralls-image]: https://img.shields.io/coveralls/nelsonic/perma.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/nelsonic/perma?branch=master
