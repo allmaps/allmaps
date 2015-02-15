@@ -1,4 +1,4 @@
-# perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Test Coverage][coveralls-image]][coveralls-url] [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma) [![NPM Version][npm-image]][npm-url]
+# perma [![Build Status](https://travis-ci.org/nelsonic/perma.png?branch=master)](https://travis-ci.org/nelsonic/perma) [![Test Coverage][coverage-image]][coverage-url] [![Code Climate](https://codeclimate.com/github/nelsonic/perma.png)](https://codeclimate.com/github/nelsonic/perma) [![Dependencies](https://david-dm.org/nelsonic/perma.png?theme=shields.io)](https://david-dm.org/nelsonic/perma) [![NPM Version][npm-image]][npm-url]
 
 ![permalink logo](http://i.imgur.com/DTFtLb1.png)
 
@@ -111,5 +111,5 @@ Given that there are
 
 [npm-image]: https://img.shields.io/npm/v/perma.svg?style=flat
 [npm-url]: https://npmjs.org/package/perma
-[coveralls-image]: https://img.shields.io/coveralls/nelsonic/perma.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/nelsonic/perma?branch=master
+[coverage-image]: https://codeclimate.com/github/nelsonic/perma/badges/coverage.svg?style=flat
+[coverage-url]: https://codeclimate.com/github/nelsonic/perma?branch=master
