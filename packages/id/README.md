@@ -120,10 +120,15 @@ var tinyurl = perma(longurl, length);
 console.log(tinyurl); // bCvQYQafswBmQzTWTak
 ```
 
+## Practical Usage
 
 Given that there are
-[57 <sup>5</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+3)
- = 185,193 **185k** possible urls we can easily
+[57 <sup>3</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+3)
+ = 185,193 **185k** *possible* urls we can *easily* use **perma**
+ as the basis for most websites, blogs or basic apps.
+
+ + [ ] Create practical http server example
+
 
 [npm-image]: https://img.shields.io/npm/v/perma.svg?style=flat
 [npm-url]: https://npmjs.org/package/perma
