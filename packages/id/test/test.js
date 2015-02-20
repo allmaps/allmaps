@@ -21,12 +21,19 @@ test("Confirm string characters are in Allowed chars", function(t) {
   t.end();
 });
 
+test("Full Length Hash", function(t) {
+  var hash = perma("RandomGobbledygook", "full");
+  t.true(hash.length > 20, "Full Length is "+hash);
+  t.end();
+});
+
 test("Performance Test", function(t) {
   var st = new Date().getTime(); // start time
   var str;
   var n  = 1000000;
   for(var i = 0; i < n; i++){
-    str = perma(i, 6);
+    var length = Math.floor(Math.random() * 27) + 1
+    str = perma(i, length);
   }
   var et = new Date().getTime(); // end time
   var took = et - st;            // elapsed time
@@ -34,3 +41,7 @@ test("Performance Test", function(t) {
   t.true(took < 10000, " >> Performance: " + Math.floor(n/took*1000) + "/sec");
   t.end();
 });
+
+var longurl = '/my-awesome-post-about-unicorns';
+var tinyurl = perma(longurl, "full");
+console.log(">> "+tinyurl + ' | '+tinyurl.length); // 89CkC

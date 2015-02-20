@@ -19,7 +19,7 @@ npm install perma --save
 var perma   = require('perma');
 var longurl = '/my-awesome-post-about-unicorns';
 var tinyurl = perma(longurl);
-console.log(tinyurl); // 89CkC
+console.log(tinyurl); // bCvQY
 ```
 
 ## Why?
@@ -97,14 +97,30 @@ If you want to have *even* shorter urls you will need to have a
 (we recommend using **Redis** for *speed*, but you can use which ever Datastore
   your project *already* uses e.g. Postgres, MySQL, MongoDB, CouchDB etc.)
 
+### Shorter ?
+
 If you supply the **perma** method with a **length** parameter:
 ```js
 var perma   = require('perma');
 var longurl = '/my-awesome-post-about-kittens';
 var length  = 3;
 var tinyurl = perma(longurl, length);
-console.log(tinyurl); // 89C
+console.log(tinyurl); // bCv
 ```
+
+### Full Hash?
+
+If you want the *full* hash simply pass in the `length = "full"`. e.g:
+
+```js
+var perma   = require('perma');
+var longurl = '/my-awesome-post-about-unicorns';
+var length  = 'full';
+var tinyurl = perma(longurl, length);
+console.log(tinyurl); // bCvQYQafswBmQzTWTak
+```
+
+
 Given that there are
 [57 <sup>5</sup>](http://www.wolframalpha.com/input/?i=57+to+the+power+of+3)
  = 185,193 **185k** possible urls we can easily
