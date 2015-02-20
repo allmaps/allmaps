@@ -57,9 +57,9 @@ If the length is the issue we can do what GitHub does with commit hashes in thei
 
 Use *only* the ***first 6 characters*** of the hash:
 ```js
-var hash = require('crypto').createHash('sha1');
-hash.update("/my-amazing-blog-post");
-console.log(hash.digest('base64').substring(0, 6)); // Exhijl
+var hash = require('crypto').createHash('sha512');
+hash.update("/my-amazing-blog-post").digest('base64');
+console.log(hash.substring(0, 6)); // Exhijl
 ```
 
 Getting the [**base64**](http://en.wikipedia.org/wiki/Base64) "digest"

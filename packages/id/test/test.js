@@ -4,7 +4,7 @@ var test  = require('tape');
 test("Create perma for url: 1234", function(t) {
   var str = perma(1234);
   t.equal(str.length, 5, "Worked as expected "+str);
-  t.equal(str, 'cRDtp', "Perma is consistent. 1234 >> cRDtp")
+  t.equal(str, '1ARVn', "Perma is consistent. 1234 >> 1ARVn")
   t.end();
 });
 
