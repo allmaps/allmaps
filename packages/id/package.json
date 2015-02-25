@@ -1,6 +1,6 @@
 {
   "name": "perma",
-  "version": "1.0.7",
+  "version": "2.0.1",
   "description": "generate permalink (permanent link) urls for your web pages ",
   "main": "index.js",
   "scripts": {
