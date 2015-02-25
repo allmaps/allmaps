@@ -108,16 +108,16 @@ var tinyurl = perma(longurl, length);
 console.log(tinyurl); // bCv
 ```
 
-### Full Hash?
+### Longer?
 
-If you want the *full* hash simply pass in the `length = "full"`. e.g:
+If you want *more* just ask for it! e.g:
 
 ```js
 var perma   = require('perma');
 var longurl = '/my-awesome-post-about-unicorns';
-var length  = 'full';
-var tinyurl = perma(longurl, length);
-console.log(tinyurl); // bCvQYQafswBmQzTWTak
+var length  = 70;
+var hash = perma(longurl, length);
+console.log(hash); // 3ZtP18Ctj3bFMLhZww3SWEEGf15sGXczhvKcqahrcfX85ekZj7qMrqeB314MK77fjxvXfk
 ```
 
 ## Practical Usage

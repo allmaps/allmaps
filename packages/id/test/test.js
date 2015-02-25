@@ -22,7 +22,7 @@ test("Confirm string characters are in Allowed chars", function(t) {
 });
 
 test("Full Length Hash", function(t) {
-  var hash = perma("RandomGobbledygook", "full");
+  var hash = perma("RandomGobbledygook", 50);
   t.true(hash.length > 20, "Full Length is "+hash);
   t.end();
 });
