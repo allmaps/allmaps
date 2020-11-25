@@ -1,0 +1,11 @@
+{
+  "name": "georeference-js",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./test/test"
+  },
+  "author": "",
+  "license": "ISC"
+}
