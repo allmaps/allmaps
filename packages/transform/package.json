@@ -1,12 +1,16 @@
 {
   "name": "georeference-js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "node ./test/test"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allmaps/georeference-js.git"
+  },
+  "author": "Bert Spaan <hello@bertspaan.nl>",
   "license": "ISC",
   "eslintConfig": {
     "parserOptions": {
