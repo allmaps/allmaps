@@ -1,3 +1,5 @@
+// http://mourner.github.io/simplify-js/
+
 const {GCP, GDALCreateGCPTransformer, GDALGCPTransform} = require('./gdaltransform.js')
 
 function createTransformer (gcps) {
@@ -31,7 +33,8 @@ function createTransformer (gcps) {
 
   return {
     toWorld,
-    toPixels
+    toPixels,
+    hTransformArg
   }
 }
 
