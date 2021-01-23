@@ -1,17 +1,16 @@
 <script>
+	import Map from './Map.svelte'
+
 	import queryString from 'query-string'
 
 	let queryParams
-
-	export let url
-	export let annotation
-
+	let url
+	let annotation
 
 	$: queryParams = queryString.parse(window.location.search)
 	$: url = queryParams.url
 
 	async function fetchAnnotation (url) {
-		console.log('nu', url)
 		const response = await fetch(url)
 
 		// TODO: check annotation!
@@ -22,9 +21,9 @@
 <main>
 	{#if url}
 		{#await fetchAnnotation(url)}
-			<p>...waiting</p>
+			<p>Loading...</p>
 		{:then data}
-			<pre><code>{JSON.stringify(annotation, null, 2)}</code></pre>
+			<Map annotation={annotation} />
 		{:catch error}
 			<p>An error occurred!</p>
 		{/await}
