@@ -1,0 +1,24 @@
+name: Node.js npm run deploy
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm ci
+    - run: |
+        git config user.name "bertspaan" && git config user.email "bert.spaan@gmail.com"
+        npm run deploy
+
