@@ -8,7 +8,7 @@ const ERRORS = ({
   MNPTERR: 'NOT ENOUGH POINTS'
 })
 
-class GCP {
+export class GCP {
   constructor (dfGCPPixel, dfGCPLine, dfGCPX, dfGCPY) {
     this.dfGCPPixel = dfGCPPixel
     this.dfGCPLine = dfGCPLine
@@ -74,7 +74,7 @@ class MATRIX {
   }
 }
 
-function GDALCreateGCPTransformer (pasGCPList, nReqOrder, bReversed) {
+export function GDALCreateGCPTransformer (pasGCPList, nReqOrder, bReversed) {
   return GDALCreateGCPTransformerEx(pasGCPList, nReqOrder, bReversed, false, -1, -1)
 }
 
@@ -450,7 +450,7 @@ function term (nTerm, e, n) {
   return 0
 }
 
-function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
+export function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
   const nPointCount = points.length
 
   // GCPTransformInfo *psInfo = static_cast<GCPTransformInfo *>(pTransformArg);
@@ -553,10 +553,4 @@ function CRS_georef (e1, n1, E, N, order) {
   } else {
     throw new Error(ERRORS.MPARMERR)
   }
-}
-
-module.exports = {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
 }

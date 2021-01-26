@@ -1,21 +1,41 @@
 {
-  "name": "georeference-js",
-  "version": "0.0.2",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "node ./test/test"
+  "name": "@allmaps/georeference",
+  "version": "0.0.1-alpha",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
   },
+  "description": "Georeference",
+  "main": "dist/georeference.node.js",
+  "unpkg": "dist/georeference.min.js",
+  "jsdelivr": "dist/georeference.min.js",
+  "module": "index.js",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/allmaps/georeference-js.git"
+    "url": "https://github.com/allmaps/georeference.git"
   },
-  "author": "Bert Spaan <hello@bertspaan.nl>",
-  "license": "ISC",
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module"
-    }
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "georeference",
+    "map"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.1.0",
+    "rollup": "^2.38.0",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=12"
   }
 }

@@ -1,4 +1,4 @@
-# georeference-js
+# @allmaps/georeference
 
 JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html).
 
