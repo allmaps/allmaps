@@ -1,4 +1,4 @@
-name: Node.js npm run deploy
+name: deploy
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: 14
     - run: npm ci
     - run: |
         git config user.name "bertspaan" && git config user.email "bert.spaan@gmail.com"

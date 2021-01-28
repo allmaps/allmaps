@@ -8,7 +8,6 @@
   import IIIFInfo from 'ol/format/IIIFInfo'
 
   export let annotation
-  export let maps
 
   let iiifLayer
   let iiifOl
@@ -42,11 +41,10 @@
 
 	onMount(async () => {
     let imageUri
-
     if (annotation.type === 'Annotation') {
-      imageUri = annotation.target.service[0]['@id']
+      imageUri = annotation.target.source
     } else if (annotation.type === 'AnnotationPage') {
-      imageUri = annotation.items[0].target.service[0]['@id']
+      imageUri = annotation.items[0].target.source
     }
 
     iiifLayer = new TileLayer()
@@ -65,7 +63,7 @@
 
 <style>
   .iiif {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
   }
 </style>
