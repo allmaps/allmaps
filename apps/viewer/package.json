@@ -1,6 +1,16 @@
 {
   "name": "@allmaps/viewer",
   "version": "1.0.0",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/viewer.git"
+  },
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
