@@ -1,5 +1,2 @@
-// export * from './src/import'
-
-export function test () {
-  return 'test!'
-}
+export * from './src/parser'
+export * from './src/generator'

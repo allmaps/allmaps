@@ -1,17 +1,16 @@
-function svgSelector (width, height, mask) {
+function svgSelector ([width, height], mask) {
   return {
     type: 'SvgSelector',
     value: `<svg width="${width}" height="${height}"><polygon points="${mask.map((point) => point.join(',')).join(' ')}" /></svg>`
   }
 }
 
-function createMapAnnotation (map, image) {
-  let source = image.uri
-  if (source.endsWith('info.json')) {
-    source = source.replace(/\/?info\.json$/gi, '')
-  }
+function createMapAnnotation (map) {
+  // TODO: create library function, and check what
+  //  quality/format is available in resource
+  const sourceSuffix = '/full/full/0/default.jpg'
+  const source = `${map.imageServiceId}${sourceSuffix}`
 
-  // https://www.w3.org/TR/annotation-model/#sets-of-bodies-and-targets
   let body
   if (map.gcps) {
     body = {
@@ -19,7 +18,7 @@ function createMapAnnotation (map, image) {
       features: map.gcps.map((gcp) => ({
         type: 'Feature',
         properties: {
-          pixel: gcp.pixel
+          image: gcp.image
         },
         geometry: {
           type: 'Point',
@@ -30,19 +29,29 @@ function createMapAnnotation (map, image) {
   }
 
   let target = {
-    source
+    type: 'Image',
+    source,
+    service: [
+      {
+        '@id': map.imageServiceId,
+        // TODO: always 2?
+        // or can we omit the type?
+        type: 'ImageService2',
+        profile: 'http://iiif.io/api/image/2/level2.json'
+      }
+    ]
   }
 
   if (map.pixelMask) {
     target = {
-      source,
-      selector: svgSelector(image.width, image.height, map.pixelMask)
+      ...target,
+      selector: svgSelector(map.imageDimensions, map.pixelMask)
     }
   }
 
   return {
+    // '@id': `https://data.allmaps.org/annotations/i/${image.id}/m/${map.id}`,
     type: 'Annotation',
-    '@id': `https://data.allmaps.org/annotations/i/${image.id}/m/${map.id}`,
     '@context': [
       'http://geojson.org/geojson-ld/geojson-context.jsonld',
       'http://iiif.io/api/presentation/3/context.json'
@@ -53,8 +62,8 @@ function createMapAnnotation (map, image) {
   }
 }
 
-export function createAnnotation (manifest, images, maps) {
-  if (!maps || Object.keys(maps).length === 0) {
+export function generate (maps) {
+  if (!maps || maps.length === 0) {
     return {
       type: 'Annotation',
       '@context': [
@@ -67,14 +76,14 @@ export function createAnnotation (manifest, images, maps) {
     }
   }
 
-  const annotations = Object.values(maps)
-    .map((map) => createMapAnnotation(map, images[map.imageId]))
+  const annotations = maps
+    .map((map) => createMapAnnotation(map))
 
   if (annotations.length === 1) {
     return annotations[0]
   } else if (annotations.length > 1) {
     return {
-      '@id': `https://data.allmaps.org/annotations/m/${manifest.id}`,
+      // '@id': `https://data.allmaps.org/annotations/m/${manifest.id}`,
       type: 'AnnotationPage',
       '@context': [
         'http://geojson.org/geojson-ld/geojson-context.jsonld',
