@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 	import { onMount } from 'svelte'
 
   import Map from 'ol/Map'
@@ -66,4 +66,4 @@
     width: 100vw;
     height: 100vh;
   }
-</style>
+</style> -->

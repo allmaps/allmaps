@@ -3,12 +3,6 @@
     <a href="/">allmaps viewer</a>
   </h1>
   <a href="https://allmaps.org">Go to allmaps.org</a>
-
-<!--
-map
-image
-annotation -->
-
 </header>
 
 <style>

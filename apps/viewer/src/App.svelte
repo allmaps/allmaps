@@ -69,7 +69,7 @@
 			<input bind:value="{annotationUrl}" name="url" placeholder="Annotation URL" autofocus />
 			<button disabled="{annotationUrl.length === 0}">Go</button>
 		</form>
-		<p>Or, past an annotation in the text box:</p>
+		<p>Or, paste an annotation in the text box:</p>
 		<form on:submit|preventDefault={handleStringSubmit}>
 			<textarea bind:value="{annotationString}"
 				autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
