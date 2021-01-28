@@ -1,16 +1,14 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
   "description": "Annotation",
-  "main": "dist/annotation.node.js",
-  "unpkg": "dist/annotation.min.js",
-  "jsdelivr": "dist/annotation.min.js",
-  "module": "index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "files": [
     "dist"
   ],
@@ -29,6 +27,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.1.0",
     "rollup": "^2.38.0",
