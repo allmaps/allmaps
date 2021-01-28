@@ -1,39 +1,32 @@
 import {GCP, GDALCreateGCPTransformer, GDALGCPTransform} from './gdaltransform.js'
 
-function createTransformer (gcps) {
-  const pasGCPs = gcps.features
+export function toWorld (transformArgs, point) {
+  const bInverse = false
+
+  const input = [{x: point[0], y: point[1]}]
+  const output = GDALGCPTransform(transformArgs, bInverse, input)
+
+  return [output[0].y, output[0].x]
+}
+
+export function toImage (transformArgs, point) {
+  const bInverse = true
+
+  const input = [({x: point[1], y: point[0]})]
+  const output = GDALGCPTransform(transformArgs, bInverse, input)
+
+  return [output[0].x, output[0].y]
+}
+
+export function createTransformer (gcps) {
+  const pasGCPs = gcps
     .map((gcp) => new GCP(
-      gcp.properties.pixel[0], gcp.properties.pixel[1],
-      gcp.geometry.coordinates[1], gcp.geometry.coordinates[0]
+      gcp.image[0], gcp.image[1],
+      gcp.world[1], gcp.world[0]
     ))
 
   const nOrder = 0
   const hTransformArg = GDALCreateGCPTransformer(pasGCPs, nOrder, false)
 
-  function toWorld (pixels) {
-    const bInverse = false
-    const input = pixels.map((pixel) => ({x: pixel[0], y: pixel[1]}))
-    const output = GDALGCPTransform(hTransformArg, bInverse, input)
-
-    return {
-      type: 'MultiPoint',
-      coordinates: output.map(({x, y}) => ([y, x]))
-    }
-  }
-
-  function toPixels (multiPoint) {
-    const bInverse = true
-
-    const input = multiPoint.coordinates.map((point) => ({x: point[1], y: point[0]}))
-    const output = GDALGCPTransform(hTransformArg, bInverse, input)
-    return output.map(({x, y}) => ([x, y]))
-  }
-
-  return {
-    toWorld,
-    toPixels,
-    hTransformArg
-  }
+  return hTransformArg
 }
-
-module.exports = createTransformer

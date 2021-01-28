@@ -17,7 +17,7 @@ export class GCP {
   }
 }
 
-class Control_Points {
+class ControlPoints {
   // int  count;
   // double *e1;
   // double *n1;
@@ -32,10 +32,10 @@ class GCPTransformInfo {
 
   // double adfFromGeoX[20];
   // double adfFromGeoY[20];
-  // double x1_mean;
-  // double y1_mean;
-  // double x2_mean;
-  // double y2_mean;
+  // double x1Mean;
+  // double y1Mean;
+  // double x2Mean;
+  // double y2Mean;
   // int    nOrder;
   // int    bReversed;
 
@@ -87,17 +87,17 @@ function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, 
 
   const nGCPCount = pasGCPList.length
 
-  let nCRSresult = 0
-  let sPoints = new Control_Points()
+  // let nCRSresult
+  let sPoints = new ControlPoints()
 
-  let x1_sum = 0
-  let y1_sum = 0
-  let x2_sum = 0
-  let y2_sum = 0
+  let x1Sum = 0
+  let y1Sum = 0
+  let x2Sum = 0
+  let y2Sum = 0
 
   //     memset( &sPoints, 0, sizeof(sPoints) );
 
-  if (nReqOrder == 0) {
+  if (nReqOrder === 0) {
     if (nGCPCount >= 10) {
       // for now we avoid 3rd order since it is unstable
       nReqOrder = 2
@@ -153,25 +153,25 @@ function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, 
       padfGeoY[iGCP] = pasGCPList[iGCP].dfGCPY
       padfRasterX[iGCP] = pasGCPList[iGCP].dfGCPPixel
       padfRasterY[iGCP] = pasGCPList[iGCP].dfGCPLine
-      x1_sum += pasGCPList[iGCP].dfGCPPixel
-      y1_sum += pasGCPList[iGCP].dfGCPLine
-      x2_sum += pasGCPList[iGCP].dfGCPX
-      y2_sum += pasGCPList[iGCP].dfGCPY
+      x1Sum += pasGCPList[iGCP].dfGCPPixel
+      y1Sum += pasGCPList[iGCP].dfGCPLine
+      x2Sum += pasGCPList[iGCP].dfGCPX
+      y2Sum += pasGCPList[iGCP].dfGCPY
     }
 
-    psInfo.x1_mean = x1_sum / nGCPCount
-    psInfo.y1_mean = y1_sum / nGCPCount
-    psInfo.x2_mean = x2_sum / nGCPCount
-    psInfo.y2_mean = y2_sum / nGCPCount
+    psInfo.x1Mean = x1Sum / nGCPCount
+    psInfo.y1Mean = y1Sum / nGCPCount
+    psInfo.x2Mean = x2Sum / nGCPCount
+    psInfo.y2Mean = y2Sum / nGCPCount
 
     sPoints.count = nGCPCount
-    sPoints.e1 = padfRasterX;
+    sPoints.e1 = padfRasterX
     sPoints.n1 = padfRasterY
     sPoints.e2 = padfGeoX
     sPoints.n2 = padfGeoY
     sPoints.status = panStatus
 
-    nCRSresult = CRS_compute_georef_equations(psInfo, sPoints,
+    crsComputeGeorefEquations(psInfo, sPoints,
       psInfo.adfToGeoX, psInfo.adfToGeoY,
       psInfo.adfFromGeoX, psInfo.adfFromGeoY,
       nReqOrder)
@@ -180,9 +180,9 @@ function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, 
   return psInfo
 }
 
-function CRS_compute_georef_equations (psInfo, cp, E12, N12, E21, N21, order) {
+function crsComputeGeorefEquations (psInfo, cp, E12, N12, E21, N21, order) {
   // C++ signature:
-  // CRS_compute_georef_equations (GCPTransformInfo *psInfo, struct Control_Points *cp,
+  // crsComputeGeorefEquations (GCPTransformInfo *psInfo, struct ControlPoints *cp,
   //   double E12[], double N12[],
   //   double E21[], double N21[],
   //   int order)
@@ -194,7 +194,7 @@ function CRS_compute_georef_equations (psInfo, cp, E12, N12, E21, N21, order) {
   }
 
   /* CALCULATE THE FORWARD TRANSFORMATION COEFFICIENTS */
-  calccoef(cp, psInfo.x1_mean, psInfo.y1_mean, E12, N12, order)
+  calcCoef(cp, psInfo.x1Mean, psInfo.y1Mean, E12, N12, order)
 
   /* SWITCH THE 1 AND 2 EASTING AND NORTHING ARRAYS */
   tempptr = cp.e1
@@ -205,7 +205,7 @@ function CRS_compute_georef_equations (psInfo, cp, E12, N12, E21, N21, order) {
   cp.n2 = tempptr
 
   /* CALCULATE THE BACKWARD TRANSFORMATION COEFFICIENTS */
-  calccoef(cp, psInfo.x2_mean, psInfo.y2_mean, E21, N21, order)
+  calcCoef(cp, psInfo.x2Mean, psInfo.y2Mean, E21, N21, order)
 
   /* SWITCH THE 1 AND 2 EASTING AND NORTHING ARRAYS BACK */
   tempptr = cp.e1
@@ -216,10 +216,10 @@ function CRS_compute_georef_equations (psInfo, cp, E12, N12, E21, N21, order) {
   cp.n2 = tempptr
 }
 
-function calccoef (cp, x_mean, y_mean, E, N, order) {
+function calcCoef (cp, xMean, yMean, E, N, order) {
   // C++ signature:
   // static int
-  // calccoef (struct Control_Points *cp, double x_mean, double y_mean, double E[], double N[], int order)
+  // calcCoef (struct ControlPoints *cp, double xMean, double yMean, double E[], double N[], int order)
 
   const m = new MATRIX()
 
@@ -247,20 +247,20 @@ function calccoef (cp, x_mean, y_mean, E, N, order) {
   m.v = []
 
   /* INITIALIZE MATRIX */
-  if (numactive == m.n) {
-    exactdet(cp, m, x_mean, y_mean, a, b, E, N)
+  if (numactive === m.n) {
+    exactDet(cp, m, xMean, yMean, a, b, E, N)
   } else {
-    calcls(cp, m, x_mean, y_mean, a, b, E, N)
+    calcls(cp, m, xMean, yMean, a, b, E, N)
   }
 }
 
-function calcls (cp, m, x_mean, y_mean, a, b, E, N) {
+function calcls (cp, m, xMean, yMean, a, b, E, N) {
   // C++ signature:
   // static int calcls (
-  //   struct Control_Points *cp,
+  //   struct ControlPoints *cp,
   //   struct MATRIX *m,
-  //   double x_mean,
-  //   double y_mean,
+  //   double xMean,
+  //   double yMean,
   //   double a[],
   //   double b[],
   //   double E[],     /* EASTING COEFFICIENTS */
@@ -276,7 +276,7 @@ function calcls (cp, m, x_mean, y_mean, a, b, E, N) {
       m.setM(i, j, 0)
     }
 
-    a[i-1] = b[i-1] = 0
+    a[i - 1] = b[i - 1] = 0
   }
 
   /* SUM THE UPPER HALF OF THE MATRIX AND THE COLUMN VECTORS ACCORDING TO
@@ -288,11 +288,11 @@ function calcls (cp, m, x_mean, y_mean, a, b, E, N) {
 
       for (let i = 1; i <= m.n; i++) {
         for (let j = i; j <= m.n; j++) {
-          m.setM(i, j, m.getM(i, j) + term(i, cp.e1[n] - x_mean, cp.n1[n] - y_mean) * term(j, cp.e1[n] - x_mean, cp.n1[n] - y_mean))
+          m.setM(i, j, m.getM(i, j) + term(i, cp.e1[n] - xMean, cp.n1[n] - yMean) * term(j, cp.e1[n] - xMean, cp.n1[n] - yMean))
         }
 
-        a[i-1] += cp.e2[n] * term(i, cp.e1[n] - x_mean, cp.n1[n] - y_mean)
-        b[i-1] += cp.n2[n] * term(i, cp.e1[n] - x_mean, cp.n1[n] - y_mean)
+        a[i - 1] += cp.e2[n] * term(i, cp.e1[n] - xMean, cp.n1[n] - yMean)
+        b[i - 1] += cp.n2[n] * term(i, cp.e1[n] - xMean, cp.n1[n] - yMean)
       }
     }
   }
@@ -308,16 +308,16 @@ function calcls (cp, m, x_mean, y_mean, a, b, E, N) {
     }
   }
 
-  return solvemat(m, a, b, E, N)
+  return solveMat(m, a, b, E, N)
 }
 
-function exactdet (cp, m, x_mean, y_mean, a, b, E, N) {
+function exactDet (cp, m, xMean, yMean, a, b, E, N) {
   // C++ signature:
-  // static int exactdet (
-  //   struct Control_Points *cp,
+  // static int exactDet (
+  //   struct ControlPoints *cp,
   //   struct MATRIX *m,
-  //   double x_mean,
-  //   double y_mean,
+  //   double xMean,
+  //   double yMean,
   //   double a[],
   //   double b[],
   //   double E[],     /* EASTING COEFFICIENTS */
@@ -329,12 +329,12 @@ function exactdet (cp, m, x_mean, y_mean, a, b, E, N) {
     if (cp.status[pntnow] > 0) {
       /* POPULATE MATRIX M */
       for (let j = 1; j <= m.n; j++) {
-        m.setM(currow, j, term(j, cp.e1[pntnow] - x_mean, cp.n1[pntnow] - y_mean))
+        m.setM(currow, j, term(j, cp.e1[pntnow] - xMean, cp.n1[pntnow] - yMean))
       }
 
       /* POPULATE MATRIX A AND B */
-      a[currow-1] = cp.e2[pntnow]
-      b[currow-1] = cp.n2[pntnow]
+      a[currow - 1] = cp.e2[pntnow]
+      b[currow - 1] = cp.n2[pntnow]
 
       currow++
     }
@@ -344,12 +344,12 @@ function exactdet (cp, m, x_mean, y_mean, a, b, E, N) {
     throw new Error(ERRORS.MINTERR)
   }
 
-  return solvemat(m, a, b, E, N)
+  return solveMat(m, a, b, E, N)
 }
 
-function solvemat (m, a, b, E, N) {
+function solveMat (m, a, b, E, N) {
   // C++ signature:
-  // static int solvemat (struct MATRIX *m,
+  // static int solveMat (struct MATRIX *m,
   //   double a[], double b[], double E[], double N[])
 
   for (let i = 1; i <= m.n; i++) {
@@ -357,7 +357,7 @@ function solvemat (m, a, b, E, N) {
 
     /* find row with largest magnitude value for pivot value */
     let pivot = m.getM(i, j) /* ACTUAL VALUE OF THE LARGEST PIVOT CANDIDATE */
-    let imark = i;
+    let imark = i
 
     for (let i2 = i + 1; i2 <= m.n; i2++) {
       if (Math.abs(m.getM(i2, j)) > Math.abs(pivot)) {
@@ -388,19 +388,19 @@ function solvemat (m, a, b, E, N) {
       // std::swap(a[imark-1], a[i-1]);
       // std::swap(b[imark-1], b[i-1]);
       const ta1 = a[imark - 1]
-      const ta2 = a[i-1]
-      a[i-1] = ta1
+      const ta2 = a[i - 1]
+      a[i - 1] = ta1
       a[imark - 1] = ta2
 
-      const tb1 = b[imark-1]
-      const tb2 = b[i-1]
-      b[imark-1] = tb2
-      b[i-1] = tb1
+      const tb1 = b[imark - 1]
+      const tb2 = b[i - 1]
+      b[imark - 1] = tb2
+      b[i - 1] = tb1
     }
 
     /* compute zeros above and below the pivot, and compute
        values for the rest of the row as well */
-    for (let i2 = 1 ; i2 <= m.n ; i2++) {
+    for (let i2 = 1 ; i2 <= m.n; i2++) {
       if (i2 !== i) {
         const factor = m.getM(i2, j) / pivot
 
@@ -417,7 +417,7 @@ function solvemat (m, a, b, E, N) {
 
   /* SINCE ALL OTHER VALUES IN THE MATRIX ARE ZERO NOW, CALCULATE THE
     COEFFICIENTS BY DIVIDING THE COLUMN VECTORS BY THE DIAGONAL VALUES. */
-  for (let i = 1; i <= m.n ; i++) {
+  for (let i = 1; i <= m.n; i++) {
     E[i - 1] = a[i - 1] / m.getM(i, i)
     N[i - 1] = b[i - 1] / m.getM(i, i)
   }
@@ -470,13 +470,13 @@ export function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
     let transformedPoint
 
     if (bDstToSrc) {
-      transformedPoint = CRS_georef(
-        points[i].x - psInfo.x2_mean, points[i].y - psInfo.y2_mean,
+      transformedPoint = crsGeoref(
+        points[i].x - psInfo.x2Mean, points[i].y - psInfo.y2Mean,
         psInfo.adfFromGeoX, psInfo.adfFromGeoY,
         psInfo.nOrder)
     } else {
-      transformedPoint = CRS_georef(
-        points[i].x - psInfo.x1_mean, points[i].y - psInfo.y1_mean,
+      transformedPoint = crsGeoref(
+        points[i].x - psInfo.x1Mean, points[i].y - psInfo.y1Mean,
         psInfo.adfToGeoX, psInfo.adfToGeoY,
         psInfo.nOrder)
     }
@@ -490,9 +490,9 @@ export function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
   return transformedPoints
 }
 
-function CRS_georef (e1, n1, E, N, order) {
+function crsGeoref (e1, n1, E, N, order) {
   // C++ signature:
-  // static int CRS_georef (
+  // static int crsGeoref (
   //   double e1,  /* EASTINGS TO BE TRANSFORMED */
   //   double n1,  /* NORTHINGS TO BE TRANSFORMED */
   //   double *e,  /* EASTINGS TO BE TRANSFORMED */

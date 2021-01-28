@@ -1,45 +1,49 @@
-import node from '@rollup/plugin-node-resolve'
-// import commonjs from '@rollup/plugin-commonjs'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import babel from '@rollup/plugin-babel'
 import {terser} from 'rollup-plugin-terser'
 import * as meta from './package.json'
 
 const copyright = `// ${meta.homepage} v${meta.version} Copyright ${(new Date()).getFullYear()} ${meta.author.name}`
+const name = meta.name.split('/')[1]
 
 export default [
   {
     input: 'index.js',
-    external: Object.keys(meta.dependencies || {}).filter(key => /^d3-/.test(key)),
-    output: {
-      file: 'dist/georeference.node.js',
-      format: 'cjs'
-    }
-  },
-  {
-    input: 'index.js',
     plugins: [
-
-    ],
-    output: {
-      extend: true,
-      banner: copyright,
-      file: 'dist/georeference.js',
-      format: 'umd',
-      indent: false,
-      name: 'georeference'
-    }
-  },
-  {
-    input: 'index.js',
-    plugins: [
-      node(),
+      nodeResolve(),
+      babel({
+        babelHelpers: 'bundled'
+      }),
       terser({output: {preamble: copyright}})
     ],
     output: {
-      extend: true,
-      file: 'dist/annotation.min.js',
+      file: `dist/${name}.min.js`,
+      banner: copyright,
       format: 'umd',
-      indent: false,
-      name: 'annotation'
+      name,
+      esModule: false,
+      exports: 'named',
+      sourcemap: true
     }
+  },
+  {
+    input: 'index.js',
+    plugins: [
+      nodeResolve()
+    ],
+    output: [
+      {
+        dir: 'dist/esm',
+        format: 'esm',
+        exports: 'named',
+        sourcemap: true
+      },
+      {
+        dir: 'dist/cjs',
+        format: 'cjs',
+        exports: 'named',
+        sourcemap: true
+      }
+    ]
   }
 ]
