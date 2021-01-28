@@ -1,20 +1,18 @@
 import nodeResolve from '@rollup/plugin-node-resolve'
-// import commonjs from '@rollup/plugin-commonjs'
-import buble from '@rollup/plugin-buble'
+import babel from '@rollup/plugin-babel'
 import {terser} from 'rollup-plugin-terser'
 import * as meta from './package.json'
 
 const copyright = `// ${meta.homepage} v${meta.version} Copyright ${(new Date()).getFullYear()} ${meta.author.name}`
-
-const name = 'annotation'
+const name = meta.name.split('/')[1]
 
 export default [
   {
     input: 'index.js',
     plugins: [
       nodeResolve(),
-      buble({
-        objectAssign: 'Object.assign'
+      babel({
+        babelHelpers: 'bundled'
       }),
       terser({output: {preamble: copyright}})
     ],
