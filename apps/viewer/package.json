@@ -19,6 +19,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "@allmaps/annotation": "^1.0.0-alpha.1",
     "ol": "^6.5.0",
     "query-string": "^6.13.8",
     "sirv-cli": "^1.0.0"
