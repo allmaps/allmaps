@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -9,6 +9,8 @@
   "description": "Functions for generating and parsing IIIF georeference annotations",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "unpkg": "dist/annotation.min.js",
+  "jsdelivr": "dist/annotation.min.js",
   "files": [
     "dist"
   ],

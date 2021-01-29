@@ -40,7 +40,7 @@ export default [
       },
       {
         dir: 'dist/cjs',
-        format: 'amd', // format: 'cjs',
+        format: 'cjs',
         exports: 'named',
         sourcemap: true
       }
