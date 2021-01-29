@@ -1,6 +1,8 @@
 <script>
+	import 'bulma/css/bulma.css'
+
 	import Header from './Header.svelte'
-	import Map from './Map.svelte'
+	import Tabs from './Tabs.svelte'
 
 	import { parse as parseAnnotation } from '@allmaps/annotation'
 
@@ -59,8 +61,7 @@
 		{#await parseUrlData(data)}
 			<p>Loading...</p>
 		{:then annotation}
-			<!-- TODO: check annotation! -->
-			<Map annotation={annotation} maps={parseAnnotation(annotation)} />
+			<Tabs annotation={annotation} maps={parseAnnotation(annotation)} />
 		{:catch error}
 			<p>An error occurred!</p>
 		{/await}
