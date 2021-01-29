@@ -24,10 +24,10 @@ body {
 }
 
 body, a, a:visited {
-	color: #333;
+	color: #000;
 }
 
-a {
+header a {
 	text-decoration: none;
 }
 

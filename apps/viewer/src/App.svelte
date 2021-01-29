@@ -1,39 +1,44 @@
 <script>
-	import 'bulma/css/bulma.css'
+	import { onMount } from 'svelte'
 
 	import Header from './Header.svelte'
 	import Tabs from './Tabs.svelte'
+	import Examples from './Examples.svelte'
 
 	import { parse as parseAnnotation } from '@allmaps/annotation'
 
 	const dataUrlPrefix = 'data:text/x-url,'
 	const dataJsonPrefix = 'data=data:application/json,'
 
-	let queryParams
+	let data
 
 	let annotationUrl = ''
 	let annotationString = ''
 
-	$: hash = location.hash.slice(1)
-	$: queryParams = new URLSearchParams(hash)
-	$: data = queryParams.get('data')
+	function getHash () {
+		return location.hash.slice(1)
+	}
 
-	function handleUrlSubmit () {
-		queryParams.set('data', dataUrlPrefix + encodeURIComponent(annotationUrl))
+	let hash = getHash()
 
-		history.replaceState(null, null, '#' + queryParams.toString())
-		window.dispatchEvent(new HashChangeEvent('hashchange'))
-
+	$: {
+		const queryParams = new URLSearchParams(hash)
 		data = queryParams.get('data')
 	}
 
-	function handleStringSubmit () {
-		queryParams.set('data', dataJsonPrefix + encodeURIComponent(annotationString))
-
+	function setDataHash (data) {
+		const queryParams = new URLSearchParams('')
+		queryParams.set('data', data)
 		history.replaceState(null, null, '#' + queryParams.toString())
 		window.dispatchEvent(new HashChangeEvent('hashchange'))
+	}
 
-		data = queryParams.get('data')
+	function handleUrlSubmit () {
+		setDataHash(dataUrlPrefix + encodeURIComponent(annotationUrl))
+	}
+
+	function handleStringSubmit () {
+		setDataHash(dataJsonPrefix + encodeURIComponent(annotationString))
 	}
 
 	async function fetchAnnotation (url) {
@@ -53,32 +58,48 @@
 			throw new Error('Unsupported!')
 		}
 	}
+
+	onMount(async () => {
+		window.addEventListener('hashchange', () => {
+			hash = getHash()
+		}, false);
+	})
 </script>
 
 <Header />
 <main>
 	{#if data}
 		{#await parseUrlData(data)}
-			<p>Loading...</p>
+			<div class="content">
+				<!-- TODO: centered  -->
+				<p>Loading…</p>
+			</div>
 		{:then annotation}
 			<Tabs annotation={annotation} maps={parseAnnotation(annotation)} />
 		{:catch error}
-			<p>An error occurred!</p>
+			<div class="content">
+				<!-- TODO: centered! Make Error component!  -->
+				<p>An error occurred!</p>
+			</div>
 		{/await}
 	{:else}
-		<form on:submit|preventDefault={handleUrlSubmit}>
-			<input bind:value="{annotationUrl}" name="url" placeholder="Annotation URL" autofocus />
-			<button disabled="{annotationUrl.length === 0}">Go</button>
-		</form>
-		<p>Or, paste an annotation in the text box:</p>
-		<form on:submit|preventDefault={handleStringSubmit}>
-			<textarea bind:value="{annotationString}"
-				autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-			<button disabled="{annotationString.length === 0}">Go</button>
-		</form>
-		<section>
-			<h2>Examples</h2>
-		</section>
+		<div class="content">
+			<p>Open a <a href="https://allmaps.org/about#annotations">
+				IIIF georeference annotation</a> from a URL:</p>
+			<form on:submit|preventDefault={handleUrlSubmit}>
+				<input bind:value="{annotationUrl}" name="url" placeholder="Annotation URL" autofocus />
+				<button disabled="{annotationUrl.length === 0}">View</button>
+			</form>
+			<p>Or, paste an annotation in the text box:</p>
+			<form on:submit|preventDefault={handleStringSubmit}>
+				<textarea bind:value="{annotationString}"
+					autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+				<button disabled="{annotationString.length === 0}">View</button>
+			</form>
+			<section>
+				<Examples />
+			</section>
+		</div>
 	{/if}
 </main>
 
@@ -86,5 +107,20 @@
 main {
 	padding: 0;
 	height: 100%;
+}
+
+.content {
+	padding: 0.5em;
+	margin: 0 auto;
+	max-width: 900px;
+}
+
+form input,
+form textarea {
+	width: 100%;
+}
+
+form textarea {
+	height: 10em;
 }
 </style>

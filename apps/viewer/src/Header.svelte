@@ -13,15 +13,21 @@
 
 <style scoped>
 header {
-  padding: 0.5rem;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  border-bottom-color: rgba(0, 0, 0, 0.5);
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  margin-bottom: 1px;
+
+  padding: 0.5em;
 }
 
 h1 {
-  font-size: 180%;
+  font-size: 100%;
   margin: 0;
 }
 
@@ -32,7 +38,7 @@ h1 a {
 }
 
 h1 a img {
-  width: 1.5em;
+  width: 1.8em;
 }
 
 h1 a span {
