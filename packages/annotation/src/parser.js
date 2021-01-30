@@ -16,7 +16,7 @@ function getImageBasename (annotation) {
 function getGcps (annotation) {
   return annotation.body.features
     .map((gcpFeature) => ({
-      image: gcpFeature.properties.pixel,
+      image: gcpFeature.properties.image,
       world: gcpFeature.geometry.coordinates
     }))
 }
