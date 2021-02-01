@@ -26,7 +26,5 @@ export function createTransformer (gcps) {
     ))
 
   const nOrder = 0
-  const hTransformArg = GDALCreateGCPTransformer(pasGCPs, nOrder, false)
-
-  return hTransformArg
+  return GDALCreateGCPTransformer(pasGCPs, nOrder, false)
 }
