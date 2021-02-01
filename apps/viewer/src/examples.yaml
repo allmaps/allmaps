@@ -14,7 +14,10 @@
   organization: National Library of Scotland
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/nls-10146-101465411.json
 
-
 - title: Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide
   organization: Library of Congress
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-88695674.json
+
+- title: Expugnatio Fortissimae Vibis Bredae Anno 1637 COLLBN Port 51 N 13
+  organization: Universiteit Leiden
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/leiden-2481595.json
