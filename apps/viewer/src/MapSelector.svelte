@@ -119,5 +119,7 @@ li a img {
 
 li a .sheet {
   padding: 0.5em;
+  font-weight: bold;
+  text-shadow: 0 0 2px white;
 }
 </style>

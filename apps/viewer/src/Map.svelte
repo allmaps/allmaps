@@ -92,8 +92,6 @@
       view: new View({
         minZoom: 10,
         maxZoom: 18,
-        center: fromLonLat([-71.0626, 42.3576]), // Boston
-        // center: fromLonLat([4.4617, 51.9152]), // Rotterdam
         zoom: 12
       })
     })

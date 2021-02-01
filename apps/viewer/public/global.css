@@ -28,6 +28,10 @@ body {
 	font-family: 'Roboto Mono', monospace;
 }
 
+.light {
+	font-weight: 300;
+}
+
 body, a, a:visited {
 	color: #000;
 }

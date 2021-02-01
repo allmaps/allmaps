@@ -84,7 +84,7 @@
 		{/await}
 	{:else}
 		<div class="content">
-			<p>Open a <a href="https://allmaps.org/about#annotations">
+			<p>Open a <a href="https://allmaps.org/#annotations">
 				IIIF georeference annotation</a> from a URL:</p>
 			<form on:submit|preventDefault={handleUrlSubmit}>
 				<input bind:value="{annotationUrl}" name="url" placeholder="Annotation URL" autofocus />

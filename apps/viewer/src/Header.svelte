@@ -13,7 +13,7 @@
       </span>
     </a>
   </h1>
-  <a href="https://allmaps.org">Go to allmaps.org</a>
+  <a class="light" href="https://allmaps.org">Go to allmaps.org</a>
 </header>
 
 <style scoped>
@@ -32,6 +32,7 @@ header {
 
 h1 {
   font-size: 100%;
+  font-weight: normal;
   margin: 0;
 }
 

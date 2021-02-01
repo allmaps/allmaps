@@ -11,7 +11,7 @@
 		<li>
 			<a href={`#data=data:text/x-url,${encodeURIComponent(example.url)}`}>
 				<span>{example.title}</span>
-			</a> <span class="organization">{example.organization}</span>
+			</a> <span class="light organization">{example.organization}</span>
 		</li>
 	{/each}
 </ul>
