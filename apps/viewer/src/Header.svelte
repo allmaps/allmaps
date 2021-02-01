@@ -7,7 +7,7 @@
   <h1>
     <a href="/">
       <img alt="Allmaps"
-        src="https://raw.githubusercontent.com/allmaps/style/master/allmaps-logo.svg" />
+        src="https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo.svg" />
       <span>
         Allmaps viewer
       </span>

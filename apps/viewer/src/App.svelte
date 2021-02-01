@@ -99,6 +99,12 @@
 			<section>
 				<Examples />
 			</section>
+			<footer>
+				<a href="https://bertspaan.nl">
+					<img alt="Made by Bert Spaan"
+					src="https://raw.githubusercontent.com/allmaps/style/master/images/bertspaan.svg" />
+				</a>
+			</footer>
 		</div>
 	{/if}
 </main>
@@ -128,5 +134,18 @@ form textarea {
 
 form > *:not(:last-child) {
 	margin-bottom: 0.5em;
+}
+
+footer {
+	padding-top: 4em;
+	padding-bottom: 1em;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+footer img {
+	margin: 1em;
+	width: 125px;
 }
 </style>
