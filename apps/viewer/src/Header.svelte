@@ -1,3 +1,8 @@
+<script>
+	import Banner from './Banner.svelte'
+</script>
+
+<Banner />
 <header>
   <h1>
     <a href="/">
@@ -21,7 +26,6 @@ header {
   border-bottom-color: rgba(0, 0, 0, 0.5);
   border-bottom-style: solid;
   border-bottom-width: 1px;
-  margin-bottom: 1px;
 
   padding: 0.5em;
 }

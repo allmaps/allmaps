@@ -92,7 +92,7 @@
 			</form>
 			<p>Or, paste an annotation in the text box:</p>
 			<form on:submit|preventDefault={handleStringSubmit}>
-				<textarea bind:value="{annotationString}"
+				<textarea bind:value="{annotationString}" class="monospace"
 					autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 				<button disabled="{annotationString.length === 0}">View</button>
 			</form>
@@ -105,8 +105,9 @@
 
 <style>
 main {
-	padding: 0;
-	height: 100%;
+	flex-grow: 1;
+	/* overflow: hidden; */
+	overflow: auto;
 }
 
 .content {
@@ -118,9 +119,14 @@ main {
 form input,
 form textarea {
 	width: 100%;
+	display: block;
 }
 
 form textarea {
 	height: 10em;
+}
+
+form > *:not(:last-child) {
+	margin-bottom: 0.5em;
 }
 </style>

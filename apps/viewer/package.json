@@ -30,7 +30,9 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-alpha.2",
+    "@allmaps/annotation": "^1.0.0-alpha.9",
+    "@allmaps/transform": "^1.0.0-alpha.3",
+    "@allmaps/layers": "^1.0.0-alpha.2",
     "ol": "^6.5.0",
     "sirv-cli": "^1.0.0"
   }

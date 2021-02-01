@@ -1,36 +1,32 @@
-<!-- <script>
-	import { onMount } from 'svelte'
+<script>
+  import { onMount } from 'svelte'
 
   import Map from 'ol/Map'
-  import View from 'ol/View'
-  import {Tile as TileLayer} from 'ol/layer'
-  import IIIF from 'ol/source/IIIF'
-  import IIIFInfo from 'ol/format/IIIFInfo'
+  import { IIIFLayer } from '@allmaps/layers'
 
-  export let annotation
+  export let map
 
+  let ol
   let iiifLayer
-  let iiifOl
 
-  function updateIiif (image) {
-    const options = new IIIFInfo(image).getTileSourceOptions()
-    if (options === undefined || options.version === undefined) {
-      throw new Error('Data seems to be no valid IIIF image information.')
+  $: updateMap(map)
+
+  async function updateMap (map) {
+    if (iiifLayer) {
+      ol.removeLayer(iiifLayer)
     }
 
-    options.zDirection = -1
-    const iiifTileSource = new IIIF(options)
-    iiifLayer.setSource(iiifTileSource)
+    if (ol) {
+      const imageUri = map.imageService['@id']
+      const image = await fetchImage(imageUri)
+      iiifLayer = new IIIFLayer(image)
+      ol.addLayer(iiifLayer)
 
-    const extent = iiifTileSource.getTileGrid().getExtent()
-
-    iiifOl.setView(new View({
-      resolutions: iiifTileSource.getTileGrid().getResolutions(),
-      extent,
-      constrainOnlyCenter: true
-    }))
-
-    iiifOl.getView().fit(iiifTileSource.getTileGrid().getExtent())
+      ol.setView(iiifLayer.getView())
+      ol.getView().fit(iiifLayer.getExtent(), {
+        padding: [25, 25, 25, 25]
+      })
+    }
   }
 
   async function fetchImage (imageUri) {
@@ -40,30 +36,21 @@
 	}
 
 	onMount(async () => {
-    let imageUri
-    if (annotation.type === 'Annotation') {
-      imageUri = annotation.target.source
-    } else if (annotation.type === 'AnnotationPage') {
-      imageUri = annotation.items[0].target.source
-    }
-
-    iiifLayer = new TileLayer()
-    iiifOl = new Map({
-      layers: [iiifLayer],
-      target: 'iiif'
+    ol = new Map({
+      layers: [],
+      target: 'ol'
     })
 
-    const image = await fetchImage(imageUri)
-    updateIiif(image)
-	})
+    updateMap(map)
+  })
 </script>
 
-<div id="iiif" class="iiif">
+<div id="ol">
 </div>
 
 <style>
-  .iiif {
-    width: 100vw;
-    height: 100vh;
-  }
-</style> -->
+#ol {
+  width: 100%;
+  height: 100%;
+}
+</style>

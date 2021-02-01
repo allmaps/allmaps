@@ -2,69 +2,111 @@
 	import { onMount } from 'svelte'
 
   import Map from 'ol/Map'
+  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
+  import { OSM, Vector as VectorSource } from 'ol/source'
+  import { Fill, Stroke, Style } from 'ol/style'
+  import {GeoJSON} from 'ol/format'
+  import XYZ from 'ol/source/XYZ'
   import View from 'ol/View'
-  import {Tile as TileLayer} from 'ol/layer'
-  import IIIF from 'ol/source/IIIF'
-  import IIIFInfo from 'ol/format/IIIFInfo'
+  import { fromLonLat } from 'ol/proj'
 
-  export let annotation
-  export let maps
+  import { WarpedMapLayer } from '@allmaps/layers'
+  import { createTransformer, toWorld } from '@allmaps/transform'
 
-  let iiifLayer
-  let iiifOl
+  export let map
 
-  function updateIiif (image) {
-    const options = new IIIFInfo(image).getTileSourceOptions()
-    if (options === undefined || options.version === undefined) {
-      throw new Error('Data seems to be no valid IIIF image information.')
+  let ol
+  let warpedMapLayer
+
+  let vectorSource
+  let vectorLayer
+
+  $: updateMap(map)
+
+  async function updateMap (map) {
+    if (warpedMapLayer) {
+      ol.removeLayer(warpedMapLayer)
     }
 
-    options.zDirection = -1
-    const iiifTileSource = new IIIF(options)
-    iiifLayer.setSource(iiifTileSource)
+    if (ol) {
+      vectorSource.clear()
 
-    const extent = iiifTileSource.getTileGrid().getExtent()
+      const transformArgs = createTransformer(map.gcps)
+      const polygon = map.pixelMask.map((point) => toWorld(transformArgs, point))
+      const geoMask = {
+        type: 'Polygon',
+        coordinates: [polygon]
+      }
 
-    iiifOl.setView(new View({
-      resolutions: iiifTileSource.getTileGrid().getResolutions(),
-      extent,
-      constrainOnlyCenter: true
-    }))
+      vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
 
-    iiifOl.getView().fit(iiifTileSource.getTileGrid().getExtent())
+      const imageUri = map.imageService['@id']
+      const image = await fetchImage(imageUri)
+      const options = {
+        image,
+        georeferencedMap: map
+      }
+      warpedMapLayer = new WarpedMapLayer(options)
+      ol.addLayer(warpedMapLayer)
+
+      const extent = vectorSource.getExtent()
+
+      ol.getView().fit(extent, {
+        padding: [25, 25, 25, 25],
+        maxZoom: 18
+      })
+    }
   }
 
   async function fetchImage (imageUri) {
 		const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image
-	}
+  }
 
 	onMount(async () => {
-    let imageUri
-
-    if (annotation.type === 'Annotation') {
-      imageUri = annotation.target.service[0]['@id']
-    } else if (annotation.type === 'AnnotationPage') {
-      imageUri = annotation.items[0].target.service[0]['@id']
-    }
-
-    iiifLayer = new TileLayer()
-    iiifOl = new Map({
-      layers: [iiifLayer],
-      target: 'iiif'
+    // https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png
+    const baseLayer = new TileLayer({
+      // source: new OSM()
+      source: new XYZ({
+        url: 'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png'
+      })
     })
 
-    const image = await fetchImage(imageUri)
-    updateIiif(image)
+    vectorSource = new VectorSource()
+    vectorLayer = new VectorLayer({
+      source: vectorSource,
+      style: new Style({
+        stroke: new Stroke({
+          color: 'rgb(248, 193, 79)',
+          width: 3
+        })
+      })
+    })
+
+    vectorLayer.setZIndex(100)
+
+    ol = new Map({
+      layers: [baseLayer, vectorLayer],
+      target: 'ol',
+      view: new View({
+        minZoom: 10,
+        maxZoom: 18,
+        center: fromLonLat([-71.0626, 42.3576]), // Boston
+        // center: fromLonLat([4.4617, 51.9152]), // Rotterdam
+        zoom: 12
+      })
+    })
+
+    updateMap(map)
 	})
 </script>
 
-<div id="iiif" class="iiif">
+<div id="ol">
 </div>
 
 <style>
-  .iiif {
+  #ol {
     width: 100%;
     height: 100%;
   }

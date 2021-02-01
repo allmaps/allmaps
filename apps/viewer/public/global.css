@@ -21,6 +21,11 @@ body {
 	flex-direction: column;
 
 	font-size: 18px;
+	overflow: hidden;
+}
+
+.monospace {
+	font-family: 'Roboto Mono', monospace;
 }
 
 body, a, a:visited {
@@ -42,9 +47,8 @@ pre code {
 input, button, select, textarea {
 	font-family: inherit;
 	font-size: inherit;
-	-webkit-padding: 0.4em 0;
-	padding: 0.4em;
-	margin: 0 0 0.5em 0;
+	padding: 0.5em;
+	margin: 0;
 	box-sizing: border-box;
 	border: 1px solid #ccc;
 	border-radius: 2px;
