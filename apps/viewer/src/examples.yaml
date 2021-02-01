@@ -14,6 +14,10 @@
   organization: National Library of Scotland
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/nls-10146-101465411.json
 
+- title: "Cornwall LXXIV.NW (includes: Madron; Paul; Penzance.)"
+  organization: National Library of Scotland
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/nls-10143-101439530.json
+
 - title: Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide
   organization: Library of Congress
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-88695674.json
