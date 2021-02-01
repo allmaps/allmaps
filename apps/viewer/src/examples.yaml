@@ -1,5 +1,20 @@
-- title: Leventhal Map & Education Center
+- title: Atlas of the city of Boston, West Roxbury
+  organization: Leventhal Map & Education Center
   url: https://raw.githubusercontent.com/allmaps/lmec/master/annotation.json
 
-- title: Rotterdams Publiek
+- title: "Plattegrond van Rotterdam in 12 bladen: Blad 5"
+  organization: Stadsarchief Rotterdam
   url: https://raw.githubusercontent.com/bertspaan/rotterdams-publiek/master/annotations/NL-RtSA_4201_I-138-02-5.json
+
+- title: Antwerp
+  organization: Digital Commonwealth - Massachusetts Collections Online
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/commonwealth-0z709594h.json
+
+- title: "Kent II.NW (includes: Borough Of Greenwich; Borough Of Woolwich; East Ham; West Ham.)"
+  organization: National Library of Scotland
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/nls-10146-101465411.json
+
+
+- title: Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide
+  organization: Library of Congress
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-88695674.json

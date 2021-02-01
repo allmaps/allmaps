@@ -8,8 +8,21 @@
 
 <ul>
 	{#each examples as example}
-		<li><a href={`#data=data:text/x-url,${encodeURIComponent(example.url)}`}>
-			{example.title}
-		</a></li>
+		<li>
+			<a href={`#data=data:text/x-url,${encodeURIComponent(example.url)}`}>
+				<span>{example.title}</span>
+			</a> <span class="organization">{example.organization}</span>
+		</li>
 	{/each}
 </ul>
+
+<style scoped>
+li {
+	margin-bottom: 0.5em;
+}
+
+.organization {
+	color: #aaa;
+	text-decoration: none;
+}
+</style>
