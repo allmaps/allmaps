@@ -66,8 +66,8 @@
       <a role="button" href="#"
         class="{selectedMap === index ? 'selected' : ''}"
         on:click|preventDefault={() => setSelectedMap(index)}>
-        <img alt={`Sheet ${index + 1}`} src={thumbnailUrl(map)} />
-        <span class="sheet">{index + 1}</span>
+        <img alt={`Map ${index + 1}`} src={thumbnailUrl(map)} />
+        <span class="index">{index + 1}</span>
 		  </a>
     </li>
 	{/each}
@@ -117,7 +117,7 @@ li a img {
   object-fit: cover;
 }
 
-li a .sheet {
+li a .index {
   padding: 0.5em;
   text-shadow: 0 0 2px white;
 }
