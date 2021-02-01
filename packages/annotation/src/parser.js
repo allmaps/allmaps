@@ -33,6 +33,10 @@ function getImageSize (annotation) {
   }
 }
 
+function getImageService (annotation) {
+  return annotation?.target?.service?.[0]
+}
+
 function getPixelMask (annotation) {
   const selector = annotation.target.selector
   if (selector) {
@@ -46,6 +50,7 @@ function getMap (annotation) {
   return {
     id: annotation['@id'],
     source: getSource(annotation),
+    imageService: getImageService(annotation),
     imageSize: getImageSize(annotation),
     pixelMask: getPixelMask(annotation),
     gcps: getGcps(annotation)
