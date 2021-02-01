@@ -146,6 +146,6 @@ footer {
 
 footer img {
 	margin: 1em;
-	width: 125px;
+	width: 128px;
 }
 </style>

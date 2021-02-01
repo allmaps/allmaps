@@ -90,6 +90,7 @@
       layers: [baseLayer, vectorLayer],
       target: 'ol',
       view: new View({
+        enableRotation: false,
         minZoom: 8,
         maxZoom: 18,
         zoom: 12
