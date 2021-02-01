@@ -18,6 +18,10 @@
   organization: Library of Congress
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-88695674.json
 
-- title: Expugnatio Fortissimae Vibis Bredae Anno 1637 COLLBN Port 51 N 13
+- title: Expugnatio Fortissimae Vibis Bredae Anno 1637
   organization: Universiteit Leiden
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/leiden-2481595.json
+
+- title: New York Central and Hudson River Railroad
+  organization: Library of Congress
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-98688736.json
