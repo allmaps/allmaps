@@ -140,9 +140,4 @@ footer {
 	flex-direction: column;
 	align-items: center;
 }
-
-footer img {
-	margin: 1em;
-	width: 128px;
-}
 </style>
