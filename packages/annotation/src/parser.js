@@ -34,7 +34,8 @@ function getImageSize (annotation) {
 }
 
 function getImageService (annotation) {
-  return annotation?.target?.service?.[0]
+  return annotation.target && annotation.target.service
+    && annotation.target.service[0]
 }
 
 function getPixelMask (annotation) {
