@@ -4,6 +4,7 @@
 	import Header from './Header.svelte'
 	import Tabs from './Tabs.svelte'
 	import Examples from './Examples.svelte'
+	import BertSpaan from './BertSpaan.svelte'
 
 	import { parse as parseAnnotation } from '@allmaps/annotation'
 
@@ -100,10 +101,7 @@
 				<Examples />
 			</section>
 			<footer>
-				<a href="https://bertspaan.nl">
-					<img alt="Made by Bert Spaan"
-					src="https://raw.githubusercontent.com/allmaps/style/master/images/bertspaan.svg" />
-				</a>
+				<BertSpaan />
 			</footer>
 		</div>
 	{/if}
@@ -112,7 +110,6 @@
 <style>
 main {
 	flex-grow: 1;
-	/* overflow: hidden; */
 	overflow: auto;
 }
 
