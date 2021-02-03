@@ -1,5 +1,5 @@
 <script>
-  export let width = '150px'
+  export let width = '112.5px'
 </script>
 
 <!-- Made with: -->
@@ -20,6 +20,8 @@
 
 <style scoped>
 .grid-container {
+  font-size: 75%;
+
   text-decoration: none;
   text-transform: uppercase;
   font-weight: bold;
