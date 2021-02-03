@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte'
+  import { onMount } from 'svelte'
 
   import Map from 'ol/Map'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
@@ -59,12 +59,12 @@
   }
 
   async function fetchImage (imageUri) {
-		const response = await fetch(`${imageUri}/info.json`)
+    const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image
   }
 
-	onMount(async () => {
+  onMount(async () => {
     // https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png
     const baseLayer = new TileLayer({
       // source: new OSM()
@@ -98,7 +98,7 @@
     })
 
     updateMap(map)
-	})
+  })
 </script>
 
 <div id="ol">

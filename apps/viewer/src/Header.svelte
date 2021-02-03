@@ -1,5 +1,5 @@
 <script>
-	import Banner from './Banner.svelte'
+  import Banner from './Banner.svelte'
 </script>
 
 <Banner />

@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
 
   export let maps
   export let selectedMap
@@ -61,16 +61,16 @@
 </script>
 
 <ol bind:this={list}>
-	{#each maps as map, index}
-		<li>
+  {#each maps as map, index}
+    <li>
       <a role="button" href="#"
         class="{selectedMap === index ? 'selected' : ''}"
         on:click|preventDefault={() => setSelectedMap(index)}>
         <img alt={`Map ${index + 1}`} src={thumbnailUrl(map)} />
         <span class="index">{index + 1}</span>
-		  </a>
+      </a>
     </li>
-	{/each}
+  {/each}
 </ol>
 
 <style>

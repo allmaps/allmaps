@@ -30,12 +30,12 @@
   }
 
   async function fetchImage (imageUri) {
-		const response = await fetch(`${imageUri}/info.json`)
+    const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image
-	}
+  }
 
-	onMount(async () => {
+  onMount(async () => {
     ol = new Map({
       layers: [],
       target: 'ol'

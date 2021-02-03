@@ -1,3 +1,3 @@
-# allmaps viewer
+# Allmaps Viewer
 
 https://viewer.allmaps.org
