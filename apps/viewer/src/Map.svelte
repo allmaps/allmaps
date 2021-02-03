@@ -92,7 +92,7 @@
       view: new View({
         enableRotation: false,
         minZoom: 8,
-        maxZoom: 18,
+        maxZoom: 20,
         zoom: 12
       })
     })
