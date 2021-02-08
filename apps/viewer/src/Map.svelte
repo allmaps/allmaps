@@ -89,9 +89,10 @@
     ol = new Map({
       layers: [baseLayer, vectorLayer],
       target: 'ol',
+      // controls: [],
       view: new View({
         enableRotation: false,
-        minZoom: 8,
+        minZoom: 6,
         maxZoom: 20,
         zoom: 12
       })

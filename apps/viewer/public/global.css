@@ -21,6 +21,7 @@ body {
 	flex-direction: column;
 
 	font-size: 18px;
+	line-height: 1.4;
 	overflow: hidden;
 }
 

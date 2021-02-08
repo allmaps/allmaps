@@ -38,6 +38,7 @@
   onMount(async () => {
     ol = new Map({
       layers: [],
+      // controls: [],
       target: 'ol'
     })
 
