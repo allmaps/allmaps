@@ -30,7 +30,7 @@
   function setDataHash (data) {
     const queryParams = new URLSearchParams('')
     queryParams.set('data', data)
-    history.replaceState(null, null, '#' + queryParams.toString())
+    history.pushState(null, null, '#' + queryParams.toString())
     window.dispatchEvent(new HashChangeEvent('hashchange'))
   }
 
