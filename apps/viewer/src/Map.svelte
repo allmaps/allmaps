@@ -3,7 +3,7 @@
 
   import Map from 'ol/Map'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
-  import { OSM, Vector as VectorSource } from 'ol/source'
+  import { Vector as VectorSource } from 'ol/source'
   import { Fill, Stroke, Style } from 'ol/style'
   import {GeoJSON} from 'ol/format'
   import XYZ from 'ol/source/XYZ'
@@ -52,7 +52,8 @@
       const extent = vectorSource.getExtent()
 
       ol.getView().fit(extent, {
-        padding: [25, 25, 25, 25],
+        // TODO: move to settings file
+        padding: [10, 10, 10, 10],
         maxZoom: 18
       })
     }
@@ -67,7 +68,6 @@
   onMount(async () => {
     // https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png
     const baseLayer = new TileLayer({
-      // source: new OSM()
       source: new XYZ({
         url: 'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png'
       })
