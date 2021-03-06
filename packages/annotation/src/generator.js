@@ -9,7 +9,7 @@ function createMapAnnotation (map) {
   // TODO: create library function, and check what
   //  quality/format is available in resource
   const sourceSuffix = '/full/full/0/default.jpg'
-  const source = `${map.imageServiceId}${sourceSuffix}`
+  const source = `${map.image.uri}${sourceSuffix}`
 
   let body
   if (map.gcps) {
@@ -17,13 +17,14 @@ function createMapAnnotation (map) {
       type: 'FeatureCollection',
       features: map.gcps.map((gcp) => ({
         type: 'Feature',
+        id: gcp.id,
         properties: {
-          image: gcp.image
+          image: gcp.image || null
         },
-        geometry: {
+        geometry: gcp.world ? {
           type: 'Point',
           coordinates: gcp.world
-        }
+        } : null
       }))
     }
   }
@@ -33,7 +34,7 @@ function createMapAnnotation (map) {
     source,
     service: [
       {
-        '@id': map.imageServiceId,
+        '@id': map.image.uri,
         // TODO: always 2?
         // or can we omit the type?
         type: 'ImageService2',
@@ -45,12 +46,11 @@ function createMapAnnotation (map) {
   if (map.pixelMask) {
     target = {
       ...target,
-      selector: svgSelector(map.imageDimensions, map.pixelMask)
+      selector: svgSelector(map.image.dimensions, map.pixelMask)
     }
   }
 
   return {
-    // '@id': `https://data.allmaps.org/annotations/i/${image.id}/m/${map.id}`,
     type: 'Annotation',
     '@context': [
       'http://geojson.org/geojson-ld/geojson-context.jsonld',

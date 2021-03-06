@@ -2,26 +2,27 @@ function getSource (annotation) {
   return annotation.target.source || annotation.target
 }
 
-function getImageBasename (annotation) {
-  const source = getSource(annotation)
-  const imageId = source.split('/').slice(-1)[0]
+// function getImageBasename (annotation) {
+//   const source = getSource(annotation)
+//   const imageId = source.split('/').slice(-1)[0]
 
-  if (!imageId) {
-    throw new Error(`Couldn't find image id for image: ${source}`)
-  }
+//   if (!imageId) {
+//     throw new Error(`Couldn't find image id for image: ${source}`)
+//   }
 
-  return imageId
-}
+//   return imageId
+// }
 
 function getGcps (annotation) {
   return annotation.body.features
     .map((gcpFeature) => ({
-      image: gcpFeature.properties.image,
-      world: gcpFeature.geometry.coordinates
+      id: gcpFeature.id,
+      image: gcpFeature.properties.image || null,
+      world: gcpFeature.geometry ? gcpFeature.geometry.coordinates : null
     }))
 }
 
-function getImageSize (annotation) {
+function getImageDimensions (annotation) {
   const selector = annotation.target.selector
   if (selector) {
     const svg = selector.value
@@ -33,7 +34,7 @@ function getImageSize (annotation) {
   }
 }
 
-function getImageService (annotation) {
+function getImageUri (annotation) {
   return annotation.target && annotation.target.service
     && annotation.target.service[0]
 }
@@ -51,8 +52,10 @@ function getMap (annotation) {
   return {
     id: annotation['@id'],
     source: getSource(annotation),
-    imageService: getImageService(annotation),
-    imageSize: getImageSize(annotation),
+    image: {
+      uri: getImageUri(annotation),
+      dimensions: getImageDimensions(annotation),
+    },
     pixelMask: getPixelMask(annotation),
     gcps: getGcps(annotation)
   }
