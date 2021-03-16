@@ -19,9 +19,13 @@
 
 <div class="container">
   {#if tab === 'map'}
-    <Map map={map} />
+    <div class="ol-container">
+      <Map map={map} />
+    </div>
   {:else if tab === 'iiif'}
-    <IIIF map={map} />
+    <div class="ol-container">
+      <IIIF map={map} />
+    </div>
   {:else if tab === 'annotation'}
     <Annotation annotation={annotation} />
   {/if}
@@ -44,6 +48,7 @@
 <style scoped>
 .container {
   height: 100%;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -71,5 +76,11 @@ ol {
   margin: 0;
   display: flex;
   justify-content: center;
+}
+
+.ol-container {
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
 }
 </style>
