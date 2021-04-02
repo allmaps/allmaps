@@ -9,7 +9,7 @@
   import { parse as parseAnnotation } from '@allmaps/annotation'
 
   const dataUrlPrefix = 'data:text/x-url,'
-  const dataJsonPrefix = 'data=data:application/json,'
+  const dataJsonPrefix = 'data:application/json,'
 
   let data
 
@@ -35,11 +35,11 @@
   }
 
   function handleUrlSubmit () {
-    setDataHash(dataUrlPrefix + encodeURIComponent(annotationUrl))
+    setDataHash(dataUrlPrefix + annotationUrl)
   }
 
   function handleStringSubmit () {
-    setDataHash(dataJsonPrefix + encodeURIComponent(annotationString))
+    setDataHash(dataJsonPrefix + annotationString)
   }
 
   async function fetchAnnotation (url) {
@@ -50,10 +50,10 @@
 
   async function parseUrlData (data) {
     if (data.startsWith(dataUrlPrefix)) {
-      const url = decodeURIComponent(data.replace(dataUrlPrefix, ''))
+      const url = data.replace(dataUrlPrefix, '')
       return fetchAnnotation(url)
     } else if (data.startsWith(dataJsonPrefix)) {
-      const annotation = JSON.parse(decodeURIComponent(data.replace(dataJsonPrefix, '')))
+      const annotation = JSON.parse(data.replace(dataJsonPrefix, ''))
       return annotation
     } else {
       throw new Error('Unsupported!')
