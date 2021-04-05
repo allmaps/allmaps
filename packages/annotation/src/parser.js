@@ -35,8 +35,9 @@ function getImageDimensions (annotation) {
 }
 
 function getImageUri (annotation) {
+  // TODO: error if undefined
   return annotation.target && annotation.target.service
-    && annotation.target.service[0]
+    && annotation.target.service[0] && annotation.target.service[0]['@id']
 }
 
 function getPixelMask (annotation) {
