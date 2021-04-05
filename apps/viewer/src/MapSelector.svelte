@@ -22,7 +22,7 @@
   }
 
   function thumbnailUrl (map) {
-    const imageUri = map.imageService['@id']
+    const imageUri = map.image.uri
     return `${imageUri}/full/100,100/0/default.jpg`
   }
 
@@ -60,21 +60,21 @@
   })
 </script>
 
-<ol bind:this={list}>
+<ol bind:this={list} class="maps">
   {#each maps as map, index}
-    <li>
-      <a role="button" href="#"
+    <li class="map">
+      <button
         class="{selectedMap === index ? 'selected' : ''}"
         on:click|preventDefault={() => setSelectedMap(index)}>
         <img alt={`Map ${index + 1}`} src={thumbnailUrl(map)} />
         <span class="index">{index + 1}</span>
-      </a>
+      </button>
     </li>
   {/each}
 </ol>
 
 <style>
-ol {
+.maps {
   list-style-type: none;
   display: flex;
   flex-direction: row;
@@ -84,7 +84,7 @@ ol {
   flex-shrink: 0;
 }
 
-li {
+.maps .map {
   margin: 5px;
   padding: 0;
   height: 100px;
@@ -92,32 +92,35 @@ li {
   flex-shrink: 0;
 }
 
-li a {
+.maps .map button {
   cursor: pointer;
   width: 100%;
   height: 100%;
   display: inline-block;
   position: relative;
 
+  border: none;
+  background: none;
 }
 
-li a.selected {
+.maps .map button.selected {
   border-style: solid;
   border-width: 2px;
 }
 
-li a > * {
+.maps .map button > * {
   top: 0;
+  left: 0;
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
-li a img {
+.maps .map button img {
   object-fit: cover;
 }
 
-li a .index {
+.maps .map button .index {
   padding: 0.5em;
   text-shadow: 0 0 2px white;
 }

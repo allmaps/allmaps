@@ -80,3 +80,17 @@ button:not(:disabled):active {
 button:focus {
 	border-color: #666;
 }
+
+.zoom-controls-bottom-left .ol-zoom {
+  top: auto;
+  bottom: .5em;
+  left: .5em;
+  right: auto;
+}
+
+.zoom-controls-bottom-right .ol-zoom {
+  top: auto;
+  bottom: .5em;
+  left: auto;
+  right: .5em;
+}

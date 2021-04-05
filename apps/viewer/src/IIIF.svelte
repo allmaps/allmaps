@@ -17,7 +17,7 @@
     }
 
     if (ol) {
-      const imageUri = map.imageService['@id']
+      const imageUri = map.image.uri
       const image = await fetchImage(imageUri)
       iiifLayer = new IIIFLayer(image)
       ol.addLayer(iiifLayer)
@@ -46,7 +46,7 @@
   })
 </script>
 
-<div id="ol">
+<div id="ol" class="zoom-controls-bottom-left">
 </div>
 
 <style>

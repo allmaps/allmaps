@@ -1,8 +1,9 @@
 <script>
   import { onMount } from 'svelte'
 
+  import Banner from './Banner.svelte'
   import Header from './Header.svelte'
-  import Tabs from './Tabs.svelte'
+  import Maps from './Maps.svelte'
   import Examples from './Examples.svelte'
   import BertSpaan from './BertSpaan.svelte'
 
@@ -11,6 +12,7 @@
   const dataUrlPrefix = 'data:text/x-url,'
   const dataJsonPrefix = 'data:application/json,'
 
+  let type
   let data
 
   let annotationUrl = ''
@@ -25,6 +27,7 @@
   $: {
     const queryParams = new URLSearchParams(hash)
     data = queryParams.get('data')
+    type = queryParams.get('type')
   }
 
   function setDataHash (data) {
@@ -56,19 +59,29 @@
       const annotation = JSON.parse(data.replace(dataJsonPrefix, ''))
       return annotation
     } else {
-      throw new Error('Unsupported!')
+      throw new Error(`Unsupported URL`)
     }
   }
 
   onMount(async () => {
     window.addEventListener('hashchange', () => {
       hash = getHash()
-    }, false);
+    }, false)
   })
 </script>
 
-<Header />
+<svelte:head>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css"
+  />
+  <link rel='stylesheet' href='/global.css'>
+</svelte:head>
+
+<Banner />
 <main>
+  <Header inline={!data} />
   {#if data}
     {#await parseUrlData(data)}
       <div class="content">
@@ -76,11 +89,12 @@
         <p>Loading…</p>
       </div>
     {:then annotation}
-      <Tabs annotation={annotation} maps={parseAnnotation(annotation)} />
+      <Maps maps={parseAnnotation(annotation)} />
     {:catch error}
       <div class="content">
         <!-- TODO: centered! Make Error component!  -->
         <p>An error occurred!</p>
+        <p><code>{ error.message }</code></p>
       </div>
     {/await}
   {:else}
@@ -113,6 +127,7 @@ main {
   overflow: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .content {

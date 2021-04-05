@@ -1,19 +1,19 @@
 <script>
-  import Banner from './Banner.svelte'
+  export let inline = false
 </script>
 
-<Banner />
-<header>
+<header class:absolute="{!inline}">
   <h1>
     <a href="/">
       <img alt="Allmaps"
         src="https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo.svg" />
+      {#if inline}
       <span>
         Allmaps viewer
       </span>
+      {/if}
     </a>
   </h1>
-  <a class="light" href="https://allmaps.org">Go to allmaps.org</a>
 </header>
 
 <style scoped>
@@ -23,11 +23,13 @@ header {
   align-items: center;
   justify-content: space-between;
 
-  border-bottom-color: rgba(0, 0, 0, 0.5);
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-
   padding: 0.5em;
+}
+
+.absolute {
+  z-index: 35;
+  top: 0;
+  position: absolute;
 }
 
 h1 {
@@ -43,7 +45,7 @@ h1 a {
 }
 
 h1 a img {
-  width: 1.8em;
+  width: 40px;
 }
 
 h1 a span {
