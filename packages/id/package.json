@@ -1,17 +1,14 @@
 {
-  "name": "perma",
+  "name": "@allmaps/id",
   "version": "2.0.1",
-  "description": "generate permalink (permanent link) urls for your web pages ",
+  "description": "IDs for Allmaps",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/.bin/istanbul cover ./node_modules/tape/bin/tape ./test/*.js | node_modules/tap-spec/bin/cmd.js",
-    "codeclimate": "CODECLIMATE_REPO_TOKEN=d35f23a33911412b3147e358a55dcf890ec44781462b3a5ac0ad31b505bb4511 ./node_modules/codeclimate-test-reporter/bin/codeclimate.js < ./coverage/lcov.info",
-    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/tape/bin/tape ./test/*.js && ./node_modules/.bin/istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
-    "jshint": "./node_modules/jshint/bin/jshint -c .jshintrc --exclude-path .gitignore ."
+    "test": "node ./node_modules/tape/bin/tape ./test/*.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nelsonic/perma.git"
+    "url": "https://github.com/allmaps/id.git"
   },
   "keywords": [
     "permalink",
@@ -23,20 +20,10 @@
   "author": "@nelsonic <contact.nelsonic@gmail.com> (https://github.com/nelsonic)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nelsonic/perma/issues"
+    "url": "https://github.com/allmaps/id/issues"
   },
-  "homepage": "https://github.com/nelsonic/perma",
+  "homepage": "https://github.com/allmaps/id",
   "devDependencies": {
-    "codeclimate-test-reporter": "0.0.4",
-    "istanbul": "^0.3.4",
-    "jshint": "^2.5.10",
-    "pre-commit": "0.0.9",
-    "tap-spec": "^2.2.1",
-    "tape": "^3.5.0"
-  },
-  "pre-commit": [
-    "jshint",
-    "coverage",
-    "codeclimate"
-  ]
+    "tape": "^5.2.2"
+  }
 }
