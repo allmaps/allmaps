@@ -64,7 +64,7 @@
   padding: 0.5em;
 }
 
-.tabs li {
+.tabs li a {
   background: white;
 }
 
