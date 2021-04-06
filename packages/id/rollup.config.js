@@ -27,9 +27,11 @@ export default [
     }
   },
   {
-    input: 'index.js',
+    input: 'web.js',
     plugins: [
-      nodeResolve()
+      nodeResolve({
+        browser: true
+      })
     ],
     output: [
       {

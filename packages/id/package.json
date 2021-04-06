@@ -1,9 +1,9 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "IDs for Allmaps",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/cjs/web.js",
+  "module": "dist/esm/web.js",
   "unpkg": "dist/id.min.js",
   "jsdelivr": "dist/id.min.js",
   "scripts": {
