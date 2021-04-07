@@ -1,20 +1,21 @@
-const id = require('../index')
-const test = require('tape')
+import test from 'tape'
 
-test('Create id for url: 1234', (t) => {
-  const str = id(1234)
-  t.equal(str.length, 16, 'Worked as expected ' + str)
-  t.equal(str, '1ARVn2Auq2WAqx2g', 'id is consistent. 1234 >> 1ARVn2Auq2WAqx2g')
+import { createId, createChecksum } from '../nodejs.js'
+
+test('Create id for url: 1234', async (t) => {
+  const id = await createId(1234)
+  t.equal(id.length, 16, 'Worked as expected ' + id)
+  t.equal(id, '1ARVn2Auq2WAqx2g', 'id is consistent. 1234 >> 1ARVn2Auq2WAqx2g')
   t.end()
 })
 
-test('Confirm string characters are in allowed chars', (t) => {
+test('Confirm string characters are in allowed chars', async (t) => {
   const charSet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789'
-  const str = id(Math.random())
-  console.log('Our Random string is: ' + str)
+  const id = await createId(Math.random())
+  console.log('Our Random string is: ' + id)
 
   let char
-  str.split('').map((c) => {
+  id.split('').map((c) => {
     char = c
   })
 
@@ -22,8 +23,36 @@ test('Confirm string characters are in allowed chars', (t) => {
   t.end()
 })
 
-test('Full Length Hash', (t) => {
-  const hash = id('RandomGobbledygook', 50)
-  t.true(hash.length > 20, 'Full Length is ' + hash)
+test('Full Length Hash', async (t) => {
+  const id = await createId('qwertyuiopasdfghjklzxcvbnm', 50)
+  t.true(id.length > 20, 'Full Length is ' + id)
   t.end()
 })
+
+const obj1 = {
+  a: 1,
+  b: 2,
+  c: [1, 2, 3, 4, 5]
+}
+
+const obj2 = {
+  c: [1, 2, 3, 4, 5],
+  b: 2,
+  a: 1
+}
+
+test('Object checksum', async (t) => {
+  const checksum = await createChecksum(obj1)
+  t.equal(checksum.length, 16, 'Worked as expected ' + checksum)
+  t.equal(checksum, 'f2XwC5sWfSCWd9mJ', 'checksum is correct')
+  t.end()
+})
+
+
+test('Semantically equal objects produce equal checksums', async (t) => {
+  const checksum1 = await createChecksum(obj1)
+  const checksum2 = await createChecksum(obj2)
+  t.equal(checksum1, checksum2, 'checksums are equal')
+  t.end()
+})
+

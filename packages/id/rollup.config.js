@@ -8,7 +8,7 @@ const name = meta.name.split('/')[1]
 
 export default [
   {
-    input: 'index.js',
+    input: 'nodejs.js',
     plugins: [
       nodeResolve(),
       babel({

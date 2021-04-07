@@ -1,7 +1,8 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "IDs for Allmaps",
+  "type": "module",
   "main": "dist/cjs/web.js",
   "module": "dist/esm/web.js",
   "unpkg": "dist/id.min.js",
@@ -9,7 +10,7 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "node ./node_modules/tape/bin/tape ./test/*.js"
+    "test": "node ./test/*.js"
   },
   "repository": {
     "type": "git",

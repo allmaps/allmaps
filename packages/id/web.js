@@ -1,3 +1,7 @@
+/* global crypto, TextEncoder, btoa */
+
+import { hashToId, serialize } from './src/id'
+
 function sha512 (str) {
   return crypto.subtle.digest('SHA-512', new TextEncoder('utf-8').encode(str))
 }
@@ -6,11 +10,18 @@ function toBase64 (buffer) {
   return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
 }
 
-export default async function generateId (str) {
-  const hash = await sha512(str)
+async function createBase64Hash (str) {
+  const hash = await sha512(String(str))
     .then(toBase64)
-
   return hash
-    .replace(/[Il0oO=\/\+]/g, '')
-    .substring(0, 16)
+}
+
+export async function createId (str, length) {
+  const hash = await createBase64Hash(str)
+  return hashToId(hash, length)
+}
+
+export async function createChecksum (obj, length) {
+  const hash = await createBase64Hash(serialize(obj))
+  return hashToId(hash, length)
 }
