@@ -1,8 +1,8 @@
 import test from 'tape'
 
-import { createId, createChecksum } from '../nodejs.js'
+import { createId, createRandomId, createChecksum } from '../nodejs.js'
 
-test('Create id for url: 1234', async (t) => {
+test('Create ID for url: 1234', async (t) => {
   const id = await createId(1234)
   t.equal(id.length, 16, 'Worked as expected ' + id)
   t.equal(id, '1ARVn2Auq2WAqx2g', 'id is consistent. 1234 >> 1ARVn2Auq2WAqx2g')
@@ -20,6 +20,14 @@ test('Confirm string characters are in allowed chars', async (t) => {
   })
 
   t.true(charSet.indexOf(char) > -1, char + ' is in charSet: ' + charSet)
+  t.end()
+})
+
+test('Create random IDs', async (t) => {
+  const id1 = await createRandomId()
+  const id2 = await createRandomId()
+  t.equal(id1.length, 16, 'Worked as expected ' + id1)
+  t.notEqual(id1, id2, 'IDs are different')
   t.end()
 })
 
@@ -48,11 +56,9 @@ test('Object checksum', async (t) => {
   t.end()
 })
 
-
 test('Semantically equal objects produce equal checksums', async (t) => {
   const checksum1 = await createChecksum(obj1)
   const checksum2 = await createChecksum(obj2)
   t.equal(checksum1, checksum2, 'checksums are equal')
   t.end()
 })
-

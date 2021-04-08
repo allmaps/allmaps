@@ -20,3 +20,7 @@ export function serialize (obj) {
 
   return obj
 }
+
+export function randomString () {
+  return String(Math.random())
+}

@@ -1,4 +1,4 @@
-import { hashToId, serialize } from './src/id.js'
+import { hashToId, serialize, randomString } from './src/id.js'
 import crypto from 'crypto'
 
 function createBase64Hash (str) {
@@ -10,6 +10,11 @@ function createBase64Hash (str) {
 export async function createId (str, length) {
   const hash = await createBase64Hash(String(str))
   return hashToId(hash, length)
+}
+
+export async function createRandomId (length) {
+  const id = await createId(randomString(), length)
+  return id
 }
 
 export async function createChecksum (obj, length) {
