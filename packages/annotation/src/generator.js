@@ -15,13 +15,13 @@ function createMapAnnotation (map) {
   if (map.gcps) {
     body = {
       type: 'FeatureCollection',
+      transformation: {
+        type: 'polynomial',
+        order: 0
+      },
       features: map.gcps.map((gcp) => ({
         type: 'Feature',
         id: gcp.id,
-        transformation: {
-          type: 'polynomial',
-          order: 0
-        },
         properties: {
           image: gcp.image || null
         },
