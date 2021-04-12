@@ -18,6 +18,10 @@ function createMapAnnotation (map) {
       features: map.gcps.map((gcp) => ({
         type: 'Feature',
         id: gcp.id,
+        transformation: {
+          type: 'polynomial',
+          order: 0
+        },
         properties: {
           image: gcp.image || null
         },
