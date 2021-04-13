@@ -1,10 +1,9 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "IDs for Allmaps",
-  "type": "module",
-  "main": "dist/cjs/web.js",
-  "module": "dist/esm/web.js",
+  "main": "dist/id.min.js",
+  "module": "dist/id.mjs",
   "unpkg": "dist/id.min.js",
   "jsdelivr": "dist/id.min.js",
   "scripts": {
@@ -16,13 +15,7 @@
     "type": "git",
     "url": "https://github.com/allmaps/id.git"
   },
-  "keywords": [
-    "permalink",
-    "permanent",
-    "link",
-    "short",
-    "url"
-  ],
+  "keywords": [],
   "author": {
     "name": "@nelsonic",
     "email": "contact.nelsonic@gmail.com",

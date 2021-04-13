@@ -13,6 +13,26 @@ export default [
       nodeResolve(),
       babel({
         babelHelpers: 'bundled'
+      })
+    ],
+    output: {
+      file: `dist/${name}.mjs`,
+      banner: copyright,
+      format: 'esm',
+      name,
+      exports: 'named',
+      sourcemap: true,
+      globals: {
+        crypto: 'crypto'
+      }
+    }
+  },
+  {
+    input: 'nodejs.js',
+    plugins: [
+      nodeResolve(),
+      babel({
+        babelHelpers: 'bundled'
       }),
       terser({output: {preamble: copyright}})
     ],
@@ -23,7 +43,10 @@ export default [
       name,
       esModule: false,
       exports: 'named',
-      sourcemap: true
+      sourcemap: true,
+      globals: {
+        crypto: 'crypto'
+      }
     }
   },
   {
@@ -33,19 +56,27 @@ export default [
         browser: true
       })
     ],
-    output: [
-      {
-        dir: 'dist/esm',
-        format: 'esm',
-        exports: 'named',
-        sourcemap: true
-      },
-      {
-        dir: 'dist/cjs',
-        format: 'cjs',
-        exports: 'named',
-        sourcemap: true
-      }
-    ]
+    output: {
+      dir: 'dist/esm',
+      esModule: true,
+      format: 'esm',
+      exports: 'named',
+      sourcemap: true
+    }
+  },
+  {
+    input: 'web.js',
+    plugins: [
+      nodeResolve({
+        browser: true
+      }),
+      terser({output: {preamble: copyright}})
+    ],
+    output: {
+      dir: 'dist/cjs',
+      format: 'cjs',
+      exports: 'named',
+      sourcemap: true
+    }
   }
 ]
