@@ -291,8 +291,8 @@ export function parseIiif (data) {
       type: 'manifest',
       version,
       // label
-      data: manifest,
-      images: parseManifestImages(manifest, version)
+      data,
+      images: parseManifestImages(data, version)
     }
   } else if (type === 'image') {
   //   const image = await initializeImage(iiifObject)
