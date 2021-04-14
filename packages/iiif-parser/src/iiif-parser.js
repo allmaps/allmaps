@@ -286,53 +286,44 @@ export function parseIiif (data) {
   version = parseInt(version.split('.')[0])
 
   if (type === 'presentation') {
-    const manifest = data
-
     return {
       uri,
       type: 'manifest',
       version,
       // label
-      data,
+      data: manifest,
       images: parseManifestImages(manifest, version)
     }
-  // } else if (type === 'image') {
+  } else if (type === 'image') {
   //   const image = await initializeImage(iiifObject)
 
-  //   const iiif = {
-  //     data: iiifObject,
-  //     id: image.id,
-  //     type: 'image',
-  //     label
-  //     version,
-  //     manifest: undefined,
-  //     images: {
-  //       [image.id]: image
-  //     }
-  //   }
-
-  //   return iiif
+    return {
+      type: 'image',
+      version,
+      ...parseImage(data)
+    }
   } else {
     throw new Error('Invalid IIIF data')
   }
 }
 
-// TODO: rename function
-function initializeImage (manifestImage, canvas) {
-  const uri = manifestImage['@id'] || manifestImage.id
+function parseImage (image, canvas) {
+  const uri = image['@id'] || image.id
 
   const canvasUri = canvas && canvas['@id']
-  // const label = image.label || (canvas && canvas.label)
+  const label = image.label || (canvas && canvas.label)
 
-  const width = manifestImage.width || canvas.width
-  const height = manifestImage.height || canvas.height
+  const width = image.width || (canvas && canvas.width)
+  const height = image.height || (canvas && canvas.height)
+
+  // TODO: add tiles?
 
   return {
     uri,
     canvasUri,
-    // label,
+    label,
     dimensions: [width, height],
-    data: manifestImage
+    data: image
   }
 }
 
@@ -384,7 +375,7 @@ function parseManifestImages (manifest, version) {
 
     const resource = imageAnnotation.body || imageAnnotation.resource
     const iiifApiImage = resource.service
-    return initializeImage(iiifApiImage, canvas)
+    return parseImage(iiifApiImage, canvas)
   })
 }
 
