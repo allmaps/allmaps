@@ -6,6 +6,10 @@
   organization: Stadsarchief Rotterdam
   url: https://raw.githubusercontent.com/bertspaan/rotterdams-publiek/master/annotations/NL-RtSA_4201_I-138-02-5.json
 
+- title: "'t Hooge heemraedschap van Delflant (Nicolaes en Jacob Kruikius, 1712)"
+  organization: TU Delft Library
+  url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/tudelft-1712-kruikius.json
+
 - title: Antwerp
   organization: Digital Commonwealth - Massachusetts Collections Online
   url: https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/commonwealth-0z709594h.json
