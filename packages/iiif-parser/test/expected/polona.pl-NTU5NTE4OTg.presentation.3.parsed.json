@@ -1,0 +1,19 @@
+{
+  "uri": "https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json",
+  "type": "manifest",
+  "version": 3,
+  "images": [
+    {
+      "type": "image",
+      "version": 2,
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif",
+      "canvasUri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/info.json",
+      "width": 1496,
+      "height": 2274,
+      "format": "jpg",
+      "quality": "default",
+      "supportsAnyRegionAndSize": true,
+      "fullImageUrl": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/full/max/0/default.jpg"
+    }
+  ]
+}

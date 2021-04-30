@@ -1,0 +1,32 @@
+{
+  "type": "manifest",
+  "uri": "https://iiif.bodleian.ox.ac.uk/iiif/manifest/f45ff5a5-8c14-435b-82b1-f95d61f530d0.json",
+  "version": 2,
+  "label": "Bodleian Library (E) C17:70 Oxford (66)",
+  "images": [
+    {
+      "type": "image",
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
+      "canvasUri": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+      "label": "Sheet 1",
+      "width": 4478,
+      "height": 6482,
+      "quality": "default",
+      "format": "jpg",
+      "supportsAnyRegionAndSize": true,
+      "fullImageUrl": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037/full/full/0/default.jpg"
+    },
+    {
+      "type": "image",
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
+      "canvasUri": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/ba18d903-4645-43fa-bc4c-8c396d24a86c.json",
+      "label": "Sheet 2",
+      "width": 4535,
+      "height": 6443,
+      "quality": "default",
+      "format": "jpg",
+      "supportsAnyRegionAndSize": true,
+      "fullImageUrl": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c/full/full/0/default.jpg"
+    }
+  ]
+}

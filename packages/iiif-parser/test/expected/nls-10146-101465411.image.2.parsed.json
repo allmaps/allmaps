@@ -1,0 +1,26 @@
+{
+  "uri": "https://mapview.nls.uk/iiif/10146/101465411",
+  "type": "image",
+  "version": 2,
+  "width": 8932,
+  "height": 6493,
+  "quality": "default",
+  "format": "jpg",
+  "fullImageUrl": "https://mapview.nls.uk/iiif/10146/101465411/full/full/0/default.jpg",
+  "tiles": [
+    {
+      "width": 256,
+      "height": 256,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64
+      ]
+    }
+  ],
+  "supportsAnyRegionAndSize": true
+}

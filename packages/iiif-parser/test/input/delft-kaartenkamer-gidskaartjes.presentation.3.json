@@ -1,0 +1,1452 @@
+{
+  "metadata": [
+    {
+      "label": {
+        "en": [
+          "Title"
+        ]
+      },
+      "value": {
+        "en": [
+          "Guide maps of the TU Delft campus"
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": [
+          "Period"
+        ]
+      },
+      "value": {
+        "en": [
+          "1956-1985"
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": [
+          "Collection"
+        ]
+      },
+      "value": {
+        "en": [
+          "Kaartenkamer, TU Delft Library"
+        ]
+      }
+    }
+  ],
+  "type": "Manifest",
+  "id": "https://dlc.services/iiif-resource/7/string1/gidskaartjes-edit",
+  "items": [
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 754,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 754
+              },
+              {
+                "width": 400,
+                "height": 294
+              },
+              {
+                "width": 200,
+                "height": 147
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8/full/full/0/default.jpg"
+        }
+      ],
+      "height": 2449,
+      "width": 3327,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=0",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=0#",
+              "body": {
+                "height": 2449,
+                "width": 3327,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 2449,
+                  "width": 3327,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/d351195f-3a08-43a0-966a-cf2532c3f5bd"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 766,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 766
+              },
+              {
+                "width": 400,
+                "height": 299
+              },
+              {
+                "width": 200,
+                "height": 150
+              },
+              {
+                "width": 100,
+                "height": 75
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/ee949d4b-8c87-441e-8f2d-4c81a6af73c8",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/ee949d4b-8c87-441e-8f2d-4c81a6af73c8/full/full/0/default.jpg"
+        }
+      ],
+      "height": 2448,
+      "width": 3273,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=1",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/ee949d4b-8c87-441e-8f2d-4c81a6af73c8/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=1#",
+              "body": {
+                "height": 2448,
+                "width": 3273,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 2448,
+                  "width": 3273,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/ee949d4b-8c87-441e-8f2d-4c81a6af73c8",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/ee949d4b-8c87-441e-8f2d-4c81a6af73c8/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/b52f28dc-a613-49f6-bd67-012b31fbb4aa"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 508,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 508
+              },
+              {
+                "width": 400,
+                "height": 198
+              },
+              {
+                "width": 200,
+                "height": 99
+              },
+              {
+                "width": 100,
+                "height": 50
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/8cd20974-34d1-4749-8b0d-4b406e46f420",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/8cd20974-34d1-4749-8b0d-4b406e46f420/full/full/0/default.jpg"
+        }
+      ],
+      "height": 2449,
+      "width": 4940,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=2",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/8cd20974-34d1-4749-8b0d-4b406e46f420/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=2#",
+              "body": {
+                "height": 2449,
+                "width": 4940,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 2449,
+                  "width": 4940,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/8cd20974-34d1-4749-8b0d-4b406e46f420",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/8cd20974-34d1-4749-8b0d-4b406e46f420/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/9e6fa0fe-626a-480a-bde3-de667cbd72c4"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 504,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 504
+              },
+              {
+                "width": 400,
+                "height": 197
+              },
+              {
+                "width": 200,
+                "height": 98
+              },
+              {
+                "width": 100,
+                "height": 49
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/a8cce3af-c11d-4abc-92c7-739b8f4b4f6e",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/a8cce3af-c11d-4abc-92c7-739b8f4b4f6e/full/full/0/default.jpg"
+        }
+      ],
+      "height": 2439,
+      "width": 4959,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=3",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/a8cce3af-c11d-4abc-92c7-739b8f4b4f6e/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=3#",
+              "body": {
+                "height": 2439,
+                "width": 4959,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 2439,
+                  "width": 4959,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/a8cce3af-c11d-4abc-92c7-739b8f4b4f6e",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/a8cce3af-c11d-4abc-92c7-739b8f4b4f6e/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/c7042b84-45b6-45a0-abfb-23b38b569ac8"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 530,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 530
+              },
+              {
+                "width": 400,
+                "height": 207
+              },
+              {
+                "width": 200,
+                "height": 104
+              },
+              {
+                "width": 100,
+                "height": 52
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/789b263d-ac3c-4033-9622-4bc662cb0a93",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/789b263d-ac3c-4033-9622-4bc662cb0a93/full/full/0/default.jpg"
+        }
+      ],
+      "height": 3407,
+      "width": 6582,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=4",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/789b263d-ac3c-4033-9622-4bc662cb0a93/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=4#",
+              "body": {
+                "height": 3407,
+                "width": 6582,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3407,
+                  "width": 6582,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/789b263d-ac3c-4033-9622-4bc662cb0a93",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/789b263d-ac3c-4033-9622-4bc662cb0a93/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/e4a409eb-e164-4b19-8af9-1a3ac7f90d8c"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 518,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 518
+              },
+              {
+                "width": 400,
+                "height": 202
+              },
+              {
+                "width": 200,
+                "height": 101
+              },
+              {
+                "width": 100,
+                "height": 51
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/f60a15a4-3e2c-4c1c-b642-c8a237c7b297",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/f60a15a4-3e2c-4c1c-b642-c8a237c7b297/full/full/0/default.jpg"
+        }
+      ],
+      "height": 3290,
+      "width": 6500,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=5",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/f60a15a4-3e2c-4c1c-b642-c8a237c7b297/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=5#",
+              "body": {
+                "height": 3290,
+                "width": 6500,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3290,
+                  "width": 6500,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/f60a15a4-3e2c-4c1c-b642-c8a237c7b297",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/f60a15a4-3e2c-4c1c-b642-c8a237c7b297/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/d7b270e4-3adf-4ba0-b437-a1428119a27b"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 413,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 413
+              },
+              {
+                "width": 400,
+                "height": 161
+              },
+              {
+                "width": 200,
+                "height": 81
+              },
+              {
+                "width": 100,
+                "height": 40
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/1852dcac-83d8-47ec-a00d-e169aabbfbde",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/1852dcac-83d8-47ec-a00d-e169aabbfbde/full/full/0/default.jpg"
+        }
+      ],
+      "height": 3286,
+      "width": 8147,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=6",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/1852dcac-83d8-47ec-a00d-e169aabbfbde/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=6#",
+              "body": {
+                "height": 3286,
+                "width": 8147,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3286,
+                  "width": 8147,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/1852dcac-83d8-47ec-a00d-e169aabbfbde",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/1852dcac-83d8-47ec-a00d-e169aabbfbde/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/cbd2f5e7-52bd-470d-8a28-40f475b97ac5"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 412,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 412
+              },
+              {
+                "width": 400,
+                "height": 161
+              },
+              {
+                "width": 200,
+                "height": 80
+              },
+              {
+                "width": 100,
+                "height": 40
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/441e321c-65b9-4bbf-8640-dcb000f7debe",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/441e321c-65b9-4bbf-8640-dcb000f7debe/full/full/0/default.jpg"
+        }
+      ],
+      "height": 3266,
+      "width": 8124,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=7",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/441e321c-65b9-4bbf-8640-dcb000f7debe/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=7#",
+              "body": {
+                "height": 3266,
+                "width": 8124,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3266,
+                  "width": 8124,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/441e321c-65b9-4bbf-8640-dcb000f7debe",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/441e321c-65b9-4bbf-8640-dcb000f7debe/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/77428bc8-f500-49bc-9785-a932f44f6702"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 514,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 514
+              },
+              {
+                "width": 400,
+                "height": 201
+              },
+              {
+                "width": 200,
+                "height": 100
+              },
+              {
+                "width": 100,
+                "height": 50
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/12013484-8b66-4665-be4d-7bdd18ca1109",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/12013484-8b66-4665-be4d-7bdd18ca1109/full/full/0/default.jpg"
+        }
+      ],
+      "height": 3264,
+      "width": 6506,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=8",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/12013484-8b66-4665-be4d-7bdd18ca1109/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=8#",
+              "body": {
+                "height": 3264,
+                "width": 6506,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3264,
+                  "width": 6506,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/12013484-8b66-4665-be4d-7bdd18ca1109",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/12013484-8b66-4665-be4d-7bdd18ca1109/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/999fa2af-e746-4407-ba6c-ecb8dac5a618"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 775,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 775
+              },
+              {
+                "width": 400,
+                "height": 303
+              },
+              {
+                "width": 200,
+                "height": 151
+              },
+              {
+                "width": 100,
+                "height": 76
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/57eca0a8-71ff-43de-b071-8c3960e75750",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/57eca0a8-71ff-43de-b071-8c3960e75750/full/full/0/default.jpg"
+        }
+      ],
+      "height": 5162,
+      "width": 6822,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=9",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/57eca0a8-71ff-43de-b071-8c3960e75750/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=9#",
+              "body": {
+                "height": 5162,
+                "width": 6822,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5162,
+                  "width": 6822,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/57eca0a8-71ff-43de-b071-8c3960e75750",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/57eca0a8-71ff-43de-b071-8c3960e75750/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/99881795-7e7e-44ad-9e82-24361ed90477"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 758,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 758
+              },
+              {
+                "width": 400,
+                "height": 296
+              },
+              {
+                "width": 200,
+                "height": 148
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/d76f4e5e-c768-4ac4-bb4e-3a35d681cd09",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/d76f4e5e-c768-4ac4-bb4e-3a35d681cd09/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4784,
+      "width": 6459,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=10",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/d76f4e5e-c768-4ac4-bb4e-3a35d681cd09/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=10#",
+              "body": {
+                "height": 4784,
+                "width": 6459,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4784,
+                  "width": 6459,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/d76f4e5e-c768-4ac4-bb4e-3a35d681cd09",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/d76f4e5e-c768-4ac4-bb4e-3a35d681cd09/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/3c4e0b57-3c68-4447-adbb-b21e64d55a7f"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 761,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 761
+              },
+              {
+                "width": 400,
+                "height": 297
+              },
+              {
+                "width": 200,
+                "height": 149
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/7ab9d569-398a-4121-b70f-ef9e040dff57",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/7ab9d569-398a-4121-b70f-ef9e040dff57/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4790,
+      "width": 6444,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=11",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/7ab9d569-398a-4121-b70f-ef9e040dff57/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=11#",
+              "body": {
+                "height": 4790,
+                "width": 6444,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4790,
+                  "width": 6444,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/7ab9d569-398a-4121-b70f-ef9e040dff57",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/7ab9d569-398a-4121-b70f-ef9e040dff57/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/6c40dc9a-fd85-4c50-86a5-bedabe22a3e8"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 761,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 761
+              },
+              {
+                "width": 400,
+                "height": 297
+              },
+              {
+                "width": 200,
+                "height": 149
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/8d2d8a9c-06b3-4e55-aa88-89d3bb98a379",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/8d2d8a9c-06b3-4e55-aa88-89d3bb98a379/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4774,
+      "width": 6428,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=12",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/8d2d8a9c-06b3-4e55-aa88-89d3bb98a379/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=12#",
+              "body": {
+                "height": 4774,
+                "width": 6428,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4774,
+                  "width": 6428,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/8d2d8a9c-06b3-4e55-aa88-89d3bb98a379",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/8d2d8a9c-06b3-4e55-aa88-89d3bb98a379/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/1d58c4d6-6432-4dcd-9a55-9fb87c55dc86"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 760,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 760
+              },
+              {
+                "width": 400,
+                "height": 297
+              },
+              {
+                "width": 200,
+                "height": 148
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/2cb179f9-dc37-4aed-988b-1788fe672a94",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/2cb179f9-dc37-4aed-988b-1788fe672a94/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4775,
+      "width": 6436,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=13",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/2cb179f9-dc37-4aed-988b-1788fe672a94/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=13#",
+              "body": {
+                "height": 4775,
+                "width": 6436,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4775,
+                  "width": 6436,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/2cb179f9-dc37-4aed-988b-1788fe672a94",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/2cb179f9-dc37-4aed-988b-1788fe672a94/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/e414e1eb-d9b7-4b8c-a0e8-8984b67787cf"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 758,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 758
+              },
+              {
+                "width": 400,
+                "height": 296
+              },
+              {
+                "width": 200,
+                "height": 148
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/7410695d-48e4-4cd1-804c-4bd420192915",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/7410695d-48e4-4cd1-804c-4bd420192915/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4793,
+      "width": 6472,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=14",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/7410695d-48e4-4cd1-804c-4bd420192915/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=14#",
+              "body": {
+                "height": 4793,
+                "width": 6472,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4793,
+                  "width": 6472,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/7410695d-48e4-4cd1-804c-4bd420192915",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/7410695d-48e4-4cd1-804c-4bd420192915/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/116791df-e940-4193-ab8c-54f3c95507f8"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 762,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 762
+              },
+              {
+                "width": 400,
+                "height": 298
+              },
+              {
+                "width": 200,
+                "height": 149
+              },
+              {
+                "width": 100,
+                "height": 74
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/499d07b3-f824-45ad-b8a2-3353ff6819ac",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/499d07b3-f824-45ad-b8a2-3353ff6819ac/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4777,
+      "width": 6416,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=15",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/499d07b3-f824-45ad-b8a2-3353ff6819ac/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=15#",
+              "body": {
+                "height": 4777,
+                "width": 6416,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4777,
+                  "width": 6416,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/499d07b3-f824-45ad-b8a2-3353ff6819ac",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/499d07b3-f824-45ad-b8a2-3353ff6819ac/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/836c8556-9d78-4939-a032-a48403564ad7"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 769,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 769
+              },
+              {
+                "width": 400,
+                "height": 300
+              },
+              {
+                "width": 200,
+                "height": 150
+              },
+              {
+                "width": 100,
+                "height": 75
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/0dccaec6-5955-48f6-b8b8-fc89d61978ed",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/0dccaec6-5955-48f6-b8b8-fc89d61978ed/full/full/0/default.jpg"
+        }
+      ],
+      "height": 4864,
+      "width": 6481,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=16",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/0dccaec6-5955-48f6-b8b8-fc89d61978ed/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=16#",
+              "body": {
+                "height": 4864,
+                "width": 6481,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4864,
+                  "width": 6481,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/0dccaec6-5955-48f6-b8b8-fc89d61978ed",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/0dccaec6-5955-48f6-b8b8-fc89d61978ed/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/3a847f1c-85a8-4f0d-9ab2-a6566d55ca82"
+        }
+      ]
+    },
+    {
+      "thumbnail": [
+        {
+          "service": {
+            "profile": [
+              "http://iiif.io/api/image/2/level0.json",
+              {
+                "formats": [
+                  "jpg"
+                ],
+                "qualities": [
+                  "color"
+                ],
+                "supports": [
+                  "sizeByWhListed"
+                ]
+              }
+            ],
+            "width": 1024,
+            "height": 733,
+            "sizes": [
+              {
+                "width": 1024,
+                "height": 733
+              },
+              {
+                "width": 400,
+                "height": 286
+              },
+              {
+                "width": 200,
+                "height": 143
+              },
+              {
+                "width": 100,
+                "height": 72
+              }
+            ],
+            "id": "https://dlc.services/thumbs/7/4/8432d50c-5238-4d8d-b394-9e46937aebc3",
+            "type": "ImageService2"
+          },
+          "type": "Image",
+          "id": "https://dlc.services/thumbs/7/4/8432d50c-5238-4d8d-b394-9e46937aebc3/full/full/0/default.jpg"
+        }
+      ],
+      "height": 5353,
+      "width": 7482,
+      "type": "Canvas",
+      "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=17",
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "motivation": "painting",
+              "type": "Annotation",
+              "id": "https://dlc.services/iiif-img/7/4/8432d50c-5238-4d8d-b394-9e46937aebc3/anno",
+              "target": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=17#",
+              "body": {
+                "height": 5353,
+                "width": 7482,
+                "service": {
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5353,
+                  "width": 7482,
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "id": "https://dlc.services/iiif-img/7/4/8432d50c-5238-4d8d-b394-9e46937aebc3",
+                  "type": "Service"
+                },
+                "type": "Image",
+                "id": "https://dlc.services/iiif-img/7/4/8432d50c-5238-4d8d-b394-9e46937aebc3/full/!2000,2000/0/default.jpg"
+              }
+            }
+          ],
+          "id": "https://example.org/uuid/f6c8c0b3-0098-4e7f-bf0d-62ce345f049b"
+        }
+      ]
+    }
+  ],
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://iiif.io/api/presentation/3/context.json"
+  ]
+}

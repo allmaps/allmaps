@@ -1,0 +1,1335 @@
+{
+  "metadata": [
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "number_of_edition"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Pharus-Plan von K\u00f6nigsberg (Pr)"
+        ]
+      },
+      "label": {
+        "pl": [
+          "press_title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "uniform_title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "national_bibliography"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          55951898
+        ]
+      },
+      "label": {
+        "pl": [
+          "academica_id"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "file_characteristics"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "key_title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "audience_group"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "former_title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "musical_presentation_statement"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "1901-2000 DBN",
+          "1918-1939 DBN"
+        ]
+      },
+      "label": {
+        "pl": [
+          "chronological_term"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Domena Publiczna. Wolno zwielokrotnia\u0107, zmienia\u0107 i rozpowszechnia\u0107 oraz wykonywa\u0107 utw\u00f3r, nawet w celach komercyjnych, bez konieczno\u015bci pytania o zgod\u0119. Wykorzystuj\u0105c utw\u00f3r nale\u017cy pami\u0119ta\u0107 o poszanowaniu autorskich praw osobistych Tw\u00f3rcy."
+        ]
+      },
+      "label": {
+        "pl": [
+          "rights"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "[ca 1938]"
+        ]
+      },
+      "label": {
+        "pl": [
+          "date_descriptive"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Ma\u00dfstab 1:15 000."
+        ]
+      },
+      "label": {
+        "pl": [
+          "cartographic_math_data"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Kr\u00f3lewiec"
+        ]
+      },
+      "label": {
+        "pl": [
+          "publish_place"
+        ]
+      }
+    },
+    {
+      "value": {},
+      "label": {
+        "pl": [
+          "projects"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "copublished"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "has_subseries"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Zak\u0142ad Reprografii i Digitalizacji Biblioteki Narodowej"
+        ]
+      },
+      "label": {
+        "pl": [
+          "digital_copy_by"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "niemiecki"
+        ]
+      },
+      "label": {
+        "pl": [
+          "languages"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "creator_apposition"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "year_of_edition"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "tome_of_edition"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "uniform_title_aut"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "content_of_uid"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "1918 - 1939"
+        ]
+      },
+      "label": {
+        "pl": [
+          "subject_time"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "isbn"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "alternative_hidden"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          true
+        ]
+      },
+      "label": {
+        "pl": [
+          "is_public"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Kr\u00f3lewiec"
+        ]
+      },
+      "label": {
+        "pl": [
+          "keywords"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "n"
+        ]
+      },
+      "label": {
+        "pl": [
+          "material_type"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "e"
+        ]
+      },
+      "label": {
+        "pl": [
+          "bibliographic_level"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "1938-01-01T00:00:00"
+        ]
+      },
+      "label": {
+        "pl": [
+          "date"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Mapy"
+        ]
+      },
+      "label": {
+        "pl": [
+          "form_and_type"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "frequency"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "series_title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Pharus-Plan von K\u00f6nigsberg (Pr) : mit Stra\u00dfenverzeichnis : Ma\u00dfstab 1:15 000"
+        ]
+      },
+      "label": {
+        "pl": [
+          "title"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "uniform_title_add"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "link_to_original_content"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "1 mapa : kartolitogr. barw. ; 60x60 cm, ark. 62x62 cm, ca\u0142o\u015b\u0107 w ok\u0142. 19x12 cm + broszura (8 s.)"
+        ]
+      },
+      "label": {
+        "pl": [
+          "physical_description"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "release"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "creator"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "edition"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "translated_as"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "content_of"
+        ]
+      }
+    },
+    {
+      "value": {},
+      "label": {
+        "pl": [
+          "provenances"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "plan miasta"
+        ]
+      },
+      "label": {
+        "pl": [
+          "metatypes"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "time_period_of_creation"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "ZZK 34 032"
+        ]
+      },
+      "label": {
+        "pl": [
+          "call_no"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "translation_of"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "ismn"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "maps"
+        ]
+      },
+      "label": {
+        "pl": [
+          "categories"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "udc"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "contributor"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "series"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Gr\u00e4fe und Unzer",
+          "Pharus-Verlag"
+        ]
+      },
+      "label": {
+        "pl": [
+          "contributor_corp"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "issn"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Tyt. z mapy: Pharus-Plan K\u00f6nigsberg (Pr)"
+        ]
+      },
+      "label": {
+        "pl": [
+          "alternative"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "additional_title"
+        ]
+      }
+    },
+    {
+      "value": {},
+      "label": {
+        "pl": [
+          "contents"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "K\u00f6nigsberg : Gr\u00e4fe und Unser Verlag ;  Berlin : Pharus-Plan, [ca 1938]"
+        ]
+      },
+      "label": {
+        "pl": [
+          "imprint"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Gr\u00e4fe und UnzerPharus-Verlag"
+        ]
+      },
+      "label": {
+        "pl": [
+          "publisher"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "creator_corp"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Geografia i nauki o Ziemi"
+        ]
+      },
+      "label": {
+        "pl": [
+          "discipline_and_approach"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "publisher_number"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "creator_date"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          false
+        ]
+      },
+      "label": {
+        "pl": [
+          "has_text_content"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "(PL-WaBN)b51549839-48omnis_nlop",
+          "b51549839",
+          "(OCoLC)812592989",
+          "(PL)b0000051549839"
+        ]
+      },
+      "label": {
+        "pl": [
+          "oclc_no"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Biblioteka Narodowa"
+        ]
+      },
+      "label": {
+        "pl": [
+          "sources"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "creator_name"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Kr\u00f3lewiec DBN"
+        ]
+      },
+      "label": {
+        "pl": [
+          "subject"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          "Niemcy"
+        ]
+      },
+      "label": {
+        "pl": [
+          "country"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "literature"
+        ]
+      }
+    },
+    {
+      "value": {
+        "pl": [
+          null
+        ]
+      },
+      "label": {
+        "pl": [
+          "cultural_area"
+        ]
+      }
+    }
+  ],
+  "items": [
+    {
+      "width": 1496,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 1496,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176580.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2274,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/96f96149-0d51-43fa-97e8-6e21e9cadd52",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2274,
+      "thumbnail": [
+        {
+          "width": 66,
+          "format": "image/jpeg",
+          "height": 100,
+          "id": "https://zas.bn.org.pl/thumbnail/56176580?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "-"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 2915,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 2915,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176583.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2263,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/662ec346-fe90-4919-af3d-9a9967ab4f84",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2263,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 116,
+          "id": "https://zas.bn.org.pl/thumbnail/56176583?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "1"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 2922,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 2922,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176585.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2267,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/8eabd5d3-07f8-4408-9130-ce8644555972",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2267,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 116,
+          "id": "https://zas.bn.org.pl/thumbnail/56176585?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "2,3"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 2938,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 2938,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176590.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2265,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/0f2a920d-3002-4d6d-a7d5-a104a7a4ff7f",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2265,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 116,
+          "id": "https://zas.bn.org.pl/thumbnail/56176590?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "4,5"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 2924,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 2924,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176593.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2280,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/c4e43d69-0292-4ae9-9a74-a95a86ceb628",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2280,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 117,
+          "id": "https://zas.bn.org.pl/thumbnail/56176593?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "6,7"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 2918,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 2918,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176598.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2271,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/4c7f00a9-f96f-457c-950b-a4b00df3b605",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2271,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 117,
+          "id": "https://zas.bn.org.pl/thumbnail/56176598?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "8"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 15083,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 15083,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176602.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 14957,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/9c1d2f48-8ab7-49c7-901b-aacdcfbcb620",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 14957,
+      "thumbnail": [
+        {
+          "width": 150,
+          "format": "image/jpeg",
+          "height": 149,
+          "id": "https://zas.bn.org.pl/thumbnail/56176602?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "[1r]"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 7462,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 7462,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176613.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 7491,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/de4ab76b-ee11-406e-96b7-f294457a4c08",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 7491,
+      "thumbnail": [
+        {
+          "width": 100,
+          "format": "image/jpeg",
+          "height": 100,
+          "id": "https://zas.bn.org.pl/thumbnail/56176613?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "[1v]"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/info.json",
+      "type": "Canvas"
+    },
+    {
+      "width": 1496,
+      "items": [
+        {
+          "items": [
+            {
+              "body": {
+                "width": 1496,
+                "service": [
+                  {
+                    "profile": "http://iiif.io/api/image/2/level2.json",
+                    "@id": "https://zas.bn.org.pl/iiif/55951898/56176614.tif",
+                    "@type": "ImageService2"
+                  }
+                ],
+                "format": "image/jpeg",
+                "height": 2295,
+                "id": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/full/full/0/default.jpg",
+                "type": "Image"
+              },
+              "motivation": "painting",
+              "id": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/full/full/0/default.jpg",
+              "type": "Annotation",
+              "target": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/info.json"
+            }
+          ],
+          "id": "https://example.org/uuid/5b0c694a-a053-45df-9212-32fff43fb17d",
+          "type": "AnnotationPage"
+        }
+      ],
+      "height": 2295,
+      "thumbnail": [
+        {
+          "width": 65,
+          "format": "image/jpeg",
+          "height": 100,
+          "id": "https://zas.bn.org.pl/thumbnail/56176614?uid=55951898",
+          "type": "Image"
+        }
+      ],
+      "label": {
+        "pl": [
+          "-"
+        ]
+      },
+      "id": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/info.json",
+      "type": "Canvas"
+    }
+  ],
+  "label": {
+    "pl": [
+      "Pharus-Plan von K\u00f6nigsberg (Pr) : mit Stra\u00dfenverzeichnis : Ma\u00dfstab 1:15 000"
+    ]
+  },
+  "summary": {
+    "pl": [
+      "Pharus-Plan von K\u00f6nigsberg (Pr) : mit Stra\u00dfenverzeichnis : Ma\u00dfstab 1:15 000"
+    ]
+  },
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "id": "https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json",
+  "type": "Manifest"
+}

@@ -1,0 +1,19 @@
+{
+  "uri": "https://collections.library.yale.edu/manifests/15826830",
+  "type": "manifest",
+  "label": "Map of Canals and Navigable Rivers in Belgium and The North of France.",
+  "images": [
+    {
+      "uri": "https://collections.library.yale.edu/iiif/2/15828036",
+      "canvasUri": "https://collections.library.yale.edu/manifests/oid/15826830/canvas/15828036",
+      "label": "recto",
+      "quality": "default",
+      "format": "jpg",
+      "supportsAnyRegionAndSize": true,
+      "fullImageUrl": "https://collections.library.yale.edu/iiif/2/15828036/full/full/0/default.jpg",
+      "type": "image",
+      "width": 11560,
+      "height": 9128
+    }
+  ]
+}

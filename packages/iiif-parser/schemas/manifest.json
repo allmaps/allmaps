@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://allmaps.org/iiif-parser/schemas/manifest.json",
+  "title": "Parsed IIIF Manifest Resource",
+  "type": "object",
+  "properties": {
+    "uri": {
+      "description": "Manifest Resource URI",
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "const": "manifest"
+    },
+    "version": {
+      "type": "integer",
+      "enum": [
+        2,
+        3
+      ]
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "$ref": "https://allmaps.org/iiif-parser/schemas/image.json"
+      }
+    },
+    "label": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "sourceData": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "uri",
+    "type",
+    "version",
+    "images"
+  ]
+}

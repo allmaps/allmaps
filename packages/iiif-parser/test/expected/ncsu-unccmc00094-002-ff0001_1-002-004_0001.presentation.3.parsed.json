@@ -1,0 +1,26 @@
+{
+  "uri": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001/manifest",
+  "type": "manifest",
+  "label": {
+    "en": [
+      "Alternate plan #1"
+    ]
+  },
+  "images": [
+    {
+      "uri": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001",
+      "canvasUri": "https://d.lib.ncsu.edu/collections/canvas/unccmc00094-002-ff0001_1-002-004_0001",
+      "label": {
+        "en": [
+          "1"
+        ]
+      },
+      "height": 3599,
+      "width": 7096,
+      "quality": "default",
+      "format": "jpg",
+      "supportsAnyRegionAndSize": true,
+      "fullImageUrl": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001/full/max/0/default.jpg"
+    }
+  ]
+}

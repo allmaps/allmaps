@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://allmaps.org/iiif-parser/schemas/iiif.json",
+  "title": "Parsed IIIF object",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "https://allmaps.org/iiif-parser/schemas/image.json"
+    },
+    {
+      "$ref": "https://allmaps.org/iiif-parser/schemas/manifest.json"
+    },
+    {
+      "$ref": "https://allmaps.org/iiif-parser/schemas/collection.json"
+    }
+  ]
+}

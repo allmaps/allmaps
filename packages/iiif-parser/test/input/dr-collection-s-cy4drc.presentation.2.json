@@ -1,0 +1,31 @@
+{
+  "@context" : "http://iiif.io/api/presentation/2/context.json",
+  "@id" : "https://www.davidrumsey.com/luna/servlet/iiif/collection/s/cy4drc",
+  "@type" : "sc:Collection",
+  "label" : "Media Search ",
+  "manifests" : [ {
+    "@type" : "sc:Manifest",
+    "@id" : "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~268774~90043015/manifest",
+    "label" : "Covers: The Story of Cane Sugar."
+  }, {
+    "@type" : "sc:Manifest",
+    "@id" : "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~268775~90043014/manifest",
+    "label" : "Text: Sweet Things To Make These Goodies Are Good for You ... Sugar as a Food."
+  }, {
+    "@type" : "sc:Manifest",
+    "@id" : "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~268776~90043013/manifest",
+    "label" : "Where Sugar Cane Comes From."
+  }, {
+    "@type" : "sc:Manifest",
+    "@id" : "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~268777~90043012/manifest",
+    "label" : "Quaker Sugar ... For Home Use."
+  } ],
+  "total" : 4,
+  "first" : "https://www.davidrumsey.com/luna/servlet/iiif/collection/s/cy4drc/0",
+  "seeAlso" : "https%3A%2F%2Fwww.davidrumsey.com%2Fluna%2Fservlet%2Fview%2Fsearch%3BJSESSIONID%3D6f3c58dc-9c48-445b-9dce-727a72cace5b%3Fq%3Dpub_list_no%253D%25228730.000%2522%26qvq%3Dlc%253ARUMSEY%257E8%257E1%26pgs%3D50%26res%3D2%26mi%3D0",
+  "attribution" : "David Rumsey Historical Map Collection",
+  "logo" : {
+    "@id" : "https://www.davidrumsey.com/luna/images/LUNAIIIF80.png",
+    "format" : "image/png"
+  }
+}

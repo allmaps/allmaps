@@ -1,0 +1,46 @@
+{
+  "type": "image",
+  "uri": "https://objects.library.uu.nl/fcgi-bin/iipsrv.fcgi?IIIF=/manifestation/viewer/60/82/67/60826765847502039061478934746532282060.jp2",
+  "version": 2,
+  "width": 4695,
+  "height": 2997,
+  "sizes": [
+    {
+      "width": 146,
+      "height": 93
+    },
+    {
+      "width": 293,
+      "height": 187
+    },
+    {
+      "width": 586,
+      "height": 374
+    },
+    {
+      "width": 1173,
+      "height": 749
+    },
+    {
+      "width": 2347,
+      "height": 1498
+    }
+  ],
+  "tiles": [
+    {
+      "width": 256,
+      "height": 256,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32
+      ]
+    }
+  ],
+  "quality": "default",
+  "format": "jpg",
+  "supportsAnyRegionAndSize": true
+}

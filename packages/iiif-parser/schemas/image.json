@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://allmaps.org/iiif-parser/schemas/image.json",
+  "title": "Parsed IIIF Image Resource",
+  "type": "object",
+  "properties": {
+    "uri": {
+      "description": "Image Resource URI",
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "const": "image"
+    },
+    "version": {
+      "type": "integer",
+      "enum": [
+        2,
+        3
+      ]
+    },
+    "width": {
+      "type": "integer",
+      "description": "Width of image"
+    },
+    "height": {
+      "type": "integer",
+      "description": "Height of image"
+    },
+    "maxWidth": {
+      "type": "integer"
+    },
+    "maxHeight": {
+      "type": "integer"
+    },
+    "maxArea": {
+      "type": "integer"
+    },
+    "quality": {
+      "type": "string",
+      "enum": [
+        "native",
+        "default"
+      ]
+    },
+    "format": {
+      "type": "string",
+      "const": "jpg"
+    },
+    "fullImageUrl": {
+      "type": "string"
+    },
+    "sizes": {
+      "type": "array"
+    },
+    "tiles": {
+      "type": "array"
+    },
+    "supportsAnyRegionAndSize": {
+      "type": "boolean"
+    },
+    "canvasUri": {
+      "type": "string"
+    },
+    "label": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "sourceData": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "uri",
+    "type",
+    "version",
+    "width",
+    "height",
+    "quality",
+    "format",
+    "fullImageUrl",
+    "supportsAnyRegionAndSize"
+  ]
+}

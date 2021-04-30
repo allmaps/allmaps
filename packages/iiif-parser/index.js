@@ -1,1 +1,4 @@
-export * from './src/iiif-parser'
+export * from './src/parser.js'
+export * from './src/functions.js'
+export * from './src/thumbnails.js'
+export * from './src/tiles.js'

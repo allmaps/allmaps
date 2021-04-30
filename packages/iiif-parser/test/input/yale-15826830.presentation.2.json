@@ -1,0 +1,187 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://collections.library.yale.edu/manifests/15826830",
+  "@type": "sc:Manifest",
+  "label": "Map of Canals and Navigable Rivers in Belgium and The North of France.",
+  "rendering": [
+    {
+      "@id": "https://collections.library.yale.edu/pdfs/15826830.pdf",
+      "format": "application/pdf",
+      "label": "Download as PDF"
+    }
+  ],
+  "metadata": [
+    {
+      "label": "Published/Created Date",
+      "value": [
+        "1915"
+      ]
+    },
+    {
+      "label": "Publication Place",
+      "value": [
+        "Rotterdam :"
+      ]
+    },
+    {
+      "label": "Publisher",
+      "value": [
+        "Commission for Relief in Belgium,"
+      ]
+    },
+    {
+      "label": "Description",
+      "value": [
+        "In English and Dutch."
+      ]
+    },
+    {
+      "label": "Extent",
+      "value": [
+        "1 map : col. ; 69 x 89 cm."
+      ]
+    },
+    {
+      "label": "Extent of Digitization",
+      "value": [
+        "Complete work digitized."
+      ]
+    },
+    {
+      "label": "Scale",
+      "value": [
+        "Scale [ca. 1:400 000]."
+      ]
+    },
+    {
+      "label": "Coordinates",
+      "value": [
+        "400000",
+        "a"
+      ]
+    },
+    {
+      "label": "Language",
+      "value": [
+        "English"
+      ]
+    },
+    {
+      "label": "Call Number",
+      "value": [
+        "335 1915"
+      ]
+    },
+    {
+      "label": "Container / Volume Information",
+      "value": [
+        "BRBL_00086"
+      ]
+    },
+    {
+      "label": "Format",
+      "value": [
+        "cartographic"
+      ]
+    },
+    {
+      "label": "Genre",
+      "value": [
+        "Maps"
+      ]
+    },
+    {
+      "label": "Resource Type",
+      "value": [
+        "Maps, Atlases & Globes"
+      ]
+    },
+    {
+      "label": "Subject (Geographic)",
+      "value": [
+        "Belgium--Maps"
+      ]
+    },
+    {
+      "label": "Access",
+      "value": [
+        "Public"
+      ]
+    },
+    {
+      "label": "Rights",
+      "value": [
+        "The use of this image may be subject to the copyright law of the United States (Title 17, United States Code) or to site license or other rights management terms and conditions. The person using the image is liable for any infringement"
+      ]
+    },
+    {
+      "label": "Orbis ID",
+      "value": [
+        "8552009"
+      ]
+    },
+    {
+      "label": "OID",
+      "value": [
+        "15826830"
+      ]
+    }
+  ],
+  "attribution": "Yale University Library",
+  "sequences": [
+    {
+      "@id": "https://collections.library.yale.edu/manifests/sequence/15826830",
+      "@type": "sc:Sequence",
+      "rendering": [
+        {
+          "@id": "https://collections.library.yale.edu/pdfs/15826830.pdf",
+          "format": "application/pdf",
+          "label": "Download as PDF"
+        }
+      ],
+      "canvases": [
+        {
+          "@id": "https://collections.library.yale.edu/manifests/oid/15826830/canvas/15828036",
+          "@type": "sc:Canvas",
+          "label": "recto",
+          "images": [
+            {
+              "@id": "https://collections.library.yale.edu/manifests/oid/15826830/canvas/15828036/image/1",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://collections.library.yale.edu/manifests/oid/15826830/canvas/15828036",
+              "resource": {
+                "@id": "https://collections.library.yale.edu/iiif/2/15828036/full/!200,200/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 11560,
+                "height": 9128,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://collections.library.yale.edu/iiif/2/15828036",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              }
+            }
+          ],
+          "height": 9128,
+          "width": 11560,
+          "metadata": [
+            {
+              "label": "Image OID",
+              "value": [
+                "15828036"
+              ]
+            },
+            {
+              "label": "Image Label",
+              "value": [
+                "recto"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

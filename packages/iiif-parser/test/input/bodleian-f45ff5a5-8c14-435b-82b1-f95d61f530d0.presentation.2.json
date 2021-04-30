@@ -1,0 +1,182 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://iiif.bodleian.ox.ac.uk/iiif/manifest/f45ff5a5-8c14-435b-82b1-f95d61f530d0.json",
+  "@type": "sc:Manifest",
+  "label": "Bodleian Library (E) C17:70 Oxford (66)",
+  "description": "Plan of the City of Oxford",
+  "metadata": [
+    {
+      "label": "Homepage",
+      "value": "<span><a href=\"https://digital.bodleian.ox.ac.uk/objects/f45ff5a5-8c14-435b-82b1-f95d61f530d0\">View on Digital Bodleian</a></span>"
+    },
+    {
+      "label": "Title",
+      "value": "Plan of the City of Oxford"
+    },
+    {
+      "label": "Shelfmark",
+      "value": "Bodleian Library (E) C17:70 Oxford (66)"
+    },
+    {
+      "label": "Publisher",
+      "value": "Faden, William, 1749-1836"
+    },
+    {
+      "label": "Cartographer",
+      "value": "Faden, William, 1749-1836"
+    },
+    {
+      "label": "Language",
+      "value": "English"
+    },
+    {
+      "label": "Date Statement",
+      "value": "1789"
+    },
+    {
+      "label": "Place of Origin",
+      "value": "London"
+    },
+    {
+      "label": "Description",
+      "value": "A revised version of Isaac Taylor's 1750 plan of Oxford, updated after the major redevelopment of the 1770s. Streets & principal buildings named, key to colleges, etc. Includes views of Christ Church, Peckwater Square, Magdalen New Building and the Observatory. Scale: 1:2,376."
+    },
+    {
+      "label": "Description",
+      "value": "Dedication: To the Chancellor, Vice Chancellor & Heads of Colleges, And the High Steward, Mayor Aldermen &c Of the University & City of Oxford; This Plan of the City of Oxford is humbly inscribed by their obedient servant Wm Faden, Geographer to the King."
+    },
+    {
+      "label": "Description",
+      "value": "Remarks: Oxford Contains 20 Streets, 70 publick Courts, Lanes, and Alleys, besides many noble publick Buildings. It has 1814 Houses, & 8292 Inhabitants, exclusive of the University; likewise 13 Parish-Churches and a Cathedral, and with the University, stands upon 300 Acres of Land, & is 3\u00bd Miles in Circumference. The University contains 20 Colleges and 5 Halls. This Plan was first published by Isaac Taylor in 1750, but the Copper Plates having been lately purchased by the present Proprietor the whole has been re-surveyed & all the new Improvements Alterations &c are carefully inserted. Likewise the Views of Christ-Church, Peckwater & the Observatory are entirely new. Published by Wm. FadenCharing Cross Septemr. 1st. 1789."
+    },
+    {
+      "label": "Materials",
+      "value": "paper"
+    },
+    {
+      "label": "Extent",
+      "value": "2 sheets"
+    },
+    {
+      "label": "Collection",
+      "value": "Maps and Atlases"
+    },
+    {
+      "label": "Other Identifier",
+      "value": "Aleph Control Number: 020167565"
+    },
+    {
+      "label": "Record Created",
+      "value": "2019-02-21T17:50:46Z"
+    },
+    {
+      "label": "Holding Institution",
+      "value": "Bodleian Libraries, University of Oxford"
+    }
+  ],
+  "navDate": "1789-01-01T00:00:00Z",
+  "rendering": {
+    "@id": "https://digital.bodleian.ox.ac.uk/objects/f45ff5a5-8c14-435b-82b1-f95d61f530d0",
+    "label": "View on Digital Bodleian",
+    "format": "text/html"
+  },
+  "attribution": "<span>Photo: \u00a9 Bodleian Libraries, University of Oxford. Terms of use: <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">CC-BY-NC 4.0</a>. For more information, please see <a href=\"https://digital.bodleian.ox.ac.uk/terms.html\">https://digital.bodleian.ox.ac.uk/terms.html</a></span>",
+  "logo": {
+    "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/f27e28db-0b08-4f16-9bdf-3565f591fb71/full/256,/0/default.jpg",
+    "@type": "dctypes:Image",
+    "format": "image/jpeg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "profile": "http://iiif.io/api/image/2/level1.json",
+      "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/f27e28db-0b08-4f16-9bdf-3565f591fb71"
+    }
+  },
+  "thumbnail": {
+    "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037/full/256,/0/default.jpg",
+    "@type": "dctypes:Image",
+    "format": "image/jpeg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "profile": "http://iiif.io/api/image/2/level1.json",
+      "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037"
+    }
+  },
+  "viewingHint": "paged",
+  "viewingDirection": "left-to-right",
+  "sequences": [
+    {
+      "@id": "https://iiif.bodleian.ox.ac.uk/iiif/sequence/f45ff5a5-8c14-435b-82b1-f95d61f530d0_default.json",
+      "@type": "sc:Sequence",
+      "label": "Default",
+      "canvases": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+          "@type": "sc:Canvas",
+          "label": "Sheet 1",
+          "width": 4478,
+          "height": 6482,
+          "images": [
+            {
+              "@id": "https://iiif.bodleian.ox.ac.uk/iiif/annotation/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+              "resource": {
+                "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 4478,
+                "height": 6482,
+                "service": {
+                  "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/ba18d903-4645-43fa-bc4c-8c396d24a86c.json",
+          "@type": "sc:Canvas",
+          "label": "Sheet 2",
+          "width": 4535,
+          "height": 6443,
+          "images": [
+            {
+              "@id": "https://iiif.bodleian.ox.ac.uk/iiif/annotation/ba18d903-4645-43fa-bc4c-8c396d24a86c.json",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/ba18d903-4645-43fa-bc4c-8c396d24a86c.json",
+              "resource": {
+                "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 4535,
+                "height": 6443,
+                "service": {
+                  "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "structures": [
+    {
+      "@id": "https://iiif.bodleian.ox.ac.uk/iiif/range/f45ff5a5-8c14-435b-82b1-f95d61f530d0/LOG_0000",
+      "@type": "sc:Range",
+      "label": "(E) C17:70 Oxford (66)",
+      "viewingHint": "top",
+      "canvases": [
+        "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+        "https://iiif.bodleian.ox.ac.uk/iiif/canvas/ba18d903-4645-43fa-bc4c-8c396d24a86c.json"
+      ],
+      "startCanvas": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "image",
+  "version": "2",
+  "uri": "https://rotterdamspubliek.nl/iiif/NL-RtSA_4001_1985-1014-01",
+  "format": "jpg",
+  "quality": "default",
+  "tiles": [
+    {
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "width": 512
+    }
+  ],
+  "width": 9102,
+  "height": 6922,
+  "supportsAnyRegionAndSize": false
+}

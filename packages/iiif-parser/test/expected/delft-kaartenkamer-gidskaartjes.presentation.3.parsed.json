@@ -1,0 +1,19 @@
+{
+  "type": "manifest",
+  "uri": "https://dlc.services/iiif-resource/7/string1/gidskaartjes-edit",
+  "version": 3,
+  "images": [
+    {
+      "type": "image",
+      "uri": "https://dlc.services/iiif-img/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8",
+      "canvasUri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=gidskaartjes-edit&n1=&n2=0",
+      "version": 2,
+      "width": 3327,
+      "height": 2449,
+      "quality": "default",
+      "format": "jpg",
+      "fullImageUrl": "https://dlc.services/iiif-img/7/4/a0f6b14a-ba83-48e8-8efb-9371b3dde5d8/full/max/0/default.jpg",
+      "supportsAnyRegionAndSize": true
+    }
+  ]
+}

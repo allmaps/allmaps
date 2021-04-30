@@ -1,0 +1,21 @@
+{
+  "uri": "https://www.loc.gov/item/87694060/manifest.json",
+  "type": "manifest",
+  "version": 2,
+  "label": "Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending June 30, 1894",
+  "images": [
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+      "type": "image",
+      "version": 2,
+      "label": "Page 1",
+      "canvasUri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+      "width": 2115,
+      "height": 2203,
+      "quality": "default",
+      "format": "jpg",
+      "fullImageUrl": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586/full/full/0/default.jpg",
+      "supportsAnyRegionAndSize": true
+    }
+  ]
+}

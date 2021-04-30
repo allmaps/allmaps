@@ -1,0 +1,75 @@
+{
+  "@context": "http://iiif.io/api/image/3/context.json",
+  "id": "https://data.nhm.ac.uk/iiif_images/vfactor:L014163620.jpg",
+  "@id": "https://data.nhm.ac.uk/iiif_images/vfactor:L014163620.jpg",
+  "type": "ImageService3",
+  "protocol": "http://iiif.io/api/image",
+  "width": 14833,
+  "height": 14171,
+  "rights": "http://creativecommons.org/licenses/by/4.0/",
+  "profile": "level1",
+  "tiles": [
+    {
+      "width": 512,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ]
+    },
+    {
+      "width": 256,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ]
+    },
+    {
+      "width": 1024,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ]
+    }
+  ],
+  "sizes": [
+    {
+      "width": 14833,
+      "height": 14171
+    },
+    {
+      "width": 7416,
+      "height": 7085
+    },
+    {
+      "width": 3708,
+      "height": 3542
+    },
+    {
+      "width": 1854,
+      "height": 1771
+    },
+    {
+      "width": 927,
+      "height": 885
+    },
+    {
+      "width": 463,
+      "height": 442
+    },
+    {
+      "width": 231,
+      "height": 221
+    }
+  ],
+  "maxWidth": 14833,
+  "maxHeight": 14171
+}
