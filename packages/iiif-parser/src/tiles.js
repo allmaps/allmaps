@@ -1,32 +1,36 @@
-export function getIiifTile (parsedImage, tileset, x, y) {
+export function getIiifTile (parsedImage, zoomLevel, x, y) {
   // See https://iiif.io/api/image/3.0/implementation/#3-tile-region-parameter-calculation
 
-  const regionX = x * tileset.originalWidth
-  const regionY = y * tileset.originalHeight
-  const regionWidth = x * tileset.originalWidth + tileset.width * tileset.scaleFactor > parsedImage.width
-    ? parsedImage.width - x * tileset.originalWidth : tileset.width * tileset.scaleFactor
-  const regionHeight = y * tileset.originalHeight + tileset.height * tileset.scaleFactor > parsedImage.height
-    ? parsedImage.height - y * tileset.originalHeight : tileset.height * tileset.scaleFactor
+  const regionX = x * zoomLevel.originalWidth
+  const regionY = y * zoomLevel.originalHeight
+  const regionWidth = x * zoomLevel.originalWidth + zoomLevel.width * zoomLevel.scaleFactor > parsedImage.width
+    ? parsedImage.width - x * zoomLevel.originalWidth : zoomLevel.width * zoomLevel.scaleFactor
+  const regionHeight = y * zoomLevel.originalHeight + zoomLevel.height * zoomLevel.scaleFactor > parsedImage.height
+    ? parsedImage.height - y * zoomLevel.originalHeight : zoomLevel.height * zoomLevel.scaleFactor
 
-  let tileWidth = tileset.width
-  let tileHeight = tileset.height
+  let tileWidth = zoomLevel.width
+  let tileHeight = zoomLevel.height
 
-  if (regionX + tileset.width * tileset.scaleFactor > parsedImage.width) {
-    tileWidth = Math.floor((parsedImage.width - regionX + tileset.scaleFactor - 1) / tileset.scaleFactor)
+  if (regionX + zoomLevel.width * zoomLevel.scaleFactor > parsedImage.width) {
+    tileWidth = Math.floor((parsedImage.width - regionX + zoomLevel.scaleFactor - 1) / zoomLevel.scaleFactor)
   }
 
-  if (regionY + tileset.height * tileset.scaleFactor > parsedImage.height) {
-    tileHeight = Math.floor((parsedImage.height - regionY + tileset.scaleFactor - 1) / tileset.scaleFactor)
+  if (regionY + zoomLevel.height * zoomLevel.scaleFactor > parsedImage.height) {
+    tileHeight = Math.floor((parsedImage.height - regionY + zoomLevel.scaleFactor - 1) / zoomLevel.scaleFactor)
   }
 
   return {
-    regionX,
-    regionY,
-    regionWidth,
-    regionHeight,
-    tileWidth,
-    tileHeight,
-    scaleFactor: tileset.scaleFactor
+    // scaleFactor: zoomLevel.scaleFactor,
+    region: {
+      x: regionX,
+      y: regionY,
+      width: regionWidth,
+      height: regionHeight
+    },
+    size: {
+      width: tileWidth,
+      height: tileHeight
+    }
   }
 }
 
@@ -50,7 +54,7 @@ function getDefaultTileset (parsedImage, tileWidth = 256) {
 
   return {
     scaleFactors: Array
-      .from({length: maxExponent}, (_, exponent) => 2 ** exponent)
+      .from({ length: maxExponent }, (_, exponent) => 2 ** exponent)
       .filter((scaleFactor) => {
         if (maxTileSide) {
           return tileWidth * scaleFactor <= maxTileSide
@@ -62,15 +66,26 @@ function getDefaultTileset (parsedImage, tileWidth = 256) {
   }
 }
 
-function getTilesFromTilesets (tilesets) {
+function getTilesetFromScaleFactor (parsedImage, tileset, scaleFactor) {
+  const height = tileset.height || tileset.width
+
+  const originalWidth = tileset.width * scaleFactor
+  const originalHeight = height * scaleFactor
+
+  return {
+    scaleFactor,
+    width: tileset.width,
+    height,
+    originalWidth,
+    originalHeight,
+    columns: Math.ceil(parsedImage.width / originalWidth),
+    rows: Math.ceil(parsedImage.height / originalHeight)
+  }
+}
+
+function getTilesFromTilesets (parsedImage, tilesets) {
   return tilesets.map((tileset) => tileset.scaleFactors
-    .map((scaleFactor) => ({
-      scaleFactor,
-      width: tileset.width,
-      height: tileset.height || tileset.width,
-      originalWidth: tileset.width * scaleFactor,
-      originalHeight: (tileset.height || tileset.width) * scaleFactor
-    }))).flat()
+    .map((scaleFactor) => getTilesetFromScaleFactor(parsedImage, tileset, scaleFactor)))
 }
 
 function supportsCustomTiles (parsedImage) {
@@ -83,17 +98,16 @@ function hasValidTileset (parsedImage) {
       .some((tileset) => tileset.width && tileset.scaleFactors && tileset.scaleFactors.length)
 }
 
-function getTilesets (parsedImage) {
+export function getTilesets (parsedImage) {
+  let tilesets
+
   if (hasValidTileset(parsedImage)) {
-    return parsedImage.tiles
+    tilesets = parsedImage.tiles
   } else if (supportsCustomTiles(parsedImage)) {
-    return [getDefaultTileset(parsedImage)]
+    tilesets = [getDefaultTileset(parsedImage)]
   } else {
     throw new Error('Image does not support tiles or custom regions and sizes.')
   }
-}
 
-export function getTiles (parsedImage) {
-  const tilesets = getTilesets(parsedImage)
-  return getTilesFromTilesets(tilesets)
+  return getTilesFromTilesets(parsedImage, tilesets)
 }

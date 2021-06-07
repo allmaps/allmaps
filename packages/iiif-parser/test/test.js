@@ -1,5 +1,8 @@
+/* global import */
+
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 import Ajv from 'ajv'
 
@@ -7,13 +10,21 @@ import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-import { parseIiif, getTiles, getImageUrl, getThumbnail } from '../index.js'
+import * as allmaps from '../index.js'
+import { parseIiif, getTilesets } from '../index.js'
 
 chai.use(shallowDeepEqual)
 
 const inputDir = './test/input'
-const expectedDir = './test/expected'
+const parsedDir = './test/parsed'
+const tilesDir = './test/tiles'
 const schemasDir = './schemas'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Expected output of other functions than parseIiif and getTiles is found in this JSON file:
+const functionOutput = readJSONFile(path.join(__dirname, 'function-output.json'))
 
 const schemas = {
   iiif: readJSONFile(`${schemasDir}/iiif.json`),
@@ -34,16 +45,17 @@ fs.readdirSync(inputDir)
     const basename = path.basename(filename, '.json')
 
     const inputFilename = `${inputDir}/${basename}.json`
-    const parsedFilename = `${expectedDir}/${basename}.parsed.json`
-    const errorFilename = `${expectedDir}/${basename}.error.json`
+    const parsedFilename = `${parsedDir}/${basename}.parsed.json`
+    const tilesFilename = `${tilesDir}/${basename}.tiles.json`
+    const errorFilename = `${parsedDir}/${basename}.error.json`
 
     const input = readJSONFile(inputFilename)
 
-    let parsed
+    let parseOutput
     let parseError
 
     try {
-      parsed = parseIiif(input, {
+      parseOutput = parseIiif(input, {
         includeSourceData: false
       })
     } catch (err) {
@@ -53,10 +65,11 @@ fs.readdirSync(inputDir)
     return {
       basename,
       input,
-      parsed,
+      parsed: parseOutput,
       parseError,
       expected: {
         parsed: readJSONFile(parsedFilename),
+        tiles: readJSONFile(tilesFilename),
         error: readJSONFile(errorFilename)
       }
     }
@@ -72,37 +85,84 @@ function readJSONFile (filename) {
 }
 
 function runTests (file) {
-  describe(`Parsing ${file.basename}`, function () {
-    if (file.expected.parsed || file.expected.error) {
+  describe(`Parsing ${file.basename}`, () => {
+    if (file.expected.parsed || file.expected.error !== undefined) {
       if (file.parsed) {
-        it('should result in output which is valid according to JSON Schema', function () {
+        it('should result in output which is valid according to JSON Schema', () => {
           const valid = validate(file.parsed)
           if (!valid) {
-            console.log(file.parsed)
             throw new Error(JSON.stringify(validate.errors))
           }
         })
 
-        it('should match expected output', function () {
+        it('should match expected output', () => {
           expect(file.parsed).to.shallowDeepEqual(file.expected.parsed)
         })
       } else {
-        it('should result in the correct error message', function () {
+        it('should result in the correct error message', () => {
           expect(file.parseError.message).to.equal(file.expected.error)
         })
       }
     } else {
-      it('Input IIIF file should have either matching parsed or error JSON file', function () {
-        throw new Error('File not found')
-      })
+      console.error('Input IIIF file should have either matching parsed or error JSON file:\n  ', file.basename)
     }
   })
 
-  // if (file.parsed) {
-  //   if (file.parsed.type === 'image') {
-  //     getTiles(file.parsed)
-  //   } else if (file.parsed.type === 'manifest') {
-  //     file.parsed.images.map(getTiles)
-  //   }
-  // }
+  if (file.parsed) {
+    if (file.expected.tiles) {
+      if (file.parsed.type !== 'image') {
+        throw new Error('Only test getTiles output for images!')
+      }
+
+      describe(`Tiles for ${file.basename}`, () => {
+        it('should match expected output', () => {
+          let tilesetsOutput
+          let tilesetsError
+
+          try {
+            tilesetsOutput = getTilesets(file.parsed)
+          } catch (err) {
+            tilesetsError = err
+          }
+
+          if (tilesetsOutput) {
+            expect(tilesetsOutput).to.have.deep.members(file.expected.tiles)
+          } else {
+            expect(tilesetsError.message).to.equal(file.expected.tiles)
+          }
+        })
+      })
+    }
+
+    if (functionOutput[file.basename]) {
+      if (file.parsed.type !== 'image') {
+        throw new Error('Only test function output for images!')
+      }
+
+      describe(`Functions for ${file.basename}`, () => {
+        for (const [fn, tests] of Object.entries(functionOutput[file.basename])) {
+          describe(`${fn}`, () => {
+            for (const { input, output: expectedOutput } of tests) {
+              it('should match expected output', () => {
+                let fnOutput
+                let fnError
+
+                try {
+                  fnOutput = allmaps[fn](file.parsed, ...input)
+                } catch (err) {
+                  fnError = err
+                }
+
+                if (fnOutput) {
+                  expect(fnOutput).to.deep.equal(expectedOutput)
+                } else {
+                  expect(fnError.message).to.equal(expectedOutput)
+                }
+              })
+            }
+          })
+        }
+      })
+    }
+  }
 }

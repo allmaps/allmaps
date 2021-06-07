@@ -1,0 +1,48 @@
+[
+    [  {
+        "columns": 18,
+        "height": 512,
+        "originalHeight": 512,
+        "originalWidth": 512,
+        "rows": 14,
+        "scaleFactor": 1,
+        "width": 512
+      },
+      {
+        "columns": 9,
+        "height": 512,
+        "originalHeight": 1024,
+        "originalWidth": 1024,
+        "rows": 7,
+        "scaleFactor": 2,
+        "width": 512
+      },
+      {
+        "columns": 5,
+        "height": 512,
+        "originalHeight": 2048,
+        "originalWidth": 2048,
+        "rows": 4,
+        "scaleFactor": 4,
+        "width": 512
+      },
+      {
+        "columns": 3,
+        "height": 512,
+        "originalHeight": 4096,
+        "originalWidth": 4096,
+        "rows": 2,
+        "scaleFactor": 8,
+        "width": 512
+      },
+      {
+        "columns": 2,
+        "height": 512,
+        "originalHeight": 8192,
+        "originalWidth": 8192,
+        "rows": 1,
+        "scaleFactor": 16,
+        "width": 512
+      }
+    ]
+  ]

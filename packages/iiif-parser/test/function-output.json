@@ -1,0 +1,229 @@
+{
+  "nls-10146-101465411.image.2": {
+    "getImageUrl": [
+      {
+        "input": [
+          {
+            "region": { "x": 10, "y": 10, "width": 100, "height": 100 },
+            "size": { "width": 1000, "height": 1000 }
+          }
+        ],
+        "output": "https://mapview.nls.uk/iiif/10146/101465411/10,10,100,100/1000,1000/0/default.jpg"
+      }
+    ],
+    "getThumbnail": [
+      {
+        "input": [500, 500, "contain"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 500,
+            "height": 363
+          }
+        }
+      },
+      {
+        "input": [500, 500, "cover"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 688,
+            "height": 500
+          }
+        }
+      }
+    ]
+  },
+  "nhm-vfactor-L014163620.image.3": {
+    "getImageUrl": [
+      {
+        "input": [
+          {
+            "region": { "x": 10, "y": 10, "width": 100, "height": 100 },
+            "size": { "width": 100, "height": 100 }
+          }
+        ],
+        "output": "https://data.nhm.ac.uk/iiif_images/vfactor:L014163620.jpg/10,10,100,100/100,100/0/default.jpg"
+      },
+      {
+        "input": [
+          {
+            "region": { "x": 10, "y": 10, "width": 100, "height": 100 }
+          }
+        ],
+        "output": "https://data.nhm.ac.uk/iiif_images/vfactor:L014163620.jpg/10,10,100,100/max/0/default.jpg"
+      },
+      {
+        "input": [
+          {
+            "size": { "width": 100, "height": 100 }
+          }
+        ],
+        "output": "https://data.nhm.ac.uk/iiif_images/vfactor:L014163620.jpg/full/100,100/0/default.jpg"
+      }
+    ],
+    "getThumbnail": [
+      {
+        "input": [500, 500, "contain"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 463,
+            "height": 442
+          }
+        }
+      },
+      {
+        "input": [500, 500, "cover"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 463,
+            "height": 442
+          }
+        }
+      },
+      {
+        "input": [3700, 7000, "contain"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 3708,
+            "height": 3542
+          }
+        }
+      },
+      {
+        "input": [3700, 7000, "cover"],
+        "output": {
+          "region": "full",
+          "size": {
+            "width": 7416,
+            "height": 7085
+          }
+        }
+      }
+    ],
+    "getIiifTile": [
+
+    ]
+  },
+  "rp-rtsa-4001-1985-1014-01.image.2": {
+    "getThumbnail": [
+      {
+        "input": [500, 500, "incorrect"],
+        "output": "Size must be either \"cover\" or \"contain\""
+      },
+      {
+        "input": [500, 500, "contain"],
+        "output": [
+          {
+            "region": { "x": 0, "y": 0, "width": 8192, "height": 6922 },
+            "size": { "width": 512, "height": 433 }
+          }
+        ]
+      },
+      {
+        "input": [500, 500, "cover"],
+        "output": [
+          {
+            "region": { "x": 0, "y": 0, "width": 8192, "height": 6922 },
+            "size": { "width": 512, "height": 433 }
+          },
+          {
+            "region": { "x": 8192, "y": 0, "width": 910, "height": 6922 },
+            "size": { "width": 57, "height": 433 }
+          }
+        ]
+      },
+      {
+        "input": [1600, 1600, "cover"],
+        "output": [
+          {
+            "region": { "x": 0, "y": 0, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 0, "y": 2048, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 0, "y": 4096, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 0, "y": 6144, "width": 2048, "height": 778 },
+            "size": { "width": 512, "height": 195 }
+          },
+          {
+            "region": { "x": 2048, "y": 0, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 2048, "y": 2048, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 2048, "y": 4096, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 2048, "y": 6144, "width": 2048, "height": 778 },
+            "size": { "width": 512, "height": 195 }
+          },
+          {
+            "region": { "x": 4096, "y": 0, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 4096, "y": 2048, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 4096, "y": 4096, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 4096, "y": 6144, "width": 2048, "height": 778 },
+            "size": { "width": 512, "height": 195 }
+          },
+          {
+            "region": { "x": 6144, "y": 0, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 6144, "y": 2048, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 6144, "y": 4096, "width": 2048, "height": 2048 },
+            "size": { "width": 512, "height": 512 }
+          },
+          {
+            "region": { "x": 6144, "y": 6144, "width": 2048, "height": 778 },
+            "size": { "width": 512, "height": 195 }
+          },
+          {
+            "region": { "x": 8192, "y": 0, "width": 910, "height": 2048 },
+            "size": { "width": 228, "height": 512 }
+          },
+          {
+            "region": { "x": 8192, "y": 2048, "width": 910, "height": 2048 },
+            "size": { "width": 228, "height": 512 }
+          },
+          {
+            "region": { "x": 8192, "y": 4096, "width": 910, "height": 2048 },
+            "size": { "width": 228, "height": 512 }
+          },
+          {
+            "region": { "x": 8192, "y": 6144, "width": 910, "height": 778 },
+            "size": { "width": 228, "height": 195 }
+          }
+        ]
+      }
+    ],
+    "getIiifTile": [
+
+    ]
+  }
+}

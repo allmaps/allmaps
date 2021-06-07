@@ -1,4 +1,8 @@
 function parseContext (data) {
+  if (!data['@context']) {
+    throw new Error('Invalid IIIF: no @context property found.')
+  }
+
   const iiif2AndUpBaseUri = 'http://iiif.io/api'
 
   let iiifContextUri
@@ -125,7 +129,7 @@ export function parseProfileUri (profileUri) {
 
 function parseProfile (context, image) {
   const region = 'full'
-  const size = context.version === '2' ? 'full' : 'max'
+  const size = context.majorVersion === 2 ? 'full' : 'max'
   const format = 'jpg'
   const quality = 'default'
 

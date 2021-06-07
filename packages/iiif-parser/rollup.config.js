@@ -4,7 +4,6 @@ import {terser} from 'rollup-plugin-terser'
 import * as meta from './package.json'
 
 const copyright = `// ${meta.homepage} v${meta.version} Copyright ${(new Date()).getFullYear()} ${meta.author.name}`
-const name = meta.name.split('/')[1]
 
 export default [
   {
@@ -17,10 +16,10 @@ export default [
       terser({output: {preamble: copyright}})
     ],
     output: {
-      file: `dist/${name}.min.js`,
+      file: `dist/allmaps-iiif-parser.min.js`,
       banner: copyright,
       format: 'umd',
-      name,
+      name: 'allmaps',
       esModule: false,
       exports: 'named',
       sourcemap: true
