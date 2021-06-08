@@ -1,40 +1,5 @@
 import { getTilesets, getIiifTile } from './tiles.js'
 
-// export function getThumbnailUrls (image, thumbnailWidth = 100) {
-//   const sizes = getSizes(image)
-
-//   const dimensions = [
-//     image.width,
-//     image.height
-//   ]
-
-//   const baseUrl = image['@id']
-//   const suffix = `0/${getQuality(image)}.${getFormat(image)}`
-
-//   if (sizes.anySize) {
-//     return `${baseUrl}/full/${thumbnailWidth},/${suffix}`
-//   } else if (sizes.sizes) {
-//     let currentSizeIndex = 0
-//     while (currentSizeIndex < sizes.sizes.length && sizes.sizes[currentSizeIndex] < thumbnailWidth) {
-//       currentSizeIndex++
-//     }
-//     const width = sizes.sizes[currentSizeIndex].width
-//     return `${baseUrl}/full/${width},/${suffix}`
-//   } else if (sizes.tiles) {
-//     const tileSet = sizes.tiles[0]
-//     const tileWidth = tileSet.width
-//     const scaleFactor = Math.max(...tileSet.scaleFactors)
-
-//     const regionWidth = tileWidth * scaleFactor
-//     const regionHeight = tileWidth * scaleFactor
-
-//     const region = `0,0,${Math.min(dimensions[0], regionWidth)},${Math.min(dimensions[1], regionHeight)}`
-//     return `${baseUrl}/${region}/${tileWidth},/${suffix}`
-//   } else {
-//     throw new Error('Image without sizes, tiles or sizeByWhListed')
-//   }
-// }
-
 function getThumbnailSize (parsedImage, containerWidth, containerHeight, mode = 'cover') {
   if (mode === 'cover' || mode === 'contain') {
     const widthRatio = containerWidth / parsedImage.width
@@ -112,13 +77,16 @@ export function getThumbnail (parsedImage, containerWidth, containerHeight, mode
     const zoomLevel = tileset[nearestZoomLevels[0].index]
 
     let thumbnailTiles = []
-    for (let x = 0; x < tilesX; x++) {
-      for (let y = 0; y < tilesY; y++) {
-        thumbnailTiles.push({ x, y })
+    for (let y = 0; y < tilesY; y++) {
+      let thumbnailRow = []
+      for (let x = 0; x < tilesX; x++) {
+        const thumbnailTile = getIiifTile(parsedImage, zoomLevel, x, y)
+        thumbnailRow.push(thumbnailTile)
       }
+      thumbnailTiles.push(thumbnailRow)
     }
 
-    return thumbnailTiles.map(({ x, y }) => getIiifTile(parsedImage, zoomLevel, x, y))
+    return thumbnailTiles
   }
 
   throw new Error('Unable to create thumbnail')

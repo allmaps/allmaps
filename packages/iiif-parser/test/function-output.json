@@ -116,110 +116,15 @@
       },
       {
         "input": [500, 500, "contain"],
-        "output": [
-          {
-            "region": { "x": 0, "y": 0, "width": 8192, "height": 6922 },
-            "size": { "width": 512, "height": 433 }
-          }
-        ]
+        "output": [[{"region":{"x":0,"y":0,"width":8192,"height":6922},"size":{"width":512,"height":433}}]]
       },
       {
         "input": [500, 500, "cover"],
-        "output": [
-          {
-            "region": { "x": 0, "y": 0, "width": 8192, "height": 6922 },
-            "size": { "width": 512, "height": 433 }
-          },
-          {
-            "region": { "x": 8192, "y": 0, "width": 910, "height": 6922 },
-            "size": { "width": 57, "height": 433 }
-          }
-        ]
+        "output": [[{"region":{"x":0,"y":0,"width":8192,"height":6922},"size":{"width":512,"height":433}},{"region":{"x":8192,"y":0,"width":910,"height":6922},"size":{"width":57,"height":433}}]]
       },
       {
         "input": [1600, 1600, "cover"],
-        "output": [
-          {
-            "region": { "x": 0, "y": 0, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 0, "y": 2048, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 0, "y": 4096, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 0, "y": 6144, "width": 2048, "height": 778 },
-            "size": { "width": 512, "height": 195 }
-          },
-          {
-            "region": { "x": 2048, "y": 0, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 2048, "y": 2048, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 2048, "y": 4096, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 2048, "y": 6144, "width": 2048, "height": 778 },
-            "size": { "width": 512, "height": 195 }
-          },
-          {
-            "region": { "x": 4096, "y": 0, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 4096, "y": 2048, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 4096, "y": 4096, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 4096, "y": 6144, "width": 2048, "height": 778 },
-            "size": { "width": 512, "height": 195 }
-          },
-          {
-            "region": { "x": 6144, "y": 0, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 6144, "y": 2048, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 6144, "y": 4096, "width": 2048, "height": 2048 },
-            "size": { "width": 512, "height": 512 }
-          },
-          {
-            "region": { "x": 6144, "y": 6144, "width": 2048, "height": 778 },
-            "size": { "width": 512, "height": 195 }
-          },
-          {
-            "region": { "x": 8192, "y": 0, "width": 910, "height": 2048 },
-            "size": { "width": 228, "height": 512 }
-          },
-          {
-            "region": { "x": 8192, "y": 2048, "width": 910, "height": 2048 },
-            "size": { "width": 228, "height": 512 }
-          },
-          {
-            "region": { "x": 8192, "y": 4096, "width": 910, "height": 2048 },
-            "size": { "width": 228, "height": 512 }
-          },
-          {
-            "region": { "x": 8192, "y": 6144, "width": 910, "height": 778 },
-            "size": { "width": 228, "height": 195 }
-          }
-        ]
+        "output": [[{"region":{"x":0,"y":0,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":2048,"y":0,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":4096,"y":0,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":6144,"y":0,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":8192,"y":0,"width":910,"height":2048},"size":{"width":228,"height":512}}],[{"region":{"x":0,"y":2048,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":2048,"y":2048,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":4096,"y":2048,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":6144,"y":2048,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":8192,"y":2048,"width":910,"height":2048},"size":{"width":228,"height":512}}],[{"region":{"x":0,"y":4096,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":2048,"y":4096,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":4096,"y":4096,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":6144,"y":4096,"width":2048,"height":2048},"size":{"width":512,"height":512}},{"region":{"x":8192,"y":4096,"width":910,"height":2048},"size":{"width":228,"height":512}}],[{"region":{"x":0,"y":6144,"width":2048,"height":778},"size":{"width":512,"height":195}},{"region":{"x":2048,"y":6144,"width":2048,"height":778},"size":{"width":512,"height":195}},{"region":{"x":4096,"y":6144,"width":2048,"height":778},"size":{"width":512,"height":195}},{"region":{"x":6144,"y":6144,"width":2048,"height":778},"size":{"width":512,"height":195}},{"region":{"x":8192,"y":6144,"width":910,"height":778},"size":{"width":228,"height":195}}]]
       }
     ],
     "getIiifTile": [
