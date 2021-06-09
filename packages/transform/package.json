@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -9,8 +9,8 @@
   "description": "Coordinate transformation functions, based on gdaltransform",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "unpkg": "dist/transform.min.js",
-  "jsdelivr": "dist/transform.min.js",
+  "unpkg": "dist/allmaps-transform.min.js",
+  "jsdelivr": "dist/allmaps-transform.min.js",
   "files": [
     "dist"
   ],
@@ -36,8 +36,11 @@
     "rollup": "^2.38.0",
     "rollup-plugin-terser": "^7.0.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@turf/distance": "^6.3.0",
+    "@turf/midpoint": "^6.3.0"
+  },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   }
 }

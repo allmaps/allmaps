@@ -1,4 +1,4 @@
-import {GCP, GDALCreateGCPTransformer, GDALGCPTransform} from './gdaltransform.js'
+import { GCP, GDALCreateGCPTransformer, GDALGCPTransform } from './gdaltransform.js'
 
 export function toWorld (transformArgs, point) {
   const bInverse = false

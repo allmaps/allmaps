@@ -1,1 +1,2 @@
-export * from './src/transformer'
+export * from './src/transformer.js'
+export * from './src/polygon.js'
