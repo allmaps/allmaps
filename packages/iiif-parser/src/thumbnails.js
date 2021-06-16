@@ -36,22 +36,17 @@ export function getThumbnail (parsedImage, containerWidth, containerHeight, mode
     }
 
     return {
-      region: 'full',
       size: matchingSize
     }
   }
 
   if (parsedImage.supportsAnyRegionAndSize) {
     // TODO: can request smaller region than full
-    const region = 'full'
-    const size = {
-      width: Math.round(width),
-      height: Math.round(height)
-    }
-
     return {
-      region,
-      size
+      size: {
+        width: Math.round(width),
+        height: Math.round(height)
+      }
     }
   }
 
@@ -60,9 +55,6 @@ export function getThumbnail (parsedImage, containerWidth, containerHeight, mode
 
     // TODO: also use other tilesets!
     const tileset = tilesets[0]
-
-    const tilesX = Math.ceil(width / tileset[0].width)
-    const tilesY = Math.ceil(height / tileset[0].height)
 
     // TODO: take maxThumbnailDownscale and maxThumbnailUpscale into account
     const ratio = parsedImage.width / width
@@ -75,6 +67,9 @@ export function getThumbnail (parsedImage, containerWidth, containerHeight, mode
       .sort((a, b) => a.diff - b.diff)
 
     const zoomLevel = tileset[nearestZoomLevels[0].index]
+
+    const tilesX = Math.ceil(parsedImage.width / (zoomLevel.scaleFactor * tileset[0].width))
+    const tilesY = Math.ceil(parsedImage.height / (zoomLevel.scaleFactor * tileset[0].height))
 
     let thumbnailTiles = []
     for (let y = 0; y < tilesY; y++) {

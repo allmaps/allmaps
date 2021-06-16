@@ -1,9 +1,10 @@
 import nodeResolve from '@rollup/plugin-node-resolve'
 import babel from '@rollup/plugin-babel'
-import {terser} from 'rollup-plugin-terser'
+import { terser } from 'rollup-plugin-terser'
 import * as meta from './package.json'
 
 const copyright = `// ${meta.homepage} v${meta.version} Copyright ${(new Date()).getFullYear()} ${meta.author.name}`
+const name = meta.name.split('/')[1]
 
 export default [
   {
@@ -13,10 +14,10 @@ export default [
       babel({
         babelHelpers: 'bundled'
       }),
-      terser({output: {preamble: copyright}})
+      terser({output: { preamble: copyright }})
     ],
     output: {
-      file: `dist/allmaps-iiif-parser.min.js`,
+      file: `dist/allmaps-${name}.min.js`,
       banner: copyright,
       format: 'umd',
       name: 'allmaps',

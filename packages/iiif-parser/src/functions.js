@@ -12,8 +12,13 @@ export function getImageUrl (parsedImage, { region, size }) {
 
   let urlSize
   if (size) {
+    let height = ''
+    if (size.height && size.width !== size.height) {
+      height = size.height
+    }
+
     // size = width,height
-    urlSize = `${size.width},${size.height}`
+    urlSize = `${size.width},${height}`
   } else {
     urlSize = parsedImage.version === 2 ? 'full' : 'max'
   }

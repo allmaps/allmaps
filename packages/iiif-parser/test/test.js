@@ -143,7 +143,7 @@ function runTests (file) {
         for (const [fn, tests] of Object.entries(functionOutput[file.basename])) {
           describe(`${fn}`, () => {
             for (const { input, output: expectedOutput } of tests) {
-              it('should match expected output', () => {
+              it(`should match expected output for: ${JSON.stringify(input)}` , () => {
                 let fnOutput
                 let fnError
 

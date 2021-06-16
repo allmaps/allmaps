@@ -1,12 +1,12 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "IIIF parser",
+  "description": "Allmaps IIIF parser",
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -43,6 +43,6 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   }
 }
