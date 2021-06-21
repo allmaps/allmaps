@@ -49,8 +49,8 @@ export function parseIiif (data, options) {
 
   if (context.api === 'image') {
     return parseImage(data, {
-    context,
-    ...options
+      context,
+      ...options
     })
   } else if (context.api === 'presentation') {
     return parsePresentation(data, {

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -41,6 +41,19 @@
     "mocha": "^8.3.2",
     "rollup": "^2.38.0",
     "rollup-plugin-terser": "^7.0.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": "off"
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
   },
   "engines": {
     "node": ">=14"

@@ -23,6 +23,10 @@ const maxThumbnailDownscale = 0.8
 const maxThumbnailUpscale = 1.5
 
 export function getThumbnail (parsedImage, containerWidth, containerHeight, mode = 'cover') {
+  if (!containerHeight) {
+    containerHeight = containerWidth
+  }
+
   const { width, height } = getThumbnailSize(parsedImage, containerWidth, containerHeight, mode)
 
   if (parsedImage.sizes) {
