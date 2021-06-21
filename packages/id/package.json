@@ -1,11 +1,12 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "description": "IDs for Allmaps",
+  "type": "module",
   "main": "dist/id.min.js",
   "module": "dist/id.mjs",
-  "unpkg": "dist/id.min.js",
-  "jsdelivr": "dist/id.min.js",
+  "unpkg": "dist/allmaps-id.min.js",
+  "jsdelivr": "dist/allmaps-id.min.js",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -52,6 +53,6 @@
     }
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   }
 }

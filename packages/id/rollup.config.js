@@ -16,10 +16,10 @@ export default [
       })
     ],
     output: {
-      file: `dist/${name}.mjs`,
+      file: `dist/allmaps-${name}.mjs`,
       banner: copyright,
       format: 'esm',
-      name,
+      name: 'allmaps',
       exports: 'named',
       sourcemap: true,
       globals: {
@@ -37,10 +37,10 @@ export default [
       terser({output: {preamble: copyright}})
     ],
     output: {
-      file: `dist/${name}.min.js`,
+      file: `dist/allmaps-${name}.min.js`,
       banner: copyright,
       format: 'umd',
-      name,
+      name: 'allmaps',
       esModule: false,
       exports: 'named',
       sourcemap: true,
