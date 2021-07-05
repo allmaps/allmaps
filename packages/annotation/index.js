@@ -1,2 +1,2 @@
-export * from './src/parser'
-export * from './src/generator'
+export * from './src/parser.js'
+export * from './src/generator.js'

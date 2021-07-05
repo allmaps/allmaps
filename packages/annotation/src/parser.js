@@ -17,7 +17,7 @@ function getGcps (annotation) {
   return annotation.body.features
     .map((gcpFeature) => ({
       id: gcpFeature.id,
-      image: gcpFeature.properties.image || null,
+      image: gcpFeature.properties.pixelCoords || null,
       world: gcpFeature.geometry ? gcpFeature.geometry.coordinates : null
     }))
 }
@@ -30,7 +30,10 @@ function getImageDimensions (annotation) {
     const { groups: { width } } = /width="(?<width>\d+)"/.exec(svg)
     const { groups: { height } } = /height="(?<height>\d+)"/.exec(svg)
 
-    return [parseInt(width), parseInt(height)]
+    return {
+      width,
+      height
+    }
   }
 }
 
@@ -40,7 +43,8 @@ function getImageUri (annotation) {
     && annotation.target.service[0] && annotation.target.service[0]['@id']
 }
 
-function getPixelMask (annotation) {
+// TODO: export function
+export function getPixelMask (annotation) {
   const selector = annotation.target.selector
   if (selector) {
     const svg = selector.value
@@ -55,7 +59,7 @@ function getMap (annotation) {
     source: getSource(annotation),
     image: {
       uri: getImageUri(annotation),
-      dimensions: getImageDimensions(annotation),
+      ...getImageDimensions(annotation)
     },
     pixelMask: getPixelMask(annotation),
     gcps: getGcps(annotation)
