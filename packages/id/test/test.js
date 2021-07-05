@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import { createId, createRandomId, createChecksum } from '../nodejs.js'
+import { createId, createRandomId, createChecksum } from '../index.js'
 
 test('Create ID for url: 1234', async (t) => {
   const id = await createId(1234)

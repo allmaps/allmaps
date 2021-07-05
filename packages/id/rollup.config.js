@@ -8,7 +8,7 @@ const name = meta.name.split('/')[1]
 
 export default [
   {
-    input: 'nodejs.js',
+    input: 'index.js',
     plugins: [
       nodeResolve(),
       babel({
@@ -28,7 +28,7 @@ export default [
     }
   },
   {
-    input: 'nodejs.js',
+    input: 'index.js',
     plugins: [
       nodeResolve(),
       babel({
@@ -37,7 +37,7 @@ export default [
       terser({output: {preamble: copyright}})
     ],
     output: {
-      file: `dist/allmaps-${name}.min.js`,
+      file: `dist/allmaps-${name}.min.cjs`,
       banner: copyright,
       format: 'umd',
       name: 'allmaps',
@@ -57,7 +57,7 @@ export default [
       })
     ],
     output: {
-      dir: 'dist/esm',
+      file: `dist/web/allmaps-${name}.min.mjs`,
       esModule: true,
       format: 'esm',
       exports: 'named',
@@ -73,7 +73,7 @@ export default [
       terser({output: {preamble: copyright}})
     ],
     output: {
-      dir: 'dist/cjs',
+      file: `dist/web/allmaps-${name}.min.cjs`,
       format: 'cjs',
       exports: 'named',
       sourcemap: true
