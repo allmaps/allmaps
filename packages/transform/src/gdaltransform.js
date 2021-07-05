@@ -97,16 +97,22 @@ function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, 
 
   //     memset( &sPoints, 0, sizeof(sPoints) );
 
-  if (nReqOrder === 0) {
-    if (nGCPCount >= 10) {
-      // for now we avoid 3rd order since it is unstable
-      nReqOrder = 2
-    } else if (nGCPCount >= 6) {
-      nReqOrder = 2
-    } else {
-      nReqOrder = 1
-    }
-  }
+  // if (nReqOrder === 0) {
+  //   if (nGCPCount >= 10) {
+  //     // for now we avoid 3rd order since it is unstable
+  //     nReqOrder = 2
+  //   } else if (nGCPCount >= 6) {
+  //     nReqOrder = 2
+  //   } else {
+  //     nReqOrder = 1
+  //   }
+  // }
+
+  // TODO: the code above that sets nReqOrder comes from GDAL
+  // this can lead to unwanted and unpredictable results
+  // in the future, nReqOrder can maybe be selected by the user
+  // for now, always set nReqOrder to 1
+  nReqOrder = 1
 
   const psInfo = new GCPTransformInfo()
   psInfo.bReversed = bReversed
