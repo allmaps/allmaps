@@ -23,7 +23,12 @@
     "type": "git",
     "url": "https://github.com/allmaps/id.git"
   },
-  "keywords": [],
+  "keywords": [
+    "allmaps",
+    "id",
+    "identifier",
+    "checksum"
+  ],
   "author": {
     "name": "@nelsonic",
     "email": "contact.nelsonic@gmail.com",
