@@ -1,13 +1,19 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "description": "IDs for Allmaps",
   "type": "module",
-  "main": "dist/allmaps-id.min.cjs",
-  "browser": "dist/web/allmaps-id.min.cjs",
-  "module": "dist/allmaps-id.min.mjs",
-  "unpkg": "dist/web/allmaps-id.min.mjs",
-  "jsdelivr": "dist/web/allmaps-id.min.cjs",
+  "main": "./dist/allmaps-id.min.cjs",
+  "module": "./dist/allmaps-id.min.mjs",
+  "exports": {
+    "require": "./dist/allmaps-id.min.cjs",
+    "import": "./dist/allmaps-id.min.mjs",
+    "default": "./dist/allmaps-id.min.mjs",
+    "browser": "./dist/web/allmaps-id.min.cjs"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
