@@ -11,7 +11,7 @@
   import { fromLonLat } from 'ol/proj'
 
   import { WarpedMapLayer } from '@allmaps/layers'
-  import { createTransformer, toWorld } from '@allmaps/transform'
+  import { createTransformer, polygonToWorld } from '@allmaps/transform'
 
   export let map
 
@@ -35,11 +35,7 @@
       vectorSource.clear()
 
       const transformArgs = createTransformer(map.gcps)
-      const polygon = map.pixelMask.map((point) => toWorld(transformArgs, point))
-      const geoMask = {
-        type: 'Polygon',
-        coordinates: [polygon]
-      }
+      const geoMask = polygonToWorld(transformArgs, map.pixelMask)
 
       vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
 
@@ -49,12 +45,15 @@
       const options = {
         image,
         georeferencedMap: map,
-
         source: new VectorSource()
-
       }
+
       warpedMapLayer = new WarpedMapLayer(options)
       ol.addLayer(warpedMapLayer)
+
+      // warpedMapLayer.on('tile-load-error', (event) => {
+      //   console.log(event)
+      // })
 
       const extent = vectorSource.getExtent()
 

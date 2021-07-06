@@ -1,6 +1,8 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte'
 
+  import Thumbnail from './Thumbnail.svelte'
+
   export let maps
   export let selectedMap
 
@@ -11,6 +13,8 @@
   let totalScrollDistance = 0
   let scrollThreshold = 5
 
+  const thumbnailWidth = 100
+
   const dispatch = createEventDispatcher()
 
   function setSelectedMap (index) {
@@ -19,11 +23,6 @@
         selectedMap: index
       })
     }
-  }
-
-  function thumbnailUrl (map) {
-    const imageUri = map.image.uri
-    return `${imageUri}/full/100,100/0/default.jpg`
   }
 
   onMount(async () => {
@@ -66,7 +65,7 @@
       <button
         class="{selectedMap === index ? 'selected' : ''}"
         on:click|preventDefault={() => setSelectedMap(index)}>
-        <img alt={`Map ${index + 1}`} src={thumbnailUrl(map)} />
+        <Thumbnail imageUri={map.image.uri} width={thumbnailWidth} />
         <span class="index">{index + 1}</span>
       </button>
     </li>
