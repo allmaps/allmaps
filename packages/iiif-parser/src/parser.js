@@ -148,12 +148,12 @@ function parseProfile (context, image) {
     if (image.profile) {
       if (typeof image.profile === 'string') {
         const { level: profileLevel } = parseProfileUri(image.profile)
-        supportsAnyRegionAndSize ||= (profileLevel >= 1)
+        supportsAnyRegionAndSize = supportsAnyRegionAndSize || (profileLevel >= 1)
       } else if (image.profile.constructor === Array) {
         image.profile.forEach((profile) => {
           if (typeof profile === 'string') {
             const { level: profileLevel } = parseProfileUri(profile)
-            supportsAnyRegionAndSize ||= (profileLevel >= 1)
+            supportsAnyRegionAndSize = supportsAnyRegionAndSize || (profileLevel >= 1)
           } else {
             if (profile.maxWidth) {
               maxWidth = maxWidth ? Math.max(profile.maxWidth, maxWidth) : profile.maxWidth
@@ -168,7 +168,7 @@ function parseProfile (context, image) {
             }
 
             if (profile.supports) {
-              supportsAnyRegionAndSize ||= anyRegionAndSizeFeatures
+              supportsAnyRegionAndSize = supportsAnyRegionAndSize || anyRegionAndSizeFeatures
                 .every((feature) => profile.supports.includes(feature))
             }
           }
