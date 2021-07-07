@@ -17,7 +17,7 @@ export default [
       terser({output: { preamble: copyright }})
     ],
     output: {
-      file: `dist/allmaps-${name}.min.cjs`,
+      file: `dist/allmaps-${name}.min.js`,
       banner: copyright,
       format: 'umd',
       name: 'allmaps',
@@ -25,26 +25,5 @@ export default [
       exports: 'named',
       sourcemap: true
     }
-  },
-  {
-    input: 'index.js',
-    plugins: [
-      nodeResolve()
-    ],
-    output: [
-      {
-        dir: 'dist/esm',
-        format: 'esm',
-        exports: 'named',
-        sourcemap: true
-      },
-      {
-        // dir: 'dist/cjs',
-        file: `dist/index.cjs`,
-        format: 'cjs',
-        exports: 'named',
-        sourcemap: true
-      }
-    ]
   }
 ]

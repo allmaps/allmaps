@@ -52,6 +52,9 @@ wget -O yale-15826830.presentation.2.json \
 wget -O stanford-vg994wz9415.presentation.2.json \
   https://purl.stanford.edu/vg994wz9415/iiif/manifest
 
+wget -O archivelab-map19820040456-presentation.2.json \
+  https://iiif.archivelab.org/iiif/map19820040456/manifest.json
+
 ### Presentation 3.0:
 
 wget -O delft-kaartenkamer-gidskaartjes.presentation.3.json \

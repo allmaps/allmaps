@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.11",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -8,12 +8,18 @@
   },
   "description": "Allmaps IIIF parser",
   "type": "module",
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/esm/index.js",
-  "unpkg": "dist/allmaps-iiif-parser.min.cjs",
-  "jsdelivr": "dist/allmaps-iiif-parser.min.cjs",
+  "module": "index.js",
+  "main": "index.js",
+  "jsdelivr": "dist/allmaps.iiif-parser.min.js",
+  "unpkg": "dist/allmaps-iiif-parser.min.js",
+  "exports": {
+    "umd": "./dist/allmaps-iiif-parser.min.js",
+    "default": "./index.js"
+  },
   "files": [
-    "dist"
+    "index.js",
+    "dist/**/*.js",
+    "src/**/*.js"
   ],
   "repository": {
     "type": "git",
