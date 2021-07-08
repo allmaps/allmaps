@@ -1,9 +1,10 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.11",
   "description": "IDs for Allmaps",
   "type": "module",
   "module": "index.js",
+  "unpkg": "web.js",
   "exports": {
     "import": "./index.js",
     "browser": "./web.js"
