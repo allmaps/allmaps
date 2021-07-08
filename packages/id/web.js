@@ -1,6 +1,6 @@
 /* global crypto, TextEncoder, btoa */
 
-import { hashToId, serialize, randomString } from './src/id'
+import { hashToId, serialize, randomString } from './src/id.js'
 
 function sha512 (str) {
   return crypto.subtle.digest('SHA-512', new TextEncoder('utf-8').encode(str))
