@@ -9,8 +9,8 @@ jobs:
         with:
           node-version: 14
 
+      # - run: npm ci
       - run: npm install
-      - run: npm run build
 
       # https://github.com/marketplace/actions/npm-publish
       # TODO: set access to public
