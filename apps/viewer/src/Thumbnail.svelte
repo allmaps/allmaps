@@ -38,11 +38,11 @@
     {#if Array.isArray(thumbnail) }
     	{#each thumbnail as row, rowIndex}
         {#each row as cell, columnIndex}
-          <img src={getImageUrl(parsedImage, removeHeight(cell))} />
+          <img alt="thumbnail tile" src={getImageUrl(parsedImage, removeHeight(cell))} />
         {/each}
       {/each}
     {:else}
-      <img class="single" src={getImageUrl(parsedImage, thumbnail)} />
+      <img alt="thumbnail" class="single" src={getImageUrl(parsedImage, thumbnail)} />
     {/if}
   {:catch error}
     <div class="content">
