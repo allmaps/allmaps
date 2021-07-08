@@ -11,8 +11,8 @@ npm install @allmaps/id --save
 Usage:
 
 ```js
-const generateId = require('@allmaps/id')
+import { createId } from '@allmaps/id'
 const url = 'https://orka.bibliothek.uni-kassel.de/viewer/rest/iiif/manifests/1535113582549/manifest/'
-const id = generateId(url)
+const id = await createId(url)
 console.log(id)
 ```
