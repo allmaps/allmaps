@@ -35,9 +35,11 @@
       vectorSource.clear()
 
       const transformArgs = createTransformer(map.gcps)
-      const geoMask = polygonToWorld(transformArgs, map.pixelMask)
 
-      vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
+      if (map.pixelMask && map.pixelMask.length) {
+        const geoMask = polygonToWorld(transformArgs, map.pixelMask)
+        vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
+      }
 
       const imageUri = map.image.uri
 
