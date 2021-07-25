@@ -36,6 +36,8 @@
 
       const transformArgs = createTransformer(map.gcps)
 
+      // TODO: what happens with maps without pixelMask?!
+      // Make sure annotation parser/generator always adds pixelMask!
       if (map.pixelMask && map.pixelMask.length) {
         const geoMask = polygonToWorld(transformArgs, map.pixelMask)
         vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
@@ -54,7 +56,8 @@
       ol.addLayer(warpedMapLayer)
 
       // warpedMapLayer.on('tile-load-error', (event) => {
-      //   console.log(event)
+      //   TODO: this is probably a CORS error! Show these!
+      //   TODO: and show other errors as well...
       // })
 
       const extent = vectorSource.getExtent()
