@@ -9,9 +9,6 @@ jobs:
         with:
           node-version: 14
 
-      # - run: npm ci
-      - run: npm install
-
       # https://github.com/marketplace/actions/npm-publish
       # TODO: set access to public
       - uses: JS-DevTools/npm-publish@v1
