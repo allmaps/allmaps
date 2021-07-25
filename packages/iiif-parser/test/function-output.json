@@ -1,4 +1,34 @@
 {
+  "spk-berlin-630107580-00000001.image.2": {
+    "getThumbnail": [
+      {
+        "input": [
+          200
+        ],
+        "output": {
+          "size": {
+            "height": 297,
+            "width": 200
+          }
+        }
+      }
+    ]
+  },
+	"zlb-15453873-00000001.image.2": {
+    "getThumbnail": [
+      {
+        "input": [
+          200
+        ],
+        "output": {
+          "size": {
+            "height": 200,
+            "width": 253
+          }
+        }
+      }
+    ]
+  },
   "nls-10146-101465411.image.2": {
     "getImageUrl": [
       {

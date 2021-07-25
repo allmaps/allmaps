@@ -39,8 +39,10 @@ export function getThumbnail (parsedImage, containerWidth, containerHeight, mode
       }
     }
 
-    return {
-      size: matchingSize
+    if (matchingSize) {
+      return {
+        size: matchingSize
+      }
     }
   }
 

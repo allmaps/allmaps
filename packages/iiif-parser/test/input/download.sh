@@ -18,6 +18,12 @@ wget -O uu-60-82-67-60826765847502039061478934746532282060.image.2.json \
 wget -O rp-rtsa-4001-1985-1014-01.image.2.json \
   https://rotterdamspubliek.nl/iiif/NL-RtSA_4001_1985-1014-01/info.json
 
+wget -O spk-berlin-630107580-00000001.image.2.json \
+  https://digital.iai.spk-berlin.de/viewer/api/v1/records/630107580/files/images/00000001.tif/info.json
+
+wget -O zlb-15453873-00000001.image.2.json \
+  https://digital.zlb.de/viewer/api/v1/records/15453873/files/images/00000001.tif/info.json
+
 ### Image 3.0
 
 # This is not a map... it's just an image of lots of beetles...
