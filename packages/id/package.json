@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.12",
+  "version": "1.0.0-alpha.13",
   "description": "IDs for Allmaps",
   "type": "module",
   "module": "index.js",
@@ -14,7 +14,7 @@
     "src"
   ],
   "scripts": {
-    "test": "node ./test/*.js"
+    "test": "mocha && eslint src test"
   },
   "repository": {
     "type": "git",
@@ -37,25 +37,11 @@
   },
   "homepage": "https://allmaps.org",
   "devDependencies": {
-    "tape": "^5.2.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "off",
-      "no-unused-vars": "off"
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
+    "eslint": "7",
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
   },
   "engines": {
-    "node": ">=14"
+    "node": "^14.13.1 || >=16.0.0"
   }
 }
