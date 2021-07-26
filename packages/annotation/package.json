@@ -1,19 +1,20 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0-alpha.15",
+  "version": "1.0.0-alpha.16",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
   "description": "Functions for generating and parsing IIIF georeference annotations",
-
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "unpkg": "dist/allmaps-annotation.min.js",
-  "jsdelivr": "dist/allmaps-annotation.min.js",
+  "type": "module",
+  "module": "index.js",
+  "exports": {
+    "import": "./index.js"
+  },
   "files": [
-    "dist"
+    "index.js",
+    "src"
   ],
   "repository": {
     "type": "git",
@@ -25,39 +26,16 @@
     "map"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
-    "test": "mocha"
+    "test": "mocha && eslint src test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@rollup/plugin-babel": "^5.2.2",
-    "@rollup/plugin-node-resolve": "^11.1.0",
+    "eslint": "7",
     "chai": "^4.3.4",
     "chai-shallow-deep-equal": "^1.4.6",
-    "mocha": "^8.3.2",
-    "rollup": "^2.38.0",
-    "rollup-plugin-terser": "^7.0.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "off",
-      "no-unused-vars": "off"
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
+    "mocha": "^8.3.2"
   },
   "engines": {
-    "node": ">=14"
+    "node": "^14.13.1 || >=16.0.0"
   }
 }
