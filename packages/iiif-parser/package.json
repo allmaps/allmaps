@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.15",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,16 +27,17 @@
     "parser"
   ],
   "scripts": {
-    "test": "mocha"
+    "test": "mocha && eslint src test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "eslint": "7",
     "ajv": "^8.1.0",
     "chai": "^4.3.4",
     "chai-shallow-deep-equal": "^1.4.6",
     "mocha": "^8.3.2"
   },
   "engines": {
-    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+    "node": "^14.13.1 || >=16.0.0"
   }
 }

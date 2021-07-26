@@ -92,9 +92,7 @@ function parsePresentation (data, options) {
   }
 }
 
-function parseCollection (collection, options) {
-  const context = options.context
-
+function parseCollection () {
   throw new Error('Collections are not yet supported')
 }
 
@@ -179,7 +177,7 @@ function parseProfile (context, image) {
     }
   } else if (context.majorVersion === 3) {
     if (!image.profile) {
-      throw new error('Profile not present in image')
+      throw new Error('Profile not present in image')
     }
 
     maxWidth = image.maxWidth
@@ -234,7 +232,6 @@ function parseImage (image, options) {
   }
 
   if (!(imageVersion === 2 || imageVersion === 3)) {
-    console.log(image)
     throw new Error('Only supports Image API versions 2 and 3')
   }
 
@@ -247,9 +244,9 @@ function parseImage (image, options) {
   const width = image.width || (canvas && canvas.width)
   const height = image.height || (canvas && canvas.height)
 
-  if (!width || !height) {
-    console.log('geeeen width', canvas)
-  }
+  // TODO: check if width/height are found?!
+  // if (!width || !height) {
+  // }
 
   const { region, size, format, quality, supportsAnyRegionAndSize,
     maxWidth, maxHeight, maxArea } = parseProfile(context, image)
@@ -289,7 +286,7 @@ function parseManifestImages (manifest, options) {
   } else if (context.majorVersion === 3) {
     canvases = manifest.items
   } else {
-    throw new Error(`Unsupported Presentation API version: ${version}`)
+    throw new Error(`Unsupported Presentation API version: ${context.majorVersion}`)
   }
 
   return canvases.map((canvas) => {
