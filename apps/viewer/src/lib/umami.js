@@ -2,7 +2,9 @@
 
 function trackEvent (detail, event) {
   try {
-    umami.trackEvent(detail, event)
+    setTimeout(() => {
+      umami.trackEvent(detail, event)
+    }, 5000)
   } catch (err) {
     // Do nothing!
   }

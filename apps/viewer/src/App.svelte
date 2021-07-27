@@ -57,18 +57,14 @@
     if (data.startsWith(dataUrlPrefix)) {
       const url = data.replace(dataUrlPrefix, '')
 
-      setTimeout(() => {
-        trackAnnotationSource('url')
-        trackAnnotationUrl(url)
-      }, 5000)
+      trackAnnotationSource('url')
+      trackAnnotationUrl(url)
 
       return fetchAnnotation(url)
     } else if (data.startsWith(dataJsonPrefix)) {
       const annotation = JSON.parse(data.replace(dataJsonPrefix, ''))
 
-      setTimeout(() => {
-        trackAnnotationSource('string')
-      }, 5000)
+      trackAnnotationSource('string')
 
       return annotation
     } else {
