@@ -3,7 +3,11 @@
   import IIIF from './IIIF.svelte'
   import MapSelector from './MapSelector.svelte'
 
+  import { trackHostnames } from './lib/umami.js'
+
   export let maps
+
+  trackHostnames(maps)
 
   let selectedMap = 0
 

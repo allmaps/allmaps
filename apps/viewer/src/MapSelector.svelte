@@ -115,10 +115,6 @@
   height: 100%;
 }
 
-.maps .map button img {
-  object-fit: cover;
-}
-
 .maps .map button .index {
   padding: 0.5em;
   text-shadow: 0 0 2px white;

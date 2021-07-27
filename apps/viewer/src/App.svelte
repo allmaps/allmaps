@@ -7,6 +7,8 @@
   import Examples from './Examples.svelte'
   import BertSpaan from './BertSpaan.svelte'
 
+  import { trackAnnotationUrl, trackAnnotationSource } from './lib/umami.js'
+
   import { parse as parseAnnotation } from '@allmaps/annotation'
 
   const dataUrlPrefix = 'data:text/x-url,'
@@ -54,9 +56,20 @@
   async function parseUrlData (data) {
     if (data.startsWith(dataUrlPrefix)) {
       const url = data.replace(dataUrlPrefix, '')
+
+      setTimeout(() => {
+        trackAnnotationSource('url')
+        trackAnnotationUrl(url)
+      }, 5000)
+
       return fetchAnnotation(url)
     } else if (data.startsWith(dataJsonPrefix)) {
       const annotation = JSON.parse(data.replace(dataJsonPrefix, ''))
+
+      setTimeout(() => {
+        trackAnnotationSource('string')
+      }, 5000)
+
       return annotation
     } else {
       throw new Error(`Unsupported URL`)
