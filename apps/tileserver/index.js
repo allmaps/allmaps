@@ -2,7 +2,8 @@ const axios = require('axios')
 const sharp = require('sharp')
 const express = require('express')
 const app = express()
-const port = 3000
+
+const port = process.env.PORT || 3000
 
 const tileUrl = 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd380:g3804:g3804n:rr003520/2048,4096,2048,1584/512,/0/default.jpg'
 
