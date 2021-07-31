@@ -3,14 +3,21 @@ const sharp = require('sharp')
 const express = require('express')
 const app = express()
 
+const cache = require('./src/cache.js')
+
 const port = process.env.PORT || 3000
 
-const tileUrl = 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd380:g3804:g3804n:rr003520/2048,4096,2048,1584/512,/0/default.jpg'
+const tileUrl = 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd380:g3804:g3804n:rr003520/0,0,2048,2048/256,/0/default.jpg'
 
 async function createImage () {
-  const input = (await axios({ url: tileUrl, responseType: 'arraybuffer' })).data
+  let data = await cache.get(tileUrl)
 
-  const image = await sharp(input)
+  if (!data) {
+    data = (await axios({ url: tileUrl, responseType: 'arraybuffer' })).data
+    await cache.set(tileUrl, data)
+  }
+
+  const image = await sharp(data)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true })
@@ -20,11 +27,11 @@ async function createImage () {
 
 app.get('/', async (req, res) => {
   res.send({
-    hello: 'tileserver'
+    name: 'tileserver'
   })
 })
 
-app.get('/image', async (req, res) => {
+app.get('/:mapId/:x/:y/:z.png', async (req, res) => {
   const image = await createImage()
 
   for (let i = 0; i < image.data.length; i++) {
