@@ -31,7 +31,8 @@ app.get('/', async (req, res) => {
   })
 })
 
-app.get('/:mapId/:x/:y/:z.png', async (req, res) => {
+// TODO: also support PNG
+app.get('/:mapId/:z/:x/:y.jpg', async (req, res) => {
   const image = await createImage()
 
   for (let i = 0; i < image.data.length; i++) {
@@ -47,10 +48,10 @@ app.get('/:mapId/:x/:y/:z.png', async (req, res) => {
       channels: image.info.channels
     }
   })
-    .toFormat('png')
+    .toFormat('jpg')
     .toBuffer()
 
-  res.set({ 'Content-Type': 'image/png' })
+  res.set({ 'Content-Type': 'image/jpeg' })
   res.send(data)
 })
 
