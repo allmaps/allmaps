@@ -31,8 +31,8 @@ function getImageDimensions (annotation) {
     const { groups: { height } } = /height="(?<height>\d+)"/.exec(svg)
 
     return {
-      width,
-      height
+      width: parseInt(width),
+      height: parseInt(height)
     }
   }
 }
