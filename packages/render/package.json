@@ -1,0 +1,49 @@
+{
+  "name": "@allmaps/render",
+  "version": "1.0.0-alpha.1",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "",
+  "type": "module",
+  "module": "index.js",
+  "exports": {
+    "import": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/render.git"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "georeference",
+    "map"
+  ],
+  "dependencies": {
+    "@allmaps/transform": "^1.0.0-alpha.6",
+    "d3-geo": "^2.0.1",
+    "d3-tile": "^1.0.0",
+    "potpack": "^1.0.1",
+    "ramda": "^0.27.1",
+    "regl": "2.0.1"
+  },
+  "scripts": {
+    "test": "mocha && eslint src test"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "eslint": "7",
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
+  },
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0"
+  }
+}
