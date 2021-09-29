@@ -8,7 +8,7 @@ function createSvgSelector (width, height, mask) {
   }
 }
 
-function createMapAnnotation (map) {
+function createMapAnnotation (map, options) {
   const region = 'full'
   const imageQuality = map.image.quality || 'default'
   const imageFormat = map.image.format || 'jpg'
@@ -66,9 +66,16 @@ function createMapAnnotation (map) {
     }
   }
 
+  let annotationId
+  if (options.idToUri) {
+    annotationId = options.idToUri(map.id)
+  }
+
   return {
     type: 'Annotation',
+    id: annotationId,
     '@context': [
+      'http://www.w3.org/ns/anno.jsonld',
       'http://geojson.org/geojson-ld/geojson-context.jsonld',
       'http://iiif.io/api/presentation/3/context.json'
     ],
@@ -78,7 +85,9 @@ function createMapAnnotation (map) {
   }
 }
 
-export function generate (maps) {
+export function generate (maps, options) {
+  options = options || {}
+
   if (!maps || maps.length === 0) {
     return {
       type: 'Annotation',
@@ -93,7 +102,7 @@ export function generate (maps) {
   }
 
   const annotations = maps
-    .map((map) => createMapAnnotation(map))
+    .map((map) => createMapAnnotation(map, options))
 
   if (annotations.length === 1) {
     return annotations[0]

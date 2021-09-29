@@ -67,6 +67,7 @@ function getMap (annotation) {
 }
 
 export function parse (annotation) {
+  // TODO: Add function uriToId
   if (annotation.type === 'Annotation') {
     return [getMap(annotation)]
   } else if (annotation.type === 'AnnotationPage') {
