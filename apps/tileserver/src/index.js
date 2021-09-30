@@ -1,0 +1,166 @@
+import dotenv from 'dotenv'
+import sharp from 'sharp'
+import express from 'express'
+
+import { createTransformer, toImage } from '@allmaps/transform'
+import { parseIiif, getIiifTile, getImageUrl } from '@allmaps/iiif-parser'
+import { iiifTilesForMapExtent } from '@allmaps/render'
+
+import { xyzTileToGeoExtent } from './geo.js'
+import { fetchJson, fetchImage } from './fetch.js'
+
+dotenv.config()
+
+const TILE_SIZE = 256
+
+const app = express()
+
+const port = process.env.PORT || 3000
+
+function sendFetchError (res, err) {
+  const response = err.response
+
+  if (response.status === 404) {
+    res.status(400).send({
+      error: 'Not found'
+    })
+  } else {
+    res.status(500).send({
+      error: 'Internal server error'
+    })
+  }
+}
+
+app.get('/', async (req, res) => {
+  res.send({
+    name: 'tileserver'
+  })
+})
+
+const channels = 4
+
+// http://localhost:3000/qP7VwmmJQYutccpC/14/8396/5418.png
+// http://localhost:3000/qP7VwmmJQYutccpC/15/16793/10836.png
+// http://localhost:3000/qP7VwmmJQYutccpC/16/33587/21672.png
+app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
+  console.log('Requested tile:', req.originalUrl)
+  const xyzTileUrl = `https://tiles.allmaps.org/${req.originalUrl}`
+  // TODO: use cache!
+
+  const mapId = req.params.mapId
+
+  const z = parseInt(req.params.z)
+  const x = parseInt(req.params.x)
+  const y = parseInt(req.params.y)
+
+  let map
+  try {
+    map = await fetchJson(`https://api.allmaps.org/maps/${mapId}`)
+  } catch (err) {
+    sendFetchError(res, err)
+    return
+  }
+
+  let image
+  try {
+    image = await fetchJson(`${map.image.uri}/info.json`)
+  } catch (err) {
+    sendFetchError(res, err)
+    return
+  }
+
+  const parsedImage = parseIiif(image)
+
+  const extent = xyzTileToGeoExtent({x, y, z})
+
+  const transformer = createTransformer(map.gcps)
+
+  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, extent)
+  const iiifTileUrls = iiifTiles
+    .map((tile) => {
+      const { region, size } = getIiifTile(parsedImage, tile, tile.x, tile.y)
+      return getImageUrl(parsedImage, { region, size })
+    })
+
+  const iiifTileImages = await Promise.all(iiifTileUrls.map(fetchImage))
+
+  const buffers = await Promise.all(iiifTileImages
+    .map((image) => sharp(image)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true })))
+
+  const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * channels)
+
+  const longitudeFrom = extent[0]
+  const latitudeFrom = extent[1]
+
+  const longitudeDiff = extent[2] - extent[0]
+  const latitudeDiff = extent[3] - extent[1]
+
+  const longitudeStep = longitudeDiff / TILE_SIZE
+  const latitudeStep = latitudeDiff / TILE_SIZE
+
+  console.log('Start rendering')
+
+  for (let y = 0; y < TILE_SIZE; y++) {
+    for (let x = 0; x < TILE_SIZE; x++) {
+      const world = [
+        longitudeFrom + y * longitudeStep,
+        latitudeFrom + x * latitudeStep
+      ]
+
+      const [pixelX, pixelY] = toImage(transformer, world)
+
+      let tileIndex
+      let tile
+      let tileXMin
+      let tileYMin
+      for (tileIndex in iiifTiles) {
+
+        tile = iiifTiles[tileIndex]
+        tileXMin = tile.x * tile.originalWidth
+        tileYMin = tile.y * tile.originalHeight
+
+        if (pixelX >= tileXMin && pixelX <= tileXMin + tile.originalWidth &&
+          pixelY >= tileYMin && pixelY <= tileYMin + tile.originalHeight) {
+          break
+        }
+      }
+
+      if (tileIndex !== undefined) {
+        const buffer = buffers[tileIndex]
+        const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
+        const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
+
+        const warpedBufferIndex = (y * TILE_SIZE + x) * channels
+        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
+
+        for (let color = 0; color < channels; color++) {
+          warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
+        }
+      }
+    }
+  }
+
+  const warpedTileJpg = await sharp(warpedTile, {
+    raw: {
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      channels
+    }
+  })
+    .rotate(-90)
+    .flip()
+    .toFormat('png')
+    .toBuffer()
+
+  console.log('Done rendering')
+
+  res.set({ 'Content-Type': 'image/jpeg' })
+  res.send(warpedTileJpg)
+})
+
+app.listen(port, () => {
+  console.log(`Allmaps Tile Server listening at http://localhost:${port}`)
+})

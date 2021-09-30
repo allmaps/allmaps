@@ -1,28 +1,50 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
+import { promisify } from 'util'
+import redis from 'redis'
 
-const { promisify } = require('util')
-const redis = require('redis')
-const client = redis.createClient(process.env.REDIS_URL, {
-  return_buffers: true
-})
+dotenv.config()
 
-const EXPIRE_SECONDS = 60 * 10
+const DEFAULT_EXPIRE_SECONDS = 60 * 10
 
-const getAsync = promisify(client.get).bind(client)
-const setAsync = promisify(client.set).bind(client)
-const expireAsync = promisify(client.expire).bind(client)
+export default function cache () {
+  let ready = false
 
-async function set (key, data) {
-  await setAsync(key, data)
-  await expireAsync(key, EXPIRE_SECONDS)
-}
+  const client = redis.createClient(process.env.REDIS_URL, {
+    return_buffers: true
+  })
 
-async function get (key) {
-  const data = await getAsync(key)
-  return data
-}
+  client.on('error', (err) => {
+    console.log('Error', err.message)
+  })
 
-module.exports = {
-  get,
-  set
+  client.on('ready', () => {
+    ready = true
+  })
+
+  client.on('end', () => {
+    ready = false
+  })
+
+  const getAsync = promisify(client.get).bind(client)
+  const setAsync = promisify(client.set).bind(client)
+  const expireAsync = promisify(client.expire).bind(client)
+
+  async function set (key, data, seconds = DEFAULT_EXPIRE_SECONDS) {
+    if (ready) {
+      await setAsync(key, data)
+      await expireAsync(key, seconds)
+    }
+  }
+
+  async function get (key) {
+    if (ready) {
+      const data = await getAsync(key)
+      return data
+    }
+  }
+
+  return {
+    get,
+    set
+  }
 }
