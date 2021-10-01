@@ -150,14 +150,17 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
       channels
     }
   })
+    // ===================================
+    // TODO: this should not be needed!
     .rotate(-90)
     .flip()
+    // ===================================
     .toFormat('png')
     .toBuffer()
 
   console.log('Done rendering')
 
-  res.set({ 'Content-Type': 'image/jpeg' })
+  res.set({ 'Content-Type': 'image/png' })
   res.send(warpedTileJpg)
 })
 
