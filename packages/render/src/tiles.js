@@ -167,6 +167,11 @@ export function iiifTilesForMapExtent (transformer, parsedImage, extent) {
   const pixelExtent = extentToImage(transformer, extent)
   const pixelExtentMinMax = computeMinMax(pixelExtent)
 
+  if ((pixelExtentMinMax.minX > parsedImage.width || pixelExtentMinMax.maxX < 0) &&
+    (pixelExtentMinMax.maxY > parsedImage.height || pixelExtentMinMax.maxY < 0)) {
+    return []
+  }
+
   const mapTileScale = pixelExtentMinMax.width / TILE_WIDTH
 
   const zoomLevel = findBestZoomLevel(tilesets, mapTileScale)
