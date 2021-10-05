@@ -1,3 +1,31 @@
+export function pointInPolygon (point, polygon) {
+  // From:
+  //  https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
+  // Ray-casting algorithm based on:
+  //  https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+
+  if (!polygon) {
+    return true
+  }
+
+  let [x, y] = point
+
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    let [xi, yi] = polygon[i]
+    let [xj, yj] = polygon[j]
+
+    const intersect = ((yi > y) != (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+
+    if (intersect) {
+      inside = !inside
+    }
+  }
+
+  return inside
+}
+
 export function xyzTileToGeoJSON ({z, x, y}) {
   const topLeft = xyzTileTopLeft({z, x, y})
   const bottomRight = xyzTileBottomRight({z, x, y})

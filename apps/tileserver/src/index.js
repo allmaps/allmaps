@@ -6,7 +6,7 @@ import { createTransformer, toImage } from '@allmaps/transform'
 import { parseIiif, getIiifTile, getImageUrl } from '@allmaps/iiif-parser'
 import { iiifTilesForMapExtent } from '@allmaps/render'
 
-import { xyzTileToGeoExtent } from './geo.js'
+import { xyzTileToGeoExtent, pointInPolygon } from './geo.js'
 import { fetchJson, fetchImage } from './fetch.js'
 
 dotenv.config()
@@ -61,6 +61,13 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
     return
   }
 
+  let pixelMask
+  if (map.pixelMask) {
+    pixelMask = map.pixelMask
+  } else {
+    // TODO: create mask from full image
+  }
+
   let image
   try {
     image = await fetchJson(`${map.image.uri}/info.json`)
@@ -112,23 +119,32 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
 
       const [pixelX, pixelY] = toImage(transformer, world)
 
+      // TODO: improve efficiency
+      // TODO: fix strange repeating error,
+      //  remove pointInPolygon check and fix first
+      const inside = pointInPolygon([pixelX, pixelY], pixelMask)
+      if (!inside) {
+        continue
+      }
+
       let tileIndex
       let tile
       let tileXMin
       let tileYMin
+      let foundTile = false
       for (tileIndex in iiifTiles) {
-
         tile = iiifTiles[tileIndex]
         tileXMin = tile.x * tile.originalWidth
         tileYMin = tile.y * tile.originalHeight
 
         if (pixelX >= tileXMin && pixelX <= tileXMin + tile.originalWidth &&
           pixelY >= tileYMin && pixelY <= tileYMin + tile.originalHeight) {
+          foundTile = true
           break
         }
       }
 
-      if (tileIndex !== undefined) {
+      if (tileIndex !== undefined && foundTile) {
         const buffer = buffers[tileIndex]
         const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
         const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
