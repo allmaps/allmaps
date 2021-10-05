@@ -4,7 +4,8 @@ import redis from 'redis'
 
 dotenv.config()
 
-const DEFAULT_EXPIRE_SECONDS = 60 * 10
+const MINUTES = 60 // 1 minute in seconds
+const DEFAULT_EXPIRE_SECONDS = 30 * MINUTES
 
 export default function cache () {
   let ready = false

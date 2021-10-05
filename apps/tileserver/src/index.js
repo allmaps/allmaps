@@ -8,6 +8,9 @@ import { iiifTilesForMapExtent } from '@allmaps/render'
 
 import { xyzTileToGeoExtent, pointInPolygon } from './geo.js'
 import { fetchJson, fetchImage } from './fetch.js'
+import Cache from './cache.js'
+
+const cache = Cache()
 
 dotenv.config()
 
@@ -43,9 +46,18 @@ const channels = 4
 // http://localhost:3000/qP7VwmmJQYutccpC/15/16793/10836.png
 // http://localhost:3000/qP7VwmmJQYutccpC/16/33587/21672.png
 app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
+  res.set({ 'Content-Type': 'image/png' })
+
+  // TODO: add url param to skip cache
   console.log('Requested tile:', req.originalUrl)
   const xyzTileUrl = `https://tiles.allmaps.org/${req.originalUrl}`
-  // TODO: use cache!
+
+  let cached = await cache.get(xyzTileUrl)
+  if (cached) {
+    console.log('  Tile found in cache!')
+    res.send(cached)
+    return
+  }
 
   const mapId = req.params.mapId
 
@@ -55,7 +67,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
 
   let map
   try {
-    map = await fetchJson(`https://api.allmaps.org/maps/${mapId}`)
+    map = await fetchJson(cache, `https://api.allmaps.org/maps/${mapId}`)
   } catch (err) {
     sendFetchError(res, err)
     return
@@ -70,7 +82,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
 
   let image
   try {
-    image = await fetchJson(`${map.image.uri}/info.json`)
+    image = await fetchJson(cache, `${map.image.uri}/info.json`)
   } catch (err) {
     sendFetchError(res, err)
     return
@@ -89,7 +101,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
       return getImageUrl(parsedImage, { region, size })
     })
 
-  const iiifTileImages = await Promise.all(iiifTileUrls.map(fetchImage))
+  const iiifTileImages = await Promise.all(iiifTileUrls.map((url) => fetchImage(cache, url)))
 
   const buffers = await Promise.all(iiifTileImages
     .map((image) => sharp(image)
@@ -108,6 +120,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
   const longitudeStep = longitudeDiff / TILE_SIZE
   const latitudeStep = latitudeDiff / TILE_SIZE
 
+  // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
   console.log('Start rendering')
 
   for (let y = 0; y < TILE_SIZE; y++) {
@@ -176,8 +189,9 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
 
   console.log('Done rendering')
 
-  res.set({ 'Content-Type': 'image/png' })
   res.send(warpedTileJpg)
+
+  cache.set(xyzTileUrl, warpedTileJpg)
 })
 
 app.listen(port, () => {

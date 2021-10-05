@@ -1,10 +1,6 @@
 import axios from 'axios'
 
-import Cache from './cache.js'
-
-const cache = Cache()
-
-export async function fetchJson (url) {
+export async function fetchJson (cache, url) {
   console.log('fetchJson', url)
   let data
 
@@ -27,7 +23,7 @@ export async function fetchJson (url) {
   return data
 }
 
-export async function fetchImage (url) {
+export async function fetchImage (cache, url) {
   console.log('fetchImage', url)
   let data = await cache.get(url)
 
