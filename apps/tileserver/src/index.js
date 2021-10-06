@@ -164,7 +164,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
         const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
 
         const warpedBufferIndex = (y * TILE_SIZE + x) * CHANNELS
-        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.CHANNELS
+        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
 
         for (let color = 0; color < CHANNELS; color++) {
           warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
@@ -177,7 +177,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     raw: {
       width: TILE_SIZE,
       height: TILE_SIZE,
-      CHANNELS
+      channels
     }
   })
     // ===================================
