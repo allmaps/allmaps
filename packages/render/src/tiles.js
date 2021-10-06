@@ -5,6 +5,8 @@ import { getTilesets } from '@allmaps/iiif-parser'
 
 const TILE_WIDTH = 256
 
+// TODO: create ES6 CLASS!!!
+
 // From:
 //  https://github.com/vHawk/tiles-intersect
 // See also:
@@ -182,13 +184,3 @@ export function iiifTilesForMapExtent (transformer, parsedImage, extent) {
 
   return iiifTiles
 }
-
-// TODO: create CLASS!!!
-// class Car {
-//   constructor(brand) {
-//     this.carname = brand;
-//   }
-//   present() {
-//     return "I have a " + this.carname + ".";
-//   }
-// }
