@@ -177,7 +177,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     raw: {
       width: TILE_SIZE,
       height: TILE_SIZE,
-      channels
+      channels: CHANNELS
     }
   })
     // ===================================
