@@ -15,6 +15,7 @@ const cache = Cache()
 dotenv.config()
 
 const TILE_SIZE = 256
+const CHANNELS = 4
 
 const app = express()
 
@@ -40,13 +41,13 @@ app.get('/', async (req, res) => {
   })
 })
 
-const channels = 4
-
-// http://localhost:3000/qP7VwmmJQYutccpC/14/8396/5418.png
-// http://localhost:3000/qP7VwmmJQYutccpC/15/16793/10836.png
-// http://localhost:3000/qP7VwmmJQYutccpC/16/33587/21672.png
-app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
+app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   res.set({ 'Content-Type': 'image/png' })
+
+  // TODO: implement cancelled request
+  // req.on('close', (err) => {
+  //   cancelRequest = true
+  // })
 
   // TODO: add url param to skip cache
   console.log('Requested tile:', req.originalUrl)
@@ -109,7 +110,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
       .raw()
       .toBuffer({ resolveWithObject: true })))
 
-  const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * channels)
+  const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * CHANNELS)
 
   const longitudeFrom = extent[0]
   const latitudeFrom = extent[1]
@@ -162,10 +163,10 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
         const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
         const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
 
-        const warpedBufferIndex = (y * TILE_SIZE + x) * channels
-        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
+        const warpedBufferIndex = (y * TILE_SIZE + x) * CHANNELS
+        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.CHANNELS
 
-        for (let color = 0; color < channels; color++) {
+        for (let color = 0; color < CHANNELS; color++) {
           warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
         }
       }
@@ -176,7 +177,7 @@ app.get('/:mapId/:z/:x/:y.png', async (req, res) => {
     raw: {
       width: TILE_SIZE,
       height: TILE_SIZE,
-      channels
+      CHANNELS
     }
   })
     // ===================================
