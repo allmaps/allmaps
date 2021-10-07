@@ -37,7 +37,7 @@ function sendFetchError (res, err) {
 
 app.get('/', async (req, res) => {
   res.send({
-    name: 'tileserver'
+    name: 'Allmaps Tile Server'
   })
 })
 
