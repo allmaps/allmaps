@@ -102,7 +102,13 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
       return getImageUrl(parsedImage, { region, size })
     })
 
-  const iiifTileImages = await Promise.all(iiifTileUrls.map((url) => fetchImage(cache, url)))
+  let iiifTileImages
+  try {
+    iiifTileImages = await Promise.all(iiifTileUrls.map((url) => fetchImage(cache, url)))
+  } catch (err) {
+    sendFetchError(res, err)
+    return
+  }
 
   const buffers = await Promise.all(iiifTileImages
     .map((image) => sharp(image)
