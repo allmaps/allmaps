@@ -112,10 +112,12 @@ function parseManifest (manifest, options) {
 }
 
 export function parseProfileUri (profileUri) {
-  const match = profileUri.match(/image\/(?<version>\d+)\/level(?<level>\d+)/)
+  const matchVersion = profileUri.match(/image\/(?<version>\d+)\//)
+  const matchLevel = profileUri.match(/\/level(?<level>\d+).json$/)
 
-  if (match) {
-    const { groups: { version, level }} = match
+  if (matchVersion && matchLevel) {
+    const { groups: { version }} = matchVersion
+    const { groups: { level }} = matchLevel
     return {
       version: parseInt(version),
       level: parseInt(level)
