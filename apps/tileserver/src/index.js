@@ -50,12 +50,12 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   // })
 
   // TODO: add url param to skip cache
-  console.log('Requested tile:', req.originalUrl)
+  // console.log('Requested tile:', req.originalUrl)
   const xyzTileUrl = `https://tiles.allmaps.org/${req.originalUrl}`
 
   let cached = await cache.get(xyzTileUrl)
   if (cached) {
-    console.log('  Tile found in cache!')
+    // console.log('  Tile found in cache!')
     res.send(cached)
     return
   }
@@ -128,7 +128,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   const latitudeStep = latitudeDiff / TILE_SIZE
 
   // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
-  console.log('Start rendering')
+  // console.log('Start rendering')
 
   for (let y = 0; y < TILE_SIZE; y++) {
     for (let x = 0; x < TILE_SIZE; x++) {
@@ -194,7 +194,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     .toFormat('png')
     .toBuffer()
 
-  console.log('Done rendering')
+  // console.log('Done rendering')
 
   res.send(warpedTileJpg)
 
