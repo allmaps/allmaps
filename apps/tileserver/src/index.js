@@ -111,6 +111,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   }
 
   const buffers = await Promise.all(iiifTileImages
+    .filter((image) => image.length > 0)
     .map((image) => sharp(image)
       .ensureAlpha()
       .raw()
