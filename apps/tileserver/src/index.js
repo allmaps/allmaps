@@ -48,6 +48,11 @@ app.get('/', async (req, res) => {
   })
 })
 
+// TODO:
+// app.get('/maps/:mapId/tiles.json', async (req, res) => {
+//   Return extent, min zoom, max zoom
+// })
+
 app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   res.set({ 'Content-Type': 'image/png' })
 
