@@ -22,6 +22,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 function sendFetchError (res, err) {
+  // TODO: send error description in HTTP headers
   console.error('Fetch error:', err.message)
 
   if (!err.response) {
@@ -44,6 +45,12 @@ function sendFetchError (res, err) {
   }
 }
 
+function sendError (res, err) {
+  res.status(500).send({
+    error: err.message || 'Internal server error'
+  })
+}
+
 app.get('/', async (req, res) => {
   res.send({
     name: 'Allmaps Tile Server'
@@ -55,6 +62,7 @@ app.get('/', async (req, res) => {
 //   Return extent, min zoom, max zoom
 // })
 
+// TODO: support retina tiles @2x
 app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   res.set({ 'Content-Type': 'image/png' })
 
@@ -103,11 +111,23 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     return
   }
 
-  const parsedImage = parseIiif(image)
+  let parsedImage
+  try {
+    parsedImage = parseIiif(image)
+  } catch (err) {
+    sendError(res, err)
+    return
+  }
 
   const extent = xyzTileToGeoExtent({x, y, z})
 
-  const transformer = createTransformer(map.gcps)
+  let transformer
+  try {
+    transformer = createTransformer(map.gcps)
+  } catch (err) {
+    sendError(res, err)
+    return
+  }
 
   const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, extent)
   const iiifTileUrls = iiifTiles
@@ -120,7 +140,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   try {
     iiifTileImages = await Promise.all(iiifTileUrls.map((url) => fetchImage(cache, url)))
   } catch (err) {
-    sendFetchError(res, err)
+    sendError(res, err)
     return
   }
 
