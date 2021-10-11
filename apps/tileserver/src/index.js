@@ -109,7 +109,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
 
   const transformer = createTransformer(map.gcps)
 
-  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, [TILE_SIZE, TILE_SIZE], extent)
+  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, extent)
   const iiifTileUrls = iiifTiles
     .map((tile) => {
       const { region, size } = getIiifTile(parsedImage, tile, tile.x, tile.y)
