@@ -111,11 +111,10 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   }
 
   const buffers = await Promise.all(iiifTileImages
-    .filter((image) => image.length > 0)
-    .map((image) => sharp(image)
+    .map((image) => image.length ? sharp(image)
       .ensureAlpha()
       .raw()
-      .toBuffer({ resolveWithObject: true })))
+      .toBuffer({ resolveWithObject: true }) : null))
 
   const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * CHANNELS)
 
@@ -167,14 +166,17 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
 
       if (tileIndex !== undefined && foundTile) {
         const buffer = buffers[tileIndex]
-        const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
-        const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
 
-        const warpedBufferIndex = (y * TILE_SIZE + x) * CHANNELS
-        const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
+        if (buffer) {
+          const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
+          const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
 
-        for (let color = 0; color < CHANNELS; color++) {
-          warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
+          const warpedBufferIndex = (y * TILE_SIZE + x) * CHANNELS
+          const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
+
+          for (let color = 0; color < CHANNELS; color++) {
+            warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
+          }
         }
       }
     }
