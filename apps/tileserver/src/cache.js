@@ -15,7 +15,7 @@ export default function cache () {
   })
 
   client.on('error', (err) => {
-    console.log('Error', err.message)
+    console.error('Error', err.message)
   })
 
   client.on('ready', () => {

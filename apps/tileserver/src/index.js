@@ -22,6 +22,8 @@ const app = express()
 const port = process.env.PORT || 3000
 
 function sendFetchError (res, err) {
+  console.error('Fetch error:', err.message)
+
   if (!err.response) {
     res.status(500).send({
       error: 'Internal server error'
@@ -107,7 +109,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
 
   const transformer = createTransformer(map.gcps)
 
-  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, extent)
+  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, [TILE_SIZE, TILE_SIZE], extent)
   const iiifTileUrls = iiifTiles
     .map((tile) => {
       const { region, size } = getIiifTile(parsedImage, tile, tile.x, tile.y)
