@@ -59,7 +59,7 @@ app.get('/', async (req, res) => {
 
 // TODO:
 // app.get('/maps/:mapId/tiles.json', async (req, res) => {
-//   Return extent, min zoom, max zoom
+//   // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
 // })
 
 // TODO: support retina tiles @2x
@@ -159,6 +159,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
 
   const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * CHANNELS)
 
+  // TODO: use spherical mercator instead of lat/lon
   const longitudeFrom = extent[0]
   const latitudeFrom = extent[1]
 
@@ -215,6 +216,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
           const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
 
           for (let color = 0; color < CHANNELS; color++) {
+            // TODO: don't just copy single pixel, do proper image interpolating
             warpedTile[warpedBufferIndex + color] = buffer.data[bufferIndex + color]
           }
         }
