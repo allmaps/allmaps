@@ -9,11 +9,11 @@
     "dev": "nodemon src/index.js"
   },
   "author": "Bert Spaan",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@allmaps/transform": "^1.0.0-alpha.6",
     "@allmaps/iiif-parser": "^1.0.0-alpha.15",
-    "@allmaps/render": "^1.0.0-alpha.2",
+    "@allmaps/render": "^1.0.0-alpha.3",
     "axios": "0.21.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",

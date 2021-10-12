@@ -15,7 +15,7 @@ export function pointInPolygon (point, polygon) {
     let [xi, yi] = polygon[i]
     let [xj, yj] = polygon[j]
 
-    const intersect = ((yi > y) != (yj > y)) &&
+    const intersect = ((yi > y) !== (yj > y)) &&
       (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
 
     if (intersect) {
@@ -70,7 +70,6 @@ function xyzTileBottomRight ({z, x, y}) {
 
 // From:
 //   https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-
 function tile2long ({x, z}) {
   return (x / Math.pow(2, z) * 360 - 180)
 }

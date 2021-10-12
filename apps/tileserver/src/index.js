@@ -71,13 +71,20 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   //   cancelRequest = true
   // })
 
-  // TODO: add url param to skip cache
-  // console.log('Requested tile:', req.originalUrl)
+  let useCache = true
+  if ('nocache' in req.query) {
+    useCache = false
+  }
+
   const xyzTileUrl = `https://tiles.allmaps.org/${req.originalUrl}`
 
-  let cached = await cache.get(xyzTileUrl)
+  let cached
+  // TODO: also use useCache in fetchImage and fetchJson
+  if (useCache) {
+    cached = await cache.get(xyzTileUrl)
+  }
+
   if (cached) {
-    // console.log('  Tile found in cache!')
     res.send(cached)
     return
   }
@@ -129,7 +136,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     return
   }
 
-  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, extent)
+  const iiifTiles = iiifTilesForMapExtent(transformer, parsedImage, [TILE_SIZE, TILE_SIZE], extent)
   const iiifTileUrls = iiifTiles
     .map((tile) => {
       const { region, size } = getIiifTile(parsedImage, tile, tile.x, tile.y)
@@ -162,10 +169,9 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
   const latitudeStep = latitudeDiff / TILE_SIZE
 
   // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
-  // console.log('Start rendering')
 
-  for (let y = 0; y < TILE_SIZE; y++) {
-    for (let x = 0; x < TILE_SIZE; x++) {
+  for (let x = 0; x < TILE_SIZE; x++) {
+    for (let y = 0; y < TILE_SIZE; y++) {
       const world = [
         longitudeFrom + y * longitudeStep,
         latitudeFrom + x * latitudeStep
@@ -205,7 +211,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
           const pixelTileX = (pixelX - tileXMin) / tile.scaleFactor
           const pixelTileY = (pixelY - tileYMin) / tile.scaleFactor
 
-          const warpedBufferIndex = (y * TILE_SIZE + x) * CHANNELS
+          const warpedBufferIndex = (x * TILE_SIZE + y) * CHANNELS
           const bufferIndex = (Math.floor(pixelTileY) * buffer.info.width + Math.floor(pixelTileX)) * buffer.info.channels
 
           for (let color = 0; color < CHANNELS; color++) {
@@ -223,15 +229,8 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
       channels: CHANNELS
     }
   })
-    // ===================================
-    // TODO: this should not be needed!
-    .rotate(-90)
-    .flip()
-    // ===================================
     .toFormat('png')
     .toBuffer()
-
-  // console.log('Done rendering')
 
   res.send(warpedTileJpg)
 
