@@ -3,8 +3,6 @@ import { extent } from 'd3-array'
 import { toImage } from '@allmaps/transform'
 import { getTilesets } from '@allmaps/iiif-parser'
 
-const TILE_WIDTH = 256
-
 // TODO: create ES6 CLASS!!!
 
 // From:
@@ -153,6 +151,7 @@ function iiifTilesByXToArray (zoomLevel, iiifTilesByX) {
         x: parseInt(x),
         y,
         ...zoomLevel
+        // TODO: consider adding getIiifTile here
       })
     }
   }
@@ -160,24 +159,26 @@ function iiifTilesByXToArray (zoomLevel, iiifTilesByX) {
   return neededIiifTiles
 }
 
-export function iiifTilesForMapExtent (transformer, parsedImage, extent) {
+export function iiifTilesForMapExtent (transformer, parsedImage, pixelExtent, geoExtent) {
   // =================================================
   // TODO: move to constructor
   const tilesets = getTilesets(parsedImage)
   // =================================================
 
-  const pixelExtent = extentToImage(transformer, extent)
-  const pixelExtentMinMax = computeMinMax(pixelExtent)
+  const imagePixelExtent = extentToImage(transformer, geoExtent)
+  const imagePixelExtentMinMax = computeMinMax(imagePixelExtent)
 
-  if ((pixelExtentMinMax.minX > parsedImage.width || pixelExtentMinMax.maxX < 0) &&
-    (pixelExtentMinMax.maxY > parsedImage.height || pixelExtentMinMax.maxY < 0)) {
+  if ((imagePixelExtentMinMax.minX > parsedImage.width || imagePixelExtentMinMax.maxX < 0) &&
+    (imagePixelExtentMinMax.maxY > parsedImage.height || imagePixelExtentMinMax.maxY < 0)) {
     return []
   }
 
-  const mapTileScale = pixelExtentMinMax.width / TILE_WIDTH
+  const mapTileScaleX = imagePixelExtentMinMax.width / pixelExtent[0]
+  const mapTileScaleY = imagePixelExtentMinMax.height / pixelExtent[1]
+  const mapTileScale = Math.min(mapTileScaleX, mapTileScaleY)
 
   const zoomLevel = findBestZoomLevel(tilesets, mapTileScale)
-  const tilePixelExtent = scaleToTiles(zoomLevel, pixelExtent)
+  const tilePixelExtent = scaleToTiles(zoomLevel, imagePixelExtent)
 
   const iiifTilesByX = findNeededIiifTilesByX(zoomLevel, tilePixelExtent)
   const iiifTiles = iiifTilesByXToArray(zoomLevel, iiifTilesByX)
