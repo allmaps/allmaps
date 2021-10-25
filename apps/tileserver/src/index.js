@@ -76,7 +76,7 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     useCache = false
   }
 
-  const xyzTileUrl = `https://tiles.allmaps.org/${req.originalUrl}`
+  const xyzTileUrl = `https://tiles.allmaps.org${req.originalUrl}`
 
   let cached
   // TODO: also use useCache in fetchImage and fetchJson
@@ -151,11 +151,17 @@ app.get('/maps/:mapId/:z/:x/:y.png', async (req, res) => {
     return
   }
 
-  const buffers = await Promise.all(iiifTileImages
-    .map((image) => image.length ? sharp(image)
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true }) : null))
+  let buffers
+  try {
+    buffers = await Promise.all(iiifTileImages
+      .map((image) => image.length ? sharp(image)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true }) : null))
+  } catch (err) {
+    sendError(res, err)
+    return
+  }
 
   const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * CHANNELS)
 
