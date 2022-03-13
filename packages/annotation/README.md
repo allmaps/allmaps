@@ -1,18 +1,16 @@
 # @allmaps/annotation
 
-@allmaps/annotation is a JavaScript module that can generate and parse *georeference annotations*.
+@allmaps/annotation is a JavaScript module that can generate and parse _georeference annotations_.
 
 A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/). The [IIIF community](https://iiif.io/community/groups/maps-tsg/) is working on a turning georeference annotations into a specification and a [IIIF extension](https://iiif.io/api/index.html#approved-extensions).
 
 A georeference annotation contains the following data:
 
-*   The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
-*   A list of ground control points (GCPs) that define the mapping between pixels and geospatial coordinates.
-*   A polygonal pixel mask that defines the cartographic part of the image.
+- The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
+- A list of ground control points (GCPs) that define the mapping between pixels and geospatial coordinates.
+- A polygonal pixel mask that defines the cartographic part of the image.
 
-Georeference annotation are a core part of Allmaps.
-
-**[Allmaps Viewer]() can warp maps , only annotation and iiif image**
+Georeference annotation are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
 
 <!-- TODO: create Observable notebook that allows you to try out this module! -->
 
@@ -32,7 +30,10 @@ Browser:
 
 ```html
 <script type="module">
-  import { parseAnnotation, generateAnnotation } from 'https://unpkg.com/@allmaps/annotation?module'
+  import {
+    parseAnnotation,
+    generateAnnotation
+  } from 'https://unpkg.com/@allmaps/annotation?module'
 </script>
 ```
 
@@ -42,20 +43,18 @@ Browser:
 
 #### Table of Contents
 
-*   [Generating & parsing georeference annotations](#generating--parsing-georeference-annotations)
-    *   [parseAnnotation](#parseannotation)
-        *   [Parameters](#parameters)
-        *   [Examples](#examples)
-    *   [generateAnnotation](#generateannotation)
-        *   [Parameters](#parameters-1)
-        *   [Examples](#examples-1)
-*   [Types](#types)
-    *   [Map](#map)
-    *   [Annotation](#annotation)
+- [Generating & parsing georeference annotations](#generating--parsing-georeference-annotations)
+  - [parseAnnotation](#parseannotation)
+    - [Parameters](#parameters)
+    - [Examples](#examples)
+  - [generateAnnotation](#generateannotation)
+    - [Parameters](#parameters-1)
+    - [Examples](#examples-1)
+- [Types](#types)
+  - [Map](#map)
+  - [Annotation](#annotation)
 
 ### Generating & parsing georeference annotations
-
-
 
 #### parseAnnotation
 
@@ -63,7 +62,7 @@ Parses a [georeference annotation](#annotation) and returns an array of [maps](#
 
 ##### Parameters
 
-*   `annotation` **[Annotation](#annotation)** Georeference annotation
+- `annotation` **[Annotation](#annotation)** Georeference annotation
 
 ##### Examples
 
@@ -71,7 +70,9 @@ Parses a [georeference annotation](#annotation) and returns an array of [maps](#
 import fs from 'fs'
 import { parseAnnotation } from '@allmaps/annotation'
 
-const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
+const annotation = JSON.parse(
+  fs.readFileSync('./examples/annotation.example.json')
+)
 const maps = parseAnnotation(annotation)
 ```
 
@@ -83,7 +84,7 @@ Generates a [georeference annotation](#annotation) from a single [map](#map) or 
 
 ##### Parameters
 
-*   `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
+- `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
 
 ##### Examples
 
