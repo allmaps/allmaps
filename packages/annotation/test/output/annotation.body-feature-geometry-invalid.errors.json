@@ -1,0 +1,3 @@
+[
+  "Invalid GCP geometry. Annotation body must be a GeoJSON FeatureCollection and each Feature must have a Point geometry."
+]

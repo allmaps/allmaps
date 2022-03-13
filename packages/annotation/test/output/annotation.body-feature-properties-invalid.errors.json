@@ -1,0 +1,3 @@
+[
+  "Invalid GCP. Annotation body must be a GeoJSON FeatureCollection and each Feature must have a property `pixelCoord` (`[x, y]`) in its `properties` object."
+]

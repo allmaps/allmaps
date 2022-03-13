@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allmaps.org/annotation/schemas/annotations.json",
+  "title": "IIIF georeference annotation",
+  "type": "object",
+  "properties": {
+    "type": {
+      "const": "AnnotationPage"
+    },
+    "@context": {
+      "$ref": "https://allmaps.org/annotation/schemas/annotation.json#/$defs/context"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "https://allmaps.org/annotation/schemas/annotation.json"
+      }
+    }
+  },
+  "required": ["type", "@context", "items"]
+}

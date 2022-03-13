@@ -1,0 +1,74 @@
+{
+  "type": "Annotation",
+  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://geojson.org/geojson-ld/geojson-context.jsonld",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "motivation": "georeferencing",
+  "target": {
+    "type": "Image",
+    "source": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3/full/full/0/default.jpg",
+    "service": [
+      {
+        "@id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+        "type": "ImageService2"
+      }
+    ],
+    "selector": {
+      "type": "SvgSelector",
+      "value": "<svg width=\"4708\" height=\"1860\"><polygon points=\"117,120 113,1776 4587,1772 4568,101\" /></svg>"
+    }
+  },
+  "body": {
+    "type": "FeatureCollection",
+    "purpose": "gcp-georeferencing",
+    "transformation": {
+      "type": "polynomial",
+      "order": 0
+    },
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "pixelCoords": [336]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [2.2906458, 48.8637277]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "pixelCoords": [294, 227]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [2.2906458, 48.8637277]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "pixelCoords": [2252, 1108]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [2.2945555, 48.8574745]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "pixelCoords": [1892, 773]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [2.2945164, 48.8590133]
+        }
+      }
+    ]
+  }
+}

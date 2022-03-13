@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allmaps.org/annotation/schemas/map.json",
+  "title": "Georeferenced map",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": ["integer", "string"]
+    },
+    "gcps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gcp"
+      }
+    },
+    "version": {
+      "type": "integer",
+      "enum": [1],
+      "default": 1,
+      "errorMessage": "Only version 1 is supported. Map should have property `version` with value `1`."
+    },
+    "image": {
+      "$ref": "#/$defs/image"
+    },
+    "pixelMask": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "errorMessage": "Invalid pixel mask. The property `pixelMask` must be an array of at least 3 points (`[x, y]`)."
+    }
+  },
+  "required": ["image"],
+  "$defs": {
+    "gcp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": ["integer", "string"]
+        },
+        "image": {
+          "$ref": "#/$defs/point"
+        },
+        "world": {
+          "$ref": "#/$defs/point"
+        }
+      },
+      "required": ["image", "world"],
+      "errorMessage": "Invalid GCPs. Each GCP must have property `image` (`[x, y]`) and property `world` (`[lon, lat]`)."
+    },
+    "point": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": ["integer", "string"]
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "errorMessage": "Invalid or missing image URI. Image property `uri` must be a [valid URI](https://datatracker.ietf.org/doc/html/rfc3986)."
+        },
+        "width": {
+          "type": "integer",
+          "errorMessage": "Invalid or missing image width. Image property `width` must be a valid integer."
+        },
+        "height": {
+          "type": "integer",
+          "errorMessage": "Invalid or missing image height. Image property `height` must be a valid integer."
+        },
+        "version": {
+          "type": "integer",
+          "enum": [2, 3],
+          "default": 2,
+          "errorMessage": "Invalid image version, only IIIF Image API 2.0 and 3.0 are supported. Image property `version` must be either `2` or `3`."
+        }
+      },
+      "required": ["uri", "width", "height"],
+      "errorMessage": "Invalid image. Image must be an object with required properties `uri`, `width` and `height`."
+    }
+  },
+  "errorMessage": "Invalid map. A map must be an object with required property `image`."
+}

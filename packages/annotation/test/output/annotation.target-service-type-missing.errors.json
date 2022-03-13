@@ -1,0 +1,3 @@
+[
+  "Invalid image service. The property `service` of the annnotation target must be an array with a single object and required properties `type` and `@id`."
+]

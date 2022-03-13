@@ -1,0 +1,3 @@
+[
+  "Invalid purpose in annotation body. Annotation property `body` must be a GeoJSON FeatureCollection and should have property `purpose` with value `\"gcp-georeferencing\"`."
+]

@@ -1,14 +1,29 @@
+import { validateMap } from './lib/validators.js'
+import { ValidationError } from './lib/errors.js'
+
 const motivation = 'georeferencing'
 const purpose = 'gcp-georeferencing'
 
-function createSvgSelector (width, height, mask) {
+const context = [
+  'http://www.w3.org/ns/anno.jsonld',
+  'http://geojson.org/geojson-ld/geojson-context.jsonld',
+  'http://iiif.io/api/presentation/3/context.json'
+]
+
+function createSvgSelector(width, height, mask) {
   return {
     type: 'SvgSelector',
-    value: `<svg width="${width}" height="${height}"><polygon points="${mask.map((point) => point.join(',')).join(' ')}" /></svg>`
+    value: `<svg width="${width}" height="${height}"><polygon points="${mask
+      .map((point) => point.join(','))
+      .join(' ')}" /></svg>`
   }
 }
 
-function createMapAnnotation (map, options) {
+function createMapAnnotation(map, index, includeContext = true) {
+  if (!validateMap(map)) {
+    throw new ValidationError('map', validateMap.errors, index)
+  }
+
   const region = 'full'
   const imageQuality = map.image.quality || 'default'
   const imageFormat = map.image.format || 'jpg'
@@ -39,10 +54,12 @@ function createMapAnnotation (map, options) {
         properties: {
           pixelCoords: gcp.image || null
         },
-        geometry: gcp.world ? {
-          type: 'Point',
-          coordinates: gcp.world
-        } : null
+        geometry: gcp.world
+          ? {
+              type: 'Point',
+              coordinates: gcp.world
+            }
+          : null
       }))
     }
   }
@@ -62,57 +79,62 @@ function createMapAnnotation (map, options) {
   if (map.pixelMask) {
     target = {
       ...target,
-      selector: createSvgSelector(map.image.width, map.image.height, map.pixelMask)
+      selector: createSvgSelector(
+        map.image.width,
+        map.image.height,
+        map.pixelMask
+      )
     }
   }
 
-  let annotationId
-  if (options.idToUri) {
-    annotationId = options.idToUri(map.id)
-  }
-
-  return {
+  const annotation = {
     type: 'Annotation',
-    id: annotationId,
-    '@context': [
-      'http://www.w3.org/ns/anno.jsonld',
-      'http://geojson.org/geojson-ld/geojson-context.jsonld',
-      'http://iiif.io/api/presentation/3/context.json'
-    ],
+    id: map.id,
     motivation,
     target,
     body
   }
+
+  if (includeContext) {
+    annotation['@context'] = context
+  }
+
+  return annotation
 }
 
-export function generate (maps, options) {
-  options = options || {}
+/**
+ * Generates a {@link Annotation georeference annotation} from a single {@link Map map} or an array of {@link Map maps}.
+ * @param {Map | Map[]} mapOrMaps - Single map object, or array of maps
+ * @returns {Annotation} Georeference annotation
+ * @example
+ * import fs from 'fs'
+ * import { generateAnnotation } from '@allmaps/annotation'
+ *
+ * const map = JSON.parse(fs.readFileSync('./examples/map.example.json'))
+ * const annotation = generateAnnotation(map)
+ */
+export function generateAnnotation(mapOrMaps) {
+  let maps
 
-  if (!maps || maps.length === 0) {
-    return {
-      type: 'Annotation',
-      '@context': [
-        'http://geojson.org/geojson-ld/geojson-context.jsonld',
-        'http://iiif.io/api/presentation/3/context.json'
-      ],
-      motivation,
-      target: null,
-      body: null
-    }
+  if (Array.isArray(mapOrMaps)) {
+    maps = mapOrMaps
+  } else {
+    maps = [mapOrMaps]
+  }
+
+  if (maps.length === 0) {
+    throw new Error('No maps provided')
   }
 
   const annotations = maps
-    .map((map) => createMapAnnotation(map, options))
+    .map((map, index) => createMapAnnotation(map, index, maps.length === 1))
 
-  if (annotations.length === 1) {
+  if (maps.length === 1) {
     return annotations[0]
-  } else if (annotations.length > 1) {
+  } else {
     return {
       type: 'AnnotationPage',
-      '@context': [
-        'http://geojson.org/geojson-ld/geojson-context.jsonld',
-        'http://iiif.io/api/presentation/3/context.json'
-      ],
+      '@context': context,
       items: annotations
     }
   }

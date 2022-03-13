@@ -1,0 +1,4 @@
+[
+  "Invalid image service, only IIIF Image API 2.0 and 3.0 are supported. The property `type` of the single object in the `service` array must be either `\"ImageService2\"` or `\"ImageService3\"`.",
+  "Invalid image service. The property `service` of the annnotation target must be an array with a single object and required properties `type` and `@id`."
+]

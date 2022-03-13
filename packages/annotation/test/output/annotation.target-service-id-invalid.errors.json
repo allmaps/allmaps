@@ -1,0 +1,3 @@
+[
+  "Invalid image serice. The property `@id` of the single object in the `service` array must be a [valid URI](https://datatracker.ietf.org/doc/html/rfc3986)."
+]

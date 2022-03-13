@@ -1,0 +1,11 @@
+toc:
+  - name: Generating & parsing georeference annotations
+    children:
+      - parseAnnotation
+      - generateAnnotation
+  - name: Types
+    description: |
+      The two types this module converts between, [Annotation](#annotation) and [Map](#map), are described below.
+    children:
+      - Map
+      - Annotation

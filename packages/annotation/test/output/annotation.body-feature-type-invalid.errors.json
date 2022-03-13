@@ -1,0 +1,3 @@
+[
+  "Invalid GCP in annotation body. Annotation body must be a GeoJSON FeatureCollection, each of its features must have property `type` with value `\"Feature\"`."
+]

@@ -1,34 +1,32 @@
-function getSource (annotation) {
-  return annotation.target.source || annotation.target
-}
+import { validateAnnotation } from './lib/validators.js'
+import { ValidationError } from './lib/errors.js'
 
-// function getImageBasename (annotation) {
-//   const source = getSource(annotation)
-//   const imageId = source.split('/').slice(-1)[0]
-
-//   if (!imageId) {
-//     throw new Error(`Couldn't find image id for image: ${source}`)
-//   }
-
-//   return imageId
-// }
-
-function getGcps (annotation) {
-  return annotation.body.features
-    .map((gcpFeature) => ({
-      id: gcpFeature.id,
+function getGcps(annotation) {
+  return annotation.body.features.map((gcpFeature) => {
+    const gcp = {
       image: gcpFeature.properties.pixelCoords || null,
       world: gcpFeature.geometry ? gcpFeature.geometry.coordinates : null
-    }))
+    }
+
+    if (gcpFeature.id) {
+      gcp.id = gcpFeature.id
+    }
+
+    return gcp
+  })
 }
 
-function getImageDimensions (annotation) {
+function getImageDimensions(annotation) {
   const selector = annotation.target.selector
   if (selector) {
     const svg = selector.value
 
-    const { groups: { width } } = /width="(?<width>\d+)"/.exec(svg)
-    const { groups: { height } } = /height="(?<height>\d+)"/.exec(svg)
+    const {
+      groups: { width }
+    } = /width="(?<width>\d+)"/.exec(svg)
+    const {
+      groups: { height }
+    } = /height="(?<height>\d+)"/.exec(svg)
 
     return {
       width: parseInt(width),
@@ -37,26 +35,39 @@ function getImageDimensions (annotation) {
   }
 }
 
-function getImageUri (annotation) {
-  // TODO: error if undefined
-  return annotation.target && annotation.target.service
-    && annotation.target.service[0] && annotation.target.service[0]['@id']
+function getImageUri(annotation) {
+  return (
+    annotation.target &&
+    annotation.target.service &&
+    annotation.target.service[0] &&
+    annotation.target.service[0]['@id']
+  )
 }
 
-// TODO: export function
-export function getPixelMask (annotation) {
+export function getPixelMask(annotation) {
   const selector = annotation.target.selector
   if (selector) {
     const svg = selector.value
-    const { groups: { points } } = /points="(?<points>.+)"/.exec(svg)
-    return points.split(' ').map((point) => point.split(',').map((c) => parseInt(c)))
+    const {
+      groups: { points }
+    } = /points="(?<points>.+)"/.exec(svg)
+
+    if (points) {
+      return points
+        .split(' ')
+        .map((point) => point.split(',').map((c) => parseInt(c)))
+    }
   }
 }
 
-function getMap (annotation) {
+function getMap(annotation, index) {
+  if (!validateAnnotation(annotation)) {
+    throw new ValidationError('annotation', validateAnnotation.errors, index)
+  }
+
   return {
-    id: annotation['@id'],
-    source: getSource(annotation),
+    version: 1,
+    id: annotation.id,
     image: {
       uri: getImageUri(annotation),
       ...getImageDimensions(annotation)
@@ -66,13 +77,26 @@ function getMap (annotation) {
   }
 }
 
-export function parse (annotation) {
-  // TODO: Add function uriToId
-  if (annotation.type === 'Annotation') {
-    return [getMap(annotation)]
-  } else if (annotation.type === 'AnnotationPage') {
-    return annotation.items.map(getMap)
+/**
+ *
+ * Parses a {@link Annotation georeference annotation} and returns an array of {@link Map maps}.
+ * @param {Annotation} annotation - Georeference annotation
+ * @returns {Map[]} Array of maps
+ * @example
+ * import fs from 'fs'
+ * import { parseAnnotation } from '@allmaps/annotation'
+ *
+ * const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
+ * const maps = parseAnnotation(annotation)
+ */
+export function parseAnnotation(annotation) {
+  if (annotation && annotation.type === 'AnnotationPage') {
+    if (annotation.items) {
+      return annotation.items.map(getMap)
+    } else {
+      return []
+    }
   } else {
-    throw new Error('Invalid annotation')
+    return [getMap(annotation)]
   }
 }

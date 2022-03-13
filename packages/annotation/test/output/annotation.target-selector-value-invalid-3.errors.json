@@ -1,0 +1,3 @@
+[
+  "Invalid selector. The property `selector` of the annotation target must be a valid SvgSelector with a single `<polygon>` element."
+]

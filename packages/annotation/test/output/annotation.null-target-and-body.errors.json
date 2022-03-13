@@ -1,0 +1,4 @@
+[
+  "Invalid annotation body. Annotation body must be an object with required properties `type`, `@context`, `target`, `body`.",
+  "Invalid annotation target. Annotation target must be an object with required properties `type`, `source`, `service`, and `selector`."
+]

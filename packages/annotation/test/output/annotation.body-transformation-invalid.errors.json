@@ -1,0 +1,3 @@
+[
+  "Invalid transformation. Annotation property `body` must be a GeoJSON FeatureCollection and should have object property `transformation` with metadata for the transformation algorithm."
+]

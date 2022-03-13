@@ -1,0 +1,3 @@
+[
+  "Invalid annotation target. Annotation target must be an object with required properties `type`, `source`, `service`, and `selector`."
+]

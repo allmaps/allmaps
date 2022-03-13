@@ -1,0 +1,3 @@
+[
+  "Invalid annotation body. Annotation body must be a GeoJSON FeatureCollection and have a property `type` with value `\"FeatureCollection\"`."
+]

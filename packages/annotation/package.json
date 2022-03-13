@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0-alpha.18",
+  "version": "1.0.0",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -22,20 +22,32 @@
   },
   "homepage": "https://allmaps.org",
   "keywords": [
+    "iiif",
     "georeference",
     "map"
   ],
   "scripts": {
-    "test": "mocha && eslint src test"
+    "test": "mocha && eslint src test && npm run examples",
+    "validators": "node create-validators.js | esbuild --bundle --minify --format=esm --target=es2020 > ./src/lib/validators.js",
+    "documentation": "documentation readme index.js --config documentation.yml --section=API",
+    "examples": "cp test/input/map.nagwjzJ6qURmPEHV.json examples/map.example.json && cp test/input/annotation.i7YhWu1sFExRzm3d.json examples/annotation.example.json"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "eslint": "7",
+    "ajv": "^8.9.0",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^2.1.1",
     "chai": "^4.3.4",
     "chai-shallow-deep-equal": "^1.4.6",
+    "documentation": "^13.2.5",
+    "esbuild": "^0.14.16",
+    "eslint": "7",
     "mocha": "^8.3.2"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
-  }
+  },
+  "eslintIgnore": [
+    "src/lib/validators.js"
+  ]
 }

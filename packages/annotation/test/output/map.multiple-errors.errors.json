@@ -1,0 +1,5 @@
+[
+  "Invalid GCPs. Each GCP must have property `image` (`[x, y]`) and property `world` (`[lon, lat]`).",
+  "Invalid image. Image must be an object with required properties `uri`, `width` and `height`.",
+  "Invalid pixel mask. The property `pixelMask` must be an array of at least 3 points (`[x, y]`)."
+]
