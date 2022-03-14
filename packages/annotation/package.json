@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,6 +27,7 @@
     "map"
   ],
   "scripts": {
+    "preversion": "npm test",
     "test": "mocha && eslint src test && npm run examples",
     "validators": "node create-validators.js | esbuild --bundle --minify --format=esm --target=es2020 > ./src/lib/validators.js",
     "documentation": "documentation readme index.js --config documentation.yml --section=API",
