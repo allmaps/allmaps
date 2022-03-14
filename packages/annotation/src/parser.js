@@ -44,7 +44,7 @@ function getImageUri(annotation) {
   )
 }
 
-export function getPixelMask(annotation) {
+function getPixelMask(annotation) {
   const selector = annotation.target.selector
   if (selector) {
     const svg = selector.value
