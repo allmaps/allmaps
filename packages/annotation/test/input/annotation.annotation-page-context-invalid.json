@@ -1,0 +1,8 @@
+{
+  "type": "AnnotationPage",
+  "@context": [
+    "http://geojson.org/geojson-ld/geojson-context.jsonld",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "items": []
+}

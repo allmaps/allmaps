@@ -1,4 +1,4 @@
-import { validateAnnotation } from './lib/validators.js'
+import { validateAnnotation, validateAnnotationPage } from './lib/validators.js'
 import { ValidationError } from './lib/errors.js'
 
 function getGcps(annotation) {
@@ -60,14 +60,9 @@ function getPixelMask(annotation) {
   }
 }
 
-function getMap(annotation, index) {
-  if (!validateAnnotation(annotation)) {
-    throw new ValidationError('annotation', validateAnnotation.errors, index)
-  }
-
-  return {
+function getMap(annotation) {
+  const map = {
     version: 1,
-    id: annotation.id,
     image: {
       uri: getImageUri(annotation),
       ...getImageDimensions(annotation)
@@ -75,6 +70,12 @@ function getMap(annotation, index) {
     pixelMask: getPixelMask(annotation),
     gcps: getGcps(annotation)
   }
+
+  if (annotation.id) {
+    map.id = annotation.id
+  }
+
+  return map
 }
 
 /**
@@ -91,12 +92,21 @@ function getMap(annotation, index) {
  */
 export function parseAnnotation(annotation) {
   if (annotation && annotation.type === 'AnnotationPage') {
-    if (annotation.items) {
-      return annotation.items.map(getMap)
-    } else {
-      return []
+
+    if (!validateAnnotationPage(annotation)) {
+      throw new ValidationError('Annotation Page', validateAnnotationPage.errors)
     }
+
+    // if (annotation.items) {
+    return annotation.items.map(getMap)
+    // } else {
+      // return []
+    // }
   } else {
+    if (!validateAnnotation(annotation)) {
+      throw new ValidationError('Annotation', validateAnnotation.errors)
+    }
+
     return [getMap(annotation)]
   }
 }

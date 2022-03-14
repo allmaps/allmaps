@@ -1,4 +1,4 @@
-import { validateMap } from './lib/validators.js'
+import { validateMap, validateMaps } from './lib/validators.js'
 import { ValidationError } from './lib/errors.js'
 
 const motivation = 'georeferencing'
@@ -19,11 +19,7 @@ function createSvgSelector(width, height, mask) {
   }
 }
 
-function createMapAnnotation(map, index, includeContext = true) {
-  if (!validateMap(map)) {
-    throw new ValidationError('map', validateMap.errors, index)
-  }
-
+function createMapAnnotation(map, includeContext = true) {
   const region = 'full'
   const imageQuality = map.image.quality || 'default'
   const imageFormat = map.image.format || 'jpg'
@@ -48,19 +44,25 @@ function createMapAnnotation(map, index, includeContext = true) {
         type: 'polynomial',
         order: 0
       },
-      features: map.gcps.map((gcp) => ({
-        type: 'Feature',
-        id: gcp.id,
-        properties: {
-          pixelCoords: gcp.image || null
-        },
-        geometry: gcp.world
-          ? {
-              type: 'Point',
-              coordinates: gcp.world
-            }
-          : null
-      }))
+      features: map.gcps.map((gcp) => {
+        const feature = {
+          type: 'Feature',
+
+          properties: {
+            pixelCoords: gcp.image
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: gcp.world
+          }
+        }
+
+        if (gcp.id) {
+          feature.id = gcp.id
+        }
+
+        return feature
+      })
     }
   }
 
@@ -89,10 +91,13 @@ function createMapAnnotation(map, index, includeContext = true) {
 
   const annotation = {
     type: 'Annotation',
-    id: map.id,
     motivation,
     target,
     body
+  }
+
+  if (map.id) {
+    annotation.id = map.id
   }
 
   if (includeContext) {
@@ -114,28 +119,27 @@ function createMapAnnotation(map, index, includeContext = true) {
  * const annotation = generateAnnotation(map)
  */
 export function generateAnnotation(mapOrMaps) {
-  let maps
-
   if (Array.isArray(mapOrMaps)) {
-    maps = mapOrMaps
-  } else {
-    maps = [mapOrMaps]
-  }
+    const maps = mapOrMaps
 
-  if (maps.length === 0) {
-    throw new Error('No maps provided')
-  }
+    if (!validateMaps(maps)) {
+      throw new ValidationError('Maps', validateMaps.errors)
+    }
 
-  const annotations = maps
-    .map((map, index) => createMapAnnotation(map, index, maps.length === 1))
+    const annotations = maps.map((map) => createMapAnnotation(map, false))
 
-  if (maps.length === 1) {
-    return annotations[0]
-  } else {
     return {
       type: 'AnnotationPage',
       '@context': context,
       items: annotations
     }
+  } else {
+    const map = mapOrMaps
+
+    if (!validateMap(map)) {
+      throw new ValidationError('Map', validateMap.errors)
+    }
+
+    return createMapAnnotation(map, true)
   }
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allmaps.org/annotation/schemas/maps.json",
+  "title": "Array of georeferenced maps",
+  "type": "array",
+  "items": {
+    "$ref": "https://allmaps.org/annotation/schemas/map.json"
+  }
+}

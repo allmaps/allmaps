@@ -1,0 +1,126 @@
+{
+  "type": "AnnotationPage",
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://geojson.org/geojson-ld/geojson-context.jsonld",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "items": [
+    {
+      "type": "Annotation",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "Image",
+        "source": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615/full/full/0/default.jpg",
+        "service": [
+          {
+            "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+            "type": "ImageService2"
+          }
+        ],
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5212\" height=\"7072\"><polygon points=\"945,3624 947,6728 2385,6744 2397,3619\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "purpose": "gcp-georeferencing",
+        "transformation": {
+          "type": "polynomial",
+          "order": 0
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [1845, 6663]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.0594799, 38.8902923]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [1714, 3801]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.2411204, 39.020656]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [2097, 4799]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.1574461, 38.9909944]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Annotation",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "Image",
+        "source": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615/full/full/0/default.jpg",
+        "service": [
+          {
+            "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+            "type": "ImageService2"
+          }
+        ],
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5212\" height=\"7072\"><polygon points=\"2697,501 2683,6946 5226,6946 5228,492\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "purpose": "gcp-georeferencing",
+        "transformation": {
+          "type": "polynomial",
+          "order": 0
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [3113, 6933]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.0225611, 38.8574708]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [3779, 4107]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.7284148, 39.32293]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "pixelCoords": [4496, 4795]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-77.4326706, 39.4060591]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

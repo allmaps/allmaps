@@ -28,7 +28,7 @@
     }
   },
   "additionalProperties": false,
-  "required": ["type", "@context", "target", "body"],
+  "required": ["type", "target", "body"],
   "$defs": {
     "context": {
       "type": "array",

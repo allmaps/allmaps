@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://allmaps.org/annotation/schemas/annotations.json",
-  "title": "IIIF georeference annotation",
+  "$id": "https://allmaps.org/annotation/schemas/annotation-page.json",
+  "title": "Annotation Page with one or more IIIF georeference annotations",
   "type": "object",
   "properties": {
     "type": {
@@ -17,5 +17,6 @@
       }
     }
   },
-  "required": ["type", "@context", "items"]
+  "required": ["type", "items"],
+  "errorMessage": "Invalid annotation. Annotation Page must have a property `type` with value `\"AnnotationPage\"` and the property `items` must be an array with 0 or more georeference annotations."
 }

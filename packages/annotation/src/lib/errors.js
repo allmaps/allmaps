@@ -1,12 +1,10 @@
-export function formatError(type, errors, index) {
-  return `Errors encountered in ${type}${
-    index ? ` ${index}` : ''
-  }: ${errors.join(', ')}`
+export function formatError(type, errors) {
+  return `Errors encountered in ${type}: ${errors.map((error) => error.message).join(', ')}`
 }
 
 export class ValidationError extends Error {
-  constructor(type, errors, index) {
-    const message = formatError(type, errors, index)
+  constructor(type, errors) {
+    const message = formatError(type, errors)
     super(message)
     this.errors = errors
     this.name = 'AnnotationError'

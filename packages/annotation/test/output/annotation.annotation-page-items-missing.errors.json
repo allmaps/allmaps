@@ -1,0 +1,3 @@
+[
+  "Invalid annotation. Annotation Page must have a property `type` with value `\"AnnotationPage\"` and the property `items` must be an array with 0 or more georeference annotations."
+]
