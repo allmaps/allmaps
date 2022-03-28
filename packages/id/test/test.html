@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Test</title>
+    <script type="module">
+      import { generateId, generateRandomId, generateChecksum } from '../dist/web.js'
+
+      const iiifUrl = 'https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json'
+      const id = await generateId(iiifUrl)
+
+      const expectedId = '4ac2770ae8624e38'
+      console.log(id, id === expectedId)
+
+      const randomId = await generateRandomId()
+      console.log(randomId)
+    </script>
+  </head>
+  <body>
+    <h1>Test</h1>
+  </body>
+</html>

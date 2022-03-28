@@ -1,20 +1,22 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-alpha.13",
+  "version": "1.0.0-beta.0",
   "description": "IDs for Allmaps",
   "type": "module",
-  "module": "index.js",
-  "unpkg": "web.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/web.js",
   "exports": {
-    "import": "./index.js",
-    "browser": "./web.js"
+    "import": "./dist/index.js",
+    "browser": "./dist/web.js"
   },
   "files": [
-    "*.js",
-    "src"
+    "dist"
   ],
   "scripts": {
-    "test": "mocha && eslint src test"
+    "tsc": "tsc --watch",
+    "test": "mocha && eslint dist test",
+    "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "repository": {
     "type": "git",
@@ -27,9 +29,8 @@
     "checksum"
   ],
   "author": {
-    "name": "@nelsonic",
-    "email": "contact.nelsonic@gmail.com",
-    "url": "https://github.com/nelsonic"
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl"
   },
   "license": "ISC",
   "bugs": {
@@ -37,9 +38,11 @@
   },
   "homepage": "https://allmaps.org",
   "devDependencies": {
-    "eslint": "7",
+    "@types/node": "^17.0.23",
     "chai": "^4.3.4",
-    "mocha": "^8.3.2"
+    "eslint": "7",
+    "mocha": "^8.3.2",
+    "documentation": "^13.2.5"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
