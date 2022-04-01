@@ -1,0 +1,20 @@
+name = "tileserver"
+type = "javascript"
+usage_model = 'unbound'
+compatibility_flags = []
+compatibility_date = "2021-12-29"
+account_id = "6b4ce0b3a6c21b7769cc1c3eff7eaadf"
+workers_dev = true
+
+[build]
+command="npm run build"
+watch_dir="."
+
+[build.upload]
+format = "modules"
+dir = "./dist"
+main = "worker.js"
+
+[[build.upload.rules]]
+type = "ESModule"
+globs = ["**/*.js"]
