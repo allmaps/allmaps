@@ -1,0 +1,89 @@
+<script lang="ts">
+  import { page } from '$app/stores'
+  // import { onMount } from 'svelte'
+  import { browser } from '$app/env'
+
+  import { env } from '$lib/variables'
+
+  import { parseIiif, getThumbnail, getImageUrl } from '@allmaps/iiif-parser'
+  import { generateId } from '@allmaps/id/browser'
+
+  import Summary from '../components/Summary.svelte'
+  import Image from '../components/Image.svelte'
+  import Manifest from '../components/Manifest.svelte'
+  import Map from '../components/Map.svelte'
+
+  let id
+  let type
+  let parsedIiif
+  let maps
+
+  let input: HTMLInputElement
+  let url: string = $page.url.searchParams.get('url')
+
+  function submit() {
+    url = input.value
+
+    const params = new URLSearchParams(window.location.search)
+    params.set('url', url)
+    window.history.replaceState(
+      {},
+      '',
+      decodeURIComponent(`${window.location.pathname}?${params}`)
+    )
+  }
+
+  $: {
+    if (browser) {
+      loadIiifUrl(url)
+    }
+  }
+
+  async function loadIiifUrl(iiifUrl: string) {
+    // TODO: try/catch
+    const iiifData = await fetch(iiifUrl).then((response) => response.json())
+
+    // TODO: try/catch
+    parsedIiif = parseIiif(iiifData)
+    type = parsedIiif.type
+    id = await generateId(parsedIiif.uri)
+
+    let apiUrl: string
+    if (parsedIiif.type === 'image') {
+      apiUrl = `${env.apiBaseUrl}/images/${id}/maps`
+    } else if (parsedIiif.type === 'manifest') {
+      apiUrl = `${env.apiBaseUrl}/manifests/${id}/maps`
+    }
+
+    if (apiUrl) {
+      // TODO: try/catch
+      maps = await fetch(apiUrl).then((response) => response.json())
+    }
+  }
+</script>
+
+<h1>Allmaps IDs</h1>
+
+<form on:submit|preventDefault={submit}>
+  <input
+    placeholder="IIIF Image or Manifest URL"
+    value={url}
+    bind:this={input}
+  />
+  <button type="submit">Submit</button>
+  {#if parsedIiif}
+    <Summary {id} {parsedIiif} {maps} />
+    {#if type === 'image'}
+      <Image {id} {parsedIiif} {maps} />
+    {:else if type === 'manifest'}
+      <Manifest {id} {parsedIiif} {maps} />
+    {/if}
+  {/if}
+
+  {#if maps}
+    <div>Georeferenced maps:</div>
+    {#each maps as map}
+      <Map {map} />
+    {/each}
+  {/if}
+</form>
