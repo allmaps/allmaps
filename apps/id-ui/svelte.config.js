@@ -9,8 +9,13 @@ const config = {
   preprocess: preprocess(),
 
   kit: {
-    adapter: adapter()
-  }
+    adapter: adapter(),
+    prerender: {
+      default: false
+    }
+  },
+
+  ssr: false
 }
 
 export default config
