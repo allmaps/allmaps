@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-  // import { onMount } from 'svelte'
+  import { onMount } from 'svelte'
   import { browser } from '$app/env'
 
   import { env } from '$lib/variables'
@@ -19,7 +18,11 @@
   let maps
 
   let input: HTMLInputElement
-  let url: string = $page.url.searchParams.get('url')
+  let url: string
+
+  onMount(async () => {
+    url = new URLSearchParams(window.location.search).get('url')
+  })
 
   function submit() {
     url = input.value

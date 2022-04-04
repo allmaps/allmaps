@@ -9,9 +9,13 @@ const config = {
   preprocess: preprocess(),
 
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+      pages: 'build',
+      assets: 'build',
+      fallback: null
+    }),
     prerender: {
-      default: false
+      default: true
     }
   },
 
