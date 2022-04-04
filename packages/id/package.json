@@ -7,8 +7,11 @@
   "module": "./dist/index.js",
   "unpkg": "./dist/web.js",
   "exports": {
-    "import": "./dist/index.js",
-    "browser": "./dist/web.js"
+    ".": {
+      "import": "./dist/index.js",
+      "browser": "./dist/web.js"
+    },
+    "./browser": "./dist/web.js"
   },
   "files": [
     "dist"
