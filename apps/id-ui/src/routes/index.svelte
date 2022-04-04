@@ -37,7 +37,7 @@
   }
 
   $: {
-    if (browser) {
+    if (browser && url) {
       loadIiifUrl(url)
     }
   }
