@@ -9,7 +9,7 @@
   const annotationUrl = `https://dev.annotations.allmaps.org/maps/${mapId}`
   const viewerUrl = `https://dev.viewer.allmaps.org/#data=data:text/x-url,${annotationUrl}`
   const editorUrl = `${env.editorBaseUrl}/#/collection?url=${imageUri}/info.json`
-  const tileServerUrl = `/maps/${mapId}/{z}/{x}/{y}.png`
+  const tileServerUrl = `${env.tilesBaseUrl}/maps/${mapId}/{z}/{x}/{y}.png`
 
   // geoMask = map ? transform.polygonToWorld(transformer, map.pixelMask) : null
 
@@ -41,17 +41,17 @@
 </script>
 
 <div>
-  <code>{map.id}</code>
+  <div>
+    Map ID: <code>{map.id}</code>.
+  </div>
 
-  <ol>
+  <ul>
     <li><a href={annotationUrl}>Georef Annotation</a></li>
     <!-- TODO: add GeoJSON polygon -->
     <li><a href={viewerUrl}>Allmaps Viewer</a></li>
     <li><a href={editorUrl}>Allmaps Editor</a></li>
     <li>XYZ tiles: <code>{tileServerUrl}</code></li>
-  </ol>
-
-
+  </ul>
 </div>
 
 

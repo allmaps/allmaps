@@ -84,8 +84,8 @@
   {/if}
 
   {#if maps}
-    <div>Georeferenced maps:</div>
-    {#each maps as map}
+    <div>This IIIF {parsedIiif.type === 'image' ? 'Image' : 'Manifest'} contains {maps.length} georeferenced {maps.length === 1 ? 'map' : 'maps'}:</div>
+    {#each maps as map (map.id)}
       <Map {map} />
     {/each}
   {/if}
