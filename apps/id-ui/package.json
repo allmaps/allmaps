@@ -5,7 +5,7 @@
     "dev": "svelte-kit dev --port 3030",
     "build": "svelte-kit build",
     "package": "svelte-kit package",
-    "preview": "svelte-kit preview",
+    "preview": "svelte-kit preview --port 3031",
     "prepare": "svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -13,7 +13,7 @@
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
   },
   "dependencies": {
-    "@allmaps/id": "1.0.0-beta.1",
+    "@allmaps/id": "1.0.0-beta.2",
     "@allmaps/iiif-parser": "^1.0.0-alpha.16",
     "node-fetch": "^3.2.3"
   },
