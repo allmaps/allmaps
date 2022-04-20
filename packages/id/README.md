@@ -1,6 +1,6 @@
 # @allmaps/id
 
-Uses the [SHA-512](https://en.wikipedia.org/wiki/SHA-2) algorithm to generate IDs from strings, random IDs from UUIDs and checksums from JSON objects.
+Uses the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) algorithm to generate IDs from strings, random IDs from UUIDs and checksums from JSON objects.
 
 Allmaps uses this module to create IDs from IIIF URIs. For example:
 
@@ -55,14 +55,14 @@ The browser version of @allmaps/id uses the [`SubtleCrypto.digest()`](https://de
 
 ### generateId
 
-Generates a ID from a string using the SHA-512 algorithm. Given the same input, the ID will always be the same.
+Generates an ID from a string using the SHA-1 algorithm. Given the same input, the ID will always be the same.
 
 #### Parameters
 
-*   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Input string
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash (optional, default `16`)
+*   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Input string.
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash.  The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **any** First `length` characters of the SHA-512 hash of `str`
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of `str`.
 
 ### generateRandomId
 
@@ -70,9 +70,9 @@ Generates a random ID.
 
 #### Parameters
 
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash (optional, default `16`)
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-512 hash of a random UUID.
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of a random UUID.
 
 ### generateChecksum
 
@@ -80,7 +80,7 @@ Generates a checksum of a JSON object.
 
 #### Parameters
 
-*   `obj` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** JSON object
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash (optional, default `16`)
+*   `obj` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** JSON object.
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-512 hash of sorted and serialized version of `obj`.
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.

@@ -12,7 +12,7 @@ describe('generate ID for string "1234"', async () => {
     expect(id.length).to.equal(DEFAULT_LENGTH)
   })
 
-  const expectedId = 'd404559f602eab6f'
+  const expectedId = '7110eda4d09e062a'
   it(`ID should equal "${expectedId}"`, () => {
     expect(id).to.equal(expectedId)
   })
@@ -22,7 +22,7 @@ const iiifUrl = 'https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json'
 describe(`generate ID for URL "${iiifUrl}"`, async () => {
   const id = await generateId(iiifUrl)
 
-  const expectedId = '4ac2770ae8624e38'
+  const expectedId = '8520a34527aba090'
   it(`ID should equal "${expectedId}"`, () => {
     expect(id).to.equal(expectedId)
   })
@@ -43,11 +43,12 @@ describe('generate random IDs', async () => {
 })
 
 const length = 50
+const maxLength = 40
 describe(`ID of length ${length}`, async () => {
   const id = await generateId('qwertyuiopasdfghjklzxcvbnm', length)
 
-  it(`ID should have length ${length}`, () => {
-    expect(id.length).to.equal(length)
+  it(`ID should have length ${maxLength}`, () => {
+    expect(id.length).to.equal(maxLength)
   })
 })
 
@@ -73,7 +74,7 @@ describe('Object checksum', async () => {
   })
 
   it('Checksum should be correct', () => {
-    expect(checksum1).to.equal('7f65f00b9b1621f4')
+    expect(checksum1).to.equal('9d50f0d6814d9f21')
   })
 
   it('Semantically equal objects produce equal checksums', () => {

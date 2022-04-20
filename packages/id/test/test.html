@@ -2,19 +2,29 @@
   <head>
     <title>Test</title>
     <script type="module">
-      import { generateId, generateRandomId, generateChecksum } from '../dist/web.js'
+      import { generateId, generateRandomId, generateChecksum } from '../dist/browser.js'
 
       const iiifUrl = 'https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json'
       const id = await generateId(iiifUrl)
 
-      const expectedId = '4ac2770ae8624e38'
+      const expectedId = '8520a34527aba090'
       console.log(id, id === expectedId)
 
       const randomId = await generateRandomId()
       console.log(randomId)
+
+      document.getElementById('iiif-url').innerHTML = iiifUrl
+      document.getElementById('generated-id').innerHTML = id
+      document.getElementById('expected-id').innerHTML = expectedId
+      document.getElementById('random-id').innerHTML = randomId
     </script>
   </head>
   <body>
     <h1>Test</h1>
+    <div>IIIF URL: <code id="iiif-url"></code></div>
+    <div>Generated ID: <code id="generated-id"></code></div>
+    <div>Expected ID: <code id="expected-id"></code></div>
+    <div>Generated random ID: <code id="random-id"></code></div>
+
   </body>
 </html>
