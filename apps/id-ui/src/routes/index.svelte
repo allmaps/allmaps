@@ -61,13 +61,13 @@
     bind:this={input}
   />
   <button type="submit">Submit</button>
-  {#if parsedIiif}
-    <Summary {id} {parsedIiif} {maps} />
-    {#if type === 'image'}
-      <Image {id} {parsedIiif} {maps} />
-    {:else if type === 'manifest'}
-      <Manifest {id} {parsedIiif} {maps} />
-    {/if}
+</form>
+{#if parsedIiif}
+  <Summary {id} {parsedIiif} {maps} />
+  {#if type === 'image'}
+    <Image {id} {parsedIiif} {maps} />
+  {:else if type === 'manifest'}
+    <Manifest {id} {parsedIiif} {maps} />
   {/if}
 
   {#if maps && Array.isArray(maps) && maps.length}
@@ -84,7 +84,7 @@
       any georeferenced maps.
     </div>
   {/if}
-</form>
+{/if}
 
 <svelte:head>
   <style>
