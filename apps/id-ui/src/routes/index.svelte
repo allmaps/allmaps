@@ -8,15 +8,19 @@
   import Image from '../components/Image.svelte'
   import Manifest from '../components/Manifest.svelte'
   import Map from '../components/Map.svelte'
+
   let id
   let type
   let parsedIiif
   let maps
   let input: HTMLInputElement
   let url: string
+  let editorUrl: string
+
   onMount(async () => {
     url = new URLSearchParams(window.location.search).get('url')
   })
+
   function submit() {
     url = input.value
     const params = new URLSearchParams(window.location.search)
@@ -28,10 +32,13 @@
     )
   }
   $: {
+    editorUrl = `${env.editorBaseUrl}/#/collection?url=${url}`
+
     if (browser && url) {
       loadIiifUrl(url)
     }
   }
+
   async function loadIiifUrl(iiifUrl: string) {
     // TODO: try/catch
     const iiifData = await fetch(iiifUrl).then((response) => response.json())
@@ -81,7 +88,8 @@
   {:else}
     <div>
       This IIIF {parsedIiif.type === 'image' ? 'Image' : 'Manifest'} does not contain
-      any georeferenced maps.
+      any georeferenced maps. You can georeference this image with
+      <a href={editorUrl}>Allmaps Editor</a>.
     </div>
   {/if}
 {/if}
