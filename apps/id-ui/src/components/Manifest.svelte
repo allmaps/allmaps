@@ -5,5 +5,5 @@
 </script>
 
 <div>
-  This manifest consisrs of the following images
+  This manifest consists of the following images
 </div>
