@@ -1,0 +1,154 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://purl.stanford.edu/vg994wz9415/iiif/manifest",
+  "@type": "sc:Manifest",
+  "label": "Map of city of Palo Alto, Santa Clara Co., Calif",
+  "attribution": "This work has been identified as being free of known restrictions under copyright law, including all related and neighboring rights. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.",
+  "logo": {
+    "@id": "https://stacks.stanford.edu/image/iiif/wy534zh7137%2FSULAIR_rosette/full/400,/0/default.jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://stacks.stanford.edu/image/iiif/wy534zh7137%2FSULAIR_rosette",
+      "profile": "http://iiif.io/api/image/2/level2.json"
+    }
+  },
+  "seeAlso": {
+    "@id": "https://purl.stanford.edu/vg994wz9415.mods",
+    "format": "application/mods+xml"
+  },
+  "metadata": [
+    {
+      "label": "Available Online",
+      "value": "<a href='https://purl.stanford.edu/vg994wz9415'>https://purl.stanford.edu/vg994wz9415</a>"
+    },
+    {
+      "label": "Title",
+      "value": "Map of city of Palo Alto, Santa Clara Co., Calif"
+    },
+    {
+      "label": "Type",
+      "value": "map"
+    },
+    {
+      "label": "Type",
+      "value": "cartographic image"
+    },
+    {
+      "label": "Type",
+      "value": "Maps-California-Palo Alto-1926."
+    },
+    {
+      "label": "Type",
+      "value": "Maps"
+    },
+    {
+      "label": "Date",
+      "value": "1926"
+    },
+    {
+      "label": "Date",
+      "value": "January 1926"
+    },
+    {
+      "label": "Publisher",
+      "value": "Slonaker's Printing House"
+    },
+    {
+      "label": "Language",
+      "value": "eng"
+    },
+    {
+      "label": "Format",
+      "value": "1 map ; 35 x 42 cm, on sheet 40 x 46 cm"
+    },
+    {
+      "label": "Format",
+      "value": "cartographic material"
+    },
+    {
+      "label": "Description",
+      "value": "North oriented towards upper left."
+    },
+    {
+      "label": "Coverage",
+      "value": "Scale approximately 1:12,500"
+    },
+    {
+      "label": "Coverage",
+      "value": "(W 122°10'48\"--W 122°07'44\"/N 37°27'48\"--N 37°24'57\")."
+    },
+    {
+      "label": "Coverage",
+      "value": "Palo Alto (Calif.)"
+    },
+    {
+      "label": "Coverage",
+      "value": "California"
+    },
+    {
+      "label": "Coverage",
+      "value": "Palo Alto"
+    },
+    {
+      "label": "PublishDate",
+      "value": "2020-06-10T11:42:28Z"
+    }
+  ],
+  "description": "North oriented towards upper left.",
+  "thumbnail": {
+    "@id": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001/full/!400,400/0/default.jpg",
+    "@type": "dctypes:Image",
+    "format": "image/jpeg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001",
+      "profile": "http://iiif.io/api/image/2/level2.json"
+    },
+    "width": 400,
+    "height": 346
+  },
+  "sequences": [
+    {
+      "@id": "https://purl.stanford.edu/vg994wz9415#sequence-1",
+      "@type": "sc:Sequence",
+      "label": "Current order",
+      "viewingDirection": "left-to-right",
+      "canvases": [
+        {
+          "@id": "https://purl.stanford.edu/vg994wz9415/iiif/canvas/vg994wz9415_1",
+          "@type": "sc:Canvas",
+          "label": "Image 1",
+          "height": 9607,
+          "width": 11091,
+          "rendering": [
+            {
+              "@id": "https://stacks.stanford.edu/file/vg994wz9415/vg994wz9415_0001.jp2",
+              "label": "Original source file (19.1 MB)",
+              "format": "image/jp2"
+            }
+          ],
+          "images": [
+            {
+              "@id": "https://purl.stanford.edu/vg994wz9415/iiif/annotation/vg994wz9415_1",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 9607,
+                "width": 11091,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://purl.stanford.edu/vg994wz9415/iiif/canvas/vg994wz9415_1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
