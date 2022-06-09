@@ -1,24 +1,28 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-beta.0",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "",
+  "description": "Render functions for WebGL and image buffers",
   "type": "module",
-  "module": "index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.js",
   "exports": {
-    "import": "./index.js"
+    ".": {
+      "import": "./dist/index.js"
+    }
   },
   "files": [
-    "index.js",
-    "src"
+    "dist"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/allmaps/render.git"
+  "scripts": {
+    "tsc": "tsc --watch",
+    "test": "mocha && eslint dist test",
+    "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
@@ -29,17 +33,15 @@
   "dependencies": {
     "@allmaps/transform": "^1.0.0-alpha.6",
     "@allmaps/iiif-parser": "^1.0.0-alpha.15",
-    "d3-array": "^3.0.4",
     "potpack": "^1.0.1"
-  },
-  "scripts": {
-    "test": "mocha && eslint src test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "chai": "^4.3.4",
     "eslint": "7",
-    "mocha": "^8.3.2"
+    "mocha": "^8.3.2",
+    "@types/node": "^17.0.23",
+    "documentation": "^13.2.5"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
