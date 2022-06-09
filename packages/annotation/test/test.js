@@ -5,7 +5,8 @@ import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-import { parseAnnotation, generateAnnotation } from '../index.js'
+// import { parseAnnotation, generateAnnotation } from '../lib/index.js'
+import { parseAnnotation, generateAnnotation } from '../dist/index.js'
 
 chai.use(shallowDeepEqual)
 
@@ -22,6 +23,9 @@ function readJSONFile(filename) {
 
 fs.readdirSync(inputDir)
   .filter((filename) => filename.endsWith('.json'))
+  //
+  .slice(17, 18)
+  //
   .map((filename) => {
     const basename = path.basename(filename, '.json')
 

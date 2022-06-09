@@ -20,13 +20,13 @@
   "image": {
     "uri": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
     "width": false,
-    "height": 1860
+    "height": 1860,
+    "version": 2
   },
   "pixelMask": [
     [117, 120],
     [113, 1776],
     [4587, 1772],
-    [4568, 101],
-    [117, 120]
+    [4568, 101]
   ]
 }

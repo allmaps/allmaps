@@ -8,5 +8,5 @@
  * @typedef {Object} Annotation
  */
 
-export * from './src/parser.js'
-export * from './src/generator.js'
+export * from './parser.js'
+export * from './generator.js'

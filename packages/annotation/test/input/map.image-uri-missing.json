@@ -19,7 +19,8 @@
   ],
   "image": {
     "width": 4708,
-    "height": 1860
+    "height": 1860,
+    "version": 2
   },
   "pixelMask": [
     [117, 120],
