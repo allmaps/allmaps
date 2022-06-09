@@ -9,9 +9,15 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "browser": "./dist/browser.js"
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      }
     },
-    "./browser": "./dist/browser.js"
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    }
   },
   "files": [
     "dist"
