@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   publish:
@@ -16,3 +16,4 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: public
+          tag: beta
