@@ -1,3 +1,5 @@
+type Point = {x: number, y: number}
+
 const HUGE_VAL = Number.POSITIVE_INFINITY
 const MAXORDER = 3
 
@@ -9,7 +11,12 @@ const ERRORS = ({
 })
 
 export class GCP {
-  constructor (dfGCPPixel, dfGCPLine, dfGCPX, dfGCPY) {
+  dfGCPPixel: number
+  dfGCPLine: number
+  dfGCPX: number
+  dfGCPY: number
+
+  constructor (dfGCPPixel: number, dfGCPLine: number, dfGCPX: number, dfGCPY: number) {
     this.dfGCPPixel = dfGCPPixel
     this.dfGCPLine = dfGCPLine
     this.dfGCPX = dfGCPX
@@ -24,9 +31,16 @@ class ControlPoints {
   // double *e2;
   // double *n2;
   // int *status;
+
+  count: number = 0
+  e1: number[] = []
+  n1: number[] = []
+  e2: number[] = []
+  n2: number[] = []
+  status: number[] = []
 }
 
-class GCPTransformInfo {
+export class GCPTransformInfo {
   // double adfToGeoX[20];
   // double adfToGeoY[20];
 
@@ -47,6 +61,28 @@ class GCPTransformInfo {
 
   // volatile int nRefCount;
 
+  x1Mean: number = 0
+  y1Mean: number = 0
+  x2Mean: number = 0
+  y2Mean: number = 0
+
+  bReversed: boolean = false
+  nOrder: number = 1
+  bRefine: boolean = false
+  dfTolerance: number = -1
+  nMinimumGcps: number = -1
+
+  nRefCount: number = 1
+
+  pasGCPList: GCP[] = []
+  nGCPCount: number = 0
+
+  adfToGeoX: number[] = []
+  adfToGeoY: number[] = []
+
+  adfFromGeoX: number[] = []
+  adfFromGeoY: number[] = []
+
   constructor () {
     this.adfToGeoX = []
     this.adfToGeoY = []
@@ -60,25 +96,28 @@ class MATRIX {
   // int     n;     /* SIZE OF THIS MATRIX (N x N) */
   // double *v;
 
+  n: number
+  v: number[]
+
   constructor (n = 0) {
     this.n = n
     this.v = []
   }
 
-  getM (row, col) {
+  getM (row: number, col: number) {
     return this.v[(((row) - 1) * (this.n)) + (col) - 1]
   }
 
-  setM (row, col, value) {
+  setM (row: number, col: number, value: number) {
     this.v[(((row) - 1) * (this.n)) + (col) - 1] = value
   }
 }
 
-export function GDALCreateGCPTransformer (pasGCPList, nReqOrder, bReversed) {
+export function GDALCreateGCPTransformer (pasGCPList: GCP[], nReqOrder: number, bReversed: boolean) {
   return GDALCreateGCPTransformerEx(pasGCPList, nReqOrder, bReversed, false, -1, -1)
 }
 
-function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, dfTolerance, nMinimumGcps) {
+function GDALCreateGCPTransformerEx (pasGCPList: GCP[], nReqOrder: number, bReversed: boolean, bRefine: boolean, dfTolerance: number, nMinimumGcps: number) {
   // double *padfGeoX = nullptr;
   // double *padfGeoY = nullptr;
   // double *padfRasterX = nullptr;
@@ -186,7 +225,7 @@ function GDALCreateGCPTransformerEx (pasGCPList, nReqOrder, bReversed, bRefine, 
   return psInfo
 }
 
-function crsComputeGeorefEquations (psInfo, cp, E12, N12, E21, N21, order) {
+function crsComputeGeorefEquations (psInfo: GCPTransformInfo, cp: ControlPoints, E12: number[], N12: number[], E21: number[], N21: number[], order: number) {
   // C++ signature:
   // crsComputeGeorefEquations (GCPTransformInfo *psInfo, struct ControlPoints *cp,
   //   double E12[], double N12[],
@@ -222,15 +261,15 @@ function crsComputeGeorefEquations (psInfo, cp, E12, N12, E21, N21, order) {
   cp.n2 = tempptr
 }
 
-function calcCoef (cp, xMean, yMean, E, N, order) {
+function calcCoef (cp: ControlPoints, xMean: number, yMean: number, E: number[], N: number[], order: number) {
   // C++ signature:
   // static int
   // calcCoef (struct ControlPoints *cp, double xMean, double yMean, double E[], double N[], int order)
 
   const m = new MATRIX()
 
-  const a = []
-  const b = []
+  let a: number[] = []
+  let b: number[] = []
 
   let numactive = 0 /* NUMBER OF ACTIVE CONTROL POINTS */
   let i = 0
@@ -260,7 +299,7 @@ function calcCoef (cp, xMean, yMean, E, N, order) {
   }
 }
 
-function calcls (cp, m, xMean, yMean, a, b, E, N) {
+function calcls (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: number[], b: number[], E: number[], N: number[]) {
   // C++ signature:
   // static int calcls (
   //   struct ControlPoints *cp,
@@ -317,7 +356,7 @@ function calcls (cp, m, xMean, yMean, a, b, E, N) {
   return solveMat(m, a, b, E, N)
 }
 
-function exactDet (cp, m, xMean, yMean, a, b, E, N) {
+function exactDet (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: number[], b: number[], E: number[], N: number[]) {
   // C++ signature:
   // static int exactDet (
   //   struct ControlPoints *cp,
@@ -353,7 +392,7 @@ function exactDet (cp, m, xMean, yMean, a, b, E, N) {
   return solveMat(m, a, b, E, N)
 }
 
-function solveMat (m, a, b, E, N) {
+function solveMat (m: MATRIX, a: number[], b: number[], E: number[], N: number[]) {
   // C++ signature:
   // static int solveMat (struct MATRIX *m,
   //   double a[], double b[], double E[], double N[])
@@ -429,7 +468,7 @@ function solveMat (m, a, b, E, N) {
   }
 }
 
-function term (nTerm, e, n) {
+function term (nTerm: number, e: number, n: number) {
   switch (nTerm) {
     case 1:
       return 1
@@ -456,7 +495,7 @@ function term (nTerm, e, n) {
   return 0
 }
 
-export function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
+export function GDALGCPTransform (pTransformArg: GCPTransformInfo, bDstToSrc: boolean, points: Point[]) {
   const nPointCount = points.length
 
   // GCPTransformInfo *psInfo = static_cast<GCPTransformInfo *>(pTransformArg);
@@ -496,7 +535,7 @@ export function GDALGCPTransform (pTransformArg, bDstToSrc, points) {
   return transformedPoints
 }
 
-function crsGeoref (e1, n1, E, N, order) {
+function crsGeoref (e1: number, n1: number, E: number[], N: number[], order: number) {
   // C++ signature:
   // static int crsGeoref (
   //   double e1,  /* EASTINGS TO BE TRANSFORMED */

@@ -1,12 +1,12 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "allowJs": true,
-    "target": "es2021",
-    "declaration": true,
-    "moduleResolution": "node"
   },
+  "references": [
+    { "path": "../transform" },
+    { "path": "../iiif-parser" }
+  ],
   "include": ["./src/**/*"]
 }

@@ -1,7 +1,11 @@
 {
-  "name": "root",
+  "name": "@allmaps/core",
   "private": true,
+  "scripts": {
+    "tsc": "tsc -b --watch"
+  },
   "devDependencies": {
-    "lerna": "^5.1.0"
+    "lerna": "^5.1.0",
+    "turbo": "^1.2.16"
   }
 }

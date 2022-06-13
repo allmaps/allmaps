@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "strict": true,
+    "allowJs": true,
+    "target": "es2021",
+    "composite": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "paths": {
+      "@allmaps/id": ["./packages/id/src"],
+      "@allmaps/transform": ["./packages/transform/src"],
+      "@allmaps/render": ["./packages/render/src"],
+      "@allmaps/annotation": ["./packages/annotation/src"],
+      "@allmaps/iiif-parser": ["./packages/iiif-parser/src"]
+    }
+  }
+}

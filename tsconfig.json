@@ -1,12 +1,10 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "allowJs": true,
-    "target": "es2021",
-    "declaration": true,
-    "moduleResolution": "node"
-  },
-  "include": ["./src/**/*"]
+  "files": [],
+  "references": [
+    { "path": "./packages/id" },
+    { "path": "./packages/transform" },
+    { "path": "./packages/render" },
+    { "path": "./packages/annotation" },
+    { "path": "./packages/iiif-parser" }
+  ]
 }

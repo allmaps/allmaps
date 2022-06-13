@@ -1,6 +1,15 @@
 {
-  "packages": [
-    "packages/*"
-  ],
-  "version": "0.0.0"
+  "packages": ["packages/*"],
+  "npmClientArgs": ["--no-lockfile"],
+  "version": "independent",
+  "command": {
+    "version": {
+      "ignoreChanges": ["*.md"],
+      "npmClient": "npm",
+      "message": "chore(release): publish"
+    },
+    "publish": {
+      "npmClient": "npm"
+    }
+  }
 }

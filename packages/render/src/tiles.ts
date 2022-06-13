@@ -1,22 +1,30 @@
-// import { extent } from 'd3-array'
-
 import { toImage } from '@allmaps/transform'
 import { Image } from '@allmaps/iiif-parser'
+
+import type { GCPTransformInfo } from '@allmaps/transform'
+
+import type { TileZoomLevel } from '@allmaps/iiif-parser'
+
+// TODO: import Size from @allmaps/iiif-parser
+type Size = [number, number]
+type Extent = [number, number, number, number]
+type Coord = [number, number]
+type Line = [Coord, Coord]
+
+type CoordByX = { [key: number]: Coord }
 
 // TODO: create ES6 CLASS!!!\
 
 function computeExtent(values: number[]): [number, number] {
-  let min: number
-  let max: number
+  let min: number = Number.POSITIVE_INFINITY
+  let max: number = Number.NEGATIVE_INFINITY
 
   for (const value of values) {
-    if (value != null) {
-      if (min === undefined) {
-        if (value >= value) min = max = value
-      } else {
-        if (min > value) min = value
-        if (max < value) max = value
-      }
+    if (min === undefined) {
+      if (value >= value) min = max = value
+    } else {
+      if (min > value) min = value
+      if (max < value) max = value
     }
   }
 
@@ -27,7 +35,7 @@ function computeExtent(values: number[]): [number, number] {
 //  https://github.com/vHawk/tiles-intersect
 // See also:
 //  https://www.redblobgames.com/grids/line-drawing.html
-function tilesIntersect([a, b]: [[number, number], [number, number]]): [
+function tilesIntersect([a, b]: Line): [
   number,
   number
 ][] {
@@ -36,7 +44,7 @@ function tilesIntersect([a, b]: [[number, number], [number, number]]): [
   const endX = Math.floor(b[0])
   const endY = Math.floor(b[1])
 
-  let points: [number, number][] = [[x, y]]
+  let points: Coord[] = [[x, y]]
 
   if (x === endX && y === endY) {
     return points
@@ -72,7 +80,7 @@ function tilesIntersect([a, b]: [[number, number], [number, number]]): [
   return points
 }
 
-function extentToImage(transformer, extent) {
+function extentToImage(transformer: GCPTransformInfo, extent: Extent) {
   const [y1, x1, y2, x2] = extent
 
   return [
@@ -83,7 +91,7 @@ function extentToImage(transformer, extent) {
   ]
 }
 
-function computeMinMax(points) {
+function computeMinMax(points: Coord[]) {
   const xs = []
   const ys = []
 
@@ -105,9 +113,12 @@ function computeMinMax(points) {
   }
 }
 
-function findBestZoomLevel(timeZoomLevels, mapTileScale: number) {
+function findBestZoomLevel(
+  timeZoomLevels: TileZoomLevel[],
+  mapTileScale: number
+) : TileZoomLevel | undefined {
   let smallestScaleDiff = Number.POSITIVE_INFINITY
-  let bestZoomLevel
+  let bestZoomLevel: TileZoomLevel | undefined
 
   for (let zoomLevel of timeZoomLevels) {
     const scaleFactor = zoomLevel.scaleFactor
@@ -123,18 +134,18 @@ function findBestZoomLevel(timeZoomLevels, mapTileScale: number) {
   return bestZoomLevel
 }
 
-function scaleToTiles(zoomLevel, points) {
+function scaleToTiles(zoomLevel: TileZoomLevel, points: Coord[]): Coord[] {
   return points.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
 }
 
-function findNeededIiifTilesByX(tilePixelExtent) {
+function findNeededIiifTilesByX(tilePixelExtent: Coord[]) {
   // TODO: use Map
-  const tiles = {}
+  const tiles: CoordByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
-    const line = [
+    const line: Line = [
       tilePixelExtent[i],
       tilePixelExtent[(i + 1) % tilePixelExtent.length]
     ]
@@ -158,7 +169,7 @@ function findNeededIiifTilesByX(tilePixelExtent) {
   return tiles
 }
 
-function iiifTilesByXToArray(zoomLevel, iiifTilesByX) {
+function iiifTilesByXToArray(zoomLevel: TileZoomLevel, iiifTilesByX: CoordByX) {
   const neededIiifTiles = []
   for (let xKey in iiifTilesByX) {
     const x = parseInt(xKey)
@@ -183,10 +194,10 @@ function iiifTilesByXToArray(zoomLevel, iiifTilesByX) {
 }
 
 export function computeIiifTilesForMapExtent(
-  transformer,
+  transformer: GCPTransformInfo,
   image: Image,
   viewportSize: Size,
-  geoExtent
+  geoExtent: Extent
 ) {
   const imagePixelExtent = extentToImage(transformer, geoExtent)
   const imagePixelExtentMinMax = computeMinMax(imagePixelExtent)
@@ -205,10 +216,13 @@ export function computeIiifTilesForMapExtent(
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
   const zoomLevel = findBestZoomLevel(image.tileZoomLevels, mapScale)
-  const tilePixelExtent = scaleToTiles(zoomLevel, imagePixelExtent)
 
-  const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
-  const iiifTiles = iiifTilesByXToArray(zoomLevel, iiifTilesByX)
+  if (zoomLevel) {
+    const tilePixelExtent = scaleToTiles(zoomLevel, imagePixelExtent)
 
-  return iiifTiles
+    const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
+    const iiifTiles = iiifTilesByXToArray(zoomLevel, iiifTilesByX)
+
+    return iiifTiles
+  }
 }
