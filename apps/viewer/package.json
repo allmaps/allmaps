@@ -14,14 +14,12 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public",
-    "deploy": "npm run build; push-dir --dir=public --branch=gh-pages --cleanup"
+    "start": "sirv public"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-yaml": "^3.0.0",
-    "push-dir": "^0.4.1",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
@@ -31,7 +29,7 @@
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-alpha.14",
-    "@allmaps/iiif-parser": "^1.0.0-alpha.14",
+    "@allmaps/iiif-parser": "^1.0.0-alpha.16",
     "@allmaps/layers": "^1.0.0-alpha.12",
     "@allmaps/transform": "^1.0.0-alpha.5",
     "ol": "^6.5.0",

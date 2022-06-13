@@ -12,6 +12,7 @@
 
   import { WarpedMapLayer } from '@allmaps/layers'
   import { createTransformer, polygonToWorld } from '@allmaps/transform'
+  import { parseIiif } from '@allmaps/iiif-parser'
 
   export let map
 
@@ -46,14 +47,23 @@
       const imageUri = map.image.uri
 
       const image = await fetchImage(imageUri)
+      const parsedImage = parseIiif(image)
+
       const options = {
-        image,
+        parsedImage,
         georeferencedMap: map,
         source: new VectorSource()
       }
 
       warpedMapLayer = new WarpedMapLayer(options)
       ol.addLayer(warpedMapLayer)
+
+
+
+
+
+
+
 
       // warpedMapLayer.on('tile-load-error', (event) => {
       //   TODO: this is probably a CORS error! Show these!
@@ -103,7 +113,10 @@
   onMount(async () => {
     const tileUrl = tileSources[tileSourceIndex].url
     // TODO: set attribution
-    xyz = new XYZ(tileUrl)
+    xyz = new XYZ({
+      url: tileUrl,
+      maxZoom: 19
+    })
 
     baseLayer = new TileLayer({
       source: xyz
@@ -128,7 +141,7 @@
       // controls: [],
       view: new View({
         enableRotation: false,
-        minZoom: 6,
+        // minZoom: 6,
         maxZoom: 20,
         zoom: 12
       })
