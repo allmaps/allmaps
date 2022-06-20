@@ -1,3 +1,1 @@
-[
-  "Invalid image. Image must be an object with required properties `uri`, `width` and `height`."
-]
+["Required", "Required"]

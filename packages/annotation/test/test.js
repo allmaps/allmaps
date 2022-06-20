@@ -1,19 +1,19 @@
 import fs from 'fs'
 import path from 'path'
+import { z } from 'zod'
 
 import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-// import { parseAnnotation, generateAnnotation } from '../lib/index.js'
 import { parseAnnotation, generateAnnotation } from '../dist/index.js'
 
 chai.use(shallowDeepEqual)
 
-const inputDir = './test/input'
-const outputDir = './test/output'
+export const inputDir = './test/input'
+export const outputDir = './test/output'
 
-function readJSONFile(filename) {
+export function readJSONFile(filename) {
   try {
     return JSON.parse(fs.readFileSync(filename))
   } catch (err) {
@@ -23,9 +23,6 @@ function readJSONFile(filename) {
 
 fs.readdirSync(inputDir)
   .filter((filename) => filename.endsWith('.json'))
-  //
-  .slice(17, 18)
-  //
   .map((filename) => {
     const basename = path.basename(filename, '.json')
 
@@ -39,14 +36,18 @@ fs.readdirSync(inputDir)
 
     const parsedType = type === 'annotation' ? 'map' : 'annotation'
 
-    const inputFilename = `${inputDir}/${basename}.json`
-    const outputFilename = `${outputDir}/${basename}.${parsedType}.json`
-    const errorsFilename = `${outputDir}/${basename}.errors.json`
+    const inputFilename = path.join(inputDir, `${basename}.json`)
+    const outputFilename = path.join(
+      outputDir,
+      `${basename}.${parsedType}.json`
+    )
+    const errorsFilename = path.join(outputDir, `${basename}.errors.json`)
 
     const input = readJSONFile(inputFilename)
 
     let output
     let errors
+    let zodError
 
     try {
       if (type === 'map') {
@@ -55,11 +56,14 @@ fs.readdirSync(inputDir)
         output = parseAnnotation(input)
       }
     } catch (err) {
-      // TODO: include other AJV error data?
       if (err.errors) {
         errors = err.errors.map((error) => error.message)
       } else {
         errors = [err.message]
+      }
+
+      if (err instanceof z.ZodError) {
+        zodError = err
       }
     }
 
@@ -69,6 +73,7 @@ fs.readdirSync(inputDir)
       input,
       output,
       errors,
+      zodError,
       expected: {
         output: readJSONFile(outputFilename),
         errors: readJSONFile(errorsFilename)
@@ -90,11 +95,19 @@ function runTests(file) {
         expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
       })
     } else if (file.output && file.expected.errors) {
-      console.error('File parsed correctly, but expected errors:', file.basename)
-      console.log(file.output)
+      console.error(
+        'File parsed correctly, but expected errors:',
+        file.basename
+      )
     } else if (file.errors && file.expected.output) {
-      console.error('File failed to parse:', file.basename)
-      console.log(file.errors)
+      console.error(
+        'File failed to parse, but expected no errors:',
+        file.basename
+      )
+      if (file.zodError) {
+        console.error(JSON.stringify(file.zodError.format(), null, 2))
+        console.error(file.zodError.issues)
+      }
     } else {
       console.error(
         'Input file should have either matching output or errors JSON file:\n  ',

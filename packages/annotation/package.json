@@ -8,13 +8,16 @@
   },
   "description": "Functions for generating and parsing IIIF georeference annotations",
   "type": "module",
-  "module": "index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.js",
   "exports": {
-    "import": "./index.js"
+    ".": {
+      "import": "./dist/index.js"
+    }
   },
   "files": [
-    "index.js",
-    "src"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -28,8 +31,10 @@
   ],
   "scripts": {
     "tsc": "tsc --watch",
+    "build": "tsc",
     "preversion": "npm test",
     "test": "mocha && npm run lint && npm run examples",
+    "pretest": "npm run build",
     "lint": "eslint dist test",
     "documentation": "documentation readme index.js --config documentation.yml --section=API",
     "examples": "cp test/input/map.nagwjzJ6qURmPEHV.json examples/map.example.json && cp test/input/annotation.i7YhWu1sFExRzm3d.json examples/annotation.example.json"

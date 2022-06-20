@@ -18,6 +18,7 @@
     }
   ],
   "image": {
+    "type": "ImageService2",
     "uri": "invalid",
     "width": 4708,
     "height": 1860
@@ -27,5 +28,6 @@
     [113, 1776],
     [4587, 1772],
     [4568, 101]
-  ]
+  ],
+  "version": 1
 }

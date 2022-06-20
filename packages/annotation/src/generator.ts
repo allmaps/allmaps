@@ -8,8 +8,6 @@ import {
   SvgSelectorSchema
 } from './schemas/annotation.js'
 
-import { mapErrorMap } from './errors.js'
-
 type ImageService = z.infer<typeof ImageServiceSchema>
 
 type Map = z.infer<typeof MapSchema>
@@ -115,13 +113,12 @@ function generateGeorefAnnotation(map: Map): Annotation {
  * const annotation = generateAnnotation(map)
  */
 export function generateAnnotation(
-  mapOrMaps: Map | Map[]
+  mapOrMaps: any
 ): Annotation | AnnotationPage {
   if (Array.isArray(mapOrMaps)) {
+    // eslint-disable-next-line no-useless-catch
     try {
-      const maps = MapsSchema.parse(mapOrMaps, {
-        errorMap: mapErrorMap
-      })
+      const maps = MapsSchema.parse(mapOrMaps)
 
       const annotations = maps.map((map) => generateGeorefAnnotation(map))
 
@@ -131,18 +128,15 @@ export function generateAnnotation(
         items: annotations
       }
     } catch (err) {
-      // TODO: handle errors
       throw err
     }
   } else {
+    // eslint-disable-next-line no-useless-catch
     try {
-      const map = MapSchema.parse(mapOrMaps, {
-        errorMap: mapErrorMap
-      })
+      const map = MapSchema.parse(mapOrMaps)
 
       return generateGeorefAnnotation(map)
     } catch (err) {
-      // TODO: handle errors
       throw err
     }
   }

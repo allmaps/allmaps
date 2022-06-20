@@ -20,6 +20,7 @@
     ],
     "image": {
       "uri": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+      "type": "ImageService2",
       "width": 4708,
       "height": 1860
     },
@@ -47,6 +48,7 @@
     ],
     "image": {
       "uri": "https://dlc.services/iiif-img/7/4/c835d908-c0c5-4374-a0b3-f1ebd7ad0871",
+      "type": "ImageService2",
       "width": 4201,
       "height": 4089
     },

@@ -18,7 +18,7 @@
     ],
     "selector": {
       "type": "SvgSelector",
-      "value": "<svg width=\"4708\" height=\"1860\"><polygon points=\"117,120 113,1776 4587,1772 4568,101 117,120\" /></svg>"
+      "value": "<svg width=\"4708\" height=\"1860\"><polygon points=\"117,120 113,1776 4587,1772 4568,101\" /></svg>"
     }
   },
   "body": {

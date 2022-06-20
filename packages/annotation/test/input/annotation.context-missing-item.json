@@ -1,6 +1,5 @@
 {
   "type": "Annotation",
-  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
   "@context": [
     "http://geojson.org/geojson-ld/geojson-context.jsonld",
     "http://iiif.io/api/presentation/3/context.json"

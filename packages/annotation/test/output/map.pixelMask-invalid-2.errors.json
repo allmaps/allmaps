@@ -1,3 +1,1 @@
-[
-  "Invalid pixel mask. The property `pixelMask` must be an array of at least 3 points (`[x, y]`)."
-]
+["Expected number, received boolean", "Expected number, received boolean"]

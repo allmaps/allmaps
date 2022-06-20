@@ -21,7 +21,7 @@
     "uri": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
     "width": false,
     "height": 1860,
-    "version": 2
+    "type": "ImageService2"
   },
   "pixelMask": [
     [117, 120],

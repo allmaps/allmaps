@@ -1,3 +1,1 @@
-[
-  "Invalid GCPs. Each GCP must have property `image` (`[x, y]`) and property `world` (`[lon, lat]`)."
-]
+["Expected number, received string", "Expected number, received string"]

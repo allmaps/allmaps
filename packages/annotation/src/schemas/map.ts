@@ -17,9 +17,8 @@ export const ImageSchema = z.object({
 export const PixelMaskSchema = PointSchema.array().min(3)
 
 export const MapSchema = z.object({
-  // TODO: uri instead of id?
   id: z.string().url().optional(),
-  version: z.literal(1),
+  version: z.number().min(1).max(1).default(1),
   gcps: GCPSchema.array(),
   pixelMask: PixelMaskSchema,
   image: ImageSchema

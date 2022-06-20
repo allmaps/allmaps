@@ -4,7 +4,8 @@
     "image": {
       "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
       "width": 5212,
-      "height": 7072
+      "height": 7072,
+      "type": "ImageService2"
     },
     "pixelMask": [
       [945, 3624],
@@ -32,7 +33,8 @@
     "image": {
       "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
       "width": 5212,
-      "height": 7072
+      "height": 7072,
+      "type": "ImageService2"
     },
     "pixelMask": [
       [2697, 501],

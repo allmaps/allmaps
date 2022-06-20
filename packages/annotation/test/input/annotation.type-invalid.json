@@ -1,6 +1,5 @@
 {
   "type": "invalid",
-  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
   "@context": [
     "http://www.w3.org/ns/anno.jsonld",
     "http://geojson.org/geojson-ld/geojson-context.jsonld",

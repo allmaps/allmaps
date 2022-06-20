@@ -1,13 +1,16 @@
 {
   "type": "AnnotationPage",
   "@context": [
-    "http://www.w3.org/ns/anno.jsonld",
-    "http://geojson.org/geojson-ld/geojson-context.jsonld",
-    "http://iiif.io/api/presentation/3/context.json"
+    "http://www.w3.org/ns/anno.jsonld"
   ],
   "items": [
     {
       "type": "Annotation",
+      "@context": [
+        "http://www.w3.org/ns/anno.jsonld",
+        "http://geojson.org/geojson-ld/geojson-context.jsonld",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
       "motivation": "georeferencing",
       "target": {
         "type": "Image",
@@ -65,6 +68,11 @@
     },
     {
       "type": "Annotation",
+      "@context": [
+        "http://www.w3.org/ns/anno.jsonld",
+        "http://geojson.org/geojson-ld/geojson-context.jsonld",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
       "motivation": "georeferencing",
       "target": {
         "type": "Image",

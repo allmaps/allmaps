@@ -6,8 +6,6 @@ import {
   SvgSelectorSchema
 } from './schemas/annotation.js'
 
-import { annotationErrorMap } from './errors.js'
-
 import { MapSchema, PixelMaskSchema, GCPSchema } from './schemas/map.js'
 
 type Annotation = z.infer<typeof AnnotationSchema>
@@ -107,15 +105,12 @@ function getMap(annotation: Annotation): Map {
  * const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
  * const maps = parseAnnotation(annotation)
  */
-export function parseAnnotation(
-  annotation: Annotation | AnnotationPage
-): Map[] {
+export function parseAnnotation(annotation: any): Map[] {
   if (annotation && annotation.type === 'AnnotationPage') {
+    // eslint-disable-next-line no-useless-catch
     try {
-      const parsedAnnotationPage = AnnotationPageSchema.parse(annotation, {
-        errorMap: annotationErrorMap
-      }
-      )
+      const parsedAnnotationPage = AnnotationPageSchema.parse(annotation)
+
       return parsedAnnotationPage.items.map((parsedAnnotation) =>
         getMap(parsedAnnotation)
       )
@@ -124,18 +119,12 @@ export function parseAnnotation(
       throw err
     }
   } else {
+    // eslint-disable-next-line no-useless-catch
     try {
-      const parsedAnnotation = AnnotationSchema.parse(annotation, {
-        errorMap: annotationErrorMap
-      })
+      const parsedAnnotation = AnnotationSchema.parse(annotation)
 
       return [getMap(parsedAnnotation)]
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        // console.log(JSON.stringify(err.format(), null, 2))
-        console.log(err.issues)
-        // TODO: handle errors
-      }
       throw err
     }
   }

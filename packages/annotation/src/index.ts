@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 /**
  * Object that contains the data needed to georeference a IIIF map. For details, see its [JSON Schema](schemas/map.json) or the [example](examples/map.example.json) in the `examples` directory.
  * @typedef {Object} Map
@@ -10,3 +12,16 @@
 
 export * from './parser.js'
 export * from './generator.js'
+
+import {
+  AnnotationSchema,
+  AnnotationPageSchema,
+} from './schemas/annotation.js'
+
+import { MapSchema, MapsSchema } from './schemas/map.js'
+
+export type Annotation = z.infer<typeof AnnotationSchema>
+export type AnnotationPage = z.infer<typeof AnnotationPageSchema>
+
+export type Map = z.infer<typeof MapSchema>
+export type Maps = z.infer<typeof MapsSchema>

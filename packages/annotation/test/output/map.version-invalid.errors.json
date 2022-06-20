@@ -1,3 +1,1 @@
-[
-  "Only version 1 is supported. Map should have property `version` with value `1`."
-]
+["Number must be greater than or equal to 1"]

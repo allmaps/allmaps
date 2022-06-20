@@ -1,3 +1,1 @@
-[
-  "Invalid GCPs. Each GCP must have property `image` (`[x, y]`) and property `world` (`[lon, lat]`)."
-]
+["Array must contain at least 2 element(s)"]
