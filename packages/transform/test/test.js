@@ -1,27 +1,39 @@
-// import { describe, it } from 'mocha'
-// import chai, { expect } from 'chai'
+import { describe, it } from 'mocha'
+import { expect } from 'chai'
 
-import axios from 'axios'
+import { createTransformer, toWorld } from '../dist/index.js'
 
-import { parse } from '@allmaps/annotation'
-import { createTransformer, polygonToWorld } from '../index.js'
+const gcps = [
+  {
+    image: [518, 991],
+    world: [4.9516614, 52.4633102]
+  },
+  {
+    image: [4345, 2357],
+    world: [5.0480391, 52.5123762]
+  },
+  {
+    image: [2647, 475],
+    world: [4.9702906, 52.5035815]
+  }
+]
 
-async function runTests (url) {
-  const response = await axios.get(url)
-  const annotation = response.data
-
-  const maps = parse(annotation)
-  const map = maps[0]
-
-  const transformArgs = createTransformer(map.gcps)
-  const geojson = polygonToWorld(transformArgs, map.pixelMask)
-
-  console.log(JSON.stringify(geojson, null, 2))
+function expectToBeCloseToArray(actual, expected) {
+  expect(actual.length).to.equal(expected.length)
+  actual.forEach((n, i) => expect(n).to.be.approximately(expected[i], 0.00001))
 }
 
-// const annotationUrl = 'https://annotations.allmaps.org/images/wVAswZEjDuXggbBh'
-// const annotationUrl = 'https://annotations.allmaps.org/images/2MVa8QBQ7FqUYfnR'
-// const annotationUrl = 'https://annotations.allmaps.org/images/QMvWyWMesK7Jbg8q'
-const annotationUrl = 'https://annotations.allmaps.org/images/9FdzQJiiDKDGG6F6'
+describe('toImage', async () => {
+  const transformArgs = createTransformer(gcps)
 
-runTests(annotationUrl)
+  it(`should have the same output as running GDAL's gdaltransform`, () => {
+    expectToBeCloseToArray(
+      toWorld(transformArgs, [100, 100]),
+      [4.92079391286352, 52.4654946986157]
+    )
+    expectToBeCloseToArray(
+      toWorld(transformArgs, [1000, 1000]),
+      [4.95932911267323, 52.4711479887873]
+    )
+  })
+})
