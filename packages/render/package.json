@@ -20,6 +20,8 @@
     "dist"
   ],
   "scripts": {
+    "pretest": "npm run build",
+    "build": "tsc",
     "tsc": "tsc --watch",
     "test": "mocha && eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"

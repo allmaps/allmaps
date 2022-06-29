@@ -1,7 +1,3 @@
-// Uint8ClampedArray
-
-
-
 // const warpedTile = Buffer.alloc(TILE_SIZE * TILE_SIZE * CHANNELS)
 
 // // TODO: use spherical mercator instead of lat/lon
@@ -13,8 +9,6 @@
 
 // const longitudeStep = longitudeDiff / TILE_SIZE
 // const latitudeStep = latitudeDiff / TILE_SIZE
-
-
 
 // for (let x = 0; x < TILE_SIZE; x++) {
 //     for (let y = 0; y < TILE_SIZE; y++) {

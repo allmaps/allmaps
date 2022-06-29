@@ -2,10 +2,10 @@ import { toImage } from '@allmaps/transform'
 import { Image } from '@allmaps/iiif-parser'
 
 import type { GCPTransformInfo } from '@allmaps/transform'
-
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-// TODO: import Size from @allmaps/iiif-parser
+// TODO: import types from @allmaps/iiif-parser,
+// or create types package
 type Size = [number, number]
 type Extent = [number, number, number, number]
 type Coord = [number, number]
@@ -13,7 +13,11 @@ type Line = [Coord, Coord]
 
 type CoordByX = { [key: number]: Coord }
 
-// TODO: create ES6 CLASS!!!\
+type Tile = {
+  column: number,
+  row: number,
+  zoomLevel: TileZoomLevel
+}
 
 function computeExtent(values: number[]): [number, number] {
   let min: number = Number.POSITIVE_INFINITY
@@ -198,7 +202,7 @@ export function computeIiifTilesForMapExtent(
   image: Image,
   viewportSize: Size,
   geoExtent: Extent
-) {
+) : Tile[] {
   const imagePixelExtent = extentToImage(transformer, geoExtent)
   const imagePixelExtentMinMax = computeMinMax(imagePixelExtent)
 
@@ -224,5 +228,7 @@ export function computeIiifTilesForMapExtent(
     const iiifTiles = iiifTilesByXToArray(zoomLevel, iiifTilesByX)
 
     return iiifTiles
+  } else {
+    return []
   }
 }

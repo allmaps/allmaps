@@ -1,21 +1,36 @@
-// import potpack from 'potpack'
+async function fetchImage(url: string) {
+  const response = await fetch(url)
 
-// export function packTiles (iiifTiles) {
-//   const tilesToPack = iiifTiles
-//     .map((tile) => ({
-//       w: tile.width,
-//       h: tile.height
-//     }))
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
 
-//   const { w: textureWidth, h: textureHeight } = potpack(tilesToPack)
+  return response
+}
 
-//   return {
-//     textureWidth,
-//     textureHeight,
-//     tiles: tilesToPack.map((tile, index) => ({
-//       ...iiifTiles[index],
-//       textureX: tile.x,
-//       textureY: tile.y
-//     }))
-//   }
-// }
+export function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+
+    image.addEventListener('load', () => resolve(image))
+    image.addEventListener('error', async () => {
+      // image.src errors are not at all descriptive
+      // load image again using fetch
+      try {
+        await fetchImage(url)
+        throw new Error('Image failed to load by setting Image src but downloaded successfully using fetch')
+      } catch (err) {
+        let message = 'Unknown Error'
+
+        if (err instanceof Error) {
+          message = err.message
+        }
+
+        reject(message)
+      }
+    })
+
+    image.crossOrigin = 'anonymous'
+    image.src = url
+  })
+}
