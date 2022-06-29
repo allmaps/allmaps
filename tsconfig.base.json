@@ -12,7 +12,17 @@
       "@allmaps/transform": ["./packages/transform/src"],
       "@allmaps/render": ["./packages/render/src"],
       "@allmaps/annotation": ["./packages/annotation/src"],
-      "@allmaps/iiif-parser": ["./packages/iiif-parser/src"]
+      "@allmaps/iiif-parser": ["./packages/iiif-parser/src"],
+
+      "@allmaps/openlayers": ["./packages/openlayers/src"],
+
+      "@allmaps/id/*": ["./packages/id/src/*"],
+      "@allmaps/transform/*": ["./packages/transform/src/*"],
+      "@allmaps/render/*": ["./packages/render/src/*"],
+      "@allmaps/annotation/*": ["./packages/annotation/src/*"],
+      "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
+
+      "@allmaps/openlayers/*": ["./packages/openlayers/src/*"]
     }
   }
 }
