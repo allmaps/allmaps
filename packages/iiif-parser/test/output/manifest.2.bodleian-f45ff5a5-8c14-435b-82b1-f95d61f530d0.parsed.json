@@ -1,0 +1,175 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": ["Bodleian Library (E) C17:70 Oxford (66)"]
+  },
+  "description": {
+    "none": ["Plan of the City of Oxford"]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Homepage"]
+      },
+      "value": {
+        "none": [
+          "<span><a href=\"https://digital.bodleian.ox.ac.uk/objects/f45ff5a5-8c14-435b-82b1-f95d61f530d0/\">View on Digital Bodleian</a></span>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "none": ["Plan of the City of Oxford"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Shelfmark"]
+      },
+      "value": {
+        "none": ["Bodleian Library (E) C17:70 Oxford (66)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": ["Faden, William, 1749-1836"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Cartographer"]
+      },
+      "value": {
+        "none": ["Faden, William, 1749-1836"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "none": ["English"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date Statement"]
+      },
+      "value": {
+        "none": ["1789"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Place of Origin"]
+      },
+      "value": {
+        "none": ["London"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": [
+          "A revised version of Isaac Taylor's 1750 plan of Oxford, updated after the major redevelopment of the 1770s. Streets & principal buildings named, key to colleges, etc. Includes views of Christ Church, Peckwater Square, Magdalen New Building and the Observatory. Scale: 1:2,376."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": [
+          "Dedication: To the Chancellor, Vice Chancellor & Heads of Colleges, And the High Steward, Mayor Aldermen &c Of the University & City of Oxford; This Plan of the City of Oxford is humbly inscribed by their obedient servant Wm Faden, Geographer to the King."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": [
+          "Remarks: Oxford Contains 20 Streets, 70 publick Courts, Lanes, and Alleys, besides many noble publick Buildings. It has 1814 Houses, & 8292 Inhabitants, exclusive of the University; likewise 13 Parish-Churches and a Cathedral, and with the University, stands upon 300 Acres of Land, & is 3½ Miles in Circumference. The University contains 20 Colleges and 5 Halls. This Plan was first published by Isaac Taylor in 1750, but the Copper Plates having been lately purchased by the present Proprietor the whole has been re-surveyed & all the new Improvements Alterations &c are carefully inserted. Likewise the Views of Christ-Church, Peckwater & the Observatory are entirely new. Published by Wm. FadenCharing Cross Septemr. 1st. 1789."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Materials"]
+      },
+      "value": {
+        "none": ["paper"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Extent"]
+      },
+      "value": {
+        "none": ["2 sheets"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Collection"]
+      },
+      "value": {
+        "none": ["Maps and Atlases"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Other Identifier"]
+      },
+      "value": {
+        "none": ["Aleph Control Number: 020167565"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Record Created"]
+      },
+      "value": {
+        "none": ["2019-02-21T17:50:46Z"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Holding Institution"]
+      },
+      "value": {
+        "none": ["Bodleian Libraries, University of Oxford"]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4478,
+      "height": 6482,
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4535,
+      "height": 6443,
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://iiif.bodleian.ox.ac.uk/iiif/manifest/f45ff5a5-8c14-435b-82b1-f95d61f530d0.json",
+  "majorVersion": 2
+}

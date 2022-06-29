@@ -3,6 +3,8 @@ import { TilesetSchema } from '../schemas/shared.js'
 
 export type Tileset = z.infer<typeof TilesetSchema>
 
+export type Fit = 'cover' | 'contain'
+
 export interface Region {
   x: number
   y: number
@@ -39,15 +41,13 @@ export interface ProfileProperties {
   maxArea?: number
 }
 
-//   "label": {
-//     "en": [
-//       "Whistler's Mother",
-//       "Arrangement in Grey and Black No. 1: The Artist's Mother"
-//     ],
-//     "fr": [
-//       "Arrangement en gris et noir no 1",
-//       "Portrait de la mère de l'artiste",
-//       "La Mère de Whistler"
-//     ],
-//     "none": [ "Whistler (1871)" ]
-//   }
+export interface LanguageString {
+  [language: string]: string[]
+}
+
+export interface MetadataItem {
+  label: LanguageString
+  value: LanguageString
+}
+
+export type Metadata = MetadataItem[]

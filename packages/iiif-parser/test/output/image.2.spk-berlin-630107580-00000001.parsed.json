@@ -1,0 +1,32 @@
+{
+  "embedded": false,
+  "type": "image",
+  "uri": "https://digital.iai.spk-berlin.de:443/viewer/api/v1/records/630107580/files/images/00000001.tif",
+  "majorVersion": 2,
+  "width": 11458,
+  "height": 17014,
+  "supportsAnyRegionAndSize": true,
+  "maxWidth": 10000,
+  "maxHeight": 10000,
+  "tileZoomLevels": [
+    {
+      "scaleFactor": 1,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 512,
+      "originalHeight": 512,
+      "columns": 23,
+      "rows": 34
+    },
+    {
+      "scaleFactor": 32,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 16384,
+      "originalHeight": 16384,
+      "columns": 1,
+      "rows": 2
+    }
+  ],
+  "sizes": [{ "width": 11458, "height": 17014 }]
+}

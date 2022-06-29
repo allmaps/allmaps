@@ -1,0 +1,74 @@
+{
+  "uri": "https://mapview.nls.uk/iiif/10146/101465411",
+  "embedded": false,
+  "type": "image",
+  "majorVersion": 2,
+  "width": 8932,
+  "height": 6493,
+  "supportsAnyRegionAndSize": true,
+  "tileZoomLevels": [
+    {
+      "scaleFactor": 1,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 256,
+      "originalHeight": 256,
+      "columns": 35,
+      "rows": 26
+    },
+    {
+      "scaleFactor": 2,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 512,
+      "originalHeight": 512,
+      "columns": 18,
+      "rows": 13
+    },
+    {
+      "scaleFactor": 4,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 1024,
+      "originalHeight": 1024,
+      "columns": 9,
+      "rows": 7
+    },
+    {
+      "scaleFactor": 8,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 2048,
+      "originalHeight": 2048,
+      "columns": 5,
+      "rows": 4
+    },
+    {
+      "scaleFactor": 16,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 4096,
+      "originalHeight": 4096,
+      "columns": 3,
+      "rows": 2
+    },
+    {
+      "scaleFactor": 32,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 8192,
+      "originalHeight": 8192,
+      "columns": 2,
+      "rows": 1
+    },
+    {
+      "scaleFactor": 64,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 16384,
+      "originalHeight": 16384,
+      "columns": 1,
+      "rows": 1
+    }
+  ]
+}

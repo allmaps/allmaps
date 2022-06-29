@@ -7,7 +7,6 @@ import { TilesetSchema, SizeSchema } from './shared.js'
 const profiles = ['level0', 'level1', 'level2'] as const
 
 export const Image3Schema = z.object({
-  // '@context': z.literal('http://iiif.io/api/image/2/context.json'),
   id: z.string().url(),
   type: z.literal('ImageService3'),
   protocol: z.literal('http://iiif.io/api/image'),

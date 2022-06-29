@@ -1,0 +1,176 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Map of Canals and Navigable Rivers in Belgium and The North of France."
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Published/Created Date"]
+      },
+      "value": {
+        "none": ["1915"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publication Place"]
+      },
+      "value": {
+        "none": ["Rotterdam :"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": ["Commission for Relief in Belgium,"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": ["In English and Dutch."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Extent"]
+      },
+      "value": {
+        "none": ["1 map : col. ; 69 x 89 cm."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Extent of Digitization"]
+      },
+      "value": {
+        "none": ["Complete work digitized."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Scale"]
+      },
+      "value": {
+        "none": ["Scale [ca. 1:400 000]."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coordinates"]
+      },
+      "value": {
+        "none": ["400000", "a"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "none": ["English"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Call Number"]
+      },
+      "value": {
+        "none": ["335 1915"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Container / Volume Information"]
+      },
+      "value": {
+        "none": ["BRBL_00086"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Format"]
+      },
+      "value": {
+        "none": ["cartographic"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Genre"]
+      },
+      "value": {
+        "none": ["Maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Resource Type"]
+      },
+      "value": {
+        "none": ["Maps, Atlases & Globes"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject (Geographic)"]
+      },
+      "value": {
+        "none": ["Belgium--Maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Access"]
+      },
+      "value": {
+        "none": ["Public"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Rights"]
+      },
+      "value": {
+        "none": [
+          "The use of this image may be subject to the copyright law of the United States (Title 17, United States Code) or to site license or other rights management terms and conditions. The person using the image is liable for any infringement"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Orbis ID"]
+      },
+      "value": {
+        "none": ["8552009"]
+      }
+    },
+    {
+      "label": {
+        "none": ["OID"]
+      },
+      "value": {
+        "none": ["15826830"]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 11560,
+      "height": 9128,
+      "uri": "https://collections.library.yale.edu/iiif/2/15828036",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://collections.library.yale.edu/manifests/15826830",
+  "majorVersion": 2
+}

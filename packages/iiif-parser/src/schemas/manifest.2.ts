@@ -5,24 +5,25 @@ import { z } from 'zod'
 
 import { ImageServiceSchema } from './image-service.js'
 
-const StringValue2Schema = z.object({})
+export const SingleStringValue2Schema = z.string().or(z.string().array())
 
-// {"description": {"@value": "Here is a longer description of the object", "@language": "en"}}
+export const LanguageString2Schema = z.object({
+  '@language': z.string(),
+  '@value': SingleStringValue2Schema
+})
 
-// {
-//   "label": [
-//     { "@language": "de", "@value": "Umfang" },
-//     { "@language": "en", "@value": "Scope" }
-//   ],
-//   "value": "1 Karte"
-// },
+export const StringValue2Schema = SingleStringValue2Schema.or(
+  LanguageString2Schema
+).or(LanguageString2Schema.array())
 
-const MetadataEntry2Schema = z.object({
+export const MetadataItem2Schema = z.object({
   label: StringValue2Schema,
   value: StringValue2Schema
 })
 
-const ImageResource2Schema = z.object({
+export const Metadata2Schema = MetadataItem2Schema.array()
+
+export const ImageResource2Schema = z.object({
   resource: z.object({
     width: z.number().int(),
     height: z.number().int(),
@@ -33,11 +34,11 @@ const ImageResource2Schema = z.object({
 export const Canvas2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('sc:Canvas'),
-  // TODO: add label MUST
-  // metadata OPTIONAL
   width: z.number().int(),
   height: z.number().int(),
-  images: ImageResource2Schema.array().length(1)
+  images: ImageResource2Schema.array().length(1),
+  label: StringValue2Schema.optional(),
+  metadata: Metadata2Schema.optional()
 })
 
 const Sequence2Schema = z.object({
@@ -45,12 +46,11 @@ const Sequence2Schema = z.object({
 })
 
 export const Manifest2Schema = z.object({
-  // Of array met deze als eerste
-  // '@context': z.literal('http://iiif.io/api/presentation/2/context.json'),
   '@id': z.string().url(),
   '@type': z.literal('sc:Manifest'),
   sequences: Sequence2Schema.array().length(1),
-  label: StringValue2Schema,
+  label: StringValue2Schema.optional(),
   description: StringValue2Schema.optional(),
-  metadata: MetadataEntry2Schema.array().optional()
+  metadata: Metadata2Schema.optional()
 })
+

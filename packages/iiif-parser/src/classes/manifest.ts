@@ -3,6 +3,9 @@ import { z } from 'zod'
 import { ManifestSchema } from '../schemas/iiif.js'
 import { Image, EmbeddedImage } from './image.js'
 
+import type { LanguageString, Metadata } from '../lib/types.js'
+import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
+
 type ManifestType = z.infer<typeof ManifestSchema>
 
 type FetchFunction = (url: string) => Promise<any>
@@ -27,12 +30,13 @@ export class FetchedEvent extends Event {
 
 export class Manifest extends EventTarget {
   uri: string
+  type = 'manifest'
   majorVersion: MajorVersion
   images: ManifestImage[] = []
 
-  label?: any
-
-  // TODO: add label, metadata, description
+  label?: LanguageString
+  description?: LanguageString
+  metadata?: Metadata
 
   constructor(parsedManifest: ManifestType) {
     super()
@@ -42,6 +46,16 @@ export class Manifest extends EventTarget {
       this.uri = parsedManifest['@id']
       this.majorVersion = 2
 
+      if (parsedManifest.label) {
+        this.label = parseVersion2String(parsedManifest.label)
+      }
+
+      if (parsedManifest.description) {
+        this.description = parseVersion2String(parsedManifest.description)
+      }
+
+      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
+
       const canvases = parsedManifest.sequences[0].canvases
       this.images = canvases.map((canvas) => new EmbeddedImage(canvas))
     } else if ('type' in parsedManifest) {
@@ -50,6 +64,8 @@ export class Manifest extends EventTarget {
       this.majorVersion = 3
 
       this.label = parsedManifest.label
+      this.description = parsedManifest.description
+      this.metadata = parsedManifest.metadata
 
       const canvases = parsedManifest.items
       this.images = canvases.map((canvas) => new EmbeddedImage(canvas))
@@ -71,41 +87,41 @@ export class Manifest extends EventTarget {
   //   collections: false
   // }
 
-  async *fetchNextImages(
-    fetch: FetchFunction
-    // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
-  ) {
-    for (const imageIndex in this.images) {
-      const image = this.images[imageIndex]
-      if (image instanceof EmbeddedImage) {
-        const url = `${image.uri}/info.json`
+  // async *fetchNextImages(
+  //   fetch: FetchFunction
+  //   // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
+  // ) {
+  //   for (const imageIndex in this.images) {
+  //     const image = this.images[imageIndex]
+  //     if (image instanceof EmbeddedImage) {
+  //       const url = `${image.uri}/info.json`
 
-        const iiifData = await fetch(url)
-        const newImage = Image.parse(iiifData)
+  //       const iiifData = await fetch(url)
+  //       const newImage = Image.parse(iiifData)
 
-        this.images[imageIndex] = newImage
-        yield newImage
-      }
-    }
-  }
+  //       this.images[imageIndex] = newImage
+  //       yield newImage
+  //     }
+  //   }
+  // }
 
-  async fetchNextImages2(
-    fetch: FetchFunction
-    // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
-  ) {
-    for (const imageIndex in this.images) {
-      const image = this.images[imageIndex]
-      if (image instanceof EmbeddedImage) {
-        const url = `${image.uri}/info.json`
+  // async fetchNextImages2(
+  //   fetch: FetchFunction
+  //   // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
+  // ) {
+  //   for (const imageIndex in this.images) {
+  //     const image = this.images[imageIndex]
+  //     if (image instanceof EmbeddedImage) {
+  //       const url = `${image.uri}/info.json`
 
-        const iiifData = await fetch(url)
-        const newImage = Image.parse(iiifData)
+  //       const iiifData = await fetch(url)
+  //       const newImage = Image.parse(iiifData)
 
-        this.images[imageIndex] = newImage
+  //       this.images[imageIndex] = newImage
 
-        const event = new FetchedEvent(newImage)
-        this.dispatchEvent(event)
-      }
-    }
-  }
+  //       const event = new FetchedEvent(newImage)
+  //       this.dispatchEvent(event)
+  //     }
+  //   }
+  // }
 }

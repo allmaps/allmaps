@@ -5,39 +5,14 @@ import { z } from 'zod'
 
 import { ImageServiceSchema } from './image-service.js'
 
-// const StringValue3Schema = z.map(z.string(), z.string().array())
-const StringValue3Schema = z.record(z.string().array())
+export const StringValue3Schema = z.record(z.string(), z.string().array())
 
-// Example:
-// {
-//   "label": {
-//     "en": [
-//       "Whistler's Mother",
-//       "Arrangement in Grey and Black No. 1: The Artist's Mother"
-//     ],
-//     "fr": [
-//       "Arrangement en gris et noir no 1",
-//       "Portrait de la mère de l'artiste",
-//       "La Mère de Whistler"
-//     ],
-//     "none": [ "Whistler (1871)" ]
-//   }
-// }
-
-const MetadataEntry3Schema = z.object({
+export const MetadataItem3Schema = z.object({
   label: StringValue3Schema,
   value: StringValue3Schema
 })
 
-// Example:
-// {
-//   "metadata": [
-//     {
-//       "label": { "en": [ "Creator" ] },
-//       "value": { "en": [ "Anne Artist (1776-1824)" ] }
-//     }
-//   ]
-// }
+export const Metadata3Schema = MetadataItem3Schema.array()
 
 const AnnotationBody3Schema = z.object({
   type: z.literal('Image'),
@@ -63,15 +38,14 @@ export const Canvas3Schema = z.object({
   height: z.number().int(),
   items: AnnotationPage3Schema.array().length(1),
   label: StringValue3Schema.optional(),
-  metadata: MetadataEntry3Schema.array().optional()
+  metadata: Metadata3Schema.optional()
 })
 
 export const Manifest3Schema = z.object({
-  // Of array met deze als eerste
-  // '@context': z.literal('http://iiif.io/api/presentation/2/context.json'),
   id: z.string().url(),
   type: z.literal('Manifest'),
   items: Canvas3Schema.array().nonempty(),
-  label: StringValue3Schema,
-  metadata: MetadataEntry3Schema.array().optional()
+  label: StringValue3Schema.optional(),
+  description: StringValue3Schema.optional(),
+  metadata: Metadata3Schema.optional()
 })

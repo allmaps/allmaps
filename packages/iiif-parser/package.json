@@ -26,7 +26,9 @@
     "parser"
   ],
   "scripts": {
+    "build": "tsc",
     "test": "mocha && eslint dist test",
+    "pretest": "npm run build",
     "tsc": "tsc --watch"
   },
   "license": "GPL-3.0-or-later",

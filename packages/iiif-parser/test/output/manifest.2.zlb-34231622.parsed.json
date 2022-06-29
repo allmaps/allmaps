@@ -1,0 +1,333 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Die Churfürstlich Brandenburgisch nun Königlich Preussische Residenz Statt"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["MD_DV_OWNERLOGO"]
+      },
+      "value": {
+        "none": [
+          "https://digital.zlb.de/viewer/resources/themes/zlb/images/zlbdfgviewerlogo.jpg"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["URL"]
+      },
+      "value": {
+        "none": ["http://digital.zlb.de/viewer/ppnresolver?id=34231622"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Berlin"]
+      },
+      "value": {
+        "none": [
+          "B 54 Kartographie. Vermessungswesen: Stadtpläne. Stadtteilkarten. Ortspläne"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_TAGCLOUD"]
+      },
+      "value": {
+        "none": [
+          "Die Churfürstlich Brandenburgisch nun Königlich Preussische Residenz Statt; Bodenehr; Gabriel; Zentral- und Landesbibliothek Berlin; Augsburg; Berlin"
+        ]
+      }
+    },
+    {
+      "label": {
+        "de": ["Umfang"],
+        "en": ["Scope"]
+      },
+      "value": {
+        "none": ["1 Karte"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Verfasser"],
+        "en": ["Creator"]
+      },
+      "value": {
+        "none": ["Bodenehr, Gabriel"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Signatur"],
+        "en": ["Shelfmark"]
+      },
+      "value": {
+        "none": ["B 54/1695/1"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Erscheinungsort"],
+        "en": ["Place of publication"]
+      },
+      "value": {
+        "none": ["Augsburg"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Dokumenttyp"]
+      },
+      "value": {
+        "none": ["cartographic"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Sprache"],
+        "en": ["Language"]
+      },
+      "value": {
+        "de": ["Deutsch"],
+        "en": ["German"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Maßstab"],
+        "en": ["Scale"]
+      },
+      "value": {
+        "none": ["1:15 000"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_EYEARPUBLISH"]
+      },
+      "value": {
+        "none": ["2019"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_DV_OWNER"]
+      },
+      "value": {
+        "none": ["Zentral- und Landesbibliothek Berlin"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Zugriffsberechtigung"],
+        "en": ["Accessibility"]
+      },
+      "value": {
+        "none": ["Free Access"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Gattung"],
+        "en": ["Genre"]
+      },
+      "value": {
+        "de": ["Karte"],
+        "en": ["Map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_EEDITION"]
+      },
+      "value": {
+        "none": ["[Electronic ed.]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_DV_LINK"]
+      },
+      "value": {
+        "none": ["http://digital.zlb.de/viewer/ppnresolver?id=34231622"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Untertitel"],
+        "en": ["Sub title"]
+      },
+      "value": {
+        "none": [
+          "Berlin und Cölln an der Spree sampt Fridrichswerder und Dorotheenstatt"
+        ]
+      }
+    },
+    {
+      "label": {
+        "de": ["Publikationstyp"],
+        "en": ["Document type"]
+      },
+      "value": {
+        "de": ["Karte"],
+        "en": ["Map"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Veröffentlichungsform"],
+        "en": ["Digital Origin"]
+      },
+      "value": {
+        "none": ["Digitalisat"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Titel"],
+        "en": ["Title"]
+      },
+      "value": {
+        "none": [
+          "Die Churfürstlich Brandenburgisch nun Königlich Preussische Residenz Statt"
+        ]
+      }
+    },
+    {
+      "label": {
+        "de": ["DDC"],
+        "en": ["DDC Group"]
+      },
+      "value": {
+        "none": ["914.3 Landeskunde Deutschlands"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_YEARPUBLISHISO"]
+      },
+      "value": {
+        "none": ["1695"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_ACCESSCONDITIONCOPYRIGHTURL"]
+      },
+      "value": {
+        "none": ["https://www.zlb.de"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Verfasserangabe"],
+        "en": ["Statement of Responsibility"]
+      },
+      "value": {
+        "none": ["Gabriel Bodenehr"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_PLACESALL"]
+      },
+      "value": {
+        "none": ["Augsburg; Berlin"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_DV_OWNERSITEURL"]
+      },
+      "value": {
+        "none": ["https://www.zlb.de"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Erscheinungsjahr"],
+        "en": ["Year of publication"]
+      },
+      "value": {
+        "none": ["[1695]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Illustrator"]
+      },
+      "value": {
+        "none": ["Bodenehr, Gabriel"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_EPLACEPUBLISH"]
+      },
+      "value": {
+        "none": ["Berlin"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Verlag"],
+        "en": ["Publisher"]
+      },
+      "value": {
+        "none": ["Bodenehr"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Kontakt"],
+        "en": ["Contact"]
+      },
+      "value": {
+        "none": ["landesbibliothek-digital@zlb.de"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Copyright"]
+      },
+      "value": {
+        "none": ["Public Domain / Gemeinfrei"]
+      }
+    },
+    {
+      "label": {
+        "de": ["Standort der Druckausgabe"],
+        "en": ["Location"]
+      },
+      "value": {
+        "none": ["Zentral- und Landesbibliothek Berlin"]
+      }
+    },
+    {
+      "label": {
+        "none": ["MD_EPUBLISHER"]
+      },
+      "value": {
+        "none": ["Zentral- und Landesbibliothek Berlin"]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 12874,
+      "height": 4181,
+      "uri": "https://digital.zlb.de/viewer/api/v1/records/34231622/files/images/Die_Churfuerstlich_Brandenburgisch_nun_Koeniglich_Preussische_Residenz_Statt_0001.tif",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://digital.zlb.de/viewer/api/v1/records/34231622/manifest/",
+  "majorVersion": 2
+}

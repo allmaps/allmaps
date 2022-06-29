@@ -1,67 +1,75 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { z } from 'zod'
 
 import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-// import * as allmaps from '../index.js'
-// import { parseIiif, getTilesets } from '../index.js'
-
 import { IIIF } from '../dist/index.js'
-import { IIIFSchema } from '../dist/schemas/iiif.js'
+// import { IIIFSchema } from '../dist/schemas/iiif.js'
 
 chai.use(shallowDeepEqual)
 
 const inputDir = './test/input'
-const parsedDir = './test/parsed'
-const tilesDir = './test/tiles'
-const schemasDir = './schemas'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Expected output of other functions than parseIiif and getTiles is found in this JSON file:
-const functionOutput = readJSONFile(path.join(__dirname, 'function-output.json'))
+const outputDir = './test/output'
 
 fs.readdirSync(inputDir)
   .filter((filename) => filename.endsWith('.json'))
   .map((filename) => {
     const basename = path.basename(filename, '.json')
 
-    const inputFilename = `${inputDir}/${basename}.json`
-    const parsedFilename = `${parsedDir}/${basename}.parsed.json`
-    const tilesFilename = `${tilesDir}/${basename}.tiles.json`
-    const errorFilename = `${parsedDir}/${basename}.error.json`
+    const inputFilename = path.join(inputDir, `${basename}.json`)
+    const parsedFilename = path.join(outputDir, `${basename}.parsed.json`)
+    const errorFilename = path.join(outputDir, `${basename}.error.json`)
 
     const input = readJSONFile(inputFilename)
 
+    let output
     let parsedIiif
-    let parseError
+    let errors
+    let zodError
+
+    if (
+      basename === 'manifest.2.princeton-fa4fb452-5f1d-42ab-a471-53afc176c948'
+    ) {
+      console.log('vis')
+      const parsed = IIIF.parse(input)
+      console.log({ ...parsed })
+      console.log('HONDEN')
+    }
 
     try {
-      // class = IIIF.parse(input)
-      parsedIiif = IIIFSchema.parse(input)
+      parsedIiif = IIIF.parse(input)
+      output = { ...parsedIiif }
     } catch (err) {
-      parseError = err
+      if (err.errors) {
+        errors = err.errors.map((error) => error.message)
+      } else {
+        errors = [err.message]
+      }
+
+      if (err instanceof z.ZodError) {
+        zodError = err
+      }
     }
 
     return {
       basename,
       input,
       parsedIiif,
-      parseError,
+      output,
+      errors,
+      zodError,
       expected: {
-        parsed: readJSONFile(parsedFilename),
-        tiles: readJSONFile(tilesFilename),
-        error: readJSONFile(errorFilename)
+        output: readJSONFile(parsedFilename),
+        errors: readJSONFile(errorFilename)
       }
     }
   })
   .forEach(runTests)
 
-function readJSONFile (filename) {
+export function readJSONFile(filename) {
   try {
     return JSON.parse(fs.readFileSync(filename))
   } catch (err) {
@@ -69,91 +77,38 @@ function readJSONFile (filename) {
   }
 }
 
-function runTests (file) {
+function runTests(file) {
   describe(`Parsing ${file.basename}`, () => {
-    console.log(file.basename)
-    if (file.parseError) {
-    console.log(file.parseError)
+    if (file.output && file.expected.output) {
+      it('should match expected output', () => {
+        expect(file.expected.output).to.shallowDeepEqual(file.output)
+      })
+
+      console.log(file.basename)
+      console.log(JSON.stringify(file.output))
+    } else if (file.errors && file.expected.errors) {
+      it('should result in the correct error message', () => {
+        expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
+      })
+    } else if (file.output && file.expected.errors) {
+      console.log('File parsed correctly, but expected errors:', file.basename)
+    } else if (file.errors && file.expected.output) {
+      console.log(
+        'File failed to parse, but expected no errors:',
+        file.basename
+      )
+
+      console.log(file.errors)
+
+      if (file.zodError) {
+        console.error(JSON.stringify(file.zodError.format(), null, 2))
+        console.error(file.zodError.issues)
+      }
     } else {
-      console.log(file.parsedIiif)
+      console.log(
+        'Input file should have either matching output or errors JSON file:\n  ',
+        file.basename
+      )
     }
-  //   if (file.expected.parsed || file.expected.error !== undefined) {
-  //     if (file.parsed) {
-  //       it('should result in output which is valid according to JSON Schema', () => {
-  //         const valid = validate(file.parsed)
-  //         if (!valid) {
-  //           throw new Error(JSON.stringify(validate.errors))
-  //         }
-  //       })
-
-  //       it('should match expected output', () => {
-  //         expect(file.parsed).to.shallowDeepEqual(file.expected.parsed)
-  //       })
-  //     } else {
-  //       it('should result in the correct error message', () => {
-  //         expect(file.parseError.message).to.equal(file.expected.error)
-  //       })
-  //     }
-  //   } else {
-  //     console.error('Input IIIF file should have either matching parsed or error JSON file:\n  ', file.basename)
-  //   }
   })
-
-  // if (file.parsed) {
-  //   if (file.expected.tiles) {
-  //     if (file.parsed.type !== 'image') {
-  //       throw new Error('Only test getTiles output for images!')
-  //     }
-
-  //     describe(`Tiles for ${file.basename}`, () => {
-  //       it('should match expected output', () => {
-  //         let tilesetsOutput
-  //         let tilesetsError
-
-  //         try {
-  //           tilesetsOutput = getTilesets(file.parsed)
-  //         } catch (err) {
-  //           tilesetsError = err
-  //         }
-
-  //         if (tilesetsOutput) {
-  //           expect(tilesetsOutput).to.have.deep.members(file.expected.tiles)
-  //         } else {
-  //           expect(tilesetsError.message).to.equal(file.expected.tiles)
-  //         }
-  //       })
-  //     })
-  //   }
-
-  //   if (functionOutput[file.basename]) {
-  //     if (file.parsed.type !== 'image') {
-  //       throw new Error('Only test function output for images!')
-  //     }
-
-  //     describe(`Functions for ${file.basename}`, () => {
-  //       for (const [fn, tests] of Object.entries(functionOutput[file.basename])) {
-  //         describe(`${fn}`, () => {
-  //           for (const { input, output: expectedOutput } of tests) {
-  //             it(`should match expected output for: ${JSON.stringify(input)}` , () => {
-  //               let fnOutput
-  //               let fnError
-
-  //               try {
-  //                 fnOutput = allmaps[fn](file.parsed, ...input)
-  //               } catch (err) {
-  //                 fnError = err
-  //               }
-
-  //               if (fnOutput) {
-  //                 expect(fnOutput).to.deep.equal(expectedOutput)
-  //               } else {
-  //                 expect(fnError.message).to.equal(expectedOutput)
-  //               }
-  //             })
-  //           }
-  //         })
-  //       }
-  //     })
-  //   }
-  // }
 }

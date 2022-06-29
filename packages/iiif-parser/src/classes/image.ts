@@ -4,11 +4,12 @@ import { CanvasSchema } from '../schemas/iiif.js'
 import { ImageSchema } from '../schemas/iiif.js'
 
 import { getTileZoomLevels, getIiifTile } from '../lib/tiles.js'
-import { getThumbnail, Fit } from '../lib/thumbnails.js'
+import { getThumbnail } from '../lib/thumbnails.js'
 import { getProfileProperties } from '../lib/profile.js'
 
-import {
+import type {
   Size,
+  Fit,
   ImageRequest,
   MajorVersion,
   TileZoomLevel
@@ -21,12 +22,12 @@ type EmbeddedImageType = ImageType | CanvasType
 export class EmbeddedImage {
   embedded = true
   uri: string
+  type = 'image'
 
   width: number
   height: number
 
   majorVersion: MajorVersion
-  // welke andere velden??? kijk in voorbeelden!
 
   constructor(parsedImageOrCanvas: EmbeddedImageType) {
     if (
@@ -124,8 +125,9 @@ export class Image extends EmbeddedImage {
   maxHeight?: number
   maxArea?: number
 
-  // canvasUri,
-  // label,
+  // TODO: add
+  //  - canvasUri,
+  //  - label,
 
   tileZoomLevels: TileZoomLevel[]
   sizes?: Size[]
@@ -167,7 +169,10 @@ export class Image extends EmbeddedImage {
     )
   }
 
-  getThumbnail(size: Size, mode: Fit = 'cover'): ImageRequest | ImageRequest[][] {
+  getThumbnail(
+    size: Size,
+    mode: Fit = 'cover'
+  ): ImageRequest | ImageRequest[][] {
     return getThumbnail(
       this.sizes,
       this.tileZoomLevels,

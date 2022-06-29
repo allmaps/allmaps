@@ -1,8 +1,6 @@
 import { getIiifTile } from './tiles.js'
 
-import { ImageRequest, Size, Tileset, TileZoomLevel } from './types.js'
-
-export type Fit = 'cover' | 'contain'
+import { ImageRequest, Size, TileZoomLevel, Fit } from './types.js'
 
 function getThumbnailSize(
   imageSize: Size,

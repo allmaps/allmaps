@@ -1,0 +1,316 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Choro-topographische kaart der Noordelijke Provinciën van het Koningrijk der Nederlanden / uitgevoerd aan het Topographisch Bureau van dezen Staat, volgens het ontwerp, de geodesische en astronomische waarnemingen van Baron Kraijenhoff"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Documentsoort"]
+      },
+      "value": {
+        "none": ["Cartografisch document"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Jaar van uitgave"]
+      },
+      "value": {
+        "none": ["[1816-1823]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Gegevens digitalisering"]
+      },
+      "value": {
+        "none": [
+          "Jaar: 2009;; Opdrachtgever: Amsterdam : Universiteitsbibliotheek Vrije Universiteit;; Uitvoering: Heiloo : Pictura;; Locatie origineel: NL, Universiteitsbibliotheek Vrije Universiteit, LL.09777gk: 162/od/1816;; Fysieke gegevens: tiff-bestand;; Gedigitaliseerd: juli 2009"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Land van uitgave"]
+      },
+      "value": {
+        "none": ["nl"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Auteurs"]
+      },
+      "value": {
+        "none": ["Cornelis Rudolphus Theodorus Kraijenhoff 1758-1840"]
+      }
+    },
+    {
+      "label": {
+        "none": ["(Co)auteurs"]
+      },
+      "value": {
+        "none": [
+          "Topographisch Bureau, Den Haag;; Archief van Oorlog, Den Haag"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Uitgave"]
+      },
+      "value": {
+        "none": ["['s-Gravenhage : Topographisch Bureau, Archief van Oorlog]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Specificaties kaart"]
+      },
+      "value": {
+        "none": [
+          "1 kaart in 9 bladen, gedigitaliseerd : kopergravure ; elk blad 85×92,5 cm + bladwijzer (40×70,5 cm)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Toegangsgegevens (URL)"]
+      },
+      "value": {
+        "none": ["http://imagebase.ubvu.vu.nl/getobj.php?ppn=330027247"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Annotatie"]
+      },
+      "value": {
+        "none": [
+          "Gestempeld r.o. in rood: AVO (=Archief van Oorlog);; Lit.: J.A. van der Linden, Topographische en militaire kaart van het Koningrijk der Nederlanden. Bussum 1973. p. 9-16 & E. ten Brink, De grote kaart van Krayenhoff, speciaal p. 38-39;; Op de bladwijzer staat de Hoofddriehoeksmeting aangegeven met de Alphabetische tafel der breedte en lengte van de standplaatsen"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["EPN"]
+      },
+      "value": {
+        "none": ["535661398"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Mathematische gegevens"]
+      },
+      "value": {
+        "none": ["[ca. 1:115.200]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["PPN origineel"]
+      },
+      "value": {
+        "none": ["863371639"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Annotatie geografische gegevens"]
+      },
+      "value": {
+        "none": [
+          "Schaalstok van 27,77 Mylen (Kilomètres) of 7380 Rh. Roeden of 5 Uren (=23,7 cm), op schaal: 800 Rl. Roeden op den Rh. Duim of van 1,152 Myl (Kilomètre) op den Duim (Centimètre);; Legenda r.o. op blad VII"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Geografische trefwoorden"]
+      },
+      "value": {
+        "none": ["4.210 Nederland"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Vormtrefwoorden"]
+      },
+      "value": {
+        "none": ["Kaarten (vorm)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Taal"]
+      },
+      "value": {
+        "none": ["ned"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Nederlandse Basisclassificatie"]
+      },
+      "value": {
+        "none": ["74.20 geografie van Nederland"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Lokale classificatie"]
+      },
+      "value": {
+        "none": ["80.4.210;; 81.273.5;; 81.AL"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Collectie"]
+      },
+      "value": {
+        "none": ["Beeldbank cartografisch materiaal"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Identifier"]
+      },
+      "value": {
+        "none": ["OCLC nummer: 71417003"]
+      }
+    },
+    {
+      "label": {
+        "none": ["PPN"]
+      },
+      "value": {
+        "none": ["330027247"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Titel"]
+      },
+      "value": {
+        "none": [
+          "Choro-topographische kaart der Noordelijke Provinciën van het Koningrijk der Nederlanden / uitgevoerd aan het Topographisch Bureau van dezen Staat, volgens het ontwerp, de geodesische en astronomische waarnemingen van Baron Kraijenhoff"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Repository"]
+      },
+      "value": {
+        "none": ["University Library, Imagebase"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Source"]
+      },
+      "value": {
+        "none": [
+          "<span>From: <a href=\"https://vu.contentdm.oclc.org/digital/collection/krt/id/2175\">Choro-topographische kaart der Noordelijke Provinciën van het Koningrijk der Nederlanden / uitgevoerd aan het Topographisch Bureau van dezen Staat, volgens het ontwerp, de geodesische en astronomische waarnemingen van Baron Kraijenhoff</a></span>"
+        ]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 2867,
+      "height": 2832,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2164",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4979,
+      "height": 3012,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2165",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4141,
+      "height": 3622,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2166",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4131,
+      "height": 3630,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2167",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4142,
+      "height": 3621,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2168",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4137,
+      "height": 3625,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2169",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4141,
+      "height": 3622,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2170",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4138,
+      "height": 3624,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2171",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4134,
+      "height": 3627,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2172",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4119,
+      "height": 3641,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2173",
+      "majorVersion": 2
+    },
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4129,
+      "height": 3632,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2174",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2175/manifest.json",
+  "majorVersion": 2
+}

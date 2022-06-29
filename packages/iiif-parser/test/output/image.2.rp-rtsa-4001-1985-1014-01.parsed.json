@@ -1,0 +1,56 @@
+{
+  "embedded": false,
+  "type": "image",
+  "uri": "https://rotterdamspubliek.nl/iiif/NL-RtSA_4001_1985-1014-01",
+  "majorVersion": 2,
+  "width": 9102,
+  "height": 6922,
+  "supportsAnyRegionAndSize": false,
+  "tileZoomLevels": [
+    {
+      "scaleFactor": 1,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 512,
+      "originalHeight": 512,
+      "columns": 18,
+      "rows": 14
+    },
+    {
+      "scaleFactor": 2,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 1024,
+      "originalHeight": 1024,
+      "columns": 9,
+      "rows": 7
+    },
+    {
+      "scaleFactor": 4,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 2048,
+      "originalHeight": 2048,
+      "columns": 5,
+      "rows": 4
+    },
+    {
+      "scaleFactor": 8,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 4096,
+      "originalHeight": 4096,
+      "columns": 3,
+      "rows": 2
+    },
+    {
+      "scaleFactor": 16,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 8192,
+      "originalHeight": 8192,
+      "columns": 2,
+      "rows": 1
+    }
+  ]
+}

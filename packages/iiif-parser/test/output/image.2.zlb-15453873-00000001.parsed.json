@@ -1,0 +1,36 @@
+{
+  "embedded": false,
+  "type": "image",
+  "uri": "https://digital.zlb.de/viewer/api/v1/records/15453873/files/images/00000001.tif",
+  "majorVersion": 2,
+  "width": 11735,
+  "height": 9288,
+  "supportsAnyRegionAndSize": true,
+  "maxWidth": 6000,
+  "maxHeight": 6000,
+  "tileZoomLevels": [
+    {
+      "scaleFactor": 1,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 512,
+      "originalHeight": 512,
+      "columns": 23,
+      "rows": 19
+    },
+    {
+      "scaleFactor": 32,
+      "width": 512,
+      "height": 512,
+      "originalWidth": 16384,
+      "originalHeight": 16384,
+      "columns": 1,
+      "rows": 1
+    }
+  ],
+  "sizes": [
+    { "width": 600, "height": 475 },
+    { "width": 900, "height": 712 },
+    { "width": 1800, "height": 1425 }
+  ]
+}

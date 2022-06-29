@@ -1,0 +1,27 @@
+{
+  "type": "manifest",
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 1170,
+      "height": 593,
+      "uri": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001/manifest",
+  "majorVersion": 3,
+  "label": { "en": ["Alternate plan #1"] },
+  "metadata": [
+    { "label": { "en": ["title"] }, "value": { "en": ["Alternate plan #1"] } },
+    {
+      "label": { "en": ["Rights and Use"] },
+      "value": {
+        "en": [
+          "\u003ca href=\"https://d.lib.ncsu.edu/collections/about#rights_and_use\"\u003ehttps://d.lib.ncsu.edu/collections/about#rights_and_use\u003c/a\u003e"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Map of Russian Lapland drawn from the original map made by Professor J. A. Friis by George T. Temple"
+    ]
+  },
+  "description": {
+    "none": [
+      "Fishing stations and Lappish [Sami] chapels are shown. Russian, Karelian, and Lappish villages are differentiated.",
+      "Boundaries of Russian Lapland with Norway, Finland, and Russia proper, and of slanovoi (police districts), are shown.",
+      "Course of proposed road from Kem to Kola is shown.",
+      "Northern limits of compact coniferous and foliferous woods [tree lines] are shown.",
+      "Relief shown by hachures.",
+      "Includes explanation of Lappish [Sami], Finnish, and Russian geographical terms.",
+      "From: Proceedings of the Royal Geographical Society and monthly record of geography. Vol. 2 (1880), no. 10, pp. 593-602; held in Firestone Library. Call number: G7 .J6873"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Author"]
+      },
+      "value": {
+        "none": ["Temple, George T., fl. 1880"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Lithographer"]
+      },
+      "value": {
+        "none": ["W. & A.K. Johnston Limited"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "eng": [
+          "Map of Russian Lapland drawn from the original map made by Professor J. A. Friis by George T. Temple / [lithographed by] W. & A. K. Johnston, Edinburgh & London"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type"]
+      },
+      "value": {
+        "none": ["Physical maps", "Maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Provenance"]
+      },
+      "value": {
+        "none": ["Princeton"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Contributor"]
+      },
+      "value": {
+        "none": ["Edward Stanford Ltd"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Creator"]
+      },
+      "value": {
+        "none": ["Temple, George T., fl. 1880"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["1880"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "none": ["English"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Local Identifier"]
+      },
+      "value": {
+        "none": ["p6w926v19q", "PUmap_28146"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": ["London : Edward Stanford, 1880."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject"]
+      },
+      "value": {
+        "none": ["Lapland—Description and travel"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Cartographic Scale"]
+      },
+      "value": {
+        "none": ["Scale 1:2,200,000 ;"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Source Metadata Identifier"]
+      },
+      "value": {
+        "none": ["9980828223506421"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Call Number"]
+      },
+      "value": {
+        "none": ["G7062.K6C1 1880 .R6"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Location"]
+      },
+      "value": {
+        "none": ["SCIMAP G7062.K6C1 1880 .R6"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Imported Author"]
+      },
+      "value": {
+        "none": ["Temple, George T., fl. 1880"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Downloadable"]
+      },
+      "value": {
+        "none": ["public"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Held By"]
+      },
+      "value": {
+        "none": ["Princeton"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Spatial"]
+      },
+      "value": {
+        "none": ["Russia (Federation)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Ark"]
+      },
+      "value": {
+        "none": ["http://arks.princeton.edu/ark:/88435/w6634614q"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Relation"]
+      },
+      "value": {
+        "none": [
+          "Proceedings of the Royal Geographical Society and monthly record of geography Vol. 2 (1880), no. 10, p. 593-602, facing page 656. London : Edward Stanford"
+        ]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 4467,
+      "height": 5609,
+      "uri": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://figgy.princeton.edu/concern/scanned_maps/fa4fb452-5f1d-42ab-a471-53afc176c948/manifest",
+  "majorVersion": 2
+}

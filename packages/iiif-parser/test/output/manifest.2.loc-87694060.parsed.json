@@ -1,0 +1,113 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending June 30, 1894"
+    ]
+  },
+  "description": {
+    "none": [
+      "Also shows block numbers. At head of title: No. II. Includes directory of \"Width of streets and avenues.\" \"D C 53 3.\" LC copy halved and mounted on cloth backing. LC lacks other sheets in set. Available also through the Library of Congress Web site as a raster image. DCP"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["APA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "Lukesh, G. M. (1893) <cite>Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending</cite>. [Washington, D.C.?: s.n., ?] [Map] Retrieved from the Library of Congress, https://www.loc.gov/item/87694060/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["MLA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "Lukesh, G. M. <cite>Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending</cite>. [Washington, D.C.?: s.n., ?, 1893] Map. Retrieved from the Library of Congress, &lt;www.loc.gov/item/87694060/&gt;."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Chicago Citation Style"]
+      },
+      "value": {
+        "none": [
+          "Lukesh, G. M. <cite>Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending</cite>. [Washington, D.C.?: s.n., ?, 1893] Map. https://www.loc.gov/item/87694060/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Contributors"]
+      },
+      "value": {
+        "none": ["Lukesh, G. M."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Created Published"]
+      },
+      "value": {
+        "none": ["[Washington, D.C.? : s.n., 1894?]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Original Format"]
+      },
+      "value": {
+        "none": ["map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subjects"]
+      },
+      "value": {
+        "none": [
+          "washington (d.c.)",
+          "washington",
+          "united states",
+          "maps",
+          "district of columbia",
+          "mortality",
+          "communicable diseases"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Online Format"]
+      },
+      "value": {
+        "none": ["image"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Item Url"]
+      },
+      "value": {
+        "none": ["https://www.loc.gov/item/87694060/"]
+      }
+    }
+  ],
+  "images": [
+    {
+      "embedded": true,
+      "type": "image",
+      "width": 2115,
+      "height": 2203,
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+      "majorVersion": 2
+    }
+  ],
+  "uri": "https://www.loc.gov/item/87694060/manifest.json",
+  "majorVersion": 2
+}
