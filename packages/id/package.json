@@ -22,6 +22,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+ },
   "scripts": {
     "build": "tsc",
     "tsc": "tsc --watch",
@@ -31,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/id.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/id"
   },
   "keywords": [
     "allmaps",
