@@ -4,3 +4,5 @@ dist
 *.tsbuildinfo
 .pnpm-debug.log
 lerna-debug.log
+
+.svelte-kit
