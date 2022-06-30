@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -33,17 +33,17 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/transform": "^1.0.0-alpha.6",
-    "@allmaps/iiif-parser": "^1.0.0-alpha.15",
+    "@allmaps/iiif-parser": "^1.0.0-beta.1",
+    "@allmaps/transform": "^1.0.0-beta.1",
     "potpack": "^1.0.1"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "chai": "^4.3.4",
-    "eslint": "7",
-    "mocha": "^8.3.2",
     "@types/node": "^17.0.23",
-    "documentation": "^13.2.5"
+    "chai": "^4.3.4",
+    "documentation": "^13.2.5",
+    "eslint": "7",
+    "mocha": "^8.3.2"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

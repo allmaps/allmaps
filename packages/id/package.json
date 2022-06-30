@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -51,9 +51,9 @@
   "devDependencies": {
     "@types/node": "^17.0.23",
     "chai": "^4.3.4",
+    "documentation": "^13.2.5",
     "eslint": "7",
-    "mocha": "^8.3.2",
-    "documentation": "^13.2.5"
+    "mocha": "^8.3.2"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
