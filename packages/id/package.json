@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -24,7 +24,7 @@
   ],
   "publishConfig": {
     "access": "public"
- },
+  },
   "scripts": {
     "build": "tsc",
     "tsc": "tsc --watch",
