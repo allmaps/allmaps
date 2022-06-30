@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "es2020"
+  },
+  "references": [
+    { "path": "../../packages/render" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/annotation" }
+  ],
+  "include": ["./src/**/*"]
+}

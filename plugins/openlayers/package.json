@@ -1,0 +1,57 @@
+{
+  "name": "@allmaps/openlayers",
+  "version": "1.0.0-beta.0",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "",
+  "type": "module",
+  "module": "./dist/allmaps-openlayers.es.js",
+  "unpkg": "./dist/allmaps-openlayers.umd.js",
+  "exports": {
+    ".": {
+      "import": "./dist/allmaps-openlayers.es.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/core.git"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "iiif",
+    "georeference",
+    "map"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "rollup": "rollup --config",
+    "preview": "vite preview"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/lodash": "^4.14.182",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9"
+  },
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "1.0.0-beta.2",
+    "@allmaps/id": "1.0.0-beta.2",
+    "@allmaps/iiif-parser": "1.0.0-beta.0",
+    "@allmaps/render": "1.0.0-beta.0",
+    "@allmaps/transform": "1.0.0-beta.0",
+    "earcut": "^2.2.3",
+    "lodash": "^4.17.21",
+    "ol": "^6.14.1",
+    "rbush": "^3.0.1"
+  }
+}
