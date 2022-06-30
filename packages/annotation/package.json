@@ -19,9 +19,13 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/annotation.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/annotation"
   },
   "homepage": "https://allmaps.org",
   "keywords": [

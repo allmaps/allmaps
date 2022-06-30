@@ -18,9 +18,13 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/core.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "plugins/openlayers"
   },
   "homepage": "https://allmaps.org",
   "keywords": [

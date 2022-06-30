@@ -15,9 +15,13 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/iiif-parser.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/iiif-parser"
   },
   "homepage": "https://allmaps.org",
   "keywords": [

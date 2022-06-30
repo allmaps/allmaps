@@ -19,9 +19,13 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/transform.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/transform"
   },
   "homepage": "https://allmaps.org",
   "keywords": [

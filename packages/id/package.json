@@ -25,17 +25,17 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/id"
+  },
   "scripts": {
     "build": "tsc",
     "tsc": "tsc --watch",
     "test": "mocha && eslint dist test",
     "pretest": "npm run build",
     "documentation": "documentation readme ./dist/index.js --section=API"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/id"
   },
   "keywords": [
     "allmaps",
