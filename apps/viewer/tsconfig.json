@@ -1,0 +1,44 @@
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+
+    "composite": true,
+    "paths": {
+      "$lib": ["src/lib"],
+      "$lib/*": ["src/lib/*"],
+
+      "@allmaps/id": ["../../packages/id/src"],
+      "@allmaps/transform": ["../../packages/transform/src"],
+      "@allmaps/render": ["../../packages/render/src"],
+      "@allmaps/annotation": ["../../packages/annotation/src"],
+      "@allmaps/iiif-parser": ["../../packages/iiif-parser/src"],
+
+      "@allmaps/openlayers": ["../../plugins/openlayers/src"],
+
+      "@allmaps/id/*": ["../../packages/id/src/*"],
+      "@allmaps/transform/*": ["../../packages/transform/src/*"],
+      "@allmaps/render/*": ["../../packages/render/src/*"],
+      "@allmaps/annotation/*": ["../../packages/annotation/src/*"],
+      "@allmaps/iiif-parser/*": ["../../packages/iiif-parser/src/*"],
+
+      "@allmaps/openlayers/*": ["../../plugins/openlayers/src/*"],
+    }
+  },
+  "references": [
+    { "path": "../../packages/id" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/render" },
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/iiif-parser" },
+
+    { "path": "../../plugins/openlayers" }
+  ]
+}

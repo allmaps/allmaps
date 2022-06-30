@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte'
 
-  import Map from 'ol/Map'
-  import { IIIFLayer } from '@allmaps/layers'
+  import Map from 'ol/Map.js'
+  import { IIIFLayer } from '@allmaps/openlayers'
 
   export let map
 
@@ -19,17 +19,18 @@
     if (ol) {
       const imageUri = map.image.uri
       const image = await fetchImage(imageUri)
+
       iiifLayer = new IIIFLayer(image)
       ol.addLayer(iiifLayer)
 
-      ol.setView(iiifLayer.getView())
+      // ol.setView(iiifLayer.getView())
       ol.getView().fit(iiifLayer.getExtent(), {
         padding: [25, 25, 25, 25]
       })
     }
   }
 
-  async function fetchImage (imageUri) {
+  async function fetchImage (imageUri: string) {
     const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image

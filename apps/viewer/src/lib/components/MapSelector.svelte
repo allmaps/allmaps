@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
 
   import Thumbnail from './Thumbnail.svelte'

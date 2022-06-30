@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let inline = false
 </script>
 
@@ -9,7 +9,7 @@
         src="https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo.svg" />
       {#if inline}
       <span>
-        Allmaps viewer
+        Allmaps Viewer
       </span>
       {/if}
     </a>

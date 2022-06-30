@@ -11,28 +11,43 @@
     "url": "https://github.com/allmaps/viewer.git"
   },
   "license": "GPL-3.0-or-later",
+  "type": "module",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-yaml": "^3.0.0",
-    "rollup": "^2.3.4",
-    "rollup-plugin-css-only": "^3.1.0",
-    "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "svelte": "^3.0.0"
+    "dev": "svelte-kit dev --port 3003",
+    "build": "svelte-kit build",
+    "package": "svelte-kit package",
+    "preview": "svelte-kit preview",
+    "prepare": "svelte-kit sync",
+    "test": "playwright test",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --check --plugin-search-dir=. . && eslint .",
+    "format": "prettier --write --plugin-search-dir=. ."
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-alpha.14",
+    "@allmaps/id": "^1.0.0-beta.2",
     "@allmaps/iiif-parser": "^1.0.0-alpha.16",
-    "@allmaps/layers": "^1.0.0-alpha.12",
+    "@allmaps/openlayers": "^1.0.0-beta.0",
     "@allmaps/transform": "^1.0.0-alpha.5",
-    "ol": "^6.5.0",
-    "sirv-cli": "^1.0.0"
+    "ol": "^6.14.1"
+  },
+  "devDependencies": {
+    "@modyfi/vite-plugin-yaml": "^1.0.2",
+    "@playwright/test": "^1.22.2",
+    "@sveltejs/adapter-static": "next",
+    "@sveltejs/kit": "next",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.16.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.6.2",
+    "prettier-plugin-svelte": "^2.7.0",
+    "svelte": "^3.44.0",
+    "svelte-check": "^2.7.1",
+    "svelte-preprocess": "^4.10.6",
+    "tslib": "^2.3.1",
+    "typescript": "^4.7.2"
   }
 }

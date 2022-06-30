@@ -1,13 +1,15 @@
-<script>
-  import Map from './Map.svelte'
-  import IIIF from './IIIF.svelte'
+<script lang="ts">
+  import WarpedMap from './WarpedMap.svelte'
+  import IIIFImage from './IIIFImage.svelte'
   import MapSelector from './MapSelector.svelte'
 
-  import { trackHostnames } from './lib/umami.js'
+  import type { Map as MapType } from '@allmaps/annotation'
 
-  export let maps
+  // import { trackHostnames } from './lib/umami.js'
 
-  trackHostnames(maps)
+  export let maps: MapType[]
+
+  // trackHostnames(maps)
 
   let selectedMap = 0
 
@@ -22,11 +24,11 @@
 <div class="maps">
   {#if tab === 'map'}
     <div class="ol-container">
-      <Map map={map} />
+      <WarpedMap maps={maps} />
     </div>
   {:else if tab === 'iiif'}
     <div class="ol-container">
-      <IIIF map={map} />
+      <IIIFImage map={map} />
     </div>
   {/if}
 

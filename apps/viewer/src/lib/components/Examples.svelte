@@ -1,5 +1,13 @@
-<script>
-  import examples from './examples.yaml'
+<script lang="ts">
+  import examples from '$lib/components/examples.yaml'
+
+  // type Example = {
+  //   title: string
+  //   organization: string
+  //   url: string
+  // }
+
+  // const chips: Example[] = examples
 </script>
 
 <p>
