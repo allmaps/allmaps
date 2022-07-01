@@ -21,7 +21,7 @@ import type { WarpedMapSourceEvent } from './WarpedMapSource.js'
 type Size = [number, number]
 type Extent = [number, number, number, number]
 
-export class WarpedMapLayer3 extends Layer {
+export class WarpedMapLayer extends Layer {
   source: WarpedMapSource | null = null
   container: HTMLElement
   canvas: HTMLCanvasElement | null = null
