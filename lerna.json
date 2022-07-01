@@ -1,5 +1,5 @@
 {
-  "packages": ["packages/*", "plugins/*"],
+  "packages": ["packages/*", "plugins/*", "apps/*"],
   "npmClientArgs": ["--no-lockfile"],
   "version": "independent",
   "command": {
