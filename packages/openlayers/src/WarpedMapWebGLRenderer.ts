@@ -3,7 +3,7 @@ import Event from 'ol/events/Event.js'
 
 import potpack from 'potpack'
 
-import { loadImage } from '@allmaps/render'
+import { loadImage } from './textures.js'
 import { WarpedMapEventTypes } from './WarpedMapEventType.js'
 
 import type { Image as IIIFImage } from '@allmaps/iiif-parser'
