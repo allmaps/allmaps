@@ -47,6 +47,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "typescript": "^4.5.4",
     "@types/node": "^17.0.23",
     "chai": "^4.3.4",
     "documentation": "^13.2.5",
