@@ -41,7 +41,7 @@ export const BodySchema = z.object({
 })
 
 export const AnnotationSchema = z.object({
-  id: z.string().url().optional(),
+  id: z.string().optional(),
   type: z.literal('Annotation'),
   '@context': z.string().url().array().optional(),
   motivation: z.string().default('georeferencing').optional(),
@@ -50,7 +50,7 @@ export const AnnotationSchema = z.object({
 })
 
 export const AnnotationPageSchema = z.object({
-  id: z.string().url().optional(),
+  id: z.string().optional(),
   type: z.literal('AnnotationPage'),
   '@context': z.string().url().array().optional(),
   items: z.array(AnnotationSchema)
