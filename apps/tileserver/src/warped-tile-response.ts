@@ -59,8 +59,6 @@ export async function createWarpedTileResponse(
     return parsedImage.getImageUrl({ region, size })
   })
 
-  console.log('iiifTileUrls', iiifTileUrls)
-
   const iiifTileResponses = await Promise.all(
     iiifTileUrls.map((url) => cachedFetch(cache, url))
   )
@@ -97,6 +95,7 @@ export async function createWarpedTileResponse(
       if (!inside) {
         continue
       }
+
       let tileIndex: number | undefined
       let tile: Tile | undefined
       let tileXMin: number | undefined
@@ -116,7 +115,13 @@ export async function createWarpedTileResponse(
           break
         }
       }
-      if (foundTile && tile && tileXMin && tileYMin) {
+
+      if (
+        foundTile &&
+        tile &&
+        tileXMin !== undefined &&
+        tileYMin !== undefined
+      ) {
         const decodedJpeg = decodedJpegs[tileIndex]
         if (decodedJpeg) {
           const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor

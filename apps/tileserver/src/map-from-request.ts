@@ -3,15 +3,15 @@ import { validateMap, parseAnnotation } from '@allmaps/annotation'
 import { cachedFetch } from './fetch.js'
 
 import type { Cache } from './types.js'
-import type { Map } from '@allmaps/annotation'
+import type { Map, Maps } from '@allmaps/annotation'
 import type { Obj } from 'itty-router'
 
-export async function mapFromParams(params: Obj| undefined, cache: Cache): Promise<Map> {
+export async function mapFromParams(cache: Cache, env: any, params: Obj| undefined): Promise<Map> {
   const mapId = params?.mapId
 
   const mapResponse = await cachedFetch(
     cache,
-    `https://dev.api.allmaps.org/maps/${mapId}`
+    `${env.API_BASE_URL}/maps/${mapId}`
   )
 
   const fetchedMap = await mapResponse.json()
@@ -27,16 +27,18 @@ export async function mapFromParams(params: Obj| undefined, cache: Cache): Promi
   return map
 }
 
-export function mapFromQuery(query: Obj| undefined): Map {
+export async function mapsFromQuery(cache: Cache, query: Obj| undefined): Promise<Maps> {
   if (query?.annotation) {
     const annotation = JSON.parse(query.annotation)
 
     const maps = parseAnnotation(annotation)
-    if (maps.length !== 1) {
-      throw new Error('Annotation must contain exactly one map')
-    }
-    const map = maps[0]
-    return map
+    return maps
+  } else if (query?.url) {
+    const annotationResponse = await cachedFetch(cache, query?.url)
+    const fetchedAnnotation = await annotationResponse.json()
+
+    const maps = parseAnnotation(fetchedAnnotation)
+    return maps
   } else {
     throw new Error('No annotation query parameter supplied')
   }
