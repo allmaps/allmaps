@@ -29,6 +29,10 @@ Run Allmaps Viewer:
 
 # Versioning & publishing
 
-<!-- lerna version prerelease -->
+Create prerelease versions:
 
-<!-- lerna publish from-git --dist-tag beta -->
+    lerna version prerelease
+
+Publish beta versions to npm:
+
+    lerna publish from-git --dist-tag beta
