@@ -12,6 +12,7 @@ import { z } from 'zod'
 
 export * from './parser.js'
 export * from './generator.js'
+export * from './validator.js'
 
 import {
   AnnotationSchema,
