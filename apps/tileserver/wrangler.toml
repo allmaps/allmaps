@@ -1,6 +1,6 @@
 name = "tileserver"
 usage_model = 'unbound'
-main = "dist/worker.js"
+main = "dist/worker.es.js"
 compatibility_flags = []
 compatibility_date = "2021-12-29"
 account_id = "6b4ce0b3a6c21b7769cc1c3eff7eaadf"
