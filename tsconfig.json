@@ -5,6 +5,7 @@
     { "path": "./packages/transform" },
     { "path": "./packages/render" },
     { "path": "./packages/annotation" },
-    { "path": "./packages/iiif-parser" }
+    { "path": "./packages/iiif-parser" },
+    { "path": "./packages/openlayers" }
   ]
 }
