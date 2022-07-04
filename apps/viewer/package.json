@@ -1,6 +1,7 @@
 {
   "name": "@allmaps/viewer",
   "version": "1.0.0-beta.2",
+  "private": true,
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -8,7 +9,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/allmaps/viewer.git"
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "apps/viewer"
   },
   "license": "GPL-3.0-or-later",
   "type": "module",

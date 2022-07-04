@@ -12,16 +12,15 @@
   import View from 'ol/View.js'
   import { fromLonLat } from 'ol/proj.js'
 
-  // import { createTransformer, polygonToWorld } from '@allmaps/transform'
-  // import { parseIiif } from '@allmaps/iiif-parser'
+  import { createTransformer, polygonToWorld } from '@allmaps/transform'
+  import { IIIF } from '@allmaps/iiif-parser'
 
-  import { WarpedMapLayer3, WarpedMapSource } from '@allmaps/openlayers'
-  // import { ChipsLayer, WarpedMapLayer2, WarpedMapLayer3 } from '@allmaps/openlayers'
+  import { WarpedMapLayer, WarpedMapSource } from '@allmaps/openlayers'
 
   export let maps
 
   let ol: Map
-  let warpedMapLayer3: WarpedMapLayer3
+  let warpedMapLayer: WarpedMapLayer
   let warpedMapSource: WarpedMapSource
 
   let vectorSource
@@ -32,7 +31,7 @@
 
   $: updateMaps(maps)
 
-  async function updateMaps (maps) {
+  async function updateMaps(maps) {
     if (ol && warpedMapSource) {
       // vectorSource.clear()
 
@@ -41,8 +40,6 @@
         warpedMapSource.addMap(map)
         // console.log(map)
       }
-
-
 
       // const transformArgs = createTransformer(map.gcps)
 
@@ -67,11 +64,6 @@
       // warpedMapLayer = new WarpedMapLayer(options)
       // ol.addLayer(warpedMapLayer)
 
-
-
-
-
-
       // warpedMapLayer.on('tile-load-error', (event) => {
       //   TODO: this is probably a CORS error! Show these!
       //   TODO: and show other errors as well...
@@ -87,7 +79,7 @@
     }
   }
 
-  async function fetchImage (imageUri: string) {
+  async function fetchImage(imageUri: string) {
     const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image
@@ -96,15 +88,18 @@
   const tileSources = [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-	    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+      attribution:
+        'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+      attribution:
+        'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      attribution:
+        'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     }
   ]
 
@@ -163,29 +158,26 @@
     updateMaps(maps)
   })
 
-  function handleKeydown (event: KeyboardEvent) {
+  function handleKeydown(event: KeyboardEvent) {
     if (event.code === 'Space') {
       warpedMapLayer3.setVisible(false)
     }
   }
 
-  function handleKeyup (event: KeyboardEvent) {
+  function handleKeyup(event: KeyboardEvent) {
     if (event.code === 'Space') {
       warpedMapLayer3.setVisible(true)
     }
   }
 </script>
 
-<svelte:window
-  on:keydown={handleKeydown}
-  on:keyup={handleKeyup} />
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div id="ol" class="zoom-controls-bottom-left">
-</div>
+<div id="ol" class="zoom-controls-bottom-left" />
 
 <div class="select-container">
   <div class="select">
-    <select bind:value={tileSourceIndex} >
+    <select bind:value={tileSourceIndex}>
       <option value={0}>Map</option>
       <option value={2}>Satellite</option>
     </select>
@@ -193,16 +185,16 @@
 </div>
 
 <style>
-#ol {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+  #ol {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
 
-.select-container {
-  bottom: 0;
-  right: 0;
-  position: absolute;
-  padding: 0.5em;
-}
+  .select-container {
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    padding: 0.5em;
+  }
 </style>

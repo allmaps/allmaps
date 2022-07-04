@@ -10,26 +10,9 @@
     "sourceMap": true,
     "strict": true,
 
-    "composite": true,
     "paths": {
       "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"],
-
-      "@allmaps/id": ["../../packages/id/src"],
-      "@allmaps/transform": ["../../packages/transform/src"],
-      "@allmaps/render": ["../../packages/render/src"],
-      "@allmaps/annotation": ["../../packages/annotation/src"],
-      "@allmaps/iiif-parser": ["../../packages/iiif-parser/src"],
-
-      "@allmaps/openlayers": ["../../plugins/openlayers/src"],
-
-      "@allmaps/id/*": ["../../packages/id/src/*"],
-      "@allmaps/transform/*": ["../../packages/transform/src/*"],
-      "@allmaps/render/*": ["../../packages/render/src/*"],
-      "@allmaps/annotation/*": ["../../packages/annotation/src/*"],
-      "@allmaps/iiif-parser/*": ["../../packages/iiif-parser/src/*"],
-
-      "@allmaps/openlayers/*": ["../../plugins/openlayers/src/*"],
+      "$lib/*": ["src/lib/*"]
     }
   },
   "references": [
@@ -38,7 +21,6 @@
     { "path": "../../packages/render" },
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
-
-    { "path": "../../plugins/openlayers" }
+    { "path": "../../packages/openlayers" }
   ]
 }
