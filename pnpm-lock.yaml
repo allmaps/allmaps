@@ -10,45 +10,57 @@ importers:
       lerna: 5.1.1
       nx: 14.3.6
 
+  apps/cli:
+    specifiers:
+      '@allmaps/iiif-parser': ^1.0.0-beta.2
+      '@types/node': ^17.0.42
+      typescript: ^4.6.2
+    dependencies:
+      '@allmaps/iiif-parser': link:../../packages/iiif-parser
+    devDependencies:
+      '@types/node': 17.0.42
+      typescript: 4.7.3
+
   apps/tileserver:
     specifiers:
-      '@allmaps/annotation': ^1.0.0-beta.4
+      '@allmaps/annotation': ^1.0.0-beta.5
       '@allmaps/id': ^1.0.0-beta.5
       '@allmaps/iiif-parser': ^1.0.0-beta.2
-      '@allmaps/render': ^1.0.0-beta.2
+      '@allmaps/render': ^1.0.0-beta.3
       '@allmaps/transform': ^1.0.0-beta.2
       '@cloudflare/workers-types': ^3.14.0
       '@tsndr/cloudflare-worker-router': ^2.0.1
+      '@turf/bbox': ^6.5.0
+      '@turf/center': ^6.5.0
       '@types/upng-js': ^2.1.2
-      dotenv: ^10.0.0
       itty-router: ^2.6.1
       jpeg-js: ^0.4.3
       typescript: ^4.5.4
       upng-js: ^2.1.0
       vite: ^2.9.12
-    dependencies:
+    devDependencies:
       '@allmaps/annotation': link:../../packages/annotation
       '@allmaps/id': link:../../packages/id
       '@allmaps/iiif-parser': link:../../packages/iiif-parser
       '@allmaps/render': link:../../packages/render
       '@allmaps/transform': link:../../packages/transform
-      '@tsndr/cloudflare-worker-router': 2.0.1
-      dotenv: 10.0.0
-      jpeg-js: 0.4.4
-      upng-js: 2.1.0
-    devDependencies:
       '@cloudflare/workers-types': 3.14.0
+      '@tsndr/cloudflare-worker-router': 2.0.1
+      '@turf/bbox': 6.5.0
+      '@turf/center': 6.5.0
       '@types/upng-js': 2.1.2
       itty-router: 2.6.1
+      jpeg-js: 0.4.4
       typescript: 4.7.3
+      upng-js: 2.1.0
       vite: 2.9.12
 
   apps/viewer:
     specifiers:
-      '@allmaps/annotation': ^1.0.0-beta.3
+      '@allmaps/annotation': ^1.0.0-beta.5
       '@allmaps/id': ^1.0.0-beta.4
       '@allmaps/iiif-parser': ^1.0.0-beta.1
-      '@allmaps/openlayers': ^1.0.0-beta.2
+      '@allmaps/openlayers': ^1.0.0-beta.4
       '@allmaps/transform': ^1.0.0-beta.1
       '@modyfi/vite-plugin-yaml': ^1.0.2
       '@playwright/test': ^1.22.2
@@ -78,7 +90,7 @@ importers:
       '@modyfi/vite-plugin-yaml': 1.0.2
       '@playwright/test': 1.22.2
       '@sveltejs/adapter-static': 1.0.0-next.34
-      '@sveltejs/kit': 1.0.0-next.357_svelte@3.48.0
+      '@sveltejs/kit': 1.0.0-next.360_svelte@3.48.0
       '@typescript-eslint/eslint-plugin': 5.27.1_aq7uryhocdbvbqum33pitcm3y4
       '@typescript-eslint/parser': 5.27.1_ud6rd4xtew5bv4yhvkvu24pzm4
       eslint: 8.17.0
@@ -148,10 +160,10 @@ importers:
 
   packages/openlayers:
     specifiers:
-      '@allmaps/annotation': ^1.0.0-beta.4
+      '@allmaps/annotation': ^1.0.0-beta.5
       '@allmaps/id': ^1.0.0-beta.5
       '@allmaps/iiif-parser': ^1.0.0-beta.2
-      '@allmaps/render': ^1.0.0-beta.2
+      '@allmaps/render': ^1.0.0-beta.3
       '@allmaps/transform': ^1.0.0-beta.2
       '@types/lodash': ^4.14.182
       earcut: ^2.2.3
@@ -1611,27 +1623,24 @@ packages:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.357_svelte@3.48.0:
-    resolution: {integrity: sha512-nCAehVybIEpQNnPu61V/EFVdfDb1nBSiQUfW9EcSSDEUbyAMCVBOKZZuzQ0qQDp3xniqRkyDzpBA4wN+ADxHBw==}
+  /@sveltejs/kit/1.0.0-next.360_svelte@3.48.0:
+    resolution: {integrity: sha512-z1W6oYSmDzYcjlXANkbsb0N0IS/0aDl0huzDGRZWXobis4VmzoqzOyxsczyvxwH6FWxQBXls5wNrtm6drzsr6A==}
     engines: {node: '>=16.7'}
     hasBin: true
     peerDependencies:
       svelte: ^3.44.0
+      vite: ^2.9.10
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 1.0.0-next.49_svelte@3.48.0+vite@2.9.12
+      '@sveltejs/vite-plugin-svelte': 1.0.0-next.49_svelte@3.48.0
       chokidar: 3.5.3
       sade: 1.8.1
       svelte: 3.48.0
-      vite: 2.9.12
     transitivePeerDependencies:
       - diff-match-patch
-      - less
-      - sass
-      - stylus
       - supports-color
     dev: true
 
-  /@sveltejs/vite-plugin-svelte/1.0.0-next.49_svelte@3.48.0+vite@2.9.12:
+  /@sveltejs/vite-plugin-svelte/1.0.0-next.49_svelte@3.48.0:
     resolution: {integrity: sha512-AKh0Ka8EDgidnxWUs8Hh2iZLZovkETkefO99XxZ4sW4WGJ7VFeBx5kH/NIIGlaNHLcrIvK3CK0HkZwC3Cici0A==}
     engines: {node: ^14.13.1 || >= 16}
     peerDependencies:
@@ -1649,7 +1658,6 @@ packages:
       magic-string: 0.26.2
       svelte: 3.48.0
       svelte-hmr: 0.14.12_svelte@3.48.0
-      vite: 2.9.12
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1666,7 +1674,14 @@ packages:
 
   /@tsndr/cloudflare-worker-router/2.0.1:
     resolution: {integrity: sha512-/3CUqkj8EnOHT1YI6jm4qsz6Cl+W8Ka/fDXVC34vjxXlibFII1NljzKW4rM1IUdhuozrUglW3pP5JHTJ1cmmlQ==}
-    dev: false
+    dev: true
+
+  /@turf/bbox/6.5.0:
+    resolution: {integrity: sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+      '@turf/meta': 6.5.0
+    dev: true
 
   /@turf/bearing/6.5.0:
     resolution: {integrity: sha512-dxINYhIEMzgDOztyMZc20I7ssYVNEpSv04VbMo5YPQsqa80KO3TFvbuCahMsCAW5z8Tncc8dwBlEFrmRjJG33A==}
@@ -1674,6 +1689,13 @@ packages:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
     dev: false
+
+  /@turf/center/6.5.0:
+    resolution: {integrity: sha512-T8KtMTfSATWcAX088rEDKjyvQCBkUsLnK/Txb6/8WUXIeOZyHu42G7MkdkHRoHtwieLdduDdmPLFyTdG5/e7ZQ==}
+    dependencies:
+      '@turf/bbox': 6.5.0
+      '@turf/helpers': 6.5.0
+    dev: true
 
   /@turf/destination/6.5.0:
     resolution: {integrity: sha512-4cnWQlNC8d1tItOz9B4pmJdWpXqS0vEvv65bI/Pj/genJnsL7evI0/Xw42RvEGROS481MPiU80xzvwxEvhQiMQ==}
@@ -1691,13 +1713,18 @@ packages:
 
   /@turf/helpers/6.5.0:
     resolution: {integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==}
-    dev: false
 
   /@turf/invariant/6.5.0:
     resolution: {integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==}
     dependencies:
       '@turf/helpers': 6.5.0
     dev: false
+
+  /@turf/meta/6.5.0:
+    resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+    dev: true
 
   /@turf/midpoint/6.5.0:
     resolution: {integrity: sha512-MyTzV44IwmVI6ec9fB2OgZ53JGNlgOpaYl9ArKoF49rXpL84F9rNATndbe0+MQIhdkw8IlzA6xVP4lZzfMNVCw==}
@@ -3328,6 +3355,7 @@ packages:
   /dotenv/10.0.0:
     resolution: {integrity: sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==}
     engines: {node: '>=10'}
+    dev: true
 
   /dotgitignore/2.1.0:
     resolution: {integrity: sha512-sCm11ak2oY6DglEPpCB8TixLjWAxd3kJTs6UIcSasNYxXdFPV+YKlye92c8H4kKFqV5qYMIh7d+cYecEg0dIkA==}
@@ -5241,7 +5269,7 @@ packages:
 
   /jpeg-js/0.4.4:
     resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
-    dev: false
+    dev: true
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -6802,7 +6830,7 @@ packages:
 
   /pako/1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
-    dev: false
+    dev: true
 
   /pako/2.0.4:
     resolution: {integrity: sha512-v8tweI900AUkZN6heMU/4Uy4cXRc2AYNRggVmTR+dEncawDJgCdLMximOVA2p4qO57WMynangsfGRb5WD6L1Bg==}
@@ -8617,7 +8645,7 @@ packages:
     resolution: {integrity: sha512-d3xzZzpMP64YkjP5pr8gNyvBt7dLk/uGI67EctzDuVp4lCZyVMo0aJO6l/VDlgbInJYDY6cnClLoBp29eKWI6g==}
     dependencies:
       pako: 1.0.11
-    dev: false
+    dev: true
 
   /uri-js/4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
