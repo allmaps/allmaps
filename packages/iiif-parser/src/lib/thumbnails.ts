@@ -32,12 +32,18 @@ const maxThumbnailDownscale = 0.8
 const maxThumbnailUpscale = 1.5
 
 export function getThumbnail(
-  sizes: Size[] | undefined,
-  tileZoomLevels: TileZoomLevel[],
-  supportsAnyRegionAndSize: boolean | null,
   imageSize: Size,
   containerSize: Size,
-  mode: Fit = 'cover'
+  mode: Fit = 'cover',
+  {
+    sizes,
+    tileZoomLevels,
+    supportsAnyRegionAndSize
+  }: {
+    sizes?: Size[]
+    tileZoomLevels?: TileZoomLevel[]
+    supportsAnyRegionAndSize?: boolean | null
+  }
 ): ImageRequest | ImageRequest[][] {
   const { width, height } = getThumbnailSize(imageSize, containerSize, mode)
 

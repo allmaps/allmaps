@@ -116,6 +116,20 @@ export class EmbeddedImage {
 
     return `${this.uri}/${urlRegion}/${urlSize}/0/default.jpg`
   }
+
+  getThumbnail(
+    size: Size,
+    mode: Fit = 'cover'
+  ): ImageRequest | ImageRequest[][] {
+    return getThumbnail(
+      { width: this.width, height: this.height },
+      size,
+      mode,
+      {
+        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize
+      }
+    )
+  }
 }
 
 export class Image extends EmbeddedImage {
@@ -160,12 +174,14 @@ export class Image extends EmbeddedImage {
     mode: Fit = 'cover'
   ): ImageRequest | ImageRequest[][] {
     return getThumbnail(
-      this.sizes,
-      this.tileZoomLevels,
-      this.supportsAnyRegionAndSize,
       { width: this.width, height: this.height },
       size,
-      mode
+      mode,
+      {
+        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize,
+        sizes: this.sizes,
+        tileZoomLevels: this.tileZoomLevels
+      }
     )
   }
 }
