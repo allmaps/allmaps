@@ -1,38 +1,34 @@
 import { z } from 'zod'
 
 import { ManifestSchema } from '../schemas/iiif.js'
-import { Image, EmbeddedImage } from './image.js'
+import { Canvas } from './canvas.js'
 
-import type { LanguageString, Metadata } from '../lib/types.js'
+import type { LanguageString, Metadata, MajorVersion } from '../lib/types.js'
 import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
 
-type FetchFunction = (url: string) => Promise<any>
+// type FetchFunction = (url: string) => Promise<any>
 
-interface FetchNextOptions {
-  maxDepth: number
-  maxItems: number
-}
+// interface FetchNextOptions {
+//   maxDepth: number
+//   maxItems: number
+// }
 
-type MajorVersion = 2 | 3
+// export class FetchedEvent extends Event {
+//   image: Image
 
-type ManifestImage = EmbeddedImage | Image
-
-export class FetchedEvent extends Event {
-  image: Image
-
-  constructor(image: Image) {
-    super('fetched')
-    this.image = image
-  }
-}
+//   constructor(image: Image) {
+//     super('fetched')
+//     this.image = image
+//   }
+// }
 
 export class Manifest extends EventTarget {
   uri: string
   type = 'manifest'
   majorVersion: MajorVersion
-  images: ManifestImage[] = []
+  canvases: Canvas[] = []
 
   label?: LanguageString
   description?: LanguageString
@@ -56,19 +52,17 @@ export class Manifest extends EventTarget {
 
       this.metadata = parseVersion2Metadata(parsedManifest.metadata)
 
-      const canvases = parsedManifest.sequences[0].canvases
-      this.images = canvases.map((canvas) => new EmbeddedImage(canvas))
+      const sequence = parsedManifest.sequences[0]
+      this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
       this.uri = parsedManifest.id
       this.majorVersion = 3
 
       this.label = parsedManifest.label
-      this.description = parsedManifest.description
       this.metadata = parsedManifest.metadata
 
-      const canvases = parsedManifest.items
-      this.images = canvases.map((canvas) => new EmbeddedImage(canvas))
+      this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))
     } else {
       throw new Error('Unsupported Manifest')
     }

@@ -198,14 +198,24 @@
       }
     }
   ],
-  "images": [
+  "canvases": [
     {
-      "embedded": true,
-      "type": "image",
+      "type": "canvas",
+      "uri": "https://figgy.princeton.edu/concern/scanned_maps/fa4fb452-5f1d-42ab-a471-53afc176c948/manifest/canvas/eaaa0dde-64d9-4dae-b905-c73322b592bf",
       "width": 4467,
       "height": 5609,
-      "uri": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file",
-      "majorVersion": 2
+      "label": {
+        "none": ["PUmap_28146"]
+      },
+      "image": {
+        "embedded": true,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "width": 4467,
+        "height": 5609,
+        "uri": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file",
+        "majorVersion": 2
+      }
     }
   ],
   "uri": "https://figgy.princeton.edu/concern/scanned_maps/fa4fb452-5f1d-42ab-a471-53afc176c948/manifest",

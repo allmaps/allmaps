@@ -161,14 +161,42 @@
       }
     }
   ],
-  "images": [
+  "canvases": [
     {
-      "embedded": true,
-      "type": "image",
-      "width": 11560,
+      "type": "canvas",
+      "uri": "https://collections.library.yale.edu/manifests/oid/15826830/canvas/15828036",
       "height": 9128,
-      "uri": "https://collections.library.yale.edu/iiif/2/15828036",
-      "majorVersion": 2
+      "width": 11560,
+      "label": {
+        "none": ["recto"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Image OID"]
+          },
+          "value": {
+            "none": ["15828036"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Image Label"]
+          },
+          "value": {
+            "none": ["recto"]
+          }
+        }
+      ],
+      "image": {
+        "embedded": true,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "width": 11560,
+        "height": 9128,
+        "uri": "https://collections.library.yale.edu/iiif/2/15828036",
+        "majorVersion": 2
+      }
     }
   ],
   "uri": "https://collections.library.yale.edu/manifests/15826830",

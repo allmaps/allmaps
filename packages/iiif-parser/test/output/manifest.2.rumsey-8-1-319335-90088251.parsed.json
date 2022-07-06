@@ -1,0 +1,338 @@
+{
+  "type": "manifest",
+  "label": {
+    "none": ["Map of the County of Cornwall"]
+  },
+  "majorVersion": 2,
+  "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/manifest",
+  "canvases": [
+    {
+      "height": 8318,
+      "image": {
+        "embedded": true,
+        "height": 8318,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251",
+        "width": 10802
+      },
+      "label": {
+        "none": ["Map of the County of Cornwall"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Author"]
+          },
+          "value": {
+            "none": ["Greenwood, Charles"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Author"]
+          },
+          "value": {
+            "none": ["Greenwood, John, 1791-1867"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Date"]
+          },
+          "value": {
+            "none": ["1829"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Short Title"]
+          },
+          "value": {
+            "none": ["Map of the County of Cornwall"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Publisher"]
+          },
+          "value": {
+            "none": ["Greenwood & Co."]
+          }
+        },
+        {
+          "label": {
+            "none": ["Publisher Location"]
+          },
+          "value": {
+            "none": ["London"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Type"]
+          },
+          "value": {
+            "none": ["Atlas Map"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Obj Height cm"]
+          },
+          "value": {
+            "none": ["61"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Obj Width cm"]
+          },
+          "value": {
+            "none": ["69"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Scale 1"]
+          },
+          "value": {
+            "none": ["200,000"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Note"]
+          },
+          "value": {
+            "none": [
+              "Engraved hand colored map. Include inset map of Scilly Isles and view of St. Michael's Mount. Includes explanation and compass rose oriented with north to the upper center. Relief shown by hachures."
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["Reference"]
+          },
+          "value": {
+            "none": ["OCLC:ocm79263024"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Country"]
+          },
+          "value": {
+            "none": ["England"]
+          }
+        },
+        {
+          "label": {
+            "none": ["County"]
+          },
+          "value": {
+            "none": ["Cornwall (England : County)"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Subject"]
+          },
+          "value": {
+            "none": ["Administrative and political divisions"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Full Title"]
+          },
+          "value": {
+            "none": [
+              "Map of the County of Cornwall, from an actual survey made in the years 1826 & 1827 ... July 4th. 1829. Corrected to the present period. Engraved by J. Dower. (to accompany) Atlas of the Counties of England, by C. & J. Greenwood. Published by proprietors Greenwood & Co., London. Engraved by J. & C. Walker. April 1st. 1834."
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["List No"]
+          },
+          "value": {
+            "none": ["13302.008"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Page No"]
+          },
+          "value": {
+            "none": ["(6)"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Series No"]
+          },
+          "value": {
+            "none": ["8"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Engraver or Printer"]
+          },
+          "value": {
+            "none": ["J. & C. Walker (Firm)"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Engraver or Printer"]
+          },
+          "value": {
+            "none": ["Walker, John, 1786-1873"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Engraver or Printer"]
+          },
+          "value": {
+            "none": ["Dower, John"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Publication Author"]
+          },
+          "value": {
+            "none": ["Greenwood, Charles"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Publication Author"]
+          },
+          "value": {
+            "none": ["Greenwood, John, 1791-1867"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Date"]
+          },
+          "value": {
+            "none": ["1834"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Title"]
+          },
+          "value": {
+            "none": [
+              "Atlas of the Counties of England, from actual surveys made from the years 1817 to 1833 by C. & J. Greenwood. Published by proprietors Greenwood & Co. London. Engraved by J. & C. Walker. Published April 1st. 1834."
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Reference"]
+          },
+          "value": {
+            "none": ["OCLC:ocm79263024"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Note"]
+          },
+          "value": {
+            "none": [
+              "Greenwood's county atlas, engraved by J & C Walker Published April 1st 1834. Atlas consists of engraved title page, with hand colored index map of England and Wales, showing counties and major towns in each county, and 46 engraved hand colored unnumbered maps, including 4 maps of counties of Wales and 1 index map. Most maps engraved by J. and C. Walker. Other engravers are J. and J. Neele, J. Dower, and H. Frost. Each map shows the boundaries of the county, parishes, villages, roads, churches, chapels, railways, parks, rivers, canals, woods, watermills and windmills. Includes reference to the wards, liberties and boroughs, place of election and polling places. Relief shown by hachures. Prime meridian is Greenwich. Each map includes inset view of a landmark, or landscape located in the county, engraved by R. Creighton, delt.; Josiah Neele, sc.; J & C. Walker, sculpt.; G. Richards, sculpt.; J.J. Jones. Some sheets list place of election and polling places. Bound in half leather green paper covered boards with orange paper label with title \"Greenwood's atlas of England and Wales\" in gold and the leather rebound spine embossed with \"Greenwood Atlas\" in gold."
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub List No"]
+          },
+          "value": {
+            "none": ["13302.000"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Type"]
+          },
+          "value": {
+            "none": ["National Atlas"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Maps"]
+          },
+          "value": {
+            "none": ["47"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Height cm"]
+          },
+          "value": {
+            "none": ["66"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Pub Width cm"]
+          },
+          "value": {
+            "none": ["42"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Image No"]
+          },
+          "value": {
+            "none": ["13302008.jp2"]
+          }
+        },
+        {
+          "label": {
+            "none": ["Download 1"]
+          },
+          "value": {
+            "none": [
+              "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/179/13302008.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["Download 2"]
+          },
+          "value": {
+            "none": [
+              "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "none": ["Authors"]
+          },
+          "value": {
+            "none": ["Greenwood, Charles; Greenwood, John, 1791-1867"]
+          }
+        }
+      ],
+      "type": "canvas",
+      "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/canvas/c1",
+      "width": 10802
+    }
+  ]
+}

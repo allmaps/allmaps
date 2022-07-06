@@ -7,7 +7,6 @@ import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
 import { IIIF } from '../dist/index.js'
-// import { IIIFSchema } from '../dist/schemas/iiif.js'
 
 chai.use(shallowDeepEqual)
 
@@ -29,15 +28,6 @@ fs.readdirSync(inputDir)
     let parsedIiif
     let errors
     let zodError
-
-    if (
-      basename === 'manifest.2.princeton-fa4fb452-5f1d-42ab-a471-53afc176c948'
-    ) {
-      console.log('vis')
-      const parsed = IIIF.parse(input)
-      console.log({ ...parsed })
-      console.log('HONDEN')
-    }
 
     try {
       parsedIiif = IIIF.parse(input)
@@ -83,9 +73,6 @@ function runTests(file) {
       it('should match expected output', () => {
         expect(file.expected.output).to.shallowDeepEqual(file.output)
       })
-
-      console.log(file.basename)
-      console.log(JSON.stringify(file.output))
     } else if (file.errors && file.expected.errors) {
       it('should result in the correct error message', () => {
         expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())

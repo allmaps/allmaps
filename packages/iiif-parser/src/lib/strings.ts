@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { StringValue2Schema, Metadata2Schema } from '../schemas/manifest.2.js'
-import { StringValue3Schema, Metadata3Schema } from '../schemas/manifest.3.js'
+import { StringValue2Schema, Metadata2Schema } from '../schemas/presentation.2.js'
+import { StringValue3Schema, Metadata3Schema } from '../schemas/presentation.3.js'
 
 type StringValue2Type = z.infer<typeof StringValue2Schema>
 type Metadata2Type = z.infer<typeof Metadata2Schema>

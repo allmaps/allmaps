@@ -4,11 +4,7 @@
 import { z } from 'zod'
 import { TilesetSchema, SizeSchema } from './shared.js'
 
-const profileUris = [
-  'http://iiif.io/api/image/2/level0.json',
-  'http://iiif.io/api/image/2/level1.json',
-  'http://iiif.io/api/image/2/level2.json'
-] as const
+import { profileUris } from './image-service.2.js'
 
 const Image2ProfileUri = z.enum(profileUris)
 

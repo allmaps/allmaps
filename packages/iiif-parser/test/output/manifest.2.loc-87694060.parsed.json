@@ -98,14 +98,34 @@
       }
     }
   ],
-  "images": [
+  "canvases": [
     {
-      "embedded": true,
-      "type": "image",
+      "type": "canvas",
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
       "width": 2115,
       "height": 2203,
-      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
-      "majorVersion": 2
+      "label": {
+        "none": ["Page 1"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": ["https://www.loc.gov/resource/g3851e.ct004586/?sp=1"]
+          }
+        }
+      ],
+      "image": {
+        "embedded": true,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "width": 2115,
+        "height": 2203,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+        "majorVersion": 2
+      }
     }
   ],
   "uri": "https://www.loc.gov/item/87694060/manifest.json",

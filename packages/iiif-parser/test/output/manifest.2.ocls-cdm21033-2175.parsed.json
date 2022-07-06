@@ -1,5 +1,207 @@
 {
   "type": "manifest",
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 2867,
+      "height": 2832,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2164/canvas/c0",
+      "label": {
+        "none": ["[Indexkaart]"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2164",
+        "majorVersion": 2,
+        "width": 2867,
+        "height": 2832
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4979,
+      "height": 3012,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2165/canvas/c1",
+      "label": {
+        "none": ["Bladwijzer van de Choro-topographische kaart"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2165",
+        "majorVersion": 2,
+        "width": 4979,
+        "height": 3012
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4141,
+      "height": 3622,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2166/canvas/c2",
+      "label": {
+        "none": ["(No. I)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2166",
+        "majorVersion": 2,
+        "width": 4141,
+        "height": 3622
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4131,
+      "height": 3630,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2167/canvas/c3",
+      "label": {
+        "none": ["No. II"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2167",
+        "majorVersion": 2,
+        "width": 4131,
+        "height": 3630
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4142,
+      "height": 3621,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2168/canvas/c4",
+      "label": {
+        "none": ["(No. III) [Titelblad]"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2168",
+        "majorVersion": 2,
+        "width": 4142,
+        "height": 3621
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4137,
+      "height": 3625,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2169/canvas/c5",
+      "label": {
+        "none": ["(No. IV)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2169",
+        "majorVersion": 2,
+        "width": 4137,
+        "height": 3625
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4141,
+      "height": 3622,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2170/canvas/c6",
+      "label": {
+        "none": ["(No. V)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2170",
+        "majorVersion": 2,
+        "width": 4141,
+        "height": 3622
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4138,
+      "height": 3624,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2171/canvas/c7",
+      "label": {
+        "none": ["No. VI"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2171",
+        "majorVersion": 2,
+        "width": 4138,
+        "height": 3624
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4134,
+      "height": 3627,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2172/canvas/c8",
+      "label": {
+        "none": ["(No. VII)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2172",
+        "majorVersion": 2,
+        "width": 4134,
+        "height": 3627
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4119,
+      "height": 3641,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2173/canvas/c9",
+      "label": {
+        "none": ["(No. VIII)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2173",
+        "majorVersion": 2,
+        "width": 4119,
+        "height": 3641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4129,
+      "height": 3632,
+      "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2174/canvas/c10",
+      "label": {
+        "none": ["(No. IX)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2174",
+        "majorVersion": 2,
+        "width": 4129,
+        "height": 3632
+      }
+    }
+  ],
+  "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2175/manifest.json",
+  "majorVersion": 2,
   "label": {
     "none": [
       "Choro-topographische kaart der Noordelijke Provinciën van het Koningrijk der Nederlanden / uitgevoerd aan het Topographisch Bureau van dezen Staat, volgens het ontwerp, de geodesische en astronomische waarnemingen van Baron Kraijenhoff"
@@ -220,97 +422,5 @@
         ]
       }
     }
-  ],
-  "images": [
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 2867,
-      "height": 2832,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2164",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4979,
-      "height": 3012,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2165",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4141,
-      "height": 3622,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2166",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4131,
-      "height": 3630,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2167",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4142,
-      "height": 3621,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2168",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4137,
-      "height": 3625,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2169",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4141,
-      "height": 3622,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2170",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4138,
-      "height": 3624,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2171",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4134,
-      "height": 3627,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2172",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4119,
-      "height": 3641,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2173",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4129,
-      "height": 3632,
-      "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2174",
-      "majorVersion": 2
-    }
-  ],
-  "uri": "https://cdm21033.contentdm.oclc.org/iiif/krt:2175/manifest.json",
-  "majorVersion": 2
+  ]
 }

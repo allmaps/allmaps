@@ -87,6 +87,11 @@
   type: manifest
   version: 2
 
+- filename: rumsey-8-1-319335-90088251
+  url: https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/manifest
+  type: manifest
+  version: 2
+
 ### Collection 2.0
 
 # - filename: davidrumsey-collection-s-cy4drc

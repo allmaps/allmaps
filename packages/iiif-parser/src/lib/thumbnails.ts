@@ -34,7 +34,7 @@ const maxThumbnailUpscale = 1.5
 export function getThumbnail(
   sizes: Size[] | undefined,
   tileZoomLevels: TileZoomLevel[],
-  supportsAnyRegionAndSize: boolean,
+  supportsAnyRegionAndSize: boolean | null,
   imageSize: Size,
   containerSize: Size,
   mode: Fit = 'cover'

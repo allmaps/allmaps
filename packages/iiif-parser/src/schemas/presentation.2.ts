@@ -24,11 +24,13 @@ export const MetadataItem2Schema = z.object({
 export const Metadata2Schema = MetadataItem2Schema.array()
 
 export const ImageResource2Schema = z.object({
-  resource: z.object({
-    width: z.number().int(),
-    height: z.number().int(),
-    service: ImageServiceSchema
-  })
+  width: z.number().int(),
+  height: z.number().int(),
+  service: ImageServiceSchema
+})
+
+export const Annotation2Schema = z.object({
+  resource: ImageResource2Schema
 })
 
 export const Canvas2Schema = z.object({
@@ -36,7 +38,7 @@ export const Canvas2Schema = z.object({
   '@type': z.literal('sc:Canvas'),
   width: z.number().int(),
   height: z.number().int(),
-  images: ImageResource2Schema.array().length(1),
+  images: Annotation2Schema.array().length(1),
   label: StringValue2Schema.optional(),
   metadata: Metadata2Schema.optional()
 })
@@ -53,4 +55,3 @@ export const Manifest2Schema = z.object({
   description: StringValue2Schema.optional(),
   metadata: Metadata2Schema.optional()
 })
-

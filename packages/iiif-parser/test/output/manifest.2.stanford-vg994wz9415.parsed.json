@@ -162,14 +162,24 @@
       }
     }
   ],
-  "images": [
+  "canvases": [
     {
-      "embedded": true,
-      "type": "image",
-      "width": 11091,
+      "type": "canvas",
+      "uri": "https://purl.stanford.edu/vg994wz9415/iiif/canvas/vg994wz9415_1",
+      "label": {
+        "none": ["Image 1"]
+      },
       "height": 9607,
-      "uri": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001",
-      "majorVersion": 2
+      "width": 11091,
+      "image": {
+        "embedded": true,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "width": 11091,
+        "height": 9607,
+        "uri": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001",
+        "majorVersion": 2
+      }
     }
   ],
   "uri": "https://purl.stanford.edu/vg994wz9415/iiif/manifest",

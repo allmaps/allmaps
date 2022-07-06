@@ -14,7 +14,7 @@ export const MetadataItem3Schema = z.object({
 
 export const Metadata3Schema = MetadataItem3Schema.array()
 
-const AnnotationBody3Schema = z.object({
+export const AnnotationBody3Schema = z.object({
   type: z.literal('Image'),
   width: z.number().int(),
   height: z.number().int(),

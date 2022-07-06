@@ -1,0 +1,201 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/manifest",
+  "label": "Map of the County of Cornwall",
+  "attribution": "David Rumsey Historical Map Collection",
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/canvas/c1",
+          "@type": "sc:Canvas",
+          "label": "Map of the County of Cornwall",
+          "description": "",
+          "metadata": [
+            {
+              "label": "Author",
+              "value": "Greenwood, Charles"
+            },
+            {
+              "label": "Author",
+              "value": "Greenwood, John, 1791-1867"
+            },
+            {
+              "label": "Date",
+              "value": "1829"
+            },
+            {
+              "label": "Short Title",
+              "value": "Map of the County of Cornwall"
+            },
+            {
+              "label": "Publisher",
+              "value": "Greenwood & Co."
+            },
+            {
+              "label": "Publisher Location",
+              "value": "London"
+            },
+            {
+              "label": "Type",
+              "value": "Atlas Map"
+            },
+            {
+              "label": "Obj Height cm",
+              "value": "61"
+            },
+            {
+              "label": "Obj Width cm",
+              "value": "69"
+            },
+            {
+              "label": "Scale 1",
+              "value": "200,000"
+            },
+            {
+              "label": "Note",
+              "value": "Engraved hand colored map. Include inset map of Scilly Isles and view of St. Michael's Mount. Includes explanation and compass rose oriented with north to the upper center. Relief shown by hachures."
+            },
+            {
+              "label": "Reference",
+              "value": "OCLC:ocm79263024"
+            },
+            {
+              "label": "Country",
+              "value": "England"
+            },
+            {
+              "label": "County",
+              "value": "Cornwall (England : County)"
+            },
+            {
+              "label": "Subject",
+              "value": "Administrative and political divisions"
+            },
+            {
+              "label": "Full Title",
+              "value": "Map of the County of Cornwall, from an actual survey made in the years 1826 & 1827 ... July 4th. 1829. Corrected to the present period. Engraved by J. Dower. (to accompany) Atlas of the Counties of England, by C. & J. Greenwood. Published by proprietors Greenwood & Co., London. Engraved by J. & C. Walker. April 1st. 1834."
+            },
+            {
+              "label": "List No",
+              "value": "13302.008"
+            },
+            {
+              "label": "Page No",
+              "value": "(6)"
+            },
+            {
+              "label": "Series No",
+              "value": "8"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "J. & C. Walker (Firm)"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "Walker, John, 1786-1873"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "Dower, John"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Greenwood, Charles"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Greenwood, John, 1791-1867"
+            },
+            {
+              "label": "Pub Date",
+              "value": "1834"
+            },
+            {
+              "label": "Pub Title",
+              "value": "Atlas of the Counties of England, from actual surveys made from the years 1817 to 1833 by C. & J. Greenwood. Published by proprietors Greenwood & Co. London. Engraved by J. & C. Walker. Published April 1st. 1834."
+            },
+            {
+              "label": "Pub Reference",
+              "value": "OCLC:ocm79263024"
+            },
+            {
+              "label": "Pub Note",
+              "value": "Greenwood's county atlas, engraved by J & C Walker Published April 1st 1834. Atlas consists of engraved title page, with hand colored index map of England and Wales, showing counties and major towns in each county, and 46 engraved hand colored unnumbered maps, including 4 maps of counties of Wales and 1 index map. Most maps engraved by J. and C. Walker. Other engravers are J. and J. Neele, J. Dower, and H. Frost. Each map shows the boundaries of the county, parishes, villages, roads, churches, chapels, railways, parks, rivers, canals, woods, watermills and windmills. Includes reference to the wards, liberties and boroughs, place of election and polling places. Relief shown by hachures. Prime meridian is Greenwich. Each map includes inset view of a landmark, or landscape located in the county, engraved by R. Creighton, delt.; Josiah Neele, sc.; J & C. Walker, sculpt.; G. Richards, sculpt.; J.J. Jones. Some sheets list place of election and polling places. Bound in half leather green paper covered boards with orange paper label with title \"Greenwood's atlas of England and Wales\" in gold and the leather rebound spine embossed with \"Greenwood Atlas\" in gold."
+            },
+            {
+              "label": "Pub List No",
+              "value": "13302.000"
+            },
+            {
+              "label": "Pub Type",
+              "value": "National Atlas"
+            },
+            {
+              "label": "Pub Maps",
+              "value": "47"
+            },
+            {
+              "label": "Pub Height cm",
+              "value": "66"
+            },
+            {
+              "label": "Pub Width cm",
+              "value": "42"
+            },
+            {
+              "label": "Image No",
+              "value": "13302008.jp2"
+            },
+            {
+              "label": "Download 1",
+              "value": "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/179/13302008.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            },
+            {
+              "label": "Download 2",
+              "value": "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            },
+            {
+              "label": "Authors",
+              "value": "Greenwood, Charles; Greenwood, John, 1791-1867"
+            }
+          ],
+          "thumbnail": {
+            "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251/full/!96,96/0/default.jpg",
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251/full/!1024,1024/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 10802,
+                "height": 8318
+              },
+              "on": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/canvas/c1"
+            }
+          ],
+          "width": 10802,
+          "height": 8318
+        }
+      ]
+    }
+  ],
+  "logo": {
+    "@id": "https://www.davidrumsey.com/luna/images/LUNAIIIF80.png",
+    "format": "image/png"
+  },
+  "related": "https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~319335~90088251"
+}

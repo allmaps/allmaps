@@ -1,5 +1,45 @@
 {
   "type": "manifest",
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 4478,
+      "height": 6482,
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/c042e80d-9542-45b6-afd5-4a8dfdfe8037.json",
+      "label": {
+        "none": ["Sheet 1"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
+        "majorVersion": 2,
+        "width": 4478,
+        "height": 6482
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4535,
+      "height": 6443,
+      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/canvas/ba18d903-4645-43fa-bc4c-8c396d24a86c.json",
+      "label": {
+        "none": ["Sheet 2"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
+        "majorVersion": 2,
+        "width": 4535,
+        "height": 6443
+      }
+    }
+  ],
+  "uri": "https://iiif.bodleian.ox.ac.uk/iiif/manifest/f45ff5a5-8c14-435b-82b1-f95d61f530d0.json",
+  "majorVersion": 2,
   "label": {
     "none": ["Bodleian Library (E) C17:70 Oxford (66)"]
   },
@@ -151,25 +191,5 @@
         "none": ["Bodleian Libraries, University of Oxford"]
       }
     }
-  ],
-  "images": [
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4478,
-      "height": 6482,
-      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
-      "majorVersion": 2
-    },
-    {
-      "embedded": true,
-      "type": "image",
-      "width": 4535,
-      "height": 6443,
-      "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
-      "majorVersion": 2
-    }
-  ],
-  "uri": "https://iiif.bodleian.ox.ac.uk/iiif/manifest/f45ff5a5-8c14-435b-82b1-f95d61f530d0.json",
-  "majorVersion": 2
+  ]
 }
