@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -21,23 +21,21 @@
     "dev": "npx miniflare dist/worker.js -w -m"
   },
   "license": "GPL-3.0-or-later",
-  "dependencies": {
-  },
   "devDependencies": {
     "@allmaps/annotation": "^1.0.0-beta.5",
     "@allmaps/id": "^1.0.0-beta.5",
-    "@allmaps/iiif-parser": "^1.0.0-beta.2",
-    "@allmaps/render": "^1.0.0-beta.3",
+    "@allmaps/iiif-parser": "^1.0.0-beta.3",
+    "@allmaps/render": "^1.0.0-beta.4",
     "@allmaps/transform": "^1.0.0-beta.2",
-    "@tsndr/cloudflare-worker-router": "^2.0.1",
-    "jpeg-js": "^0.4.3",
-    "upng-js": "^2.1.0",
     "@cloudflare/workers-types": "^3.14.0",
+    "@tsndr/cloudflare-worker-router": "^2.0.1",
     "@turf/bbox": "^6.5.0",
     "@turf/center": "^6.5.0",
     "@types/upng-js": "^2.1.2",
     "itty-router": "^2.6.1",
+    "jpeg-js": "^0.4.3",
     "typescript": "^4.5.4",
+    "upng-js": "^2.1.0",
     "vite": "^2.9.12"
   }
 }
