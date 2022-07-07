@@ -74,7 +74,6 @@ export class EmbeddedImage {
       } else {
         throw new Error('Unsupported IIIF Image')
       }
-      console.log('VISEN', parsedImage)
 
       if ('profile' in parsedImage) {
         const profileProperties = getProfileProperties(parsedImage)
@@ -84,9 +83,6 @@ export class EmbeddedImage {
         // this.maxWidth = profileProperties.maxWidth
         // this.maxHeight = profileProperties.maxHeight
         // this.maxArea = profileProperties.maxArea
-
-
-        console.log('BEEEER', profileProperties.supportsAnyRegionAndSize)
       }
     }
 
