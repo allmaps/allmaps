@@ -33,7 +33,7 @@
     "tsc": "tsc --watch",
     "build": "tsc",
     "preversion": "npm test",
-    "test": "mocha && npm run lint && npm run examples",
+    "test": "mocha && npm run lint",
     "pretest": "npm run build",
     "lint": "eslint dist test"
   },
