@@ -35,7 +35,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preversion": "npm run build"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

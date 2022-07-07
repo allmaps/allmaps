@@ -31,10 +31,12 @@
     "directory": "packages/id"
   },
   "scripts": {
-    "build": "tsc",
     "tsc": "tsc --watch",
-    "test": "mocha && eslint dist test",
+    "build": "tsc",
+    "preversion": "npm test",
+    "test": "mocha && npm run lint && npm run examples",
     "pretest": "npm run build",
+    "lint": "eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "keywords": [
