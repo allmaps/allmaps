@@ -36,3 +36,7 @@ Create prerelease versions:
 Publish beta versions to npm:
 
     lerna publish from-git --dist-tag beta
+
+Promoting unchanged pre-release versions:
+
+    lerna version --conventional-commits --conventional-graduate
