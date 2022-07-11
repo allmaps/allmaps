@@ -115,3 +115,8 @@
   url: https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json
   type: manifest
   version: 3
+
+- filename: tu-cre-tib-aa270916.json
+  url: https://raw.githubusercontent.com/digirati-co-uk/delft-static-site-generator/master/content/collections/tu-campus/tu-cre-tib-bouwtekeningen/tu-cre-tib-aa270916.json
+  type: manifest
+  version: 3
