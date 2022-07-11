@@ -92,6 +92,11 @@
   type: manifest
   version: 2
 
+- filename: stanford-tc010rc2373
+  url: https://purl.stanford.edu/tc010rc2373/iiif/manifest
+  type: manifest
+  version: 2
+
 ### Collection 2.0
 
 # - filename: davidrumsey-collection-s-cy4drc

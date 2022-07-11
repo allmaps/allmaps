@@ -19,7 +19,6 @@ export const Image2ProfileDescriptionSchema = z.object({
 const profile = z.union([Image2ProfileUri, Image2ProfileDescriptionSchema])
 
 export const Image2Schema = z.object({
-  '@context': z.literal('http://iiif.io/api/image/2/context.json'),
   '@id': z.string().url(),
   '@type': z.literal('iiif:Image').optional(),
   protocol: z.literal('http://iiif.io/api/image'),

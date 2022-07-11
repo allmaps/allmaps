@@ -1,0 +1,194 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://purl.stanford.edu/tc010rc2373/iiif/manifest",
+  "@type": "sc:Manifest",
+  "label": "Palo Alto Cal. [Sheet] 3",
+  "attribution": "This work has been identified as being free of known restrictions under copyright law, including all related and neighboring rights. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.",
+  "logo": {
+    "@id": "https://stacks.stanford.edu/image/iiif/wy534zh7137/SULAIR_rosette/full/400,/0/default.jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://stacks.stanford.edu/image/iiif/wy534zh7137/SULAIR_rosette",
+      "profile": "http://iiif.io/api/image/2/level2.json"
+    }
+  },
+  "seeAlso": {
+    "@id": "https://purl.stanford.edu/tc010rc2373.mods",
+    "format": "application/mods+xml"
+  },
+  "metadata": [
+    {
+      "label": "Available Online",
+      "value": "<a href='https://purl.stanford.edu/tc010rc2373'>https://purl.stanford.edu/tc010rc2373</a>"
+    },
+    {
+      "label": "Title",
+      "value": "Palo Alto Cal. [Sheet] 3"
+    },
+    {
+      "label": "Contributor",
+      "value": "Sanborn Map Company"
+    },
+    {
+      "label": "Type",
+      "value": "map"
+    },
+    {
+      "label": "Type",
+      "value": "Maps."
+    },
+    {
+      "label": "Type",
+      "value": "Fire insurance maps."
+    },
+    {
+      "label": "Date",
+      "value": "1895"
+    },
+    {
+      "label": "Date",
+      "value": "Aug. 1895"
+    },
+    {
+      "label": "Publisher",
+      "value": "[Sanborn - Perris Map Co., Limited, 117 & 119 Broadway]"
+    },
+    {
+      "label": "Language",
+      "value": "eng"
+    },
+    {
+      "label": "Format",
+      "value": "1 map"
+    },
+    {
+      "label": "Format",
+      "value": "electronic"
+    },
+    {
+      "label": "Description",
+      "value": "Bar scale on map given in \"Feet\"."
+    },
+    {
+      "label": "Description",
+      "value": "Compass rose indicates north toward upper right of sheet."
+    },
+    {
+      "label": "Description",
+      "value": "Shows streets and bulidings, some labeled according to individual rooms."
+    },
+    {
+      "label": "Coverage",
+      "value": "Scale not given"
+    },
+    {
+      "label": "Coverage",
+      "value": "(W 122°12'09\"--W 122°04'15\"/N 37°28'40\"--N 37°17'10\")."
+    },
+    {
+      "label": "Subject",
+      "value": "Fire risk assessment"
+    },
+    {
+      "label": "Coverage",
+      "value": "California"
+    },
+    {
+      "label": "Coverage",
+      "value": "Palo Alto"
+    },
+    {
+      "label": "Coverage",
+      "value": "19th century"
+    },
+    {
+      "label": "Subject",
+      "value": "Fire risk assessment--California--Palo Alto--Maps--19th century"
+    },
+    {
+      "label": "Coverage",
+      "value": "California"
+    },
+    {
+      "label": "Coverage",
+      "value": "19th century"
+    },
+    {
+      "label": "Coverage",
+      "value": "Santa Clara County (Calif.)"
+    },
+    {
+      "label": "Coverage",
+      "value": "19th century"
+    },
+    {
+      "label": "Coverage",
+      "value": "Palo Alto (Calif.)"
+    },
+    {
+      "label": "Coverage",
+      "value": "19th century"
+    },
+    {
+      "label": "PublishDate",
+      "value": "2021-07-14T20:19:51Z"
+    }
+  ],
+  "description": "Bar scale on map given in \"Feet\".",
+  "thumbnail": {
+    "@id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3/full/!400,400/0/default.jpg",
+    "@type": "dctypes:Image",
+    "format": "image/jpeg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+      "profile": "http://iiif.io/api/image/2/level2.json"
+    },
+    "height": 400,
+    "width": 337
+  },
+  "sequences": [
+    {
+      "@id": "https://purl.stanford.edu/tc010rc2373#sequence-1",
+      "@type": "sc:Sequence",
+      "label": "Current order",
+      "viewingDirection": "left-to-right",
+      "canvases": [
+        {
+          "@id": "https://purl.stanford.edu/tc010rc2373/iiif/canvas/http://cocina.sul.stanford.edu/fileSet/6d94cdea-64f9-406b-b9d8-1d3df6bc2d6b",
+          "@type": "sc:Canvas",
+          "label": "Image 1",
+          "height": 7953,
+          "width": 6710,
+          "rendering": [
+            {
+              "@id": "https://stacks.stanford.edu/file/tc010rc2373/PaloAlto3.jp2",
+              "label": "Original source file (9.58 MB)",
+              "format": "image/jp2"
+            }
+          ],
+          "images": [
+            {
+              "@id": "https://purl.stanford.edu/tc010rc2373/iiif/annotation/http://cocina.sul.stanford.edu/fileSet/6d94cdea-64f9-406b-b9d8-1d3df6bc2d6b",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 7953,
+                "width": 6710,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://purl.stanford.edu/tc010rc2373/iiif/canvas/http://cocina.sul.stanford.edu/fileSet/6d94cdea-64f9-406b-b9d8-1d3df6bc2d6b"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

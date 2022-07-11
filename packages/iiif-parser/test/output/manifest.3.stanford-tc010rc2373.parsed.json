@@ -1,0 +1,272 @@
+{
+  "canvases": [
+    {
+      "height": 7953,
+      "image": {
+        "embedded": true,
+        "height": 7953,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+        "width": 6710
+      },
+      "label": {
+        "none": ["Image 1"]
+      },
+
+      "type": "canvas",
+      "uri": "https://purl.stanford.edu/tc010rc2373/iiif/canvas/http://cocina.sul.stanford.edu/fileSet/6d94cdea-64f9-406b-b9d8-1d3df6bc2d6b",
+      "width": 6710
+    }
+  ],
+  "description": {
+    "none": ["Bar scale on map given in \"Feet\"."]
+  },
+  "label": {
+    "none": ["Palo Alto Cal. [Sheet] 3"]
+  },
+  "majorVersion": 2,
+  "metadata": [
+    {
+      "label": {
+        "none": ["Available Online"]
+      },
+      "value": {
+        "none": [
+          "<a href='https://purl.stanford.edu/tc010rc2373'>https://purl.stanford.edu/tc010rc2373</a>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "none": ["Palo Alto Cal. [Sheet] 3"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Contributor"]
+      },
+      "value": {
+        "none": ["Sanborn Map Company"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type"]
+      },
+      "value": {
+        "none": ["map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type"]
+      },
+      "value": {
+        "none": ["Maps."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type"]
+      },
+      "value": {
+        "none": ["Fire insurance maps."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["1895"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["Aug. 1895"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": ["[Sanborn - Perris Map Co., Limited, 117 & 119 Broadway]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "none": ["eng"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Format"]
+      },
+      "value": {
+        "none": ["1 map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Format"]
+      },
+      "value": {
+        "none": ["electronic"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": ["Bar scale on map given in \"Feet\"."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": ["Compass rose indicates north toward upper right of sheet."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "none": [
+          "Shows streets and bulidings, some labeled according to individual rooms."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["Scale not given"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["(W 122°12'09\"--W 122°04'15\"/N 37°28'40\"--N 37°17'10\")."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject"]
+      },
+      "value": {
+        "none": ["Fire risk assessment"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["California"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["Palo Alto"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["19th century"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject"]
+      },
+      "value": {
+        "none": [
+          "Fire risk assessment--California--Palo Alto--Maps--19th century"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["California"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["19th century"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["Santa Clara County (Calif.)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["19th century"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["Palo Alto (Calif.)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Coverage"]
+      },
+      "value": {
+        "none": ["19th century"]
+      }
+    },
+    {
+      "label": {
+        "none": ["PublishDate"]
+      },
+      "value": {
+        "none": ["2021-07-14T20:19:51Z"]
+      }
+    }
+  ],
+  "type": "manifest",
+  "uri": "https://purl.stanford.edu/tc010rc2373/iiif/manifest"
+}
