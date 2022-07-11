@@ -16,7 +16,11 @@ export const Image2ProfileDescriptionSchema = z.object({
   qualities: z.string().array().optional(),
   supports: z.string().array().optional()
 })
-const profile = z.union([Image2ProfileUri, Image2ProfileDescriptionSchema])
+
+const Image2ProfileSchema = z.union([
+  Image2ProfileUri,
+  Image2ProfileDescriptionSchema
+])
 
 export const Image2Schema = z.object({
   '@id': z.string().url(),
@@ -24,9 +28,8 @@ export const Image2Schema = z.object({
   protocol: z.literal('http://iiif.io/api/image'),
   width: z.number().int(),
   height: z.number().int(),
-  profile: z
-    .array(profile),
-    // .refine((val) => Array.isArray(val) && (typeof val[0] === 'string') && ['profileUris'].includes(val[0])),
+  profile: Image2ProfileUri.or(z.array(Image2ProfileSchema)),
+  // .refine((val) => Array.isArray(val) && (typeof val[0] === 'string') && ['profileUris'].includes(val[0])),
   sizes: SizeSchema.array().optional(),
   tiles: TilesetSchema.array().optional()
 })

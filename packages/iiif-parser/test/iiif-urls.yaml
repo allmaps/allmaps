@@ -35,6 +35,11 @@
   type: image
   version: 2
 
+- filename: stanford-tc010rc2373-PaloAlto3
+  url: https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3/info.json
+  type: image
+  version: 2
+
 ### Image 3.0
 
 # # This is not a map... it's just an image of lots of beetles...
