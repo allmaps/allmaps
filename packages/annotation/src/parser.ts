@@ -9,7 +9,6 @@ import {
 import { MapSchema, PixelMaskSchema, GCPSchema } from './schemas/map.js'
 
 type Annotation = z.infer<typeof AnnotationSchema>
-type AnnotationPage = z.infer<typeof AnnotationPageSchema>
 
 type Map = z.infer<typeof MapSchema>
 type PixelMask = z.infer<typeof PixelMaskSchema>
