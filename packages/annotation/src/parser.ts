@@ -65,7 +65,7 @@ function getPixelMask(annotation: Annotation): PixelMask {
         const numberStrings = point.split(',')
 
         if (numberStrings.length === 2) {
-          return [parseInt(numberStrings[0]), parseInt(numberStrings[1])]
+          return [parseFloat(numberStrings[0]), parseFloat(numberStrings[1])]
         } else {
           throw new Error('Could not parse pixel mask')
         }
