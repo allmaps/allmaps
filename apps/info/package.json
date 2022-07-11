@@ -1,6 +1,7 @@
 {
   "name": "@allmaps/info",
   "version": "0.0.2-alpha.0",
+  "private": "true",
   "scripts": {
     "dev": "svelte-kit dev --port 3030",
     "build": "svelte-kit build",
