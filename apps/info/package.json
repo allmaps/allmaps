@@ -1,5 +1,5 @@
 {
-  "name": "@allmaps/id-ui",
+  "name": "@allmaps/info",
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev --port 3030",
