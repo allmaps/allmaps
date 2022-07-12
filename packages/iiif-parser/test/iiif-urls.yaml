@@ -40,6 +40,11 @@
   type: image
   version: 2
 
+- filename: toolforge-e8f0e820e00680e69939a97ffccf64e8
+  url: https://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif/info.json
+  type: image
+  version: 2
+
 ### Image 3.0
 
 # # This is not a map... it's just an image of lots of beetles...
@@ -128,5 +133,10 @@
 
 - filename: tu-cre-tib-aa270916.json
   url: https://raw.githubusercontent.com/digirati-co-uk/delft-static-site-generator/master/content/collections/tu-campus/tu-cre-tib-bouwtekeningen/tu-cre-tib-aa270916.json
+  type: manifest
+  version: 3
+
+- filename: jd-03909-006-4.json
+  url: https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/manifest.json
   type: manifest
   version: 3

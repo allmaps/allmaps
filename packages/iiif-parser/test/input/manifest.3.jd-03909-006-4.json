@@ -1,0 +1,104 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/manifest.json",
+  "type": "Manifest",
+  "metadata": [
+    {
+      "label": { "en": ["image_url"] },
+      "value": {
+        "en": [
+          "https://upload.wikimedia.org/wikipedia/commons/b/b7/Sanborn_Fire_Insurance_Map_from_Ann_Arbor%2C_Washtenaw_County%2C_Michigan._LOC_sanborn03909_006-4.tif"
+        ]
+      }
+    },
+    {
+      "label": { "en": ["source_url"] },
+      "value": {
+        "en": [
+          "https://commons.wikimedia.org/wiki/File:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif"
+        ]
+      }
+    },
+    { "label": { "en": ["depicts"] }, "value": { "en": [] } },
+    {
+      "label": { "en": ["updated"] },
+      "value": { "en": ["2022-07-12T13:59:05Z"] }
+    }
+  ],
+  "label": {
+    "en": [
+      "Sanborn Fire Insurance Map from Ann Arbor, Washtenaw County, Michigan. LOC sanborn03909 006-4"
+    ]
+  },
+  "summary": { "en": ["Jan 1925.   41 Sheet(s)."] },
+  "thumbnail": [
+    {
+      "id": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Sanborn_Fire_Insurance_Map_from_Ann_Arbor%2C_Washtenaw_County%2C_Michigan._LOC_sanborn03909_006-4.tif/240px-Sanborn_Fire_Insurance_Map_from_Ann_Arbor%2C_Washtenaw_County%2C_Michigan._LOC_sanborn03909_006-4.tif.jpg",
+      "type": "Image"
+    }
+  ],
+  "provider": [
+    {
+      "id": "https://commons.wikimedia.org/wiki/Main_Page",
+      "type": "Agent",
+      "label": { "en": ["Wikimedia Commons"] },
+      "homepage": [
+        {
+          "id": "https://commons.wikimedia.org/wiki/Main_Page",
+          "label": { "en": ["Wikimedia Commons"] },
+          "language": ["en"],
+          "type": "Text"
+        }
+      ],
+      "logo": [
+        {
+          "id": "https://upload.wikimedia.org/wikipedia/en/4/4a/Commons-logo.svg",
+          "type": "Image",
+          "width": 150
+        }
+      ]
+    }
+  ],
+  "rights": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "items": [
+    {
+      "type": "Canvas",
+      "id": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/canvas/p1",
+      "label": {
+        "en": [
+          "Sanborn Fire Insurance Map from Ann Arbor, Washtenaw County, Michigan. LOC sanborn03909 006-4"
+        ]
+      },
+      "width": 6510,
+      "height": 7707,
+      "items": [
+        {
+          "type": "AnnotationPage",
+          "id": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/p1/1",
+          "items": [
+            {
+              "type": "Annotation",
+              "id": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/annotation/p0001-image",
+              "motivation": "painting",
+              "target": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/canvas/p1",
+              "body": {
+                "type": "Image",
+                "id": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Sanborn_Fire_Insurance_Map_from_Ann_Arbor%2C_Washtenaw_County%2C_Michigan._LOC_sanborn03909_006-4.tif",
+                "format": "image/tiff",
+                "width": 6510,
+                "height": 7707,
+                "service": [
+                  {
+                    "id": "https://zoomviewer.toolforge.org/proxy.php?iiif=Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.jpg",
+                    "profile": "level2",
+                    "type": "ImageService2"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

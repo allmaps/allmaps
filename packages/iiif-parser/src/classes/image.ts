@@ -50,12 +50,16 @@ export class EmbeddedImage {
 
       if ('@id' in imageService) {
         this.uri = imageService['@id']
-        this.majorVersion = 2
       } else if ('id' in imageService) {
         this.uri = imageService.id
-        this.majorVersion = 3
       } else {
         throw new Error('Unsupported IIIF Image Service')
+      }
+
+      if ('type' in imageService && imageService.type === 'ImageService3') {
+        this.majorVersion = 3
+      } else {
+        this.majorVersion = 2
       }
 
       const profileProperties = getProfileProperties(imageService)
@@ -67,12 +71,16 @@ export class EmbeddedImage {
     } else {
       if ('@id' in parsedImage) {
         this.uri = parsedImage['@id']
-        this.majorVersion = 2
       } else if ('id' in parsedImage) {
         this.uri = parsedImage.id
-        this.majorVersion = 3
       } else {
         throw new Error('Unsupported IIIF Image')
+      }
+
+      if ('type' in parsedImage && parsedImage.type === 'ImageService3') {
+        this.majorVersion = 3
+      } else {
+        this.majorVersion = 2
       }
 
       if ('profile' in parsedImage) {

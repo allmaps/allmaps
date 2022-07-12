@@ -14,11 +14,11 @@ type ImageType = z.infer<typeof ImageSchema>
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 
 function parseProfileUri(uri: string): number {
-  if (uri === 'http://iiif.io/api/image/2/level0.json') {
+  if (uri.startsWith('http://iiif.io/api/image/2/level0')) {
     return 0
-  } else if (uri === 'http://iiif.io/api/image/2/level1.json') {
+  } else if (uri.startsWith('http://iiif.io/api/image/2/level1')) {
     return 1
-  } else if (uri === 'http://iiif.io/api/image/2/level2.json') {
+  } else if (uri.startsWith('http://iiif.io/api/image/2/level2')) {
     return 2
   } else {
     throw new Error('Unsupported IIIF Image Profile')
