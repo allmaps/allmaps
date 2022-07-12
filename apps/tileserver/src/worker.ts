@@ -117,13 +117,7 @@ export default {
           // Set CORS headers
           res.headers.set('Access-Control-Allow-Origin', '*')
 
-          // Set Cache TTL
-          // TODO: read TTL from config
-          const ttlSeconds = 5 * 60
-          res.headers.set('Cache-Control', `s-maxage=${ttlSeconds}`)
-
           await cache.put(url, res.clone())
-
           return res
         })
         .catch((err) => {

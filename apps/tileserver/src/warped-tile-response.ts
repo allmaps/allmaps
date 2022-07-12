@@ -151,7 +151,7 @@ export async function createWarpedTileResponse(
     status: 200,
     headers: { 'content-type': 'image/png' }
   })
-  tileResponse.headers.append('Cache-Control', 's-maxage=100')
+  // tileResponse.headers.append('Cache-Control', 's-maxage=100')
 
   return tileResponse
 }

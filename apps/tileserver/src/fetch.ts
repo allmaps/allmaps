@@ -15,13 +15,7 @@ export async function cachedFetch(
       throw new Error(`Failed to fetch ${url}`)
     }
 
-    const response = fetchResponse.clone()
-
-    // TODO: read ttl from config
-    const ttlSeconds = 5 * 60
-    response.headers.append('Cache-Control', `s-maxage=${ttlSeconds}`)
-    // TODO: do we need to do response.clone()?
-    await cache.put(url, response)
+    await cache.put(url, fetchResponse.clone())
 
     return fetchResponse
   } else {
