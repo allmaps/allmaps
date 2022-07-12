@@ -8,7 +8,7 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "main": "./dist/worker.js",
+  "main": "./dist/worker.es.js",
   "type": "module",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
   "scripts": {
     "tsc": "tsc --watch",
     "build": "vite build",
-    "dev": "npx miniflare dist/worker.js -w -m"
+    "dev": "npx miniflare dist/worker.es.js -w -m"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
@@ -28,12 +28,12 @@
     "@allmaps/render": "^1.0.0-beta.9",
     "@allmaps/transform": "^1.0.0-beta.2",
     "@cloudflare/workers-types": "^3.14.0",
-    "@tsndr/cloudflare-worker-router": "^2.0.1",
     "@turf/bbox": "^6.5.0",
     "@turf/center": "^6.5.0",
     "@types/upng-js": "^2.1.2",
     "itty-router": "^2.6.1",
     "jpeg-js": "^0.4.3",
+    "miniflare": "^2.6.0",
     "typescript": "^4.5.4",
     "upng-js": "^2.1.0",
     "vite": "^2.9.12"
