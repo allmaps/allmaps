@@ -33,7 +33,6 @@ export async function createWarpedTileResponse(
 
   const imageInfoResponse = await cachedFetch(
     cache,
-    // context,
     `${map.image.uri}/info.json`
   )
 
@@ -59,9 +58,15 @@ export async function createWarpedTileResponse(
     return parsedImage.getImageUrl({ region, size })
   })
 
-  const iiifTileResponses = await Promise.all(
-    iiifTileUrls.map((url) => cachedFetch(cache, url))
-  )
+  // TODO: find a way to do max. 6 requests at the same time,
+  // instead of one by one with this loop
+  // https://developers.cloudflare.com/workers/platform/limits/
+  let iiifTileResponses = []
+  for (let url of iiifTileUrls) {
+    const response = await cachedFetch(cache, url)
+    iiifTileResponses.push(response)
+  }
+
   const iiifTileImages: ArrayBuffer[] = await Promise.all(
     iiifTileResponses.map((response) => response.arrayBuffer())
   )
@@ -147,9 +152,6 @@ export async function createWarpedTileResponse(
     headers: { 'content-type': 'image/png' }
   })
   tileResponse.headers.append('Cache-Control', 's-maxage=100')
-
-  //   context.waitUntil(cache.put(cacheKey, tileResponse.clone()))
-  // }
 
   return tileResponse
 }

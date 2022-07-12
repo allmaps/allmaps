@@ -32,18 +32,7 @@ function xyzFromParams(params: unknown): XYZTile {
 
 const notFoundHandler = () => createErrorResponse('Not found', 404, 'Not found')
 
-router.get(
-  '/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png',
-  async (req, env, context) => {
-    return createErrorResponse(
-      'Encountered unprocessed template URL. Please read documentation.',
-      400,
-      'Bad Request'
-    )
-  }
-)
-
-router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', async (req, env, context) => {
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
   return createErrorResponse(
     'Encountered unprocessed template URL. Please read documentation.',
     400,
@@ -51,7 +40,15 @@ router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', async (req, env, context) => {
   )
 })
 
-router.get('/tiles.json', async (req, env, context) => {
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
+  return createErrorResponse(
+    'Encountered unprocessed template URL. Please read documentation.',
+    400,
+    'Bad Request'
+  )
+})
+
+router.get('/tiles.json', async (req, env) => {
   const maps = await mapsFromQuery(cache, req.query)
 
   if (maps.length !== 1) {
@@ -65,7 +62,7 @@ router.get('/tiles.json', async (req, env, context) => {
   return createJsonResponse(generateTileJson(templateUrl, map))
 })
 
-router.get('/maps/:mapId/tiles.json', async (req, env, context) => {
+router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const mapId = req.params?.mapId
   const map = await mapFromParams(cache, env, req.params)
 
@@ -75,14 +72,14 @@ router.get('/maps/:mapId/tiles.json', async (req, env, context) => {
 })
 
 // TODO: support retina tiles @2x
-router.get('/maps/:mapId/:z/:x/:y.png', async (req, env, context) => {
+router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   const map = await mapFromParams(cache, env, req.params)
   const { x, y, z } = xyzFromParams(req.params)
 
   return await createWarpedTileResponse(map, { x, y, z }, cache)
 })
 
-router.get('/:z/:x/:y.png', async (req, env, context) => {
+router.get('/:z/:x/:y.png', async (req) => {
   const maps = await mapsFromQuery(cache, req.query)
   const { x, y, z } = xyzFromParams(req.params)
 
@@ -121,10 +118,10 @@ export default {
           res.headers.set('Access-Control-Allow-Origin', '*')
 
           // Set Cache TTL
+          // TODO: read TTL from config
           const ttlSeconds = 5 * 60
           res.headers.set('Cache-Control', `s-maxage=${ttlSeconds}`)
 
-          // await cache.put(url, res)
           await cache.put(url, res.clone())
 
           return res

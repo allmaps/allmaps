@@ -2,12 +2,8 @@ import type { Cache } from './types.js'
 
 export async function cachedFetch(
   cache: Cache,
-  // context: ExecutionContext,
   url: string
 ) {
-  // const cacheUrl = new URL(request.url)
-  // const cacheKey = new Request(cacheUrl.toString(), request)
-
   console.log('Fetching:', url)
   const cacheResponse = await cache.match(url)
 
@@ -24,7 +20,7 @@ export async function cachedFetch(
     // TODO: read ttl from config
     const ttlSeconds = 5 * 60
     response.headers.append('Cache-Control', `s-maxage=${ttlSeconds}`)
-    // context.waitUntil(cache.put(url, fetchResponse.clone()))
+    // TODO: do we need to do response.clone()?
     await cache.put(url, response)
 
     return fetchResponse
