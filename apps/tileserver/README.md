@@ -2,14 +2,21 @@
 
 Tiny proxy server that turns Georeference Annotations into [XYZ map tiles](https://en.wikipedia.org/wiki/Tiled_web_map).
 
-Allmaps Tile Server runs on [Cloudflare Workers](https://workers.cloudflare.com/). Cloudflare Workers let you run tiny JavaScript programs on Cloudflare's global CDN.
-
-<!-- https://blog.cloudflare.com/workers-open-source-announcement/ -->
-<!-- https://github.com/cloudflare/miniflare -->
+Allmaps Tile Server runs on [Cloudflare Workers](https://workers.cloudflare.com/). Cloudflare Workers let you run tiny JavaScript programs on Cloudflare's global CDN. [Cloudflare is working on publishing the Workers system as open source](https://blog.cloudflare.com/workers-open-source-announcement/).
 
 For more information, see https://observablehq.com/@bertspaan/allmaps-tile-server.
 
 ![](screenshot.jpg)
+
+## Development
+
+Run locally with [Miniflare](https://miniflare.dev/):
+
+    pnpm run dev
+
+Publish to Cloudflare Workers:
+
+    wrangler publish
 
 ## API
 
