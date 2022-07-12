@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/info",
-  "version": "0.0.2-alpha.1",
+  "version": "0.0.2-alpha.2",
   "private": "true",
   "scripts": {
     "dev": "svelte-kit dev --port 3030",
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@allmaps/id": "1.0.0-beta.2",
-    "@allmaps/iiif-parser": "^1.0.0-beta.8",
+    "@allmaps/iiif-parser": "^1.0.0-beta.9",
     "node-fetch": "^3.2.3"
   },
   "devDependencies": {
