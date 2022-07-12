@@ -19,10 +19,13 @@ export async function cachedFetch(
       throw new Error(`Failed to fetch ${url}`)
     }
 
-    // TODO: ttl from config
-    // fetchResponse.headers.append('Cache-Control', 's-maxage=120')
+    const response = fetchResponse.clone()
+
+    // TODO: read ttl from config
+    const ttlSeconds = 5 * 60
+    response.headers.append('Cache-Control', `s-maxage=${ttlSeconds}`)
     // context.waitUntil(cache.put(url, fetchResponse.clone()))
-    cache.put(url, fetchResponse.clone())
+    await cache.put(url, response)
 
     return fetchResponse
   } else {

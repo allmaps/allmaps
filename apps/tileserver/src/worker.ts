@@ -2,8 +2,8 @@ import { Router } from 'itty-router'
 
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { createJsonResponse, createErrorResponse } from './json-response.js'
-import { mapFromParams, mapsFromQuery} from './map-from-request.js'
-import { generateTileJson} from './tilejson.js'
+import { mapFromParams, mapsFromQuery } from './map-from-request.js'
+import { generateTileJson } from './tilejson.js'
 
 import type { XYZTile, Caches } from './types.js'
 
@@ -60,7 +60,7 @@ router.get('/tiles.json', async (req, env, context) => {
   const map = maps[0]
 
   const url = new URL(req.url)
-  const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
+  const templateUrl: string = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
   return createJsonResponse(generateTileJson(templateUrl, map))
 })
@@ -69,9 +69,9 @@ router.get('/maps/:mapId/tiles.json', async (req, env, context) => {
   const mapId = req.params?.mapId
   const map = await mapFromParams(cache, env, req.params)
 
-  const urlTemplate =`${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
 
-  return createJsonResponse(generateTileJson(urlTemplate    , map))
+  return createJsonResponse(generateTileJson(urlTemplate, map))
 })
 
 // TODO: support retina tiles @2x
@@ -82,7 +82,7 @@ router.get('/maps/:mapId/:z/:x/:y.png', async (req, env, context) => {
   return await createWarpedTileResponse(map, { x, y, z }, cache)
 })
 
-router.get('/:z/:x/:y', async (req, env, context) => {
+router.get('/:z/:x/:y.png', async (req, env, context) => {
   const maps = await mapsFromQuery(cache, req.query)
   const { x, y, z } = xyzFromParams(req.params)
 
@@ -103,14 +103,36 @@ router.get('/', () => {
 router.all('*', notFoundHandler)
 
 export default {
-  fetch: (request: Request, ...extra: any) =>
-    router
-      .handle(request, ...extra)
-      .then((response) => {
-        response.headers.set('Access-Control-Allow-Origin', '*')
-        return response
-      })
-      .catch((err) => {
-        return createErrorResponse(err.issues || err.message)
-      })
+  fetch: async (req: Request, ...extra: any) => {
+    const url = req.url
+
+    const cacheResponse = await cache.match(req.url)
+
+    if (cacheResponse) {
+      console.log('Found in cache:', req.url)
+      return cacheResponse
+    } else {
+      console.log('Not found in cache:', req.url)
+
+      return router
+        .handle(req, ...extra)
+        .then(async (res) => {
+          // Set CORS headers
+          res.headers.set('Access-Control-Allow-Origin', '*')
+
+          // Set Cache TTL
+          const ttlSeconds = 5 * 60
+          res.headers.set('Cache-Control', `s-maxage=${ttlSeconds}`)
+
+          // await cache.put(url, res)
+          await cache.put(url, res.clone())
+
+          return res
+        })
+        .catch((err) => {
+          console.error(err)
+          return createErrorResponse(err.issues || err.message)
+        })
+    }
+  }
 }
