@@ -23,10 +23,10 @@ importers:
 
   apps/tileserver:
     specifiers:
-      '@allmaps/annotation': ^1.0.0-beta.5
-      '@allmaps/id': ^1.0.0-beta.5
-      '@allmaps/iiif-parser': ^1.0.0-beta.2
-      '@allmaps/render': ^1.0.0-beta.3
+      '@allmaps/annotation': ^1.0.0-beta.6
+      '@allmaps/id': ^1.0.0-beta.7
+      '@allmaps/iiif-parser': ^1.0.0-beta.8
+      '@allmaps/render': ^1.0.0-beta.9
       '@allmaps/transform': ^1.0.0-beta.2
       '@cloudflare/workers-types': ^3.14.0
       '@tsndr/cloudflare-worker-router': ^2.0.1
@@ -35,6 +35,7 @@ importers:
       '@types/upng-js': ^2.1.2
       itty-router: ^2.6.1
       jpeg-js: ^0.4.3
+      miniflare: ^2.6.0
       typescript: ^4.5.4
       upng-js: ^2.1.0
       vite: ^2.9.12
@@ -51,6 +52,7 @@ importers:
       '@types/upng-js': 2.1.2
       itty-router: 2.6.1
       jpeg-js: 0.4.4
+      miniflare: 2.6.0
       typescript: 4.7.3
       upng-js: 2.1.0
       vite: 2.9.12
@@ -485,6 +487,10 @@ packages:
   /@hutson/parse-repository-url/3.0.2:
     resolution: {integrity: sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==}
     engines: {node: '>=6.9.0'}
+    dev: true
+
+  /@iarna/toml/2.2.5:
+    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
     dev: true
 
   /@isaacs/string-locale-compare/1.1.0:
@@ -1262,6 +1268,159 @@ packages:
     resolution: {integrity: sha512-HPnRdYO0WjFjRTSwO3frz1wKaU649OBFPX3Zo/2WZvuRi6zMiRGui8SnPQiQABgqCf8YikDe5t3HViTVw1WUzA==}
     dev: false
 
+  /@miniflare/cache/2.6.0:
+    resolution: {integrity: sha512-4oh8MgpquoxaslI7Z8sMzmEZR0Dc+L3aEh69o9d8ZCs4nUdOENnfKlY50O5nEnL7nhhyAljkMBaXD2wAH2DLeQ==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      http-cache-semantics: 4.1.0
+      undici: 5.5.1
+    dev: true
+
+  /@miniflare/cli-parser/2.6.0:
+    resolution: {integrity: sha512-dJDoIPAUqWhzvBHHyqyhobdzDedBYRWZ4yItBi9m4MTU/EneLJ5jryB340SwUnmtBMZxUh/LWdAuUEkKpdVNyA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+      kleur: 4.1.4
+    dev: true
+
+  /@miniflare/core/2.6.0:
+    resolution: {integrity: sha512-CmofhIRot++GI7NHPMwzNb65+0hWLN186L91BrH/doPVHnT/itmEfzYQpL9bFLD0c/i14dfv+IUNetDdGEBIrw==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@iarna/toml': 2.2.5
+      '@miniflare/shared': 2.6.0
+      '@miniflare/watcher': 2.6.0
+      busboy: 1.6.0
+      dotenv: 10.0.0
+      kleur: 4.1.4
+      set-cookie-parser: 2.5.0
+      undici: 5.5.1
+      urlpattern-polyfill: 4.0.3
+    dev: true
+
+  /@miniflare/durable-objects/2.6.0:
+    resolution: {integrity: sha512-uzWoGFtkIIh3m3HAzqd5f86nOSC0xFli6dq2q7ilE3UjgouOcLqObxJyE/IzvSwsj4DUWFv6//YDfHihK2fGAA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      '@miniflare/storage-memory': 2.6.0
+      undici: 5.5.1
+    dev: true
+
+  /@miniflare/html-rewriter/2.6.0:
+    resolution: {integrity: sha512-+JqFlIDLzstb/Spj+j/kI6uHzolrqjsMks3Tf24Q4YFo9YYdZguqUFcDz2yr79ZTP/SKXaZH+AYqosnJps4dHQ==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      html-rewriter-wasm: 0.4.1
+      undici: 5.5.1
+    dev: true
+
+  /@miniflare/http-server/2.6.0:
+    resolution: {integrity: sha512-FhcAVIpipMEzMCsJBc/b0JhNEJ66GPX60vA2NcqjGKHYbwoPCPlwCFQq2giPzW/R95ugrEjPfo4/5Q4UbnpoGA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      '@miniflare/web-sockets': 2.6.0
+      kleur: 4.1.4
+      selfsigned: 2.0.1
+      undici: 5.5.1
+      ws: 8.8.0
+      youch: 2.2.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: true
+
+  /@miniflare/kv/2.6.0:
+    resolution: {integrity: sha512-7Q+Q0Wwinsz85qpKLlBeXSCLweiVowpMJ5AmQpmELnTya59HQ24cOUHxPd64hXFhdYXVIxOmk6lQaZ21JhdHGQ==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+    dev: true
+
+  /@miniflare/r2/2.6.0:
+    resolution: {integrity: sha512-Ymbqu17ajtuk9b11txF2h1Ewqqlu3XCCpAwAgCQa6AK1yRidQECCPq9w9oXZxE1p5aaSuLTOUbgSdtveFCsLxQ==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+      undici: 5.5.1
+    dev: true
+
+  /@miniflare/runner-vm/2.6.0:
+    resolution: {integrity: sha512-ZxsiVMMUcjb01LwrO2t50YbU5PT5s3k7DrmR5185R/n04K5BikqZz8eQf8lKlQQYem0BROqmmQgurZGw0a2HUw==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+    dev: true
+
+  /@miniflare/scheduler/2.6.0:
+    resolution: {integrity: sha512-BM+RDF+8twkTCOb7Oz0NIs5phzAVJ/Gx7tFZR23fGsZjWRnE3TBeqfzaNutU9pcoWDZtBQqEJMeTeb0KZTo75Q==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      cron-schedule: 3.0.6
+    dev: true
+
+  /@miniflare/shared/2.6.0:
+    resolution: {integrity: sha512-/7k4C37GF0INu99LNFmFhHYL6U9/oRY/nWDa5sr6+lPEKKm2rkmfvDIA+YNAj7Ql61ZWMgEMj0S3NhV0rWkj7Q==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      ignore: 5.2.0
+      kleur: 4.1.4
+    dev: true
+
+  /@miniflare/sites/2.6.0:
+    resolution: {integrity: sha512-XfWhpREC638LOGNmuHaPn1MAz1sh2mz+VdMsjRCzUo6NwPl4IcUhnorJR62Xr0qmI/RqVMTZbvzrChXio4Bi4A==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/kv': 2.6.0
+      '@miniflare/shared': 2.6.0
+      '@miniflare/storage-file': 2.6.0
+    dev: true
+
+  /@miniflare/storage-file/2.6.0:
+    resolution: {integrity: sha512-xprDVJClQ2X1vXVPM16WQZz3rS+6fNuCYC8bfEFHABDByQoUNDpk8q+m1IpTaFXYivYxRhE+xr7eK2QQP068tA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+      '@miniflare/storage-memory': 2.6.0
+    dev: true
+
+  /@miniflare/storage-memory/2.6.0:
+    resolution: {integrity: sha512-0EwELTG2r6IC4AMlQv0YXRZdw9g/lCydceuGKeFkWAVb55pY+yMBxkJO9VV7QOrEx8MLsR8tsfl5SBK3AkfLtA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+    dev: true
+
+  /@miniflare/watcher/2.6.0:
+    resolution: {integrity: sha512-mttfhNDmEIFo2rWF73JeWj1TLN+3cQC1TFhbtLApz9bXilLywArXMYqDJGA8PUnJCFM/8k2FDjaFNiPy6ggIJw==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/shared': 2.6.0
+    dev: true
+
+  /@miniflare/web-sockets/2.6.0:
+    resolution: {integrity: sha512-ePbcuP9LrStVTllZzqx2oNVoOpceyU3jJF3nGDMNW5+bqB+BdeTggSF8rhER7omcSCswCMY2Do6VelIcAXHkXA==}
+    engines: {node: '>=16.7'}
+    dependencies:
+      '@miniflare/core': 2.6.0
+      '@miniflare/shared': 2.6.0
+      undici: 5.5.1
+      ws: 8.8.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: true
+
   /@modyfi/vite-plugin-yaml/1.0.2:
     resolution: {integrity: sha512-lV7WvSHwZ2OmjILPxABOurjb5v0YXpCqjs+YGzdvHqJB1oQ+BD27hpjWjde7+u8eC6Ppnrl9l10e5NQaKXk0Bg==}
     peerDependencies:
@@ -1781,6 +1940,10 @@ packages:
     resolution: {integrity: sha512-BPdoIt1lfJ6B7rw35ncdwBZrAssjcwzI5LByIrYs+tpXlj/CAkuVdRsgZDdP4lq5EjyWzwxZCqAoFyHKFwp32g==}
     dependencies:
       '@types/node': 17.0.42
+    dev: true
+
+  /@types/stack-trace/0.0.29:
+    resolution: {integrity: sha512-TgfOX+mGY/NyNxJLIbDWrO9DjGoVSW9+aB8H2yy1fy32jsvxijhmyJI9fDFgvz3YP4lvJaq9DzdR/M1bOgVc9g==}
     dev: true
 
   /@types/unist/2.0.6:
@@ -2405,6 +2568,13 @@ packages:
       semver: 7.3.7
     dev: true
 
+  /busboy/1.6.0:
+    resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
+    engines: {node: '>=10.16.0'}
+    dependencies:
+      streamsearch: 1.1.0
+    dev: true
+
   /byte-size/7.0.1:
     resolution: {integrity: sha512-crQdqyCwhokxwV1UyDzLZanhkugAgft7vt0qbbdt60C6Zf3CAiGmtUCylbtYwrU6loOUw3euGrNtW1J651ot1A==}
     engines: {node: '>=10'}
@@ -3013,6 +3183,11 @@ packages:
       safe-buffer: 5.1.2
     dev: true
 
+  /cookie/0.4.2:
+    resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
+    engines: {node: '>= 0.6'}
+    dev: true
+
   /copy-descriptor/0.1.1:
     resolution: {integrity: sha512-XgZ0pFcakEUlbwQEVNg3+QAis1FyTL3Qel9FYy8pSkQqoG3PNoT0bOCQtOXcOkur21r2Eq2kI+IE+gsmAEVlYw==}
     engines: {node: '>=0.10.0'}
@@ -3031,6 +3206,10 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+    dev: true
+
+  /cron-schedule/3.0.6:
+    resolution: {integrity: sha512-izfGgKyzzIyLaeb1EtZ3KbglkS6AKp9cv7LxmiyoOu+fXfol1tQDC0Cof0enVZGNtudTHW+3lfuW9ZkLQss4Wg==}
     dev: true
 
   /cross-spawn/7.0.3:
@@ -4805,6 +4984,10 @@ packages:
       lru-cache: 7.10.1
     dev: true
 
+  /html-rewriter-wasm/0.4.1:
+    resolution: {integrity: sha512-lNovG8CMCCmcVB1Q7xggMSf7tqPCijZXaH4gL6iE8BFghdQCbaY5Met9i1x2Ex8m/cZHDUtXK9H6/znKamRP8Q==}
+    dev: true
+
   /html-void-elements/1.0.5:
     resolution: {integrity: sha512-uE/TxKuyNIcx44cIWnjr/rfIATDH7ZaOMmstu0CwhFG1Dunhlp4OC6/NMbhiwoq5BpW0ubi303qnEk/PZj614w==}
     dev: true
@@ -5996,6 +6179,46 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /miniflare/2.6.0:
+    resolution: {integrity: sha512-KDAQZV2aDZ044X1ihlCIa6DPdq1w3fUJFW4xZ+r+DPUxj9t1AuehjR9Fc6zCmZQrk12gLXDSZSyNft1ozm1X7Q==}
+    engines: {node: '>=16.7'}
+    hasBin: true
+    peerDependencies:
+      '@miniflare/storage-redis': 2.6.0
+      cron-schedule: ^3.0.4
+      ioredis: ^4.27.9
+    peerDependenciesMeta:
+      '@miniflare/storage-redis':
+        optional: true
+      cron-schedule:
+        optional: true
+      ioredis:
+        optional: true
+    dependencies:
+      '@miniflare/cache': 2.6.0
+      '@miniflare/cli-parser': 2.6.0
+      '@miniflare/core': 2.6.0
+      '@miniflare/durable-objects': 2.6.0
+      '@miniflare/html-rewriter': 2.6.0
+      '@miniflare/http-server': 2.6.0
+      '@miniflare/kv': 2.6.0
+      '@miniflare/r2': 2.6.0
+      '@miniflare/runner-vm': 2.6.0
+      '@miniflare/scheduler': 2.6.0
+      '@miniflare/shared': 2.6.0
+      '@miniflare/sites': 2.6.0
+      '@miniflare/storage-file': 2.6.0
+      '@miniflare/storage-memory': 2.6.0
+      '@miniflare/web-sockets': 2.6.0
+      kleur: 4.1.4
+      semiver: 1.1.0
+      source-map-support: 0.5.21
+      undici: 5.5.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: true
+
   /minimatch/3.0.4:
     resolution: {integrity: sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==}
     dependencies:
@@ -6225,6 +6448,11 @@ packages:
       minimatch: 3.1.2
     dev: true
 
+  /mustache/4.2.0:
+    resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
+    hasBin: true
+    dev: true
+
   /mute-stream/0.0.8:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
     dev: true
@@ -6301,6 +6529,11 @@ packages:
       data-uri-to-buffer: 4.0.0
       fetch-blob: 3.1.5
       formdata-polyfill: 4.0.10
+    dev: true
+
+  /node-forge/1.3.1:
+    resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
+    engines: {node: '>= 6.13.0'}
     dev: true
 
   /node-gyp-build/4.4.0:
@@ -7652,6 +7885,18 @@ packages:
       rimraf: 2.7.1
     dev: true
 
+  /selfsigned/2.0.1:
+    resolution: {integrity: sha512-LmME957M1zOsUhG+67rAjKfiWFox3SBxE/yymatMZsAx+oMrJ0YQ8AToOnyCm7xbeg2ep37IHLxdu0o2MavQOQ==}
+    engines: {node: '>=10'}
+    dependencies:
+      node-forge: 1.3.1
+    dev: true
+
+  /semiver/1.1.0:
+    resolution: {integrity: sha512-QNI2ChmuioGC1/xjyYwyZYADILWyW6AmS1UH6gDj/SFUUUS4MBAWs/7mxnkRPc/F4iHezDP+O8t0dO8WHiEOdg==}
+    engines: {node: '>=6'}
+    dev: true
+
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
     hasBin: true
@@ -7686,6 +7931,10 @@ packages:
 
   /set-blocking/2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
+    dev: true
+
+  /set-cookie-parser/2.5.0:
+    resolution: {integrity: sha512-cHMAtSXilfyBePduZEBVPTCftTQWz6ehWJD5YNUg4mqvRosrrjKbo4WS8JkB0/RxonMoohHm7cOGH60mDkRQ9w==}
     dev: true
 
   /set-value/2.0.1:
@@ -7879,6 +8128,13 @@ packages:
       urix: 0.1.0
     dev: true
 
+  /source-map-support/0.5.21:
+    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
+    dependencies:
+      buffer-from: 1.1.2
+      source-map: 0.6.1
+    dev: true
+
   /source-map-url/0.4.1:
     resolution: {integrity: sha512-cPiFOTLUKvJFIg4SKVScy4ilPPW6rFgMgfuZJPNoDuMs3nC1HbMUycBoJw77xFIp6z1UJQJOfx6C9GMH80DiTw==}
     deprecated: See https://github.com/lydell/source-map-url#deprecated
@@ -7966,6 +8222,10 @@ packages:
       minipass: 3.1.6
     dev: true
 
+  /stack-trace/0.0.10:
+    resolution: {integrity: sha512-KGzahc7puUKkzyMt+IqAep+TVNbKP+k2Lmwhub39m1AsTSkaDutx56aDCo+HLDzf/D26BIHTJWNiTG1KAJiQCg==}
+    dev: true
+
   /standard-version/9.5.0:
     resolution: {integrity: sha512-3zWJ/mmZQsOaO+fOlsa0+QK90pwhNd042qEcw6hKFNoLFs7peGyvPffpEBbK/DSGPbyOvli0mUIFv5A4qTjh2Q==}
     engines: {node: '>=10'}
@@ -8011,6 +8271,11 @@ packages:
 
   /stream-shift/1.0.1:
     resolution: {integrity: sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==}
+    dev: true
+
+  /streamsearch/1.1.0:
+    resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
+    engines: {node: '>=10.0.0'}
     dev: true
 
   /strict-uri-encode/2.0.0:
@@ -8542,6 +8807,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /undici/5.5.1:
+    resolution: {integrity: sha512-MEvryPLf18HvlCbLSzCW0U00IMftKGI5udnjrQbC5D4P0Hodwffhv+iGfWuJwg16Y/TK11ZFK8i+BPVW2z/eAw==}
+    engines: {node: '>=12.18'}
+    dev: true
+
   /unified/9.2.2:
     resolution: {integrity: sha512-Sg7j110mtefBD+qunSLO1lqOEKdrwBFBrR6Qd8f4uwkhWNlbkaqwHse6e7QvD3AP/MNoJdEDLaf8OxYyoWgorQ==}
     dependencies:
@@ -8656,6 +8926,10 @@ packages:
   /urix/0.1.0:
     resolution: {integrity: sha512-Am1ousAhSLBeB9cG/7k7r2R0zj50uDRlZHPGbazid5s9rlF1F/QKYObEKSIunSjIOkJZqwRRLpvewjEkM7pSqg==}
     deprecated: Please see https://github.com/lydell/urix#deprecated
+    dev: true
+
+  /urlpattern-polyfill/4.0.3:
+    resolution: {integrity: sha512-DOE84vZT2fEcl9gqCUTcnAw5ZY5Id55ikUcziSUntuEFL3pRvavg5kwDmTEUJkeCHInTlV/HexFomgYnzO5kdQ==}
     dev: true
 
   /use/3.1.1:
@@ -8996,6 +9270,19 @@ packages:
       write-json-file: 3.2.0
     dev: true
 
+  /ws/8.8.0:
+    resolution: {integrity: sha512-JDAgSYQ1ksuwqfChJusw1LSJ8BizJ2e/vVu5Lxjq3YvNJNlROv1ui4i+c/kUUrPheBvQl4c5UbERhTwKa6QBJQ==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: ^5.0.2
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: true
+
   /xml-utils/1.0.3:
     resolution: {integrity: sha512-8nKSzSUwJZw7XYcUrY6YjlicZs+lpxV2QzR53btjgq/eNqk1WK3PId5Zy3M2AHkJdpcgC+9/VJspTlH1aNZiuQ==}
     dev: false
@@ -9102,6 +9389,15 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  /youch/2.2.2:
+    resolution: {integrity: sha512-/FaCeG3GkuJwaMR34GHVg0l8jCbafZLHiFowSjqLlqhC6OMyf2tPJBu8UirF7/NI9X/R5ai4QfEKUCOxMAGxZQ==}
+    dependencies:
+      '@types/stack-trace': 0.0.29
+      cookie: 0.4.2
+      mustache: 4.2.0
+      stack-trace: 0.0.10
     dev: true
 
   /zod/3.17.3:
