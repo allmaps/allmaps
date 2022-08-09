@@ -1,22 +1,18 @@
 import Layer from 'ol/layer/Layer.js'
 import type { FrameState } from 'ol/PluggableMap.js'
 
-import { throttle } from 'lodash'
+import { throttle } from 'lodash-es'
 
+import { OLCustomEvent } from './OLCustomEvent.js'
 import { WarpedMapEventTypes } from './WarpedMapEventType.js'
 
+// @ts-ignore
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
+// @ts-ignore
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
-
-// // @ts-ignore
-// import vertexShaderSource from './shaders/vertex-shader.glsl'
-// // @ts-ignore
-// import fragmentShaderSource from './shaders/fragment-shader.glsl'
 
 import type { WarpedMapSource } from './WarpedMapSource.js'
 import { WarpedMapWebGLRenderer } from './WarpedMapWebGLRenderer.js'
-
-import type { WarpedMapSourceEvent } from './WarpedMapSource.js'
 
 type Size = [number, number]
 type Extent = [number, number, number, number]
@@ -34,7 +30,8 @@ export class WarpedMapLayer extends Layer {
   backgroundColorThreshold = 0
 
   uboBuffers: Map<string, WebGLBuffer> = new Map()
-  uboVariableInfo: Map<string, Map<string, { index: number; offset: number }>> = new Map()
+  uboVariableInfo: Map<string, Map<string, { index: number; offset: number }>> =
+    new Map()
 
   warpedMapWebGLRenderers: Map<string, WarpedMapWebGLRenderer> = new Map()
   mapIdsInExtent: Set<string> = new Set()
@@ -48,16 +45,31 @@ export class WarpedMapLayer extends Layer {
 
     this.source = this.getSource() as WarpedMapSource
     if (this.source) {
-      // @ts-ignore
-      this.source.on(WarpedMapEventTypes.WARPEDMAPADDED, this.warpedMapAdded.bind(this))
-      // @ts-ignore
-      this.source.on(WarpedMapEventTypes.WARPEDMAPENTEREXTENT, this.warpedMapEnterExtent.bind(this))
-      // @ts-ignore
-      this.source.on(WarpedMapEventTypes.WARPEDMAPLEAVEEXTENT, this.warpedMapLeaveExtent.bind(this))
+      this.source.on(
+        // @ts-ignore
+        WarpedMapEventTypes.WARPEDMAPADDED,
+        this.warpedMapAdded.bind(this)
+      )
+
+      this.source.on(
+        // @ts-ignore
+        WarpedMapEventTypes.WARPEDMAPENTEREXTENT,
+        this.warpedMapEnterExtent.bind(this)
+      )
+
+      this.source.on(
+        // @ts-ignore
+        WarpedMapEventTypes.WARPEDMAPLEAVEEXTENT,
+        this.warpedMapLeaveExtent.bind(this)
+      )
       // @ts-ignore
       this.source.on(WarpedMapEventTypes.TILENEEDED, this.tileNeeded.bind(this))
-      // @ts-ignore
-      this.source.on(WarpedMapEventTypes.TILEUNNEEDED, this.tileUnneeded.bind(this))
+
+      this.source.on(
+        // @ts-ignore
+        WarpedMapEventTypes.TILEUNNEEDED,
+        this.tileUnneeded.bind(this)
+      )
 
       this.throttledUpdateNeededTiles = throttle(
         this.source.updateNeededTiles.bind(this.source),
@@ -95,8 +107,16 @@ export class WarpedMapLayer extends Layer {
     this.canvas = canvas
     this.gl = gl
 
-    const vertexShader = this.createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
-    const fragmentShader = this.createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
+    const vertexShader = this.createShader(
+      gl,
+      gl.VERTEX_SHADER,
+      vertexShaderSource
+    )
+    const fragmentShader = this.createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      fragmentShaderSource
+    )
 
     this.program = this.createProgram(gl, vertexShader, fragmentShader)
 
@@ -120,7 +140,12 @@ export class WarpedMapLayer extends Layer {
     // TODO: add data to buffer directly?
   }
 
-  createUniformBufferObject(uniformBlockName: string, uboVariableNames: string[]) {
+  createUniformBufferObject(
+    uniformBlockName: string,
+    uboVariableNames: string[]
+  ) {
+    // TODO: are all unneeded webgl objects properly deleted?
+
     // Adapted from
     // https://gist.github.com/jialiang/2880d4cc3364df117320e8cb324c2880
 
@@ -165,14 +190,21 @@ export class WarpedMapLayer extends Layer {
     gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, uboBuffer)
 
     // Get the respective index of the member variables inside our Uniform Block
-    const uboVariableIndices: number[] | null = gl.getUniformIndices(program, uboVariableNames) as number[] | null
+    const uboVariableIndices: number[] | null = gl.getUniformIndices(
+      program,
+      uboVariableNames
+    ) as number[] | null
 
     if (!uboVariableIndices) {
       throw new Error('Unable to get uniform indices')
     }
 
     // Get the offset of the member variables inside our Uniform Block in bytes
-    const uboVariableOffsets = gl.getActiveUniforms(program, uboVariableIndices, gl.UNIFORM_OFFSET)
+    const uboVariableOffsets = gl.getActiveUniforms(
+      program,
+      uboVariableIndices,
+      gl.UNIFORM_OFFSET
+    )
 
     // Create an object to map each variable name to its respective index and offset
     const uboVariableInfo = new Map()
@@ -192,58 +224,66 @@ export class WarpedMapLayer extends Layer {
     this.uboBuffers.set(uniformBlockName, uboBuffer)
   }
 
-  warpedMapAdded(event: WarpedMapSourceEvent) {
-    const { mapId, image, transformer, triangles } = event.data
+  warpedMapAdded(event: OLCustomEvent) {
+    const { mapId, image, transformer, triangles } = event.detail
 
     const gl = this.gl
     const program = this.program
 
     if (gl && program) {
-      const warpedMapWebGLRenderer = new WarpedMapWebGLRenderer(gl, program, mapId, {
-        image,
-        transformer,
-        triangles
-      })
+      const warpedMapWebGLRenderer = new WarpedMapWebGLRenderer(
+        gl,
+        program,
+        mapId,
+        {
+          image,
+          transformer,
+          triangles
+        }
+      )
       this.warpedMapWebGLRenderers.set(mapId, warpedMapWebGLRenderer)
 
-      // @ts-ignore
-      warpedMapWebGLRenderer.on(WarpedMapEventTypes.TILELOADED, this.tileLoaded.bind(this))
+      warpedMapWebGLRenderer.on(
+        // @ts-ignore
+        WarpedMapEventTypes.TILELOADED,
+        this.tileLoaded.bind(this)
+      )
     }
 
     this.changed()
   }
 
-  warpedMapEnterExtent(event: WarpedMapSourceEvent) {
-    const { mapId } = event.data
+  warpedMapEnterExtent(event: OLCustomEvent) {
+    const { mapId } = event.detail
     this.mapIdsInExtent.add(mapId)
 
     // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
     // TODO: set visible
   }
 
-  warpedMapLeaveExtent(event: WarpedMapSourceEvent) {
-    const { mapId } = event.data
+  warpedMapLeaveExtent(event: OLCustomEvent) {
+    const { mapId } = event.detail
     this.mapIdsInExtent.delete(mapId)
 
     // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
     // TODO: set invisible
   }
 
-  tileNeeded(event: WarpedMapSourceEvent) {
-    const { mapId, url, tile, imageRequest } = event.data
+  tileNeeded(event: OLCustomEvent) {
+    const { mapId, url, tile, imageRequest } = event.detail
 
     const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
     warpedMapWebGLRenderer?.addTileNeeded(url, tile, imageRequest)
   }
 
-  tileUnneeded(event: WarpedMapSourceEvent) {
-    const { mapId, url } = event.data
+  tileUnneeded(event: OLCustomEvent) {
+    const { mapId, url } = event.detail
 
     const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
     warpedMapWebGLRenderer?.deleteTileNeeded(url)
   }
 
-  tileLoaded(event: WarpedMapSourceEvent) {
+  tileLoaded(event: OLCustomEvent) {
     this.changed()
   }
 
@@ -252,6 +292,8 @@ export class WarpedMapLayer extends Layer {
     type: WebGLRenderingContextBase['VERTEX_SHADER'],
     source: string
   ): WebGLShader {
+    // TODO: are all unneeded webgl objects properly deleted?
+
     const shader = gl.createShader(type)
 
     if (shader) {
@@ -275,6 +317,8 @@ export class WarpedMapLayer extends Layer {
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
   ): WebGLProgram {
+    // TODO: are all unneeded webgl objects properly deleted?
+
     const program = gl.createProgram()
 
     if (program) {
@@ -346,7 +390,10 @@ export class WarpedMapLayer extends Layer {
       : null
   }
 
-  hideBackgroundColor(hexBackgroundColor?: string, backgroundColorThreshold?: number) {
+  hideBackgroundColor(
+    hexBackgroundColor?: string,
+    backgroundColorThreshold?: number
+  ) {
     if (hexBackgroundColor) {
       const backgroundColor = this.hexToRgb(hexBackgroundColor)
       if (backgroundColor) {
@@ -361,12 +408,24 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  destroy() {
-    // TODO: Remove WebGL context, all textures etc.
+  disposeInternal() {
+    for (let warpedMapWebGLRenderer of this.warpedMapWebGLRenderers.values()) {
+      warpedMapWebGLRenderer.dispose()
+    }
+
+    if (this.gl) {
+      for (let uboBuffer of this.uboBuffers.values()) {
+        this.gl.deleteBuffer(uboBuffer)
+      }
+
+      this.gl.deleteProgram(this.program)
+      this.gl.getExtension('WEBGL_lose_context')?.loseContext()
+    }
+
+    super.disposeInternal()
   }
 
   render(frameState: FrameState, target: HTMLElement): HTMLElement {
-
     if (this.canvas) {
       this.resizeCanvas(this.canvas, this.canvasSize)
     }
@@ -404,11 +463,20 @@ export class WarpedMapLayer extends Layer {
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.getOpacity())
 
-      const backgroundColorLocation = gl.getUniformLocation(this.program, 'u_backgroundColor')
+      const backgroundColorLocation = gl.getUniformLocation(
+        this.program,
+        'u_backgroundColor'
+      )
       gl.uniform3fv(backgroundColorLocation, this.backgroundColor)
 
-      const backgroundColorThresholdLocation = gl.getUniformLocation(this.program, 'u_backgroundColorThreshold')
-      gl.uniform1f(backgroundColorThresholdLocation, this.backgroundColorThreshold)
+      const backgroundColorThresholdLocation = gl.getUniformLocation(
+        this.program,
+        'u_backgroundColorThreshold'
+      )
+      gl.uniform1f(
+        backgroundColorThresholdLocation,
+        this.backgroundColorThreshold
+      )
 
       // const settingsUboBuffer = this.uboBuffers.get('Settings')
       // const settingsUboVariableInfo = this.uboVariableInfo.get('Settings')
@@ -425,7 +493,10 @@ export class WarpedMapLayer extends Layer {
       // gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, settingsUboBuffer)
       // gl.bindBuffer(gl.UNIFORM_BUFFER, null)
 
-      const viewportSizeLocation = gl.getUniformLocation(this.program, 'u_viewportSize')
+      const viewportSizeLocation = gl.getUniformLocation(
+        this.program,
+        'u_viewportSize'
+      )
       gl.uniform2f(
         viewportSizeLocation,
         Math.round(gl.canvas.width / window.devicePixelRatio),
@@ -441,9 +512,15 @@ export class WarpedMapLayer extends Layer {
         this.program,
         'u_coordinateToPixelTransform'
       )
-      gl.uniform1fv(coordinateToPixelTransformLocation, frameState.coordinateToPixelTransform)
+      gl.uniform1fv(
+        coordinateToPixelTransformLocation,
+        frameState.coordinateToPixelTransform
+      )
 
-      const devicePixelRatioLocation = gl.getUniformLocation(this.program, 'u_devicePixelRatio')
+      const devicePixelRatioLocation = gl.getUniformLocation(
+        this.program,
+        'u_devicePixelRatio'
+      )
       gl.uniform1f(devicePixelRatioLocation, window.devicePixelRatio)
 
       const pixelToCoordinateTransformLocation = gl.getUniformLocation(
@@ -451,7 +528,10 @@ export class WarpedMapLayer extends Layer {
         'u_pixelToCoordinateTransform'
       )
 
-      gl.uniform1fv(pixelToCoordinateTransformLocation, frameState.pixelToCoordinateTransform)
+      gl.uniform1fv(
+        pixelToCoordinateTransformLocation,
+        frameState.pixelToCoordinateTransform
+      )
 
       for (let mapId of this.mapIdsInExtent) {
         const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
@@ -468,7 +548,10 @@ export class WarpedMapLayer extends Layer {
         const y2MeanLocation = gl.getUniformLocation(this.program, 'u_y2Mean')
         gl.uniform1f(y2MeanLocation, transformer.y2Mean)
 
-        const adfFromGeoXLocation = gl.getUniformLocation(this.program, 'u_adfFromGeoX')
+        const adfFromGeoXLocation = gl.getUniformLocation(
+          this.program,
+          'u_adfFromGeoX'
+        )
         gl.uniform3f(
           adfFromGeoXLocation,
           transformer.adfFromGeoX[0],
@@ -476,7 +559,10 @@ export class WarpedMapLayer extends Layer {
           transformer.adfFromGeoX[2]
         )
 
-        const adfFromGeoYLocation = gl.getUniformLocation(this.program, 'u_adfFromGeoY')
+        const adfFromGeoYLocation = gl.getUniformLocation(
+          this.program,
+          'u_adfFromGeoY'
+        )
         gl.uniform3f(
           adfFromGeoYLocation,
           transformer.adfFromGeoY[0],
@@ -484,7 +570,10 @@ export class WarpedMapLayer extends Layer {
           transformer.adfFromGeoY[2]
         )
 
-        const u_tilesTextureLocation = gl.getUniformLocation(this.program, 'u_tilesTexture')
+        const u_tilesTextureLocation = gl.getUniformLocation(
+          this.program,
+          'u_tilesTexture'
+        )
         gl.uniform1i(u_tilesTextureLocation, 0)
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, warpedMapWebGLRenderer.tilesTexture)
@@ -495,7 +584,10 @@ export class WarpedMapLayer extends Layer {
         )
         gl.uniform1i(u_tilePositionsTextureLocation, 1)
         gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, warpedMapWebGLRenderer.tilePositionsTexture)
+        gl.bindTexture(
+          gl.TEXTURE_2D,
+          warpedMapWebGLRenderer.tilePositionsTexture
+        )
 
         const u_imagePositionsTextureLocation = gl.getUniformLocation(
           this.program,
@@ -503,7 +595,10 @@ export class WarpedMapLayer extends Layer {
         )
         gl.uniform1i(u_imagePositionsTextureLocation, 2)
         gl.activeTexture(gl.TEXTURE2)
-        gl.bindTexture(gl.TEXTURE_2D, warpedMapWebGLRenderer.imagePositionsTexture)
+        gl.bindTexture(
+          gl.TEXTURE_2D,
+          warpedMapWebGLRenderer.imagePositionsTexture
+        )
 
         const u_scaleFactorsTextureLocation = gl.getUniformLocation(
           this.program,
@@ -511,7 +606,10 @@ export class WarpedMapLayer extends Layer {
         )
         gl.uniform1i(u_scaleFactorsTextureLocation, 3)
         gl.activeTexture(gl.TEXTURE3)
-        gl.bindTexture(gl.TEXTURE_2D, warpedMapWebGLRenderer.scaleFactorsTexture)
+        gl.bindTexture(
+          gl.TEXTURE_2D,
+          warpedMapWebGLRenderer.scaleFactorsTexture
+        )
 
         const vao = warpedMapWebGLRenderer.vao
         const triangles = warpedMapWebGLRenderer.triangles

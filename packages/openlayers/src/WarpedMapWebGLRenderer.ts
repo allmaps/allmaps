@@ -12,16 +12,16 @@ import type { GCPTransformInfo } from '@allmaps/transform'
 import type { TileZoomLevel, ImageRequest } from '@allmaps/iiif-parser'
 
 type Tile = {
-  column: number,
-  row: number,
-  zoomLevel: TileZoomLevel,
+  column: number
+  row: number
+  zoomLevel: TileZoomLevel
 }
 
 type NeededTile = {
-  tile: Tile,
-  imageRequest: ImageRequest,
+  tile: Tile
+  imageRequest: ImageRequest
   // url: string
-  imageBitmap?: ImageBitmap,
+  imageBitmap?: ImageBitmap
   loading: boolean
 }
 
@@ -62,7 +62,11 @@ export class WarpedMapWebGLRenderer extends BaseObject {
     gl: WebGL2RenderingContext,
     program: WebGLProgram,
     mapId: string,
-    { image, transformer, triangles } : { image: IIIFImage, transformer: GCPTransformInfo, triangles: number[] }
+    {
+      image,
+      transformer,
+      triangles
+    }: { image: IIIFImage; transformer: GCPTransformInfo; triangles: number[] }
   ) {
     super()
 
@@ -138,11 +142,22 @@ export class WarpedMapWebGLRenderer extends BaseObject {
     const offset = 0
 
     const positionAttributeLocation = gl.getAttribLocation(program, name)
-    gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
+    gl.vertexAttribPointer(
+      positionAttributeLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    )
     gl.enableVertexAttribArray(positionAttributeLocation)
   }
 
-  async setTileImage(url: string, scaleFactor: number, image: HTMLImageElement) {
+  async setTileImage(
+    url: string,
+    scaleFactor: number,
+    image: HTMLImageElement
+  ) {
     // TODO: check currentScaleFactor === scaleFactor
     const tile = this.currentScaleFactorTiles.get(url)
     if (tile) {
@@ -150,7 +165,9 @@ export class WarpedMapWebGLRenderer extends BaseObject {
 
       tile.imageBitmap = await createImageBitmap(image)
 
-      this.dispatchEvent(new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADED, url))
+      this.dispatchEvent(
+        new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADED, url)
+      )
     }
 
     this.updateTextures()
@@ -188,7 +205,9 @@ export class WarpedMapWebGLRenderer extends BaseObject {
     // values with the texture position in pixel values
     const { w: textureWidth, h: textureHeight } = potpack(packedTiles)
 
-    const scaleFactors = packedTiles.map(({ index }) => tilesForTexture[index].tile.zoomLevel.scaleFactor)
+    const scaleFactors = packedTiles.map(
+      ({ index }) => tilesForTexture[index].tile.zoomLevel.scaleFactor
+    )
 
     gl.bindTexture(gl.TEXTURE_2D, this.scaleFactorsTexture)
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
@@ -254,7 +273,10 @@ export class WarpedMapWebGLRenderer extends BaseObject {
       }
     })
 
-    const tilePositions = packedTiles.map((packedTile) => [packedTile.x, packedTile.y])
+    const tilePositions = packedTiles.map((packedTile) => [
+      packedTile.x,
+      packedTile.y
+    ])
 
     gl.bindTexture(gl.TEXTURE_2D, this.tilePositionsTexture)
     gl.texImage2D(
@@ -315,13 +337,24 @@ export class WarpedMapWebGLRenderer extends BaseObject {
     try {
       tileImage = await loadImage(url)
     } catch (err) {
-      this.dispatchEvent(new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADINGERROR, url))
+      this.dispatchEvent(
+        new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADINGERROR, url)
+      )
     }
 
     if (tileImage) {
       this.setTileImage(url, scaleFactor, tileImage)
     } else {
-      this.dispatchEvent(new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADINGERROR, url))
+      this.dispatchEvent(
+        new WarpedMapRendererEvent(WarpedMapEventTypes.TILELOADINGERROR, url)
+      )
     }
+  }
+
+  dispose() {
+    this.gl.deleteTexture(this.tilesTexture)
+    this.gl.deleteTexture(this.scaleFactorsTexture)
+    this.gl.deleteTexture(this.tilePositionsTexture)
+    this.gl.deleteTexture(this.imagePositionsTexture)
   }
 }

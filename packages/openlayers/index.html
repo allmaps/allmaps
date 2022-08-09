@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/openlayers</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol.js"></script>
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <footer>
+      <button id="button">Dispose warped map layer</button>
+    </footer>
+    <script type="module">
+      import { WarpedMapLayer, WarpedMapSource } from './src/index.ts'
+
+      const warpedMapSource = new WarpedMapSource()
+      const warpedMapLayer = new WarpedMapLayer({
+        source: warpedMapSource
+      })
+
+      const map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          warpedMapLayer
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-71.0599, 42.3589]),
+          zoom: 14
+        })
+      })
+
+      // https://api.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8/maps
+      const georef = {
+        gcps: [
+          {
+            world: [-71.0643878699, 42.3593524428],
+            image: [835.25, 1667.5]
+          },
+          {
+            world: [-71.0650771976, 42.3588351454],
+            image: [768.75, 1725]
+          },
+          {
+            world: [-71.0539218904, 42.3643190737],
+            image: [1782.25, 1091.25]
+          },
+          {
+            world: [-71.0527578117, 42.3662473526],
+            image: [1884.125, 873.25]
+          },
+          {
+            world: [-71.0580404223, 42.3672679489],
+            image: [1403.375, 750.25]
+          },
+          {
+            world: [-71.0566295803, 42.3682191695],
+            image: [1534.625, 635.5]
+          },
+          {
+            world: [-71.0573966921, 42.3677514879],
+            image: [1445.375, 706]
+          },
+          {
+            world: [-71.0635577262, 42.3594277577],
+            image: [918.75, 1656.5]
+          }
+        ],
+        image: {
+          uri: 'https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:9s161b03w',
+          type: 'ImageService2',
+          width: 2589,
+          height: 4088
+        },
+        version: 1,
+        pixelMask: [
+          [0, 0],
+          [2589, 0],
+          [2589, 4088],
+          [0, 4088]
+        ]
+      }
+
+      // https://api.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79/maps
+
+      warpedMapSource.addMap(georef)
+
+      document.getElementById('button').addEventListener('click', () => {
+        map.removeLayer(warpedMapLayer)
+        warpedMapLayer.dispose()
+
+        warpedMapSource.dispose()
+      })
+    </script>
+  </body>
+</html>

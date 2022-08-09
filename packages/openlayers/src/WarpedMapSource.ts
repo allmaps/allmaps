@@ -1,28 +1,16 @@
 import Source from 'ol/source/Source.js'
-import SourceState from 'ol/source/State.js'
-import Event from 'ol/events/Event.js'
-
-import Worker from './worker.ts?worker&inline'
 
 import { generateChecksum } from '@allmaps/id/browser'
 
+import { OLCustomEvent } from './OLCustomEvent.js'
 import { WarpedMapEventTypes } from './WarpedMapEventType.js'
+import { RTree } from './RTree.js'
 
 type Size = [number, number]
 type Extent = [number, number, number, number]
 
-export class WarpedMapSourceEvent extends Event {
-  data: any
-
-  constructor(type: string, data: any) {
-    super(type)
-
-    this.data = data
-  }
-}
-
 export class WarpedMapSource extends Source {
-  worker: Worker
+  rtree: RTree
 
   tileUrls: Set<string> = new Set()
 
@@ -30,73 +18,65 @@ export class WarpedMapSource extends Source {
     super({
       interpolate: true,
       projection: undefined,
-      state: SourceState.READY,
+      state: 'ready',
       wrapX: true
     })
 
-    this.worker = new Worker()
-    // console.log(import.meta.url, new URL('worker.ts', import.meta.url))
-    // console.log(import.meta.url)
-    // this.worker = new Worker(new URL('./worker.ts', import.meta.url))
+    this.rtree = new RTree()
 
-    // this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
-    //   type: 'module'
-    // })
-
-    // @ts-ignore
-    this.worker.onmessage = this.onWorkerMessage.bind(this)
-  }
-
-  onWorkerMessage(event: WarpedMapSourceEvent): any {
-    const { type, data } = event.data
-    if (type === WarpedMapEventTypes.WARPEDMAPADDED) {
-      this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.WARPEDMAPADDED, data)
-      )
+    // WARPEDMAPADDED
+    this.rtree.addEventListener(WarpedMapEventTypes.WARPEDMAPADDED, ((
+      event
+    ) => {
+      this.dispatchEvent(event as unknown as OLCustomEvent)
       this.changed()
-    } else if (type === WarpedMapEventTypes.WARPEDMAPENTEREXTENT) {
-      this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.WARPEDMAPENTEREXTENT, data)
-      )
-    } else if (type === WarpedMapEventTypes.WARPEDMAPLEAVEEXTENT) {
-      this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.WARPEDMAPLEAVEEXTENT, data)
-      )
-    } else if (type === WarpedMapEventTypes.TILENEEDED) {
-      this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.TILENEEDED, data)
-      )
+    }) as EventListener)
 
-      const { url } = data
+    // WARPEDMAPENTEREXTENT
+    this.rtree.addEventListener(WarpedMapEventTypes.WARPEDMAPENTEREXTENT, ((
+      event
+    ) => {
+      this.dispatchEvent(event as unknown as OLCustomEvent)
+    }) as EventListener)
+
+    // WARPEDMAPLEAVEEXTENT
+    this.rtree.addEventListener(WarpedMapEventTypes.WARPEDMAPLEAVEEXTENT, ((
+      event: CustomEvent
+    ) => {
+      this.dispatchEvent(event as unknown as OLCustomEvent)
+    }) as EventListener)
+
+    // TILENEEDED
+    this.rtree.addEventListener(WarpedMapEventTypes.TILENEEDED, ((
+      event: CustomEvent
+    ) => {
+      this.dispatchEvent(event as unknown as OLCustomEvent)
+
+      const { url } = event.detail
       this.tileUrls.add(url)
 
       this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.TILESCHANGED, [
-          ...this.tileUrls
-        ])
+        new OLCustomEvent(WarpedMapEventTypes.TILESCHANGED, {
+          detail: [...this.tileUrls]
+        })
       )
-    } else if (type === WarpedMapEventTypes.TILEUNNEEDED) {
-      this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.TILEUNNEEDED, data)
-      )
+    }) as EventListener)
 
-      const { url } = data
+    // TILEUNNEEDED
+    this.rtree.addEventListener(WarpedMapEventTypes.TILEUNNEEDED, ((
+      event: CustomEvent
+    ) => {
+      this.dispatchEvent(event as unknown as OLCustomEvent)
+
+      const { url } = event.detail
       this.tileUrls.delete(url)
 
       this.dispatchEvent(
-        new WarpedMapSourceEvent(WarpedMapEventTypes.TILESCHANGED, [
-          ...this.tileUrls
-        ])
+        new OLCustomEvent(WarpedMapEventTypes.TILESCHANGED, {
+          detail: [...this.tileUrls]
+        })
       )
-    }
-  }
-
-  sendWorkerMessage(type: string, data: any) {
-    console.log('Send to worker', type, data)
-    this.worker.postMessage({
-      type,
-      data
-    })
+    }) as EventListener)
   }
 
   updateNeededTiles(
@@ -104,15 +84,12 @@ export class WarpedMapSource extends Source {
     extent: Extent,
     coordinateToPixelTransform: number[]
   ) {
-    this.sendWorkerMessage(WarpedMapEventTypes.UPDATENEEDEDTILES, {
-      size,
-      extent,
-      coordinateToPixelTransform
-    })
+    // TODO: rename function this.updateNeededTiles and/or rtree.setViewport
+    this.rtree.setViewport(size, extent, coordinateToPixelTransform)
   }
 
   async addMap(map: any) {
     const mapId = await generateChecksum(map)
-    this.sendWorkerMessage(WarpedMapEventTypes.ADDMAP, { mapId, map })
+    this.rtree.addMap(mapId, map)
   }
 }
