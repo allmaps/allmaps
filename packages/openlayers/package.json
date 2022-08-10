@@ -15,7 +15,7 @@
     ".": {
       "require": "./dist/bundled/allmaps-openlayers-6.umd.js",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
