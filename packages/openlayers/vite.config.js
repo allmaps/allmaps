@@ -5,10 +5,11 @@ export default defineConfig({
     target: 'es2020',
     // minify: false,
     sourcemap: true,
+    emptyOutDir: false,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) => `allmaps-openlayers-6.${format}.js`,
+      fileName: (format) => `bundled/allmaps-openlayers-6.${format}.js`,
       formats: ['umd']
     },
     rollupOptions: {

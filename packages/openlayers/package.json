@@ -6,13 +6,16 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "",
+  "description": "OpenLayers classes for Allmaps",
   "type": "module",
-  "module": "./dist/allmaps-openlayers.es.js",
-  "unpkg": "./dist/allmaps-openlayers.umd.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/allmaps-openlayers-6.umd.js",
   "exports": {
     ".": {
-      "import": "./dist/allmaps-openlayers.es.js"
+      "require": "./dist/bundled/allmaps-openlayers-6.umd.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
     }
   },
   "files": [
@@ -30,7 +33,9 @@
   "keywords": [
     "iiif",
     "georeference",
-    "map"
+    "map",
+    "openlayers",
+    "allmaps"
   ],
   "scripts": {
     "dev": "vite",
