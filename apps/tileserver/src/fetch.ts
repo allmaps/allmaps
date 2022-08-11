@@ -12,7 +12,9 @@ export async function cachedFetch(cache: Cache, url: string) {
       throw new Error(`Failed to fetch ${url}`)
     }
 
-    const cacheResponse = fetchResponse.clone()
+    // Clone the response so that it's no longer immutable
+    // https://developers.cloudflare.com/workers/examples/alter-headers
+    const cacheResponse = new Response(fetchResponse.body, fetchResponse)
 
     // Remove cookie headers to ensure response is cached
     // https://developers.cloudflare.com/workers/runtime-apis/cache/#headers
