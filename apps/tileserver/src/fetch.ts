@@ -1,5 +1,17 @@
 import type { Cache } from './types.js'
 
+export class FetchError extends Error {
+  status: number
+  body: any
+
+  constructor(message: string, status: number, body: any) {
+    super(message)
+    this.name = 'FetchError'
+    this.status = status
+    this.body = body
+  }
+}
+
 export async function cachedFetch(cache: Cache, url: string) {
   console.log('Fetching:', url)
   const cacheResponse = await cache.match(url)
@@ -8,13 +20,27 @@ export async function cachedFetch(cache: Cache, url: string) {
     console.log('  Not found in cache. Downloading.')
     const fetchResponse = await fetch(url)
 
-    if (fetchResponse.status !== 200) {
-      throw new Error(`Failed to fetch ${url}`)
+    if (!fetchResponse.ok || fetchResponse.status !== 200) {
+      let jsonBody
+      try {
+        jsonBody = await fetchResponse.json()
+      } catch (err) {
+        // Response has no JSON body
+      }
+
+      throw new FetchError(
+        `Failed to fetch ${url}`,
+        fetchResponse.status,
+        jsonBody
+      )
     }
 
     // Clone the response so that it's no longer immutable
     // https://developers.cloudflare.com/workers/examples/alter-headers
-    const cacheResponse = new Response(fetchResponse.body, fetchResponse)
+    const cacheResponse = new Response(
+      fetchResponse.clone().body,
+      fetchResponse
+    )
 
     // Remove cookie headers to ensure response is cached
     // https://developers.cloudflare.com/workers/runtime-apis/cache/#headers
@@ -28,6 +54,9 @@ export async function cachedFetch(cache: Cache, url: string) {
 
       cacheResponse.headers.set('last-modified', now.toUTCString())
     }
+
+    // if (!cacheResponse.headers.has('last-modified')) {
+    // Cache-control
 
     await cache.put(url, cacheResponse)
 

@@ -30,19 +30,21 @@ function xyzFromParams(params: unknown): XYZTile {
   }
 }
 
-const notFoundHandler = () => createErrorResponse('Not found', 404, 'Not found')
-
 router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
-  return createErrorResponse(
-    'Encountered unprocessed template URL. Please read documentation.',
+  return createJsonResponse(
+    {
+      error: 'Encountered unprocessed template URL. Please read documentation.'
+    },
     400,
     'Bad Request'
   )
 })
 
 router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
-  return createErrorResponse(
-    'Encountered unprocessed template URL. Please read documentation.',
+  return createJsonResponse(
+    {
+      error: 'Encountered unprocessed template URL. Please read documentation.'
+    },
     400,
     'Bad Request'
   )
@@ -91,13 +93,11 @@ router.get('/:z/:x/:y.png', async (req) => {
   return await createWarpedTileResponse(map, { x, y, z }, cache)
 })
 
-router.get('/', () => {
-  return createJsonResponse({
-    name: 'Allmaps Tile Server'
-  })
-})
+router.get('/', () => createJsonResponse({ name: 'Allmaps Tile Server' }))
 
-router.all('*', notFoundHandler)
+router.all('*', () =>
+  createJsonResponse({ error: 'Not found' }, 404, 'Not found')
+)
 
 export default {
   fetch: async (req: Request, ...extra: any) => {
@@ -113,16 +113,19 @@ export default {
 
       return router
         .handle(req, ...extra)
-        .then(async (res) => {
+        .then((res) => {
+          if (res.status !== 200) {
+            throw new Error(`Failed to fetch ${url}`)
+          }
+
           // Set CORS headers
           res.headers.set('Access-Control-Allow-Origin', '*')
 
-          await cache.put(url, res.clone())
+          cache.put(url, res.clone())
           return res
         })
         .catch((err) => {
-          console.error(err)
-          return createErrorResponse(err.issues || err.message)
+          return createErrorResponse(err)
         })
     }
   }

@@ -7,7 +7,7 @@ import type { Map } from '@allmaps/annotation'
 
 interface TileJSON {
   tilejson: '3.0.0'
-  id: string | undefined,
+  id: string | undefined
   tiles: string[]
   fields: {}
   bounds: number[]
@@ -17,10 +17,7 @@ interface TileJSON {
 }
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(
-  urlTemplate: string,
-  map: Map
-): TileJSON {
+export function generateTileJson(urlTemplate: string, map: Map): TileJSON {
   const transformer = createTransformer(map.gcps)
   const geoMask = polygonToWorld(transformer, map.pixelMask)
 
