@@ -6,6 +6,8 @@
 
   import Examples from '$lib/components/Examples.svelte'
 
+  import 'ol/ol.css'
+
   // import { trackAnnotationUrl, trackAnnotationSource } from './lib/umami.js'
 
   const dataUrlPrefix = 'data:text/x-url,'
@@ -18,7 +20,7 @@
   let annotationUrl = ''
   let annotationString = ''
 
-  function getHash () {
+  function getHash() {
     return window.location.hash.slice(1)
   }
 
@@ -28,28 +30,28 @@
     type = queryParams.get('type')
   }
 
-  function setDataHash (data: string) {
+  function setDataHash(data: string) {
     const queryParams = new URLSearchParams('')
     queryParams.set('data', data)
     history.pushState(null, '', '#' + queryParams.toString())
     window.dispatchEvent(new HashChangeEvent('hashchange'))
   }
 
-  function handleUrlSubmit () {
+  function handleUrlSubmit() {
     setDataHash(dataUrlPrefix + annotationUrl)
   }
 
-  function handleStringSubmit () {
+  function handleStringSubmit() {
     setDataHash(dataJsonPrefix + annotationString)
   }
 
-  async function fetchAnnotation (url: string) {
+  async function fetchAnnotation(url: string) {
     const response = await fetch(url)
     const annotation = await response.json()
     return annotation
   }
 
-  async function parseUrlData (data: string) {
+  async function parseUrlData(data: string) {
     if (data.startsWith(dataUrlPrefix)) {
       const url = data.replace(dataUrlPrefix, '')
 
@@ -72,10 +74,14 @@
     hash = getHash()
     console.log('moubt', hash)
 
-    window.addEventListener('hashchange', () => {
-      hash = getHash()
-      console.log(hash, 'change')
-    }, false)
+    window.addEventListener(
+      'hashchange',
+      () => {
+        hash = getHash()
+        console.log(hash, 'change')
+      },
+      false
+    )
   })
 </script>
 
@@ -85,7 +91,7 @@
     type="text/css"
     href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css"
   /> -->
-  <link rel='stylesheet' href='/global.css'>
+  <link rel="stylesheet" href="/global.css" />
 </svelte:head>
 
 <main>
@@ -97,72 +103,81 @@
         <p>Loading…</p>
       </div>
     {:then annotation}
-      <Annotation annotation={annotation} />
+      <Annotation {annotation} />
     {:catch error}
       <div class="content">
         <!-- TODO: centered! Make Error component!  -->
         <p>An error occurred!</p>
-        <p><code>{ error.message }</code></p>
+        <p><code>{error.message}</code></p>
       </div>
     {/await}
   {:else}
     <div class="content">
       <p>Open a IIIF Georef Annotation from a URL:</p>
       <form on:submit|preventDefault={handleUrlSubmit}>
-        <input bind:value="{annotationUrl}" name="url" placeholder="Annotation URL" autofocus />
-        <button disabled="{annotationUrl.length === 0}">View</button>
+        <input
+          bind:value={annotationUrl}
+          name="url"
+          placeholder="Georef Annotation URL"
+          autofocus
+        />
+        <button disabled={annotationUrl.length === 0}>View</button>
       </form>
-      <p>Or, paste an annotation in the text box:</p>
+      <p>Or, paste an Georef Annotation in the text box:</p>
       <form on:submit|preventDefault={handleStringSubmit}>
-        <textarea bind:value="{annotationString}" class="monospace"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-        <button disabled="{annotationString.length === 0}">View</button>
+        <textarea
+          bind:value={annotationString}
+          class="monospace"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+        <button disabled={annotationString.length === 0}>View</button>
       </form>
       <section>
         <Examples />
       </section>
-      <footer>
-        What is Allmaps
-      </footer>
+      <footer>What is Allmaps</footer>
     </div>
   {/if}
 </main>
 
 <style>
-main {
-  flex-grow: 1;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
+  main {
+    flex-grow: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
 
-.content {
-  padding: 0.5em;
-  margin: 0 auto;
-  max-width: 900px;
-}
+  .content {
+    padding: 0.5em;
+    margin: 0 auto;
+    max-width: 900px;
+  }
 
-form input,
-form textarea {
-  width: 100%;
-  display: block;
-}
+  form input,
+  form textarea {
+    width: 100%;
+    display: block;
+  }
 
-form textarea {
-  height: 10em;
-  resize: none;
-}
+  form textarea {
+    height: 10em;
+    resize: none;
+  }
 
-form > *:not(:last-child) {
-  margin-bottom: 0.5em;
-}
+  form > *:not(:last-child) {
+    margin-bottom: 0.5em;
+  }
 
-footer {
-  padding-top: 4em;
-  padding-bottom: 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  footer {
+    padding-top: 4em;
+    padding-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 </style>

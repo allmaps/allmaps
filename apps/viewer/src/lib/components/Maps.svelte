@@ -3,80 +3,76 @@
   import IIIFImage from './IIIFImage.svelte'
   import MapSelector from './MapSelector.svelte'
 
-  import type { Map as MapType } from '@allmaps/annotation'
+  import type { Map, Annotation } from '@allmaps/annotation'
 
-  // import { trackHostnames } from './lib/umami.js'
+  export let maps: Map[]
+  export let annotation: Annotation
 
-  export let maps: MapType[]
+  let selectedMapIndex = 0
 
-  // trackHostnames(maps)
-
-  let selectedMap = 0
-
-  $: map = maps[selectedMap]
+  $: map = maps[selectedMapIndex]
   $: tab = 'map'
 
-  function updateSelectedMap (event) {
-    selectedMap = event.detail.selectedMap
+  function updateSelectedMapIndex(event: CustomEvent) {
+    selectedMapIndex = event.detail.selectedMapIndex
   }
 </script>
 
 <div class="maps">
   {#if tab === 'map'}
     <div class="ol-container">
-      <WarpedMap maps={maps} />
+      <WarpedMap {annotation} />
     </div>
   {:else if tab === 'iiif'}
     <div class="ol-container">
-      <IIIFImage map={map} />
+      <IIIFImage {map} />
     </div>
   {/if}
 
   <div class="tabs is-toggle">
     <ul>
       <li class:is-active={tab === 'map'}>
-        <a on:click={() => tab = 'map'}>
+        <button on:click={() => (tab = 'map')}>
           <span>Warped map</span>
-        </a>
+        </button>
       </li>
       <li class:is-active={tab === 'iiif'}>
-        <a on:click={() => tab = 'iiif'}>
+        <button on:click={() => (tab = 'iiif')}>
           <span>Original image</span>
-        </a>
+        </button>
       </li>
     </ul>
   </div>
 </div>
 
 {#if maps.length > 1}
-  <MapSelector maps={maps} selectedMap={selectedMap}
-    on:update={updateSelectedMap}/>
+  <MapSelector {maps} {selectedMapIndex} on:update={updateSelectedMapIndex} />
 {/if}
 
 <style scoped>
-.maps {
-  height: 100%;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
+  .maps {
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
 
-.tabs {
-  top: 0;
-  right: 0;
-  position: absolute;
-  padding: 0.5em;
-}
+  .tabs {
+    top: 0;
+    right: 0;
+    position: absolute;
+    padding: 0.5em;
+  }
 
-.tabs li a {
-  background: white;
-}
+  .tabs li a {
+    background: white;
+  }
 
-.ol-container {
-  flex-grow: 1;
-  height: 100%;
-  position: relative;
-}
+  .ol-container {
+    flex-grow: 1;
+    height: 100%;
+    position: relative;
+  }
 </style>

@@ -4,14 +4,16 @@
   import Map from 'ol/Map.js'
   import { IIIFLayer } from '@allmaps/openlayers'
 
-  export let map
+  import type { Map as Georef } from '@allmaps/annotation'
 
-  let ol
-  let iiifLayer
+  export let map: Georef
+
+  let ol: Map
+  let iiifLayer: IIIFLayer
 
   $: updateMap(map)
 
-  async function updateMap (map) {
+  async function updateMap(map: Georef) {
     if (iiifLayer) {
       ol.removeLayer(iiifLayer)
     }
@@ -23,14 +25,16 @@
       iiifLayer = new IIIFLayer(image)
       ol.addLayer(iiifLayer)
 
-      // ol.setView(iiifLayer.getView())
-      ol.getView().fit(iiifLayer.getExtent(), {
-        padding: [25, 25, 25, 25]
-      })
+      const extent = iiifLayer.getExtent()
+      if (extent) {
+        ol.getView().fit(extent, {
+          padding: [25, 25, 25, 25]
+        })
+      }
     }
   }
 
-  async function fetchImage (imageUri: string) {
+  async function fetchImage(imageUri: string) {
     const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image
@@ -47,13 +51,12 @@
   })
 </script>
 
-<div id="ol" class="zoom-controls-bottom-left">
-</div>
+<div id="ol" class="zoom-controls-bottom-left" />
 
 <style>
-#ol {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+  #ol {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
 </style>

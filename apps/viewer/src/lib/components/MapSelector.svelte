@@ -3,12 +3,14 @@
 
   import Thumbnail from './Thumbnail.svelte'
 
-  export let maps
-  export let selectedMap
+  import type { Map } from '@allmaps/annotation'
 
-  let list
-  let startX
-  let scrollLeft
+  export let maps: Map[]
+  export let selectedMapIndex: number
+
+  let list: HTMLElement
+  let startX: number
+  let scrollLeft: number
   let isDown = false
   let totalScrollDistance = 0
   let scrollThreshold = 5
@@ -17,10 +19,10 @@
 
   const dispatch = createEventDispatcher()
 
-  function setSelectedMap (index) {
+  function setSelectedMap(index: number) {
     if (totalScrollDistance <= scrollThreshold) {
       dispatch('update', {
-        selectedMap: index
+        selectedMapIndex: index
       })
     }
   }
@@ -51,7 +53,7 @@
 
       event.preventDefault()
       const x = event.pageX - list.offsetLeft
-      const scrollDistance = (x - startX)
+      const scrollDistance = x - startX
 
       totalScrollDistance += Math.abs(scrollDistance)
       list.scrollLeft = scrollLeft - scrollDistance
@@ -63,8 +65,9 @@
   {#each maps as map, index}
     <li class="map">
       <button
-        class="{selectedMap === index ? 'selected' : ''}"
-        on:click|preventDefault={() => setSelectedMap(index)}>
+        class={selectedMapIndex === index ? 'selected' : ''}
+        on:click|preventDefault={() => setSelectedMap(index)}
+      >
         <Thumbnail imageUri={map.image.uri} width={thumbnailWidth} />
         <span class="index">{index + 1}</span>
       </button>
@@ -73,50 +76,50 @@
 </ol>
 
 <style>
-.maps {
-  list-style-type: none;
-  display: flex;
-  flex-direction: row;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 5px;
-  flex-shrink: 0;
-}
+  .maps {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 5px;
+    flex-shrink: 0;
+  }
 
-.maps .map {
-  margin: 5px;
-  padding: 0;
-  height: 100px;
-  width: 100px;
-  flex-shrink: 0;
-}
+  .maps .map {
+    margin: 5px;
+    padding: 0;
+    height: 100px;
+    width: 100px;
+    flex-shrink: 0;
+  }
 
-.maps .map button {
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-  display: inline-block;
-  position: relative;
+  .maps .map button {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    position: relative;
 
-  border: none;
-  background: none;
-}
+    border: none;
+    background: none;
+  }
 
-.maps .map button.selected {
-  border-style: solid;
-  border-width: 2px;
-}
+  .maps .map button.selected {
+    border-style: solid;
+    border-width: 2px;
+  }
 
-.maps .map button > * {
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+  .maps .map button > * {
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
 
-.maps .map button .index {
-  padding: 0.5em;
-  text-shadow: 0 0 2px white;
-}
+  .maps .map button .index {
+    padding: 0.5em;
+    text-shadow: 0 0 2px white;
+  }
 </style>

@@ -17,7 +17,9 @@
 
   import { WarpedMapLayer, WarpedMapSource } from '@allmaps/openlayers'
 
-  export let maps
+  import type { Map as MapType, Annotation } from '@allmaps/annotation'
+
+  export let annotation: Annotation
 
   let ol: Map
   let warpedMapLayer: WarpedMapLayer
@@ -29,17 +31,13 @@
   let xyz: XYZ
   let baseLayer
 
-  $: updateMaps(maps)
+  $: updateAnnotation(annotation)
 
-  async function updateMaps(maps) {
+  async function updateAnnotation(annotation: Annotation) {
     if (ol && warpedMapSource) {
       // vectorSource.clear()
 
-      // console.log('add map', maps)
-      for (let map of maps) {
-        warpedMapSource.addMap(map)
-        // console.log(map)
-      }
+      await warpedMapSource.addGeorefAnnotation(annotation)
 
       // const transformArgs = createTransformer(map.gcps)
 
@@ -69,21 +67,21 @@
       //   TODO: and show other errors as well...
       // })
 
-      // const extent = vectorSource.getExtent()
-
-      // ol.getView().fit(extent, {
-      //   // TODO: move to settings file
-      //   padding: [10, 10, 10, 10],
-      //   maxZoom: 18
-      // })
+      const extent = warpedMapSource.getExtent()
+      if (extent) {
+        ol.getView().fit(extent, {
+          padding: [25, 25, 25, 25]
+          // maxZoom: 18
+        })
+      }
     }
   }
 
-  async function fetchImage(imageUri: string) {
-    const response = await fetch(`${imageUri}/info.json`)
-    const image = await response.json()
-    return image
-  }
+  // async function fetchImage(imageUri: string) {
+  //   const response = await fetch(`${imageUri}/info.json`)
+  //   const image = await response.json()
+  //   return image
+  // }
 
   const tileSources = [
     {
@@ -138,16 +136,16 @@
     // vectorLayer.setZIndex(100)
 
     warpedMapSource = new WarpedMapSource()
-    warpedMapLayer3 = new WarpedMapLayer3({
+    warpedMapLayer = new WarpedMapLayer({
       source: warpedMapSource
     })
 
     ol = new Map({
-      layers: [baseLayer, warpedMapLayer3],
+      layers: [baseLayer, warpedMapLayer],
       target: 'ol',
       // controls: [],
       view: new View({
-        center: [-7914732, 5209134],
+        // center: [-7914732, 5209134],
 
         // minZoom: 6,
         maxZoom: 20,
@@ -155,18 +153,18 @@
       })
     })
 
-    updateMaps(maps)
+    updateAnnotation(annotation)
   })
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.code === 'Space') {
-      warpedMapLayer3.setVisible(false)
+      warpedMapLayer.setVisible(false)
     }
   }
 
   function handleKeyup(event: KeyboardEvent) {
     if (event.code === 'Space') {
-      warpedMapLayer3.setVisible(true)
+      warpedMapLayer.setVisible(true)
     }
   }
 </script>
