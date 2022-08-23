@@ -1,3 +1,4 @@
+.DS_Store
 node_modules
 dist
 
@@ -8,4 +9,5 @@ lerna-debug.log
 .svelte-kit
 
 .env
-.env.development
+.env.*
+!.env.example
