@@ -6,3 +6,6 @@ dist
 lerna-debug.log
 
 .svelte-kit
+
+.env
+.env.development
