@@ -8,6 +8,7 @@
   },
   "description": "Allmaps IIIF parser",
   "type": "module",
+  "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "exports": {
     "import": "./dist/index.js"
