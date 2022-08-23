@@ -2,19 +2,24 @@
   import { onMount } from 'svelte'
   import { browser } from '$app/env'
   import { env } from '$lib/variables'
-  import { parseIiif, getThumbnail, getImageUrl } from '@allmaps/iiif-parser'
+
+  import { IIIF } from '@allmaps/iiif-parser'
   import { generateId } from '@allmaps/id/browser'
+
   import Summary from '../components/Summary.svelte'
   import Image from '../components/Image.svelte'
   import Manifest from '../components/Manifest.svelte'
   import Map from '../components/Map.svelte'
 
-  let id
-  let type
-  let parsedIiif
-  let maps
+  import type { Map as MapType } from '@allmaps/annotation'
+  import type { Image as IIIFImage, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
+
+  let id: string
+  let type: string
+  let parsedIiif: IIIFImage | IIIFManifest
+  let maps: MapType[]
   let input: HTMLInputElement
-  let url: string
+  let url: string | null
   let editorUrl: string
 
   onMount(async () => {
@@ -43,15 +48,16 @@
     // TODO: try/catch
     const iiifData = await fetch(iiifUrl).then((response) => response.json())
     // TODO: try/catch
-    parsedIiif = parseIiif(iiifData)
+    parsedIiif = IIIF.parse(iiifData)
     type = parsedIiif.type
     id = await generateId(parsedIiif.uri)
-    let apiUrl: string
+    let apiUrl: string | undefined
     if (parsedIiif.type === 'image') {
       apiUrl = `${env.apiBaseUrl}/images/${id}/maps`
     } else if (parsedIiif.type === 'manifest') {
       apiUrl = `${env.apiBaseUrl}/manifests/${id}/maps`
     }
+
     if (apiUrl) {
       // TODO: try/catch
       maps = await fetch(apiUrl).then((response) => response.json())
@@ -59,7 +65,7 @@
   }
 </script>
 
-<h1>Allmaps IDs</h1>
+<h1>Allmaps Info</h1>
 
 <form on:submit|preventDefault={submit}>
   <input
@@ -70,7 +76,7 @@
   <button type="submit">Submit</button>
 </form>
 {#if parsedIiif}
-  <Summary {id} {parsedIiif} {maps} />
+  <Summary {id} {parsedIiif} />
   {#if type === 'image'}
     <Image {id} {parsedIiif} {maps} />
   {:else if type === 'manifest'}

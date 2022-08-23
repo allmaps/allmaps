@@ -1,5 +1,8 @@
 <script lang="ts">
-  export let id
-  export let parsedIiif
-  export let maps
+  import type { Map as MapType } from '@allmaps/annotation'
+  import type { Image as IIIFImage, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
+
+  export let id: string
+  export let parsedIiif: IIIFImage | IIIFManifest
+  export let maps: MapType[]
 </script>
