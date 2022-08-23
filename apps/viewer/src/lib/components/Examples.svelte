@@ -1,18 +1,17 @@
 <script lang="ts">
-  import examples from '$lib/components/examples.yaml'
+  import examplesYaml from '$lib/components/examples.yaml'
 
-  // type Example = {
-  //   title: string
-  //   organization: string
-  //   url: string
-  // }
+  type Example = {
+    title: string
+    organization: string
+    url: string
+  }
+  type Examples = Example[]
 
-  // const chips: Example[] = examples
+  const examples: Examples = examplesYaml.examples
 </script>
 
-<p>
-  You can also use one of these examples:
-</p>
+<p>You can also use one of these examples:</p>
 
 <ul>
   {#each examples as example}
@@ -25,12 +24,12 @@
 </ul>
 
 <style scoped>
-li {
-  margin-bottom: 0.5em;
-}
+  li {
+    margin-bottom: 0.5em;
+  }
 
-.organization {
-  color: #aaa;
-  text-decoration: none;
-}
+  .organization {
+    color: #aaa;
+    text-decoration: none;
+  }
 </style>
