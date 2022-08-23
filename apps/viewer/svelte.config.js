@@ -11,24 +11,13 @@ const config = {
 
   kit: {
     adapter: adapter({
-      // pages: 'build',
-      // assets: 'build',
-      // fallback: null,
-      // precompress: false
-    })
+      pages: 'build',
+      assets: 'build'
+    }),
+    prerender: {
+      default: true
+    }
   }
 }
 
 export default config
-
-//     paths: {
-//       base: dev ? '' : '/webgl2-preview'
-//     },
-//     prerender: {
-//       default: true
-//     },
-//     vite: defineConfig({
-//       plugins: [ViteYaml()]
-//     })
-//   }
-// }
