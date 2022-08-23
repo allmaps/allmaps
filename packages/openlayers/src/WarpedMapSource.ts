@@ -1,6 +1,7 @@
 import Source from 'ol/source/Source.js'
 
 import { generateChecksum } from '@allmaps/id/browser'
+import { parseAnnotation  } from '@allmaps/annotation'
 
 import { OLCustomEvent } from './OLCustomEvent.js'
 import { WarpedMapEventTypes } from './WarpedMapEventType.js'
@@ -88,8 +89,15 @@ export class WarpedMapSource extends Source {
     this.rtree.setViewport(size, extent, coordinateToPixelTransform)
   }
 
-  async addMap(map: any) {
-    const mapId = await generateChecksum(map)
-    this.rtree.addMap(mapId, map)
+  async addGeorefAnnotation(annotation: any) {
+    const maps = parseAnnotation(annotation)
+    for (let map of maps) {
+      const mapId = map.id || (await generateChecksum(map))
+      await this.rtree.addMap(mapId, map)
+    }
+  }
+
+  getExtent(): Extent | undefined {
+    return this.rtree.getExtent()
   }
 }

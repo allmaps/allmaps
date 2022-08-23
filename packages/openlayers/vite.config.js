@@ -1,16 +1,17 @@
 import { defineConfig } from 'vite'
 
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   build: {
     target: 'es2020',
     // minify: false,
     sourcemap: true,
-    emptyOutDir: false,
+    // emptyOutDir: false,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
       fileName: (format) => `bundled/allmaps-openlayers-6.${format}.js`,
-      formats: ['umd']
+      formats: ['es', 'umd']
     },
     rollupOptions: {
       external: [

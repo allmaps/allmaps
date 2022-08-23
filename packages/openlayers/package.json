@@ -14,8 +14,7 @@
   "exports": {
     ".": {
       "require": "./dist/bundled/allmaps-openlayers-6.umd.js",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/bundled/allmaps-openlayers-6.es.js"
     }
   },
   "files": [
@@ -39,8 +38,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build && npm run build:types",
+    "preview": "vite preview",
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

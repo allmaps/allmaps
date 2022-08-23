@@ -8,12 +8,12 @@ type Polygon = {
   coordinates: Coord[][]
 }
 
-type GeoExtent = {
-  minX: number
-  minY: number
-  maxX: number
-  maxY: number
-}
+type Extent = [
+  number, // minX
+  number, // minY
+  number, // maxX
+  number // maxY
+]
 
 export class WarpedMap {
   mapId: string
@@ -22,7 +22,7 @@ export class WarpedMap {
   image: IIIFImage
   geoMask: Polygon
   triangles: number[]
-  geoExtent
+  geoMaskExtent: Extent
 
   constructor(
     mapId: string,
@@ -30,7 +30,7 @@ export class WarpedMap {
     image: IIIFImage,
     transformer: GCPTransformInfo,
     geoMask: Polygon,
-    geoExtent: GeoExtent,
+    geoMaskExtent: Extent,
     triangles: number[]
   ) {
     this.mapId = mapId
@@ -39,6 +39,6 @@ export class WarpedMap {
     this.image = image
     this.geoMask = geoMask
     this.triangles = triangles
-    this.geoExtent = geoExtent
+    this.geoMaskExtent = geoMaskExtent
   }
 }

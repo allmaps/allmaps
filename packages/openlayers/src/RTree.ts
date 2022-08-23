@@ -52,8 +52,14 @@ export class RTree extends EventTarget {
   neededTilesByMap: Map<string, Map<string, NeededTile>> = new Map()
   warpedMaps: Map<string, WarpedMap> = new Map()
   warpedMapsRtree: RBush<WarpedMapsRtreeItem> = new RBush()
+  extent: Extent = [
+    Number.POSITIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+    Number.NEGATIVE_INFINITY,
+    Number.NEGATIVE_INFINITY
+  ]
 
-  getGeoMaskExtent(geoMask: Polygon) {
+  getGeoMaskExtent(geoMask: Polygon): Extent {
     let minX = Number.POSITIVE_INFINITY
     let minY = Number.POSITIVE_INFINITY
     let maxX = Number.NEGATIVE_INFINITY
@@ -66,17 +72,20 @@ export class RTree extends EventTarget {
       maxY = Math.max(maxY, coordinate[1])
     })
 
-    return {
+    return [
       minX,
       minY,
       maxX,
       maxY
-    }
+    ]
   }
 
   sendSourceMessage(type: string, data: any) {
-    this.dispatchEvent(new CustomEvent(type, {
-      detail: data}))
+    this.dispatchEvent(
+      new CustomEvent(type, {
+        detail: data
+      })
+    )
     // this.dispatchEvent(new RTreeEvent(type, data))
   }
 
@@ -163,11 +172,6 @@ export class RTree extends EventTarget {
   async addMap(mapId: string, map: Georef) {
     const imageUri = map.image.uri
 
-    const iiifData = await fetch(`${imageUri}/info.json`).then((response) =>
-      response.json()
-    )
-    const image = IIIFImage.parse(iiifData)
-
     const gcps = map.gcps
 
     const sphericalMercatorGcps = gcps.map(({ world, image }) => ({
@@ -183,6 +187,18 @@ export class RTree extends EventTarget {
       0.01,
       0
     )
+
+    const geoMaskExtent = this.getGeoMaskExtent(geoMask)
+
+    this.extent[0] = Math.min(this.extent[0], geoMaskExtent[0])
+    this.extent[1] = Math.min(this.extent[1], geoMaskExtent[1])
+    this.extent[2] = Math.max(this.extent[2], geoMaskExtent[2])
+    this.extent[3] = Math.max(this.extent[3], geoMaskExtent[3])
+
+    const iiifData = await fetch(`${imageUri}/info.json`).then((response) =>
+      response.json()
+    )
+    const image = IIIFImage.parse(iiifData)
 
     // TODO: to make sure only tiles for visible parts of the map are requested
     // (and not for parts hidden behind maps on top of it)
@@ -206,22 +222,23 @@ export class RTree extends EventTarget {
       ])
       .flat()
 
-    const geoExtent = this.getGeoMaskExtent(geoMask)
-
     const warpedMap = new WarpedMap(
       mapId,
       map,
       image,
       transformer,
       geoMask,
-      geoExtent,
+      geoMaskExtent,
       triangles
     )
 
     this.warpedMaps.set(mapId, warpedMap)
 
     const item = {
-      ...warpedMap.geoExtent,
+      minX: warpedMap.geoMaskExtent[0],
+      minY: warpedMap.geoMaskExtent[1],
+      maxX: warpedMap.geoMaskExtent[2],
+      maxY: warpedMap.geoMaskExtent[3],
       mapId
     }
 
@@ -259,8 +276,8 @@ export class RTree extends EventTarget {
           continue
         }
 
-        const topLeft = [warpedMap.geoExtent.minX, warpedMap.geoExtent.minY]
-        const bottomRight = [warpedMap.geoExtent.maxX, warpedMap.geoExtent.maxY]
+        const topLeft = [warpedMap.geoMaskExtent[0], warpedMap.geoMaskExtent[1]]
+        const bottomRight = [warpedMap.geoMaskExtent[2], warpedMap.geoMaskExtent[3]]
 
         const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
         const pixelBottomRight = applyTransform(
@@ -308,6 +325,10 @@ export class RTree extends EventTarget {
         mapId
       })
     }
+  }
+
+  getExtent(): Extent | undefined {
+    return this.extent
   }
 
   // To remove data from RBush, see
