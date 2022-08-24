@@ -31,7 +31,7 @@ importers:
     devDependencies:
       '@playwright/test': 1.25.0
       '@sveltejs/adapter-auto': 1.0.0-next.65
-      '@sveltejs/kit': 1.0.0-next.429_svelte@3.48.0+vite@3.0.4
+      '@sveltejs/kit': 1.0.0-next.431_svelte@3.48.0+vite@3.0.4
       '@typescript-eslint/eslint-plugin': 5.27.1_gav5dxubrvrjafh4n6juxjnvcu
       '@typescript-eslint/parser': 5.27.1_n4lrrl552kqf5nk4rgej5xdcha
       eslint: 8.17.0
@@ -74,7 +74,7 @@ importers:
     devDependencies:
       '@playwright/test': 1.25.0
       '@sveltejs/adapter-static': 1.0.0-next.39
-      '@sveltejs/kit': 1.0.0-next.429_svelte@3.48.0+vite@3.0.4
+      '@sveltejs/kit': 1.0.0-next.431_svelte@3.48.0+vite@3.0.4
       '@typescript-eslint/eslint-plugin': 5.27.1_gav5dxubrvrjafh4n6juxjnvcu
       '@typescript-eslint/parser': 5.27.1_n4lrrl552kqf5nk4rgej5xdcha
       eslint: 8.17.0
@@ -130,7 +130,6 @@ importers:
       '@allmaps/iiif-parser': ^1.0.0-beta.10
       '@allmaps/openlayers': ^1.0.0-beta.14
       '@allmaps/transform': ^1.0.0-beta.1
-      '@modyfi/vite-plugin-yaml': ^1.0.3
       '@playwright/test': ^1.25.0
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -156,10 +155,9 @@ importers:
       '@allmaps/transform': link:../../packages/transform
       ol: 6.15.1
     devDependencies:
-      '@modyfi/vite-plugin-yaml': 1.0.3_vite@3.0.4
       '@playwright/test': 1.25.0
       '@sveltejs/adapter-static': 1.0.0-next.39
-      '@sveltejs/kit': 1.0.0-next.429_svelte@3.48.0+vite@3.0.4
+      '@sveltejs/kit': 1.0.0-next.431_svelte@3.48.0+vite@3.0.4
       '@typescript-eslint/eslint-plugin': 5.27.1_gav5dxubrvrjafh4n6juxjnvcu
       '@typescript-eslint/parser': 5.27.1_n4lrrl552kqf5nk4rgej5xdcha
       eslint: 8.17.0
@@ -1518,18 +1516,6 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@modyfi/vite-plugin-yaml/1.0.3_vite@3.0.4:
-    resolution: {integrity: sha512-UB9A9b5h9v4fruyZPeLQh4k7ZF7KPrOuMnTfSIJD2WYXx9rHE0U19/RzLjFhDzWnTBPZWu6RoT4wxsaDkxXUzw==}
-    requiresBuild: true
-    peerDependencies:
-      vite: ^2.6.0 || ^3.0.0
-    dependencies:
-      '@rollup/pluginutils': 4.2.1
-      js-yaml: 4.1.0
-      tosource: 2.0.0-alpha.3
-      vite: 3.0.4
-    dev: true
-
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1921,8 +1907,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.429_svelte@3.48.0+vite@3.0.4:
-    resolution: {integrity: sha512-u5/RugPTeaT2e7oHKKZh0uy1qzqphhJOS5QBxr2D/JXYqSjEJcyFnXXpzmqo6lB1Oxlj88WF9Ozul6Wlekvyew==}
+  /@sveltejs/kit/1.0.0-next.431_svelte@3.48.0+vite@3.0.4:
+    resolution: {integrity: sha512-kK3FCw0cBB/nqjgV8G9W5ctDxemQpkqxidsKVr3aEXSExm4mdM3MYgNf6y2OuvOH9zLD+/t6DAxQQC/RPxuz8Q==}
     engines: {node: '>=16.9'}
     hasBin: true
     requiresBuild: true
@@ -9016,11 +9002,6 @@ packages:
     engines: {node: '>= 0.10'}
     dependencies:
       through2: 2.0.5
-    dev: true
-
-  /tosource/2.0.0-alpha.3:
-    resolution: {integrity: sha512-KAB2lrSS48y91MzFPFuDg4hLbvDiyTjOVgaK7Erw+5AmZXNq4sFRVn8r6yxSLuNs15PaokrDRpS61ERY9uZOug==}
-    engines: {node: '>=10'}
     dev: true
 
   /totalist/3.0.0:
