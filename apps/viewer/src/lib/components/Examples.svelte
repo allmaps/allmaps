@@ -1,14 +1,5 @@
 <script lang="ts">
-  import examplesYaml from '$lib/components/examples.yaml'
-
-  type Example = {
-    title: string
-    organization: string
-    url: string
-  }
-  type Examples = Example[]
-
-  const examples: Examples = examplesYaml.examples
+  import { examples } from '$lib/components/examples.json'
 </script>
 
 <p>You can also use one of these examples:</p>
