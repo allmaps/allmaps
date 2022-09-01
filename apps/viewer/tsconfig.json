@@ -12,8 +12,7 @@
     "paths": {
       "$lib": ["./src/lib"],
       "$lib/*": ["./src/lib/*"]
-    },
-    "types": ["@modyfi/vite-plugin-yaml/modules"]
+    }
   },
   "references": [
     { "path": "../../packages/id" },
