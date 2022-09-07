@@ -13,6 +13,8 @@ Apps:
 
 - [Allmaps Viewer](apps/viewer)
 - [Allmaps Tile Server](apps/tileserver)
+- [Allmaps Explore](apps/explore)
+- [Allmaps Info](apps/info)
 
 ## Installation
 
@@ -26,6 +28,11 @@ Run Allmaps Viewer:
  Run tests in single package:
 
     npx lerna run --scope @allmaps/id test
+
+Run `dev` and `build --watch` scripts for all packages and apps:
+
+    npx lerna run dev --parallel
+    npx lerna run watch --parallel
 
 # Versioning & publishing
 
