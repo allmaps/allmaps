@@ -1,6 +1,6 @@
 # Allmaps Tile Server
 
-Tiny proxy server that turns Georeference Annotations into [XYZ map tiles](https://en.wikipedia.org/wiki/Tiled_web_map).
+Allmaps Tile Server is a proxy server that turns Georeference Annotations into [XYZ map tiles](https://en.wikipedia.org/wiki/Tiled_web_map).
 
 Allmaps Tile Server runs on [Cloudflare Workers](https://workers.cloudflare.com/). Cloudflare Workers let you run tiny JavaScript programs on Cloudflare's global CDN. [Cloudflare is working on publishing the Workers system as open source](https://blog.cloudflare.com/workers-open-source-announcement/).
 
@@ -50,7 +50,7 @@ And for TileJSON:
 
 - https://allmaps.xyz/maps/25b0d49e1b659498/tiles.json
 
-### By supplying a copmlete – URL encoded – Georeference Annotation
+### By supplying a complete URL encoded Georeference Annotation
 
 Instead of the URL of a Georeference Annotation, you can also supply the URL-encoded contents of the Georeference Annotation using the `annotation` URL parameter:
 
