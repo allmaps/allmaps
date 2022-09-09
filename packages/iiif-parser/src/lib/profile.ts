@@ -5,6 +5,8 @@ import { ImageServiceSchema } from '../schemas/image-service.js'
 import { Image2ProfileDescriptionSchema } from '../schemas/image.2.js'
 import { ProfileProperties } from '../lib/types.js'
 
+import { image2ProfileUriRegex } from '../schemas/image.2.js'
+
 const anyRegionAndSizeFeatures = ['regionByPx', 'sizeByWh']
 
 type Image2ProfileDescriptionType = z.infer<
@@ -14,12 +16,11 @@ type ImageType = z.infer<typeof ImageSchema>
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 
 function parseProfileUri(uri: string): number {
-  if (uri.startsWith('http://iiif.io/api/image/2/level0')) {
-    return 0
-  } else if (uri.startsWith('http://iiif.io/api/image/2/level1')) {
-    return 1
-  } else if (uri.startsWith('http://iiif.io/api/image/2/level2')) {
-    return 2
+  const match = uri.match(image2ProfileUriRegex)
+
+  if (match && match.groups) {
+    const level = parseInt(match.groups.level)
+    return level
   } else {
     throw new Error('Unsupported IIIF Image Profile')
   }
@@ -29,13 +30,13 @@ function parseImage2ProfileDescription(
   parsedProfileDescription: Image2ProfileDescriptionType
 ): ProfileProperties {
   return {
-    maxWidth: parsedProfileDescription.maxWidth,
-    maxHeight: parsedProfileDescription.maxHeight,
-    maxArea: parsedProfileDescription.maxArea,
+    maxWidth: parsedProfileDescription?.maxWidth,
+    maxHeight: parsedProfileDescription?.maxHeight,
+    maxArea: parsedProfileDescription?.maxArea,
     supportsAnyRegionAndSize: anyRegionAndSizeFeatures.every(
       (feature) =>
-        parsedProfileDescription.supports &&
-        parsedProfileDescription.supports.includes(feature)
+        parsedProfileDescription?.supports &&
+        parsedProfileDescription?.supports?.includes(feature)
     )
   }
 }

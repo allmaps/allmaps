@@ -88,7 +88,7 @@ function runTests(file) {
       console.log(file)
 
       if (file.zodError) {
-        console.log("BEREN", JSON.stringify(file.zodError.issues, null, 2))
+        console.log(JSON.stringify(file.zodError.issues, null, 2))
         console.error(JSON.stringify(file.zodError.format(), null, 2))
         console.error(file.zodError.issues)
       }

@@ -23,7 +23,7 @@ export const AnnotationBody3Schema = z.object({
 
 const Annotation3Schema = z.object({
   type: z.literal('Annotation'),
-  body: AnnotationBody3Schema
+  body: AnnotationBody3Schema.or(AnnotationBody3Schema.array().length(1))
 })
 
 const AnnotationPage3Schema = z.object({

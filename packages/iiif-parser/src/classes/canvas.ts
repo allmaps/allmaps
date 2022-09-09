@@ -44,7 +44,16 @@ export class Canvas {
       this.label = parsedCanvas.label
       this.metadata = parsedCanvas.metadata
 
-      this.image = new EmbeddedImage(parsedCanvas.items[0].items[0].body)
+      const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
+
+      let annotationBody
+      if (Array.isArray(annotationBodyOrBodies)) {
+        annotationBody = annotationBodyOrBodies[0]
+      } else {
+        annotationBody = annotationBodyOrBodies
+      }
+
+      this.image = new EmbeddedImage(annotationBody)
     } else {
       throw new Error('Invalid IIIF Canvas')
     }

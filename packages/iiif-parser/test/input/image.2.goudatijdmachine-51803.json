@@ -1,0 +1,13 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://www.goudatijdmachine.nl/data/iiif/2/51803",
+  "protocol": "http://iiif.io/api/image",
+  "width": 10290,
+  "height": 8664,
+  "sizes": [
+    { "width": 200, "height": 168 },
+    { "width": 800, "height": 674 },
+    { "width": 10290, "height": 8664 }
+  ],
+  "profile": ["http://iiif.io/api/image/2/level2.json"]
+}

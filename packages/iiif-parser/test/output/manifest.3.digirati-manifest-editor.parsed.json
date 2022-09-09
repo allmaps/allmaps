@@ -1,0 +1,25 @@
+{
+  "type": "manifest",
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 4524,
+      "height": 3940,
+      "uri": "https://example.org/canvas/3cab18d8-bad8-4089-a0ea-2cd2fccb2c72",
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://dlc.services/iiif-img/7/4/00e3862e-f98e-4e7e-a701-fa74dcc93cb9",
+        "majorVersion": 2,
+        "width": 4524,
+        "height": 3940
+      }
+    }
+  ],
+  "uri": "https://example.org/ef0caf64-01c9-4257-b67b-a874a41c5040",
+  "majorVersion": 3,
+  "label": {
+    "en": ["Blank Manifest"]
+  }
+}
