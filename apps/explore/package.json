@@ -1,6 +1,6 @@
 {
 	"name": "@allmaps/explore",
-	"version": "0.0.2-alpha.0",
+	"version": "0.0.2-alpha.1",
 	"private": true,
 	"author": {
 		"name": "Bert Spaan",
@@ -26,7 +26,7 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.25.0",
-    "@sveltejs/adapter-static": "next",
+		"@sveltejs/adapter-static": "next",
 		"@sveltejs/kit": "next",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
