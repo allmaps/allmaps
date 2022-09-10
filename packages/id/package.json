@@ -31,7 +31,7 @@
     "directory": "packages/id"
   },
   "scripts": {
-    "tsc": "tsc --watch",
+    "watch": "tsc --watch",
     "build": "tsc",
     "preversion": "npm test",
     "test": "mocha && npm run lint",

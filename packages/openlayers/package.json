@@ -38,6 +38,7 @@
   ],
   "scripts": {
     "dev": "vite",
+    "watch": "vite build --watch",
     "build": "tsc && vite build && npm run build:types",
     "preview": "vite preview",
     "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist"

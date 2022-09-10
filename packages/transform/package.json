@@ -37,8 +37,8 @@
     "@turf/midpoint": "^6.3.0"
   },
   "scripts": {
+    "watch": "tsc --watch",
     "build": "tsc",
-    "tsc": "tsc --watch",
     "test": "mocha && eslint dist test",
     "pretest": "npm run build"
   },

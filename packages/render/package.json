@@ -28,9 +28,8 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "pretest": "npm run build",
+    "watch": "tsc --watch",
     "build": "tsc",
-    "tsc": "tsc --watch",
     "test": "mocha && eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
