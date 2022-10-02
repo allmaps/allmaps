@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ImageSchema } from '../schemas/iiif.js'
+import { Image2Schema, Image3Schema, ImageSchema } from '../schemas/iiif.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
@@ -26,9 +26,9 @@ export class EmbeddedImage {
   uri: string
   type = 'image'
 
-  // maxWidth: number | null
-  // maxHeight: number | null
-  // maxArea: number | null = null
+  maxWidth: number | undefined
+  maxHeight: number | undefined
+  maxArea: number | undefined
 
   supportsAnyRegionAndSize: boolean | null = null
 
@@ -65,9 +65,10 @@ export class EmbeddedImage {
       const profileProperties = getProfileProperties(imageService)
 
       this.supportsAnyRegionAndSize = profileProperties.supportsAnyRegionAndSize
-      // this.maxWidth = profileProperties.maxWidth
-      // this.maxHeight = profileProperties.maxHeight
-      // this.maxArea = profileProperties.maxArea
+
+      this.maxWidth = profileProperties.maxWidth
+      this.maxHeight = profileProperties.maxHeight
+      this.maxArea = profileProperties.maxArea
     } else {
       if ('@id' in parsedImage) {
         this.uri = parsedImage['@id']
@@ -88,9 +89,10 @@ export class EmbeddedImage {
 
         this.supportsAnyRegionAndSize =
           profileProperties.supportsAnyRegionAndSize
-        // this.maxWidth = profileProperties.maxWidth
-        // this.maxHeight = profileProperties.maxHeight
-        // this.maxArea = profileProperties.maxArea
+
+        this.maxWidth = profileProperties.maxWidth
+        this.maxHeight = profileProperties.maxHeight
+        this.maxArea = profileProperties.maxArea
       }
     }
 
@@ -99,6 +101,10 @@ export class EmbeddedImage {
   }
 
   getImageUrl({ region, size }: ImageRequest): string {
+    let width
+    let height
+    let area
+
     let urlRegion: string
     if (region) {
       urlRegion = `${region.x},${region.y},${region.width},${region.height}`
@@ -108,14 +114,52 @@ export class EmbeddedImage {
 
     let urlSize: string
     if (size) {
-      let height = ''
+      width = size.width
+
+      let widthStr = String(size.width)
+      let heightStr = ''
+
       if (size.height && size.width !== size.height) {
-        height = String(size.height)
+        width = this.width
+        height = this.height
+
+        heightStr = String(size.height)
+      } else {
+        height = this.width
       }
 
-      urlSize = `${size.width},${height}`
+      urlSize = `${widthStr},${heightStr}`
     } else {
+      width = this.width
+      height = this.height
+
       urlSize = this.majorVersion === 2 ? 'full' : 'max'
+    }
+
+    area = width * height
+
+    if (this.maxWidth !== undefined) {
+      if (width > this.maxWidth) {
+        throw new Error(
+          `Width of requested image is too large: ${width} > ${this.maxWidth}`
+        )
+      }
+    }
+
+    if (this.maxHeight !== undefined) {
+      if (height > this.maxHeight) {
+        throw new Error(
+          `Height of requested image is too large: ${height} > ${this.maxHeight}`
+        )
+      }
+    }
+
+    if (this.maxArea !== undefined) {
+      if (area > this.maxArea) {
+        throw new Error(
+          `Area of requested image is too large: ${area} > ${this.maxArea}`
+        )
+      }
     }
 
     return `${this.uri}/${urlRegion}/${urlSize}/0/default.jpg`
@@ -130,7 +174,10 @@ export class EmbeddedImage {
       size,
       mode,
       {
-        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize
+        supportsAnyRegionAndSize: this.supportsAnyRegionAndSize,
+        maxWidth: this.maxWidth,
+        maxHeight: this.maxHeight,
+        maxArea: this.maxArea
       }
     )
   }
@@ -155,8 +202,17 @@ export class Image extends EmbeddedImage {
     this.sizes = parsedImage.sizes
   }
 
-  static parse(iiifData: any) {
-    const parsedImage = ImageSchema.parse(iiifData)
+  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+    let parsedImage
+
+    if (majorVersion === 2) {
+      parsedImage = Image2Schema.parse(iiifData)
+    } else if (majorVersion === 3) {
+      parsedImage = Image3Schema.parse(iiifData)
+    } else {
+      parsedImage = ImageSchema.parse(iiifData)
+    }
+
     return new Image(parsedImage)
   }
 
@@ -182,9 +238,12 @@ export class Image extends EmbeddedImage {
       size,
       mode,
       {
-        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize,
+        supportsAnyRegionAndSize: this.supportsAnyRegionAndSize,
         sizes: this.sizes,
-        tileZoomLevels: this.tileZoomLevels
+        tileZoomLevels: this.tileZoomLevels,
+        maxWidth: this.maxWidth,
+        maxHeight: this.maxHeight,
+        maxArea: this.maxArea
       }
     )
   }

@@ -2,6 +2,8 @@
   "embedded": false,
   "height": 7707,
   "majorVersion": 2,
+  "maxHeight": 5000,
+  "maxWidth": 5000,
   "sizes": [
     {
       "height": 240,

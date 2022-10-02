@@ -1,7 +1,7 @@
 import { Size, ImageRequest, Tileset, TileZoomLevel } from './types.js'
 
 export function getIiifTile(
-  {width: imageWidth, height: imageHeight}: Size,
+  { width: imageWidth, height: imageHeight }: Size,
   zoomLevel: TileZoomLevel,
   column: number,
   row: number
@@ -52,7 +52,7 @@ export function getIiifTile(
 }
 
 function getDefaultTileset(
-  {width: imageWidth, height: imageHeight}: Size,
+  { width: imageWidth, height: imageHeight }: Size,
   tileWidth = 256
 ): Tileset {
   const maxTilesPerSide = Math.max(imageWidth, imageHeight) / tileWidth
@@ -90,7 +90,7 @@ function getDefaultTileset(
 }
 
 function getTileZoomLevelFromScaleFactor(
-  {width: imageWidth, height: imageHeight}: Size,
+  { width: imageWidth, height: imageHeight }: Size,
   tileset: Tileset,
   scaleFactor: number
 ): TileZoomLevel {
@@ -114,11 +114,13 @@ function getTileZoomLevelsFromTilesets(
   imageSize: Size,
   tilesets: Tileset[]
 ): TileZoomLevel[] {
-  return tilesets.map((tileset) =>
-    tileset.scaleFactors.map((scaleFactor) =>
-    getTileZoomLevelFromScaleFactor(imageSize, tileset, scaleFactor)
+  return tilesets
+    .map((tileset) =>
+      tileset.scaleFactors.map((scaleFactor) =>
+        getTileZoomLevelFromScaleFactor(imageSize, tileset, scaleFactor)
+      )
     )
-  ).flat()
+    .flat()
 }
 
 function hasValidTileset(tilesets: Tileset[]): boolean {

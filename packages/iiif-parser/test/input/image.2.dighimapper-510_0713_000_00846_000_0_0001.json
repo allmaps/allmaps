@@ -1,0 +1,48 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://images.dighimapper.eu/iiif/2/510_0713_000_00846_000_0_0001.tif",
+  "protocol": "http://iiif.io/api/image",
+  "width": 18995,
+  "height": 10276,
+  "sizes": [
+    { "width": 148, "height": 80 },
+    { "width": 297, "height": 161 },
+    { "width": 594, "height": 321 }
+  ],
+  "tiles": [
+    {
+      "width": 512,
+      "height": 512,
+      "scaleFactors": [1, 2, 4, 8, 16, 32, 64, 128]
+    }
+  ],
+  "profile": [
+    "http://iiif.io/api/image/2/level2.json",
+    {
+      "formats": ["tif", "jpg", "gif", "png"],
+      "maxArea": 262144,
+      "qualities": ["bitonal", "default", "gray", "color"],
+      "supports": [
+        "regionByPx",
+        "sizeByW",
+        "sizeByWhListed",
+        "cors",
+        "regionSquare",
+        "sizeByDistortedWh",
+        "canonicalLinkHeader",
+        "sizeByConfinedWh",
+        "sizeByPct",
+        "jsonldMediaType",
+        "regionByPct",
+        "rotationArbitrary",
+        "sizeByH",
+        "baseUriRedirect",
+        "rotationBy90s",
+        "profileLinkHeader",
+        "sizeByForcedWh",
+        "sizeByWh",
+        "mirroring"
+      ]
+    }
+  ]
+}

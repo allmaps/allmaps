@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { ManifestSchema } from '../schemas/iiif.js'
+import {
+  Manifest2Schema,
+  Manifest3Schema,
+  ManifestSchema
+} from '../schemas/iiif.js'
 import { Canvas } from './canvas.js'
 
 import type { LanguageString, Metadata, MajorVersion } from '../lib/types.js'
@@ -24,7 +28,8 @@ type ManifestType = z.infer<typeof ManifestSchema>
 //   }
 // }
 
-export class Manifest extends EventTarget {
+// export class Manifest extends EventTarget {
+export class Manifest {
   uri: string
   type = 'manifest'
   majorVersion: MajorVersion
@@ -35,7 +40,7 @@ export class Manifest extends EventTarget {
   metadata?: Metadata
 
   constructor(parsedManifest: ManifestType) {
-    super()
+    // super()
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
@@ -68,8 +73,17 @@ export class Manifest extends EventTarget {
     }
   }
 
-  static parse(iiifData: any) {
-    const parsedManifest = ManifestSchema.parse(iiifData)
+  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+    let parsedManifest
+
+    if (majorVersion === 2) {
+      parsedManifest = Manifest2Schema.parse(iiifData)
+    } else if (majorVersion === 3) {
+      parsedManifest = Manifest3Schema.parse(iiifData)
+    } else {
+      parsedManifest = ManifestSchema.parse(iiifData)
+    }
+
     return new Manifest(parsedManifest)
   }
 
