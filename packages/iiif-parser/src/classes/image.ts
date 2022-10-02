@@ -120,12 +120,12 @@ export class EmbeddedImage {
       let heightStr = ''
 
       if (size.height && size.width !== size.height) {
-        width = this.width
-        height = this.height
+        width = size.width
+        height = size.height
 
         heightStr = String(size.height)
       } else {
-        height = this.width
+        height = size.width
       }
 
       urlSize = `${widthStr},${heightStr}`

@@ -24,7 +24,7 @@ function getThumbnailSize(
       height
     }
   } else {
-    throw new Error('Size must be either "cover" or "contain"')
+    throw new Error('Mode must be either "cover" or "contain"')
   }
 }
 
@@ -64,8 +64,11 @@ export function getThumbnail(
   }
 
   if (maxArea && width * height > maxArea) {
-    const aspectRatio = width / height
-    width = Math.floor(Math.sqrt(maxArea / aspectRatio))
+    const aspectRatio = height / width
+    const thumbnailMaxWidth = Math.floor(Math.sqrt(maxArea / aspectRatio))
+    const thumbnailMaxHeight = thumbnailMaxWidth * aspectRatio
+
+    width = Math.floor(thumbnailMaxHeight) / aspectRatio
     height = width * aspectRatio
   }
 
