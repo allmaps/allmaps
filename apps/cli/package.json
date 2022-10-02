@@ -1,12 +1,12 @@
 {
-  "name": "@allmaps/render",
-  "version": "1.0.0-beta.14",
+  "name": "@allmaps/cli",
+  "version": null,
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "Render functions for WebGL and image buffers",
+  "description": "Allmaps CLI",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
@@ -19,41 +19,49 @@
   "files": [
     "dist"
   ],
+  "bin": {
+    "allmaps": "./dist/index.js"
+  },
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/render"
-  },
-  "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
-    "test": "mocha && eslint dist test",
-    "documentation": "documentation readme ./dist/index.js --section=API"
+    "directory": "apps/cli"
   },
   "homepage": "https://allmaps.org",
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc && chmod +x dist/index.js",
+    "test": "mocha && npm run lint",
+    "pretest": "npm run build",
+    "lint": "eslint dist test"
+  },
   "keywords": [
     "allmaps",
+    "cli",
+    "iiif",
     "georeference",
     "map"
   ],
-  "dependencies": {
-    "@allmaps/iiif-parser": "^1.0.0-beta.13",
-    "@allmaps/transform": "^1.0.0-beta.4",
-    "potpack": "^1.0.1"
-  },
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/annotation": "1.0.0-beta.8",
+    "@allmaps/iiif-parser": "^1.0.0-beta.13",
+    "@allmaps/transform": "1.0.0-beta.4",
+    "stream-json": "^1.7.4",
+    "svg-parser": "^2.0.4",
+    "yargs": "^17.5.1"
+  },
   "devDependencies": {
     "@types/node": "^17.0.23",
+    "@types/stream-json": "^1.7.2",
+    "@types/svg-parser": "^2.0.3",
+    "@types/yargs": "^17.0.12",
     "chai": "^4.3.4",
-    "documentation": "^13.2.5",
     "eslint": "7",
     "mocha": "^8.3.2",
-    "typescript": "^4.5.4"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "zod": "^3.19.1"
   }
 }
