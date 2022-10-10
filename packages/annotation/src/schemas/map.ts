@@ -18,6 +18,7 @@ export const PixelMaskSchema = PointSchema.array().min(3)
 
 export const MapSchema = z.object({
   id: z.string().optional(),
+  // type: z.literal('Georef'),
   version: z.number().min(1).max(1).default(1),
   gcps: GCPSchema.array(),
   pixelMask: PixelMaskSchema,
