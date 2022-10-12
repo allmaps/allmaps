@@ -28,6 +28,12 @@ const tests = [
       'https://images.dighimapper.eu/iiif/2/510_0713_000_00846_000_0_0001.tif/full/297,161/0/default.jpg'
   },
   {
+    filename: 'image.2.dighimapper-510_0713_000_00003_000_0_0001.json',
+    thumbnailSize: { width: 400, height: 400 },
+    expectedUrl:
+      'https://images.dighimapper.eu/iiif/2/510_0713_000_00496_000_0_0001.tif/full/304,557/0/default.jpg'
+  },
+  {
     filename: 'image.2.spk-berlin-630107580-00000001.json',
     thumbnailSize: { width: 10001, height: 10001 },
     expectedUrl:
