@@ -5,12 +5,19 @@ import {
   Manifest3Schema,
   ManifestSchema
 } from '../schemas/iiif.js'
+
+import { EmbeddedManifest2Schema } from '../schemas/presentation.2.js'
+import { EmbeddedManifest3Schema } from '../schemas/presentation.3.js'
+
 import { Canvas } from './canvas.js'
 
 import type { LanguageString, Metadata, MajorVersion } from '../lib/types.js'
 import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
+type EmbeddedManifestType =
+  | z.infer<typeof EmbeddedManifest2Schema>
+  | z.infer<typeof EmbeddedManifest3Schema>
 
 // type FetchFunction = (url: string) => Promise<any>
 
@@ -28,20 +35,17 @@ type ManifestType = z.infer<typeof ManifestSchema>
 //   }
 // }
 
-// export class Manifest extends EventTarget {
-export class Manifest {
+export class EmbeddedManifest {
+  embedded = true
+
   uri: string
   type = 'manifest'
-  majorVersion: MajorVersion
-  canvases: Canvas[] = []
 
   label?: LanguageString
-  description?: LanguageString
-  metadata?: Metadata
 
-  constructor(parsedManifest: ManifestType) {
-    // super()
+  majorVersion: MajorVersion
 
+  constructor(parsedManifest: ManifestType | EmbeddedManifestType) {
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
       this.uri = parsedManifest['@id']
@@ -50,7 +54,31 @@ export class Manifest {
       if (parsedManifest.label) {
         this.label = parseVersion2String(parsedManifest.label)
       }
+    } else if ('type' in parsedManifest) {
+      // IIIF Presentation API 3.0
+      this.uri = parsedManifest.id
+      this.majorVersion = 3
 
+      this.label = parsedManifest.label
+    } else {
+      throw new Error('Unsupported Manifest')
+    }
+  }
+}
+
+export class Manifest extends EmbeddedManifest {
+  canvases: Canvas[] = []
+
+  description?: LanguageString
+  metadata?: Metadata
+
+  constructor(parsedManifest: ManifestType) {
+    super(parsedManifest)
+
+    this.embedded = false
+
+    if ('@type' in parsedManifest) {
+      // IIIF Presentation API 2.0
       if (parsedManifest.description) {
         this.description = parseVersion2String(parsedManifest.description)
       }
@@ -61,10 +89,6 @@ export class Manifest {
       this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
-      this.uri = parsedManifest.id
-      this.majorVersion = 3
-
-      this.label = parsedManifest.label
       this.metadata = parsedManifest.metadata
 
       this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))

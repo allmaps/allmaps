@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": ["Map of city of Palo Alto, Santa Clara Co., Calif"]
   },

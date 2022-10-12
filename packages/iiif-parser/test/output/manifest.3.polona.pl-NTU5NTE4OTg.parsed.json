@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "canvases": [
     {
       "type": "canvas",

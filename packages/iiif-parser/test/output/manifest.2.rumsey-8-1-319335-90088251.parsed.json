@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": ["Map of the County of Cornwall"]
   },

@@ -66,6 +66,7 @@
       }
     }
   ],
+  "embedded": false,
   "type": "manifest",
   "uri": "https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/manifest.json"
 }

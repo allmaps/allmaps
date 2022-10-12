@@ -23,6 +23,7 @@ type EmbeddedImageType =
 
 export class EmbeddedImage {
   embedded = true
+
   uri: string
   type = 'image'
 

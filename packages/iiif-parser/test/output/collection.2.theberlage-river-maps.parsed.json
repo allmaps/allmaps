@@ -1,0 +1,190 @@
+{
+  "majorVersion": 2,
+  "type": "collection",
+  "uri": "https://theberlage.github.io/river-maps/iiif/collections/river-maps.json",
+  "label": {
+    "none": ["River Maps"]
+  },
+  "items": [
+    {
+      "label": {
+        "none": ["First Edition, Series 1"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-1.json"
+    },
+    {
+      "label": {
+        "none": ["First Edition, Series 2"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-2.json"
+    },
+    {
+      "label": {
+        "none": ["First Edition, Series 3"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-3.json"
+    },
+    {
+      "label": {
+        "none": ["First Edition, Series 4"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-4.json"
+    },
+    {
+      "label": {
+        "none": ["First Edition, Series 5"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-5.json"
+    },
+    {
+      "label": {
+        "none": ["First Edition, Series 6"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-6.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 1"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-1.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 2"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-2.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 3"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-3.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 4 and 5"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-4-and-5.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 6"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-6.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 7"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-7.json"
+    },
+    {
+      "label": {
+        "none": ["First Revision, Series 8"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-revision-series-8.json"
+    },
+    {
+      "label": {
+        "none": ["Vassen Revision, Series 1"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-vassen-revision-series-1.json"
+    },
+    {
+      "label": {
+        "none": ["Vassen Revision, Series 2"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-vassen-revision-series-2.json"
+    },
+    {
+      "label": {
+        "none": ["Second Revision, Series 1"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-second-revision-series-1.json"
+    },
+    {
+      "label": {
+        "none": ["Second Revision, Series 2"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-second-revision-series-2.json"
+    },
+    {
+      "label": {
+        "none": ["Second Revision, Series 2a"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-second-revision-series-2a.json"
+    },
+    {
+      "label": {
+        "none": ["Second Revision, Series 3"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-second-revision-series-3.json"
+    },
+    {
+      "label": {
+        "none": ["Second Revision, Series 4"]
+      },
+      "majorVersion": 2,
+      "type": "manifest",
+      "embedded": true,
+      "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-second-revision-series-4.json"
+    }
+  ]
+}

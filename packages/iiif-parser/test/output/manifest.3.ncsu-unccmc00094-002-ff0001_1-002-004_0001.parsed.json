@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "canvases": [
     {
       "uri": "https://d.lib.ncsu.edu/collections/canvas/unccmc00094-002-ff0001_1-002-004_0001",

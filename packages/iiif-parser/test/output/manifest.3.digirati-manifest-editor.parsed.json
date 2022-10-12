@@ -19,6 +19,7 @@
   ],
   "uri": "https://example.org/ef0caf64-01c9-4257-b67b-a874a41c5040",
   "majorVersion": 3,
+  "embedded": false,
   "label": {
     "en": ["Blank Manifest"]
   }

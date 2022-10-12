@@ -49,3 +49,34 @@ export const Manifest3Schema = z.object({
   description: StringValue3Schema.optional(),
   metadata: Metadata3Schema.optional()
 })
+
+export interface EmbeddedManifest3 {
+  id: string
+  type: 'Manifest'
+  label?: z.infer<typeof StringValue3Schema>
+}
+
+export interface Collection3 {
+  id: string
+  type: 'Collection'
+  label?: z.infer<typeof StringValue3Schema>
+  items: (EmbeddedManifest3 | Collection3)[]
+}
+
+export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
+  () =>
+    z.object({
+      id: z.string().url(),
+      type: z.literal('Manifest'),
+      label: StringValue3Schema.optional()
+    })
+)
+
+export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
+  z.object({
+    id: z.string().url(),
+    type: z.literal('Collection'),
+    label: StringValue3Schema.optional(),
+    items: EmbeddedManifest3Schema.or(Collection3Schema).array()
+  })
+)

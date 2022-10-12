@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": [
       "Map of Russian Lapland drawn from the original map made by Professor J. A. Friis by George T. Temple"

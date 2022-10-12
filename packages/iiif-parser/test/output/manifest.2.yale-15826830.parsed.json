@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": [
       "Map of Canals and Navigable Rivers in Belgium and The North of France."
