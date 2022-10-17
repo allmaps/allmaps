@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { EmbeddedImage } from './image.js'
+import { EmbeddedImage, Image } from './image.js'
 import { CanvasSchema } from '../schemas/iiif.js'
 
 import type { LanguageString, Metadata } from '../lib/types.js'
@@ -15,7 +15,7 @@ export class Canvas {
   height: number
   width: number
 
-  image: EmbeddedImage
+  image: EmbeddedImage | Image
 
   label?: LanguageString
   metadata?: Metadata

@@ -72,6 +72,7 @@ export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
     })
 )
 
+// TODO: introduce embedded collection without items
 export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
   z.object({
     id: z.string().url(),

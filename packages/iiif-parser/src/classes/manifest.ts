@@ -9,31 +9,23 @@ import {
 import { EmbeddedManifest2Schema } from '../schemas/presentation.2.js'
 import { EmbeddedManifest3Schema } from '../schemas/presentation.3.js'
 
+import { Image } from './image.js'
 import { Canvas } from './canvas.js'
 
-import type { LanguageString, Metadata, MajorVersion } from '../lib/types.js'
+import type {
+  LanguageString,
+  Metadata,
+  MajorVersion,
+  FetchFunction,
+  FetchNextOptions,
+  FetchNextResults
+} from '../lib/types.js'
 import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
 type EmbeddedManifestType =
   | z.infer<typeof EmbeddedManifest2Schema>
   | z.infer<typeof EmbeddedManifest3Schema>
-
-// type FetchFunction = (url: string) => Promise<any>
-
-// interface FetchNextOptions {
-//   maxDepth: number
-//   maxItems: number
-// }
-
-// export class FetchedEvent extends Event {
-//   image: Image
-
-//   constructor(image: Image) {
-//     super('fetched')
-//     this.image = image
-//   }
-// }
 
 export class EmbeddedManifest {
   embedded = true
@@ -111,49 +103,37 @@ export class Manifest extends EmbeddedManifest {
     return new Manifest(parsedManifest)
   }
 
-  // const options = {
-  //   maxDepth: 2,
-  //   maxItems: 10,
-  //   images: true,
-  //   manifests: true,
-  //   collections: false
-  // }
+  async *fetchNext(
+    fetch: FetchFunction,
+    depth: number = 0
+  ): AsyncGenerator<FetchNextResults<Image>, void, void> {
+    for (const canvasIndex in this.canvases) {
+      const canvas = this.canvases[canvasIndex]
+      const image = canvas.image
 
-  // async *fetchNextImages(
-  //   fetch: FetchFunction
-  //   // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
-  // ) {
-  //   for (const imageIndex in this.images) {
-  //     const image = this.images[imageIndex]
-  //     if (image instanceof EmbeddedImage) {
-  //       const url = `${image.uri}/info.json`
+      if (image.embedded) {
+        const url = `${image.uri}/info.json`
 
-  //       const iiifData = await fetch(url)
-  //       const newImage = Image.parse(iiifData)
+        const iiifData = await fetch(url)
+        const newImage = Image.parse(iiifData)
 
-  //       this.images[imageIndex] = newImage
-  //       yield newImage
-  //     }
-  //   }
-  // }
+        canvas.image = newImage
 
-  // async fetchNextImages2(
-  //   fetch: FetchFunction
-  //   // options: FetchNextOptions = { maxDepth: 2, maxItems: 10 }
-  // ) {
-  //   for (const imageIndex in this.images) {
-  //     const image = this.images[imageIndex]
-  //     if (image instanceof EmbeddedImage) {
-  //       const url = `${image.uri}/info.json`
+        yield {
+          item: newImage,
+          depth,
+          parent: {
+            uri: this.uri,
+            type: this.type
+          }
+        }
+      }
+    }
+  }
 
-  //       const iiifData = await fetch(url)
-  //       const newImage = Image.parse(iiifData)
-
-  //       this.images[imageIndex] = newImage
-
-  //       const event = new FetchedEvent(newImage)
-  //       this.dispatchEvent(event)
-  //     }
-  //   }
+  // TODO: implement fetchByUri function, also for collections
+  // async fetchImageByUri(fetch: FetchFunction, uri: string) {
+  //   //
+  //   canvases
   // }
 }

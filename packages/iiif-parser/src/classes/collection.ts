@@ -7,9 +7,16 @@ import {
 } from '../schemas/iiif.js'
 
 import { EmbeddedManifest, Manifest } from './manifest.js'
+import type { Image } from './image.js'
 
-import type { LanguageString, Metadata, MajorVersion } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
+import type {
+  LanguageString,
+  MajorVersion,
+  FetchFunction,
+  FetchNextOptions,
+  FetchNextResults
+} from '../lib/types.js'
+import { parseVersion2String } from '../lib/strings.js'
 
 type CollectionType = z.infer<typeof CollectionSchema>
 
@@ -18,7 +25,7 @@ export class Collection {
   type = 'collection'
   majorVersion: MajorVersion
 
-  items: (Collection | EmbeddedManifest)[] = []
+  items: (Collection | Manifest | EmbeddedManifest)[] = []
 
   // TODO: add description? Add metadata?
   label?: LanguageString
@@ -76,5 +83,77 @@ export class Collection {
     }
 
     return new Collection(parsedCollection)
+  }
+
+  async *fetchNext(
+    fetch: FetchFunction,
+    options: FetchNextOptions = {
+      maxDepth: Number.POSITIVE_INFINITY,
+      fetchManifests: true,
+      fetchImages: true
+    },
+    depth: number = 0
+  ): AsyncGenerator<
+    FetchNextResults<Collection | Manifest | Image>,
+    void,
+    void
+  > {
+    if (depth >= options.maxDepth) {
+      return
+    }
+
+    for (const itemIndex in this.items) {
+      let item = this.items[itemIndex]
+
+      if (item instanceof Manifest) {
+        if ( options.fetchImages) {
+          yield* item.fetchNext(fetch, depth + 1)
+        }
+      } else if (item instanceof EmbeddedManifest && options.fetchManifests) {
+        const manifestUri = item.uri
+        const iiifData = await fetch(manifestUri)
+        const newManifest = Manifest.parse(iiifData)
+
+        this.items[itemIndex] = newManifest
+
+        yield {
+          item: newManifest,
+          depth: depth + 1,
+          parent: {
+            uri: this.uri,
+            type: this.type
+          }
+        }
+
+        if (depth + 1 < options.maxDepth && options.fetchImages) {
+          yield* newManifest.fetchNext(fetch, depth + 2)
+        }
+      } else if (item instanceof Collection) {
+        // item is Collection
+        // TODO: use embedded
+        if (!item.items.length) {
+          const collectionUri = item.uri
+          const iiifData = await fetch(collectionUri)
+          const newCollection = Collection.parse(iiifData)
+
+          this.items[itemIndex] = newCollection
+
+          yield {
+            item: newCollection,
+            depth: depth + 1,
+            parent: {
+              uri: this.uri,
+              type: this.type
+            }
+          }
+
+          item = newCollection
+        }
+
+        if (depth + 1 < options.maxDepth) {
+          yield* item.fetchNext(fetch, options, depth + 2)
+        }
+      }
+    }
   }
 }
