@@ -1,6 +1,6 @@
 {
-  "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.18",
+  "name": "@allmaps/iiif",
+  "version": "0.0.2-alpha.8",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -10,7 +10,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "apps/viewer"
+    "directory": "apps/iiif"
   },
   "license": "GPL-3.0-or-later",
   "type": "module",
@@ -26,28 +26,32 @@
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.9",
-    "@allmaps/id": "^1.0.0-beta.9",
+    "@allmaps/id": "1.0.0-beta.2",
     "@allmaps/iiif-parser": "^1.0.0-beta.15",
-    "@allmaps/openlayers": "^1.0.0-beta.19",
-    "@allmaps/transform": "^1.0.0-beta.4",
-    "ol": "^6.15.1"
+    "@allmaps/ui-components": "*",
+    "openseadragon": "^3.1.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.25.0",
     "@sveltejs/adapter-static": "next",
     "@sveltejs/kit": "next",
+    "@types/openseadragon": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
+    "autoprefixer": "^10.4.8",
+    "daisyui": "^2.24.0",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "postcss": "^8.4.16",
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.7.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.7.1",
     "svelte-preprocess": "^4.10.6",
+    "tailwindcss": "^3.1.8",
     "tslib": "^2.3.1",
     "typescript": "^4.7.4",
-    "vite": "^3.0.4"
+    "vite": "^3.1.0"
   }
 }
