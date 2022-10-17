@@ -7,7 +7,6 @@
     "url": "https://bertspaan.nl"
   },
   "description": "Allmaps CLI",
-  "private": true,
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
