@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": null,
+  "version": "1.0.0-beta.0",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
