@@ -1,104 +1,80 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { browser } from '$app/env'
-  import { env } from '$lib/variables'
-
   import { IIIF } from '@allmaps/iiif-parser'
-  import { generateId } from '@allmaps/id/browser'
+  import { parseAnnotation } from '@allmaps/annotation'
 
-  import Summary from '../components/Summary.svelte'
-  import Image from '../components/Image.svelte'
-  import Manifest from '../components/Manifest.svelte'
-  import Map from '../components/Map.svelte'
+  import { Header, URLInput, URLType, urlStore } from '@allmaps/ui-components'
+
+  import Image from '$lib/components/Image.svelte'
+  import Manifest from '$lib/components/Manifest.svelte'
+  import Collection from '$lib/components/Collection.svelte'
+  import Annotation from '$lib/components/Annotation.svelte'
 
   import type { Map as MapType } from '@allmaps/annotation'
-  import type { Image as IIIFImage, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
+  import {
+    Image as IIIFImage,
+    Manifest as IIIFManifest,
+    Collection as IIIFCollection
+  } from '@allmaps/iiif-parser'
 
-  let id: string
-  let type: string
-  let parsedIiif: IIIFImage | IIIFManifest
+  let loaded = false
+  let type: 'image' | 'annotation' | 'collection' | 'manifest'
+  let error: string
+
+  let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
   let maps: MapType[]
-  let input: HTMLInputElement
-  let url: string | null
-  let editorUrl: string
 
-  onMount(async () => {
-    url = new URLSearchParams(window.location.search).get('url')
+  urlStore.subscribe((value) => {
+    loadUrl(value)
   })
 
-  function submit() {
-    url = input.value
-    const params = new URLSearchParams(window.location.search)
-    params.set('url', url)
-    window.history.replaceState(
-      {},
-      '',
-      decodeURIComponent(`${window.location.pathname}?${params}`)
-    )
-  }
-  $: {
-    editorUrl = `${env.editorBaseUrl}/#/collection?url=${url}`
+  async function loadUrl(url: string) {
+    try {
+      const json = await fetch(url).then((response) => response.json())
 
-    if (browser && url) {
-      loadIiifUrl(url)
-    }
-  }
+      if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
+        // The JSON data might be a Georef Annotation
+        maps = parseAnnotation(json)
+        type = 'annotation'
+      } else {
+        // Try to parse IIIF data
+        parsedIiif = IIIF.parse(json)
+        type = parsedIiif.type
+      }
 
-  async function loadIiifUrl(iiifUrl: string) {
-    // TODO: try/catch
-    const iiifData = await fetch(iiifUrl).then((response) => response.json())
-    // TODO: try/catch
-    parsedIiif = IIIF.parse(iiifData)
-    type = parsedIiif.type
-    id = await generateId(parsedIiif.uri)
-    let apiUrl: string | undefined
-    if (parsedIiif.type === 'image') {
-      apiUrl = `${env.apiBaseUrl}/images/${id}/maps`
-    } else if (parsedIiif.type === 'manifest') {
-      apiUrl = `${env.apiBaseUrl}/manifests/${id}/maps`
-    }
-
-    if (apiUrl) {
-      // TODO: try/catch
-      maps = await fetch(apiUrl).then((response) => response.json())
+      loaded = true
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        error = err.message
+      } else {
+        error = 'Unknown error'
+      }
     }
   }
 </script>
 
-<h1>Allmaps Info</h1>
-
-<form on:submit|preventDefault={submit}>
-  <input
-    placeholder="IIIF Image or Manifest URL"
-    value={url}
-    bind:this={input}
-  />
-  <button type="submit">Submit</button>
-</form>
-{#if parsedIiif}
-  <Summary {id} {parsedIiif} />
-  {#if type === 'image'}
-    <Image {id} {parsedIiif} {maps} />
-  {:else if type === 'manifest'}
-    <Manifest {id} {parsedIiif} {maps} />
+<Header appName="Info">
+  {#if loaded}
+    <URLInput>
+      <URLType {type} />
+    </URLInput>
   {/if}
+</Header>
 
-  {#if maps && Array.isArray(maps) && maps.length}
-    <div>
-      This IIIF {parsedIiif.type === 'image' ? 'Image' : 'Manifest'} contains {maps.length}
-      georeferenced {maps.length === 1 ? 'map' : 'maps'}:
-    </div>
-    {#each maps as map (map.id)}
-      <Map {map} />
-    {/each}
+<main class="md:container md:mx-auto p-2 overflow-auto">
+  {#if loaded}
+    {#if parsedIiif instanceof IIIFImage}
+      <Image {parsedIiif} />
+    {:else if parsedIiif instanceof IIIFManifest}
+      <Manifest {parsedIiif} />
+    {:else if parsedIiif instanceof IIIFCollection}
+      <Collection {parsedIiif} />
+    {:else}
+      <Annotation {maps} />
+    {/if}
   {:else}
-    <div>
-      This IIIF {parsedIiif.type === 'image' ? 'Image' : 'Manifest'} does not contain
-      any georeferenced maps. You can georeference this image with
-      <a href={editorUrl}>Allmaps Editor</a>.
-    </div>
+    <URLInput />
   {/if}
-{/if}
+</main>
 
 <svelte:head>
   <style>
