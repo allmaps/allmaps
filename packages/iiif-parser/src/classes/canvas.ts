@@ -8,9 +8,11 @@ import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
 
+const CanvasTypeString = 'canvas'
+
 export class Canvas {
   uri: string
-  type = 'canvas'
+  type: typeof CanvasTypeString = CanvasTypeString
 
   height: number
   width: number

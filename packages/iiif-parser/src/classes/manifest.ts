@@ -27,11 +27,13 @@ type EmbeddedManifestType =
   | z.infer<typeof EmbeddedManifest2Schema>
   | z.infer<typeof EmbeddedManifest3Schema>
 
+const ManifestTypeString = 'manifest'
+
 export class EmbeddedManifest {
   embedded = true
 
   uri: string
-  type = 'manifest'
+  type: typeof ManifestTypeString = ManifestTypeString
 
   label?: LanguageString
 

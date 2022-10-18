@@ -20,9 +20,11 @@ import { parseVersion2String } from '../lib/strings.js'
 
 type CollectionType = z.infer<typeof CollectionSchema>
 
+const CollectionTypeString = 'collection'
+
 export class Collection {
   uri: string
-  type = 'collection'
+  type: typeof CollectionTypeString = CollectionTypeString
   majorVersion: MajorVersion
 
   items: (Collection | Manifest | EmbeddedManifest)[] = []
@@ -106,7 +108,7 @@ export class Collection {
       let item = this.items[itemIndex]
 
       if (item instanceof Manifest) {
-        if ( options.fetchImages) {
+        if (options.fetchImages) {
           yield* item.fetchNext(fetch, depth + 1)
         }
       } else if (item instanceof EmbeddedManifest && options.fetchManifests) {

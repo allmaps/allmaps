@@ -21,11 +21,13 @@ type EmbeddedImageType =
   | z.infer<typeof AnnotationBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
+const ImageTypeString = 'image'
+
 export class EmbeddedImage {
   embedded = true
 
   uri: string
-  type = 'image'
+  type: typeof ImageTypeString = ImageTypeString
 
   maxWidth: number | undefined
   maxHeight: number | undefined
