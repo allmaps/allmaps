@@ -26,12 +26,12 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@allmaps/annotation": "workspace:^1.0.0-beta.9",
-    "@allmaps/id": "workspace:^1.0.0-beta.9",
-    "@allmaps/iiif-parser": "workspace:^1.0.0-beta.15",
-    "@allmaps/openlayers": "workspace:^1.0.0-beta.19",
-    "@allmaps/transform": "workspace:^1.0.0-beta.4",
-    "@allmaps/ui-components": "workspace:1.0.0-beta.0",
+    "@allmaps/annotation": "^1.0.0-beta.9",
+    "@allmaps/id": "^1.0.0-beta.9",
+    "@allmaps/iiif-parser": "^1.0.0-beta.15",
+    "@allmaps/openlayers": "^1.0.0-beta.19",
+    "@allmaps/transform": "^1.0.0-beta.4",
+    "@allmaps/ui-components": "1.0.0-beta.0",
     "ol": "^6.15.1"
   },
   "devDependencies": {
