@@ -21,7 +21,10 @@ async function handler(argv: ArgumentsCamelCase) {
   for (let map of maps) {
     if (map.gcps.length >= 3) {
       const transformer = createTransformer(map.gcps)
-      const polygon = polygonToWorld(transformer, map.pixelMask)
+      const polygon = polygonToWorld(transformer, [
+        ...map.pixelMask,
+        map.pixelMask[0]
+      ])
 
       features.push({
         type: 'Feature',

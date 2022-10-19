@@ -93,9 +93,13 @@ export async function parseJsonFromStdin() {
 }
 
 export function printJson(json: any) {
-  if (process.stdout.isTTY) {
-    console.dir(json, { depth: null, colors: true })
-  } else {
-    console.log(JSON.stringify(json, null, 2))
-  }
+  console.log(JSON.stringify(json, null, 2))
+
+  // if (process.stdout.isTTY) {
+  //   // console.dir has 1 drawback: it doesn't add quotes to
+  //   // object keys, the CLI output therefore can't be copy/pasted
+  //   console.dir(json, { depth: null, colors: true })
+  // } else {
+  //   console.log(JSON.stringify(json, null, 2))
+  // }
 }
