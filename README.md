@@ -8,6 +8,7 @@ Packages:
 - [@allmaps/transform](packages/transform)
 - [@allmaps/render](packages/render)
 - [@allmaps/openlayers](packages/openlayers)
+- [@allmaps/ui-components](packages/ui-components)
 
 Apps:
 
@@ -15,6 +16,8 @@ Apps:
 - [Allmaps Tile Server](apps/tileserver)
 - [Allmaps Explore](apps/explore)
 - [Allmaps Info](apps/info)
+- [Allmaps IIIF Viewer](apps/iiif)
+- [Allmaps CLI](apps/cli)
 
 ## Installation
 
