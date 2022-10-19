@@ -24,7 +24,8 @@ Use Allmaps API to find Georef Annotation:
 
 Fetch Georef Annotation with cURL, pipe to Allmaps CLI and transform pixel mask to GeoJSON:
 
-    curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest" | allmaps transform pixel-mask
+    curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest" \
+    | allmaps transform pixel-mask
 
 You can pipe as multiple Georef Annotations to Allmaps CLI:
 
