@@ -1,4 +1,6 @@
 <script lang="ts">
+  /// <reference types="OpenSeadragon" />
+
   import { onMount } from 'svelte'
 
   import { IIIF } from '@allmaps/iiif-parser'
@@ -28,7 +30,8 @@
       collectionTileSize: 1024,
       collectionTileMargin: 256,
       collectionLayout: 'vertical',
-      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/'
+      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
+      navigationControlAnchor: OpenSeadragon.ControlAnchor.BOTTOM_RIGHT
     })
 
     urlStore.subscribe((value) => {
