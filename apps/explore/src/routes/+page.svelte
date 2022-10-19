@@ -15,6 +15,8 @@
   import View from 'ol/View.js'
   import { fromLonLat } from 'ol/proj.js'
 
+  import 'ol/ol.css'
+
   let ol: Map
 
   onMount(async () => {
