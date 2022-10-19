@@ -24,6 +24,10 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
+  "engines": {
+    "node": "<=18"
+  },
+  "packageManager": "pnpm@6.32.3",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.9",
     "@allmaps/id": "1.0.0-beta.2",
