@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite'
 
+import ports from '../../ports.json'
+
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
+  server: {
+    port: ports.openlayers
+  },
   build: {
     target: 'es2020',
     // minify: false,
