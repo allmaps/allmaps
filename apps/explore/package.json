@@ -26,26 +26,26 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.25.0",
+    "@playwright/test": "^1.27.1",
     "@sveltejs/adapter-static": "next",
     "@sveltejs/kit": "next",
-    "@typescript-eslint/eslint-plugin": "^5.27.0",
-    "@typescript-eslint/parser": "^5.27.0",
-    "eslint": "^8.16.0",
-    "eslint-config-prettier": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
+    "eslint": "^8.25.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "prettier": "^2.6.2",
-    "prettier-plugin-svelte": "^2.7.0",
-    "svelte": "^3.44.0",
-    "svelte-check": "^2.7.1",
-    "svelte-preprocess": "^4.10.6",
-    "tslib": "^2.3.1",
-    "typescript": "^4.7.4",
-    "vite": "^3.1.0"
+    "prettier": "^2.7.1",
+    "prettier-plugin-svelte": "^2.8.0",
+    "svelte": "^3.52.0",
+    "svelte-check": "^2.9.2",
+    "svelte-preprocess": "^4.10.7",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.8"
   },
   "dependencies": {
-    "ol": "^6.15.1",
-    "@allmaps/ui-components": "1.0.0-beta.0",
-    "flowbite-svelte": "^0.27.8"
+    "@allmaps/ui-components": "workspace:1.0.0-beta.0",
+    "flowbite-svelte": "^0.27.9",
+    "ol": "^6.15.1"
   }
 }
