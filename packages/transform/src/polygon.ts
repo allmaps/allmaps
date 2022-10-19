@@ -37,10 +37,10 @@ export function polygonToWorld(
 
   // if (maxOffsetPercentage > 0)
 
-  const segments = Array.from(Array(worldPoints.length - 1)).map(
+  const segments = Array.from(Array(worldPoints.length)).map(
     (_, index) => ({
       from: worldPoints[index],
-      to: worldPoints[index + 1]
+      to: worldPoints[(index + 1) % worldPoints.length]
     })
   )
 
