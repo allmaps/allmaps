@@ -13,7 +13,7 @@
   const dataUrlPrefix = 'data:text/x-url,'
   const dataJsonPrefix = 'data:application/json,'
 
-  let type: string
+  let type: 'annotation'
   let loaded = false
   let annotationUrl = ''
   let annotationString = ''
@@ -70,7 +70,7 @@
     //   setDataHash('', annotationString)
   }
 
-  function loadUrl(url) {
+  function loadUrl(url: string) {
     if (url) {
       annotationUrl = url
     }
@@ -164,4 +164,3 @@
     {/if}
   </main>
 </div>
-
