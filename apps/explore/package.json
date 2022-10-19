@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "lerna-build": "lerna run build --scope @allmaps/explore --include-dependencies",
     "preview": "vite preview",
     "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -43,6 +44,7 @@
     "vite": "^3.1.0"
   },
   "dependencies": {
-    "ol": "^6.15.1"
+    "ol": "^6.15.1",
+    "@allmaps/ui-components": "1.0.0-beta.0",
   }
 }
