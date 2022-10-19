@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { afterNavigate } from '$app/navigation'
+
   import url from '$lib/shared/stores/url.js'
 
   let urlValue: string
-  export let placeholder = 'Type the URL of a IIIF Image, Manifest, Collection or Georef Annotation'
+  export let placeholder =
+    'Type the URL of a IIIF Image, Manifest, Collection or Georef Annotation'
 
   url.subscribe((value) => {
     urlValue = value
@@ -17,8 +20,25 @@
   }
 
   function submit() {
+    if (urlValue) {
+      setStoreValue(urlValue)
+    }
+  }
+
+  function setStoreValue(urlValue: string) {
     $url = urlValue
   }
+
+  afterNavigate(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const url = searchParams.get('url')
+
+    if (url) {
+      setStoreValue(url)
+    } else {
+      setStoreValue('')
+    }
+  })
 </script>
 
 <form
@@ -32,5 +52,7 @@
     class="bg-transparent w-full p-2 focus:outline-none truncate"
     {placeholder}
   />
-  <slot />
+  <div class="shrink-0">
+    <slot />
+  </div>
 </form>

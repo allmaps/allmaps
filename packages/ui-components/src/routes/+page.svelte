@@ -4,8 +4,6 @@
   import Header from '$lib/components/Header.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
 
-  // const url = 'https://collections.leventhalmap.org/search/commonwealth:7h14cv71z/manifest'
-
   let urlValue: string
 
   url.subscribe((value) => {
@@ -23,6 +21,6 @@
   <URLInput />
 
   <p class="my-2">
-    The current URL is <a class="underline" href={urlValue}>{urlValue}</a>.
+    The current URL is "{urlValue}".
   </p>
 </main>

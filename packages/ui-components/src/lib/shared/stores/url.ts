@@ -1,9 +1,7 @@
 import { browser } from '$app/environment'
 import { goto } from '$app/navigation'
 import { page } from '$app/stores'
-import { get } from 'svelte/store'
-
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 
 let initialUrl = ''
 
@@ -25,7 +23,11 @@ url.subscribe((value) => {
       const searchParams = $page.url.searchParams
       if (value !== searchParams.get('url')) {
         $page.url.searchParams.set('url', value)
-        goto(`?${$page.url.searchParams.toString()}`)
+
+        // TODO: also use page path in goto
+        goto(`?${$page.url.searchParams.toString()}`, {
+          keepfocus: true
+        })
       }
     }
   }

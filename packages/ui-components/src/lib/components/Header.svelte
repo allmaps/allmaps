@@ -1,6 +1,4 @@
 <script lang="ts">
-  // import '$lib/shared/app.css'
-
   import logo from '$lib/shared/images/allmaps-logo.svg'
 
   export let appName: string
