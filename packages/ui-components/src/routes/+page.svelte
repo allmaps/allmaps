@@ -13,12 +13,16 @@
 
 <Header appName="Header">
   <URLInput>
-    <div class="shrink-0 px-1 py-0.5 m-1 bg-lime-600/50 text-lime-700 rounded-md border-lime-800/25 border-2 text-xs ">Length: {urlValue.length}</div>
+    <div
+      class="shrink-0 px-1 py-0.5 m-1 bg-lime-600/50 text-lime-700 rounded-md border-lime-800/25 border-2 text-xs "
+    >
+      Length: {urlValue.length}
+    </div>
   </URLInput>
 </Header>
 
 <main class="container mx-auto p-4">
-  <URLInput />
+  <URLInput autofocus={false} />
 
   <p class="my-2">
     The current URL is "{urlValue}".

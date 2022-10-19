@@ -4,6 +4,11 @@
   import url from '$lib/shared/stores/url.js'
 
   let urlValue: string
+
+  // TODO: only set autofocus default to true
+  // when url is empty
+  export let autofocus = true
+
   export let placeholder =
     'Type the URL of a IIIF Image, Manifest, Collection or Georef Annotation'
 
@@ -47,6 +52,7 @@
 >
   <input
     type="input"
+    {autofocus}
     on:click={inputClick}
     bind:value={urlValue}
     class="bg-transparent w-full p-2 focus:outline-none truncate"
