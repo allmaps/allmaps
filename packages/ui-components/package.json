@@ -1,6 +1,6 @@
 {
 	"name": "@allmaps/ui-components",
-	"version": "1.0.0-beta.0",
+	"version": "1.0.0-beta.1",
 	"author": {
 		"name": "Bert Spaan",
 		"email": "hello@bertspaan.nl",
@@ -8,8 +8,8 @@
 	},
 	"description": "Allmaps UI components, build with Svelte",
 	"type": "module",
-  "types": "./package/index.d.ts",
-  "module": "./package/index.js",
+	"types": "./package/index.d.ts",
+	"module": "./package/index.js",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -36,10 +36,10 @@
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
 		"autoprefixer": "^10.4.8",
-		"flowbite-svelte": "^0.27.5",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"flowbite-svelte": "^0.27.5",
 		"postcss": "^8.4.16",
 		"prettier": "^2.6.2",
 		"prettier-plugin-svelte": "^2.7.0",

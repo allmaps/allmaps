@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -48,8 +48,8 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.9",
-    "@allmaps/iiif-parser": "^1.0.0-beta.15",
-    "@allmaps/transform": "1.0.0-beta.4",
+    "@allmaps/iiif-parser": "^1.0.0-beta.16",
+    "@allmaps/transform": "^1.0.0-beta.5",
     "stream-json": "^1.7.4",
     "svg-parser": "^2.0.4",
     "yargs": "^17.5.1"

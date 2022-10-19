@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.16",
+  "version": "1.0.0-beta.17",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -40,8 +40,8 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/iiif-parser": "^1.0.0-beta.15",
-    "@allmaps/transform": "^1.0.0-beta.4",
+    "@allmaps/iiif-parser": "^1.0.0-beta.16",
+    "@allmaps/transform": "^1.0.0-beta.5",
     "potpack": "^1.0.1"
   },
   "license": "GPL-3.0-or-later",
