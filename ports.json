@@ -1,0 +1,9 @@
+{
+  "viewer": 5500,
+  "info": 5501,
+  "explore": 5502,
+  "openlayers": 5503,
+  "tileserver": 5504,
+  "ui-components": 5505,
+  "iiif": 5506
+}
