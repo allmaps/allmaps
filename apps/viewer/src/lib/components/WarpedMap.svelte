@@ -148,7 +148,7 @@
         // center: [-7914732, 5209134],
 
         // minZoom: 6,
-        maxZoom: 20,
+        maxZoom: 24,
         zoom: 12
       })
     })

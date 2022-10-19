@@ -1,34 +1,14 @@
 {
   "examples": [
     {
-      "title": "Plattegrond van Rotterdam in 12 bladen: Blad 5",
+      "title": "Kaart van het centrum van Rotterdam van voor mei 1940",
       "organization": "Stadsarchief Rotterdam",
-      "url": "https://raw.githubusercontent.com/bertspaan/rotterdams-publiek/master/annotations/NL-RtSA_4201_I-138-02-5.json"
-    },
-    {
-      "title": "'t Hooge heemraedschap van Delflant (Nicolaes en Jacob Kruikius, 1712)",
-      "organization": "TU Delft Library",
-      "url": "https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/tudelft-1712-kruikius.json"
-    },
-    {
-      "title": "Antwerp",
-      "organization": "Digital Commonwealth - Massachusetts Collections Online",
-      "url": "https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/commonwealth-0z709594h.json"
+      "url": "https://annotations.allmaps.org/?url=https://rotterdamspubliek.nl/iiif/NL-RtSA_4001_1972-755-1/info.json"
     },
     {
       "title": "Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide",
       "organization": "Library of Congress",
-      "url": "https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-88695674.json"
-    },
-    {
-      "title": "Expugnatio Fortissimae Vibis Bredae Anno 1637",
-      "organization": "Universiteit Leiden",
-      "url": "https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/leiden-2481595.json"
-    },
-    {
-      "title": "New York Central and Hudson River Railroad",
-      "organization": "Library of Congress",
-      "url": "https://raw.githubusercontent.com/bertspaan/iiif-map-collections/master/georeferencing-annotations/loc-98688736.json"
+      "url": "https://annotations.allmaps.org/?url=https://www.loc.gov/item/88695674/manifest.json"
     },
     {
       "title": "Atlas of the city of Boston, West Roxbury",
