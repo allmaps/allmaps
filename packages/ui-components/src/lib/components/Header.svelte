@@ -6,7 +6,7 @@
   export let appName: string
 </script>
 
-<header class="shadow-md p-2">
+<header class="shadow-md p-1 md:p-2">
   <nav class="mx-auto flex flex-wrap justify-between items-center gap-3">
     <a href="/" class="flex gap-2 no-underline">
       <img class="w-8 inline" alt="Allmaps logo" src={logo} />
