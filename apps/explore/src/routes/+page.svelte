@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
+  import { Header } from '@allmaps/ui-components'
+
   import Map from 'ol/Map.js'
 
   import TileLayer from 'ol/layer/Tile.js'
@@ -47,14 +49,7 @@
   })
 </script>
 
-<h1>Allmaps Explore</h1>
-
-<div id="ol">s</div>
-
-<style>
-  #ol {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-</style>
+<div class="absolute w-full h-full flex flex-col">
+  <Header appName="Explore" />
+  <div id="ol" class="w-full h-full" />
+</div>

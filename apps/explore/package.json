@@ -46,5 +46,6 @@
   "dependencies": {
     "ol": "^6.15.1",
     "@allmaps/ui-components": "1.0.0-beta.0",
+    "flowbite-svelte": "^0.27.8"
   }
 }
