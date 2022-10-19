@@ -15,131 +15,134 @@ const TILE_SIZE = 256
 const CHANNELS = 4
 
 export async function createWarpedTileResponse(
-  map: Map,
+  maps: Map[],
   { x, y, z }: XYZTile,
   cache: Cache
 ): Promise<Response> {
+  const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
+
   if (!(x >= 0 && y >= 0 && z >= 0)) {
     throw new Error('x, y and z must be positive integers')
   }
 
-  let pixelMask
-  if (map.pixelMask) {
-    pixelMask = map.pixelMask
-  } else {
-    // TODO: create mask from full image
-    throw new Error('Map does not have pixelMask')
-  }
+  for (let map of maps) {
+    let pixelMask
+    if (map.pixelMask) {
+      pixelMask = map.pixelMask
+    } else {
+      // TODO: create mask from full image
+      throw new Error('Map does not have pixelMask')
+    }
 
-  const imageInfoResponse = await cachedFetch(
-    cache,
-    `${map.image.uri}/info.json`
-  )
-
-  const imageInfo = await imageInfoResponse.json()
-  const parsedImage: Image = Image.parse(imageInfo)
-
-  const extent = xyzTileToGeoExtent({ x, y, z })
-
-  const transformer = new GCPTransformer(map.gcps)
-  const iiifTiles = computeIiifTilesForMapGeoBBox(
-    transformer,
-    parsedImage,
-    [TILE_SIZE, TILE_SIZE],
-    extent
-  )
-
-  const iiifTileUrls = iiifTiles.map((tile: Tile) => {
-    const { region, size } = parsedImage.getIiifTile(
-      tile.zoomLevel,
-      tile.column,
-      tile.row
+    const imageInfoResponse = await cachedFetch(
+      cache,
+      `${map.image.uri}/info.json`
     )
-    return parsedImage.getImageUrl({ region, size })
-  })
 
-  // TODO: find a way to do max. 6 requests at the same time,
-  // instead of one by one with this loop
-  // https://developers.cloudflare.com/workers/platform/limits/
-  const iiifTileResponses = []
-  for (const url of iiifTileUrls) {
-    const response = await cachedFetch(cache, url)
-    iiifTileResponses.push(response)
-  }
+    const imageInfo = await imageInfoResponse.json()
+    const parsedImage: Image = Image.parse(imageInfo)
 
-  const iiifTileImages: ArrayBuffer[] = await Promise.all(
-    iiifTileResponses.map((response) => response.arrayBuffer())
-  )
+    const extent = xyzTileToGeoExtent({ x, y, z })
 
-  // TODO: Rename
-  const decodedJpegs = iiifTileImages.map((buffer) =>
-    decodeJpeg(buffer, { useTArray: true })
-  )
+    const transformer = new GCPTransformer(map.gcps)
+    const iiifTiles = computeIiifTilesForMapGeoBBox(
+      transformer,
+      parsedImage,
+      [TILE_SIZE, TILE_SIZE],
+      extent
+    )
 
-  const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
-  // TODO: use spherical mercator instead of lat/lon
-  const longitudeFrom = extent[0]
-  const latitudeFrom = extent[1]
-  const longitudeDiff = extent[2] - extent[0]
-  const latitudeDiff = extent[3] - extent[1]
-  const longitudeStep = longitudeDiff / TILE_SIZE
-  const latitudeStep = latitudeDiff / TILE_SIZE
+    const iiifTileUrls = iiifTiles.map((tile: Tile) => {
+      const { region, size } = parsedImage.getIiifTile(
+        tile.zoomLevel,
+        tile.column,
+        tile.row
+      )
+      return parsedImage.getImageUrl({ region, size })
+    })
 
-  // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
-  for (let x = 0; x < TILE_SIZE; x++) {
-    for (let y = 0; y < TILE_SIZE; y++) {
-      const world: Coord = [
-        longitudeFrom + y * longitudeStep,
-        latitudeFrom + x * latitudeStep
-      ]
-      const [pixelX, pixelY] = transformer.toResource(world)
-      // TODO: improve efficiency
-      // TODO: fix strange repeating error,
-      //    remove pointInPolygon check and fix first
-      const inside = pointInPolygon([pixelX, pixelY], pixelMask)
-      if (!inside) {
-        continue
-      }
+    // TODO: find a way to do max. 6 requests at the same time,
+    // instead of one by one with this loop
+    // https://developers.cloudflare.com/workers/platform/limits/
+    const iiifTileResponses = []
+    for (const url of iiifTileUrls) {
+      const response = await cachedFetch(cache, url)
+      iiifTileResponses.push(response)
+    }
 
-      let tileIndex: number | undefined
-      let tile: Tile | undefined
-      let tileXMin: number | undefined
-      let tileYMin: number | undefined
-      let foundTile = false
-      for (tileIndex = 0; tileIndex < iiifTiles.length; tileIndex++) {
-        tile = iiifTiles[tileIndex]
-        tileXMin = tile.column * tile.zoomLevel.originalWidth
-        tileYMin = tile.row * tile.zoomLevel.originalHeight
-        if (
-          pixelX >= tileXMin &&
-          pixelX <= tileXMin + tile.zoomLevel.originalWidth &&
-          pixelY >= tileYMin &&
-          pixelY <= tileYMin + tile.zoomLevel.originalHeight
-        ) {
-          foundTile = true
-          break
+    const iiifTileImages: ArrayBuffer[] = await Promise.all(
+      iiifTileResponses.map((response) => response.arrayBuffer())
+    )
+
+    // TODO: Rename
+    const decodedJpegs = iiifTileImages.map((buffer) =>
+      decodeJpeg(buffer, { useTArray: true })
+    )
+
+    // TODO: use spherical mercator instead of lat/lon
+    const longitudeFrom = extent[0]
+    const latitudeFrom = extent[1]
+    const longitudeDiff = extent[2] - extent[0]
+    const latitudeDiff = extent[3] - extent[1]
+    const longitudeStep = longitudeDiff / TILE_SIZE
+    const latitudeStep = latitudeDiff / TILE_SIZE
+
+    // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
+    for (let x = 0; x < TILE_SIZE; x++) {
+      for (let y = 0; y < TILE_SIZE; y++) {
+        const world: Coord = [
+          longitudeFrom + y * longitudeStep,
+          latitudeFrom + x * latitudeStep
+        ]
+        const [pixelX, pixelY] = transformer.toResource(world)
+        // TODO: improve efficiency
+        // TODO: fix strange repeating error,
+        //    remove pointInPolygon check and fix first
+        const inside = pointInPolygon([pixelX, pixelY], pixelMask)
+        if (!inside) {
+          continue
         }
-      }
 
-      if (
-        foundTile &&
-        tile &&
-        tileXMin !== undefined &&
-        tileYMin !== undefined
-      ) {
-        const decodedJpeg = decodedJpegs[tileIndex]
-        if (decodedJpeg) {
-          const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
-          const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
-          const warpedBufferIndex = (x * TILE_SIZE + y) * CHANNELS
-          const bufferIndex =
-            (Math.floor(pixelTileY) * decodedJpeg.width +
-              Math.floor(pixelTileX)) *
-            CHANNELS
-          for (let color = 0; color < CHANNELS; color++) {
-            // TODO: don't just copy single pixel, do proper image interpolating
-            warpedTile[warpedBufferIndex + color] =
-              decodedJpeg.data[bufferIndex + color]
+        let tileIndex: number | undefined
+        let tile: Tile | undefined
+        let tileXMin: number | undefined
+        let tileYMin: number | undefined
+        let foundTile = false
+        for (tileIndex = 0; tileIndex < iiifTiles.length; tileIndex++) {
+          tile = iiifTiles[tileIndex]
+          tileXMin = tile.column * tile.zoomLevel.originalWidth
+          tileYMin = tile.row * tile.zoomLevel.originalHeight
+          if (
+            pixelX >= tileXMin &&
+            pixelX <= tileXMin + tile.zoomLevel.originalWidth &&
+            pixelY >= tileYMin &&
+            pixelY <= tileYMin + tile.zoomLevel.originalHeight
+          ) {
+            foundTile = true
+            break
+          }
+        }
+
+        if (
+          foundTile &&
+          tile &&
+          tileXMin !== undefined &&
+          tileYMin !== undefined
+        ) {
+          const decodedJpeg = decodedJpegs[tileIndex]
+          if (decodedJpeg) {
+            const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
+            const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
+            const warpedBufferIndex = (x * TILE_SIZE + y) * CHANNELS
+            const bufferIndex =
+              (Math.floor(pixelTileY) * decodedJpeg.width +
+                Math.floor(pixelTileX)) *
+              CHANNELS
+            for (let color = 0; color < CHANNELS; color++) {
+              // TODO: don't just copy single pixel, do proper image interpolating
+              warpedTile[warpedBufferIndex + color] =
+                decodedJpeg.data[bufferIndex + color]
+            }
           }
         }
       }

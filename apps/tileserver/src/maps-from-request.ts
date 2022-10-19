@@ -6,41 +6,41 @@ import type { Cache } from './types.js'
 import type { Map, Maps } from '@allmaps/annotation'
 import type { Obj } from 'itty-router'
 
-export async function mapFromParams(
+export async function mapsFromParams(
   cache: Cache,
-  env: unknown,
+  env: any,
   params: Obj | undefined
-): Promise<Map> {
+): Promise<Map[]> {
   const mapId = params?.mapId
+  const manifestId = params?.manifestId
 
-  let baseUrl: string | undefined
-
-  if (env && typeof env === 'object' && 'API_BASE_URL' in env) {
-    baseUrl = String(env.API_BASE_URL)
+  let url
+  if (mapId) {
+    url = `${env.API_BASE_URL}/maps/${mapId}`
+  } else if (manifestId) {
+    url = `${env.API_BASE_URL}/manifests/${manifestId}/maps`
+  } else {
+    return []
   }
 
-  if (!baseUrl) {
-    throw new Error('Base URL not found in API_BASE_URL environment variable')
-  }
+  const mapsResponse = await cachedFetch(cache, url)
 
-  const url = `${baseUrl}/maps/${mapId}`
-  const mapResponse = await cachedFetch(cache, url)
-
-  if (!mapResponse) {
+  if (!mapsResponse) {
     throw new Error(`Error fetching maps from URL: ${url}`)
   }
 
-  const fetchedMap = await mapResponse.json()
-  const mapOrMaps = validateMap(fetchedMap)
+  const fetchedMaps = await mapsResponse.json()
+  const mapOrMaps = validateMap(fetchedMaps)
 
-  let map: Map
+  let maps: Map[]
   if (Array.isArray(mapOrMaps)) {
-    map = mapOrMaps[0]
+    maps = mapOrMaps
   } else {
-    map = mapOrMaps
+    maps = [mapOrMaps]
   }
 
-  return map
+  // Only return maps with at least 3 GCPs
+  return maps.filter((map) => map.gcps.length >= 3)
 }
 
 export async function mapsFromQuery(
@@ -62,7 +62,9 @@ export async function mapsFromQuery(
     const fetchedAnnotation = await annotationResponse.json()
 
     const maps = parseAnnotation(fetchedAnnotation)
-    return maps
+
+    // Only return maps with at least 3 GCPs
+    return maps.filter((map) => map.gcps.length >= 3)
   } else {
     throw new Error('No annotation query parameter supplied')
   }

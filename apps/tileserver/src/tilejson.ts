@@ -1,6 +1,5 @@
 import { GCPTransformer } from '@allmaps/transform'
 
-import center from '@turf/center'
 import bbox from '@turf/bbox'
 
 import type { Map } from '@allmaps/annotation'
@@ -17,22 +16,37 @@ type TileJSON = {
 }
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(urlTemplate: string, map: Map): TileJSON {
-  const transformer = new GCPTransformer(map.gcps)
+export function generateTileJson(urlTemplate: string, maps: Map[]): TileJSON {
+  let geoMasks = []
 
-  const geoMask = transformer.toGeoJSON(map.pixelMask, {
-    maxOffsetRatio: 0.01
+  for (let map of maps) {
+    const transformer = new GCPTransformer(map.gcps)
+
+    const geoMask = transformer.toGeoJSON(map.pixelMask, {
+      maxOffsetRatio: 0.01
+    })
+    geoMasks.push(geoMask)
+  }
+
+  const bounds = bbox({
+    type: 'FeatureCollection',
+    features: geoMasks.map((geoMask) => ({
+      type: 'Feature',
+      properties: {},
+      geometry: geoMask
+    }))
   })
-
-  bbox(geoMask)
 
   return {
     tilejson: '3.0.0',
     id: urlTemplate,
     tiles: [urlTemplate],
     fields: {},
-    bounds: bbox(geoMask),
-    center: center(geoMask).geometry.coordinates
+    bounds,
+    center: [
+      (bounds[2] - bounds[0]) / 2 + bounds[0],
+      (bounds[3] - bounds[1]) / 2 + bounds[1]
+    ]
     // TODO: add minzoom and maxzoom
   }
 }

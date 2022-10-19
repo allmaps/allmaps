@@ -25,6 +25,10 @@ Publish to Cloudflare Workers:
 
 ## API
 
+//////
+Georeference Annotation
+Editor
+
 Example Georeference Annotation of a map of [Coney Island from the NYPL](https://digitalcollections.nypl.org/items/bdde3640-8624-0137-35d0-37ca81be9adc):
 
 - https://annotations.allmaps.org/images/ea443ffaabb121e2
@@ -39,9 +43,18 @@ Allmaps Tile Server also supports [TileJSON](https://github.com/mapbox/tilejson-
 
 - https://allmaps.xyz/tiles.json?url=https://annotations.allmaps.org/images/ea443ffaabb121e2
 
+_Note: Allmaps Tile Server does not depend on https://annotations.allmaps.org. You can use Georef Annotations from any URL._
+
 ### By using the Allmaps ID of a georeferenced map
 
 If Allmaps has georeference data available about a certain IIIF image and you know its Allmaps ID, you can also use this ID directly.
+
+//////
+@allmaps/id
+https://github.com/allmaps/allmaps/tree/develop/packages/id
+
+//////
+annotations.allmaps.org/?url=https://iiif.nypl.org/iiif/2/58009096
 
 You can find out the Allmaps ID of all the maps in a georeferenced image like this:
 
