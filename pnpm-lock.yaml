@@ -45,6 +45,7 @@ importers:
 
   apps/explore:
     specifiers:
+      '@allmaps/ui-components': 1.0.0-beta.0
       '@playwright/test': ^1.25.0
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -53,6 +54,7 @@ importers:
       eslint: ^8.16.0
       eslint-config-prettier: ^8.3.0
       eslint-plugin-svelte3: ^4.0.0
+      flowbite-svelte: ^0.27.8
       ol: ^6.15.1
       prettier: ^2.6.2
       prettier-plugin-svelte: ^2.7.0
@@ -63,6 +65,8 @@ importers:
       typescript: ^4.7.4
       vite: ^3.1.0
     dependencies:
+      '@allmaps/ui-components': link:../../packages/ui-components
+      flowbite-svelte: 0.27.8
       ol: 6.15.1
     devDependencies:
       '@playwright/test': 1.25.0
@@ -87,7 +91,7 @@ importers:
       '@allmaps/annotation': ^1.0.0-beta.9
       '@allmaps/id': 1.0.0-beta.2
       '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/ui-components': '*'
+      '@allmaps/ui-components': 1.0.0-beta.0
       '@playwright/test': ^1.25.0
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -99,7 +103,7 @@ importers:
       eslint: ^8.16.0
       eslint-config-prettier: ^8.3.0
       eslint-plugin-svelte3: ^4.0.0
-      openseadragon: ^3.1.0
+      flowbite-svelte: ^0.27.8
       postcss: ^8.4.16
       prettier: ^2.6.2
       prettier-plugin-svelte: ^2.7.0
@@ -115,7 +119,7 @@ importers:
       '@allmaps/id': 1.0.0-beta.2
       '@allmaps/iiif-parser': link:../../packages/iiif-parser
       '@allmaps/ui-components': link:../../packages/ui-components
-      openseadragon: 3.1.0
+      flowbite-svelte: 0.27.8
     devDependencies:
       '@playwright/test': 1.25.0
       '@sveltejs/adapter-static': 1.0.0-next.44
@@ -144,7 +148,7 @@ importers:
       '@allmaps/annotation': ^1.0.0-beta.9
       '@allmaps/id': 1.0.0-beta.2
       '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/ui-components': '*'
+      '@allmaps/ui-components': 1.0.0-beta.0
       '@playwright/test': ^1.27.1
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -233,6 +237,7 @@ importers:
       '@allmaps/iiif-parser': ^1.0.0-beta.15
       '@allmaps/openlayers': ^1.0.0-beta.19
       '@allmaps/transform': ^1.0.0-beta.4
+      '@allmaps/ui-components': 1.0.0-beta.0
       '@playwright/test': ^1.25.0
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -260,6 +265,7 @@ importers:
       '@allmaps/iiif-parser': link:../../packages/iiif-parser
       '@allmaps/openlayers': link:../../packages/openlayers
       '@allmaps/transform': link:../../packages/transform
+      '@allmaps/ui-components': link:../../packages/ui-components
       ol: 6.15.1
     devDependencies:
       '@playwright/test': 1.25.0
@@ -8955,10 +8961,6 @@ packages:
       is-docker: 2.2.1
       is-wsl: 2.2.0
     dev: true
-
-  /openseadragon/3.1.0:
-    resolution: {integrity: sha512-0zCbRIWUbCto7xm1tv2ZLEiSl84cDU659W/sfs2zqqTqVRa4CRHzhy7i9nsv6dHA1DryFR8IzjStjmWOqRs9Rg==}
-    dev: false
 
   /optionator/0.9.1:
     resolution: {integrity: sha512-74RlY5FCnhq4jRxVUPKDaRwrVNXMqsGsiW6AJw4XK8hmtm10wC0ypZBLw5IIp85NZMr91+qd1RvvENwg7jjRFw==}
