@@ -32,23 +32,6 @@
     }/{z}/{x}/{y}.png?annotation=${encodeURIComponent(urlAnnotation)}`
   }
 
-  // geoMask = map ? transform.polygonToWorld(transformer, map.pixelMask) : null
-
-  //   bounds = {
-  //   const nw = L.geoJson(geoMask).getBounds().getNorthWest()
-  //   const se = L.geoJson(geoMask).getBounds().getSouthEast()
-
-  //   return [
-  //     [
-  //       nw.lat,
-  //       nw.lng,
-  //     ],[
-  //       se.lat,
-  //       se.lng
-  //     ]
-  //   ]
-  // }
-
   // https://bertspaan.nl/xyz?url=https://tiles.allmaps.org/maps/CFqQGwiHhs5Bf4Bu/{z}/{x}/{y}.png&bounds=51.92313317376381,4.354052530621939,51.87322883159531,4.5166149971211125
   // https://editor.allmaps.org/#/collection?url=https%3A%2F%2Fvu.contentdm.oclc.org%2Fdigital%2Fiiif%2Fkrt%2F1019%2Finfo.json&image=AxCqqiUiBKR1Erw1
 

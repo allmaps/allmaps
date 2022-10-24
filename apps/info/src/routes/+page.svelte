@@ -20,7 +20,7 @@
   let type: 'image' | 'annotation' | 'collection' | 'manifest'
   let error: string
 
-  let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
+  let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection | undefined
   let maps: MapType[]
 
   urlStore.subscribe((value) => {
@@ -34,10 +34,14 @@
       if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
         // The JSON data might be a Georef Annotation
         maps = parseAnnotation(json)
+        parsedIiif = undefined
+
         type = 'annotation'
       } else {
         // Try to parse IIIF data
         parsedIiif = IIIF.parse(json)
+        maps = []
+
         type = parsedIiif.type
       }
 
