@@ -92,7 +92,7 @@
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
-  <Header appName="IIIF Viewer">
+  <Header appName="IIIF">
     {#if iiifUrl}
       <URLInput>
         <URLType {type} />
