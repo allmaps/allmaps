@@ -21,5 +21,7 @@
 {#if error}
   <p>{error.message}</p>
 {:else if maps}
-  <Maps {annotation} {maps} />
+  <div class="flex flex-col h-full">
+    <Maps {annotation} {maps} />
+  </div>
 {/if}

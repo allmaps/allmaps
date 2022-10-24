@@ -67,7 +67,7 @@
   // }
 
   function handleStringSubmit() {
-    //   setDataHash('', annotationString)
+    // setDataHash('', annotationString)
   }
 
   function loadUrl(url: string) {
@@ -82,10 +82,10 @@
     return annotation
   }
 
-  async function parseAnnotation() {
+  async function parseAnnotation(annotationUrl: string | undefined, annotationString: string | undefined) {
     let annotation
     if (annotationUrl) {
-      annotation = fetchAnnotation(annotationUrl)
+      annotation = await fetchAnnotation(annotationUrl)
     } else if (annotationString) {
       annotation = JSON.parse(annotationString)
     }
@@ -116,9 +116,9 @@
       </URLInput>
     {/if}
   </Header>
-  <main class="h-full">
+  <main class="grow">
     {#if annotationUrl || annotationString}
-      {#await parseAnnotation()}
+      {#await parseAnnotation(annotationUrl, annotationString)}
         <Loading />
       {:then annotation}
         <Annotation {annotation} />
