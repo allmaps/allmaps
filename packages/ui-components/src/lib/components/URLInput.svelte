@@ -1,13 +1,16 @@
 <script lang="ts">
   import { afterNavigate } from '$app/navigation'
+  import { get } from 'svelte/store'
 
   import url from '$lib/shared/stores/url.js'
 
   let urlValue: string
 
-  // TODO: only set autofocus default to true
-  // when url is empty
-  export let autofocus = true
+  export let autofocus: boolean | undefined = undefined
+
+  const hasInitialUrl = get(url) ? true : false
+
+  autofocus = (autofocus === undefined) ? !hasInitialUrl : false
 
   export let placeholder =
     'Type the URL of a IIIF Image, Manifest, Collection or Georef Annotation'

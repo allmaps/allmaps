@@ -11,7 +11,8 @@
 </script>
 
 <div
-  class="small-caps px-2 py-0.5 m-1 bg-lime-600/50 text-lime-700 rounded-md border-lime-800/25 border-1 text-xs "
+  class="small-caps px-2 py-0.5 m-1 bg-lime-600/50 text-lime-700 rounded-md border-lime-800/25 border-1 text-xs"
+  title={urlTypeToString(type)}
 >
   {urlTypeToString(type)}
 </div>
