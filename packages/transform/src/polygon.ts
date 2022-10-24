@@ -24,18 +24,20 @@ function point(point: Coord): Point {
   }
 }
 
-export function polygonToWorld(
+export function svgPolygonToGeoJSONPolygon(
   transformArgs: GCPTransformInfo,
   points: Coord[],
   maxOffsetPercentage = 0.01,
   maxDepth = 8
 ) {
+  if (!points || points.length < 3) {
+    throw new Error('SVG polygon should contain at least 3 points')
+  }
+
   const worldPoints = points.map((point) => ({
     image: point,
     world: toWorld(transformArgs, point)
   }))
-
-  // if (maxOffsetPercentage > 0)
 
   const segments = Array.from(Array(worldPoints.length)).map(
     (_, index) => ({
@@ -46,7 +48,7 @@ export function polygonToWorld(
 
   const segmentsWithMidpoints = segments
     .map((segment) =>
-      addMidpoints(transformArgs, segment, maxOffsetPercentage, maxDepth)
+      addMidpoints(transformArgs, segment, maxOffsetPercentage, maxDepth, 0)
     )
     .flat(1)
 
@@ -66,7 +68,7 @@ function addMidpoints(
   segment: Segment,
   maxOffsetPercentage: number,
   maxDepth: number,
-  depth = 0
+  depth: number
 ): Segment | Segment[] {
   const imageMidpoint: Coord = [
     (segment.from.image[0] + segment.to.image[0]) / 2,
@@ -86,6 +88,7 @@ function addMidpoints(
   const distanceMidpoints = distance(segmentWorldMidpoint, actualWorldMidpoint)
 
   if (
+    distanceSegment > 0 &&
     distanceMidpoints / distanceSegment > maxOffsetPercentage &&
     depth < maxDepth
   ) {
@@ -99,12 +102,14 @@ function addMidpoints(
         transformArgs,
         { from: segment.from, to: newSegmentMidpoint },
         maxOffsetPercentage,
+        maxDepth,
         depth + 1
       ),
       addMidpoints(
         transformArgs,
         { from: newSegmentMidpoint, to: segment.to },
         maxOffsetPercentage,
+        maxDepth,
         depth + 1
       )
     ].flat(1)

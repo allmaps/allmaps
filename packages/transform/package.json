@@ -45,6 +45,7 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "chai": "^4.3.4",
+    "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "7",
     "mocha": "^8.3.2"
   },
