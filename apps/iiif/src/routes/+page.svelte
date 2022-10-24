@@ -1,11 +1,12 @@
 <script lang="ts">
-  /// <reference types="OpenSeadragon" />
-
   import { onMount } from 'svelte'
 
   import { IIIF } from '@allmaps/iiif-parser'
+  import { parseAnnotation } from '@allmaps/annotation'
 
   import { Header, URLInput, URLType, urlStore } from '@allmaps/ui-components'
+
+  import OpenSeadragon from '$lib/components/OpenSeadragon.svelte'
 
   import {
     Image as IIIFImage,
@@ -13,27 +14,15 @@
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
 
+  let iiifUrl: string | undefined
   let loaded = false
-  let error
+  let error: string
 
-  let type: string
-  let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
-  let images: IIIFImage[] = []
+  let type: 'manifest' | 'image' | 'collection' | 'annotation'
 
-  let openSeadragon: OpenSeadragon.Viewer
+  let imageUris = new Set<string>()
 
   onMount(async () => {
-    openSeadragon = OpenSeadragon({
-      id: 'openseadragon',
-      collectionMode: true,
-      collectionRows: 8,
-      collectionTileSize: 1024,
-      collectionTileMargin: 256,
-      collectionLayout: 'vertical',
-      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
-      navigationControlAnchor: OpenSeadragon.ControlAnchor.BOTTOM_RIGHT
-    })
-
     urlStore.subscribe((value) => {
       loadIiifUrl(value)
     })
@@ -43,21 +32,29 @@
     return fetch(url).then((response) => response.json())
   }
 
-  async function loadIiifUrl(iiifUrl: string) {
-    if (iiifUrl) {
-      images = []
-      openSeadragon.world.resetItems()
-      openSeadragon.world.removeAll()
-      openSeadragon.world.update()
+  async function loadIiifUrl(newIiifUrl: string) {
+    if (newIiifUrl) {
+      iiifUrl = newIiifUrl
+
+      imageUris = new Set()
+      loaded = false
 
       try {
-        const iiifData = await fetchJson(iiifUrl)
+        const json = await fetchJson(iiifUrl)
 
-        parsedIiif = IIIF.parse(iiifData)
-        type = parsedIiif.type
-        loaded = true
+        if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
+          // JSON might be a Georef Annotation
+          const maps = parseAnnotation(json)
+          type = 'annotation'
+          maps.forEach((map) => addImageUri(map.image.uri))
+          loaded = true
+        } else {
+          // JSON might be IIIF data
+          const parsedIiif = IIIF.parse(json)
+          type = parsedIiif.type
 
-        addImages(parsedIiif)
+          addImages(parsedIiif)
+        }
       } catch (err: unknown) {
         if (err instanceof Error) {
           error = err.message
@@ -65,17 +62,13 @@
           error = 'Unknown error'
         }
       }
+    } else {
+      iiifUrl = undefined
     }
   }
 
-  function addImage(image: IIIFImage) {
-    images.push(image)
-
-    const tileSource = `${image.uri}/info.json`
-
-    openSeadragon.addTiledImage({
-      tileSource
-    })
+  function addImageUri(imageUri: string) {
+    imageUris.add(imageUri)
   }
 
   async function addImages(
@@ -87,28 +80,40 @@
     ) {
       for await (const next of parsedIiif.fetchNext(fetchJson)) {
         if (next.item instanceof IIIFImage) {
-          addImage(next.item)
+          addImageUri(next.item.uri)
         }
       }
     } else {
-      addImage(parsedIiif)
+      addImageUri(parsedIiif.uri)
     }
+
+    loaded = true
   }
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="IIIF Viewer">
-    {#if loaded}
+    {#if iiifUrl}
       <URLInput>
         <URLType {type} />
       </URLInput>
     {/if}
   </Header>
-
-  {#if !loaded}
-    <URLInput />
+  {#if !iiifUrl || !loaded || error}
+    <div class="container m-auto">
+      {#if !iiifUrl}
+        <URLInput />
+      {:else if error}
+        <p>Error: {error}</p>
+      {:else if !loaded}
+        <p>Loading!</p>
+      {/if}
+    </div>
+  {:else}
+    <div class="grow">
+      <OpenSeadragon imageUris={Array.from(imageUris)} />
+    </div>
   {/if}
-  <div id="openseadragon" class:hidden={!loaded} class="grow" />
 </div>
 
 <svelte:head>

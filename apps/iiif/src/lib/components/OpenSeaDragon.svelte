@@ -1,56 +1,27 @@
 <script lang="ts">
+  /// <reference types="OpenSeadragon" />
+
   import { onMount } from 'svelte'
 
-  import { Collection } from '@allmaps/iiif-parser'
+  export let imageUris: string[]
 
-  let parsedCollection: Collection | undefined
+  onMount(() => {
+    const tileSources = imageUris.map((imageUri) => `${imageUri}/info.json`)
 
-  async function fetchJson(url: string) {
-    const response = await fetch(url)
-    return await response.json()
-  }
+    const columns = Math.floor(Math.sqrt(tileSources.length))
 
-  onMount(async () => {
-    const iiifData = await fetchJson(
-      'https://raw.githubusercontent.com/theberlage/river-maps/main/iiif/collections/river-maps.json'
-    )
-
-    parsedCollection = Collection.parse(iiifData)
-
-    // console.dir(parsedCollection)
-    for await (const next of parsedCollection.fetchNext(fetchJson, {
-      maxDepth: 2,
-      fetchManifests: true,
-      fetchImages: false
-    })) {
-      parsedCollection = parsedCollection
-    }
+    const openSeadragon = OpenSeadragon({
+      id: 'openseadragon',
+      collectionMode: true,
+      collectionRows: columns,
+      collectionTileSize: 1024,
+      collectionTileMargin: 256,
+      // collectionLayout: 'vertical',
+      prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
+      navigationControlAnchor: OpenSeadragon.ControlAnchor.BOTTOM_RIGHT,
+      tileSources
+    })
   })
 </script>
 
-<div>
-  {#if parsedCollection}
-    <div>{parsedCollection.uri}</div>
-    <ol>
-      {#each parsedCollection.items as manifest}
-        <li>
-          <div>{manifest.type}</div>
-          {#if manifest.type === 'manifest' && manifest.canvases}
-            <ol>
-              {#each manifest.canvases as canvas}
-                <li><img src={canvas.image.getImageUrl(canvas.image.getThumbnail({width:100,height: 100}))} /></li>
-              {/each}
-            </ol>
-          {/if}
-        </li>
-      {/each}
-    </ol>
-  {/if}
-</div>
-
-<style>
-  ol {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-</style>
+<div id="openseadragon" class="w-full h-full" />
