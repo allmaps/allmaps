@@ -1,4 +1,7 @@
-import { createTransformer, polygonToWorld } from '@allmaps/transform'
+import {
+  createTransformer,
+  svgPolygonToGeoJSONPolygon
+} from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
@@ -21,10 +24,7 @@ async function handler(argv: ArgumentsCamelCase) {
   for (let map of maps) {
     if (map.gcps.length >= 3) {
       const transformer = createTransformer(map.gcps)
-      const polygon = polygonToWorld(transformer, [
-        ...map.pixelMask,
-        map.pixelMask[0]
-      ])
+      const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
 
       features.push({
         type: 'Feature',

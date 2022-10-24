@@ -1,5 +1,5 @@
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
-import { createTransformer, polygonToWorld } from '@allmaps/transform'
+import { createTransformer, svgPolygonToGeoJSONPolygon } from '@allmaps/transform'
 
 // import { parseJsonFromStdin, printJson } from '../../lib/io.js'
 

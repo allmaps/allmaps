@@ -10,7 +10,10 @@ import { apply as applyTransform } from 'ol/transform.js'
 
 import { computeIiifTilesForMapExtent } from '@allmaps/render'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
-import { createTransformer, polygonToWorld } from '@allmaps/transform'
+import {
+  createTransformer,
+  svgPolygonToGeoJSONPolygon
+} from '@allmaps/transform'
 
 import { WarpedMap } from './WarpedMap.js'
 import { WarpedMapEventTypes } from './WarpedMapEventType.js'
@@ -72,12 +75,7 @@ export class RTree extends EventTarget {
       maxY = Math.max(maxY, coordinate[1])
     })
 
-    return [
-      minX,
-      minY,
-      maxX,
-      maxY
-    ]
+    return [minX, minY, maxX, maxY]
   }
 
   sendSourceMessage(type: string, data: any) {
@@ -181,12 +179,7 @@ export class RTree extends EventTarget {
 
     const transformer = createTransformer(sphericalMercatorGcps)
 
-    const geoMask = polygonToWorld(
-      transformer,
-      [...map.pixelMask, map.pixelMask[map.pixelMask.length - 1]],
-      0.01,
-      0
-    )
+    const geoMask = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
 
     const geoMaskExtent = this.getGeoMaskExtent(geoMask)
 
@@ -277,7 +270,10 @@ export class RTree extends EventTarget {
         }
 
         const topLeft = [warpedMap.geoMaskExtent[0], warpedMap.geoMaskExtent[1]]
-        const bottomRight = [warpedMap.geoMaskExtent[2], warpedMap.geoMaskExtent[3]]
+        const bottomRight = [
+          warpedMap.geoMaskExtent[2],
+          warpedMap.geoMaskExtent[3]
+        ]
 
         const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
         const pixelBottomRight = applyTransform(

@@ -39,7 +39,7 @@ export default {
 
 //     for (let map of maps) {
 //       const transformer = createTransformer(map.gcps)
-//       const polygon = polygonToWorld(transformer, map.pixelMask)
+//       const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
 
 //       features.push({
 //         type: 'Feature',

@@ -1,4 +1,7 @@
-import { createTransformer, polygonToWorld } from '@allmaps/transform'
+import {
+  createTransformer,
+  svgPolygonToGeoJSONPolygon
+} from '@allmaps/transform'
 
 import center from '@turf/center'
 import bbox from '@turf/bbox'
@@ -19,7 +22,7 @@ interface TileJSON {
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
 export function generateTileJson(urlTemplate: string, map: Map): TileJSON {
   const transformer = createTransformer(map.gcps)
-  const geoMask = polygonToWorld(transformer, map.pixelMask)
+  const geoMask = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
 
   bbox(geoMask)
 

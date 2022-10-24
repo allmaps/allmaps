@@ -12,7 +12,10 @@
   import View from 'ol/View.js'
   import { fromLonLat } from 'ol/proj.js'
 
-  import { createTransformer, polygonToWorld } from '@allmaps/transform'
+  import {
+    createTransformer,
+    svgPolygonToGeoJSONPolygon
+  } from '@allmaps/transform'
   import { IIIF } from '@allmaps/iiif-parser'
 
   import { WarpedMapLayer, WarpedMapSource } from '@allmaps/openlayers'
@@ -44,7 +47,7 @@
       // // TODO: what happens with maps without pixelMask?!
       // // Make sure annotation parser/generator always adds pixelMask!
       // if (map.pixelMask && map.pixelMask.length) {
-      //   const geoMask = polygonToWorld(transformArgs, map.pixelMask)
+      //   const geoMask = svgPolygonToGeoJSONPolygon(transformArgs, map.pixelMask)
       //   vectorSource.addFeature((new GeoJSON()).readFeature(geoMask, { featureProjection: 'EPSG:3857' }))
       // }
 
