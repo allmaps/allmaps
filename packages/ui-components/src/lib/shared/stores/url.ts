@@ -46,7 +46,7 @@ url.subscribe((value) => {
     const $page = get(page)
     if ($page.url) {
       const searchParams = $page.url.searchParams
-      if (value !== searchParams.get('url')) {
+      if (value !== searchParams.get('url') && value.length) {
         $page.url.searchParams.set('url', value)
 
         // TODO: also use page path in goto
