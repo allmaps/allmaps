@@ -13,8 +13,8 @@ importers:
   apps/cli:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/transform': 1.0.0-beta.4
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/transform': ^1.0.0-beta.5
       '@types/node': ^17.0.23
       '@types/stream-json': ^1.7.2
       '@types/svg-parser': ^2.0.3
@@ -45,7 +45,7 @@ importers:
 
   apps/explore:
     specifiers:
-      '@allmaps/ui-components': 1.0.0-beta.0
+      '@allmaps/ui-components': ^1.0.0-beta.1
       '@playwright/test': ^1.27.1
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -70,8 +70,8 @@ importers:
       ol: 6.15.1
     devDependencies:
       '@playwright/test': 1.27.1
-      '@sveltejs/adapter-static': 1.0.0-next.45
-      '@sveltejs/kit': 1.0.0-next.519_svelte@3.52.0+vite@3.1.8
+      '@sveltejs/adapter-static': 1.0.0-next.46
+      '@sveltejs/kit': 1.0.0-next.522_svelte@3.52.0+vite@3.1.8
       '@typescript-eslint/eslint-plugin': 5.40.1_ukgdydjtebaxmxfqp5v5ulh64y
       '@typescript-eslint/parser': 5.40.1_z4bbprzjrhnsfa24uvmcbu7f5q
       eslint: 8.25.0
@@ -90,8 +90,8 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
       '@allmaps/id': 1.0.0-beta.2
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/ui-components': 1.0.0-beta.0
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/ui-components': ^1.0.0-beta.1
       '@playwright/test': ^1.27.1
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -122,8 +122,8 @@ importers:
       flowbite-svelte: 0.27.9
     devDependencies:
       '@playwright/test': 1.27.1
-      '@sveltejs/adapter-static': 1.0.0-next.45
-      '@sveltejs/kit': 1.0.0-next.519_svelte@3.52.0+vite@3.1.8
+      '@sveltejs/adapter-static': 1.0.0-next.46
+      '@sveltejs/kit': 1.0.0-next.522_svelte@3.52.0+vite@3.1.8
       '@types/openseadragon': 3.0.4
       '@typescript-eslint/eslint-plugin': 5.40.1_ukgdydjtebaxmxfqp5v5ulh64y
       '@typescript-eslint/parser': 5.40.1_z4bbprzjrhnsfa24uvmcbu7f5q
@@ -146,9 +146,9 @@ importers:
   apps/info:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
-      '@allmaps/id': 1.0.0-beta.2
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/ui-components': 1.0.0-beta.0
+      '@allmaps/id': ^1.0.0-beta.10
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/ui-components': ^1.0.0-beta.1
       '@playwright/test': ^1.27.1
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -171,14 +171,14 @@ importers:
       vite: ^3.1.8
     dependencies:
       '@allmaps/annotation': link:../../packages/annotation
-      '@allmaps/id': 1.0.0-beta.2
+      '@allmaps/id': link:../../packages/id
       '@allmaps/iiif-parser': link:../../packages/iiif-parser
       '@allmaps/ui-components': link:../../packages/ui-components
       flowbite-svelte: 0.27.9
     devDependencies:
       '@playwright/test': 1.27.1
-      '@sveltejs/adapter-static': 1.0.0-next.45
-      '@sveltejs/kit': 1.0.0-next.519_svelte@3.52.0+vite@3.1.8
+      '@sveltejs/adapter-static': 1.0.0-next.46
+      '@sveltejs/kit': 1.0.0-next.522_svelte@3.52.0+vite@3.1.8
       '@typescript-eslint/eslint-plugin': 5.40.1_ukgdydjtebaxmxfqp5v5ulh64y
       '@typescript-eslint/parser': 5.40.1_z4bbprzjrhnsfa24uvmcbu7f5q
       autoprefixer: 10.4.12_postcss@8.4.18
@@ -199,10 +199,10 @@ importers:
   apps/tileserver:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
-      '@allmaps/id': ^1.0.0-beta.9
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/render': ^1.0.0-beta.16
-      '@allmaps/transform': ^1.0.0-beta.4
+      '@allmaps/id': ^1.0.0-beta.10
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/render': ^1.0.0-beta.17
+      '@allmaps/transform': ^1.0.0-beta.5
       '@cloudflare/workers-types': ^3.14.0
       '@turf/bbox': ^6.5.0
       '@turf/center': ^6.5.0
@@ -233,11 +233,11 @@ importers:
   apps/viewer:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
-      '@allmaps/id': ^1.0.0-beta.9
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/openlayers': ^1.0.0-beta.19
-      '@allmaps/transform': ^1.0.0-beta.4
-      '@allmaps/ui-components': 1.0.0-beta.0
+      '@allmaps/id': ^1.0.0-beta.10
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/openlayers': ^1.0.0-beta.20
+      '@allmaps/transform': ^1.0.0-beta.5
+      '@allmaps/ui-components': ^1.0.0-beta.1
       '@playwright/test': ^1.27.1
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next
@@ -269,8 +269,8 @@ importers:
       ol: 6.15.1
     devDependencies:
       '@playwright/test': 1.27.1
-      '@sveltejs/adapter-static': 1.0.0-next.45
-      '@sveltejs/kit': 1.0.0-next.519_svelte@3.52.0+vite@3.1.8
+      '@sveltejs/adapter-static': 1.0.0-next.46
+      '@sveltejs/kit': 1.0.0-next.522_svelte@3.52.0+vite@3.1.8
       '@typescript-eslint/eslint-plugin': 5.40.1_ukgdydjtebaxmxfqp5v5ulh64y
       '@typescript-eslint/parser': 5.40.1_z4bbprzjrhnsfa24uvmcbu7f5q
       autoprefixer: 10.4.12_postcss@8.4.18
@@ -346,10 +346,10 @@ importers:
   packages/openlayers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.9
-      '@allmaps/id': ^1.0.0-beta.9
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/render': ^1.0.0-beta.16
-      '@allmaps/transform': ^1.0.0-beta.4
+      '@allmaps/id': ^1.0.0-beta.10
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/render': ^1.0.0-beta.17
+      '@allmaps/transform': ^1.0.0-beta.5
       '@types/earcut': ^2.1.1
       '@types/lodash-es': ^4.17.6
       '@types/rbush': ^3.0.0
@@ -380,8 +380,8 @@ importers:
 
   packages/render:
     specifiers:
-      '@allmaps/iiif-parser': ^1.0.0-beta.15
-      '@allmaps/transform': ^1.0.0-beta.4
+      '@allmaps/iiif-parser': ^1.0.0-beta.16
+      '@allmaps/transform': ^1.0.0-beta.5
       '@types/node': ^17.0.23
       chai: ^4.3.4
       documentation: ^13.2.5
@@ -406,6 +406,7 @@ importers:
       '@turf/distance': ^6.3.0
       '@turf/midpoint': ^6.3.0
       chai: ^4.3.4
+      chai-shallow-deep-equal: ^1.4.6
       eslint: '7'
       mocha: ^8.3.2
     dependencies:
@@ -413,6 +414,7 @@ importers:
       '@turf/midpoint': 6.5.0
     devDependencies:
       chai: 4.3.6
+      chai-shallow-deep-equal: 1.4.6_chai@4.3.6
       eslint: 7.32.0
       mocha: 8.4.0
 
@@ -442,7 +444,7 @@ importers:
     devDependencies:
       '@playwright/test': 1.25.0
       '@sveltejs/adapter-auto': 1.0.0-next.84
-      '@sveltejs/kit': 1.0.0-next.519_svelte@3.48.0+vite@3.1.0
+      '@sveltejs/kit': 1.0.0-next.522_svelte@3.48.0+vite@3.1.0
       '@sveltejs/package': 1.0.0-next.1_lvfi2wesz6u4l5rfbnetbucfmm
       '@typescript-eslint/eslint-plugin': 5.27.1_gav5dxubrvrjafh4n6juxjnvcu
       '@typescript-eslint/parser': 5.27.1_n4lrrl552kqf5nk4rgej5xdcha
@@ -1904,7 +1906,7 @@ packages:
     resolution: {integrity: sha512-8KG5RD0GVP4ydEzRn/I4BNDuxDtqVbOdm8675T49OIG/NGhaK0pjPX7ZcDlvKYbA+ulvVK3ztfcF4uBdOxuJbQ==}
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.3.7
+      semver: 7.3.8
     dev: true
 
   /@npmcli/fs/2.1.0:
@@ -2219,8 +2221,8 @@ packages:
       set-cookie-parser: 2.5.1
     dev: true
 
-  /@sveltejs/adapter-static/1.0.0-next.45:
-    resolution: {integrity: sha512-7hJp3QYbn5+hDJKJDMe3ufAvPlgSP6Ishm1X84cbydKM1ZuI/rtmQw3gDEUuXAgcU+TDJTJLwrSlcErr1/HjIw==}
+  /@sveltejs/adapter-static/1.0.0-next.46:
+    resolution: {integrity: sha512-8BlgwD3fjAbtUUgvREjrq5okZSXMTU/Qla99RhTqGaFo+uOrUzguKrXvjeaD4GzxQZdQUNyTX9hKT0V7tX6TMw==}
     dev: true
 
   /@sveltejs/adapter-vercel/1.0.0-next.80:
@@ -2233,8 +2235,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.519_svelte@3.48.0+vite@3.1.0:
-    resolution: {integrity: sha512-Hlpee5iOcvfRPNxs641SNohhUGOx4ZQjM+QRJkv0sZpR897XougM7HSgp70eijacb0UbyPrx6inWKm/MZZSeow==}
+  /@sveltejs/kit/1.0.0-next.522_svelte@3.48.0+vite@3.1.0:
+    resolution: {integrity: sha512-dVVrRPbXlAut4vg8kbCeZOjUZnYB7ZvDKp/yAx8InpDF0P1bvUDlc++DXFeMBdXX8bakTA3NGonWnDjqslCsZw==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true
@@ -2261,8 +2263,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.519_svelte@3.52.0+vite@3.1.8:
-    resolution: {integrity: sha512-Hlpee5iOcvfRPNxs641SNohhUGOx4ZQjM+QRJkv0sZpR897XougM7HSgp70eijacb0UbyPrx6inWKm/MZZSeow==}
+  /@sveltejs/kit/1.0.0-next.522_svelte@3.52.0+vite@3.1.8:
+    resolution: {integrity: sha512-dVVrRPbXlAut4vg8kbCeZOjUZnYB7ZvDKp/yAx8InpDF0P1bvUDlc++DXFeMBdXX8bakTA3NGonWnDjqslCsZw==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true
@@ -3430,7 +3432,7 @@ packages:
   /builtins/5.0.1:
     resolution: {integrity: sha512-qwVpFEHNfhYJIzNRBvd2C1kyo6jz3ZSMPyyuR47OPdiKWlbYnZNyDWuyR175qDnAJLiCo5fBBqPb3RiXgWlkOQ==}
     dependencies:
-      semver: 7.3.7
+      semver: 7.3.8
     dev: true
 
   /busboy/1.6.0:
