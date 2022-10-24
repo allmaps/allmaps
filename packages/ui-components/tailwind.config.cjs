@@ -6,11 +6,6 @@ module.exports = {
   ],
   theme: {
     extend: {}
-  },
-  plugins: [require('flowbite/plugin')],
-  // safelist: [
-  //   {
-  //     pattern: /./
-  //   }
-  // ]
+  }
+  // plugins: [require('flowbite/plugin')]
 }
