@@ -22,6 +22,12 @@ type CollectionType = z.infer<typeof CollectionSchema>
 
 const CollectionTypeString = 'collection'
 
+const defaulfFetchNextOptions = {
+  maxDepth: Number.POSITIVE_INFINITY,
+  fetchManifests: true,
+  fetchImages: true
+}
+
 export class Collection {
   uri: string
   type: typeof CollectionTypeString = CollectionTypeString
@@ -89,17 +95,25 @@ export class Collection {
 
   async *fetchNext(
     fetch: FetchFunction,
-    options: FetchNextOptions = {
-      maxDepth: Number.POSITIVE_INFINITY,
-      fetchManifests: true,
-      fetchImages: true
-    },
+    options: FetchNextOptions = defaulfFetchNextOptions,
     depth: number = 0
   ): AsyncGenerator<
     FetchNextResults<Collection | Manifest | Image>,
     void,
     void
   > {
+    if (options.maxDepth === undefined) {
+      options.maxDepth = defaulfFetchNextOptions.maxDepth
+    }
+
+    if (options.fetchImages === undefined) {
+      options.fetchImages = defaulfFetchNextOptions.fetchImages
+    }
+
+    if (options.fetchManifests === undefined) {
+      options.fetchManifests = defaulfFetchNextOptions.fetchManifests
+    }
+
     if (depth >= options.maxDepth) {
       return
     }

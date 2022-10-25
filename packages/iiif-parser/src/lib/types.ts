@@ -55,7 +55,7 @@ export type Metadata = MetadataItem[]
 export type FetchFunction = (url: string) => Promise<any>
 
 export interface FetchNextOptions {
-  maxDepth: number
+  maxDepth?: number
   fetchManifests?: boolean
   fetchImages?: boolean
 }
