@@ -53,6 +53,7 @@
   class="flex items-center gap-2 w-full bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
   on:submit|preventDefault={submit}
 >
+  <!-- svelte-ignore a11y-autofocus -->
   <input
     type="input"
     {autofocus}

@@ -12,7 +12,7 @@ function getUrlFromQueryString(location: Location): string | null {
 }
 
 function getUrlFromHash(location: Location): string | null {
-  const hashQueryString = window.location.hash.slice(1)
+  const hashQueryString = location.hash.slice(1)
   const searchParams = new URLSearchParams(hashQueryString)
   const data = searchParams.get('data')
 

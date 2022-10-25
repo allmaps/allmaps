@@ -1,9 +1,10 @@
 import urlStore from './shared/stores/url.js'
 
-import Header from './components/Header.svelte'
-import URLInput from './components/URLInput.svelte'
-import URLType from './components/URLType.svelte'
+import Header from '$lib/components/Header.svelte'
+import URLInput from '$lib/components/URLInput.svelte'
+import URLType from '$lib/components/URLType.svelte'
+import Loading from '$lib/components/Loading.svelte'
 
 export { urlStore }
 
-export { Header, URLInput, URLType }
+export { Header, URLInput, URLType, Loading }
