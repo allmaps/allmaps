@@ -4,7 +4,7 @@
   import { IIIF } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import { Header, URLInput, URLType, urlStore } from '@allmaps/ui-components'
+  import { Header, URLInput, URLType, Loading, urlStore } from '@allmaps/ui-components'
 
   import OpenSeadragon from '$lib/components/OpenSeadragon.svelte'
 
@@ -14,7 +14,7 @@
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
 
-  let iiifUrl: string | undefined
+  let url: string | undefined
   let loaded = false
   let error: string
 
@@ -24,7 +24,7 @@
 
   onMount(async () => {
     urlStore.subscribe((value) => {
-      loadIiifUrl(value)
+      loadUrl(value)
     })
   })
 
@@ -32,15 +32,15 @@
     return fetch(url).then((response) => response.json())
   }
 
-  async function loadIiifUrl(newIiifUrl: string) {
-    if (newIiifUrl) {
-      iiifUrl = newIiifUrl
+  async function loadUrl(newUrl: string) {
+    if (newUrl) {
+      url = newUrl
 
       imageUris = new Set()
       loaded = false
 
       try {
-        const json = await fetchJson(iiifUrl)
+        const json = await fetchJson(url)
 
         if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
           // JSON might be a Georef Annotation
@@ -63,26 +63,32 @@
         }
       }
     } else {
-      iiifUrl = undefined
+      url = undefined
     }
+  }
+
+  function addManifest(manifest: IIIFManifest) {
+    manifest.canvases.forEach(({ image }) => addImageUri(image.uri))
   }
 
   function addImageUri(imageUri: string) {
     imageUris.add(imageUri)
+    imageUris = imageUris
   }
 
   async function addImages(
     parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
   ) {
-    if (
-      parsedIiif instanceof IIIFCollection ||
-      parsedIiif instanceof IIIFManifest
-    ) {
-      for await (const next of parsedIiif.fetchNext(fetchJson)) {
-        if (next.item instanceof IIIFImage) {
-          addImageUri(next.item.uri)
+    if (parsedIiif instanceof IIIFCollection) {
+      for await (const next of parsedIiif.fetchNext(fetchJson, {
+        fetchImages: false
+      })) {
+        if (next.item instanceof IIIFManifest) {
+          addManifest(next.item)
         }
       }
+    } else if (parsedIiif instanceof IIIFManifest) {
+      addManifest(parsedIiif)
     } else {
       addImageUri(parsedIiif.uri)
     }
@@ -93,20 +99,25 @@
 
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="IIIF">
-    {#if iiifUrl}
+    {#if url}
       <URLInput>
         <URLType {type} />
       </URLInput>
     {/if}
   </Header>
-  {#if !iiifUrl || !loaded || error}
-    <div class="container m-auto">
-      {#if !iiifUrl}
+  {#if !url || !loaded || error}
+    <div class="container m-auto p-1 md:p-2">
+      {#if !url}
         <URLInput />
       {:else if error}
         <p>Error: {error}</p>
       {:else if !loaded}
-        <p>Loading!</p>
+        <div class="flex gap-4 flex-col items-center">
+          <Loading />
+          <div>
+            {imageUris.size} images loaded…
+          </div>
+        </div>
       {/if}
     </div>
   {:else}
