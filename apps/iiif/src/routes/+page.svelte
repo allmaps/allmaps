@@ -1,10 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { get} from 'svelte/store'
+  import { page } from '$app/stores'
 
   import { IIIF } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import { Header, URLInput, URLType, Loading, urlStore } from '@allmaps/ui-components'
+  import {
+    Header,
+    URLInput,
+    URLType,
+    Loading,
+    urlStore
+  } from '@allmaps/ui-components'
 
   import OpenSeadragon from '$lib/components/OpenSeadragon.svelte'
 
@@ -14,15 +22,18 @@
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
 
-  let url: string | undefined
+  let url: string | undefined = get(urlStore)
+
   let loaded = false
-  let error: string
+  let mounted = false
+  let error: string | undefined
 
   let type: 'manifest' | 'image' | 'collection' | 'annotation'
 
   let imageUris = new Set<string>()
 
   onMount(async () => {
+    mounted = true
     urlStore.subscribe((value) => {
       loadUrl(value)
     })
@@ -38,6 +49,7 @@
 
       imageUris = new Set()
       loaded = false
+      error = undefined
 
       try {
         const json = await fetchJson(url)
@@ -65,6 +77,14 @@
     } else {
       url = undefined
     }
+  }
+
+  function locationUrlWithInfoJson(url: string) {
+    const searchParams = $page.url.searchParams
+
+    const slash = url.endsWith('/') ? '' : '/'
+    searchParams.set('url', `${url}${slash}info.json`)
+    return `${window.location.pathname}?${searchParams.toString()}`
   }
 
   function addManifest(manifest: IIIFManifest) {
@@ -107,16 +127,25 @@
   </Header>
   {#if !url || !loaded || error}
     <div class="container m-auto p-1 md:p-2">
-      {#if !url}
+      {#if !url && mounted}
         <URLInput />
       {:else if error}
-        <p>Error: {error}</p>
+        <div class="flex flex-col items-center">
+          <p>Error: {error}</p>
+          {#if url && !url.endsWith('info.json')}
+            <p>
+              If you're loading a IIIF Image, try again by <a href={locationUrlWithInfoJson(url)}>adding <code
+                >info.json</code
+              > to the URL</a>.
+            </p>
+          {/if}
+        </div>
       {:else if !loaded}
-        <div class="flex gap-4 flex-col items-center">
+        <div class="flex flex-col items-center">
           <Loading />
-          <div>
+          <p>
             {imageUris.size} images loaded…
-          </div>
+          </p>
         </div>
       {/if}
     </div>
