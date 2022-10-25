@@ -43,16 +43,20 @@ Georef Annotations:
 
 Concatenate these two Georef Annotations with Bash and transform pixel masks to GeoJSON:
 
-    cat <(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest") \
-    <(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest") \
-    | allmaps transform pixel-mask
+```bash
+cat \
+<(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest") \
+<(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest") \
+| allmaps transform pixel-mask
+```
 
 ### Combine multiple Georef Annotations
 
 Allmaps CLI can combine multiple Georef Annotations and output them as a single AnnotationPage:
 
 ```bash
-cat <(curl https://annotations.allmaps.org/manifests/f2aa771c7d0ae1e8) \
+cat \
+<(curl https://annotations.allmaps.org/manifests/f2aa771c7d0ae1e8) \
 <(curl https://annotations.allmaps.org/images/813b0579711371e2) \
 | allmaps annotation generate
 ```
