@@ -1,0 +1,105 @@
+{
+  "@context": ["https://iiif.io/api/presentation/3/context.json"],
+  "type": "Manifest",
+  "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/",
+  "label": { "en": ["postcard: American Airlines"] },
+  "provider": [
+    {
+      "id": "https://collection.sfomuseum.org/",
+      "type": "Agent",
+      "label": { "en": ["SFO Museum Aviation Collection"] },
+      "homepage": [
+        {
+          "id": "https://collection.sfomuseum.org/",
+          "type": "Text",
+          "label": { "en": ["SFO Museum Aviation Collection"] },
+          "format": "text/html"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "en": [
+      "Monochrome blue postcard depicting route map of American Airlines Flagship flights; with text, \u201cThe pencil line shows the route of my Flagship Flight\u201d on right side; American Airlines logo on top right; American Airlines logotype on bottom right. "
+    ]
+  },
+  "thumbnail": [
+    {
+      "id": "https://static.sfomuseum.org/media/176/270/383/1/1762703831_qU3KkLfvbsrnoH8A4dg2pJ9WGsrsztl9_s.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "height": 320,
+      "width": 320
+    }
+  ],
+  "items": [
+    {
+      "type": "Canvas",
+      "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703831",
+      "height": 1099,
+      "width": 1698,
+      "items": [
+        {
+          "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#annotations-page-1762703831",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#annotations-1762703831",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collection.sfomuseum.org/images/1762703831/",
+                "type": "Image",
+                "format": "image/jpeg",
+                "height": 1099,
+                "width": 1698,
+                "service": [
+                  {
+                    "id": "https://static.sfomuseum.org/media/176/270/383/1/tiles/",
+                    "profile": "https://iiif.io/api/image/2/level0.json",
+                    "type": "ImageService2"
+                  }
+                ]
+              },
+              "target": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703831"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Canvas",
+      "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703833",
+      "height": 1099,
+      "width": 1703,
+      "items": [
+        {
+          "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#annotations-page-1762703833",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collection.sfomuseum.org/objects/1762679999/manifest/#annotations-1762703833",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collection.sfomuseum.org/images/1762703833/",
+                "type": "Image",
+                "format": "image/jpeg",
+                "height": 1099,
+                "width": 1703,
+                "service": [
+                  {
+                    "id": "https://static.sfomuseum.org/media/176/270/383/3/tiles/",
+                    "profile": "https://iiif.io/api/image/2/level0.json",
+                    "type": "ImageService2"
+                  }
+                ]
+              },
+              "target": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703833"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "canvases": [
+    {
+      "width": 1698,
+      "height": 1099,
+      "image": {
+        "embedded": true,
+        "width": 1698,
+        "height": 1099,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://static.sfomuseum.org/media/176/270/383/1/tiles/"
+      },
+      "type": "canvas",
+      "uri": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703831"
+    },
+    {
+      "width": 1703,
+      "height": 1099,
+      "image": {
+        "embedded": true,
+        "width": 1703,
+        "height": 1099,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://static.sfomuseum.org/media/176/270/383/3/tiles/"
+      },
+      "type": "canvas",
+      "uri": "https://collection.sfomuseum.org/objects/1762679999/manifest/#canvas-1762703833"
+    }
+  ],
+  "embedded": false,
+  "label": {
+    "en": ["postcard: American Airlines"]
+  },
+  "majorVersion": 3,
+  "type": "manifest",
+  "uri": "https://collection.sfomuseum.org/objects/1762679999/manifest/"
+}
