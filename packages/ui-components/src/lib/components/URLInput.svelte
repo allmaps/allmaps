@@ -23,6 +23,7 @@
     const target = event.target
 
     if (target instanceof HTMLInputElement) {
+      // TODO: only select when not selected
       target.select()
     }
   }
