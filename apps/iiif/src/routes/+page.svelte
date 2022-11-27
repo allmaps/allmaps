@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { get} from 'svelte/store'
+  import { get } from 'svelte/store'
   import { page } from '$app/stores'
 
   import { IIIF } from '@allmaps/iiif-parser'
@@ -126,7 +126,7 @@
     {/if}
   </Header>
   {#if !url || !loaded || error}
-    <div class="container m-auto p-1 md:p-2">
+    <main class="container m-auto p-1 md:p-2">
       {#if !url && mounted}
         <URLInput />
       {:else if error}
@@ -134,9 +134,10 @@
           <p>Error: {error}</p>
           {#if url && !url.endsWith('info.json')}
             <p>
-              If you're loading a IIIF Image, try again by <a href={locationUrlWithInfoJson(url)}>adding <code
-                >info.json</code
-              > to the URL</a>.
+              If you're loading a IIIF Image, try again by <a
+                href={locationUrlWithInfoJson(url)}
+                >adding <code>info.json</code> to the URL</a
+              >.
             </p>
           {/if}
         </div>
@@ -148,11 +149,11 @@
           </p>
         </div>
       {/if}
-    </div>
+    </main>
   {:else}
-    <div class="grow">
+    <main class="grow">
       <OpenSeadragon imageUris={Array.from(imageUris)} />
-    </div>
+    </main>
   {/if}
 </div>
 
