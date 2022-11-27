@@ -3,7 +3,7 @@ usage_model = 'unbound'
 main = "dist/worker.es.js"
 compatibility_flags = []
 compatibility_date = "2021-12-29"
-account_id = "6b4ce0b3a6c21b7769cc1c3eff7eaadf"
+account_id = "514081276e13c9aa2894e2efde2dc41f"
 workers_dev = true
 
 [vars]
