@@ -1,12 +1,12 @@
 {
-  "name": "@allmaps/ui-components",
-  "version": "1.0.0-beta.2",
+  "name": "@allmaps/mapboxgl",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "Allmaps UI components, build with Svelte",
+  "description": "Allmaps Mapbox GL Layer",
   "type": "module",
   "types": "./package/index.d.ts",
   "module": "./package/index.js",
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/ui-components"
+    "directory": "packages/mapboxgl"
   },
   "scripts": {
     "dev": "vite dev",
@@ -28,11 +28,15 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
+  "dependencies": {
+    "@allmaps/render": "^1.0.0-beta.18"
+  },
   "devDependencies": {
     "@playwright/test": "^1.25.0",
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
     "@sveltejs/package": "next",
+    "@types/mapbox-gl": "^2.7.6",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "autoprefixer": "^10.4.8",

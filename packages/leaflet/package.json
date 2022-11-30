@@ -1,12 +1,12 @@
 {
-  "name": "@allmaps/transform",
-  "version": "1.0.0-beta.6",
+  "name": "@allmaps/leaflet",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "Coordinate transformation functions, based on gdaltransform",
+  "description": "Allmaps Leaflet plugin",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
@@ -25,29 +25,36 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/transform"
+    "directory": "packages/leaflet"
+  },
+  "scripts": {
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "tsc && vite build && npm run build:types",
+    "preview": "vite preview",
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist",
+    "test": "mocha && eslint dist test"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
+    "allmaps",
     "georeference",
-    "map"
+    "map",
+    "leaflet"
   ],
   "dependencies": {
-    "@turf/distance": "^6.3.0",
-    "@turf/midpoint": "^6.3.0"
-  },
-  "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
-    "test": "mocha && eslint dist test",
-    "pretest": "npm run build"
+    "@allmaps/render": "^1.0.0-beta.18"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/leaflet": "^1.9.0",
     "chai": "^4.3.4",
-    "chai-shallow-deep-equal": "^1.4.6",
+    "documentation": "^13.2.5",
     "eslint": "7",
-    "mocha": "^8.3.2"
+    "leaflet": "^1.9.2",
+    "mocha": "^8.3.2",
+    "typescript": "^4.5.4",
+    "vite": "^3.0.4"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
