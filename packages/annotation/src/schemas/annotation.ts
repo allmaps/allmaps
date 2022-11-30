@@ -25,7 +25,6 @@ export const TargetSchema = z.object({
 
 export const BodySchema = z.object({
   type: z.literal('FeatureCollection'),
-  purpose: z.string().default('gcp-georeferencing').optional(),
   features: z.array(
     z.object({
       type: z.literal('Feature'),

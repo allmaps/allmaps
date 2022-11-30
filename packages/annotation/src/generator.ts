@@ -58,7 +58,9 @@ function generateGeorefAnnotation(map: Map): Annotation {
     type: 'FeatureCollection' as const,
     transformation: {
       type: 'polynomial',
-      order: 1
+      options: {
+        order: 1
+      }
     },
     features: map.gcps.map((gcp) => ({
       type: 'Feature' as const,

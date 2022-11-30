@@ -28,7 +28,9 @@
         "purpose": "gcp-georeferencing",
         "transformation": {
           "type": "polynomial",
-          "order": 0
+          "options": {
+            "order": 1
+          }
         },
         "features": [
           {
@@ -86,7 +88,9 @@
         "purpose": "gcp-georeferencing",
         "transformation": {
           "type": "polynomial",
-          "order": 0
+          "options": {
+            "order": 1
+          }
         },
         "features": [
           {
