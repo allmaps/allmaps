@@ -10,9 +10,11 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
+  "main": "./dist/index.js",
+  "unpkg": "./dist/index.cjs",
   "exports": {
     ".": {
+      "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
   },
@@ -28,8 +30,11 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
     "test": "mocha && eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
@@ -40,18 +45,26 @@
     "map"
   ],
   "dependencies": {
+    "@allmaps/annotation": "^1.0.0-beta.10",
+    "@allmaps/id": "^1.0.0-beta.11",
     "@allmaps/iiif-parser": "^1.0.0-beta.17",
     "@allmaps/transform": "^1.0.0-beta.6",
-    "potpack": "^1.0.1"
+    "earcut": "^2.2.3",
+    "potpack": "^1.0.1",
+    "rbush": "^3.0.1"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/earcut": "^2.1.1",
+    "@types/geojson": "^7946.0.10",
     "@types/node": "^17.0.23",
+    "@types/rbush": "^3.0.0",
     "chai": "^4.3.4",
     "documentation": "^13.2.5",
     "eslint": "7",
     "mocha": "^8.3.2",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vite": "^4.0.0"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

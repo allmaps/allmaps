@@ -2,11 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist"
   },
   "references": [
     { "path": "../transform" },
-    { "path": "../iiif-parser" }
+    { "path": "../annotation" },
+    { "path": "../iiif-parser" },
+    { "path": "../id" }
   ],
   "include": ["./src/**/*"]
 }

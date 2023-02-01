@@ -1,54 +1,69 @@
-import { toImage } from '@allmaps/transform'
 import { Image } from '@allmaps/iiif-parser'
 
 import type { GCPTransformInfo } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-// TODO: import types from @allmaps/iiif-parser,
-// or create types package
-type Size = [number, number]
-type Extent = [number, number, number, number]
-type Coord = [number, number]
-type Line = [Coord, Coord]
+import { computeBBox } from './bbox.js'
+import { geoBBoxToSVGPolygon } from './transform.js'
 
-type CoordByX = { [key: number]: Coord }
+import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
 
-type Tile = {
-  column: number,
-  row: number,
-  zoomLevel: TileZoomLevel
+type PositionByX = { [key: number]: Position }
+
+export function imageCoordinatesToTileCoordinates(
+  tile: Tile,
+  imageCoordinates: Position,
+  clip = true
+): Position | undefined {
+  const tileXMin = tile.column * tile.zoomLevel.originalWidth
+  const tileYMin = tile.row * tile.zoomLevel.originalHeight
+
+  const tileX = (imageCoordinates[0] - tileXMin) / tile.zoomLevel.scaleFactor
+  const tileY = (imageCoordinates[1] - tileYMin) / tile.zoomLevel.scaleFactor
+
+  if (!clip || (
+    imageCoordinates[0] >= tileXMin &&
+    imageCoordinates[0] <= tileXMin + tile.zoomLevel.originalWidth &&
+    imageCoordinates[1] >= tileYMin &&
+    imageCoordinates[1] <= tileYMin + tile.zoomLevel.originalHeight &&
+    imageCoordinates[0] <= tile.imageSize[0] &&
+    imageCoordinates[1] <= tile.imageSize[1])
+  ) {
+    return [tileX, tileY]
+  }
 }
 
-function computeExtent(values: number[]): [number, number] {
-  let min: number = Number.POSITIVE_INFINITY
-  let max: number = Number.NEGATIVE_INFINITY
+export function tileBBox(tile: Tile): BBox {
+  const tileXMin = tile.column * tile.zoomLevel.originalWidth
+  const tileYMin = tile.row * tile.zoomLevel.originalHeight
 
-  for (const value of values) {
-    if (min === undefined) {
-      if (value >= value) min = max = value
-    } else {
-      if (min > value) min = value
-      if (max < value) max = value
-    }
-  }
+  const tileXMax = Math.min(
+    tileXMin + tile.zoomLevel.originalWidth,
+    tile.imageSize[0]
+  )
+  const tileYMax = Math.min(
+    tileYMin + tile.zoomLevel.originalHeight,
+    tile.imageSize[1]
+  )
 
-  return [min, max]
+  return [tileXMin, tileYMin, tileXMax, tileYMax]
+}
+
+export function tilePolygon(tile: Tile, transformer: GCPTransformInfo) {
+  const bbox = tileBBox(tile)
 }
 
 // From:
 //  https://github.com/vHawk/tiles-intersect
 // See also:
 //  https://www.redblobgames.com/grids/line-drawing.html
-function tilesIntersect([a, b]: Line): [
-  number,
-  number
-][] {
+function tilesIntersect([a, b]: Line): Position[] {
   let x = Math.floor(a[0])
   let y = Math.floor(a[1])
   const endX = Math.floor(b[0])
   const endY = Math.floor(b[1])
 
-  let points: Coord[] = [[x, y]]
+  let points: Position[] = [[x, y]]
 
   if (x === endX && y === endY) {
     return points
@@ -84,43 +99,10 @@ function tilesIntersect([a, b]: Line): [
   return points
 }
 
-function extentToImage(transformer: GCPTransformInfo, extent: Extent) {
-  const [y1, x1, y2, x2] = extent
-
-  return [
-    toImage(transformer, [y1, x1]),
-    toImage(transformer, [y1, x2]),
-    toImage(transformer, [y2, x2]),
-    toImage(transformer, [y2, x1])
-  ]
-}
-
-function computeMinMax(points: Coord[]) {
-  const xs = []
-  const ys = []
-
-  for (let point of points) {
-    xs.push(point[0])
-    ys.push(point[1])
-  }
-
-  const [minX, maxX] = computeExtent(xs)
-  const [minY, maxY] = computeExtent(ys)
-
-  return {
-    minX,
-    maxX,
-    minY,
-    maxY,
-    width: maxX - minX,
-    height: maxY - minY
-  }
-}
-
 function findBestZoomLevel(
   timeZoomLevels: TileZoomLevel[],
   mapTileScale: number
-) : TileZoomLevel | undefined {
+): TileZoomLevel | undefined {
   let smallestScaleDiff = Number.POSITIVE_INFINITY
   let bestZoomLevel: TileZoomLevel | undefined
 
@@ -138,16 +120,19 @@ function findBestZoomLevel(
   return bestZoomLevel
 }
 
-function scaleToTiles(zoomLevel: TileZoomLevel, points: Coord[]): Coord[] {
+function scaleToTiles(
+  zoomLevel: TileZoomLevel,
+  points: SVGPolygon
+): SVGPolygon {
   return points.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
 }
 
-function findNeededIiifTilesByX(tilePixelExtent: Coord[]) {
+function findNeededIiifTilesByX(tilePixelExtent: SVGPolygon) {
   // TODO: use Map
-  const tiles: CoordByX = {}
+  const tiles: PositionByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
     const line: Line = [
       tilePixelExtent[i],
@@ -173,8 +158,12 @@ function findNeededIiifTilesByX(tilePixelExtent: Coord[]) {
   return tiles
 }
 
-function iiifTilesByXToArray(zoomLevel: TileZoomLevel, iiifTilesByX: CoordByX) {
-  const neededIiifTiles = []
+function iiifTilesByXToArray(
+  zoomLevel: TileZoomLevel,
+  imageSize: Size,
+  iiifTilesByX: PositionByX
+): Tile[] {
+  const neededIiifTiles: Tile[] = []
   for (let xKey in iiifTilesByX) {
     const x = parseInt(xKey)
 
@@ -189,7 +178,8 @@ function iiifTilesByXToArray(zoomLevel: TileZoomLevel, iiifTilesByX: CoordByX) {
       neededIiifTiles.push({
         column: x,
         row: y,
-        zoomLevel
+        zoomLevel,
+        imageSize
       })
     }
   }
@@ -197,35 +187,42 @@ function iiifTilesByXToArray(zoomLevel: TileZoomLevel, iiifTilesByX: CoordByX) {
   return neededIiifTiles
 }
 
-export function computeIiifTilesForMapExtent(
+export function computeIiifTilesForMapGeoBBox(
   transformer: GCPTransformInfo,
   image: Image,
   viewportSize: Size,
-  geoExtent: Extent
-) : Tile[] {
-  const imagePixelExtent = extentToImage(transformer, geoExtent)
-  const imagePixelExtentMinMax = computeMinMax(imagePixelExtent)
+  geoBBox: BBox
+): Tile[] {
+  const imageBBoxPolygon = geoBBoxToSVGPolygon(transformer, geoBBox)
+  const geoBBoxImageBBox = computeBBox(imageBBoxPolygon)
 
   if (
-    (imagePixelExtentMinMax.minX > image.width ||
-      imagePixelExtentMinMax.maxX < 0) &&
-    (imagePixelExtentMinMax.maxY > image.height ||
-      imagePixelExtentMinMax.maxY < 0)
+    (geoBBoxImageBBox[0] > image.width || geoBBoxImageBBox[2] < 0) &&
+    (geoBBoxImageBBox[1] > image.height || geoBBoxImageBBox[3] < 0)
   ) {
     return []
   }
 
-  const mapScaleX = imagePixelExtentMinMax.width / viewportSize[0]
-  const mapScaleY = imagePixelExtentMinMax.height / viewportSize[1]
+  const geoBBoxImageBBoxWidth = geoBBoxImageBBox[2] - geoBBoxImageBBox[0]
+  const geoBBoxImageBBoxHeight = geoBBoxImageBBox[3] - geoBBoxImageBBox[1]
+
+  const mapScaleX = geoBBoxImageBBoxWidth / viewportSize[0]
+  const mapScaleY = geoBBoxImageBBoxHeight / viewportSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
   const zoomLevel = findBestZoomLevel(image.tileZoomLevels, mapScale)
 
   if (zoomLevel) {
-    const tilePixelExtent = scaleToTiles(zoomLevel, imagePixelExtent)
+    // TODO: maybe index all tiles in rtree?
+
+    const tilePixelExtent = scaleToTiles(zoomLevel, imageBBoxPolygon)
 
     const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
-    const iiifTiles = iiifTilesByXToArray(zoomLevel, iiifTilesByX)
+    const iiifTiles = iiifTilesByXToArray(
+      zoomLevel,
+      [image.width, image.height],
+      iiifTilesByX
+    )
 
     return iiifTiles
   } else {
