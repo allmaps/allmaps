@@ -33,9 +33,9 @@
     "@types/upng-js": "^2.1.2",
     "itty-router": "^2.6.1",
     "jpeg-js": "^0.4.3",
-    "miniflare": "^2.6.0",
+    "miniflare": "^2.11.0",
     "typescript": "^4.5.4",
     "upng-js": "^2.1.0",
-    "vite": "^2.9.12"
+    "vite": "^4.0.0"
   }
 }
