@@ -7,20 +7,21 @@
   "module": "./dist/index.js",
   "unpkg": "./dist/browser.js",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "browser": {
-        "types": "./dist/browser.d.ts",
-        "default": "./dist/browser.js"
-      }
-    },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
+    },
+    ".": {
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      },
+      "import": "./dist/index.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "*.d.ts"
   ],
   "publishConfig": {
     "access": "public"
