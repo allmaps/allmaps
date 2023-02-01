@@ -14,20 +14,86 @@
   </head>
   <body>
     <div id="map"></div>
-    <footer>
-      <button id="button">Dispose warped map layer</button>
-    </footer>
+    <div id="controls">
+      <div>
+        <input
+          type="range"
+          id="opacity"
+          name="opacity"
+          min="0"
+          max="1"
+          step="0.001"
+          value="1"
+        />
+        <label for="opacity">Opacity</label>
+      </div>
+
+      <div>
+        <input
+          type="checkbox"
+          id="remove-background-color"
+          name="remove-background-color"
+        />
+        <label for="remove-background-color">Remove background</label>
+      </div>
+
+      <div>
+        <input
+          type="color"
+          id="background-color"
+          name="background-color"
+          value="#e2d1b6"
+        />
+        <label for="background-color">Background color</label>
+      </div>
+
+      <div>
+        <input
+          type="range"
+          id="background-color-threshold"
+          name="background-color-threshold"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0"
+        />
+        <label for="background-color-threshold">Threshold</label>
+      </div>
+
+      <div>
+        <input
+          type="range"
+          id="background-color-hardness"
+          name="background-color-hardness"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0.3"
+        />
+        <label for="background-color-hardness">Hardness</label>
+      </div>
+
+      <div>
+        <input type="checkbox" id="colorize" name="colorize" />
+        <label for="colorize">Colorize</label>
+      </div>
+
+      <div>
+        <input
+          type="color"
+          id="colorize-color"
+          name="colorize-color"
+          value="#00ff24"
+        />
+        <label for="colorize-color">Colorize color</label>
+      </div>
+    </div>
+    <script src="examples/controls.js" defer></script>
     <script src="examples/examples.js" defer></script>
     <script type="module">
       import { WarpedMapLayer, WarpedMapSource } from './src/index.ts'
 
       initialize(WarpedMapLayer, WarpedMapSource)
-
-      // document.getElementById('button').addEventListener('click', () => {
-      //   map.removeLayer(warpedMapLayer)
-      //   warpedMapLayer.dispose()
-      //   warpedMapSource.dispose()
-      // })
     </script>
   </body>
 </html>

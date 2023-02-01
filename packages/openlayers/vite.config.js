@@ -1,6 +1,21 @@
 import { defineConfig } from 'vite'
+import { exec } from 'child_process'
 
 import ports from '../../ports.json'
+
+// TODO: move to @allmaps/stdlib?
+const dts = {
+  name: 'dts-generator',
+  buildEnd: (error) => {
+    if (!error) {
+      return new Promise((resolve, reject) => {
+        exec('npm run build:types', (err) =>
+          err ? reject(err) : resolve()
+        )
+      })
+    }
+  }
+}
 
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
@@ -9,13 +24,16 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
-    // minify: false,
     sourcemap: true,
-    // emptyOutDir: false,
+    emptyOutDir: false,
+    // minify: false,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) => `bundled/allmaps-openlayers-6.${format}.js`,
+      fileName: (format) =>
+        `bundled/allmaps-openlayers-6.${format}.${
+          format === 'umd' ? 'cjs' : 'js'
+        }`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
@@ -51,5 +69,6 @@ export default defineConfig({
       target: 'es2020'
     }
   },
-  base: ''
+  base: '',
+  plugins: [dts]
 })

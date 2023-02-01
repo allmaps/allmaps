@@ -29,4 +29,9 @@ async function initialize(WarpedMapLayer, WarpedMapSource) {
 
   addGeorefAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8')
   addGeorefAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79')
+  addGeorefAnnotationByUrl(warpedMapSource, 'https://allmaps.org/webgl2-preview/west-roxbury.json')
+
+  if (initializeControls) {
+    initializeControls(warpedMapLayer)
+  }
 }
