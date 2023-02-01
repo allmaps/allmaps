@@ -1,14 +1,14 @@
-type Point = {x: number, y: number}
+type XYPoint = { x: number; y: number }
 
 const HUGE_VAL = Number.POSITIVE_INFINITY
 const MAXORDER = 3
 
-const ERRORS = ({
+const ERRORS = {
   MPARMERR: 'PARAMETER ERROR',
   MINTERR: 'INTERNAL ERROR',
   MUNSOLVABLE: 'NOT SOLVABLE',
   MNPTERR: 'NOT ENOUGH POINTS'
-})
+}
 
 export class GCP {
   dfGCPPixel: number
@@ -16,7 +16,12 @@ export class GCP {
   dfGCPX: number
   dfGCPY: number
 
-  constructor (dfGCPPixel: number, dfGCPLine: number, dfGCPX: number, dfGCPY: number) {
+  constructor(
+    dfGCPPixel: number,
+    dfGCPLine: number,
+    dfGCPX: number,
+    dfGCPY: number
+  ) {
     this.dfGCPPixel = dfGCPPixel
     this.dfGCPLine = dfGCPLine
     this.dfGCPX = dfGCPX
@@ -83,7 +88,7 @@ export class GCPTransformInfo {
   adfFromGeoX: number[] = []
   adfFromGeoY: number[] = []
 
-  constructor () {
+  constructor() {
     this.adfToGeoX = []
     this.adfToGeoY = []
 
@@ -99,25 +104,43 @@ class MATRIX {
   n: number
   v: number[]
 
-  constructor (n = 0) {
+  constructor(n = 0) {
     this.n = n
     this.v = []
   }
 
-  getM (row: number, col: number) {
-    return this.v[(((row) - 1) * (this.n)) + (col) - 1]
+  getM(row: number, col: number) {
+    return this.v[(row - 1) * this.n + col - 1]
   }
 
-  setM (row: number, col: number, value: number) {
-    this.v[(((row) - 1) * (this.n)) + (col) - 1] = value
+  setM(row: number, col: number, value: number) {
+    this.v[(row - 1) * this.n + col - 1] = value
   }
 }
 
-export function GDALCreateGCPTransformer (pasGCPList: GCP[], nReqOrder: number, bReversed: boolean) {
-  return GDALCreateGCPTransformerEx(pasGCPList, nReqOrder, bReversed, false, -1, -1)
+export function GDALCreateGCPTransformer(
+  pasGCPList: GCP[],
+  nReqOrder: number,
+  bReversed: boolean
+) {
+  return GDALCreateGCPTransformerEx(
+    pasGCPList,
+    nReqOrder,
+    bReversed,
+    false,
+    -1,
+    -1
+  )
 }
 
-function GDALCreateGCPTransformerEx (pasGCPList: GCP[], nReqOrder: number, bReversed: boolean, bRefine: boolean, dfTolerance: number, nMinimumGcps: number) {
+function GDALCreateGCPTransformerEx(
+  pasGCPList: GCP[],
+  nReqOrder: number,
+  bReversed: boolean,
+  bRefine: boolean,
+  dfTolerance: number,
+  nMinimumGcps: number
+) {
   // double *padfGeoX = nullptr;
   // double *padfGeoY = nullptr;
   // double *padfRasterX = nullptr;
@@ -216,16 +239,29 @@ function GDALCreateGCPTransformerEx (pasGCPList: GCP[], nReqOrder: number, bReve
     sPoints.n2 = padfGeoY
     sPoints.status = panStatus
 
-    crsComputeGeorefEquations(psInfo, sPoints,
-      psInfo.adfToGeoX, psInfo.adfToGeoY,
-      psInfo.adfFromGeoX, psInfo.adfFromGeoY,
-      nReqOrder)
+    crsComputeGeorefEquations(
+      psInfo,
+      sPoints,
+      psInfo.adfToGeoX,
+      psInfo.adfToGeoY,
+      psInfo.adfFromGeoX,
+      psInfo.adfFromGeoY,
+      nReqOrder
+    )
   }
 
   return psInfo
 }
 
-function crsComputeGeorefEquations (psInfo: GCPTransformInfo, cp: ControlPoints, E12: number[], N12: number[], E21: number[], N21: number[], order: number) {
+function crsComputeGeorefEquations(
+  psInfo: GCPTransformInfo,
+  cp: ControlPoints,
+  E12: number[],
+  N12: number[],
+  E21: number[],
+  N21: number[],
+  order: number
+) {
   // C++ signature:
   // crsComputeGeorefEquations (GCPTransformInfo *psInfo, struct ControlPoints *cp,
   //   double E12[], double N12[],
@@ -261,7 +297,14 @@ function crsComputeGeorefEquations (psInfo: GCPTransformInfo, cp: ControlPoints,
   cp.n2 = tempptr
 }
 
-function calcCoef (cp: ControlPoints, xMean: number, yMean: number, E: number[], N: number[], order: number) {
+function calcCoef(
+  cp: ControlPoints,
+  xMean: number,
+  yMean: number,
+  E: number[],
+  N: number[],
+  order: number
+) {
   // C++ signature:
   // static int
   // calcCoef (struct ControlPoints *cp, double xMean, double yMean, double E[], double N[], int order)
@@ -299,7 +342,16 @@ function calcCoef (cp: ControlPoints, xMean: number, yMean: number, E: number[],
   }
 }
 
-function calcls (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: number[], b: number[], E: number[], N: number[]) {
+function calcls(
+  cp: ControlPoints,
+  m: MATRIX,
+  xMean: number,
+  yMean: number,
+  a: number[],
+  b: number[],
+  E: number[],
+  N: number[]
+) {
   // C++ signature:
   // static int calcls (
   //   struct ControlPoints *cp,
@@ -333,7 +385,13 @@ function calcls (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: 
 
       for (let i = 1; i <= m.n; i++) {
         for (let j = i; j <= m.n; j++) {
-          m.setM(i, j, m.getM(i, j) + term(i, cp.e1[n] - xMean, cp.n1[n] - yMean) * term(j, cp.e1[n] - xMean, cp.n1[n] - yMean))
+          m.setM(
+            i,
+            j,
+            m.getM(i, j) +
+              term(i, cp.e1[n] - xMean, cp.n1[n] - yMean) *
+                term(j, cp.e1[n] - xMean, cp.n1[n] - yMean)
+          )
         }
 
         a[i - 1] += cp.e2[n] * term(i, cp.e1[n] - xMean, cp.n1[n] - yMean)
@@ -356,7 +414,16 @@ function calcls (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: 
   return solveMat(m, a, b, E, N)
 }
 
-function exactDet (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a: number[], b: number[], E: number[], N: number[]) {
+function exactDet(
+  cp: ControlPoints,
+  m: MATRIX,
+  xMean: number,
+  yMean: number,
+  a: number[],
+  b: number[],
+  E: number[],
+  N: number[]
+) {
   // C++ signature:
   // static int exactDet (
   //   struct ControlPoints *cp,
@@ -392,7 +459,13 @@ function exactDet (cp: ControlPoints, m: MATRIX, xMean: number, yMean: number, a
   return solveMat(m, a, b, E, N)
 }
 
-function solveMat (m: MATRIX, a: number[], b: number[], E: number[], N: number[]) {
+function solveMat(
+  m: MATRIX,
+  a: number[],
+  b: number[],
+  E: number[],
+  N: number[]
+) {
   // C++ signature:
   // static int solveMat (struct MATRIX *m,
   //   double a[], double b[], double E[], double N[])
@@ -445,7 +518,7 @@ function solveMat (m: MATRIX, a: number[], b: number[], E: number[], N: number[]
 
     /* compute zeros above and below the pivot, and compute
        values for the rest of the row as well */
-    for (let i2 = 1 ; i2 <= m.n; i2++) {
+    for (let i2 = 1; i2 <= m.n; i2++) {
       if (i2 !== i) {
         const factor = m.getM(i2, j) / pivot
 
@@ -468,7 +541,7 @@ function solveMat (m: MATRIX, a: number[], b: number[], E: number[], N: number[]
   }
 }
 
-function term (nTerm: number, e: number, n: number) {
+function term(nTerm: number, e: number, n: number) {
   switch (nTerm) {
     case 1:
       return 1
@@ -495,7 +568,11 @@ function term (nTerm: number, e: number, n: number) {
   return 0
 }
 
-export function GDALGCPTransform (pTransformArg: GCPTransformInfo, bDstToSrc: boolean, points: Point[]) {
+export function GDALGCPTransform(
+  pTransformArg: GCPTransformInfo,
+  bDstToSrc: boolean,
+  points: XYPoint[]
+) {
   const nPointCount = points.length
 
   // GCPTransformInfo *psInfo = static_cast<GCPTransformInfo *>(pTransformArg);
@@ -516,14 +593,20 @@ export function GDALGCPTransform (pTransformArg: GCPTransformInfo, bDstToSrc: bo
 
     if (bDstToSrc) {
       transformedPoint = crsGeoref(
-        points[i].x - psInfo.x2Mean, points[i].y - psInfo.y2Mean,
-        psInfo.adfFromGeoX, psInfo.adfFromGeoY,
-        psInfo.nOrder)
+        points[i].x - psInfo.x2Mean,
+        points[i].y - psInfo.y2Mean,
+        psInfo.adfFromGeoX,
+        psInfo.adfFromGeoY,
+        psInfo.nOrder
+      )
     } else {
       transformedPoint = crsGeoref(
-        points[i].x - psInfo.x1Mean, points[i].y - psInfo.y1Mean,
-        psInfo.adfToGeoX, psInfo.adfToGeoY,
-        psInfo.nOrder)
+        points[i].x - psInfo.x1Mean,
+        points[i].y - psInfo.y1Mean,
+        psInfo.adfToGeoX,
+        psInfo.adfToGeoY,
+        psInfo.nOrder
+      )
     }
 
     transformedPoints[i] = {
@@ -535,7 +618,13 @@ export function GDALGCPTransform (pTransformArg: GCPTransformInfo, bDstToSrc: bo
   return transformedPoints
 }
 
-function crsGeoref (e1: number, n1: number, E: number[], N: number[], order: number) {
+function crsGeoref(
+  e1: number,
+  n1: number,
+  E: number[],
+  N: number[],
+  order: number
+) {
   // C++ signature:
   // static int crsGeoref (
   //   double e1,  /* EASTINGS TO BE TRANSFORMED */
@@ -569,30 +658,42 @@ function crsGeoref (e1: number, n1: number, E: number[], N: number[], order: num
     n2 = n1 * n1
     en = e1 * n1
 
-    e = E[0]      + E[1] * e1 + E[2] * n1 +
-        E[3] * e2 + E[4] * en + E[5] * n2
+    e = E[0] + E[1] * e1 + E[2] * n1 + E[3] * e2 + E[4] * en + E[5] * n2
 
-    n = N[0]      + N[1] * e1 + N[2] * n1 +
-        N[3] * e2 + N[4] * en + N[5] * n2
+    n = N[0] + N[1] * e1 + N[2] * n1 + N[3] * e2 + N[4] * en + N[5] * n2
 
     return [e, n]
   } else if (order === 3) {
-    e2  = e1 * e1
-    en  = e1 * n1
-    n2  = n1 * n1
-    e3  = e1 * e2
+    e2 = e1 * e1
+    en = e1 * n1
+    n2 = n1 * n1
+    e3 = e1 * e2
     e2n = e2 * n1
     en2 = e1 * n2
-    n3  = n1 * n2
+    n3 = n1 * n2
 
-    e = E[0]      +
-        E[1] * e1 + E[2] * n1  +
-        E[3] * e2 + E[4] * en  + E[5] * n2  +
-        E[6] * e3 + E[7] * e2n + E[8] * en2 + E[9] * n3
-    n = N[0]      +
-        N[1] * e1 + N[2] * n1  +
-        N[3] * e2 + N[4] * en  + N[5] * n2  +
-        N[6] * e3 + N[7] * e2n + N[8] * en2 + N[9] * n3
+    e =
+      E[0] +
+      E[1] * e1 +
+      E[2] * n1 +
+      E[3] * e2 +
+      E[4] * en +
+      E[5] * n2 +
+      E[6] * e3 +
+      E[7] * e2n +
+      E[8] * en2 +
+      E[9] * n3
+    n =
+      N[0] +
+      N[1] * e1 +
+      N[2] * n1 +
+      N[3] * e2 +
+      N[4] * en +
+      N[5] * n2 +
+      N[6] * e3 +
+      N[7] * e2n +
+      N[8] * en2 +
+      N[9] * n3
 
     return [e, n]
   } else {

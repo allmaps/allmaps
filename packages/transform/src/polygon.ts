@@ -5,19 +5,10 @@ import distance from '@turf/distance'
 import { toWorld } from './transformer.js'
 
 import type { GCPTransformInfo } from './gdaltransform.js'
-import type { Coord, ImageWorldGCP } from './transformer.js'
 
-type Segment = {
-  from: ImageWorldGCP
-  to: ImageWorldGCP
-}
+import type { Position, Point, Polygon, Segment } from './shared/types.js'
 
-type Point = {
-  type: 'Point'
-  coordinates: Coord
-}
-
-function point(point: Coord): Point {
+function point(point: Position): Point {
   return {
     type: 'Point',
     coordinates: point
@@ -26,10 +17,11 @@ function point(point: Coord): Point {
 
 export function svgPolygonToGeoJSONPolygon(
   transformArgs: GCPTransformInfo,
-  points: Coord[],
+  points: Position[],
+  // TODO: set default to 0
   maxOffsetPercentage = 0.01,
   maxDepth = 8
-) {
+): Polygon {
   if (!points || points.length < 3) {
     throw new Error('SVG polygon should contain at least 3 points')
   }
@@ -39,12 +31,10 @@ export function svgPolygonToGeoJSONPolygon(
     world: toWorld(transformArgs, point)
   }))
 
-  const segments = Array.from(Array(worldPoints.length)).map(
-    (_, index) => ({
-      from: worldPoints[index],
-      to: worldPoints[(index + 1) % worldPoints.length]
-    })
-  )
+  const segments = Array.from(Array(worldPoints.length)).map((_, index) => ({
+    from: worldPoints[index],
+    to: worldPoints[(index + 1) % worldPoints.length]
+  }))
 
   const segmentsWithMidpoints = segments
     .map((segment) =>
@@ -70,7 +60,7 @@ function addMidpoints(
   maxDepth: number,
   depth: number
 ): Segment | Segment[] {
-  const imageMidpoint: Coord = [
+  const imageMidpoint: Position = [
     (segment.from.image[0] + segment.to.image[0]) / 2,
     (segment.from.image[1] + segment.to.image[1]) / 2
   ]
