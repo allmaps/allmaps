@@ -18,7 +18,7 @@
     <div class="flex grow">
       <slot />
     </div>
-    <button
+    <!-- <button
       type="button"
       class="text-white bg-blue-100 hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 rounded-lg text-sm p-2 focus:outline-none"
     >
@@ -35,6 +35,6 @@
           d="M4 6h16M4 12h16M4 18h16"
         /></svg
       >
-    </button>
+    </button> -->
   </nav>
 </header>

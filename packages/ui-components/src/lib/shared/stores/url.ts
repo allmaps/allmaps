@@ -13,6 +13,11 @@ function getUrlFromQueryString(location: Location): string | null {
 
 function getUrlFromHash(location: Location): string | null {
   const hashQueryString = location.hash.slice(1)
+
+  if (!hashQueryString) {
+    return null
+  }
+
   const searchParams = new URLSearchParams(hashQueryString)
   const data = searchParams.get('data')
 
@@ -51,7 +56,7 @@ url.subscribe((value) => {
 
         // TODO: also use page path in goto
         goto(`?${$page.url.searchParams.toString()}`, {
-          keepfocus: true
+          keepFocus: true
         })
       }
     }

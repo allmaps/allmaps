@@ -1,31 +1,34 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
   import { afterNavigate } from '$app/navigation'
   import { get } from 'svelte/store'
 
   import url from '$lib/shared/stores/url.js'
 
   let urlValue: string
+  let input: HTMLInputElement
 
   export let autofocus: boolean | undefined = undefined
 
   const hasInitialUrl = get(url) ? true : false
 
-  autofocus = (autofocus === undefined) ? !hasInitialUrl : false
+  autofocus = autofocus === undefined ? !hasInitialUrl : false
 
   export let placeholder =
-    'Type the URL of a IIIF Image, Manifest, Collection or Georef Annotation'
+    'Type the URL of a IIIF Image, Manifest, Collection or Georeference Annotation'
 
   url.subscribe((value) => {
     urlValue = value
   })
 
-  function inputClick(event: MouseEvent) {
-    const target = event.target
+  function inputClick(event: Event) {
+    selectInputText()
+    event.preventDefault()
+  }
 
-    if (target instanceof HTMLInputElement) {
-      // TODO: only select when not selected
-      target.select()
-    }
+  function selectInputText() {
+    input.focus()
+    input.select()
   }
 
   function submit() {
@@ -48,6 +51,15 @@
       setStoreValue('')
     }
   })
+
+  if (browser) {
+    document.addEventListener('keyup', (event: KeyboardEvent) => {
+      const target = event.target as Element
+      if (event.key === '/' && target.tagName !== 'INPUT') {
+        selectInputText()
+      }
+    })
+  }
 </script>
 
 <form
@@ -60,7 +72,8 @@
     {autofocus}
     on:click={inputClick}
     bind:value={urlValue}
-    class="bg-transparent w-full p-2 focus:outline-none truncate"
+    bind:this={input}
+    class="bg-transparent w-full px-2 py-1 focus:outline-none truncate"
     {placeholder}
   />
   <div class="shrink-0">
