@@ -2,7 +2,9 @@
   import { Image } from '@allmaps/iiif-parser'
 
   export let imageUri: string
+
   export let width: number
+  export let height: number
 
   // let parsedImage: Image
 
@@ -34,10 +36,8 @@
   // }
 </script>
 
-<div />
-
 {#await parseImage(imageUri) then parsedImage}
-  {#await parsedImage.getThumbnail({ width, height: width }) then imageRequest}
+  {#await parsedImage.getThumbnail({ width, height }) then imageRequest}
     {#if Array.isArray(imageRequest)}
       <!-- {#each thumbnail as row, rowIndex}
         {#each row as cell, columnIndex}
@@ -47,7 +47,9 @@
     {:else}
       <img
         alt="thumbnail"
-        class="single"
+        class="object-contain"
+        style:width={`${width}px`}
+        style:height={`${height}px`}
         src={parsedImage.getImageUrl(imageRequest)}
       />
     {/if}
@@ -61,14 +63,3 @@
     {/if}
   </div>
 {/await}
-
-<style>
-  img.single {
-    top: 0;
-    left: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-</style>

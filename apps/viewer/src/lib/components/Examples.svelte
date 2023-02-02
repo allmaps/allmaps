@@ -2,25 +2,14 @@
   import { examples } from '$lib/components/examples.json'
 </script>
 
-<p>You can also use one of these examples:</p>
+<p class="mb-2">You can also use one of these examples:</p>
 
-<ul>
+<ul class="list-disc list-inside space-y-1">
   {#each examples as example}
     <li>
-      <a href={`#url=${encodeURIComponent(example.url)}`}>
+      <a class="underline" href={`?url=${encodeURIComponent(example.url)}`}>
         <span>{example.title}</span>
-      </a> <span class="light organization">{example.organization}</span>
+      </a> <span class="text-gray-500">{example.organization}</span>
     </li>
   {/each}
 </ul>
-
-<style scoped>
-  li {
-    margin-bottom: 0.5em;
-  }
-
-  .organization {
-    color: #aaa;
-    text-decoration: none;
-  }
-</style>

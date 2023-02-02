@@ -1,166 +1,184 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { afterNavigate } from '$app/navigation'
+  import { fade } from 'svelte/transition'
 
-  import { Header, URLInput, URLType, urlStore } from '@allmaps/ui-components'
+  import {
+    Header,
+    URLInput,
+    URLType,
+    urlStore,
+    dataStore,
+    paramStore
+  } from '@allmaps/ui-components'
+
+  import {
+    addUrlSource,
+    addStringSource,
+    resetSources
+  } from '$lib/shared/stores/sources.js'
+  import { mapCount } from '$lib/shared/stores/maps.js'
 
   import Loading from '$lib/components/Loading.svelte'
-  import Annotation from '$lib/components/Annotation.svelte'
-
+  import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
+
+  import ShowError from '$lib/components/elements/Error.svelte'
 
   import 'ol/ol.css'
 
-  const dataUrlPrefix = 'data:text/x-url,'
-  const dataJsonPrefix = 'data:application/json,'
-
   let type: 'annotation'
-  let loaded = false
+
+  let initialized = false
+  let showForm = false
+  let error: Error | null
+
   let annotationUrl = ''
   let annotationString = ''
 
-  urlStore.subscribe((value) => {
-    loadUrl(value)
+  function resetForm() {
+    error = null
+    annotationUrl = ''
+    annotationString = ''
+
+    showForm = true
+  }
+
+  async function handleAnnotationStringSubmit() {
+    dataStore.set(annotationString)
+  }
+
+  // TODO: move to ui-components
+  afterNavigate(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const data = searchParams.get('data')
+
+    if (data) {
+      dataStore.set(data)
+    } else {
+      dataStore.set('')
+    }
   })
 
-  // function getAnnotationFromHash() {
-  //   const hash = window.location.hash.slice(1)
-  //   const queryParams = new URLSearchParams(hash)
-  //   const urlParam = queryParams.get('url')
-  //   const annotationParam = queryParams.get('annotation')
-  //   const dataParam = queryParams.get('data')
-
-  //   annotationUrl = ''
-  //   annotationString = ''
-
-  //   if (urlParam) {
-  //     annotationUrl = urlParam
-  //   } else if (annotationParam) {
-  //     annotationString = annotationParam
-  //   } else if (dataParam && dataParam.startsWith(dataUrlPrefix)) {
-  //     annotationUrl = dataParam.replace(dataUrlPrefix, '')
-  //   } else if (dataParam && dataParam.startsWith(dataJsonPrefix)) {
-  //     annotationString = dataParam.replace(dataJsonPrefix, '')
-  //   }
-
-  //   if (!annotationUrl && !annotationString) {
-  //     loaded = false
-  //   }
-  // }
-
-  // function setDataHash(annotationUrl: string, annotationString: string) {
-  //   if (annotationUrl || annotationString) {
-  //     const queryParams = new URLSearchParams('')
-
-  //     if (annotationUrl) {
-  //       queryParams.set('url', annotationUrl)
-  //     } else if (annotationString) {
-  //       queryParams.set('annotation', annotationString)
-  //     }
-
-  //     history.pushState(null, '', '#' + queryParams.toString())
-  //     window.dispatchEvent(new HashChangeEvent('hashchange'))
-  //   }
-  // }
-
-  // function handleUrlSubmit() {
-  //   setDataHash(annotationUrl, '')
-  // }
-
-  function handleStringSubmit() {
-    // setDataHash('', annotationString)
-  }
-
-  function loadUrl(url: string) {
-    if (url) {
-      annotationUrl = url
-    }
-  }
-
-  async function fetchAnnotation(url: string) {
-    const response = await fetch(url)
-    const annotation = await response.json()
-    return annotation
-  }
-
-  async function parseAnnotation(annotationUrl: string | undefined, annotationString: string | undefined) {
-    let annotation
-    if (annotationUrl) {
-      annotation = await fetchAnnotation(annotationUrl)
-    } else if (annotationString) {
-      annotation = JSON.parse(annotationString)
-    }
-
-    type = 'annotation'
-    loaded = true
-
-    return annotation
-  }
-
   onMount(async () => {
-    // getAnnotationFromHash()
-    // window.addEventListener(
-    //   'hashchange',
-    //   () => {
-    //     getAnnotationFromHash()
-    //   },
-    //   false
-    // )
+    // TODO: move out of onMount?
+    paramStore.subscribe(async (value) => {
+      console.log('new paramStore', value)
+      resetSources()
+
+      initialized = true
+      if (!value) {
+        resetForm()
+      } else {
+        showForm = false
+
+        try {
+          if (value.type === 'url' && value.url) {
+            await addUrlSource(value.url)
+          } else if (value.data) {
+            await addStringSource(value.data)
+          }
+
+        } catch (err) {
+          if (err instanceof Error) {
+            error = err
+          }
+        }
+      }
+    })
+
+    // // TODO: move out of onMount?
+    // urlStore.subscribe(async (value) => {
+    //   console.log('new urlStore', value)
+    //   resetSources()
+
+    //   initialized = true
+    //   if (!value) {
+    //     resetForm()
+    //   } else {
+    //     showForm = false
+
+    //     try {
+    //       await addUrlSource(value)
+    //     } catch (err) {
+    //       if (err instanceof Error) {
+    //         error = err
+    //       }
+    //     }
+    //   }
+    // })
+
+    // // TODO: move out of onMount?
+    // dataStore.subscribe(async (value) => {
+    //   console.log('new dataStore', value)
+    //   resetSources()
+
+    //   initialized = true
+    //   if (!value) {
+    //     resetForm()
+    //   } else {
+    //     showForm = false
+
+    //     try {
+    //       await addStringSource(value)
+    //     } catch (err) {
+    //       if (err instanceof Error) {
+    //         error = err
+    //       }
+    //     }
+    //   }
+    // })
   })
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="Viewer">
-    {#if loaded}
+    {#if !showForm && initialized}
       <URLInput>
         <URLType {type} />
       </URLInput>
     {/if}
   </Header>
   <main class="grow">
-    {#if annotationUrl || annotationString}
-      {#await parseAnnotation(annotationUrl, annotationString)}
-        <Loading />
-      {:then annotation}
-        <Annotation {annotation} />
-      {:catch error}
-        <div class="content">
-          <!-- TODO: centered! Make Error component!  -->
-          <p>An error occurred!</p>
-          <p><code>{error.message}</code></p>
-          <a href="/#">Reset</a>.
-        </div>
-      {/await}
-      <!-- {:else if !loaded} -->
-      <!-- <Loading /> -->
-    {:else}
-      <div class="content">
-        <p>Open a Georef Annotation from a URL:</p>
+    {#if showForm}
+      <div
+        class="container mx-auto mt-10 p-2"
+        transition:fade={{ duration: 120 }}
+      >
+        <p class="mb-3">Open a Georeference Annotation from a URL:</p>
         <URLInput />
-        <!-- <form on:submit|preventDefault={handleUrlSubmit}>
-        <input
-          bind:value={annotationUrl}
-          name="url"
-          placeholder="Georef Annotation URL"
-          autofocus
-        />
-        <button disabled={annotationUrl.length === 0}>View</button>
-      </form> -->
-        <p>Or, paste an Georef Annotation in the text box:</p>
-        <form on:submit|preventDefault={handleStringSubmit}>
+
+        <p class="mt-3 mb-3">
+          Or, paste an Georeference Annotation in the text box:
+        </p>
+        <form on:submit|preventDefault={handleAnnotationStringSubmit}>
           <textarea
             bind:value={annotationString}
-            class="monospace"
+            class="font-mono block mb-3 w-full h-60 bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
             spellcheck="false"
           />
-          <button disabled={annotationString.length === 0}>View</button>
+          <button
+            type="submit"
+            disabled={annotationString.length === 0}
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >View</button
+          >
         </form>
         <section>
           <Examples />
         </section>
       </div>
+    {:else if $mapCount}
+      <Container />
+    {:else if error}
+      <div class="container mx-auto">
+        <ShowError {error} />
+      </div>
+    {:else if initialized}
+      <Loading />
     {/if}
   </main>
 </div>

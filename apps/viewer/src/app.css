@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.inline-flex .ol-rotate.ol-hidden {
+  opacity: 1;
+  visibility: visible;
+}
