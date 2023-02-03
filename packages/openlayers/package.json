@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.22",
+  "version": "1.0.0-beta.23",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -59,7 +59,7 @@
     "@allmaps/annotation": "^1.0.0-beta.10",
     "@allmaps/id": "^1.0.0-beta.12",
     "@allmaps/iiif-parser": "^1.0.0-beta.18",
-    "@allmaps/render": "^1.0.0-beta.19",
+    "@allmaps/render": "^1.0.0-beta.20",
     "@allmaps/transform": "^1.0.0-beta.7",
     "earcut": "^2.2.3",
     "lodash-es": "^4.17.21",
