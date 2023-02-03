@@ -1,0 +1,47 @@
+{
+  "embedded": false,
+  "height": 3000,
+  "majorVersion": 2,
+  "supportsAnyRegionAndSize": true,
+  "tileZoomLevels": [
+    {
+      "columns": 5,
+      "height": 512,
+      "originalHeight": 512,
+      "originalWidth": 512,
+      "rows": 6,
+      "scaleFactor": 1,
+      "width": 512
+    },
+    {
+      "columns": 3,
+      "height": 512,
+      "originalHeight": 1024,
+      "originalWidth": 1024,
+      "rows": 3,
+      "scaleFactor": 2,
+      "width": 512
+    },
+    {
+      "columns": 2,
+      "height": 512,
+      "originalHeight": 2048,
+      "originalWidth": 2048,
+      "rows": 2,
+      "scaleFactor": 4,
+      "width": 512
+    },
+    {
+      "columns": 1,
+      "height": 512,
+      "originalHeight": 4096,
+      "originalWidth": 4096,
+      "rows": 1,
+      "scaleFactor": 8,
+      "width": 512
+    }
+  ],
+  "type": "image",
+  "uri": "https://ids.si.edu/ids/iiif/NASM-NASM2013-00143",
+  "width": 2071
+}
