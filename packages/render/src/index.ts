@@ -5,10 +5,10 @@ import TileCache from './TileCache.js'
 
 export { World, Viewport, RTree, TileCache }
 
-import CanvasRenderer from './CanvasRenderer.js'
+// import CanvasRenderer from './CanvasRenderer.js'
 import WebGL2Renderer from './WebGL2Renderer.js'
 
-export { CanvasRenderer, WebGL2Renderer }
+export { WebGL2Renderer }
 
 export * from './shared/types.js'
 export * from './shared/events.js'
