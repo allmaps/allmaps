@@ -4,7 +4,6 @@
   import {
     renderOptionsLayer,
     renderOptionsSelectedMaps,
-    renderOptionsMaps,
     renderOptionsScope
   } from '$lib/shared/stores/render-options.js'
   import { ol, xyzLayer } from '$lib/shared/stores/openlayers.js'
@@ -40,7 +39,6 @@
 
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
 
-  import type { Writable } from 'svelte/store'
   import type { WarpedMap } from '@allmaps/render'
   import type { Source } from '$lib/shared/types.js'
 

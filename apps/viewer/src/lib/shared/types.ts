@@ -31,18 +31,6 @@ export type MapState = {
   selected: boolean
 }
 
-
-// export type SelectedMap = {
-//   mapId: string
-//   sourceId: string
-//   // path: string
-//   selected: boolean
-//   highlighted: boolean
-//   order: number
-//   orderInSelected?: number
-// }
-
-
 export type RemoveBackgroundOptions = {
   enabled: boolean
   color: string
