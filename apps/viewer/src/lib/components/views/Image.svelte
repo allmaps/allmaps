@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
 
   import { ol } from '$lib/shared/stores/openlayers.js'
-  // import { map as mapStore } from '$lib/shared/stores/sources.js'
+  import { highlightedMap } from '$lib/shared/stores/highlighted.js'
 
   import OLMap from 'ol/Map.js'
   import Feature from 'ol/Feature'
@@ -17,36 +17,40 @@
 
   import { IIIFLayer } from '@allmaps/openlayers'
 
-  import type { Map } from '@allmaps/annotation'
+  import type { ViewerMap } from '$lib/shared/types.js'
 
   let iiifLayer: IIIFLayer
   let vectorSource: VectorSource
   let vectorLayer: VectorLayer<VectorSource>
 
-  // $: updateMap(map)
+  $: updateMap($highlightedMap)
 
-  function updateVectorLayer(map: Map) {
-    // const feature = new Feature({
-    //   index: 0,
-    //   geometry: new Polygon(maskToPolygon(map.pixelMask))
-    // })
+  function updateVectorLayer(viewerMap: ViewerMap) {
+    const map = viewerMap.map
 
-    // feature.setId(map.id)
+    const feature = new Feature({
+      index: 0,
+      geometry: new Polygon(maskToPolygon(map.pixelMask))
+    })
 
-    // vectorSource.clear()
-    // vectorSource.addFeature(feature)
+    feature.setId(map.id)
+
+    vectorSource.clear()
+    vectorSource.addFeature(feature)
   }
 
-  async function updateMap(map: Map) {
+  async function updateMap(viewerMap: ViewerMap) {
     if ($ol && iiifLayer) {
       $ol.removeLayer(iiifLayer)
     }
 
     if ($ol) {
+      const map = viewerMap.map
+
       const imageUri = map.image.uri
       const imageInfo = await fetchImage(imageUri)
 
-      updateVectorLayer(map)
+      updateVectorLayer(viewerMap)
 
       iiifLayer = new IIIFLayer(imageInfo)
       $ol.addLayer(iiifLayer)
@@ -83,7 +87,7 @@
       target: 'ol'
     })
 
-    // await updateMap(map)
+    await updateMap($highlightedMap)
   })
 
   onDestroy(() => {

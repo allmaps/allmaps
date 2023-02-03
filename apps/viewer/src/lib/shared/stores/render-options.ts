@@ -1,92 +1,64 @@
 import { get, writable, derived, type Writable } from 'svelte/store'
 
-import { mapsById } from '$lib/shared/stores/maps.js'
-import { selectedMapIds } from '$lib/shared/stores/selected.js'
+import { mapsById, maps } from '$lib/shared/stores/maps.js'
+import {
+  selectedMaps,
+  selectedMapIds,
+  lastSelectedMap
+} from '$lib/shared/stores/selected.js'
+
+import { defaultRenderOptions } from '$lib/shared/defaults.js'
 
 import type { RenderOptions } from '$lib/shared/types.js'
 
-const defaultRenderOptions: RenderOptions = {
-  opacity: 1,
-  removeBackground: {
-    enabled: false,
-    color: '#faeed4',
-    threshold: 0.2,
-    hardness: 0.7
-  },
-  colorize: {
-    enabled: false,
-    color: '#ff0000'
-  }
-}
-
-type RenderOptionsByMapId = Map<string, Writable<RenderOptions>>
-
-export const renderOptionsAll = writable<RenderOptions>(defaultRenderOptions)
-export const renderOptionsByMapId = writable<RenderOptionsByMapId>(new Map())
-export const mapId = writable<string>()
 export const renderOptionsScope = writable<'layer' | 'map'>('layer')
 
+export const renderOptionsLayer = writable<RenderOptions>(defaultRenderOptions)
 
-
-mapsById.subscribe(($mapsById) => {
-  renderOptionsByMapId.update(($renderOptionsByMapId) => {
-    // Remove mapIds that no longer exist from selectedMapIds
-    for (let mapId of $renderOptionsByMapId.keys()) {
-      if (!$mapsById.has(mapId)) {
-        $renderOptionsByMapId.delete(mapId)
-      }
-    }
-
-    // Add new mapIds to selectedMapIdsStore
-    // and set as not selected
-    for (let mapId of $mapsById.keys()) {
-      if (!$renderOptionsByMapId.has(mapId)) {
-        const sourceMap = $mapsById.get(mapId)
-
-        if (sourceMap) {
-          $renderOptionsByMapId.set(mapId, writable(defaultRenderOptions))
-        }
-      }
-    }
-
-    console.log('$renderOptionsByMapId', $renderOptionsByMapId)
-    return $renderOptionsByMapId
-  })
-})
-
-
-export const renderOptionsForSelectedMaps = derived(
-  [renderOptionsByMapId, selectedMapIds],
-  ([$renderOptionsByMapId, $selectedMapIds]) =>
-    $selectedMapIds
-      .filter((mapId) => $renderOptionsByMapId.has(mapId))
-      .map((mapId) => $renderOptionsByMapId.get(mapId)!)
+export const renderOptionsMaps = derived(maps, ($maps) =>
+  $maps.map((viewerMap) => viewerMap.renderOptions)
 )
 
-selectedMapIds.subscribe((s) => {
-  console.log('selectedMapIds', s)
-})
-
-renderOptionsForSelectedMaps.subscribe((v) =>
-{
-  console.log('renderOptionsForSelectedMaps', v)
-})
-
-// export const renderOptions = get(renderOptionsByMapId).get(get(mapId))
+export const renderOptionsSelectedMaps = derived(
+  selectedMaps,
+  ($selectedMaps) =>
+    $selectedMaps.map((selectedMap) => selectedMap.renderOptions)
+)
 
 export const renderOptions = {
   ...derived(
-    [renderOptionsAll, ...get(renderOptionsForSelectedMaps)],
-    ([$renderOptionsAll, ...$renderOptionsForSelectedMaps]) => {
-      console.log(
-        '$renderOptionsForSelectedMaps',
-        $renderOptionsForSelectedMaps
-      )
-      return $renderOptionsAll
+    [renderOptionsScope, renderOptionsLayer, lastSelectedMap],
+    ([$renderOptionsScope, $renderOptionsLayer, $lastSelectedMap]) => {
+      if ($renderOptionsScope === 'map' && $lastSelectedMap) {
+        return $lastSelectedMap.renderOptions
+      } else {
+        return $renderOptionsLayer
+      }
     }
   ),
   set: function (renderOptions: RenderOptions) {
-    renderOptionsAll.set(renderOptions)
-    console.log('nu iupdate', renderOptions)
+    const $renderOptionsScope = get(renderOptionsScope)
+
+    if ($renderOptionsScope === 'layer') {
+      renderOptionsLayer.set(renderOptions)
+    } else {
+      const $selectedMapIds = get(selectedMapIds)
+
+      if ($selectedMapIds.length) {
+        mapsById.update(($mapsById) => {
+          for (let selectedMapId of $selectedMapIds) {
+            const viewerMap = $mapsById.get(selectedMapId)
+
+            if (viewerMap) {
+              // console.log('now setting', selectedMapId, renderOptions)
+              viewerMap.renderOptions = renderOptions
+              $mapsById.set(selectedMapId, viewerMap)
+            }
+          }
+
+          return $mapsById
+        })
+      }
+    }
   }
 }

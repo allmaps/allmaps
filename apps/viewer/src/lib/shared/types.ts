@@ -15,22 +15,32 @@ export type Source = (UrlSourceOptions | StringSourceOptions) & {
   json: any
 }
 
-export type SourceMap = {
+export type ViewerMap = {
   sourceId: string
   mapId: string
   map: Map
-  order: number
+
+  // order: number
+  // path: string
+
+  renderOptions: RenderOptions
+  state: MapState
 }
 
-export type SelectedMap = {
-  mapId: string
-  sourceId: string
-  // path: string
+export type MapState = {
   selected: boolean
-  highlighted: boolean
-  order: number
-  orderInSelected?: number
 }
+
+
+// export type SelectedMap = {
+//   mapId: string
+//   sourceId: string
+//   // path: string
+//   selected: boolean
+//   highlighted: boolean
+//   order: number
+//   orderInSelected?: number
+// }
 
 
 export type RemoveBackgroundOptions = {

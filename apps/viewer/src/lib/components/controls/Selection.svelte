@@ -7,11 +7,19 @@
 
   import { mapCount } from '$lib/shared/stores/maps.js'
 
-  import {
-    highlightPrevMap,
-    highlightNextMap,
-    selectedMapCount
-  } from '$lib/shared/stores/selected.js'
+  import { selectedMapCount } from '$lib/shared/stores/selected.js'
+
+  import { highlightedIndex } from '$lib/shared/stores/highlighted.js'
+
+  function highlightPrevMap() {
+    $highlightedIndex -= 1
+    console.log($highlightedIndex)
+  }
+
+  function highlightNextMap() {
+    $highlightedIndex += 1
+    console.log($highlightedIndex)
+  }
 
   function handleKeyUp(event: KeyboardEvent) {
     // TODO: only when not in input
@@ -65,37 +73,37 @@
       />
     </svg>
   </button> -->
-  {#if $selectedMapCount > 1}
-    <button class="w-5 h-5" on:click={highlightPrevMap}>
-      <svg
-        aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          clip-rule="evenodd"
-          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-          fill-rule="evenodd"
-        />
-      </svg>
-    </button>
 
-    <button class="w-5 h-5" on:click={highlightNextMap}>
-      <svg
-        aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          clip-rule="evenodd"
-          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-          fill-rule="evenodd"
-        />
-      </svg>
-    </button>
-    <!-- <button class="w-5 h-5">
+  <button class="w-5 h-5" on:click={highlightPrevMap}>
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        clip-rule="evenodd"
+        d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+        fill-rule="evenodd"
+      />
+    </svg>
+  </button>
+
+  <button class="w-5 h-5" on:click={highlightNextMap}>
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        clip-rule="evenodd"
+        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+        fill-rule="evenodd"
+      />
+    </svg>
+  </button>
+  <!-- <button class="w-5 h-5">
     <svg
       aria-hidden="true"
       fill="currentColor"
@@ -114,5 +122,4 @@
       />
     </svg>
   </button> -->
-  {/if}
 </div>

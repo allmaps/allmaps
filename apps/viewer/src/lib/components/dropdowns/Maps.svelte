@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { selectedMapsById } from '$lib/shared/stores/selected.js'
+  import { maps } from '$lib/shared/stores/maps.js'
 
   import MapsItem from '$lib/components/dropdowns/MapsItem.svelte'
 </script>
 
 <ol class="p-2">
-  {#each [...$selectedMapsById.entries()] as [mapId, selectedMap] (mapId)}
+  <!-- {#each [...$maps] as viewerMap (viewerMap.mapId + viewerMap.state.selected)} -->
+  {#each $maps as viewerMap}
     <li class="flex flex-row">
-      <MapsItem selectedMap={selectedMap} />
-  </li>
+      <MapsItem {viewerMap} />
+    </li>
   {/each}
 </ol>

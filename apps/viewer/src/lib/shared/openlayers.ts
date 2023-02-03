@@ -1,4 +1,5 @@
 import { Stroke, Fill, Style } from 'ol/style'
+import type Feature from 'ol/feature'
 
 import type { SVGPolygon } from '@allmaps/render'
 
@@ -41,4 +42,8 @@ export function maskToPolygon(pixelMask: SVGPolygon) {
       [pixelMask[0][0], -pixelMask[0][1]]
     ]
   ]
+}
+
+export function idsFromFeatures(features: Feature[]) {
+  return features.map((feature) => String(feature.getId()))
 }

@@ -2,16 +2,18 @@
   import { onMount, onDestroy } from 'svelte'
 
   import {
-    renderOptionsAll,
-    renderOptionsByMapId,
+    renderOptionsLayer,
+    renderOptionsSelectedMaps,
+    renderOptionsMaps,
     renderOptionsScope
   } from '$lib/shared/stores/render-options.js'
-  import { ol } from '$lib/shared/stores/openlayers.js'
+  import { ol, xyzLayer } from '$lib/shared/stores/openlayers.js'
   import { sourcesById } from '$lib/shared/stores/sources.js'
 
   import {
-    selectedMapsById,
-    setSelectedMapIds
+    selectedMapIds,
+    selectedMaps,
+    updateSelectedMaps
   } from '$lib/shared/stores/selected.js'
 
   import OLMap from 'ol/Map.js'
@@ -20,12 +22,13 @@
   import View from 'ol/View.js'
   import { GeoJSON } from 'ol/format'
   import { Vector as VectorSource } from 'ol/source'
-  import Select from 'ol/interaction/Select.js'
+  import Select, { SelectEvent } from 'ol/interaction/Select.js'
   import { click } from 'ol/events/condition.js'
 
   import {
     invisiblePolygonStyle,
-    selectedPolygonStyle
+    selectedPolygonStyle,
+    idsFromFeatures
   } from '$lib/shared/openlayers.js'
 
   import {
@@ -39,7 +42,7 @@
 
   import type { Writable } from 'svelte/store'
   import type { WarpedMap } from '@allmaps/render'
-  import type { Source, SelectedMap } from '$lib/shared/types.js'
+  import type { Source } from '$lib/shared/types.js'
 
   let warpedMapLayer: WarpedMapLayer
   let warpedMapSource: WarpedMapSource
@@ -109,40 +112,17 @@
     updateWarpedMapLayer($sourcesById)
   }
 
-  const tileSources = [
-    {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-      attribution:
-        'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-    },
-    {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-      attribution:
-        'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-    },
-    {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attribution:
-        'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    }
-  ]
-
-  let tileSourceIndex = 0
-
   $: {
     if (xyz) {
-      const tileUrl = tileSources[tileSourceIndex].url
-      xyz.setUrl(tileUrl)
+      xyz.setUrl($xyzLayer.url)
     }
   }
 
-  function handleSelect() {
-    const selectedFeatures = select.getFeatures()
-    const selectedMapIds = selectedFeatures
-      .getArray()
-      .map((feature) => String(feature.getId()))
+  function handleSelect(event: SelectEvent) {
+    const selectedMapIds = idsFromFeatures(event.selected)
+    const deselectedMapIds = idsFromFeatures(event.deselected)
 
-    setSelectedMapIds(selectedMapIds)
+    updateSelectedMaps(selectedMapIds, deselectedMapIds)
   }
 
   // $: {
@@ -167,11 +147,53 @@
   // // })
   // }
 
+  $: {
+    if (warpedMapLayer) {
+      if ($renderOptionsScope === 'layer') {
+        warpedMapLayer.setOpacity($renderOptionsLayer.opacity)
+
+        if ($renderOptionsLayer.removeBackground.enabled) {
+          warpedMapLayer.setRemoveBackground(
+            $renderOptionsLayer.removeBackground.color,
+            {
+              threshold: $renderOptionsLayer.removeBackground.threshold,
+              hardness: $renderOptionsLayer.removeBackground.hardness
+            }
+          )
+        } else {
+          warpedMapLayer.resetRemoveBackground()
+        }
+        if ($renderOptionsLayer.colorize.enabled) {
+          warpedMapLayer.setColorize($renderOptionsLayer.colorize.color)
+        } else {
+          warpedMapLayer.resetColorize()
+        }
+      } else {
+        const renderOptions = $renderOptionsSelectedMaps[0]
+
+        for (let selectedMapId of $selectedMapIds) {
+          warpedMapLayer.setMapOpacity(selectedMapId, renderOptions.opacity)
+          warpedMapLayer.setMapRemoveBackground(
+            selectedMapId,
+            renderOptions.removeBackground.color,
+            {
+              threshold: renderOptions.removeBackground.threshold,
+              hardness: renderOptions.removeBackground.hardness
+            }
+          )
+          warpedMapLayer.setMapColorize(
+            selectedMapId,
+            renderOptions.colorize.color
+          )
+        }
+      }
+    }
+  }
+
   onMount(async () => {
-    const tileUrl = tileSources[tileSourceIndex].url
     // TODO: set attribution
     xyz = new XYZ({
-      url: tileUrl,
+      url: $xyzLayer.url,
       maxZoom: 19
     })
 
@@ -209,28 +231,6 @@
 
     select.on('select', handleSelect)
 
-    renderOptionsAll.subscribe((renderOptions) => {
-      warpedMapLayer.setOpacity(renderOptions.opacity)
-
-      if (renderOptions.removeBackground.enabled) {
-        warpedMapLayer.setRemoveBackground(
-          renderOptions.removeBackground.color,
-          {
-            threshold: renderOptions.removeBackground.threshold,
-            hardness: renderOptions.removeBackground.hardness
-          }
-        )
-      } else {
-        warpedMapLayer.resetRemoveBackground()
-      }
-
-      if (renderOptions.colorize.enabled) {
-        warpedMapLayer.setColorize(renderOptions.colorize.color)
-      } else {
-        warpedMapLayer.resetColorize()
-      }
-    })
-
     warpedMapLayer.on(
       WarpedMapEventType.WARPEDMAPADDED,
       (event: OLWarpedMapEvent) => {
@@ -248,61 +248,6 @@
   onDestroy(() => {
     $ol = undefined
   })
-
-  // function setBackgroundColor() {
-  //   if (warpedMapLayer) {
-  //     // TODO: use subscribe instead of get
-  //     const removeBackgroundColorValue = get(removeBackgroundColor)
-  //     const backgroundColorValue = get(backgroundColor)
-  //     const backgroundColorThresholdValue = get(backgroundColorThreshold)
-  //     const backgroundColorThresholdHardnessValue = get(
-  //       backgroundColorThresholdHardness
-  //     )
-
-  //     warpedMapLayer.setBackgroundColor(
-  //       removeBackgroundColorValue ? backgroundColorValue : null
-  //     )
-  //     warpedMapLayer.setBackgroundColorThreshold(
-  //       backgroundColorThresholdValue,
-  //       backgroundColorThresholdHardnessValue
-  //     )
-  //   }
-  // }
-
-  // function setColorizeColor() {
-  //   if (warpedMapLayer) {
-  //     const colorizeValue = get(colorize)
-  //     const colorizeColorValue = get(colorizeColor)
-
-  //     warpedMapLayer.setColorizeColor(colorizeValue ? colorizeColorValue : null)
-  //   }
-  // }
-
-  // opacity.subscribe((value) => {
-  //   if (warpedMapLayer) {
-  //     warpedMapLayer.setOpacity(value)
-  //   }
-  // })
-
-  // removeBackgroundColor.subscribe((value) => {
-  //   setBackgroundColor()
-  // })
-
-  // backgroundColor.subscribe((value) => {
-  //   setBackgroundColor()
-  // })
-  // backgroundColorThreshold.subscribe((value) => {
-  //   setBackgroundColor()
-  // })
-  // backgroundColorThresholdHardness.subscribe((value) => {
-  //   setBackgroundColor()
-  // })
-  // colorize.subscribe((value) => {
-  //   setColorizeColor()
-  // })
-  // colorizeColor.subscribe((value) => {
-  //   setColorizeColor()
-  // })
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.code === 'Space' && event.target === document.body) {
@@ -323,9 +268,9 @@
 {#if vectorSource && select}
   <div class="hidden">
     <ol>
-      {#each [...$selectedMapsById.entries()] as [mapId, selectedMap] (mapId)}
+      {#each $selectedMaps as viewerMap (viewerMap.mapId)}
         <li>
-          <HiddenWarpedMap {vectorSource} {select} {selectedMap} />
+          <HiddenWarpedMap {vectorSource} {select} {viewerMap} />
         </li>
       {/each}
     </ol>
