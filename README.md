@@ -18,6 +18,7 @@ Apps:
 - [Allmaps Info](apps/info)
 - [Allmaps IIIF Viewer](apps/iiif)
 - [Allmaps CLI](apps/cli)
+- [Allmaps Style Guide](apps/style)
 
 ## Installation
 
