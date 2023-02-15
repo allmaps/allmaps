@@ -1,7 +1,7 @@
 import Layer from 'ol/layer/Layer.js'
 import type { FrameState } from 'ol/PluggableMap.js'
 
-// import { throttle } from 'lodash-es'
+import { throttle } from 'lodash-es'
 
 import {
   TileCache,
@@ -14,9 +14,22 @@ import {
 
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
-import type { Size, BBox, Transform, OptionalColor } from '@allmaps/render'
+import type {
+  Size,
+  BBox,
+  Transform,
+  OptionalColor,
+  NeededTile
+} from '@allmaps/render'
 
 import type { WarpedMapSource } from './WarpedMapSource.js'
+
+const THROTTLE_WAIT_MS = 500
+
+const THROTTLE_OPTIONS = {
+  leading: true,
+  trailing: true
+}
 
 export class WarpedMapLayer extends Layer {
   source: WarpedMapSource | null = null
@@ -33,6 +46,11 @@ export class WarpedMapLayer extends Layer {
   tileCache: TileCache
 
   mapIdsInViewport: Set<string> = new Set()
+
+  throttledUpdateViewportAndGetTilesNeeded: (
+    viewportSize: Size,
+    geoBBox: BBox
+  ) => NeededTile[] | undefined
 
   constructor(options: {}) {
     options = options || {}
@@ -87,6 +105,12 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.viewport = new Viewport(this.world)
+
+    this.throttledUpdateViewportAndGetTilesNeeded = throttle(
+      this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
+      THROTTLE_WAIT_MS,
+      THROTTLE_OPTIONS
+    )
 
     this.viewport.addEventListener(
       WarpedMapEventType.WARPEDMAPENTER,
@@ -147,25 +171,29 @@ export class WarpedMapLayer extends Layer {
 
   onResize(entries: ResizeObserverEntry[]) {
     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    // TODO: read + understand https://web.dev/device-pixel-content-box/
     for (const entry of entries) {
       let width = entry.contentRect.width
       let height = entry.contentRect.height
       let dpr = window.devicePixelRatio
-      if (entry.devicePixelContentBoxSize) {
-        // NOTE: Only this path gives the correct answer
-        // The other paths are imperfect fallbacks
-        // for browsers that don't provide anyway to do this
-        width = entry.devicePixelContentBoxSize[0].inlineSize
-        height = entry.devicePixelContentBoxSize[0].blockSize
-        dpr = 1 // it's already in width and height
-      } else if (entry.contentBoxSize) {
-        if (entry.contentBoxSize[0]) {
-          width = entry.contentBoxSize[0].inlineSize
-          height = entry.contentBoxSize[0].blockSize
-        }
-      }
+
+      // if (entry.devicePixelContentBoxSize) {
+      //   // NOTE: Only this path gives the correct answer
+      //   // The other paths are imperfect fallbacks
+      //   // for browsers that don't provide anyway to do this
+      //   width = entry.devicePixelContentBoxSize[0].inlineSize
+      //   height = entry.devicePixelContentBoxSize[0].blockSize
+      //   dpr = 1 // it's already in width and height
+      // } else if (entry.contentBoxSize) {
+      //   if (entry.contentBoxSize[0]) {
+      //     width = entry.contentBoxSize[0].inlineSize
+      //     height = entry.contentBoxSize[0].blockSize
+      //   }
+      // }
+
       const displayWidth = Math.round(width * dpr)
       const displayHeight = Math.round(height * dpr)
+
       this.canvasSize = [displayWidth, displayHeight]
     }
     this.changed()
@@ -303,20 +331,14 @@ export class WarpedMapLayer extends Layer {
         frameState.size[1] * window.devicePixelRatio
       ] as Size
 
-      //   if (this.throttledUpdateNeededTiles) {
-      //     this.throttledUpdateNeededTiles(
-      //       viewportSize,
-      //       extent,
-      //       frameState.coordinateToPixelTransform
-      //     )
-      //   }
-      // }
-      const tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
+      const tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
         viewportSize,
         extent
       )
 
-      this.tileCache.setTiles(tilesNeeded)
+      if (tilesNeeded) {
+        this.tileCache.setTiles(tilesNeeded)
+      }
 
       this.renderer.render(
         frameState.coordinateToPixelTransform as Transform,

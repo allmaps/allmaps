@@ -21,7 +21,7 @@ export class WarpedMapSource extends Source {
     this.world = new World(this.rtree)
   }
 
-  async addGeorefAnnotation(annotation: Annotation): Promise<string[]> {
+  async addGeorefAnnotation(annotation: Annotation): Promise<(string | Error)[]> {
     return this.world.addGeorefAnnotation(annotation)
   }
 
