@@ -3,10 +3,6 @@
 precision highp float;
 precision highp isampler2D;
 
-// uniform Settings {
-//   float u_opacity;
-// };
-
 uniform float u_opacity;
 
 uniform bool u_removeBackgroundColor;
@@ -23,14 +19,13 @@ uniform vec3 u_adfFromGeoX;
 uniform vec3 u_adfFromGeoY;
 
 uniform float[6] u_pixelToCoordinateTransform;
-uniform vec2 u_viewportSize;
+uniform vec2 u_canvasSize;
 uniform float u_devicePixelRatio;
 
 vec2 CRS_georef(float e1, float n1, vec3 E, vec3 N) {
   float e;
   float n;
 
-  // if(order == 1) {
   e = E[0] + E[1] * e1 + E[2] * n1;
   n = N[0] + N[1] * e1 + N[2] * n1;
 
@@ -50,10 +45,6 @@ uniform isampler2D u_scaleFactorsTexture;
 
 out vec4 outColor;
 
-float luma(vec3 color) {
-  return dot(color, vec3(0.299, 0.587, 0.114));
-}
-
 vec2 apply(float[6] transform, vec2 coordinate) {
   float x = coordinate[0];
   float y = coordinate[1];
@@ -61,10 +52,10 @@ vec2 apply(float[6] transform, vec2 coordinate) {
 }
 
 void main() {
-  // gl_FragCoord contains canvas pixel values:
+  // gl_FragCoord contains canvas pixel coordinates:
   // lower-left origin: substract y component from viewport height and
   // divide by u_devicePixelRatio to get HTML coordinates used by OpenLayers
-  vec2 pixelCoords = vec2(gl_FragCoord.x / u_devicePixelRatio, u_viewportSize.y - gl_FragCoord.y / u_devicePixelRatio);
+  vec2 pixelCoords = vec2(gl_FragCoord.x / u_devicePixelRatio, (u_canvasSize.y - gl_FragCoord.y) / u_devicePixelRatio);
 
   vec2 geoCoords = apply(u_pixelToCoordinateTransform, pixelCoords);
   vec2 imageCoords = GDALGCPTransform(u_x2Mean, u_y2Mean, u_adfFromGeoX, u_adfFromGeoY, geoCoords.yx);
@@ -113,31 +104,11 @@ void main() {
   outColor = vec4(0.0, 0.0, 0.0, 0.0);
 
   if(found == true) {
-    // vec2 pixelCoords2 = vec2((gl_FragCoord.x + 1.0) / u_devicePixelRatio, u_viewportSize.y - (gl_FragCoord.y + 1.0) / u_devicePixelRatio);
-    // vec2 geoCoords2 = apply(u_pixelToCoordinateTransform, pixelCoords2);
-    // vec2 imageCoords2 = GDALGCPTransform(u_x2Mean, u_y2Mean, u_adfFromGeoX, u_adfFromGeoY, geoCoords2.yx);
-
-    // int imageX2 = int(round(imageCoords2.x));
-    // int imageY2 = int(round(imageCoords2.y));
-
-    // float diffX2 = float(imageX2 - tileRegionX) / float(scaleFactor);
-    // float diffY2 = float(imageY2 - tileRegionY) / float(scaleFactor);
-
     float texturePixelX = float(tilePosition.r) + diffX;
     float texturePixelY = float(tilePosition.g) + diffY;
 
     int texturePixelXRounded = int(round(texturePixelX));
     int texturePixelYRounded = int(round(texturePixelY));
-
-    // float texturePixelX2 = float(tilePosition.r) + diffX2;
-    // float texturePixelY2 = float(tilePosition.g) + diffY2;
-
-    // int texturePixelX2Rounded = int(round(texturePixelX2));
-    // int texturePixelY2Rounded = int(round(texturePixelX2));
-
-    // if(texturePixelX2 - texturePixelX < 0.01) {
-    //   // return;
-    // }
 
     // Set opacity
     vec4 color = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));

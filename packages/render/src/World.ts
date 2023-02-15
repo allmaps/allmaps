@@ -26,68 +26,74 @@ export default class World extends EventTarget {
     this.rtree = rtree
   }
 
-  async addGeorefAnnotation(annotation: any): Promise<string[]> {
-    let mapIds: string[] = []
+  async addGeorefAnnotation(annotation: any): Promise<(string | Error)[]> {
+    let results: (string | Error)[] = []
 
     const maps = parseAnnotation(annotation)
 
     for (let map of maps) {
-      const gcps = map.gcps
-      const pixelMask = map.pixelMask
+      try {
+        const mapId = map.id || (await generateChecksum(map))
 
-      const sphericalMercatorGcps = gcps.map(({ world, image }) => ({
-        world: fromLonLat(world),
-        image
-      }))
+        const gcps = map.gcps
+        const pixelMask = map.pixelMask
 
-      // TODO: to make sure only tiles for visible parts of the map are requested
-      // (and not for parts hidden behind maps on top of it)
-      // use https://github.com/mfogel/polygon-clipping to subtract geoMasks of
-      // maps that have been added before.
-      // Map A (topmost): show completely
-      // Map B: B - A
-      // Map C: C - B - A
-      // Map D: D - C - B - A
+        const sphericalMercatorGcps = gcps.map(({ world, image }) => ({
+          world: fromLonLat(world),
+          image
+        }))
 
-      const transformer = createTransformer(sphericalMercatorGcps)
-      const geoMask = svgPolygonToGeoJSONPolygon(transformer, pixelMask)
+        // TODO: to make sure only tiles for visible parts of the map are requested
+        // (and not for parts hidden behind maps on top of it)
+        // use https://github.com/mfogel/polygon-clipping to subtract geoMasks of
+        // maps that have been added before.
+        // Map A (topmost): show completely
+        // Map B: B - A
+        // Map C: C - B - A
+        // Map D: D - C - B - A
 
-      // TODO: only load info.json when its needed
-      const imageUri = map.image.uri
-      const imageInfoJson = await fetchJson(`${imageUri}/info.json`)
-      const parsedImage = IIIFImage.parse(imageInfoJson)
+        const transformer = createTransformer(sphericalMercatorGcps)
+        const geoMask = svgPolygonToGeoJSONPolygon(transformer, pixelMask)
 
-      const mapId = map.id || (await generateChecksum(map))
-      const imageId = await generateId(imageUri)
+        // TODO: only load info.json when its needed
+        const imageUri = map.image.uri
+        const imageInfoJson = await fetchJson(`${imageUri}/info.json`)
+        const parsedImage = IIIFImage.parse(imageInfoJson)
+        const imageId = await generateId(imageUri)
 
-      const warpedMap: WarpedMap = {
-        imageId,
-        mapId,
-        parsedImage,
-        pixelMask,
-        transformer,
-        geoMask
+        const warpedMap: WarpedMap = {
+          imageId,
+          mapId,
+          parsedImage,
+          pixelMask,
+          transformer,
+          geoMask
+        }
+
+        this.imagesById.set(imageId, parsedImage)
+        this.warpedMapsById.set(mapId, warpedMap)
+
+        if (this.rtree) {
+          await this.rtree.addItem(mapId, geoMask)
+        }
+
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
+        )
+
+        results.push(mapId)
+      } catch (err) {
+        if (err instanceof Error) {
+          results.push(err)
+        }
       }
-
-      this.imagesById.set(imageId, parsedImage)
-      this.warpedMapsById.set(mapId, warpedMap)
-
-      if (this.rtree) {
-        await this.rtree.addItem(mapId, geoMask)
-      }
-
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
-      )
-
-      mapIds.push(mapId)
     }
 
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.GEOREFANNOTATIONADDED)
     )
 
-    return mapIds
+    return results
   }
 
   getPossibleVisibleWarpedMapIds(geoBBox: BBox) {

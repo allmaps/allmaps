@@ -292,15 +292,12 @@ export default class WebGL2Renderer extends EventTarget {
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(this.program)
 
-    const viewportSizeLocation = gl.getUniformLocation(
+    const canvasSizeLocation = gl.getUniformLocation(
       this.program,
-      'u_viewportSize'
+      'u_canvasSize'
     )
-    gl.uniform2f(
-      viewportSizeLocation,
-      Math.round(gl.canvas.width / window.devicePixelRatio),
-      Math.round(gl.canvas.height / window.devicePixelRatio)
-    )
+
+    gl.uniform2f(canvasSizeLocation, gl.canvas.width, gl.canvas.height)
 
     // Warped maps jiggle when zoomed in. This is probably caused by converting
     // 64 bit numbers in frameState.coordinateToPixelTransform to 32 bit floats in the vertex shader.
@@ -319,6 +316,7 @@ export default class WebGL2Renderer extends EventTarget {
       this.program,
       'u_devicePixelRatio'
     )
+
     gl.uniform1f(devicePixelRatioLocation, window.devicePixelRatio)
     const pixelToCoordinateTransformLocation = gl.getUniformLocation(
       this.program,

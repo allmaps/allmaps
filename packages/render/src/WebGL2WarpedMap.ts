@@ -77,12 +77,16 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {
     this.tilesForTexture.set(tileUrl, cachedTile)
+
+    // TODO: throttle calls to updateTextures?
     this.updateTextures()
   }
 
   removeCachedTile(tileUrl: string) {
     this.tilesForTexture.delete(tileUrl)
     this.tileImageBitmapsByUrl.delete(tileUrl)
+
+    // TODO: throttle calls to updateTextures?
     this.updateTextures()
   }
 
