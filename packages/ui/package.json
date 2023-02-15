@@ -1,12 +1,12 @@
 {
-  "name": "@allmaps/ui-components",
+  "name": "@allmaps/ui",
   "version": "1.0.0-beta.3",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "Allmaps UI components, build with Svelte",
+  "description": "UI components and functions for Allmaps. And style guide!",
   "type": "module",
   "types": "./package/index.d.ts",
   "module": "./package/index.js",
@@ -16,30 +16,26 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/ui-components"
+    "directory": "packages/ui"
   },
   "scripts": {
     "dev": "vite dev",
     "watch": "svelte-package --watch",
     "build": "svelte-kit sync && svelte-package && rm ./package/package.json",
-    "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-static": "^1.0.0",
     "@sveltejs/kit": "^1.0.0",
     "@sveltejs/package": "^1.0.0",
-    "@types/openseadragon": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "flowbite-svelte": "^0.27.5",
     "postcss": "^8.4.18",
     "prettier": "^2.8.0",
     "prettier-plugin-svelte": "^2.8.1",

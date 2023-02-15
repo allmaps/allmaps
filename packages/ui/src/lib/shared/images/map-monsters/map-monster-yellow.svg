@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="144px" height="163px" viewBox="0 0 144 163" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>map-monster-yellow</title>
+    <defs>
+        <filter x="-21.1%" y="-100.0%" width="142.1%" height="300.0%" filterUnits="objectBoundingBox" id="filter-1">
+            <feGaussianBlur stdDeviation="8" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-style" transform="translate(-899.000000, -1768.000000)">
+            <g id="Map-Monster-Outline" transform="translate(757.000000, 1712.000000)">
+                <g id="Group" transform="translate(157.000000, 59.000000)">
+                    <ellipse id="shadow" fill-opacity="0.401059878" fill="#FFC742" filter="url(#filter-1)" cx="57" cy="130" rx="57" ry="12"></ellipse>
+                    <g id="monster" transform="translate(7.000000, 0.000000)">
+                        <polygon id="body" stroke="#FFC742" stroke-width="5" fill-opacity="0.303895323" fill="#FFC742" transform="translate(50.000000, 49.000000) scale(-1, 1) translate(-50.000000, -49.000000) " points="100 98 98.3192566 21.5410676 87.8567909 21.5410676 87.1318863 0 0 0 0 51.3092473 15.11375 51.3092473 11.4578719 98"></polygon>
+                        <g id="face-flatline" transform="translate(28.623586, 56.000000)">
+                            <path d="M30.4087251,0 C28.0095892,0 26.0646215,1.90284948 26.0646215,4.25003222 C26.0646215,6.59721496 28.0095892,8.50006443 30.4087251,8.50006443 C32.807861,8.50006443 34.7528287,6.59721496 34.7528287,4.25003222 C34.7528287,1.90284948 32.807861,0 30.4087251,0 M4.34410358,0 C1.94496766,0 0,1.90284948 0,4.25003222 C0,6.59721496 1.94496766,8.50006443 4.34410358,8.50006443 C6.74323951,8.50006443 8.68820717,6.59721496 8.68820717,4.25003222 C8.68820717,1.90284948 6.74323951,0 4.34410358,0" id="eyes" fill="#FFC742"></path>
+                            <line x1="4.65436372e-13" y1="23.5" x2="34.7528287" y2="23.5" id="mouth" stroke="#FFC742" stroke-width="5" stroke-linecap="square"></line>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

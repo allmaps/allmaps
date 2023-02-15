@@ -5,7 +5,7 @@ import ports from '../../ports.json'
 
 const config: UserConfig = {
   server: {
-    port: ports['ui-components']
+    port: ports.ui
   },
   plugins: [sveltekit()]
 }

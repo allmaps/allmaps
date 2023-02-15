@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from '$app/environment'
-  import { afterNavigate } from '$app/navigation'
   import { get } from 'svelte/store'
 
   import url from '$lib/shared/stores/url.js'
@@ -40,17 +39,6 @@
   function setStoreValue(urlValue: string) {
     $url = urlValue
   }
-
-  afterNavigate(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const url = searchParams.get('url')
-
-    if (url) {
-      setStoreValue(url)
-    } else {
-      setStoreValue('')
-    }
-  })
 
   if (browser) {
     document.addEventListener('keyup', (event: KeyboardEvent) => {

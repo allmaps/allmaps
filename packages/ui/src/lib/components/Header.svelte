@@ -9,7 +9,7 @@
     <a href="/" class="flex gap-2 no-underline">
       <img class="w-8 inline" alt="Allmaps logo" src={logo} />
       <h1
-        class="self-center whitespace-nowrap text-xl font-semibold dark:text-white inline"
+        class="self-center whitespace-nowrap text-xl font-medium dark:text-white inline"
       >
         <span class="hidden sm:inline">Allmaps</span>
         <span class="font-light">{appName}</span>
