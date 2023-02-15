@@ -117,18 +117,16 @@ export class EmbeddedImage {
 
     let urlSize: string
     if (size) {
-      width = size.width
+      width = Math.round(size.width)
+      height = Math.round(size.height)
 
-      let widthStr = String(size.width)
+      let widthStr = String(width)
       let heightStr = ''
 
-      if (size.height && size.width !== size.height) {
-        width = size.width
-        height = size.height
+      const aspectRatioHeight = Math.round((this.height / this.width) * width)
 
-        heightStr = String(size.height)
-      } else {
-        height = size.width
+      if (height !== aspectRatioHeight) {
+        heightStr = String(height)
       }
 
       urlSize = `${widthStr},${heightStr}`

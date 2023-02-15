@@ -72,6 +72,10 @@ export function getThumbnail(
     height = width * aspectRatio
   }
 
+  const aspectRatio = imageSize.width / imageSize.height
+  width = Math.floor(width)
+  height = Math.round(width / aspectRatio)
+
   if (sizes) {
     let matchingSize
     for (let size of sizes) {
