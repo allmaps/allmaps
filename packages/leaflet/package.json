@@ -31,7 +31,7 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "tsc && vite build && npm run build:types",
+    "build": "vite build",
     "preview": "vite preview",
     "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist",
     "test": "mocha && eslint dist test"
