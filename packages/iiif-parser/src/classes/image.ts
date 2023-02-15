@@ -108,11 +108,20 @@ export class EmbeddedImage {
     let height
     let area
 
+    let regionHeight
+    let regionWidth
+
     let urlRegion: string
     if (region) {
       urlRegion = `${region.x},${region.y},${region.width},${region.height}`
+
+      regionHeight = region.width
+      regionWidth = region.height
     } else {
       urlRegion = 'full'
+
+      regionHeight= this.height
+      regionWidth = this.width
     }
 
     let urlSize: string
@@ -123,7 +132,7 @@ export class EmbeddedImage {
       let widthStr = String(width)
       let heightStr = ''
 
-      const aspectRatioHeight = Math.round((this.height / this.width) * width)
+      const aspectRatioHeight = Math.round((regionHeight / regionWidth) * width)
 
       if (height !== aspectRatioHeight) {
         heightStr = String(height)
