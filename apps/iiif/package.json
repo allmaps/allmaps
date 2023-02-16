@@ -32,8 +32,7 @@
     "@allmaps/annotation": "^1.0.0-beta.10",
     "@allmaps/id": "1.0.0-beta.2",
     "@allmaps/iiif-parser": "^1.0.0-beta.18",
-    "@allmaps/ui-components": "^1.0.0-beta.3",
-    "flowbite-svelte": "^0.27.9"
+    "@allmaps/ui": "^1.0.0-beta.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.28.1",

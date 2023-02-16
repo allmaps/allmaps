@@ -123,28 +123,6 @@
     updateSelectedMaps(selectedMapIds, deselectedMapIds)
   }
 
-  // $: {
-  //   for (let selectedMap of $selectedMaps.values() ){
-  //     // if ($selectedMap)
-  //     // console.log(selectedMap.)
-  //   }
-  // // const selectedFeatures = select.getFeatures()
-  // // // console.log(value)
-  // // vectorSource.getFeatureById
-  // // selectedFeatures.
-  // // for (let selectedMapId of value) {
-  // // }
-  // // vectorSource.getFeatures().forEach((feature) => {
-  // //   const mapId = String(feature.getId())
-  // //   // if (!value.has(mapId)) {
-  // //   //   selectedFeatures.remove(feature)
-  // //   // } else {
-  // //   //   selectedFeatures.push(feature)
-  // //   // }
-  // // })
-  // // })
-  // }
-
   $: {
     if (warpedMapLayer) {
       if ($renderOptionsScope === 'layer') {

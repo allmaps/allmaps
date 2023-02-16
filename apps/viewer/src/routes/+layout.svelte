@@ -1,7 +1,6 @@
 <script>
   import '../app.css'
-
-  export const prerender = true
+  import '@allmaps/ui/package/css/fonts.css'
 </script>
 
 <slot />

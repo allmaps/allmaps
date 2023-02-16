@@ -21,8 +21,6 @@ export function updateSelectedMaps(
   selectedMapIds: Iterable<string>,
   deselectedMapIds: Iterable<string>
 ) {
-  console.log(selectedMapIds, deselectedMapIds)
-
   mapsById.update(($mapsById) => {
     let lastMapId: string | undefined
 

@@ -1,16 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { afterNavigate } from '$app/navigation'
   import { fade } from 'svelte/transition'
 
   import {
     Header,
+    Loading,
     URLInput,
     URLType,
-    urlStore,
+    Navigation,
     dataStore,
     paramStore
-  } from '@allmaps/ui-components'
+  } from '@allmaps/ui'
 
   import {
     addUrlSource,
@@ -19,7 +19,6 @@
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
 
-  import Loading from '$lib/components/Loading.svelte'
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
 
@@ -48,22 +47,8 @@
     dataStore.set(annotationString)
   }
 
-  // TODO: move to ui-components
-  afterNavigate(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const data = searchParams.get('data')
-
-    if (data) {
-      dataStore.set(data)
-    } else {
-      dataStore.set('')
-    }
-  })
-
   onMount(async () => {
-    // TODO: move out of onMount?
     paramStore.subscribe(async (value) => {
-      console.log('new paramStore', value)
       resetSources()
 
       initialized = true
@@ -78,7 +63,6 @@
           } else if (value.data) {
             await addStringSource(value.data)
           }
-
         } catch (err) {
           if (err instanceof Error) {
             error = err
@@ -86,51 +70,10 @@
         }
       }
     })
-
-    // // TODO: move out of onMount?
-    // urlStore.subscribe(async (value) => {
-    //   console.log('new urlStore', value)
-    //   resetSources()
-
-    //   initialized = true
-    //   if (!value) {
-    //     resetForm()
-    //   } else {
-    //     showForm = false
-
-    //     try {
-    //       await addUrlSource(value)
-    //     } catch (err) {
-    //       if (err instanceof Error) {
-    //         error = err
-    //       }
-    //     }
-    //   }
-    // })
-
-    // // TODO: move out of onMount?
-    // dataStore.subscribe(async (value) => {
-    //   console.log('new dataStore', value)
-    //   resetSources()
-
-    //   initialized = true
-    //   if (!value) {
-    //     resetForm()
-    //   } else {
-    //     showForm = false
-
-    //     try {
-    //       await addStringSource(value)
-    //     } catch (err) {
-    //       if (err instanceof Error) {
-    //         error = err
-    //       }
-    //     }
-    //   }
-    // })
   })
 </script>
 
+<Navigation />
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="Viewer">
     {#if !showForm && initialized}
@@ -139,7 +82,7 @@
       </URLInput>
     {/if}
   </Header>
-  <main class="grow">
+  <main class="grow relative">
     {#if showForm}
       <div
         class="container mx-auto mt-10 p-2"
@@ -178,7 +121,9 @@
         <ShowError {error} />
       </div>
     {:else if initialized}
-      <Loading />
+      <div class="h-full flex items-center justify-center">
+        <Loading />
+      </div>
     {/if}
   </main>
 </div>

@@ -50,7 +50,6 @@ export const renderOptions = {
             const viewerMap = $mapsById.get(selectedMapId)
 
             if (viewerMap) {
-              // console.log('now setting', selectedMapId, renderOptions)
               viewerMap.renderOptions = renderOptions
               $mapsById.set(selectedMapId, viewerMap)
             }

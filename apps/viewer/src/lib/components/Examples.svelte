@@ -9,7 +9,7 @@
     <li>
       <a class="underline" href={`?url=${encodeURIComponent(example.url)}`}>
         <span>{example.title}</span>
-      </a> <span class="text-gray-500">{example.organization}</span>
+      </a> <span class="text-gray-500 font-light">{example.organization}</span>
     </li>
   {/each}
 </ul>

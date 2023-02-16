@@ -8,7 +8,7 @@ Packages:
 - [@allmaps/transform](packages/transform)
 - [@allmaps/render](packages/render)
 - [@allmaps/openlayers](packages/openlayers)
-- [@allmaps/ui-components](packages/ui-components)
+- [@allmaps/ui](packages/ui)
 
 Apps:
 
@@ -18,7 +18,6 @@ Apps:
 - [Allmaps Info](apps/info)
 - [Allmaps IIIF Viewer](apps/iiif)
 - [Allmaps CLI](apps/cli)
-- [Allmaps Style Guide](apps/style)
 
 ## Installation
 

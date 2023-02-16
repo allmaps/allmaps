@@ -20,8 +20,7 @@
     <Error error={$error} />
   </div>
 {:else if $mapCount === 0}
-  <!-- TODO -->
-  <div>EMPTY!</div>
+  <!-- <div>EMPTY!</div> -->
 {:else}
   <div class="w-full h-full relative">
     {#if $view === 'map'}

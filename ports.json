@@ -4,8 +4,7 @@
   "explore": 5502,
   "openlayers": 5503,
   "tileserver": 5504,
-  "ui-components": 5505,
+  "ui": 5505,
   "iiif": 5506,
-  "render": 5507,
-  "style": 5510
+  "render": 5507
 }

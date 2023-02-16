@@ -50,7 +50,6 @@ export async function addAnnotation(sourceId: string, json: any) {
 }
 
 export function removeAnnotation(sourceId: string) {
-  console.log('removeAnnotation', sourceId)
   mapsById.update(($mapsById) => {
     for (let [id, map] of $mapsById.entries()) {
       if (map.sourceId === sourceId) {
@@ -60,6 +59,10 @@ export function removeAnnotation(sourceId: string) {
 
     return $mapsById
   })
+}
+
+export function resetMaps () {
+  mapsById.set(new Map())
 }
 
 export const mapIds = derived(mapsById, ($mapsById) => $mapsById.keys())

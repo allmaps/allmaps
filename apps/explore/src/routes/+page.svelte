@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Header } from '@allmaps/ui-components'
+  import { Header } from '@allmaps/ui'
 
   import Map from 'ol/Map.js'
 

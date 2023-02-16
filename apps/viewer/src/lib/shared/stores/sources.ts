@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store'
 
-import { addAnnotation, removeAnnotation } from '$lib/shared/stores/maps.js'
+import { addAnnotation, removeAnnotation, resetMaps } from '$lib/shared/stores/maps.js'
 
 import { generateId } from '@allmaps/id/browser'
 
@@ -21,7 +21,6 @@ async function addSource(
   json: any,
   options: UrlSourceOptions | StringSourceOptions
 ) {
-  console.log('addsource', id, json, options)
   sourcesStore.update((sources) => {
     const source: Source = {
       id,
@@ -71,8 +70,8 @@ export function removeSource(id: string) {
 }
 
 export function resetSources() {
-  console.log('resetSources')
   sourcesStore.set(new Map())
+  resetMaps()
 }
 
 export const sourceIds = derived(sourcesStore, (sources) => sources.keys())

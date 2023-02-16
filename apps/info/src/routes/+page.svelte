@@ -2,7 +2,7 @@
   import { IIIF } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import { Header, URLInput, URLType, urlStore } from '@allmaps/ui-components'
+  import { Header, URLInput, URLType, urlStore } from '@allmaps/ui'
 
   import Image from '$lib/components/Image.svelte'
   import Manifest from '$lib/components/Manifest.svelte'

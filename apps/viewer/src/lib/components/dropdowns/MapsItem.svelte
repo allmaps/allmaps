@@ -38,7 +38,6 @@
       <Thumbnail imageUri={viewerMap.map.image.uri} width={192} height={192} />
     {/if}
 
-    <div class="w-full text-lg font-semibold">{mapId}</div>
-    <div class="w-full text-sm">Hier over de kaart</div>
+    <div class="w-full text-lg font-medium">{mapId}</div>
   </div>
 </label>

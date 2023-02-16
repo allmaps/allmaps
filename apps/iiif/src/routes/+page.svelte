@@ -6,13 +6,7 @@
   import { IIIF } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import {
-    Header,
-    URLInput,
-    URLType,
-    Loading,
-    urlStore
-  } from '@allmaps/ui-components'
+  import { Header, URLInput, URLType, Loading, urlStore } from '@allmaps/ui'
 
   import OpenSeadragon from '$lib/components/OpenSeadragon.svelte'
 

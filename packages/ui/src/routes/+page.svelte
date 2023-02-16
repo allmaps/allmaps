@@ -10,6 +10,7 @@
   let urlValue: string
 
   const colors = [
+    'bg-blue-dark',
     'bg-blue',
     'bg-purple',
     'bg-pink',
