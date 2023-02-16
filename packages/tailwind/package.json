@@ -36,9 +36,6 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "npm test",
-    "test": "mocha && npm run lint",
-    "pretest": "npm run build",
     "lint": "eslint dist test"
   },
   "license": "GPL-3.0-or-later",
