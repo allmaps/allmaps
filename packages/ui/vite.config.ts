@@ -1,9 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite'
-import type { UserConfig } from 'vite'
 
 import ports from '../../ports.json'
 
-const config: UserConfig = {
+/** @type {import('vite').UserConfig} */
+const config = {
   server: {
     port: ports.ui
   },
