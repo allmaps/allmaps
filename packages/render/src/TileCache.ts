@@ -1,22 +1,13 @@
-// import RTree from './RTree.js'
-
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { fetchImage } from './shared/textures'
-import { until } from './shared/until.js'
 
 import type { NeededTile, CachedTile } from './shared/types.js'
 
 export default class TileCache extends EventTarget {
   cachedTilesByUrl: Map<string, CachedTile> = new Map()
   cachedTileUrlsByMapId: Map<string, Set<string>> = new Map()
-  // rtree?: RTree
 
   tilesLoadingCount = 0
-
-  // constructor(rtree?: RTree) {
-  //   super()
-  //   this.rtree = rtree
-  // }
 
   // TODO: support multiple scaleFactors
   // keepScaleFactorsCount
@@ -24,20 +15,7 @@ export default class TileCache extends EventTarget {
   async addTile(tile: NeededTile) {
     const cachedTile = this.cachedTilesByUrl.get(tile.url)
 
-    if (cachedTile) {
-      if (cachedTile.loading) {
-        await until(() => {
-          const cachedTile = this.cachedTilesByUrl.get(tile.url)
-          if (cachedTile) {
-            return !cachedTile.loading
-          } else {
-            return true
-          }
-        })
-      } else {
-        return
-      }
-    } else {
+    if (!cachedTile) {
       await this.fetchTile(tile)
     }
   }
@@ -116,7 +94,7 @@ export default class TileCache extends EventTarget {
   }
 
   private async fetchTile(tile: NeededTile) {
-    this.storeTile(tile)
+    await this.storeTile(tile)
 
     const image = await fetchImage(tile.url)
 
@@ -130,15 +108,21 @@ export default class TileCache extends EventTarget {
       context.drawImage(image, 0, 0)
       const imageData = context.getImageData(0, 0, image.width, image.height)
 
-      this.storeTile(tile, imageData)
+      await this.storeTile(tile, imageData)
     }
   }
 
-  private storeTile(tile: NeededTile, imageData?: ImageData) {
+  private async storeTile(tile: NeededTile, imageData?: ImageData) {
     const tileUrl = tile.url
     const mapId = tile.mapId
+    let loading = true
 
-    const loading = imageData ? false : true
+    let imageBitmap: ImageBitmap | undefined
+
+    if (imageData) {
+      loading = false
+      imageBitmap = await createImageBitmap(imageData)
+    }
 
     this.cachedTilesByUrl.set(tileUrl, {
       mapId,
@@ -146,7 +130,8 @@ export default class TileCache extends EventTarget {
       imageRequest: tile.imageRequest,
       url: tile.url,
       loading,
-      imageData
+      imageData,
+      imageBitmap
     })
 
     if (!this.cachedTileUrlsByMapId.has(mapId)) {

@@ -40,7 +40,9 @@ export type CachedTile = {
   tile: Tile
   imageRequest: ImageRequest
   url: string
+  // TODO: can imageData be removed?
   imageData?: ImageData
+  imageBitmap?: ImageBitmap
   loading: boolean
 }
 

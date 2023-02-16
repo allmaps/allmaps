@@ -1,9 +1,17 @@
 import potpack from 'potpack'
 import earcut from 'earcut'
+import { throttle } from 'lodash-es'
 
 import { createBuffer } from './shared/webgl2.js'
 
 import type { WarpedMap, CachedTile, RenderOptions } from './shared/types.js'
+
+const THROTTLE_WAIT_MS = 50
+
+const THROTTLE_OPTIONS = {
+  leading: true,
+  trailing: true
+}
 
 export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
@@ -18,7 +26,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   vao: WebGLVertexArrayObject | null
 
   tilesForTexture: Map<string, CachedTile> = new Map()
-  tileImageBitmapsByUrl: Map<string, ImageBitmap> = new Map()
+  // tileImageBitmapsByUrl: Map<string, ImageBitmap> = new Map()
 
   renderOptions: RenderOptions = {}
 
@@ -32,6 +40,8 @@ export default class WebGL2WarpedMap extends EventTarget {
   scaleFactorsTexture: WebGLTexture | null
   tilePositionsTexture: WebGLTexture | null
   imagePositionsTexture: WebGLTexture | null
+
+  throttledUpdateTextures: () => Promise<void> | undefined
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -73,21 +83,29 @@ export default class WebGL2WarpedMap extends EventTarget {
     if (this.vao) {
       createBuffer(gl, program, this.triangles, 2, 'a_position')
     }
+
+    this.throttledUpdateTextures = throttle(
+      this.updateTextures.bind(this),
+      THROTTLE_WAIT_MS,
+      THROTTLE_OPTIONS
+    )
   }
 
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {
     this.tilesForTexture.set(tileUrl, cachedTile)
 
     // TODO: throttle calls to updateTextures?
-    this.updateTextures()
+    this.throttledUpdateTextures()
+    // this.updateTextures()
   }
 
   removeCachedTile(tileUrl: string) {
     this.tilesForTexture.delete(tileUrl)
-    this.tileImageBitmapsByUrl.delete(tileUrl)
+    // this.tileImageBitmapsByUrl.delete(tileUrl)
 
     // TODO: throttle calls to updateTextures?
-    this.updateTextures()
+    this.throttledUpdateTextures()
+    // this.updateTextures()
   }
 
   async updateTextures() {
@@ -169,15 +187,35 @@ export default class WebGL2WarpedMap extends EventTarget {
       const index = packedTile.index
       const cachedTile = tilesForTexture[index]
 
-      let tileImageBitmap = this.tileImageBitmapsByUrl.get(cachedTile.url)
-      if (!tileImageBitmap && cachedTile.imageData) {
-        tileImageBitmap = await createImageBitmap(cachedTile.imageData)
-        this.tileImageBitmapsByUrl.set(cachedTile.url, tileImageBitmap)
-      }
+      const tileImageBitmap = cachedTile.imageBitmap
+      console.log(tileImageBitmap)
+
+      // let tileImageBitmap = this.tileImageBitmapsByUrl.get(cachedTile.url)
+      // if (!tileImageBitmap && cachedTile.imageData) {
+      //   tileImageBitmap = await createImageBitmap(cachedTile.imageData)
+      //   this.tileImageBitmapsByUrl.set(cachedTile.url, tileImageBitmap)
+      // }
 
       if (tileImageBitmap) {
         const textureX = packedTile.x
         const textureY = packedTile.y
+
+        //   textureWidth,
+        // textureHeight,
+
+        //   100 = 0..99
+
+        //   textureX = 0
+        //   tileImageBitmap.width = 10 ===
+        //   0 - 9
+
+        if (textureX + tileImageBitmap.width > textureWidth) {
+          console.log(textureX, tileImageBitmap.width, textureWidth)
+        }
+
+        if (textureY + tileImageBitmap.height > textureHeight) {
+          console.log(textureY, tileImageBitmap.height, textureHeight)
+        }
 
         gl.texSubImage2D(
           gl.TEXTURE_2D,

@@ -50,6 +50,7 @@
     "@allmaps/iiif-parser": "^1.0.0-beta.19",
     "@allmaps/transform": "^1.0.0-beta.7",
     "earcut": "^2.2.3",
+    "lodash-es": "^4.17.21",
     "potpack": "^1.0.1",
     "rbush": "^3.0.1"
   },
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@types/earcut": "^2.1.1",
     "@types/geojson": "^7946.0.10",
+    "@types/lodash-es": "^4.17.6",
     "@types/node": "^17.0.23",
     "@types/rbush": "^3.0.0",
     "chai": "^4.3.4",

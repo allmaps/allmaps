@@ -389,16 +389,18 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
       '@allmaps/transform': ^1.0.0-beta.7
       '@types/earcut': ^2.1.1
       '@types/geojson': ^7946.0.10
+      '@types/lodash-es': ^4.17.6
       '@types/node': ^17.0.23
       '@types/rbush': ^3.0.0
       chai: ^4.3.4
       documentation: ^13.2.5
       earcut: ^2.2.3
       eslint: '7'
+      lodash-es: ^4.17.21
       mocha: ^8.3.2
       potpack: ^1.0.1
       rbush: ^3.0.1
@@ -410,11 +412,13 @@ importers:
       '@allmaps/iiif-parser': link:../iiif-parser
       '@allmaps/transform': link:../transform
       earcut: 2.2.3
+      lodash-es: 4.17.21
       potpack: 1.0.2
       rbush: 3.0.1
     devDependencies:
       '@types/earcut': 2.1.1
       '@types/geojson': 7946.0.10
+      '@types/lodash-es': 4.17.6
       '@types/node': 17.0.42
       '@types/rbush': 3.0.0
       chai: 4.3.6
