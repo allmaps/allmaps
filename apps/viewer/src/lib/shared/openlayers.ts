@@ -14,7 +14,7 @@ export function invisiblePolygonStyle() {
 export function outlinePolygonStyle() {
   return new Style({
     stroke: new Stroke({
-      color: '#ff0800',
+      color: '#FF56BA',
       width: 1
     }),
     fill: new Fill({
@@ -26,7 +26,7 @@ export function outlinePolygonStyle() {
 export function selectedPolygonStyle() {
   return new Style({
     stroke: new Stroke({
-      color: '#ff0800',
+      color: '#FF56BA',
       width: 3
     }),
     fill: new Fill({
