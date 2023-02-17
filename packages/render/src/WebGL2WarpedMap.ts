@@ -124,8 +124,8 @@ export default class WebGL2WarpedMap extends EventTarget {
     const tilesForTexture = [...this.tilesForTexture.values()]
 
     const packedTiles = tilesForTexture.map((tile, index) => ({
-      w: tile.imageData?.width || 0,
-      h: tile.imageData?.height || 0,
+      w: tile.imageBitmap?.width || 0,
+      h: tile.imageBitmap?.height || 0,
       // calling potpack will add x and y properties
       // By adding them here already, we'll make TypeScript happy!
       x: 0,
@@ -188,7 +188,6 @@ export default class WebGL2WarpedMap extends EventTarget {
       const cachedTile = tilesForTexture[index]
 
       const tileImageBitmap = cachedTile.imageBitmap
-      console.log(tileImageBitmap)
 
       // let tileImageBitmap = this.tileImageBitmapsByUrl.get(cachedTile.url)
       // if (!tileImageBitmap && cachedTile.imageData) {
@@ -199,23 +198,6 @@ export default class WebGL2WarpedMap extends EventTarget {
       if (tileImageBitmap) {
         const textureX = packedTile.x
         const textureY = packedTile.y
-
-        //   textureWidth,
-        // textureHeight,
-
-        //   100 = 0..99
-
-        //   textureX = 0
-        //   tileImageBitmap.width = 10 ===
-        //   0 - 9
-
-        if (textureX + tileImageBitmap.width > textureWidth) {
-          console.log(textureX, tileImageBitmap.width, textureWidth)
-        }
-
-        if (textureY + tileImageBitmap.height > textureHeight) {
-          console.log(textureY, tileImageBitmap.height, textureHeight)
-        }
 
         gl.texSubImage2D(
           gl.TEXTURE_2D,

@@ -9,9 +9,9 @@ import RTree from './RTree.js'
 
 import { fromLonLat, getPolygonBBox } from './shared/geo.js'
 import { combineBBoxes } from './shared/bbox.js'
-import { fetchJson } from './shared/fetch.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
+import { fetchJson } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import type { BBox, WarpedMap } from './shared/types.js'

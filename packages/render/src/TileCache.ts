@@ -7,6 +7,8 @@ export default class TileCache extends EventTarget {
   cachedTilesByUrl: Map<string, CachedTile> = new Map()
   cachedTileUrlsByMapId: Map<string, Set<string>> = new Map()
 
+  abortControllersByUrl: Map<string, AbortController> = new Map()
+
   tilesLoadingCount = 0
 
   // TODO: support multiple scaleFactors
@@ -21,12 +23,19 @@ export default class TileCache extends EventTarget {
   }
 
   async removeTile(tileUrl: string) {
-    // TODO: cancel tiles if tile is still being fetched
-
     const cachedTile = this.cachedTilesByUrl.get(tileUrl)
 
     if (!cachedTile) {
       return
+    }
+
+    if (cachedTile.loading) {
+      // Cancel fetch if tile is still being fetched
+      const abortController = this.abortControllersByUrl.get(tileUrl)
+      if (abortController) {
+        abortController.abort()
+        this.abortControllersByUrl.delete(tileUrl)
+      }
     }
 
     const mapId = cachedTile.mapId
@@ -39,11 +48,6 @@ export default class TileCache extends EventTarget {
         this.cachedTileUrlsByMapId.delete(mapId)
       }
     }
-
-    // // Remove tile from rtree
-    // if (this.rtree) {
-    //   this.rtree.removeItem(url)
-    // }
 
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.TILEREMOVED, {
@@ -96,33 +100,19 @@ export default class TileCache extends EventTarget {
   private async fetchTile(tile: NeededTile) {
     await this.storeTile(tile)
 
-    const image = await fetchImage(tile.url)
+    const abortController = new AbortController()
+    this.abortControllersByUrl.set(tile.url, abortController)
 
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
+    const image = await fetchImage(tile.url, abortController.signal)
 
-    if (context) {
-      canvas.width = image.width
-      canvas.height = image.height
-
-      context.drawImage(image, 0, 0)
-      const imageData = context.getImageData(0, 0, image.width, image.height)
-
-      await this.storeTile(tile, imageData)
-    }
+    const imageBitmap = await createImageBitmap(image)
+    await this.storeTile(tile, imageBitmap)
   }
 
-  private async storeTile(tile: NeededTile, imageData?: ImageData) {
+  private async storeTile(tile: NeededTile, imageBitmap?: ImageBitmap) {
     const tileUrl = tile.url
     const mapId = tile.mapId
-    let loading = true
-
-    let imageBitmap: ImageBitmap | undefined
-
-    if (imageData) {
-      loading = false
-      imageBitmap = await createImageBitmap(imageData)
-    }
+    const loading = imageBitmap ? false : true
 
     this.cachedTilesByUrl.set(tileUrl, {
       mapId,
@@ -130,7 +120,6 @@ export default class TileCache extends EventTarget {
       imageRequest: tile.imageRequest,
       url: tile.url,
       loading,
-      imageData,
       imageBitmap
     })
 

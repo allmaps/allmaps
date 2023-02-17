@@ -46,6 +46,7 @@ export default defineConfig({
         '@allmaps/id',
         '@allmaps/iiif-parser',
         '@allmaps/transform',
+        '@allmaps/stdlib',
         'earcut',
         'potpack',
         'rbush'
@@ -53,8 +54,10 @@ export default defineConfig({
       output: {
         globals: {
           '@allmaps/annotation': '@allmaps/annotation',
-          '@allmaps/transform': '@allmaps/transform',
+          '@allmaps/id': '@allmaps/id',
           '@allmaps/iiif-parser': '@allmaps/iiif-parser',
+          '@allmaps/transform': '@allmaps/transform',
+          '@allmaps/stdlib': '@allmaps/stdlib',
           rbush: 'rbush',
           potpack: 'potpack',
           earcut: 'earcut'

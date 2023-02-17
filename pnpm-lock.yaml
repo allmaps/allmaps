@@ -13,7 +13,7 @@ importers:
   apps/cli:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
       '@allmaps/transform': ^1.0.0-beta.7
       '@types/node': ^17.0.23
       '@types/stream-json': ^1.7.2
@@ -45,7 +45,7 @@ importers:
 
   apps/explore:
     specifiers:
-      '@allmaps/ui': ^1.0.0-beta.3
+      '@allmaps/ui': ^1.0.0-beta.6
       '@playwright/test': ^1.28.1
       '@sveltejs/adapter-static': ^1.0.0
       '@sveltejs/kit': ^1.0.0
@@ -86,8 +86,8 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': 1.0.0-beta.2
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
-      '@allmaps/ui': ^1.0.0-beta.3
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/ui': ^1.0.0-beta.6
       '@playwright/test': ^1.28.1
       '@sveltejs/adapter-static': ^1.0.0
       '@sveltejs/kit': ^1.0.0
@@ -135,8 +135,8 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
-      '@allmaps/ui': ^1.0.0-beta.3
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/ui': ^1.0.0-beta.6
       '@playwright/test': ^1.28.1
       '@sveltejs/adapter-static': ^1.0.0
       '@sveltejs/kit': ^1.0.0
@@ -184,8 +184,8 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
-      '@allmaps/render': ^1.0.0-beta.20
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/render': ^1.0.0-beta.22
       '@allmaps/transform': ^1.0.0-beta.7
       '@cloudflare/workers-types': ^3.14.0
       '@turf/bbox': ^6.5.0
@@ -218,11 +218,11 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
-      '@allmaps/openlayers': ^1.0.0-beta.23
-      '@allmaps/render': ^1.0.0-beta.20
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/openlayers': ^1.0.0-beta.25
+      '@allmaps/render': ^1.0.0-beta.22
       '@allmaps/transform': ^1.0.0-beta.7
-      '@allmaps/ui': ^1.0.0-beta.3
+      '@allmaps/ui': ^1.0.0-beta.6
       '@playwright/test': ^1.28.1
       '@sveltejs/adapter-static': ^1.0.0
       '@sveltejs/kit': ^1.0.0
@@ -329,7 +329,7 @@ importers:
 
   packages/leaflet:
     specifiers:
-      '@allmaps/render': ^1.0.0-beta.20
+      '@allmaps/render': ^1.0.0-beta.22
       '@types/leaflet': ^1.9.0
       chai: ^4.3.4
       documentation: ^13.2.5
@@ -354,8 +354,8 @@ importers:
     specifiers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
-      '@allmaps/iiif-parser': ^1.0.0-beta.18
-      '@allmaps/render': ^1.0.0-beta.20
+      '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/render': ^1.0.0-beta.22
       '@allmaps/transform': ^1.0.0-beta.7
       '@types/earcut': ^2.1.1
       '@types/lodash-es': ^4.17.6
@@ -390,6 +390,7 @@ importers:
       '@allmaps/annotation': ^1.0.0-beta.10
       '@allmaps/id': ^1.0.0-beta.12
       '@allmaps/iiif-parser': ^1.0.0-beta.19
+      '@allmaps/stdlib': ^1.0.0-beta.1
       '@allmaps/transform': ^1.0.0-beta.7
       '@types/earcut': ^2.1.1
       '@types/geojson': ^7946.0.10
@@ -410,6 +411,7 @@ importers:
       '@allmaps/annotation': link:../annotation
       '@allmaps/id': link:../id
       '@allmaps/iiif-parser': link:../iiif-parser
+      '@allmaps/stdlib': link:../stdlib
       '@allmaps/transform': link:../transform
       earcut: 2.2.3
       lodash-es: 4.17.21
