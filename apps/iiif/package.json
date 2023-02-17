@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-viewer",
-  "version": "0.0.2-alpha.13",
+  "version": "0.0.2-alpha.14",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -32,7 +32,7 @@
     "@allmaps/annotation": "^1.0.0-beta.10",
     "@allmaps/id": "1.0.0-beta.2",
     "@allmaps/iiif-parser": "^1.0.0-beta.19",
-    "@allmaps/ui": "^1.0.0-beta.6"
+    "@allmaps/ui": "^1.0.0-beta.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.28.1",
