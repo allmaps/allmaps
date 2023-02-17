@@ -221,6 +221,7 @@ importers:
       '@allmaps/iiif-parser': ^1.0.0-beta.19
       '@allmaps/openlayers': ^1.0.0-beta.25
       '@allmaps/render': ^1.0.0-beta.22
+      '@allmaps/stdlib': ^1.0.0-beta.1
       '@allmaps/transform': ^1.0.0-beta.7
       '@allmaps/ui': ^1.0.0-beta.6
       '@playwright/test': ^1.28.1
@@ -249,6 +250,7 @@ importers:
       '@allmaps/iiif-parser': link:../../packages/iiif-parser
       '@allmaps/openlayers': link:../../packages/openlayers
       '@allmaps/render': link:../../packages/render
+      '@allmaps/stdlib': link:../../packages/stdlib
       '@allmaps/transform': link:../../packages/transform
       '@allmaps/ui': link:../../packages/ui
       flowbite: 1.6.3

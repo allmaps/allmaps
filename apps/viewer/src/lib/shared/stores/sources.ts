@@ -4,7 +4,7 @@ import { addAnnotation, removeAnnotation, resetMaps } from '$lib/shared/stores/m
 
 import { generateId } from '@allmaps/id/browser'
 
-import { fetchJson } from '$lib/shared/fetch.js'
+import { fetchJson } from '@allmaps/stdlib'
 
 import type {
   Source,
