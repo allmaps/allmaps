@@ -21,13 +21,14 @@ export function imageCoordinatesToTileCoordinates(
   const tileX = (imageCoordinates[0] - tileXMin) / tile.zoomLevel.scaleFactor
   const tileY = (imageCoordinates[1] - tileYMin) / tile.zoomLevel.scaleFactor
 
-  if (!clip || (
-    imageCoordinates[0] >= tileXMin &&
-    imageCoordinates[0] <= tileXMin + tile.zoomLevel.originalWidth &&
-    imageCoordinates[1] >= tileYMin &&
-    imageCoordinates[1] <= tileYMin + tile.zoomLevel.originalHeight &&
-    imageCoordinates[0] <= tile.imageSize[0] &&
-    imageCoordinates[1] <= tile.imageSize[1])
+  if (
+    !clip ||
+    (imageCoordinates[0] >= tileXMin &&
+      imageCoordinates[0] <= tileXMin + tile.zoomLevel.originalWidth &&
+      imageCoordinates[1] >= tileYMin &&
+      imageCoordinates[1] <= tileYMin + tile.zoomLevel.originalHeight &&
+      imageCoordinates[0] <= tile.imageSize[0] &&
+      imageCoordinates[1] <= tile.imageSize[1])
   ) {
     return [tileX, tileY]
   }
@@ -49,8 +50,21 @@ export function tileBBox(tile: Tile): BBox {
   return [tileXMin, tileYMin, tileXMax, tileYMax]
 }
 
-export function tilePolygon(tile: Tile, transformer: GCPTransformInfo) {
+export function tileCenter(tile: Tile): Position {
   const bbox = tileBBox(tile)
+
+  return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
+}
+
+function distanceFromPoint(tile: Tile, point: Position) {
+  const center = tileCenter(tile)
+
+  const dx = center[0] - point[0]
+  const dy = center[1] - point[1]
+
+  console.log('distance', Math.sqrt(dx ** 2 + dy ** 2))
+
+  return Math.sqrt(dx ** 2 + dy ** 2)
 }
 
 // From:
@@ -222,6 +236,18 @@ export function computeIiifTilesForMapGeoBBox(
       zoomLevel,
       [image.width, image.height],
       iiifTilesByX
+    )
+
+    const imageBBoxCenter = [
+      geoBBoxImageBBoxWidth / 2 + geoBBoxImageBBox[0],
+      geoBBoxImageBBoxHeight / 2 + geoBBoxImageBBox[1]
+    ]
+
+    // sort tiles to load tiles in order of their distance to center
+    iiifTiles.sort(
+      (tileA, tileB) =>
+        distanceFromPoint(tileB, imageBBoxCenter) -
+        distanceFromPoint(tileA, imageBBoxCenter)
     )
 
     return iiifTiles
