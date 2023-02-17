@@ -126,7 +126,5 @@ void main() {
     if(u_colorize) {
       outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
     }
-
-      // outColor = vec4(0.7,0.2,0.5,0.6);
   }
 }
