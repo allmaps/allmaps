@@ -62,8 +62,6 @@ function distanceFromPoint(tile: Tile, point: Position) {
   const dx = center[0] - point[0]
   const dy = center[1] - point[1]
 
-  console.log('distance', Math.sqrt(dx ** 2 + dy ** 2))
-
   return Math.sqrt(dx ** 2 + dy ** 2)
 }
 
