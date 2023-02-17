@@ -246,8 +246,8 @@ export function computeIiifTilesForMapGeoBBox(
     // sort tiles to load tiles in order of their distance to center
     iiifTiles.sort(
       (tileA, tileB) =>
-        distanceFromPoint(tileB, imageBBoxCenter) -
-        distanceFromPoint(tileA, imageBBoxCenter)
+        distanceFromPoint(tileA, imageBBoxCenter) -
+        distanceFromPoint(tileB, imageBBoxCenter)
     )
 
     return iiifTiles
