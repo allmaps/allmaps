@@ -7,6 +7,11 @@ export const GCPSchema = z.object({
   world: PointSchema
 })
 
+export const TransformationSchema = z.object({
+  type: z.string(),
+  order: z.number().optional()
+})
+
 export const ImageSchema = z.object({
   uri: z.string().url(),
   width: z.number(),
@@ -25,7 +30,8 @@ export const MapSchema = z.object({
   version: z.number().min(1).max(1).default(1),
   gcps: GCPSchema.array(),
   pixelMask: PixelMaskSchema,
-  image: ImageSchema
+  image: ImageSchema,
+  transformation: TransformationSchema.optional()
 })
 
 export const MapsSchema = z.array(MapSchema)

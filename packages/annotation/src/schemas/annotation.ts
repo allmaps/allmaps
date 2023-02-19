@@ -25,6 +25,12 @@ export const TargetSchema = z.object({
 
 export const BodySchema = z.object({
   type: z.literal('FeatureCollection'),
+  transformation: z.object({
+    type: z.string(),
+    options: z.object({
+      'order': z.number()
+    }).optional(),
+  }),
   features: z.array(
     z.object({
       type: z.literal('Feature'),

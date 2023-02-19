@@ -6,19 +6,27 @@ import {
   SvgSelectorSchema
 } from './schemas/annotation.js'
 
-import { MapSchema, PixelMaskSchema, GCPSchema } from './schemas/map.js'
+import { MapSchema, PixelMaskSchema, GCPSchema, TransformationSchema } from './schemas/map.js'
 
 type Annotation = z.infer<typeof AnnotationSchema>
 
 type Map = z.infer<typeof MapSchema>
 type PixelMask = z.infer<typeof PixelMaskSchema>
 type GCP = z.infer<typeof GCPSchema>
+type Transformation = z.infer<typeof TransformationSchema>
 
 function getGcps(annotation: Annotation): GCP[] {
   return annotation.body.features.map((gcpFeature) => ({
     image: gcpFeature.properties.pixelCoords,
     world: gcpFeature.geometry.coordinates
   }))
+}
+
+function getTransformation(annotation: Annotation): Transformation {
+  return {
+    type: annotation.body.transformation.type,
+    order: annotation.body.transformation.options?.order
+  }
 }
 
 function getImageDimensions(annotation: Annotation): {
@@ -88,7 +96,8 @@ function getMap(annotation: Annotation): Map {
       ...getImageDimensions(annotation)
     },
     pixelMask: getPixelMask(annotation),
-    gcps: getGcps(annotation)
+    gcps: getGcps(annotation),
+    transformation: getTransformation(annotation)
   }
 }
 

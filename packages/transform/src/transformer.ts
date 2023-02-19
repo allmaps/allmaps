@@ -32,11 +32,12 @@ export function toImage(
   return [output[0].x, output[0].y]
 }
 
-export function createTransformer(gcps: ImageWorldGCP[]): GCPTransformInfo {
+export function createTransformer(gcps: ImageWorldGCP[], nOrder?: number): GCPTransformInfo {
   const pasGCPs = gcps.map(
     (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
   )
 
-  const nOrder = 0
-  return GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+  // const nOrder = 0
+  // NOTE : the optional is resolved here in order not to change the order of the parameters in the GDAL functions
+  return GDALCreateGCPTransformer(pasGCPs, nOrder ?? 1, false)
 }
