@@ -42,7 +42,10 @@ export default class World extends EventTarget {
           world: fromLonLat(world),
           image
         }))
+        const transformation = map.transformation
+        const nReqOrder = transformation?.order
 
+        console.debug("nReqOrder (addGeorefAnnotation)=", nReqOrder)
         // TODO: to make sure only tiles for visible parts of the map are requested
         // (and not for parts hidden behind maps on top of it)
         // use https://github.com/mfogel/polygon-clipping to subtract geoMasks of
@@ -52,7 +55,7 @@ export default class World extends EventTarget {
         // Map C: C - B - A
         // Map D: D - C - B - A
 
-        const transformer = createTransformer(sphericalMercatorGcps)
+        const transformer = createTransformer(sphericalMercatorGcps, nReqOrder)
         const geoMask = svgPolygonToGeoJSONPolygon(transformer, pixelMask)
 
         // TODO: only load info.json when its needed
