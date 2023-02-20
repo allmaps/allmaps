@@ -115,12 +115,12 @@ export class EmbeddedImage {
     if (region) {
       urlRegion = `${region.x},${region.y},${region.width},${region.height}`
 
-      regionHeight = region.width
-      regionWidth = region.height
+      regionHeight = region.height
+      regionWidth = region.width
     } else {
       urlRegion = 'full'
 
-      regionHeight= this.height
+      regionHeight = this.height
       regionWidth = this.width
     }
 
@@ -132,9 +132,15 @@ export class EmbeddedImage {
       let widthStr = String(width)
       let heightStr = ''
 
-      const aspectRatioHeight = Math.round((regionHeight / regionWidth) * width)
+      const aspectRatio = regionWidth / regionHeight
+      const aspectRatioWidth = height * aspectRatio
+      const aspectRatioHeight = aspectRatioWidth / aspectRatio
 
-      if (height !== aspectRatioHeight) {
+      // Is this really the right way to do it?
+      // See also:
+      // - https://iiif.io/api/image/3.0/implementation/
+      // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
+      if (height !== Math.round(aspectRatioHeight)) {
         heightStr = String(height)
       }
 

@@ -1,0 +1,20 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://rotterdamspubliek.nl/iiif/A136B927DA744CD2BEA9F1A3FF2271BA",
+  "profile": [
+    "http://iiif.io/api/image/2/level0.json",
+    {
+      "formats": ["jpg"],
+      "qualities": ["default"]
+    }
+  ],
+  "protocol": "http://iiif.io/api/image",
+  "tiles": [
+    {
+      "scaleFactors": [1, 2, 4, 8],
+      "width": 512
+    }
+  ],
+  "width": 6426,
+  "height": 4810
+}

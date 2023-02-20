@@ -1,17 +1,9 @@
-import url from 'url'
-import fs from 'fs'
-import path from 'path'
-
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
 import { Image } from '../dist/index.js'
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
-
-function readJson(filename) {
-  return JSON.parse(fs.readFileSync(path.join(__dirname, 'input', filename)))
-}
+import { readJson } from './lib/fs.js'
 
 const tests = [
   {
