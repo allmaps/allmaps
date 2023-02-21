@@ -18,12 +18,3 @@ export function geoBBoxToSVGPolygon(
     toImage(transformer, [y2, x1])
   ]
 }
-
-export function imageBBoxToGeoPolygon(
-  transformer: GCPTransformInfo,
-  bbox: BBox
-): GeoJSONPolygon {
-  const svgPolygon = bboxToSvgPolygon(bbox)
-  const geojsonPolygon = svgPolygonToGeoJSONPolygon(transformer, svgPolygon, 10)
-  return geojsonPolygon
-}
