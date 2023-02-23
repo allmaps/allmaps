@@ -1,11 +1,12 @@
 import {
+  Image1Schema,
   Image2Schema,
   Image3Schema,
   // TODO: add Canvas!
   Manifest2Schema,
   Manifest3Schema,
   Collection2Schema,
-  Collection3Schema
+  Collection3Schema,
 } from '../schemas/iiif.js'
 
 import { Image } from './image.js'
@@ -16,7 +17,10 @@ import type { MajorVersion } from '../lib/types.js'
 
 export class IIIF {
   static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
-    if (majorVersion === 2 || '@id' in iiifData) {
+    if (majorVersion === 1 || ('@context' in iiifData && iiifData['@context'] === 'http://library.stanford.edu/iiif/image-api/1.1/context.json')) {
+      const parsedImage = Image1Schema.parse(iiifData)
+      return new Image(parsedImage)
+    } else if (majorVersion === 2 || '@id' in iiifData) {
       if (iiifData.protocol === 'http://iiif.io/api/image') {
         const parsedImage = Image2Schema.parse(iiifData)
         return new Image(parsedImage)

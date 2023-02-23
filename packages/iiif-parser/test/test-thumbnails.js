@@ -50,7 +50,7 @@ const tests = [
     // Expected size: 105 × 124
   },
   {
-    filename: 'image.2.si-NASM-NASM2013-00143.json',
+    filename: 'image.2.si-nasm-nasm2013-00143.json',
     thumbnailSize: { width: 400, height: 400 },
     expectedUrl:
       'https://ids.si.edu/ids/iiif/NASM-NASM2013-00143/full/400,/0/default.jpg'

@@ -22,7 +22,7 @@ export interface ImageRequest {
   size?: Size
 }
 
-export type MajorVersion = 2 | 3
+export type MajorVersion = 1 | 2 | 3
 
 export interface TileZoomLevel {
   scaleFactor: number

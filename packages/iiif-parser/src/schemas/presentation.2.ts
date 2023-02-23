@@ -8,7 +8,7 @@ import { ImageServiceSchema } from './image-service.js'
 export const SingleStringValue2Schema = z.string().or(z.string().array())
 
 export const LanguageString2Schema = z.object({
-  '@language': z.string(),
+  '@language': z.string().optional(),
   '@value': SingleStringValue2Schema
 })
 
