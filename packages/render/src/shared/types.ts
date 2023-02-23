@@ -64,6 +64,25 @@ export type RenderOptions = {
 
 export type Transform = [number, number, number, number, number, number]
 
+export type Matrix4 = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+]
+
 export type WarpedMap = {
   imageId: string
   mapId: string

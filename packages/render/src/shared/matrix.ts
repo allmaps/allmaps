@@ -1,4 +1,4 @@
-import type { Transform, Position } from './types.js'
+import type { Transform, Position, Matrix4 } from './types.js'
 
 export function applyTransform(
   transform: Transform,
@@ -113,4 +113,17 @@ export function invertTransform(source: Transform): Transform {
 
 export function getDeterminant(mat: Transform): number {
   return mat[0] * mat[3] - mat[1] * mat[2]
+}
+
+export function transformToMatrix4(transform: Transform): Matrix4 {
+  let matrix4: Matrix4 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+
+  matrix4[0] = transform[0]
+  matrix4[1] = transform[1]
+  matrix4[4] = transform[2]
+  matrix4[5] = transform[3]
+  matrix4[12] = transform[4]
+  matrix4[13] = transform[5]
+
+  return matrix4
 }
