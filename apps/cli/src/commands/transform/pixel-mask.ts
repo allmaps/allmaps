@@ -24,7 +24,7 @@ async function handler(argv: ArgumentsCamelCase) {
   for (let map of maps) {
     if (map.gcps.length >= 3) {
       const transformer = createTransformer(map.gcps)
-      const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
+      const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask, 0.01)
 
       features.push({
         type: 'Feature',

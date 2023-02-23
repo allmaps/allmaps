@@ -22,7 +22,7 @@ interface TileJSON {
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
 export function generateTileJson(urlTemplate: string, map: Map): TileJSON {
   const transformer = createTransformer(map.gcps)
-  const geoMask = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
+  const geoMask = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask, 0.01)
 
   bbox(geoMask)
 

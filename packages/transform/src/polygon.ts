@@ -18,8 +18,8 @@ function point(point: Position): Point {
 export function svgPolygonToGeoJSONPolygon(
   transformArgs: GCPTransformInfo,
   points: Position[],
-  // TODO: set default to 0
-  maxOffsetPercentage = 0.01,
+  // TODO: use options param
+  maxOffsetPercentage: number = 0,
   maxDepth = 8
 ): Polygon {
   if (!points || points.length < 3) {
@@ -56,7 +56,7 @@ export function svgPolygonToGeoJSONPolygon(
 function addMidpoints(
   transformArgs: GCPTransformInfo,
   segment: Segment,
-  maxOffsetPercentage: number,
+  maxOffsetPercentage: number | null,
   maxDepth: number,
   depth: number
 ): Segment | Segment[] {
@@ -76,11 +76,12 @@ function addMidpoints(
     point(segment.to.world)
   )
   const distanceMidpoints = distance(segmentWorldMidpoint, actualWorldMidpoint)
-
   if (
-    distanceSegment > 0 &&
-    distanceMidpoints / distanceSegment > maxOffsetPercentage &&
-    depth < maxDepth
+    depth < maxDepth &&
+    (maxOffsetPercentage
+      ? distanceMidpoints / distanceSegment > maxOffsetPercentage
+      : false) &&
+    distanceSegment > 0
   ) {
     const newSegmentMidpoint = {
       image: imageMidpoint,
