@@ -51,13 +51,13 @@ export function createProgram(
 export function createBuffer(
   gl: WebGL2RenderingContext,
   program: WebGLProgram,
-  data: Iterable<number>,
+  data: Float32Array,
   size: number,
   name: string
 ) {
   const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW)
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
 
   const type = gl.FLOAT
   const normalize = false

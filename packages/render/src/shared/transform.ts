@@ -1,9 +1,7 @@
-import { toImage, svgPolygonToGeoJSONPolygon } from '@allmaps/transform'
-
-import { bboxToSvgPolygon } from './bbox.js'
+import { toImage } from '@allmaps/transform'
 
 import type { GCPTransformInfo } from '@allmaps/transform'
-import type { BBox, SVGPolygon, GeoJSONPolygon } from './types.js'
+import type { BBox, SVGPolygon } from './types.js'
 
 export function geoBBoxToSVGPolygon(
   transformer: GCPTransformInfo,

@@ -6,6 +6,16 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
+import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import {
+  createTransform,
+  translateTransform,
+  scaleTransform,
+  multiplyTransform,
+  invertTransform,
+  transformToMatrix4
+} from './shared/matrix.js'
+
 import type {
   WarpedMap,
   Transform,
@@ -13,7 +23,8 @@ import type {
   RemoveBackgroundOptions,
   ColorizeOptions
 } from './shared/types.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+
+import type { GCPTransformInfo } from '@allmaps/transform'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0.2
@@ -27,15 +38,11 @@ export default class WebGL2Renderer extends EventTarget {
 
   webGLWarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
-  // opacity = 1
-  // backgroundColor: OptionalColor = null
-  // backgroundColorThreshold = 0
-
-  // backgroundColorThresholdHardness = DEFAULT_BACKGROUND_COLOR_THRESHOLD_HARDNESS
-  // colorizeColor: OptionalColor = null
-
   renderOptions: RenderOptions = {}
   renderOptionsScope: 'layer' | 'map' = 'layer'
+
+  // TODO: move to Viewport?
+  invertedRenderTransform: Transform
 
   constructor(gl: WebGL2RenderingContext, tileCache: TileCache) {
     super()
@@ -64,6 +71,8 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.TILEREMOVED,
       this.tileRemoved.bind(this)
     )
+
+    this.invertedRenderTransform = createTransform()
   }
 
   tileLoaded(event: Event) {
@@ -255,12 +264,12 @@ export default class WebGL2Renderer extends EventTarget {
           : DEFAULT_REMOVE_BACKGROUND_THRESHOLD
       )
 
-      const backgroundColorThresholdHardnessLocation = gl.getUniformLocation(
+      const backgroundColorHardnessLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColorThresholdHardness'
+        'u_backgroundColorHardness'
       )
       gl.uniform1f(
-        backgroundColorThresholdHardnessLocation,
+        backgroundColorHardnessLocation,
         renderOptions.removeBackground.hardness !== undefined
           ? renderOptions.removeBackground.hardness
           : DEFAULT_REMOVE_BACKGROUND_HARDNESS
@@ -279,11 +288,77 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  render(
-    coordinateToPixelTransform: Transform,
+  updateVertexBuffers(
+    projectionTransform: Transform,
+    mapIds: IterableIterator<string>
+  ) {
+    this.invertedRenderTransform = invertTransform(projectionTransform)
+
+    for (let mapId of mapIds) {
+      const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
+
+      if (!webglWarpedMap) {
+        break
+      }
+
+      webglWarpedMap.updateVertexBuffers(projectionTransform)
+    }
+  }
+
+  getGcpTransform(transformer: GCPTransformInfo): Transform {
+    const u_adfFromGeoX = transformer.adfFromGeoX
+    const u_adfFromGeoY = transformer.adfFromGeoY
+
+    return [
+      u_adfFromGeoX[2],
+      u_adfFromGeoY[2],
+      u_adfFromGeoX[1],
+      u_adfFromGeoY[1],
+      u_adfFromGeoX[0],
+      u_adfFromGeoY[0]
+    ]
+  }
+
+  getPixelToImageTransform(
     pixelToCoordinateTransform: Transform,
+    transformer: GCPTransformInfo,
+    devicePixelRatio: number,
+    canvasHeight: number
+  ): Transform {
+    let transform = scaleTransform(
+      pixelToCoordinateTransform,
+      1 / devicePixelRatio,
+      1 / devicePixelRatio
+    )
+
+    transform = translateTransform(transform, 0, canvasHeight)
+    transform = scaleTransform(transform, 1, -1)
+
+    const meanTranslateTransform = translateTransform(
+      createTransform(),
+      -transformer.y2Mean,
+      -transformer.x2Mean
+    )
+
+    return multiplyTransform(
+      multiplyTransform(
+        this.getGcpTransform(transformer),
+        meanTranslateTransform
+      ),
+      transform
+    )
+  }
+
+  render(
+    pixelToCoordinateTransform: Transform,
+    projectionTransform: Transform,
     mapIds: IterableIterator<string>
   ): void {
+    const renderTransform = multiplyTransform(
+      projectionTransform,
+      this.invertedRenderTransform
+    )
+
     const gl = this.gl
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.enable(gl.BLEND)
@@ -292,39 +367,14 @@ export default class WebGL2Renderer extends EventTarget {
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(this.program)
 
-    const canvasSizeLocation = gl.getUniformLocation(
+    const projectionMatrixLocation = gl.getUniformLocation(
       this.program,
-      'u_canvasSize'
+      'u_projectionMatrix'
     )
-
-    gl.uniform2f(canvasSizeLocation, gl.canvas.width, gl.canvas.height)
-
-    // Warped maps jiggle when zoomed in. This is probably caused by converting
-    // 64 bit numbers in frameState.coordinateToPixelTransform to 32 bit floats in the vertex shader.
-    // See:
-    // https://segmentfault.com/a/1190000040332266/en
-    // https://blog.mapbox.com/rendering-big-geodata-on-the-fly-with-geojson-vt-4e4d2a5dd1f2
-    const coordinateToPixelTransformLocation = gl.getUniformLocation(
-      this.program,
-      'u_coordinateToPixelTransform'
-    )
-    gl.uniform1fv(
-      coordinateToPixelTransformLocation,
-      coordinateToPixelTransform
-    )
-    const devicePixelRatioLocation = gl.getUniformLocation(
-      this.program,
-      'u_devicePixelRatio'
-    )
-
-    gl.uniform1f(devicePixelRatioLocation, window.devicePixelRatio)
-    const pixelToCoordinateTransformLocation = gl.getUniformLocation(
-      this.program,
-      'u_pixelToCoordinateTransform'
-    )
-    gl.uniform1fv(
-      pixelToCoordinateTransformLocation,
-      pixelToCoordinateTransform
+    gl.uniformMatrix4fv(
+      projectionMatrixLocation,
+      false,
+      transformToMatrix4(renderTransform)
     )
 
     if (this.renderOptionsScope === 'layer') {
@@ -343,30 +393,24 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       const transformer = webglWarpedMap.warpedMap.transformer
-      const x2MeanLocation = gl.getUniformLocation(this.program, 'u_x2Mean')
-      gl.uniform1f(x2MeanLocation, transformer.x2Mean)
-      const y2MeanLocation = gl.getUniformLocation(this.program, 'u_y2Mean')
-      gl.uniform1f(y2MeanLocation, transformer.y2Mean)
-      const adfFromGeoXLocation = gl.getUniformLocation(
+
+      const pixelToImageTransform = this.getPixelToImageTransform(
+        pixelToCoordinateTransform,
+        transformer,
+        window.devicePixelRatio,
+        gl.canvas.height
+      )
+
+      const pixelToImageMatrixLocation = gl.getUniformLocation(
         this.program,
-        'u_adfFromGeoX'
+        'u_pixelToImageMatrix'
       )
-      gl.uniform3f(
-        adfFromGeoXLocation,
-        transformer.adfFromGeoX[0],
-        transformer.adfFromGeoX[1],
-        transformer.adfFromGeoX[2]
+      gl.uniformMatrix4fv(
+        pixelToImageMatrixLocation,
+        false,
+        transformToMatrix4(pixelToImageTransform)
       )
-      const adfFromGeoYLocation = gl.getUniformLocation(
-        this.program,
-        'u_adfFromGeoY'
-      )
-      gl.uniform3f(
-        adfFromGeoYLocation,
-        transformer.adfFromGeoY[0],
-        transformer.adfFromGeoY[1],
-        transformer.adfFromGeoY[2]
-      )
+
       const u_tilesTextureLocation = gl.getUniformLocation(
         this.program,
         'u_tilesTexture'

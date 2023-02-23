@@ -3,11 +3,17 @@ import earcut from 'earcut'
 import { throttle } from 'lodash-es'
 
 import { createBuffer } from './shared/webgl2.js'
+import { applyTransform } from './shared/matrix.js'
 
-import type { WarpedMap, CachedTile, RenderOptions } from './shared/types.js'
+import type {
+  Transform,
+  WarpedMap,
+  CachedTile,
+  RenderOptions
+} from './shared/types.js'
 
+// TODO: Move to stdlib?
 const THROTTLE_WAIT_MS = 50
-
 const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
@@ -23,18 +29,18 @@ export default class WebGL2WarpedMap extends EventTarget {
   imageHeight: number
 
   triangles: number[]
+  transformedTriangles: Float32Array
   vao: WebGLVertexArrayObject | null
 
   tilesForTexture: Map<string, CachedTile> = new Map()
-  // tileImageBitmapsByUrl: Map<string, ImageBitmap> = new Map()
 
   renderOptions: RenderOptions = {}
 
-  //   currentScaleFactor?: number = undefined
-  //   previousScaleFactor?: number = undefined
+  // currentScaleFactor?: number = undefined
+  // previousScaleFactor?: number = undefined
 
-  //   currentScaleFactorTiles: Map<string, NeededTile> = new Map()
-  //   previousScaleFactorTiles: Map<string, NeededTile> = new Map()
+  // currentScaleFactorTiles: Map<string, NeededTile> = new Map()
+  // previousScaleFactorTiles: Map<string, NeededTile> = new Map()
 
   tilesTexture: WebGLTexture | null
   scaleFactorsTexture: WebGLTexture | null
@@ -72,17 +78,14 @@ export default class WebGL2WarpedMap extends EventTarget {
       ])
       .flat()
 
+    this.transformedTriangles = new Float32Array(this.triangles.length)
+
     this.tilesTexture = gl.createTexture()
     this.scaleFactorsTexture = gl.createTexture()
     this.tilePositionsTexture = gl.createTexture()
     this.imagePositionsTexture = gl.createTexture()
 
     this.vao = gl.createVertexArray()
-    gl.bindVertexArray(this.vao)
-
-    if (this.vao) {
-      createBuffer(gl, program, this.triangles, 2, 'a_position')
-    }
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -91,21 +94,40 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
+  updateVertexBuffers(transform: Transform) {
+    if (this.vao) {
+      this.gl.bindVertexArray(this.vao)
+
+      for (let index = 0; index < this.triangles.length; index += 2) {
+        const transformedPoint = applyTransform(transform, [
+          this.triangles[index],
+          this.triangles[index + 1]
+        ])
+
+        this.transformedTriangles[index] = transformedPoint[0]
+        this.transformedTriangles[index + 1] = transformedPoint[1]
+      }
+
+      createBuffer(
+        this.gl,
+        this.program,
+        this.transformedTriangles,
+        2,
+        'a_position'
+      )
+    }
+  }
+
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {
     this.tilesForTexture.set(tileUrl, cachedTile)
 
-    // TODO: throttle calls to updateTextures?
     this.throttledUpdateTextures()
-    // this.updateTextures()
   }
 
   removeCachedTile(tileUrl: string) {
     this.tilesForTexture.delete(tileUrl)
-    // this.tileImageBitmapsByUrl.delete(tileUrl)
 
-    // TODO: throttle calls to updateTextures?
     this.throttledUpdateTextures()
-    // this.updateTextures()
   }
 
   async updateTextures() {
@@ -188,12 +210,6 @@ export default class WebGL2WarpedMap extends EventTarget {
       const cachedTile = tilesForTexture[index]
 
       const tileImageBitmap = cachedTile.imageBitmap
-
-      // let tileImageBitmap = this.tileImageBitmapsByUrl.get(cachedTile.url)
-      // if (!tileImageBitmap && cachedTile.imageData) {
-      //   tileImageBitmap = await createImageBitmap(cachedTile.imageData)
-      //   this.tileImageBitmapsByUrl.set(cachedTile.url, tileImageBitmap)
-      // }
 
       if (tileImageBitmap) {
         const textureX = packedTile.x

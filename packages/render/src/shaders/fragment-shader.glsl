@@ -8,35 +8,12 @@ uniform float u_opacity;
 uniform bool u_removeBackgroundColor;
 uniform vec3 u_backgroundColor;
 uniform float u_backgroundColorThreshold;
-uniform float u_backgroundColorThresholdHardness;
+uniform float u_backgroundColorHardness;
 
 uniform bool u_colorize;
 uniform vec3 u_colorizeColor;
 
-uniform float u_x2Mean;
-uniform float u_y2Mean;
-uniform vec3 u_adfFromGeoX;
-uniform vec3 u_adfFromGeoY;
-
-uniform float[6] u_pixelToCoordinateTransform;
-uniform vec2 u_canvasSize;
-uniform float u_devicePixelRatio;
-
-vec2 CRS_georef(float e1, float n1, vec3 E, vec3 N) {
-  float e;
-  float n;
-
-  e = E[0] + E[1] * e1 + E[2] * n1;
-  n = N[0] + N[1] * e1 + N[2] * n1;
-
-  return vec2(e, n);
-}
-
-vec2 GDALGCPTransform(float x2_mean, float y2_mean, vec3 adfFromGeoX, vec3 adfFromGeoY, vec2 point) {
-  vec2 transformedPoint = CRS_georef(point.x - x2_mean, point.y - y2_mean, adfFromGeoX, adfFromGeoY);
-
-  return transformedPoint;
-}
+uniform mat4 u_pixelToImageMatrix;
 
 uniform sampler2D u_tilesTexture;
 uniform isampler2D u_tilePositionsTexture;
@@ -45,20 +22,8 @@ uniform isampler2D u_scaleFactorsTexture;
 
 out vec4 outColor;
 
-vec2 apply(float[6] transform, vec2 coordinate) {
-  float x = coordinate[0];
-  float y = coordinate[1];
-  return vec2(transform[0] * x + transform[2] * y + transform[4], transform[1] * x + transform[3] * y + transform[5]);
-}
-
 void main() {
-  // gl_FragCoord contains canvas pixel coordinates:
-  // lower-left origin: substract y component from viewport height and
-  // divide by u_devicePixelRatio to get HTML coordinates used by OpenLayers
-  vec2 pixelCoords = vec2(gl_FragCoord.x / u_devicePixelRatio, (u_canvasSize.y - gl_FragCoord.y) / u_devicePixelRatio);
-
-  vec2 geoCoords = apply(u_pixelToCoordinateTransform, pixelCoords);
-  vec2 imageCoords = GDALGCPTransform(u_x2Mean, u_y2Mean, u_adfFromGeoX, u_adfFromGeoY, geoCoords.yx);
+  vec2 imageCoords = (u_pixelToImageMatrix * vec4(gl_FragCoord.xy, 0.0, 1.0)).xy;
 
   ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
   int tileCount = tilePositionsTextureSize.y;
@@ -118,7 +83,7 @@ void main() {
     vec3 backgroundColorDiff = color.rgb - u_backgroundColor.rgb;
     float backgroundColorDistance = length(backgroundColorDiff);
     if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-      float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorThresholdHardness), u_backgroundColorThreshold, backgroundColorDistance);
+      float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
       outColor = vec4(outColor.rgb * amount, amount);
     }
 
