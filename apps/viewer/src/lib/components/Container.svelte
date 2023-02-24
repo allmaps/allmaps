@@ -10,6 +10,7 @@
   import MapControl from '$lib/components/controls/Map.svelte'
   import ViewControl from '$lib/components/controls/View.svelte'
   import PathControl from '$lib/components/controls/Path.svelte'
+  import OpacityControl from '$lib/components/controls/Opacity.svelte'
   import SelectionControl from '$lib/components/controls/Selection.svelte'
 
   import Error from '$lib/components/elements/Error.svelte'
@@ -20,6 +21,7 @@
     <Error error={$error} />
   </div>
 {:else if $mapCount === 0}
+  <!-- TODO: -->
   <!-- <div>EMPTY!</div> -->
 {:else}
   <div class="w-full h-full relative">
@@ -29,13 +31,14 @@
       <ImageView />
     {/if}
     <div
-      class="pointer-events-none absolute top-0 w-full h-full p-2 grid grid-cols-2 grid-rows-2"
+      class="pointer-events-none absolute top-0 w-full h-full p-2 grid grid-cols-3 grid-rows-2"
     >
       <div>
         <div class="pointer-events-auto inline">
           <MapControl />
         </div>
       </div>
+      <div />
       <div class="justify-self-end">
         <div class="pointer-events-auto inline">
           <ViewControl />
@@ -44,6 +47,11 @@
       <div class="self-end">
         <div class="pointer-events-auto inline">
           <PathControl />
+        </div>
+      </div>
+      <div class="justify-self-center self-end">
+        <div class="pointer-events-auto inline">
+          <OpacityControl />
         </div>
       </div>
       <div class="justify-self-end self-end">
