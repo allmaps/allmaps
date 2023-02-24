@@ -18,7 +18,7 @@
   function handleOpacityMove(event: Event) {
     let screenX: number | undefined
 
-    if (event instanceof window.TouchEvent) {
+    if (window.TouchEvent && event instanceof TouchEvent) {
       screenX = event.touches[0].screenX
     } else if (event instanceof MouseEvent) {
       screenX = event.screenX
