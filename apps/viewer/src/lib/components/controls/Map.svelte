@@ -36,10 +36,16 @@
 
   let rotateButtonMouseMoveStartX: number
 
-  function rotateButtonMouseMove(event: MouseEvent) {
-    const diffX = event.screenX - rotateButtonMouseMoveStartX
+  function handleRotateButtonMove(event: Event) {
+    let diffX: number | undefined
 
-    if ($ol) {
+    if (event instanceof TouchEvent) {
+      diffX = event.touches[0].screenX - rotateButtonMouseMoveStartX
+    } else if (event instanceof MouseEvent) {
+      diffX = event.screenX - rotateButtonMouseMoveStartX
+    }
+
+    if ($ol && diffX !== undefined) {
       $ol.getView().setRotation(diffX / 100)
     }
   }
@@ -82,15 +88,33 @@
       const rotateButton = container.querySelector('.ol-rotate-reset')
       if (rotateButton) {
         rotateButton.classList.add(...classes, 'rounded-r-lg')
+
         rotateButton.addEventListener('mousedown', (event: Event) => {
           if (event instanceof MouseEvent) {
             rotateButtonMouseMoveStartX = event.screenX
-          }
-          window.addEventListener('mousemove', rotateButtonMouseMove)
 
-          window.addEventListener('mouseup', (event) => {
-            window.removeEventListener('mousemove', rotateButtonMouseMove)
-          })
+            window.addEventListener('mousemove', handleRotateButtonMove)
+
+            window.addEventListener('mouseup', () => {
+              window.removeEventListener('mousemove', handleRotateButtonMove)
+            })
+
+            event.preventDefault()
+          }
+        })
+
+        rotateButton.addEventListener('touchstart', (event: Event) => {
+          if (event instanceof TouchEvent) {
+            rotateButtonMouseMoveStartX = event.touches[0].screenX
+
+            window.addEventListener('touchmove', handleRotateButtonMove)
+
+            window.addEventListener('touchend', () => {
+              window.removeEventListener('touchmove', handleRotateButtonMove)
+            })
+
+            event.preventDefault()
+          }
         })
       }
     } else {
