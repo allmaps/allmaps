@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { Image2Schema, Image3Schema, ImageSchema } from '../schemas/iiif.js'
+import { Image1Schema, Image2Schema, Image3Schema, ImageSchema } from '../schemas/iiif.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
@@ -61,8 +61,14 @@ export class EmbeddedImage {
 
       if ('type' in imageService && imageService.type === 'ImageService3') {
         this.majorVersion = 3
-      } else {
+      } else if (
+        ('type' in imageService && imageService.type === 'ImageService2') || 
+        ('@type' in imageService && imageService['@type'] === 'ImageService2') || 
+        ('@context' in imageService && imageService['@context'] === "http://iiif.io/api/image/2/context.json")) {
         this.majorVersion = 2
+      } else {
+        // console.log('imageService=',imageService)
+        this.majorVersion = 1
       }
 
       const profileProperties = getProfileProperties(imageService)
@@ -83,8 +89,13 @@ export class EmbeddedImage {
 
       if ('type' in parsedImage && parsedImage.type === 'ImageService3') {
         this.majorVersion = 3
-      } else {
+      } else if (
+        ('@type' in parsedImage && parsedImage['@type'] === 'iiif:Image')||
+        ('@context' in parsedImage && parsedImage['@context'] === "http://iiif.io/api/image/2/context.json")) {
         this.majorVersion = 2
+      } else {
+        // console.log('parsedImage=',parsedImage)
+        this.majorVersion = 1
       }
 
       if ('profile' in parsedImage) {
@@ -221,7 +232,9 @@ export class Image extends EmbeddedImage {
   static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
     let parsedImage
 
-    if (majorVersion === 2) {
+    if (majorVersion === 1) {
+      parsedImage = Image1Schema.parse(iiifData)
+    } else if (majorVersion === 2) {
       parsedImage = Image2Schema.parse(iiifData)
     } else if (majorVersion === 3) {
       parsedImage = Image3Schema.parse(iiifData)

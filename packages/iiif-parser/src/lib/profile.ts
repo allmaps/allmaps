@@ -5,6 +5,7 @@ import { ImageServiceSchema } from '../schemas/image-service.js'
 import { Image2ProfileDescriptionSchema } from '../schemas/image.2.js'
 import { ProfileProperties } from '../lib/types.js'
 
+import { image1ProfileUriRegex } from '../schemas/image.1.js'
 import { image2ProfileUriRegex } from '../schemas/image.2.js'
 
 const anyRegionAndSizeFeatures = ['regionByPx', 'sizeByWh']
@@ -22,7 +23,13 @@ function parseProfileUri(uri: string): number {
     const level = parseInt(match.groups.level)
     return level
   } else {
-    throw new Error('Unsupported IIIF Image Profile')
+    const match1 = uri.match(image1ProfileUriRegex)
+    if (match1 && match1.groups) {
+      const level = parseInt(match1.groups.level)
+      return level
+    } else {  
+      throw new Error('Unsupported IIIF Image Profile')
+    }
   }
 }
 

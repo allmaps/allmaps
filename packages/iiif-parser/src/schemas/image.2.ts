@@ -42,9 +42,12 @@ export const Image2ProfileSchema = Image2ProfileUri.or(
   )
 )
 
+export const Image2Context = z.literal('http://iiif.io/api/image/2/context.json')
+
 export const Image2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('iiif:Image').optional(),
+  '@context': Image2Context,
   protocol: z.literal('http://iiif.io/api/image'),
   width: z.number().int(),
   height: z.number().int(),
