@@ -45,7 +45,7 @@ importers:
 
   apps/explore:
     specifiers:
-      '@allmaps/ui': ^1.0.0-beta.8
+      '@allmaps/ui': ^1.0.0-beta.9
       '@playwright/test': ^1.28.1
       '@sveltejs/adapter-static': ^1.0.0
       '@sveltejs/kit': ^1.0.0
