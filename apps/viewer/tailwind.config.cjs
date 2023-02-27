@@ -5,7 +5,11 @@ module.exports = {
     './node_modules/@allmaps/ui/package/components/**/*.{html,js,svelte,ts}'
   ],
   theme: {
-    // extend: {}
+    extend: {
+      transitionDuration: {
+        '0': '0ms'
+      }
+    },
     fontFamily: {
       sans: ['Geograph', 'sans-serif'],
       mono: ['DM Mono', 'monospace']
