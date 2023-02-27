@@ -103,10 +103,20 @@ export default class TileCache extends EventTarget {
     const abortController = new AbortController()
     this.abortControllersByUrl.set(tile.url, abortController)
 
-    const image = await fetchImage(tile.url, abortController.signal)
+    try {
+      const image = await fetchImage(tile.url, abortController.signal)
 
-    const imageBitmap = await createImageBitmap(image)
-    await this.storeTile(tile, imageBitmap)
+      const imageBitmap = await createImageBitmap(image)
+      await this.storeTile(tile, imageBitmap)
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // fetchImage was aborted because viewport was moved and tile
+        // is no longer needed. This error can be ignored, nothing to do.
+      } else {
+        // Something else happend
+        console.error(err)
+      }
+    }
   }
 
   private async storeTile(tile: NeededTile, imageBitmap?: ImageBitmap) {
