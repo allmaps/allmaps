@@ -42,7 +42,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.14.2",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",

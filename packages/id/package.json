@@ -56,7 +56,7 @@
   },
   "homepage": "https://allmaps.org",
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.14.2",
     "chai": "^4.3.6",
     "documentation": "^14.0.0",
     "eslint": "^7.32.0",
