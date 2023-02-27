@@ -48,7 +48,7 @@
       const map = viewerMap.map
 
       const imageUri = map.image.uri
-      const imageInfo = await fetchImage(imageUri)
+      const imageInfo = await fetchImageInfo(imageUri)
 
       updateVectorLayer(viewerMap)
 
@@ -68,7 +68,8 @@
     }
   }
 
-  async function fetchImage(imageUri: string) {
+  // TODO: move to stdlib
+  async function fetchImageInfo(imageUri: string) {
     const response = await fetch(`${imageUri}/info.json`)
     const image = await response.json()
     return image

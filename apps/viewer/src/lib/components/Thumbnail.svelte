@@ -6,23 +6,21 @@
   export let width: number
   export let height: number
 
-  // let parsedImage: Image
-
-  // $: (async () => (parsedImage = await parseImage(imageUri)))()
-
+  // TODO: move to stdlib
   async function fetchJSON(url: string) {
     const response = await fetch(url)
     const json = await response.json()
     return json
   }
 
-  async function fetchImage(imageUri: string) {
+  // TODO: move to stdlib
+  async function fetchImageInfo(imageUri: string) {
     const json = await fetchJSON(`${imageUri}/info.json`)
     return json
   }
 
   async function parseImage(imageUri: string) {
-    const image = await fetchImage(imageUri)
+    const image = await fetchImageInfo(imageUri)
     return Image.parse(image)
   }
 
