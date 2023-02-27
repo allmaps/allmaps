@@ -45,10 +45,10 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/geojson": "^7946.0.10",
-    "chai": "^4.3.4",
+    "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
-    "eslint": "7",
-    "mocha": "^8.3.2"
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

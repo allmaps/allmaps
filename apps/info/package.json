@@ -25,9 +25,6 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
-  "engines": {
-    "node": "<=18"
-  },
   "packageManager": "pnpm@6.32.3",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.11",
@@ -42,7 +39,7 @@
     "@types/openseadragon": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "eslint": "^8.28.0",
+    "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "postcss": "^8.4.18",
