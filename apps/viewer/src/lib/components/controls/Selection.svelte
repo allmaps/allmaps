@@ -38,22 +38,22 @@
 </script>
 
 <div
-  class="inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
+  class="inline-flex items-center p-1 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
 >
-  {#if $selectedMapCount === 0}
+  <!-- {#if $selectedMapCount === 0}
     <div>Viewing {$mapCount} maps</div>
   {:else if $selectedMapCount === 1}
     <div>{$selectedMapCount} map selected</div>
   {:else}
     <div>{$selectedMapCount} maps selected</div>
-  {/if}
+  {/if} -->
   <!-- path in collection, cluster, selection. click will display popover with thumbnails -->
   <!-- title, id current Map, click will display info about current map + URLs -->
 
-  <DropdownButton>
+  <!-- <DropdownButton>
     <RenderOptionsButton slot="button" />
     <RenderOptionsDropdown slot="dropdown" />
-  </DropdownButton>
+  </DropdownButton> -->
 
   <!-- order icon, popover https://kbpdfstudio.qoppa.com/wp-content/uploads/Z-order2.png -->
 

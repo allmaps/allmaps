@@ -45,9 +45,9 @@
         </div>
       </div>
       <div class="self-end">
-        <div class="pointer-events-auto inline">
+        <!-- <div class="pointer-events-auto inline">
           <PathControl />
-        </div>
+        </div> -->
       </div>
       <div class="justify-self-center self-end">
         <div class="pointer-events-auto inline">

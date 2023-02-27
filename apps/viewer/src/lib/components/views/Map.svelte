@@ -15,6 +15,8 @@
     updateSelectedMaps
   } from '$lib/shared/stores/selected.js'
 
+  import { renderOptions } from '$lib/shared/stores/render-options.js'
+
   import OLMap from 'ol/Map.js'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
   import XYZ from 'ol/source/XYZ.js'
@@ -54,6 +56,8 @@
   let baseLayer
 
   type IDs = Set<string>
+
+  let initialOpacity = 0
 
   const sourcesInWarpedMapSource: IDs = new Set()
 
@@ -227,13 +231,16 @@
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.code === 'Space' && event.target === document.body) {
-      warpedMapLayer.setVisible(false)
+      initialOpacity = $renderOptions.opacity
+      $renderOptions.opacity = 0
+      // warpedMapLayer.setVisible(false)
     }
   }
 
   function handleKeyup(event: KeyboardEvent) {
     if (event.code === 'Space' && event.target === document.body) {
-      warpedMapLayer.setVisible(true)
+      $renderOptions.opacity = initialOpacity
+      // warpedMapLayer.setVisible(true)
     }
   }
 </script>
