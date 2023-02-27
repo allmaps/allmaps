@@ -228,24 +228,7 @@
   onDestroy(() => {
     $ol = undefined
   })
-
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.code === 'Space' && event.target === document.body) {
-      initialOpacity = $renderOptions.opacity
-      $renderOptions.opacity = 0
-      // warpedMapLayer.setVisible(false)
-    }
-  }
-
-  function handleKeyup(event: KeyboardEvent) {
-    if (event.code === 'Space' && event.target === document.body) {
-      $renderOptions.opacity = initialOpacity
-      // warpedMapLayer.setVisible(true)
-    }
-  }
 </script>
-
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <div id="ol" class="w-full h-full" />
 {#if vectorSource && select}

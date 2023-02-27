@@ -14,6 +14,8 @@
   let hasMoved = false
 
   let initialOpacity = 1
+  let opacityThreshold = 0.2
+
   renderOptions.subscribe(($renderOptions) => {
     if (!active) {
       initialOpacity = $renderOptions.opacity
@@ -46,10 +48,6 @@
 
       if (distance > threshold || hasMoved) {
         hasMoved = true
-
-        // const max = startX - threshold * 2
-        // const opacity = 1 - Math.min(diff / max, 1)
-
         $renderOptions.opacity = angleToOpacity(angle)
       }
     }
@@ -57,6 +55,11 @@
 
   function handleMousedown(event: MouseEvent) {
     active = true
+
+    if (initialOpacity < opacityThreshold) {
+      initialOpacity = 1
+    }
+
     $renderOptions.opacity = 0
 
     window.addEventListener('mousemove', handleOpacityMove)
@@ -86,6 +89,11 @@
 
   function handleTouchstart(event: TouchEvent) {
     active = true
+
+    if (initialOpacity < opacityThreshold) {
+      initialOpacity = 1
+    }
+
     $renderOptions.opacity = 0
 
     window.addEventListener('touchmove', handleOpacityMove)
@@ -103,7 +111,28 @@
 
     event.preventDefault()
   }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.code === 'Space' && event.target === document.body) {
+      active = true
+
+      if (initialOpacity < opacityThreshold) {
+        initialOpacity = 1
+      }
+
+      $renderOptions.opacity = 0
+    }
+  }
+
+  function handleKeyup(event: KeyboardEvent) {
+    if (event.code === 'Space' && event.target === document.body) {
+      $renderOptions.opacity = initialOpacity
+      active = false
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <div
   class="inline-flex items-center p-1 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
