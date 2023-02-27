@@ -5,8 +5,16 @@ import { ImageServiceSchema } from '../schemas/image-service.js'
 import { Image2ProfileDescriptionSchema } from '../schemas/image.2.js'
 import { ProfileProperties } from '../lib/types.js'
 
-import { image1ProfileUriRegex } from '../schemas/image.1.js'
-import { image2ProfileUriRegex } from '../schemas/image.2.js'
+import {
+  Image1ContextString,
+  image1ProfileUriRegex
+} from '../schemas/image.1.js'
+import {
+  Image2ContextString,
+  image2ProfileUriRegex
+} from '../schemas/image.2.js'
+
+import type { MajorVersion } from '../lib/types.js'
 
 const anyRegionAndSizeFeatures = ['regionByPx', 'sizeByWh']
 
@@ -16,20 +24,25 @@ type Image2ProfileDescriptionType = z.infer<
 type ImageType = z.infer<typeof ImageSchema>
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 
-function parseProfileUri(uri: string): number {
+function parseImage1ProfileUri(uri: string): number {
+  const match = uri.match(image1ProfileUriRegex)
+
+  if (match && match.groups) {
+    const level = parseInt(match.groups.level)
+    return level
+  } else {
+    throw new Error('Unsupported IIIF Image Profile for IIIF Image API 1.1')
+  }
+}
+
+function parseImage2ProfileUri(uri: string): number {
   const match = uri.match(image2ProfileUriRegex)
 
   if (match && match.groups) {
     const level = parseInt(match.groups.level)
     return level
   } else {
-    const match1 = uri.match(image1ProfileUriRegex)
-    if (match1 && match1.groups) {
-      const level = parseInt(match1.groups.level)
-      return level
-    } else {  
-      throw new Error('Unsupported IIIF Image Profile')
-    }
+    throw new Error('Unsupported IIIF Image Profile for IIIF Image API 2.1')
   }
 }
 
@@ -51,7 +64,7 @@ function parseImage2ProfileDescription(
 export function getProfileProperties(
   parsedImage: ImageType | ImageServiceType
 ): ProfileProperties {
-  if ('id' in parsedImage) {
+  if ('type' in parsedImage && parsedImage.type === 'ImageService3') {
     let supportsAnyRegionAndSize = false
     if (parsedImage.profile === 'level0') {
       if ('extraFeatures' in parsedImage) {
@@ -71,7 +84,10 @@ export function getProfileProperties(
       maxArea: 'maxArea' in parsedImage ? parsedImage.maxArea : undefined,
       supportsAnyRegionAndSize
     }
-  } else if ('@id' in parsedImage) {
+  } else if (
+    '@context' in parsedImage &&
+    parsedImage['@context'] === Image2ContextString
+  ) {
     if (Array.isArray(parsedImage.profile)) {
       let supportsAnyRegionAndSize = false
       let maxHeight = Number.NEGATIVE_INFINITY
@@ -80,7 +96,7 @@ export function getProfileProperties(
 
       parsedImage.profile.forEach((profile) => {
         if (typeof profile === 'string') {
-          const profileLevel = parseProfileUri(profile)
+          const profileLevel = parseImage2ProfileUri(profile)
           supportsAnyRegionAndSize =
             supportsAnyRegionAndSize || profileLevel >= 1
         } else {
@@ -115,10 +131,32 @@ export function getProfileProperties(
         supportsAnyRegionAndSize
       }
     } else {
-      const profileLevel = parseProfileUri(parsedImage.profile)
+      if ('profile' in parsedImage && parsedImage.profile) {
+        const profileLevel = parseImage2ProfileUri(parsedImage.profile)
+
+        return {
+          supportsAnyRegionAndSize: profileLevel >= 1
+        }
+      }
+
+      return {
+        supportsAnyRegionAndSize: false
+      }
+    }
+  } else if (
+    '@context' in parsedImage &&
+    parsedImage['@context'] === Image1ContextString
+  ) {
+    if ('profile' in parsedImage && typeof parsedImage.profile === 'string') {
+      const profileLevel = parseImage1ProfileUri(parsedImage.profile)
+
       return {
         supportsAnyRegionAndSize: profileLevel >= 1
       }
+    }
+
+    return {
+      supportsAnyRegionAndSize: false
     }
   } else {
     throw new Error('Invalid Image')

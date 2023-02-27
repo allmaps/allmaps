@@ -7,6 +7,12 @@ import { readJson } from './lib/fs.js'
 
 const tests = [
   {
+    filename: 'image.1.gallica.bnf.12148.btv1b53243704g.f1.json',
+    size: { width: 790, height: 1106 },
+    expectedUrl:
+      'https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f1/full/790,/0/native.jpg'
+  },
+  {
     filename: 'image.2.rp-A136B927DA744CD2BEA9F1A3FF2271BA.json',
     region: { x: 4096, y: 4096, width: 2330, height: 714 },
     size: { width: 292, height: 90 },
@@ -23,7 +29,17 @@ const tests = [
 ]
 
 for (let { filename, region, size, expectedUrl } of tests) {
-  describe(`${region.x},${region.y},${region.width},${region.height}/${size.width},${size.height} thumbnail for ${filename}`, () => {
+  let regionStr = 'full'
+  if (region) {
+    regionStr = `${region.x},${region.y},${region.width},${region.height}`
+  }
+
+  let sizeStr = 'full'
+  if (size) {
+    sizeStr = `${size.width},${size.height}`
+  }
+
+  describe(`${regionStr}/${sizeStr} thumbnail for ${filename}`, () => {
     it('should match expected URL', () => {
       const image = readJson(filename)
       const parsedImage = Image.parse(image)

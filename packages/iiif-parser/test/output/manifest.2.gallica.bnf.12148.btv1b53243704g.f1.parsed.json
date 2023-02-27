@@ -4,9 +4,7 @@
   "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/manifest.json",
   "majorVersion": 2,
   "label": {
-    "none": [
-      "BnF, département Cartes et plans, GE DD-2998"
-    ]
+    "none": ["BnF, département Cartes et plans, GE DD-2998"]
   },
   "canvases": [
     {
@@ -15,9 +13,7 @@
       "height": 11060,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f1",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -35,9 +31,7 @@
       "height": 6834,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f2",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -55,9 +49,7 @@
       "height": 8046,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f3",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -75,9 +67,7 @@
       "height": 7974,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f4",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -95,9 +85,7 @@
       "height": 8006,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f5",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -115,9 +103,7 @@
       "height": 8020,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f6",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -135,9 +121,7 @@
       "height": 8002,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f7",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -155,9 +139,7 @@
       "height": 8016,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f8",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -175,9 +157,7 @@
       "height": 7958,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f9",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -195,9 +175,7 @@
       "height": 7978,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f10",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -215,9 +193,7 @@
       "height": 8066,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f11",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -235,9 +211,7 @@
       "height": 8006,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f12",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -255,9 +229,7 @@
       "height": 7984,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f13",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -275,9 +247,7 @@
       "height": 8222,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f14",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -295,9 +265,7 @@
       "height": 7966,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f15",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -315,9 +283,7 @@
       "height": 8038,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f16",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -335,9 +301,7 @@
       "height": 7988,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f17",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -355,9 +319,7 @@
       "height": 7970,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f18",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -375,9 +337,7 @@
       "height": 8118,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f19",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -395,9 +355,7 @@
       "height": 7944,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f20",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -415,9 +373,7 @@
       "height": 7950,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f21",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -435,9 +391,7 @@
       "height": 7952,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f22",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -455,9 +409,7 @@
       "height": 7970,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f23",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -475,9 +427,7 @@
       "height": 7958,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f24",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -495,9 +445,7 @@
       "height": 7972,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f25",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -515,9 +463,7 @@
       "height": 7974,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f26",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -535,9 +481,7 @@
       "height": 8050,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f27",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -555,9 +499,7 @@
       "height": 7990,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f28",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -575,9 +517,7 @@
       "height": 8050,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f29",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -595,9 +535,7 @@
       "height": 8000,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f30",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -615,9 +553,7 @@
       "height": 8004,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f31",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -635,9 +571,7 @@
       "height": 7994,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f32",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -655,9 +589,7 @@
       "height": 8018,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f33",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -675,9 +607,7 @@
       "height": 8002,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f34",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -695,9 +625,7 @@
       "height": 7956,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f35",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -715,9 +643,7 @@
       "height": 8040,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f36",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -735,9 +661,7 @@
       "height": 8026,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f37",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -755,9 +679,7 @@
       "height": 8010,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f38",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -775,9 +697,7 @@
       "height": 8010,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f39",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -795,9 +715,7 @@
       "height": 8000,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f40",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -815,9 +733,7 @@
       "height": 8012,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f41",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -835,9 +751,7 @@
       "height": 8014,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f42",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -855,9 +769,7 @@
       "height": 7954,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f43",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -875,9 +787,7 @@
       "height": 8028,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f44",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -895,9 +805,7 @@
       "height": 7992,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f45",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -915,9 +823,7 @@
       "height": 8014,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f46",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -935,9 +841,7 @@
       "height": 7968,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f47",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -955,9 +859,7 @@
       "height": 7968,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f48",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -975,9 +877,7 @@
       "height": 7970,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f49",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -995,9 +895,7 @@
       "height": 7964,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f50",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1015,9 +913,7 @@
       "height": 7996,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f51",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1035,9 +931,7 @@
       "height": 7960,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f52",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1055,9 +949,7 @@
       "height": 7980,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f53",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1075,9 +967,7 @@
       "height": 7994,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f54",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1095,9 +985,7 @@
       "height": 8000,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f55",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1115,9 +1003,7 @@
       "height": 8028,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f56",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1135,9 +1021,7 @@
       "height": 7982,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f57",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1155,9 +1039,7 @@
       "height": 7982,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f58",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1175,9 +1057,7 @@
       "height": 7994,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f59",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1195,9 +1075,7 @@
       "height": 7988,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f60",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1215,9 +1093,7 @@
       "height": 7960,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f61",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1235,9 +1111,7 @@
       "height": 7998,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f62",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1255,9 +1129,7 @@
       "height": 8000,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f63",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1275,9 +1147,7 @@
       "height": 7968,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f64",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1295,9 +1165,7 @@
       "height": 8030,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f65",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1315,9 +1183,7 @@
       "height": 8140,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f66",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1335,9 +1201,7 @@
       "height": 7990,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f67",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1355,9 +1219,7 @@
       "height": 7970,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f68",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1375,9 +1237,7 @@
       "height": 8040,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f69",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1395,9 +1255,7 @@
       "height": 8034,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f70",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1415,9 +1273,7 @@
       "height": 8008,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f71",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1435,9 +1291,7 @@
       "height": 8050,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f72",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1455,9 +1309,7 @@
       "height": 7982,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f73",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1475,9 +1327,7 @@
       "height": 8036,
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f74",
       "label": {
-        "none": [
-          "NP"
-        ]
+        "none": ["NP"]
       },
       "image": {
         "embedded": true,
@@ -1498,45 +1348,31 @@
   "metadata": [
     {
       "label": {
-        "none": [
-          "Repository"
-        ]
+        "none": ["Repository"]
       },
       "value": {
-        "none": [
-          "Bibliothèque nationale de France"
-        ]
+        "none": ["Bibliothèque nationale de France"]
       }
     },
     {
       "label": {
-        "none": [
-          "Digitised by"
-        ]
+        "none": ["Digitised by"]
       },
       "value": {
-        "none": [
-          "Bibliothèque nationale de France"
-        ]
+        "none": ["Bibliothèque nationale de France"]
       }
     },
     {
       "label": {
-        "none": [
-          "Source Images"
-        ]
+        "none": ["Source Images"]
       },
       "value": {
-        "none": [
-          "https://gallica.bnf.fr/ark:/12148/btv1b53243704g"
-        ]
+        "none": ["https://gallica.bnf.fr/ark:/12148/btv1b53243704g"]
       }
     },
     {
       "label": {
-        "none": [
-          "Metadata Source"
-        ]
+        "none": ["Metadata Source"]
       },
       "value": {
         "none": [
@@ -1546,9 +1382,7 @@
     },
     {
       "label": {
-        "none": [
-          "Shelfmark"
-        ]
+        "none": ["Shelfmark"]
       },
       "value": {
         "none": [
@@ -1558,9 +1392,7 @@
     },
     {
       "label": {
-        "none": [
-          "Title"
-        ]
+        "none": ["Title"]
       },
       "value": {
         "none": [
@@ -1570,33 +1402,23 @@
     },
     {
       "label": {
-        "none": [
-          "Date"
-        ]
+        "none": ["Date"]
       },
       "value": {
-        "none": [
-          "179."
-        ]
+        "none": ["179."]
       }
     },
     {
       "label": {
-        "none": [
-          "Language"
-        ]
+        "none": ["Language"]
       },
       "value": {
-        "none": [
-          "français"
-        ]
+        "none": ["français"]
       }
     },
     {
       "label": {
-        "none": [
-          "Format"
-        ]
+        "none": ["Format"]
       },
       "value": {
         "none": [
@@ -1608,9 +1430,7 @@
     },
     {
       "label": {
-        "none": [
-          "Creator"
-        ]
+        "none": ["Creator"]
       },
       "value": {
         "none": [
@@ -1622,9 +1442,7 @@
     },
     {
       "label": {
-        "none": [
-          "Relation"
-        ]
+        "none": ["Relation"]
       },
       "value": {
         "none": [
@@ -1634,14 +1452,10 @@
     },
     {
       "label": {
-        "none": [
-          "Type"
-        ]
+        "none": ["Type"]
       },
       "value": {
-        "none": [
-          "Carte"
-        ]
+        "none": ["Carte"]
       }
     }
   ]

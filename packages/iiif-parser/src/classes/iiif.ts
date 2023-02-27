@@ -6,8 +6,10 @@ import {
   Manifest2Schema,
   Manifest3Schema,
   Collection2Schema,
-  Collection3Schema,
+  Collection3Schema
 } from '../schemas/iiif.js'
+
+import { Image1ContextString } from '../schemas/image.1.js'
 
 import { Image } from './image.js'
 import { Manifest } from './manifest.js'
@@ -17,7 +19,10 @@ import type { MajorVersion } from '../lib/types.js'
 
 export class IIIF {
   static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
-    if (majorVersion === 1 || ('@context' in iiifData && iiifData['@context'] === 'http://library.stanford.edu/iiif/image-api/1.1/context.json')) {
+    if (
+      majorVersion === 1 ||
+      ('@context' in iiifData && iiifData['@context'] === Image1ContextString)
+    ) {
       const parsedImage = Image1Schema.parse(iiifData)
       return new Image(parsedImage)
     } else if (majorVersion === 2 || '@id' in iiifData) {

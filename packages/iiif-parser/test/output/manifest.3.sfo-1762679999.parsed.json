@@ -8,7 +8,7 @@
         "width": 1698,
         "height": 1099,
         "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
+        "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://static.sfomuseum.org/media/176/270/383/1/tiles/"
       },
@@ -23,7 +23,7 @@
         "width": 1703,
         "height": 1099,
         "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
+        "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://static.sfomuseum.org/media/176/270/383/3/tiles/"
       },

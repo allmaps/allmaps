@@ -1,1 +1,7 @@
-{"profile":"http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2","width":7900,"height":11060,"@context":"http://library.stanford.edu/iiif/image-api/1.1/context.json","@id":"https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f1"}
+{
+  "profile": "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2",
+  "width": 7900,
+  "height": 11060,
+  "@context": "http://library.stanford.edu/iiif/image-api/1.1/context.json",
+  "@id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f1"
+}
