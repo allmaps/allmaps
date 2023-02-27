@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.29",
+  "version": "1.0.0-beta.30",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -56,11 +56,11 @@
     "node": "^14.13.1 || >=16.0.0"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.11",
-    "@allmaps/id": "^1.0.0-beta.12",
-    "@allmaps/iiif-parser": "^1.0.0-beta.21",
-    "@allmaps/render": "^1.0.0-beta.26",
-    "@allmaps/transform": "^1.0.0-beta.8",
+    "@allmaps/annotation": "^1.0.0-beta.12",
+    "@allmaps/id": "^1.0.0-beta.13",
+    "@allmaps/iiif-parser": "^1.0.0-beta.22",
+    "@allmaps/render": "^1.0.0-beta.27",
+    "@allmaps/transform": "^1.0.0-beta.11",
     "earcut": "^2.2.3",
     "lodash-es": "^4.17.21",
     "ol": "^6.15.1",
