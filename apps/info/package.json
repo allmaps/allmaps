@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/info",
-  "version": "0.0.2-alpha.15",
+  "version": "0.0.2-alpha.16",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -30,9 +30,9 @@
   },
   "packageManager": "pnpm@6.32.3",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.10",
+    "@allmaps/annotation": "^1.0.0-beta.11",
     "@allmaps/id": "^1.0.0-beta.12",
-    "@allmaps/iiif-parser": "^1.0.0-beta.20",
+    "@allmaps/iiif-parser": "^1.0.0-beta.21",
     "@allmaps/ui": "^1.0.0-beta.7"
   },
   "devDependencies": {
