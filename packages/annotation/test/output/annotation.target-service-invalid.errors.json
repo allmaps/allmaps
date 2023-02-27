@@ -1,5 +1,5 @@
 [
   "Array must contain at most 1 element(s)",
-  "Invalid enum value. Expected 'ImageService2' | 'ImageService3', received 'invalid'",
+  "Invalid enum value. Expected 'ImageService1' | 'ImageService2' | 'ImageService3', received 'invalid'",
   "Expected object, received boolean"
 ]
