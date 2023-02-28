@@ -55,7 +55,7 @@
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.14.2",
     "@types/stream-json": "^1.7.2",
     "@types/svg-parser": "^2.0.3",
     "@types/yargs": "^17.0.12",
