@@ -19,6 +19,7 @@
     resetSources
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
+  import { renderOptions, resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -63,6 +64,7 @@
 
   onMount(async () => {
     paramStore.subscribe(async (value) => {
+      resetRenderOptionsLayer()
       resetSources()
 
       initialized = true

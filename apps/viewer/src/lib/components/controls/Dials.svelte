@@ -2,8 +2,6 @@
   import { renderOptions } from '$lib/shared/stores/render-options.js'
 
   import { Dial } from '@allmaps/ui'
-
-  $renderOptions.removeBackground.enabled = true
 </script>
 
 <div

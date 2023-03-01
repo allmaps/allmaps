@@ -13,7 +13,11 @@ import type { RenderOptions } from '$lib/shared/types.js'
 
 export const renderOptionsScope = writable<'layer' | 'map'>('layer')
 
-export const renderOptionsLayer = writable<RenderOptions>(defaultRenderOptions)
+export const renderOptionsLayer = writable<RenderOptions>({...defaultRenderOptions})
+
+export function resetRenderOptionsLayer() {
+  renderOptionsLayer.set({...defaultRenderOptions})
+}
 
 export const renderOptionsMaps = derived(maps, ($maps) =>
   $maps.map((viewerMap) => viewerMap.renderOptions)
