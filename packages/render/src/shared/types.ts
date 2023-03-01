@@ -5,11 +5,17 @@ import type {
 } from '@allmaps/iiif-parser'
 import type { GCPTransformInfo } from '@allmaps/transform'
 
-import type { BBox, Polygon, Position } from 'geojson'
+export type Position = [number, number]
 
-export { BBox, Polygon as GeoJSONPolygon, Position }
+// export type BBox = [number, number, number, number] | [number, number, number, number, number, number];
+export type BBox = [number, number, number, number]
 
-// TODO: rename
+export type GeoJSONPolygon = {
+  type: 'Polygon'
+  coordinates: Position[][]
+}
+
+// TODO: rename?
 export type SVGPolygon = Position[]
 
 export type Line = [Position, Position]
@@ -89,7 +95,7 @@ export type WarpedMap = {
   parsedImage: IIIFImage
   pixelMask: SVGPolygon
   transformer: GCPTransformInfo
-  geoMask: Polygon
+  geoMask: GeoJSONPolygon
 }
 
 export type XYZTile = {

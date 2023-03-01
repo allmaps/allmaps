@@ -44,7 +44,6 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@types/geojson": "^7946.0.10",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",

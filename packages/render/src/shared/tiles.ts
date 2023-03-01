@@ -236,7 +236,7 @@ export function computeIiifTilesForMapGeoBBox(
       iiifTilesByX
     )
 
-    const imageBBoxCenter = [
+    const imageBBoxCenter: Position = [
       geoBBoxImageBBoxWidth / 2 + geoBBoxImageBBox[0],
       geoBBoxImageBBoxHeight / 2 + geoBBoxImageBBox[1]
     ]
