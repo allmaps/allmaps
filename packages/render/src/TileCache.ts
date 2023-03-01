@@ -1,5 +1,6 @@
+import { fetchImage } from '@allmaps/stdlib'
+
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
-import { fetchImage } from './shared/textures'
 
 import type { NeededTile, CachedTile } from './shared/types.js'
 
@@ -12,7 +13,9 @@ export default class TileCache extends EventTarget {
   tilesLoadingCount = 0
 
   // TODO: support multiple scaleFactors
-  // keepScaleFactorsCount
+  // keep distance between each tile and viewport
+  // different zoom levels also have a distance to current
+  // zoom level.
 
   async addTile(tile: NeededTile) {
     const cachedTile = this.cachedTilesByUrl.get(tile.url)
