@@ -1,37 +1,15 @@
 <script lang="ts">
   import { Image } from '@allmaps/iiif-parser'
+  import { fetchImageInfo } from '@allmaps/stdlib'
 
   export let imageUri: string
-
   export let width: number
   export let height: number
 
-  // TODO: move to stdlib
-  async function fetchJSON(url: string) {
-    const response = await fetch(url)
-    const json = await response.json()
-    return json
-  }
-
-  // TODO: move to stdlib
-  async function fetchImageInfo(imageUri: string) {
-    const json = await fetchJSON(`${imageUri}/info.json`)
-    return json
-  }
-
   async function parseImage(imageUri: string) {
-    const image = await fetchImageInfo(imageUri)
-    return Image.parse(image)
+    const imageInfo = await fetchImageInfo(imageUri)
+    return Image.parse(imageInfo)
   }
-
-  // function removeHeight ({ region, size }: {region: number, size: number}) {
-  //   return {
-  //     region,
-  //     size: {
-  //       width: size.width
-  //     }
-  //   }
-  // }
 </script>
 
 {#await parseImage(imageUri) then parsedImage}
