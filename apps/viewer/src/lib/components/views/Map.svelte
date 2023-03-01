@@ -15,8 +15,6 @@
     updateSelectedMaps
   } from '$lib/shared/stores/selected.js'
 
-  import { renderOptions } from '$lib/shared/stores/render-options.js'
-
   import OLMap from 'ol/Map.js'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
   import XYZ from 'ol/source/XYZ.js'
@@ -56,8 +54,6 @@
   let baseLayer
 
   type IDs = Set<string>
-
-  let initialOpacity = 0
 
   const sourcesInWarpedMapSource: IDs = new Set()
 
@@ -207,15 +203,18 @@
       style: selectedPolygonStyle
     })
 
-    $ol.addInteraction(select)
+    // TODO: enable select
+    // $ol.addInteraction(select)
+    // select.on('select', handleSelect)
 
-    select.on('select', handleSelect)
-
+    // TODO: fix typescript error
     warpedMapLayer.on(
+      // @ts-ignore
       WarpedMapEventType.WARPEDMAPADDED,
       (event: OLWarpedMapEvent) => {
         const mapId = event.data as string
         const warpedMap = warpedMapSource.getWarpedMap(mapId)
+
         if (warpedMap) {
           updateVectorLayer(warpedMap)
         }

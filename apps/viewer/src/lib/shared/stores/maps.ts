@@ -2,8 +2,11 @@ import { writable, derived } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id/browser'
 import { parseAnnotation } from '@allmaps/annotation'
+import { fetchImageInfo } from '@allmaps/stdlib'
+import { Image } from '@allmaps/iiif-parser'
 
 import { defaultRenderOptions } from '$lib/shared/defaults.js'
+import { getBackgroundColor } from '$lib/shared/remove-background.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
@@ -22,6 +25,11 @@ export async function addAnnotation(sourceId: string, json: any) {
     for (let map of maps) {
       const mapId = map.id || (await generateChecksum(map))
 
+      // TODO: get info.json or parsedImage from WarpedMapSource via event
+      const imageUri = map.image.uri
+      const imageInfo = await fetchImageInfo(imageUri)
+      const parsedImage = Image.parse(imageInfo)
+
       const viewerMap: ViewerMap = {
         sourceId,
         mapId,
@@ -35,6 +43,12 @@ export async function addAnnotation(sourceId: string, json: any) {
 
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
+
+      // Process image once, also when the same image is used
+      // in multiple georeferenced maps
+      getBackgroundColor(map, parsedImage).then((color) =>
+        setRemoveBackgroundColor(mapId, color)
+      )
     }
 
     mapsById.update(($mapsById) => {
@@ -49,6 +63,21 @@ export async function addAnnotation(sourceId: string, json: any) {
   return mapIds
 }
 
+export function setRemoveBackgroundColor(
+  mapId: string,
+  removeBackgroundColor: string
+) {
+  mapsById.update(($mapsById) => {
+    const viewerMap = $mapsById.get(mapId)
+
+    if (viewerMap) {
+      viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
+    }
+
+    return $mapsById
+  })
+}
+
 export function removeAnnotation(sourceId: string) {
   mapsById.update(($mapsById) => {
     for (let [id, map] of $mapsById.entries()) {
@@ -61,7 +90,7 @@ export function removeAnnotation(sourceId: string) {
   })
 }
 
-export function resetMaps () {
+export function resetMaps() {
   mapsById.set(new Map())
 }
 

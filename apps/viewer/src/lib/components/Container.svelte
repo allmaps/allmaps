@@ -9,8 +9,8 @@
 
   import MapControl from '$lib/components/controls/Map.svelte'
   import ViewControl from '$lib/components/controls/View.svelte'
-  import PathControl from '$lib/components/controls/Path.svelte'
-  import OpacityControl from '$lib/components/controls/Opacity.svelte'
+  // import PathControl from '$lib/components/controls/Path.svelte'
+  import DialsControl from '$lib/components/controls/Dials.svelte'
   import SelectionControl from '$lib/components/controls/Selection.svelte'
 
   import Error from '$lib/components/elements/Error.svelte'
@@ -51,7 +51,7 @@
       </div>
       <div class="justify-self-center self-end">
         <div class="pointer-events-auto inline">
-          <OpacityControl />
+          <DialsControl />
         </div>
       </div>
       <div class="justify-self-end self-end">

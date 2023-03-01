@@ -1,4 +1,4 @@
-import type{ Map } from '@allmaps/annotation'
+import type { Map } from '@allmaps/annotation'
 
 export interface UrlSourceOptions {
   sourceType: 'url'
@@ -48,4 +48,3 @@ export type RenderOptions = {
   removeBackground: RemoveBackgroundOptions
   colorize: ColorizeOptions
 }
-
