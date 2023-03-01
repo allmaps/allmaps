@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { browser } from '$app/environment'
   import { fade } from 'svelte/transition'
 
   import {
@@ -47,6 +48,19 @@
     dataStore.set(annotationString)
   }
 
+  function hasTouch() {
+    if (browser) {
+      // See:
+      //  - https://css-tricks.com/touch-devices-not-judged-size/
+      //  - https://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
+      return window.matchMedia('(pointer: coarse)').matches
+    }
+
+    return false
+  }
+
+  let autofocus = !hasTouch()
+
   onMount(async () => {
     paramStore.subscribe(async (value) => {
       resetSources()
@@ -89,7 +103,7 @@
         transition:fade={{ duration: 120 }}
       >
         <p class="mb-3">Open a Georeference Annotation from a URL:</p>
-        <URLInput />
+        <URLInput {autofocus} />
 
         <p class="mt-3 mb-3">
           Or, paste an Georeference Annotation in the text box:
