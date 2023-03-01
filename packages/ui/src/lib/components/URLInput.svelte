@@ -11,7 +11,9 @@
 
   const hasInitialUrl = get(url) ? true : false
 
-  autofocus = autofocus === undefined ? !hasInitialUrl : false
+  if (autofocus === undefined) {
+    autofocus = !hasInitialUrl
+  }
 
   export let placeholder =
     'Type the URL of a IIIF Image, Manifest, Collection or Georeference Annotation'
