@@ -7,8 +7,9 @@ import Navigation from '$lib/components/Navigation.svelte'
 import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
 import Loading from '$lib/components/Loading.svelte'
+import Dial from '$lib/components/Dial.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 
 export { urlStore, dataStore, paramStore }
 
-export { Header, Navigation, URLInput, URLType, Loading, MapMonster }
+export { Header, Navigation, URLInput, URLType, Loading, Dial, MapMonster }

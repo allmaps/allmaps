@@ -4,6 +4,7 @@
   import Header from '$lib/components/Header.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
   import URLType from '$lib/components/URLType.svelte'
+  import Dial from '$lib/components/Dial.svelte'
 
   import Color from '$lib/components/styleguide/Color.svelte'
 
@@ -24,6 +25,9 @@
     'bg-white'
   ]
 
+  let opacity = 1
+  let threshold = 1
+
   url.subscribe((value) => {
     urlValue = value
   })
@@ -39,4 +43,10 @@
       <li><Color {color} /></li>
     {/each}
   </ul>
+
+  <Dial bind:value={opacity} keyCode="Space">Opacity</Dial>
+  <span>{Math.round(opacity * 100)}%</span>
+
+  <Dial bind:value={threshold} keyCode="KeyB">Threshold</Dial>
+  <span>{Math.round(threshold * 100)}%</span>
 </main>

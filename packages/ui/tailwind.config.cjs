@@ -3,7 +3,10 @@ module.exports = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
-      textColor: '#222222'
+      textColor: '#222222',
+      transitionDuration: {
+        '0': '0ms'
+      }
     },
     colors: {
       blue: '#63D8E6',
@@ -22,6 +25,7 @@ module.exports = {
 
     fontFamily: {
       sans: ['Geograph', 'sans-serif'],
+      // Consider using https://tosche.net/fonts/codelia
       mono: ['DM Mono', 'monospace']
     }
   }
