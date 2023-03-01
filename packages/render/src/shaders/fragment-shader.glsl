@@ -75,21 +75,25 @@ void main() {
     int texturePixelXRounded = int(round(texturePixelX));
     int texturePixelYRounded = int(round(texturePixelY));
 
-    // Set opacity
-    vec4 color = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
-    outColor = vec4(color.rgb * u_opacity, u_opacity);
+    // Read pixel from texture
+    outColor = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
 
     // Remove background color
-    vec3 backgroundColorDiff = color.rgb - u_backgroundColor.rgb;
-    float backgroundColorDistance = length(backgroundColorDiff);
-    if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-      float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
-      outColor = vec4(outColor.rgb * amount, amount);
+    if(u_backgroundColorThreshold > 0.0) {
+      vec3 backgroundColorDiff = outColor.rgb - u_backgroundColor.rgb;
+      float backgroundColorDistance = length(backgroundColorDiff);
+      if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
+        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
+        outColor = vec4(outColor.rgb * amount, amount);
+      }
     }
 
     // Colorize
     if(u_colorize) {
       outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
     }
+
+    // Set opacity
+    outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
   }
 }
