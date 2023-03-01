@@ -1,24 +1,55 @@
-import { IIIFSchema } from '../schemas/iiif.js'
+import {
+  Image1Schema,
+  Image2Schema,
+  Image3Schema,
+  // TODO: add Canvas!
+  Manifest2Schema,
+  Manifest3Schema,
+  Collection2Schema,
+  Collection3Schema
+} from '../schemas/iiif.js'
+
+import { Image1ContextString } from '../schemas/image.1.js'
 
 import { Image } from './image.js'
 import { Manifest } from './manifest.js'
+import { Collection } from './collection.js'
+
+import type { MajorVersion } from '../lib/types.js'
 
 export class IIIF {
-  static parse(iiifData: any) {
-    const parsedIiif = IIIFSchema.parse(iiifData)
-
+  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
     if (
-      'protocol' in parsedIiif &&
-      parsedIiif.protocol === 'http://iiif.io/api/image'
+      majorVersion === 1 ||
+      ('@context' in iiifData && iiifData['@context'] === Image1ContextString)
     ) {
-      return new Image(parsedIiif)
-    } else if (
-      ('@type' in parsedIiif && parsedIiif['@type'] === 'sc:Manifest') ||
-      ('type' in parsedIiif && parsedIiif.type === 'Manifest')
-    ) {
-      return new Manifest(parsedIiif)
-    } else {
-      throw new Error('Unsupported IIIF type')
+      const parsedImage = Image1Schema.parse(iiifData)
+      return new Image(parsedImage)
+    } else if (majorVersion === 2 || '@id' in iiifData) {
+      if (iiifData.protocol === 'http://iiif.io/api/image') {
+        const parsedImage = Image2Schema.parse(iiifData)
+        return new Image(parsedImage)
+      } else if (iiifData['@type'] === 'sc:Manifest') {
+        const parsedManifest = Manifest2Schema.parse(iiifData)
+        return new Manifest(parsedManifest)
+      } else if (iiifData['@type'] === 'sc:Collection') {
+        const parsedCollection = Collection2Schema.parse(iiifData)
+        return new Collection(parsedCollection)
+      }
+    } else if (majorVersion === 3 || 'id' in iiifData) {
+      if (iiifData.protocol === 'http://iiif.io/api/image') {
+        const parsedImage = Image3Schema.parse(iiifData)
+        return new Image(parsedImage)
+      } else if (iiifData.type === 'Manifest') {
+        const parsedManifest = Manifest3Schema.parse(iiifData)
+        return new Manifest(parsedManifest)
+      } else if (iiifData.type === 'Collection') {
+        const parsedCollection = Collection3Schema.parse(iiifData)
+        return new Collection(parsedCollection)
+      }
     }
+
+    // TODO: improve error message
+    throw new Error('Invalid IIIF data or unsupported IIIF type')
   }
 }

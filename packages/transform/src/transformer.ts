@@ -1,14 +1,17 @@
-import type { GCPTransformInfo } from './gdaltransform.js'
 import {
   GCP,
   GDALCreateGCPTransformer,
   GDALGCPTransform
 } from './gdaltransform.js'
 
-export type Coord = [number, number]
-export type ImageWorldGCP = { image: Coord; world: Coord }
+import type { Position, ImageWorldGCP } from './shared/types.js'
 
-export function toWorld(transformArgs: GCPTransformInfo, point: Coord): Coord {
+import type { GCPTransformInfo } from './gdaltransform.js'
+
+export function toWorld(
+  transformArgs: GCPTransformInfo,
+  point: Position
+): Position {
   const bInverse = false
 
   const input = [{ x: point[0], y: point[1] }]
@@ -17,7 +20,10 @@ export function toWorld(transformArgs: GCPTransformInfo, point: Coord): Coord {
   return [output[0].y, output[0].x]
 }
 
-export function toImage(transformArgs: GCPTransformInfo, point: Coord): Coord {
+export function toImage(
+  transformArgs: GCPTransformInfo,
+  point: Position
+): Position {
   const bInverse = true
 
   const input = [{ x: point[1], y: point[0] }]

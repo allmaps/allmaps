@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": [
       "Die Churfürstlich Brandenburgisch nun Königlich Preussische Residenz Statt"

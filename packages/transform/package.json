@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.12",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -37,16 +37,17 @@
     "@turf/midpoint": "^6.3.0"
   },
   "scripts": {
+    "watch": "tsc --watch",
     "build": "tsc",
-    "tsc": "tsc --watch",
     "test": "mocha && eslint dist test",
     "pretest": "npm run build"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "chai": "^4.3.4",
-    "eslint": "7",
-    "mocha": "^8.3.2"
+    "chai": "^4.3.6",
+    "chai-shallow-deep-equal": "^1.4.6",
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

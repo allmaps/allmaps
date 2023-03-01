@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
+  },
+  "references": [
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/annotation" }
+  ],
+  "include": ["./src/**/*"]
+}

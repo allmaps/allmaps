@@ -19,7 +19,6 @@ type AnnotationPage = z.infer<typeof AnnotationPageSchema>
 type SvgSelector = z.infer<typeof SvgSelectorSchema>
 
 const motivation = 'georeferencing' as const
-const purpose = 'gcp-georeferencing' as const
 
 const context = [
   'http://www.w3.org/ns/anno.jsonld',
@@ -57,10 +56,11 @@ function generateGeorefAnnotation(map: Map): Annotation {
 
   const body = {
     type: 'FeatureCollection' as const,
-    purpose,
     transformation: {
       type: 'polynomial',
-      order: 0
+      options: {
+        order: 1
+      }
     },
     features: map.gcps.map((gcp) => ({
       type: 'Feature' as const,

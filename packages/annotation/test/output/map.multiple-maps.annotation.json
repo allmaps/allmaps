@@ -1,8 +1,6 @@
 {
   "type": "AnnotationPage",
-  "@context": [
-    "http://www.w3.org/ns/anno.jsonld"
-  ],
+  "@context": ["http://www.w3.org/ns/anno.jsonld"],
   "items": [
     {
       "type": "Annotation",
@@ -29,7 +27,12 @@
       "body": {
         "type": "FeatureCollection",
         "purpose": "gcp-georeferencing",
-        "transformation": { "type": "polynomial", "order": 0 },
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
         "features": [
           {
             "type": "Feature",
@@ -91,7 +94,12 @@
       "body": {
         "type": "FeatureCollection",
         "purpose": "gcp-georeferencing",
-        "transformation": { "type": "polynomial", "order": 0 },
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
         "features": [
           {
             "type": "Feature",

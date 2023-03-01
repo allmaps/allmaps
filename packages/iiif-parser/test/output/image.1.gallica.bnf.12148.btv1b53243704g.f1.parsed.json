@@ -1,0 +1,65 @@
+{
+  "embedded": false,
+  "type": "image",
+  "supportsAnyRegionAndSize": true,
+  "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f1",
+  "majorVersion": 1,
+  "width": 7900,
+  "height": 11060,
+  "tileZoomLevels": [
+    {
+      "scaleFactor": 1,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 256,
+      "originalHeight": 256,
+      "columns": 31,
+      "rows": 44
+    },
+    {
+      "scaleFactor": 2,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 512,
+      "originalHeight": 512,
+      "columns": 16,
+      "rows": 22
+    },
+    {
+      "scaleFactor": 4,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 1024,
+      "originalHeight": 1024,
+      "columns": 8,
+      "rows": 11
+    },
+    {
+      "scaleFactor": 8,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 2048,
+      "originalHeight": 2048,
+      "columns": 4,
+      "rows": 6
+    },
+    {
+      "scaleFactor": 16,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 4096,
+      "originalHeight": 4096,
+      "columns": 2,
+      "rows": 3
+    },
+    {
+      "scaleFactor": 32,
+      "width": 256,
+      "height": 256,
+      "originalWidth": 8192,
+      "originalHeight": 8192,
+      "columns": 1,
+      "rows": 2
+    }
+  ]
+}

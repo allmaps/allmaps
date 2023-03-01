@@ -2,8 +2,8 @@ import { Router } from 'itty-router'
 
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { createJsonResponse, createErrorResponse } from './json-response.js'
-import { mapFromParams, mapsFromQuery} from './map-from-request.js'
-import { generateTileJson} from './tilejson.js'
+import { mapFromParams, mapsFromQuery } from './map-from-request.js'
+import { generateTileJson } from './tilejson.js'
 
 import type { XYZTile, Caches } from './types.js'
 
@@ -30,28 +30,27 @@ function xyzFromParams(params: unknown): XYZTile {
   }
 }
 
-const notFoundHandler = () => createErrorResponse('Not found', 404, 'Not found')
-
-router.get(
-  '/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png',
-  async (req, env, context) => {
-    return createErrorResponse(
-      'Encountered unprocessed template URL. Please read documentation.',
-      400,
-      'Bad Request'
-    )
-  }
-)
-
-router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', async (req, env, context) => {
-  return createErrorResponse(
-    'Encountered unprocessed template URL. Please read documentation.',
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
+  return createJsonResponse(
+    {
+      error: 'Encountered unprocessed template URL. Please read documentation.'
+    },
     400,
     'Bad Request'
   )
 })
 
-router.get('/tiles.json', async (req, env, context) => {
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
+  return createJsonResponse(
+    {
+      error: 'Encountered unprocessed template URL. Please read documentation.'
+    },
+    400,
+    'Bad Request'
+  )
+})
+
+router.get('/tiles.json', async (req, env) => {
   const maps = await mapsFromQuery(cache, req.query)
 
   if (maps.length !== 1) {
@@ -60,29 +59,29 @@ router.get('/tiles.json', async (req, env, context) => {
   const map = maps[0]
 
   const url = new URL(req.url)
-  const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
+  const templateUrl: string = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
   return createJsonResponse(generateTileJson(templateUrl, map))
 })
 
-router.get('/maps/:mapId/tiles.json', async (req, env, context) => {
+router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const mapId = req.params?.mapId
   const map = await mapFromParams(cache, env, req.params)
 
-  const urlTemplate =`${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
 
-  return createJsonResponse(generateTileJson(urlTemplate    , map))
+  return createJsonResponse(generateTileJson(urlTemplate, map))
 })
 
 // TODO: support retina tiles @2x
-router.get('/maps/:mapId/:z/:x/:y.png', async (req, env, context) => {
+router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   const map = await mapFromParams(cache, env, req.params)
   const { x, y, z } = xyzFromParams(req.params)
 
   return await createWarpedTileResponse(map, { x, y, z }, cache)
 })
 
-router.get('/:z/:x/:y', async (req, env, context) => {
+router.get('/:z/:x/:y.png', async (req) => {
   const maps = await mapsFromQuery(cache, req.query)
   const { x, y, z } = xyzFromParams(req.params)
 
@@ -94,23 +93,40 @@ router.get('/:z/:x/:y', async (req, env, context) => {
   return await createWarpedTileResponse(map, { x, y, z }, cache)
 })
 
-router.get('/', () => {
-  return createJsonResponse({
-    name: 'Allmaps Tile Server'
-  })
-})
+router.get('/', () => createJsonResponse({ name: 'Allmaps Tile Server' }))
 
-router.all('*', notFoundHandler)
+router.all('*', () =>
+  createJsonResponse({ error: 'Not found' }, 404, 'Not found')
+)
 
 export default {
-  fetch: (request: Request, ...extra: any) =>
-    router
-      .handle(request, ...extra)
-      .then((response) => {
-        response.headers.set('Access-Control-Allow-Origin', '*')
-        return response
-      })
-      .catch((err) => {
-        return createErrorResponse(err.issues || err.message)
-      })
+  fetch: async (req: Request, ...extra: any) => {
+    const url = req.url
+
+    const cacheResponse = await cache.match(req.url)
+
+    if (cacheResponse) {
+      console.log('Found in cache:', req.url)
+      return cacheResponse
+    } else {
+      console.log('Not found in cache:', req.url)
+
+      return router
+        .handle(req, ...extra)
+        .then((res) => {
+          if (res.status !== 200) {
+            throw new Error(`Failed to fetch ${url}`)
+          }
+
+          // Set CORS headers
+          res.headers.set('Access-Control-Allow-Origin', '*')
+
+          cache.put(url, res.clone())
+          return res
+        })
+        .catch((err) => {
+          return createErrorResponse(err)
+        })
+    }
+  }
 }

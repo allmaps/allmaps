@@ -1,0 +1,89 @@
+{
+  "embedded": false,
+  "height": 7707,
+  "majorVersion": 2,
+  "maxHeight": 5000,
+  "maxWidth": 5000,
+  "sizes": [
+    {
+      "height": 240,
+      "width": 203
+    },
+    {
+      "height": 481,
+      "width": 406
+    },
+    {
+      "height": 963,
+      "width": 813
+    },
+    {
+      "height": 1926,
+      "width": 1627
+    },
+    {
+      "height": 3853,
+      "width": 3255
+    }
+  ],
+  "supportsAnyRegionAndSize": true,
+  "tileZoomLevels": [
+    {
+      "columns": 26,
+      "height": 256,
+      "originalHeight": 256,
+      "originalWidth": 256,
+      "rows": 31,
+      "scaleFactor": 1,
+      "width": 256
+    },
+    {
+      "columns": 13,
+      "height": 256,
+      "originalHeight": 512,
+      "originalWidth": 512,
+      "rows": 16,
+      "scaleFactor": 2,
+      "width": 256
+    },
+    {
+      "columns": 7,
+      "height": 256,
+      "originalHeight": 1024,
+      "originalWidth": 1024,
+      "rows": 8,
+      "scaleFactor": 4,
+      "width": 256
+    },
+    {
+      "columns": 4,
+      "height": 256,
+      "originalHeight": 2048,
+      "originalWidth": 2048,
+      "rows": 4,
+      "scaleFactor": 8,
+      "width": 256
+    },
+    {
+      "columns": 2,
+      "height": 256,
+      "originalHeight": 4096,
+      "originalWidth": 4096,
+      "rows": 2,
+      "scaleFactor": 16,
+      "width": 256
+    },
+    {
+      "columns": 1,
+      "height": 256,
+      "originalHeight": 8192,
+      "originalWidth": 8192,
+      "rows": 1,
+      "scaleFactor": 32,
+      "width": 256
+    }
+  ],
+  "type": "image",
+  "uri": "http://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif",
+  "width": 6510
+}

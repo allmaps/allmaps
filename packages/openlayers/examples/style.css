@@ -1,0 +1,21 @@
+body {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: monospace;
+}
+
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+#controls {
+  padding: 0.2em;
+  display: flex;
+}

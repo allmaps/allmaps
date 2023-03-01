@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.28",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -10,9 +10,11 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
+  "main": "./dist/index.js",
+  "unpkg": "./dist/index.cjs",
   "exports": {
     ".": {
+      "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
   },
@@ -28,9 +30,11 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "pretest": "npm run build",
-    "build": "tsc",
-    "tsc": "tsc --watch",
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
     "test": "mocha && eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
@@ -41,18 +45,28 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/iiif-parser": "^1.0.0-beta.6",
-    "@allmaps/transform": "^1.0.0-beta.2",
-    "potpack": "^1.0.1"
+    "@allmaps/annotation": "^1.0.0-beta.12",
+    "@allmaps/id": "^1.0.0-beta.14",
+    "@allmaps/iiif-parser": "^1.0.0-beta.22",
+    "@allmaps/stdlib": "^1.0.0-beta.7",
+    "@allmaps/transform": "^1.0.0-beta.12",
+    "earcut": "^2.2.3",
+    "lodash-es": "^4.17.21",
+    "potpack": "^1.0.1",
+    "rbush": "^3.0.1"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@types/node": "^17.0.23",
-    "chai": "^4.3.4",
-    "documentation": "^13.2.5",
-    "eslint": "7",
-    "mocha": "^8.3.2",
-    "typescript": "^4.5.4"
+    "@types/earcut": "^2.1.1",
+    "@types/lodash-es": "^4.17.6",
+    "@types/node": "^18.14.2",
+    "@types/rbush": "^3.0.0",
+    "chai": "^4.3.6",
+    "documentation": "^14.0.0",
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.0.0"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

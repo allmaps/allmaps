@@ -1,12 +1,11 @@
 import { z } from 'zod'
+import { Image1ProfileSchema, Image1Context } from './image.1.js'
+import { Image2ProfileSchema, Image2Context } from './image.2.js'
 
-export const profileUris = [
-  'http://iiif.io/api/image/2/level0.json',
-  'http://iiif.io/api/image/2/level1.json',
-  'http://iiif.io/api/image/2/level2.json'
-] as const
-
+// TODO: also support Presentation API 2 with Image API 3
+// TODO: also support Image3Context (a string or an array of strings)
 export const ImageService2Schema = z.object({
   '@id': z.string().url(),
-  profile: z.enum(profileUris)
+  profile: Image1ProfileSchema.or(Image2ProfileSchema),
+  '@context': Image1Context.or(z.literal('http://iiif.io/api/image/1/context.json')).or(Image2Context)
 })

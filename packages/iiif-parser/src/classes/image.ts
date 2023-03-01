@@ -1,6 +1,13 @@
 import { z } from 'zod'
 
-import { ImageSchema } from '../schemas/iiif.js'
+import {
+  Image1Schema,
+  Image2Schema,
+  Image3Schema,
+  ImageSchema
+} from '../schemas/iiif.js'
+import { Image1ContextString } from '../schemas/image.1.js'
+import { Image2ContextString } from '../schemas/image.2.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
@@ -13,6 +20,7 @@ import type {
   Fit,
   ImageRequest,
   MajorVersion,
+  Tileset,
   TileZoomLevel
 } from '../lib/types.js'
 
@@ -21,16 +29,19 @@ type EmbeddedImageType =
   | z.infer<typeof AnnotationBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
+const ImageTypeString = 'image'
+
 export class EmbeddedImage {
   embedded = true
+
   uri: string
-  type = 'image'
+  type: typeof ImageTypeString = ImageTypeString
 
-  // maxWidth: number | null
-  // maxHeight: number | null
-  // maxArea: number | null = null
+  maxWidth: number | undefined
+  maxHeight: number | undefined
+  maxArea: number | undefined
 
-  supportsAnyRegionAndSize: boolean | null = null
+  supportsAnyRegionAndSize: boolean
 
   width: number
   height: number
@@ -50,27 +61,65 @@ export class EmbeddedImage {
 
       if ('@id' in imageService) {
         this.uri = imageService['@id']
-        this.majorVersion = 2
       } else if ('id' in imageService) {
         this.uri = imageService.id
-        this.majorVersion = 3
       } else {
         throw new Error('Unsupported IIIF Image Service')
       }
 
-      const profileProperties = getProfileProperties(imageService)
+      if ('type' in imageService && imageService.type === 'ImageService3') {
+        this.majorVersion = 3
+      } else if (
+        ('type' in imageService && imageService.type === 'ImageService2') ||
+        ('@type' in imageService &&
+          imageService['@type'] === 'ImageService2') ||
+        ('@context' in imageService &&
+          imageService['@context'] === Image2ContextString)
+      ) {
+        this.majorVersion = 2
+      } else if (
+        '@context' in imageService &&
+        imageService['@context'] === Image1ContextString
+      ) {
+        this.majorVersion = 1
+      } else {
+        throw new Error('Unsupported IIIF Image Service')
+      }
 
-      this.supportsAnyRegionAndSize = profileProperties.supportsAnyRegionAndSize
-      // this.maxWidth = profileProperties.maxWidth
-      // this.maxHeight = profileProperties.maxHeight
-      // this.maxArea = profileProperties.maxArea
+      if ('profile' in imageService) {
+        const profileProperties = getProfileProperties(imageService)
+
+        this.supportsAnyRegionAndSize =
+          profileProperties.supportsAnyRegionAndSize
+
+        this.maxWidth = profileProperties.maxWidth
+        this.maxHeight = profileProperties.maxHeight
+        this.maxArea = profileProperties.maxArea
+      } else {
+        this.supportsAnyRegionAndSize = false
+      }
     } else {
       if ('@id' in parsedImage) {
         this.uri = parsedImage['@id']
-        this.majorVersion = 2
       } else if ('id' in parsedImage) {
         this.uri = parsedImage.id
+      } else {
+        throw new Error('Unsupported IIIF Image')
+      }
+
+      if ('type' in parsedImage && parsedImage.type === 'ImageService3') {
         this.majorVersion = 3
+      } else if (
+        ('@type' in parsedImage && parsedImage['@type'] === 'iiif:Image') ||
+        ('@context' in parsedImage &&
+          parsedImage['@context'] === Image2ContextString)
+      ) {
+        this.majorVersion = 2
+      } else if (
+        '@context' in parsedImage &&
+        parsedImage['@context'] === Image1ContextString
+      ) {
+        this.majorVersion = 1
       } else {
         throw new Error('Unsupported IIIF Image')
       }
@@ -80,9 +129,12 @@ export class EmbeddedImage {
 
         this.supportsAnyRegionAndSize =
           profileProperties.supportsAnyRegionAndSize
-        // this.maxWidth = profileProperties.maxWidth
-        // this.maxHeight = profileProperties.maxHeight
-        // this.maxArea = profileProperties.maxArea
+
+        this.maxWidth = profileProperties.maxWidth
+        this.maxHeight = profileProperties.maxHeight
+        this.maxArea = profileProperties.maxArea
+      } else {
+        this.supportsAnyRegionAndSize = false
       }
     }
 
@@ -91,26 +143,83 @@ export class EmbeddedImage {
   }
 
   getImageUrl({ region, size }: ImageRequest): string {
+    let width
+    let height
+    let area
+
+    let regionHeight
+    let regionWidth
+
     let urlRegion: string
     if (region) {
       urlRegion = `${region.x},${region.y},${region.width},${region.height}`
+
+      regionHeight = region.height
+      regionWidth = region.width
     } else {
       urlRegion = 'full'
+
+      regionHeight = this.height
+      regionWidth = this.width
     }
 
     let urlSize: string
     if (size) {
-      let height = ''
-      if (size.height && size.width !== size.height) {
-        height = String(size.height)
+      width = Math.round(size.width)
+      height = Math.round(size.height)
+
+      let widthStr = String(width)
+      let heightStr = ''
+
+      const aspectRatio = regionWidth / regionHeight
+      const aspectRatioWidth = height * aspectRatio
+      const aspectRatioHeight = aspectRatioWidth / aspectRatio
+
+      // Is this really the right way to do it?
+      // See also:
+      // - https://iiif.io/api/image/3.0/implementation/
+      // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
+      if (height !== Math.round(aspectRatioHeight)) {
+        heightStr = String(height)
       }
 
-      urlSize = `${size.width},${height}`
+      urlSize = `${widthStr},${heightStr}`
     } else {
+      width = this.width
+      height = this.height
+
       urlSize = this.majorVersion === 2 ? 'full' : 'max'
     }
 
-    return `${this.uri}/${urlRegion}/${urlSize}/0/default.jpg`
+    area = width * height
+
+    if (this.maxWidth !== undefined) {
+      if (width > this.maxWidth) {
+        throw new Error(
+          `Width of requested image is too large: ${width} > ${this.maxWidth}`
+        )
+      }
+    }
+
+    if (this.maxHeight !== undefined) {
+      if (height > this.maxHeight) {
+        throw new Error(
+          `Height of requested image is too large: ${height} > ${this.maxHeight}`
+        )
+      }
+    }
+
+    if (this.maxArea !== undefined) {
+      if (area > this.maxArea) {
+        throw new Error(
+          `Area of requested image is too large: ${area} > ${this.maxArea}`
+        )
+      }
+    }
+
+    const quality = this.majorVersion === 1 ? 'native' : 'default'
+
+    return `${this.uri}/${urlRegion}/${urlSize}/0/${quality}.jpg`
   }
 
   getThumbnail(
@@ -122,7 +231,10 @@ export class EmbeddedImage {
       size,
       mode,
       {
-        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize
+        supportsAnyRegionAndSize: this.supportsAnyRegionAndSize,
+        maxWidth: this.maxWidth,
+        maxHeight: this.maxHeight,
+        maxArea: this.maxArea
       }
     )
   }
@@ -139,16 +251,35 @@ export class Image extends EmbeddedImage {
 
     const profileProperties = getProfileProperties(parsedImage)
 
+    let tilesets: Tileset[] | undefined
+    if ('tiles' in parsedImage) {
+      tilesets = parsedImage.tiles
+    }
+
     this.tileZoomLevels = getTileZoomLevels(
       { width: this.width, height: this.height },
-      parsedImage.tiles,
+      tilesets,
       profileProperties.supportsAnyRegionAndSize
     )
-    this.sizes = parsedImage.sizes
+
+    if ('sizes' in parsedImage) {
+      this.sizes = parsedImage.sizes
+    }
   }
 
-  static parse(iiifData: any) {
-    const parsedImage = ImageSchema.parse(iiifData)
+  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+    let parsedImage
+
+    if (majorVersion === 1) {
+      parsedImage = Image1Schema.parse(iiifData)
+    } else if (majorVersion === 2) {
+      parsedImage = Image2Schema.parse(iiifData)
+    } else if (majorVersion === 3) {
+      parsedImage = Image3Schema.parse(iiifData)
+    } else {
+      parsedImage = ImageSchema.parse(iiifData)
+    }
+
     return new Image(parsedImage)
   }
 
@@ -174,9 +305,12 @@ export class Image extends EmbeddedImage {
       size,
       mode,
       {
-        supportsAnyRegionAndSize:this.supportsAnyRegionAndSize,
+        supportsAnyRegionAndSize: this.supportsAnyRegionAndSize,
         sizes: this.sizes,
-        tileZoomLevels: this.tileZoomLevels
+        tileZoomLevels: this.tileZoomLevels,
+        maxWidth: this.maxWidth,
+        maxHeight: this.maxHeight,
+        maxArea: this.maxArea
       }
     )
   }

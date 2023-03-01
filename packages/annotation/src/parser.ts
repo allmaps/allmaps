@@ -9,7 +9,6 @@ import {
 import { MapSchema, PixelMaskSchema, GCPSchema } from './schemas/map.js'
 
 type Annotation = z.infer<typeof AnnotationSchema>
-type AnnotationPage = z.infer<typeof AnnotationPageSchema>
 
 type Map = z.infer<typeof MapSchema>
 type PixelMask = z.infer<typeof PixelMaskSchema>
@@ -58,14 +57,14 @@ function getPixelMask(annotation: Annotation): PixelMask {
   const groups = result?.groups
 
   if (groups && groups.points) {
-    const pointStrings = groups.points.split(' ')
+    const pointStrings = groups.points.trim().split(/\s+/)
 
     if (pointStrings.length >= 3) {
       return pointStrings.map((point: string) => {
         const numberStrings = point.split(',')
 
         if (numberStrings.length === 2) {
-          return [parseInt(numberStrings[0]), parseInt(numberStrings[1])]
+          return [parseFloat(numberStrings[0]), parseFloat(numberStrings[1])]
         } else {
           throw new Error('Could not parse pixel mask')
         }

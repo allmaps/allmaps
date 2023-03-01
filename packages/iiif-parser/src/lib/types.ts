@@ -22,7 +22,7 @@ export interface ImageRequest {
   size?: Size
 }
 
-export type MajorVersion = 2 | 3
+export type MajorVersion = 1 | 2 | 3
 
 export interface TileZoomLevel {
   scaleFactor: number
@@ -51,3 +51,20 @@ export interface MetadataItem {
 }
 
 export type Metadata = MetadataItem[]
+
+export type FetchFunction = (url: string) => Promise<any>
+
+export interface FetchNextOptions {
+  maxDepth?: number
+  fetchManifests?: boolean
+  fetchImages?: boolean
+}
+
+export interface FetchNextResults<Item> {
+  item: Item
+  depth: number
+  parent: {
+    uri: string
+    type: string
+  }
+}

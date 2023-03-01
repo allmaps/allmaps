@@ -1,5 +1,6 @@
 {
   "type": "manifest",
+  "embedded": false,
   "label": {
     "none": [
       "Map of the city of Washington showing location of fatal cases of zymotic diseases for the year ending June 30, 1894"

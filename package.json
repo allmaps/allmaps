@@ -2,10 +2,15 @@
   "name": "@allmaps/allmaps",
   "private": true,
   "scripts": {
-    "tsc": "tsc -b --watch"
+    "tsc": "tsc -b --watch",
+    "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
+    "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete"
   },
   "devDependencies": {
     "lerna": "^5.1.0",
     "nx": "^14.3.6"
+  },
+  "engines": {
+    "node": ">=18.3"
   }
 }

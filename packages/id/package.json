@@ -1,26 +1,27 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.14",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "unpkg": "./dist/browser.js",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "browser": {
-        "types": "./dist/browser.d.ts",
-        "default": "./dist/browser.js"
-      }
-    },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
+    },
+    ".": {
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      },
+      "import": "./dist/index.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "*.d.ts"
   ],
   "publishConfig": {
     "access": "public"
@@ -31,7 +32,7 @@
     "directory": "packages/id"
   },
   "scripts": {
-    "tsc": "tsc --watch",
+    "watch": "tsc --watch",
     "build": "tsc",
     "preversion": "npm test",
     "test": "mocha && npm run lint",
@@ -55,11 +56,12 @@
   },
   "homepage": "https://allmaps.org",
   "devDependencies": {
-    "@types/node": "^17.0.23",
-    "chai": "^4.3.4",
-    "documentation": "^13.2.5",
-    "eslint": "7",
-    "mocha": "^8.3.2"
+    "@types/node": "^18.14.2",
+    "chai": "^4.3.6",
+    "documentation": "^14.0.0",
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0",
+    "typescript": "^4.9.5"
   },
   "engines": {
     "node": "^14.13.1 || >=16.0.0"

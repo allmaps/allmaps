@@ -1,65 +1,41 @@
 <script lang="ts">
-  // import { parseIiif, getImageUrl, getThumbnail } from  '@allmaps/iiif-parser'
+  import { Image } from '@allmaps/iiif-parser'
+  import { fetchImageInfo } from '@allmaps/stdlib'
 
-  export let imageUri
-  export let width
+  export let imageUri: string
+  export let width: number
+  export let height: number
 
-  // let parsedImage
-  // $: (async () => parsedImage = await parseImage(imageUri))()
-
-  // async function fetchJSON (url) {
-  //   const response = await fetch(url)
-  //   const json = await response.json()
-  //   return json
-  // }
-
-  // async function fetchImage (imageUri) {
-  //   const json = await fetchJSON(`${imageUri}/info.json`)
-  //   return json
-  // }
-
-  // async function parseImage (imageUri) {
-  //   const image = await fetchImage(imageUri)
-  //   return parseIiif(image)
-  // }
-
-  // function removeHeight ({ region, size }) {
-  //   return {
-  //     region,
-  //     size: {
-  //       width: size.width
-  //     }
-  //   }
-  // }
+  async function parseImage(imageUri: string) {
+    const imageInfo = await fetchImageInfo(imageUri)
+    return Image.parse(imageInfo)
+  }
 </script>
 
-<div></div>
-
-<!-- {#if parsedImage}
-  {#await getThumbnail(parsedImage, width, width) then thumbnail}
-    {#if Array.isArray(thumbnail) }
-    	{#each thumbnail as row, rowIndex}
+{#await parseImage(imageUri) then parsedImage}
+  {#await parsedImage.getThumbnail({ width, height }) then imageRequest}
+    {#if Array.isArray(imageRequest)}
+      <!-- {#each thumbnail as row, rowIndex}
         {#each row as cell, columnIndex}
           <img alt="thumbnail tile" src={getImageUrl(parsedImage, removeHeight(cell))} />
         {/each}
-      {/each}
+      {/each} -->
     {:else}
-      <img alt="thumbnail" class="single" src={getImageUrl(parsedImage, thumbnail)} />
+      <img
+        alt="thumbnail"
+        class="object-contain"
+        style:width={`${width}px`}
+        style:height={`${height}px`}
+        src={parsedImage.getImageUrl(imageRequest)}
+      />
     {/if}
-  {:catch error}
-    <div class="content">
-      <p data-error={ error.message }>An error occurred!</p>
-    </div>
   {/await}
-{/if} -->
-
-<style>
-img.single {
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-</style>
+{:catch error}
+  <div class="content">
+    {#if error instanceof Error}
+      <p data-error={error.message}>An error occurred!</p>
+    {:else}
+      <p data-error={String(error)}>An error occurred!</p>
+    {/if}
+  </div>
+{/await}

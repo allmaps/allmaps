@@ -1,0 +1,48 @@
+{
+  "name": "@allmaps/tailwind",
+  "version": "1.0.0-beta.4",
+  "private": "true",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "Allmaps Tailwind CSS presets",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/tailwind"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "tailwind",
+    "css"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "lint": "eslint dist test"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0"
+  }
+}

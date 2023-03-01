@@ -107,6 +107,8 @@ function runTests(file) {
       if (file.zodError) {
         console.error(JSON.stringify(file.zodError.format(), null, 2))
         console.error(file.zodError.issues)
+      } else {
+        console.error(file.errors)
       }
     } else {
       console.error(

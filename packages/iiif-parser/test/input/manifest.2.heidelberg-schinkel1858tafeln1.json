@@ -1,0 +1,1564 @@
+{
+  "@context" : "http://iiif.io/api/presentation/2/context.json",
+  "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/manifest",
+  "@type" : "sc:Manifest",
+  "attribution" : [
+     {
+        "@language" : "de",
+        "@value" : "Universit\u00e4tsbibliothek Heidelberg"
+     },
+     {
+        "@language" : "en",
+        "@value" : "Heidelberg University Library"
+     }
+  ],
+  "description" : [
+     {
+        "@language" : "de",
+        "@value" : "(Tafelband 1); Universit\u00e4tsbibliothek Heidelberg, C 6696-424 Gross::TAFELBD.1 RES"
+     },
+     {
+        "@language" : "en",
+        "@value" : "(Tafelband 1); Universit\u00e4tsbibliothek Heidelberg, C 6696-424 Gross::TAFELBD.1 RES"
+     }
+  ],
+  "label" : "(Tafelband 1)",
+  "license" : "http://creativecommons.org/publicdomain/mark/1.0/deed.de",
+  "logo" : "https://www.ub.uni-heidelberg.de/nav4/grafik/layout/ub_logo2.gif",
+  "metadata" : [
+     {
+        "label" : "Author",
+        "value" : [
+           "Schinkel, Karl Friedrich"
+        ]
+     },
+     {
+        "label" : "Date",
+        "value" : [
+           "1858"
+        ]
+     },
+     {
+        "label" : "Published",
+        "value" : [
+           "1858"
+        ]
+     },
+     {
+        "label" : "Identifier (URN)",
+        "value" : [
+           "http://nbn-resolving.de/urn:nbn:de:bsz:16-diglit-52116"
+        ]
+     },
+     {
+        "label" : "Identifier (DOI)",
+        "value" : [
+           "https://doi.org/10.11588/diglit.5211"
+        ]
+     },
+     {
+        "label" : "Bibliographic Information",
+        "value" : [
+           "http://katalog.ub.uni-heidelberg.de/cgi-bin/search.cgi?query=si:1401547737+-(teil:ezblf)&pos=1"
+        ]
+     },
+     {
+        "label" : "Shelfmark",
+        "value" : [
+           "Universit\u00e4tsbibliothek Heidelberg, C 6696-424 Gross::TAFELBD.1 RES"
+        ]
+     }
+  ],
+  "seeAlso" : "https://digi.ub.uni-heidelberg.de/diglit/schinkel1858tafeln1/mets",
+  "sequences" : [
+     {
+        "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/sequence/normal",
+        "@type" : "sc:Sequence",
+        "canvases" : [
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0001",
+              "@type" : "sc:Canvas",
+              "height" : 5538,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0001-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0001",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/00_A.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5538,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A00_A.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 6518
+                    }
+                 }
+              ],
+              "label" : "Einband _Vorne",
+              "width" : 6518
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0002",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0002-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0002",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/01.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A01.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "1",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0003",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0003-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0003",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/02.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A02.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "2",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0004",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0004-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0004",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/03.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A03.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "3",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0005",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0005-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0005",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/04.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A04.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "4",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0006",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0006-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0006",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/05.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A05.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "5",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0007",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0007-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0007",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/06.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A06.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "6",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0008",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0008-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0008",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/07.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A07.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "7",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0009",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0009-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0009",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/08.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A08.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "8",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0010",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0010-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0010",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/09.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A09.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "9",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0011",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0011-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0011",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/10.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A10.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "10",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0012",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0012-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0012",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/11.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A11.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "11",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0013",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0013-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0013",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/12.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A12.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "12",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0014",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0014-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0014",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/13.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A13.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "13",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0015",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0015-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0015",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/14.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A14.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "14",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0016",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0016-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0016",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/15.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A15.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "15",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0017",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0017-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0017",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/16.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A16.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "16",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0018",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0018-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0018",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/17.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A17.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "17",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0019",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0019-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0019",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/18.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A18.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "18",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0020",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0020-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0020",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/19.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A19.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "19",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0021",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0021-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0021",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/20.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A20.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "20",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0022",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0022-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0022",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/21.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A21.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "21",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0023",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0023-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0023",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/22.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A22.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "22",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0024",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0024-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0024",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/23.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A23.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "23",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0025",
+              "@type" : "sc:Canvas",
+              "height" : 4256,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0025-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0025",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/24.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4256,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A24.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5741
+                    }
+                 }
+              ],
+              "label" : "24",
+              "width" : 5741
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0026",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0026-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0026",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/25.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A25.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "25",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0027",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0027-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0027",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/26.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A26.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "26",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0028",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0028-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0028",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/27.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A27.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "27",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0029",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0029-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0029",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/28.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A28.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "28",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0030",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0030-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0030",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/29.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A29.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "29",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0031",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0031-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0031",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/30.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A30.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "30",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0032",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0032-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0032",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/31.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A31.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "31",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0033",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0033-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0033",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/32.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A32.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "32",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0034",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0034-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0034",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/33.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A33.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "33",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0035",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0035-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0035",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/34.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A34.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "34",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0036",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0036-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0036",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/35.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A35.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "35",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0037",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0037-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0037",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/36.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A36.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "36",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0038",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0038-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0038",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/37.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A37.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "37",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0039",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0039-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0039",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/38.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A38.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "38",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0040",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0040-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0040",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/39.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A39.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "39",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0041",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0041-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0041",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/40.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A40.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "40",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0042",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0042-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0042",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/41.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A41.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "41",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0043",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0043-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0043",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/42.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A42.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "42",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0044",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0044-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0044",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/43.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A43.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "43",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0045",
+              "@type" : "sc:Canvas",
+              "height" : 5965,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0045-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0045",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/44.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5965,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A44.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 4237
+                    }
+                 }
+              ],
+              "label" : "44",
+              "width" : 4237
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0046",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0046-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0046",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/45.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A45.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "45",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0047",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0047-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0047",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/46.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A46.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "46",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0048",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0048-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0048",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/47.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A47.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "47",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0049",
+              "@type" : "sc:Canvas",
+              "height" : 4641,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0049-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0049",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/48.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 4641,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A48.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 5662
+                    }
+                 }
+              ],
+              "label" : "48",
+              "width" : 5662
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0050",
+              "@type" : "sc:Canvas",
+              "height" : 5421,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0050-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0050",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/49_A.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5421,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3A49_A.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 6500
+                    }
+                 }
+              ],
+              "label" : "Einband _Hinten",
+              "width" : 6500
+           },
+           {
+              "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0051",
+              "@type" : "sc:Canvas",
+              "height" : 5558,
+              "images" : [
+                 {
+                    "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/annotation/0051-image",
+                    "@type" : "oa:Annotation",
+                    "motivation" : "sc:painting",
+                    "on" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0051",
+                    "resource" : {
+                       "@id" : "https://digi.ub.uni-heidelberg.de/diglitData/image/schinkel1858tafeln1/4/farbkeil.jpg",
+                       "@type" : "dctypes:Image",
+                       "format" : "image/jpeg",
+                       "height" : 5558,
+                       "service" : {
+                          "@context" : "http://iiif.io/api/image/2/context.json",
+                          "@id" : "https://digi.ub.uni-heidelberg.de/iiif/2/schinkel1858tafeln1%3Afarbkeil.jpg",
+                          "profile" : "http://iiif.io/api/image/2/profiles/level2.json"
+                       },
+                       "width" : 6206
+                    }
+                 }
+              ],
+              "label" : "Massstab",
+              "width" : 6206
+           }
+        ],
+        "label" : [
+           {
+              "@language" : "de",
+              "@value" : "Standardabfolge"
+           },
+           {
+              "@language" : "en",
+              "@value" : "Normal Sequence"
+           }
+        ],
+        "startCanvas" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0001",
+        "viewingDirection" : "left-to-right",
+        "viewingHint" : "paged"
+     }
+  ],
+  "service" : "https://digi.ub.uni-heidelberg.de/diglit/schinkel1858tafeln1",
+  "structures" : [
+     {
+        "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/range/r0",
+        "@type" : "sc:Range",
+        "canvases" : [
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0001"
+        ],
+        "label" : "Einband"
+     },
+     {
+        "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/range/r1",
+        "@type" : "sc:Range",
+        "canvases" : [
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0002",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0003",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0004",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0005",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0006",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0007",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0008",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0009",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0010",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0011",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0012",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0013",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0014",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0015",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0016",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0017",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0018",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0019",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0020",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0021",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0022",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0023",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0024",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0025",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0026",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0027",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0028",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0029",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0030",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0031",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0032",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0033",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0034",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0035",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0036",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0037",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0038",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0039",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0040",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0041",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0042",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0043",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0044",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0045",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0046",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0047",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0048",
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0049"
+        ],
+        "label" : "Tafel 1 - 48"
+     },
+     {
+        "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/range/r2",
+        "@type" : "sc:Range",
+        "canvases" : [
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0050"
+        ],
+        "label" : "Einband"
+     },
+     {
+        "@id" : "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/range/r3",
+        "@type" : "sc:Range",
+        "canvases" : [
+           "https://digi.ub.uni-heidelberg.de/diglit/iiif/schinkel1858tafeln1/canvas/0051"
+        ],
+        "label" : "Ma\u00dfstab/Farbkeil"
+     }
+  ],
+  "thumbnail" : {
+     "@id" : "https://digi.ub.uni-heidelberg.de/diglit/schinkel1858tafeln1/introimage",
+     "format" : "image/jpeg",
+     "height" : 367,
+     "width" : 320
+  },
+  "viewingDirection" : "left-to-right",
+  "viewingHint" : "paged",
+  "within" : [
+     "https://digi.ub.uni-heidelberg.de/diglit/schinkel1858ga"
+  ]
+}

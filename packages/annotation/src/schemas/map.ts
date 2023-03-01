@@ -17,6 +17,10 @@ export const ImageSchema = z.object({
 export const PixelMaskSchema = PointSchema.array().min(3)
 
 export const MapSchema = z.object({
+  // TODO: add JSON-LD context and type, remove version
+  // '@context': z.literal('http://schemas.allmaps.org/map/1/context.json').optional(),
+  // type: z.literal('Georef'),
+
   id: z.string().optional(),
   version: z.number().min(1).max(1).default(1),
   gcps: GCPSchema.array(),

@@ -24,7 +24,7 @@ function getThumbnailSize(
       height
     }
   } else {
-    throw new Error('Size must be either "cover" or "contain"')
+    throw new Error('Mode must be either "cover" or "contain"')
   }
 }
 
@@ -38,14 +38,43 @@ export function getThumbnail(
   {
     sizes,
     tileZoomLevels,
-    supportsAnyRegionAndSize
+    supportsAnyRegionAndSize,
+    maxWidth,
+    maxHeight,
+    maxArea
   }: {
     sizes?: Size[]
     tileZoomLevels?: TileZoomLevel[]
     supportsAnyRegionAndSize?: boolean | null
+    maxWidth?: number
+    maxHeight?: number
+    maxArea?: number
   }
 ): ImageRequest | ImageRequest[][] {
-  const { width, height } = getThumbnailSize(imageSize, containerSize, mode)
+  let { width, height } = getThumbnailSize(imageSize, containerSize, mode)
+
+  if (maxWidth && width > maxWidth) {
+    height = (height / width) * maxWidth
+    width = maxWidth
+  }
+
+  if (maxHeight && height > maxHeight) {
+    width = (width / height) * maxHeight
+    height = maxHeight
+  }
+
+  if (maxArea && width * height > maxArea) {
+    const aspectRatio = height / width
+    const thumbnailMaxWidth = Math.floor(Math.sqrt(maxArea / aspectRatio))
+    const thumbnailMaxHeight = thumbnailMaxWidth * aspectRatio
+
+    width = Math.floor(thumbnailMaxHeight) / aspectRatio
+    height = width * aspectRatio
+  }
+
+  const aspectRatio = imageSize.width / imageSize.height
+  width = Math.floor(width)
+  height = Math.round(width / aspectRatio)
 
   if (sizes) {
     let matchingSize

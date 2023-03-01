@@ -1,7 +1,13 @@
 import { z } from 'zod'
 
-import { StringValue2Schema, Metadata2Schema } from '../schemas/presentation.2.js'
-import { StringValue3Schema, Metadata3Schema } from '../schemas/presentation.3.js'
+import {
+  StringValue2Schema,
+  Metadata2Schema
+} from '../schemas/presentation.2.js'
+import {
+  StringValue3Schema,
+  Metadata3Schema
+} from '../schemas/presentation.3.js'
 
 type StringValue2Type = z.infer<typeof StringValue2Schema>
 type Metadata2Type = z.infer<typeof Metadata2Schema>
@@ -9,9 +15,7 @@ type Metadata2Type = z.infer<typeof Metadata2Schema>
 type StringValue3Type = z.infer<typeof StringValue3Schema>
 type Metadata3Type = z.infer<typeof Metadata3Schema>
 
-export function parseVersion2String(
-  str: StringValue2Type
-): StringValue3Type {
+export function parseVersion2String(str: StringValue2Type): StringValue3Type {
   if (typeof str === 'string') {
     return {
       none: [str]
@@ -24,9 +28,9 @@ export function parseVersion2String(
         if (!strings['none']) {
           strings['none'] = []
         }
-
         strings['none'].push(item)
       } else if (typeof item === 'object') {
+        // TODO: find test input data for this scenario
         strings = { ...strings, ...parseVersion2String(item) }
       } else {
         throw new Error('Unable to parse string')
@@ -35,7 +39,7 @@ export function parseVersion2String(
 
     return strings
   } else if (str && typeof str === 'object') {
-    const language = str['@language']
+    const language = str['@language'] || 'none'
     const value = str['@value']
 
     return {

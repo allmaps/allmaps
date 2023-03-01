@@ -1,0 +1,75 @@
+{
+  "id": "https://example.org/ef0caf64-01c9-4257-b67b-a874a41c5040",
+  "type": "Manifest",
+  "label": { "en": ["Blank Manifest"] },
+  "items": [
+    {
+      "id": "https://example.org/canvas/3cab18d8-bad8-4089-a0ea-2cd2fccb2c72",
+      "type": "Canvas",
+      "height": 3940,
+      "width": 4524,
+      "items": [
+        {
+          "id": "https://example.org/canvas/3cab18d8-bad8-4089-a0ea-2cd2fccb2c72/annotation-page",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://example.org/canvas/3cab18d8-bad8-4089-a0ea-2cd2fccb2c72/painting",
+              "type": "Annotation",
+              "motivation": ["painting"],
+              "target": "https://example.org/canvas/3cab18d8-bad8-4089-a0ea-2cd2fccb2c72",
+              "body": [
+                {
+                  "id": "https://dlc.services/iiif-img/7/4/00e3862e-f98e-4e7e-a701-fa74dcc93cb9",
+                  "type": "Image",
+                  "height": 3940,
+                  "width": 4524,
+                  "service": [
+                    {
+                      "@context": "http://iiif.io/api/image/2/context.json",
+                      "@id": "https://dlc.services/iiif-img/7/4/00e3862e-f98e-4e7e-a701-fa74dcc93cb9",
+                      "protocol": "http://iiif.io/api/image",
+                      "width": 4524,
+                      "height": 3940,
+                      "tiles": [
+                        {
+                          "width": 256,
+                          "height": 256,
+                          "scaleFactors": [1, 2, 4, 8, 16, 32]
+                        }
+                      ],
+                      "sizes": [
+                        { "width": 1024, "height": 892 },
+                        { "width": 400, "height": 348 },
+                        { "width": 200, "height": 174 },
+                        { "width": 100, "height": 87 }
+                      ],
+                      "profile": [
+                        "http://iiif.io/api/image/2/level1.json",
+                        {
+                          "formats": ["jpg"],
+                          "qualities": ["native", "color", "gray"],
+                          "supports": [
+                            "regionByPct",
+                            "sizeByForcedWh",
+                            "sizeByWh",
+                            "sizeAboveFull",
+                            "rotationBy90s",
+                            "mirroring",
+                            "gray"
+                          ]
+                        }
+                      ],
+                      "type": "ImageService2",
+                      "id": "https://dlc.services/iiif-img/7/4/00e3862e-f98e-4e7e-a701-fa74dcc93cb9"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

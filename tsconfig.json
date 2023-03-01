@@ -6,6 +6,8 @@
     { "path": "./packages/render" },
     { "path": "./packages/annotation" },
     { "path": "./packages/iiif-parser" },
-    { "path": "./packages/openlayers" }
+    { "path": "./packages/openlayers" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/tailwind" },
   ]
 }

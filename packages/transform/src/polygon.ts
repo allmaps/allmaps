@@ -5,48 +5,45 @@ import distance from '@turf/distance'
 import { toWorld } from './transformer.js'
 
 import type { GCPTransformInfo } from './gdaltransform.js'
-import type { Coord, ImageWorldGCP } from './transformer.js'
 
-type Segment = {
-  from: ImageWorldGCP
-  to: ImageWorldGCP
-}
+import type {
+  Position,
+  GeoJSONPoint,
+  GeoJSONPolygon,
+  Segment
+} from './shared/types.js'
 
-type Point = {
-  type: 'Point'
-  coordinates: Coord
-}
-
-function point(point: Coord): Point {
+function point(point: Position): GeoJSONPoint {
   return {
     type: 'Point',
     coordinates: point
   }
 }
 
-export function polygonToWorld(
+export function svgPolygonToGeoJSONPolygon(
   transformArgs: GCPTransformInfo,
-  points: Coord[],
-  maxOffsetPercentage = 0.01,
+  points: Position[],
+  // TODO: use options param
+  maxOffsetPercentage: number = 0,
   maxDepth = 8
-) {
+): GeoJSONPolygon {
+  if (!points || points.length < 3) {
+    throw new Error('SVG polygon should contain at least 3 points')
+  }
+
   const worldPoints = points.map((point) => ({
     image: point,
     world: toWorld(transformArgs, point)
   }))
 
-  // if (maxOffsetPercentage > 0)
-
-  const segments = Array.from(Array(worldPoints.length - 1)).map(
-    (_, index) => ({
-      from: worldPoints[index],
-      to: worldPoints[index + 1]
-    })
-  )
+  const segments = Array.from(Array(worldPoints.length)).map((_, index) => ({
+    from: worldPoints[index],
+    to: worldPoints[(index + 1) % worldPoints.length]
+  }))
 
   const segmentsWithMidpoints = segments
     .map((segment) =>
-      addMidpoints(transformArgs, segment, maxOffsetPercentage, maxDepth)
+      addMidpoints(transformArgs, segment, maxOffsetPercentage, maxDepth, 0)
     )
     .flat(1)
 
@@ -64,11 +61,11 @@ export function polygonToWorld(
 function addMidpoints(
   transformArgs: GCPTransformInfo,
   segment: Segment,
-  maxOffsetPercentage: number,
+  maxOffsetPercentage: number | null,
   maxDepth: number,
-  depth = 0
+  depth: number
 ): Segment | Segment[] {
-  const imageMidpoint: Coord = [
+  const imageMidpoint: Position = [
     (segment.from.image[0] + segment.to.image[0]) / 2,
     (segment.from.image[1] + segment.to.image[1]) / 2
   ]
@@ -84,10 +81,12 @@ function addMidpoints(
     point(segment.to.world)
   )
   const distanceMidpoints = distance(segmentWorldMidpoint, actualWorldMidpoint)
-
   if (
-    distanceMidpoints / distanceSegment > maxOffsetPercentage &&
-    depth < maxDepth
+    depth < maxDepth &&
+    (maxOffsetPercentage
+      ? distanceMidpoints / distanceSegment > maxOffsetPercentage
+      : false) &&
+    distanceSegment > 0
   ) {
     const newSegmentMidpoint = {
       image: imageMidpoint,
@@ -99,12 +98,14 @@ function addMidpoints(
         transformArgs,
         { from: segment.from, to: newSegmentMidpoint },
         maxOffsetPercentage,
+        maxDepth,
         depth + 1
       ),
       addMidpoints(
         transformArgs,
         { from: newSegmentMidpoint, to: segment.to },
         maxOffsetPercentage,
+        maxDepth,
         depth + 1
       )
     ].flat(1)

@@ -1,0 +1,36 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "protocol": "http://iiif.io/api/image",
+  "width": 6510,
+  "height": 7707,
+  "sizes": [
+    { "width": 203, "height": 240 },
+    { "width": 406, "height": 481 },
+    { "width": 813, "height": 963 },
+    { "width": 1627, "height": 1926 },
+    { "width": 3255, "height": 3853 }
+  ],
+  "tiles": [
+    { "width": 256, "height": 256, "scaleFactors": [1, 2, 4, 8, 16, 32] }
+  ],
+  "@id": "http://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif",
+  "profile": [
+    "http://iiif.io/api/image/2/level2",
+    {
+      "formats": ["jpg", "png"],
+      "qualities": ["native", "color", "gray", "bitonal"],
+      "supports": [
+        "regionByPct",
+        "regionSquare",
+        "sizeByForcedWh",
+        "sizeByWh",
+        "sizeAboveFull",
+        "sizeUpscaling",
+        "rotationBy90s",
+        "mirroring"
+      ],
+      "maxWidth": 5000,
+      "maxHeight": 5000
+    }
+  ]
+}

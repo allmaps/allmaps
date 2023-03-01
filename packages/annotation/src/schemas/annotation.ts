@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { PointSchema, ImageServiceSchema } from './shared.js'
 
 const svg =
-  /^<svg\s+width="\d+"\s+height="\d+"\s*>\s*<polygon\s+points="(\d+,\d+\s+){2,}\d+,\d+"\s*\/>\s*<\/svg>$/
+  /^<svg\s+width="\d+"\s+height="\d+"\s*>\s*<polygon\s+points="\s*(-?\d+(\.\d+)?,-?\d+(\.\d+)?\s+){2,}-?\d+(\.\d+)?,-?\d+(\.\d+)?\s*"\s*\/>\s*<\/svg>$/
 
 export const SvgSelectorSchema = z.object({
   type: z.literal('SvgSelector'),
@@ -25,7 +25,6 @@ export const TargetSchema = z.object({
 
 export const BodySchema = z.object({
   type: z.literal('FeatureCollection'),
-  purpose: z.string().default('gcp-georeferencing').optional(),
   features: z.array(
     z.object({
       type: z.literal('Feature'),

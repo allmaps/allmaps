@@ -1,0 +1,4264 @@
+{
+  "type": "manifest",
+  "embedded": false,
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 2180,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$0/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$0",
+        "majorVersion": 2,
+        "width": 2180,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1991,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$1/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$1",
+        "majorVersion": 2,
+        "width": 1991,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2020,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$2/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$2",
+        "majorVersion": 2,
+        "width": 2020,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$3/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$3",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2027,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$4/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$4",
+        "majorVersion": 2,
+        "width": 2027,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$5/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$5",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2027,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$6/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$6",
+        "majorVersion": 2,
+        "width": 2027,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$7/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$7",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2029,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$8/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$8",
+        "majorVersion": 2,
+        "width": 2029,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$9/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$9",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2026,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$10/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$10",
+        "majorVersion": 2,
+        "width": 2026,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$11/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$11",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2026,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$12/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$12",
+        "majorVersion": 2,
+        "width": 2026,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$13/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$13",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2026,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$14/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$14",
+        "majorVersion": 2,
+        "width": 2026,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$15/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$15",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2029,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$16/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$16",
+        "majorVersion": 2,
+        "width": 2029,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$17/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$17",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2029,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$18/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$18",
+        "majorVersion": 2,
+        "width": 2029,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$19/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$19",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2024,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$20/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$20",
+        "majorVersion": 2,
+        "width": 2024,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$21/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$21",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2024,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$22/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$22",
+        "majorVersion": 2,
+        "width": 2024,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$23/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$23",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2024,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$24/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$24",
+        "majorVersion": 2,
+        "width": 2024,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$25/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$25",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2028,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$26/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$26",
+        "majorVersion": 2,
+        "width": 2028,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$27/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$27",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2028,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$28/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$28",
+        "majorVersion": 2,
+        "width": 2028,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$29/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$29",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2028,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$30/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$30",
+        "majorVersion": 2,
+        "width": 2028,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$31/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$31",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$32/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$32",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$33/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$33",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2018,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$34/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$34",
+        "majorVersion": 2,
+        "width": 2018,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$35/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$35",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2018,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$36/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$36",
+        "majorVersion": 2,
+        "width": 2018,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$37/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$37",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2018,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$38/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$38",
+        "majorVersion": 2,
+        "width": 2018,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$39/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$39",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2018,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$40/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$40",
+        "majorVersion": 2,
+        "width": 2018,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$41/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$41",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2018,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$42/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$42",
+        "majorVersion": 2,
+        "width": 2018,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$43/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$43",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2021,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$44/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$44",
+        "majorVersion": 2,
+        "width": 2021,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$45/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$45",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$46/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$46",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$47/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$47",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2020,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$48/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$48",
+        "majorVersion": 2,
+        "width": 2020,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$49/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$49",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2020,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$50/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$50",
+        "majorVersion": 2,
+        "width": 2020,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$51/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$51",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$52/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$52",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$53/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$53",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$54/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$54",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$55/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$55",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$56/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$56",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$57/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$57",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$58/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$58",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$59/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$59",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$60/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$60",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$61/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$61",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$62/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$62",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$63/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$63",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$64/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$64",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$65/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$65",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$66/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$66",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$67/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$67",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$68/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$68",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$69/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$69",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2011,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$70/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$70",
+        "majorVersion": 2,
+        "width": 2011,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$71/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$71",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2011,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$72/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$72",
+        "majorVersion": 2,
+        "width": 2011,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$73/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$73",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2011,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$74/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$74",
+        "majorVersion": 2,
+        "width": 2011,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$75/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$75",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$76/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$76",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$77/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$77",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$78/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$78",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$79/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$79",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$80/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$80",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$81/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$81",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$82/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$82",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$83/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$83",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$84/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$84",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$85/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$85",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$86/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$86",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$87/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$87",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$88/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$88",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$89/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$89",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$90/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$90",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$91/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$91",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2009,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$92/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$92",
+        "majorVersion": 2,
+        "width": 2009,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$93/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$93",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2009,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$94/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$94",
+        "majorVersion": 2,
+        "width": 2009,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$95/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$95",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$96/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$96",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$97/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$97",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$98/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$98",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$99/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$99",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$100/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$100",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$101/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$101",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$102/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$102",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$103/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$103",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$104/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$104",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$105/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$105",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2015,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$106/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$106",
+        "majorVersion": 2,
+        "width": 2015,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$107/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$107",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2013,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$108/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$108",
+        "majorVersion": 2,
+        "width": 2013,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$109/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$109",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2017,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$110/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$110",
+        "majorVersion": 2,
+        "width": 2017,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$111/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$111",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2017,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$112/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$112",
+        "majorVersion": 2,
+        "width": 2017,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$113/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$113",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2017,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$114/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$114",
+        "majorVersion": 2,
+        "width": 2017,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$115/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$115",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2012,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$116/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$116",
+        "majorVersion": 2,
+        "width": 2012,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$117/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$117",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2007,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$118/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$118",
+        "majorVersion": 2,
+        "width": 2007,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$119/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$119",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2013,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$120/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$120",
+        "majorVersion": 2,
+        "width": 2013,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$121/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$121",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2013,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$122/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$122",
+        "majorVersion": 2,
+        "width": 2013,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$123/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$123",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2013,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$124/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$124",
+        "majorVersion": 2,
+        "width": 2013,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$125/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$125",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$126/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$126",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$127/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$127",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$128/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$128",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$129/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$129",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$130/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$130",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$131/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$131",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$132/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$132",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$133/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$133",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$134/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$134",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$135/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$135",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$136/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$136",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$137/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$137",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$138/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$138",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$139/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$139",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$140/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$140",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$141/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$141",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$142/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$142",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$143/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$143",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$144/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$144",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$145/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$145",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$146/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$146",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$147/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$147",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$148/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$148",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$149/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$149",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$150/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$150",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$151/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$151",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$152/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$152",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$153/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$153",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$154/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$154",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$155/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$155",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$156/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$156",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$157/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$157",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$158/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$158",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$159/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$159",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$160/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$160",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$161/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$161",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$162/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$162",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$163/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$163",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$164/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$164",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$165/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$165",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$166/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$166",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$167/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$167",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$168/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$168",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$169/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$169",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1996,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$170/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$170",
+        "majorVersion": 2,
+        "width": 1996,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$171/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$171",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$172/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$172",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$173/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$173",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$174/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$174",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$175/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$175",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$176/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$176",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$177/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$177",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$178/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$178",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$179/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$179",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2004,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$180/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$180",
+        "majorVersion": 2,
+        "width": 2004,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$181/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$181",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2010,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$182/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$182",
+        "majorVersion": 2,
+        "width": 2010,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$183/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$183",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2010,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$184/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$184",
+        "majorVersion": 2,
+        "width": 2010,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$185/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$185",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2005,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$186/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$186",
+        "majorVersion": 2,
+        "width": 2005,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$187/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$187",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$188/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$188",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$189/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$189",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$190/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$190",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$191/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$191",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$192/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$192",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$193/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$193",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$194/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$194",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$195/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$195",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$196/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$196",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$197/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$197",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$198/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$198",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$199/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$199",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 1998,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$200/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$200",
+        "majorVersion": 2,
+        "width": 1998,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$201/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$201",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2003,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$202/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$202",
+        "majorVersion": 2,
+        "width": 2003,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2006,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$203/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$203",
+        "majorVersion": 2,
+        "width": 2006,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2014,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$204/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$204",
+        "majorVersion": 2,
+        "width": 2014,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2003,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$205/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$205",
+        "majorVersion": 2,
+        "width": 2003,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2002,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$206/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$206",
+        "majorVersion": 2,
+        "width": 2002,
+        "height": 3000
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2180,
+      "height": 3000,
+      "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$207/canvas",
+      "label": {
+        "none": [
+          "p. "
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137$207",
+        "majorVersion": 2,
+        "width": 2180,
+        "height": 3000
+      }
+    }
+  ],
+  "uri": "https://iiif.archivelab.org/iiif/gri_33125006526137/manifest.json",
+  "majorVersion": 2,
+  "label": {
+    "none": [
+      "A monograph of the work of McKim, Mead & White, 1879-1915 .."
+    ]
+  },
+  "description": {
+    "none": [
+      "4 v. plates. 53 cm"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": [
+          "title"
+        ]
+      },
+      "value": {
+        "none": [
+          "A monograph of the work of McKim, Mead & White, 1879-1915 .."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "volume"
+        ]
+      },
+      "value": {
+        "none": [
+          "2"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "publisher"
+        ]
+      },
+      "value": {
+        "none": [
+          "New York, The Architectural book publishing co"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "subject"
+        ]
+      },
+      "value": {
+        "none": [
+          "Architecture -- United States"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "date"
+        ]
+      },
+      "value": {
+        "none": [
+          "1914"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "contributor"
+        ]
+      },
+      "value": {
+        "none": [
+          "Getty Research Institute"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": [
+          "creator"
+        ]
+      },
+      "value": {
+        "none": [
+          "McKim, Mead & White"
+        ]
+      }
+    }
+  ]
+}

@@ -11,16 +11,22 @@
       "@allmaps/id": ["./packages/id/src"],
       "@allmaps/transform": ["./packages/transform/src"],
       "@allmaps/render": ["./packages/render/src"],
+      "@allmaps/stdlib": ["./packages/stdlib/src"],
       "@allmaps/annotation": ["./packages/annotation/src"],
       "@allmaps/iiif-parser": ["./packages/iiif-parser/src"],
       "@allmaps/openlayers": ["./packages/openlayers/src"],
+      "@allmaps/ui": ["./packages/ui/src"],
+      "@allmaps/tailwind": ["./packages/tailwind/src"],
 
       "@allmaps/id/*": ["./packages/id/src/*"],
       "@allmaps/transform/*": ["./packages/transform/src/*"],
       "@allmaps/render/*": ["./packages/render/src/*"],
+      "@allmaps/stdlib/*": ["./packages/stdlib/src/*"],
       "@allmaps/annotation/*": ["./packages/annotation/src/*"],
       "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
-      "@allmaps/openlayers/*": ["./packages/openlayers/src/*"]
+      "@allmaps/openlayers/*": ["./packages/openlayers/src/*"],
+      "@allmaps/ui/*": ["./packages/ui/src/*"],
+      "@allmaps/tailwind/*": ["./packages/tailwind/src/*"]
     }
   }
 }

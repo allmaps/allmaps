@@ -1,0 +1,20 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://ids.si.edu/ids/iiif/NASM-NASM2013-00143",
+  "protocol": "http://iiif.io/api/image",
+  "width": 2071,
+  "height": 3000,
+  "tiles": [
+    {
+      "width": 512,
+      "scaleFactors": [1, 2, 4, 8]
+    }
+  ],
+  "profile": [
+    "http://iiif.io/api/image/2/level2.json",
+    {
+      "formats": ["jpg"],
+      "supports": ["sizeByH", "sizeByW", "sizeByForcedWh"]
+    }
+  ]
+}

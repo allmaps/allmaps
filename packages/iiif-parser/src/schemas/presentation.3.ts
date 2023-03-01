@@ -23,7 +23,7 @@ export const AnnotationBody3Schema = z.object({
 
 const Annotation3Schema = z.object({
   type: z.literal('Annotation'),
-  body: AnnotationBody3Schema
+  body: AnnotationBody3Schema.or(AnnotationBody3Schema.array().length(1))
 })
 
 const AnnotationPage3Schema = z.object({
@@ -49,3 +49,35 @@ export const Manifest3Schema = z.object({
   description: StringValue3Schema.optional(),
   metadata: Metadata3Schema.optional()
 })
+
+export interface EmbeddedManifest3 {
+  id: string
+  type: 'Manifest'
+  label?: z.infer<typeof StringValue3Schema>
+}
+
+export interface Collection3 {
+  id: string
+  type: 'Collection'
+  label?: z.infer<typeof StringValue3Schema>
+  items: (EmbeddedManifest3 | Collection3)[]
+}
+
+export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
+  () =>
+    z.object({
+      id: z.string().url(),
+      type: z.literal('Manifest'),
+      label: StringValue3Schema.optional()
+    })
+)
+
+// TODO: introduce embedded collection without items
+export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
+  z.object({
+    id: z.string().url(),
+    type: z.literal('Collection'),
+    label: StringValue3Schema.optional(),
+    items: EmbeddedManifest3Schema.or(Collection3Schema).array()
+  })
+)

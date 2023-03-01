@@ -9,6 +9,8 @@ Allmaps uses this module to create IDs from IIIF URIs. For example:
 *   We can use this ID to view the annotation for the georeferenced maps in the manifest in Allmaps:
     https://dev.annotations.allmaps.org/manifests/4ac2770ae8624e38.
 
+To see @allmaps/id in action, view this [Observable notebook](https://observablehq.com/@bertspaan/ids-for-allmaps?collection=@bertspaan/allmaps).
+
 ## Usage
 
 This is an ESM-only module that works in browsers or in Node.js.

@@ -35,6 +35,16 @@
   type: image
   version: 2
 
+- filename: stanford-tc010rc2373-PaloAlto3
+  url: https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3/info.json
+  type: image
+  version: 2
+
+- filename: toolforge-e8f0e820e00680e69939a97ffccf64e8
+  url: https://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif/info.json
+  type: image
+  version: 2
+
 ### Image 3.0
 
 # # This is not a map... it's just an image of lots of beetles...
@@ -92,6 +102,11 @@
   type: manifest
   version: 2
 
+- filename: stanford-tc010rc2373
+  url: https://purl.stanford.edu/tc010rc2373/iiif/manifest
+  type: manifest
+  version: 2
+
 ### Collection 2.0
 
 # - filename: davidrumsey-collection-s-cy4drc
@@ -113,5 +128,20 @@
 
 - filename: polona.pl-NTU5NTE4OTg
   url: https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json
+  type: manifest
+  version: 3
+
+- filename: tu-cre-tib-aa270916.json
+  url: https://raw.githubusercontent.com/digirati-co-uk/delft-static-site-generator/master/content/collections/tu-campus/tu-cre-tib-bouwtekeningen/tu-cre-tib-aa270916.json
+  type: manifest
+  version: 3
+
+- filename: jd-03909-006-4.json
+  url: https://iiif.juncture-digital.org/wc:Sanborn_Fire_Insurance_Map_from_Ann_Arbor,_Washtenaw_County,_Michigan._LOC_sanborn03909_006-4.tif/manifest.json
+  type: manifest
+  version: 3
+
+- filename: sfo-1762679999.json
+  url: https://collection.sfomuseum.org/objects/1762679999/manifest/
   type: manifest
   version: 3

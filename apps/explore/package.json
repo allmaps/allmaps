@@ -1,0 +1,49 @@
+{
+  "name": "@allmaps/explore",
+  "version": "0.0.2-alpha.14",
+  "private": true,
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "apps/explore"
+  },
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "lerna-build": "lerna run build --scope @allmaps/explore --include-dependencies",
+    "preview": "vite preview",
+    "test": "playwright test",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.28.1",
+    "@sveltejs/adapter-static": "^1.0.0",
+    "@sveltejs/kit": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.8.0",
+    "prettier-plugin-svelte": "^2.8.1",
+    "svelte": "^3.54.0",
+    "svelte-check": "^2.9.2",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.5",
+    "vite": "^4.0.0"
+  },
+  "dependencies": {
+    "@allmaps/ui": "^1.0.0-beta.12",
+    "ol": "^6.15.1"
+  }
+}
