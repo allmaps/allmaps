@@ -158,7 +158,7 @@
 <div class="flex flex-row items-center gap-2">
   <div bind:this={container} class="flex">
     <button
-      class="bg-white w-7 h-7 text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+      class="bg-white w-8 h-8 text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
       on:mousedown={handleMousedown}
       on:touchstart={handleTouchstart}
     >
