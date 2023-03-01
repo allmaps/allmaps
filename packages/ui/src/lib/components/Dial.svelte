@@ -114,7 +114,7 @@
       initialValue = maxValue
     }
 
-    value = minValue
+    value = toggleValue
 
     window.addEventListener('touchmove', handleMove)
     window.addEventListener('touchend', () => {
