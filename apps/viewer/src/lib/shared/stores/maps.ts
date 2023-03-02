@@ -5,7 +5,7 @@ import { parseAnnotation } from '@allmaps/annotation'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image } from '@allmaps/iiif-parser'
 
-import { defaultRenderOptions } from '$lib/shared/defaults.js'
+import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { getBackgroundColor } from '$lib/shared/remove-background.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
@@ -38,7 +38,7 @@ export async function addAnnotation(sourceId: string, json: any) {
           selected: false
         },
         // TODO: detect background color of map?
-        renderOptions: defaultRenderOptions
+        renderOptions: getDefaultRenderOptions()
       }
 
       newViewerMaps.push(viewerMap)
@@ -48,7 +48,9 @@ export async function addAnnotation(sourceId: string, json: any) {
       // in multiple georeferenced maps
       getBackgroundColor(map, parsedImage).then((color) =>
         setRemoveBackgroundColor(mapId, color)
-      )
+      ).catch((err) => {
+        console.error(`Couldn't detect background color for map ${mapId}`, err)
+      })
     }
 
     mapsById.update(($mapsById) => {

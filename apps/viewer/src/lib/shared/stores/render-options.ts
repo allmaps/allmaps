@@ -7,16 +7,16 @@ import {
   lastSelectedMap
 } from '$lib/shared/stores/selected.js'
 
-import { defaultRenderOptions } from '$lib/shared/defaults.js'
+import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 
 import type { RenderOptions } from '$lib/shared/types.js'
 
 export const renderOptionsScope = writable<'layer' | 'map'>('layer')
 
-export const renderOptionsLayer = writable<RenderOptions>({...defaultRenderOptions})
+export const renderOptionsLayer = writable<RenderOptions>(getDefaultRenderOptions())
 
 export function resetRenderOptionsLayer() {
-  renderOptionsLayer.set({...defaultRenderOptions})
+  renderOptionsLayer.set(getDefaultRenderOptions())
 }
 
 export const renderOptionsMaps = derived(maps, ($maps) =>
