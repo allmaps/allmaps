@@ -86,6 +86,7 @@
     })
 
     event.preventDefault()
+    event.stopPropagation()
   }
 
   function angleToValue(angle: number): number {
@@ -130,6 +131,7 @@
     })
 
     event.preventDefault()
+    event.stopPropagation()
   }
 
   // TODO: check if keyCode is defined
