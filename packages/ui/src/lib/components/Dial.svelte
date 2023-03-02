@@ -159,7 +159,7 @@
 
 <div class="flex flex-row items-center gap-2">
   <div bind:this={container} class="flex">
-    <button
+    <button type="button"
       class="bg-white w-8 h-8 text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
       on:mousedown={handleMousedown}
       on:touchstart={handleTouchstart}
@@ -167,6 +167,7 @@
       <img
         src={dial}
         alt="Dial"
+        aria-hidden="true"
         style:transform={`rotate(${valueToAngle(value)}deg)`}
         class="transition-transform ease-linear"
         class:duration-75={!hasMoved}
