@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.31",
+  "version": "1.0.0-beta.32",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -33,7 +33,7 @@
     "@allmaps/render": "^1.0.0-beta.28",
     "@allmaps/stdlib": "^1.0.0-beta.7",
     "@allmaps/transform": "^1.0.0-beta.12",
-    "@allmaps/ui": "^1.0.0-beta.12",
+    "@allmaps/ui": "^1.0.0-beta.13",
     "flowbite": "^1.6.2",
     "ol": "^6.15.1"
   },
