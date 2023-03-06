@@ -6,7 +6,10 @@ import {
   Image3Schema,
   ImageSchema
 } from '../schemas/iiif.js'
-import { Image1ContextString } from '../schemas/image.1.js'
+import {
+  Image1ContextString,
+  Image1ContextStringIncorrect
+} from '../schemas/image.1.js'
 import { Image2ContextString } from '../schemas/image.2.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
@@ -79,7 +82,8 @@ export class EmbeddedImage {
         this.majorVersion = 2
       } else if (
         '@context' in imageService &&
-        imageService['@context'] === Image1ContextString
+        (imageService['@context'] === Image1ContextString ||
+          imageService['@context'] === Image1ContextStringIncorrect)
       ) {
         this.majorVersion = 1
       } else {
@@ -168,19 +172,20 @@ export class EmbeddedImage {
       width = Math.round(size.width)
       height = Math.round(size.height)
 
-      let widthStr = String(width)
-      let heightStr = ''
+      const widthStr = String(width)
+      let heightStr = String(height)
 
-      const aspectRatio = regionWidth / regionHeight
-      const aspectRatioWidth = height * aspectRatio
-      const aspectRatioHeight = aspectRatioWidth / aspectRatio
+      if (this.majorVersion <= 2) {
+        const aspectRatio = regionWidth / regionHeight
+        const aspectRatioWidth = height * aspectRatio
+        const aspectRatioHeight = aspectRatioWidth / aspectRatio
 
-      // Is this really the right way to do it?
-      // See also:
-      // - https://iiif.io/api/image/3.0/implementation/
-      // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
-      if (height !== Math.round(aspectRatioHeight)) {
-        heightStr = String(height)
+        // Is this really the right way to do it?
+        // See also:
+        // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
+        if (height === Math.round(aspectRatioHeight)) {
+          heightStr = ''
+        }
       }
 
       urlSize = `${widthStr},${heightStr}`

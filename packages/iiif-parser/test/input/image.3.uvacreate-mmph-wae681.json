@@ -1,0 +1,42 @@
+{
+  "tiles": [
+    {
+      "scaleFactors": [32, 16, 8, 4, 2, 1],
+      "width": 128,
+      "height": 128
+    }
+  ],
+  "protocol": "http://iiif.io/api/image",
+  "sizes": [
+    {
+      "width": 63,
+      "height": 47
+    },
+    {
+      "width": 125,
+      "height": 93
+    },
+    {
+      "width": 250,
+      "height": 186
+    },
+    {
+      "width": 500,
+      "height": 372
+    },
+    {
+      "width": 1000,
+      "height": 743
+    },
+    {
+      "width": 1999,
+      "height": 1485
+    }
+  ],
+  "profile": "level0",
+  "width": 1999,
+  "id": "https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681",
+  "type": "ImageService3",
+  "@context": "http://iiif.io/api/image/3/context.json",
+  "height": 1485
+}

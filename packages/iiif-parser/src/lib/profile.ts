@@ -24,25 +24,21 @@ type Image2ProfileDescriptionType = z.infer<
 type ImageType = z.infer<typeof ImageSchema>
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 
-function parseImage1ProfileUri(uri: string): number {
+function parseImage1ProfileUri(uri: string): number | undefined {
   const match = uri.match(image1ProfileUriRegex)
 
   if (match && match.groups) {
     const level = parseInt(match.groups.level)
     return level
-  } else {
-    throw new Error('Unsupported IIIF Image Profile for IIIF Image API 1.1')
   }
 }
 
-function parseImage2ProfileUri(uri: string): number {
+function parseImage2ProfileUri(uri: string): number | undefined {
   const match = uri.match(image2ProfileUriRegex)
 
   if (match && match.groups) {
     const level = parseInt(match.groups.level)
     return level
-  } else {
-    throw new Error('Unsupported IIIF Image Profile for IIIF Image API 2.1')
   }
 }
 
@@ -64,9 +60,17 @@ function parseImage2ProfileDescription(
 export function getProfileProperties(
   parsedImage: ImageType | ImageServiceType
 ): ProfileProperties {
-  if ('type' in parsedImage && parsedImage.type === 'ImageService3') {
+  // TODO: this function is very messy and needs cleaning up.
+  // Probably also needs a better way to keep ImageService and ImageInfo apart.
+
+  if ('type' in parsedImage) {
+    const profile = parsedImage.profile
+
     let supportsAnyRegionAndSize = false
-    if (parsedImage.profile === 'level0') {
+    if (
+      profile === 'level0' ||
+      (typeof profile === 'string' && profile.endsWith('level0.json'))
+    ) {
       if ('extraFeatures' in parsedImage) {
         supportsAnyRegionAndSize = anyRegionAndSizeFeatures.every(
           (feature) =>
@@ -84,79 +88,66 @@ export function getProfileProperties(
       maxArea: 'maxArea' in parsedImage ? parsedImage.maxArea : undefined,
       supportsAnyRegionAndSize
     }
-  } else if (
-    '@context' in parsedImage &&
-    parsedImage['@context'] === Image2ContextString
-  ) {
-    if (Array.isArray(parsedImage.profile)) {
-      let supportsAnyRegionAndSize = false
-      let maxHeight = Number.NEGATIVE_INFINITY
-      let maxWidth = Number.NEGATIVE_INFINITY
-      let maxArea = Number.NEGATIVE_INFINITY
+  } else if (Array.isArray(parsedImage.profile)) {
+    let supportsAnyRegionAndSize = false
+    let maxHeight = Number.NEGATIVE_INFINITY
+    let maxWidth = Number.NEGATIVE_INFINITY
+    let maxArea = Number.NEGATIVE_INFINITY
 
-      parsedImage.profile.forEach((profile) => {
-        if (typeof profile === 'string') {
-          const profileLevel = parseImage2ProfileUri(profile)
+    parsedImage.profile.forEach((profile) => {
+      if (typeof profile === 'string') {
+        const profileLevel = parseImage2ProfileUri(profile)
+        if (profileLevel) {
           supportsAnyRegionAndSize =
             supportsAnyRegionAndSize || profileLevel >= 1
-        } else {
-          const {
-            maxWidth: profileMaxWidth,
-            maxHeight: profileMaxHeight,
-            maxArea: profileMaxArea,
-            supportsAnyRegionAndSize: profileSupportsAnyRegionAndSize
-          } = parseImage2ProfileDescription(profile)
-
-          if (profileMaxWidth !== undefined) {
-            maxWidth = Math.max(profileMaxWidth, maxWidth)
-          }
-
-          if (profileMaxHeight !== undefined) {
-            maxHeight = Math.max(profileMaxHeight, maxHeight)
-          }
-
-          if (profileMaxArea !== undefined) {
-            maxArea = Math.max(profileMaxArea, maxArea)
-          }
-
-          supportsAnyRegionAndSize =
-            supportsAnyRegionAndSize || profileSupportsAnyRegionAndSize
         }
-      })
+      } else {
+        const {
+          maxWidth: profileMaxWidth,
+          maxHeight: profileMaxHeight,
+          maxArea: profileMaxArea,
+          supportsAnyRegionAndSize: profileSupportsAnyRegionAndSize
+        } = parseImage2ProfileDescription(profile)
 
+        if (profileMaxWidth !== undefined) {
+          maxWidth = Math.max(profileMaxWidth, maxWidth)
+        }
+
+        if (profileMaxHeight !== undefined) {
+          maxHeight = Math.max(profileMaxHeight, maxHeight)
+        }
+
+        if (profileMaxArea !== undefined) {
+          maxArea = Math.max(profileMaxArea, maxArea)
+        }
+
+        supportsAnyRegionAndSize =
+          supportsAnyRegionAndSize || profileSupportsAnyRegionAndSize
+      }
+    })
+
+    return {
+      maxWidth: maxWidth >= 0 ? maxWidth : undefined,
+      maxHeight: maxHeight >= 0 ? maxHeight : undefined,
+      maxArea: maxArea >= 0 ? maxArea : undefined,
+      supportsAnyRegionAndSize
+    }
+  } else if ('profile' in parsedImage && parsedImage.profile) {
+    const profileLevel1 = parseImage1ProfileUri(parsedImage.profile)
+    const profileLevel2 = parseImage2ProfileUri(parsedImage.profile)
+
+    if (profileLevel1) {
       return {
-        maxWidth: maxWidth >= 0 ? maxWidth : undefined,
-        maxHeight: maxHeight >= 0 ? maxHeight : undefined,
-        maxArea: maxArea >= 0 ? maxArea : undefined,
-        supportsAnyRegionAndSize
+        supportsAnyRegionAndSize: profileLevel1 >= 1
+      }
+    } else if (profileLevel2) {
+      return {
+        supportsAnyRegionAndSize: profileLevel2 >= 1
       }
     } else {
-      if ('profile' in parsedImage && parsedImage.profile) {
-        const profileLevel = parseImage2ProfileUri(parsedImage.profile)
-
-        return {
-          supportsAnyRegionAndSize: profileLevel >= 1
-        }
-      }
-
       return {
         supportsAnyRegionAndSize: false
       }
-    }
-  } else if (
-    '@context' in parsedImage &&
-    parsedImage['@context'] === Image1ContextString
-  ) {
-    if ('profile' in parsedImage && typeof parsedImage.profile === 'string') {
-      const profileLevel = parseImage1ProfileUri(parsedImage.profile)
-
-      return {
-        supportsAnyRegionAndSize: profileLevel >= 1
-      }
-    }
-
-    return {
-      supportsAnyRegionAndSize: false
     }
   } else {
     throw new Error('Invalid Image')

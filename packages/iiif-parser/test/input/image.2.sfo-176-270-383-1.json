@@ -1,0 +1,42 @@
+{
+  "height": 1099,
+  "width": 1698,
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://static.sfomuseum.org/media/176/270/383/1/tiles",
+  "protocol": "http://iiif.io/api/image",
+  "profile": [
+    "http://iiif.io/api/image/2/level0.json",
+    {
+      "formats": [
+        "jpg"
+      ],
+      "qualities": [
+        "default"
+      ],
+      "supports": [
+        "full",
+        "regionByPx",
+        "sizeByW",
+        "sizeByH",
+        "sizeByWh",
+        "full",
+        "none",
+        "baseUriRedirect",
+        "cors",
+        "jsonldMediaType"
+      ]
+    }
+  ],
+  "tiles": [
+    {
+      "height": 256,
+      "width": 256,
+      "scaleFactors": [
+        1,
+        2,
+        4,
+        8
+      ]
+    }
+  ]
+}
