@@ -1,30 +1,23 @@
+import { Command } from 'commander'
+
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 
-import type { ArgumentsCamelCase } from 'yargs'
+export default function parse() {
+  return new Command('parse')
+    .argument('[files...]')
+    .summary('parse Georeference Annotation')
+    .description(
+      `Parses and validates Georeference Annotations and outputs Allmaps' internal format`
+    )
+    .action(async (files) => {
+      const jsonValues = await parseJsonInput(files as string[])
+      const maps = parseAnnotationsValidateMaps(jsonValues)
 
-const command = 'parse [file...]'
-
-const describe =
-  "Parses and validates Georef Annotations and outputs Allmaps' internal Georef format."
-
-const builder = {}
-
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonInput(argv.file as string[])
-
-  const maps = parseAnnotationsValidateMaps(jsonValues)
-
-  if (maps.length === 1) {
-    printJson(maps[0])
-  } else {
-    printJson(maps)
-  }
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
+      if (maps.length === 1) {
+        printJson(maps[0])
+      } else {
+        printJson(maps)
+      }
+    })
 }

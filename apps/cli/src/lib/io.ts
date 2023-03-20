@@ -19,25 +19,39 @@ export async function readInput(files: string[]): Promise<string[]> {
   }
 }
 
-export function parseJsonInput(files: string[]) {
-  if (process.stdin.isTTY) {
-    return parseJsonFromFiles(files)
+export async function parseJsonInput(files?: string[]) {
+  let jsonValues: unknown[] = []
+
+  // TODO: does this function need the isTTY check?
+  if (files && Array.isArray(files) && files.length) {
+    jsonValues = await parseJsonFromFiles(files)
+  } else if (!process.stdin.isTTY) {
+    jsonValues = await parseJsonFromStdin()
+  }
+
+  if (jsonValues.length > 0) {
+    return jsonValues
   } else {
-    return parseJsonFromStdin()
+    throw new Error(
+      'error: no input files supplied, and nothing to read from the standard input'
+    )
   }
 }
 
 export function parseJsonFromStream(stream: Readable) {
-  return new Promise<any[]>((resolve, reject) => {
-    let jsonValues: any[] = []
+  return new Promise<unknown[]>((resolve, reject) => {
+    let jsonValues: unknown[] = []
+
+    stream.on('error', (err: Error) => reject(err))
 
     const pipeline = stream.pipe(StreamValues.withParser())
     pipeline.on('data', (data: any) => jsonValues.push(data.value))
     pipeline.on('end', () => resolve(jsonValues))
+    pipeline.on('error', (err: Error) => reject(err))
   })
 }
 
-export function parseJsonFromFile(file: string): any {
+export function parseJsonFromFile(file: string): unknown {
   return JSON.parse(readFileSync(file, { encoding: 'utf8', flag: 'r' }))
 }
 
@@ -102,4 +116,8 @@ export function printJson(json: any) {
   // } else {
   //   console.log(JSON.stringify(json, null, 2))
   // }
+}
+
+export function print(str: string) {
+  console.log(str)
 }

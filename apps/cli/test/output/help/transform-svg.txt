@@ -1,0 +1,1 @@
+error: required option '-a, --annotation <filename>' not specified

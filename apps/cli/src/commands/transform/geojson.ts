@@ -1,59 +1,57 @@
-import { generateAnnotation } from '@allmaps/annotation'
+import { Command } from 'commander'
 
-import { parseJsonFromStdin, printJson } from '../../lib/io.js'
-import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
+import { createTransformer } from '@allmaps/transform'
 
-import type { ArgumentsCamelCase } from 'yargs'
+import { parseJsonFromFile, parseJsonInput, print } from '../../lib/io.js'
+import { parseAnnotationValidateMap } from '../../lib/parse.js'
+import {
+  addAnnotationOption,
+  addTransformOptions,
+  parseTransformOptions
+} from '../../lib/options.js'
+import { createSvgString, transformGeoJsonToSvg } from '../../lib/svg.js'
+import { isGeoJSONGeometry } from '../../lib/geojson.js'
 
-const command = 'geojson -a <annotation> [file...]'
+export default function geojson() {
+  let command = new Command('geojson')
+    .argument('[files...]')
+    .summary('transform GeoJSON to SVG')
+    .description('Transforms GeoJSON to SVG using a Georeference Annotation')
 
-const describe = "Transforms GeoJSON to SVG"
+  command = addAnnotationOption(command)
 
-const builder = {
-  annotation: {
-    alias: 'a',
-    description: 'Filename of Georeference Annotation',
-    demandOption: true
-  }
+  return addTransformOptions(command).action(async (files, options) => {
+    const annotation = parseJsonFromFile(options.annotation as string)
+    const mapOrMaps = parseAnnotationValidateMap(annotation)
+
+    if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
+      throw new Error('Annotation must contain exactly 1 georeferenced map')
+    }
+
+    const transformOptions = parseTransformOptions(options)
+
+    const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
+    const transformer = createTransformer(map.gcps)
+
+    const geoJsonGeometries = await parseJsonInput(files as string[])
+
+    let svgElements = []
+    for (let geoJsonGeometry of geoJsonGeometries) {
+      if (isGeoJSONGeometry(geoJsonGeometry)) {
+        const svgElement = transformGeoJsonToSvg(
+          transformer,
+          geoJsonGeometry,
+          transformOptions
+        )
+        svgElements.push(svgElement)
+      } else {
+        throw new Error(
+          'Unsupported input. Only GeoJSON Points, LineStrings and Polygons are supported.'
+        )
+      }
+    }
+
+    const svg = createSvgString(svgElements)
+    print(svg)
+  })
 }
-
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonFromStdin()
-
-  // geomEach
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
-}
-
-
-
-//   } else if (argv.format === 'geojson') {
-//     const maps = jsonValues.map(parseAnnotation).flat()
-
-//     let features = []
-
-//     for (let map of maps) {
-//       const transformer = createTransformer(map.gcps)
-//       const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
-
-//       features.push({
-//         type: 'Feature',
-//         properties: map,
-//         geometry: polygon
-//       })
-//     }
-
-//     let featureCollection = {
-//       type: 'FeatureCollection',
-//       features
-//     }
-
-//     printJson(featureCollection)
-//   } else if (argv.format === 'svg') {
-//     console.log('svg')
-//   }

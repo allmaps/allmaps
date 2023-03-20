@@ -1,0 +1,14 @@
+Allmaps CLI
+
+Usage: allmaps [options] [command]
+
+Options:
+  -h, --help      display help for command
+
+Commands:
+  annotation      parse and generate Georeference Annotations
+  transform       transform SVG to GeoJSON and vice versa
+  iiif            parse and generate IIIF resources
+  help [command]  display help for command
+
+For more details about Allmaps, see https://allmaps.org

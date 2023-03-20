@@ -1,56 +1,62 @@
+import { Command } from 'commander'
+
 import {
   createTransformer,
-  svgPolygonToGeoJSONPolygon
+  toGeoJSONPolygon,
+  type OptionalTransformOptions
 } from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
+import {
+  addTransformOptions,
+  parseTransformOptions
+} from '../../lib/options.js'
 
-import type { ArgumentsCamelCase } from 'yargs'
+export default function pixelMask() {
+  const command = new Command('pixel-mask')
+    .argument('[files...]')
+    .summary('transform pixel masks to GeoJSON')
+    .description(
+      'Transforms pixel masks of input Georeference Annotations to GeoJSON'
+    )
 
-const command = 'pixel-mask [file...]'
+  return addTransformOptions(command).action(async (files, options) => {
+    const jsonValues = await parseJsonInput(files as string[])
+    const maps = parseAnnotationsValidateMaps(jsonValues)
 
-const describe =
-  'Transforms pixel masks of input Georeference Annotations to GeoJSON'
+    let features = []
 
-const builder = {}
+    const transformOptions = parseTransformOptions(options)
 
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonInput(argv.file as string[])
-  const maps = parseAnnotationsValidateMaps(jsonValues)
+    for (let map of maps) {
+      if (map.gcps.length >= 3) {
+        const transformer = createTransformer(map.gcps)
+        const polygon = toGeoJSONPolygon(
+          transformer,
+          map.pixelMask,
+          transformOptions
+        )
 
-  let features = []
-
-  for (let map of maps) {
-    if (map.gcps.length >= 3) {
-      const transformer = createTransformer(map.gcps)
-      const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask, 0.01)
-
-      features.push({
-        type: 'Feature',
-        properties: {
-          imageUri: map.image.uri
-        },
-        geometry: polygon
-      })
-    } else {
-      console.error(
-        'Encountered Georeference Annotation with less than 3 points'
-      )
+        features.push({
+          type: 'Feature',
+          properties: {
+            imageUri: map.image.uri
+          },
+          geometry: polygon
+        })
+      } else {
+        console.error(
+          'Encountered Georeference Annotation with less than 3 points'
+        )
+      }
     }
-  }
 
-  const featureCollection = {
-    type: 'FeatureCollection',
-    features
-  }
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features
+    }
 
-  printJson(featureCollection)
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
+    printJson(featureCollection)
+  })
 }

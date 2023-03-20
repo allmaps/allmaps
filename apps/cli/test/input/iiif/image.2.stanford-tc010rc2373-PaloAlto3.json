@@ -1,0 +1,49 @@
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+  "protocol": "http://iiif.io/api/image",
+  "width": 6710,
+  "height": 7953,
+  "sizes": [
+    {
+      "width": 105,
+      "height": 124
+    },
+    {
+      "width": 210,
+      "height": 249
+    },
+    {
+      "width": 419,
+      "height": 497
+    },
+    {
+      "width": 839,
+      "height": 994
+    },
+    {
+      "width": 1678,
+      "height": 1988
+    },
+    {
+      "width": 3355,
+      "height": 3977
+    },
+    {
+      "width": 6710,
+      "height": 7953
+    },
+    {
+      "width": 6710,
+      "height": 7953
+    }
+  ],
+  "tiles": [
+    {
+      "width": 1024,
+      "height": 1024,
+      "scaleFactors": [1, 2, 4, 8, 16, 32, 64]
+    }
+  ],
+  "profile": "http://iiif.io/api/image/2/level2.json"
+}

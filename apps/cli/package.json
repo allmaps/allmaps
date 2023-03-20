@@ -34,8 +34,9 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "mocha && npm run lint",
+    "test": "NODE_ENV=test mocha --slow 200ms",
     "pretest": "npm run build",
+    "posttest": "npm run lint",
     "lint": "eslint dist test"
   },
   "keywords": [
@@ -50,18 +51,18 @@
     "@allmaps/annotation": "^1.0.0-beta.12",
     "@allmaps/iiif-parser": "^1.0.0-beta.22",
     "@allmaps/transform": "^1.0.0-beta.12",
+    "commander": "^10.0.0",
     "stream-json": "^1.7.4",
-    "svg-parser": "^2.0.4",
-    "yargs": "^17.5.1"
+    "svg-parser": "^2.0.4"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",
     "@types/stream-json": "^1.7.2",
     "@types/svg-parser": "^2.0.3",
-    "@types/yargs": "^17.0.12",
     "chai": "^4.3.6",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
+    "typescript": "^4.9.5",
     "zod": "^3.20.6"
   }
 }

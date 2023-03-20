@@ -1,0 +1,16 @@
+Allmaps CLI
+
+Usage: allmaps annotation [options] [command]
+
+Parses and generates Georeference Annotations
+
+Options:
+  -h, --help           display help for command
+
+Commands:
+  parse [files...]     parse Georeference Annotation
+  generate [files...]  generate Georeference Annotation
+  svg [files...]       generate SVG from pixel mask
+  help [command]       display help for command
+
+For more details about Allmaps, see https://allmaps.org

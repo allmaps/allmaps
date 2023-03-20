@@ -1,21 +1,12 @@
-import type { ArgumentsCamelCase } from 'yargs'
+import { Command } from 'commander'
 
 import parse from './iiif/parse.js'
 import manifest from './iiif/manifest.js'
 
-const command = 'iiif <command> [file...]'
-
-const describe = 'Parses and generates IIIF data'
-
-function builder(yargs: any) {
-  return yargs.command(parse).command(manifest).demandCommand(1, '')
-}
-
-async function handler(argv: ArgumentsCamelCase) {}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
+export default function iiif() {
+  return new Command('iiif')
+    .summary('parse and generate IIIF resources')
+    .description(`Parses and generates IIIF resources`)
+    .addCommand(parse())
+    .addCommand(manifest())
 }

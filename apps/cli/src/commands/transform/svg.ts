@@ -1,43 +1,56 @@
+import { Command } from 'commander'
+
+import { createTransformer } from '@allmaps/transform'
+
 import { parseJsonFromFile, readInput, printJson } from '../../lib/io.js'
 import { parseAnnotationValidateMap } from '../../lib/parse.js'
+import {
+  addAnnotationOption,
+  addTransformOptions,
+  parseTransformOptions
+} from '../../lib/options.js'
 import { geomEach } from '../../lib/svg.js'
+import {
+  transformSvgToGeoJson,
+  createFeatureCollection
+} from '../../lib/geojson.js'
 
-import type { ArgumentsCamelCase } from 'yargs'
+export default function svg() {
+  let command = new Command('svg')
+    .argument('[files...]')
+    .summary('transform SVG to GeoJSON')
+    .description('Transforms SVG to GeoJSON using a Georeference Annotation')
 
-const command = 'svg [file...]'
+  command = addAnnotationOption(command)
 
-const describe = 'Transforms SVG to GeoJSON'
+  return addTransformOptions(command).action(async (files, options) => {
+    const annotation = parseJsonFromFile(options.annotation as string)
+    const mapOrMaps = parseAnnotationValidateMap(annotation)
 
-const builder = {
-  annotation: {
-    alias: 'a',
-    description: 'Filename of Georeference Annotation',
-    demandOption: true
-  }
-}
-
-async function handler(argv: ArgumentsCamelCase) {
-  const annotation = parseJsonFromFile(argv.annotation as string)
-  const mapOrMaps = parseAnnotationValidateMap(annotation)
-
-  if (Array.isArray(mapOrMaps)) {
-    throw new Error('Annotation must contain exactly 1 georeferenced map')
-  }
-
-  const svgs = await readInput(argv.file as string[])
-
-  for (let svg of svgs) {
-    for (let geometry of geomEach(svg)) {
-      console.log(geometry)
+    if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
+      throw new Error('Annotation must contain exactly 1 georeferenced map')
     }
-  }
 
-  // read SVG from input
-}
+    const transformOptions = parseTransformOptions(options)
 
-export default {
-  command,
-  describe,
-  builder,
-  handler
+    const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
+    const transformer = createTransformer(map.gcps)
+
+    const svgs = await readInput(files as string[])
+
+    let geoJsonGeometries = []
+    for (let svg of svgs) {
+      for (let geometry of geomEach(svg)) {
+        const geoJsonGeometry = transformSvgToGeoJson(
+          transformer,
+          geometry,
+          transformOptions
+        )
+        geoJsonGeometries.push(geoJsonGeometry)
+      }
+    }
+
+    const featureCollection = createFeatureCollection(geoJsonGeometries)
+    printJson(featureCollection)
+  })
 }

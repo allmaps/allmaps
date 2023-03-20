@@ -18,18 +18,18 @@ Manifest URL:
 
 - https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 
-Use Allmaps API to find Georef Annotation:
+Use Allmaps API to find Georeference Annotations:
 
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 
-Fetch Georef Annotation with cURL, pipe to Allmaps CLI and transform pixel mask to GeoJSON:
+Fetch a Georeference Annotation with cURL, pipe to Allmaps CLI and transform pixel mask to GeoJSON:
 
 ```bash
 curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest" \
 | allmaps transform pixel-mask
 ```
 
-You can pipe as multiple Georef Annotations to Allmaps CLI:
+You can pipe as multiple Georeference Annotations to Allmaps CLI:
 
 Manifest URLs:
 
@@ -41,7 +41,7 @@ Georef Annotations:
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest
 
-Concatenate these two Georef Annotations with Bash and transform pixel masks to GeoJSON:
+Concatenate these two Georeference Annotations with Bash and transform pixel masks to GeoJSON:
 
 ```bash
 cat \
@@ -50,9 +50,9 @@ cat \
 | allmaps transform pixel-mask
 ```
 
-### Combine multiple Georef Annotations
+### Combine multiple Georeference Annotations
 
-Allmaps CLI can combine multiple Georef Annotations and output them as a single AnnotationPage:
+Allmaps CLI can combine multiple Georeference Annotations and output them as a single AnnotationPage:
 
 ```bash
 cat \
@@ -61,13 +61,13 @@ cat \
 | allmaps annotation generate
 ```
 
-If you have a directory containing multiple Georef Annotations, you can run:
+If you have a directory containing multiple Georeference Annotations, you can run:
 
 ```bash
 cat *.json | allmaps annotation generate
 ```
 
-If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georef Annotation to your clipboard:
+If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georeference Annotation to your clipboard:
 
 ```bash
 cat *.json | allmaps annotation generate | pbcopy

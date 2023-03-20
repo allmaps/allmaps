@@ -1,32 +1,52 @@
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
-import type { Map } from '@allmaps/annotation'
+import {
+  fromGeoJSONPoint,
+  fromGeoJSONLineString,
+  fromGeoJSONPolygon
+} from '@allmaps/transform'
 
-type ViewBox = [number, number, number, number]
+import type {
+  GeoJSONGeometry,
+  GCPTransformInfo,
+  OptionalTransformOptions
+} from '@allmaps/transform'
+
+import type { Map } from '@allmaps/annotation'
 
 type Coord = [number, number]
 
+type Circle = {
+  type: 'circle'
+  attributes?: {}
+  coordinates: Coord
+}
+
 type Line = {
   type: 'line'
+  attributes?: {}
   coordinates: [Coord, Coord]
 }
 
 type PolyLine = {
   type: 'polyline'
+  attributes?: {}
   coordinates: Coord[]
 }
 
 type Polygon = {
   type: 'polygon'
+  attributes?: {}
   coordinates: Coord[]
 }
 
 type Rect = {
   type: 'rect'
+  attributes?: {}
   coordinates: Coord[]
 }
 
-type Geometry = Line | PolyLine | Polygon | Rect
+export type GeometryElement = Circle | Line | PolyLine | Polygon | Rect
 
 function getNodeNumberProperty(node: ElementNode, prop: string): number {
   const value = node?.properties?.[prop]
@@ -50,10 +70,21 @@ function pointsToCoords(node: ElementNode): Coord[] {
   return []
 }
 
-function getGeometry(node: ElementNode): Geometry | undefined {
-  const tag = node?.tagName?.toLowerCase()
+function coordsToPoints(coordinates: Coord[]): string {
+  return coordinates.map((coordinate) => coordinate.join(',')).join(' ')
+}
 
-  if (tag === 'line') {
+function getGeometry(node: ElementNode): GeometryElement | undefined {
+  const tag = node?.tagName?.toLowerCase()
+  if (tag === 'circle') {
+    return {
+      type: 'circle',
+      coordinates: [
+        getNodeNumberProperty(node, 'cx'),
+        getNodeNumberProperty(node, 'cy')
+      ]
+    }
+  } else if (tag === 'line') {
     return {
       type: 'line',
       coordinates: [
@@ -95,6 +126,8 @@ function getGeometry(node: ElementNode): Geometry | undefined {
         [getNodeNumberProperty(node, 'x'), getNodeNumberProperty(node, 'y')]
       ]
     }
+  } else {
+    throw new Error(`Unsupported SVG element: ${tag}`)
   }
 }
 
@@ -117,66 +150,98 @@ export function* geomEach(svg: string) {
 
   for (let node of helper(parsedSvg)) {
     if ('tagName' in node) {
-      const geometry = getGeometry(node)
-      if (geometry) {
-        yield geometry
+      if (node.tagName !== 'svg' && node.tagName !== 'g') {
+        const geometry = getGeometry(node)
+        if (geometry) {
+          yield geometry
+        }
       }
     }
   }
 }
 
-function generateSvg(viewBox: ViewBox, contents: string) {
-  return `<svg viewBox="${viewBox.join(
-    ' '
-  )}" xmlns="http://www.w3.org/2000/svg">
-  ${contents}</svg>`
+export function createSvgString(elements: GeometryElement[]) {
+  return `<svg xmlns="http://www.w3.org/2000/svg">
+  ${elements.map(geometryElementToString).join('\n')}
+</svg>`
 }
 
-function pixelMapToPoints(pixelMask: [number, number][]): string {
-  return pixelMask.map((coordinate) => coordinate.join(',')).join(' ')
-}
-
-function pixelMapToViewBox(pixelMask: [number, number][]): ViewBox {
-  let minX = Number.POSITIVE_INFINITY
-  let minY = Number.POSITIVE_INFINITY
-  let maxX = Number.NEGATIVE_INFINITY
-  let maxY = Number.NEGATIVE_INFINITY
-
-  for (let [x, y] of pixelMask) {
-    minX = Math.min(x, minX)
-    minY = Math.min(y, minY)
-    maxX = Math.max(x, maxX)
-    maxY = Math.max(y, maxY)
+function geometryElementToString(element: GeometryElement): string {
+  if (element.type === 'circle') {
+    return elementToString('circle', {
+      ...element.attributes,
+      cx: element.coordinates[0],
+      cy: element.coordinates[1]
+    })
+  } else if (element.type === 'line') {
+    return elementToString('line', {
+      ...element.attributes,
+      x1: element.coordinates[0][0],
+      y1: element.coordinates[0][1],
+      x2: element.coordinates[1][0],
+      y2: element.coordinates[1][1]
+    })
+  } else if (element.type === 'polyline') {
+    return elementToString('polyline', {
+      ...element.attributes,
+      points: coordsToPoints(element.coordinates)
+    })
+  } else if (element.type === 'polygon') {
+    return elementToString('polygon', {
+      ...element.attributes,
+      points: coordsToPoints(element.coordinates)
+    })
+  } else if (element.type === 'rect') {
+    return elementToString('rect', {
+      ...element.attributes,
+      x: element.coordinates[0][0],
+      y: element.coordinates[0][1],
+      width: element.coordinates[1][0] - element.coordinates[0][0],
+      height: element.coordinates[2][1] - element.coordinates[0][1]
+    })
+  } else {
+    throw new Error('Unknown SVG element')
   }
-
-  return [minX, minY, maxX - minX, maxY - minY]
 }
 
-export function generatePixelMapSvg(maps: Map[]) {
-  let minX = Number.POSITIVE_INFINITY
-  let minY = Number.POSITIVE_INFINITY
-  let maxX = Number.NEGATIVE_INFINITY
-  let maxY = Number.NEGATIVE_INFINITY
-
-  const polygons = maps.map((map) => {
-    const imageUri = map.image.uri
-    const polygon = `<polygon data-image-uri="${encodeURIComponent(
-      imageUri
-    )}" fill="none" stroke="black" points="${pixelMapToPoints(
-      map.pixelMask
-    )}" />`
-
-    const viewBox = pixelMapToViewBox(map.pixelMask)
-    minX = Math.min(viewBox[0], minX)
-    minY = Math.min(viewBox[1], minY)
-    maxX = Math.max(viewBox[0] + viewBox[2], maxX)
-    maxY = Math.max(viewBox[1] + viewBox[3], maxY)
-
-    return polygon
-  })
-
-  return generateSvg(
-    polygons.length ? [minX, minY, maxX - minX, maxY - minY] : [0, 0, 0, 0],
-    polygons.join('\n')
+function elementToString(tag: string, attributes: {}): string {
+  const attributeStrings = Object.entries(attributes).map(
+    ([key, value]) => `${key}="${value}"`
   )
+  return `<${tag} ${attributeStrings.join(' ')} />`
+}
+
+export function pixelMaskToSvgPolygon(map: Map): Polygon {
+  return {
+    type: 'polygon',
+    attributes: {
+      'data-image-uri': encodeURIComponent(map.image.uri)
+    },
+    coordinates: map.pixelMask
+  }
+}
+
+export function transformGeoJsonToSvg(
+  transformer: GCPTransformInfo,
+  geometry: GeoJSONGeometry,
+  options?: OptionalTransformOptions
+): GeometryElement {
+  if (geometry.type === 'Point') {
+    return {
+      type: 'circle',
+      coordinates: fromGeoJSONPoint(transformer, geometry)
+    }
+  } else if (geometry.type === 'LineString') {
+    return {
+      type: 'polyline',
+      coordinates: fromGeoJSONLineString(transformer, geometry, options)
+    }
+  } else if (geometry.type === 'Polygon') {
+    return {
+      type: 'polygon',
+      coordinates: fromGeoJSONPolygon(transformer, geometry, options)
+    }
+  } else {
+    throw new Error(`Unsupported GeoJSON geometry`)
+  }
 }
