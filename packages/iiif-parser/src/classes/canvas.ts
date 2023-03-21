@@ -37,7 +37,7 @@ export class Canvas {
 
       this.metadata = parseVersion2Metadata(parsedCanvas.metadata)
 
-      this.image = new EmbeddedImage(parsedCanvas.images[0].resource)
+      this.image = new EmbeddedImage(parsedCanvas.images[0].resource, parsedCanvas)
     } else if ('id' in parsedCanvas) {
       // IIIF Presentation API 3.0
 
@@ -55,7 +55,7 @@ export class Canvas {
         annotationBody = annotationBodyOrBodies
       }
 
-      this.image = new EmbeddedImage(annotationBody)
+      this.image = new EmbeddedImage(annotationBody, parsedCanvas)
     } else {
       throw new Error('Invalid IIIF Canvas')
     }

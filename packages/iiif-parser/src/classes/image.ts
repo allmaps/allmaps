@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  CanvasSchema,
   Image1Schema,
   Image2Schema,
   Image3Schema,
@@ -27,6 +28,7 @@ import type {
   TileZoomLevel
 } from '../lib/types.js'
 
+type CanvasType = z.infer<typeof CanvasSchema>
 type ImageType = z.infer<typeof ImageSchema>
 type EmbeddedImageType =
   | z.infer<typeof AnnotationBody3Schema>
@@ -51,8 +53,11 @@ export class EmbeddedImage {
 
   majorVersion: MajorVersion
 
-  constructor(parsedImage: ImageType | EmbeddedImageType, embedded = true) {
-    if (embedded) {
+  constructor(
+    parsedImage: ImageType | EmbeddedImageType,
+    parsedCanvas?: CanvasType
+  ) {
+    if (parsedCanvas) {
       const parsedEmbeddedImage = parsedImage as EmbeddedImageType
 
       let imageService
@@ -142,8 +147,21 @@ export class EmbeddedImage {
       }
     }
 
-    this.width = parsedImage.width
-    this.height = parsedImage.height
+    if (parsedImage.width !== undefined) {
+      this.width = parsedImage.width
+    } else if (parsedCanvas) {
+      this.width = parsedCanvas.width
+    } else {
+      throw new Error('Width not present on either Canvas or Image Resource')
+    }
+
+    if (parsedImage.height !== undefined) {
+      this.height = parsedImage.height
+    } else if (parsedCanvas) {
+      this.height = parsedCanvas.height
+    } else {
+      throw new Error('Height not present on either Canvas or Image Resource')
+    }
   }
 
   getImageUrl({ region, size }: ImageRequest): string {
@@ -250,7 +268,7 @@ export class Image extends EmbeddedImage {
   sizes?: Size[]
 
   constructor(parsedImage: ImageType) {
-    super(parsedImage, false)
+    super(parsedImage)
 
     this.embedded = false
 

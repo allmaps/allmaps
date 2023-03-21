@@ -24,8 +24,8 @@ export const MetadataItem2Schema = z.object({
 export const Metadata2Schema = MetadataItem2Schema.array()
 
 export const ImageResource2Schema = z.object({
-  width: z.number().int(),
-  height: z.number().int(),
+  width: z.number().int().optional(),
+  height: z.number().int().optional(),
   service: ImageServiceSchema
 })
 
