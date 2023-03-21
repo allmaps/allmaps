@@ -4,7 +4,7 @@ import {
   GDALGCPTransform
 } from './gdaltransform.js'
 
-import type { Position, ImageWorldGCP } from './shared/types.js'
+import type { Position, ImageWorldPosition } from './shared/types.js'
 
 import type { GCPTransformInfo } from './gdaltransform.js'
 
@@ -32,7 +32,7 @@ export function toImage(
   return [output[0].x, output[0].y]
 }
 
-export function createTransformer(gcps: ImageWorldGCP[]): GCPTransformInfo {
+export function createTransformer(gcps: ImageWorldPosition[]): GCPTransformInfo {
   const pasGCPs = gcps.map(
     (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
   )

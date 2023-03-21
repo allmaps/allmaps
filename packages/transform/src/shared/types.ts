@@ -5,9 +5,17 @@ export type Position = [number, number]
 
 export type BBox = [number, number, number, number]
 
+// Consider using @types/geojson!
+export type GeoJSONGeometry = GeoJSONPoint | GeoJSONLineString | GeoJSONPolygon
+
 export type GeoJSONPoint = {
   type: 'Point'
   coordinates: Position
+}
+
+export type GeoJSONLineString = {
+  type: 'LineString'
+  coordinates: Position[]
 }
 
 export type GeoJSONPolygon = {
@@ -15,9 +23,16 @@ export type GeoJSONPolygon = {
   coordinates: Position[][]
 }
 
-export type ImageWorldGCP = { image: Position; world: Position }
+export type ImageWorldPosition = { image: Position; world: Position }
 
 export type Segment = {
-  from: ImageWorldGCP
-  to: ImageWorldGCP
+  from: ImageWorldPosition
+  to: ImageWorldPosition
 }
+
+export type TransformOptions = {
+  maxOffsetRatio: number
+  maxDepth: number
+}
+
+export type OptionalTransformOptions = Partial<TransformOptions>

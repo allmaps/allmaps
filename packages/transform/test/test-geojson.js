@@ -5,7 +5,7 @@ import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-import { createTransformer, svgPolygonToGeoJSONPolygon } from '../dist/index.js'
+import { createTransformer, toGeoJSONPolygon } from '../dist/index.js'
 
 chai.use(shallowDeepEqual)
 
@@ -54,7 +54,7 @@ function runTests(file) {
     let error
 
     try {
-      geojson = svgPolygonToGeoJSONPolygon(transformer, file.map.pixelMask)
+      geojson = toGeoJSONPolygon(transformer, file.map.pixelMask)
     } catch (err) {
       error = err.message
     }
