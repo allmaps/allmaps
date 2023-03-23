@@ -21,21 +21,32 @@ Apps:
 
 ## Installation
 
+First, clone this repository locally:
+
+    git clone https://github.com/allmaps/allmaps.git
+    cd allmaps
+
+Install dependencies and create symlinks:
+
     pnpm install -r
     lerna link
-
-Run Allmaps Viewer:
-
-    pnpm --filter "@allmaps/viewer" run dev
-
- Run tests in single package:
-
-    npx lerna run --scope @allmaps/id test
 
 Run `dev` and `build --watch` scripts for all packages and apps:
 
     npx lerna run dev --parallel
     npx lerna run watch --parallel
+
+Run `test` scripts for all packages and apps:
+
+    npx lerna run test --parallel
+
+You can also use pnpm to run packages individually. For example, to run Allmaps Viewer:
+
+    pnpm --filter "@allmaps/viewer" run dev
+
+Run tests in single package:
+
+    npx lerna run --scope @allmaps/id test
 
 # Versioning & publishing
 
