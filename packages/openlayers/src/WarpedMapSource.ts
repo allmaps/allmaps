@@ -21,7 +21,9 @@ export class WarpedMapSource extends Source {
     this.world = new World(this.rtree)
   }
 
-  async addGeorefAnnotation(annotation: Annotation): Promise<(string | Error)[]> {
+  async addGeorefAnnotation(
+    annotation: Annotation
+  ): Promise<(string | Error)[]> {
     return this.world.addGeorefAnnotation(annotation)
   }
 
@@ -35,5 +37,25 @@ export class WarpedMapSource extends Source {
 
   getExtent(): BBox | undefined {
     return this.world.getBBox()
+  }
+
+  bringToFront(mapIds: Iterable<string>) {
+    this.world.bringToFront(mapIds)
+    this.changed()
+  }
+
+  sendToBack(mapIds: string[]) {
+    this.world.sendToBack(mapIds)
+    this.changed()
+  }
+
+  bringForward(mapIds: Iterable<string>) {
+    this.world.bringForward(mapIds)
+    this.changed()
+  }
+
+  sendBackward(mapIds: Iterable<string>) {
+    this.world.sendBackward(mapIds)
+    this.changed()
   }
 }

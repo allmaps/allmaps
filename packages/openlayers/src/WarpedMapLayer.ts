@@ -107,6 +107,11 @@ export class WarpedMapLayer extends Layer {
       this.warpedMapAdded.bind(this)
     )
 
+    this.world.addEventListener(
+      WarpedMapEventType.ZINDICESCHANGES,
+      this.zIndicesChanged.bind(this)
+    )
+
     this.viewport = new Viewport(this.world)
 
     this.throttledUpdateViewportAndGetTilesNeeded = throttle(
@@ -149,11 +154,27 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
+  zIndicesChanged() {
+    const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
+      (mapIdA, mapIdB) => {
+        const zIndexA = this.world.getZIndex(mapIdA)
+        const zIndexB = this.world.getZIndex(mapIdB)
+        if (zIndexA !== undefined && zIndexB !== undefined) {
+          return zIndexA - zIndexB
+        }
+
+        return 0
+      }
+    )
+
+    this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
+  }
+
   warpedMapEnter(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       this.mapIdsInViewport.add(mapId)
-
+      this.zIndicesChanged()
       // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
       // TODO: set visible
     }

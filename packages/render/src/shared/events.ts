@@ -1,6 +1,11 @@
 export enum WarpedMapEventType {
   WARPEDMAPADDED = 'warpedmapadded',
+  WARPEDMAPREMOVED = 'warpedmapremoved',
+
+  ZINDICESCHANGES = 'zindiceschanged',
+
   GEOREFANNOTATIONADDED = 'georefannotationadded',
+  GEOREFANNOTATIONREMOVED = 'georefannotationremoved',
 
   WARPEDMAPENTER = 'warpedmapenter',
   WARPEDMAPLEAVE = 'warpedmapleave',
