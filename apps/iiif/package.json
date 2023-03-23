@@ -19,7 +19,6 @@
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/iiif-viewer --include-dependencies",
     "preview": "vite preview",
-    "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
@@ -32,7 +31,6 @@
     "@allmaps/ui": "^1.0.0-beta.13"
   },
   "devDependencies": {
-    "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-static": "^1.0.0",
     "@sveltejs/kit": "^1.0.0",
     "@types/openseadragon": "^3.0.4",

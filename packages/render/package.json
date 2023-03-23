@@ -35,7 +35,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
-    "test": "mocha && eslint dist test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "homepage": "https://allmaps.org",

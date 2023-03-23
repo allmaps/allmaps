@@ -33,8 +33,7 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist",
-    "test": "mocha && eslint dist test"
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
