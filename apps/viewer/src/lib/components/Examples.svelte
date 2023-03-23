@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { examples } from '$lib/components/examples.json'
+  import examples from '$lib/components/examples.js'
 </script>
 
 <p class="mb-2">You can also use one of these examples:</p>
