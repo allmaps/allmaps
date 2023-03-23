@@ -1,5 +1,5 @@
+import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import 'mocha'
 
 import { exec, execJson } from './lib/exec.js'
 import { readFileJson } from './lib/fs.js'

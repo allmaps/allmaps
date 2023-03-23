@@ -1,5 +1,5 @@
+import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import 'mocha'
 
 import { readFile, readFileJson } from './lib/fs.js'
 import { exec, execJson } from './lib/exec.js'
@@ -13,16 +13,16 @@ describe('allmaps transform', () => {
 
 describe('allmaps transform svg', () => {
   it('should display help when no arguments are provided', () => {
-    expect(() => exec('transform svg')).to.throw(
-      helpMessage('transform-svg')
-    )
+    expect(() => exec('transform svg')).to.throw(helpMessage('transform-svg'))
   })
 
   // with -a, but no file
   // with -a, but multiple maps
 
   it('should read an SVG polygon from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation', () => {
-    const expected = readFileJson('output/geojson/7a69f9470b49a744-polygon.geojson')
+    const expected = readFileJson(
+      'output/geojson/7a69f9470b49a744-polygon.geojson'
+    )
     const output = execJson(
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polygon.svg'
@@ -32,7 +32,9 @@ describe('allmaps transform svg', () => {
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation', () => {
-    const expected = readFileJson('output/geojson/7a69f9470b49a744-polylines.geojson')
+    const expected = readFileJson(
+      'output/geojson/7a69f9470b49a744-polylines.geojson'
+    )
     const output = execJson(
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polylines.svg'
@@ -107,12 +109,9 @@ describe('allmaps transform pixel-mask', () => {
     expect(expected).to.deep.equal(output)
   })
 
-
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
-    const expected = readFileJson(
-      'output/geojson/13fd7a1921f2b011-d0.geojson'
-    )
-      const output = execJson(
+    const expected = readFileJson('output/geojson/13fd7a1921f2b011-d0.geojson')
+    const output = execJson(
       'transform pixel-mask input/annotations/13fd7a1921f2b011.json'
     )
 
@@ -120,14 +119,11 @@ describe('allmaps transform pixel-mask', () => {
   })
 
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the custom transform options', () => {
-    const expected = readFileJson(
-      'output/geojson/13fd7a1921f2b011-d8.geojson'
-    )
+    const expected = readFileJson('output/geojson/13fd7a1921f2b011-d8.geojson')
     const output = execJson(
       'transform pixel-mask -p 0.01 -d 8 input/annotations/13fd7a1921f2b011.json'
     )
 
     expect(expected).to.deep.equal(output)
-
   })
 })
