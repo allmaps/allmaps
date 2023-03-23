@@ -44,6 +44,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "typescript": "^4.9.5",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",
