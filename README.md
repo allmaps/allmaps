@@ -29,7 +29,7 @@ First, clone this repository locally:
 Install dependencies and create symlinks:
 
     pnpm install -r
-    lerna link
+    npx lerna link
 
 Run `dev` and `build --watch` scripts for all packages and apps:
 
