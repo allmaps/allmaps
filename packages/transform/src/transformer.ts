@@ -1,42 +1,43 @@
-import {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
-} from './gdaltransform.js'
+import type {
+  TransformerInterface,
+  TransformationType,
+  Position,
+  ImageWorldPosition
+} from './shared/types.js'
 
-import type { Position, ImageWorldPosition } from './shared/types.js'
+import PolynomialTransformer from './transformers/polynomial-transformer.js'
+import RadialBasisFunctionTransformer from './transformers/radial-basis-function-transformer.js'
 
-import type { GCPTransformInfo } from './gdaltransform.js'
+import { distanceThinPlate } from './shared/distance-functions.js'
 
-export function toWorld(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = false
+export default class Transformer implements TransformerInterface {
+  gcps: ImageWorldPosition[]
+  transformer: TransformerInterface
 
-  const input = [{ x: point[0], y: point[1] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
+  constructor(
+    gcps: ImageWorldPosition[],
+    type: TransformationType = 'polynomial'
+    // options: TransformationOptions
+  ) {
+    this.gcps = gcps
 
-  return [output[0].y, output[0].x]
-}
+    if (type === 'polynomial') {
+      this.transformer = new PolynomialTransformer(gcps)
+    } else if (type === 'thin-plate-spline') {
+      this.transformer = new RadialBasisFunctionTransformer(
+        gcps,
+        distanceThinPlate
+      )
+    } else {
+      throw new Error(`Unsupported transformation type: ${type}`)
+    }
+  }
 
-export function toImage(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = true
+  toWorld(point: Position): Position {
+    return this.transformer.toWorld(point)
+  }
 
-  const input = [{ x: point[1], y: point[0] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
-
-  return [output[0].x, output[0].y]
-}
-
-export function createTransformer(gcps: ImageWorldPosition[]): GCPTransformInfo {
-  const pasGCPs = gcps.map(
-    (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
-  )
-
-  const nOrder = 0
-  return GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+  toResource(point: Position): Position {
+    return this.transformer.toResource(point)
+  }
 }
