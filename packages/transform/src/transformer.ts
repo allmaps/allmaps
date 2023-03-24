@@ -1,44 +1,43 @@
-import {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
-} from './gdaltransform.js'
+import type {
+  TransformerInterface,
+  TransformationType,
+  Position,
+  ImageWorldPosition
+} from './shared/types.js'
 
-import type { Position, ImageWorldPosition } from './shared/types.js'
+import PolynomialTransformer from './transformers/polynomial-transformer.js'
+import RadialBasisFunctionTransformer from './transformers/radial-basis-function-transformer.js'
 
-import type { GCPTransformInfo } from './gdaltransform.js'
+import { distanceThinPlate } from './shared/distance-functions.js'
 
-export function toWorld(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = false
-
-  const input = [{ x: point[0], y: point[1] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
-
-  return [output[0].y, output[0].x]
-}
-
-export function toImage(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = true
-
-  const input = [{ x: point[1], y: point[0] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
-
-  return [output[0].x, output[0].y]
-}
-
-export function createTransformer(
+export default class Transformer implements TransformerInterface {
   gcps: ImageWorldPosition[]
-): GCPTransformInfo {
-  const pasGCPs = gcps.map(
-    (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
-  )
+  transformer: TransformerInterface
 
-  const nOrder = 0
-  return GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+  constructor(
+    gcps: ImageWorldPosition[],
+    type: TransformationType = 'polynomial'
+    // options: TransformationOptions
+  ) {
+    this.gcps = gcps
+
+    if (type === 'polynomial') {
+      this.transformer = new PolynomialTransformer(gcps)
+    } else if (type === 'thin-plate-spline') {
+      this.transformer = new RadialBasisFunctionTransformer(
+        gcps,
+        distanceThinPlate
+      )
+    } else {
+      throw new Error(`Unsupported transformation type: ${type}`)
+    }
+  }
+
+  toWorld(point: Position): Position {
+    return this.transformer.toWorld(point)
+  }
+
+  toResource(point: Position): Position {
+    return this.transformer.toResource(point)
+  }
 }
