@@ -1,0 +1,154 @@
+{
+  "embedded": false,
+  "type": "manifest",
+  "uri": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171660.0x000001/manifest.json",
+  "majorVersion": 2,
+  "label": {
+    "none": [
+      "CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences"
+    ]
+  },
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 8586,
+      "height": 6543,
+      "uri": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171687.0x000002",
+      "label": {
+        "none": ["-"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 8586,
+        "height": 6543
+      }
+    }
+  ],
+  "description": {
+    "none": ["Item supplied by the British Library"]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Identifier"]
+      },
+      "value": {
+        "none": ["Digital Store Maps K.Top.124.4.a."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Held by"]
+      },
+      "value": {
+        "none": [
+          "<span><a href=\"https://www.bl.uk\">The British Library</a></span>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "none": [
+          "CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Creator"]
+      },
+      "value": {
+        "none": ["L'Isle, Guillaume de"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Place"]
+      },
+      "value": {
+        "none": ["Paris"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": [
+          "Chez l'Auteur sur le Quai de l'Horloge. avec Privilege du Roi pour 20 ans 1703"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["[1703-[1708.]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "none": ["French"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Catalogue record"]
+      },
+      "value": {
+        "none": [
+          "<a href=\"http://explore.bl.uk/primo_library/libweb/action/dlDisplay.do?docId=BLL01018640954&amp;vid=BLVU1&amp;lang=en_US&amp;institution=BL\">View the catalogue record</a>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Digitised from"]
+      },
+      "value": {
+        "none": [
+          "<a href=\"http://explore.bl.uk/primo_library/libweb/action/dlDisplay.do?docId=BLL01004908105&amp;vid=BLVU1&amp;lang=en_US&amp;institution=BL\">CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c. : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c. /</a>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Citation"]
+      },
+      "value": {
+        "none": [
+          "<span>L'Isle, Guillaume de, <i>CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences</i>, (Paris: Chez l'Auteur sur le Quai de l'Horloge. avec Privilege du Roi pour 20 ans 1703, [1703-[1708.]) &lt;http://access.bl.uk/item/viewer/ark:/81055/vdc_100052171660.0x000001&gt;</span>"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Digitisation funded by"]
+      },
+      "value": {
+        "none": [
+          "The King's Topographical Collection has been digitised with the generous support of several trusts and individuals: https://www.bl.uk/projects/kings-topographical-collection-cataloguing-and-digitisation"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Digitised by"]
+      },
+      "value": {
+        "none": ["The British Library"]
+      }
+    }
+  ]
+}

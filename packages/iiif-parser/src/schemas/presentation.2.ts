@@ -17,8 +17,8 @@ export const StringValue2Schema = SingleStringValue2Schema.or(
 ).or(LanguageString2Schema.array())
 
 export const MetadataItem2Schema = z.object({
-  label: StringValue2Schema,
-  value: StringValue2Schema
+  label: StringValue2Schema.optional(),
+  value: StringValue2Schema.optional()
 })
 
 export const Metadata2Schema = MetadataItem2Schema.array()

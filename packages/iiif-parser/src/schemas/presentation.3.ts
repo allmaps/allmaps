@@ -8,8 +8,8 @@ import { ImageServiceSchema } from './image-service.js'
 export const StringValue3Schema = z.record(z.string(), z.string().array())
 
 export const MetadataItem3Schema = z.object({
-  label: StringValue3Schema,
-  value: StringValue3Schema
+  label: StringValue3Schema.optional(),
+  value: StringValue3Schema.optional()
 })
 
 export const Metadata3Schema = MetadataItem3Schema.array()
