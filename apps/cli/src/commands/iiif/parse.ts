@@ -27,8 +27,10 @@ export default function parse() {
             const issues = getIssues(jsonValue, zodError)
 
             issues.forEach((issue) => {
-              console.log(formatIssue(issue))
+              console.error(formatIssue(issue))
             })
+          } else if (err instanceof Error) {
+            console.error(err.message)
           }
         }
       }
