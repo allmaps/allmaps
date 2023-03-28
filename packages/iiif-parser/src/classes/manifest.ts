@@ -66,10 +66,10 @@ export class Manifest extends EmbeddedManifest {
   description?: LanguageString
   metadata?: Metadata
 
+  embedded = false
+
   constructor(parsedManifest: ManifestType) {
     super(parsedManifest)
-
-    this.embedded = false
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0

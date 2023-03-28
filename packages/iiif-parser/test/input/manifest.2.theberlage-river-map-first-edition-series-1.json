@@ -1,0 +1,1441 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-1.json",
+  "@type": "sc:Manifest",
+  "label": "Eerste druk, Serie 1",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "Kaart van de rivieren de Boven Rijn, de Waal, de Merwede, de Oude en een gedeelte van de Nieuwe Maas van Lobith tot Brielle : in twintig bladen benevens twee supplementaire bladen voor de Dordtsche Kil / vervaardigd op last van zijne excellentie den Minister van Binnenlandse Zaken, onder directie van den Hoofd-Ingenieur bij de Algemeene Dienst van den Waterstaat B.H. Goudriaan. \u2013 Schaal 1:10.000. - [Delft] : Algemeene Dienst van den Waterstaat, 1830-1835. ([Delft] : het Bureau en de drukkerij van de Directie der Militaire Verkenningen). -1 kaartserie, in 27 bladen : lithografie ; diverse formaten."
+    },
+    {
+      "label": "Editie",
+      "value": "EERSTE DRUK"
+    },
+    {
+      "label": "Serie",
+      "value": "1"
+    },
+    {
+      "label": "Geoplaza Kaartseries",
+      "value": "<a href=\"https://geoplaza.vu.nl/mapseries/search?&fs[base_series]=Rivierkaarten&fs[base_set]=rvr^EERSTE DRUK,%20serie%201\">EERSTE DRUK, serie 1</a>"
+    }
+  ],
+  "sequences": [
+    {
+      "@id": "https://dlc.services/iiif-query/7/?sequence=n1&manifest=s1&canvas=n2&s1=rivierkaart&n1=",
+      "@type": "sc:Sequence",
+      "label": "Sequence 0",
+      "canvases": [
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=0",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 712,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 712
+                },
+                {
+                  "width": 400,
+                  "height": 278
+                },
+                {
+                  "width": 200,
+                  "height": 139
+                },
+                {
+                  "width": 100,
+                  "height": 70
+                }
+              ]
+            }
+          },
+          "height": 5064,
+          "width": 7280,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5064,
+                "width": 7280,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5064,
+                  "width": 7280,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=0"
+            }
+          ],
+          "label": "00A. Titelblad met bladwijzer en verklaring van de zamenstelling der kaart (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=1",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 644,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 644
+                },
+                {
+                  "width": 400,
+                  "height": 252
+                },
+                {
+                  "width": 200,
+                  "height": 126
+                },
+                {
+                  "width": 100,
+                  "height": 63
+                }
+              ]
+            }
+          },
+          "height": 4992,
+          "width": 7936,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4992,
+                "width": 7936,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4992,
+                  "width": 7936,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=1"
+            }
+          ],
+          "label": "00B. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Waal, Merwede, Oude- en Nieuwe Maas van Emmerik tot Brielle (1863)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=2",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 603,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 603
+                },
+                {
+                  "width": 400,
+                  "height": 235
+                },
+                {
+                  "width": 200,
+                  "height": 118
+                },
+                {
+                  "width": 100,
+                  "height": 59
+                }
+              ]
+            }
+          },
+          "height": 4572,
+          "width": 7768,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4572,
+                "width": 7768,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4572,
+                  "width": 7768,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=2"
+            }
+          ],
+          "label": "00C. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn, Lek, Nieuwe-Maas en Scheur van Emmerik tot aan zee (1863)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=3",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 637,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 637
+                },
+                {
+                  "width": 400,
+                  "height": 249
+                },
+                {
+                  "width": 200,
+                  "height": 125
+                },
+                {
+                  "width": 100,
+                  "height": 62
+                }
+              ]
+            }
+          },
+          "height": 4512,
+          "width": 7248,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4512,
+                "width": 7248,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4512,
+                  "width": 7248,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=3"
+            }
+          ],
+          "label": "00D. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn en Geldersche IJssel van Emmerik tot de Zuiderzee (1863)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=4",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 674,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 674
+                },
+                {
+                  "width": 400,
+                  "height": 263
+                },
+                {
+                  "width": 200,
+                  "height": 132
+                },
+                {
+                  "width": 100,
+                  "height": 66
+                }
+              ]
+            }
+          },
+          "height": 4920,
+          "width": 7480,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4920,
+                "width": 7480,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4920,
+                  "width": 7480,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=4"
+            }
+          ],
+          "label": "01. Schenkenschans (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=5",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 736,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 736
+                },
+                {
+                  "width": 400,
+                  "height": 288
+                },
+                {
+                  "width": 200,
+                  "height": 144
+                },
+                {
+                  "width": 100,
+                  "height": 72
+                }
+              ]
+            }
+          },
+          "height": 5040,
+          "width": 7008,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5040,
+                "width": 7008,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5040,
+                  "width": 7008,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=5"
+            }
+          ],
+          "label": "02. Kekerdom (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=6",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 742,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 742
+                },
+                {
+                  "width": 400,
+                  "height": 290
+                },
+                {
+                  "width": 200,
+                  "height": 145
+                },
+                {
+                  "width": 100,
+                  "height": 72
+                }
+              ]
+            }
+          },
+          "height": 3088,
+          "width": 4260,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 3088,
+                "width": 4260,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 3088,
+                  "width": 4260,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=6"
+            }
+          ],
+          "label": "02A. Suplementair Blad, behoorende bij het blad No. 2 Kekerdom (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=7",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 700,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 700
+                },
+                {
+                  "width": 400,
+                  "height": 274
+                },
+                {
+                  "width": 200,
+                  "height": 137
+                },
+                {
+                  "width": 100,
+                  "height": 68
+                }
+              ]
+            }
+          },
+          "height": 4980,
+          "width": 7280,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4980,
+                "width": 7280,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4980,
+                  "width": 7280,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=7"
+            }
+          ],
+          "label": "03. Nijmegen (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=8",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 783,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 783
+                },
+                {
+                  "width": 400,
+                  "height": 306
+                },
+                {
+                  "width": 200,
+                  "height": 153
+                },
+                {
+                  "width": 100,
+                  "height": 76
+                }
+              ]
+            }
+          },
+          "height": 5604,
+          "width": 7328,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5604,
+                "width": 7328,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5604,
+                  "width": 7328,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=8"
+            }
+          ],
+          "label": "04. Herveld (1830)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=9",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 712,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 712
+                },
+                {
+                  "width": 400,
+                  "height": 278
+                },
+                {
+                  "width": 200,
+                  "height": 139
+                },
+                {
+                  "width": 100,
+                  "height": 70
+                }
+              ]
+            }
+          },
+          "height": 5052,
+          "width": 7264,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5052,
+                "width": 7264,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5052,
+                  "width": 7264,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=9"
+            }
+          ],
+          "label": "05. Dodewaard (1831)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=10",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 711,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 711
+                },
+                {
+                  "width": 400,
+                  "height": 278
+                },
+                {
+                  "width": 200,
+                  "height": 139
+                },
+                {
+                  "width": 100,
+                  "height": 69
+                }
+              ]
+            }
+          },
+          "height": 5100,
+          "width": 7344,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5100,
+                "width": 7344,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5100,
+                  "width": 7344,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=10"
+            }
+          ],
+          "label": "06. Leeuwen (1831)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=11",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 826,
+              "height": 1024,
+              "sizes": [
+                {
+                  "width": 826,
+                  "height": 1024
+                },
+                {
+                  "width": 323,
+                  "height": 400
+                },
+                {
+                  "width": 161,
+                  "height": 200
+                },
+                {
+                  "width": 81,
+                  "height": 100
+                }
+              ]
+            }
+          },
+          "height": 6592,
+          "width": 5316,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 6592,
+                "width": 5316,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 6592,
+                  "width": 5316,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=11"
+            }
+          ],
+          "label": "07. Tiel (1831)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=12",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 712,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 712
+                },
+                {
+                  "width": 400,
+                  "height": 278
+                },
+                {
+                  "width": 200,
+                  "height": 139
+                },
+                {
+                  "width": 100,
+                  "height": 70
+                }
+              ]
+            }
+          },
+          "height": 5088,
+          "width": 7320,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5088,
+                "width": 7320,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5088,
+                  "width": 7320,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=12"
+            }
+          ],
+          "label": "08. Varik (1831)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=13",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/4de72774-2c60-466c-9bee-bdd9e827e561/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/4de72774-2c60-466c-9bee-bdd9e827e561",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 699,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 699
+                },
+                {
+                  "width": 400,
+                  "height": 273
+                },
+                {
+                  "width": 200,
+                  "height": 137
+                },
+                {
+                  "width": 100,
+                  "height": 68
+                }
+              ]
+            }
+          },
+          "height": 5004,
+          "width": 7328,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5004,
+                "width": 7328,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5004,
+                  "width": 7328,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=13"
+            }
+          ],
+          "label": "09. Zalt-Boemel (1832)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=14",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 892,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 892
+                },
+                {
+                  "width": 400,
+                  "height": 349
+                },
+                {
+                  "width": 200,
+                  "height": 174
+                },
+                {
+                  "width": 100,
+                  "height": 87
+                }
+              ]
+            }
+          },
+          "height": 6336,
+          "width": 7272,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 6336,
+                "width": 7272,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 6336,
+                  "width": 7272,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=14"
+            }
+          ],
+          "label": "10. Zuilichem (1832)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=15",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 820,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 820
+                },
+                {
+                  "width": 400,
+                  "height": 320
+                },
+                {
+                  "width": 200,
+                  "height": 160
+                },
+                {
+                  "width": 100,
+                  "height": 80
+                }
+              ]
+            }
+          },
+          "height": 5856,
+          "width": 7312,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5856,
+                "width": 7312,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5856,
+                  "width": 7312,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=15"
+            }
+          ],
+          "label": "11. Brakel (1832)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=16",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 752,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 752
+                },
+                {
+                  "width": 400,
+                  "height": 294
+                },
+                {
+                  "width": 200,
+                  "height": 147
+                },
+                {
+                  "width": 100,
+                  "height": 73
+                }
+              ]
+            }
+          },
+          "height": 5376,
+          "width": 7320,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5376,
+                "width": 7320,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5376,
+                  "width": 7320,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=16"
+            }
+          ],
+          "label": "12. Gorinchem (1833)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=17",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 718,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 718
+                },
+                {
+                  "width": 400,
+                  "height": 280
+                },
+                {
+                  "width": 200,
+                  "height": 140
+                },
+                {
+                  "width": 100,
+                  "height": 70
+                }
+              ]
+            }
+          },
+          "height": 5088,
+          "width": 7256,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5088,
+                "width": 7256,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5088,
+                  "width": 7256,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=17"
+            }
+          ],
+          "label": "13. Giesendam (1833)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=18",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/0adb3cad-0a85-4057-b088-47273f5573de/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/0adb3cad-0a85-4057-b088-47273f5573de",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 744,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 744
+                },
+                {
+                  "width": 400,
+                  "height": 291
+                },
+                {
+                  "width": 200,
+                  "height": 145
+                },
+                {
+                  "width": 100,
+                  "height": 73
+                }
+              ]
+            }
+          },
+          "height": 4980,
+          "width": 6856,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4980,
+                "width": 6856,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4980,
+                  "width": 6856,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=18"
+            }
+          ],
+          "label": "14. Dordrecht (1833)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=19",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/2d081f50-2eff-453b-b015-8fec400190c4/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/2d081f50-2eff-453b-b015-8fec400190c4",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 758,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 758
+                },
+                {
+                  "width": 400,
+                  "height": 296
+                },
+                {
+                  "width": 200,
+                  "height": 148
+                },
+                {
+                  "width": 100,
+                  "height": 74
+                }
+              ]
+            }
+          },
+          "height": 4944,
+          "width": 6680,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4944,
+                "width": 6680,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4944,
+                  "width": 6680,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=19"
+            }
+          ],
+          "label": "15. Puttershoek (1833)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=20",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 758,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 758
+                },
+                {
+                  "width": 400,
+                  "height": 296
+                },
+                {
+                  "width": 200,
+                  "height": 148
+                },
+                {
+                  "width": 100,
+                  "height": 74
+                }
+              ]
+            }
+          },
+          "height": 4956,
+          "width": 6696,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 4956,
+                "width": 6696,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 4956,
+                  "width": 6696,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=20"
+            }
+          ],
+          "label": "16. Heinenoord (1834)"
+        },
+        {
+          "@id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=21",
+          "@type": "sc:Canvas",
+          "thumbnail": {
+            "@id": "https://dlc.services/thumbs/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229/full/full/0/default.jpg",
+            "@type": "dctypes:Image",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://apex.dlc.services/thumbs/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229",
+              "profile": [
+                "http://iiif.io/api/image/2/level0.json",
+                {
+                  "formats": ["jpg"],
+                  "qualities": ["color"],
+                  "supports": ["sizeByWhListed"]
+                }
+              ],
+              "width": 1024,
+              "height": 709,
+              "sizes": [
+                {
+                  "width": 1024,
+                  "height": 709
+                },
+                {
+                  "width": 400,
+                  "height": 277
+                },
+                {
+                  "width": 200,
+                  "height": 138
+                },
+                {
+                  "width": 100,
+                  "height": 69
+                }
+              ]
+            }
+          },
+          "height": 5040,
+          "width": 7280,
+          "images": [
+            {
+              "@id": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229/anno",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229/full/!2000,2000/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 5040,
+                "width": 7280,
+                "service": {
+                  "@id": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229",
+                  "protocol": "http://iiif.io/api/image",
+                  "height": 5040,
+                  "width": 7280,
+                  "profile": "http://iiif.io/api/image/2/level1.json"
+                }
+              },
+              "on": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=21"
+            }
+          ],
+          "label": "17. Poortugaal (1834)"
+        }
+      ]
+    }
+  ]
+}

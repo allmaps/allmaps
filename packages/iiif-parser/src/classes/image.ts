@@ -9,9 +9,13 @@ import {
 } from '../schemas/iiif.js'
 import {
   Image1ContextString,
-  Image1ContextStringIncorrect
+  Image1ContextStringIncorrect,
+  image1ProfileUriRegex
 } from '../schemas/image.1.js'
-import { Image2ContextString } from '../schemas/image.2.js'
+import {
+  Image2ContextString,
+  image2ProfileUriRegex
+} from '../schemas/image.2.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
@@ -91,6 +95,21 @@ export class EmbeddedImage {
           imageService['@context'] === Image1ContextStringIncorrect)
       ) {
         this.majorVersion = 1
+      } else if ('profile' in imageService) {
+        let profile: string
+        if (Array.isArray(imageService.profile)) {
+          profile = imageService.profile[0]
+        } else {
+          profile = imageService.profile
+        }
+
+        if (profile.match(image1ProfileUriRegex)) {
+          this.majorVersion = 1
+        } else if (profile.match(image2ProfileUriRegex)) {
+          this.majorVersion = 2
+        } else {
+          this.majorVersion = 3
+        }
       } else {
         throw new Error('Unsupported IIIF Image Service')
       }
@@ -267,10 +286,10 @@ export class Image extends EmbeddedImage {
   tileZoomLevels: TileZoomLevel[]
   sizes?: Size[]
 
+  embedded = false
+
   constructor(parsedImage: ImageType) {
     super(parsedImage)
-
-    this.embedded = false
 
     const profileProperties = getProfileProperties(parsedImage)
 

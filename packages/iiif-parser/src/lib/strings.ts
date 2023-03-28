@@ -15,7 +15,7 @@ type Metadata2Type = z.infer<typeof Metadata2Schema>
 type StringValue3Type = z.infer<typeof StringValue3Schema>
 type Metadata3Type = z.infer<typeof Metadata3Schema>
 
-export function parseVersion2String(str: StringValue2Type): StringValue3Type {
+export function parseVersion2String(str?: StringValue2Type): StringValue3Type {
   if (typeof str === 'string') {
     return {
       none: [str]
@@ -54,10 +54,13 @@ export function parseVersion2Metadata(
   metadata: Metadata2Type | undefined
 ): Metadata3Type | undefined {
   if (metadata?.length) {
-    return metadata.map(({ label, value }) => ({
-      label: parseVersion2String(label),
-      value: parseVersion2String(value)
-    }))
+    return metadata
+      // Only process metadata entries that have both label & value
+      .filter(({ label, value }) => label && value)
+      .map(({ label, value }) => ({
+        label: parseVersion2String(label),
+        value: parseVersion2String(value)
+      }))
   } else if (!metadata) {
     return undefined
   } else {
