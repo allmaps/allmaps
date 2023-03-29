@@ -9,6 +9,8 @@ import {
   Metadata3Schema
 } from '../schemas/presentation.3.js'
 
+import type { Metadata } from '../lib/types.js'
+
 type StringValue2Type = z.infer<typeof StringValue2Schema>
 type Metadata2Type = z.infer<typeof Metadata2Schema>
 
@@ -54,16 +56,40 @@ export function parseVersion2Metadata(
   metadata: Metadata2Type | undefined
 ): Metadata3Type | undefined {
   if (metadata?.length) {
-    return metadata
-      // Only process metadata entries that have both label & value
-      .filter(({ label, value }) => label && value)
-      .map(({ label, value }) => ({
-        label: parseVersion2String(label),
-        value: parseVersion2String(value)
-      }))
+    return (
+      metadata
+        // Only process metadata entries that have both label & value
+        .filter(({ label, value }) => label && value)
+        .map(({ label, value }) => ({
+          label: parseVersion2String(label),
+          value: parseVersion2String(value)
+        }))
+    )
   } else if (!metadata) {
     return undefined
   } else {
     throw new Error('Unable to parse metadata')
   }
+}
+
+export function filterInvalidMetadata(
+  metadata: Metadata3Type | undefined
+): Metadata | undefined {
+  if (!metadata) {
+    return undefined
+  }
+
+  // TODO: I don't know why TypeScript complains about
+  // a simple filter function. For now, do this:
+  let filteredMetadata: Metadata = []
+  for (let item of metadata) {
+    if (item.label && item.value) {
+      filteredMetadata.push({
+        label: item.label,
+        value: item.value
+      })
+    }
+  }
+
+  return filteredMetadata
 }
