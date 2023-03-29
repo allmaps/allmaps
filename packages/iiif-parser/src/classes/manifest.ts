@@ -12,6 +12,12 @@ import { EmbeddedManifest3Schema } from '../schemas/presentation.3.js'
 import { Image } from './image.js'
 import { Canvas } from './canvas.js'
 
+import {
+  parseVersion2String,
+  parseVersion2Metadata,
+  filterInvalidMetadata
+} from '../lib/strings.js'
+
 import type {
   LanguageString,
   Metadata,
@@ -20,7 +26,6 @@ import type {
   FetchNextOptions,
   FetchNextResults
 } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
 type EmbeddedManifestType =
@@ -77,13 +82,15 @@ export class Manifest extends EmbeddedManifest {
         this.description = parseVersion2String(parsedManifest.description)
       }
 
-      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
+      this.metadata = filterInvalidMetadata(
+        parseVersion2Metadata(parsedManifest.metadata)
+      )
 
       const sequence = parsedManifest.sequences[0]
       this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
-      this.metadata = parsedManifest.metadata
+      this.metadata = filterInvalidMetadata(parsedManifest.metadata)
 
       this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))
     } else {
