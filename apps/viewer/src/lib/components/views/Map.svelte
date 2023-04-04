@@ -24,6 +24,11 @@
   import Select, { SelectEvent } from 'ol/interaction/Select.js'
   import { click } from 'ol/events/condition.js'
 
+  import { applyStyle } from 'ol-mapbox-style';
+  import { VectorTile } from 'ol/layer.js';
+  import protomaps from 'protomaps-themes-base';
+  import {Attribution} from 'ol/control.js';
+
   import {
     invisiblePolygonStyle,
     selectedPolygonStyle,
@@ -168,14 +173,25 @@
 
   onMount(async () => {
     // TODO: set attribution
-    xyz = new XYZ({
-      url: $xyzLayer.url,
-      maxZoom: 19
-    })
 
-    baseLayer = new TileLayer({
-      source: xyz
-    })
+    baseLayer = new VectorTile({declutter: true});
+
+    applyStyle(baseLayer, {
+      version:"8",
+      layers:protomaps("protomaps","white"),
+      sources:{
+        protomaps: {
+          type: "vector",
+          tiles: ["https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=507ade1803ce471c"],
+          attribution: 'base layer © <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>',
+          maxzoom: 14
+        }
+      }
+    });
+
+    const attribution = new Attribution({
+      collapsible: false,
+    });
 
     warpedMapSource = new WarpedMapSource()
     warpedMapLayer = new WarpedMapLayer({
@@ -191,7 +207,7 @@
     $ol = new OLMap({
       layers: [baseLayer, warpedMapLayer, vectorLayer],
       target: 'ol',
-      controls: [],
+      controls: [attribution],
       view: new View({
         maxZoom: 24,
         zoom: 12

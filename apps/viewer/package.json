@@ -34,7 +34,9 @@
     "@allmaps/transform": "^1.0.0-beta.12",
     "@allmaps/ui": "^1.0.0-beta.13",
     "flowbite": "^1.6.2",
-    "ol": "^6.15.1"
+    "ol": "^6.15.1",
+    "ol-mapbox-style": "^10.3.4",
+    "protomaps-themes-base": "^1.3.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",
