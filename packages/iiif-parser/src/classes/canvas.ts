@@ -4,7 +4,7 @@ import { EmbeddedImage, Image } from './image.js'
 import { CanvasSchema } from '../schemas/iiif.js'
 
 import type { LanguageString, Metadata } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
+import { parseVersion2String, parseVersion2Metadata, filterInvalidMetadata } from '../lib/strings.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
 
@@ -35,7 +35,7 @@ export class Canvas {
         this.label = parseVersion2String(parsedCanvas.label)
       }
 
-      this.metadata = parseVersion2Metadata(parsedCanvas.metadata)
+      this.metadata = filterInvalidMetadata(parseVersion2Metadata(parsedCanvas.metadata))
 
       this.image = new EmbeddedImage(parsedCanvas.images[0].resource, parsedCanvas)
     } else if ('id' in parsedCanvas) {
@@ -44,7 +44,7 @@ export class Canvas {
       this.uri = parsedCanvas.id
 
       this.label = parsedCanvas.label
-      this.metadata = parsedCanvas.metadata
+      this.metadata = filterInvalidMetadata(parsedCanvas.metadata)
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
 
