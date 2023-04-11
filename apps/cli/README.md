@@ -6,9 +6,85 @@ With [pnpm](https://pnpm.io/):
 
     pnpm add -g @allmaps/cli
 
+## Documentation
+
 Run Allmaps CLI:
 
     allmaps
+
+Show help:
+
+    allmaps --help
+
+### Commands
+
+All CLI commands accept one or more files as input. You can supply these files in two ways:
+
+- With their full or relative paths. In the CLI's help output, this is shown as `[files...]`.
+- Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI. Commands that require SVG input only accept one file, commands that require JSON input accept multiple files.
+
+#### Parse and generate Georeference Annotations
+
+Show help:
+
+    allmaps annotation --help
+
+Generate Georeference Annotations from input files:
+
+    allmaps annotation generate [files...]
+
+Parse input files and output them in the format used internally by Allmaps:
+
+    allmaps annotation parse [files...]
+
+Convert the pixel mask from the input files to SVG polygons:
+
+    allmaps annotation svg [files...]
+
+For all the commands above, the input files can be either Georeference Annotations or parsed Georeference Annotations
+
+#### Transform resource coordinates to geospatial coordinates (and vice versa)
+
+Show help:
+
+    allmaps transform --help
+
+Transform SVG to GeoJSON using a Georeference Annotation:
+
+    allmaps transform svg -a <filename> [files...]
+
+Transform GeoJSON to SVG using a Georeference Annotation:
+
+    allmaps transform geojson -a <filename> [files...]
+
+The filename of the Georeference Annotation must be supplied with the `-a` or `--annotation` option.
+
+Transform pixel masks to GeoJSON:
+
+    allmaps transform pixel-mask [files...]
+
+All the commands above accept the following options:
+
+| Option                            | Description                                                     | Default
+|:----------------------------------|:----------------------------------------------------------------|:--------
+| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints | 0
+| `-d, --max-depth <number>`        | Maximum recursion depth                                         | 6
+
+#### Parse and generate IIIF resources
+
+Show help:
+
+    allmaps iiif --help
+
+Parse IIIF resources and output them in the format used internally by Allmaps:
+
+    allmaps iiif parse [files...]
+
+Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
+
+    allmaps manifest -d <id> [files...]
+
+The ID of the IIIF Manifest can be supplied with the `-i` or `--id` option.
 
 ## Examples
 
