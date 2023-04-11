@@ -3,7 +3,7 @@ import type { Command } from 'commander'
 import type { OptionalTransformOptions } from '@allmaps/transform'
 
 const DEFAULT_MAX_OFFSET_RATIO = 0
-const DEFAULT_MAX_DEPTH = 0
+const DEFAULT_MAX_DEPTH = 6
 
 export function addAnnotationOption(command: Command) {
   return command.requiredOption(
