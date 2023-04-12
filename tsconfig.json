@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
+    { "path": "./packages/types" },
     { "path": "./packages/id" },
     { "path": "./packages/transform" },
     { "path": "./packages/render" },
