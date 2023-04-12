@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/leaflet",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -43,7 +43,7 @@
     "leaflet"
   ],
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.28"
+    "@allmaps/render": "^1.0.0-beta.29"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

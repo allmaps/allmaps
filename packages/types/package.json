@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/types",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -38,7 +38,6 @@
     "lint": "eslint dist test"
   },
   "license": "GPL-3.0-or-later",
-  "dependencies": {},
   "devDependencies": {
     "eslint": "^8.35.0",
     "typescript": "^4.9.5"
