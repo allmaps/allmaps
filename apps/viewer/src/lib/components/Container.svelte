@@ -4,12 +4,12 @@
   import { mapCount } from '$lib/shared/stores/maps.js'
 
   import MapView from '$lib/components/views/Map.svelte'
-  // import ListView from '$lib/components/views/List.svelte'
+  import ListView from '$lib/components/views/List.svelte'
   import ImageView from '$lib/components/views/Image.svelte'
 
   import MapControl from '$lib/components/controls/Map.svelte'
   import ViewControl from '$lib/components/controls/View.svelte'
-  // import PathControl from '$lib/components/controls/Path.svelte'
+  import PathControl from '$lib/components/controls/Path.svelte'
   import DialsControl from '$lib/components/controls/Dials.svelte'
   import SelectionControl from '$lib/components/controls/Selection.svelte'
 
@@ -24,9 +24,11 @@
   <!-- TODO: -->
   <!-- <div>EMPTY!</div> -->
 {:else}
-  <div class="w-full h-full relative">
+  <div class="w-full h-full relative flex flex-col">
     {#if $view === 'map'}
       <MapView />
+    {:else if $view === 'list'}
+      <ListView />
     {:else}
       <ImageView />
     {/if}
@@ -34,9 +36,11 @@
       class="pointer-events-none absolute top-0 w-full h-full p-2 grid grid-cols-3 grid-rows-2"
     >
       <div>
-        <div class="pointer-events-auto inline">
-          <MapControl />
-        </div>
+        {#if $view !== 'list'}
+          <div class="pointer-events-auto inline">
+            <MapControl />
+          </div>
+        {/if}
       </div>
       <div />
       <div class="justify-self-end">
@@ -45,19 +49,25 @@
         </div>
       </div>
       <div class="self-end">
-        <!-- <div class="pointer-events-auto inline">
-          <PathControl />
-        </div> -->
+        {#if $view !== 'list'}
+          <div class="pointer-events-auto inline">
+            <PathControl />
+          </div>
+        {/if}
       </div>
       <div class="justify-self-center self-end">
-        <div class="pointer-events-auto inline">
-          <DialsControl />
-        </div>
+        {#if $view === 'map'}
+          <div class="pointer-events-auto inline">
+            <DialsControl />
+          </div>
+        {/if}
       </div>
       <div class="justify-self-end self-end">
-        <div class="pointer-events-auto inline">
-          <SelectionControl />
-        </div>
+        {#if $view !== 'list' && $mapCount > 1}
+          <div class="pointer-events-auto inline">
+            <SelectionControl />
+          </div>
+        {/if}
       </div>
     </div>
   </div>

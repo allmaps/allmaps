@@ -39,7 +39,7 @@
   function handleRotateButtonMove(event: Event) {
     let diffX: number | undefined
 
-    if (event instanceof TouchEvent) {
+    if (window.TouchEvent && event instanceof TouchEvent) {
       diffX = event.touches[0].screenX - rotateButtonMouseMoveStartX
     } else if (event instanceof MouseEvent) {
       diffX = event.screenX - rotateButtonMouseMoveStartX

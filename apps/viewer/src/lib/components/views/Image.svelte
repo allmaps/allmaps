@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
 
   import { ol } from '$lib/shared/stores/openlayers.js'
-  import { highlightedMap } from '$lib/shared/stores/highlighted.js'
+  import { activeMap } from '$lib/shared/stores/active.js'
 
   import OLMap from 'ol/Map.js'
   import Feature from 'ol/Feature'
@@ -16,6 +16,7 @@
   } from '$lib/shared/openlayers.js'
 
   import { IIIFLayer } from '@allmaps/openlayers'
+  import { computeBBox } from '@allmaps/stdlib'
 
   import type { ViewerMap } from '$lib/shared/types.js'
 
@@ -23,7 +24,11 @@
   let vectorSource: VectorSource
   let vectorLayer: VectorLayer<VectorSource>
 
-  $: updateMap($highlightedMap)
+  $: {
+    if ($ol && $activeMap) {
+      updateMap($activeMap.viewerMap)
+    }
+  }
 
   function updateVectorLayer(viewerMap: ViewerMap) {
     const map = viewerMap.map
@@ -58,13 +63,17 @@
       iiifLayer.setZIndex(1)
       vectorLayer.setZIndex(2)
 
-      const extent = iiifLayer.getExtent()
+      const pixelMaskBbox = computeBBox(viewerMap.map.pixelMask)
+      const iiifLayerPixelMaskBbox = [
+        pixelMaskBbox[0],
+        -pixelMaskBbox[3],
+        pixelMaskBbox[2],
+        -pixelMaskBbox[1]
+      ]
 
-      if (extent) {
-        $ol.getView().fit(extent, {
-          padding: [25, 25, 25, 25]
-        })
-      }
+      $ol.getView().fit(iiifLayerPixelMaskBbox, {
+        padding: [25, 25, 25, 25]
+      })
     }
   }
 
@@ -75,7 +84,7 @@
     return image
   }
 
-  onMount(async () => {
+  onMount(() => {
     vectorSource = new VectorSource()
     vectorLayer = new VectorLayer({
       source: vectorSource,
@@ -87,8 +96,6 @@
       layers: [vectorLayer],
       target: 'ol'
     })
-
-    await updateMap($highlightedMap)
   })
 
   onDestroy(() => {

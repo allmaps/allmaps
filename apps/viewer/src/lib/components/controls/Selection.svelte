@@ -6,25 +6,27 @@
   import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
 
   import { mapCount } from '$lib/shared/stores/maps.js'
+  import {
+    setPrevMapActive,
+    setNextMapActive
+  } from '$lib/shared/stores/active.js'
 
   import { selectedMapCount } from '$lib/shared/stores/selected.js'
 
-  import { highlightedIndex } from '$lib/shared/stores/highlighted.js'
-
-  function highlightPrevMap() {
-    $highlightedIndex -= 1
+  function prevMap() {
+    setPrevMapActive(true)
   }
 
-  function highlightNextMap() {
-    $highlightedIndex += 1
+  function nextMap() {
+    setNextMapActive(true)
   }
 
   function handleKeyUp(event: KeyboardEvent) {
     // TODO: only when not in input
     if (event.key === '[') {
-      highlightPrevMap()
+      prevMap()
     } else if (event.key === ']') {
-      highlightNextMap()
+      nextMap()
     }
   }
 
@@ -38,15 +40,13 @@
 </script>
 
 <div
-  class="inline-flex items-center p-1 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
+  class="inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
 >
-  <!-- {#if $selectedMapCount === 0}
-    <div>Viewing {$mapCount} maps</div>
-  {:else if $selectedMapCount === 1}
-    <div>{$selectedMapCount} map selected</div>
-  {:else}
+  {#if $selectedMapCount >= 2}
     <div>{$selectedMapCount} maps selected</div>
-  {/if} -->
+  {:else}
+    <div>Viewing {$mapCount} maps</div>
+  {/if}
   <!-- path in collection, cluster, selection. click will display popover with thumbnails -->
   <!-- title, id current Map, click will display info about current map + URLs -->
 
@@ -72,7 +72,7 @@
     </svg>
   </button> -->
 
-  <button class="w-5 h-5" on:click={highlightPrevMap}>
+  <button class="w-5 h-5" on:click={prevMap}>
     <svg
       aria-hidden="true"
       fill="currentColor"
@@ -87,7 +87,7 @@
     </svg>
   </button>
 
-  <button class="w-5 h-5" on:click={highlightNextMap}>
+  <button class="w-5 h-5" on:click={nextMap}>
     <svg
       aria-hidden="true"
       fill="currentColor"

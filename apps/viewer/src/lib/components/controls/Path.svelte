@@ -1,8 +1,11 @@
 <script lang="ts">
   import { mapCount } from '$lib/shared/stores/maps.js'
+  import { firstSource } from '$lib/shared/stores/sources.js'
 
-  import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
-  import MapsDropdown from '$lib/components/dropdowns/Maps.svelte'
+  // import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
+  // import MapsDropdown from '$lib/components/dropdowns/Maps.svelte'
+
+  import type { Source } from '$lib/shared/types.js'
 
   /*
   MAP VIEW:
@@ -22,22 +25,45 @@
 
       source 1 -> collection -> manifest -> 3 maps                 viewing map 4 of 10 selected
   */
+
+  function typeFromSource(source: Source) {
+    if (source.parsed.type === 'annotation') {
+      return 'Annotation'
+    } else if (source.parsed.type === 'iiif') {
+      if (source.parsed.iiif.type === 'image') {
+        return 'Image'
+      } else if (source.parsed.iiif.type === 'manifest') {
+        return 'Manifest'
+      } else if (source.parsed.iiif.type === 'collection') {
+        return 'Collection'
+      }
+    }
+  }
 </script>
 
 <nav
   class="inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
 >
   <ol class="inline-flex items-center space-x-1 md:space-x-3">
-    <li class="inline-flex items-center">
-      <DropdownButton>
-        <div slot="button">Annotation</div>
-        <div slot="dropdown">Annotation!</div>
-      </DropdownButton>
-    </li>
+    {#if $firstSource}
+      <li class="inline-flex items-center">
+        <div>{typeFromSource($firstSource)}</div>
+      </li>
+    {/if}
     <li>
       <div class="flex items-center space-x-1 md:space-x-3">
         <span>→</span>
-        <DropdownButton>
+
+        <div>
+          <span>{$mapCount} </span>
+          {#if $mapCount === 1}
+            <span>map</span>
+          {:else}
+            <span>maps</span>
+          {/if}
+        </div>
+
+        <!-- <DropdownButton>
           <div slot="button">
             <span>{$mapCount} </span>
             {#if $mapCount === 1}
@@ -47,7 +73,7 @@
             {/if}
           </div>
           <MapsDropdown slot="dropdown" />
-        </DropdownButton>
+        </DropdownButton> -->
       </div>
     </li>
   </ol>
