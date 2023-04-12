@@ -54,6 +54,10 @@ export default class RTree {
     }
   }
 
+  clear() {
+    this.rbush.clear()
+  }
+
   private search(
     minX: number,
     minY: number,

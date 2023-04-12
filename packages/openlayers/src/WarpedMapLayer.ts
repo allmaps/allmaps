@@ -1,7 +1,7 @@
 import Layer from 'ol/layer/Layer.js'
 import ViewHint from 'ol/ViewHint.js'
 
-import { throttle } from 'lodash-es'
+import { throttle, type DebouncedFunc } from 'lodash-es'
 
 import {
   TileCache,
@@ -50,10 +50,11 @@ export class WarpedMapLayer extends Layer {
 
   mapIdsInViewport: Set<string> = new Set()
 
-  throttledUpdateViewportAndGetTilesNeeded: (
-    viewportSize: Size,
-    geoBBox: BBox
-  ) => NeededTile[] | undefined
+  throttledUpdateViewportAndGetTilesNeeded: DebouncedFunc<
+    (viewportSize: Size, geoBBox: BBox) => NeededTile[]
+  >
+
+  throttledRenderTimeoutId: number | undefined
 
   constructor(options: {}) {
     options = options || {}
@@ -102,6 +103,7 @@ export class WarpedMapLayer extends Layer {
     // TODO: listen to change:source
 
     this.world = this.source.getWorld()
+
     this.world.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.warpedMapAdded.bind(this)
@@ -110,6 +112,26 @@ export class WarpedMapLayer extends Layer {
     this.world.addEventListener(
       WarpedMapEventType.ZINDICESCHANGES,
       this.zIndicesChanged.bind(this)
+    )
+
+    this.world.addEventListener(
+      WarpedMapEventType.VISIBILITYCHANGED,
+      this.visibilityChanged.bind(this)
+    )
+
+    this.world.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.worldCleared.bind(this)
+    )
+
+    this.tileCache.addEventListener(
+      WarpedMapEventType.TILEADDED,
+      this.changed.bind(this)
+    )
+
+    this.tileCache.addEventListener(
+      WarpedMapEventType.ALLTILESLOADED,
+      this.changed.bind(this)
     )
 
     this.viewport = new Viewport(this.world)
@@ -129,7 +151,7 @@ export class WarpedMapLayer extends Layer {
       this.warpedMapLeave.bind(this)
     )
 
-    for (let warpedMap of this.world.getWarpedMaps()) {
+    for (let warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
   }
@@ -138,7 +160,7 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
-      const warpedMap = this.world.getWarpedMap(mapId)
+      const warpedMap = this.world.getMap(mapId)
 
       if (warpedMap) {
         this.renderer.addWarpedMap(warpedMap)
@@ -170,6 +192,10 @@ export class WarpedMapLayer extends Layer {
     this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
   }
 
+  visibilityChanged() {
+    this.changed()
+  }
+
   warpedMapEnter(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
@@ -187,6 +213,12 @@ export class WarpedMapLayer extends Layer {
       // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
       // TODO: set invisible
     }
+  }
+
+  private worldCleared() {
+    this.renderer.clear()
+    // viewport: Viewport
+    this.tileCache.clear()
   }
 
   rendererChanged() {
@@ -385,17 +417,13 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  render(frameState: FrameState): HTMLElement {
+  private renderInternal(frameState: FrameState, last = false): HTMLElement {
     this.prepareFrameInternal(frameState)
 
     const projectionTransform = this.makeProjectionTransform(frameState)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
-
-      if (this.canvas) {
-        this.resizeCanvas(this.canvas, this.canvasSize)
-      }
 
       this.renderer.setOpacity(this.getOpacity())
 
@@ -404,12 +432,20 @@ export class WarpedMapLayer extends Layer {
         frameState.size[1] * window.devicePixelRatio
       ] as Size
 
-      const tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
-        viewportSize,
-        extent
-      )
+      let tilesNeeded: NeededTile[] | undefined
+      if (last) {
+        tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
+          viewportSize,
+          extent
+        )
+      } else {
+        tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
+          viewportSize,
+          extent
+        )
+      }
 
-      if (tilesNeeded) {
+      if (tilesNeeded && tilesNeeded.length) {
         this.tileCache.setTiles(tilesNeeded)
       }
 
@@ -424,5 +460,21 @@ export class WarpedMapLayer extends Layer {
     }
 
     return this.container
+  }
+
+  render(frameState: FrameState): HTMLElement {
+    if (this.throttledRenderTimeoutId) {
+      clearTimeout(this.throttledRenderTimeoutId)
+    }
+
+    if (this.canvas) {
+      this.resizeCanvas(this.canvas, this.canvasSize)
+    }
+
+    this.throttledRenderTimeoutId = setTimeout(() => {
+      this.renderInternal(frameState, true)
+    }, THROTTLE_WAIT_MS)
+
+    return this.renderInternal(frameState)
   }
 }

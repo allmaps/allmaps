@@ -41,17 +41,6 @@ export type NeededTile = {
   url: string
 }
 
-export type CachedTile = {
-  mapId: string
-  tile: Tile
-  imageRequest: ImageRequest
-  url: string
-  // TODO: can imageData be removed?
-  // imageData?: ImageData
-  imageBitmap?: ImageBitmap
-  loading: boolean
-}
-
 export type RemoveBackgroundOptions = {
   color: Color
   threshold?: number
@@ -92,10 +81,12 @@ export type Matrix4 = [
 export type WarpedMap = {
   imageId: string
   mapId: string
+  visible: boolean
   parsedImage: IIIFImage
   pixelMask: SVGPolygon
   transformer: GCPTransformInfo
   geoMask: GeoJSONPolygon
+  fullGeoMask: GeoJSONPolygon
 }
 
 export type XYZTile = {

@@ -3,7 +3,6 @@ import Source from 'ol/source/Source.js'
 import { RTree, World } from '@allmaps/render'
 
 import type { BBox } from '@allmaps/render'
-import type { Annotation } from '@allmaps/annotation'
 
 export class WarpedMapSource extends Source {
   rtree: RTree
@@ -21,18 +20,44 @@ export class WarpedMapSource extends Source {
     this.world = new World(this.rtree)
   }
 
-  async addGeorefAnnotation(
-    annotation: Annotation
+  async addMap(map: unknown): Promise<string | Error> {
+    return this.world.addMap(map)
+  }
+
+  async removeMap(map: unknown): Promise<string | Error> {
+    return this.world.removeMap(map)
+  }
+
+  async addGeoreferenceAnnotation(
+    annotation: unknown
   ): Promise<(string | Error)[]> {
-    return this.world.addGeorefAnnotation(annotation)
+    return this.world.addGeoreferenceAnnotation(annotation)
+  }
+
+  async removeGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    return this.world.removeGeoreferenceAnnotation(annotation)
+  }
+
+  clear() {
+    this.world.clear()
   }
 
   getWorld() {
     return this.world
   }
 
-  getWarpedMap(mapId: string) {
-    return this.world.getWarpedMap(mapId)
+  getMap(mapId: string) {
+    return this.world.getMap(mapId)
+  }
+
+  showMaps(mapIds: Iterable<string>) {
+    this.world.showMaps(mapIds)
+  }
+
+  hideMaps(mapIds: Iterable<string>) {
+    this.world.hideMaps(mapIds)
   }
 
   getExtent(): BBox | undefined {

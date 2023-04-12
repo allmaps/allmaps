@@ -63,8 +63,8 @@ export default class WebGL2Renderer extends EventTarget {
     this.tileCache = tileCache
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.TILELOADED,
-      this.tileLoaded.bind(this)
+      WarpedMapEventType.TILEADDED,
+      this.tileAdded.bind(this)
     )
 
     this.tileCache.addEventListener(
@@ -75,9 +75,9 @@ export default class WebGL2Renderer extends EventTarget {
     this.invertedRenderTransform = createTransform()
   }
 
-  tileLoaded(event: Event) {
+  tileAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { tileUrl } = event.data
+      const { mapId, tileUrl } = event.data
 
       const cachedTile = this.tileCache.getCachedTile(tileUrl)
 
@@ -85,7 +85,7 @@ export default class WebGL2Renderer extends EventTarget {
         return
       }
 
-      const webglWarpedMap = this.webGLWarpedMapsById.get(cachedTile.mapId)
+      const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
         return
@@ -98,7 +98,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   tileRemoved(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { tileUrl, mapId } = event.data
+      const { mapId, tileUrl } = event.data
 
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
@@ -119,6 +119,15 @@ export default class WebGL2Renderer extends EventTarget {
   removeWarpedMap(mapId: string) {
     this.webGLWarpedMapsById.delete(mapId)
   }
+
+  clear() {
+    this.webGLWarpedMapsById = new Map()
+  }
+
+  // update
+  // updateTriangulation
+
+  setVisible(visible: boolean): void {}
 
   getOpacity(): number | undefined {
     return this.renderOptions?.opacity
@@ -385,7 +394,13 @@ export default class WebGL2Renderer extends EventTarget {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
-        break
+        continue
+      }
+
+      // TODO: we can also exclude hidden maps earlier, in RTree or before
+      // passing mapIds to render function
+      if (!webglWarpedMap.warpedMap.visible) {
+        continue
       }
 
       if (this.renderOptionsScope === 'map') {

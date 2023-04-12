@@ -3,7 +3,7 @@ import World from './World.js'
 import { computeIiifTilesForMapGeoBBox } from './shared/tiles.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import type { Size, BBox, NeededTile, WarpedMap } from './shared/types.js'
+import type { Size, BBox, NeededTile } from './shared/types.js'
 
 export default class Viewport extends EventTarget {
   world: World
@@ -22,15 +22,19 @@ export default class Viewport extends EventTarget {
 
   // TODO: split function in two?
   // Find better name?
-  updateViewportAndGetTilesNeeded(viewportSize: Size, geoBBox: BBox): NeededTile[] {
+  updateViewportAndGetTilesNeeded(
+    viewportSize: Size,
+    geoBBox: BBox
+  ): NeededTile[] {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     let possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
-    possibleVisibleWarpedMapIds = this.world.getPossibleVisibleWarpedMapIds(geoBBox)
+    possibleVisibleWarpedMapIds =
+      this.world.getPossibleVisibleWarpedMapIds(geoBBox)
 
     let neededTiles: NeededTile[] = []
     for (let mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.world.getWarpedMap(mapId)
+      const warpedMap = this.world.getMap(mapId)
 
       if (!warpedMap) {
         continue

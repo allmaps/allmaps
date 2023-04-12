@@ -2,9 +2,9 @@ async function fetchJson (url) {
   return fetch(url).then((response) => response.json())
 }
 
-async function addGeorefAnnotationByUrl(warpedMapSource, url) {
+async function addGeoreferenceAnnotationByUrl(warpedMapSource, url) {
   const annotation = await fetchJson(url)
-  warpedMapSource.addGeorefAnnotation(annotation)
+  warpedMapSource.addGeoreferenceAnnotation(annotation)
 }
 
 async function initialize(WarpedMapLayer, WarpedMapSource) {
@@ -27,9 +27,9 @@ async function initialize(WarpedMapLayer, WarpedMapSource) {
     })
   })
 
-  addGeorefAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8')
-  addGeorefAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79')
-  addGeorefAnnotationByUrl(warpedMapSource, 'https://allmaps.org/webgl2-preview/west-roxbury.json')
+  addGeoreferenceAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8')
+  addGeoreferenceAnnotationByUrl(warpedMapSource, 'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79')
+  addGeoreferenceAnnotationByUrl(warpedMapSource, 'https://allmaps.org/webgl2-preview/west-roxbury.json')
 
   if (initializeControls) {
     initializeControls(warpedMapLayer)

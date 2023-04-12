@@ -32,6 +32,6 @@ const annotationUrl =
 fetch(annotationUrl)
   .then((response) => response.json())
   .then((annotation) => {
-    warpedMapSource.addGeorefAnnotation(annotation)
+    warpedMapSource.addGeoreferenceAnnotation(annotation)
   })
 ```
