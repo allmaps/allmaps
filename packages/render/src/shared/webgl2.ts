@@ -1,6 +1,8 @@
 export function createShader(
   gl: WebGL2RenderingContext,
-  type: WebGLRenderingContextBase['VERTEX_SHADER'],
+  type:
+    | WebGLRenderingContextBase['VERTEX_SHADER']
+    | WebGLRenderingContextBase['FRAGMENT_SHADER'],
   source: string
 ): WebGLShader {
   // TODO: are all unneeded webgl objects properly deleted?
