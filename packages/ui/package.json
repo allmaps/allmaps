@@ -50,5 +50,8 @@
   },
   "peerDependencies": {
     "svelte": "^3.54.0"
+  },
+  "dependencies": {
+    "flowbite": "^1.6.4"
   }
 }
