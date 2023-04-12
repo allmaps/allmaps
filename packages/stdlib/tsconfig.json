@@ -4,5 +4,10 @@
     "rootDir": "./src",
     "outDir": "./dist",
   },
+  "references": [
+    { "path": "../types" },
+    { "path": "../annotation" },
+    { "path": "../iiif-parser" }
+  ],
   "include": ["./src/**/*"]
 }

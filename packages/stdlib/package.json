@@ -37,6 +37,11 @@
     "lint": "eslint dist test"
   },
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/types": "1.0.0-beta.0",
+    "@allmaps/annotation": "^1.0.0-beta.12",
+    "@allmaps/iiif-parser": "^1.0.0-beta.22"
+  },
   "devDependencies": {
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
