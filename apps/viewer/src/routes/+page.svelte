@@ -19,7 +19,10 @@
     resetSources
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
-  import { renderOptions, resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
+  import {
+    renderOptions,
+    resetRenderOptionsLayer
+  } from '$lib/shared/stores/render-options.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -91,14 +94,16 @@
 
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
-  <Header appName="Viewer">
-    {#if !showForm && initialized}
-      <URLInput>
-        <URLType {type} />
-      </URLInput>
-    {/if}
-  </Header>
-  <main class="grow relative">
+  <div class="z-10">
+    <Header appName="Viewer">
+      {#if !showForm && initialized}
+        <URLInput>
+          <URLType {type} />
+        </URLInput>
+      {/if}
+    </Header>
+  </div>
+  <main class="relative h-full overflow-y-auto">
     {#if showForm}
       <div
         class="container mx-auto mt-10 p-2"

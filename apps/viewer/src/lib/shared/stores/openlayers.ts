@@ -1,5 +1,7 @@
 import { writable, derived } from 'svelte/store'
 
+import { WarpedMapSource } from '@allmaps/openlayers'
+
 import type Map from 'ol/Map.js'
 
 type XYZLayer = {
@@ -25,8 +27,6 @@ const defaultXYZLayers: XYZLayer[] = [
   }
 ]
 
-let initialOl: Map | undefined
-
 export const xyzLayers = writable<XYZLayer[]>(defaultXYZLayers)
 
 export const xyzLayerIndex = writable(0)
@@ -36,4 +36,6 @@ export const xyzLayer = derived(
   ([$xyzLayers, $xyzLayerIndex]) => $xyzLayers[$xyzLayerIndex]
 )
 
-export const ol = writable<Map | undefined>(initialOl)
+export const ol = writable<Map | undefined>()
+
+export const warpedMapSource = writable<WarpedMapSource>(new WarpedMapSource())

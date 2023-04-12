@@ -1,14 +1,20 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
 
+  import { visibleMapIds, hiddenMapIds } from '$lib/shared/stores/visible.js'
   import {
     renderOptionsLayer,
     renderOptionsSelectedMaps,
     renderOptionsScope
   } from '$lib/shared/stores/render-options.js'
-  import { ol, xyzLayer } from '$lib/shared/stores/openlayers.js'
-  import { sourcesById } from '$lib/shared/stores/sources.js'
-
+  import {
+    ol,
+    xyzLayer,
+    warpedMapSource
+  } from '$lib/shared/stores/openlayers.js'
+  import { sourceLoading, sourcesCount } from '$lib/shared/stores/sources.js'
+  import { activeMap } from '$lib/shared/stores/active.js'
+  import { mapIds } from '$lib/shared/stores/maps.js'
   import {
     selectedMapIds,
     selectedMaps,
@@ -30,20 +36,17 @@
     idsFromFeatures
   } from '$lib/shared/openlayers.js'
 
-  import {
-    WarpedMapLayer,
-    WarpedMapSource,
-    OLWarpedMapEvent,
-    WarpedMapEventType
-  } from '@allmaps/openlayers'
+  import { WarpedMapLayer } from '@allmaps/openlayers'
+  import { computeBBox } from '@allmaps/stdlib'
 
+  import ContextMenu from '$lib/components/elements/ContextMenu.svelte'
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
 
   import type { WarpedMap } from '@allmaps/render'
-  import type { Source } from '$lib/shared/types.js'
+
+  import type { ShowContextMenu } from '$lib/shared/types.js'
 
   let warpedMapLayer: WarpedMapLayer
-  let warpedMapSource: WarpedMapSource
 
   let vectorSource: VectorSource
   let vectorLayer: VectorLayer<VectorSource>
@@ -53,11 +56,9 @@
   let xyz: XYZ
   let baseLayer
 
-  type IDs = Set<string>
+  let showContextMenu: ShowContextMenu | undefined
 
-  const sourcesInWarpedMapSource: IDs = new Set()
-
-  function updateVectorLayer(warpedMap: WarpedMap) {
+  function addMapToVectorLayer(warpedMap: WarpedMap) {
     const geoMask = warpedMap.geoMask
     const feature = new GeoJSON().readFeature(geoMask)
 
@@ -65,39 +66,18 @@
     vectorSource.addFeature(feature)
   }
 
-  async function updateWarpedMapLayer(sourcesById: Map<string, Source>) {
-    if ($ol && warpedMapSource) {
-      const addSourceIds: IDs = new Set()
-      const deleteSourceIds: IDs = new Set()
+  async function updateWarpedMapLayer() {
+    if ($ol) {
+      vectorSource.clear()
 
-      for (let currentSourceId of sourcesById.keys()) {
-        if (!sourcesInWarpedMapSource.has(currentSourceId)) {
-          addSourceIds.add(currentSourceId)
+      for (let mapId of $mapIds) {
+        const warpedMap = $warpedMapSource?.getMap(mapId)
+        if (warpedMap) {
+          addMapToVectorLayer(warpedMap)
         }
       }
 
-      for (let warpedMapSourceId of sourcesInWarpedMapSource) {
-        if (!sourcesById.has(warpedMapSourceId)) {
-          deleteSourceIds.add(warpedMapSourceId)
-        }
-      }
-
-      for (let addSourceId of addSourceIds) {
-        const source = sourcesById.get(addSourceId)
-        if (source) {
-          await warpedMapSource.addGeorefAnnotation(source.json)
-        }
-
-        sourcesInWarpedMapSource.add(addSourceId)
-      }
-
-      for (let deleteSourceId of deleteSourceIds) {
-        // TODO: remove maps from warpedMapSource
-
-        sourcesInWarpedMapSource.delete(deleteSourceId)
-      }
-
-      const extent = warpedMapSource.getExtent()
+      const extent = $warpedMapSource.getExtent()
       if (extent) {
         $ol.getView().fit(extent, {
           padding: [25, 25, 25, 25]
@@ -107,7 +87,22 @@
   }
 
   $: {
-    updateWarpedMapLayer($sourcesById)
+    if (!$sourceLoading && $sourcesCount > 0) {
+      updateWarpedMapLayer()
+    }
+  }
+
+  $: {
+    if ($ol && $activeMap && $activeMap.updateView) {
+      const warpedMap = $warpedMapSource?.getMap($activeMap.viewerMap.mapId)
+      if (warpedMap) {
+        const bbox = computeBBox(warpedMap.geoMask.coordinates[0])
+        $ol.getView().fit(bbox, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+    }
   }
 
   $: {
@@ -120,7 +115,14 @@
     const selectedMapIds = idsFromFeatures(event.selected)
     const deselectedMapIds = idsFromFeatures(event.deselected)
 
-    updateSelectedMaps(selectedMapIds, deselectedMapIds)
+    updateSelectedMaps(selectedMapIds, deselectedMapIds, false)
+  }
+
+  $: {
+    if ($warpedMapSource) {
+      $warpedMapSource.showMaps($visibleMapIds)
+      $warpedMapSource.hideMaps($hiddenMapIds)
+    }
   }
 
   $: {
@@ -177,9 +179,8 @@
       source: xyz
     })
 
-    warpedMapSource = new WarpedMapSource()
     warpedMapLayer = new WarpedMapLayer({
-      source: warpedMapSource
+      source: $warpedMapSource
     })
 
     vectorSource = new VectorSource()
@@ -203,25 +204,47 @@
       style: selectedPolygonStyle
     })
 
-    // TODO: enable select
-    // $ol.addInteraction(select)
-    // select.on('select', handleSelect)
+    $ol.addInteraction(select)
+    select.on('select', handleSelect)
 
     // TODO: fix typescript error
-    warpedMapLayer.on(
-      // @ts-ignore
-      WarpedMapEventType.WARPEDMAPADDED,
-      (event: OLWarpedMapEvent) => {
-        const mapId = event.data as string
-        const warpedMap = warpedMapSource.getWarpedMap(mapId)
+    // warpedMapLayer.on(
+    //   // @ts-ignore
+    //   WarpedMapEventType.WARPEDMAPADDED,
+    //   (event: OLWarpedMapEvent) => {
+    //     const mapId = event.data as string
+    //     const warpedMap = $warpedMapSource?.getMap(mapId)
 
-        if (warpedMap) {
-          updateVectorLayer(warpedMap)
+    //     if (warpedMap) {
+    //       updateVectorLayer(warpedMap)
+    //     }
+    //   }
+    // )
+
+    const element = $ol.getTargetElement()
+    if (element) {
+      element.addEventListener('contextmenu', (event) => {
+        if ($ol) {
+          event.preventDefault()
+
+          const feature = $ol.forEachFeatureAtPixel(
+            $ol.getEventPixel(event),
+            (feature) => feature
+          )
+
+          if (feature) {
+            showContextMenu = {
+              event,
+              feature
+            }
+          }
         }
-      }
-    )
+      })
+    }
 
-    updateWarpedMapLayer($sourcesById)
+    if (!$sourceLoading && $sourcesCount > 0) {
+      updateWarpedMapLayer()
+    }
   })
 
   onDestroy(() => {
@@ -230,6 +253,9 @@
 </script>
 
 <div id="ol" class="w-full h-full" />
+{#if showContextMenu}
+  <ContextMenu show={showContextMenu} />
+{/if}
 {#if vectorSource && select}
   <div class="hidden">
     <ol>

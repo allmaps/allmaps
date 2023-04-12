@@ -1,11 +1,8 @@
 import { get, writable, derived, type Writable } from 'svelte/store'
 
 import { mapsById, maps } from '$lib/shared/stores/maps.js'
-import {
-  selectedMaps,
-  selectedMapIds,
-  lastSelectedMap
-} from '$lib/shared/stores/selected.js'
+import { selectedMaps, selectedMapIds } from '$lib/shared/stores/selected.js'
+import { activeMap } from '$lib/shared/stores/active.js'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 
@@ -13,7 +10,9 @@ import type { RenderOptions } from '$lib/shared/types.js'
 
 export const renderOptionsScope = writable<'layer' | 'map'>('layer')
 
-export const renderOptionsLayer = writable<RenderOptions>(getDefaultRenderOptions())
+export const renderOptionsLayer = writable<RenderOptions>(
+  getDefaultRenderOptions()
+)
 
 export function resetRenderOptionsLayer() {
   renderOptionsLayer.set(getDefaultRenderOptions())
@@ -31,10 +30,10 @@ export const renderOptionsSelectedMaps = derived(
 
 export const renderOptions = {
   ...derived(
-    [renderOptionsScope, renderOptionsLayer, lastSelectedMap],
-    ([$renderOptionsScope, $renderOptionsLayer, $lastSelectedMap]) => {
-      if ($renderOptionsScope === 'map' && $lastSelectedMap) {
-        return $lastSelectedMap.renderOptions
+    [renderOptionsScope, renderOptionsLayer, activeMap],
+    ([$renderOptionsScope, $renderOptionsLayer, $activeMap]) => {
+      if ($renderOptionsScope === 'map' && $activeMap) {
+        return $activeMap.renderOptions
       } else {
         return $renderOptionsLayer
       }

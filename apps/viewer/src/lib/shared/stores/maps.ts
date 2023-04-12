@@ -1,7 +1,7 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id/browser'
-import { parseAnnotation } from '@allmaps/annotation'
+import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image } from '@allmaps/iiif-parser'
 
@@ -14,7 +14,11 @@ type SourceMaps = Map<string, ViewerMap>
 
 export const mapsById = writable<SourceMaps>(new Map())
 
+export const mapIndex = writable<number[]>([])
+
 export async function addAnnotation(sourceId: string, json: any) {
+  let startIndex = get(mapCount)
+
   const maps = parseAnnotation(json)
 
   let mapIds: string[] = []
@@ -33,9 +37,13 @@ export async function addAnnotation(sourceId: string, json: any) {
       const viewerMap: ViewerMap = {
         sourceId,
         mapId,
+        index: startIndex++,
         map,
+        annotation: generateAnnotation(map),
         state: {
-          selected: false
+          visible: true,
+          selected: false,
+          highlighted: false
         },
         // TODO: detect background color of map?
         renderOptions: getDefaultRenderOptions()
@@ -46,11 +54,14 @@ export async function addAnnotation(sourceId: string, json: any) {
 
       // Process image once, also when the same image is used
       // in multiple georeferenced maps
-      getBackgroundColor(map, parsedImage).then((color) =>
-        setRemoveBackgroundColor(mapId, color)
-      ).catch((err) => {
-        console.error(`Couldn't detect background color for map ${mapId}`, err)
-      })
+      getBackgroundColor(map, parsedImage)
+        .then((color) => setRemoveBackgroundColor(mapId, color))
+        .catch((err) => {
+          console.error(
+            `Couldn't detect background color for map ${mapId}`,
+            err
+          )
+        })
     }
 
     mapsById.update(($mapsById) => {
@@ -101,3 +112,7 @@ export const mapIds = derived(mapsById, ($mapsById) => $mapsById.keys())
 export const maps = derived(mapsById, ($mapsById) => [...$mapsById.values()])
 
 export const mapCount = derived(mapsById, ($mapsById) => $mapsById.size)
+
+export const visibleMaps = derived(mapsById, ($mapsById) =>
+  [...$mapsById.values()].filter((map) => map.state.visible)
+)
