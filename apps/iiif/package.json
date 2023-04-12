@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-viewer",
-  "version": "0.0.2-alpha.20",
+  "version": "0.0.2-alpha.21",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -27,8 +27,8 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.12",
     "@allmaps/id": "^1.0.0-beta.14",
-    "@allmaps/iiif-parser": "^1.0.0-beta.22",
-    "@allmaps/ui": "^1.0.0-beta.13"
+    "@allmaps/iiif-parser": "^1.0.0-beta.23",
+    "@allmaps/ui": "^1.0.0-beta.14"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",

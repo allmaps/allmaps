@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.28",
+  "version": "1.0.0-beta.29",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -46,9 +46,9 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.12",
     "@allmaps/id": "^1.0.0-beta.14",
-    "@allmaps/iiif-parser": "^1.0.0-beta.22",
-    "@allmaps/stdlib": "^1.0.0-beta.7",
-    "@allmaps/transform": "^1.0.0-beta.12",
+    "@allmaps/iiif-parser": "^1.0.0-beta.23",
+    "@allmaps/stdlib": "^1.0.0-beta.8",
+    "@allmaps/transform": "^1.0.0-beta.13",
     "earcut": "^2.2.3",
     "lodash-es": "^4.17.21",
     "potpack": "^1.0.1",
