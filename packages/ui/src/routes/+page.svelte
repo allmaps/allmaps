@@ -26,7 +26,6 @@
   ]
 
   let opacity = 1
-  let threshold = 1
 
   url.subscribe((value) => {
     urlValue = value
@@ -44,9 +43,6 @@
     {/each}
   </ul>
 
-  <Dial bind:value={opacity} keyCode="Space">Opacity</Dial>
+  <Dial bind:value={opacity} keyCode="Space" label="Opacity" />
   <span>{Math.round(opacity * 100)}%</span>
-
-  <Dial bind:value={threshold} keyCode="KeyB">Threshold</Dial>
-  <span>{Math.round(threshold * 100)}%</span>
 </main>
