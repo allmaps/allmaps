@@ -2,19 +2,26 @@ export enum WarpedMapEventType {
   WARPEDMAPADDED = 'warpedmapadded',
   WARPEDMAPREMOVED = 'warpedmapremoved',
 
+  // TODO: Maybe have one MAPSCHANGED event?
   ZINDICESCHANGES = 'zindiceschanged',
+  PIXELMASKUPDATED = 'pixelmaskupdated',
+  VISIBILITYCHANGED = 'visibilitychanged',
 
-  GEOREFANNOTATIONADDED = 'georefannotationadded',
-  GEOREFANNOTATIONREMOVED = 'georefannotationremoved',
+  GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
+  GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
 
   WARPEDMAPENTER = 'warpedmapenter',
   WARPEDMAPLEAVE = 'warpedmapleave',
 
-  TILELOADED = 'tileloaded',
+  TILENEEDED = 'tileneeded',
+  TILEADDED = 'tileadded',
   TILEREMOVED = 'tileremoved',
-  TILELOADINGERROR = 'tileloadingerror',
+
+  TILEFETCHED = 'tilefetched',
+  TILEFETCHERROR = 'tilefetcherror',
   ALLTILESLOADED = 'alltilesloaded',
 
+  CLEARED = 'cleared',
   CHANGED = 'changed'
 }
 

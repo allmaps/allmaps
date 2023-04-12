@@ -5,11 +5,13 @@ import { throttle } from 'lodash-es'
 import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
+import type CachedTile from './CachedTile.js'
+
 import type {
   Transform,
   WarpedMap,
-  CachedTile,
-  RenderOptions
+  RenderOptions,
+  GeoJSONPolygon
 } from './shared/types.js'
 
 // TODO: Move to stdlib?
@@ -28,8 +30,9 @@ export default class WebGL2WarpedMap extends EventTarget {
   imageWidth: number
   imageHeight: number
 
-  triangles: number[]
-  transformedTriangles: Float32Array
+  triangles: number[] = []
+  transformedTriangles: Float32Array = new Float32Array()
+
   vao: WebGLVertexArrayObject | null
 
   tilesForTexture: Map<string, CachedTile> = new Map()
@@ -64,7 +67,24 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.imageWidth = warpedMap.parsedImage.width
     this.imageHeight = warpedMap.parsedImage.height
 
-    const flattened = earcut.flatten(warpedMap.geoMask.coordinates)
+    this.updateTriangulation(warpedMap.geoMask)
+
+    this.tilesTexture = gl.createTexture()
+    this.scaleFactorsTexture = gl.createTexture()
+    this.tilePositionsTexture = gl.createTexture()
+    this.imagePositionsTexture = gl.createTexture()
+
+    this.vao = gl.createVertexArray()
+
+    this.throttledUpdateTextures = throttle(
+      this.updateTextures.bind(this),
+      THROTTLE_WAIT_MS,
+      THROTTLE_OPTIONS
+    )
+  }
+
+  updateTriangulation(geoMask: GeoJSONPolygon) {
+    const flattened = earcut.flatten(geoMask.coordinates)
     const vertexIndices = earcut(
       flattened.vertices,
       flattened.holes,
@@ -79,19 +99,6 @@ export default class WebGL2WarpedMap extends EventTarget {
       .flat()
 
     this.transformedTriangles = new Float32Array(this.triangles.length)
-
-    this.tilesTexture = gl.createTexture()
-    this.scaleFactorsTexture = gl.createTexture()
-    this.tilePositionsTexture = gl.createTexture()
-    this.imagePositionsTexture = gl.createTexture()
-
-    this.vao = gl.createVertexArray()
-
-    this.throttledUpdateTextures = throttle(
-      this.updateTextures.bind(this),
-      THROTTLE_WAIT_MS,
-      THROTTLE_OPTIONS
-    )
   }
 
   updateVertexBuffers(transform: Transform) {
@@ -287,6 +294,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 
+  // TODO: correctly dispose webgl objects
   //   dispose() {
   //     this.gl.deleteTexture(this.tilesTexture)
   //     this.gl.deleteTexture(this.scaleFactorsTexture)

@@ -1,5 +1,7 @@
 import type { BBox, SVGPolygon, Extent } from './types.js'
 
+// TODO: move to @allmaps/stdlib
+
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
   let max: number = Number.NEGATIVE_INFINITY
