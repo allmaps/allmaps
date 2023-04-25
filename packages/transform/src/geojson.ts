@@ -1,6 +1,7 @@
 // TODO: consider implementing these functions in this module instead of using dependencies
 import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
+import { rewindGeometry } from '@placemarkio/geojson-rewind'
 
 import { toWorld, toImage } from './transformer.js'
 
@@ -51,10 +52,12 @@ function makeGeoJSONLineString(points: Position[]): GeoJSONLineString {
 }
 
 function makeGeoJSONPolygon(points: Position[]): GeoJSONPolygon {
-  return {
+  const geometry = {
     type: 'Polygon',
     coordinates: [points]
   }
+
+  return rewindGeometry(geometry as GeoJSONPolygon) as GeoJSONPolygon
 }
 
 export function toGeoJSONPoint(

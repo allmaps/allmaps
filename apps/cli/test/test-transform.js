@@ -126,4 +126,26 @@ describe('allmaps transform pixel-mask', () => {
 
     expect(expected).to.deep.equal(output)
   })
+
+  it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
+    const expected = readFileJson(
+      'output/geojson/7a69f9470b49a744.geojson'
+    )
+    const output = execJson(
+      'transform pixel-mask input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
+  it('should read a Georeference Annotation with a reversed pixel mask from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
+    const expected = readFileJson(
+      'output/geojson/7a69f9470b49a744-reversed-pixel-mask.geojson'
+    )
+    const output = execJson(
+      'transform pixel-mask input/annotations/7a69f9470b49a744-reversed-pixel-mask.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
 })

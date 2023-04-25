@@ -33,6 +33,7 @@
     "map"
   ],
   "dependencies": {
+    "@placemarkio/geojson-rewind": "^1.0.2",
     "@turf/distance": "^6.3.0",
     "@turf/midpoint": "^6.3.0"
   },
