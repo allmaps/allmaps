@@ -90,7 +90,7 @@ void main() {
 
     // Colorize
     if(u_colorize) {
-      outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
+      outColor = vec4((u_colorizeColor + outColor.rgb) , outColor.a);
     }
 
     // Set opacity
