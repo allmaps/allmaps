@@ -34,12 +34,14 @@
     "@allmaps/transform": "^1.0.0-beta.13",
     "@allmaps/ui": "^1.0.0-beta.14",
     "flowbite": "^1.6.4",
-    "ol": "^6.15.1"
+    "ol": "^6.15.1",
+    "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",
     "@sveltejs/kit": "^1.0.0",
     "@types/openseadragon": "^3.0.4",
+    "@types/tinycolor2": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.35.0",
@@ -50,7 +52,7 @@
     "prettier-plugin-svelte": "^2.8.1",
     "svelte": "^3.54.0",
     "svelte-check": "^2.9.2",
-    "tailwindcss": "^3.2.0",
+    "tailwindcss": "^3.3.2",
     "tslib": "^2.4.1",
     "typescript": "^4.9.5",
     "vite": "^4.0.0"
