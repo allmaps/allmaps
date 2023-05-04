@@ -1,35 +1,39 @@
 <script lang="ts">
   import { browser } from '$app/environment'
-  import { get } from 'svelte/store'
 
-  import url from '$lib/shared/stores/url.js'
+  import urlStore from '$lib/shared/stores/url.js'
 
   let urlValue: string
   let input: HTMLInputElement
 
   export let autofocus: boolean | undefined = undefined
 
-  const hasInitialUrl = get(url) ? true : false
+  $: urlValue = $urlStore
 
   if (autofocus === undefined) {
-    autofocus = !hasInitialUrl
+    autofocus = $urlStore === ''
   }
 
   export let placeholder =
     'Type the URL of a IIIF Image, Manifest, Collection or Georeference Annotation'
 
-  url.subscribe((value) => {
-    urlValue = value
-  })
-
-  function inputClick(event: Event) {
-    selectInputText()
-    event.preventDefault()
-  }
-
   function selectInputText() {
     input.focus()
-    input.select()
+    input.setSelectionRange(0, urlValue.length)
+  }
+
+  function handleFocus() {
+    selectInputText()
+  }
+
+  function handleKeyup(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      urlValue = $urlStore
+    }
+  }
+
+  function handleMouseup(event: Event) {
+    event.preventDefault()
   }
 
   function submit() {
@@ -39,13 +43,13 @@
   }
 
   function setStoreValue(urlValue: string) {
-    $url = urlValue
+    $urlStore = urlValue
   }
 
   if (browser) {
     document.addEventListener('keyup', (event: KeyboardEvent) => {
       const target = event.target as Element
-      if (event.key === '/' && target.tagName !== 'INPUT') {
+      if (event.key === '/' && target.nodeName !== 'input') {
         selectInputText()
       }
     })
@@ -60,7 +64,9 @@
   <input
     type="input"
     {autofocus}
-    on:click={inputClick}
+    on:focus|preventDefault={handleFocus}
+    on:keyup={handleKeyup}
+    on:mouseup={handleMouseup}
     bind:value={urlValue}
     bind:this={input}
     class="bg-transparent w-full px-2 py-1 focus:outline-none truncate"

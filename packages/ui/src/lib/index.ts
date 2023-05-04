@@ -11,6 +11,11 @@ import Dial from '$lib/components/Dial.svelte'
 import Copy from '$lib/components/Copy.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 
+import BringToFront from '$lib/components/icons/BringToFront.svelte'
+import BringForward from '$lib/components/icons/BringForward.svelte'
+import SendBackward from '$lib/components/icons/SendBackward.svelte'
+import SendToBack from '$lib/components/icons/SendToBack.svelte'
+
 export { urlStore, dataStore, paramStore }
 
 export {
@@ -21,5 +26,9 @@ export {
   Loading,
   Dial,
   Copy,
-  MapMonster
+  MapMonster,
+  BringToFront,
+  BringForward,
+  SendBackward,
+  SendToBack
 }

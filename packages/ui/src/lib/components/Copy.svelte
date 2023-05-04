@@ -1,43 +1,48 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-
   import { Tooltip } from 'flowbite'
   import type { TooltipOptions, TooltipInterface } from 'flowbite'
 
   export let string: string
 
-  let textarea: HTMLTextAreaElement
+  // let textarea: HTMLTextAreaElement
+  let input: HTMLInputElement
 
   let tooltipTarget: HTMLElement
   let tooltipTrigger: HTMLElement
-  let tooltip: TooltipInterface
+  let tooltip: TooltipInterface | undefined
 
   let copying = false
 
   const copyingTimeout = 2000
 
   function copy() {
+    const options: TooltipOptions = {
+      triggerType: 'none'
+    }
+
+    tooltip = new Tooltip(tooltipTarget, tooltipTrigger, options)
+
     copying = true
     navigator.clipboard.writeText(string)
     tooltip.show()
 
     setTimeout(() => {
       copying = false
-      tooltip.hide()
+
+      if (tooltip) {
+        tooltip.hide()
+        tooltip = undefined
+      }
     }, copyingTimeout)
   }
 
   function handleFocus() {
-    textarea.select()
+    input.setSelectionRange(0, string.length)
   }
 
-  onMount(() => {
-    const options: TooltipOptions = {
-      triggerType: 'none'
-    }
-
-    tooltip = new Tooltip(tooltipTarget, tooltipTrigger, options)
-  })
+  function handleMouseup(event: Event) {
+    event.preventDefault()
+  }
 </script>
 
 <div class="relative w-full h-8 flex flex-row">
@@ -50,14 +55,19 @@
     <div class="tooltip-arrow" data-popper-arrow />
   </div>
 
-  <textarea
-    bind:this={textarea}
+  <input
+    type="text"
+    bind:this={input}
     on:focus={handleFocus}
-    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-sm text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-    readonly>{string}</textarea
-  >
+    on:mouseup={handleMouseup}
+    on:touchend={handleMouseup}
+    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-sm text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+    readonly
+    value={string}
+  />
+
   <button
-    class="top-0 right-0 p-1 text-sm font-medium text-white rounded-r-lg border border-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300"
+    class="top-0 right-0 p-1 w-8 h-8 text-sm font-medium text-white rounded-r-lg border-gray-100 border-2 focus:ring-4 focus:outline-none focus:ring-blue-300"
     bind:this={tooltipTrigger}
     on:click={copy}
     ><svg
