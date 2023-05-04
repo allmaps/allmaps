@@ -93,6 +93,19 @@ export class Collection {
     return new Collection(parsedCollection)
   }
 
+  async fetchAll(
+    fetch: FetchFunction,
+    options: FetchNextOptions = defaulfFetchNextOptions
+  ): Promise<FetchNextResults<Collection | Manifest | Image>[]> {
+    const results: FetchNextResults<Collection | Manifest | Image>[] = []
+
+    for await (const next of this.fetchNext(fetch, options)) {
+      results.push(next)
+    }
+
+    return results
+  }
+
   async *fetchNext(
     fetch: FetchFunction,
     options: FetchNextOptions = defaulfFetchNextOptions,
