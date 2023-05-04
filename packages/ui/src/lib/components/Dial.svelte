@@ -9,9 +9,15 @@
   let tooltip: TooltipInterface
 
   export let value: number
-  export let keyCode: string
+  export let keyCode: string | undefined = undefined
   export let label: string
+
+  export let distanceValueRatio = 1 / 100
+
   export let invert = false
+  export let clamp = true
+  export let toggle = true
+  export let showDial = true
 
   export let active = false
   export let disableTooltip = false
@@ -85,7 +91,13 @@
 
         diff = diffX
 
-        internalValue = clamp(initialValue + diff / 100)
+        let newValue = initialValue + diff * distanceValueRatio
+
+        if (clamp) {
+          internalValue = clampValue(newValue)
+        } else {
+          internalValue = (newValue + 1) % 1
+        }
 
         // value = angleToValue(angle)
       }
@@ -107,7 +119,7 @@
     return value * (maxAngle - minAngle) + minAngle
   }
 
-  function clamp(value: number): number {
+  function clampValue(value: number): number {
     if (value > 1) {
       return 1
     } else if (value < 0) {
@@ -124,14 +136,16 @@
   ) {
     active = true
 
-    if (initialValue < threshold) {
-      initialValue = maxValue
-    }
+    if (toggle) {
+      if (initialValue < threshold) {
+        initialValue = maxValue
+      }
 
-    if (event.shiftKey) {
-      internalValue = clamp(initialValue + toggleValue)
-    } else {
-      internalValue = clamp(initialValue - toggleValue)
+      if (event.shiftKey) {
+        internalValue = clampValue(initialValue + toggleValue)
+      } else {
+        internalValue = clampValue(initialValue - toggleValue)
+      }
     }
 
     window.addEventListener(moveEventType, handleMove)
@@ -171,9 +185,8 @@
     }
   }
 
-  // TODO: check if keyCode is defined
   function handleKeydown(event: KeyboardEvent) {
-    if (event.code === keyCode && event.target === document.body) {
+    if (keyCode && event.code === keyCode && event.target === document.body) {
       active = true
 
       if (initialValue < threshold) {
@@ -181,72 +194,95 @@
       }
 
       if (event.shiftKey) {
-        internalValue = clamp(initialValue + toggleValue)
+        internalValue = clampValue(initialValue + toggleValue)
       } else {
-        internalValue = clamp(initialValue - toggleValue)
+        internalValue = clampValue(initialValue - toggleValue)
       }
     }
   }
 
   function handleKeyup(event: KeyboardEvent) {
-    if (event.code === keyCode && event.target === document.body) {
+    if (keyCode && event.code === keyCode && event.target === document.body) {
       internalValue = initialValue
       active = false
     }
   }
 
   onMount(() => {
-    const options: TooltipOptions = {
-      triggerType: 'none'
-    }
+    if (!disableTooltip) {
+      const options: TooltipOptions = {
+        triggerType: 'none'
+      }
 
-    tooltip = new Tooltip(tooltipTarget, tooltipTrigger, options)
+      tooltip = new Tooltip(tooltipTarget, tooltipTrigger, options)
+    }
   })
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div bind:this={container} class="flex">
-  <div
-    id="tooltip-animation"
-    role="tooltip"
-    bind:this={tooltipTarget}
-    class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
-  >
-    {label}:
-    <span class="relative inline-block w-8 text-right"
-      >{Math.round(value * 100)}%</span
+<div class="inline-block">
+  <div bind:this={container} class="flex">
+    <div
+      id="tooltip-animation"
+      role="tooltip"
+      bind:this={tooltipTarget}
+      class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
     >
-    <div class="tooltip-arrow" data-popper-arrow />
-  </div>
+      {label}:
+      <span class="relative inline-block w-8 text-right"
+        >{Math.round(value * 100)}%</span
+      >
+      <div class="tooltip-arrow" data-popper-arrow />
+    </div>
 
-  <button
-    type="button"
-    data-tooltip-target="tooltip-animation"
-    bind:this={tooltipTrigger}
-    class="select-none relative bg-white w-7 h-7 text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 drop-shadow"
-    on:mousedown={handleMousedown}
-    on:touchstart={handleTouchstart}
-    on:mouseenter={handleMouseenter}
-    on:mouseleave={handleMouseleave}
-  >
-    <svg
-      aria-hidden="true"
-      style:transform={`rotate(${valueToAngle(internalValue)}deg)`}
-      class="absolute inset-0 transition-transform ease-linear w-full h-full"
-      class:duration-75={!hasMoved}
-      class:duration-0={hasMoved}
-      viewBox="0 0 100 100"
+    <input
+      type="range"
+      class="sr-only peer"
+      bind:value={internalValue}
+      min="0"
+      max="1"
+      step={0.01}
+    />
+
+    <!-- focus:ring-2 focus:ring-blue-700 focus:text-blue-700 -->
+    <div
+      data-tooltip-target="tooltip-animation"
+      bind:this={tooltipTrigger}
+      class="select-none relative bg-white w-7 h-7 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
+      on:mousedown={handleMousedown}
+      on:touchstart={handleTouchstart}
+      on:mouseenter={handleMouseenter}
+      on:mouseleave={handleMouseleave}
     >
-      <circle
-        cx="50"
-        cy="50"
-        r="45"
-        fill="none"
-        stroke="black"
-        stroke-width="7"
-      />
-      <line x1="50" y1="40" x2="50" y2="5" stroke="black" stroke-width="7" />
-    </svg>
-  </button>
+      {#if showDial}
+        <svg
+          aria-hidden="true"
+          style:transform={`rotate(${valueToAngle(internalValue)}deg)`}
+          class="absolute inset-0 transition-transform ease-linear w-full h-full"
+          class:duration-75={!hasMoved}
+          class:duration-0={hasMoved}
+          viewBox="0 0 100 100"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="black"
+            stroke-width="7"
+          />
+          <line
+            x1="50"
+            y1="40"
+            x2="50"
+            y2="5"
+            stroke="black"
+            stroke-width="7"
+          />
+        </svg>
+      {/if}
+      <slot />
+    </div>
+  </div>
 </div>
