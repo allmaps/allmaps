@@ -20,20 +20,20 @@ const gcps = [
 
 const gcps2 = [
   {
-    world: [4.4091165, 51.9017125],
-    image: [1344, 4098]
+    image: [1344, 4098],
+    world: [4.4091165, 51.9017125]
   },
   {
-    world: [4.5029222, 51.9164451],
-    image: [4440, 3441]
+    image: [4440, 3441],
+    world: [4.5029222, 51.9164451]
   },
   {
-    world: [4.4764224, 51.897309],
-    image: [3549, 4403]
+    image: [3549, 4403],
+    world: [4.4764224, 51.897309]
   },
   {
-    world: [4.4199066, 51.9391509],
-    image: [1794, 2130]
+    image: [1794, 2130],
+    world: [4.4199066, 51.9391509]
   },
   {
     world: [4.4775683, 51.9324358],
@@ -50,6 +50,8 @@ describe('Polynomial transformer', async () => {
   const transformer = new GCPTransformer(gcps)
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
+    // from: gdaltransform -output_xy -gcp 518 991 4.9516614 52.4633102 -gcp 4345 2357 5.0480391 52.5123762 -gcp 2647 475 4.9702906 52.5035815
+    // with input e.g.: 100 100
     expectToBeCloseToArray(
       transformer.toWorld([100, 100]),
       [4.92079391286352, 52.4654946986157]
@@ -67,14 +69,15 @@ describe('Thin-plate spline transformer', async () => {
   it(`should have the same output as running GDAL's gdaltransform`, () => {
     console.log(transformer.toWorld([518, 991]))
     console.log(transformer.toWorld([1000, 1000]))
-
+    // from: gdaltransform -output_xy -tps -gcp 1344 4098 4.4091165 51.9017125 -gcp 4440 3441 4.5029222 51.9164451 -gcp 3549 4403 4.4764224 51.897309 -gcp 1794 2130 4.4199066 51.9391509 -gcp 3656 2558 4.4775683 51.9324358
+    // with input e.g.: 100 100
     expectToBeCloseToArray(
       transformer.toWorld([100, 100]),
-      [4.92079391286352, 52.4654946986157]
+      [4.36548266472303, 51.9763955169575]
     )
     expectToBeCloseToArray(
       transformer.toWorld([1000, 1000]),
-      [4.95932911267323, 52.4711479887873]
+      [4.39415154224292, 51.9599873720927]
     )
   })
 })
