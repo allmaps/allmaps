@@ -3,6 +3,8 @@ import { derived } from 'svelte/store'
 import { mapsById } from '$lib/shared/stores/maps.js'
 import { deselectMap } from '$lib/shared/stores/selected.js'
 
+import { showMap as olShowMap, hideMap as olHideMap } from '$lib/shared/stores/openlayers.js'
+
 export function showMap(mapId: string) {
   updateVisibleMaps([mapId], [])
 }
@@ -24,6 +26,7 @@ function updateVisibleMaps(
       if (viewerMap) {
         viewerMap.state.visible = true
         $mapsById.set(mapId, viewerMap)
+        olShowMap(mapId)
       }
     }
 
@@ -33,6 +36,7 @@ function updateVisibleMaps(
       if (viewerMap) {
         viewerMap.state.visible = false
         $mapsById.set(mapId, viewerMap)
+        olHideMap(mapId)
       }
     }
 

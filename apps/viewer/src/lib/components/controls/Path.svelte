@@ -42,7 +42,7 @@
 </script>
 
 <nav
-  class="inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
+  class="hidden md:inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
 >
   <ol class="inline-flex items-center space-x-1 md:space-x-3">
     {#if $firstSource}

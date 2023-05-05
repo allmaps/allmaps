@@ -1,5 +1,6 @@
 <script lang="ts">
   import { renderOptions } from '$lib/shared/stores/render-options.js'
+  import { opacity } from '$lib/shared/stores/opacity.js'
 
   import { Dial } from '@allmaps/ui'
 
@@ -17,7 +18,7 @@
 
 <div class="inline-flex items-center space-x-1 md:space-x-3">
   <Dial
-    bind:value={$renderOptions.opacity}
+    bind:value={$opacity}
     bind:active={opacityActive}
     disableTooltip={opacityDisableTooltip}
     keyCode="Space"

@@ -7,7 +7,7 @@ import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
 
 type ImageInfo = string | ImageInformationResponse
 
-function createIIIFTileSource (imageInfo: ImageInfo) {
+function createIIIFTileSource(imageInfo: ImageInfo) {
   const options = new IIIFInfo(imageInfo).getTileSourceOptions()
   if (options === undefined || options.version === undefined) {
     throw new Error('Data seems to be no valid IIIF image information.')
@@ -18,18 +18,24 @@ function createIIIFTileSource (imageInfo: ImageInfo) {
 }
 
 export class IIIFLayer extends TileLayer<IIIFSource> {
-  constructor (imageInfo: ImageInfo) {
+  constructor(imageInfo?: ImageInfo) {
     super()
 
+    if (imageInfo) {
+      this.setImageInfo(imageInfo)
+    }
+  }
+
+  setImageInfo(imageInfo: ImageInfo) {
     const iiifTileSource = createIIIFTileSource(imageInfo)
     this.setSource(iiifTileSource)
   }
 
-  getExtent () {
+  getExtent() {
     return this.getSource()?.getTileGrid()?.getExtent()
   }
 
-  getView () {
+  getView() {
     return new View({
       resolutions: this.getSource()?.getTileGrid()?.getResolutions(),
       extent: this.getExtent(),

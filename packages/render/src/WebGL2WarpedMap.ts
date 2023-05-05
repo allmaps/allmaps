@@ -21,6 +21,8 @@ const THROTTLE_OPTIONS = {
   trailing: true
 }
 
+const DEFAULT_OPACITY = 1
+
 export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
 
@@ -37,6 +39,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   tilesForTexture: Map<string, CachedTile> = new Map()
 
+  opacity: number = DEFAULT_OPACITY
   renderOptions: RenderOptions = {}
 
   // currentScaleFactor?: number = undefined

@@ -82,7 +82,9 @@ export default class World extends EventTarget {
         pixelMask,
         transformer,
         geoMask,
-        fullGeoMask
+        geoMaskBBox: getPolygonBBox(geoMask),
+        fullGeoMask,
+        fullGeoMaskBBox: getPolygonBBox(fullGeoMask)
       }
 
       this.warpedMapsById.set(mapId, warpedMap)
@@ -280,6 +282,7 @@ export default class World extends EventTarget {
     if (warpedMap) {
       const geoMask = toGeoJSONPolygon(warpedMap.transformer, pixelMask)
       warpedMap.geoMask = geoMask
+      warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
 
       if (this.rtree) {
         this.rtree.removeItem(mapId)
@@ -342,12 +345,10 @@ export default class World extends EventTarget {
 
     for (let warpedMap of this.warpedMapsById.values()) {
       if (warpedMap.visible) {
-        const warpedMapBBox = getPolygonBBox(warpedMap.geoMask)
-
         if (!bbox) {
-          bbox = warpedMapBBox
+          bbox = warpedMap.geoMaskBBox
         } else {
-          bbox = combineBBoxes(bbox, warpedMapBBox)
+          bbox = combineBBoxes(bbox, warpedMap.geoMaskBBox)
         }
       }
     }

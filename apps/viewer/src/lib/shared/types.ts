@@ -1,5 +1,6 @@
 import type { Image, Manifest, Collection } from '@allmaps/iiif-parser'
 import type { Map, Annotation, AnnotationPage } from '@allmaps/annotation'
+import type { Position } from '@allmaps/render'
 
 import type { FeatureLike } from 'ol/Feature.js'
 
@@ -17,6 +18,7 @@ export type Source = (UrlSourceOptions | StringSourceOptions) & {
   id: string
   json: unknown
   parsed: Parsed
+  // error?: Error
   annotations: unknown[]
 }
 
@@ -41,6 +43,7 @@ export type ViewerMap = {
 
   annotation: Annotation | AnnotationPage
 
+  opacity: number
   renderOptions: RenderOptions
   state: MapState
 }
@@ -49,6 +52,7 @@ export type MapState = {
   visible: boolean
   selected: boolean
   highlighted: boolean
+  customPixelMask?: Position[]
 }
 
 export type RemoveBackgroundOptions = {
@@ -64,7 +68,6 @@ export type ColorizeOptions = {
 }
 
 export type RenderOptions = {
-  opacity: number
   removeBackground: RemoveBackgroundOptions
   colorize: ColorizeOptions
 }

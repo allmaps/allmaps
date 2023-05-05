@@ -2,8 +2,17 @@ import World from './World.js'
 
 import { computeIiifTilesForMapGeoBBox } from './shared/tiles.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import { applyTransform } from './shared/matrix.js'
 
-import type { Size, BBox, NeededTile } from './shared/types.js'
+import type {
+  Position,
+  Size,
+  BBox,
+  Transform,
+  NeededTile
+} from './shared/types.js'
+
+const MIN_COMBINED_PIXEL_SIZE = 5
 
 export default class Viewport extends EventTarget {
   world: World
@@ -24,7 +33,8 @@ export default class Viewport extends EventTarget {
   // Find better name?
   updateViewportAndGetTilesNeeded(
     viewportSize: Size,
-    geoBBox: BBox
+    geoBBox: BBox,
+    coordinateToPixelTransform: Transform
   ): NeededTile[] {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     let possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
@@ -40,27 +50,30 @@ export default class Viewport extends EventTarget {
         continue
       }
 
-      // TODO: don't show maps when they're too small
-      // const topLeft = [indexedMap.geoMaskBBox[0], indexedMap.geoMaskBBox[1]]
-      // const bottomRight = [
-      //   indexedMap.geoMaskBBox[2],
-      //   indexedMap.geoMaskBBox[3]
-      // ]
+      // Don't show maps when they're too small
+      const topLeft: Position = [
+        warpedMap.geoMaskBBox[0],
+        warpedMap.geoMaskBBox[1]
+      ]
+      const bottomRight: Position = [
+        warpedMap.geoMaskBBox[2],
+        warpedMap.geoMaskBBox[3]
+      ]
 
-      // const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
-      // const pixelBottomRight = applyTransform(
-      //   coordinateToPixelTransform,
-      //   bottomRight
-      // )
+      const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
+      const pixelBottomRight = applyTransform(
+        coordinateToPixelTransform,
+        bottomRight
+      )
 
-      // const pixelWidth = Math.abs(pixelBottomRight[0] - pixelTopLeft[0])
-      // const pixelHeight = Math.abs(pixelTopLeft[1] - pixelBottomRight[1])
+      const pixelWidth = Math.abs(pixelBottomRight[0] - pixelTopLeft[0])
+      const pixelHeight = Math.abs(pixelTopLeft[1] - pixelBottomRight[1])
 
-      // // Only draw maps that are larger than 1 pixel in combined width and height
-      // // TODO: use constant instead of 1
-      // if (pixelWidth + pixelHeight < 1) {
-      //   continue
-      // }
+      // Only draw maps that are larger than MIN_COMBINED_PIXEL_SIZE pixels
+      // in combined width and height
+      if (pixelWidth + pixelHeight < MIN_COMBINED_PIXEL_SIZE) {
+        continue
+      }
 
       // TODO: rename function
       const tiles = computeIiifTilesForMapGeoBBox(

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import {
-    renderOptions,
-    renderOptionsScope
-  } from '$lib/shared/stores/render-options'
+  // import {
+  //   renderOptions,
+  //   renderOptionsScope
+  // } from '$lib/shared/stores/render-options'
 </script>
 
-<div
+<!-- <div
   id="dropdownNotification"
   class="z-20 w-full max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800 dark:divide-gray-700"
   aria-labelledby="dropdownNotificationButton"
@@ -183,20 +183,6 @@
       </ul>
     </li>
   </ul>
-  <!--
-title: render options
-
-
-opacity
-
-
-remove backlground
-
-
-colorize
-
-
-option: layer | selection -->
 
   <a
     href="#"
@@ -214,4 +200,4 @@ option: layer | selection -->
     >
     Delete user
   </a>
-</div>
+</div> -->

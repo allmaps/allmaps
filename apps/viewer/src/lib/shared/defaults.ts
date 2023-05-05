@@ -1,17 +1,16 @@
 import type { RenderOptions } from '$lib/shared/types.js'
 
-export function getDefaultRenderOptions(): RenderOptions {
+export function getDefaultRenderOptions(enableRemoveBackground: boolean, enableColorize: boolean): RenderOptions {
   return {
-    opacity: 1,
     removeBackground: {
-      enabled: true,
+      enabled: enableRemoveBackground,
       color: '#faeed4',
       threshold: 0,
       hardness: 0.2
     },
     colorize: {
-      enabled: false,
-      color: '#ff0000'
+      enabled: enableColorize,
+      color: '#000000'
     }
   }
 }

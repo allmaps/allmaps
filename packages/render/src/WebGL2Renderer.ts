@@ -21,7 +21,8 @@ import type {
   Transform,
   RenderOptions,
   RemoveBackgroundOptions,
-  ColorizeOptions
+  ColorizeOptions,
+  GeoJSONPolygon
 } from './shared/types.js'
 
 import type { GCPTransformInfo } from '@allmaps/transform'
@@ -38,8 +39,8 @@ export default class WebGL2Renderer extends EventTarget {
 
   webGLWarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
+  opacity: number = DEFAULT_OPACITY
   renderOptions: RenderOptions = {}
-  renderOptionsScope: 'layer' | 'map' = 'layer'
 
   // TODO: move to Viewport?
   invertedRenderTransform: Transform
@@ -125,41 +126,46 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   // update
-  // updateTriangulation
+  updateTriangulation(mapId: string, geoMask: GeoJSONPolygon) {
+    const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
+    if (webGLWarpedMap) {
+      webGLWarpedMap.updateTriangulation(geoMask)
+    }
+  }
 
-  setVisible(visible: boolean): void {}
+  // setVisible(visible: boolean): void {}
 
   getOpacity(): number | undefined {
-    return this.renderOptions?.opacity
+    return this.opacity
   }
 
   setOpacity(opacity: number): void {
-    this.renderOptions.opacity = opacity
+    this.opacity = opacity
   }
 
   resetOpacity(): void {
-    this.renderOptions.opacity = undefined
+    this.opacity = DEFAULT_OPACITY
   }
 
   getMapOpacity(mapId: string): number | undefined {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
     if (webGLWarpedMap) {
-      return webGLWarpedMap.renderOptions.opacity
+      return webGLWarpedMap.opacity
     }
   }
 
   setMapOpacity(mapId: string, opacity: number): void {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
-      webGLWarpedMap.renderOptions.opacity = opacity
+      webGLWarpedMap.opacity = opacity
     }
   }
 
   resetMapOpacity(mapId: string): void {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
-      return (webGLWarpedMap.renderOptions.opacity = undefined)
+      webGLWarpedMap.opacity = DEFAULT_OPACITY
     }
   }
 
@@ -232,35 +238,28 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  setRenderOptionsUniforms(renderOptions: RenderOptions) {
+  setRenderOptionsUniforms(
+    layerRenderOptions: Partial<RenderOptions>,
+    mapRenderOptions: Partial<RenderOptions>
+  ) {
     const gl = this.gl
 
-    const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
-    gl.uniform1f(
-      opacityLocation,
-      renderOptions.opacity !== undefined
-        ? renderOptions.opacity
-        : DEFAULT_OPACITY
-    )
+    // Remove background color
+    const removeBackground =
+      mapRenderOptions.removeBackground || layerRenderOptions.removeBackground
 
     const removeBackgroundColorLocation = gl.getUniformLocation(
       this.program,
       'u_removeBackgroundColor'
     )
-    gl.uniform1f(
-      removeBackgroundColorLocation,
-      renderOptions.removeBackground ? 1 : 0
-    )
+    gl.uniform1f(removeBackgroundColorLocation, removeBackground ? 1 : 0)
 
-    if (renderOptions.removeBackground) {
+    if (removeBackground) {
       const backgroundColorLocation = gl.getUniformLocation(
         this.program,
         'u_backgroundColor'
       )
-      gl.uniform3fv(
-        backgroundColorLocation,
-        renderOptions.removeBackground.color
-      )
+      gl.uniform3fv(backgroundColorLocation, removeBackground.color)
 
       const backgroundColorThresholdLocation = gl.getUniformLocation(
         this.program,
@@ -268,8 +267,8 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1f(
         backgroundColorThresholdLocation,
-        renderOptions.removeBackground.threshold !== undefined
-          ? renderOptions.removeBackground.threshold
+        removeBackground.threshold !== undefined
+          ? removeBackground.threshold
           : DEFAULT_REMOVE_BACKGROUND_THRESHOLD
       )
 
@@ -279,21 +278,28 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1f(
         backgroundColorHardnessLocation,
-        renderOptions.removeBackground.hardness !== undefined
-          ? renderOptions.removeBackground.hardness
+        removeBackground.hardness !== undefined
+          ? removeBackground.hardness
           : DEFAULT_REMOVE_BACKGROUND_HARDNESS
       )
     }
 
-    const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
-    gl.uniform1f(colorizeLocation, renderOptions.colorize ? 1 : 0)
+    // Colorize
+    const colorize = mapRenderOptions.colorize || layerRenderOptions.colorize
 
-    if (renderOptions.colorize) {
+    const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
+    // gl.uniform1f(colorizeLocation, colorize ? 1 : 1)
+    gl.uniform1f(colorizeLocation, colorize ? 1 : 0)
+
+    if (colorize) {
       const colorizeColorLocation = gl.getUniformLocation(
         this.program,
         'u_colorizeColor'
       )
-      gl.uniform3fv(colorizeColorLocation, renderOptions.colorize.color)
+      gl.uniform3fv(colorizeColorLocation, colorize.color)
+      // gl.uniform3fv(colorizeColorLocation, [1, 0.07, 1])
+      // gl.uniform3fv(colorizeColorLocation, [0.99609375, 0.43359375, 0])
+
     }
   }
 
@@ -386,10 +392,6 @@ export default class WebGL2Renderer extends EventTarget {
       transformToMatrix4(renderTransform)
     )
 
-    if (this.renderOptionsScope === 'layer') {
-      this.setRenderOptionsUniforms(this.renderOptions)
-    }
-
     for (let mapId of mapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
@@ -403,9 +405,13 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      if (this.renderOptionsScope === 'map') {
-        this.setRenderOptionsUniforms(webglWarpedMap.renderOptions)
-      }
+      this.setRenderOptionsUniforms(
+        this.renderOptions,
+        webglWarpedMap.renderOptions
+      )
+
+      const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
+      gl.uniform1f(opacityLocation, this.opacity * webglWarpedMap.opacity)
 
       const transformer = webglWarpedMap.warpedMap.transformer
 

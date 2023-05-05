@@ -83,3 +83,8 @@ export const selectedMapCount = derived(
 export const selectedMapIds = derived(selectedMaps, ($selectedMaps) =>
   $selectedMaps.map((selectedMap) => selectedMap.mapId)
 )
+
+export const firstSelectedMapId = derived(
+  selectedMapIds,
+  ($selectedMapIds) => $selectedMapIds[0]
+)

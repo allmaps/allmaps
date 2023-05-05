@@ -16,18 +16,19 @@
   import {
     addUrlSource,
     addStringSource,
-    resetSources
+    resetSources,
+    sourcesCount,
+    firstSource
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
-  import {
-    renderOptions,
-    resetRenderOptionsLayer
-  } from '$lib/shared/stores/render-options.js'
+  import { resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
+  import { createMapOl, createImageOl } from '$lib/shared/stores/openlayers.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
 
-  import ShowError from '$lib/components/elements/Error.svelte'
+  import ErrorElement from '$lib/components/elements/Error.svelte'
+  import SourceError from '$lib/components/elements/SourceError.svelte'
 
   import 'ol/ol.css'
 
@@ -66,6 +67,9 @@
   let autofocus = !hasTouch()
 
   onMount(async () => {
+    createMapOl()
+    createImageOl()
+
     paramStore.subscribe(async (value) => {
       resetRenderOptionsLayer()
       resetSources()
@@ -103,43 +107,51 @@
       {/if}
     </Header>
   </div>
-  <main class="relative h-full overflow-y-auto">
+  <main class="relative h-full overflow-hidden">
     {#if showForm}
-      <div
-        class="container mx-auto mt-10 p-2"
-        transition:fade={{ duration: 120 }}
-      >
-        <p class="mb-3">Open a Georeference Annotation from a URL:</p>
-        <URLInput {autofocus} />
+      <div class="h-full flex overflow-y-auto">
+        <div
+          class="container mx-auto mt-10 p-2"
+          transition:fade={{ duration: 120 }}
+        >
+          <p class="mb-3">
+            Open a IIIF Resource or Georeference Annotation from a URL:
+          </p>
+          <URLInput {autofocus} />
 
-        <p class="mt-3 mb-3">
-          Or, paste an Georeference Annotation in the text box:
-        </p>
-        <form on:submit|preventDefault={handleAnnotationStringSubmit}>
-          <textarea
-            bind:value={annotationString}
-            class="font-mono block mb-3 w-full h-60 bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-          />
-          <button
-            type="submit"
-            disabled={annotationString.length === 0}
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            >View</button
-          >
-        </form>
-        <section>
-          <Examples />
-        </section>
+          <p class="mt-3 mb-3">
+            Or, paste a Georeference Annotation in the text box:
+          </p>
+          <form on:submit|preventDefault={handleAnnotationStringSubmit}>
+            <textarea
+              bind:value={annotationString}
+              class="font-mono block mb-3 w-full h-60 bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+            <button
+              type="submit"
+              disabled={annotationString.length === 0}
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >View</button
+            >
+          </form>
+          <section>
+            <Examples />
+          </section>
+        </div>
       </div>
     {:else if $mapCount}
       <Container />
+    {:else if $mapCount === 0 && $sourcesCount > 0}
+      <div class="h-full flex flex-col gap-2 items-center justify-center">
+        <SourceError source={$firstSource} />
+      </div>
     {:else if error}
       <div class="h-full flex flex-col gap-2 items-center justify-center">
-        <ShowError {error} />
+        <ErrorElement {error} />
       </div>
     {:else if initialized}
       <div class="h-full flex items-center justify-center">
