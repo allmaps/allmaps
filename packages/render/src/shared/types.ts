@@ -52,7 +52,7 @@ export type ColorizeOptions = {
 }
 
 export type RenderOptions = {
-  opacity?: number
+  // opacity?: number
   removeBackground?: RemoveBackgroundOptions
   colorize?: ColorizeOptions
 }
@@ -86,7 +86,9 @@ export type WarpedMap = {
   pixelMask: SVGPolygon
   transformer: GCPTransformInfo
   geoMask: GeoJSONPolygon
+  geoMaskBBox: BBox
   fullGeoMask: GeoJSONPolygon
+  fullGeoMaskBBox: BBox
 }
 
 export type XYZTile = {

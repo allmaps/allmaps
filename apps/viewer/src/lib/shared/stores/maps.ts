@@ -7,8 +7,11 @@ import { Image } from '@allmaps/iiif-parser'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { getBackgroundColor } from '$lib/shared/remove-background.js'
+import { mapWarpedMapSource, addMap, removeMap } from '$lib/shared/stores/openlayers.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
+
+import type { Position } from '@allmaps/render'
 
 type SourceMaps = Map<string, ViewerMap>
 
@@ -40,17 +43,19 @@ export async function addAnnotation(sourceId: string, json: any) {
         index: startIndex++,
         map,
         annotation: generateAnnotation(map),
+        opacity: 1,
         state: {
           visible: true,
           selected: false,
           highlighted: false
         },
         // TODO: detect background color of map?
-        renderOptions: getDefaultRenderOptions()
+        renderOptions: getDefaultRenderOptions(false, false)
       }
 
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
+      await addMap(viewerMap)
 
       // Process image once, also when the same image is used
       // in multiple georeferenced maps
@@ -76,6 +81,32 @@ export async function addAnnotation(sourceId: string, json: any) {
   return mapIds
 }
 
+export function resetCustomPixelMask(mapId: string) {
+  mapsById.update(($mapsById) => {
+    const viewerMap = $mapsById.get(mapId)
+
+    if (viewerMap) {
+      viewerMap.state.customPixelMask = undefined
+      mapWarpedMapSource.setPixelMask(mapId, viewerMap.map.pixelMask)
+    }
+
+    return $mapsById
+  })
+}
+
+export function setCustomPixelMask(mapId: string, customPixelMask: Position[]) {
+  mapsById.update(($mapsById) => {
+    const viewerMap = $mapsById.get(mapId)
+
+    if (viewerMap) {
+      viewerMap.state.customPixelMask = customPixelMask
+      mapWarpedMapSource.setPixelMask(mapId, customPixelMask)
+    }
+
+    return $mapsById
+  })
+}
+
 export function setRemoveBackgroundColor(
   mapId: string,
   removeBackgroundColor: string
@@ -91,11 +122,12 @@ export function setRemoveBackgroundColor(
   })
 }
 
-export function removeAnnotation(sourceId: string) {
+export async function removeAnnotation(sourceId: string) {
   mapsById.update(($mapsById) => {
     for (let [id, map] of $mapsById.entries()) {
       if (map.sourceId === sourceId) {
         $mapsById.delete(id)
+        removeMap(map)
       }
     }
 

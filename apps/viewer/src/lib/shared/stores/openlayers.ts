@@ -1,8 +1,27 @@
 import { writable, derived } from 'svelte/store'
 
-import { WarpedMapSource } from '@allmaps/openlayers'
+import { WarpedMapSource, WarpedMapLayer } from '@allmaps/openlayers'
+import { IIIFLayer } from '@allmaps/openlayers'
 
-import type Map from 'ol/Map.js'
+import Map from 'ol/Map.js'
+import { Vector as VectorSource } from 'ol/source'
+import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
+import XYZ from 'ol/source/XYZ.js'
+import View from 'ol/View.js'
+import { GeoJSON } from 'ol/format'
+import Select from 'ol/interaction/Select.js'
+import { click } from 'ol/events/condition.js'
+
+import {
+  selectedPolygonStyle,
+  invisiblePolygonStyle
+} from '$lib/shared/openlayers.js'
+
+import { view } from '$lib/shared/stores/view.js'
+
+import type { ViewerMap } from '$lib/shared/types.js'
+import type FeatureLike from 'ol/Feature'
+import type { OrderFunction } from 'ol/render'
 
 type XYZLayer = {
   url: string
@@ -36,6 +55,140 @@ export const xyzLayer = derived(
   ([$xyzLayers, $xyzLayerIndex]) => $xyzLayers[$xyzLayerIndex]
 )
 
-export const ol = writable<Map | undefined>()
+// Map view
 
-export const warpedMapSource = writable<WarpedMapSource>(new WarpedMapSource())
+export let mapOl: Map | undefined
+export let mapTileSource: XYZ | undefined
+export let mapTileLayer: TileLayer<XYZ> | undefined
+export const mapWarpedMapSource = new WarpedMapSource()
+export let mapWarpedMapLayer: WarpedMapLayer | undefined
+export const mapVectorSource = new VectorSource()
+export let mapVectorLayer: VectorLayer<VectorSource> | undefined
+export let mapSelect: Select | undefined
+
+function mapVectorLayerOrderFunction (feature1: FeatureLike, feature2: FeatureLike): number | null {
+  const mapId1 = feature1.getId() as string
+  const mapId2 = feature2.getId() as string
+
+  if (mapId1 && mapId2) {
+    const zIndex1 = mapWarpedMapSource.getZIndex(mapId1)
+    const zIndex2 = mapWarpedMapSource.getZIndex(mapId2)
+
+    if (zIndex1 !== undefined && zIndex2 !== undefined) {
+      return zIndex1 - zIndex2
+    }
+  }
+
+  return null
+}
+
+export function createMapOl() {
+  // TODO: set attribution
+  mapTileSource = new XYZ({
+    url: defaultXYZLayers[0].url,
+    maxZoom: 19
+  })
+
+  mapTileLayer = new TileLayer({
+    source: mapTileSource
+  })
+
+  mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
+
+  mapVectorLayer = new VectorLayer({
+    source: mapVectorSource,
+    style: invisiblePolygonStyle,
+    renderOrder: mapVectorLayerOrderFunction as OrderFunction
+  })
+
+  mapOl = new Map({
+    layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
+    controls: [],
+    view: new View({
+      maxZoom: 24,
+      zoom: 12
+    })
+  })
+
+  mapSelect = new Select({
+    condition: click,
+    style: selectedPolygonStyle
+  })
+
+  mapOl.addInteraction(mapSelect)
+}
+
+// Image view
+
+export let imageOl: Map | undefined
+export const imageVectorSource = new VectorSource()
+export let imageVectorLayer: VectorLayer<VectorSource> | undefined
+export let imageIiifLayer: IIIFLayer | undefined
+
+export function createImageOl() {
+  imageVectorLayer = new VectorLayer({
+    source: imageVectorSource,
+    style: selectedPolygonStyle
+  })
+
+  imageIiifLayer = new IIIFLayer()
+
+  imageOl = new Map({
+    controls: [],
+    layers: [imageIiifLayer, imageVectorLayer]
+  })
+}
+
+export const ol = derived(view, ($view) => {
+  if ($view === 'map') {
+    return mapOl
+  } else if ($view === 'image') {
+    return imageOl
+  }
+})
+
+// Exported functions
+
+export function showMap(mapId: string) {
+  if (!mapWarpedMapSource.isVisible(mapId)) {
+    mapWarpedMapSource.showMap(mapId)
+    addMapToVectorSource(mapId)
+  }
+}
+
+export function hideMap(mapId: string) {
+  if (mapWarpedMapSource.isVisible(mapId)) {
+    mapWarpedMapSource.hideMap(mapId)
+    removeMapFromVectorSource(mapId)
+  }
+}
+
+export async function addMap(viewerMap: ViewerMap) {
+  await mapWarpedMapSource.addMap(viewerMap.map)
+  addMapToVectorSource(viewerMap.mapId)
+}
+
+export async function removeMap(viewerMap: ViewerMap) {
+  await mapWarpedMapSource.removeMap(viewerMap.map)
+  removeMapFromVectorSource(viewerMap.mapId)
+}
+
+export function addMapToVectorSource(mapId: string) {
+  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  if (warpedMap) {
+    const geoMask = warpedMap.geoMask
+    const feature = new GeoJSON().readFeature(geoMask)
+    feature.setId(warpedMap.mapId)
+
+    if (!mapVectorSource.hasFeature(feature)) {
+      mapVectorSource.addFeature(feature)
+    }
+  }
+}
+
+export function removeMapFromVectorSource(mapId: string) {
+  const feature = mapVectorSource.getFeatureById(mapId)
+  if (feature) {
+    mapVectorSource.removeFeature(feature)
+  }
+}

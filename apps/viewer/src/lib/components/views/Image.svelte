@@ -1,36 +1,27 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
 
-  import { ol } from '$lib/shared/stores/openlayers.js'
+  import Feature from 'ol/Feature'
+  import { Polygon } from 'ol/geom'
+
+  import { imageOl, imageIiifLayer, imageVectorSource,  } from '$lib/shared/stores/openlayers.js'
   import { activeMap } from '$lib/shared/stores/active.js'
 
-  import OLMap from 'ol/Map.js'
-  import Feature from 'ol/Feature'
-  import { Vector as VectorLayer } from 'ol/layer'
-  import { Polygon } from 'ol/geom'
-  import { Vector as VectorSource } from 'ol/source'
-
   import {
-    selectedPolygonStyle,
     maskToPolygon
   } from '$lib/shared/openlayers.js'
 
-  import { IIIFLayer } from '@allmaps/openlayers'
   import { computeBBox } from '@allmaps/stdlib'
 
   import type { ViewerMap } from '$lib/shared/types.js'
 
-  let iiifLayer: IIIFLayer
-  let vectorSource: VectorSource
-  let vectorLayer: VectorLayer<VectorSource>
-
   $: {
-    if ($ol && $activeMap) {
+    if (imageOl && $activeMap) {
       updateMap($activeMap.viewerMap)
     }
   }
 
-  function updateVectorLayer(viewerMap: ViewerMap) {
+  function updateVectorSource(viewerMap: ViewerMap) {
     const map = viewerMap.map
 
     const feature = new Feature({
@@ -40,28 +31,20 @@
 
     feature.setId(map.id)
 
-    vectorSource.clear()
-    vectorSource.addFeature(feature)
+    imageVectorSource.clear()
+    imageVectorSource.addFeature(feature)
   }
 
   async function updateMap(viewerMap: ViewerMap) {
-    if ($ol && iiifLayer) {
-      $ol.removeLayer(iiifLayer)
-    }
-
-    if ($ol) {
+    if (imageOl && imageIiifLayer) {
       const map = viewerMap.map
 
       const imageUri = map.image.uri
       const imageInfo = await fetchImageInfo(imageUri)
 
-      updateVectorLayer(viewerMap)
+      updateVectorSource(viewerMap)
 
-      iiifLayer = new IIIFLayer(imageInfo)
-      $ol.addLayer(iiifLayer)
-
-      iiifLayer.setZIndex(1)
-      vectorLayer.setZIndex(2)
+      imageIiifLayer.setImageInfo(imageInfo)
 
       const pixelMaskBbox = computeBBox(viewerMap.map.pixelMask)
       const iiifLayerPixelMaskBbox = [
@@ -71,7 +54,7 @@
         -pixelMaskBbox[1]
       ]
 
-      $ol.getView().fit(iiifLayerPixelMaskBbox, {
+      imageOl.getView().fit(iiifLayerPixelMaskBbox, {
         padding: [25, 25, 25, 25]
       })
     }
@@ -85,21 +68,11 @@
   }
 
   onMount(() => {
-    vectorSource = new VectorSource()
-    vectorLayer = new VectorLayer({
-      source: vectorSource,
-      style: selectedPolygonStyle
-    })
-
-    $ol = new OLMap({
-      controls: [],
-      layers: [vectorLayer],
-      target: 'ol'
-    })
+    imageOl?.setTarget('ol')
   })
 
   onDestroy(() => {
-    $ol = undefined
+    imageOl?.setTarget()
   })
 </script>
 

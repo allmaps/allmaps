@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store'
+import { writable, derived } from 'svelte/store'
 
 import { generateId } from '@allmaps/id/browser'
 import { fetchJson, fetchAnnotationsFromApi } from '@allmaps/stdlib'
@@ -8,7 +8,7 @@ import {
   removeAnnotation,
   resetMaps
 } from '$lib/shared/stores/maps.js'
-import { warpedMapSource } from '$lib/shared/stores/openlayers.js'
+import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
 
 import { parseJson } from '$lib/shared/parser.js'
 
@@ -35,20 +35,22 @@ async function addSource(
 
   const parsed = await parseJson(json)
   if (parsed.type === 'annotation') {
-    // Annotation is already parsed in parseJson function
-    // TODO: find a way to parse data only once
     annotations = [json]
   } else {
     if (parsed.iiif.type === 'collection') {
-      for await (const next of parsed.iiif.fetchNext(fetchJson, {
+      await parsed.iiif.fetchAll(fetchJson, {
         fetchManifests: true,
         fetchImages: false
-      })) {
-        console.log(next)
-      }
+      })
     }
 
     annotations = await fetchAnnotationsFromApi(parsed.iiif)
+  }
+
+  let mapIds = []
+
+  for (let annotation of annotations) {
+    mapIds.push(...(await addAnnotation(id, annotation)))
   }
 
   sourcesStore.update((sources) => {
@@ -63,13 +65,6 @@ async function addSource(
     sources.set(id, source)
     return sources
   })
-
-  let mapIds = []
-  const $warpedMapSource = get(warpedMapSource)
-  for (let annotation of annotations) {
-    mapIds.push(...(await addAnnotation(id, annotation)))
-    await $warpedMapSource.addGeoreferenceAnnotation(annotation)
-  }
 
   sourceLoading.set(false)
 
@@ -102,14 +97,6 @@ export async function addStringSource(string: string) {
 
 export function removeSource(id: string) {
   sourcesStore.update((sources) => {
-    const source = sources.get(id)
-    if (source) {
-      const $warpedMapSource = get(warpedMapSource)
-      for (let annotation of source.annotations) {
-        $warpedMapSource.removeGeoreferenceAnnotation(annotation)
-      }
-    }
-
     sources.delete(id)
     return sources
   })
@@ -118,8 +105,7 @@ export function removeSource(id: string) {
 }
 
 export function resetSources() {
-  const $warpedMapSource = get(warpedMapSource)
-  $warpedMapSource.clear()
+  mapWarpedMapSource.clear()
 
   sourcesStore.set(new Map())
   resetMaps()

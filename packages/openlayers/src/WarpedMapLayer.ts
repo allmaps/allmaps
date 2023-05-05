@@ -51,7 +51,7 @@ export class WarpedMapLayer extends Layer {
   mapIdsInViewport: Set<string> = new Set()
 
   throttledUpdateViewportAndGetTilesNeeded: DebouncedFunc<
-    (viewportSize: Size, geoBBox: BBox) => NeededTile[]
+    typeof this.viewport.updateViewportAndGetTilesNeeded
   >
 
   throttledRenderTimeoutId: number | undefined
@@ -117,6 +117,11 @@ export class WarpedMapLayer extends Layer {
     this.world.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
       this.visibilityChanged.bind(this)
+    )
+
+    this.world.addEventListener(
+      WarpedMapEventType.PIXELMASKUPDATED,
+      this.pixelMaskUpdated.bind(this)
     )
 
     this.world.addEventListener(
@@ -194,6 +199,18 @@ export class WarpedMapLayer extends Layer {
 
   visibilityChanged() {
     this.changed()
+  }
+
+  pixelMaskUpdated(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      const warpedMap = this.world.getMap(mapId)
+
+
+      if (warpedMap) {
+        this.renderer.updateTriangulation(mapId, warpedMap.geoMask)
+      }
+    }
   }
 
   warpedMapEnter(event: Event) {
@@ -436,12 +453,14 @@ export class WarpedMapLayer extends Layer {
       if (last) {
         tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
-          extent
+          extent,
+          frameState.coordinateToPixelTransform as Transform
         )
       } else {
         tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
           viewportSize,
-          extent
+          extent,
+          frameState.coordinateToPixelTransform as Transform
         )
       }
 

@@ -2,7 +2,7 @@ import Source from 'ol/source/Source.js'
 
 import { RTree, World } from '@allmaps/render'
 
-import type { BBox } from '@allmaps/render'
+import type { Position, BBox } from '@allmaps/render'
 
 export class WarpedMapSource extends Source {
   rtree: RTree
@@ -52,12 +52,29 @@ export class WarpedMapSource extends Source {
     return this.world.getMap(mapId)
   }
 
+  showMap(mapId: string) {
+    this.world.showMaps([mapId])
+  }
+
   showMaps(mapIds: Iterable<string>) {
     this.world.showMaps(mapIds)
   }
 
+  hideMap(mapId: string) {
+    this.world.hideMaps([mapId])
+  }
+
   hideMaps(mapIds: Iterable<string>) {
     this.world.hideMaps(mapIds)
+  }
+
+  isVisible(mapId: string) {
+    const warpedMap = this.world.getMap(mapId)
+    return warpedMap?.visible
+  }
+
+  setPixelMask(mapId: string, pixelMask: Position[]) {
+    return this.world.setPixelMask(mapId, pixelMask)
   }
 
   getExtent(): BBox | undefined {
@@ -82,5 +99,9 @@ export class WarpedMapSource extends Source {
   sendBackward(mapIds: Iterable<string>) {
     this.world.sendBackward(mapIds)
     this.changed()
+  }
+
+  getZIndex(mapId: string) {
+    return this.world.getZIndex(mapId)
   }
 }

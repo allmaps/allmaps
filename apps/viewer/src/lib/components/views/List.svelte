@@ -5,7 +5,7 @@
 </script>
 
 <section class="w-full h-full overflow-y-auto">
-  <div class="container pt-14 mx-auto">
+  <div class="container pt-14 pb-7 mx-auto">
     <ol class="p-2 flex flex-col gap-2">
       {#each $maps as viewerMap}
         <li class="flex flex-row">

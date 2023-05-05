@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
 
-  import RenderOptionsButton from '$lib/components/elements/RenderOptionsButton.svelte'
-  import RenderOptionsDropdown from '$lib/components/dropdowns/RenderOptions.svelte'
-  import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
+  // import RenderOptionsButton from '$lib/components/elements/RenderOptionsButton.svelte'
+  // import RenderOptionsDropdown from '$lib/components/dropdowns/RenderOptions.svelte'
+  // import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
 
   import { mapCount } from '$lib/shared/stores/maps.js'
   import {
@@ -22,7 +22,11 @@
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    // TODO: only when not in input
+    const target = event.target as Element
+    if (target.nodeName === 'input') {
+      return
+    }
+
     if (event.key === '[') {
       prevMap()
     } else if (event.key === ']') {
@@ -39,14 +43,16 @@
   })
 </script>
 
-<div
-  class="inline-flex items-center p-2 space-x-1 md:space-x-3 text-sm bg-white border border-gray-200 rounded-lg"
->
-  {#if $selectedMapCount >= 2}
-    <div>{$selectedMapCount} maps selected</div>
-  {:else}
-    <div>Viewing {$mapCount} maps</div>
-  {/if}
+<div class="inline-flex rounded-md shadow-sm">
+  <div
+    class="hidden md:inline-flex h-9 px-3 py-1.5 text-sm items-center space-x-1 md:space-x-3 bg-white border border-gray-200 rounded-l-lg"
+  >
+    {#if $selectedMapCount >= 2}
+      <div>{$selectedMapCount} maps selected</div>
+    {:else}
+      <div>Viewing {$mapCount} maps</div>
+    {/if}
+  </div>
   <!-- path in collection, cluster, selection. click will display popover with thumbnails -->
   <!-- title, id current Map, click will display info about current map + URLs -->
 
@@ -72,7 +78,10 @@
     </svg>
   </button> -->
 
-  <button class="w-5 h-5" on:click={prevMap}>
+  <button
+    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-l-lg md:rounded-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+    on:click={prevMap}
+  >
     <svg
       aria-hidden="true"
       fill="currentColor"
@@ -87,7 +96,10 @@
     </svg>
   </button>
 
-  <button class="w-5 h-5" on:click={nextMap}>
+  <button
+    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+    on:click={nextMap}
+  >
     <svg
       aria-hidden="true"
       fill="currentColor"

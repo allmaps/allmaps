@@ -1,30 +1,84 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import { writable } from 'svelte/store'
 
-  import { selectMap, deselectMap } from '$lib/shared/stores/selected.js'
+  import {
+    setCustomPixelMask,
+    resetCustomPixelMask
+  } from '$lib/shared/stores/maps.js'
+  import {
+    selectMap,
+    deselectMap,
+    firstSelectedMapId
+  } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
   import { view } from '$lib/shared/stores/view.js'
-  import { warpedMapSource } from '$lib/shared/stores/openlayers.js'
+  import {
+    mapWarpedMapSource,
+    mapWarpedMapLayer
+  } from '$lib/shared/stores/openlayers.js'
+  import { setActiveMapId } from '$lib/shared/stores/active.js'
+  import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
+  import { getHue, fromHue } from '$lib/shared/color.js'
 
   import Thumbnail from '$lib/components/Thumbnail.svelte'
 
-  import { Copy } from '@allmaps/ui'
+  import {
+    Copy,
+    Dial,
+    BringToFront,
+    BringForward,
+    SendBackward,
+    SendToBack
+  } from '@allmaps/ui'
 
   import type { ViewerMap } from '$lib/shared/types.js'
 
   export let viewerMap: ViewerMap
 
+  let container: HTMLElement
+
   const selected = writable(viewerMap.state.selected)
   const visible = writable(viewerMap.state.visible)
+  const useMask = writable(viewerMap.state.customPixelMask ? false : true)
 
-  let showCompleteImage = false
+  // TODO: create function in stores/opacity.ts that creates opacity
+  // for map opacity
+  const opacity = writable(viewerMap.opacity)
+
+  const colorize = writable(viewerMap.renderOptions.colorize.enabled)
+
+  const colorizeColor = viewerMap.renderOptions.colorize.color
+  let hueInitialized = false
+  const hue = writable(getHue(colorizeColor) / 360)
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.image.uri
+  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  const geoMask = warpedMap?.geoMask
+
   const checkboxId = `dropdown-maps-${mapId}`
 
   const imageWidth = viewerMap.map.image.width
   const imageHeight = viewerMap.map.image.height
+
+  $: {
+    $hue
+    if (hueInitialized) {
+      $colorize = true
+    }
+
+    hueInitialized = true
+  }
+
+  $: {
+    setRenderOptionsForMap(mapId, {
+      colorize: {
+        enabled: $colorize,
+        color: fromHue($hue * 360)
+      }
+    })
+  }
 
   const fullPixelMask: [number, number][] = [
     [0, 0],
@@ -49,6 +103,18 @@
     }
   })
 
+  useMask.subscribe(($useMask) => {
+    if ($useMask) {
+      resetCustomPixelMask(mapId)
+    } else {
+      setCustomPixelMask(mapId, fullPixelMask)
+    }
+  })
+
+  opacity.subscribe(($opacity) => {
+    mapWarpedMapLayer?.setMapOpacity(mapId, $opacity)
+  })
+
   function pixelMaskToPoints(
     pixelMask: [number, number][],
     viewBox: [number, number]
@@ -71,28 +137,42 @@
   }
 
   function handleMapClick() {
-    console.log('open map', viewerMap)
+    setActiveMapId(viewerMap.mapId, true)
+    $view = 'map'
   }
 
   function handleImageClick() {
+    setActiveMapId(viewerMap.mapId, true)
     $view = 'image'
   }
 
   function handleBringToFrontClick() {
-    $warpedMapSource.bringToFront([mapId])
+    mapWarpedMapSource.bringToFront([mapId])
   }
+
   function handleBringForwardClick() {
-    $warpedMapSource.bringForward([mapId])
+    mapWarpedMapSource.bringForward([mapId])
   }
+
   function handleSendBackwardClick() {
-    $warpedMapSource.sendBackward([mapId])
+    mapWarpedMapSource.sendBackward([mapId])
   }
+
   function handleSendToBackClick() {
-    $warpedMapSource.sendToBack([mapId])
+    mapWarpedMapSource.sendToBack([mapId])
   }
+
+  onMount(() => {
+    if ($firstSelectedMapId === mapId) {
+      container.scrollIntoView()
+    }
+  })
 </script>
 
-<div class="flex flex-row gap-4 w-full">
+<div
+  bind:this={container}
+  class="grid gap-4 grid-cols-[auto_1fr] grid-rows-[auto_auto] w-full"
+>
   <div>
     <input
       type="checkbox"
@@ -102,7 +182,7 @@
     />
     <label
       for={checkboxId}
-      class="relative inline-block w-48 h-48 p-2 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 select-none"
+      class="relative inline-block w-48 h-48 p-2 text-gray-500 bg-white border-2 border-gray-200 rounded cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 select-none"
     >
       <div
         class="relative inline-flex items-center justify-between w-full h-full transition-opacity"
@@ -119,7 +199,7 @@
           <svg class="absolute w-full h-full inset-0" viewBox="0 0 100 100">
             <polygon
               points={pixelMaskToPoints(
-                showCompleteImage ? fullPixelMask : viewerMap.map.pixelMask,
+                $useMask ? viewerMap.map.pixelMask : fullPixelMask,
                 [100, 100]
               )}
               class="fill-none stroke-2"
@@ -131,155 +211,198 @@
     </label>
   </div>
 
-  <div class="flex flex-col justify-between w-full">
-    <div class="flex flex-row justify-between w-full">
-      <div>
-        <div>
-          <span>Map {viewerMap.index + 1}</span>
-          <code class="font-mono">{mapId}</code>
+  <div class="flex flex-col gap-4 justify-between w-full">
+    <!-- 2 -->
+
+    <div>
+      <span>Map {viewerMap.index + 1}</span>
+    </div>
+    <div class="flex flex-row justify-between items-center">
+      <div class="inline-flex flex-row gap-4">
+        <div class="inline-flex items-center">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              bind:checked={$visible}
+              class="sr-only peer"
+            />
+            <div
+              class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            />
+            <span
+              class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >Visible</span
+            >
+          </label>
+        </div>
+        <div class="inline-flex items-center">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              bind:checked={$useMask}
+              class="sr-only peer"
+            />
+            <div
+              class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            />
+            <span
+              class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >Use mask</span
+            >
+          </label>
+        </div>
+        <div class="inline-flex items-center">
+          <div class="inline-flex items-center">
+            <Dial
+              bind:value={$hue}
+              label="Colorize"
+              toggle={false}
+              clamp={false}
+              showDial={false}
+              distanceValueRatio={1 / 250}
+              disableTooltip={true}
+            >
+              <div
+                class="w-full h-full rounded-full"
+                class:opacity-50={!$colorize}
+                style={`background: hsl(${$hue * 360}, 100%, 50%);`}
+              />
+            </Dial>
+          </div>
+
+          <label class="relative ml-3 inline-flex items-center cursor-pointer">
+            <div>
+              <input
+                type="checkbox"
+                bind:checked={$colorize}
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+              />
+            </div>
+
+            <span
+              class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >Colorize</span
+            >
+          </label>
         </div>
 
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" bind:checked={$visible} class="sr-only peer" />
-          <div
-            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-          />
-          <span
-            class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >Visible</span
-          >
-        </label>
-
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            bind:checked={showCompleteImage}
-            class="sr-only peer"
-          />
-          <div
-            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-          />
-          <span
-            class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >Don't use mask</span
-          >
-        </label>
+        <div>
+          <!-- svelte-ignore a11y-label-has-associated-control -->
+          <label class="relative inline-flex items-center cursor-pointer">
+            <Dial bind:value={$opacity} label="Opacity" toggle={false} />
+            <span class="ml-3 text-sm font-medium text-gray-900">Opacity</span>
+          </label>
+        </div>
       </div>
-      <div>
-        <div>
-          <button
-            type="button"
-            on:click={handleMapClick}
-            class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-            >Show on map</button
-          >
-          <button
-            type="button"
-            on:click={handleImageClick}
-            class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-            >Show image</button
-          >
-        </div>
+
+      <div class="inline-flex rounded-md shadow-sm" role="group">
+        <button
+          type="button"
+          title="Bring To Front"
+          on:click={handleBringToFrontClick}
+          class="inline-flex items-center p-1 w-8 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+        >
+          <BringToFront />
+        </button>
+        <button
+          type="button"
+          title="Bring Forward"
+          on:click={handleBringForwardClick}
+          class="inline-flex items-center p-1 w-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+        >
+          <BringForward />
+        </button>
+        <button
+          type="button"
+          title="Send Backward"
+          on:click={handleSendBackwardClick}
+          class="inline-flex items-center p-1 w-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+        >
+          <SendBackward />
+        </button>
+        <button
+          type="button"
+          title="Send to Back"
+          on:click={handleSendToBackClick}
+          class="inline-flex items-center p-1 w-8 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+        >
+          <SendToBack />
+        </button>
       </div>
     </div>
 
-    <div class="inline-flex rounded-md shadow-sm" role="group">
-      <button
-        type="button"
-        on:click={handleBringToFrontClick}
-        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
-      >
-        <!-- <svg
-          aria-hidden="true"
-          class="w-4 h-4 mr-2 fill-current"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            fill-rule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-            clip-rule="evenodd"
-          /></svg
-        > -->
-        Bring to Front
-      </button>
-      <button
-        type="button"
-        on:click={handleBringForwardClick}
-        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
-      >
-        <!-- <svg
-          aria-hidden="true"
-          class="w-4 h-4 mr-2 fill-current"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
-          /></svg
-        > -->
-        Bring Forward
-      </button>
-      <button
-        type="button"
-        on:click={handleSendBackwardClick}
-        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
-      >
-        <!-- <svg
-          aria-hidden="true"
-          class="w-4 h-4 mr-2 fill-current"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
-          /></svg
-        > -->
-        Send Backward
-      </button>
-      <button
-        type="button"
-        on:click={handleSendToBackClick}
-        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
-      >
-        <!-- <svg
-          aria-hidden="true"
-          class="w-4 h-4 mr-2 fill-current"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            fill-rule="evenodd"
-            d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z"
-            clip-rule="evenodd"
-          /></svg
-        > -->
-        Send to Back
-      </button>
-    </div>
+    <div class="grid gap-4 grid-cols-[auto_1fr] grid-rows-[auto_auto] w-full">
+      <div class="py-1">Georeference Annotation:</div>
 
-    <!--
+      <div class="flex flex-col items-end gap-4">
+        <Copy string={JSON.stringify(viewerMap.annotation, null, 2)} />
+
+        <div>
+          Open in:
+          <a
+            class="underline"
+            target="_blank"
+            rel="noreferrer"
+            href="https://annotations.allmaps.org/maps/{mapId}">new tab</a
+          >,
+
+          {#if geoMask}
+            <a
+              class="underline"
+              target="_blank"
+              rel="noreferrer"
+              href="http://geojson.io/#data=data:application/json,{encodeURIComponent(
+                JSON.stringify(geoMask)
+              )}">geojson.io</a
+            >,
+          {/if}
+
+          <a
+            class="underline"
+            target="_blank"
+            rel="noreferrer"
+            href="https://editor.allmaps.org/#/collection?url={imageUri}/info.json"
+            >Allmaps Editor</a
+          >
+        </div>
+      </div>
+      <div class="py-1">XYZ tile URL:</div>
+      <Copy string={`https://allmaps.xyz/maps/${mapId}/{z}/{x}/{y}.png`} />
+    </div>
+  </div>
+
+  <div>
+    <!-- 3 -->
+    <div>
+      <button
+        type="button"
+        title="Show on map"
+        on:click={handleMapClick}
+        class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+        >Map</button
+      >
+      <button
+        type="button"
+        title="Show image"
+        on:click={handleImageClick}
+        class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+        >Image</button
+      >
+    </div>
+  </div>
+
+  <div>
+    <!-- 4 -->
+  </div>
+
+  <!--
     TODO:
       - toggle
       - opacity
-      - always show complete image
       - remove background
       - open annotation in new tab
    -->
-
-    <Copy string={JSON.stringify(viewerMap.annotation, null, 2)} />
-
-    <div>
-      <a
-        class="underline"
-        target="_blank"
-        rel="noreferrer"
-        href="https://editor.allmaps.org/#/collection?url={imageUri}/info.json"
-        >Open in Allmaps Editor</a
-      >
-    </div>
-    <div>XYZ tile URL:</div>
-
-    <Copy string={`https://allmaps.xyz/maps/${mapId}/{z}/{x}/{y}.png`} />
-  </div>
 </div>
