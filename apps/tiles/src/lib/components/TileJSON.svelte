@@ -4,17 +4,9 @@
   import Map from 'ol/Map.js'
   import XYZ from 'ol/source/XYZ.js'
   import TileLayer from 'ol/layer/Tile.js'
-  import View from 'ol/View.js'
   import { fromLonLat } from 'ol/proj.js'
 
-  type TileJSON = {
-    tilejson: string
-    id: string
-    tiles: string[]
-    fields: {}
-    bounds: [number, number, number, number]
-    center: [number, number]
-  }
+  import type { TileJSON } from '$lib/types.js'
 
   export let tileJson: TileJSON
 
