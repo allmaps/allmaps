@@ -61,7 +61,7 @@
     on:focus={handleFocus}
     on:mouseup={handleMouseup}
     on:touchend={handleMouseup}
-    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-sm text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-sm text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis"
     readonly
     value={string}
   />
