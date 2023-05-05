@@ -16,9 +16,7 @@ export async function fetchUrl(url: string, options: FetchOptions = {}) {
     })
 
     if (options.cache) {
-      // TODO: is this needed,
-      // cache.put(url, response.clone())
-      options.cache.put(url, response)
+      options.cache.put(url, response.clone())
     }
   }
 
