@@ -20,27 +20,6 @@
   function nextMap() {
     setNextMapActive(true)
   }
-
-  function handleKeyUp(event: KeyboardEvent) {
-    const target = event.target as Element
-    if (target.nodeName === 'input') {
-      return
-    }
-
-    if (event.key === '[') {
-      prevMap()
-    } else if (event.key === ']') {
-      nextMap()
-    }
-  }
-
-  onMount(() => {
-    document.addEventListener('keyup', handleKeyUp)
-  })
-
-  onDestroy(() => {
-    document.removeEventListener('keyup', handleKeyUp)
-  })
 </script>
 
 <div class="inline-flex rounded-md shadow-sm">
