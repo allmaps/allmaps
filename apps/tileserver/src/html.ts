@@ -3,7 +3,11 @@ import type { Request } from 'itty-router'
 const tilesBaseUrl = 'https://tiles.allmaps.org'
 
 const generateIframeHtml = (tileJsonUrl: string) => `<!DOCTYPE html>
-<header>
+<head>
+  <meta charset="utf-8" />
+  <title>Allmaps Tile Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
 <style>
   html {
     height: 100%;
