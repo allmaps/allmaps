@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
   import { browser } from '$app/environment'
   import { fade } from 'svelte/transition'
 
@@ -124,11 +124,13 @@
     })
 
     document.addEventListener('keyup', handleKeyup)
+
+    return onDestroy
   })
 
-  onDestroy(() => {
+  function onDestroy() {
     document.removeEventListener('keyup', handleKeyup)
-  })
+  }
 </script>
 
 <Navigation />
