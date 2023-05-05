@@ -4,12 +4,17 @@
   import Feature from 'ol/Feature'
   import { Polygon } from 'ol/geom'
 
-  import { imageOl, imageIiifLayer, imageVectorSource,  } from '$lib/shared/stores/openlayers.js'
-  import { activeMap } from '$lib/shared/stores/active.js'
+  import { fetchImageInfo } from '@allmaps/stdlib'
 
   import {
-    maskToPolygon
-  } from '$lib/shared/openlayers.js'
+    imageInfoCache,
+    imageOl,
+    imageIiifLayer,
+    imageVectorSource
+  } from '$lib/shared/stores/openlayers.js'
+  import { activeMap } from '$lib/shared/stores/active.js'
+
+  import { maskToPolygon } from '$lib/shared/openlayers.js'
 
   import { computeBBox } from '@allmaps/stdlib'
 
@@ -37,12 +42,16 @@
 
   async function updateMap(viewerMap: ViewerMap) {
     if (imageOl && imageIiifLayer) {
+      updateVectorSource(viewerMap)
+
       const map = viewerMap.map
 
       const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(imageUri)
-
-      updateVectorSource(viewerMap)
+      const imageInfo = await fetchImageInfo(
+        imageUri,
+        undefined,
+        imageInfoCache
+      )
 
       imageIiifLayer.setImageInfo(imageInfo)
 
@@ -58,13 +67,6 @@
         padding: [25, 25, 25, 25]
       })
     }
-  }
-
-  // TODO: move to stdlib
-  async function fetchImageInfo(imageUri: string) {
-    const response = await fetch(`${imageUri}/info.json`)
-    const image = await response.json()
-    return image
   }
 
   onMount(() => {

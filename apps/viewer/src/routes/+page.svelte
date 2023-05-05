@@ -22,7 +22,7 @@
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
   import { resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
-  import { createMapOl, createImageOl } from '$lib/shared/stores/openlayers.js'
+  import { createMapOl, createImageOl, createImageInfoCache } from '$lib/shared/stores/openlayers.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -69,6 +69,7 @@
   onMount(async () => {
     createMapOl()
     createImageOl()
+    createImageInfoCache()
 
     paramStore.subscribe(async (value) => {
       resetRenderOptionsLayer()

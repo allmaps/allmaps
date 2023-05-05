@@ -55,6 +55,15 @@ export const xyzLayer = derived(
   ([$xyzLayers, $xyzLayerIndex]) => $xyzLayers[$xyzLayerIndex]
 )
 
+/// Image Information Cache
+
+export let imageInfoCache: Cache | undefined
+
+export async function createImageInfoCache() {
+  imageInfoCache = await caches.open('new-cache')
+  mapWarpedMapSource.setImageInfoCache(imageInfoCache)
+}
+
 // Map view
 
 export let mapOl: Map | undefined
@@ -66,7 +75,10 @@ export const mapVectorSource = new VectorSource()
 export let mapVectorLayer: VectorLayer<VectorSource> | undefined
 export let mapSelect: Select | undefined
 
-function mapVectorLayerOrderFunction (feature1: FeatureLike, feature2: FeatureLike): number | null {
+function mapVectorLayerOrderFunction(
+  feature1: FeatureLike,
+  feature2: FeatureLike
+): number | null {
   const mapId1 = feature1.getId() as string
   const mapId2 = feature2.getId() as string
 
