@@ -6,5 +6,6 @@
   "tileserver": 5504,
   "ui": 5505,
   "iiif": 5506,
-  "render": 5507
+  "render": 5507,
+  "tiles": 5508
 }
