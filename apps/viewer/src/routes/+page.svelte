@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { browser } from '$app/environment'
   import { fade } from 'svelte/transition'
 
@@ -13,6 +13,7 @@
     paramStore
   } from '@allmaps/ui'
 
+  import { view } from '$lib/shared/stores/view.js'
   import {
     addUrlSource,
     addStringSource,
@@ -22,7 +23,15 @@
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
   import { resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
-  import { createMapOl, createImageOl, createImageInfoCache } from '$lib/shared/stores/openlayers.js'
+  import {
+    setPrevMapActive,
+    setNextMapActive
+  } from '$lib/shared/stores/active.js'
+  import {
+    createMapOl,
+    createImageOl,
+    createImageInfoCache
+  } from '$lib/shared/stores/openlayers.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -66,6 +75,25 @@
 
   let autofocus = !hasTouch()
 
+  function handleKeyup(event: KeyboardEvent) {
+    const target = event.target as Element
+    if (target.nodeName === 'input') {
+      return
+    }
+
+    if (event.key === '[') {
+      setPrevMapActive(true)
+    } else if (event.key === ']') {
+      setNextMapActive(true)
+    } else if (event.key === '1') {
+      $view = 'map'
+    } else if (event.key === '2') {
+      $view = 'list'
+    } else if (event.key === '3') {
+      $view = 'image'
+    }
+  }
+
   onMount(async () => {
     createMapOl()
     createImageOl()
@@ -94,6 +122,12 @@
         }
       }
     })
+
+    document.addEventListener('keyup', handleKeyup)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('keyup', handleKeyup)
   })
 </script>
 
