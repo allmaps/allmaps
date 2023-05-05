@@ -12,7 +12,7 @@ import { fromLonLat, getPolygonBBox } from './shared/geo.js'
 import { combineBBoxes } from './shared/bbox.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import { fetchJson } from '@allmaps/stdlib'
+import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import type { Position, BBox, WarpedMap } from './shared/types.js'
@@ -22,10 +22,12 @@ export default class World extends EventTarget {
   zIndices: Map<string, number> = new Map()
 
   rtree?: RTree
+  imageInfoCache?: Cache
 
-  constructor(rtree?: RTree) {
+  constructor(rtree?: RTree, imageInfoCache?: Cache) {
     super()
     this.rtree = rtree
+    this.imageInfoCache = imageInfoCache
   }
 
   private async getMapId(map: Georef) {
@@ -70,7 +72,7 @@ export default class World extends EventTarget {
 
       // TODO: only load info.json when its needed
       const imageUri = map.image.uri
-      const imageInfoJson = await fetchJson(`${imageUri}/info.json`)
+      const imageInfoJson = await fetchImageInfo(imageUri, undefined, this.imageInfoCache)
       const parsedImage = IIIFImage.parse(imageInfoJson)
       const imageId = await generateId(imageUri)
 
@@ -354,5 +356,9 @@ export default class World extends EventTarget {
     }
 
     return bbox
+  }
+
+  setImageInfoCache(cache: Cache) {
+    this.imageInfoCache = cache
   }
 }

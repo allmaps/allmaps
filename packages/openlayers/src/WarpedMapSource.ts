@@ -8,7 +8,7 @@ export class WarpedMapSource extends Source {
   rtree: RTree
   world: World
 
-  constructor() {
+  constructor(imageInfoCache?: Cache) {
     super({
       interpolate: true,
       projection: undefined,
@@ -17,7 +17,7 @@ export class WarpedMapSource extends Source {
     })
 
     this.rtree = new RTree()
-    this.world = new World(this.rtree)
+    this.world = new World(this.rtree, imageInfoCache)
   }
 
   async addMap(map: unknown): Promise<string | Error> {
@@ -103,5 +103,9 @@ export class WarpedMapSource extends Source {
 
   getZIndex(mapId: string) {
     return this.world.getZIndex(mapId)
+  }
+
+  setImageInfoCache(cache: Cache) {
+    this.world.setImageInfoCache(cache)
   }
 }
