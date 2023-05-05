@@ -47,11 +47,9 @@
       const map = viewerMap.map
 
       const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(
-        imageUri,
-        undefined,
-        imageInfoCache
-      )
+      const imageInfo = await fetchImageInfo(imageUri, {
+        cache: imageInfoCache
+      })
 
       imageIiifLayer.setImageInfo(imageInfo)
 

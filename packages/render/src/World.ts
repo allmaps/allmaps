@@ -72,7 +72,9 @@ export default class World extends EventTarget {
 
       // TODO: only load info.json when its needed
       const imageUri = map.image.uri
-      const imageInfoJson = await fetchImageInfo(imageUri, undefined, this.imageInfoCache)
+      const imageInfoJson = await fetchImageInfo(imageUri, {
+        cache: this.imageInfoCache
+      })
       const parsedImage = IIIFImage.parse(imageInfoJson)
       const imageId = await generateId(imageUri)
 
