@@ -13,6 +13,7 @@
   export let label: string
 
   export let distanceValueRatio = 1 / 100
+  export let step = 0.05
 
   export let invert = false
   export let clamp = true
@@ -242,7 +243,7 @@
       bind:value={internalValue}
       min="0"
       max="1"
-      step={0.01}
+      {step}
     />
 
     <!-- focus:ring-2 focus:ring-blue-700 focus:text-blue-700 -->
