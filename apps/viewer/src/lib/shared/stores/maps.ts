@@ -7,7 +7,12 @@ import { Image } from '@allmaps/iiif-parser'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { getBackgroundColor } from '$lib/shared/remove-background.js'
-import { mapWarpedMapSource, addMap, removeMap } from '$lib/shared/stores/openlayers.js'
+import {
+  imageInfoCache,
+  mapWarpedMapSource,
+  addMap,
+  removeMap
+} from '$lib/shared/stores/openlayers.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
@@ -32,11 +37,6 @@ export async function addAnnotation(sourceId: string, json: any) {
     for (let map of maps) {
       const mapId = map.id || (await generateChecksum(map))
 
-      // TODO: get info.json or parsedImage from WarpedMapSource via event
-      const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(imageUri)
-      const parsedImage = Image.parse(imageInfo)
-
       const viewerMap: ViewerMap = {
         sourceId,
         mapId,
@@ -56,6 +56,12 @@ export async function addAnnotation(sourceId: string, json: any) {
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
       await addMap(viewerMap)
+
+      const imageUri = map.image.uri
+      const imageInfo = await fetchImageInfo(imageUri, {
+        cache: imageInfoCache
+      })
+      const parsedImage = Image.parse(imageInfo)
 
       // Process image once, also when the same image is used
       // in multiple georeferenced maps

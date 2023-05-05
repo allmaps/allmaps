@@ -9,7 +9,7 @@
   export let height: number
 
   async function parseImage(imageUri: string) {
-    const imageInfo = await fetchImageInfo(imageUri, undefined, imageInfoCache)
+    const imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
     return Image.parse(imageInfo)
   }
 </script>
