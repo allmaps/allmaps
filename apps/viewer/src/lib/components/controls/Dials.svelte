@@ -20,14 +20,14 @@
   <Dial
     bind:value={$opacity}
     bind:active={opacityActive}
-    disableTooltip={opacityDisableTooltip}
+    enableTooltip={!opacityDisableTooltip}
     keyCode="Space"
     label="Opacity"
   />
   <Dial
     bind:value={$renderOptions.removeBackground.threshold}
     bind:active={removeBackgroundActive}
-    disableTooltip={removeBackgroundDisableTooltip}
+    enableTooltip={!removeBackgroundDisableTooltip}
     keyCode="KeyB"
     label="Remove background"
     invert

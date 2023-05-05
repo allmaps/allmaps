@@ -21,7 +21,7 @@
   export let showDial = true
 
   export let active = false
-  export let disableTooltip = false
+  export let enableTooltip = true
 
   // internalValue always has minValue 0 and maxValue 1
   let internalValue = invert ? 1 - value : value
@@ -48,7 +48,7 @@
 
   $: {
     if (tooltip) {
-      if (active && !disableTooltip) {
+      if (active && enableTooltip) {
         tooltip.show()
       } else {
         tooltip.hide()
@@ -175,7 +175,7 @@
   }
 
   function handleMouseenter() {
-    if (tooltip && !disableTooltip) {
+    if (tooltip && enableTooltip) {
       tooltip.show()
     }
   }
@@ -210,7 +210,7 @@
   }
 
   onMount(() => {
-    if (!disableTooltip) {
+    if (enableTooltip) {
       const options: TooltipOptions = {
         triggerType: 'none'
       }
