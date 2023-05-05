@@ -260,7 +260,7 @@
               clamp={false}
               showDial={false}
               distanceValueRatio={1 / 250}
-              disableTooltip={true}
+              enableTooltip={false}
             >
               <div
                 class="w-full h-full rounded-full"
@@ -292,7 +292,12 @@
         <div>
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="relative inline-flex items-center cursor-pointer">
-            <Dial bind:value={$opacity} label="Opacity" toggle={false} />
+            <Dial
+              bind:value={$opacity}
+              label="Opacity"
+              toggle={false}
+              enableTooltip={false}
+            />
             <span class="ml-3 text-sm font-medium text-gray-900">Opacity</span>
           </label>
         </div>
@@ -397,12 +402,4 @@
   <div>
     <!-- 4 -->
   </div>
-
-  <!--
-    TODO:
-      - toggle
-      - opacity
-      - remove background
-      - open annotation in new tab
-   -->
 </div>
