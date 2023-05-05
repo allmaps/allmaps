@@ -67,7 +67,7 @@ describe('Thin-plate spline transformer', async () => {
   const transformer = new GCPTransformer(gcps2, 'thin-plate-spline')
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    console.log(transformer.toWorld([518, 991]))
+    console.log(transformer.toWorld([100, 100]))
     console.log(transformer.toWorld([1000, 1000]))
     // from: gdaltransform -output_xy -tps -gcp 1344 4098 4.4091165 51.9017125 -gcp 4440 3441 4.5029222 51.9164451 -gcp 3549 4403 4.4764224 51.897309 -gcp 1794 2130 4.4199066 51.9391509 -gcp 3656 2558 4.4775683 51.9324358
     // with input e.g.: 100 100
