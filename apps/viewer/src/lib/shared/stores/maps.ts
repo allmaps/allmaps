@@ -7,6 +7,7 @@ import { Image } from '@allmaps/iiif-parser'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { getBackgroundColor } from '$lib/shared/remove-background.js'
+import { fromHue } from '$lib/shared/color.js'
 import {
   imageInfoCache,
   mapWarpedMapSource,
@@ -52,6 +53,8 @@ export async function addAnnotation(sourceId: string, json: any) {
         // TODO: detect background color of map?
         renderOptions: getDefaultRenderOptions(false, false)
       }
+
+      viewerMap.renderOptions.colorize.color = fromHue((viewerMap.index * 60) % 360)
 
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)

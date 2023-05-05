@@ -5,5 +5,5 @@ export function getHue(color: string) {
 }
 
 export function fromHue(hue: number) {
-  return tinycolor({ h: hue, s: 100, l: 50 }).toHex()
+  return '#' + tinycolor({ h: hue, s: 100, l: 50 }).toHex()
 }
