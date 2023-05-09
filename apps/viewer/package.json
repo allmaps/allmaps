@@ -35,6 +35,7 @@
     "@allmaps/stdlib": "^1.0.0-beta.8",
     "@allmaps/transform": "^1.0.0-beta.13",
     "@allmaps/ui": "^1.0.0-beta.14",
+    "comlink": "^4.4.1",
     "flowbite": "^1.6.4",
     "ol": "^6.15.1",
     "tinycolor2": "^1.6.0"

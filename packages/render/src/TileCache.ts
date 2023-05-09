@@ -10,6 +10,7 @@ import type { NeededTile } from './shared/types.js'
 export default class TileCache extends EventTarget {
   protected cachedTilesByUrl: Map<string, CachedTile> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
+  protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
   protected tilesLoadingCount = 0
 
@@ -26,6 +27,7 @@ export default class TileCache extends EventTarget {
 
     if (!cachedTile) {
       const cachedTile = new CachedTile(neededTile)
+
       this.updateTilesLoadingCount(1)
       cachedTile.addEventListener(
         WarpedMapEventType.TILEFETCHED,
@@ -36,14 +38,19 @@ export default class TileCache extends EventTarget {
         this.tileFetchError.bind(this)
       )
 
+      cachedTile.fetch()
+
       this.cachedTilesByUrl.set(tileUrl, cachedTile)
     } else {
+      // Tile is already cached, emit TILEADDED event
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEADDED, {
           mapId,
           tileUrl
         })
       )
+
+      this.addTileUrlForMapId(mapId, tileUrl)
     }
 
     this.addMapIdForTileUrl(mapId, tileUrl)
@@ -57,6 +64,7 @@ export default class TileCache extends EventTarget {
     }
 
     const mapIds = this.removeMapIdForTileUrl(mapId, tileUrl)
+    this.removeTileUrlForMapId(mapId, tileUrl)
 
     if (!mapIds.size) {
       if (cachedTile.loading) {
@@ -89,6 +97,8 @@ export default class TileCache extends EventTarget {
             tileUrl
           })
         )
+
+        this.addTileUrlForMapId(mapId, tileUrl)
       }
     }
   }
@@ -136,6 +146,47 @@ export default class TileCache extends EventTarget {
     return mapIds
   }
 
+  private addTileUrlForMapId(mapId: string, tileUrl: string) {
+    let tileUrls = this.tileUrlsByMapId.get(mapId)
+
+    if (!tileUrls) {
+      tileUrls = new Set([tileUrl])
+    } else {
+      tileUrls.add(tileUrl)
+    }
+
+    this.tileUrlsByMapId.set(mapId, tileUrls)
+
+    if (tileUrls.size === 1) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.FIRSTTILEADDED, {
+          mapId,
+          tileUrl
+        })
+      )
+    }
+
+    return tileUrls
+  }
+
+  private removeTileUrlForMapId(mapId: string, tileUrl: string) {
+    let tileUrls = this.tileUrlsByMapId.get(mapId)
+
+    if (!tileUrls) {
+      return new Set()
+    } else {
+      tileUrls.delete(tileUrl)
+
+      if (!tileUrls.size) {
+        this.tileUrlsByMapId.delete(mapId)
+      } else {
+        this.tileUrlsByMapId.set(mapId, tileUrls)
+      }
+
+      return tileUrls
+    }
+  }
+
   private createKey(mapId: string, tileUrl: string) {
     return `${mapId}:${tileUrl}`
   }
@@ -164,6 +215,7 @@ export default class TileCache extends EventTarget {
   clear() {
     this.cachedTilesByUrl = new Map()
     this.mapIdsByTileUrl = new Map()
+    this.tileUrlsByMapId = new Map()
     this.tilesLoadingCount = 0
   }
 

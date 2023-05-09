@@ -3,6 +3,10 @@
   import { browser } from '$app/environment'
   import { fade } from 'svelte/transition'
 
+  import * as Comlink from 'comlink'
+  import TestWorker from '$lib/shared/workers/test.js?worker'
+  import type { TestWorkerType } from '$lib/shared/workers/test.js'
+
   import {
     Header,
     Loading,
@@ -93,6 +97,17 @@
   }
 
   onMount(async () => {
+    const worker = new TestWorker()
+    const instance: Comlink.Remote<TestWorkerType> = Comlink.wrap(worker)
+
+    const localInstance = await new instance()
+    const result: number = await localInstance.calculateNumber()
+    const chips: {} = await localInstance.fetch(
+      'https://dev.annotations.allmaps.org/images/813b0579711371e2'
+    )
+
+    console.log(result, chips)
+
     createMapOl()
     createImageOl()
     createImageInfoCache()

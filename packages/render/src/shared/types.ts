@@ -52,7 +52,6 @@ export type ColorizeOptions = {
 }
 
 export type RenderOptions = {
-  // opacity?: number
   removeBackground?: RemoveBackgroundOptions
   colorize?: ColorizeOptions
 }

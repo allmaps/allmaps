@@ -26,8 +26,6 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-import type { GCPTransformer } from '@allmaps/transform'
-
 const DEFAULT_OPACITY = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0.2
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7

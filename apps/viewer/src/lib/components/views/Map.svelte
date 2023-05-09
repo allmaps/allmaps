@@ -25,6 +25,7 @@
 
   import type { ShowContextMenu } from '$lib/shared/types.js'
 
+  let ol: HTMLElement
   let showContextMenu: ShowContextMenu | undefined
 
   function fitExtent() {
@@ -63,29 +64,28 @@
   }
 
   onMount(async () => {
-    mapOl?.setTarget('ol')
+    mapOl?.setTarget(ol)
     mapSelect?.on('select', handleSelect)
 
-    // const element = $ol.getTargetElement()
-    // if (element) {
-    //   element.addEventListener('contextmenu', (event) => {
-    //     if ($ol) {
-    //       event.preventDefault()
+    ol.addEventListener('contextmenu', (event) => {
+      if (mapOl) {
+        event.preventDefault()
 
-    //       const feature = $ol.forEachFeatureAtPixel(
-    //         $ol.getEventPixel(event),
-    //         (feature) => feature
-    //       )
+        // TODO: use selected maps
+        const feature = mapOl.forEachFeatureAtPixel(
+          mapOl.getEventPixel(event),
+          (feature) => feature
+        )
 
-    //       if (feature) {
-    //         showContextMenu = {
-    //           event,
-    //           feature
-    //         }
-    //       }
-    //     }
-    //   })
-    // }
+        if (feature) {
+          console.log('show context menu', feature)
+          showContextMenu = {
+            event,
+            feature
+          }
+        }
+      }
+    })
 
     fitExtent()
   })
@@ -96,9 +96,9 @@
   })
 </script>
 
-<div id="ol" class="w-full h-full" />
+<div id="ol" bind:this={ol} class="w-full h-full" />
 {#if showContextMenu}
-  <ContextMenu show={showContextMenu} />
+    <MapContextMenu show={showContextMenu} />
 {/if}
 {#if mapVectorSource && mapSelect}
   <div class="hidden">

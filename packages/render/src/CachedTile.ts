@@ -24,20 +24,20 @@ export default class CachedTile extends EventTarget {
     this.tileUrl = storedTile.url
 
     this.abortController = new AbortController()
-
-    this.fetchTile(this.tileUrl)
   }
 
-  private async fetchTile(tileUrl: string) {
+  async fetch() {
     try {
-      const image = await fetchImage(tileUrl, this.abortController.signal)
+      const image = await fetchImage(this.tileUrl, this.abortController.signal)
       this.imageBitmap = await createImageBitmap(image)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-          tileUrl
+          tileUrl: this.tileUrl
         })
       )
+
+      return this.imageBitmap
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         // fetchImage was aborted because viewport was moved and tile
@@ -45,7 +45,7 @@ export default class CachedTile extends EventTarget {
       } else {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl
+            tileUrl: this.tileUrl
           })
         )
       }
