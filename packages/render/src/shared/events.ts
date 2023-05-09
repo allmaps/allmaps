@@ -17,6 +17,9 @@ export enum WarpedMapEventType {
   TILEADDED = 'tileadded',
   TILEREMOVED = 'tileremoved',
 
+  // Emits when the first tile of a map is added
+  FIRSTTILEADDED = 'firsttileadded',
+
   TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
   ALLTILESLOADED = 'alltilesloaded',

@@ -129,15 +129,12 @@ export default class WebGL2Renderer extends EventTarget {
     this.webGLWarpedMapsById = new Map()
   }
 
-  // update
   updateTriangulation(mapId: string, geoMask: GeoJSONPolygon) {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
       webGLWarpedMap.updateTriangulation(geoMask)
     }
   }
-
-  // setVisible(visible: boolean): void {}
 
   getOpacity(): number | undefined {
     return this.opacity

@@ -7,7 +7,7 @@ export function getDefaultRenderOptions(
   return {
     removeBackground: {
       enabled: enableRemoveBackground,
-      color: '#faeed4',
+      color: null,
       threshold: 0,
       hardness: 0.2
     },

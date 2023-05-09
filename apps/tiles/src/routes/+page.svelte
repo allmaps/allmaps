@@ -5,6 +5,7 @@
   import { fetchJson } from '@allmaps/stdlib'
 
   import TileJSON from '$lib/components/TileJSON.svelte'
+  import Info from '$lib/components/Info.svelte'
 
   import type { TileJSON as TileJSONType } from '$lib/types.js'
 
@@ -48,8 +49,11 @@
       {/if}
     </main>
   {:else}
-    <main class="grow">
+    <main class="grow relative">
       <TileJSON {tileJson} />
+      <div class="absolute bottom-0 w-full pointer-events-none">
+        <Info />
+      </div>
     </main>
   {/if}
 </div>

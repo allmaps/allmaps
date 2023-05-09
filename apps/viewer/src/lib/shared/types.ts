@@ -57,7 +57,7 @@ export type MapState = {
 
 export type RemoveBackgroundOptions = {
   enabled: boolean
-  color: string
+  color: string | null
   threshold: number
   hardness: number
 }

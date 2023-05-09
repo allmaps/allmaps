@@ -2,14 +2,10 @@ import { writable, derived, get } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id/browser'
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
-import { fetchImageInfo } from '@allmaps/stdlib'
-import { Image } from '@allmaps/iiif-parser'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
-import { getBackgroundColor } from '$lib/shared/remove-background.js'
 import { fromHue } from '$lib/shared/color.js'
 import {
-  imageInfoCache,
   mapWarpedMapSource,
   addMap,
   removeMap
@@ -61,23 +57,6 @@ export async function addAnnotation(sourceId: string, json: unknown) {
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
       await addMap(viewerMap)
-
-      const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(imageUri, {
-        cache: imageInfoCache
-      })
-      const parsedImage = Image.parse(imageInfo)
-
-      // Process image once, also when the same image is used
-      // in multiple georeferenced maps
-      getBackgroundColor(map, parsedImage)
-        .then((color) => setRemoveBackgroundColor(mapId, color))
-        .catch((err) => {
-          console.error(
-            `Couldn't detect background color for map ${mapId}`,
-            err
-          )
-        })
     }
 
     mapsById.update(($mapsById) => {
