@@ -13,8 +13,6 @@ import {
 } from './shared/events.js'
 import {
   createTransform,
-  translateTransform,
-  scaleTransform,
   multiplyTransform,
   invertTransform,
   transformToMatrix4
@@ -25,8 +23,7 @@ import type {
   Transform,
   RenderOptions,
   RemoveBackgroundOptions,
-  ColorizeOptions,
-  GeoJSONPolygon
+  ColorizeOptions
 } from './shared/types.js'
 
 import type { GCPTransformer } from '@allmaps/transform'
@@ -135,8 +132,6 @@ export default class WebGL2Renderer extends EventTarget {
       webGLWarpedMap.updateTriangulation(warpedMap)
     }
   }
-
-  // setVisible(visible: boolean): void {}
 
   getOpacity(): number | undefined {
     return this.opacity
@@ -300,8 +295,6 @@ export default class WebGL2Renderer extends EventTarget {
         'u_colorizeColor'
       )
       gl.uniform3fv(colorizeColorLocation, colorize.color)
-      // gl.uniform3fv(colorizeColorLocation, [1, 0.07, 1])
-      // gl.uniform3fv(colorizeColorLocation, [0.99609375, 0.43359375, 0])
     }
   }
 
@@ -322,56 +315,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getGcpTransform(transformer: GCPTransformer): Transform {
-    const transformArgs = transformer.getOptions()
-
-    const u_adfFromGeoX = transformArgs.adfFromGeoX
-    const u_adfFromGeoY = transformArgs.adfFromGeoY
-
-    return [
-      u_adfFromGeoX[2],
-      u_adfFromGeoY[2],
-      u_adfFromGeoX[1],
-      u_adfFromGeoY[1],
-      u_adfFromGeoX[0],
-      u_adfFromGeoY[0]
-    ]
-  }
-
-  getPixelToImageTransform(
-    pixelToCoordinateTransform: Transform,
-    transformer: GCPTransformer,
-    devicePixelRatio: number,
-    canvasHeight: number
-  ): Transform {
-    let transform = scaleTransform(
-      pixelToCoordinateTransform,
-      1 / devicePixelRatio,
-      1 / devicePixelRatio
-    )
-
-    transform = translateTransform(transform, 0, canvasHeight)
-    transform = scaleTransform(transform, 1, -1)
-
-    const transformArgs = transformer.getOptions()
-
-    const meanTranslateTransform = translateTransform(
-      createTransform(),
-      -transformArgs.y2Mean,
-      -transformArgs.x2Mean
-    )
-
-    return multiplyTransform(
-      multiplyTransform(
-        this.getGcpTransform(transformer),
-        meanTranslateTransform
-      ),
-      transform
-    )
-  }
-
   render(
-    pixelToCoordinateTransform: Transform,
     projectionTransform: Transform,
     mapIds: IterableIterator<string>
   ): void {
@@ -419,25 +363,6 @@ export default class WebGL2Renderer extends EventTarget {
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.opacity * webglWarpedMap.opacity)
 
-      const transformer = webglWarpedMap.warpedMap.transformer
-
-      const pixelToImageTransform = this.getPixelToImageTransform(
-        pixelToCoordinateTransform,
-        transformer,
-        window.devicePixelRatio,
-        gl.canvas.height
-      )
-
-      const pixelToImageMatrixLocation = gl.getUniformLocation(
-        this.program,
-        'u_pixelToImageMatrix'
-      )
-      gl.uniformMatrix4fv(
-        pixelToImageMatrixLocation,
-        false,
-        transformToMatrix4(pixelToImageTransform)
-      )
-
       const u_tilesTextureLocation = gl.getUniformLocation(
         this.program,
         'u_tilesTexture'
@@ -445,6 +370,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform1i(u_tilesTextureLocation, 0)
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, webglWarpedMap.tilesTexture)
+
       const u_tilePositionsTextureLocation = gl.getUniformLocation(
         this.program,
         'u_tilePositionsTexture'
@@ -452,6 +378,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform1i(u_tilePositionsTextureLocation, 1)
       gl.activeTexture(gl.TEXTURE1)
       gl.bindTexture(gl.TEXTURE_2D, webglWarpedMap.tilePositionsTexture)
+
       const u_imagePositionsTextureLocation = gl.getUniformLocation(
         this.program,
         'u_imagePositionsTexture'
@@ -459,6 +386,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform1i(u_imagePositionsTextureLocation, 2)
       gl.activeTexture(gl.TEXTURE2)
       gl.bindTexture(gl.TEXTURE_2D, webglWarpedMap.imagePositionsTexture)
+
       const u_scaleFactorsTextureLocation = gl.getUniformLocation(
         this.program,
         'u_scaleFactorsTexture'

@@ -46,8 +46,4 @@ export default class PolynomialGCPTransformer
 
     return [output[0].x, output[0].y]
   }
-
-  getOptions() {
-    return this.transformArgs
-  }
 }
