@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import { Transformer } from '../dist/index.js'
+import { GCPTransformer } from '../dist/index.js'
 
 const gcps = [
   {
@@ -47,7 +47,7 @@ function expectToBeCloseToArray(actual, expected) {
 }
 
 describe('Polynomial transformer', async () => {
-  const transformer = new Transformer(gcps)
+  const transformer = new GCPTransformer(gcps)
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
     expectToBeCloseToArray(
@@ -62,7 +62,7 @@ describe('Polynomial transformer', async () => {
 })
 
 describe('Thin-plate spline transformer', async () => {
-  const transformer = new Transformer(gcps2, 'thin-plate-spline')
+  const transformer = new GCPTransformer(gcps2, 'thin-plate-spline')
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
     console.log(transformer.toWorld([518, 991]))

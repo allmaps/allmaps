@@ -11,7 +11,9 @@ export function distanceQuintic(r: number) {
 }
 
 export function distanceThinPlate(r: number) {
-  if (r === 0) return 0
+  if (r === 0) {
+    return 0
+  }
   return Math.pow(r, 2) * Math.log(r)
 }
 

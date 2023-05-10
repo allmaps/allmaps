@@ -13,7 +13,7 @@ import {
 } from './shared/geojson.js'
 
 import type {
-  TransformerInterface,
+  GCPTransformerInterface,
   TransformationType,
   OptionalTransformOptions,
   Position,
@@ -24,12 +24,9 @@ import type {
   GeoJSONPolygon
 } from './shared/types.js'
 
-// TODO: consider other name to avoid conflict
-// with https://microsoft.github.io/PowerBI-JavaScript/interfaces/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.transformer.html
-// Mayve GCPTransformer?
-export default class Transformer implements TransformerInterface {
+export default class GCPTransformer implements GCPTransformerInterface {
   gcps: ImageWorldPosition[]
-  transformer: TransformerInterface
+  transformer: GCPTransformerInterface
 
   constructor(
     gcps: ImageWorldPosition[],

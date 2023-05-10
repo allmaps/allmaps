@@ -1,5 +1,5 @@
 import type {
-  Transformer,
+  GCPTransformer,
   GeoJSONGeometry,
   OptionalTransformOptions
 } from '@allmaps/transform'
@@ -7,7 +7,7 @@ import type {
 import type { GeometryElement } from './svg.js'
 
 export function transformSvgToGeoJson(
-  transformer: Transformer,
+  transformer: GCPTransformer,
   geometry: GeometryElement,
   options?: OptionalTransformOptions
 ) {

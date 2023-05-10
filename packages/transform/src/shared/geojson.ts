@@ -11,7 +11,7 @@ import type {
   Segment,
   ImageWorldPosition,
   TransformOptions,
-  TransformerInterface,
+  GCPTransformerInterface,
   OptionalTransformOptions
 } from './types.js'
 
@@ -63,14 +63,14 @@ function makeGeoJSONPolygon(points: Position[]): GeoJSONPolygon {
 }
 
 export function toGeoJSONPoint(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   point: Position
 ): GeoJSONPoint {
   return makeGeoJSONPoint(transformer.toWorld(point))
 }
 
 export function toGeoJSONLineString(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   points: Position[],
   options?: OptionalTransformOptions
 ): GeoJSONLineString {
@@ -99,7 +99,7 @@ export function toGeoJSONLineString(
 }
 
 export function toGeoJSONPolygon(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   points: Position[],
   options?: OptionalTransformOptions
 ): GeoJSONPolygon {
@@ -128,14 +128,14 @@ export function toGeoJSONPolygon(
 }
 
 export function fromGeoJSONPoint(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   point: GeoJSONPoint
 ): Position {
   return transformer.toResource(point.coordinates)
 }
 
 export function fromGeoJSONLineString(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   lineString: GeoJSONLineString,
   options?: OptionalTransformOptions
 ): Position[] {
@@ -166,7 +166,7 @@ export function fromGeoJSONLineString(
 }
 
 export function fromGeoJSONPolygon(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   polygon: GeoJSONPolygon,
   options?: OptionalTransformOptions
 ): Position[] {
@@ -211,7 +211,7 @@ function getSegments(points: ImageWorldPosition[], close = false): Segment[] {
 }
 
 function recursivelyAddWorldMidpoints(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -225,7 +225,7 @@ function recursivelyAddWorldMidpoints(
 }
 
 function recursivelyAddImageMidpoints(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -239,7 +239,7 @@ function recursivelyAddImageMidpoints(
 }
 
 function addWorldMidpoints(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
@@ -295,7 +295,7 @@ function addWorldMidpoints(
 }
 
 function addImageMidpoints(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number

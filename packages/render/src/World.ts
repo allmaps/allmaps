@@ -4,7 +4,7 @@ import {
   validateMap,
   type Map as Georef
 } from '@allmaps/annotation'
-import { Transformer } from '@allmaps/transform'
+import { GCPTransformer } from '@allmaps/transform'
 
 import RTree from './RTree.js'
 
@@ -59,7 +59,7 @@ export default class World extends EventTarget {
       //  - https://github.com/w8r/martinez
       //  - https://github.com/mfogel/polygon-clipping
 
-      const transformer = new Transformer(sphericalMercatorGcps)
+      const transformer = new GCPTransformer(sphericalMercatorGcps)
       const geoMask = transformer.toGeoJSONPolygon(pixelMask)
 
       const fullPixelMask: Position[] = [
