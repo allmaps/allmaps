@@ -129,11 +129,10 @@ export default class WebGL2Renderer extends EventTarget {
     this.webGLWarpedMapsById = new Map()
   }
 
-  // update
-  updateTriangulation(mapId: string, geoMask: GeoJSONPolygon) {
-    const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
+  updateTriangulation(warpedMap: WarpedMap) {
+    const webGLWarpedMap = this.webGLWarpedMapsById.get(warpedMap.mapId)
     if (webGLWarpedMap) {
-      webGLWarpedMap.updateTriangulation(geoMask)
+      webGLWarpedMap.updateTriangulation(warpedMap)
     }
   }
 
@@ -467,11 +466,14 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform1i(u_scaleFactorsTextureLocation, 3)
       gl.activeTexture(gl.TEXTURE3)
       gl.bindTexture(gl.TEXTURE_2D, webglWarpedMap.scaleFactorsTexture)
+
       const vao = webglWarpedMap.vao
-      const triangles = webglWarpedMap.triangles
+      const triangles = webglWarpedMap.geoMaskTriangles
+      const count = triangles.length / 2
+
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
-      const count = triangles.length / 2
+
       gl.bindVertexArray(vao)
       gl.drawArrays(primitiveType, offset, count)
     }
