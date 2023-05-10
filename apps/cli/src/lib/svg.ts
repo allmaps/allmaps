@@ -1,6 +1,6 @@
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
-import { Transformer } from '@allmaps/transform'
+import type { Transformer } from '@allmaps/transform'
 
 import type {
   GeoJSONGeometry,
