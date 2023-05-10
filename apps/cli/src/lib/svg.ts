@@ -1,14 +1,9 @@
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
-import {
-  fromGeoJSONPoint,
-  fromGeoJSONLineString,
-  fromGeoJSONPolygon
-} from '@allmaps/transform'
+import { Transformer } from '@allmaps/transform'
 
 import type {
   GeoJSONGeometry,
-  GCPTransformInfo,
   OptionalTransformOptions
 } from '@allmaps/transform'
 
@@ -222,24 +217,24 @@ export function pixelMaskToSvgPolygon(map: Map): Polygon {
 }
 
 export function transformGeoJsonToSvg(
-  transformer: GCPTransformInfo,
+  transformer: Transformer,
   geometry: GeoJSONGeometry,
   options?: OptionalTransformOptions
 ): GeometryElement {
   if (geometry.type === 'Point') {
     return {
       type: 'circle',
-      coordinates: fromGeoJSONPoint(transformer, geometry)
+      coordinates: transformer.fromGeoJSONPoint(geometry)
     }
   } else if (geometry.type === 'LineString') {
     return {
       type: 'polyline',
-      coordinates: fromGeoJSONLineString(transformer, geometry, options)
+      coordinates: transformer.fromGeoJSONLineString(geometry, options)
     }
   } else if (geometry.type === 'Polygon') {
     return {
       type: 'polygon',
-      coordinates: fromGeoJSONPolygon(transformer, geometry, options)
+      coordinates: transformer.fromGeoJSONPolygon(geometry, options)
     }
   } else {
     throw new Error(`Unsupported GeoJSON geometry`)

@@ -2,7 +2,7 @@ import { decode as decodeJpeg } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
 import { Image } from '@allmaps/iiif-parser'
-import { createTransformer, toImage } from '@allmaps/transform'
+import { Transformer } from '@allmaps/transform'
 import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
@@ -41,7 +41,7 @@ export async function createWarpedTileResponse(
 
   const extent = xyzTileToGeoExtent({ x, y, z })
 
-  const transformer = createTransformer(map.gcps)
+  const transformer = new Transformer(map.gcps)
   const iiifTiles = computeIiifTilesForMapGeoBBox(
     transformer,
     parsedImage,
@@ -92,7 +92,7 @@ export async function createWarpedTileResponse(
         longitudeFrom + y * longitudeStep,
         latitudeFrom + x * latitudeStep
       ]
-      const [pixelX, pixelY] = toImage(transformer, world)
+      const [pixelX, pixelY] = transformer.toResource(world)
       // TODO: improve efficiency
       // TODO: fix strange repeating error,
       //    remove pointInPolygon check and fix first
