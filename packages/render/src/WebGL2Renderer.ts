@@ -25,7 +25,7 @@ import type {
   GeoJSONPolygon
 } from './shared/types.js'
 
-import type { PolynomialGCPTransformer } from '@allmaps/transform'
+import type { GCPTransformer } from '@allmaps/transform'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0.2
@@ -299,7 +299,6 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform3fv(colorizeColorLocation, colorize.color)
       // gl.uniform3fv(colorizeColorLocation, [1, 0.07, 1])
       // gl.uniform3fv(colorizeColorLocation, [0.99609375, 0.43359375, 0])
-
     }
   }
 
@@ -320,9 +319,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getGcpTransform(transformer: PolynomialGCPTransformer): Transform {
-    const u_adfFromGeoX = transformer.transformArgs.adfFromGeoX
-    const u_adfFromGeoY = transformer.transformArgs.adfFromGeoY
+  getGcpTransform(transformer: GCPTransformer): Transform {
+    const transformArgs = transformer.getOptions()
+
+    const u_adfFromGeoX = transformArgs.adfFromGeoX
+    const u_adfFromGeoY = transformArgs.adfFromGeoY
 
     return [
       u_adfFromGeoX[2],
@@ -336,7 +337,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   getPixelToImageTransform(
     pixelToCoordinateTransform: Transform,
-    transformer: PolynomialGCPTransformer,
+    transformer: GCPTransformer,
     devicePixelRatio: number,
     canvasHeight: number
   ): Transform {
@@ -349,10 +350,12 @@ export default class WebGL2Renderer extends EventTarget {
     transform = translateTransform(transform, 0, canvasHeight)
     transform = scaleTransform(transform, 1, -1)
 
+    const transformArgs = transformer.getOptions()
+
     const meanTranslateTransform = translateTransform(
       createTransform(),
-      -transformer.transformArgs.y2Mean,
-      -transformer.transformArgs.x2Mean
+      -transformArgs.y2Mean,
+      -transformArgs.x2Mean
     )
 
     return multiplyTransform(

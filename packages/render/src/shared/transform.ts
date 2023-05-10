@@ -1,9 +1,9 @@
-import { TransformerInterface } from '@allmaps/transform'
+import { GCPTransformerInterface } from '@allmaps/transform'
 
 import type { BBox, SVGPolygon } from './types.js'
 
 export function geoBBoxToSVGPolygon(
-  transformer: TransformerInterface,
+  transformer: GCPTransformerInterface,
   bbox: BBox
 ): SVGPolygon {
   const [y1, x1, y2, x2] = bbox

@@ -12,7 +12,9 @@ import type {
   ImageWorldPosition
 } from '../shared/types.js'
 
-export default class PolynomialGCPTransformer implements GCPTransformerInterface {
+export default class PolynomialGCPTransformer
+  implements GCPTransformerInterface
+{
   gcps: ImageWorldPosition[]
   transformArgs: GCPTransformInfo
 
@@ -43,5 +45,9 @@ export default class PolynomialGCPTransformer implements GCPTransformerInterface
     const output = GDALGCPTransform(this.transformArgs, bInverse, input)
 
     return [output[0].x, output[0].y]
+  }
+
+  getOptions() {
+    return this.transformArgs
   }
 }
