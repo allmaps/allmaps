@@ -33,6 +33,7 @@ export type Segment = {
 }
 
 export type TransformOptions = {
+  close: boolean
   maxOffsetRatio: number
   maxDepth: number
 }

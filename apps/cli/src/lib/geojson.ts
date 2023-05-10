@@ -1,32 +1,26 @@
-import {
-  toGeoJSONPoint,
-  toGeoJSONLineString,
-  toGeoJSONPolygon
-} from '@allmaps/transform'
-
 import type {
+  Transformer,
   GeoJSONGeometry,
-  GCPTransformInfo,
   OptionalTransformOptions
 } from '@allmaps/transform'
 
 import type { GeometryElement } from './svg.js'
 
 export function transformSvgToGeoJson(
-  transformer: GCPTransformInfo,
+  transformer: Transformer,
   geometry: GeometryElement,
   options?: OptionalTransformOptions
 ) {
   if (geometry.type === 'circle') {
-    return toGeoJSONPoint(transformer, geometry.coordinates)
+    return transformer.toGeoJSONPoint(geometry.coordinates)
   } else if (geometry.type === 'line') {
-    return toGeoJSONLineString(transformer, geometry.coordinates, options)
+    return transformer.toGeoJSONLineString(geometry.coordinates, options)
   } else if (geometry.type === 'polyline') {
-    return toGeoJSONLineString(transformer, geometry.coordinates, options)
+    return transformer.toGeoJSONLineString(geometry.coordinates, options)
   } else if (geometry.type === 'rect') {
-    return toGeoJSONPolygon(transformer, geometry.coordinates, options)
+    return transformer.toGeoJSONPolygon(geometry.coordinates, options)
   } else if (geometry.type === 'polygon') {
-    return toGeoJSONPolygon(transformer, geometry.coordinates, options)
+    return transformer.toGeoJSONPolygon(geometry.coordinates, options)
   } else {
     throw new Error(`Unsupported SVG geometry`)
   }
