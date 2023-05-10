@@ -90,29 +90,34 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   updateTriangulation(warpedMap: WarpedMap) {
-    const flattenedGeoMask = earcut.flatten(warpedMap.geoMask.coordinates)
+    // Todo: replace earcut of pixelmask to constrained triangulation of pixelmask
 
-    const vertexGeoMaskIndices = earcut(
-      flattenedGeoMask.vertices,
-      flattenedGeoMask.holes,
-      flattenedGeoMask.dimensions
+    const flattenedPixelMask = earcut.flatten([warpedMap.pixelMask])
+
+    const vertexPixelMaskIndices = earcut(
+      flattenedPixelMask.vertices,
+      flattenedPixelMask.holes,
+      flattenedPixelMask.dimensions
     )
 
-    const geoMaskVertices = vertexGeoMaskIndices
-    .map((index) => [
-      flattenedGeoMask.vertices[index * 2],
-      flattenedGeoMask.vertices[index * 2 + 1]
+    const pixelMaskVertices = vertexPixelMaskIndices.map((index) => [
+      flattenedPixelMask.vertices[index * 2],
+      flattenedPixelMask.vertices[index * 2 + 1]
     ])
 
-    const pixelMaskVertices = geoMaskVertices.map((point) =>
-       warpedMap.transformer.toResource(point as [number, number])
+    const geoMaskVertices = pixelMaskVertices.map((point) =>
+      warpedMap.transformer.toWorld(point as [number, number])
     )
 
     this.geoMaskTriangles = geoMaskVertices.flat()
     this.pixelMaskTriangles = pixelMaskVertices.flat()
 
-    this.transformedGeoMaskTriangles = new Float32Array(this.geoMaskTriangles.length)
-    this.transformedPixelMaskTriangles = new Float32Array(this.pixelMaskTriangles.length)
+    this.transformedGeoMaskTriangles = new Float32Array(
+      this.geoMaskTriangles.length
+    )
+    this.transformedPixelMaskTriangles = new Float32Array(
+      this.pixelMaskTriangles.length
+    )
   }
 
   updateVertexBuffers(transform: Transform) {
@@ -144,7 +149,12 @@ export default class WebGL2WarpedMap extends EventTarget {
         this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
       }
 
-      console.log(this.pixelMaskTriangles, this.transformedPixelMaskTriangles)
+      console.log(
+        this.pixelMaskTriangles,
+        this.transformedPixelMaskTriangles,
+        this.geoMaskTriangles,
+        this.transformedGeoMaskTriangles
+      )
 
       createBuffer(
         this.gl,
