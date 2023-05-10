@@ -81,18 +81,43 @@ export default class RBF {
       }
     }
 
+    // construct 3xN matrix
+    // 1  1  1  1
+    // x0 x1 x2 x3
+    // y0 y1 y2 y3
+    const N = Matrix.zeros(3, points.length);
+    for (let i = 0; i < N.columns; i++) {
+        N.set(0, i, 1);
+        N.set(1, i, points[i][0]);
+        N.set(2, i, points[i][1]);
+    }
+    // combine with M in new matrix N
+    // TODO: clean blockmatrices
+    const MN = Matrix.zeros(points.length+3, points.length+3);
+    for (let i = 0; i < MN.rows; i++) {
+      for (let j = 0; j < MN.columns; j++) {
+        if (i < M.rows && j < M.columns){
+          MN.set(i, j, M.get(i,j));
+        } else if (i >= M.rows && j < M.columns) {
+          MN.set(i, j, N.get(i-M.rows,j));
+        } else if (i < M.rows && j >= M.columns) {
+          MN.set(i, j, N.transpose().get(i,j-M.columns));
+        }
+      }
+    }
+
     // reshape values by dimension/component
-    let valuesByDimension = new Array(2)
+    let valuesByDimension = new Array(2);
     for (let i = 0; i < 2; i++) {
-      valuesByDimension[i] = this.values.map((value) => value[i])
+      valuesByDimension[i] = [...values.map((value) => value[i]), 0, 0, 0];
     }
 
     // Compute basis functions weights by solving
     // the linear system of equations for each target component
     // let this.weights: [Matrix, Matrix]
     this.weights = [
-      solve(M, Matrix.columnVector(valuesByDimension[0])),
-      solve(M, Matrix.columnVector(valuesByDimension[1]))
+      solve(MN, Matrix.columnVector(valuesByDimension[0])),
+      solve(MN, Matrix.columnVector(valuesByDimension[1]))
     ]
   }
 
@@ -111,12 +136,16 @@ export default class RBF {
       )
     }
 
-    const distancesM = new Matrix(distances.map((d) => [d]))
+    const distancesMN = new Matrix(distances.map((d) => [d]))
 
     let sums: Position = [0, 0]
 
     for (let i = 0; i < 2; i++) {
-      sums[i] = sumMatrix(mulitplyMatricesValues(distancesM, this.weights[i]))
+      // sums[i] = sumMatrix(mulitplyMatricesValues(distancesM, this.weights[i]))
+      let a0 = this.weights[i].get(this.points.length,0)
+      let ax = this.weights[i].get(this.points.length+1,0)
+      let ay = this.weights[i].get(this.points.length+2,0)
+      sums[i] = a0 + ax * point[0] + ay * point[1] + sumMatrix(mulitplyMatricesValues(distancesMN, this.weights[i].selection([...Array(this.points.length).keys()],[0])));
     }
 
     return sums
