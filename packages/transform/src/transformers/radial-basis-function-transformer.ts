@@ -67,8 +67,4 @@ export default class RadialBasisFunctionGCPTransformer
 
     return this.toResourceRbf.interpolant(point)
   }
-
-  getOptions() {
-    return {}
-  }
 }

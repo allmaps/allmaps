@@ -49,8 +49,4 @@ export interface GCPTransformerInterface {
   toWorld(point: Position): Position
 
   toResource(point: Position): Position
-
-  // TODO: added to give WebGL2Render access to
-  // GCPTransformInfo
-  getOptions(): any
 }

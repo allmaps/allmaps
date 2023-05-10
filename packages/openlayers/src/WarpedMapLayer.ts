@@ -472,7 +472,6 @@ export class WarpedMapLayer extends Layer {
       // get drawn when they are visible AND when they have their buffers
       // updated.
       this.renderer.render(
-        frameState.pixelToCoordinateTransform as Transform,
         projectionTransform,
         this.mapIdsInViewport.values()
       )

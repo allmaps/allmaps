@@ -55,10 +55,6 @@ export default class GCPTransformer implements GCPTransformerInterface {
     return this.transformer.toResource(point)
   }
 
-  getOptions() {
-    return this.transformer.getOptions()
-  }
-
   toGeoJSON(point: Position): GeoJSONGeometry
   toGeoJSON(
     points: Position[],
