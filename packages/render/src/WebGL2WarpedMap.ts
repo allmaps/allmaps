@@ -32,8 +32,11 @@ export default class WebGL2WarpedMap extends EventTarget {
   imageWidth: number
   imageHeight: number
 
-  triangles: number[] = []
-  transformedTriangles: Float32Array = new Float32Array()
+  geoMaskTriangles: number[] = []
+  transformedGeoMaskTriangles: Float32Array = new Float32Array()
+
+  pixelMaskTriangles: number[] = []
+  transformedPixelMaskTriangles: Float32Array = new Float32Array()
 
   vao: WebGLVertexArrayObject | null
 
@@ -70,7 +73,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.imageWidth = warpedMap.parsedImage.width
     this.imageHeight = warpedMap.parsedImage.height
 
-    this.updateTriangulation(warpedMap.geoMask)
+    this.updateTriangulation(warpedMap)
 
     this.tilesTexture = gl.createTexture()
     this.scaleFactorsTexture = gl.createTexture()
@@ -86,44 +89,77 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
-  updateTriangulation(geoMask: GeoJSONPolygon) {
-    const flattened = earcut.flatten(geoMask.coordinates)
-    const vertexIndices = earcut(
-      flattened.vertices,
-      flattened.holes,
-      flattened.dimensions
+  updateTriangulation(warpedMap: WarpedMap) {
+    const flattenedGeoMask = earcut.flatten(warpedMap.geoMask.coordinates)
+
+    const vertexGeoMaskIndices = earcut(
+      flattenedGeoMask.vertices,
+      flattenedGeoMask.holes,
+      flattenedGeoMask.dimensions
     )
 
-    this.triangles = vertexIndices
-      .map((index) => [
-        flattened.vertices[index * 2],
-        flattened.vertices[index * 2 + 1]
-      ])
-      .flat()
+    const geoMaskVertices = vertexGeoMaskIndices
+    .map((index) => [
+      flattenedGeoMask.vertices[index * 2],
+      flattenedGeoMask.vertices[index * 2 + 1]
+    ])
 
-    this.transformedTriangles = new Float32Array(this.triangles.length)
+    const pixelMaskVertices = geoMaskVertices.map((point) =>
+       warpedMap.transformer.toResource(point as [number, number])
+    )
+
+    this.geoMaskTriangles = geoMaskVertices.flat()
+    this.pixelMaskTriangles = pixelMaskVertices.flat()
+
+    this.transformedGeoMaskTriangles = new Float32Array(this.geoMaskTriangles.length)
+    this.transformedPixelMaskTriangles = new Float32Array(this.pixelMaskTriangles.length)
   }
 
   updateVertexBuffers(transform: Transform) {
     if (this.vao) {
       this.gl.bindVertexArray(this.vao)
 
-      for (let index = 0; index < this.triangles.length; index += 2) {
+      for (let index = 0; index < this.geoMaskTriangles.length; index += 2) {
         const transformedPoint = applyTransform(transform, [
-          this.triangles[index],
-          this.triangles[index + 1]
+          this.geoMaskTriangles[index],
+          this.geoMaskTriangles[index + 1]
         ])
 
-        this.transformedTriangles[index] = transformedPoint[0]
-        this.transformedTriangles[index + 1] = transformedPoint[1]
+        this.transformedGeoMaskTriangles[index] = transformedPoint[0]
+        this.transformedGeoMaskTriangles[index + 1] = transformedPoint[1]
       }
+
+      for (let index = 0; index < this.pixelMaskTriangles.length; index += 2) {
+        // const transformedPoint = applyTransform(transform, [
+        //   this.pixelMaskTriangles[index],
+        //   this.pixelMaskTriangles[index + 1]
+        // ])
+
+        const transformedPoint = [
+          this.pixelMaskTriangles[index],
+          this.pixelMaskTriangles[index + 1]
+        ]
+
+        this.transformedPixelMaskTriangles[index] = transformedPoint[0]
+        this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
+      }
+
+      console.log(this.pixelMaskTriangles, this.transformedPixelMaskTriangles)
 
       createBuffer(
         this.gl,
         this.program,
-        this.transformedTriangles,
+        this.transformedGeoMaskTriangles,
         2,
         'a_position'
+      )
+
+      createBuffer(
+        this.gl,
+        this.program,
+        this.transformedPixelMaskTriangles,
+        2,
+        'a_pixel_position'
       )
     }
   }

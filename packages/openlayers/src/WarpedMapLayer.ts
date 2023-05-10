@@ -208,7 +208,7 @@ export class WarpedMapLayer extends Layer {
 
 
       if (warpedMap) {
-        this.renderer.updateTriangulation(mapId, warpedMap.geoMask)
+        this.renderer.updateTriangulation(warpedMap)
       }
     }
   }

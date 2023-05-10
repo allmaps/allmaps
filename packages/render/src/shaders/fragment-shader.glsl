@@ -22,78 +22,86 @@ uniform isampler2D u_scaleFactorsTexture;
 
 out vec4 outColor;
 
+in vec2 v_pixel_position;
+
 void main() {
-  vec2 imageCoords = (u_pixelToImageMatrix * vec4(gl_FragCoord.xy, 0.0, 1.0)).xy;
+  float x = v_pixel_position.x / 5000.0;
+  // float y = atan(v_pixel_position.y);
 
-  ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
-  int tileCount = tilePositionsTextureSize.y;
+  outColor = vec4(x, 0.0,0.0,1.0);
 
-  int imageX = int(round(imageCoords.x));
-  int imageY = int(round(imageCoords.y));
 
-  ivec2 tileTextureSize = textureSize(u_tilesTexture, 0);
+  // vec2 imageCoords = (u_pixelToImageMatrix * vec4(gl_FragCoord.xy, 0.0, 1.0)).xy;
 
-  int tileRegionX = 0;
-  int tileRegionY = 0;
+  // ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
+  // int tileCount = tilePositionsTextureSize.y;
 
-  float diffX = 0.0;
-  float diffY = 0.0;
+  // int imageX = int(round(imageCoords.x));
+  // int imageY = int(round(imageCoords.y));
 
-  ivec2 tilePosition = ivec2(0, 0);
+  // ivec2 tileTextureSize = textureSize(u_tilesTexture, 0);
 
-  int scaleFactor = 0;
+  // int tileRegionX = 0;
+  // int tileRegionY = 0;
 
-  bool found = false;
+  // float diffX = 0.0;
+  // float diffY = 0.0;
 
-  for(int tileIndex = 0; tileIndex < tileCount; tileIndex += 1) {
-    ivec4 imagePosition = texelFetch(u_imagePositionsTexture, ivec2(0, tileIndex), 0);
+  // ivec2 tilePosition = ivec2(0, 0);
 
-    tileRegionX = imagePosition.r;
-    tileRegionY = imagePosition.g;
+  // int scaleFactor = 0;
 
-    int tileRegionWidth = imagePosition.b;
-    int tileRegionHeight = imagePosition.a;
+  // bool found = false;
 
-    if(imageX >= tileRegionX && imageX < tileRegionX + tileRegionWidth && imageY >= tileRegionY && imageY < tileRegionY + tileRegionHeight) {
-      found = true;
+  // for(int tileIndex = 0; tileIndex < tileCount; tileIndex += 1) {
+  //   ivec4 imagePosition = texelFetch(u_imagePositionsTexture, ivec2(0, tileIndex), 0);
 
-      scaleFactor = texelFetch(u_scaleFactorsTexture, ivec2(0, tileIndex), 0).r;
+  //   tileRegionX = imagePosition.r;
+  //   tileRegionY = imagePosition.g;
 
-      diffX = float(imageX - tileRegionX) / float(scaleFactor);
-      diffY = float(imageY - tileRegionY) / float(scaleFactor);
+  //   int tileRegionWidth = imagePosition.b;
+  //   int tileRegionHeight = imagePosition.a;
 
-      tilePosition = texelFetch(u_tilePositionsTexture, ivec2(0, tileIndex), 0).rg;
-    }
-  }
+  //   if(imageX >= tileRegionX && imageX < tileRegionX + tileRegionWidth && imageY >= tileRegionY && imageY < tileRegionY + tileRegionHeight) {
+  //     found = true;
 
-  outColor = vec4(0.0, 0.0, 0.0, 0.0);
+  //     scaleFactor = texelFetch(u_scaleFactorsTexture, ivec2(0, tileIndex), 0).r;
 
-  if(found == true) {
-    float texturePixelX = float(tilePosition.r) + diffX;
-    float texturePixelY = float(tilePosition.g) + diffY;
+  //     diffX = float(imageX - tileRegionX) / float(scaleFactor);
+  //     diffY = float(imageY - tileRegionY) / float(scaleFactor);
 
-    int texturePixelXRounded = int(round(texturePixelX));
-    int texturePixelYRounded = int(round(texturePixelY));
+  //     tilePosition = texelFetch(u_tilePositionsTexture, ivec2(0, tileIndex), 0).rg;
+  //   }
+  // }
 
-    // Read pixel from texture
-    outColor = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
+  // outColor = vec4(0.0, 0.0, 0.0, 0.0);
 
-    // Remove background color
-    if(u_backgroundColorThreshold > 0.0) {
-      vec3 backgroundColorDiff = outColor.rgb - u_backgroundColor.rgb;
-      float backgroundColorDistance = length(backgroundColorDiff);
-      if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
-        outColor = vec4(outColor.rgb * amount, amount);
-      }
-    }
+  // if(found == true) {
+  //   float texturePixelX = float(tilePosition.r) + diffX;
+  //   float texturePixelY = float(tilePosition.g) + diffY;
 
-    // Colorize
-    if(u_colorize) {
-      outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
-    }
+  //   int texturePixelXRounded = int(round(texturePixelX));
+  //   int texturePixelYRounded = int(round(texturePixelY));
 
-    // Set opacity
-    outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
-  }
+  //   // Read pixel from texture
+  //   outColor = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
+
+  //   // Remove background color
+  //   if(u_backgroundColorThreshold > 0.0) {
+  //     vec3 backgroundColorDiff = outColor.rgb - u_backgroundColor.rgb;
+  //     float backgroundColorDistance = length(backgroundColorDiff);
+  //     if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
+  //       float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
+  //       outColor = vec4(outColor.rgb * amount, amount);
+  //     }
+  //   }
+
+  //   // Colorize
+  //   if(u_colorize) {
+  //     outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
+  //   }
+
+  //   // Set opacity
+  //   outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
+  // }
 }
