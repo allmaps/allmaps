@@ -29,7 +29,7 @@ import type {
   GeoJSONPolygon
 } from './shared/types.js'
 
-import type { GCPTransformInfo } from '@allmaps/transform'
+import type { PolynomialGCPTransformer } from '@allmaps/transform'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0.2
@@ -323,9 +323,9 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getGcpTransform(transformer: GCPTransformInfo): Transform {
-    const u_adfFromGeoX = transformer.adfFromGeoX
-    const u_adfFromGeoY = transformer.adfFromGeoY
+  getGcpTransform(transformer: PolynomialGCPTransformer): Transform {
+    const u_adfFromGeoX = transformer.transformArgs.adfFromGeoX
+    const u_adfFromGeoY = transformer.transformArgs.adfFromGeoY
 
     return [
       u_adfFromGeoX[2],
@@ -339,7 +339,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   getPixelToImageTransform(
     pixelToCoordinateTransform: Transform,
-    transformer: GCPTransformInfo,
+    transformer: PolynomialGCPTransformer,
     devicePixelRatio: number,
     canvasHeight: number
   ): Transform {
@@ -354,8 +354,8 @@ export default class WebGL2Renderer extends EventTarget {
 
     const meanTranslateTransform = translateTransform(
       createTransform(),
-      -transformer.y2Mean,
-      -transformer.x2Mean
+      -transformer.transformArgs.y2Mean,
+      -transformer.transformArgs.x2Mean
     )
 
     return multiplyTransform(

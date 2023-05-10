@@ -1,6 +1,6 @@
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
-import type { Transformer } from '@allmaps/transform'
+import type { GCPTransformer } from '@allmaps/transform'
 
 import type {
   GeoJSONGeometry,
@@ -218,7 +218,7 @@ export function pixelMaskToSvgPolygon(map: Map): Polygon {
 }
 
 export function transformGeoJsonToSvg(
-  transformer: Transformer,
+  transformer: GCPTransformer,
   geometry: GeoJSONGeometry,
   options?: OptionalTransformOptions
 ): GeometryElement {

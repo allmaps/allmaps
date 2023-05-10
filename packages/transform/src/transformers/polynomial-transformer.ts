@@ -7,12 +7,12 @@ import {
 import type { GCPTransformInfo } from '../shared/gdaltransform.js'
 
 import type {
-  TransformerInterface,
+  GCPTransformerInterface,
   Position,
   ImageWorldPosition
 } from '../shared/types.js'
 
-export default class PolynomialTransformer implements TransformerInterface {
+export default class PolynomialGCPTransformer implements GCPTransformerInterface {
   gcps: ImageWorldPosition[]
   transformArgs: GCPTransformInfo
 

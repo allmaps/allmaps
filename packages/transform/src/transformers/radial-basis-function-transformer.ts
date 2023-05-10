@@ -3,15 +3,15 @@ import RBF from '../shared/radial-basis-function.js'
 import { euclideanNorm } from '../shared/norm-functions.js'
 
 import type {
-  TransformerInterface,
+  GCPTransformerInterface,
   DistanceFunction,
   NormFunction,
   Position,
   ImageWorldPosition
 } from '../shared/types.js'
 
-export default class RadialBasisFunctionTransformer
-  implements TransformerInterface
+export default class RadialBasisFunctionGCPTransformer
+  implements GCPTransformerInterface
 {
   gcps: ImageWorldPosition[]
 

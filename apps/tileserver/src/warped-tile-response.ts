@@ -2,7 +2,7 @@ import { decode as decodeJpeg } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
 import { Image } from '@allmaps/iiif-parser'
-import { Transformer } from '@allmaps/transform'
+import { GCPTransformer } from '@allmaps/transform'
 import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
@@ -41,7 +41,7 @@ export async function createWarpedTileResponse(
 
   const extent = xyzTileToGeoExtent({ x, y, z })
 
-  const transformer = new Transformer(map.gcps)
+  const transformer = new GCPTransformer(map.gcps)
   const iiifTiles = computeIiifTilesForMapGeoBBox(
     transformer,
     parsedImage,

@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import { Transformer } from '@allmaps/transform'
+import { GCPTransformer } from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
@@ -27,7 +27,7 @@ export default function pixelMask() {
 
     for (const map of maps) {
       if (map.gcps.length >= 3) {
-        const transformer = new Transformer(map.gcps)
+        const transformer = new GCPTransformer(map.gcps)
         const polygon = transformer.toGeoJSONPolygon(
           map.pixelMask,
           transformOptions
