@@ -1,5 +1,5 @@
-import PolynomialTransformer from './transformers/polynomial-transformer.js'
-import RadialBasisFunctionTransformer from './transformers/radial-basis-function-transformer.js'
+import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
+import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
 
 import { distanceThinPlate } from './shared/distance-functions.js'
 
@@ -36,9 +36,9 @@ export default class GCPTransformer implements GCPTransformerInterface {
     this.gcps = gcps
 
     if (type === 'polynomial') {
-      this.transformer = new PolynomialTransformer(gcps)
+      this.transformer = new PolynomialGCPTransformer(gcps)
     } else if (type === 'thin-plate-spline') {
-      this.transformer = new RadialBasisFunctionTransformer(
+      this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,
         distanceThinPlate
       )
