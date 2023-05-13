@@ -215,7 +215,7 @@ export default class WebGL2WarpedMap extends EventTarget {
       null
     )
 
-    for (let packedTile of packedTiles) {
+    for (const packedTile of packedTiles) {
       const index = packedTile.index
       const cachedTile = tilesForTexture[index]
 

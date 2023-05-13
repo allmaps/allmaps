@@ -56,13 +56,13 @@ export const Manifest2Schema = z.object({
   metadata: Metadata2Schema.optional()
 })
 
-export interface EmbeddedManifest2 {
+export type EmbeddedManifest2 = {
   '@id': string
   '@type': 'sc:Manifest'
   label?: z.infer<typeof StringValue2Schema>
 }
 
-export interface Collection2 {
+export type Collection2 = {
   '@id': string
   '@type': 'sc:Collection'
   label?: z.infer<typeof StringValue2Schema>

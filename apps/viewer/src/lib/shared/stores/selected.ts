@@ -13,7 +13,7 @@ export function setSelectedMaps(mapIds: Iterable<string>, updateView: boolean) {
 
     const mapIdsSet = new Set(mapIds)
 
-    for (let [mapId, viewerMap] of $mapsById.entries()) {
+    for (const [mapId, viewerMap] of $mapsById.entries()) {
       const selected = mapIdsSet.has(mapId)
       viewerMap.state.selected = selected
       $mapsById.set(mapId, viewerMap)
@@ -31,11 +31,11 @@ export function setSelectedMaps(mapIds: Iterable<string>, updateView: boolean) {
   })
 }
 
-export function selectMap(mapId: string, updateView: boolean = false) {
+export function selectMap(mapId: string, updateView = false) {
   updateSelectedMaps([mapId], [], updateView)
 }
 
-export function deselectMap(mapId: string, updateView: boolean = false) {
+export function deselectMap(mapId: string, updateView = false) {
   updateSelectedMaps([], [mapId], updateView)
 }
 
@@ -47,7 +47,7 @@ export function updateSelectedMaps(
   mapsById.update(($mapsById) => {
     let lastMapId: string | undefined
 
-    for (let mapId of selectedMapIds) {
+    for (const mapId of selectedMapIds) {
       const viewerMap = $mapsById.get(mapId)
 
       if (viewerMap) {
@@ -62,7 +62,7 @@ export function updateSelectedMaps(
       activeMapId.set({ mapId: lastMapId, updateView })
     }
 
-    for (let mapId of deselectedMapIds) {
+    for (const mapId of deselectedMapIds) {
       const viewerMap = $mapsById.get(mapId)
 
       if (viewerMap) {

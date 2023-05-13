@@ -25,10 +25,15 @@ export enum WarpedMapEventType {
   CHANGED = 'changed'
 }
 
-export class WarpedMapEvent extends Event {
-  data: any
+export type WarpedMapTileEventDetail = {
+  mapId: string
+  tileUrl: string
+}
 
-  constructor(type: WarpedMapEventType, data?: any) {
+export class WarpedMapEvent extends Event {
+  data?: unknown
+
+  constructor(type: WarpedMapEventType, data?: unknown) {
     super(type)
 
     this.data = data

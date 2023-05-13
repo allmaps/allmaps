@@ -47,12 +47,10 @@
   let showForm = false
   let error: Error | null
 
-  let annotationUrl = ''
   let annotationString = ''
 
   function resetForm() {
     error = null
-    annotationUrl = ''
     annotationString = ''
 
     showForm = true

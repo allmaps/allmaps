@@ -61,8 +61,8 @@ export async function createWarpedTileResponse(
   // TODO: find a way to do max. 6 requests at the same time,
   // instead of one by one with this loop
   // https://developers.cloudflare.com/workers/platform/limits/
-  let iiifTileResponses = []
-  for (let url of iiifTileUrls) {
+  const iiifTileResponses = []
+  for (const url of iiifTileUrls) {
     const response = await cachedFetch(cache, url)
     iiifTileResponses.push(response)
   }

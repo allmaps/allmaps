@@ -10,12 +10,12 @@ export function pointInPolygon(point: Coord, polygon: Coord[]) {
     return true
   }
 
-  let [x, y] = point
+  const [x, y] = point
 
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    let [xi, yi] = polygon[i]
-    let [xj, yj] = polygon[j]
+    const [xi, yi] = polygon[i]
+    const [xj, yj] = polygon[j]
 
     const intersect =
       yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi

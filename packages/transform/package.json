@@ -40,18 +40,23 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "test": "mocha && eslint dist test",
-    "pretest": "npm run build"
+    "test": "NODE_ENV=test mocha",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "pretest": "npm run build",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "preversion": "npm types && npm lint && npm test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/geojson": "^7946.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
-    "typescript": "^4.9.5"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
   }
 }

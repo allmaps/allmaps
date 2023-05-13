@@ -3,7 +3,10 @@ import { derived } from 'svelte/store'
 import { mapsById } from '$lib/shared/stores/maps.js'
 import { deselectMap } from '$lib/shared/stores/selected.js'
 
-import { showMap as olShowMap, hideMap as olHideMap } from '$lib/shared/stores/openlayers.js'
+import {
+  showMap as olShowMap,
+  hideMap as olHideMap
+} from '$lib/shared/stores/openlayers.js'
 
 export function showMap(mapId: string) {
   updateVisibleMaps([mapId], [])
@@ -20,7 +23,7 @@ function updateVisibleMaps(
   mapsById.update(($mapsById) => {
     // TODO: set hidden maps unselected and not active
 
-    for (let mapId of visibleMapIds) {
+    for (const mapId of visibleMapIds) {
       const viewerMap = $mapsById.get(mapId)
 
       if (viewerMap) {
@@ -30,7 +33,7 @@ function updateVisibleMaps(
       }
     }
 
-    for (let mapId of hiddenMapIds) {
+    for (const mapId of hiddenMapIds) {
       const viewerMap = $mapsById.get(mapId)
 
       if (viewerMap) {

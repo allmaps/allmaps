@@ -1,10 +1,6 @@
 import { Command } from 'commander'
 
-import {
-  createTransformer,
-  toGeoJSONPolygon,
-  type OptionalTransformOptions
-} from '@allmaps/transform'
+import { createTransformer, toGeoJSONPolygon } from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
@@ -25,11 +21,11 @@ export default function pixelMask() {
     const jsonValues = await parseJsonInput(files as string[])
     const maps = parseAnnotationsValidateMaps(jsonValues)
 
-    let features = []
+    const features = []
 
     const transformOptions = parseTransformOptions(options)
 
-    for (let map of maps) {
+    for (const map of maps) {
       if (map.gcps.length >= 3) {
         const transformer = createTransformer(map.gcps)
         const polygon = toGeoJSONPolygon(

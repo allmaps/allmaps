@@ -38,9 +38,9 @@ export default function svg() {
 
     const svgs = await readInput(files as string[])
 
-    let geoJsonGeometries = []
-    for (let svg of svgs) {
-      for (let geometry of geomEach(svg)) {
+    const geoJsonGeometries = []
+    for (const svg of svgs) {
+      for (const geometry of geomEach(svg)) {
         const geoJsonGeometry = transformSvgToGeoJson(
           transformer,
           geometry,

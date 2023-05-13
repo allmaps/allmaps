@@ -81,9 +81,11 @@
       target: container
     })
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const zoomContainer = zoom.element
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const rotateContainer = rotate.element
 

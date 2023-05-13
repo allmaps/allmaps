@@ -3,7 +3,6 @@ import { Command } from 'commander'
 import { IIIF } from '@allmaps/iiif-parser'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
-import { getIssues, formatIssue } from '../../lib/errors.js'
 
 import type { ZodError } from 'zod'
 
@@ -17,17 +16,18 @@ export default function parse() {
     .action(async (files) => {
       const jsonValues = await parseJsonInput(files as string[])
 
-      let parsedIiif = []
-      for (let jsonValue of jsonValues) {
+      const parsedIiif = []
+      for (const jsonValue of jsonValues) {
         try {
           parsedIiif.push(IIIF.parse(jsonValue))
         } catch (err) {
           if (err instanceof Error && err.name === 'ZodError') {
             const zodError = err as ZodError
-            const issues = getIssues(jsonValue, zodError)
+            const formatted = zodError.format()
+            const errors = formatted._errors
 
-            issues.forEach((issue) => {
-              console.error(formatIssue(issue))
+            errors.forEach((error) => {
+              console.error(error)
             })
           } else if (err instanceof Error) {
             console.error(err.message)

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
-
   // import RenderOptionsButton from '$lib/components/elements/RenderOptionsButton.svelte'
   // import RenderOptionsDropdown from '$lib/components/dropdowns/RenderOptions.svelte'
   // import DropdownButton from '$lib/components/elements/DropdownButton.svelte'

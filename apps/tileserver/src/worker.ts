@@ -59,7 +59,7 @@ router.get('/tiles.json', async (req, env) => {
   const map = maps[0]
 
   const url = new URL(req.url)
-  const templateUrl: string = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
+  const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
   return createJsonResponse(generateTileJson(templateUrl, map))
 })
@@ -100,7 +100,7 @@ router.all('*', () =>
 )
 
 export default {
-  fetch: async (req: Request, ...extra: any) => {
+  fetch: async (req: Request, ...extra: []) => {
     const url = req.url
 
     const cacheResponse = await cache.match(req.url)

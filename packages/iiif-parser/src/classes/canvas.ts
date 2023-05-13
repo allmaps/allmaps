@@ -4,7 +4,11 @@ import { EmbeddedImage, Image } from './image.js'
 import { CanvasSchema } from '../schemas/iiif.js'
 
 import type { LanguageString, Metadata } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata, filterInvalidMetadata } from '../lib/strings.js'
+import {
+  parseVersion2String,
+  parseVersion2Metadata,
+  filterInvalidMetadata
+} from '../lib/strings.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
 
@@ -35,9 +39,14 @@ export class Canvas {
         this.label = parseVersion2String(parsedCanvas.label)
       }
 
-      this.metadata = filterInvalidMetadata(parseVersion2Metadata(parsedCanvas.metadata))
+      this.metadata = filterInvalidMetadata(
+        parseVersion2Metadata(parsedCanvas.metadata)
+      )
 
-      this.image = new EmbeddedImage(parsedCanvas.images[0].resource, parsedCanvas)
+      this.image = new EmbeddedImage(
+        parsedCanvas.images[0].resource,
+        parsedCanvas
+      )
     } else if ('id' in parsedCanvas) {
       // IIIF Presentation API 3.0
 

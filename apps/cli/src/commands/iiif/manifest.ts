@@ -20,9 +20,9 @@ export default function manifest() {
       .action(async (files, options) => {
         const jsonValues = await parseJsonInput(files as string[])
 
-        let parsedImages = []
+        const parsedImages = []
         const parsedIiif = jsonValues.map((jsonValue) => IIIF.parse(jsonValue))
-        for (let p of parsedIiif) {
+        for (const p of parsedIiif) {
           if (p instanceof Image) {
             parsedImages.push(p)
           } else if (p instanceof Manifest) {

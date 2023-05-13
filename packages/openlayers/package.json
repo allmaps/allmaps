@@ -42,29 +42,28 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop"
+    "types": "tsc --noEmit",
+    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test",
+    "preversion": "npm types && npm lint && npm test",
+    "test": "NODE_ENV=test mocha",
+    "pretest": "npm run build"
   },
   "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "@types/earcut": "^2.1.1",
-    "@types/lodash-es": "^4.17.6",
-    "@types/rbush": "^3.0.0",
-    "typescript": "^4.9.5",
-    "vite": "^4.0.0"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
-  },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.12",
-    "@allmaps/id": "^1.0.0-beta.14",
-    "@allmaps/iiif-parser": "^1.0.0-beta.23",
     "@allmaps/render": "^1.0.0-beta.29",
-    "@allmaps/transform": "^1.0.0-beta.13",
-    "earcut": "^2.2.3",
     "lodash-es": "^4.17.21",
-    "ol": "^6.15.1",
-    "potpack": "^1.0.1",
-    "rbush": "^3.0.1"
+    "ol": "^6.15.1"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.6",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.3.0"
   }
 }

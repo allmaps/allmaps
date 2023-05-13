@@ -5,11 +5,11 @@ import bbox from '@turf/bbox'
 
 import type { Map } from '@allmaps/annotation'
 
-interface TileJSON {
+type TileJSON = {
   tilejson: '3.0.0'
   id: string | undefined
   tiles: string[]
-  fields: {}
+  fields: object
   bounds: number[]
   center: number[]
   // maxzoom

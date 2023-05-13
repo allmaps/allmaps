@@ -30,7 +30,7 @@ export async function fetchUrl(url: string, options: FetchOptions = {}) {
 export async function fetchJson(
   url: string,
   options: FetchOptions = {}
-): Promise<any> {
+): Promise<unknown> {
   const response = await fetchUrl(url, options)
   return await response.json()
 }

@@ -1,6 +1,5 @@
 <script lang="ts">
   /// <reference types="OpenSeadragon" />
-
   import { onMount } from 'svelte'
 
   export let imageUris: string[]
@@ -10,7 +9,7 @@
 
     const columns = Math.floor(Math.sqrt(tileSources.length))
 
-    const openSeadragon = OpenSeadragon({
+    window.OpenSeadragon({
       id: 'openseadragon',
       collectionMode: true,
       collectionRows: columns,
@@ -18,7 +17,7 @@
       collectionTileMargin: 256,
       // collectionLayout: 'vertical',
       prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
-      navigationControlAnchor: OpenSeadragon.ControlAnchor.BOTTOM_RIGHT,
+      navigationControlAnchor: window.OpenSeadragon.ControlAnchor.BOTTOM_RIGHT,
       tileSources
     })
   })

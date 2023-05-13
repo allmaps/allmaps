@@ -15,34 +15,35 @@ import type {
 import type { Map } from '@allmaps/annotation'
 
 type Coord = [number, number]
+type SVGAttributes = Record<string, string | number>
 
 type Circle = {
   type: 'circle'
-  attributes?: {}
+  attributes?: SVGAttributes
   coordinates: Coord
 }
 
 type Line = {
   type: 'line'
-  attributes?: {}
+  attributes?: SVGAttributes
   coordinates: [Coord, Coord]
 }
 
 type PolyLine = {
   type: 'polyline'
-  attributes?: {}
+  attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
 type Polygon = {
   type: 'polygon'
-  attributes?: {}
+  attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
 type Rect = {
   type: 'rect'
-  attributes?: {}
+  attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
@@ -136,7 +137,7 @@ export function* geomEach(svg: string) {
     node: Node | ElementNode | RootNode
   ): Generator<Node | ElementNode | RootNode, void, undefined> {
     if ('children' in node) {
-      for (let childNode of node.children) {
+      for (const childNode of node.children) {
         if (typeof childNode !== 'string') {
           yield* helper(childNode)
         }
@@ -148,7 +149,7 @@ export function* geomEach(svg: string) {
 
   const parsedSvg = parse(svg)
 
-  for (let node of helper(parsedSvg)) {
+  for (const node of helper(parsedSvg)) {
     if ('tagName' in node) {
       if (node.tagName !== 'svg' && node.tagName !== 'g') {
         const geometry = getGeometry(node)
@@ -204,7 +205,7 @@ function geometryElementToString(element: GeometryElement): string {
   }
 }
 
-function elementToString(tag: string, attributes: {}): string {
+function elementToString(tag: string, attributes: SVGAttributes): string {
   const attributeStrings = Object.entries(attributes).map(
     ([key, value]) => `${key}="${value}"`
   )

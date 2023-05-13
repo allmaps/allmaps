@@ -11,7 +11,6 @@ import {
 type ImageService = z.infer<typeof ImageServiceSchema>
 
 type Map = z.infer<typeof MapSchema>
-type Maps = z.infer<typeof MapsSchema>
 type PixelMask = z.infer<typeof PixelMaskSchema>
 
 type Annotation = z.infer<typeof AnnotationSchema>
@@ -113,7 +112,7 @@ function generateGeorefAnnotation(map: Map): Annotation {
  * const annotation = generateAnnotation(map)
  */
 export function generateAnnotation(
-  mapOrMaps: any
+  mapOrMaps: unknown
 ): Annotation | AnnotationPage {
   if (Array.isArray(mapOrMaps)) {
     // eslint-disable-next-line no-useless-catch

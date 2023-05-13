@@ -81,8 +81,8 @@ export function filterInvalidMetadata(
 
   // TODO: I don't know why TypeScript complains about
   // a simple filter function. For now, do this:
-  let filteredMetadata: Metadata = []
-  for (let item of metadata) {
+  const filteredMetadata: Metadata = []
+  for (const item of metadata) {
     if (item.label && item.value) {
       filteredMetadata.push({
         label: item.label,

@@ -5,16 +5,8 @@ import { ImageServiceSchema } from '../schemas/image-service.js'
 import { Image2ProfileDescriptionSchema } from '../schemas/image.2.js'
 import { ProfileProperties } from '../lib/types.js'
 
-import {
-  Image1ContextString,
-  image1ProfileUriRegex
-} from '../schemas/image.1.js'
-import {
-  Image2ContextString,
-  image2ProfileUriRegex
-} from '../schemas/image.2.js'
-
-import type { MajorVersion } from '../lib/types.js'
+import { image1ProfileUriRegex } from '../schemas/image.1.js'
+import { image2ProfileUriRegex } from '../schemas/image.2.js'
 
 const anyRegionAndSizeFeatures = ['regionByPx', 'sizeByWh']
 

@@ -9,7 +9,7 @@ import type { BBox, Position, GeoJSONPolygon } from './shared/types.js'
 
 const DEFAULT_FILTER_INSIDE_POLYGON = true
 
-interface RTreeItem {
+type RTreeItem = {
   minX: number
   minY: number
   maxX: number

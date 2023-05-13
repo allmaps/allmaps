@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.{html,js,svelte,ts}'],
+  content: [
+    './src/**/*.{html,js,svelte,ts}',
+    './dist/components/**/*.{html,js,svelte,ts}'
+  ],
   theme: {
     extend: {
       textColor: '#222222',
       transitionDuration: {
-        '0': '0ms'
+        0: '0ms'
       }
     },
     colors: {

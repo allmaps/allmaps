@@ -47,9 +47,9 @@ async function addSource(
     annotations = await fetchAnnotationsFromApi(parsed.iiif)
   }
 
-  let mapIds = []
+  const mapIds = []
 
-  for (let annotation of annotations) {
+  for (const annotation of annotations) {
     mapIds.push(...(await addAnnotation(id, annotation)))
   }
 

@@ -34,6 +34,12 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
+    "pretest": "npm run build",
+    "test": "NODE_ENV=test mocha",
+    "preversion": "npm types && npm lint && npm test",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
     "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
@@ -51,7 +57,7 @@
     "@allmaps/transform": "^1.0.0-beta.13",
     "earcut": "^2.2.3",
     "lodash-es": "^4.17.21",
-    "potpack": "^1.0.1",
+    "potpack": "^2.0.0",
     "rbush": "^3.0.1"
   },
   "license": "GPL-3.0-or-later",
@@ -63,11 +69,11 @@
     "chai": "^4.3.6",
     "documentation": "^14.0.0",
     "eslint": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "mocha": "^8.4.0",
-    "typescript": "^4.9.5",
-    "vite": "^4.0.0"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^4.3.0",
+    "prettier": "^2.8.0"
   }
 }

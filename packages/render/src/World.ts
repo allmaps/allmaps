@@ -164,11 +164,11 @@ export default class World extends EventTarget {
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    let results: (string | Error)[] = []
+    const results: (string | Error)[] = []
 
     const maps = parseAnnotation(annotation)
 
-    for (let map of maps) {
+    for (const map of maps) {
       const mapIdOrError = await this.addMapInternal(map)
       results.push(mapIdOrError)
     }
@@ -184,11 +184,11 @@ export default class World extends EventTarget {
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    let results: (string | Error)[] = []
+    const results: (string | Error)[] = []
 
     const maps = parseAnnotation(annotation)
 
-    for (let map of maps) {
+    for (const map of maps) {
       const mapIdOrError = await this.removeMapInternal(map)
       results.push(mapIdOrError)
     }
@@ -210,7 +210,7 @@ export default class World extends EventTarget {
 
     let zIndex = 0
 
-    for (let entry of sortedZIndices) {
+    for (const entry of sortedZIndices) {
       const mapId = entry[0]
       this.zIndices.set(mapId, zIndex)
       zIndex++
@@ -224,7 +224,7 @@ export default class World extends EventTarget {
   bringToFront(mapIds: Iterable<string>) {
     let newZIndex = this.warpedMapsById.size
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       if (this.zIndices.has(mapId)) {
         this.zIndices.set(mapId, newZIndex)
         newZIndex++
@@ -238,7 +238,7 @@ export default class World extends EventTarget {
   sendToBack(mapIds: string[]) {
     let newZIndex = -mapIds.length
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       if (this.zIndices.has(mapId)) {
         this.zIndices.set(mapId, newZIndex)
         newZIndex++
@@ -250,11 +250,11 @@ export default class World extends EventTarget {
   }
 
   bringForward(mapIds: Iterable<string>) {
-    for (let [mapId, zIndex] of this.zIndices.entries()) {
+    for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const zIndex = this.zIndices.get(mapId)
       if (zIndex !== undefined) {
         this.zIndices.set(mapId, zIndex + 3)
@@ -266,11 +266,11 @@ export default class World extends EventTarget {
   }
 
   sendBackward(mapIds: Iterable<string>) {
-    for (let [mapId, zIndex] of this.zIndices.entries()) {
+    for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const zIndex = this.zIndices.get(mapId)
       if (zIndex !== undefined) {
         this.zIndices.set(mapId, zIndex - 3)
@@ -300,7 +300,7 @@ export default class World extends EventTarget {
   }
 
   showMaps(mapIds: Iterable<string>) {
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap) {
         warpedMap.visible = true
@@ -310,7 +310,7 @@ export default class World extends EventTarget {
   }
 
   hideMaps(mapIds: Iterable<string>) {
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap) {
         warpedMap.visible = false
@@ -347,7 +347,7 @@ export default class World extends EventTarget {
   getBBox(): BBox | undefined {
     let bbox
 
-    for (let warpedMap of this.warpedMapsById.values()) {
+    for (const warpedMap of this.warpedMapsById.values()) {
       if (warpedMap.visible) {
         if (!bbox) {
           bbox = warpedMap.geoMaskBBox

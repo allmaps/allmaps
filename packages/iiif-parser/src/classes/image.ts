@@ -186,7 +186,6 @@ export class EmbeddedImage {
   getImageUrl({ region, size }: ImageRequest): string {
     let width
     let height
-    let area
 
     let regionHeight
     let regionWidth
@@ -233,7 +232,7 @@ export class EmbeddedImage {
       urlSize = this.majorVersion === 2 ? 'full' : 'max'
     }
 
-    area = width * height
+    const area = width * height
 
     if (this.maxWidth !== undefined) {
       if (width > this.maxWidth) {
@@ -309,7 +308,7 @@ export class Image extends EmbeddedImage {
     }
   }
 
-  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
     let parsedImage
 
     if (majorVersion === 1) {

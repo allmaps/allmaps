@@ -2,7 +2,11 @@
   "name": "@allmaps/allmaps",
   "private": true,
   "scripts": {
-    "tsc": "tsc -b --watch",
+    "watch": "lerna run watch --parallel",
+    "dev": "lerna run dev --parallel",
+    "types": "lerna run types --parallel",
+    "lint": "lerna run lint --parallel",
+    "test": "lerna run test --parallel",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete"
   },

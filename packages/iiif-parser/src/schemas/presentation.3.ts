@@ -50,13 +50,13 @@ export const Manifest3Schema = z.object({
   metadata: Metadata3Schema.optional()
 })
 
-export interface EmbeddedManifest3 {
+export type EmbeddedManifest3 = {
   id: string
   type: 'Manifest'
   label?: z.infer<typeof StringValue3Schema>
 }
 
-export interface Collection3 {
+export type Collection3 = {
   id: string
   type: 'Collection'
   label?: z.infer<typeof StringValue3Schema>

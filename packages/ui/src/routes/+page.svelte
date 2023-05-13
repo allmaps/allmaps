@@ -1,14 +1,9 @@
 <script lang="ts">
-  import url from '$lib/shared/stores/url.js'
-
   import Header from '$lib/components/Header.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
-  import URLType from '$lib/components/URLType.svelte'
   import Dial from '$lib/components/Dial.svelte'
 
   import Color from '$lib/components/styleguide/Color.svelte'
-
-  let urlValue: string
 
   const colors = [
     'bg-blue-dark',
@@ -26,10 +21,6 @@
   ]
 
   let opacity = 1
-
-  url.subscribe((value) => {
-    urlValue = value
-  })
 </script>
 
 <Header appName="Style Guide">

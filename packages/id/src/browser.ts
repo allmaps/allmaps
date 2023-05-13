@@ -12,10 +12,7 @@ async function generateHash(str: string): Promise<string> {
   return hashHex
 }
 
-export async function generateId(
-  str: string,
-  length: number = 16
-): Promise<string> {
+export async function generateId(str: string, length = 16): Promise<string> {
   const hash = await generateHash(String(str))
   return hash.slice(0, length)
 }
@@ -27,7 +24,7 @@ export async function generateRandomId(length?: number): Promise<string> {
 }
 
 export async function generateChecksum(
-  obj: {},
+  obj: unknown,
   length?: number
 ): Promise<string> {
   const checksum = await generateId(serialize(obj), length)

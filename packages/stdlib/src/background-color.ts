@@ -47,7 +47,7 @@ export function getColorsArray(
   imageData: ImageData,
   resolution = DEFAULT_RESOLUTION
 ) {
-  let colors = []
+  const colors = []
   for (let x = 0; x < imageData.width; x += resolution) {
     for (let y = 0; y < imageData.height; y += resolution) {
       const startIndex = (x + y * imageData.width) * 4
@@ -70,9 +70,9 @@ export function getColorsArray(
 }
 
 export function getColorHistogram(colors: Color[], binSize = DEFAULT_BIN_SIZE) {
-  let histogram: Histogram = {}
+  const histogram: Histogram = {}
 
-  for (let color of colors) {
+  for (const color of colors) {
     const bin = createColorBin(color, binSize)
 
     if (!histogram[bin]) {
@@ -92,7 +92,7 @@ export function getMaxOccurringColor(histogram: Histogram): ColorCount {
   let max = Number.NEGATIVE_INFINITY
   let maxOccurringColor
 
-  for (let { count, color } of Object.values(histogram)) {
+  for (const { count, color } of Object.values(histogram)) {
     if (count > max) {
       max = count
       maxOccurringColor = color

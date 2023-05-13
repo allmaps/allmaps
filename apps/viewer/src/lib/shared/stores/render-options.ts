@@ -79,7 +79,6 @@ export const renderOptions = {
       }
 
       if (mapWarpedMapLayer) {
-
         if ($renderOptionsLayer.removeBackground.enabled) {
           mapWarpedMapLayer.setRemoveBackground(
             $renderOptionsLayer.removeBackground.color,

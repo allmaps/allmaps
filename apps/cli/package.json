@@ -36,8 +36,10 @@
     "build": "tsc && chmod +x dist/index.js",
     "test": "NODE_ENV=test mocha --slow 200ms",
     "pretest": "npm run build",
-    "posttest": "npm run lint",
-    "lint": "eslint dist test"
+    "preversion": "npm types && npm lint && npm test",
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test"
   },
   "keywords": [
     "allmaps",
@@ -61,8 +63,11 @@
     "@types/svg-parser": "^2.0.3",
     "chai": "^4.3.6",
     "eslint": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "mocha": "^8.4.0",
-    "typescript": "^4.9.5",
-    "zod": "^3.20.6"
+    "typescript": "^5.0.0",
+    "zod": "^3.20.6",
+    "prettier": "^2.8.0"
   }
 }

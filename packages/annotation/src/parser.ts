@@ -1,10 +1,6 @@
 import { z } from 'zod'
 
-import {
-  AnnotationSchema,
-  AnnotationPageSchema,
-  SvgSelectorSchema
-} from './schemas/annotation.js'
+import { AnnotationSchema, AnnotationPageSchema } from './schemas/annotation.js'
 
 import { MapSchema, PixelMaskSchema, GCPSchema } from './schemas/map.js'
 
@@ -104,8 +100,13 @@ function getMap(annotation: Annotation): Map {
  * const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
  * const maps = parseAnnotation(annotation)
  */
-export function parseAnnotation(annotation: any): Map[] {
-  if (annotation && annotation.type === 'AnnotationPage') {
+export function parseAnnotation(annotation: unknown): Map[] {
+  if (
+    annotation &&
+    typeof annotation === 'object' &&
+    'type' in annotation &&
+    annotation.type === 'AnnotationPage'
+  ) {
     // eslint-disable-next-line no-useless-catch
     try {
       const parsedAnnotationPage = AnnotationPageSchema.parse(annotation)

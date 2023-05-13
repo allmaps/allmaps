@@ -7,12 +7,8 @@
   "profile": [
     "http://iiif.io/api/image/2/level0.json",
     {
-      "formats": [
-        "jpg"
-      ],
-      "qualities": [
-        "default"
-      ],
+      "formats": ["jpg"],
+      "qualities": ["default"],
       "supports": [
         "full",
         "regionByPx",
@@ -31,12 +27,7 @@
     {
       "height": 256,
       "width": 256,
-      "scaleFactors": [
-        1,
-        2,
-        4,
-        8
-      ]
+      "scaleFactors": [1, 2, 4, 8]
     }
   ]
 }

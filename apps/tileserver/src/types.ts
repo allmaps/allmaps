@@ -8,12 +8,12 @@ export type Tile = {
   zoomLevel: TileZoomLevel
 }
 
-export interface Cache {
+export type Cache = {
   put(request: Request | string, response: Response): Promise<undefined>
   match(request: Request | string): Promise<Response | undefined>
 }
 
-export interface Caches {
+export type Caches = {
   default: Cache
 }
 

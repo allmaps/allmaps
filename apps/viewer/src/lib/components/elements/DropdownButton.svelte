@@ -2,15 +2,12 @@
   import { onMount } from 'svelte'
 
   import { Dropdown } from 'flowbite'
-  import type { DropdownInterface } from 'flowbite'
 
   let dropdownElement: HTMLElement
   let dropdownButtonElement: HTMLElement
 
-  let dropdown: DropdownInterface
-
   onMount(() => {
-    dropdown = new Dropdown(dropdownElement, dropdownButtonElement, {
+    new Dropdown(dropdownElement, dropdownButtonElement, {
       placement: 'top'
     })
   })

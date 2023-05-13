@@ -1,6 +1,6 @@
 <script>
   import '../app.css'
-  import '@allmaps/ui/package/css/fonts.css'
+  import '@allmaps/ui/css/fonts.css'
 </script>
 
 <slot />

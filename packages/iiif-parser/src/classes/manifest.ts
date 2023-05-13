@@ -23,7 +23,6 @@ import type {
   Metadata,
   MajorVersion,
   FetchFunction,
-  FetchNextOptions,
   FetchNextResults
 } from '../lib/types.js'
 
@@ -98,7 +97,7 @@ export class Manifest extends EmbeddedManifest {
     }
   }
 
-  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
     let parsedManifest
 
     if (majorVersion === 2) {
@@ -114,7 +113,7 @@ export class Manifest extends EmbeddedManifest {
 
   async *fetchNext(
     fetch: FetchFunction,
-    depth: number = 0
+    depth = 0
   ): AsyncGenerator<FetchNextResults<Image>, void, void> {
     for (const canvasIndex in this.canvases) {
       const canvas = this.canvases[canvasIndex]

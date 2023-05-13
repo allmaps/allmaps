@@ -32,8 +32,8 @@ async function fetchAnnotationsForManifest(
     const annotations = await fetchAnnotationsByIiifUrl(parsedManifest.uri)
     return [annotations]
   } catch (err) {
-    let annotations: unknown[] = []
-    for (let canvas of parsedManifest.canvases) {
+    const annotations: unknown[] = []
+    for (const canvas of parsedManifest.canvases) {
       const imageAnnotations = await fetchAnnotationsForImage(canvas.image)
       annotations.push(...imageAnnotations)
     }
@@ -49,8 +49,8 @@ async function fetchAnnotationsForCollection(
     const annotations = await fetchAnnotationsByIiifUrl(parsedCollection.uri)
     return [annotations]
   } catch (err) {
-    let annotations: unknown[] = []
-    for (let item of parsedCollection.items) {
+    const annotations: unknown[] = []
+    for (const item of parsedCollection.items) {
       if (item.type === 'collection') {
         const itemAnnotations = await fetchAnnotationsForCollection(item)
         annotations.push(...itemAnnotations)

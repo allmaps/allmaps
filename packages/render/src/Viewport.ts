@@ -37,13 +37,13 @@ export default class Viewport extends EventTarget {
     coordinateToPixelTransform: Transform
   ): NeededTile[] {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
-    let possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
+    const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
     possibleVisibleWarpedMapIds =
       this.world.getPossibleVisibleWarpedMapIds(geoBBox)
 
-    let neededTiles: NeededTile[] = []
-    for (let mapId of possibleVisibleWarpedMapIds) {
+    const neededTiles: NeededTile[] = []
+    for (const mapId of possibleVisibleWarpedMapIds) {
       const warpedMap = this.world.getMap(mapId)
 
       if (!warpedMap) {
@@ -93,7 +93,7 @@ export default class Viewport extends EventTarget {
 
         possibleInvisibleWarpedMapIds.delete(mapId)
 
-        for (let tile of tiles) {
+        for (const tile of tiles) {
           const imageRequest = warpedMap.parsedImage.getIiifTile(
             tile.zoomLevel,
             tile.column,
@@ -111,7 +111,7 @@ export default class Viewport extends EventTarget {
       }
     }
 
-    for (let mapId of possibleInvisibleWarpedMapIds) {
+    for (const mapId of possibleInvisibleWarpedMapIds) {
       if (this.visibleWarpedMapIds.has(mapId)) {
         this.visibleWarpedMapIds.delete(mapId)
         this.dispatchEvent(

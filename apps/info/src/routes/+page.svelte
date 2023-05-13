@@ -75,6 +75,8 @@
     {:else}
       <Annotation {maps} />
     {/if}
+  {:else if error}
+    <div>{error}</div>
   {:else}
     <URLInput />
   {/if}

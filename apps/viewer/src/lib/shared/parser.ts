@@ -15,13 +15,9 @@ export async function parseJson(json: unknown): Promise<Parsed> {
     // Try iiif-parser instead
   }
 
-  try {
-    const parsedIiif = IIIF.parse(json)
-    return {
-      type: 'iiif',
-      iiif: parsedIiif
-    }
-  } catch (err) {
-    throw err
+  const parsedIiif = IIIF.parse(json)
+  return {
+    type: 'iiif',
+    iiif: parsedIiif
   }
 }

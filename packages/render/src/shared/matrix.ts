@@ -116,7 +116,7 @@ export function getDeterminant(mat: Transform): number {
 }
 
 export function transformToMatrix4(transform: Transform): Matrix4 {
-  let matrix4: Matrix4 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+  const matrix4: Matrix4 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 
   matrix4[0] = transform[0]
   matrix4[1] = transform[1]

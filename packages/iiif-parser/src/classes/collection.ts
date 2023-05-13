@@ -79,7 +79,7 @@ export class Collection {
     }
   }
 
-  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
     let parsedCollection
 
     if (majorVersion === 2) {
@@ -109,7 +109,7 @@ export class Collection {
   async *fetchNext(
     fetch: FetchFunction,
     options: FetchNextOptions = defaulfFetchNextOptions,
-    depth: number = 0
+    depth = 0
   ): AsyncGenerator<
     FetchNextResults<Collection | Manifest | Image>,
     void,

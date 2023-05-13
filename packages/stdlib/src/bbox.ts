@@ -22,7 +22,7 @@ export function computeBBox(points: SVGPolygon): BBox {
   const xs = []
   const ys = []
 
-  for (let point of points) {
+  for (const point of points) {
     xs.push(point[0])
     ys.push(point[1])
   }

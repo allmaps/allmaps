@@ -35,8 +35,8 @@ export default function geojson() {
 
     const geoJsonGeometries = await parseJsonInput(files as string[])
 
-    let svgElements = []
-    for (let geoJsonGeometry of geoJsonGeometries) {
+    const svgElements = []
+    for (const geoJsonGeometry of geoJsonGeometries) {
       if (isGeoJSONGeometry(geoJsonGeometry)) {
         const svgElement = transformGeoJsonToSvg(
           transformer,

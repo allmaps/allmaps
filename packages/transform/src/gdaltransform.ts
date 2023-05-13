@@ -37,7 +37,7 @@ class ControlPoints {
   // double *n2;
   // int *status;
 
-  count: number = 0
+  count = 0
   e1: number[] = []
   n1: number[] = []
   e2: number[] = []
@@ -66,21 +66,21 @@ export class GCPTransformInfo {
 
   // volatile int nRefCount;
 
-  x1Mean: number = 0
-  y1Mean: number = 0
-  x2Mean: number = 0
-  y2Mean: number = 0
+  x1Mean = 0
+  y1Mean = 0
+  x2Mean = 0
+  y2Mean = 0
 
-  bReversed: boolean = false
-  nOrder: number = 1
-  bRefine: boolean = false
-  dfTolerance: number = -1
-  nMinimumGcps: number = -1
+  bReversed = false
+  nOrder = 1
+  bRefine = false
+  dfTolerance = -1
+  nMinimumGcps = -1
 
-  nRefCount: number = 1
+  nRefCount = 1
 
   pasGCPList: GCP[] = []
-  nGCPCount: number = 0
+  nGCPCount = 0
 
   adfToGeoX: number[] = []
   adfToGeoY: number[] = []
@@ -150,7 +150,7 @@ function GDALCreateGCPTransformerEx(
   const nGCPCount = pasGCPList.length
 
   // let nCRSresult
-  let sPoints = new ControlPoints()
+  const sPoints = new ControlPoints()
 
   let x1Sum = 0
   let y1Sum = 0
@@ -209,11 +209,11 @@ function GDALCreateGCPTransformerEx(
     /*      Allocate and initialize the working points list.                */
     /* -------------------------------------------------------------------- */
 
-    let padfGeoX = []
-    let padfGeoY = []
-    let padfRasterX = []
-    let padfRasterY = []
-    let panStatus = []
+    const padfGeoX = []
+    const padfGeoY = []
+    const padfRasterX = []
+    const padfRasterY = []
+    const panStatus = []
 
     for (let iGCP = 0; iGCP < nGCPCount; iGCP++) {
       panStatus[iGCP] = 1
@@ -311,8 +311,8 @@ function calcCoef(
 
   const m = new MATRIX()
 
-  let a: number[] = []
-  let b: number[] = []
+  const a: number[] = []
+  const b: number[] = []
 
   let numactive = 0 /* NUMBER OF ACTIVE CONTROL POINTS */
   let i = 0
@@ -471,7 +471,7 @@ function solveMat(
   //   double a[], double b[], double E[], double N[])
 
   for (let i = 1; i <= m.n; i++) {
-    let j = i
+    const j = i
 
     /* find row with largest magnitude value for pivot value */
     let pivot = m.getM(i, j) /* ACTUAL VALUE OF THE LARGEST PIVOT CANDIDATE */

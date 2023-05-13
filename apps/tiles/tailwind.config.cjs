@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     './src/**/*.{html,js,svelte,ts}',
-    './node_modules/@allmaps/ui/package/components/**/*.{html,js,svelte,ts}'
+    './node_modules/@allmaps/ui/dist/components/**/*.{html,js,svelte,ts}'
   ],
   theme: {
     fontFamily: {

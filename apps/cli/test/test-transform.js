@@ -83,7 +83,7 @@ describe('allmaps transform pixel-mask', () => {
     const expected = readFileJson('output/geojson/combined.geojson')
     const output = execJson(
       'transform pixel-mask',
-      'input/annotations/combined.json'
+      'input/annotations/combined.combined-json'
     )
 
     expect(expected).to.deep.equal(output)
@@ -128,9 +128,7 @@ describe('allmaps transform pixel-mask', () => {
   })
 
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
-    const expected = readFileJson(
-      'output/geojson/7a69f9470b49a744.geojson'
-    )
+    const expected = readFileJson('output/geojson/7a69f9470b49a744.geojson')
     const output = execJson(
       'transform pixel-mask input/annotations/7a69f9470b49a744.json'
     )

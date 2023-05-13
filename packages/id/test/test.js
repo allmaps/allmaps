@@ -1,7 +1,11 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import { generateId, generateRandomId, generateChecksum } from '../dist/index.js'
+import {
+  generateId,
+  generateRandomId,
+  generateChecksum
+} from '../dist/index.js'
 
 const DEFAULT_LENGTH = 16
 

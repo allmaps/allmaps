@@ -40,12 +40,14 @@ export async function parseJsonInput(files?: string[]) {
 
 export function parseJsonFromStream(stream: Readable) {
   return new Promise<unknown[]>((resolve, reject) => {
-    let jsonValues: unknown[] = []
+    const jsonValues: unknown[] = []
 
     stream.on('error', (err: Error) => reject(err))
 
     const pipeline = stream.pipe(StreamValues.withParser())
-    pipeline.on('data', (data: any) => jsonValues.push(data.value))
+    pipeline.on('data', (data: { value: unknown }) =>
+      jsonValues.push(data.value)
+    )
     pipeline.on('end', () => resolve(jsonValues))
     pipeline.on('error', (err: Error) => reject(err))
   })
@@ -106,7 +108,7 @@ export async function parseJsonFromStdin() {
   return await parseJsonFromStream(process.stdin)
 }
 
-export function printJson(json: any) {
+export function printJson(json: unknown) {
   console.log(JSON.stringify(json, null, 2))
 
   // if (process.stdout.isTTY) {

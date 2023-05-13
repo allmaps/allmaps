@@ -9,9 +9,10 @@ import {
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2Renderer,
   composeTransform
 } from '@allmaps/render'
+
+import { WebGL2Renderer } from '@allmaps/render'
 
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
@@ -56,7 +57,7 @@ export class WarpedMapLayer extends Layer {
 
   throttledRenderTimeoutId: number | undefined
 
-  constructor(options: {}) {
+  constructor(options: object) {
     options = options || {}
 
     super(options)
@@ -156,7 +157,7 @@ export class WarpedMapLayer extends Layer {
       this.warpedMapLeave.bind(this)
     )
 
-    for (let warpedMap of this.world.getMaps()) {
+    for (const warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
   }
@@ -206,7 +207,6 @@ export class WarpedMapLayer extends Layer {
       const mapId = event.data as string
       const warpedMap = this.world.getMap(mapId)
 
-
       if (warpedMap) {
         this.renderer.updateTriangulation(mapId, warpedMap.geoMask)
       }
@@ -246,9 +246,9 @@ export class WarpedMapLayer extends Layer {
     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
     // TODO: read + understand https://web.dev/device-pixel-content-box/
     for (const entry of entries) {
-      let width = entry.contentRect.width
-      let height = entry.contentRect.height
-      let dpr = window.devicePixelRatio
+      const width = entry.contentRect.width
+      const height = entry.contentRect.height
+      const dpr = window.devicePixelRatio
 
       // if (entry.devicePixelContentBoxSize) {
       //   // NOTE: Only this path gives the correct answer
@@ -410,8 +410,8 @@ export class WarpedMapLayer extends Layer {
   // TODO: Use OL's renderer class, move this function there?
   // TODO: finish this function, use extent and revision
   prepareFrameInternal(frameState: FrameState) {
-    const vectorSource = this.source
-    const viewState = frameState.viewState
+    // const vectorSource = this.source
+    // const viewState = frameState.viewState
     const viewNotMoving =
       !frameState.viewHints[ViewHint.ANIMATING] &&
       !frameState.viewHints[ViewHint.INTERACTING]

@@ -25,17 +25,17 @@ export const mapsById = writable<SourceMaps>(new Map())
 
 export const mapIndex = writable<number[]>([])
 
-export async function addAnnotation(sourceId: string, json: any) {
+export async function addAnnotation(sourceId: string, json: unknown) {
   let startIndex = get(mapCount)
 
   const maps = parseAnnotation(json)
 
-  let mapIds: string[] = []
+  const mapIds: string[] = []
 
   if (maps.length) {
-    let newViewerMaps: ViewerMap[] = []
+    const newViewerMaps: ViewerMap[] = []
 
-    for (let map of maps) {
+    for (const map of maps) {
       const mapId = map.id || (await generateChecksum(map))
 
       const viewerMap: ViewerMap = {
@@ -54,7 +54,9 @@ export async function addAnnotation(sourceId: string, json: any) {
         renderOptions: getDefaultRenderOptions(false, false)
       }
 
-      viewerMap.renderOptions.colorize.color = fromHue((viewerMap.index * 60) % 360)
+      viewerMap.renderOptions.colorize.color = fromHue(
+        (viewerMap.index * 60) % 360
+      )
 
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
@@ -79,7 +81,7 @@ export async function addAnnotation(sourceId: string, json: any) {
     }
 
     mapsById.update(($mapsById) => {
-      for (let viewerMap of newViewerMaps) {
+      for (const viewerMap of newViewerMaps) {
         $mapsById.set(viewerMap.mapId, viewerMap)
       }
 
@@ -133,7 +135,7 @@ export function setRemoveBackgroundColor(
 
 export async function removeAnnotation(sourceId: string) {
   mapsById.update(($mapsById) => {
-    for (let [id, map] of $mapsById.entries()) {
+    for (const [id, map] of $mapsById.entries()) {
       if (map.sourceId === sourceId) {
         $mapsById.delete(id)
         removeMap(map)

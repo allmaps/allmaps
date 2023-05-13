@@ -5,26 +5,26 @@ export type Tileset = z.infer<typeof TilesetSchema>
 
 export type Fit = 'cover' | 'contain'
 
-export interface Region {
+export type Region = {
   x: number
   y: number
   width: number
   height: number
 }
 
-export interface Size {
+export type Size = {
   width: number
   height: number
 }
 
-export interface ImageRequest {
+export type ImageRequest = {
   region?: Region
   size?: Size
 }
 
 export type MajorVersion = 1 | 2 | 3
 
-export interface TileZoomLevel {
+export type TileZoomLevel = {
   scaleFactor: number
   width: number
   height: number
@@ -34,33 +34,33 @@ export interface TileZoomLevel {
   rows: number
 }
 
-export interface ProfileProperties {
+export type ProfileProperties = {
   supportsAnyRegionAndSize: boolean
   maxWidth?: number
   maxHeight?: number
   maxArea?: number
 }
 
-export interface LanguageString {
+export type LanguageString = {
   [language: string]: string[]
 }
 
-export interface MetadataItem {
+export type MetadataItem = {
   label: LanguageString
   value: LanguageString
 }
 
 export type Metadata = MetadataItem[]
 
-export type FetchFunction = (url: string) => Promise<any>
+export type FetchFunction = (url: string) => Promise<unknown>
 
-export interface FetchNextOptions {
+export type FetchNextOptions = {
   maxDepth?: number
   fetchManifests?: boolean
   fetchImages?: boolean
 }
 
-export interface FetchNextResults<Item> {
+export type FetchNextResults<Item> = {
   item: Item
   depth: number
   parent: {

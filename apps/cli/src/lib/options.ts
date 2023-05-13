@@ -26,17 +26,19 @@ export function addTransformOptions(command: Command) {
     )
 }
 
-export function parseTransformOptions(options: any): OptionalTransformOptions {
-  let transformOptions: OptionalTransformOptions = {}
+export function parseTransformOptions(
+  options: unknown
+): OptionalTransformOptions {
+  const transformOptions: OptionalTransformOptions = {}
 
-  if (options && options.maxOffsetRatio) {
-    transformOptions.maxOffsetRatio = parseFloat(
-      options.maxOffsetRatio
-    )
-  }
+  if (options && typeof options === 'object') {
+    if ('maxOffsetRatio' in options && options.maxOffsetRatio) {
+      transformOptions.maxOffsetRatio = Number(options.maxOffsetRatio)
+    }
 
-  if (options && options.maxDepth) {
-    transformOptions.maxDepth = parseInt(options.maxDepth)
+    if ('maxDepth' in options && options.maxDepth) {
+      transformOptions.maxDepth = Math.round(Number(options.maxDepth))
+    }
   }
 
   return transformOptions

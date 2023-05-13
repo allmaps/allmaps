@@ -75,7 +75,7 @@ function tilesIntersect([a, b]: Line): Position[] {
   const endX = Math.floor(b[0])
   const endY = Math.floor(b[1])
 
-  let points: Position[] = [[x, y]]
+  const points: Position[] = [[x, y]]
 
   if (x === endX && y === endY) {
     return points
@@ -118,7 +118,7 @@ function findBestZoomLevel(
   let smallestScaleDiff = Number.POSITIVE_INFINITY
   let bestZoomLevel: TileZoomLevel | undefined
 
-  for (let zoomLevel of timeZoomLevels) {
+  for (const zoomLevel of timeZoomLevels) {
     const scaleFactor = zoomLevel.scaleFactor
     const scaleDiff = Math.abs(Math.log2(scaleFactor) - Math.log2(mapTileScale))
     // const scaleDiff = Math.abs(scaleFactor - mapTileScale)
@@ -176,7 +176,7 @@ function iiifTilesByXToArray(
   iiifTilesByX: PositionByX
 ): Tile[] {
   const neededIiifTiles: Tile[] = []
-  for (let xKey in iiifTilesByX) {
+  for (const xKey in iiifTilesByX) {
     const x = parseInt(xKey)
 
     if (x < 0 || x >= zoomLevel.columns) {

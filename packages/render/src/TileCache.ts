@@ -1,5 +1,9 @@
 import CachedTile from './CachedTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import {
+  WarpedMapEvent,
+  WarpedMapEventType,
+  WarpedMapTileEventDetail
+} from './shared/events.js'
 
 import type { NeededTile } from './shared/types.js'
 
@@ -18,7 +22,7 @@ export default class TileCache extends EventTarget {
     const mapId = neededTile.mapId
     const tileUrl = neededTile.url
 
-    let cachedTile = this.cachedTilesByUrl.get(tileUrl)
+    const cachedTile = this.cachedTilesByUrl.get(tileUrl)
 
     if (!cachedTile) {
       const cachedTile = new CachedTile(neededTile)
@@ -74,7 +78,7 @@ export default class TileCache extends EventTarget {
 
   private tileFetched(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { tileUrl } = event.data
+      const { tileUrl } = event.data as WarpedMapTileEventDetail
 
       this.updateTilesLoadingCount(-1)
 
@@ -91,7 +95,7 @@ export default class TileCache extends EventTarget {
 
   private tileFetchError(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { tileUrl } = event.data
+      const { tileUrl } = event.data as WarpedMapTileEventDetail
 
       if (!this.cachedTilesByUrl.has(tileUrl)) {
         this.cachedTilesByUrl.delete(tileUrl)
@@ -115,7 +119,7 @@ export default class TileCache extends EventTarget {
   }
 
   private removeMapIdForTileUrl(mapId: string, tileUrl: string) {
-    let mapIds = this.mapIdsByTileUrl.get(tileUrl)
+    const mapIds = this.mapIdsByTileUrl.get(tileUrl)
 
     if (!mapIds) {
       return new Set()
@@ -138,19 +142,19 @@ export default class TileCache extends EventTarget {
 
   setTiles(neededTiles: NeededTile[]) {
     const neededTileMapIdsUrls = new Set()
-    for (let neededTile of neededTiles) {
+    for (const neededTile of neededTiles) {
       neededTileMapIdsUrls.add(this.createKey(neededTile.mapId, neededTile.url))
     }
 
-    for (let [tileUrl, mapIds] of this.mapIdsByTileUrl) {
-      for (let mapId of mapIds) {
+    for (const [tileUrl, mapIds] of this.mapIdsByTileUrl) {
+      for (const mapId of mapIds) {
         if (!neededTileMapIdsUrls.has(this.createKey(mapId, tileUrl))) {
           this.removeTile(mapId, tileUrl)
         }
       }
     }
 
-    for (let neededTile of neededTiles) {
+    for (const neededTile of neededTiles) {
       if (!this.mapIdsByTileUrl.get(neededTile.url)?.has(neededTile.mapId)) {
         this.addTile(neededTile)
       }

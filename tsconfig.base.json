@@ -7,6 +7,7 @@
     "composite": true,
     "declaration": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@allmaps/types": ["./packages/types/src"],
       "@allmaps/id": ["./packages/id/src"],

@@ -6,7 +6,11 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import {
+  WarpedMapEvent,
+  WarpedMapEventType,
+  WarpedMapTileEventDetail
+} from './shared/events.js'
 import {
   createTransform,
   translateTransform,
@@ -78,7 +82,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   tileAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data
+      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
 
       const cachedTile = this.tileCache.getCachedTile(tileUrl)
 
@@ -99,7 +103,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   tileRemoved(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data
+      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
 
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
@@ -299,7 +303,6 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform3fv(colorizeColorLocation, colorize.color)
       // gl.uniform3fv(colorizeColorLocation, [1, 0.07, 1])
       // gl.uniform3fv(colorizeColorLocation, [0.99609375, 0.43359375, 0])
-
     }
   }
 
@@ -309,7 +312,7 @@ export default class WebGL2Renderer extends EventTarget {
   ) {
     this.invertedRenderTransform = invertTransform(projectionTransform)
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
@@ -392,7 +395,7 @@ export default class WebGL2Renderer extends EventTarget {
       transformToMatrix4(renderTransform)
     )
 
-    for (let mapId of mapIds) {
+    for (const mapId of mapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {

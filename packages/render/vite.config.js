@@ -9,7 +9,6 @@ const dts = {
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
-        // TODO: npm or pnpm?
         exec('npm run build:types', (err) =>
           err ? reject(err) : resolve()
         )

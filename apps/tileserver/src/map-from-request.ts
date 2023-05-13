@@ -8,12 +8,22 @@ import type { Obj } from 'itty-router'
 
 export async function mapFromParams(
   cache: Cache,
-  env: any,
+  env: unknown,
   params: Obj | undefined
 ): Promise<Map> {
   const mapId = params?.mapId
 
-  const url = `${env.API_BASE_URL}/maps/${mapId}`
+  let baseUrl: string | undefined
+
+  if (env && typeof env === 'object' && 'API_BASE_URL' in env) {
+    baseUrl = String(env.API_BASE_URL)
+  }
+
+  if (!baseUrl) {
+    throw new Error('Base URL not found in API_BASE_URL environment variable')
+  }
+
+  const url = `${baseUrl}/maps/${mapId}`
   const mapResponse = await cachedFetch(cache, url)
 
   if (!mapResponse) {

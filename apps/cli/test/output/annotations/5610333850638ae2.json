@@ -1,8 +1,6 @@
 {
   "type": "AnnotationPage",
-  "@context": [
-    "http://www.w3.org/ns/anno.jsonld"
-  ],
+  "@context": ["http://www.w3.org/ns/anno.jsonld"],
   "items": [
     {
       "type": "Annotation",
@@ -38,65 +36,41 @@
           {
             "type": "Feature",
             "properties": {
-              "pixelCoords": [
-                4642,
-                3295
-              ]
+              "pixelCoords": [4642, 3295]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0801031,
-                42.3392754
-              ]
+              "coordinates": [-71.0801031, 42.3392754]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "pixelCoords": [
-                6299,
-                5272
-              ]
+              "pixelCoords": [6299, 5272]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0731998,
-                42.3363919
-              ]
+              "coordinates": [-71.0731998, 42.3363919]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "pixelCoords": [
-                9680,
-                3821
-              ]
+              "pixelCoords": [9680, 3821]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0646008,
-                42.3422325
-              ]
+              "coordinates": [-71.0646008, 42.3422325]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "pixelCoords": [
-                6411,
-                3786
-              ]
+              "pixelCoords": [6411, 3786]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.074498,
-                42.3396365
-              ]
+              "coordinates": [-71.074498, 42.3396365]
             }
           }
         ]

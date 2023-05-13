@@ -34,10 +34,12 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "npm test",
-    "test": "mocha && npm run lint",
+    "preversion": "npm types && npm lint && npm test",
+    "test": "NODE_ENV=test mocha",
     "pretest": "npm run build",
-    "lint": "eslint dist test",
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "keywords": [
@@ -60,10 +62,10 @@
     "chai": "^4.3.6",
     "documentation": "^14.0.0",
     "eslint": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "mocha": "^8.4.0",
-    "typescript": "^4.9.5"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "typescript": "^5.0.0",
+    "prettier": "^2.8.0"
   }
 }

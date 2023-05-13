@@ -2,9 +2,9 @@ import type { Cache } from './types.js'
 
 export class FetchError extends Error {
   status: number
-  body: any
+  body: unknown
 
-  constructor(message: string, status: number, body: any) {
+  constructor(message: string, status: number, body: unknown) {
     super(message)
     this.name = 'FetchError'
     this.status = status
