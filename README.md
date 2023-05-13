@@ -53,6 +53,16 @@ And then use lerna with `--scope` to select a single app:
 
     npx lerna run --scope "@allmaps/viewer" dev
 
+## Check formatting and types
+
+Check TypeScript types for all packages:
+
+    npx lerna run types --parallel
+
+Run Prettier and ESLint for all packages:
+
+    npx lerna run lint --parallel
+
 ## Run tests
 
 Run `test` scripts for all packages and apps:
