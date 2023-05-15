@@ -1,5 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss'
+
+export default {
   content: [
     './src/**/*.{html,js,svelte,ts}',
     './node_modules/@allmaps/ui/dist/components/**/*.{html,js,svelte,ts}'
@@ -10,4 +11,4 @@ module.exports = {
       mono: ['DM Mono', 'monospace']
     }
   }
-}
+} satisfies Config

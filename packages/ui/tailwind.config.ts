@@ -1,12 +1,15 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss'
+
+export default {
   content: [
     './src/**/*.{html,js,svelte,ts}',
     './dist/components/**/*.{html,js,svelte,ts}'
   ],
   theme: {
     extend: {
-      textColor: '#222222',
+      textColor: {
+        DEFAULT: '#222222'
+      },
       transitionDuration: {
         0: '0ms'
       }
@@ -32,5 +35,4 @@ module.exports = {
       mono: ['DM Mono', 'monospace']
     }
   }
-  // plugins: [require('flowbite/plugin')]
-}
+} satisfies Config
