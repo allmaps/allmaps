@@ -5,20 +5,9 @@
 
   import Color from '$lib/components/styleguide/Color.svelte'
 
-  const colors = [
-    'bg-blue-dark',
-    'bg-blue',
-    'bg-purple',
-    'bg-pink',
-    'bg-orange',
-    'bg-red',
-    'bg-green',
-    'bg-yellow',
-    'bg-gray-dark',
-    'bg-gray-light',
-    'bg-black',
-    'bg-white'
-  ]
+  import colors from '$lib/shared/colors.js'
+
+  const backgroundColors = Object.keys(colors).map((color) => `bg-${color}`)
 
   let opacity = 1
 </script>
@@ -29,11 +18,14 @@
 
 <main class="container mx-auto p-4">
   <ul class="space-y-2">
-    {#each colors as color}
+    {#each backgroundColors as color}
       <li><Color {color} /></li>
     {/each}
   </ul>
 
-  <Dial bind:value={opacity} keyCode="Space" label="Opacity" />
-  <span>{Math.round(opacity * 100)}%</span>
+  <!-- svelte-ignore a11y-label-has-associated-control -->
+  <label class="flex items-center gap-2">
+    <Dial bind:value={opacity} keyCode="Space" label="Opacity" />
+    <span>{Math.round(opacity * 100)}%</span>
+  </label>
 </main>
