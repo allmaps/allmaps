@@ -195,7 +195,8 @@ export function createMapOl() {
     view: new View({
       maxZoom: 24,
       zoom: 12
-    })
+    }),
+    keyboardEventTarget: document
   })
 
   mapSelect = new Select({
@@ -223,7 +224,8 @@ export function createImageOl() {
 
   imageOl = new Map({
     controls: [],
-    layers: [imageIiifLayer, imageVectorLayer]
+    layers: [imageIiifLayer, imageVectorLayer],
+    keyboardEventTarget: document
   })
 }
 
