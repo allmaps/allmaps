@@ -52,12 +52,6 @@ export default class WebGL2WarpedMap extends EventTarget {
   opacity: number = DEFAULT_OPACITY
   renderOptions: RenderOptions = {}
 
-  // currentScaleFactor?: number = undefined
-  // previousScaleFactor?: number = undefined
-
-  // currentScaleFactorTiles: Map<string, NeededTile> = new Map()
-  // previousScaleFactorTiles: Map<string, NeededTile> = new Map()
-
   tilesTexture: WebGLTexture | null
   scaleFactorsTexture: WebGLTexture | null
   tilePositionsTexture: WebGLTexture | null
