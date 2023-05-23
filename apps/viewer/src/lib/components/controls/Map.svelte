@@ -116,16 +116,22 @@
           event.preventDefault()
         }
       })
-      rotateButton.addEventListener('touchstart', (event: Event) => {
-        if (event instanceof TouchEvent) {
-          rotateButtonMouseMoveStartX = event.touches[0].screenX
-          window.addEventListener('touchmove', handleRotateButtonMove)
-          window.addEventListener('touchend', () => {
-            window.removeEventListener('touchmove', handleRotateButtonMove)
-          })
-          event.preventDefault()
+      rotateButton.addEventListener(
+        'touchstart',
+        (event: Event) => {
+          if (event instanceof TouchEvent) {
+            rotateButtonMouseMoveStartX = event.touches[0].screenX
+            window.addEventListener('touchmove', handleRotateButtonMove)
+            window.addEventListener('touchend', () => {
+              window.removeEventListener('touchmove', handleRotateButtonMove)
+            })
+            event.preventDefault()
+          }
+        },
+        {
+          passive: true
         }
-      })
+      )
     }
 
     if ($ol) {
