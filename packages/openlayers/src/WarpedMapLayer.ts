@@ -302,9 +302,9 @@ export class WarpedMapLayer extends Layer {
     return needResize
   }
 
-  hexToRgb(hex: string | null): OptionalColor {
+  hexToRgb(hex: string | undefined): OptionalColor {
     if (!hex) {
-      return null
+      return
     }
 
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -328,17 +328,16 @@ export class WarpedMapLayer extends Layer {
   }
 
   setRemoveBackground(
-    hexColor: string,
-    options?: { threshold: number; hardness: number }
+    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(hexColor)
-    if (color) {
-      this.renderer.setRemoveBackground({
-        color,
-        ...options
-      })
-      this.changed()
-    }
+    const color = this.hexToRgb(options.hexColor)
+
+    this.renderer.setRemoveBackground({
+      color,
+      threshold: options.threshold,
+      hardness: options.hardness
+    })
+    this.changed()
   }
 
   resetRemoveBackground() {
@@ -348,17 +347,17 @@ export class WarpedMapLayer extends Layer {
 
   setMapRemoveBackground(
     mapId: string,
-    hexColor: string,
-    options?: { threshold: number; hardness: number }
+
+    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(hexColor)
-    if (color) {
-      this.renderer.setMapRemoveBackground(mapId, {
-        color,
-        ...options
-      })
-      this.changed()
-    }
+    const color = this.hexToRgb(options.hexColor)
+
+    this.renderer.setMapRemoveBackground(mapId, {
+      color,
+      threshold: options.threshold,
+      hardness: options.hardness
+    })
+    this.changed()
   }
 
   resetMapRemoveBackground(mapId: string) {

@@ -27,7 +27,7 @@ import type {
 } from './shared/types.js'
 
 const DEFAULT_OPACITY = 1
-const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0.2
+const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
 
 export default class WebGL2Renderer extends EventTarget {
@@ -165,7 +165,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getRemoveBackground(): RemoveBackgroundOptions | undefined {
+  getRemoveBackground(): Partial<RemoveBackgroundOptions> | undefined {
     return this.renderOptions.removeBackground
   }
 
@@ -177,7 +177,9 @@ export default class WebGL2Renderer extends EventTarget {
     this.renderOptions.removeBackground = undefined
   }
 
-  getMapRemoveBackground(mapId: string): RemoveBackgroundOptions | undefined {
+  getMapRemoveBackground(
+    mapId: string
+  ): Partial<RemoveBackgroundOptions> | undefined {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
       return webGLWarpedMap.renderOptions.removeBackground
@@ -201,7 +203,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getColorize(): ColorizeOptions | undefined {
+  getColorize(): Partial<ColorizeOptions> | undefined {
     return this.renderOptions.colorize
   }
 
@@ -213,7 +215,7 @@ export default class WebGL2Renderer extends EventTarget {
     this.renderOptions.colorize = undefined
   }
 
-  getMapColorize(mapId: string): ColorizeOptions | undefined {
+  getMapColorize(mapId: string): Partial<ColorizeOptions> | undefined {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
       return webGLWarpedMap.renderOptions.colorize
@@ -234,38 +236,70 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  max(
+    number1: number | undefined,
+    number2: number | undefined
+  ): number | undefined {
+    if (number1 !== undefined && number2 !== undefined) {
+      return Math.max(number1, number2)
+    } else if (number1 !== undefined) {
+      return number1
+    } else if (number2 !== undefined) {
+      return number2
+    }
+  }
+
   setRenderOptionsUniforms(
-    layerRenderOptions: Partial<RenderOptions>,
-    mapRenderOptions: Partial<RenderOptions>
+    layerRenderOptions: RenderOptions,
+    mapRenderOptions: RenderOptions
   ) {
     const gl = this.gl
 
+    const renderOptions: RenderOptions = {
+      removeBackground: {
+        color:
+          mapRenderOptions.removeBackground?.color ||
+          layerRenderOptions.removeBackground?.color,
+        hardness: this.max(
+          mapRenderOptions.removeBackground?.hardness,
+          layerRenderOptions.removeBackground?.hardness
+        ),
+        threshold: this.max(
+          mapRenderOptions.removeBackground?.threshold,
+          layerRenderOptions.removeBackground?.threshold
+        )
+      },
+      colorize: {
+        ...layerRenderOptions.colorize,
+        ...mapRenderOptions.colorize
+      }
+    }
+
     // Remove background color
-    const removeBackground =
-      mapRenderOptions.removeBackground || layerRenderOptions.removeBackground
+    const removeBackgroundColor = renderOptions.removeBackground?.color
 
     const removeBackgroundColorLocation = gl.getUniformLocation(
       this.program,
       'u_removeBackgroundColor'
     )
-    gl.uniform1f(removeBackgroundColorLocation, removeBackground ? 1 : 0)
+    gl.uniform1f(removeBackgroundColorLocation, removeBackgroundColor ? 1 : 0)
 
-    if (removeBackground) {
+    if (removeBackgroundColor) {
       const backgroundColorLocation = gl.getUniformLocation(
         this.program,
         'u_backgroundColor'
       )
-      gl.uniform3fv(backgroundColorLocation, removeBackground.color)
+      gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
 
       const backgroundColorThresholdLocation = gl.getUniformLocation(
         this.program,
         'u_backgroundColorThreshold'
       )
+
       gl.uniform1f(
         backgroundColorThresholdLocation,
-        removeBackground.threshold !== undefined
-          ? removeBackground.threshold
-          : DEFAULT_REMOVE_BACKGROUND_THRESHOLD
+        renderOptions.removeBackground?.threshold ||
+          DEFAULT_REMOVE_BACKGROUND_THRESHOLD
       )
 
       const backgroundColorHardnessLocation = gl.getUniformLocation(
@@ -274,25 +308,23 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1f(
         backgroundColorHardnessLocation,
-        removeBackground.hardness !== undefined
-          ? removeBackground.hardness
-          : DEFAULT_REMOVE_BACKGROUND_HARDNESS
+        renderOptions.removeBackground?.hardness ||
+          DEFAULT_REMOVE_BACKGROUND_HARDNESS
       )
     }
 
     // Colorize
-    const colorize = mapRenderOptions.colorize || layerRenderOptions.colorize
+    const colorizeColor = renderOptions.colorize?.color
 
     const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
-    // gl.uniform1f(colorizeLocation, colorize ? 1 : 1)
-    gl.uniform1f(colorizeLocation, colorize ? 1 : 0)
+    gl.uniform1f(colorizeLocation, colorizeColor ? 1 : 0)
 
-    if (colorize) {
+    if (colorizeColor) {
       const colorizeColorLocation = gl.getUniformLocation(
         this.program,
         'u_colorizeColor'
       )
-      gl.uniform3fv(colorizeColorLocation, colorize.color)
+      gl.uniform3fv(colorizeColorLocation, colorizeColor)
     }
   }
 
