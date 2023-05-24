@@ -1,7 +1,7 @@
 import { derived } from 'svelte/store'
 
 import { mapsById } from '$lib/shared/stores/maps.js'
-import { deselectMap } from '$lib/shared/stores/selected.js'
+import { deselectMap, deselectMaps } from '$lib/shared/stores/selected.js'
 
 import {
   showMap as olShowMap,
@@ -11,9 +11,19 @@ import {
 export function showMap(mapId: string) {
   updateVisibleMaps([mapId], [])
 }
+
+export function showMaps(mapIds: string[]) {
+  updateVisibleMaps(mapIds, [])
+}
+
 export function hideMap(mapId: string) {
   deselectMap(mapId)
   updateVisibleMaps([], [mapId])
+}
+
+export function hideMaps(mapIds: string[]) {
+  deselectMaps(mapIds)
+  updateVisibleMaps([], mapIds)
 }
 
 function updateVisibleMaps(
@@ -52,6 +62,7 @@ export const visibleMapIds = derived(mapsById, ($mapsById) =>
     .filter((viewerMap) => viewerMap.state.visible)
     .map((viewerMap) => viewerMap.mapId)
 )
+
 export const hiddenMapIds = derived(mapsById, ($mapsById) =>
   [...$mapsById.values()]
     .filter((viewerMap) => !viewerMap.state.visible)

@@ -1,11 +1,12 @@
 import { writable, derived, get } from 'svelte/store'
 
-import { mapsById, visibleMaps } from '$lib/shared/stores/maps.js'
+import { maps, mapsById, visibleMaps } from '$lib/shared/stores/maps.js'
 import {
   selectedMaps,
   selectedMapCount,
   setSelectedMaps
 } from '$lib/shared/stores/selected.js'
+import { showMap, hideMaps } from '$lib/shared/stores/visible.js'
 import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
@@ -35,11 +36,16 @@ type ActiveMap = {
   updateView: boolean
 }
 
+type SetActiveMapOptions = Partial<{
+  updateView: boolean
+  hideOthers: boolean
+}>
+
 export const activeMapId = writable<ActiveMapId>()
 
 function setNextOrPrevMapActive(
   direction: 'next' | 'prev',
-  updateView: boolean
+  options?: SetActiveMapOptions
 ) {
   let loopIndexToMapIndex: (index: number) => number
 
@@ -49,14 +55,16 @@ function setNextOrPrevMapActive(
     loopIndexToMapIndex = (index) => $maps.length - index - 1
   }
 
-  let newActiveMapId
+  let newActiveMapId: string | undefined
 
   const $selectedMapCount = get(selectedMapCount)
   const $activeMapId = get(activeMapId)
 
   let $maps: ViewerMap[]
 
-  if ($selectedMapCount > 1) {
+  if (options?.hideOthers) {
+    $maps = get(maps)
+  } else if ($selectedMapCount > 1) {
     $maps = get(selectedMaps)
   } else {
     $maps = get(visibleMaps)
@@ -83,19 +91,30 @@ function setNextOrPrevMapActive(
     newActiveMapId = firstViewerMap.mapId
   }
 
+  const updateView = options?.updateView ? true : false
+
+  showMap(newActiveMapId)
   activeMapId.set({ mapId: newActiveMapId, updateView })
 
   if ($selectedMapCount <= 1) {
     setSelectedMaps([newActiveMapId], updateView)
   }
+
+  if (options?.hideOthers) {
+    const hideMapIds = $maps
+      .map((viewerMap) => viewerMap.mapId)
+      .filter((mapId) => mapId !== newActiveMapId)
+
+    hideMaps(hideMapIds)
+  }
 }
 
-export function setNextMapActive(updateView: boolean) {
-  setNextOrPrevMapActive('next', updateView)
+export function setNextMapActive(options?: SetActiveMapOptions) {
+  setNextOrPrevMapActive('next', options)
 }
 
-export function setPrevMapActive(updateView: boolean) {
-  setNextOrPrevMapActive('prev', updateView)
+export function setPrevMapActive(options?: SetActiveMapOptions) {
+  setNextOrPrevMapActive('prev', options)
 }
 
 export function setActiveMapId(mapId: string, updateView: boolean) {

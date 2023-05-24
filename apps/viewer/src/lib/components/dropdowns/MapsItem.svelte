@@ -23,6 +23,8 @@
 
   import Thumbnail from '$lib/components/Thumbnail.svelte'
 
+  import { getFullPixelMask } from '@allmaps/stdlib'
+
   import {
     Copy,
     Dial,
@@ -50,7 +52,9 @@
 
   const colorizeColor = viewerMap.renderOptions.colorize.color
   let hueInitialized = false
-  const hue = writable(getHue(colorizeColor) / 360)
+  const hue = colorizeColor
+    ? writable(getHue(colorizeColor) / 360)
+    : writable(0)
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.image.uri
@@ -80,12 +84,7 @@
     })
   }
 
-  const fullPixelMask: [number, number][] = [
-    [0, 0],
-    [imageWidth, 0],
-    [imageWidth, imageHeight],
-    [0, imageHeight]
-  ]
+  const fullPixelMask = getFullPixelMask(imageWidth, imageHeight)
 
   selected.subscribe(($selected) => {
     if ($selected) {
@@ -136,29 +135,29 @@
     return pixelMask.map((point) => transformPoint(point).join(',')).join(' ')
   }
 
-  function handleMapClick() {
+  function handleShowOnMap() {
     setActiveMapId(viewerMap.mapId, true)
     $view = 'map'
   }
 
-  function handleImageClick() {
+  function handleShowImage() {
     setActiveMapId(viewerMap.mapId, true)
     $view = 'image'
   }
 
-  function handleBringToFrontClick() {
+  function handleBringToFront() {
     mapWarpedMapSource.bringToFront([mapId])
   }
 
-  function handleBringForwardClick() {
+  function handleBringForward() {
     mapWarpedMapSource.bringForward([mapId])
   }
 
-  function handleSendBackwardClick() {
+  function handleSendBackward() {
     mapWarpedMapSource.sendBackward([mapId])
   }
 
-  function handleSendToBackClick() {
+  function handleSendToBack() {
     mapWarpedMapSource.sendToBack([mapId])
   }
 
@@ -307,32 +306,32 @@
         <button
           type="button"
           title="Bring To Front"
-          on:click={handleBringToFrontClick}
-          class="inline-flex items-center p-1 w-8 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+          on:click={handleBringToFront}
+          class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
         >
           <BringToFront />
         </button>
         <button
           type="button"
           title="Bring Forward"
-          on:click={handleBringForwardClick}
-          class="inline-flex items-center p-1 w-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+          on:click={handleBringForward}
+          class="p-1.5 w-8 h-8 bg-white border-t border-b border-r border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
         >
           <BringForward />
         </button>
         <button
           type="button"
           title="Send Backward"
-          on:click={handleSendBackwardClick}
-          class="inline-flex items-center p-1 w-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+          on:click={handleSendBackward}
+          class="p-1.5 w-8 h-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
         >
           <SendBackward />
         </button>
         <button
           type="button"
           title="Send to Back"
-          on:click={handleSendToBackClick}
-          class="inline-flex items-center p-1 w-8 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+          on:click={handleSendToBack}
+          class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
         >
           <SendToBack />
         </button>
@@ -385,14 +384,14 @@
       <button
         type="button"
         title="Show on map"
-        on:click={handleMapClick}
+        on:click={handleShowOnMap}
         class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
         >Map</button
       >
       <button
         type="button"
         title="Show image"
-        on:click={handleImageClick}
+        on:click={handleShowImage}
         class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
         >Image</button
       >

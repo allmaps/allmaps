@@ -7,6 +7,7 @@ import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { fromHue } from '$lib/shared/color.js'
 import {
   mapWarpedMapSource,
+  mapWarpedMapLayer,
   addMap,
   removeMap
 } from '$lib/shared/stores/openlayers.js'
@@ -46,13 +47,17 @@ export async function addAnnotation(sourceId: string, json: unknown) {
           selected: false,
           highlighted: false
         },
-        // TODO: detect background color of map?
-        renderOptions: getDefaultRenderOptions(false, false)
+        renderOptions: getDefaultRenderOptions({
+          colorize: {
+            enabled: false,
+            color: fromHue((startIndex * 60) % 360)
+          }
+        })
       }
 
-      viewerMap.renderOptions.colorize.color = fromHue(
-        (viewerMap.index * 60) % 360
-      )
+      // viewerMap.renderOptions.colorize.color = fromHue(
+      //   (viewerMap.index * 60) % 360
+      // )
 
       newViewerMaps.push(viewerMap)
       mapIds.push(mapId)
@@ -106,6 +111,11 @@ export function setRemoveBackgroundColor(
 
     if (viewerMap) {
       viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
+      mapWarpedMapLayer?.setMapRemoveBackground(mapId, {
+        hexColor: removeBackgroundColor,
+        threshold: viewerMap.renderOptions.removeBackground.threshold,
+        hardness: viewerMap.renderOptions.removeBackground.hardness
+      })
     }
 
     return $mapsById
@@ -137,4 +147,9 @@ export const mapCount = derived(mapsById, ($mapsById) => $mapsById.size)
 
 export const visibleMaps = derived(mapsById, ($mapsById) =>
   [...$mapsById.values()].filter((map) => map.state.visible)
+)
+
+export const visibleMapCount = derived(
+  visibleMaps,
+  ($visibleMaps) => $visibleMaps.length
 )

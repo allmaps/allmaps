@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
 
   import type { SelectEvent } from 'ol/interaction/Select.js'
+  import type { FeatureLike } from 'ol/Feature.js'
 
   import {
     mapOl,
@@ -20,13 +21,13 @@
 
   import { computeBBox } from '@allmaps/stdlib'
 
-  import ContextMenu from '$lib/components/elements/ContextMenu.svelte'
+  import MapContextMenu from '$lib/components/dropdowns/MapContextMenu.svelte'
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
 
-  import type { ShowContextMenu } from '$lib/shared/types.js'
+  import type { FeatureContextMenu } from '$lib/shared/types.js'
 
   let ol: HTMLElement
-  let showContextMenu: ShowContextMenu | undefined
+  let featureContextMenu: FeatureContextMenu | undefined
 
   function fitExtent() {
     const extent = mapWarpedMapSource.getExtent()
@@ -63,6 +64,17 @@
     updateSelectedMaps(selectedMapIds, deselectedMapIds, false)
   }
 
+  function showContextMenu(event: MouseEvent, feature: FeatureLike) {
+    featureContextMenu = {
+      event,
+      feature
+    }
+  }
+
+  function hideContextMenu() {
+    featureContextMenu = undefined
+  }
+
   onMount(async () => {
     mapOl?.setTarget(ol)
     mapSelect?.on('select', handleSelect)
@@ -78,27 +90,26 @@
         )
 
         if (feature) {
-          console.log('show context menu', feature)
-          showContextMenu = {
-            event,
-            feature
-          }
+          showContextMenu(event, feature)
         }
       }
     })
+
+    mapOl?.on('movestart', hideContextMenu)
 
     fitExtent()
   })
 
   onDestroy(() => {
     mapSelect?.un('select', handleSelect)
+    mapOl?.un('movestart', hideContextMenu)
     mapOl?.setTarget()
   })
 </script>
 
 <div id="ol" bind:this={ol} class="w-full h-full" />
-{#if showContextMenu}
-    <MapContextMenu show={showContextMenu} />
+{#if featureContextMenu}
+  <MapContextMenu {featureContextMenu} />
 {/if}
 {#if mapVectorSource && mapSelect}
   <div class="hidden">
@@ -115,3 +126,5 @@
     </ol>
   </div>
 {/if}
+
+<svelte:window on:keypress={hideContextMenu} on:click={hideContextMenu} />

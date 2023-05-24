@@ -56,7 +56,6 @@ export type MapState = {
 }
 
 export type RemoveBackgroundOptions = {
-  enabled: boolean
   color: string | null
   threshold: number
   hardness: number
@@ -64,7 +63,7 @@ export type RemoveBackgroundOptions = {
 
 export type ColorizeOptions = {
   enabled: boolean
-  color: string
+  color: string | null
 }
 
 export type RenderOptions = {
@@ -72,7 +71,7 @@ export type RenderOptions = {
   colorize: ColorizeOptions
 }
 
-export type ShowContextMenu = {
+export type FeatureContextMenu = {
   event: MouseEvent
   feature: FeatureLike
 }

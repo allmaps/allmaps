@@ -35,8 +35,16 @@ export function selectMap(mapId: string, updateView = false) {
   updateSelectedMaps([mapId], [], updateView)
 }
 
+export function selectMaps(mapIds: string[], updateView = false) {
+  updateSelectedMaps(mapIds, [], updateView)
+}
+
 export function deselectMap(mapId: string, updateView = false) {
   updateSelectedMaps([], [mapId], updateView)
+}
+
+export function deselectMaps(mapIds: string[], updateView = false) {
+  updateSelectedMaps([], mapIds, updateView)
 }
 
 export function updateSelectedMaps(

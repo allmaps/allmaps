@@ -26,6 +26,8 @@ import { view } from '$lib/shared/stores/view.js'
 
 import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 
+import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
+
 import type { ViewerMap } from '$lib/shared/types.js'
 import type FeatureLike from 'ol/Feature'
 import type { OrderFunction } from 'ol/render'
@@ -62,7 +64,7 @@ export const xyzLayer = derived(
   ([$xyzLayers, $xyzLayerIndex]) => $xyzLayers[$xyzLayerIndex]
 )
 
-/// Image Information Cache
+// Image Information Cache
 
 export let imageInfoCache: Cache | undefined
 
@@ -101,66 +103,31 @@ function mapVectorLayerOrderFunction(
   return null
 }
 
-function mapWarpedMapLayerFirstTileAdded(event: Event) {
+async function mapWarpedMapLayerFirstTileAdded(event: Event) {
   if (event instanceof WarpedMapEvent) {
-    const { mapId, tileUrl } = event.data
+    const { mapId, tileUrl } = event.data as { mapId: string; tileUrl: string }
 
     const $mapsById = get(mapsById)
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
-      const cachedTile = mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+      const cachedTile =
+        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {
-        console.log('Deze gebruiken:', imageBitmap, 'om uit te rekenen voor:', mapId)
+        const backgroundColor = await detectBackgroundColor(
+          sourceMap.map,
+          imageBitmap
+        )
 
-        setRemoveBackgroundColor(mapId, '#fe3c21')
+        if (backgroundColor) {
+          setRemoveBackgroundColor(mapId, backgroundColor)
+        }
       } else {
         console.log('FOUT!')
       }
-
     }
-
-    // console.log(sourceMap?.renderOptions)
-    // console.log(mapId, 'tileAdded', 'kijken of dit is de eerste voor mapId')
-    // console.log(imageBitmap,
-    //   'als dat zo is dan kleur uitrekenen en ',
-    //   setRemoveBackgroundColor
-    // )
-
-
-    // import {
-    //   imageInfoCache,
-    //   mapWarpedMapSource,
-    //   addMap,
-    //   removeMap
-    // } from '$lib/shared/stores/openlayers.js'
-
-
-
-//     import { fetchImageInfo } from '@allmaps/stdlib'
-// import { Image } from '@allmaps/iiif-parser'
-
-    // import { getBackgroundColor } from '$lib/shared/remove-background.js'
-//
-
-    // const imageUri = map.image.uri
-    // const imageInfo = await fetchImageInfo(imageUri, {
-    //   cache: imageInfoCache
-    // })
-    // const parsedImage = Image.parse(imageInfo)
-
-    // // Process image once, also when the same image is used
-    // // in multiple georeferenced maps
-    // getBackgroundColor(map, parsedImage)
-    //   .then((color) => setRemoveBackgroundColor(mapId, color))
-    //   .catch((err) => {
-    //     console.error(
-    //       `Couldn't detect background color for map ${mapId}`,
-    //       err
-    //     )
-    //   })
   }
 }
 
