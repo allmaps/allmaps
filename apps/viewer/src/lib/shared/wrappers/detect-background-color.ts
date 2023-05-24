@@ -12,11 +12,15 @@ export let detectBackgroundColor: (
   imageBitmap: ImageBitmap
 ) => Promise<string | undefined>
 
-if (browser) {
+async function initialize() {
   const worker = new DetectBackgroundColorWorker()
   const instance = Comlink.wrap<DetectBackgroundColorWorkerType>(worker)
 
   const localInstance = await new instance()
 
   detectBackgroundColor = localInstance.detectBackgroundColor
+}
+
+if (browser) {
+  initialize()
 }
