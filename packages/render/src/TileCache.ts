@@ -170,7 +170,7 @@ export default class TileCache extends EventTarget {
   }
 
   private removeTileUrlForMapId(mapId: string, tileUrl: string) {
-    let tileUrls = this.tileUrlsByMapId.get(mapId)
+    const tileUrls = this.tileUrlsByMapId.get(mapId)
 
     if (!tileUrls) {
       return new Set()

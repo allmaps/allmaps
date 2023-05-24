@@ -25,7 +25,7 @@ export type Size = [number, number]
 export type Extent = [number, number]
 
 export type Color = [number, number, number]
-export type OptionalColor = Color | null
+export type OptionalColor = Color | undefined
 
 export type Tile = {
   column: number
@@ -41,20 +41,20 @@ export type NeededTile = {
   url: string
 }
 
-export type RemoveBackgroundOptions = {
+export type RemoveBackgroundOptions = Partial<{
   color: Color
-  threshold?: number
-  hardness?: number
-}
+  threshold: number
+  hardness: number
+}>
 
-export type ColorizeOptions = {
+export type ColorizeOptions = Partial<{
   color: Color
-}
+}>
 
-export type RenderOptions = {
+export type RenderOptions = Partial<{
   removeBackground?: RemoveBackgroundOptions
   colorize?: ColorizeOptions
-}
+}>
 
 export type Transform = [number, number, number, number, number, number]
 
