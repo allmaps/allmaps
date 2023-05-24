@@ -68,8 +68,8 @@ export default class WebGL2Renderer extends EventTarget {
     this.tileCache = tileCache
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.TILEADDED,
-      this.tileAdded.bind(this)
+      WarpedMapEventType.TILELOADED,
+      this.tileLoaded.bind(this)
     )
 
     this.tileCache.addEventListener(
@@ -80,7 +80,7 @@ export default class WebGL2Renderer extends EventTarget {
     this.invertedRenderTransform = createTransform()
   }
 
-  tileAdded(event: Event) {
+  tileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
 
