@@ -3,7 +3,7 @@
   // import RenderOptionsDropdown from '$lib/components/dropdowns/RenderOptions.svelte'
   // import DropdownButton from '$lib/components/elements/DropdownButton.svelte'
 
-  import { mapCount } from '$lib/shared/stores/maps.js'
+  import { visibleMapCount } from '$lib/shared/stores/maps.js'
   import {
     setPrevMapActive,
     setNextMapActive
@@ -11,12 +11,19 @@
 
   import { selectedMapCount } from '$lib/shared/stores/selected.js'
 
-  function prevMap() {
-    setPrevMapActive(true)
+  function prevMap(event: MouseEvent) {
+    // TODO: move to function
+    const updateView = !event.altKey
+    const hideOthers = event.shiftKey
+
+    setPrevMapActive({ updateView, hideOthers })
   }
 
-  function nextMap() {
-    setNextMapActive(true)
+  function nextMap(event: MouseEvent) {
+    const updateView = !event.altKey
+    const hideOthers = event.shiftKey
+
+    setNextMapActive({ updateView, hideOthers })
   }
 </script>
 
@@ -27,7 +34,7 @@
     {#if $selectedMapCount >= 2}
       <div>{$selectedMapCount} maps selected</div>
     {:else}
-      <div>Viewing {$mapCount} maps</div>
+      <div>Viewing {$visibleMapCount} maps</div>
     {/if}
   </div>
   <!-- path in collection, cluster, selection. click will display popover with thumbnails -->

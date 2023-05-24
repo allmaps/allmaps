@@ -9,11 +9,11 @@ import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import type { RenderOptions } from '$lib/shared/types.js'
 
 export const renderOptionsLayer = writable<RenderOptions>(
-  getDefaultRenderOptions(true, false)
+  getDefaultRenderOptions()
 )
 
 export function resetRenderOptionsLayer() {
-  renderOptionsLayer.set(getDefaultRenderOptions(true, false))
+  renderOptionsLayer.set(getDefaultRenderOptions())
 }
 
 export function setRenderOptionsForMap(
@@ -30,19 +30,22 @@ export function setRenderOptionsForMap(
       }
 
       if (mapWarpedMapLayer) {
-        if (viewerMap.renderOptions.removeBackground.enabled) {
-          mapWarpedMapLayer.setMapRemoveBackground(
-            mapId,
-            viewerMap.renderOptions.removeBackground.color,
-            {
-              threshold: viewerMap.renderOptions.removeBackground.threshold,
-              hardness: viewerMap.renderOptions.removeBackground.hardness
-            }
-          )
+        if (
+          viewerMap.renderOptions.removeBackground.threshold > 0 &&
+          viewerMap.renderOptions.removeBackground.color
+        ) {
+          mapWarpedMapLayer.setMapRemoveBackground(mapId, {
+            hexColor: viewerMap.renderOptions.removeBackground.color,
+            threshold: viewerMap.renderOptions.removeBackground.threshold,
+            hardness: viewerMap.renderOptions.removeBackground.hardness
+          })
         } else {
           mapWarpedMapLayer.resetMapRemoveBackground(mapId)
         }
-        if (viewerMap.renderOptions.colorize.enabled) {
+        if (
+          viewerMap.renderOptions.colorize.enabled &&
+          viewerMap.renderOptions.colorize.color
+        ) {
           mapWarpedMapLayer.setMapColorize(
             mapId,
             viewerMap.renderOptions.colorize.color
@@ -79,19 +82,18 @@ export const renderOptions = {
       }
 
       if (mapWarpedMapLayer) {
-        if ($renderOptionsLayer.removeBackground.enabled) {
+        if ($renderOptionsLayer.removeBackground.threshold > 0) {
           mapWarpedMapLayer.setRemoveBackground(
-            $renderOptionsLayer.removeBackground.color,
-            {
-              threshold: $renderOptionsLayer.removeBackground.threshold,
-              hardness: $renderOptionsLayer.removeBackground.hardness
-            }
+            $renderOptionsLayer.removeBackground
           )
         } else {
           mapWarpedMapLayer.resetRemoveBackground()
         }
 
-        if ($renderOptionsLayer.colorize.enabled) {
+        if (
+          $renderOptionsLayer.colorize.enabled &&
+          $renderOptionsLayer.colorize.color
+        ) {
           mapWarpedMapLayer.setColorize($renderOptionsLayer.colorize.color)
         } else {
           mapWarpedMapLayer.resetColorize()
