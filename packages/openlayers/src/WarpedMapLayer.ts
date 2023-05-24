@@ -37,6 +37,7 @@ const THROTTLE_OPTIONS = {
 
 export class WarpedMapLayer extends Layer {
   source: WarpedMapSource | null = null
+
   container: HTMLElement
 
   canvas: HTMLCanvasElement | null = null
@@ -55,7 +56,12 @@ export class WarpedMapLayer extends Layer {
     typeof this.viewport.updateViewportAndGetTilesNeeded
   >
 
-  throttledRenderTimeoutId: number | undefined
+  private throttledRenderTimeoutId: number | undefined
+
+  private lastPreparedFrameLayerRevision = 0
+  private lastPreparedFrameSourceRevision = 0
+
+  private previousExtent: number[] | null = null
 
   constructor(options: object) {
     options = options || {}
@@ -162,6 +168,23 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
+  arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
+    if (!arr1 || !arr2) {
+      return false
+    }
+
+    const len1 = arr1.length
+    if (len1 !== arr2.length) {
+      return false
+    }
+    for (let i = 0; i < len1; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false
+      }
+    }
+    return true
+  }
+
   warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
@@ -196,6 +219,7 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
+    this.changed()
   }
 
   visibilityChanged() {
@@ -218,8 +242,6 @@ export class WarpedMapLayer extends Layer {
       const mapId = event.data as string
       this.mapIdsInViewport.add(mapId)
       this.zIndicesChanged()
-      // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
-      // TODO: set visible
     }
   }
 
@@ -227,14 +249,11 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       this.mapIdsInViewport.delete(mapId)
-      // const warpedMapWebGLRenderer = this.warpedMapWebGLRenderers.get(mapId)
-      // TODO: set invisible
     }
   }
 
   private worldCleared() {
     this.renderer.clear()
-    // viewport: Viewport
     this.tileCache.clear()
   }
 
@@ -295,7 +314,7 @@ export class WarpedMapLayer extends Layer {
           parseInt(result[2], 16) / 256,
           parseInt(result[3], 16) / 256
         ]
-      : null
+      : undefined
   }
 
   setMapOpacity(mapId: string, opacity: number) {
@@ -408,23 +427,35 @@ export class WarpedMapLayer extends Layer {
   }
 
   // TODO: Use OL's renderer class, move this function there?
-  // TODO: finish this function, use extent and revision
   prepareFrameInternal(frameState: FrameState) {
-    // const vectorSource = this.source
-    // const viewState = frameState.viewState
+    const vectorSource = this.source
     const viewNotMoving =
       !frameState.viewHints[ViewHint.ANIMATING] &&
       !frameState.viewHints[ViewHint.INTERACTING]
-    const extentChanged = true // !equals(this.previousExtent_, frameState.extent)
-    const sourceChanged = true // this.sourceRevision_ < vectorSource.getRevision()
+    const extentChanged = !this.arraysEqual(
+      this.previousExtent,
+      frameState.extent
+    )
 
-    // if (sourceChanged) {
-    //   this.sourceRevision_ = vectorSource.getRevision()
-    // }
+    let sourceChanged = false
+    if (vectorSource) {
+      sourceChanged =
+        this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
 
-    if (viewNotMoving && (extentChanged || sourceChanged)) {
-      //   this.rebuildBuffers_(frameState);
-      //   this.previousExtent_ = frameState.extent.slice();
+      if (sourceChanged) {
+        this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
+      }
+    }
+
+    const layerChanged =
+      this.lastPreparedFrameLayerRevision < this.getRevision()
+
+    if (layerChanged) {
+      this.lastPreparedFrameLayerRevision = this.getRevision()
+    }
+
+    if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
+      this.previousExtent = frameState.extent?.slice() || null
 
       const projectionTransform = this.makeProjectionTransform(frameState)
       this.renderer.updateVertexBuffers(
