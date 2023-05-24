@@ -21,27 +21,40 @@ export class WarpedMapSource extends Source {
   }
 
   async addMap(map: unknown): Promise<string | Error> {
-    return this.world.addMap(map)
+    const result = this.world.addMap(map)
+    this.changed()
+
+    return result
   }
 
   async removeMap(map: unknown): Promise<string | Error> {
-    return this.world.removeMap(map)
+    const result = this.world.removeMap(map)
+    this.changed()
+
+    return result
   }
 
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    return this.world.addGeoreferenceAnnotation(annotation)
+    const results = this.world.addGeoreferenceAnnotation(annotation)
+    this.changed()
+
+    return results
   }
 
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    return this.world.removeGeoreferenceAnnotation(annotation)
+    const results = this.world.removeGeoreferenceAnnotation(annotation)
+    this.changed()
+
+    return results
   }
 
   clear() {
     this.world.clear()
+    this.changed()
   }
 
   getWorld() {
@@ -54,18 +67,22 @@ export class WarpedMapSource extends Source {
 
   showMap(mapId: string) {
     this.world.showMaps([mapId])
+    this.changed()
   }
 
   showMaps(mapIds: Iterable<string>) {
     this.world.showMaps(mapIds)
+    this.changed()
   }
 
   hideMap(mapId: string) {
     this.world.hideMaps([mapId])
+    this.changed()
   }
 
   hideMaps(mapIds: Iterable<string>) {
     this.world.hideMaps(mapIds)
+    this.changed()
   }
 
   isVisible(mapId: string) {
@@ -74,7 +91,10 @@ export class WarpedMapSource extends Source {
   }
 
   setPixelMask(mapId: string, pixelMask: Position[]) {
-    return this.world.setPixelMask(mapId, pixelMask)
+    const result = this.world.setPixelMask(mapId, pixelMask)
+    this.changed()
+
+    return result
   }
 
   getExtent(): BBox | undefined {
