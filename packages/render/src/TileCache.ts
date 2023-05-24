@@ -29,9 +29,10 @@ export default class TileCache extends EventTarget {
       const cachedTile = new CachedTile(neededTile)
 
       this.updateTilesLoadingCount(1)
+
       cachedTile.addEventListener(
-        WarpedMapEventType.TILEFETCHED,
-        this.tileFetched.bind(this)
+        WarpedMapEventType.TILELOADED,
+        this.tileLoaded.bind(this)
       )
       cachedTile.addEventListener(
         WarpedMapEventType.TILEFETCHERROR,
@@ -42,14 +43,6 @@ export default class TileCache extends EventTarget {
 
       this.cachedTilesByUrl.set(tileUrl, cachedTile)
     } else {
-      // Tile is already cached, emit TILEADDED event
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILEADDED, {
-          mapId,
-          tileUrl
-        })
-      )
-
       this.addTileUrlForMapId(mapId, tileUrl)
     }
 
@@ -84,7 +77,7 @@ export default class TileCache extends EventTarget {
     )
   }
 
-  private tileFetched(event: Event) {
+  private tileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { tileUrl } = event.data as WarpedMapTileEventDetail
 
@@ -92,13 +85,26 @@ export default class TileCache extends EventTarget {
 
       for (const mapId of this.mapIdsByTileUrl.get(tileUrl) || []) {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEADDED, {
+          new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
             mapId,
             tileUrl
           })
         )
 
         this.addTileUrlForMapId(mapId, tileUrl)
+
+        // Emit FIRSTTILELOADED events for mapId
+        const tileUrls = this.tileUrlsByMapId.get(mapId)
+        const firstTileUrl = tileUrls?.values().next().value
+
+        if (firstTileUrl === tileUrl) {
+          this.dispatchEvent(
+            new WarpedMapEvent(WarpedMapEventType.FIRSTTILELOADED, {
+              mapId,
+              tileUrl
+            })
+          )
+        }
       }
     }
   }
@@ -156,15 +162,6 @@ export default class TileCache extends EventTarget {
     }
 
     this.tileUrlsByMapId.set(mapId, tileUrls)
-
-    if (tileUrls.size === 1) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.FIRSTTILEADDED, {
-          mapId,
-          tileUrl
-        })
-      )
-    }
 
     return tileUrls
   }

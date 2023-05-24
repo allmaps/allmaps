@@ -137,7 +137,7 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.TILEADDED,
+      WarpedMapEventType.TILELOADED,
       this.changed.bind(this)
     )
 

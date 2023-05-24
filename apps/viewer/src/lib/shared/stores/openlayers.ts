@@ -103,7 +103,7 @@ function mapVectorLayerOrderFunction(
   return null
 }
 
-async function mapWarpedMapLayerFirstTileAdded(event: Event) {
+async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
   if (event instanceof WarpedMapEvent) {
     const { mapId, tileUrl } = event.data as { mapId: string; tileUrl: string }
 
@@ -125,7 +125,7 @@ async function mapWarpedMapLayerFirstTileAdded(event: Event) {
           setRemoveBackgroundColor(mapId, backgroundColor)
         }
       } else {
-        console.log('FOUT!')
+        console.warn(`Cannot detect background color for map ${mapId}`)
       }
     }
   }
@@ -146,8 +146,8 @@ export function createMapOl() {
 
   // TODO: emit this event directly from WarpedMapLayer?
   mapWarpedMapLayer.renderer.tileCache.addEventListener(
-    WarpedMapEventType.FIRSTTILEADDED,
-    mapWarpedMapLayerFirstTileAdded
+    WarpedMapEventType.FIRSTTILELOADED,
+    mapWarpedMapLayerFirstTileLoaded
   )
 
   mapVectorLayer = new VectorLayer({

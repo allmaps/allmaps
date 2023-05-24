@@ -32,7 +32,7 @@ export default class CachedTile extends EventTarget {
       this.imageBitmap = await createImageBitmap(image)
 
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+        new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
           tileUrl: this.tileUrl
         })
       )
