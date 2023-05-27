@@ -34,7 +34,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "npm types && npm lint && npm test",
+    "preversion": "npm run types && npm run lint && npm test",
     "test": "NODE_ENV=test mocha",
     "pretest": "npm run build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",

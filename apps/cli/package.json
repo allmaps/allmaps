@@ -36,7 +36,7 @@
     "build": "tsc && chmod +x dist/index.js",
     "test": "NODE_ENV=test mocha --slow 200ms",
     "pretest": "npm run build",
-    "preversion": "npm types && npm lint && npm test",
+    "preversion": "npm run types && npm run lint && npm test",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test"
