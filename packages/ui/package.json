@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.14",
+  "version": "1.0.0-beta.15",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -65,8 +65,8 @@
     "vite": "^4.3.0"
   },
   "peerDependencies": {
-    "svelte": "^3.55.0",
-    "@sveltejs/kit": "^1.5.0"
+    "@sveltejs/kit": "^1.5.0",
+    "svelte": "^3.55.0"
   },
   "dependencies": {
     "flowbite": "^1.6.4"

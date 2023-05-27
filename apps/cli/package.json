@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.10",
+  "version": "1.0.0-beta.11",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -50,9 +50,9 @@
   ],
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.12",
-    "@allmaps/iiif-parser": "^1.0.0-beta.23",
-    "@allmaps/transform": "^1.0.0-beta.13",
+    "@allmaps/annotation": "^1.0.0-beta.13",
+    "@allmaps/iiif-parser": "^1.0.0-beta.24",
+    "@allmaps/transform": "^1.0.0-beta.14",
     "commander": "^10.0.0",
     "stream-json": "^1.7.4",
     "svg-parser": "^2.0.4"
@@ -61,13 +61,13 @@
     "@types/node": "^18.14.2",
     "@types/stream-json": "^1.7.2",
     "@types/svg-parser": "^2.0.3",
-    "chai": "^4.3.6",
-    "eslint": "^8.35.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "chai": "^4.3.6",
+    "eslint": "^8.35.0",
     "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
     "typescript": "^5.0.0",
-    "zod": "^3.20.6",
-    "prettier": "^2.8.0"
+    "zod": "^3.20.6"
   }
 }
