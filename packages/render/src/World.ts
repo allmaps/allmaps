@@ -168,9 +168,17 @@ export default class World extends EventTarget {
 
     const maps = parseAnnotation(annotation)
 
-    for (const map of maps) {
-      const mapIdOrError = await this.addMapInternal(map)
-      results.push(mapIdOrError)
+    const settledResults = await Promise.allSettled(
+      maps.map((map) => this.addMapInternal(map))
+    )
+
+    // TODO: make sure reason contains Error
+    for (const settledResult of settledResults) {
+      if (settledResult.status === 'fulfilled') {
+        results.push(settledResult.value)
+      } else {
+        results.push(settledResult.reason)
+      }
     }
 
     this.dispatchEvent(

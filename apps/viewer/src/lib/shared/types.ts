@@ -34,12 +34,12 @@ export type Parsed =
 
 export type ViewerMap = {
   sourceId: string
-  mapId: string
-  map: Map
 
+  mapId: string
+  error?: Error
+
+  map: Map
   index: number
-  // order: number
-  // path: string
 
   annotation: Annotation | AnnotationPage
 
@@ -47,6 +47,8 @@ export type ViewerMap = {
   renderOptions: RenderOptions
   state: MapState
 }
+
+export type MapIDOrError = string | Error
 
 export type MapState = {
   visible: boolean

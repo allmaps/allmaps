@@ -7,6 +7,7 @@ import {
   WarpedMapEvent,
   WarpedMapEventType
 } from '@allmaps/openlayers'
+import type { Map as Georef } from '@allmaps/annotation'
 
 import Map from 'ol/Map.js'
 import { Vector as VectorSource } from 'ol/source'
@@ -28,7 +29,7 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
-import type { ViewerMap } from '$lib/shared/types.js'
+import type { MapIDOrError, ViewerMap } from '$lib/shared/types.js'
 import type FeatureLike from 'ol/Feature'
 import type { OrderFunction } from 'ol/render'
 
@@ -220,14 +221,24 @@ export function hideMap(mapId: string) {
   }
 }
 
-export async function addMap(viewerMap: ViewerMap) {
-  await mapWarpedMapSource.addMap(viewerMap.map)
-  addMapToVectorSource(viewerMap.mapId)
+export async function addMap(map: Georef): Promise<MapIDOrError> {
+  const mapIdOrError = await mapWarpedMapSource.addMap(map)
+  if (typeof mapIdOrError === 'string') {
+    const mapId = mapIdOrError
+    addMapToVectorSource(mapId)
+  }
+
+  return mapIdOrError
 }
 
-export async function removeMap(viewerMap: ViewerMap) {
-  await mapWarpedMapSource.removeMap(viewerMap.map)
-  removeMapFromVectorSource(viewerMap.mapId)
+export async function removeMap(map: Georef) {
+  const mapIdOrError = await mapWarpedMapSource.removeMap(map)
+  if (typeof mapIdOrError === 'string') {
+    const mapId = mapIdOrError
+    removeMapFromVectorSource(mapId)
+  }
+
+  return mapIdOrError
 }
 
 export function addMapToVectorSource(mapId: string) {
