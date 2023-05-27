@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.14",
+  "version": "1.0.0-beta.15",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -59,13 +59,13 @@
   "homepage": "https://allmaps.org",
   "devDependencies": {
     "@types/node": "^18.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
     "documentation": "^14.0.0",
     "eslint": "^8.35.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
     "mocha": "^8.4.0",
-    "typescript": "^5.0.0",
-    "prettier": "^2.8.0"
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
   }
 }

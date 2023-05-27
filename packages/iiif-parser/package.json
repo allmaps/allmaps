@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-beta.23",
+  "version": "1.0.0-beta.24",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -45,14 +45,14 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^18.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
     "mocha": "^8.4.0",
-    "typescript": "^5.0.0",
-    "prettier": "^2.8.0"
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
     "zod": "^3.20.6"
