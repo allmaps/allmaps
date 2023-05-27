@@ -45,7 +45,7 @@
     "pretest": "npm run build",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "preversion": "npm types && npm lint && npm test"
+    "preversion": "npm run types && npm run lint && npm test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
