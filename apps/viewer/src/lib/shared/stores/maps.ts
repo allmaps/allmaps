@@ -1,7 +1,11 @@
 import { writable, derived, get } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id/browser'
-import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
+import {
+  parseAnnotation,
+  generateAnnotation,
+  type Map as Georef
+} from '@allmaps/annotation'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { fromHue } from '$lib/shared/color.js'
@@ -22,46 +26,69 @@ export const mapsById = writable<SourceMaps>(new Map())
 
 export const mapIndex = writable<number[]>([])
 
+// async function addMap () {
+export type MapIDOrError = string | Error
+// }
+
+async function createAndAddViewerMap(
+  sourceId: string,
+  index: number,
+  map: Georef
+): Promise<ViewerMap> {
+  const mapIdOrError = await addMap(map)
+
+  let mapId
+  if (typeof mapIdOrError === 'string') {
+    mapId = mapIdOrError
+  } else {
+    mapId = await generateChecksum(map)
+  }
+
+  const viewerMap: ViewerMap = {
+    sourceId,
+    mapId,
+    error: mapIdOrError instanceof Error ? mapIdOrError : undefined,
+    index,
+    map,
+    annotation: generateAnnotation(map),
+    opacity: 1,
+    state: {
+      visible: true,
+      selected: false,
+      highlighted: false
+    },
+    renderOptions: getDefaultRenderOptions({
+      colorize: {
+        enabled: false,
+        color: fromHue((index * 60) % 360)
+      }
+    })
+  }
+
+  return viewerMap
+}
+
 export async function addAnnotation(sourceId: string, json: unknown) {
   let startIndex = get(mapCount)
 
   const maps = parseAnnotation(json)
 
-  const mapIds: string[] = []
+  const mapIds: MapIDOrError[] = []
 
   if (maps.length) {
     const newViewerMaps: ViewerMap[] = []
 
-    for (const map of maps) {
-      const mapId = map.id || (await generateChecksum(map))
+    const settledResults = await Promise.allSettled(
+      maps.map((map) => createAndAddViewerMap(sourceId, startIndex++, map))
+    )
 
-      const viewerMap: ViewerMap = {
-        sourceId,
-        mapId,
-        index: startIndex++,
-        map,
-        annotation: generateAnnotation(map),
-        opacity: 1,
-        state: {
-          visible: true,
-          selected: false,
-          highlighted: false
-        },
-        renderOptions: getDefaultRenderOptions({
-          colorize: {
-            enabled: false,
-            color: fromHue((startIndex * 60) % 360)
-          }
-        })
+    for (const settledResult of settledResults) {
+      if (settledResult.status === 'fulfilled') {
+        const viewerMap = settledResult.value
+        newViewerMaps.push(viewerMap)
+      } else {
+        console.warn('Error adding map', settledResult.reason)
       }
-
-      // viewerMap.renderOptions.colorize.color = fromHue(
-      //   (viewerMap.index * 60) % 360
-      // )
-
-      newViewerMaps.push(viewerMap)
-      mapIds.push(mapId)
-      await addMap(viewerMap)
     }
 
     mapsById.update(($mapsById) => {
@@ -124,10 +151,10 @@ export function setRemoveBackgroundColor(
 
 export async function removeAnnotation(sourceId: string) {
   mapsById.update(($mapsById) => {
-    for (const [id, map] of $mapsById.entries()) {
-      if (map.sourceId === sourceId) {
+    for (const [id, viewerMap] of $mapsById.entries()) {
+      if (viewerMap.sourceId === sourceId) {
         $mapsById.delete(id)
-        removeMap(map)
+        removeMap(viewerMap.map)
       }
     }
 
