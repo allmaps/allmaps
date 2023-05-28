@@ -30,7 +30,8 @@
   import {
     createMapOl,
     createImageOl,
-    createImageInfoCache
+    createImageInfoCache,
+    mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
 
   import Container from '$lib/components/Container.svelte'
@@ -92,6 +93,8 @@
       $view = 'list'
     } else if (event.key === '3') {
       $view = 'image'
+    } else if (event.key === 'm') {
+      $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
     }
   }
 

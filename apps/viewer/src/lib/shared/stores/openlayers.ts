@@ -20,7 +20,8 @@ import { click } from 'ol/events/condition.js'
 
 import {
   selectedPolygonStyle,
-  invisiblePolygonStyle
+  invisiblePolygonStyle,
+  outlinePolygonStyle
 } from '$lib/shared/openlayers.js'
 
 import { view } from '$lib/shared/stores/view.js'
@@ -29,7 +30,7 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
-import type { MapIDOrError, ViewerMap } from '$lib/shared/types.js'
+import type { MapIDOrError } from '$lib/shared/types.js'
 import type FeatureLike from 'ol/Feature'
 import type { OrderFunction } from 'ol/render'
 
@@ -174,6 +175,18 @@ export function createMapOl() {
 
   mapOl.addInteraction(mapSelect)
 }
+
+export const mapVectorLayerOutlinesVisible = writable(false)
+
+mapVectorLayerOutlinesVisible.subscribe(($mapVectorLayerOutlinesVisible) => {
+  if (mapVectorLayer) {
+    if ($mapVectorLayerOutlinesVisible) {
+      mapVectorLayer.setStyle(outlinePolygonStyle)
+    } else {
+      mapVectorLayer.setStyle(invisiblePolygonStyle)
+    }
+  }
+})
 
 // Image view
 
