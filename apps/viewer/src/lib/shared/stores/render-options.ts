@@ -30,10 +30,7 @@ export function setRenderOptionsForMap(
       }
 
       if (mapWarpedMapLayer) {
-        if (
-          viewerMap.renderOptions.removeBackground.threshold > 0 &&
-          viewerMap.renderOptions.removeBackground.color
-        ) {
+        if (viewerMap.renderOptions.removeBackground.color) {
           mapWarpedMapLayer.setMapRemoveBackground(mapId, {
             hexColor: viewerMap.renderOptions.removeBackground.color,
             threshold: viewerMap.renderOptions.removeBackground.threshold,
@@ -42,6 +39,7 @@ export function setRenderOptionsForMap(
         } else {
           mapWarpedMapLayer.resetMapRemoveBackground(mapId)
         }
+
         if (
           viewerMap.renderOptions.colorize.enabled &&
           viewerMap.renderOptions.colorize.color
