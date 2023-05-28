@@ -10,7 +10,10 @@ import type { Map } from '@allmaps/annotation'
 export let detectBackgroundColor: (
   map: Map,
   imageBitmap: ImageBitmap
-) => Promise<string | undefined>
+) => Promise<string | undefined> = async () => {
+  console.warn('Detect background Web Worker not yet initialized')
+  return undefined
+}
 
 async function initialize() {
   const worker = new DetectBackgroundColorWorker()
