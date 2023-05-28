@@ -49,7 +49,7 @@
   if (browser) {
     document.addEventListener('keyup', (event: KeyboardEvent) => {
       const target = event.target as Element
-      if (event.key === '/' && target.nodeName !== 'input') {
+      if (event.key === '/' && target.nodeName.toLowerCase() !== 'input') {
         selectInputText()
       }
     })

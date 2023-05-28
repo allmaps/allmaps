@@ -75,7 +75,7 @@
 
   function handleKeyup(event: KeyboardEvent) {
     const target = event.target as Element
-    if (target.nodeName === 'input') {
+    if (target.nodeName.toLowerCase() === 'input') {
       return
     }
 
