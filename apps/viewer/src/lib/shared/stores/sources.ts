@@ -8,7 +8,10 @@ import {
   removeAnnotation,
   resetMaps
 } from '$lib/shared/stores/maps.js'
-import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
+import {
+  mapWarpedMapSource,
+  mapVectorSource
+} from '$lib/shared/stores/openlayers.js'
 
 import { parseJson } from '$lib/shared/parser.js'
 
@@ -106,6 +109,7 @@ export function removeSource(id: string) {
 
 export function resetSources() {
   mapWarpedMapSource.clear()
+  mapVectorSource.clear()
 
   sourcesStore.set(new Map())
   resetMaps()
