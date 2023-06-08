@@ -1,36 +1,58 @@
 import { z } from 'zod'
 
 import {
-  StringValue2Schema,
+  PossibleLanguageValue2Schema,
   Metadata2Schema
 } from '../schemas/presentation.2.js'
 import {
-  StringValue3Schema,
+  LanguageValue3Schema,
   Metadata3Schema
 } from '../schemas/presentation.3.js'
 
-import type { Metadata } from '../lib/types.js'
+import type { LanguageString, Metadata } from '../lib/types.js'
 
-type StringValue2Type = z.infer<typeof StringValue2Schema>
+type PossibleLanguageValue2Type = z.infer<typeof PossibleLanguageValue2Schema>
 type Metadata2Type = z.infer<typeof Metadata2Schema>
 
-type StringValue3Type = z.infer<typeof StringValue3Schema>
 type Metadata3Type = z.infer<typeof Metadata3Schema>
 
-export function parseVersion2String(str?: StringValue2Type): StringValue3Type {
-  if (typeof str === 'string') {
+export const LanguageString3Schema = z.record(z.string(), z.string().array())
+
+export const MetadataStringItem3Schema = z.object({
+  label: LanguageString3Schema.optional(),
+  value: LanguageString3Schema.optional()
+})
+
+// export const MetadataString3Schema = MetadataStringItem3Schema.array()
+
+type LanguageValue3Type = z.infer<typeof LanguageValue3Schema>
+// type MetadataString3Type = z.infer<typeof MetadataString3Schema>
+
+export function parseVersion2String(
+  str?: PossibleLanguageValue2Type
+): LanguageString {
+  // TODO: use type guards!
+  if (
+    typeof str === 'string' ||
+    typeof str === 'number' ||
+    typeof str === 'boolean'
+  ) {
     return {
-      none: [str]
+      none: [String(str)]
     }
   } else if (Array.isArray(str)) {
-    let strings: StringValue3Type = {}
+    let strings: LanguageString = {}
 
     str.forEach((item) => {
-      if (typeof item === 'string') {
+      if (
+        typeof item === 'string' ||
+        typeof item === 'number' ||
+        typeof item === 'boolean'
+      ) {
         if (!strings['none']) {
           strings['none'] = []
         }
-        strings['none'].push(item)
+        strings['none'].push(String(item))
       } else if (typeof item === 'object') {
         // TODO: find test input data for this scenario
         strings = { ...strings, ...parseVersion2String(item) }
@@ -42,7 +64,7 @@ export function parseVersion2String(str?: StringValue2Type): StringValue3Type {
     return strings
   } else if (str && typeof str === 'object') {
     const language = str['@language'] || 'none'
-    const value = str['@value']
+    const value = String(str['@value'])
 
     return {
       [language]: Array.isArray(value) ? value : [value]
@@ -52,9 +74,25 @@ export function parseVersion2String(str?: StringValue2Type): StringValue3Type {
   }
 }
 
+export function parseVersion3String(
+  str?: LanguageValue3Type
+): LanguageString | undefined {
+  if (!str) {
+    return
+  }
+
+  const parsedStr: LanguageString = {}
+
+  for (const language in str) {
+    parsedStr[language] = str[language].map((item) => String(item))
+  }
+
+  return parsedStr
+}
+
 export function parseVersion2Metadata(
   metadata: Metadata2Type | undefined
-): Metadata3Type | undefined {
+): Metadata | undefined {
   if (metadata?.length) {
     return (
       metadata
@@ -83,10 +121,13 @@ export function filterInvalidMetadata(
   // a simple filter function. For now, do this:
   const filteredMetadata: Metadata = []
   for (const item of metadata) {
-    if (item.label && item.value) {
+    const label = parseVersion3String(item.label)
+    const value = parseVersion3String(item.value)
+
+    if (label && value) {
       filteredMetadata.push({
-        label: item.label,
-        value: item.value
+        label,
+        value
       })
     }
   }

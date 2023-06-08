@@ -1,0 +1,115 @@
+{
+  "embedded": false,
+  "type": "manifest",
+  "uri": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif",
+  "majorVersion": 3,
+  "label": {
+    "none": ["Use of property, 1922"]
+  },
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 9731,
+      "height": 11333,
+      "uri": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0",
+      "label": {
+        "none": ["P0234-gmap-G3764_B6G4_1922.tif"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 9731,
+        "height": 11333
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "none": ["Contributor"]
+      },
+      "value": {
+        "none": [
+          "Comey, Arthur C. (Arthur Coleman), 1886-1954 (Cartographer)",
+          "Boston (Mass.). City Planning Board (Contributor)",
+          "Walker Lith. & Pub. Co. (Contributor)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["1923"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Department"]
+      },
+      "value": {
+        "none": ["Government & Geographic Information Collection"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Dimensions"]
+      },
+      "value": {
+        "none": ["60 x 52 cm"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Genre"]
+      },
+      "value": {
+        "none": ["maps (documents)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Last Modified"]
+      },
+      "value": {
+        "none": ["2021-06-10T16:43:09.761465Z"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Materials"]
+      },
+      "value": {
+        "none": ["color map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "none": ["Boston : City Planning Board"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Rights Statement"]
+      },
+      "value": {
+        "none": ["No Copyright - United States"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject"]
+      },
+      "value": {
+        "none": ["Massachusetts--Boston", "Land use, Urban", "Maps"]
+      }
+    }
+  ]
+}

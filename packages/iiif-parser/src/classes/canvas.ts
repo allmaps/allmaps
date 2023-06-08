@@ -6,6 +6,7 @@ import { CanvasSchema } from '../schemas/iiif.js'
 import type { LanguageString, Metadata } from '../lib/types.js'
 import {
   parseVersion2String,
+  parseVersion3String,
   parseVersion2Metadata,
   filterInvalidMetadata
 } from '../lib/strings.js'
@@ -52,7 +53,7 @@ export class Canvas {
 
       this.uri = parsedCanvas.id
 
-      this.label = parsedCanvas.label
+      this.label = parseVersion3String(parsedCanvas.label)
       this.metadata = filterInvalidMetadata(parsedCanvas.metadata)
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body

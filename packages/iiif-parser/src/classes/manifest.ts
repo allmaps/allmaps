@@ -14,6 +14,7 @@ import { Canvas } from './canvas.js'
 
 import {
   parseVersion2String,
+  parseVersion3String,
   parseVersion2Metadata,
   filterInvalidMetadata
 } from '../lib/strings.js'
@@ -57,7 +58,7 @@ export class EmbeddedManifest {
       this.uri = parsedManifest.id
       this.majorVersion = 3
 
-      this.label = parsedManifest.label
+      this.label = parseVersion3String(parsedManifest.label)
     } else {
       throw new Error('Unsupported Manifest')
     }
