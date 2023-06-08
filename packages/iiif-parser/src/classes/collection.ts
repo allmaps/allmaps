@@ -16,7 +16,7 @@ import type {
   FetchNextOptions,
   FetchNextResults
 } from '../lib/types.js'
-import { parseVersion2String } from '../lib/strings.js'
+import { parseVersion2String, parseVersion3String } from '../lib/strings.js'
 
 type CollectionType = z.infer<typeof CollectionSchema>
 
@@ -64,7 +64,7 @@ export class Collection {
       this.uri = parsedCollection.id
       this.majorVersion = 3
 
-      this.label = parsedCollection.label
+      this.label = parseVersion3String(parsedCollection.label)
 
       this.items = parsedCollection.items.map((item) => {
         if (item.type === 'Collection') {

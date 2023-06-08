@@ -5,11 +5,15 @@ import { z } from 'zod'
 
 import { ImageServiceSchema } from './image-service.js'
 
-export const StringValue3Schema = z.record(z.string(), z.string().array())
+export const SingleValue3Schema = z.string().or(z.number()).or(z.boolean())
+export const LanguageValue3Schema = z.record(
+  z.string(),
+  SingleValue3Schema.array()
+)
 
 export const MetadataItem3Schema = z.object({
-  label: StringValue3Schema.optional(),
-  value: StringValue3Schema.optional()
+  label: LanguageValue3Schema.optional(),
+  value: LanguageValue3Schema.optional()
 })
 
 export const Metadata3Schema = MetadataItem3Schema.array()
@@ -37,7 +41,7 @@ export const Canvas3Schema = z.object({
   width: z.number().int(),
   height: z.number().int(),
   items: AnnotationPage3Schema.array().length(1),
-  label: StringValue3Schema.optional(),
+  label: LanguageValue3Schema.optional(),
   metadata: Metadata3Schema.optional()
 })
 
@@ -45,21 +49,21 @@ export const Manifest3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Manifest'),
   items: Canvas3Schema.array().nonempty(),
-  label: StringValue3Schema.optional(),
-  description: StringValue3Schema.optional(),
+  label: LanguageValue3Schema.optional(),
+  description: LanguageValue3Schema.optional(),
   metadata: Metadata3Schema.optional()
 })
 
 export type EmbeddedManifest3 = {
   id: string
   type: 'Manifest'
-  label?: z.infer<typeof StringValue3Schema>
+  label?: z.infer<typeof LanguageValue3Schema>
 }
 
 export type Collection3 = {
   id: string
   type: 'Collection'
-  label?: z.infer<typeof StringValue3Schema>
+  label?: z.infer<typeof LanguageValue3Schema>
   items: (EmbeddedManifest3 | Collection3)[]
 }
 
@@ -68,7 +72,7 @@ export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
     z.object({
       id: z.string().url(),
       type: z.literal('Manifest'),
-      label: StringValue3Schema.optional()
+      label: LanguageValue3Schema.optional()
     })
 )
 
@@ -77,7 +81,7 @@ export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
   z.object({
     id: z.string().url(),
     type: z.literal('Collection'),
-    label: StringValue3Schema.optional(),
+    label: LanguageValue3Schema.optional(),
     items: EmbeddedManifest3Schema.or(Collection3Schema).array()
   })
 )
