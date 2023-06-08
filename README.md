@@ -53,6 +53,19 @@ And then use lerna with `--scope` to select a single app:
 
     npx lerna run --scope "@allmaps/viewer" dev
 
+You can also directly run the `dev` script from a single app:
+
+    cd apps/viewer
+    pnpm run dev
+
+## Commit changes
+
+This repository uses [Husky](https://typicode.github.io/husky/) to run type checking, code linting and tests before each commit.
+
+To skip these tests, you can use git's `--no-verify` option:
+
+    git commit --no-verify
+
 ## Check formatting and types
 
 Check TypeScript types for all packages:
