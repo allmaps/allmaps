@@ -59,7 +59,11 @@ export default class World extends EventTarget {
       //  - https://github.com/w8r/martinez
       //  - https://github.com/mfogel/polygon-clipping
 
-      const transformer = new GCPTransformer(sphericalMercatorGcps)
+      // TODO: make the transformation type tunabel by user
+      const transformer = new GCPTransformer(
+        sphericalMercatorGcps,
+        'thin-plate-spline'
+      )
       const geoMask = transformer.toGeoJSONPolygon(pixelMask)
 
       const fullPixelMask: Position[] = [

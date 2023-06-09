@@ -1,5 +1,6 @@
 import potpack from 'potpack'
-import earcut from 'earcut'
+import { triangulate } from '@allmaps/triangulate'
+import { computeBBox } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import { createBuffer } from './shared/webgl2.js'
@@ -13,6 +14,7 @@ import type {
   RenderOptions,
   GeoJSONPolygon
 } from './shared/types.js'
+import { BBox } from '@allmaps/types'
 
 // TODO: Move to stdlib?
 const THROTTLE_WAIT_MS = 50
@@ -22,6 +24,9 @@ const THROTTLE_OPTIONS = {
 }
 
 const DEFAULT_OPACITY = 1
+
+// TODO: Consider making this tunable by the user.
+const DIAMETER_FRACTION = 40
 
 export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
@@ -90,27 +95,22 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   updateTriangulation(warpedMap: WarpedMap) {
-    // Todo: replace earcut of pixelmask to constrained triangulation of pixelmask
-
-    const flattenedPixelMask = earcut.flatten([warpedMap.pixelMask])
-
-    const vertexPixelMaskIndices = earcut(
-      flattenedPixelMask.vertices,
-      flattenedPixelMask.holes,
-      flattenedPixelMask.dimensions
+    const bbox: BBox = computeBBox(warpedMap.pixelMask)
+    const bboxDiameter: number = Math.sqrt(
+      (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
     )
 
-    const pixelMaskVertices = vertexPixelMaskIndices.map((index) => [
-      flattenedPixelMask.vertices[index * 2],
-      flattenedPixelMask.vertices[index * 2 + 1]
-    ])
+    const trianglesPositions = triangulate(
+      warpedMap.pixelMask,
+      bboxDiameter / DIAMETER_FRACTION
+    ).flat()
 
-    const geoMaskVertices = pixelMaskVertices.map((point) =>
+    const geoMaskVertices = trianglesPositions.map((point) =>
       warpedMap.transformer.toWorld(point as [number, number])
     )
 
     this.geoMaskTriangles = geoMaskVertices.flat()
-    this.pixelMaskTriangles = pixelMaskVertices.flat()
+    this.pixelMaskTriangles = trianglesPositions.flat()
 
     this.transformedGeoMaskTriangles = new Float32Array(
       this.geoMaskTriangles.length
@@ -149,12 +149,12 @@ export default class WebGL2WarpedMap extends EventTarget {
         this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
       }
 
-      console.log(
-        this.pixelMaskTriangles,
-        this.transformedPixelMaskTriangles,
-        this.geoMaskTriangles,
-        this.transformedGeoMaskTriangles
-      )
+      // console.log(
+      //   this.pixelMaskTriangles,
+      //   this.transformedPixelMaskTriangles,
+      //   this.geoMaskTriangles,
+      //   this.transformedGeoMaskTriangles
+      // )
 
       createBuffer(
         this.gl,

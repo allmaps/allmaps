@@ -4,6 +4,7 @@
     { "path": "./packages/types" },
     { "path": "./packages/id" },
     { "path": "./packages/transform" },
+    { "path": "./packages/triangulate" },
     { "path": "./packages/render" },
     { "path": "./packages/annotation" },
     { "path": "./packages/iiif-parser" },
