@@ -43,6 +43,8 @@ export default class WebGL2WarpedMap extends EventTarget {
   pixelMaskTriangles: number[] = []
   transformedPixelMaskTriangles: Float32Array = new Float32Array()
 
+  // pixelTriangleIndex: Float32Array = new Float32Array() // DEV
+
   vao: WebGLVertexArrayObject | null
 
   tilesForTexture: Map<string, CachedTile> = new Map()
@@ -149,6 +151,15 @@ export default class WebGL2WarpedMap extends EventTarget {
         this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
       }
 
+      // // DEV Compute triangle indeces, used for development purposes
+      // this.pixelTriangleIndex = new Float32Array(this.pixelMaskTriangles.length)
+
+      // for (let index = 0; index < this.pixelMaskTriangles.length; index++) {
+      //   this.pixelTriangleIndex[3 * index] = index
+      //   this.pixelTriangleIndex[3 * index + 1] = index
+      //   this.pixelTriangleIndex[3 * index + 2] = index
+      // }
+
       // console.log(
       //   this.pixelMaskTriangles,
       //   this.transformedPixelMaskTriangles,
@@ -171,6 +182,15 @@ export default class WebGL2WarpedMap extends EventTarget {
         2,
         'a_pixel_position'
       )
+
+      // // DEV
+      // createBuffer(
+      //   this.gl,
+      //   this.program,
+      //   this.pixelTriangleIndex,
+      //   1,
+      //   'a_pixel_triangle_index'
+      // )
     }
   }
 
