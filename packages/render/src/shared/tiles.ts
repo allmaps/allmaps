@@ -1,6 +1,6 @@
 import { Image } from '@allmaps/iiif-parser'
 
-import type { GCPTransformInfo } from '@allmaps/transform'
+import type { GCPTransformerInterface } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
 import { computeBBox } from './bbox.js'
@@ -200,7 +200,7 @@ function iiifTilesByXToArray(
 }
 
 export function computeIiifTilesForMapGeoBBox(
-  transformer: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   image: Image,
   viewportSize: Size,
   geoBBox: BBox

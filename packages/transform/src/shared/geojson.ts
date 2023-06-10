@@ -3,10 +3,6 @@ import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 import { rewindGeometry } from '@placemarkio/geojson-rewind'
 
-import { toWorld, toImage } from './transformer.js'
-
-import type { GCPTransformInfo } from './gdaltransform.js'
-
 import type {
   Position,
   GeoJSONPoint,
@@ -15,15 +11,21 @@ import type {
   Segment,
   ImageWorldPosition,
   TransformOptions,
+  GCPTransformerInterface,
   OptionalTransformOptions
-} from './shared/types.js'
+} from './types.js'
 
 function mergeDefaultOptions(
   options?: OptionalTransformOptions
 ): TransformOptions {
   const mergedOptions = {
+    close: false,
     maxOffsetRatio: 0,
     maxDepth: 0
+  }
+
+  if (options && options.close !== undefined) {
+    mergedOptions.close = options.close
   }
 
   if (options && options.maxDepth !== undefined) {
@@ -61,14 +63,14 @@ function makeGeoJSONPolygon(points: Position[]): GeoJSONPolygon {
 }
 
 export function toGeoJSONPoint(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   point: Position
 ): GeoJSONPoint {
-  return makeGeoJSONPoint(toWorld(transformArgs, point))
+  return makeGeoJSONPoint(transformer.toWorld(point))
 }
 
 export function toGeoJSONLineString(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   points: Position[],
   options?: OptionalTransformOptions
 ): GeoJSONLineString {
@@ -80,12 +82,12 @@ export function toGeoJSONLineString(
 
   const imageWorldPoints = points.map((point) => ({
     image: point,
-    world: toWorld(transformArgs, point)
+    world: transformer.toWorld(point)
   }))
 
   const segments = getSegments(imageWorldPoints)
   const segmentsWithMidpoints = recursivelyAddWorldMidpoints(
-    transformArgs,
+    transformer,
     segments,
     mergedOptions
   )
@@ -97,7 +99,7 @@ export function toGeoJSONLineString(
 }
 
 export function toGeoJSONPolygon(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   points: Position[],
   options?: OptionalTransformOptions
 ): GeoJSONPolygon {
@@ -109,12 +111,12 @@ export function toGeoJSONPolygon(
 
   const imageWorldPoints = points.map((point) => ({
     image: point,
-    world: toWorld(transformArgs, point)
+    world: transformer.toWorld(point)
   }))
 
   const segments = getSegments(imageWorldPoints, true)
   const segmentsWithMidpoints = recursivelyAddWorldMidpoints(
-    transformArgs,
+    transformer,
     segments,
     mergedOtions
   )
@@ -126,14 +128,14 @@ export function toGeoJSONPolygon(
 }
 
 export function fromGeoJSONPoint(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   point: GeoJSONPoint
 ): Position {
-  return toImage(transformArgs, point.coordinates)
+  return transformer.toResource(point.coordinates)
 }
 
 export function fromGeoJSONLineString(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   lineString: GeoJSONLineString,
   options?: OptionalTransformOptions
 ): Position[] {
@@ -146,13 +148,13 @@ export function fromGeoJSONLineString(
   }
 
   const imageWorldPoints = coordinates.map((coordinate) => ({
-    image: toImage(transformArgs, coordinate),
+    image: transformer.toResource(coordinate),
     world: coordinate
   }))
 
   const segments = getSegments(imageWorldPoints)
   const segmentsWithMidpoints = recursivelyAddImageMidpoints(
-    transformArgs,
+    transformer,
     segments,
     mergedOtions
   )
@@ -164,7 +166,7 @@ export function fromGeoJSONLineString(
 }
 
 export function fromGeoJSONPolygon(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   polygon: GeoJSONPolygon,
   options?: OptionalTransformOptions
 ): Position[] {
@@ -177,13 +179,13 @@ export function fromGeoJSONPolygon(
   }
 
   const imageWorldPoints = coordinates.map((coordinates) => ({
-    image: toImage(transformArgs, coordinates),
+    image: transformer.toResource(coordinates),
     world: coordinates
   }))
 
   const segments = getSegments(imageWorldPoints)
   const segmentsWithMidpoints = recursivelyAddImageMidpoints(
-    transformArgs,
+    transformer,
     segments,
     mergedOtions
   )
@@ -209,7 +211,7 @@ function getSegments(points: ImageWorldPosition[], close = false): Segment[] {
 }
 
 function recursivelyAddWorldMidpoints(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -218,12 +220,12 @@ function recursivelyAddWorldMidpoints(
   }
 
   return segments
-    .map((segment) => addWorldMidpoints(transformArgs, segment, options, 0))
+    .map((segment) => addWorldMidpoints(transformer, segment, options, 0))
     .flat(1)
 }
 
 function recursivelyAddImageMidpoints(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -232,12 +234,12 @@ function recursivelyAddImageMidpoints(
   }
 
   return segments
-    .map((segment) => addImageMidpoints(transformArgs, segment, options, 0))
+    .map((segment) => addImageMidpoints(transformer, segment, options, 0))
     .flat(1)
 }
 
 function addWorldMidpoints(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
@@ -249,7 +251,7 @@ function addWorldMidpoints(
     makeGeoJSONPoint(segment.to.world)
   )
   const actualWorldMidpoint = makeGeoJSONPoint(
-    toWorld(transformArgs, imageMidpoint)
+    transformer.toWorld(imageMidpoint)
   )
 
   const distanceSegment = getWorldDistance(
@@ -275,13 +277,13 @@ function addWorldMidpoints(
 
     return [
       addWorldMidpoints(
-        transformArgs,
+        transformer,
         { from: segment.from, to: newSegmentMidpoint },
         options,
         depth + 1
       ),
       addWorldMidpoints(
-        transformArgs,
+        transformer,
         { from: newSegmentMidpoint, to: segment.to },
         options,
         depth + 1
@@ -293,7 +295,7 @@ function addWorldMidpoints(
 }
 
 function addImageMidpoints(
-  transformArgs: GCPTransformInfo,
+  transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
@@ -304,8 +306,7 @@ function addImageMidpoints(
     segment.from.image,
     segment.to.image
   )
-  const actualImageMidpoint = toImage(
-    transformArgs,
+  const actualImageMidpoint = transformer.toResource(
     worldMidpoint.geometry.coordinates as Position
   )
 
@@ -329,13 +330,13 @@ function addImageMidpoints(
 
     return [
       addImageMidpoints(
-        transformArgs,
+        transformer,
         { from: segment.from, to: newSegmentMidpoint },
         options,
         depth + 1
       ),
       addWorldMidpoints(
-        transformArgs,
+        transformer,
         { from: newSegmentMidpoint, to: segment.to },
         options,
         depth + 1

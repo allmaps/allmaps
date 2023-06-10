@@ -1,44 +1,139 @@
+import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
+import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
+
+import { distanceThinPlate } from './shared/distance-functions.js'
+
 import {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
-} from './gdaltransform.js'
+  toGeoJSONPoint,
+  toGeoJSONLineString,
+  toGeoJSONPolygon,
+  fromGeoJSONPoint,
+  fromGeoJSONLineString,
+  fromGeoJSONPolygon
+} from './shared/geojson.js'
 
-import type { Position, ImageWorldPosition } from './shared/types.js'
+import type {
+  GCPTransformerInterface,
+  TransformationType,
+  OptionalTransformOptions,
+  Position,
+  ImageWorldPosition,
+  GeoJSONGeometry,
+  GeoJSONPoint,
+  GeoJSONLineString,
+  GeoJSONPolygon
+} from './shared/types.js'
 
-import type { GCPTransformInfo } from './gdaltransform.js'
-
-export function toWorld(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = false
-
-  const input = [{ x: point[0], y: point[1] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
-
-  return [output[0].y, output[0].x]
-}
-
-export function toImage(
-  transformArgs: GCPTransformInfo,
-  point: Position
-): Position {
-  const bInverse = true
-
-  const input = [{ x: point[1], y: point[0] }]
-  const output = GDALGCPTransform(transformArgs, bInverse, input)
-
-  return [output[0].x, output[0].y]
-}
-
-export function createTransformer(
+export default class GCPTransformer implements GCPTransformerInterface {
   gcps: ImageWorldPosition[]
-): GCPTransformInfo {
-  const pasGCPs = gcps.map(
-    (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
-  )
+  transformer: GCPTransformerInterface
 
-  const nOrder = 0
-  return GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+  constructor(
+    gcps: ImageWorldPosition[],
+    type: TransformationType = 'polynomial'
+    // options: TransformationOptions
+  ) {
+    this.gcps = gcps
+
+    if (type === 'polynomial') {
+      this.transformer = new PolynomialGCPTransformer(gcps)
+    } else if (type === 'thin-plate-spline') {
+      this.transformer = new RadialBasisFunctionGCPTransformer(
+        gcps,
+        distanceThinPlate
+      )
+    } else {
+      throw new Error(`Unsupported transformation type: ${type}`)
+    }
+  }
+
+  toWorld(point: Position): Position {
+    return this.transformer.toWorld(point)
+  }
+
+  toResource(point: Position): Position {
+    return this.transformer.toResource(point)
+  }
+
+  toGeoJSON(point: Position): GeoJSONGeometry
+  toGeoJSON(
+    points: Position[],
+    options?: OptionalTransformOptions
+  ): GeoJSONGeometry
+
+  toGeoJSON(
+    pointOrPoints: Position[] | Position,
+    options?: OptionalTransformOptions
+  ): GeoJSONGeometry {
+    // TODO: also support empty point and points arrays by throwing error
+    const isPoints = Array.isArray(pointOrPoints[0])
+
+    let point: Position
+    let points: Position[]
+
+    if (isPoints) {
+      points = pointOrPoints as Position[]
+      const close = options && options.close
+
+      if (close) {
+        return toGeoJSONPolygon(this, points, options)
+      } else {
+        return toGeoJSONLineString(this, points, options)
+      }
+    } else {
+      point = pointOrPoints as Position
+      return toGeoJSONPoint(this, point)
+    }
+  }
+
+  toGeoJSONPoint(point: Position): GeoJSONPoint {
+    return toGeoJSONPoint(this, point)
+  }
+
+  toGeoJSONLineString(
+    points: Position[],
+    options?: OptionalTransformOptions
+  ): GeoJSONLineString {
+    return toGeoJSONLineString(this, points, options)
+  }
+
+  toGeoJSONPolygon(
+    points: Position[],
+    options?: OptionalTransformOptions
+  ): GeoJSONPolygon {
+    return toGeoJSONPolygon(this, points, options)
+  }
+
+  fromGeoJSON(
+    geometry: GeoJSONGeometry,
+    options?: OptionalTransformOptions
+  ): Position | Position[] {
+    if (geometry.type === 'Point') {
+      return fromGeoJSONPoint(this, geometry)
+    } else if (geometry.type === 'LineString') {
+      return fromGeoJSONLineString(this, geometry, options)
+    } else if (geometry.type === 'Polygon') {
+      return fromGeoJSONPolygon(this, geometry, options)
+    } else {
+      throw new Error(`Unsupported geometry`)
+    }
+  }
+
+  fromGeoJSONPoint(geometry: GeoJSONPoint): Position {
+    return fromGeoJSONPoint(this, geometry)
+  }
+
+  fromGeoJSONLineString(
+    geometry: GeoJSONLineString,
+    options?: OptionalTransformOptions
+  ): Position[] {
+    return fromGeoJSONLineString(this, geometry, options)
+  }
+
+  fromGeoJSONPolygon(
+    geometry: GeoJSONPolygon,
+    options?: OptionalTransformOptions
+  ): Position[] {
+    return fromGeoJSONPolygon(this, geometry, options)
+  }
 }

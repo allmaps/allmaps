@@ -4,7 +4,7 @@ import {
   validateMap,
   type Map as Georef
 } from '@allmaps/annotation'
-import { createTransformer, toGeoJSONPolygon } from '@allmaps/transform'
+import { GCPTransformer } from '@allmaps/transform'
 
 import RTree from './RTree.js'
 
@@ -59,8 +59,13 @@ export default class World extends EventTarget {
       //  - https://github.com/w8r/martinez
       //  - https://github.com/mfogel/polygon-clipping
 
-      const transformer = createTransformer(sphericalMercatorGcps)
-      const geoMask = toGeoJSONPolygon(transformer, pixelMask)
+      // TODO: make the transformation type tunabel by user
+      const transformer = new GCPTransformer(
+        sphericalMercatorGcps,
+        'polynomial'
+      )
+
+      const geoMask = transformer.toGeoJSONPolygon(pixelMask)
 
       const fullPixelMask: Position[] = [
         [0, 0],
@@ -68,7 +73,7 @@ export default class World extends EventTarget {
         [map.image.width, map.image.height],
         [0, map.image.height]
       ]
-      const fullGeoMask = toGeoJSONPolygon(transformer, fullPixelMask)
+      const fullGeoMask = transformer.toGeoJSONPolygon(fullPixelMask)
 
       // TODO: only load info.json when its needed
       const imageUri = map.image.uri
@@ -292,7 +297,7 @@ export default class World extends EventTarget {
   setPixelMask(mapId: string, pixelMask: Position[]) {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
-      const geoMask = toGeoJSONPolygon(warpedMap.transformer, pixelMask)
+      const geoMask = warpedMap.transformer.toGeoJSONPolygon(pixelMask)
       warpedMap.geoMask = geoMask
       warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
 

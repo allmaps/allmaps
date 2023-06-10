@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import { createTransformer } from '@allmaps/transform'
+import { GCPTransformer } from '@allmaps/transform'
 
 import { parseJsonFromFile, parseJsonInput, print } from '../../lib/io.js'
 import { parseAnnotationValidateMap } from '../../lib/parse.js'
@@ -31,7 +31,7 @@ export default function geojson() {
     const transformOptions = parseTransformOptions(options)
 
     const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
-    const transformer = createTransformer(map.gcps)
+    const transformer = new GCPTransformer(map.gcps)
 
     const geoJsonGeometries = await parseJsonInput(files as string[])
 

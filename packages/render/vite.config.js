@@ -45,8 +45,8 @@ export default defineConfig({
         '@allmaps/id',
         '@allmaps/iiif-parser',
         '@allmaps/transform',
+        '@allmaps/triangulate',
         '@allmaps/stdlib',
-        'earcut',
         'potpack',
         'rbush'
       ],
@@ -56,10 +56,10 @@ export default defineConfig({
           '@allmaps/id': '@allmaps/id',
           '@allmaps/iiif-parser': '@allmaps/iiif-parser',
           '@allmaps/transform': '@allmaps/transform',
+          '@allmaps/triangulate': '@allmaps/triangulate',
           '@allmaps/stdlib': '@allmaps/stdlib',
           rbush: 'rbush',
-          potpack: 'potpack',
-          earcut: 'earcut'
+          potpack: 'potpack'
         }
       }
     }

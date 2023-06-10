@@ -1,5 +1,6 @@
 import potpack from 'potpack'
-import earcut from 'earcut'
+import { triangulate } from '@allmaps/triangulate'
+import { computeBBox } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import { createBuffer } from './shared/webgl2.js'
@@ -7,12 +8,8 @@ import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
 
-import type {
-  Transform,
-  WarpedMap,
-  RenderOptions,
-  GeoJSONPolygon
-} from './shared/types.js'
+import type { Transform, WarpedMap, RenderOptions } from './shared/types.js'
+import { BBox } from '@allmaps/types'
 
 // TODO: Move to stdlib?
 const THROTTLE_WAIT_MS = 50
@@ -23,6 +20,9 @@ const THROTTLE_OPTIONS = {
 
 const DEFAULT_OPACITY = 1
 
+// TODO: Consider making this tunable by the user.
+const DIAMETER_FRACTION = 40
+
 export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
 
@@ -32,8 +32,13 @@ export default class WebGL2WarpedMap extends EventTarget {
   imageWidth: number
   imageHeight: number
 
-  triangles: number[] = []
-  transformedTriangles: Float32Array = new Float32Array()
+  geoMaskTriangles: number[] = []
+  transformedGeoMaskTriangles: Float32Array = new Float32Array()
+
+  pixelMaskTriangles: number[] = []
+  transformedPixelMaskTriangles: Float32Array = new Float32Array()
+
+  // pixelTriangleIndex: Float32Array = new Float32Array() // DEV
 
   vao: WebGLVertexArrayObject | null
 
@@ -64,7 +69,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.imageWidth = warpedMap.parsedImage.width
     this.imageHeight = warpedMap.parsedImage.height
 
-    this.updateTriangulation(warpedMap.geoMask)
+    this.updateTriangulation(warpedMap)
 
     this.tilesTexture = gl.createTexture()
     this.scaleFactorsTexture = gl.createTexture()
@@ -80,45 +85,101 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
-  updateTriangulation(geoMask: GeoJSONPolygon) {
-    const flattened = earcut.flatten(geoMask.coordinates)
-    const vertexIndices = earcut(
-      flattened.vertices,
-      flattened.holes,
-      flattened.dimensions
+  updateTriangulation(warpedMap: WarpedMap) {
+    const bbox: BBox = computeBBox(warpedMap.pixelMask)
+    const bboxDiameter: number = Math.sqrt(
+      (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
     )
 
-    this.triangles = vertexIndices
-      .map((index) => [
-        flattened.vertices[index * 2],
-        flattened.vertices[index * 2 + 1]
-      ])
-      .flat()
+    const trianglesPositions = triangulate(
+      warpedMap.pixelMask,
+      bboxDiameter / DIAMETER_FRACTION
+    ).flat()
 
-    this.transformedTriangles = new Float32Array(this.triangles.length)
+    const geoMaskVertices = trianglesPositions.map((point) =>
+      warpedMap.transformer.toWorld(point as [number, number])
+    )
+
+    this.geoMaskTriangles = geoMaskVertices.flat()
+    this.pixelMaskTriangles = trianglesPositions.flat()
+
+    this.transformedGeoMaskTriangles = new Float32Array(
+      this.geoMaskTriangles.length
+    )
+    this.transformedPixelMaskTriangles = new Float32Array(
+      this.pixelMaskTriangles.length
+    )
   }
 
   updateVertexBuffers(transform: Transform) {
     if (this.vao) {
       this.gl.bindVertexArray(this.vao)
 
-      for (let index = 0; index < this.triangles.length; index += 2) {
+      for (let index = 0; index < this.geoMaskTriangles.length; index += 2) {
         const transformedPoint = applyTransform(transform, [
-          this.triangles[index],
-          this.triangles[index + 1]
+          this.geoMaskTriangles[index],
+          this.geoMaskTriangles[index + 1]
         ])
 
-        this.transformedTriangles[index] = transformedPoint[0]
-        this.transformedTriangles[index + 1] = transformedPoint[1]
+        this.transformedGeoMaskTriangles[index] = transformedPoint[0]
+        this.transformedGeoMaskTriangles[index + 1] = transformedPoint[1]
       }
+
+      for (let index = 0; index < this.pixelMaskTriangles.length; index += 2) {
+        // const transformedPoint = applyTransform(transform, [
+        //   this.pixelMaskTriangles[index],
+        //   this.pixelMaskTriangles[index + 1]
+        // ])
+
+        const transformedPoint = [
+          this.pixelMaskTriangles[index],
+          this.pixelMaskTriangles[index + 1]
+        ]
+
+        this.transformedPixelMaskTriangles[index] = transformedPoint[0]
+        this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
+      }
+
+      // // DEV Compute triangle indeces, used for development purposes
+      // this.pixelTriangleIndex = new Float32Array(this.pixelMaskTriangles.length)
+
+      // for (let index = 0; index < this.pixelMaskTriangles.length; index++) {
+      //   this.pixelTriangleIndex[3 * index] = index
+      //   this.pixelTriangleIndex[3 * index + 1] = index
+      //   this.pixelTriangleIndex[3 * index + 2] = index
+      // }
+
+      // console.log(
+      //   this.pixelMaskTriangles,
+      //   this.transformedPixelMaskTriangles,
+      //   this.geoMaskTriangles,
+      //   this.transformedGeoMaskTriangles
+      // )
 
       createBuffer(
         this.gl,
         this.program,
-        this.transformedTriangles,
+        this.transformedGeoMaskTriangles,
         2,
         'a_position'
       )
+
+      createBuffer(
+        this.gl,
+        this.program,
+        this.transformedPixelMaskTriangles,
+        2,
+        'a_pixel_position'
+      )
+
+      // // DEV
+      // createBuffer(
+      //   this.gl,
+      //   this.program,
+      //   this.pixelTriangleIndex,
+      //   1,
+      //   'a_pixel_triangle_index'
+      // )
     }
   }
 

@@ -1,16 +1,15 @@
 {
-  "name": "@allmaps/transform",
-  "version": "1.0.0-beta.14",
+  "name": "@allmaps/triangulate",
+  "version": "1.0.0-beta.1",
   "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
+    "name": "Manuel Claeys Bouuaert",
+    "email": "manuel.claeys.b@gmail.com",
+    "url": "https://manuelclaeysbouuaert.be"
   },
-  "description": "Coordinate transformation functions, based on gdaltransform",
+  "description": "Allmaps Triangulation Library",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
   "exports": {
     ".": {
       "import": "./dist/index.js"
@@ -25,32 +24,35 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/transform"
+    "directory": "packages/triangulate"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
-    "georeference",
-    "map"
+    "allmaps",
+    "triangulate",
+    "polygon triangulation",
+    "Constrained Delaunay Triangulation",
+    "poly2tri.js"
   ],
-  "dependencies": {
-    "@placemarkio/geojson-rewind": "^1.0.2",
-    "@turf/distance": "^6.3.0",
-    "@turf/midpoint": "^6.3.0",
-    "ml-matrix": "^6.10.4"
-  },
   "scripts": {
     "watch": "tsc --watch",
+    "bench": "node bench/index.js",
     "build": "tsc",
+    "preversion": "npm types && npm lint && npm test",
     "test": "NODE_ENV=test mocha",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "pretest": "npm run build",
-    "types": "tsc --noEmit",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "preversion": "npm run types && npm run lint && npm test"
+    "types": "tsc --noEmit"
   },
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/stdlib": "^1.0.0-beta.8",
+    "@allmaps/types": "^1.0.0-beta.1",
+    "poly2tri": "^1.5.0",
+    "robust-point-in-polygon": "^1.0.3"
+  },
   "devDependencies": {
-    "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",

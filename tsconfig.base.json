@@ -12,6 +12,7 @@
       "@allmaps/types": ["./packages/types/src"],
       "@allmaps/id": ["./packages/id/src"],
       "@allmaps/transform": ["./packages/transform/src"],
+      "@allmaps/triangulate": ["./packages/triangulate/src"],
       "@allmaps/render": ["./packages/render/src"],
       "@allmaps/stdlib": ["./packages/stdlib/src"],
       "@allmaps/annotation": ["./packages/annotation/src"],
@@ -22,6 +23,7 @@
 
       "@allmaps/types/*": ["./packages/types/src/*"],
       "@allmaps/transform/*": ["./packages/transform/src/*"],
+      "@allmaps/triangulate/*": ["./packages/triangulate/src/*"],
       "@allmaps/render/*": ["./packages/render/src/*"],
       "@allmaps/stdlib/*": ["./packages/stdlib/src/*"],
       "@allmaps/annotation/*": ["./packages/annotation/src/*"],

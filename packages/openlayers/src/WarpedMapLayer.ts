@@ -232,7 +232,7 @@ export class WarpedMapLayer extends Layer {
       const warpedMap = this.world.getMap(mapId)
 
       if (warpedMap) {
-        this.renderer.updateTriangulation(mapId, warpedMap.geoMask)
+        this.renderer.updateTriangulation(warpedMap)
       }
     }
   }
@@ -501,11 +501,7 @@ export class WarpedMapLayer extends Layer {
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(
-        frameState.pixelToCoordinateTransform as Transform,
-        projectionTransform,
-        this.mapIdsInViewport.values()
-      )
+      this.renderer.render(projectionTransform, this.mapIdsInViewport.values())
     }
 
     return this.container
