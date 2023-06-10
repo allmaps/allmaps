@@ -43,7 +43,7 @@ const triangles = triangulate(polygon, distance)
 The package exports two functions
 
 - `triangulate()` outputs an Array of triangles, each under the form `[[x0, y0], [x1, y1], [x2, y2]]`. Polygons with < 3 just return an empty array.
-- `triangulate_poly2tri()` outputs the triangles in the same fashion as `poly2tri`, with ritch information on constrained edges, neighbours, interiour, ...
+- `triangulatePoly2tri()` outputs the triangles in the same fashion as `poly2tri`, with ritch information on constrained edges, neighbours, interiour, ...
 
 ### Stability
 

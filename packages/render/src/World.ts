@@ -62,8 +62,9 @@ export default class World extends EventTarget {
       // TODO: make the transformation type tunabel by user
       const transformer = new GCPTransformer(
         sphericalMercatorGcps,
-        'thin-plate-spline'
+        'polynomial'
       )
+
       const geoMask = transformer.toGeoJSONPolygon(pixelMask)
 
       const fullPixelMask: Position[] = [

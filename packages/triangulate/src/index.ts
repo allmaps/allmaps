@@ -1,11 +1,11 @@
-import { createGrid, interpolatePolygon } from './helper_functions.js'
+import { createGrid, interpolatePolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
 import type { SVGPolygon, Position } from '@allmaps/types'
 
 // use this function to access the ritch poly2tri triangulaiton output (information on constrained edges, neighbours, interiour, ...)
-export function triangulate_poly2tri(polygon: SVGPolygon, distance: number) {
+export function triangulatePoly2tri(polygon: SVGPolygon, distance: number) {
   // create grid
   const grid: Position[] = createGrid(polygon, distance)
 
@@ -31,7 +31,7 @@ export function triangulate_poly2tri(polygon: SVGPolygon, distance: number) {
 // use this function to get an array of triangles
 // returns [[[t1x1, t1y1], [t1x2, t1y2], [t1x3, t1y3]], [[t2x1, t2y1], [t2x2, t2y2], [t2x3, t2y3]], ...]
 export function triangulate(polygon: SVGPolygon, distance: number) {
-  return triangulate_poly2tri(polygon, distance).map((t) =>
+  return triangulatePoly2tri(polygon, distance).map((t) =>
     t.getPoints().map((p) => [p.x, p.y])
   )
 }

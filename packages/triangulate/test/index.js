@@ -126,14 +126,6 @@ const rectangleOnGridNoDistanceResult = [
   ]
 ]
 
-const test = [
-  [0, 0],
-  [0, 10],
-  [20, 20],
-  [20, 0]
-]
-console.log(triangulate(test, 2))
-
 describe('Rectangle', async () => {
   it(`should work for average polygons with no distance provided`, () => {
     expect(triangulate(rectangle)).to.shallowDeepEqual(

@@ -43,7 +43,7 @@ export type OptionalTransformOptions = Partial<TransformOptions>
 export type DistanceFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (point1: Position, point2: Position) => number
 
-export interface GCPTransformerInterface {
+export type GCPTransformerInterface = {
   gcps: ImageWorldPosition[]
 
   toWorld(point: Position): Position

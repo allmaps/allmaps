@@ -18,7 +18,7 @@ import type {
 function mergeDefaultOptions(
   options?: OptionalTransformOptions
 ): TransformOptions {
-  let mergedOptions = {
+  const mergedOptions = {
     close: false,
     maxOffsetRatio: 0,
     maxDepth: 0
@@ -199,7 +199,7 @@ export function fromGeoJSONPolygon(
 function getSegments(points: ImageWorldPosition[], close = false): Segment[] {
   const segmentCount = points.length - (close ? 0 : 1)
 
-  let segments: Segment[] = []
+  const segments: Segment[] = []
   for (let index = 0; index < segmentCount; index++) {
     segments.push({
       from: points[index],

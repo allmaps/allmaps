@@ -8,12 +8,7 @@ import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
 
-import type {
-  Transform,
-  WarpedMap,
-  RenderOptions,
-  GeoJSONPolygon
-} from './shared/types.js'
+import type { Transform, WarpedMap, RenderOptions } from './shared/types.js'
 import { BBox } from '@allmaps/types'
 
 // TODO: Move to stdlib?

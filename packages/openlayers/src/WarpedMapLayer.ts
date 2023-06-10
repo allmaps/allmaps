@@ -501,10 +501,7 @@ export class WarpedMapLayer extends Layer {
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(
-        projectionTransform,
-        this.mapIdsInViewport.values()
-      )
+      this.renderer.render(projectionTransform, this.mapIdsInViewport.values())
     }
 
     return this.container
