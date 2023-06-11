@@ -1,23 +1,20 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type PluginOption } from 'vite'
 import { exec } from 'child_process'
 
 import ports from '../../ports.json'
 
 // TODO: move to @allmaps/stdlib?
-const dts = {
+const dts: PluginOption = {
   name: 'dts-generator',
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
-        exec('npm run build:types', (err) =>
-          err ? reject(err) : resolve()
-        )
+        exec('npm run build:types', (err) => (err ? reject(err) : resolve()))
       })
     }
   }
 }
 
-/** @type {import('vite').UserConfig} */
 export default defineConfig({
   server: {
     port: ports.render
