@@ -137,8 +137,7 @@ export default class RBF {
       }
     }
 
-    // Compute basis functions weights by solving the linear system of equations for each target component
-    // Note: for this example the system is solved with and without the affine part to allow comparing between both situation. This is, of course, not efficient in production, where it's best to make a choice.
+    // Compute basis functions weights and the affine parameters by solving the linear system of equations for each target component
     this.weightsMatrices = [
       solve(distancesAndAffineCoefsMatrix, destinationPointsMatrices[0]),
       solve(distancesAndAffineCoefsMatrix, destinationPointsMatrices[1])
@@ -151,7 +150,7 @@ export default class RBF {
       throw new Error('Weights not computed')
     }
 
-    // First make a column matrix with the distances of that point to all controle points
+    // Make a column matrix with the distances of that point to all controle points
     const newDistancesMatrix = Matrix.zeros(this.dimension, 1)
     for (let i = 0; i < this.dimension; i++) {
       newDistancesMatrix.set(
@@ -164,7 +163,7 @@ export default class RBF {
       )
     }
 
-    // Then it computes the interpolated value by summing the weighted contributions of the input points
+    // Compute the interpolated value by summing the weighted contributions of the input point
     const newDestinationPoint: Position = [0, 0]
     for (let i = 0; i < 2; i++) {
       // Apply the weights to the new distances

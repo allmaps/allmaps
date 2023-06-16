@@ -1,10 +1,4 @@
-import {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
-} from '../shared/gdaltransform.js'
-
-import type { GCPTransformInfo } from '../shared/gdaltransform.js'
+import Affine from '../shared/affine.js'
 
 import type {
   GCPTransformerInterface,
@@ -16,34 +10,41 @@ export default class PolynomialGCPTransformer
   implements GCPTransformerInterface
 {
   gcps: ImageWorldPosition[]
-  transformArgs: GCPTransformInfo
+
+  worldGcps: Position[]
+  resourceGcps: Position[]
+
+  toWorldAffine?: Affine
+  toResourceAffine?: Affine
 
   constructor(gcps: ImageWorldPosition[]) {
     this.gcps = gcps
 
-    const pasGCPs = gcps.map(
-      (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
-    )
+    this.worldGcps = gcps.map((gcp) => gcp.world)
+    this.resourceGcps = gcps.map((gcp) => gcp.image)
+  }
 
-    const nOrder = 0
-    this.transformArgs = GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+  createToWorldAffine(): Affine {
+    return new Affine(this.resourceGcps, this.worldGcps)
+  }
+
+  createToResourceAffine(): Affine {
+    return new Affine(this.worldGcps, this.resourceGcps)
   }
 
   toWorld(point: Position): Position {
-    const bInverse = false
+    if (!this.toWorldAffine) {
+      this.toWorldAffine = this.createToWorldAffine()
+    }
 
-    const input = [{ x: point[0], y: point[1] }]
-    const output = GDALGCPTransform(this.transformArgs, bInverse, input)
-
-    return [output[0].y, output[0].x]
+    return this.toWorldAffine.interpolant(point)
   }
 
   toResource(point: Position): Position {
-    const bInverse = true
+    if (!this.toResourceAffine) {
+      this.toResourceAffine = this.createToResourceAffine()
+    }
 
-    const input = [{ x: point[1], y: point[0] }]
-    const output = GDALGCPTransform(this.transformArgs, bInverse, input)
-
-    return [output[0].x, output[0].y]
+    return this.toResourceAffine.interpolant(point)
   }
 }

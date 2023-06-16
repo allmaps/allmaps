@@ -47,7 +47,7 @@ function expectToBeCloseToArray(actual, expected) {
 }
 
 describe('Polynomial transformer', async () => {
-  const transformer = new GCPTransformer(gcps)
+  const transformer = new GCPTransformer(gcps, 'polynomial')
 
   console.log(
     'With ',
