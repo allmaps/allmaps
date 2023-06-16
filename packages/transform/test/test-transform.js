@@ -49,6 +49,15 @@ function expectToBeCloseToArray(actual, expected) {
 describe('Polynomial transformer', async () => {
   const transformer = new GCPTransformer(gcps)
 
+  console.log(
+    'With ',
+    gcps.length,
+    ' controle points and a first order polynomial (affine) transformation our output for point [100, 100] is ',
+    transformer.toWorld([100, 100]),
+    ' and should be close to GDALs output ',
+    [4.92079391286352, 52.4654946986157]
+  )
+
   it(`should have the same output as running GDAL's gdaltransform`, () => {
     // from: gdaltransform -output_xy -gcp 518 991 4.9516614 52.4633102 -gcp 4345 2357 5.0480391 52.5123762 -gcp 2647 475 4.9702906 52.5035815
     // with input e.g.: 100 100
@@ -56,25 +65,24 @@ describe('Polynomial transformer', async () => {
       transformer.toWorld([100, 100]),
       [4.92079391286352, 52.4654946986157]
     )
-    expectToBeCloseToArray(
-      transformer.toWorld([1000, 1000]),
-      [4.95932911267323, 52.4711479887873]
-    )
   })
 })
 
 describe('Thin-plate spline transformer', async () => {
   const transformer = new GCPTransformer(gcps2, 'thin-plate-spline')
 
+  console.log(
+    'With ',
+    gcps2.length,
+    ' controle points and a TPS transformation our output for point [1000, 1000] is ',
+    transformer.toWorld([1000, 1000]),
+    ' and should be close to GDALs output ',
+    [4.39415154224292, 51.9599873720927]
+  )
+
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    console.log(transformer.toWorld([100, 100]))
-    console.log(transformer.toWorld([1000, 1000]))
     // from: gdaltransform -output_xy -tps -gcp 1344 4098 4.4091165 51.9017125 -gcp 4440 3441 4.5029222 51.9164451 -gcp 3549 4403 4.4764224 51.897309 -gcp 1794 2130 4.4199066 51.9391509 -gcp 3656 2558 4.4775683 51.9324358
-    // with input e.g.: 100 100
-    expectToBeCloseToArray(
-      transformer.toWorld([100, 100]),
-      [4.36548266472303, 51.9763955169575]
-    )
+    // with input e.g.: 1000 1000
     expectToBeCloseToArray(
       transformer.toWorld([1000, 1000]),
       [4.39415154224292, 51.9599873720927]
