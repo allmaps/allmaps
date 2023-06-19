@@ -1,4 +1,4 @@
-import Affine from '../shared/affine.js'
+import Polynomial from '../shared/polynomial.js'
 
 import type {
   GCPTransformerInterface,
@@ -14,37 +14,43 @@ export default class PolynomialGCPTransformer
   worldGcps: Position[]
   resourceGcps: Position[]
 
-  toWorldAffine?: Affine
-  toResourceAffine?: Affine
+  toWorldPolynomial?: Polynomial
+  toResourcePolynomial?: Polynomial
 
-  constructor(gcps: ImageWorldPosition[]) {
+  order?: number
+
+  constructor(gcps: ImageWorldPosition[], order?: number) {
     this.gcps = gcps
 
     this.worldGcps = gcps.map((gcp) => gcp.world)
     this.resourceGcps = gcps.map((gcp) => gcp.image)
+
+    if (order) {
+      this.order = order
+    }
   }
 
-  createToWorldAffine(): Affine {
-    return new Affine(this.resourceGcps, this.worldGcps)
+  createToWorldPolynomial(): Polynomial {
+    return new Polynomial(this.resourceGcps, this.worldGcps, this.order)
   }
 
-  createToResourceAffine(): Affine {
-    return new Affine(this.worldGcps, this.resourceGcps)
+  createToResourcePolynomial(): Polynomial {
+    return new Polynomial(this.worldGcps, this.resourceGcps, this.order)
   }
 
   toWorld(point: Position): Position {
-    if (!this.toWorldAffine) {
-      this.toWorldAffine = this.createToWorldAffine()
+    if (!this.toWorldPolynomial) {
+      this.toWorldPolynomial = this.createToWorldPolynomial()
     }
 
-    return this.toWorldAffine.interpolant(point)
+    return this.toWorldPolynomial.interpolant(point)
   }
 
   toResource(point: Position): Position {
-    if (!this.toResourceAffine) {
-      this.toResourceAffine = this.createToResourceAffine()
+    if (!this.toResourcePolynomial) {
+      this.toResourcePolynomial = this.createToResourcePolynomial()
     }
 
-    return this.toResourceAffine.interpolant(point)
+    return this.toResourcePolynomial.interpolant(point)
   }
 }

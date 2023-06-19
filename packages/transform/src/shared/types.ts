@@ -1,7 +1,12 @@
 // TODO: consider moving these types and types from @allmaps/render
 // to new package @allmaps/types
 
-export type TransformationType = 'polynomial' | 'thin-plate-spline'
+export type TransformationType =
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thin-plate-spline'
 
 export type Position = [number, number]
 

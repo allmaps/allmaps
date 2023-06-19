@@ -30,7 +30,7 @@ export default class RBF {
   weightsMatrices?: [Matrix, Matrix]
 
   epsilon?: number
-  dimension: number
+  nPoints: number
 
   constructor(
     sourcePoints: Position[],
@@ -47,7 +47,7 @@ export default class RBF {
     //
     // 'destinationPointsMatrices' and 'weightsMatrices' is an Array of Matrices
     // destinationPointsMatrices = [Matrix([[x'0], [x'1], ...]), Matrix([[y'0], [y'1], ...])]
-    // destinationPointsMatrices[i] is a Matrix of (dimension, 1)
+    // destinationPointsMatrices[i] is a Matrix of (nPoints, 1)
 
     this.sourcePoints = sourcePoints
     this.destinationPoints = destinationPoints
@@ -55,7 +55,13 @@ export default class RBF {
     this.distanceFunction = distanceFunction
     this.normFunction = normFunction
 
-    this.dimension = this.sourcePoints.length
+    this.nPoints = this.sourcePoints.length
+
+    if (this.nPoints < 3) {
+      throw new Error(
+        'Not enough controle points. A Thin-Plate-Spline transformation (with affine component) requires a minimum of 3 points.'
+      )
+    }
 
     const destinationPointsMatrices: [Matrix, Matrix] = [
       Matrix.columnVector(
@@ -67,9 +73,9 @@ export default class RBF {
     ]
 
     // Compute distancesMatrix, containing the point to point distances between all controle points
-    const distancesMatrix = Matrix.zeros(this.dimension, this.dimension)
-    for (let i = 0; i < this.dimension; i++) {
-      for (let j = 0; j < this.dimension; j++) {
+    const distancesMatrix = Matrix.zeros(this.nPoints, this.nPoints)
+    for (let i = 0; i < this.nPoints; i++) {
+      for (let j = 0; j < this.nPoints; j++) {
         distancesMatrix.set(
           i,
           j,
@@ -81,15 +87,15 @@ export default class RBF {
     // If it's not provided, compute espilon as the average distance between the controle points
     if (epsilon === undefined) {
       epsilon =
-        distancesMatrix.sum() / (Math.pow(this.dimension, 2) - this.dimension)
+        distancesMatrix.sum() / (Math.pow(this.nPoints, 2) - this.nPoints)
     }
 
     this.epsilon = epsilon
 
     // Update the matrix to reflect the requested distance function
     // Note: for distance functions which do not take an epsilon value this step does not alter the matrix. In production this can be skipped for such distance functions.
-    for (let i = 0; i < this.dimension; i++) {
-      for (let j = 0; j < this.dimension; j++) {
+    for (let i = 0; i < this.nPoints; i++) {
+      for (let j = 0; j < this.nPoints; j++) {
         distancesMatrix.set(
           i,
           j,
@@ -99,17 +105,17 @@ export default class RBF {
     }
 
     // Extend the point distance matrix to include the affine transformation
-    const affineCoefsMatrix = Matrix.zeros(this.dimension, 3)
+    const affineCoefsMatrix = Matrix.zeros(this.nPoints, 3)
     const distancesAndAffineCoefsMatrix = Matrix.zeros(
-      this.dimension + 3,
-      this.dimension + 3
+      this.nPoints + 3,
+      this.nPoints + 3
     )
     // Construct Nx3 Matrix affineCoefsMatrix
     // 1 x0 y0
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    for (let i = 0; i < this.dimension; i++) {
+    for (let i = 0; i < this.nPoints; i++) {
       affineCoefsMatrix.set(i, 0, 1)
       affineCoefsMatrix.set(i, 1, sourcePoints[i][0])
       affineCoefsMatrix.set(i, 2, sourcePoints[i][1])
@@ -117,21 +123,21 @@ export default class RBF {
     // Combine distancesMatrix and affineCoefsMatrix into new matrix distancesAndAffineCoefsMatrix
     // Note: mlMatrix has no knowledge of block matrices, but this approach is good enough
     // To speed this up, we could maybe use distancesMatrix.addRow() and distancesMatrix.addVector()
-    for (let i = 0; i < this.dimension + 3; i++) {
-      for (let j = 0; j < this.dimension + 3; j++) {
-        if (i < this.dimension && j < this.dimension) {
+    for (let i = 0; i < this.nPoints + 3; i++) {
+      for (let j = 0; j < this.nPoints + 3; j++) {
+        if (i < this.nPoints && j < this.nPoints) {
           distancesAndAffineCoefsMatrix.set(i, j, distancesMatrix.get(i, j))
-        } else if (i >= this.dimension && j < this.dimension) {
+        } else if (i >= this.nPoints && j < this.nPoints) {
           distancesAndAffineCoefsMatrix.set(
             i,
             j,
-            affineCoefsMatrix.transpose().get(i - this.dimension, j)
+            affineCoefsMatrix.transpose().get(i - this.nPoints, j)
           )
-        } else if (i < this.dimension && j >= this.dimension) {
+        } else if (i < this.nPoints && j >= this.nPoints) {
           distancesAndAffineCoefsMatrix.set(
             i,
             j,
-            affineCoefsMatrix.get(i, j - this.dimension)
+            affineCoefsMatrix.get(i, j - this.nPoints)
           )
         }
       }
@@ -151,8 +157,8 @@ export default class RBF {
     }
 
     // Make a column matrix with the distances of that point to all controle points
-    const newDistancesMatrix = Matrix.zeros(this.dimension, 1)
-    for (let i = 0; i < this.dimension; i++) {
+    const newDistancesMatrix = Matrix.zeros(this.nPoints, 1)
+    for (let i = 0; i < this.nPoints; i++) {
       newDistancesMatrix.set(
         i,
         0,
@@ -170,15 +176,12 @@ export default class RBF {
       // Note: don't consider the last three weights who are there for the affine part
       newDestinationPoint[i] = mulitplyMatricesElementwise(
         newDistancesMatrix,
-        this.weightsMatrices[i].selection(
-          [...Array(this.dimension).keys()],
-          [0]
-        )
+        this.weightsMatrices[i].selection([...Array(this.nPoints).keys()], [0])
       ).sum()
       // Add the affine part
-      const a0 = this.weightsMatrices[i].get(this.dimension, 0)
-      const ax = this.weightsMatrices[i].get(this.dimension + 1, 0)
-      const ay = this.weightsMatrices[i].get(this.dimension + 2, 0)
+      const a0 = this.weightsMatrices[i].get(this.nPoints, 0)
+      const ax = this.weightsMatrices[i].get(this.nPoints + 1, 0)
+      const ay = this.weightsMatrices[i].get(this.nPoints + 2, 0)
       newDestinationPoint[i] +=
         a0 + ax * newSourcePoint[0] + ay * newSourcePoint[1]
     }
