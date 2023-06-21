@@ -47,18 +47,18 @@ export default class Polynomial {
     const helmertCoefsMatrix = Matrix.zeros(2 * this.nPoints, 4)
     for (let i = 0; i < this.nPoints; i++) {
       helmertCoefsMatrix.set(2 * i, 0, 1)
-      helmertCoefsMatrix.set(2 * i + 1, 0, 0)
       helmertCoefsMatrix.set(2 * i, 1, 0)
-      helmertCoefsMatrix.set(2 * i + 1, 1, 1)
       helmertCoefsMatrix.set(2 * i, 2, sourcePoints[i][0])
-      helmertCoefsMatrix.set(2 * i + 1, 2, sourcePoints[i][1])
       helmertCoefsMatrix.set(2 * i, 3, -sourcePoints[i][1])
+      helmertCoefsMatrix.set(2 * i + 1, 0, 0)
+      helmertCoefsMatrix.set(2 * i + 1, 1, 1)
+      helmertCoefsMatrix.set(2 * i + 1, 2, sourcePoints[i][1])
       helmertCoefsMatrix.set(2 * i + 1, 3, sourcePoints[i][0])
     }
     // Compute helmert parameters by solving the linear system of equations for each target component
     // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-    const pseudoInversehelmertCoefsMatrix = pseudoInverse(helmertCoefsMatrix)
-    this.helmertParametersMatrix = pseudoInversehelmertCoefsMatrix.mmul(
+    const pseudoInverseHelmertCoefsMatrix = pseudoInverse(helmertCoefsMatrix)
+    this.helmertParametersMatrix = pseudoInverseHelmertCoefsMatrix.mmul(
       destinationPointsMatrix
     )
   }
@@ -71,7 +71,6 @@ export default class Polynomial {
 
     // Compute the interpolated value by applying the polynomial coefficients to the input point
     const newDestinationPoint: Position = [
-      // [a(1)+a(3)*ps_ref(1,:)-a(4)*ps_ref(2,:), a(2)+a(4)*ps_ref(1,:)+a(3)*ps_ref(2,:)],
       this.helmertParametersMatrix.get(0, 0) +
         this.helmertParametersMatrix.get(2, 0) * newSourcePoint[0] -
         this.helmertParametersMatrix.get(3, 0) * newSourcePoint[1],

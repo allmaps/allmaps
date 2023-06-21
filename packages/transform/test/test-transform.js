@@ -103,7 +103,9 @@ describe('Helmert transformer', async () => {
   // console.log(
   //   'With ',
   //   gcps.length,
-  //   ' controle points and a Helmert transformation our output for point [100, 100] is ',
+  //   ' controle points and a Helmert transformation our output for point ',
+  //   input,
+  //   ' is ',
   //   transformer.toWorld(input),
   //   ' and should be close to distortionAnalysis Helmert output ',
   //   output
@@ -124,7 +126,9 @@ describe('Polynomial transformer, order 1', async () => {
   // console.log(
   //   'With ',
   //   gcps.length,
-  //   ' controle points and a first order polynomial (affine) transformation our output for point [100, 100] is ',
+  //   ' controle points and a first order polynomial (affine) transformation our output for point ',
+  //   input,
+  //   ' is ',
   //   transformer.toWorld(input),
   //   ' and should be close to GDALs output ',
   //   output
@@ -145,7 +149,9 @@ describe('Polynomial transformer, order 2', async () => {
   // console.log(
   //   'With ',
   //   gcps.length,
-  //   ' controle points and a second order polynomial transformation our output for point [100, 100] is ',
+  //   ' controle points and a second order polynomial transformation our output for point ',
+  //   input,
+  //   ' is ',
   //   transformer.toWorld(input),
   //   ' and should be close to GDALs output ',
   //   output
@@ -166,9 +172,32 @@ describe('Polynomial transformer, order 3', async () => {
   // console.log(
   //   'With ',
   //   gcps.length,
-  //   ' controle points and a second order polynomial transformation our output for point [100, 100] is ',
+  //   ' controle points and a second order polynomial transformation our output for point ',
+  //   input,
+  //   ' is ',
   //   transformer.toWorld(input),
   //   ' and should be close to GDALs output ',
+  //   output
+  // )
+})
+
+describe('Projective transformer', async () => {
+  const transformer = new GCPTransformer(gcps2, 'projective')
+  const input = [1000, 1000]
+  const output = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
+
+  it(`should have the same output as (TODO: check reference)`, () => {
+    expectToBeCloseToArray(transformer.toWorld(input), output)
+  })
+
+  // console.log(
+  //   'With ',
+  //   gcps2.length,
+  //   ' controle points and a Projective transformation our output for point ',
+  //   input,
+  //   ' is ',
+  //   transformer.toWorld(input),
+  //   ' and should be close to distortionAnalysis Helmert output ',
   //   output
   // )
 })
@@ -187,7 +216,9 @@ describe('Thin-plate spline transformer', async () => {
   // console.log(
   //   'With ',
   //   gcps2.length,
-  //   ' controle points and a TPS transformation our output for point [1000, 1000] is ',
+  //   ' controle points and a TPS transformation our output for point ',
+  //   input,
+  //   ' is ',
   //   transformer.toWorld(input),
   //   ' and should be close to GDALs output ',
   //   output

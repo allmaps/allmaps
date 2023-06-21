@@ -1,5 +1,6 @@
 import HelmertGCPTransformer from './transformers/helmert-transformer.js'
 import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
+import ProjectiveGCPTransformer from './transformers/projective-transformer.js'
 import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
 
 import { distanceThinPlate } from './shared/distance-functions.js'
@@ -44,6 +45,8 @@ export default class GCPTransformer implements GCPTransformerInterface {
       this.transformer = new PolynomialGCPTransformer(gcps, 2)
     } else if (type === 'polynomial3') {
       this.transformer = new PolynomialGCPTransformer(gcps, 3)
+    } else if (type === 'projective') {
+      this.transformer = new ProjectiveGCPTransformer(gcps, 3)
     } else if (type === 'thin-plate-spline') {
       this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,

@@ -115,12 +115,12 @@ export default class Polynomial {
     }
     // Compute polynomial parameters by solving the linear system of equations for each target component
     // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-    const pseudoInversepolynomialCoefsMatrix = pseudoInverse(
+    const pseudoInversePolynomialCoefsMatrix = pseudoInverse(
       polynomialCoefsMatrix
     )
     this.polynomialParametersMatrices = [
-      pseudoInversepolynomialCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      pseudoInversepolynomialCoefsMatrix.mmul(destinationPointsMatrices[1])
+      pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[0]),
+      pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[1])
     ]
   }
 

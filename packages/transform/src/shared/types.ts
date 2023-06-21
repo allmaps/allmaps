@@ -6,6 +6,7 @@ export type TransformationType =
   | 'polynomial'
   | 'polynomial2'
   | 'polynomial3'
+  | 'projective'
   | 'thin-plate-spline'
 
 export type Position = [number, number]
