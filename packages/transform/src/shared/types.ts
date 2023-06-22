@@ -46,7 +46,7 @@ export type TransformOptions = {
 
 export type OptionalTransformOptions = Partial<TransformOptions>
 
-export type DistanceFunction = (r: number, epsilon?: number) => number
+export type KernelFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (point1: Position, point2: Position) => number
 
 export type GCPTransformerInterface = {

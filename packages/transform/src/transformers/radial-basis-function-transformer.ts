@@ -4,7 +4,7 @@ import { euclideanNorm } from '../shared/norm-functions.js'
 
 import type {
   GCPTransformerInterface,
-  DistanceFunction,
+  KernelFunction,
   NormFunction,
   Position,
   ImageWorldPosition
@@ -18,19 +18,19 @@ export default class RadialBasisFunctionGCPTransformer
   worldGcps: Position[]
   resourceGcps: Position[]
 
-  distanceFunction: DistanceFunction
+  kernelFunction: KernelFunction
   normFunction: NormFunction
 
   toWorldRbf?: RBF
   toResourceRbf?: RBF
 
-  constructor(gcps: ImageWorldPosition[], distanceFunction: DistanceFunction) {
+  constructor(gcps: ImageWorldPosition[], kernelFunction: KernelFunction) {
     this.gcps = gcps
 
     this.worldGcps = gcps.map((gcp) => gcp.world)
     this.resourceGcps = gcps.map((gcp) => gcp.image)
 
-    this.distanceFunction = distanceFunction
+    this.kernelFunction = kernelFunction
     this.normFunction = euclideanNorm
   }
 
@@ -38,7 +38,7 @@ export default class RadialBasisFunctionGCPTransformer
     return new RBF(
       this.resourceGcps,
       this.worldGcps,
-      this.distanceFunction,
+      this.kernelFunction,
       this.normFunction
     )
   }
@@ -47,7 +47,7 @@ export default class RadialBasisFunctionGCPTransformer
     return new RBF(
       this.worldGcps,
       this.resourceGcps,
-      this.distanceFunction,
+      this.kernelFunction,
       this.normFunction
     )
   }

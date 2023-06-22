@@ -1,67 +1,49 @@
-import { Matrix, solve } from 'ml-matrix'
+import { Matrix, inverse } from 'ml-matrix'
+import { mulitplyMatricesElementwise } from './matrix.js'
 
-import type { DistanceFunction, NormFunction, Position } from './types.js'
+import type { KernelFunction, NormFunction, Position } from './types.js'
 
-// Elementwise product of two matrices, also called Hadamard product or Shur product
-// This function is not provided as part of mlMatrix
-// This is different from a classical matrix product availble in numeric as M1.mul(M2)
-function mulitplyMatricesElementwise(M1: Matrix, M2: Matrix): Matrix {
-  M1 = Matrix.checkMatrix(M1)
-  M2 = Matrix.checkMatrix(M2)
-  if (M1.rows != M2.rows || M1.columns != M2.columns)
-    throw new Error('Matrices have different dimensions')
-  const M = Matrix.zeros(M1.rows, M1.columns)
-  for (let i = 0; i < M1.rows; i++) {
-    for (let j = 0; j < M1.columns; j++) {
-      M.set(i, j, M1.get(i, j) * M2.get(i, j))
-    }
-  }
-  return M
-}
-
-// See notebook https://observablehq.com/d/0b57d3b587542794 for code source and explanation
 export default class RBF {
   sourcePoints: Position[]
   destinationPoints: Position[]
 
-  distanceFunction: DistanceFunction
+  kernelFunction: KernelFunction
   normFunction: NormFunction
 
-  weightsMatrices?: [Matrix, Matrix]
+  weightsMatrices: [Matrix, Matrix]
 
-  epsilon?: number
   nPoints: number
+  epsilon?: number
 
   constructor(
     sourcePoints: Position[],
     destinationPoints: Position[],
-    distanceFunction: DistanceFunction,
+    kernelFunction: KernelFunction,
     normFunction: NormFunction,
     epsilon?: number
   ) {
-    // Notes on types:
-    //
-    // 'sourcePoints' and 'destinationPoints' are Arrays
-    // sourcePoints = [[x0, y0], [x1, y1], ...]
-    // destinationPoints = [[x'0, y0], [x'1, y'1], ...]
-    //
-    // 'destinationPointsMatrices' and 'weightsMatrices' is an Array of Matrices
-    // destinationPointsMatrices = [Matrix([[x'0], [x'1], ...]), Matrix([[y'0], [y'1], ...])]
-    // destinationPointsMatrices[i] is a Matrix of (nPoints, 1)
-
     this.sourcePoints = sourcePoints
     this.destinationPoints = destinationPoints
 
-    this.distanceFunction = distanceFunction
+    this.kernelFunction = kernelFunction
     this.normFunction = normFunction
 
     this.nPoints = this.sourcePoints.length
 
     if (this.nPoints < 3) {
       throw new Error(
-        'Not enough controle points. A Thin-Plate-Spline transformation (with affine component) requires a minimum of 3 points.'
+        'Not enough controle points. A Thin-Plate-Spline transformation (with affine component) requires a minimum of 3 points, but ' +
+          this.nPoints +
+          ' are given.'
       )
     }
+
+    // 2D Radial Basis Function interpolation
+    // See notebook https://observablehq.com/d/0b57d3b587542794 for code source and explanation
+
+    // The system of equations is solved for x and y separately (because they are independant)
+    // Hence destinationPointsMatrices and weightsMatrices are an Array of two column vector matrices
+    // Since they both use the same coefficients, there is only one distancesAndAffineCoefsMatrix
 
     const destinationPointsMatrices: [Matrix, Matrix] = [
       Matrix.columnVector(
@@ -84,7 +66,7 @@ export default class RBF {
       }
     }
 
-    // If it's not provided, compute espilon as the average distance between the controle points
+    // If it's not provided, and if it's an input to the kernelFunction, compute espilon as the average distance between the controle points
     if (epsilon === undefined) {
       epsilon =
         distancesMatrix.sum() / (Math.pow(this.nPoints, 2) - this.nPoints)
@@ -99,12 +81,12 @@ export default class RBF {
         distancesMatrix.set(
           i,
           j,
-          distanceFunction(distancesMatrix.get(i, j), epsilon)
+          kernelFunction(distancesMatrix.get(i, j), epsilon)
         )
       }
     }
 
-    // Extend the point distance matrix to include the affine transformation
+    // Extend distancesMatrix to include the affine transformation
     const affineCoefsMatrix = Matrix.zeros(this.nPoints, 3)
     const distancesAndAffineCoefsMatrix = Matrix.zeros(
       this.nPoints + 3,
@@ -144,9 +126,13 @@ export default class RBF {
     }
 
     // Compute basis functions weights and the affine parameters by solving the linear system of equations for each target component
+    // Note: the same distancesAndAffineCoefsMatrix is used for both solutions
+    const inverseDistancesAndAffineCoefsMatrix = inverse(
+      distancesAndAffineCoefsMatrix
+    )
     this.weightsMatrices = [
-      solve(distancesAndAffineCoefsMatrix, destinationPointsMatrices[0]),
-      solve(distancesAndAffineCoefsMatrix, destinationPointsMatrices[1])
+      inverseDistancesAndAffineCoefsMatrix.mmul(destinationPointsMatrices[0]),
+      inverseDistancesAndAffineCoefsMatrix.mmul(destinationPointsMatrices[1])
     ]
   }
 
@@ -162,7 +148,7 @@ export default class RBF {
       newDistancesMatrix.set(
         i,
         0,
-        this.distanceFunction(
+        this.kernelFunction(
           this.normFunction(newSourcePoint, this.sourcePoints[i]),
           this.epsilon
         )

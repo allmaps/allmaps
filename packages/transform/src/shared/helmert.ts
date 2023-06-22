@@ -6,20 +6,11 @@ export default class Polynomial {
   sourcePoints: Position[]
   destinationPoints: Position[]
 
-  helmertParametersMatrix?: Matrix
+  helmertParametersMatrix: Matrix
 
   nPoints: number
-  constructor(sourcePoints: Position[], destinationPoints: Position[]) {
-    // Notes on types:
-    //
-    // 'sourcePoints' and 'destinationPoints' are Arrays
-    // sourcePoints = [[x0, y0], [x1, y1], ...]
-    // destinationPoints = [[x'0, y0], [x'1, y'1], ...]
-    //
-    // 'destinationPointsMatrix' and 'helmertParametersMatrix' are each a Matrix
-    // destinationPointsMatrices = Matrix([[x'0], [y'0], [x'1], [y'1], ...])
-    // helmertParametersMatrix = Matrix([[t_x], [t_y], [m], [n]])
 
+  constructor(sourcePoints: Position[], destinationPoints: Position[]) {
     this.sourcePoints = sourcePoints
     this.destinationPoints = destinationPoints
 
@@ -33,6 +24,12 @@ export default class Polynomial {
       )
     }
 
+    // 2D Helmert transformation (= similarity transformation)
+    // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+
+    // The system of equations is solved for x and y jointly (because they are inter-related)
+    // Hence destinationPointsMatrix, helmertCoefsMatrix and helmertParametersMatrix are one Matrix
+
     const destinationPointsMatrix: Matrix = Matrix.columnVector(
       destinationPoints.flat()
     )
@@ -43,7 +40,6 @@ export default class Polynomial {
     // 1 0 x1 -y1
     // 0 1 y1 x1
     // ...
-    //
     const helmertCoefsMatrix = Matrix.zeros(2 * this.nPoints, 4)
     for (let i = 0; i < this.nPoints; i++) {
       helmertCoefsMatrix.set(2 * i, 0, 1)
@@ -56,7 +52,7 @@ export default class Polynomial {
       helmertCoefsMatrix.set(2 * i + 1, 3, sourcePoints[i][0])
     }
     // Compute helmert parameters by solving the linear system of equations for each target component
-    // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+    // Will result in a Matrix([[t_x], [t_y], [m], [n]])
     const pseudoInverseHelmertCoefsMatrix = pseudoInverse(helmertCoefsMatrix)
     this.helmertParametersMatrix = pseudoInverseHelmertCoefsMatrix.mmul(
       destinationPointsMatrix
@@ -69,7 +65,7 @@ export default class Polynomial {
       throw new Error('Helmert parameters not computed')
     }
 
-    // Compute the interpolated value by applying the polynomial coefficients to the input point
+    // Compute the interpolated value by applying the helmert coefficients to the input point
     const newDestinationPoint: Position = [
       this.helmertParametersMatrix.get(0, 0) +
         this.helmertParametersMatrix.get(2, 0) * newSourcePoint[0] -

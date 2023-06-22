@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Watch",
+      "type": "shell",
+      "command": "npx lerna run watch --parallel",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Start Vite",
+      "type": "shell",
+      "command": "pnpm --filter \"@allmaps/viewer\" run dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Build and Start",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Build Watch",
+        "Start Vite"
+      ]
+    },
+
+
+    {
+      "label": "NPM Build and Start",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "npm: watch",
+        "npm: build - apps/viewer"
+      ]
+    },
+    {
+      "type": "npm",
+      "script": "watch",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: watch",
+      "detail": "lerna run watch --parallel"
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "path": "apps/viewer",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build - apps/viewer",
+      "detail": "vite build"
+    }
+
+  ]
+}

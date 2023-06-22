@@ -6,7 +6,7 @@ export default class Polynomial {
   sourcePoints: Position[]
   destinationPoints: Position[]
 
-  polynomialParametersMatrices?: [Matrix, Matrix]
+  polynomialParametersMatrices: [Matrix, Matrix]
 
   nPoints: number
   order: number
@@ -17,16 +17,6 @@ export default class Polynomial {
     destinationPoints: Position[],
     order?: number
   ) {
-    // Notes on types:
-    //
-    // 'sourcePoints' and 'destinationPoints' are Arrays
-    // sourcePoints = [[x0, y0], [x1, y1], ...]
-    // destinationPoints = [[x'0, y0], [x'1, y'1], ...]
-    //
-    // 'destinationPointsMatrices' and 'polynomialParametersMatrices' are each an Array of Matrices
-    // destinationPointsMatrices = [Matrix([[x'0], [x'1], ...]), Matrix([[y'0], [y'1], ...])]
-    // for order = 1, polynomialParametersMatrices = [Matrix([[a0_x], [ax_x], [ay_x]]), Matrix([[a0_y], [ax_y], [ay_y]])]
-
     this.sourcePoints = sourcePoints
     this.destinationPoints = destinationPoints
 
@@ -48,6 +38,19 @@ export default class Polynomial {
       )
     }
 
+    if (this.order < 1 || this.order > 3) {
+      throw new Error(
+        'Only polynomial transformations of order 1, 2 or 3 are supported'
+      )
+    }
+
+    // 2D polynomial transformation of order 1, 2 or 3
+    // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+
+    // The system of equations is solved for x and y separately (because they are independent)
+    // Hence destinationPointsMatrices and polynomialParametersMatrices are one Matrix
+    // Since they both use the same coefficients, there is only one polynomialCoefsMatrix
+
     const destinationPointsMatrices: [Matrix, Matrix] = [
       Matrix.columnVector(destinationPoints.map((value) => value[0])),
       Matrix.columnVector(destinationPoints.map((value) => value[1]))
@@ -61,6 +64,9 @@ export default class Polynomial {
     // ...
     // for order = 2
     // 1 x0 y0 x0^2 y0^2 x0*y0
+    // ...
+    // for order = 3
+    // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
     // ...
     const polynomialCoefsMatrix = Matrix.zeros(this.nPoints, this.nCoefs)
     for (let i = 0; i < this.nPoints; i++) {
@@ -115,6 +121,10 @@ export default class Polynomial {
     }
     // Compute polynomial parameters by solving the linear system of equations for each target component
     // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+    // This wil result in:
+    // For order = 1: polynomialParametersMatrices = [Matrix([[a0_x], [ax_x], [ay_x]]), Matrix([[a0_y], [ax_y], [ay_y]])]
+    // For order = 2: ... (simirlar, following the same order as in polynomialCoefsMatrix)
+    // For order = 3: ... (simirlar, following the same order as in polynomialCoefsMatrix)
     const pseudoInversePolynomialCoefsMatrix = pseudoInverse(
       polynomialCoefsMatrix
     )

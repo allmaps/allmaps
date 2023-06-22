@@ -3,7 +3,7 @@ import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
 import ProjectiveGCPTransformer from './transformers/projective-transformer.js'
 import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
 
-import { distanceThinPlate } from './shared/distance-functions.js'
+import { thinPlateKernel } from './shared/kernel-functions.js'
 
 import {
   toGeoJSONPoint,
@@ -50,7 +50,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
     } else if (type === 'thin-plate-spline') {
       this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,
-        distanceThinPlate
+        thinPlateKernel
       )
     } else {
       throw new Error(`Unsupported transformation type: ${type}`)

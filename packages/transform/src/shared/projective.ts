@@ -6,22 +6,11 @@ export default class Projective {
   sourcePoints: Position[]
   destinationPoints: Position[]
 
-  projectiveParametersMatrix?: Matrix
+  projectiveParametersMatrix: Matrix
 
   nPoints: number
+
   constructor(sourcePoints: Position[], destinationPoints: Position[]) {
-    // Notes on types:
-    //
-    // 'sourcePoints' and 'destinationPoints' are Arrays
-    // sourcePoints = [[x0, y0], [x1, y1], ...]
-    // destinationPoints = [[x'0, y0], [x'1, y'1], ...]
-    //
-    // 'destinationPointsMatrix' and 'projectiveParametersMatrix' are each a Matrix
-    // destinationPointsMatrices = Matrix([[x'0], [y'0], [x'1], [y'1], ...])
-    // projectiveParametersMatrix = Matrix([[t_x], [t_y], [m], [n]])
-
-    // See https://citeseerx.ist.psu.edu/doc/10.1.1.186.4411 for more information
-
     this.sourcePoints = sourcePoints
     this.destinationPoints = destinationPoints
 
@@ -34,6 +23,12 @@ export default class Projective {
           ' are given.'
       )
     }
+
+    // 2D projective (= perspective) transformation
+    // See https://citeseerx.ist.psu.edu/doc/10.1.1.186.4411 for more information
+
+    // The system of equations is solved for x and y jointly (because they are inter-related)
+    // Hence projectiveCoefsMatrix and projectiveParametersMatrix are one Matrix
 
     // Construct 2Nx9 Matrix projectiveCoefsMatrix
     // −x0 −y0 −1  0   0   0  x'0x0 x'0y0 x'0
@@ -91,7 +86,7 @@ export default class Projective {
       throw new Error('projective parameters not computed')
     }
 
-    // Compute the interpolated value by applying the polynomial coefficients to the input point
+    // Compute the interpolated value by applying the coefficients to the input point
     const c =
       this.projectiveParametersMatrix.get(0, 2) * newSourcePoint[0] +
       this.projectiveParametersMatrix.get(1, 2) * newSourcePoint[1] +
