@@ -3,15 +3,13 @@ import { GCPTransformer } from '../dist/index.js'
 
 import { gcps_10 } from '../test/input/gcps-test.js'
 
-let start, ops, result
+let start, ops
 
 function logBenchmarkCreateGCPTransformer(input, type) {
   start = Date.now()
   ops = 0
   while (Date.now() - start < 1000) {
     const transformer = new GCPTransformer(input, type)
-    // const input = [100, 100]
-    // transformer.toWorld(input)
     ops++
   }
   console.log(
