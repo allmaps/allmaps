@@ -4,6 +4,7 @@
 export type TransformationType =
   | 'helmert'
   | 'polynomial'
+  | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
   | 'projective'

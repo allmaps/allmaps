@@ -39,7 +39,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
 
     if (type === 'helmert') {
       this.transformer = new HelmertGCPTransformer(gcps)
-    } else if (type === 'polynomial') {
+    } else if (type === 'polynomial1' || type === 'polynomial') {
       this.transformer = new PolynomialGCPTransformer(gcps)
     } else if (type === 'polynomial2') {
       this.transformer = new PolynomialGCPTransformer(gcps, 2)

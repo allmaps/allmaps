@@ -40,6 +40,7 @@
   },
   "scripts": {
     "watch": "tsc --watch",
+    "bench": "node bench/index.js",
     "build": "tsc",
     "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
