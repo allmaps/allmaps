@@ -43,7 +43,7 @@ export default class RBF {
 
     // The system of equations is solved for x and y separately (because they are independant)
     // Hence destinationPointsMatrices and weightsMatrices are an Array of two column vector matrices
-    // Since they both use the same coefficients, there is only one distancesAndAffineCoefsMatrix
+    // Since they both use the same coefficients, there is only one kernelsAndAffineCoefsMatrix
 
     const destinationPointsMatrices: [Matrix, Matrix] = [
       Matrix.columnVector(
@@ -54,41 +54,35 @@ export default class RBF {
       )
     ]
 
-    // Compute distancesMatrix, containing the point to point distances between all controle points
-    const distancesMatrix = Matrix.zeros(this.nPoints, this.nPoints)
+    // Pre-compute kernelsMatrix: fill it with the point to point distances between all controle points
+    const kernelsMatrix = Matrix.zeros(this.nPoints, this.nPoints)
     for (let i = 0; i < this.nPoints; i++) {
       for (let j = 0; j < this.nPoints; j++) {
-        distancesMatrix.set(
-          i,
-          j,
-          normFunction(sourcePoints[i], sourcePoints[j])
-        )
+        kernelsMatrix.set(i, j, normFunction(sourcePoints[i], sourcePoints[j]))
       }
     }
 
-    // If it's not provided, and if it's an input to the kernelFunction, compute espilon as the average distance between the controle points
+    // If it's not provided, and if it's an input to the kernelFunction, compute epsilon as the average distance between the controle points
     if (epsilon === undefined) {
-      epsilon =
-        distancesMatrix.sum() / (Math.pow(this.nPoints, 2) - this.nPoints)
+      epsilon = kernelsMatrix.sum() / (Math.pow(this.nPoints, 2) - this.nPoints)
     }
 
     this.epsilon = epsilon
 
-    // Update the matrix to reflect the requested distance function
-    // Note: for distance functions which do not take an epsilon value this step does not alter the matrix. In production this can be skipped for such distance functions.
+    // Finish the computation of kernelsMatrix by applying the requested kernel function
     for (let i = 0; i < this.nPoints; i++) {
       for (let j = 0; j < this.nPoints; j++) {
-        distancesMatrix.set(
+        kernelsMatrix.set(
           i,
           j,
-          kernelFunction(distancesMatrix.get(i, j), epsilon)
+          kernelFunction(kernelsMatrix.get(i, j), epsilon)
         )
       }
     }
 
-    // Extend distancesMatrix to include the affine transformation
+    // Extend kernelsMatrix to include the affine transformation
     const affineCoefsMatrix = Matrix.zeros(this.nPoints, 3)
-    const distancesAndAffineCoefsMatrix = Matrix.zeros(
+    const kernelsAndAffineCoefsMatrix = Matrix.zeros(
       this.nPoints + 3,
       this.nPoints + 3
     )
@@ -102,21 +96,21 @@ export default class RBF {
       affineCoefsMatrix.set(i, 1, sourcePoints[i][0])
       affineCoefsMatrix.set(i, 2, sourcePoints[i][1])
     }
-    // Combine distancesMatrix and affineCoefsMatrix into new matrix distancesAndAffineCoefsMatrix
+    // Combine kernelsMatrix and affineCoefsMatrix into new matrix kernelsAndAffineCoefsMatrix
     // Note: mlMatrix has no knowledge of block matrices, but this approach is good enough
-    // To speed this up, we could maybe use distancesMatrix.addRow() and distancesMatrix.addVector()
+    // To speed this up, we could maybe use kernelsMatrix.addRow() and kernelsMatrix.addVector()
     for (let i = 0; i < this.nPoints + 3; i++) {
       for (let j = 0; j < this.nPoints + 3; j++) {
         if (i < this.nPoints && j < this.nPoints) {
-          distancesAndAffineCoefsMatrix.set(i, j, distancesMatrix.get(i, j))
+          kernelsAndAffineCoefsMatrix.set(i, j, kernelsMatrix.get(i, j))
         } else if (i >= this.nPoints && j < this.nPoints) {
-          distancesAndAffineCoefsMatrix.set(
+          kernelsAndAffineCoefsMatrix.set(
             i,
             j,
             affineCoefsMatrix.transpose().get(i - this.nPoints, j)
           )
         } else if (i < this.nPoints && j >= this.nPoints) {
-          distancesAndAffineCoefsMatrix.set(
+          kernelsAndAffineCoefsMatrix.set(
             i,
             j,
             affineCoefsMatrix.get(i, j - this.nPoints)
@@ -126,13 +120,13 @@ export default class RBF {
     }
 
     // Compute basis functions weights and the affine parameters by solving the linear system of equations for each target component
-    // Note: the same distancesAndAffineCoefsMatrix is used for both solutions
-    const inverseDistancesAndAffineCoefsMatrix = inverse(
-      distancesAndAffineCoefsMatrix
+    // Note: the same kernelsAndAffineCoefsMatrix is used for both solutions
+    const inverseKernelsAndAffineCoefsMatrix = inverse(
+      kernelsAndAffineCoefsMatrix
     )
     this.weightsMatrices = [
-      inverseDistancesAndAffineCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      inverseDistancesAndAffineCoefsMatrix.mmul(destinationPointsMatrices[1])
+      inverseKernelsAndAffineCoefsMatrix.mmul(destinationPointsMatrices[0]),
+      inverseKernelsAndAffineCoefsMatrix.mmul(destinationPointsMatrices[1])
     ]
   }
 
