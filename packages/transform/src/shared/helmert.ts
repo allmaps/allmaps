@@ -2,7 +2,7 @@ import { Matrix, pseudoInverse } from 'ml-matrix'
 
 import type { Position } from './types.js'
 
-export default class Polynomial {
+export default class Helmert {
   sourcePoints: Position[]
   destinationPoints: Position[]
 
