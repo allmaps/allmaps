@@ -17,17 +17,11 @@ export default class ProjectiveGCPTransformer
   toWorldProjective?: Projective
   toResourceProjective?: Projective
 
-  order?: number
-
-  constructor(gcps: ImageWorldPosition[], order?: number) {
+  constructor(gcps: ImageWorldPosition[]) {
     this.gcps = gcps
 
     this.worldGcps = gcps.map((gcp) => gcp.world)
     this.resourceGcps = gcps.map((gcp) => gcp.image)
-
-    if (order) {
-      this.order = order
-    }
   }
 
   createToWorldProjective(): Projective {

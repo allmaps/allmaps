@@ -46,7 +46,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
     } else if (type === 'polynomial3') {
       this.transformer = new PolynomialGCPTransformer(gcps, 3)
     } else if (type === 'projective') {
-      this.transformer = new ProjectiveGCPTransformer(gcps, 3)
+      this.transformer = new ProjectiveGCPTransformer(gcps)
     } else if (type === 'thin-plate-spline') {
       this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,

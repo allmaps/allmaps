@@ -15,17 +15,11 @@ export default class HelmertGCPTransformer implements GCPTransformerInterface {
   toWorldHelmert?: Helmert
   toResourceHelmert?: Helmert
 
-  order?: number
-
-  constructor(gcps: ImageWorldPosition[], order?: number) {
+  constructor(gcps: ImageWorldPosition[]) {
     this.gcps = gcps
 
     this.worldGcps = gcps.map((gcp) => gcp.world)
     this.resourceGcps = gcps.map((gcp) => gcp.image)
-
-    if (order) {
-      this.order = order
-    }
   }
 
   createToWorldHelmert(): Helmert {

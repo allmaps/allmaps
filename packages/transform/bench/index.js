@@ -10,6 +10,7 @@ function logBenchmarkCreateGCPTransformer(input, type) {
   ops = 0
   while (Date.now() - start < 1000) {
     const transformer = new GCPTransformer(input, type)
+    transformer.toWorld([100, 100])
     ops++
   }
   console.log(
@@ -18,7 +19,7 @@ function logBenchmarkCreateGCPTransformer(input, type) {
       type +
       ' transformer with ' +
       input.length +
-      ' points '
+      ' points (and transform 1 point)'
   )
 }
 
@@ -43,7 +44,7 @@ function logBenchmarkUseGCPTransformer(input, type) {
       type +
       ' transformer made with with ' +
       input.length +
-      ' points '
+      ' points'
   )
 }
 
