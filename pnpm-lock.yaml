@@ -128,6 +128,76 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0(@types/node@18.14.2)
 
+  apps/here:
+    dependencies:
+      '@allmaps/annotation':
+        specifier: ^1.0.0-beta.13
+        version: link:../../packages/annotation
+      '@allmaps/stdlib':
+        specifier: ^1.0.0-beta.9
+        version: link:../../packages/stdlib
+      '@allmaps/tailwind':
+        specifier: 1.0.0-beta.5
+        version: link:../../packages/tailwind
+      '@allmaps/transform':
+        specifier: ^1.0.0-alpha.14
+        version: link:../../packages/transform
+      '@allmaps/ui':
+        specifier: ^1.0.0-beta.15
+        version: link:../../packages/ui
+      ol:
+        specifier: ^6.15.0
+        version: 6.15.1
+    devDependencies:
+      '@sveltejs/adapter-static':
+        specifier: ^1.0.0
+        version: 1.0.0(@sveltejs/kit@1.5.0)
+      '@sveltejs/kit':
+        specifier: ^1.5.0
+        version: 1.5.0(svelte@3.55.0)(vite@4.3.0)
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.45.0
+        version: 5.45.0(@typescript-eslint/parser@5.45.0)(eslint@8.35.0)(typescript@5.0.2)
+      '@typescript-eslint/parser':
+        specifier: ^5.45.0
+        version: 5.45.0(eslint@8.35.0)(typescript@5.0.2)
+      eslint:
+        specifier: ^8.35.0
+        version: 8.35.0
+      eslint-config-prettier:
+        specifier: ^8.5.0
+        version: 8.5.0(eslint@8.35.0)
+      eslint-plugin-svelte:
+        specifier: ^2.28.0
+        version: 2.28.0(eslint@8.35.0)(svelte@3.55.0)
+      postcss:
+        specifier: ^8.4.18
+        version: 8.4.18
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.0
+      prettier-plugin-svelte:
+        specifier: ^2.8.1
+        version: 2.8.1(prettier@2.8.0)(svelte@3.55.0)
+      svelte:
+        specifier: ^3.55.0
+        version: 3.55.0
+      svelte-check:
+        specifier: ^3.0.1
+        version: 3.0.1(postcss@8.4.18)(svelte@3.55.0)
+      tailwindcss:
+        specifier: ^3.3.2
+        version: 3.3.2
+      tslib:
+        specifier: ^2.4.1
+        version: 2.4.1
+      typescript:
+        specifier: ^5.0.0
+        version: 5.0.2
+      vite:
+        specifier: ^4.3.0
+        version: 4.3.0(@types/node@18.14.2)
+
   apps/iiif:
     dependencies:
       '@allmaps/annotation':
@@ -260,6 +330,88 @@ importers:
         version: 5.0.2
       vite:
         specifier: ^4.0.0
+        version: 4.3.0(@types/node@18.14.2)
+
+  apps/latest:
+    dependencies:
+      '@allmaps/annotation':
+        specifier: ^1.0.0-beta.13
+        version: link:../../packages/annotation
+      '@allmaps/id':
+        specifier: ^1.0.0-beta.15
+        version: link:../../packages/id
+      '@allmaps/tailwind':
+        specifier: 1.0.0-beta.5
+        version: link:../../packages/tailwind
+      '@allmaps/transform':
+        specifier: 1.0.0-beta.14
+        version: link:../../packages/transform
+      '@allmaps/ui':
+        specifier: ^1.0.0-beta.15
+        version: link:../../packages/ui
+      '@turf/area':
+        specifier: ^6.5.0
+        version: 6.5.0
+      '@turf/rewind':
+        specifier: ^6.5.0
+        version: 6.5.0
+      d3-geo:
+        specifier: ^3.0.1
+        version: 3.0.1
+    devDependencies:
+      '@sveltejs/adapter-static':
+        specifier: ^1.0.0
+        version: 1.0.0(@sveltejs/kit@1.5.0)
+      '@sveltejs/kit':
+        specifier: ^1.5.0
+        version: 1.5.0(svelte@3.55.0)(vite@4.3.0)
+      '@types/d3-geo':
+        specifier: ^3.0.2
+        version: 3.0.2
+      '@types/geojson':
+        specifier: ^7946.0.10
+        version: 7946.0.10
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.45.0
+        version: 5.45.0(@typescript-eslint/parser@5.45.0)(eslint@8.35.0)(typescript@5.0.2)
+      '@typescript-eslint/parser':
+        specifier: ^5.45.0
+        version: 5.45.0(eslint@8.35.0)(typescript@5.0.2)
+      eslint:
+        specifier: ^8.35.0
+        version: 8.35.0
+      eslint-config-prettier:
+        specifier: ^8.5.0
+        version: 8.5.0(eslint@8.35.0)
+      eslint-plugin-svelte:
+        specifier: ^2.28.0
+        version: 2.28.0(eslint@8.35.0)(svelte@3.55.0)
+      postcss:
+        specifier: ^8.4.18
+        version: 8.4.18
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.0
+      prettier-plugin-svelte:
+        specifier: ^2.8.1
+        version: 2.8.1(prettier@2.8.0)(svelte@3.55.0)
+      svelte:
+        specifier: ^3.55.0
+        version: 3.55.0
+      svelte-check:
+        specifier: ^3.0.1
+        version: 3.0.1(postcss@8.4.18)(svelte@3.55.0)
+      tailwindcss:
+        specifier: ^3.3.2
+        version: 3.3.2
+      tslib:
+        specifier: ^2.4.1
+        version: 2.4.1
+      typescript:
+        specifier: ^5.0.0
+        version: 5.0.2
+      vite:
+        specifier: ^4.3.0
         version: 4.3.0(@types/node@18.14.2)
 
   apps/tiles:
@@ -406,6 +558,9 @@ importers:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.9
         version: link:../../packages/stdlib
+      '@allmaps/tailwind':
+        specifier: 1.0.0-beta.5
+        version: link:../../packages/tailwind
       '@allmaps/transform':
         specifier: ^1.0.0-beta.14
         version: link:../../packages/transform
@@ -739,6 +894,9 @@ importers:
       prettier:
         specifier: ^2.8.0
         version: 2.8.0
+      tailwindcss:
+        specifier: ^3.3.2
+        version: 3.3.2
       typescript:
         specifier: ^5.0.0
         version: 5.0.2
@@ -849,6 +1007,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@allmaps/tailwind':
+        specifier: ^1.0.0-beta.5
+        version: link:../tailwind
       flowbite:
         specifier: ^1.6.4
         version: 1.6.4
@@ -862,6 +1023,9 @@ importers:
       '@sveltejs/package':
         specifier: ^2.0.0
         version: 2.0.0(svelte@3.55.0)(typescript@5.0.2)
+      '@tailwindcss/typography':
+        specifier: ^0.5.9
+        version: 0.5.9(tailwindcss@3.3.2)
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.45.0(@typescript-eslint/parser@5.45.0)(eslint@8.35.0)(typescript@5.0.2)
@@ -2781,6 +2945,18 @@ packages:
       - supports-color
     dev: true
 
+  /@tailwindcss/typography@0.5.9(tailwindcss@3.3.2):
+    resolution: {integrity: sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.3.2
+    dev: true
+
   /@tootallnate/once@1.1.2:
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
     engines: {node: '>= 6'}
@@ -2790,6 +2966,13 @@ packages:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
     dev: true
+
+  /@turf/area@6.5.0:
+    resolution: {integrity: sha512-xCZdiuojokLbQ+29qR6qoMD89hv+JAgWjLrwSEWL+3JV8IXKeNFl6XkEJz9HGkVpnXvQKJoRz4/liT+8ZZ5Jyg==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+      '@turf/meta': 6.5.0
+    dev: false
 
   /@turf/bbox@6.5.0:
     resolution: {integrity: sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==}
@@ -2805,12 +2988,25 @@ packages:
       '@turf/invariant': 6.5.0
     dev: false
 
+  /@turf/boolean-clockwise@6.5.0:
+    resolution: {integrity: sha512-45+C7LC5RMbRWrxh3Z0Eihsc8db1VGBO5d9BLTOAwU4jR6SgsunTfRWR16X7JUwIDYlCVEmnjcXJNi/kIU3VIw==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+      '@turf/invariant': 6.5.0
+    dev: false
+
   /@turf/center@6.5.0:
     resolution: {integrity: sha512-T8KtMTfSATWcAX088rEDKjyvQCBkUsLnK/Txb6/8WUXIeOZyHu42G7MkdkHRoHtwieLdduDdmPLFyTdG5/e7ZQ==}
     dependencies:
       '@turf/bbox': 6.5.0
       '@turf/helpers': 6.5.0
     dev: true
+
+  /@turf/clone@6.5.0:
+    resolution: {integrity: sha512-mzVtTFj/QycXOn6ig+annKrM6ZlimreKYz6f/GSERytOpgzodbQyOgkfwru100O1KQhhjSudKK4DsQ0oyi9cTw==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+    dev: false
 
   /@turf/destination@6.5.0:
     resolution: {integrity: sha512-4cnWQlNC8d1tItOz9B4pmJdWpXqS0vEvv65bI/Pj/genJnsL7evI0/Xw42RvEGROS481MPiU80xzvwxEvhQiMQ==}
@@ -2839,7 +3035,6 @@ packages:
     resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
     dependencies:
       '@turf/helpers': 6.5.0
-    dev: true
 
   /@turf/midpoint@6.3.0:
     resolution: {integrity: sha512-ImiYK5l/QZh5aCynxCyHoaJYn4j1VhorVyw2XihHuwAtebTc+KRaBJpWSD2eJxo3Q3J+QepWMiiMvQFJgQ5uCQ==}
@@ -2850,6 +3045,16 @@ packages:
       '@turf/helpers': 6.5.0
     dev: false
 
+  /@turf/rewind@6.5.0:
+    resolution: {integrity: sha512-IoUAMcHWotBWYwSYuYypw/LlqZmO+wcBpn8ysrBNbazkFNkLf3btSDZMkKJO/bvOzl55imr/Xj4fi3DdsLsbzQ==}
+    dependencies:
+      '@turf/boolean-clockwise': 6.5.0
+      '@turf/clone': 6.5.0
+      '@turf/helpers': 6.5.0
+      '@turf/invariant': 6.5.0
+      '@turf/meta': 6.5.0
+    dev: false
+
   /@types/better-sqlite3@7.6.4:
     resolution: {integrity: sha512-dzrRZCYPXIXfSR1/surNbJ/grU3scTaygS0OMzjlGf71i9sc2fGyHPXXiXmEvNIoE0cGwsanEFMVJxPXmco9Eg==}
     dependencies:
@@ -2858,6 +3063,12 @@ packages:
 
   /@types/cookie@0.5.1:
     resolution: {integrity: sha512-COUnqfB2+ckwXXSFInsFdOAWQzCCx+a5hq2ruyj+Vjund94RJQd4LG2u9hnvJrTgunKAaax7ancBYlDrNYxA0g==}
+    dev: true
+
+  /@types/d3-geo@3.0.2:
+    resolution: {integrity: sha512-DbqK7MLYA8LpyHQfv6Klz0426bQEf7bRTvhMy44sNGVyZoWn//B0c+Qbeg8Osi2Obdc9BLLXYAKpyWege2/7LQ==}
+    dependencies:
+      '@types/geojson': 7946.0.10
     dev: true
 
   /@types/debug@4.1.7:
@@ -3148,7 +3359,7 @@ packages:
       '@vue/shared': 3.3.1
       estree-walker: 2.0.2
       magic-string: 0.30.0
-      postcss: 8.4.18
+      postcss: 8.4.23
       source-map-js: 1.0.2
     dev: true
     optional: true
@@ -3992,6 +4203,20 @@ packages:
     hasBin: true
     dev: true
 
+  /d3-array@3.2.4:
+    resolution: {integrity: sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==}
+    engines: {node: '>=12'}
+    dependencies:
+      internmap: 2.0.3
+    dev: false
+
+  /d3-geo@3.0.1:
+    resolution: {integrity: sha512-Wt23xBych5tSy9IYAM1FR2rWIBFWa52B/oF/GYe5zbdHrg08FU8+BuI6X4PvTwPDdqdAdq04fuWJpELtsaEjeA==}
+    engines: {node: '>=12'}
+    dependencies:
+      d3-array: 3.2.4
+    dev: false
+
   /dargs@7.0.0:
     resolution: {integrity: sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==}
     engines: {node: '>=8'}
@@ -4386,9 +4611,9 @@ packages:
       eslint: 8.35.0
       esutils: 2.0.3
       known-css-properties: 0.27.0
-      postcss: 8.4.18
-      postcss-load-config: 3.1.4(postcss@8.4.18)
-      postcss-safe-parser: 6.0.0(postcss@8.4.18)
+      postcss: 8.4.23
+      postcss-load-config: 3.1.4(postcss@8.4.23)
+      postcss-safe-parser: 6.0.0(postcss@8.4.23)
       svelte: 3.55.0
       svelte-eslint-parser: 0.28.0(svelte@3.55.0)
     transitivePeerDependencies:
@@ -5339,6 +5564,11 @@ packages:
       through: 2.3.8
     dev: true
 
+  /internmap@2.0.3:
+    resolution: {integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==}
+    engines: {node: '>=12'}
+    dev: false
+
   /ip@2.0.0:
     resolution: {integrity: sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==}
     dev: true
@@ -5795,8 +6025,16 @@ packages:
     resolution: {integrity: sha512-xYHt68QRoYGjeeM/XOE1uJtvXQAgvszfBhjV4yvsQH0u2i9I6cI6c6/eG4Hh3UAOVn0y/xAXwmTzEay49Q//HA==}
     dev: true
 
+  /lodash.castarray@4.4.0:
+    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
+    dev: true
+
   /lodash.ismatch@4.4.0:
     resolution: {integrity: sha512-fPMfXjGQEV9Xsq/8MTSgUf255gawYRbjwMyDbcvDhXgV7enSZA0hynz6vMPnpAb5iONEzBHBPsT+0zes5Z301g==}
+    dev: true
+
+  /lodash.isplainobject@4.0.6:
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
     dev: true
 
   /lodash.merge@4.6.2:
@@ -7583,7 +7821,7 @@ packages:
       postcss: 8.4.23
     dev: true
 
-  /postcss-load-config@3.1.4(postcss@8.4.18):
+  /postcss-load-config@3.1.4(postcss@8.4.23):
     resolution: {integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==}
     engines: {node: '>= 10'}
     peerDependencies:
@@ -7596,7 +7834,7 @@ packages:
         optional: true
     dependencies:
       lilconfig: 2.1.0
-      postcss: 8.4.18
+      postcss: 8.4.23
       yaml: 1.10.2
     dev: true
 
@@ -7627,13 +7865,21 @@ packages:
       postcss-selector-parser: 6.0.12
     dev: true
 
-  /postcss-safe-parser@6.0.0(postcss@8.4.18):
+  /postcss-safe-parser@6.0.0(postcss@8.4.23):
     resolution: {integrity: sha512-FARHN8pwH+WiS2OPCxJI8FuRJpTVnn6ZNFiqAM2aeW2LwTHWWmWgIyKC6cUo0L8aeKiF/14MNvnpls6R2PBeMQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.3.3
     dependencies:
-      postcss: 8.4.18
+      postcss: 8.4.23
+    dev: true
+
+  /postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
     dev: true
 
   /postcss-selector-parser@6.0.12:
