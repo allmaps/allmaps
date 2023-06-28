@@ -1,26 +1,14 @@
-import type { Config } from 'tailwindcss'
+import typegraphy from '@tailwindcss/typography'
 
-import colors from './src/lib/shared/colors.js'
+import { theme } from '@allmaps/tailwind'
+
+import type { Config } from 'tailwindcss'
 
 export default {
   content: [
     './src/**/*.{html,js,svelte,ts}',
     './dist/components/**/*.{html,js,svelte,ts}'
   ],
-  theme: {
-    extend: {
-      textColor: {
-        DEFAULT: colors.black
-      },
-      transitionDuration: {
-        0: '0ms'
-      }
-    },
-    colors,
-    fontFamily: {
-      sans: ['Geograph', 'sans-serif'],
-      // Consider using https://tosche.net/fonts/codelia
-      mono: ['DM Mono', 'monospace']
-    }
-  }
+  theme,
+  plugins: [typegraphy]
 } satisfies Config

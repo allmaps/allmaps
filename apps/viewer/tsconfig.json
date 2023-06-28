@@ -21,6 +21,7 @@
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/openlayers" },
-    { "path": "../../packages/stdlib" }
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/tailwind" }
   ]
 }

@@ -57,7 +57,7 @@
 </script>
 
 <form
-  class="flex items-center gap-2 w-full bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
+  class="flex items-center gap-2 w-full rounded-lg border border-gray-300 focus-within:border-blue-dark focus-within:ring-1 focus-within:ring-blue-dark text-sm"
   on:submit|preventDefault={submit}
 >
   <!-- svelte-ignore a11y-autofocus -->
@@ -69,7 +69,7 @@
     on:mouseup={handleMouseup}
     bind:value={urlValue}
     bind:this={input}
-    class="bg-transparent w-full px-2 py-1 focus:outline-none truncate"
+    class="bg-transparent w-full rounded-lg px-2 py-1 focus:outline-none truncate"
     {placeholder}
   />
   <div class="shrink-0">

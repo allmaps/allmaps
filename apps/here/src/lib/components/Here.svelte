@@ -18,6 +18,7 @@
   import 'ol/ol.css'
 
   import { GCPTransformer } from '@allmaps/transform'
+  import { pink } from '@allmaps/tailwind'
 
   import { positionToGeoJson } from '$lib/shared/position.js'
 
@@ -58,7 +59,7 @@
         image: new CircleStyle({
           radius: 7,
           fill: new Fill({
-            color: '#0a84fe'
+            color: pink
           }),
           stroke: new Stroke({
             color: '#fff',
