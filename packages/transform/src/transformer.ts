@@ -28,6 +28,7 @@ import type {
 
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: ImageWorldPosition[]
+  type: TransformationType
   transformer: GCPTransformerInterface
 
   constructor(
@@ -36,6 +37,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
     // options: TransformationOptions
   ) {
     this.gcps = gcps
+    this.type = type
 
     if (type === 'helmert') {
       this.transformer = new HelmertGCPTransformer(gcps)

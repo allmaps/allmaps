@@ -93,7 +93,7 @@ Both of these functions can take a second argument with options for this transfo
 
 ```js
 const options = {
-  maxOffsetRatio: 0.05,
+  maxOffsetRatio: 0.01,
   maxDepth: 6
 }
 const geoJSONLineGeometry = transformer.toGeoJSON([[100, 100], [110, 115], [120, 170]], options)

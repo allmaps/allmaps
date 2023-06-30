@@ -1,3 +1,4 @@
+import { GeoJSONPolygon } from '@allmaps/types'
 import type { BBox, SVGPolygon, Extent } from './types.js'
 
 // TODO: move to @allmaps/stdlib
@@ -49,4 +50,19 @@ export function bboxToSvgPolygon(bbox: BBox): SVGPolygon {
     [bbox[2], bbox[3]],
     [bbox[0], bbox[3]]
   ]
+}
+
+export function bboxToGeoJSONPolygon(bbox: BBox): GeoJSONPolygon {
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[1]],
+        [bbox[2], bbox[3]],
+        [bbox[0], bbox[3]],
+        [bbox[0], bbox[1]]
+      ]
+    ]
+  }
 }
