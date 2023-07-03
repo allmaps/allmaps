@@ -125,7 +125,7 @@
   })
 </script>
 
-<ol class="grid">
+<ol class="grid text-xs sm:text-sm xl:text-base">
   <li
     class="rounded-lg aspect-square bg-gray/20 p-1.5 flex flex-col justify-between"
   >
