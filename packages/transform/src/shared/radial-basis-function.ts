@@ -1,5 +1,5 @@
 import { Matrix, inverse } from 'ml-matrix'
-import { mulitplyMatricesElementwise } from './matrix.js'
+import { multiplyMatricesElementwise } from './matrix.js'
 
 import type { KernelFunction, NormFunction, Position } from './types.js'
 
@@ -154,7 +154,7 @@ export default class RBF {
     for (let i = 0; i < 2; i++) {
       // Apply the weights to the new distances
       // Note: don't consider the last three weights who are there for the affine part
-      newDestinationPoint[i] = mulitplyMatricesElementwise(
+      newDestinationPoint[i] = multiplyMatricesElementwise(
         newDistancesMatrix,
         this.weightsMatrices[i].selection([...Array(this.nPoints).keys()], [0])
       ).sum()

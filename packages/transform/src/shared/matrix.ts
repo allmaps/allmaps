@@ -3,7 +3,7 @@ import { Matrix } from 'ml-matrix'
 // Elementwise product of two matrices, also called Hadamard product or Shur product
 // This function is not provided as part of mlMatrix
 // This is different from a classical matrix product availble in numeric as M1.mul(M2)
-export function mulitplyMatricesElementwise(M1: Matrix, M2: Matrix): Matrix {
+export function multiplyMatricesElementwise(M1: Matrix, M2: Matrix): Matrix {
   M1 = Matrix.checkMatrix(M1)
   M2 = Matrix.checkMatrix(M2)
   if (M1.rows != M2.rows || M1.columns != M2.columns)

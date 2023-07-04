@@ -1,4 +1,4 @@
-export const gcps_3 = [
+export const gcps3 = [
   {
     image: [518, 991],
     world: [4.9516614, 52.4633102]
@@ -13,7 +13,7 @@ export const gcps_3 = [
   }
 ]
 
-export const gcps_6 = [
+export const gcps6 = [
   {
     image: [1344, 4098],
     world: [4.4091165, 51.9017125]
@@ -40,7 +40,7 @@ export const gcps_6 = [
   }
 ]
 
-export const gcps_10 = [
+export const gcps10 = [
   { image: [6933, 3641], world: [-5.6931398, 56.1290282] },
   {
     image: [6158, 1470],
