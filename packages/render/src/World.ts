@@ -65,7 +65,15 @@ export default class World extends EventTarget {
         'polynomial'
       )
 
-      const geoMask = transformer.toGeoJSONPolygon(pixelMask)
+      const transformerOptions = {
+        maxOffsetRatio: 0.01,
+        maxDepth: 6
+      }
+
+      const geoMask = transformer.toGeoJSONPolygon(
+        pixelMask,
+        transformerOptions
+      )
 
       const fullPixelMask: Position[] = [
         [0, 0],
@@ -73,7 +81,10 @@ export default class World extends EventTarget {
         [map.image.width, map.image.height],
         [0, map.image.height]
       ]
-      const fullGeoMask = transformer.toGeoJSONPolygon(fullPixelMask)
+      const fullGeoMask = transformer.toGeoJSONPolygon(
+        fullPixelMask,
+        transformerOptions
+      )
 
       // TODO: only load info.json when its needed
       const imageUri = map.image.uri

@@ -1,9 +1,12 @@
 import { describe, it } from 'mocha'
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
+import roughly from 'chai-roughly'
 
 import { readFile, readFileJson } from './lib/fs.js'
 import { exec, execJson } from './lib/exec.js'
 import { helpMessage } from './lib/help.js'
+
+chai.use(roughly)
 
 describe('allmaps transform', () => {
   it('should display help when no arguments are provided', () => {
@@ -27,8 +30,7 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polygon.svg'
     )
-
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation', () => {
@@ -40,7 +42,7 @@ describe('allmaps transform svg', () => {
       'input/svg/polylines.svg'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 })
 
@@ -58,7 +60,7 @@ describe('allmaps transform geojson', () => {
       'input/geojson/26e384d4efabdb32-linestring.geojson'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 })
 
@@ -76,7 +78,7 @@ describe('allmaps transform pixel-mask', () => {
       'input/maps/26e384d4efabdb32.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read two Georeference Annotations from standard input and transform their pixel masks to GeoJSON', () => {
@@ -86,7 +88,7 @@ describe('allmaps transform pixel-mask', () => {
       'input/annotations/combined.combined-json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a map from a filename and transform its pixel mask to GeoJSON', () => {
@@ -95,7 +97,7 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask input/maps/26e384d4efabdb32.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a map from two filenames and transform their pixel masks to GeoJSON', () => {
@@ -106,7 +108,7 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask input/maps/26e384d4efabdb32.json input/maps/5610333850638ae2.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
@@ -115,7 +117,7 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask input/annotations/13fd7a1921f2b011.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the custom transform options', () => {
@@ -124,7 +126,7 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask -p 0.01 -d 8 input/annotations/13fd7a1921f2b011.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
@@ -133,7 +135,7 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask input/annotations/7a69f9470b49a744.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read a Georeference Annotation with a reversed pixel mask from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
@@ -144,6 +146,6 @@ describe('allmaps transform pixel-mask', () => {
       'transform pixel-mask input/annotations/7a69f9470b49a744-reversed-pixel-mask.json'
     )
 
-    expect(expected).to.deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 })

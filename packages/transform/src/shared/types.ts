@@ -1,7 +1,14 @@
 // TODO: consider moving these types and types from @allmaps/render
 // to new package @allmaps/types
 
-export type TransformationType = 'polynomial' | 'thin-plate-spline'
+export type TransformationType =
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'projective'
+  | 'thin-plate-spline'
 
 export type Position = [number, number]
 
@@ -40,7 +47,7 @@ export type TransformOptions = {
 
 export type OptionalTransformOptions = Partial<TransformOptions>
 
-export type DistanceFunction = (r: number, epsilon?: number) => number
+export type KernelFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (point1: Position, point2: Position) => number
 
 export type GCPTransformerInterface = {

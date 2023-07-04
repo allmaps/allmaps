@@ -1,10 +1,9 @@
 import { Image } from '@allmaps/iiif-parser'
 
-import type { GCPTransformerInterface } from '@allmaps/transform'
+import type { GCPTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox } from './bbox.js'
-import { geoBBoxToSVGPolygon } from './transform.js'
+import { computeBBox, bboxToGeoJSONPolygon } from './bbox.js'
 
 import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
 
@@ -200,12 +199,20 @@ function iiifTilesByXToArray(
 }
 
 export function computeIiifTilesForMapGeoBBox(
-  transformer: GCPTransformerInterface,
+  transformer: GCPTransformer,
   image: Image,
   viewportSize: Size,
   geoBBox: BBox
 ): Tile[] {
-  const imageBBoxPolygon = geoBBoxToSVGPolygon(transformer, geoBBox)
+  const transformerOptions = {
+    maxOffsetRatio: 0.01,
+    maxDepth: 6
+  }
+  const geoBBoxGeoJSONPolygon = bboxToGeoJSONPolygon(geoBBox)
+  const imageBBoxPolygon = transformer.fromGeoJSONPolygon(
+    geoBBoxGeoJSONPolygon,
+    transformerOptions
+  )
   const geoBBoxImageBBox = computeBBox(imageBBoxPolygon)
 
   if (

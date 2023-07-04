@@ -1,10 +1,4 @@
-import {
-  GCP,
-  GDALCreateGCPTransformer,
-  GDALGCPTransform
-} from '../shared/gdaltransform.js'
-
-import type { GCPTransformInfo } from '../shared/gdaltransform.js'
+import Polynomial from '../shared/polynomial.js'
 
 import type {
   GCPTransformerInterface,
@@ -16,34 +10,47 @@ export default class PolynomialGCPTransformer
   implements GCPTransformerInterface
 {
   gcps: ImageWorldPosition[]
-  transformArgs: GCPTransformInfo
 
-  constructor(gcps: ImageWorldPosition[]) {
+  worldGcps: Position[]
+  resourceGcps: Position[]
+
+  toWorldPolynomial?: Polynomial
+  toResourcePolynomial?: Polynomial
+
+  order?: number
+
+  constructor(gcps: ImageWorldPosition[], order?: number) {
     this.gcps = gcps
 
-    const pasGCPs = gcps.map(
-      (gcp) => new GCP(gcp.image[0], gcp.image[1], gcp.world[1], gcp.world[0])
-    )
+    this.worldGcps = gcps.map((gcp) => gcp.world)
+    this.resourceGcps = gcps.map((gcp) => gcp.image)
 
-    const nOrder = 0
-    this.transformArgs = GDALCreateGCPTransformer(pasGCPs, nOrder, false)
+    if (order) {
+      this.order = order
+    }
+  }
+
+  createToWorldPolynomial(): Polynomial {
+    return new Polynomial(this.resourceGcps, this.worldGcps, this.order)
+  }
+
+  createToResourcePolynomial(): Polynomial {
+    return new Polynomial(this.worldGcps, this.resourceGcps, this.order)
   }
 
   toWorld(point: Position): Position {
-    const bInverse = false
+    if (!this.toWorldPolynomial) {
+      this.toWorldPolynomial = this.createToWorldPolynomial()
+    }
 
-    const input = [{ x: point[0], y: point[1] }]
-    const output = GDALGCPTransform(this.transformArgs, bInverse, input)
-
-    return [output[0].y, output[0].x]
+    return this.toWorldPolynomial.interpolant(point)
   }
 
   toResource(point: Position): Position {
-    const bInverse = true
+    if (!this.toResourcePolynomial) {
+      this.toResourcePolynomial = this.createToResourcePolynomial()
+    }
 
-    const input = [{ x: point[1], y: point[0] }]
-    const output = GDALGCPTransform(this.transformArgs, bInverse, input)
-
-    return [output[0].x, output[0].y]
+    return this.toResourcePolynomial.interpolant(point)
   }
 }

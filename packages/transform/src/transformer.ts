@@ -1,7 +1,9 @@
+import HelmertGCPTransformer from './transformers/helmert-transformer.js'
 import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
+import ProjectiveGCPTransformer from './transformers/projective-transformer.js'
 import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
 
-import { distanceThinPlate } from './shared/distance-functions.js'
+import { thinPlateKernel } from './shared/kernel-functions.js'
 
 import {
   toGeoJSONPoint,
@@ -26,6 +28,7 @@ import type {
 
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: ImageWorldPosition[]
+  type: TransformationType
   transformer: GCPTransformerInterface
 
   constructor(
@@ -34,13 +37,22 @@ export default class GCPTransformer implements GCPTransformerInterface {
     // options: TransformationOptions
   ) {
     this.gcps = gcps
+    this.type = type
 
-    if (type === 'polynomial') {
+    if (type === 'helmert') {
+      this.transformer = new HelmertGCPTransformer(gcps)
+    } else if (type === 'polynomial1' || type === 'polynomial') {
       this.transformer = new PolynomialGCPTransformer(gcps)
+    } else if (type === 'polynomial2') {
+      this.transformer = new PolynomialGCPTransformer(gcps, 2)
+    } else if (type === 'polynomial3') {
+      this.transformer = new PolynomialGCPTransformer(gcps, 3)
+    } else if (type === 'projective') {
+      this.transformer = new ProjectiveGCPTransformer(gcps)
     } else if (type === 'thin-plate-spline') {
       this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,
-        distanceThinPlate
+        thinPlateKernel
       )
     } else {
       throw new Error(`Unsupported transformation type: ${type}`)

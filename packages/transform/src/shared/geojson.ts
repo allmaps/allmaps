@@ -103,7 +103,7 @@ export function toGeoJSONPolygon(
   points: Position[],
   options?: OptionalTransformOptions
 ): GeoJSONPolygon {
-  const mergedOtions = mergeDefaultOptions(options)
+  const mergedOptions = mergeDefaultOptions(options)
 
   if (!Array.isArray(points) || points.length < 3) {
     throw new Error('Polygon should contain at least 3 points')
@@ -118,7 +118,7 @@ export function toGeoJSONPolygon(
   const segmentsWithMidpoints = recursivelyAddWorldMidpoints(
     transformer,
     segments,
-    mergedOtions
+    mergedOptions
   )
 
   return makeGeoJSONPolygon([
@@ -139,7 +139,7 @@ export function fromGeoJSONLineString(
   lineString: GeoJSONLineString,
   options?: OptionalTransformOptions
 ): Position[] {
-  const mergedOtions = mergeDefaultOptions(options)
+  const mergedOptions = mergeDefaultOptions(options)
 
   const coordinates = lineString.coordinates
 
@@ -156,7 +156,7 @@ export function fromGeoJSONLineString(
   const segmentsWithMidpoints = recursivelyAddImageMidpoints(
     transformer,
     segments,
-    mergedOtions
+    mergedOptions
   )
 
   return [
@@ -170,7 +170,7 @@ export function fromGeoJSONPolygon(
   polygon: GeoJSONPolygon,
   options?: OptionalTransformOptions
 ): Position[] {
-  const mergedOtions = mergeDefaultOptions(options)
+  const mergedOptions = mergeDefaultOptions(options)
 
   const coordinates = polygon.coordinates[0]
 
@@ -187,7 +187,7 @@ export function fromGeoJSONPolygon(
   const segmentsWithMidpoints = recursivelyAddImageMidpoints(
     transformer,
     segments,
-    mergedOtions
+    mergedOptions
   )
 
   return [
