@@ -3,7 +3,7 @@ import { Image } from '@allmaps/iiif-parser'
 import type { GCPTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox, bboxToGeoJSONPolygon } from './bbox.js'
+import { computeBBox, bboxToGeoJSONPolygon, bboxToSvgPolygon } from './bbox.js'
 
 import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
 
@@ -208,12 +208,15 @@ export function computeIiifTilesForMapGeoBBox(
     maxOffsetRatio: 0.01,
     maxDepth: 6
   }
+  // geoBBox is a BBox of the viewport in World positions
+  // geoBBoxGeoJSONPolygon is its GeoJSON geometry
+  // transformedGeoBBox is a SVG Polygon of it's transformation, in image positions. Due to transformerOptions this in not necessarilly a 4-point SVG polygon, but can have more points
+  // geoBBoxImageBBox is the bounding box of this polygon.
   const geoBBoxGeoJSONPolygon = bboxToGeoJSONPolygon(geoBBox)
-  const imageBBoxPolygon = transformer.fromGeoJSONPolygon(
-    geoBBoxGeoJSONPolygon,
-    transformerOptions
+  const transformedGeoBBox = transformer.fromGeoJSONPolygon(
+    geoBBoxGeoJSONPolygon, transformerOptions
   )
-  const geoBBoxImageBBox = computeBBox(imageBBoxPolygon)
+  const geoBBoxImageBBox = computeBBox(transformedGeoBBox)
 
   if (
     (geoBBoxImageBBox[0] > image.width || geoBBoxImageBBox[2] < 0) &&
@@ -234,7 +237,7 @@ export function computeIiifTilesForMapGeoBBox(
   if (zoomLevel) {
     // TODO: maybe index all tiles in rtree?
 
-    const tilePixelExtent = scaleToTiles(zoomLevel, imageBBoxPolygon)
+    const tilePixelExtent = scaleToTiles(zoomLevel, bboxToSvgPolygon(geoBBoxImageBBox))
 
     const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
     const iiifTiles = iiifTilesByXToArray(
