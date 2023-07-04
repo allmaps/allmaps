@@ -18,6 +18,8 @@ Apps:
 - [Allmaps Info](apps/info)
 - [Allmaps IIIF Viewer](apps/iiif)
 - [Allmaps CLI](apps/cli)
+- [Allmaps Here](apps/here)
+- [Allmaps Latest](apps/latest)
 
 ## Installation
 
