@@ -1,12 +1,19 @@
 {
   "name": "@allmaps/transform",
   "version": "1.0.0-beta.14",
-  "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
-  },
-  "description": "Coordinate transformation functions, based on gdaltransform",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "description": "Coordinate transformation functions",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
