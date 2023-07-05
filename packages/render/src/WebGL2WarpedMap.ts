@@ -32,13 +32,18 @@ export default class WebGL2WarpedMap extends EventTarget {
   imageWidth: number
   imageHeight: number
 
-  geoMaskTriangles: number[] = []
-  transformedGeoMaskTriangles: Float32Array = new Float32Array()
+  vertexBufferTransform: Transform | undefined
 
   pixelMaskTriangles: number[] = []
   transformedPixelMaskTriangles: Float32Array = new Float32Array()
 
-  // pixelTriangleIndex: Float32Array = new Float32Array() // DEV
+  currentGeoMaskTriangles: number[] = []
+  currentTransformedGeoMaskTriangles: Float32Array = new Float32Array()
+
+  newGeoMaskTriangles: number[] = []
+  newTransformedGeoMaskTriangles: Float32Array = new Float32Array()
+
+  pixelTriangleIndex: Float32Array = new Float32Array() // DEV
 
   vao: WebGLVertexArrayObject | null
 
@@ -85,7 +90,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
-  updateTriangulation(warpedMap: WarpedMap) {
+  updateTriangulation(warpedMap: WarpedMap, immediately = true) {
     const bbox: BBox = computeBBox(warpedMap.pixelMask)
     const bboxDiameter: number = Math.sqrt(
       (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
@@ -96,33 +101,71 @@ export default class WebGL2WarpedMap extends EventTarget {
       bboxDiameter / DIAMETER_FRACTION
     ).flat()
 
-    const geoMaskVertices = trianglesPositions.map((point) =>
+    const newGeoMaskVertices = trianglesPositions.map((point) =>
       warpedMap.transformer.toWorld(point as [number, number])
     )
 
-    this.geoMaskTriangles = geoMaskVertices.flat()
+    this.newGeoMaskTriangles = newGeoMaskVertices.flat()
     this.pixelMaskTriangles = trianglesPositions.flat()
 
-    this.transformedGeoMaskTriangles = new Float32Array(
-      this.geoMaskTriangles.length
+    this.newTransformedGeoMaskTriangles = new Float32Array(
+      this.newGeoMaskTriangles.length
     )
+
     this.transformedPixelMaskTriangles = new Float32Array(
       this.pixelMaskTriangles.length
     )
+
+    if (immediately || !this.currentGeoMaskTriangles.length) {
+      this.currentGeoMaskTriangles = this.newGeoMaskTriangles
+      this.currentTransformedGeoMaskTriangles =
+        this.newTransformedGeoMaskTriangles
+    }
   }
 
-  updateVertexBuffers(transform: Transform) {
-    if (this.vao) {
+  resetCurrentTriangles() {
+    this.currentGeoMaskTriangles = this.newGeoMaskTriangles
+    this.currentTransformedGeoMaskTriangles =
+      this.newTransformedGeoMaskTriangles
+
+    this.newGeoMaskTriangles = []
+    this.newTransformedGeoMaskTriangles = new Float32Array()
+
+    this.updateVertexBuffersInternal()
+  }
+
+  private updateVertexBuffersInternal() {
+    if (this.vao && this.vertexBufferTransform) {
       this.gl.bindVertexArray(this.vao)
 
-      for (let index = 0; index < this.geoMaskTriangles.length; index += 2) {
-        const transformedPoint = applyTransform(transform, [
-          this.geoMaskTriangles[index],
-          this.geoMaskTriangles[index + 1]
-        ])
+      for (
+        let index = 0;
+        index < this.currentGeoMaskTriangles.length;
+        index += 2
+      ) {
+        const currentTransformedPoint = applyTransform(
+          this.vertexBufferTransform,
+          [
+            this.currentGeoMaskTriangles[index],
+            this.currentGeoMaskTriangles[index + 1]
+          ]
+        )
 
-        this.transformedGeoMaskTriangles[index] = transformedPoint[0]
-        this.transformedGeoMaskTriangles[index + 1] = transformedPoint[1]
+        this.currentTransformedGeoMaskTriangles[index] =
+          currentTransformedPoint[0]
+        this.currentTransformedGeoMaskTriangles[index + 1] =
+          currentTransformedPoint[1]
+
+        if (this.newGeoMaskTriangles.length) {
+          // TODO: find a way to only do this during transition
+          const transformedPoint = applyTransform(this.vertexBufferTransform, [
+            this.newGeoMaskTriangles[index],
+            this.newGeoMaskTriangles[index + 1]
+          ])
+
+          this.newTransformedGeoMaskTriangles[index] = transformedPoint[0]
+          this.newTransformedGeoMaskTriangles[index + 1] = transformedPoint[1]
+        }
       }
 
       for (let index = 0; index < this.pixelMaskTriangles.length; index += 2) {
@@ -140,29 +183,32 @@ export default class WebGL2WarpedMap extends EventTarget {
         this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
       }
 
-      // // DEV Compute triangle indeces, used for development purposes
-      // this.pixelTriangleIndex = new Float32Array(this.pixelMaskTriangles.length)
+      // DEV Compute triangle indeces, used for development purposes
+      this.pixelTriangleIndex = new Float32Array(this.pixelMaskTriangles.length)
 
-      // for (let index = 0; index < this.pixelMaskTriangles.length; index++) {
-      //   this.pixelTriangleIndex[3 * index] = index
-      //   this.pixelTriangleIndex[3 * index + 1] = index
-      //   this.pixelTriangleIndex[3 * index + 2] = index
-      // }
-
-      // console.log(
-      //   this.pixelMaskTriangles,
-      //   this.transformedPixelMaskTriangles,
-      //   this.geoMaskTriangles,
-      //   this.transformedGeoMaskTriangles
-      // )
+      for (let index = 0; index < this.pixelMaskTriangles.length; index++) {
+        this.pixelTriangleIndex[3 * index] = index
+        this.pixelTriangleIndex[3 * index + 1] = index
+        this.pixelTriangleIndex[3 * index + 2] = index
+      }
 
       createBuffer(
         this.gl,
         this.program,
-        this.transformedGeoMaskTriangles,
+        this.currentTransformedGeoMaskTriangles,
         2,
-        'a_position'
+        'a_position_current'
       )
+
+      if (this.newTransformedGeoMaskTriangles.length) {
+        createBuffer(
+          this.gl,
+          this.program,
+          this.newTransformedGeoMaskTriangles,
+          2,
+          'a_position_new'
+        )
+      }
 
       createBuffer(
         this.gl,
@@ -172,15 +218,20 @@ export default class WebGL2WarpedMap extends EventTarget {
         'a_pixel_position'
       )
 
-      // // DEV
-      // createBuffer(
-      //   this.gl,
-      //   this.program,
-      //   this.pixelTriangleIndex,
-      //   1,
-      //   'a_pixel_triangle_index'
-      // )
+      // DEV
+      createBuffer(
+        this.gl,
+        this.program,
+        this.pixelTriangleIndex,
+        1,
+        'a_pixel_triangle_index'
+      )
     }
+  }
+
+  updateVertexBuffers(transform: Transform) {
+    this.vertexBufferTransform = transform
+    this.updateVertexBuffersInternal()
   }
 
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {

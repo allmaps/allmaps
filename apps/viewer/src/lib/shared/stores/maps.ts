@@ -166,7 +166,7 @@ export function resetMaps() {
   mapsById.set(new Map())
 }
 
-export const mapIds = derived(mapsById, ($mapsById) => $mapsById.keys())
+export const mapIds = derived(mapsById, ($mapsById) => [...$mapsById.keys()])
 
 export const maps = derived(mapsById, ($mapsById) => [...$mapsById.values()])
 

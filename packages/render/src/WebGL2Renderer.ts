@@ -44,6 +44,16 @@ export default class WebGL2Renderer extends EventTarget {
   // TODO: move to Viewport?
   invertedRenderTransform: Transform
 
+  // Last render atrributes
+  projectionTransform: Transform | undefined
+  mapIds: string[] = []
+
+  lastAnimationFrameRequestId: number | undefined
+  animating = false
+  transformationTransitionStart: number | undefined
+  transformationTransitionDuration = 750
+  animationProgress = 1
+
   constructor(gl: WebGL2RenderingContext, tileCache: TileCache) {
     super()
 
@@ -124,11 +134,54 @@ export default class WebGL2Renderer extends EventTarget {
     this.webGLWarpedMapsById = new Map()
   }
 
-  updateTriangulation(warpedMap: WarpedMap) {
+  updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(warpedMap.mapId)
     if (webGLWarpedMap) {
-      webGLWarpedMap.updateTriangulation(warpedMap)
+      webGLWarpedMap.updateTriangulation(warpedMap, immediately)
     }
+  }
+
+  private transformationTransitionFrame(now: number) {
+    if (!this.transformationTransitionStart) {
+      this.transformationTransitionStart = now
+    }
+
+    if (
+      now - this.transformationTransitionStart >
+      this.transformationTransitionDuration
+    ) {
+      for (const webGLWarpedMap of this.webGLWarpedMapsById.values()) {
+        webGLWarpedMap.resetCurrentTriangles()
+      }
+
+      this.animating = false
+      this.animationProgress = 0
+
+      this.transformationTransitionStart = undefined
+    } else {
+      this.animationProgress =
+        (now - this.transformationTransitionStart) /
+        this.transformationTransitionDuration
+
+      this.renderInternal()
+
+      this.lastAnimationFrameRequestId = requestAnimationFrame(
+        this.transformationTransitionFrame.bind(this)
+      )
+    }
+  }
+
+  startTransformationTransition() {
+    if (this.lastAnimationFrameRequestId !== undefined) {
+      cancelAnimationFrame(this.lastAnimationFrameRequestId)
+    }
+
+    this.animating = true
+    // this.animationProgress = 0
+    this.transformationTransitionStart = undefined
+    this.lastAnimationFrameRequestId = requestAnimationFrame(
+      this.transformationTransitionFrame.bind(this)
+    )
   }
 
   getOpacity(): number | undefined {
@@ -345,12 +398,13 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  render(
-    projectionTransform: Transform,
-    mapIds: IterableIterator<string>
-  ): void {
+  private renderInternal(): void {
+    if (!this.projectionTransform) {
+      return
+    }
+
     const renderTransform = multiplyTransform(
-      projectionTransform,
+      this.projectionTransform,
       this.invertedRenderTransform
     )
 
@@ -372,7 +426,13 @@ export default class WebGL2Renderer extends EventTarget {
       transformToMatrix4(renderTransform)
     )
 
-    for (const mapId of mapIds) {
+    const animationProgressLocation = gl.getUniformLocation(
+      this.program,
+      'u_animation_progress'
+    )
+    gl.uniform1f(animationProgressLocation, this.animationProgress)
+
+    for (const mapId of this.mapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
@@ -426,7 +486,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.bindTexture(gl.TEXTURE_2D, webglWarpedMap.scaleFactorsTexture)
 
       const vao = webglWarpedMap.vao
-      const triangles = webglWarpedMap.geoMaskTriangles
+      const triangles = webglWarpedMap.currentGeoMaskTriangles
       const count = triangles.length / 2
 
       const primitiveType = this.gl.TRIANGLES
@@ -435,5 +495,15 @@ export default class WebGL2Renderer extends EventTarget {
       gl.bindVertexArray(vao)
       gl.drawArrays(primitiveType, offset, count)
     }
+  }
+
+  render(
+    projectionTransform: Transform,
+    mapIds: IterableIterator<string>
+  ): void {
+    this.projectionTransform = projectionTransform
+    this.mapIds = [...mapIds]
+
+    this.renderInternal()
   }
 }

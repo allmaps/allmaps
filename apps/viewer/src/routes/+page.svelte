@@ -33,6 +33,7 @@
     createImageInfoCache,
     mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
+  import { nextTransformation } from '$lib/shared/stores/transformation.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -95,6 +96,8 @@
       $view = 'image'
     } else if (event.key === 'm') {
       $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
+    } else if (event.key === 't') {
+      nextTransformation()
     }
   }
 
@@ -175,7 +178,7 @@
             <button
               type="submit"
               disabled={annotationString.length === 0}
-              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              class="text-white bg-green-500 hover:bg-green-600 transition-colors disabled:bg-gray-500 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
               >View</button
             >
           </form>

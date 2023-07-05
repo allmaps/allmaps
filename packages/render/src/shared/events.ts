@@ -6,6 +6,7 @@ export enum WarpedMapEventType {
   ZINDICESCHANGES = 'zindiceschanged',
   PIXELMASKUPDATED = 'pixelmaskupdated',
   VISIBILITYCHANGED = 'visibilitychanged',
+  TRANSFORMATIONCHANGED = 'transformationchanged',
 
   GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
   GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',

@@ -25,6 +25,8 @@ export default class RTree {
   itemsById: Map<string, RTreeItem> = new Map()
 
   addItem(id: string, polygon: GeoJSONPolygon) {
+    this.removeItem(id)
+
     const bbox = getPolygonBBox(polygon)
 
     const item = {

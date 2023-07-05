@@ -7,6 +7,8 @@
   import Zoom from 'ol/control/Zoom.js'
   import Rotate from 'ol/control/Rotate.js'
 
+  import Transformation from '$lib/components/controls/Transformation.svelte'
+
   let zoom: Zoom
   let rotate: Rotate
 
@@ -140,12 +142,15 @@
   })
 </script>
 
-<div
-  bind:this={container}
-  class="inline-flex rounded-md shadow-sm"
-  role="group"
-/>
+<div class="inline-flex gap-1">
+  <div
+    bind:this={container}
+    class="inline-flex rounded-md shadow-sm"
+    role="group"
+  />
 
+  <Transformation />
+</div>
 <!-- <div class="select-container">
   <div class="select">
     <select bind:value={tileSourceIndex}>

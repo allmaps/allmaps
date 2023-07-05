@@ -15,6 +15,7 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
+import type { TransformationType, ImageWorldPosition } from '@allmaps/transform'
 import type { Position, BBox, WarpedMap } from './shared/types.js'
 
 export default class World extends EventTarget {
@@ -42,7 +43,7 @@ export default class World extends EventTarget {
       const gcps = map.gcps
       const pixelMask = map.pixelMask
 
-      const sphericalMercatorGcps = gcps.map(({ world, image }) => ({
+      const projectedGCPs = gcps.map(({ world, image }) => ({
         world: fromLonLat(world),
         image
       }))
@@ -59,33 +60,6 @@ export default class World extends EventTarget {
       //  - https://github.com/w8r/martinez
       //  - https://github.com/mfogel/polygon-clipping
 
-      // TODO: make the transformation type tunabel by user
-      const transformer = new GCPTransformer(
-        sphericalMercatorGcps,
-        'polynomial'
-      )
-
-      const transformerOptions = {
-        maxOffsetRatio: 0.01,
-        maxDepth: 6
-      }
-
-      const geoMask = transformer.toGeoJSONPolygon(
-        pixelMask,
-        transformerOptions
-      )
-
-      const fullPixelMask: Position[] = [
-        [0, 0],
-        [map.image.width, 0],
-        [map.image.width, map.image.height],
-        [0, map.image.height]
-      ]
-      const fullGeoMask = transformer.toGeoJSONPolygon(
-        fullPixelMask,
-        transformerOptions
-      )
-
       // TODO: only load info.json when its needed
       const imageUri = map.image.uri
       const imageInfoJson = await fetchImageInfo(imageUri, {
@@ -97,24 +71,24 @@ export default class World extends EventTarget {
       const warpedMap: WarpedMap = {
         imageId,
         mapId,
+        projectedGCPs,
         visible: true,
         parsedImage,
         pixelMask,
-        transformer,
-        geoMask,
-        geoMaskBBox: getPolygonBBox(geoMask),
-        fullGeoMask,
-        fullGeoMaskBBox: getPolygonBBox(fullGeoMask)
+        // TODO: clean up!
+        ...this.computeWarpedMapTransformer(
+          mapId,
+          pixelMask,
+          parsedImage,
+          projectedGCPs,
+          'polynomial'
+        )
       }
 
       this.warpedMapsById.set(mapId, warpedMap)
 
       const zIndex = this.warpedMapsById.size - 1
       this.zIndices.set(mapId, zIndex)
-
-      if (this.rtree) {
-        this.rtree.addItem(mapId, geoMask)
-      }
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
@@ -127,6 +101,47 @@ export default class World extends EventTarget {
       } else {
         throw err
       }
+    }
+  }
+
+  private computeWarpedMapTransformer(
+    mapId: string,
+    pixelMask: Position[],
+    parsedImage: IIIFImage,
+    projectedGcps: ImageWorldPosition[],
+    transformation: TransformationType
+  ) {
+    const transformer = new GCPTransformer(projectedGcps, transformation)
+
+    const transformerOptions = {
+      maxOffsetRatio: 0.01,
+      maxDepth: 6
+    }
+
+    const geoMask = transformer.toGeoJSONPolygon(pixelMask, transformerOptions)
+
+    if (this.rtree) {
+      this.rtree.addItem(mapId, geoMask)
+    }
+
+    const fullPixelMask: Position[] = [
+      [0, 0],
+      [parsedImage.width, 0],
+      [parsedImage.width, parsedImage.height],
+      [0, parsedImage.height]
+    ]
+
+    const fullGeoMask = transformer.toGeoJSONPolygon(
+      fullPixelMask,
+      transformerOptions
+    )
+
+    return {
+      transformer,
+      geoMask,
+      geoMaskBBox: getPolygonBBox(geoMask),
+      fullGeoMask,
+      fullGeoMaskBBox: getPolygonBBox(fullGeoMask)
     }
   }
 
@@ -321,6 +336,30 @@ export default class World extends EventTarget {
         new WarpedMapEvent(WarpedMapEventType.PIXELMASKUPDATED, mapId)
       )
     }
+  }
+
+  setTransformation(mapIds: string[], transformation: TransformationType) {
+    for (const mapId of mapIds) {
+      let warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap) {
+        warpedMap = {
+          ...warpedMap,
+          ...this.computeWarpedMapTransformer(
+            mapId,
+            warpedMap.pixelMask,
+            warpedMap.parsedImage,
+            warpedMap.projectedGCPs,
+            transformation
+          )
+        }
+
+        this.warpedMapsById.set(mapId, warpedMap)
+      }
+    }
+
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.TRANSFORMATIONCHANGED, mapIds)
+    )
   }
 
   showMaps(mapIds: Iterable<string>) {

@@ -127,6 +127,11 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.world.addEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.world.addEventListener(
       WarpedMapEventType.PIXELMASKUPDATED,
       this.pixelMaskUpdated.bind(this)
     )
@@ -168,7 +173,7 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
+  private arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
     if (!arr1 || !arr2) {
       return false
     }
@@ -185,7 +190,7 @@ export class WarpedMapLayer extends Layer {
     return true
   }
 
-  warpedMapAdded(event: Event) {
+  private warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
@@ -205,7 +210,7 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  zIndicesChanged() {
+  private zIndicesChanged() {
     const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
       (mapIdA, mapIdB) => {
         const zIndexA = this.world.getZIndex(mapIdA)
@@ -222,11 +227,26 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  visibilityChanged() {
+  private visibilityChanged() {
     this.changed()
   }
 
-  pixelMaskUpdated(event: Event) {
+  private transformationChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      for (const mapId of mapIds) {
+        const warpedMap = this.world.getMap(mapId)
+
+        if (warpedMap) {
+          this.renderer.updateTriangulation(warpedMap, false)
+        }
+      }
+
+      this.renderer.startTransformationTransition()
+    }
+  }
+
+  private pixelMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       const warpedMap = this.world.getMap(mapId)
@@ -237,7 +257,7 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  warpedMapEnter(event: Event) {
+  private warpedMapEnter(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       this.mapIdsInViewport.add(mapId)
@@ -245,7 +265,7 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  warpedMapLeave(event: Event) {
+  private warpedMapLeave(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       this.mapIdsInViewport.delete(mapId)
@@ -257,11 +277,11 @@ export class WarpedMapLayer extends Layer {
     this.tileCache.clear()
   }
 
-  rendererChanged() {
+  private rendererChanged() {
     this.changed()
   }
 
-  onResize(entries: ResizeObserverEntry[]) {
+  private onResize(entries: ResizeObserverEntry[]) {
     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
     // TODO: read + understand https://web.dev/device-pixel-content-box/
     for (const entry of entries) {
@@ -302,7 +322,7 @@ export class WarpedMapLayer extends Layer {
     return needResize
   }
 
-  hexToRgb(hex: string | undefined): OptionalColor {
+  private hexToRgb(hex: string | undefined): OptionalColor {
     if (!hex) {
       return
     }
@@ -426,7 +446,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   // TODO: Use OL's renderer class, move this function there?
-  prepareFrameInternal(frameState: FrameState) {
+  private prepareFrameInternal(frameState: FrameState) {
     const vectorSource = this.source
     const viewNotMoving =
       !frameState.viewHints[ViewHint.ANIMATING] &&

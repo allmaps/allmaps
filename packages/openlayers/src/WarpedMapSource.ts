@@ -2,6 +2,7 @@ import Source from 'ol/source/Source.js'
 
 import { RTree, World } from '@allmaps/render'
 
+import type { TransformationType } from '@allmaps/transform'
 import type { Position, BBox } from '@allmaps/render'
 
 export class WarpedMapSource extends Source {
@@ -95,6 +96,11 @@ export class WarpedMapSource extends Source {
     this.changed()
 
     return result
+  }
+
+  setTransformation(mapIds: string[], transformation: TransformationType) {
+    this.world.setTransformation(mapIds, transformation)
+    this.changed()
   }
 
   getExtent(): BBox | undefined {

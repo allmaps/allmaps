@@ -19,7 +19,7 @@ uniform isampler2D u_imagePositionsTexture;
 uniform isampler2D u_scaleFactorsTexture;
 
 in vec2 v_pixel_position;
-// in float v_pixel_triangle_index; // DEV
+in float v_pixel_triangle_index; // DEV
 
 out vec4 outColor;
 
@@ -97,9 +97,8 @@ void main() {
     // Set opacity
     outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
 
-    // // DEV: draw triangles in random color
+    // DEV: draw triangles in random color
     // float color = sin(v_pixel_triangle_index * 4.0);
     // outColor = vec4(color, fract(color + 0.3), fract(color + 0.6), 1);
-
   }
 }
