@@ -335,7 +335,7 @@ function addImageMidpoints(
         options,
         depth + 1
       ),
-      addWorldMidpoints(
+      addImageMidpoints(
         transformer,
         { from: newSegmentMidpoint, to: segment.to },
         options,

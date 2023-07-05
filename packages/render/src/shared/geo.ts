@@ -26,6 +26,19 @@ export function fromLonLat([lon, lat]: Position): Position {
   return [x, y]
 }
 
+// From: https://gist.github.com/mudpuddle/6115083
+export function toLonLat([x, y]: Position): Position {
+  const rMajor = 6378137.0
+  const shift = Math.PI * rMajor
+  const lon = (x / shift) * 180.0
+  let lat = (y / shift) * 180.0
+  lat =
+    (180 / Math.PI) *
+    (2 * Math.atan(Math.exp((lat * Math.PI) / 180.0)) - Math.PI / 2.0)
+
+  return [lon, lat]
+}
+
 export function getPolygonBBox(polygon: GeoJSONPolygon): BBox {
   return computeBBox(polygon.coordinates[0])
 }
