@@ -3,7 +3,7 @@ import { Image } from '@allmaps/iiif-parser'
 import type { GCPTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox, bboxToGeoJSONPolygon } from './bbox.js'
+import { computeBBox, bboxToSvgPolygon } from './bbox.js'
 
 import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
 
@@ -204,31 +204,20 @@ export function computeIiifTilesForMapGeoBBox(
   viewportSize: Size,
   geoBBox: BBox
 ): Tile[] {
-  const transformerOptions = {
-    maxOffsetRatio: 0.01,
-    maxDepth: 6
-  }
   // geoBBox is a BBox of the extent viewport in World positions (in the projection that was given)
   // geoBBoxPolygon is its GeoJSON geometry (in the projection that was given, so not necesarilly WGS84 as requested by GeoJSON!)
   // geoBBoxPolygonToResource is a SVG Polygon of it's transformation, in image positions. Due to transformerOptions this in not necessarilly a 4-point SVG polygon, but can have more points
-  // geoBBoxToResource is the point for point transformed transformed geoBBox to image coordinates
   // geoBBoxImageBBox is the bounding box of this polygon.
 
-  // TODO: replace bboxToGeoJSONPolygon by a new computePolygon(bbox) and fromGeoJSONPolygon by a new transformBackward(polygon)
-  // Then compute geoBBoxImageBBox as computeBbox(geoBBoxPolygonToResource) and rename it to geoBBoxPolygonResourceBBox
+  // TODO: rename function bboxToSvgPolygon > bboxToPolygon
+  // TODO: make this work for maxOffsetRatio = 0
 
-  const geoBBoxPolygon = bboxToGeoJSONPolygon(geoBBox)
-  const geoBBoxToResource = transformer
-    .fromGeoJSONPolygon(geoBBoxPolygon)
-    .slice(0, 4) //
-  // const geoBBoxPolygonToResource = transformer.fromGeoJSONPolygon(
-  //   geoBBoxPolygon,
-  //   {
-  //     maxOffsetRatio: 0.01,
-  //     maxDepth: 1
-  //   }
-  // )
-  const geoBBoxImageBBox = computeBBox(geoBBoxToResource) //
+  const geoBBoxPolygon = bboxToSvgPolygon(geoBBox)
+  const geoBBoxPolygonToResource = transformer.toImagePolygon(geoBBoxPolygon, {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 2
+  })
+  const geoBBoxImageBBox = computeBBox(geoBBoxPolygonToResource)
 
   if (
     (geoBBoxImageBBox[0] > image.width || geoBBoxImageBBox[2] < 0) &&
@@ -249,7 +238,7 @@ export function computeIiifTilesForMapGeoBBox(
   if (zoomLevel) {
     // TODO: maybe index all tiles in rtree?
 
-    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxToResource)
+    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxPolygonToResource)
 
     const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
     const iiifTiles = iiifTilesByXToArray(

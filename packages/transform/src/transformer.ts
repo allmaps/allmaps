@@ -11,7 +11,9 @@ import {
   toGeoJSONPolygon,
   fromGeoJSONPoint,
   fromGeoJSONLineString,
-  fromGeoJSONPolygon
+  fromGeoJSONPolygon,
+  toWorldPolygon,
+  toImagePolygon
 } from './shared/geojson.js'
 
 import type {
@@ -147,5 +149,19 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: OptionalTransformOptions
   ): Position[] {
     return fromGeoJSONPolygon(this, geometry, options)
+  }
+
+  toWorldPolygon(
+    polygon: Position[],
+    options?: OptionalTransformOptions
+  ): Position[] {
+    return toWorldPolygon(this, polygon, options)
+  }
+
+  toImagePolygon(
+    polygon: Position[],
+    options?: OptionalTransformOptions
+  ): Position[] {
+    return toImagePolygon(this, polygon, options)
   }
 }

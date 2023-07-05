@@ -1,72 +1,67 @@
-// import fs from 'fs'
-// import path from 'path'
+import { describe, it } from 'mocha'
+import chai, { expect } from 'chai'
+import shallowDeepEqual from 'chai-shallow-deep-equal'
 
-// import { describe, it } from 'mocha'
-// import chai, { expect } from 'chai'
-// import shallowDeepEqual from 'chai-shallow-deep-equal'
+import { GCPTransformer } from '../dist/index.js'
 
-// import { createTransformer, toGeoJSONPolygon } from '../dist/index.js'
+import { gcps6 } from './input/gcps-test.js'
 
-// chai.use(shallowDeepEqual)
+chai.use(shallowDeepEqual)
 
-// const inputDir = './test/input'
-// const outputDir = './test/output'
+describe('To World Polygon transformer ', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 1
+  }
+  const transformer = new GCPTransformer(gcps6, 'thin-plate-spline')
+  const input = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const output = [
+    [4.388957777030093, 51.959084191571606],
+    [4.390889520773774, 51.94984430356657],
+    [4.392938913951547, 51.94062947962427],
+    [4.409493277493718, 51.94119110133424],
+    [4.425874493300959, 51.94172557475595],
+    [4.4230497784967655, 51.950815146974556],
+    [4.420666790347598, 51.959985351835975]
+  ]
 
-// fs.readdirSync(inputDir)
-//   .filter((filename) => filename.endsWith('.json'))
-//   .map((filename) => {
-//     const basename = path.basename(filename, '.json')
+  const result = transformer.toWorldPolygon(input, transformOptions)
 
-//     const inputFilename = path.join(inputDir, `${basename}.json`)
-//     const geojsonFilename = path.join(outputDir, `${basename}.geojson`)
-//     const errorFilename = path.join(outputDir, `${basename}.error.json`)
+  it(`should have the right output`, () => {
+    expect(result).to.shallowDeepEqual(output)
+  })
+})
 
-//     return {
-//       basename,
-//       map: readJSONFile(inputFilename),
-//       geojson: readJSONFile(geojsonFilename),
-//       error: readJSONFile(errorFilename)
-//     }
-//   })
-//   .forEach(runTests)
+describe('To Image Polygon Transformer', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 1
+  }
+  const transformer = new GCPTransformer(gcps6, 'thin-plate-spline')
+  const input = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.420666790347598, 51.959985351835975]
+  ]
+  const output = [
+    [1032.5263837176526, 992.2883187637146],
+    [1045.0268036997886, 1489.293879156599],
+    [1056.6257766352364, 1986.6566391349374],
+    [1520.5132800975002, 1995.126987432735],
+    [1972.2719445148632, 2006.6657102722945],
+    [1969.4605377858998, 1507.0986848843686],
+    [1957.822599920541, 1009.7982201488556]
+  ]
 
-// function readJSONFile(filename) {
-//   try {
-//     return JSON.parse(fs.readFileSync(filename))
-//   } catch (err) {
-//     return undefined
-//   }
-// }
+  const result = transformer.toImagePolygon(input, transformOptions)
 
-// function runTests(file) {
-//   describe(`Parsing ${file.basename}`, () => {
-//     const hasGeoJSONFile = file.geojson !== undefined
-//     const hasErrorFile = file.error !== undefined
-
-//     it('should have either a associated GeoJSON file or a associated error file', () => {
-//       expect(
-//         (hasGeoJSONFile || hasErrorFile) && !(hasGeoJSONFile && hasErrorFile)
-//       ).to.equal(true)
-//     })
-
-//     const transformer = createTransformer(file.map.gcps)
-//     let geojson
-//     let error
-
-//     try {
-//       geojson = toGeoJSONPolygon(transformer, file.map.pixelMask)
-//     } catch (err) {
-//       error = err.message
-//     }
-
-//     if (hasGeoJSONFile) {
-//       it('pixelMask should transform to a correct GeoJSON', () => {
-//         expect(file.geojson).to.shallowDeepEqual(geojson)
-//       })
-//     } else if (hasErrorFile) {
-//       it('error message should be correct', () => {
-//         expect(file.error).to.equal(error)
-//       })
-//     }
-//   })
-// }
+  it(`should have the right output`, () => {
+    expect(result).to.shallowDeepEqual(output)
+  })
+})

@@ -196,6 +196,64 @@ export function fromGeoJSONPolygon(
   ]
 }
 
+export function toWorldPolygon(
+  transformer: GCPTransformerInterface,
+  points: Position[],
+  options?: OptionalTransformOptions
+): Position[] {
+  const mergedOptions = mergeDefaultOptions(options)
+
+  if (!Array.isArray(points) || points.length < 3) {
+    throw new Error('Polygon should contain at least 3 points')
+  }
+
+  const imageWorldPoints = points.map((point) => ({
+    image: point,
+    world: transformer.toWorld(point)
+  }))
+
+  const segments = getSegments(imageWorldPoints, false)
+  const segmentsWithMidpoints = recursivelyAddWorldMidpoints2(
+    transformer,
+    segments,
+    mergedOptions
+  )
+
+  return [
+    segmentsWithMidpoints[0].from.world,
+    ...segmentsWithMidpoints.map((segment) => segment.to.world)
+  ]
+}
+
+export function toImagePolygon(
+  transformer: GCPTransformerInterface,
+  points: Position[],
+  options?: OptionalTransformOptions
+): Position[] {
+  const mergedOptions = mergeDefaultOptions(options)
+
+  if (!Array.isArray(points) || points.length < 3) {
+    throw new Error('Polygon should contain at least 3 points')
+  }
+
+  const imageWorldPoints = points.map((point) => ({
+    image: transformer.toResource(point),
+    world: point
+  }))
+
+  const segments = getSegments(imageWorldPoints, false)
+  const segmentsWithMidpoints = recursivelyAddImageMidpoints2(
+    transformer,
+    segments,
+    mergedOptions
+  )
+
+  return [
+    segmentsWithMidpoints[0].from.image,
+    ...segmentsWithMidpoints.map((segment) => segment.to.image)
+  ]
+}
+
 function getSegments(points: ImageWorldPosition[], close = false): Segment[] {
   const segmentCount = points.length - (close ? 0 : 1)
 
@@ -238,13 +296,41 @@ function recursivelyAddImageMidpoints(
     .flat(1)
 }
 
+function recursivelyAddWorldMidpoints2(
+  transformer: GCPTransformerInterface,
+  segments: Segment[],
+  options: TransformOptions
+) {
+  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+    return segments
+  }
+
+  return segments
+    .map((segment) => addWorldMidpoints2(transformer, segment, options, 0))
+    .flat(1)
+}
+
+function recursivelyAddImageMidpoints2(
+  transformer: GCPTransformerInterface,
+  segments: Segment[],
+  options: TransformOptions
+) {
+  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+    return segments
+  }
+
+  return segments
+    .map((segment) => addImageMidpoints2(transformer, segment, options, 0))
+    .flat(1)
+}
+
 function addWorldMidpoints(
   transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
-  const imageMidpoint = getImageMidpoint(segment.from.image, segment.to.image)
+  const imageMidpoint = getMidpoint(segment.from.image, segment.to.image)
 
   const segmentWorldMidpoint = getWorldMidpoint(
     makeGeoJSONPoint(segment.from.world),
@@ -302,16 +388,13 @@ function addImageMidpoints(
 ): Segment | Segment[] {
   const worldMidpoint = getWorldMidpoint(segment.from.world, segment.to.world)
 
-  const segmentImageMidpoint = getImageMidpoint(
-    segment.from.image,
-    segment.to.image
-  )
+  const segmentImageMidpoint = getMidpoint(segment.from.image, segment.to.image)
   const actualImageMidpoint = transformer.toResource(
     worldMidpoint.geometry.coordinates as Position
   )
 
-  const distanceSegment = getImageDistance(segment.from.image, segment.to.image)
-  const distanceMidpoints = getImageDistance(
+  const distanceSegment = getDistance(segment.from.image, segment.to.image)
+  const distanceMidpoints = getDistance(
     segmentImageMidpoint,
     actualImageMidpoint
   )
@@ -347,13 +430,109 @@ function addImageMidpoints(
   }
 }
 
-function getImageMidpoint(point1: Position, point2: Position): Position {
+function addWorldMidpoints2(
+  transformer: GCPTransformerInterface,
+  segment: Segment,
+  options: TransformOptions,
+  depth: number
+): Segment | Segment[] {
+  const imageMidpoint = getMidpoint(segment.from.image, segment.to.image)
+
+  const segmentWorldMidpoint = getMidpoint(segment.from.world, segment.to.world)
+  const actualWorldMidpoint = transformer.toWorld(imageMidpoint)
+
+  const distanceSegment = getDistance(segment.from.world, segment.to.world)
+  const distanceMidpoints = getDistance(
+    segmentWorldMidpoint,
+    actualWorldMidpoint
+  )
+
+  if (
+    depth < options.maxDepth &&
+    (options.maxOffsetRatio
+      ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
+      : false) &&
+    distanceSegment > 0
+  ) {
+    const newSegmentMidpoint: ImageWorldPosition = {
+      image: imageMidpoint,
+      world: actualWorldMidpoint
+    }
+
+    return [
+      addWorldMidpoints2(
+        transformer,
+        { from: segment.from, to: newSegmentMidpoint },
+        options,
+        depth + 1
+      ),
+      addWorldMidpoints2(
+        transformer,
+        { from: newSegmentMidpoint, to: segment.to },
+        options,
+        depth + 1
+      )
+    ].flat(1)
+  } else {
+    return segment
+  }
+}
+
+function addImageMidpoints2(
+  transformer: GCPTransformerInterface,
+  segment: Segment,
+  options: TransformOptions,
+  depth: number
+): Segment | Segment[] {
+  const worldMidpoint = getMidpoint(segment.from.world, segment.to.world)
+
+  const segmentImageMidpoint = getMidpoint(segment.from.image, segment.to.image)
+  const actualImageMidpoint = transformer.toResource(worldMidpoint as Position)
+
+  const distanceSegment = getDistance(segment.from.image, segment.to.image)
+  const distanceMidpoints = getDistance(
+    segmentImageMidpoint,
+    actualImageMidpoint
+  )
+
+  if (
+    depth < options.maxDepth &&
+    (options.maxOffsetRatio
+      ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
+      : false) &&
+    distanceSegment > 0
+  ) {
+    const newSegmentMidpoint: ImageWorldPosition = {
+      image: actualImageMidpoint,
+      world: worldMidpoint as Position
+    }
+
+    return [
+      addImageMidpoints2(
+        transformer,
+        { from: segment.from, to: newSegmentMidpoint },
+        options,
+        depth + 1
+      ),
+      addImageMidpoints2(
+        transformer,
+        { from: newSegmentMidpoint, to: segment.to },
+        options,
+        depth + 1
+      )
+    ].flat(1)
+  } else {
+    return segment
+  }
+}
+
+function getMidpoint(point1: Position, point2: Position): Position {
   return [
     (point2[0] - point1[0]) / 2 + point1[0],
     (point2[1] - point1[1]) / 2 + point1[1]
   ]
 }
 
-function getImageDistance(from: Position, to: Position): number {
+function getDistance(from: Position, to: Position): number {
   return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
 }
