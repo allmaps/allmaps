@@ -55,6 +55,10 @@ function getPixelMask(annotation: Annotation): PixelMask {
   if (groups && groups.points) {
     const pointStrings = groups.points.trim().split(/\s+/)
 
+    if (pointStrings[0] == pointStrings[pointStrings.length - 1]) {
+      pointStrings.splice(-1)
+    }
+
     if (pointStrings.length >= 3) {
       return pointStrings.map((point: string) => {
         const numberStrings = point.split(',')
