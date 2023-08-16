@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
 
   import urlStore from '$lib/shared/stores/url.js'
 
@@ -55,10 +55,10 @@
 
   onMount(() => {
     document.addEventListener('keyup', handleDocumentKeyup)
-  })
 
-  onDestroy(() => {
-    document.removeEventListener('keyup', handleDocumentKeyup)
+    return () => {
+      document.removeEventListener('keyup', handleDocumentKeyup)
+    }
   })
 </script>
 

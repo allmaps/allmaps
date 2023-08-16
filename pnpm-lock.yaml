@@ -422,6 +422,9 @@ importers:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.9
         version: link:../../packages/stdlib
+      '@allmaps/tailwind':
+        specifier: 1.0.0-beta.5
+        version: link:../../packages/tailwind
       '@allmaps/ui':
         specifier: ^1.0.0-beta.15
         version: link:../../packages/ui
@@ -523,7 +526,7 @@ importers:
         specifier: ^0.4.3
         version: 0.4.3
       miniflare:
-        specifier: ^2.11.0
+        specifier: ^2.8.2
         version: 2.11.0
       mocha:
         specifier: ^8.4.0

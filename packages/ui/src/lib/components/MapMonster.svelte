@@ -1,17 +1,7 @@
 <script lang="ts">
   import SpeechBalloon from '$lib/components/SpeechBalloon.svelte'
 
-  type Color =
-    | 'green'
-    | 'purple'
-    | 'red'
-    | 'yellow'
-    | 'orange'
-    | 'pink'
-    | 'blue'
-    | 'gray'
-
-  type Mood = 'happy' | 'sad' /*| 'angry'*/ | 'confused' | 'excited' | 'neutral'
+  import type { MapMonsterColor, MapMonsterMood } from '$lib/shared/types.js'
 
   const shapes = [
     '98.07 2.91 14.82 2.91 14.08 24.73 3.52 24.73 1.93 97.09 82.39 97.09 82.56 49.81 98.07 49.81 98.07 2.91',
@@ -21,8 +11,8 @@
     '98.07 2.91 24.82 2.91 3.52 44.73 1.93 97.09 82.39 97.09 82.56 79.81 98.07 79.81 98.07 2.91'
   ]
 
-  export let color: Color = 'green'
-  export let mood: Mood = 'happy'
+  export let color: MapMonsterColor = 'green'
+  export let mood: MapMonsterMood = 'happy'
   export let shape = 0
 
   export let fillClass = ''
@@ -89,11 +79,15 @@
 
   const points = shapes[Math.max(Math.min(shape, shapes.length - 1), 0)]
 
+  const containerClasses = $$slots.default
+    ? 'w-full flex flex-col justify-end items-end gap-8'
+    : ''
+
   // TODO: updated paths, remove translateX
   const translateX = -20
 </script>
 
-<div class="w-full flex flex-col justify-end items-end gap-8">
+<div class={containerClasses}>
   {#if $$slots.default}
     <SpeechBalloon backgroundColor={'green'}>
       <slot />
@@ -148,14 +142,14 @@
           <g transform="translate({translateX} 0)">
             <path
               d="M87.019375 43.198458v.10757c0 10.03191-8.200762 18.16456-18.316688 18.16456h-.216945c-10.115925 0-18.316688-8.13265-18.316688-18.16456v-.10757h36.85032ZM81.03231 26c2.399136 0 4.344103 1.90285 4.344103 4.250032 0 2.347183-1.944967 4.250032-4.344103 4.250032-2.399136 0-4.344104-1.902849-4.344104-4.250032C76.688207 27.90285 78.633175 26 81.032311 26Zm-26.064622 0c-2.399136 0-4.344103 1.90285-4.344103 4.250032 0 2.347183 1.944967 4.250032 4.344103 4.250032 2.399136 0 4.344104-1.902849 4.344104-4.250032C59.311793 27.90285 57.366825 26 54.967689 26"
-              class={strokeClass}
+              class={fillClass}
             /></g
           >
         {:else if mood === 'neutral'}
           <g transform="translate({translateX} 0)">
             <path
               d="M81.032311 59c-2.399136 0-4.344104 1.90285-4.344104 4.250032 0 2.347183 1.944968 4.250032 4.344104 4.250032 2.399136 0 4.344104-1.902849 4.344104-4.250032C85.376415 60.90285 83.431447 59 81.03231 59m-26.06462 0c-2.399136 0-4.344104 1.90285-4.344104 4.250032 0 2.347183 1.944968 4.250032 4.344104 4.250032 2.399136 0 4.344103-1.902849 4.344103-4.250032C59.311793 60.90285 57.366826 59 54.96769 59"
-              class={strokeClass}
+              class={fillClass}
             />
             <path
               class={strokeClass}

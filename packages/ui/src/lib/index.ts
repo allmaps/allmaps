@@ -51,3 +51,5 @@ export {
   Projective,
   ThinPlateSpline
 }
+
+export * from './shared/types.js'
