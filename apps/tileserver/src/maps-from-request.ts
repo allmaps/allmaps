@@ -8,11 +8,23 @@ import type { Obj } from 'itty-router'
 
 export async function mapsFromParams(
   cache: Cache,
-  env: any,
+  env: unknown,
   params: Obj | undefined
 ): Promise<Map[]> {
   const mapId = params?.mapId
   const manifestId = params?.manifestId
+
+  if (!env || typeof env !== 'object') {
+    throw new Error('No env object supplied')
+  }
+
+  if (
+    !('API_BASE_URL' in env) ||
+    env.API_BASE_URL === undefined ||
+    typeof env.API_BASE_URL !== 'string'
+  ) {
+    throw new Error('No API_BASE_URL supplied')
+  }
 
   let url
   if (mapId) {

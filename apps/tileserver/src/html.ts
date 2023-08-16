@@ -1,8 +1,9 @@
 import type { Request } from 'itty-router'
 
-const tilesBaseUrl = 'https://tiles.allmaps.org'
-
-const generateIframeHtml = (tileJsonUrl: string) => `<!DOCTYPE html>
+const generateIframeHtml = (
+  tileViewerBaseUrl: string,
+  tileJsonUrl: string
+) => `<!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
   <title>Allmaps Tile Server</title>
@@ -27,16 +28,19 @@ const generateIframeHtml = (tileJsonUrl: string) => `<!DOCTYPE html>
 </style>
 </header
 <body>
-  <iframe src="${tilesBaseUrl}/?url=${tileJsonUrl}"></iframe>
+  <iframe src="${tileViewerBaseUrl}/?url=${tileJsonUrl}"></iframe>
 </body>`
 
-export function generateTilesHtml(req: Request): Response {
+export function generateTilesHtml(
+  req: Request,
+  tileViewerBaseUrl: string
+): Response {
   const tileJsonUrl = req.url.replace(
     '%7Bz%7D/%7Bx%7D/%7By%7D.png',
     'tiles.json'
   )
 
-  return new Response(generateIframeHtml(tileJsonUrl), {
+  return new Response(generateIframeHtml(tileViewerBaseUrl, tileJsonUrl), {
     headers: {
       'content-type': 'text/html;charset=UTF-8'
     }

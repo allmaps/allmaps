@@ -3,6 +3,7 @@ import { Router } from 'itty-router'
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { createJsonResponse, createErrorResponse } from './json-response.js'
 import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
+import { optionsFromQuery } from './options.js'
 import { generateTileJson } from './tilejson.js'
 import { generateTilesHtml } from './html.js'
 
@@ -31,61 +32,71 @@ function xyzFromParams(params: unknown): XYZTile {
   }
 }
 
-router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req) => {
-  return generateTilesHtml(req)
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
 })
 
-router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req) => {
-  return generateTilesHtml(req)
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
 })
 
 router.get('/tiles.json', async (req, env) => {
   const maps = await mapsFromQuery(cache, req.query)
+  const options = optionsFromQuery(req.query)
 
   const url = new URL(req.url)
   const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(templateUrl, maps))
+  return createJsonResponse(generateTileJson(templateUrl, maps, options))
 })
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const mapId = req.params?.mapId
   const maps = await mapsFromParams(cache, env, req.params)
+  const options = optionsFromQuery(req.query)
 
-  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, maps))
+  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
 })
 
 router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
   const manifestId = req.params?.manifestId
   const maps = await mapsFromParams(cache, env, req.params)
+  const options = optionsFromQuery(req.query)
 
-  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png`
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, maps))
+  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
 })
 
 // TODO: support retina tiles @2x
 router.get('/:z/:x/:y.png', async (req) => {
   const maps = await mapsFromQuery(cache, req.query)
   const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
 })
 
 router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   const maps = await mapsFromParams(cache, env, req.params)
   const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
 })
 
 router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
   const maps = await mapsFromParams(cache, env, req.params)
   const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
 })
 
 router.get('/', () => createJsonResponse({ name: 'Allmaps Tile Server' }))

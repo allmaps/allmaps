@@ -8,7 +8,7 @@ import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
 import { cachedFetch } from './fetch.js'
 import { xyzTileToGeoExtent, pointInPolygon } from './geo.js'
 
-import type { Coord, XYZTile, Cache, Tile } from './types.js'
+import type { Coord, XYZTile, Cache, Tile, Options } from './types.js'
 import type { Map } from '@allmaps/annotation'
 
 const TILE_SIZE = 256
@@ -17,6 +17,7 @@ const CHANNELS = 4
 export async function createWarpedTileResponse(
   maps: Map[],
   { x, y, z }: XYZTile,
+  options: Options,
   cache: Cache
 ): Promise<Response> {
   const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
@@ -25,7 +26,7 @@ export async function createWarpedTileResponse(
     throw new Error('x, y and z must be positive integers')
   }
 
-  for (let map of maps) {
+  for (const map of maps) {
     let pixelMask
     if (map.pixelMask) {
       pixelMask = map.pixelMask
@@ -44,7 +45,7 @@ export async function createWarpedTileResponse(
 
     const extent = xyzTileToGeoExtent({ x, y, z })
 
-    const transformer = new GCPTransformer(map.gcps)
+    const transformer = new GCPTransformer(map.gcps, options.transformation)
     const iiifTiles = computeIiifTilesForMapGeoBBox(
       transformer,
       parsedImage,

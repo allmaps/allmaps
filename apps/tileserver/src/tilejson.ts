@@ -2,6 +2,8 @@ import { GCPTransformer } from '@allmaps/transform'
 
 import bbox from '@turf/bbox'
 
+import type { Options } from './types.js'
+
 import type { Map } from '@allmaps/annotation'
 
 type TileJSON = {
@@ -16,11 +18,15 @@ type TileJSON = {
 }
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(urlTemplate: string, maps: Map[]): TileJSON {
-  let geoMasks = []
+export function generateTileJson(
+  urlTemplate: string,
+  maps: Map[],
+  options: Options
+): TileJSON {
+  const geoMasks = []
 
-  for (let map of maps) {
-    const transformer = new GCPTransformer(map.gcps)
+  for (const map of maps) {
+    const transformer = new GCPTransformer(map.gcps, options.transformation)
 
     const geoMask = transformer.toGeoJSON(map.pixelMask, {
       maxOffsetRatio: 0.01
