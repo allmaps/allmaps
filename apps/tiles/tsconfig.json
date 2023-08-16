@@ -14,5 +14,8 @@
       "$lib/*": ["./src/lib/*"]
     }
   },
-  "references": [{ "path": "../../packages/stdlib" }]
+  "references": [
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/tailwind" }
+  ]
 }

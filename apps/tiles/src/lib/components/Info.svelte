@@ -28,9 +28,9 @@
     "
   >
     <p class="pb-4">
-      Looks like you've opened an XYZ template URL of an Allmaps Tile Server map in the
-      browser. This page shows a preview of this map, but the purpose of these
-      URLs is to be used in other GIS libraries or applications like <a
+      Looks like you've opened an XYZ template URL of an Allmaps Tile Server map
+      in the browser. This page shows a preview of this map, but the purpose of
+      these URLs is to be used in other GIS libraries or applications like <a
         class="underline"
         href="https://leafletjs.com/reference.html#tilelayer">Leaflet</a
       >,
@@ -45,7 +45,10 @@
         >QGIS</a
       >.
     </p>
-    <p>To use this map in another application, copy the XYZ template URL from the header!</p>
+    <p>
+      To use this map in another application, copy the XYZ template URL from the
+      header!
+    </p>
   </div>
-  <MapMonster color="orange" mood="confused" />
+  <MapMonster color="pink" mood="sad" />
 </div>
