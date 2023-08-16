@@ -7,13 +7,9 @@
   import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import {
-    Header,
-    Loading,
-    URLInput,
-    Navigation,
-    paramStore
-  } from '@allmaps/ui'
+  import { Header, Loading, URLInput, paramStore } from '@allmaps/ui'
+
+  import { Navigation } from '@allmaps/ui/kit'
 
   import { position } from '$lib/shared/stores/geolocation.js'
   import { map } from '$lib/shared/stores/maps.js'

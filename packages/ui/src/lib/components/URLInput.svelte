@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/environment'
+  import { onMount, onDestroy } from 'svelte'
 
   import urlStore from '$lib/shared/stores/url.js'
 
@@ -26,7 +26,7 @@
     selectInputText()
   }
 
-  function handleKeyup(event: KeyboardEvent) {
+  function handleInputKeyup(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       urlValue = $urlStore
     }
@@ -46,14 +46,20 @@
     $urlStore = urlValue
   }
 
-  if (browser) {
-    document.addEventListener('keyup', (event: KeyboardEvent) => {
-      const target = event.target as Element
-      if (event.key === '/' && target.nodeName.toLowerCase() !== 'input') {
-        selectInputText()
-      }
-    })
+  function handleDocumentKeyup(event: KeyboardEvent) {
+    const target = event.target as Element
+    if (event.key === '/' && target.nodeName.toLowerCase() !== 'input') {
+      selectInputText()
+    }
   }
+
+  onMount(() => {
+    document.addEventListener('keyup', handleDocumentKeyup)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('keyup', handleDocumentKeyup)
+  })
 </script>
 
 <form
@@ -65,7 +71,7 @@
     type="input"
     {autofocus}
     on:focus|preventDefault={handleFocus}
-    on:keyup={handleKeyup}
+    on:keyup={handleInputKeyup}
     on:mouseup={handleMouseup}
     bind:value={urlValue}
     bind:this={input}

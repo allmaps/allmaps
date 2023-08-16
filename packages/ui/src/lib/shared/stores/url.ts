@@ -1,4 +1,3 @@
-import { browser } from '$app/environment'
 import { writable } from 'svelte/store'
 
 function getUrlFromQueryString(location: Location): string | null {
@@ -30,7 +29,7 @@ function getUrlFromHash(location: Location): string | null {
 }
 
 export function fromUrl() {
-  if (browser) {
+  if (typeof window !== 'undefined') {
     const queryStringUrl = getUrlFromQueryString(window.location)
     const hashUrl = getUrlFromHash(window.location)
 

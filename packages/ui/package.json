@@ -19,6 +19,10 @@
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js"
     },
+    "./kit": {
+      "types": "./dist/components/kit/index.d.ts",
+      "svelte": "./dist/components/kit/index.js"
+    },
     "./css/*": "./dist/css/*"
   },
   "files": [

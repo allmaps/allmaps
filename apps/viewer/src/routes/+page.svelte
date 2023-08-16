@@ -8,10 +8,11 @@
     Loading,
     URLInput,
     URLType,
-    Navigation,
     dataStore,
     paramStore
   } from '@allmaps/ui'
+
+  import { Navigation } from '@allmaps/ui/kit'
 
   import { view } from '$lib/shared/stores/view.js'
   import {
