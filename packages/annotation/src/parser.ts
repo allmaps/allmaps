@@ -55,6 +55,13 @@ function getPixelMask(annotation: Annotation): PixelMask {
   if (groups && groups.points) {
     const pointStrings = groups.points.trim().split(/\s+/)
 
+    // Pixel masks are not round-trip: they don't repeat the first point at the end of the list of points.
+    // According to their spec, svg polygons are not supposed to be round-trip either.
+    // Here we deal with inputs that are round-trip by removing the last point
+    if (pointStrings[0] == pointStrings[pointStrings.length - 1]) {
+      pointStrings.splice(-1)
+    }
+
     if (pointStrings.length >= 3) {
       return pointStrings.map((point: string) => {
         const numberStrings = point.split(',')
