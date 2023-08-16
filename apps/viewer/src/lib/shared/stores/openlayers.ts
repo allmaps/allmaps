@@ -10,11 +10,12 @@ import {
 import type { Map as Georef } from '@allmaps/annotation'
 
 import Map from 'ol/Map.js'
-import { Vector as VectorSource } from 'ol/source'
-import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
+import VectorSource from 'ol/source/Vector.js'
+import TileLayer from 'ol/layer/Tile.js'
+import VectorLayer from 'ol/layer/Vector.js'
 import XYZ from 'ol/source/XYZ.js'
 import View from 'ol/View.js'
-import { GeoJSON } from 'ol/format'
+import GeoJSON from 'ol/format/GeoJSON.js'
 import Select from 'ol/interaction/Select.js'
 import { click } from 'ol/events/condition.js'
 
@@ -31,8 +32,8 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
 import type { MapIDOrError } from '$lib/shared/types.js'
-import type FeatureLike from 'ol/Feature'
-import type { OrderFunction } from 'ol/render'
+import type { FeatureLike } from 'ol/Feature.js'
+import type { OrderFunction } from 'ol/render.js'
 
 type XYZLayer = {
   url: string

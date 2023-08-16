@@ -1,5 +1,5 @@
-import { Stroke, Fill, Style } from 'ol/style'
-import type Feature from 'ol/feature'
+import { Stroke, Fill, Style } from 'ol/style.js'
+import type Feature from 'ol/Feature.js'
 
 import type { SVGPolygon } from '@allmaps/render'
 

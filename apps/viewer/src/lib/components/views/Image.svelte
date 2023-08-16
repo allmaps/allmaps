@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
 
-  import Feature from 'ol/Feature'
-  import { Polygon } from 'ol/geom'
+  import Feature from 'ol/Feature.js'
+  import Polygon from 'ol/geom/Polygon.js'
 
   import { fetchImageInfo } from '@allmaps/stdlib'
 
@@ -69,10 +69,10 @@
 
   onMount(() => {
     imageOl?.setTarget('ol')
-  })
 
-  onDestroy(() => {
-    imageOl?.setTarget()
+    return () => {
+      imageOl?.setTarget()
+    }
   })
 </script>
 

@@ -133,12 +133,10 @@
 
     document.addEventListener('keyup', handleKeyup)
 
-    return onDestroy
+    return () => {
+      document.removeEventListener('keyup', handleKeyup)
+    }
   })
-
-  function onDestroy() {
-    document.removeEventListener('keyup', handleKeyup)
-  }
 </script>
 
 <Navigation />

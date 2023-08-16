@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
 
   import type { SelectEvent } from 'ol/interaction/Select.js'
   import type { FeatureLike } from 'ol/Feature.js'
@@ -98,12 +98,12 @@
     mapOl?.on('movestart', hideContextMenu)
 
     fitExtent()
-  })
 
-  onDestroy(() => {
-    mapSelect?.un('select', handleSelect)
-    mapOl?.un('movestart', hideContextMenu)
-    mapOl?.setTarget()
+    return () => {
+      mapSelect?.un('select', handleSelect)
+      mapOl?.un('movestart', hideContextMenu)
+      mapOl?.setTarget()
+    }
   })
 </script>
 
