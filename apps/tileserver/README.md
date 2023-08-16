@@ -4,7 +4,7 @@ Allmaps Tile Server is a proxy server that turns Georeference Annotations into [
 
 Allmaps Tile Server runs on [Cloudflare Workers](https://workers.cloudflare.com/). Cloudflare Workers let you run tiny JavaScript programs on Cloudflare's global CDN. [Cloudflare is working on publishing the Workers system as open source](https://blog.cloudflare.com/workers-open-source-announcement/).
 
-For more information, see https://observablehq.com/@bertspaan/allmaps-tile-server.
+For more information, see https://observablehq.com/@allmaps/allmaps-tile-server.
 
 ![](screenshot.jpg)
 
@@ -13,6 +13,11 @@ For more information, see https://observablehq.com/@bertspaan/allmaps-tile-serve
 Run locally with [Miniflare](https://miniflare.dev/):
 
     pnpm run dev
+
+Some URLs to test Allmaps Tile Server locally:
+
+- http://localhost:8787/maps/a38b4ed7ea01a36a/16/33583/21671.png
+- http://localhost:8787/maps/135dfd2d58dc26ec/6/30/19.png?transformation=thin-plate-spline
 
 Publish to Cloudflare Workers:
 
