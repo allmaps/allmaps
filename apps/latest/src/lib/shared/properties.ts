@@ -43,6 +43,7 @@ function formatTimeAgo(dateStr?: string) {
 export function getProperties(map: Map, polygon?: Polygon) {
   // TODO: create new type for API output
   // maybe with https://github.com/trpc/trpc
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updatedAt = (map as any).updatedAt as string
 
   const { hostname } = new URL(map.image.uri)
