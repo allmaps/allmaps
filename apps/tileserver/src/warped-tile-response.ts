@@ -6,7 +6,12 @@ import { GCPTransformer } from '@allmaps/transform'
 import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
-import { xyzTileToGeoExtent, pointInPolygon } from './geo.js'
+import {
+  xyzTileToGeoExtent,
+  pointInPolygon,
+  tile2long,
+  tile2lat
+} from './geo.js'
 
 import type { Coord, XYZTile, Cache, Tile, Options } from './types.js'
 import type { Map } from '@allmaps/annotation'
@@ -27,6 +32,7 @@ export async function createWarpedTileResponse(
   }
 
   for (const map of maps) {
+    // Set pixelMask
     let pixelMask
     if (map.pixelMask) {
       pixelMask = map.pixelMask
@@ -43,9 +49,13 @@ export async function createWarpedTileResponse(
     const imageInfo = await imageInfoResponse.json()
     const parsedImage: Image = Image.parse(imageInfo)
 
+    // Compute xyz tile extent
     const extent = xyzTileToGeoExtent({ x, y, z })
 
+    // Create transformer
     const transformer = new GCPTransformer(map.gcps, options.transformation)
+
+    // Compute necessary IIIF tiles
     const iiifTiles = computeIiifTilesForMapGeoBBox(
       transformer,
       parsedImage,
@@ -53,6 +63,7 @@ export async function createWarpedTileResponse(
       extent
     )
 
+    // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {
       const { region, size } = parsedImage.getIiifTile(
         tile.zoomLevel,
@@ -62,6 +73,7 @@ export async function createWarpedTileResponse(
       return parsedImage.getImageUrl({ region, size })
     })
 
+    // Fetch IIIF tiles
     // TODO: find a way to do max. 6 requests at the same time,
     // instead of one by one with this loop
     // https://developers.cloudflare.com/workers/platform/limits/
@@ -71,31 +83,42 @@ export async function createWarpedTileResponse(
       iiifTileResponses.push(response)
     }
 
+    // Create images from fetch response
     const iiifTileImages: ArrayBuffer[] = await Promise.all(
       iiifTileResponses.map((response) => response.arrayBuffer())
     )
 
+    // Decode images to buffer
     // TODO: Rename
     const decodedJpegs = iiifTileImages.map((buffer) =>
       decodeJpeg(buffer, { useTArray: true })
     )
 
-    // TODO: use spherical mercator instead of lat/lon
-    const longitudeFrom = extent[0]
-    const latitudeFrom = extent[1]
-    const longitudeDiff = extent[2] - extent[0]
-    const latitudeDiff = extent[3] - extent[1]
-    const longitudeStep = longitudeDiff / TILE_SIZE
-    const latitudeStep = latitudeDiff / TILE_SIZE
+    // Create resulting warped tile
+    const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
 
+    // Step through all warped tile pixels and set their color
     // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
-    for (let x = 0; x < TILE_SIZE; x++) {
-      for (let y = 0; y < TILE_SIZE; y++) {
-        const world: Coord = [
-          longitudeFrom + y * longitudeStep,
-          latitudeFrom + x * latitudeStep
+    for (
+      let warpedTilePixelX = 0;
+      warpedTilePixelX < TILE_SIZE;
+      warpedTilePixelX++
+    ) {
+      for (
+        let warpedTilePixelY = 0;
+        warpedTilePixelY < TILE_SIZE;
+        warpedTilePixelY++
+      ) {
+        // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles, in two steps
+        // 1) Detemine lonlat of warped tile pixel location
+        const warpedTilePixelGeo: Coord = [
+          tile2long({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
+          tile2lat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
-        const [pixelX, pixelY] = transformer.toResource(world)
+        // 2) Determine corresponding pixel location (with decimals) on resource using transformer
+        const [pixelX, pixelY] = transformer.toResource(warpedTilePixelGeo)
+
+        // Check if pixel inside pixel mask
         // TODO: improve efficiency
         // TODO: fix strange repeating error,
         //    remove pointInPolygon check and fix first
@@ -104,6 +127,7 @@ export async function createWarpedTileResponse(
           continue
         }
 
+        // Determine tile index of resource tile on which this pixel location (with decimals) is
         let tileIndex: number | undefined
         let tile: Tile | undefined
         let tileXMin: number | undefined
@@ -124,25 +148,72 @@ export async function createWarpedTileResponse(
           }
         }
 
+        // If tile is found, set color of this warped tile pixel
         if (
           foundTile &&
           tile &&
           tileXMin !== undefined &&
           tileYMin !== undefined
         ) {
+          // Decode this resource tile
           const decodedJpeg = decodedJpegs[tileIndex]
+
           if (decodedJpeg) {
+            // Schematic drawing of resource tile and sub-pixel location of (pixelTileX, pixelTileY)
+            //
+            // PixelTile: +
+            // Surrounding pixels: *
+            //
+            //   Y
+            //   ^
+            // 2 *---------* 3
+            //   |         |
+            //   |         |
+            //   |   +     |
+            // 0 *---------* 1 > X
+            //
+            // Determine (sub-)pixel coordinates on resource tile
             const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
             const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
-            const warpedBufferIndex = (x * TILE_SIZE + y) * CHANNELS
-            const bufferIndex =
+            // Determine bufferIndices of four surrounding pixels 0, 1, 2, 3 on the resource tile
+            const bufferIndices = [
               (Math.floor(pixelTileY) * decodedJpeg.width +
                 Math.floor(pixelTileX)) *
-              CHANNELS
+                CHANNELS,
+              (Math.floor(pixelTileY) * decodedJpeg.width +
+                Math.ceil(pixelTileX)) *
+                CHANNELS,
+              (Math.ceil(pixelTileY) * decodedJpeg.width +
+                Math.floor(pixelTileX)) *
+                CHANNELS,
+              (Math.ceil(pixelTileY) * decodedJpeg.width +
+                Math.ceil(pixelTileX)) *
+                CHANNELS
+            ]
+            // Determine remaining (sub-)pixel decimals on resource tile
+            const pixelTileXDecimals = pixelTileX - Math.floor(pixelTileX)
+            const pixelTileYDecimals = pixelTileY - Math.floor(pixelTileY)
+
+            // Define index in result buffer
+            const warpedBufferIndex =
+              (warpedTilePixelY * TILE_SIZE + warpedTilePixelX) * CHANNELS
+            // For each color, compute and set the color of the warpedTile pixel
+            // by interpolating the color of the four surrounding pixels on the resource tile
+            // and set it on the warpedBufferIndex
             for (let color = 0; color < CHANNELS; color++) {
-              // TODO: don't just copy single pixel, do proper image interpolating
               warpedTile[warpedBufferIndex + color] =
-                decodedJpeg.data[bufferIndex + color]
+                decodedJpeg.data[bufferIndices[0] + color] *
+                  (1 - pixelTileXDecimals) *
+                  (1 - pixelTileYDecimals) +
+                decodedJpeg.data[bufferIndices[1] + color] *
+                  pixelTileXDecimals *
+                  (1 - pixelTileYDecimals) +
+                decodedJpeg.data[bufferIndices[2] + color] *
+                  (1 - pixelTileXDecimals) *
+                  pixelTileYDecimals +
+                decodedJpeg.data[bufferIndices[3] + color] *
+                  pixelTileXDecimals *
+                  pixelTileYDecimals
             }
           }
         }
