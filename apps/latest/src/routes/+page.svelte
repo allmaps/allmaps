@@ -127,7 +127,7 @@
 
 <ol class="grid text-xs sm:text-sm xl:text-base">
   <li
-    class="rounded-lg aspect-square bg-gray/20 p-1.5 flex flex-col justify-between"
+    class="rounded-lg aspect-square bg-white p-1.5 flex flex-col justify-between"
   >
     <h1 class="font-bold text-2xl">
       The latest maps edited with <a
