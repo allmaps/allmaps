@@ -10,7 +10,7 @@ function generateHash(str: string): string {
  *
  * @param {string} str - Input string.
  * @param {number} [length=16] - Length of returned hash.  The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of `str`.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of `str`.
  */
 export async function generateId(str: string, length = 16): Promise<string> {
   const hash = await generateHash(String(str))
@@ -22,7 +22,7 @@ export async function generateId(str: string, length = 16): Promise<string> {
  *
  * @async
  * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of a random UUID.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of a random UUID.
  */
 export async function generateRandomId(length?: number): Promise<string> {
   const uuid = crypto.randomUUID()
@@ -36,7 +36,7 @@ export async function generateRandomId(length?: number): Promise<string> {
  * @async
  * @param {Object} obj - JSON object.
  * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
  */
 export async function generateChecksum(
   obj: unknown,
