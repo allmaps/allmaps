@@ -12,6 +12,7 @@ import {
   mapWarpedMapSource,
   mapVectorSource
 } from '$lib/shared/stores/openlayers.js'
+import { resetTransformation } from '$lib/shared/stores/transformation.js'
 
 import { parseJson } from '$lib/shared/parser.js'
 
@@ -111,6 +112,7 @@ export function resetSources() {
   mapWarpedMapSource.clear()
   mapVectorSource.clear()
 
+  resetTransformation()
   sourcesStore.set(new Map())
   resetMaps()
 }

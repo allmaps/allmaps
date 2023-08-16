@@ -15,12 +15,20 @@ const transformations: TransformationType[] = [
   'thin-plate-spline'
 ]
 
-export const transformationIndex = writable<number>(0)
+const DEFAULT_TRANSFORMATION_INDEX = 0
+
+export const transformationIndex = writable<number>(
+  DEFAULT_TRANSFORMATION_INDEX
+)
 
 export const transformation = derived(
   transformationIndex,
   ($transformationIndex) => transformations[$transformationIndex]
 )
+
+export function resetTransformation() {
+  transformationIndex.set(DEFAULT_TRANSFORMATION_INDEX)
+}
 
 export function nextTransformation() {
   transformationIndex.update(
