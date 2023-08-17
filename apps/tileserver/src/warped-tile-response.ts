@@ -176,20 +176,41 @@ export async function createWarpedTileResponse(
             // Determine (sub-)pixel coordinates on resource tile
             const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
             const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
-            // Determine bufferIndices of four surrounding pixels 0, 1, 2, 3 on the resource tile
+            // Determine four surrounding pixels 0, 1, 2, 3 on the resource tile
+            const pixelTile0X = Math.max(Math.floor(pixelTileX), 0)
+            const pixelTile0Y = Math.max(Math.floor(pixelTileY), 0)
+            const pixelTile1X = Math.min(Math.ceil(pixelTileX), 255)
+            const pixelTile1Y = Math.max(Math.floor(pixelTileY), 0)
+            const pixelTile2X = Math.max(Math.floor(pixelTileX), 0)
+            const pixelTile2Y = Math.min(Math.ceil(pixelTileY), 255)
+            const pixelTile3X = Math.min(Math.ceil(pixelTileX), 255)
+            const pixelTile3Y = Math.min(Math.ceil(pixelTileY), 255)
+            // Determine bufferIndices of four surrounding pixels
             const bufferIndices = [
-              (Math.floor(pixelTileY) * decodedJpeg.width +
-                Math.floor(pixelTileX)) *
-                CHANNELS,
-              (Math.floor(pixelTileY) * decodedJpeg.width +
-                Math.ceil(pixelTileX)) *
-                CHANNELS,
-              (Math.ceil(pixelTileY) * decodedJpeg.width +
-                Math.floor(pixelTileX)) *
-                CHANNELS,
-              (Math.ceil(pixelTileY) * decodedJpeg.width +
-                Math.ceil(pixelTileX)) *
+              pixelToIndex(
+                pixelTile0X,
+                pixelTile0Y,
+                decodedJpeg.width,
                 CHANNELS
+              ),
+              pixelToIndex(
+                pixelTile1X,
+                pixelTile1Y,
+                decodedJpeg.width,
+                CHANNELS
+              ),
+              pixelToIndex(
+                pixelTile2X,
+                pixelTile2Y,
+                decodedJpeg.width,
+                CHANNELS
+              ),
+              pixelToIndex(
+                pixelTile3X,
+                pixelTile3Y,
+                decodedJpeg.width,
+                CHANNELS
+              )
             ]
             // Determine remaining (sub-)pixel decimals on resource tile
             const pixelTileXDecimals = pixelTileX - Math.floor(pixelTileX)
@@ -229,4 +250,13 @@ export async function createWarpedTileResponse(
   })
 
   return tileResponse
+}
+
+function pixelToIndex(
+  pixelX: number,
+  pixelY: number,
+  width: number,
+  channels: number
+): number {
+  return (pixelY * width + pixelX) * channels
 }

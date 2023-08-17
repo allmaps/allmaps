@@ -19,7 +19,7 @@ A local version of Allmaps Tile Server is now running on http://localhost:5504.
 Some example URLs:
 
 - http://localhost:5504/maps/a38b4ed7ea01a36a/16/33583/21671.png
-- http://localhost:5504/maps/135dfd2d58dc26ec/6/30/19.png?transformation=thin-plate-spline
+- http://localhost:5504/maps/135dfd2d58dc26ec/6/30/19.png?transformation.type=thin-plate-spline
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/15/16833/10770.png
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/tiles.json
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/{z}/{x}/{y}.png
@@ -34,9 +34,14 @@ Publish to Cloudflare Workers:
 
 To generate XYZ map tiles, Allmaps Tile Server needs a Georeference Annotation. You can supply a Georeference Annotation in three ways:
 
-1. [By using the URL of a Georeference Annotation](#by-using-the-url-of-a-georeference-annotation)
-2. [By using the Allmaps ID of a georeferenced map](#by-using-the-allmaps-id-of-a-georeferenced-map)
-3. [By supplying a complete URL-encoded Georeference Annotation](#by-supplying-a-complete-url-encoded-georeference-annotation)
+- [Allmaps Tile Server](#allmaps-tile-server)
+  - [Development](#development)
+  - [API](#api)
+    - [Supplying a Georeference Annotation](#supplying-a-georeference-annotation)
+      - [By using the URL of a Georeference Annotation](#by-using-the-url-of-a-georeference-annotation)
+      - [By using the Allmaps ID of a georeferenced map](#by-using-the-allmaps-id-of-a-georeferenced-map)
+      - [By supplying a complete URL-encoded Georeference Annotation](#by-supplying-a-complete-url-encoded-georeference-annotation)
+    - [URL parameters](#url-parameters)
 
 The different ways of supplying a Georeference Annotation are explained in detail below.
 
