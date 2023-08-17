@@ -8,6 +8,8 @@ import {
   green,
   yellow,
   gray,
+  black,
+  white,
   shades
 } from './colors.js'
 
@@ -32,8 +34,8 @@ export default {
   green,
   yellow,
   gray,
-  black: '#222222',
-  white: '#ffffff',
+  black,
+  white,
 
   // Add shades
   ...flattenShades('blue', shades.blue),

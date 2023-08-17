@@ -19,6 +19,9 @@
   export let strokeClass = ''
   export let faceClass = ''
 
+  export let speechBalloonBackgroundColor = ''
+  export let speechBalloonTextColor = ''
+
   // Tailwind CSS needs complete class strings to work
   // I don't think it's possible to create a function that outputs the object below
   // See https://v2.tailwindcss.com/docs/optimizing-for-production#writing-purgeable-html
@@ -89,7 +92,10 @@
 
 <div class={containerClasses}>
   {#if $$slots.default}
-    <SpeechBalloon backgroundColor={'green'}>
+    <SpeechBalloon
+      backgroundColor={speechBalloonBackgroundColor}
+      textColor={speechBalloonTextColor}
+    >
       <slot />
     </SpeechBalloon>
   {/if}

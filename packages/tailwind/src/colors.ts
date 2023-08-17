@@ -3,6 +3,9 @@
 
 import type { Shades } from './types.js'
 
+const black = '#222222'
+const white = '#ffffff'
+
 // Original color from Luuk's design
 export const originalColorIndex = 4
 
@@ -136,4 +139,16 @@ const green = greenShades[originalColorIndex]
 const yellow = yellowShades[originalColorIndex]
 const gray = grayShades[originalColorIndex]
 
-export { blue, darkblue, purple, pink, orange, red, green, yellow, gray }
+export {
+  blue,
+  darkblue,
+  purple,
+  pink,
+  orange,
+  red,
+  green,
+  yellow,
+  gray,
+  black,
+  white
+}

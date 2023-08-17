@@ -1,16 +1,19 @@
 <script lang="ts">
-  export let backgroundColor = '#FF56BA'
+  import { green, black } from '@allmaps/tailwind'
+
+  export let backgroundColor = green
+  export let textColor = black
 </script>
 
 <div
-  style:background-color={backgroundColor}
   style="--background-color: {backgroundColor}"
+  style:background-color={backgroundColor}
+  style:color={textColor}
   class="speech-balloon
     p-4 relative
     pointer-events-auto
     w-[30rem]
     max-w-[90%]
-    text-white
     rounded-md
     shadow-md
     after:content-['']
@@ -33,5 +36,6 @@
 <style scoped>
   .speech-balloon:after {
     border-top-color: var(--background-color);
+    color: rgba(255, 255, 255, 0);
   }
 </style>
