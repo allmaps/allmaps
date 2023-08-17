@@ -19,7 +19,7 @@
   </button>
   <div
     bind:this={dropdownElement}
-    class="z-10 drop-shadow hidden bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 overflow-y-auto max-h-[calc(100vh-7rem)]"
+    class="z-10 drop-shadow hidden bg-white divide-y divide-gray-100 rounded shadow overflow-y-auto max-h-[calc(100vh-7rem)]"
   >
     <slot name="dropdown" />
   </div>

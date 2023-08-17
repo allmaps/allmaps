@@ -228,7 +228,7 @@
       id="tooltip-animation"
       role="tooltip"
       bind:this={tooltipTarget}
-      class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+      class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip"
     >
       {label}:
       <span class="relative inline-block w-8 text-right"

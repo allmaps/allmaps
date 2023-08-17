@@ -63,7 +63,7 @@
   </button> -->
 
   <button
-    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-l-lg md:rounded-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-l-lg md:rounded-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
     on:click={prevMap}
   >
     <svg
@@ -81,7 +81,7 @@
   </button>
 
   <button
-    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+    class="w-9 h-9 p-1.5 text-sm bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
     on:click={nextMap}
   >
     <svg
