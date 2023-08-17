@@ -18,6 +18,7 @@ Some example URLs:
 - https://allmaps.xyz/manifests/a0d6d3379cfd9f0a/{z}/{x}/{y}.png
 - https://allmaps.xyz/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/images/ea443ffaabb121e2
 - https://allmaps.xyz/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/9845523343c39447
+- https://allmaps.xyz/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/135dfd2d58dc26ec&transformation.type=thin-plate-spline
 
 ## Development
 
@@ -37,6 +38,7 @@ Some example URLs for local development:
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/{z}/{x}/{y}.png
 - http://localhost:5504/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/images/ea443ffaabb121e2
 - http://localhost:5504/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/9845523343c39447
+- http://localhost:5504/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/135dfd2d58dc26ec&transformation.type=thin-plate-spline
 
 Publish to Cloudflare Workers:
 

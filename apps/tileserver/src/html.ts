@@ -28,7 +28,9 @@ const generateIframeHtml = (
 </style>
 </header
 <body>
-  <iframe src="${tileViewerBaseUrl}/?url=${tileJsonUrl}"></iframe>
+  <iframe src="${tileViewerBaseUrl}/?url=${encodeURIComponent(
+  tileJsonUrl
+)}"></iframe>
 </body>`
 
 export function generateTilesHtml(
