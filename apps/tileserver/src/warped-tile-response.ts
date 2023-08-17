@@ -25,6 +25,7 @@ export async function createWarpedTileResponse(
   options: Options,
   cache: Cache
 ): Promise<Response> {
+  // Create resulting warped tile
   const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
 
   if (!(x >= 0 && y >= 0 && z >= 0)) {
@@ -93,9 +94,6 @@ export async function createWarpedTileResponse(
     const decodedJpegs = iiifTileImages.map((buffer) =>
       decodeJpeg(buffer, { useTArray: true })
     )
-
-    // Create resulting warped tile
-    const warpedTile = new Uint8Array(TILE_SIZE * TILE_SIZE * CHANNELS)
 
     // Step through all warped tile pixels and set their color
     // TODO: if there's nothing to render, send HTTP code? Or empty PNG?
