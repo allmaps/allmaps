@@ -67,6 +67,10 @@ export async function createWarpedTileResponse(
       extent
     )
 
+    // Get resource tile size
+    // TODO: check if this is ok if no tiles returned
+    const resourceTileSize = iiifTiles[0].zoomLevel.width
+
     // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {
       const { region, size } = parsedImage.getIiifTile(
@@ -176,38 +180,40 @@ export async function createWarpedTileResponse(
             // Determine (sub-)pixel coordinates on resource tile
             const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
             const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
-            // Determine four surrounding pixels 0, 1, 2, 3 on the resource tile
-            const pixelTile0X = Math.max(Math.floor(pixelTileX), 0)
-            const pixelTile0Y = Math.max(Math.floor(pixelTileY), 0)
-            const pixelTile1X = Math.min(Math.ceil(pixelTileX), 255)
-            const pixelTile1Y = Math.max(Math.floor(pixelTileY), 0)
-            const pixelTile2X = Math.max(Math.floor(pixelTileX), 0)
-            const pixelTile2Y = Math.min(Math.ceil(pixelTileY), 255)
-            const pixelTile3X = Math.min(Math.ceil(pixelTileX), 255)
-            const pixelTile3Y = Math.min(Math.ceil(pixelTileY), 255)
-            // Determine bufferIndices of four surrounding pixels
+            // Determine coordinates of four surrounding pixels 0, 1, 2, 3 on the resource tile
+            const pixelTileXFloor = Math.max(Math.floor(pixelTileX), 0)
+            const pixelTileXCeil = Math.min(
+              Math.ceil(pixelTileX),
+              resourceTileSize - 1
+            )
+            const pixelTileYFloor = Math.max(Math.floor(pixelTileY), 0)
+            const pixelTileYCeil = Math.min(
+              Math.ceil(pixelTileY),
+              resourceTileSize - 1
+            )
+            // Determine bufferIndices of four surrounding pixels 0, 1, 2, 3
             const bufferIndices = [
               pixelToIndex(
-                pixelTile0X,
-                pixelTile0Y,
+                pixelTileXFloor,
+                pixelTileYFloor,
                 decodedJpeg.width,
                 CHANNELS
               ),
               pixelToIndex(
-                pixelTile1X,
-                pixelTile1Y,
+                pixelTileXCeil,
+                pixelTileYFloor,
                 decodedJpeg.width,
                 CHANNELS
               ),
               pixelToIndex(
-                pixelTile2X,
-                pixelTile2Y,
+                pixelTileXFloor,
+                pixelTileYCeil,
                 decodedJpeg.width,
                 CHANNELS
               ),
               pixelToIndex(
-                pixelTile3X,
-                pixelTile3Y,
+                pixelTileXCeil,
+                pixelTileYCeil,
                 decodedJpeg.width,
                 CHANNELS
               )
