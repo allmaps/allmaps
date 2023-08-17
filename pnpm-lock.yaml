@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -977,6 +977,9 @@ importers:
       chai-shallow-deep-equal:
         specifier: ^1.4.6
         version: 1.4.6(chai@4.3.6)
+      documentation:
+        specifier: ^14.0.0
+        version: 14.0.0
       eslint:
         specifier: ^8.35.0
         version: 8.35.0
@@ -3337,6 +3340,7 @@ packages:
 
   /@vue/compiler-core@3.3.1:
     resolution: {integrity: sha512-5le1qYSBgLWg2jdLrbydlhnPJkkzMw46UrRUvTnOKlfg6pThtm9ohhqBhNPHbr0RcM1MCbK5WZe/3Ghz0SZjpQ==}
+    requiresBuild: true
     dependencies:
       '@babel/parser': 7.21.8
       '@vue/shared': 3.3.1
@@ -3347,6 +3351,7 @@ packages:
 
   /@vue/compiler-dom@3.3.1:
     resolution: {integrity: sha512-VmgIsoLivCft3+oNc5KM7b9wd0nZxP/g2qilMwi1hJyGA624KWnNKHn4hzBQs4FpzydUVpNy+TWVT8KiRCh3MQ==}
+    requiresBuild: true
     dependencies:
       '@vue/compiler-core': 3.3.1
       '@vue/shared': 3.3.1
@@ -3372,6 +3377,7 @@ packages:
 
   /@vue/compiler-ssr@3.3.1:
     resolution: {integrity: sha512-QOQWGNCWuSeyKx4KvWSJlnIMGg+/2oCHgkFUYo7aJ+9Uaaz45yRgKQ+FNigy50NYBQIhpXn2e4OSR8GXh4knrQ==}
+    requiresBuild: true
     dependencies:
       '@vue/compiler-dom': 3.3.1
       '@vue/shared': 3.3.1
@@ -3380,6 +3386,7 @@ packages:
 
   /@vue/reactivity-transform@3.3.1:
     resolution: {integrity: sha512-MkOrJauAGH4MNdxGW/PmrDegMyOGX0wGIdKUZJRBXOTpotDONg7/TPJe2QeGeBCow/5v9iOqZOWCfvmOWIaDMg==}
+    requiresBuild: true
     dependencies:
       '@babel/parser': 7.21.8
       '@vue/compiler-core': 3.3.1
@@ -3391,6 +3398,7 @@ packages:
 
   /@vue/shared@3.3.1:
     resolution: {integrity: sha512-ybDBtQ+479HL/bkeIOIAwgpeAEACzztkvulJLbK3JMFuTOv4qDivmV3AIsR8RHYJ+RD9tQxcHWBsX4GqEcYrfw==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4240,6 +4248,7 @@ packages:
 
   /de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4757,6 +4766,7 @@ packages:
 
   /estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -5467,6 +5477,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true
@@ -9762,7 +9773,7 @@ packages:
   /wide-align@1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 1.0.2
+      string-width: 4.2.3
     dev: true
 
   /word-wrap@1.2.3:
