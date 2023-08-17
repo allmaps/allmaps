@@ -1,14 +1,16 @@
 # @allmaps/allmaps
 
-Packages:
+Allmaps is a project for **curating, georeferencing and exploring for IIIF maps**!
 
-- [@allmaps/annotation](packages/annotation)
-- [@allmaps/id](packages/id)
-- [@allmaps/iiif-parser](packages/iiif-parser)
-- [@allmaps/transform](packages/transform)
-- [@allmaps/render](packages/render)
-- [@allmaps/openlayers](packages/openlayers)
-- [@allmaps/ui](packages/ui)
+👉 **[allmaps.org](https://allmaps.org/)**
+
+[Observable Notebooks](https://observablehq.com/@allmaps?tab=notebooks)
+
+More documentation coming soon!
+
+## Contents
+
+This is a mono repo with the following apps and packages:
 
 Apps:
 
@@ -21,44 +23,84 @@ Apps:
 - [Allmaps Here](apps/here)
 - [Allmaps Latest](apps/latest)
 
+Packages:
+
+- [@allmaps/annotation](packages/annotation)
+- [@allmaps/id](packages/id)
+- [@allmaps/iiif-parser](packages/iiif-parser)
+- [@allmaps/transform](packages/transform)
+- [@allmaps/triangulate](packages/triangulate)
+- [@allmaps/render](packages/render)
+- [@allmaps/openlayers](packages/openlayers)
+- [@allmaps/ui](packages/ui)
+
 ## Installation
 
-First, clone this repository locally:
+First, clone this repository locally
 
-    git clone https://github.com/allmaps/allmaps.git
-    cd allmaps
+```sh
+git clone https://github.com/allmaps/allmaps.git
+cd allmaps
+```
 
-Install dependencies and create symlinks:
+Then install dependencies and create symlinks
 
-    pnpm install -r
-    npx lerna link
+```sh
+pnpm install -r
+npx lerna link
+```
 
-## Running all packages and apps locally:
+## Running packages and apps locally
+
+### All apps and packages
 
 To run the `dev` and `build --watch` scripts for all packages and apps, run the following in one terminal window:
 
-    npx lerna run watch --parallel
+```sh
+npx lerna run watch --parallel
+```
 
 And this in another:
 
-    npx lerna run dev --parallel
+```sh
+npx lerna run dev --parallel
+```
 
-If things don't work, it might help to run:
-
-    npx lerna run check --parallel
+### One app or package
 
 To only run a single app in dev mode, you need to run all packages in watch mode:
 
-    npx lerna run watch --parallel
+```sh
+npx lerna run watch --parallel
+```
 
 And then use lerna with `--scope` to select a single app:
 
-    npx lerna run --scope "@allmaps/viewer" dev
+```sh
+npx lerna run --scope "@allmaps/viewer" dev
+```
 
 You can also directly run the `dev` script from a single app:
 
-    cd apps/viewer
-    pnpm run dev
+```sh
+cd apps/viewer
+pnpm run dev
+```
+
+## Troubleshooting
+
+If things don't work, it might help to run:
+
+```sh
+npx lerna run check --parallel
+```
+
+or
+
+```sh
+npx lerna link
+```
+
 
 ## Commit changes
 
@@ -66,38 +108,54 @@ This repository uses [Husky](https://typicode.github.io/husky/) to run type chec
 
 To skip these tests, you can use git's `--no-verify` option:
 
-    git commit --no-verify
+```sh
+git commit --no-verify
+```
 
 ## Check formatting and types
 
 Check TypeScript types for all packages:
 
-    npx lerna run types --parallel
+```sh
+npx lerna run types --parallel
+```
 
 Run Prettier and ESLint for all packages:
 
-    npx lerna run lint --parallel
+```sh
+npx lerna run lint --parallel
+```
 
 ## Run tests
 
 Run `test` scripts for all packages and apps:
 
-    npx lerna run test --parallel
+```sh
+npx lerna run test --parallel
+```
 
 Run tests in single package:
 
-    npx lerna run --scope @allmaps/id test
+```sh
+npx lerna run --scope @allmaps/id test
+```
 
 # Versioning & publishing
 
 Create prerelease versions:
 
-    lerna version prerelease
+```sh
+lerna version prerelease
+```
 
 Publish beta versions to npm:
 
-    lerna publish from-git --dist-tag beta
+```sh
+lerna publish from-git --dist-tag beta
+```
 
 Promoting unchanged pre-release versions:
 
-    lerna version --conventional-commits --conventional-graduate
+```sh
+lerna version --conventional-commits --conventional-graduate
+```

@@ -4,6 +4,8 @@ This module 'triangulates' a polygon: it returns a set of small triangule that p
 
 It is used in [@allmaps/render](../../packages/render/) to triangulate the resource mask into a set of triangles that can be drawn by WebGL.
 
+## How it works
+
 It uses a simple **constrained Delaunay triangulation algorithm** for polygons, built using [poly2tri.js](https://github.com/r3mi/poly2tri.js).
 
 To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/199e169d58f0bf0d).
