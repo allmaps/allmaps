@@ -1,20 +1,16 @@
 # @allmaps/transform
 
-Allmaps Transformation Library
-
-## Aim
-
 This module serves to **transform points**, polygons and other spatial features from one cartesian `(x, y)` plane to another **using a set of control points** identified in both planes.
 
-In the Allmaps case this transformation is **from the pixel coordinates space** of a IIIF Resource **to the map coordinate space** of an interactive map.
+It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from controle points in the annotation and transforms coordinates **from the pixel coordinates space** of a IIIF Resource **to the map coordinate space** of an interactive map.
 
-This module's main usage in the Allmaps stack is in [@allmaps/render](../render) and [@allmaps/tileserver](../../apps/tileserver/), two locations where we produce a georeferenced image by triangulating a IIIF image and drawing these triangular parts on a map in a location computed by the transformation algorithm constructed from the annotation.
+## How it works
 
-This library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library applied for creating and solving the linear systems of equations which are the essence of each of these transformations. The algorithms correspond to those of GDAL and the results are (nearly) identical as can be checked in the [tests](./test/test-transform.js).
+This library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library applied for creating and solving the linear systems of equations which are the essence of each of these transformations.
 
-## Supported transformations
+The algorithms correspond to those of **GDAL** and the results are (nearly) identical as can be checked in the [tests](./test/test-transform.js).
 
-The following transformations are supported:
+These are the **supported transformations**:
 
 | Type                | Options    | Description                                           | Properties                                                       | Min number of control points |
 | ------------------- | ---------- | ----------------------------------------------------- | ---------------------------------------------------------------- | -------------------- |
@@ -25,9 +21,17 @@ The following transformations are supported:
 | `thin-plate-spline` |            | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) |  3                    |
 | `projective`        |            | Projective or 'perspective' transformation, used for aerial images              | Preserves lines and cross-ratios                                         |  4                    |
 
-## Usage
+## Installation
 
-First install using your favourite package manager. Then use in this way:
+This is an ESM-only module that works in browsers or in Node.js.
+
+Installation in Node.js:
+
+```sh
+npm install @allmaps/transform
+```
+
+## Usage
 
 ```js
 import { GCPTransformer } from '@allmaps/transform'
@@ -60,7 +64,7 @@ const result = transformer.toResource([4.9385700843392435, 52.46580484503631])
 // result = [100, 100]
 ```
 
-The transformer Class also exports the function `transformer.toGeoJSON()` for forward transforms (Arrays of) [x, y] position(s) to the geometry object of the appropriate GeoJSON object (Point, LineString, Polygon), and the function `transformer.fromGeoJSON()` to take in such a GeoJSON object and backwards transform it to an (Array of) [x, y] position(s).
+The transformer Class also exports the function `transformer.toGeoJSON()` for forward transforms (Arrays of) \[x, y] position(s) to the geometry object of the appropriate GeoJSON object (Point, LineString, Polygon), and the function `transformer.fromGeoJSON()` to take in such a GeoJSON object and backwards transform it to an (Array of) \[x, y] position(s).
 
 ```js
 const geoJSONPointGeometry = transformer.toGeoJSON([100, 100])
@@ -108,8 +112,8 @@ In the future, we hope to add an interface to manually enter coordinates of poin
 
 ### Notes
 
-- Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-- The examples here use `(longitude, latitude)` coordinates in the destination space, but it is important to stress that the functions `toWorld()` and `toResource()` are currently map-projection agnostic forward and backward transformations built for the general case of a transformation for one cartesian `(x, y)` plane to another (even though their name suggests otherwise). **When working in a geographic context** one can use control points with `(longitude, latitude)` coordinates in the destination space, which will build a transformation to the cartesian plane of an equidistant projection.  One could also transform such coordinates to a specific projection (for example Mercator) first and use control points with such projection coordinates in the destination space. This will build a transformation to the cartesian space of a Mercator projection. The output of the `toResource()` function is then also in these coordinates. Finally, since `toGeoJSON()` and `fromGeoJSON()` were specifically built with `(longitude, latitude)` coordinates in mind (as they are used in GeoJSON objects), these functions should only be used for such coordinates.
+*   Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+*   The examples here use `(longitude, latitude)` coordinates in the destination space, but it is important to stress that the functions `toWorld()` and `toResource()` are currently map-projection agnostic forward and backward transformations built for the general case of a transformation for one cartesian `(x, y)` plane to another (even though their name suggests otherwise). **When working in a geographic context** one can use control points with `(longitude, latitude)` coordinates in the destination space, which will build a transformation to the cartesian plane of an equidistant projection.  One could also transform such coordinates to a specific projection (for example Mercator) first and use control points with such projection coordinates in the destination space. This will build a transformation to the cartesian space of a Mercator projection. The output of the `toResource()` function is then also in these coordinates. Finally, since `toGeoJSON()` and `fromGeoJSON()` were specifically built with `(longitude, latitude)` coordinates in mind (as they are used in GeoJSON objects), these functions should only be used for such coordinates.
 
 ### Benchmark
 
