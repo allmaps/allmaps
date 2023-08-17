@@ -33,5 +33,5 @@ export type XYZTile = {
 export type Transformation = 'polynomial' | 'thin-plate-spline'
 
 export type Options = {
-  transformation: Transformation
+  'transformation.type': Transformation
 }

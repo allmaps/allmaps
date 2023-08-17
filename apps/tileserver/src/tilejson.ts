@@ -26,7 +26,10 @@ export function generateTileJson(
   const geoMasks = []
 
   for (const map of maps) {
-    const transformer = new GCPTransformer(map.gcps, options.transformation)
+    const transformer = new GCPTransformer(
+      map.gcps,
+      options['transformation.type']
+    )
 
     const geoMask = transformer.toGeoJSON(map.pixelMask, {
       maxOffsetRatio: 0.01

@@ -54,7 +54,10 @@ export async function createWarpedTileResponse(
     const extent = xyzTileToGeoExtent({ x, y, z })
 
     // Create transformer
-    const transformer = new GCPTransformer(map.gcps, options.transformation)
+    const transformer = new GCPTransformer(
+      map.gcps,
+      options['transformation.type']
+    )
 
     // Compute necessary IIIF tiles
     const iiifTiles = computeIiifTilesForMapGeoBBox(

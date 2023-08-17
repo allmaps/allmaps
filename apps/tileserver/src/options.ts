@@ -3,13 +3,13 @@ import type { Obj } from 'itty-router'
 import type { Transformation, Options } from './types.js'
 
 export function optionsFromQuery(query: Obj | undefined): Options {
-  let transformation: Transformation = 'polynomial'
+  let transformationType: Transformation = 'polynomial'
 
-  if (query?.transformation === 'thin-plate-spline') {
-    transformation = 'thin-plate-spline'
+  if (query?.['transformation.type'] === 'thin-plate-spline') {
+    transformationType = 'thin-plate-spline'
   }
 
   return {
-    transformation
+    ['transformation.type']: transformationType
   }
 }

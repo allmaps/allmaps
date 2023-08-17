@@ -86,6 +86,6 @@ And for TileJSON:
 
 ### URL parameters
 
-| Parameter        | Description         | Allowed values                          |
-| :--------------- | :------------------ | :-------------------------------------- |
-| `transformation` | Transformation type | `"polynomial"` \| `"thin-plate-spline"` |
+| Parameter             | Description         | Allowed values                          | Example                           |
+| :-------------------- | :------------------ | :-------------------------------------- | :-------------------------------- |
+| `transformation.type` | Transformation type | `"polynomial"` \| `"thin-plate-spline"` | `?transformation.type=polynomial` |

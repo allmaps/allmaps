@@ -12,6 +12,7 @@ export async function mapsFromParams(
   params: Obj | undefined
 ): Promise<Map[]> {
   const mapId = params?.mapId
+  const imageId = params?.imageId
   const manifestId = params?.manifestId
 
   if (!env || typeof env !== 'object') {
@@ -29,6 +30,8 @@ export async function mapsFromParams(
   let url
   if (mapId) {
     url = `${env.API_BASE_URL}/maps/${mapId}`
+  } else if (imageId) {
+    url = `${env.API_BASE_URL}/images/${imageId}/maps`
   } else if (manifestId) {
     url = `${env.API_BASE_URL}/manifests/${manifestId}/maps`
   } else {
