@@ -9,7 +9,7 @@ workers_dev = true
 [vars]
 API_BASE_URL="https://api.allmaps.org"
 TILE_SERVER_BASE_URL="https://allmaps.xyz"
-TILES_VIEWER_BASE_URL="https://tiles.allmaps.org"
+TILE_VIEWER_BASE_URL="https://tiles.allmaps.org"
 
 [build]
 command="npm run build"

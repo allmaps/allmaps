@@ -67,10 +67,6 @@ export async function createWarpedTileResponse(
       extent
     )
 
-    // Get resource tile size
-    // TODO: check if this is ok if no tiles returned
-    const resourceTileSize = iiifTiles[0].zoomLevel.width
-
     // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {
       const { region, size } = parsedImage.getIiifTile(
@@ -164,6 +160,9 @@ export async function createWarpedTileResponse(
           const decodedJpeg = decodedJpegs[tileIndex]
 
           if (decodedJpeg) {
+            // Get resource tile size
+            const resourceTileSize = tile.zoomLevel.width
+
             // Schematic drawing of resource tile and sub-pixel location of (pixelTileX, pixelTileY)
             //
             // PixelTile: +

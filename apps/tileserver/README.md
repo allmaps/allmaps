@@ -8,6 +8,17 @@ For more information, see https://observablehq.com/@allmaps/allmaps-tile-server.
 
 ![](screenshot.jpg)
 
+Some example URLs:
+
+- https://allmaps.xyz/maps/a38b4ed7ea01a36a/16/33583/21671.png
+- https://allmaps.xyz/maps/135dfd2d58dc26ec/6/30/19.png?transformation.type=thin-plate-spline
+- https://allmaps.xyz/images/03c17f5180f3a705/16/33572/21876.png
+- https://allmaps.xyz/manifests/a0d6d3379cfd9f0a/15/16833/10770.png
+- https://allmaps.xyz/manifests/a0d6d3379cfd9f0a/tiles.json
+- https://allmaps.xyz/manifests/a0d6d3379cfd9f0a/{z}/{x}/{y}.png
+- https://allmaps.xyz/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/images/ea443ffaabb121e2
+- https://allmaps.xyz/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/9845523343c39447
+
 ## Development
 
 Run locally with [Miniflare](https://miniflare.dev/):
@@ -16,13 +27,16 @@ Run locally with [Miniflare](https://miniflare.dev/):
 
 A local version of Allmaps Tile Server is now running on http://localhost:5504.
 
-Some example URLs:
+Some example URLs for local development:
 
 - http://localhost:5504/maps/a38b4ed7ea01a36a/16/33583/21671.png
 - http://localhost:5504/maps/135dfd2d58dc26ec/6/30/19.png?transformation.type=thin-plate-spline
+- http://localhost:5504/images/03c17f5180f3a705/16/33572/21876.png
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/15/16833/10770.png
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/tiles.json
 - http://localhost:5504/manifests/a0d6d3379cfd9f0a/{z}/{x}/{y}.png
+- http://localhost:5504/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/images/ea443ffaabb121e2
+- http://localhost:5504/{z}/{x}/{y}.png?url=https://annotations.allmaps.org/maps/9845523343c39447
 
 Publish to Cloudflare Workers:
 
