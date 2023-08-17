@@ -1,5 +1,6 @@
 {
   "name": "@allmaps/allmaps",
+  "type": "module",
   "private": true,
   "scripts": {
     "watch": "lerna run watch --parallel",

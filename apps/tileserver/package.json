@@ -16,7 +16,7 @@
     "directory": "apps/tileserver"
   },
   "scripts": {
-    "dev": "npx miniflare dist/worker.es.js -w -m --port $(jq -r '.tileserver' ../../ports.json)",
+    "dev": "npx miniflare dist/worker.es.js -w -m --port $(../../port.js tileserver)",
     "build": "vite build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
