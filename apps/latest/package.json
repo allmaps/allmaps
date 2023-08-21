@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -27,20 +27,20 @@
     "preversion": "npm run types && npm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.13",
-    "@allmaps/transform": "1.0.0-beta.14",
-    "@allmaps/id": "^1.0.0-beta.15",
-    "@allmaps/ui": "^1.0.0-beta.15",
-    "@allmaps/tailwind": "1.0.0-beta.5",
+    "@allmaps/annotation": "^1.0.0-beta.14",
+    "@allmaps/id": "^1.0.0-beta.16",
+    "@allmaps/tailwind": "^1.0.0-beta.6",
+    "@allmaps/transform": "^1.0.0-beta.15",
+    "@allmaps/ui": "^1.0.0-beta.16",
     "@turf/area": "^6.5.0",
     "@turf/rewind": "^6.5.0",
     "d3-geo": "^3.0.1"
   },
   "devDependencies": {
-    "@types/d3-geo": "^3.0.2",
-    "@types/geojson": "^7946.0.10",
     "@sveltejs/adapter-static": "^1.0.0",
     "@sveltejs/kit": "^1.5.0",
+    "@types/d3-geo": "^3.0.2",
+    "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.35.0",

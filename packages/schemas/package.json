@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/schemas",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -42,7 +42,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.13",
+    "@allmaps/annotation": "^1.0.0-beta.14",
     "zod": "^3.20.6",
     "zod-to-json-schema": "^3.20.6"
   },
@@ -50,8 +50,8 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.35.0",
+    "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0",
-    "mocha": "^8.4.0"
+    "typescript": "^5.0.0"
   }
 }
