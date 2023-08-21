@@ -52,7 +52,7 @@
     <main class="grow relative">
       <TileJSON {tileJson} />
       <div class="absolute bottom-0 w-full pointer-events-none">
-        <Info />
+        <Info {tileUrl} />
       </div>
     </main>
   {/if}

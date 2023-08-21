@@ -6,6 +6,8 @@
   import TileLayer from 'ol/layer/Tile.js'
   import { fromLonLat } from 'ol/proj.js'
 
+  import { view } from '$lib/shared/stores/view.js'
+
   import type { TileJSON } from '$lib/types.js'
 
   export let tileJson: TileJSON
@@ -36,7 +38,9 @@
       ...fromLonLat([tileJson.bounds[2], tileJson.bounds[3]])
     ]
 
-    map.getView().fit(bbox, {
+    $view = map.getView()
+
+    $view.fit(bbox, {
       padding: [25, 25, 25, 25]
     })
   })
