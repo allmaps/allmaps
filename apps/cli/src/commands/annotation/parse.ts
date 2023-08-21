@@ -12,12 +12,8 @@ export default function parse() {
     )
     .action(async (files) => {
       const jsonValues = await parseJsonInput(files as string[])
-      const maps = parseAnnotationsValidateMaps(jsonValues)
 
-      if (maps.length === 1) {
-        printJson(maps[0])
-      } else {
-        printJson(maps)
-      }
+      const maps = parseAnnotationsValidateMaps(jsonValues)
+      printJson(maps)
     })
 }

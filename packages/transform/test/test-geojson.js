@@ -8,12 +8,12 @@ import { gcps6 } from './input/gcps-test.js'
 
 chai.use(shallowDeepEqual)
 
-describe('To World Polygon transformer ', async () => {
+describe('To geo polygon transformer ', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GCPTransformer(gcps6, 'thin-plate-spline')
+  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -30,19 +30,19 @@ describe('To World Polygon transformer ', async () => {
     [4.420666790347598, 51.959985351835975]
   ]
 
-  const result = transformer.toWorldPolygon(input, transformOptions)
+  const result = transformer.toGeoPolygon(input, transformOptions)
 
   it(`should have the right output`, () => {
     expect(result).to.shallowDeepEqual(output)
   })
 })
 
-describe('To Image Polygon Transformer', async () => {
+describe('To resource polygon transformer', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GCPTransformer(gcps6, 'thin-plate-spline')
+  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [4.388957777030093, 51.959084191571606],
     [4.392938913951547, 51.94062947962427],
@@ -59,7 +59,7 @@ describe('To Image Polygon Transformer', async () => {
     [1957.822599920541, 1009.7982201488556]
   ]
 
-  const result = transformer.toImagePolygon(input, transformOptions)
+  const result = transformer.toResourcePolygon(input, transformOptions)
 
   it(`should have the right output`, () => {
     expect(result).to.shallowDeepEqual(output)

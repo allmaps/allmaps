@@ -9,12 +9,12 @@ import {
   parseTransformOptions
 } from '../../lib/options.js'
 
-export default function pixelMask() {
-  const command = new Command('pixel-mask')
+export default function resourceMask() {
+  const command = new Command('resource-mask')
     .argument('[files...]')
-    .summary('transform pixel masks to GeoJSON')
+    .summary('transform resource masks to GeoJSON')
     .description(
-      'Transforms pixel masks of input Georeference Annotations to GeoJSON'
+      'Transforms resource masks of input Georeference Annotations to GeoJSON'
     )
 
   return addTransformOptions(command).action(async (files, options) => {
@@ -27,16 +27,19 @@ export default function pixelMask() {
 
     for (const map of maps) {
       if (map.gcps.length >= 3) {
-        const transformer = new GCPTransformer(map.gcps)
+        const transformer = new GCPTransformer(
+          map.gcps,
+          map.transformation?.type
+        )
         const polygon = transformer.toGeoJSONPolygon(
-          map.pixelMask,
+          map.resourceMask,
           transformOptions
         )
 
         features.push({
           type: 'Feature',
           properties: {
-            imageUri: map.image.uri
+            imageId: map.resource.id
           },
           geometry: polygon
         })

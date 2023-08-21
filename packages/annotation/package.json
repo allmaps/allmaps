@@ -44,7 +44,7 @@
     "format": "prettier --write src test",
     "types": "tsc --noEmit",
     "documentation": "documentation readme index.js --config documentation.yml --section=API",
-    "examples": "cp test/input/map.nagwjzJ6qURmPEHV.json examples/map.example.json && cp test/input/annotation.i7YhWu1sFExRzm3d.json examples/annotation.example.json"
+    "examples": "cp test/input/map.parse-generate.json examples/map.example.json && cp test/input/annotation.parse-generate.json examples/annotation.example.json"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
@@ -56,7 +56,8 @@
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "zod-validation-error": "^1.5.0"
   },
   "dependencies": {
     "zod": "^3.20.6"

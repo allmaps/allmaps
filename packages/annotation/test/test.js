@@ -1,25 +1,17 @@
 import fs from 'fs'
 import path from 'path'
 import { z } from 'zod'
+import { fromZodError } from 'zod-validation-error'
 
 import { describe, it } from 'mocha'
 import chai, { expect } from 'chai'
 import shallowDeepEqual from 'chai-shallow-deep-equal'
 
+import { inputDir, outputDir, readJSONFile } from './shared.js'
+
 import { parseAnnotation, generateAnnotation } from '../dist/index.js'
 
 chai.use(shallowDeepEqual)
-
-export const inputDir = './test/input'
-export const outputDir = './test/output'
-
-export function readJSONFile(filename) {
-  try {
-    return JSON.parse(fs.readFileSync(filename))
-  } catch (err) {
-    return undefined
-  }
-}
 
 fs.readdirSync(inputDir)
   .filter((filename) => filename.endsWith('.json'))
@@ -46,8 +38,8 @@ fs.readdirSync(inputDir)
     const input = readJSONFile(inputFilename)
 
     let output
-    let errors
-    let zodError
+    let error
+    let errorMessage
 
     try {
       if (type === 'map') {
@@ -56,15 +48,31 @@ fs.readdirSync(inputDir)
         output = parseAnnotation(input)
       }
     } catch (err) {
-      if (err.errors) {
-        errors = err.errors.map((error) => error.message)
-      } else {
-        errors = [err.message]
-      }
+      error = err
 
       if (err instanceof z.ZodError) {
-        zodError = err
+        const validationError = fromZodError(err)
+        errorMessage = validationError.message
+      } else {
+        errorMessage = err.message
       }
+    }
+
+    let expectedOutput
+    let expectedErrorMessage
+
+    try {
+      expectedOutput = readJSONFile(outputFilename)
+    } catch (err) {
+      // Can't open outputFilename
+      // Don't report/throw error here
+    }
+
+    try {
+      expectedErrorMessage = readJSONFile(errorsFilename)
+    } catch (err) {
+      // Can't open errorsFilename
+      // Don't report/throw error here
     }
 
     return {
@@ -72,11 +80,11 @@ fs.readdirSync(inputDir)
       basename,
       input,
       output,
-      errors,
-      zodError,
+      error,
+      errorMessage,
       expected: {
-        output: readJSONFile(outputFilename),
-        errors: readJSONFile(errorsFilename)
+        output: expectedOutput,
+        errorMessage: expectedErrorMessage
       }
     }
   })
@@ -86,30 +94,28 @@ function runTests(file) {
   describe(file.basename, () => {
     if (file.output && file.expected.output) {
       it('should match expected output', () => {
+        // console.log('file.expected.output', file.expected.output)
+        // console.log('file.output', file.output)
         expect(file.expected.output).to.shallowDeepEqual(file.output)
+        // expect(file.expected.errors).to.deep.equal(file.errorMessage)
       })
-    } else if (file.errors && file.expected.errors) {
+    } else if (file.errorMessage && file.expected.errorMessage) {
       // TODO: test line numbers with json-source-map?
 
       it('should result in the correct error message', () => {
-        expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
+        // expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
+        expect(file.expected.errorMessage).to.deep.equal(file.errorMessage)
       })
-    } else if (file.output && file.expected.errors) {
+    } else if (file.output && file.expected.errorMessage) {
       console.error(
         'File parsed correctly, but expected errors:',
         file.basename
       )
-    } else if (file.errors && file.expected.output) {
+    } else if (file.errorMessage && file.expected.output) {
       console.error(
         'File failed to parse, but expected no errors:',
         file.basename
       )
-      if (file.zodError) {
-        console.error(JSON.stringify(file.zodError.format(), null, 2))
-        console.error(file.zodError.issues)
-      } else {
-        console.error(file.errors)
-      }
     } else {
       console.error(
         'Input file should have either matching output or errors JSON file:\n  ',

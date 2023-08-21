@@ -37,7 +37,7 @@ Parse input files and output them in the format used internally by Allmaps:
 
     allmaps annotation parse [files...]
 
-Convert the pixel mask from the input files to SVG polygons:
+Convert the resource mask from the input files to SVG polygons:
 
     allmaps annotation svg [files...]
 
@@ -59,16 +59,16 @@ Transform GeoJSON to SVG using a Georeference Annotation:
 
 The filename of the Georeference Annotation must be supplied with the `-a` or `--annotation` option.
 
-Transform pixel masks to GeoJSON:
+Transform resource masks to GeoJSON:
 
-    allmaps transform pixel-mask [files...]
+    allmaps transform resource-mask [files...]
 
 All the commands above accept the following options:
 
-| Option                            | Description                                                     | Default
-|:----------------------------------|:----------------------------------------------------------------|:--------
-| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints | 0
-| `-d, --max-depth <number>`        | Maximum recursion depth                                         | 6
+| Option                            | Description                                                     | Default |
+| :-------------------------------- | :-------------------------------------------------------------- | :------ |
+| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints | 0       |
+| `-d, --max-depth <number>`        | Maximum recursion depth                                         | 6       |
 
 #### Parse and generate IIIF resources
 
@@ -98,11 +98,11 @@ Use Allmaps API to find Georeference Annotations:
 
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 
-Fetch a Georeference Annotation with cURL, pipe to Allmaps CLI and transform pixel mask to GeoJSON:
+Fetch a Georeference Annotation with cURL, pipe to Allmaps CLI and transform resource mask to GeoJSON:
 
 ```bash
 curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest" \
-| allmaps transform pixel-mask
+| allmaps transform resource-mask
 ```
 
 You can pipe as multiple Georeference Annotations to Allmaps CLI:
@@ -117,13 +117,13 @@ Georef Annotations:
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest
 
-Concatenate these two Georeference Annotations with Bash and transform pixel masks to GeoJSON:
+Concatenate these two Georeference Annotations with Bash and transform resource masks to GeoJSON:
 
 ```bash
 cat \
 <(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest") \
 <(curl -L "https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest") \
-| allmaps transform pixel-mask
+| allmaps transform resource-mask
 ```
 
 ### Combine multiple Georeference Annotations

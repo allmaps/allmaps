@@ -34,8 +34,8 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   vertexBufferTransform: Transform | undefined
 
-  pixelMaskTriangles: number[] = []
-  transformedPixelMaskTriangles: Float32Array = new Float32Array()
+  resourceMaskTriangles: number[] = []
+  transformedResourceMaskTriangles: Float32Array = new Float32Array()
 
   currentGeoMaskTriangles: number[] = []
   currentTransformedGeoMaskTriangles: Float32Array = new Float32Array()
@@ -91,29 +91,29 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   updateTriangulation(warpedMap: WarpedMap, immediately = true) {
-    const bbox: BBox = computeBBox(warpedMap.pixelMask)
+    const bbox: BBox = computeBBox(warpedMap.resourceMask)
     const bboxDiameter: number = Math.sqrt(
       (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
     )
 
     const trianglesPositions = triangulate(
-      warpedMap.pixelMask,
+      warpedMap.resourceMask,
       bboxDiameter / DIAMETER_FRACTION
     ).flat()
 
     const newGeoMaskVertices = trianglesPositions.map((point) =>
-      warpedMap.transformer.toWorld(point as [number, number])
+      warpedMap.transformer.toGeo(point as [number, number])
     )
 
     this.newGeoMaskTriangles = newGeoMaskVertices.flat()
-    this.pixelMaskTriangles = trianglesPositions.flat()
+    this.resourceMaskTriangles = trianglesPositions.flat()
 
     this.newTransformedGeoMaskTriangles = new Float32Array(
       this.newGeoMaskTriangles.length
     )
 
-    this.transformedPixelMaskTriangles = new Float32Array(
-      this.pixelMaskTriangles.length
+    this.transformedResourceMaskTriangles = new Float32Array(
+      this.resourceMaskTriangles.length
     )
 
     if (immediately || !this.currentGeoMaskTriangles.length) {
@@ -168,25 +168,31 @@ export default class WebGL2WarpedMap extends EventTarget {
         }
       }
 
-      for (let index = 0; index < this.pixelMaskTriangles.length; index += 2) {
+      for (
+        let index = 0;
+        index < this.resourceMaskTriangles.length;
+        index += 2
+      ) {
         // const transformedPoint = applyTransform(transform, [
-        //   this.pixelMaskTriangles[index],
-        //   this.pixelMaskTriangles[index + 1]
+        //   this.resourceMaskTriangles[index],
+        //   this.resourceMaskTriangles[index + 1]
         // ])
 
         const transformedPoint = [
-          this.pixelMaskTriangles[index],
-          this.pixelMaskTriangles[index + 1]
+          this.resourceMaskTriangles[index],
+          this.resourceMaskTriangles[index + 1]
         ]
 
-        this.transformedPixelMaskTriangles[index] = transformedPoint[0]
-        this.transformedPixelMaskTriangles[index + 1] = transformedPoint[1]
+        this.transformedResourceMaskTriangles[index] = transformedPoint[0]
+        this.transformedResourceMaskTriangles[index + 1] = transformedPoint[1]
       }
 
       // DEV Compute triangle indeces, used for development purposes
-      this.pixelTriangleIndex = new Float32Array(this.pixelMaskTriangles.length)
+      this.pixelTriangleIndex = new Float32Array(
+        this.resourceMaskTriangles.length
+      )
 
-      for (let index = 0; index < this.pixelMaskTriangles.length; index++) {
+      for (let index = 0; index < this.resourceMaskTriangles.length; index++) {
         this.pixelTriangleIndex[3 * index] = index
         this.pixelTriangleIndex[3 * index + 1] = index
         this.pixelTriangleIndex[3 * index + 2] = index
@@ -213,7 +219,7 @@ export default class WebGL2WarpedMap extends EventTarget {
       createBuffer(
         this.gl,
         this.program,
-        this.transformedPixelMaskTriangles,
+        this.transformedResourceMaskTriangles,
         2,
         'a_pixel_position'
       )

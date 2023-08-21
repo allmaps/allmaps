@@ -12,7 +12,7 @@ const transformations: TransformationType[] = [
   // 'polynomial2',
   // 'polynomial3',
   // 'projective',
-  'thin-plate-spline'
+  'thinPlateSpline'
 ]
 
 const DEFAULT_TRANSFORMATION_INDEX = 0

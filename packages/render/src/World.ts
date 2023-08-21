@@ -15,7 +15,7 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
-import type { TransformationType, ImageWorldPosition } from '@allmaps/transform'
+import type { TransformationType, GCP } from '@allmaps/transform'
 import type { Position, BBox, WarpedMap } from './shared/types.js'
 
 export default class World extends EventTarget {
@@ -41,11 +41,11 @@ export default class World extends EventTarget {
       const mapId = await this.getMapId(map)
 
       const gcps = map.gcps
-      const pixelMask = map.pixelMask
+      const resourceMask = map.resourceMask
 
-      const projectedGCPs = gcps.map(({ world, image }) => ({
-        world: fromLonLat(world),
-        image
+      const projectedGCPs = gcps.map(({ geo, resource }) => ({
+        geo: fromLonLat(geo),
+        resource
       }))
 
       // TODO: to make sure only tiles for visible parts of the map are requested
@@ -61,7 +61,7 @@ export default class World extends EventTarget {
       //  - https://github.com/mfogel/polygon-clipping
 
       // TODO: only load info.json when its needed
-      const imageUri = map.image.uri
+      const imageUri = map.resource.id
       const imageInfoJson = await fetchImageInfo(imageUri, {
         cache: this.imageInfoCache
       })
@@ -74,14 +74,14 @@ export default class World extends EventTarget {
         projectedGCPs,
         visible: true,
         parsedImage,
-        pixelMask,
+        resourceMask,
         // TODO: clean up!
         ...this.computeWarpedMapTransformer(
           mapId,
-          pixelMask,
+          resourceMask,
           parsedImage,
           projectedGCPs,
-          'polynomial'
+          map.transformation?.type || 'polynomial'
         )
       }
 
@@ -106,9 +106,9 @@ export default class World extends EventTarget {
 
   private computeWarpedMapTransformer(
     mapId: string,
-    pixelMask: Position[],
+    resourceMask: Position[],
     parsedImage: IIIFImage,
-    projectedGcps: ImageWorldPosition[],
+    projectedGcps: GCP[],
     transformation: TransformationType
   ) {
     const transformer = new GCPTransformer(projectedGcps, transformation)
@@ -118,13 +118,16 @@ export default class World extends EventTarget {
       maxDepth: 6
     }
 
-    const geoMask = transformer.toGeoJSONPolygon(pixelMask, transformerOptions)
+    const geoMask = transformer.toGeoJSONPolygon(
+      resourceMask,
+      transformerOptions
+    )
 
     if (this.rtree) {
       this.rtree.addItem(mapId, geoMask)
     }
 
-    const fullPixelMask: Position[] = [
+    const fullResourceMask: Position[] = [
       [0, 0],
       [parsedImage.width, 0],
       [parsedImage.width, parsedImage.height],
@@ -132,7 +135,7 @@ export default class World extends EventTarget {
     ]
 
     const fullGeoMask = transformer.toGeoJSONPolygon(
-      fullPixelMask,
+      fullResourceMask,
       transformerOptions
     )
 
@@ -320,10 +323,10 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
   }
 
-  setPixelMask(mapId: string, pixelMask: Position[]) {
+  setResourceMask(mapId: string, resourceMask: Position[]) {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
-      const geoMask = warpedMap.transformer.toGeoJSONPolygon(pixelMask)
+      const geoMask = warpedMap.transformer.toGeoJSONPolygon(resourceMask)
       warpedMap.geoMask = geoMask
       warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
 
@@ -333,7 +336,7 @@ export default class World extends EventTarget {
       }
 
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PIXELMASKUPDATED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
       )
     }
   }
@@ -346,7 +349,7 @@ export default class World extends EventTarget {
           ...warpedMap,
           ...this.computeWarpedMapTransformer(
             mapId,
-            warpedMap.pixelMask,
+            warpedMap.resourceMask,
             warpedMap.parsedImage,
             warpedMap.projectedGCPs,
             transformation

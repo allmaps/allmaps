@@ -103,26 +103,29 @@ export async function addAnnotation(sourceId: string, json: unknown) {
   return mapIds
 }
 
-export function resetCustomPixelMask(mapId: string) {
+export function resetCustomResourceMask(mapId: string) {
   mapsById.update(($mapsById) => {
     const viewerMap = $mapsById.get(mapId)
 
     if (viewerMap) {
-      viewerMap.state.customPixelMask = undefined
-      mapWarpedMapSource.setPixelMask(mapId, viewerMap.map.pixelMask)
+      viewerMap.state.customResourceMask = undefined
+      mapWarpedMapSource.setResourceMask(mapId, viewerMap.map.resourceMask)
     }
 
     return $mapsById
   })
 }
 
-export function setCustomPixelMask(mapId: string, customPixelMask: Position[]) {
+export function setCustomResourceMask(
+  mapId: string,
+  customResourceMask: Position[]
+) {
   mapsById.update(($mapsById) => {
     const viewerMap = $mapsById.get(mapId)
 
     if (viewerMap) {
-      viewerMap.state.customPixelMask = customPixelMask
-      mapWarpedMapSource.setPixelMask(mapId, customPixelMask)
+      viewerMap.state.customResourceMask = customResourceMask
+      mapWarpedMapSource.setResourceMask(mapId, customResourceMask)
     }
 
     return $mapsById

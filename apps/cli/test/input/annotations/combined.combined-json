@@ -27,7 +27,6 @@
       },
       "body": {
         "type": "FeatureCollection",
-        "purpose": "gcp-georeferencing",
         "transformation": {
           "type": "polynomial",
           "options": {
@@ -119,7 +118,6 @@
       },
       "body": {
         "type": "FeatureCollection",
-        "purpose": "gcp-georeferencing",
         "transformation": {
           "type": "polynomial",
           "options": {

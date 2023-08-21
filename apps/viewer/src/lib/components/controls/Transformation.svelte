@@ -14,7 +14,7 @@
 >
   {#if $transformation === 'polynomial'}
     <Polynomial1 />
-  {:else if $transformation === 'thin-plate-spline'}
+  {:else if $transformation === 'thinPlateSpline'}
     <ThinPlateSpline />
   {/if}
 </button>

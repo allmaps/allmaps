@@ -64,86 +64,86 @@ describe('allmaps transform geojson', () => {
   })
 })
 
-describe('allmaps transform pixel-mask', () => {
+describe('allmaps transform resource-mask', () => {
   it('should display help when no arguments are provided', () => {
-    expect(() => exec('transform pixel-mask')).to.throw(
-      helpMessage('transform-pixel-mask')
+    expect(() => exec('transform resource-mask')).to.throw(
+      helpMessage('transform-resource-mask')
     )
   })
 
-  it('should read a map from standard input and transform its pixel mask to GeoJSON', () => {
+  it('should read a map from standard input and transform its resource mask to GeoJSON', () => {
     const expected = readFileJson('output/geojson/26e384d4efabdb32.geojson')
     const output = execJson(
-      'transform pixel-mask',
+      'transform resource-mask',
       'input/maps/26e384d4efabdb32.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read two Georeference Annotations from standard input and transform their pixel masks to GeoJSON', () => {
+  it('should read two Georeference Annotations from standard input and transform their resource masks to GeoJSON', () => {
     const expected = readFileJson('output/geojson/combined.geojson')
     const output = execJson(
-      'transform pixel-mask',
+      'transform resource-mask',
       'input/annotations/combined.combined-json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a map from a filename and transform its pixel mask to GeoJSON', () => {
+  it('should read a map from a filename and transform its resource mask to GeoJSON', () => {
     const expected = readFileJson('output/geojson/26e384d4efabdb32.geojson')
     const output = execJson(
-      'transform pixel-mask input/maps/26e384d4efabdb32.json'
+      'transform resource-mask input/maps/26e384d4efabdb32.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a map from two filenames and transform their pixel masks to GeoJSON', () => {
+  it('should read a map from two filenames and transform their resource masks to GeoJSON', () => {
     const expected = readFileJson(
       'output/geojson/26e384d4efabdb32-5610333850638ae2.geojson'
     )
     const output = execJson(
-      'transform pixel-mask input/maps/26e384d4efabdb32.json input/maps/5610333850638ae2.json'
+      'transform resource-mask input/maps/26e384d4efabdb32.json input/maps/5610333850638ae2.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
+  it('should read a Georeference Annotation from a filename and transform its resource mask to GeoJSON, using the default transform options', () => {
     const expected = readFileJson('output/geojson/13fd7a1921f2b011-d0.geojson')
     const output = execJson(
-      'transform pixel-mask input/annotations/13fd7a1921f2b011.json'
+      'transform resource-mask input/annotations/13fd7a1921f2b011.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the custom transform options', () => {
+  it('should read a Georeference Annotation from a filename and transform its resource mask to GeoJSON, using the custom transform options', () => {
     const expected = readFileJson('output/geojson/13fd7a1921f2b011-d8.geojson')
     const output = execJson(
-      'transform pixel-mask -p 0.01 -d 8 input/annotations/13fd7a1921f2b011.json'
+      'transform resource-mask -p 0.01 -d 8 input/annotations/13fd7a1921f2b011.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a Georeference Annotation from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
+  it('should read a Georeference Annotation from a filename and transform its resource mask to GeoJSON, using the default transform options', () => {
     const expected = readFileJson('output/geojson/7a69f9470b49a744.geojson')
     const output = execJson(
-      'transform pixel-mask input/annotations/7a69f9470b49a744.json'
+      'transform resource-mask input/annotations/7a69f9470b49a744.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
-  it('should read a Georeference Annotation with a reversed pixel mask from a filename and transform its pixel mask to GeoJSON, using the default transform options', () => {
+  it('should read a Georeference Annotation with a reversed resource mask from a filename and transform its resource mask to GeoJSON, using the default transform options', () => {
     const expected = readFileJson(
-      'output/geojson/7a69f9470b49a744-reversed-pixel-mask.geojson'
+      'output/geojson/7a69f9470b49a744-reversed-resource-mask.geojson'
     )
     const output = execJson(
-      'transform pixel-mask input/annotations/7a69f9470b49a744-reversed-pixel-mask.json'
+      'transform resource-mask input/annotations/7a69f9470b49a744-reversed-resource-mask.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)

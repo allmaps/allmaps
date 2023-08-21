@@ -1,56 +1,58 @@
-import { z } from 'zod'
+import {
+  AnnotationSchema as Annotation0Schema,
+  AnnotationPageSchema as AnnotationPage0Schema,
+  FeaturePropertiesSchema as Annotation0FeaturePropertiesSchema,
+  SvgSelectorSchema as SvgSelector0Schema
+} from './annotation/annotation.0.js'
+import {
+  AnnotationSchema as Annotation1Schema,
+  AnnotationPageSchema as AnnotationPage1Schema,
+  FeaturePropertiesSchema as Annotation1FeaturePropertiesSchema,
+  SvgSelectorSchema as SvgSelector1Schema
+} from './annotation/annotation.1.js'
+import {
+  PointGeometrySchema,
+  ImageServiceSchema,
+  TransformationSchema,
+  PartOfSchema
+} from './shared.js'
 
-import { PointSchema, ImageServiceSchema } from './shared.js'
+const DefaultAnnotationSchema = Annotation1Schema
+const DefaultAnnotationPageSchema = AnnotationPage1Schema
 
-const svg =
-  /^<svg\s+width="\d+"\s+height="\d+"\s*>\s*<polygon\s+points="\s*(-?\d+(\.\d+)?,-?\d+(\.\d+)?\s+){2,}-?\d+(\.\d+)?,-?\d+(\.\d+)?\s*"\s*\/>\s*<\/svg>$/
+const DefaultFeaturePropertiesSchema = Annotation1FeaturePropertiesSchema
 
-export const SvgSelectorSchema = z.object({
-  type: z.literal('SvgSelector'),
-  value: z.string().regex(svg)
-})
+const AnnotationAllVersionsSchema = Annotation0Schema.or(Annotation1Schema)
+const AnnotationPageAllVersionsSchema = AnnotationPage0Schema.or(
+  AnnotationPage1Schema
+)
 
-export const TargetSchema = z.object({
-  source: z.string().url(),
-  service: z
-    .array(
-      z.object({
-        '@id': z.string().url(),
-        type: ImageServiceSchema
-      })
-    )
-    .length(1),
-  selector: SvgSelectorSchema
-})
+const FeaturePropertiesAllVersionsSchema =
+  Annotation0FeaturePropertiesSchema.or(Annotation1FeaturePropertiesSchema)
 
-export const BodySchema = z.object({
-  type: z.literal('FeatureCollection'),
-  features: z.array(
-    z.object({
-      type: z.literal('Feature'),
-      properties: z.object({
-        pixelCoords: PointSchema
-      }),
-      geometry: z.object({
-        type: z.literal('Point'),
-        coordinates: PointSchema
-      })
-    })
-  )
-})
+export {
+  Annotation0Schema,
+  AnnotationPage0Schema,
+  Annotation0FeaturePropertiesSchema,
+  Annotation1Schema,
+  AnnotationPage1Schema,
+  Annotation1FeaturePropertiesSchema,
+  SvgSelector0Schema,
 
-export const AnnotationSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal('Annotation'),
-  '@context': z.string().url().array().optional(),
-  motivation: z.string().default('georeferencing').optional(),
-  target: TargetSchema,
-  body: BodySchema
-})
+  // Default schemas
+  DefaultAnnotationSchema as AnnotationSchema,
+  DefaultAnnotationPageSchema as AnnotationPageSchema,
+  DefaultFeaturePropertiesSchema as FeaturePropertiesSchema,
+  SvgSelector1Schema,
 
-export const AnnotationPageSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal('AnnotationPage'),
-  '@context': z.string().url().array().optional(),
-  items: z.array(AnnotationSchema)
-})
+  // All versions
+  AnnotationAllVersionsSchema,
+  AnnotationPageAllVersionsSchema,
+  FeaturePropertiesAllVersionsSchema,
+
+  // Shared schemas
+  PointGeometrySchema,
+  ImageServiceSchema,
+  TransformationSchema,
+  PartOfSchema
+}

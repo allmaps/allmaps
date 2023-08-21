@@ -1,1 +1,1 @@
-["Expected number, received string", "Expected number, received string"]
+"Validation error: Expected number, received string at \"gcps[0].image[0]\"; Expected number, received string at \"gcps[0].image[1]\""

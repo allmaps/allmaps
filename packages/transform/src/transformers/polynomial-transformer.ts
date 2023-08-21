@@ -1,49 +1,45 @@
 import Polynomial from '../shared/polynomial.js'
 
-import type {
-  GCPTransformerInterface,
-  Position,
-  ImageWorldPosition
-} from '../shared/types.js'
+import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
 
 export default class PolynomialGCPTransformer
   implements GCPTransformerInterface
 {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
 
-  worldGcps: Position[]
-  resourceGcps: Position[]
+  gcpGeoCoords: Position[]
+  gcpResourceCoords: Position[]
 
-  toWorldPolynomial?: Polynomial
+  toGeoPolynomial?: Polynomial
   toResourcePolynomial?: Polynomial
 
   order?: number
 
-  constructor(gcps: ImageWorldPosition[], order?: number) {
+  constructor(gcps: GCP[], order?: number) {
     this.gcps = gcps
 
-    this.worldGcps = gcps.map((gcp) => gcp.world)
-    this.resourceGcps = gcps.map((gcp) => gcp.image)
+    this.gcpGeoCoords = gcps.map((gcp) => gcp.geo)
+    this.gcpResourceCoords = gcps.map((gcp) => gcp.resource)
 
     if (order) {
       this.order = order
     }
   }
 
-  createToWorldPolynomial(): Polynomial {
-    return new Polynomial(this.resourceGcps, this.worldGcps, this.order)
+  createToGeoPolynomial(): Polynomial {
+    return new Polynomial(this.gcpResourceCoords, this.gcpGeoCoords, this.order)
   }
 
   createToResourcePolynomial(): Polynomial {
-    return new Polynomial(this.worldGcps, this.resourceGcps, this.order)
+    return new Polynomial(this.gcpGeoCoords, this.gcpResourceCoords, this.order)
   }
 
-  toWorld(point: Position): Position {
-    if (!this.toWorldPolynomial) {
-      this.toWorldPolynomial = this.createToWorldPolynomial()
+  toGeo(point: Position): Position {
+    if (!this.toGeoPolynomial) {
+      this.toGeoPolynomial = this.createToGeoPolynomial()
     }
 
-    return this.toWorldPolynomial.interpolant(point)
+    return this.toGeoPolynomial.interpolant(point)
   }
 
   toResource(point: Position): Position {

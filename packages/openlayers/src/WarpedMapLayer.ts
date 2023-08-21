@@ -132,8 +132,8 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.world.addEventListener(
-      WarpedMapEventType.PIXELMASKUPDATED,
-      this.pixelMaskUpdated.bind(this)
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
     )
 
     this.world.addEventListener(
@@ -246,7 +246,7 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  private pixelMaskUpdated(event: Event) {
+  private resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       const warpedMap = this.world.getMap(mapId)

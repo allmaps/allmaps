@@ -8,7 +8,7 @@ export type TransformationType =
   | 'polynomial2'
   | 'polynomial3'
   | 'projective'
-  | 'thin-plate-spline'
+  | 'thinPlateSpline'
 
 export type Position = [number, number]
 
@@ -32,11 +32,11 @@ export type GeoJSONPolygon = {
   coordinates: Position[][]
 }
 
-export type ImageWorldPosition = { image: Position; world: Position }
+export type GCP = { resource: Position; geo: Position }
 
 export type Segment = {
-  from: ImageWorldPosition
-  to: ImageWorldPosition
+  from: GCP
+  to: GCP
 }
 
 export type TransformOptions = {
@@ -51,9 +51,9 @@ export type KernelFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (point1: Position, point2: Position) => number
 
 export type GCPTransformerInterface = {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
 
-  toWorld(point: Position): Position
+  toGeo(point: Position): Position
 
   toResource(point: Position): Position
 }

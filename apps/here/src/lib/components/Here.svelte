@@ -48,7 +48,7 @@
       return
     }
 
-    transformer = new GCPTransformer($map.gcps)
+    transformer = new GCPTransformer($map.gcps, $map.transformation?.type)
 
     const tileLayer = new TileLayer()
 

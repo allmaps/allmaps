@@ -1,30 +1,30 @@
 {
+  "type": "GeoreferencedMap",
   "gcps": [
     {
-      "world": [-71.0801031, 42.3392754],
-      "image": [4642, 3295]
+      "geo": [-71.0801031, 42.3392754],
+      "resource": [4642, 3295]
     },
     {
-      "world": [-71.0731998, 42.3363919],
-      "image": [6299, 5272]
+      "geo": [-71.0731998, 42.3363919],
+      "resource": [6299, 5272]
     },
     {
-      "world": [-71.0646008, 42.3422325],
-      "image": [9680, 3821]
+      "geo": [-71.0646008, 42.3422325],
+      "resource": [9680, 3821]
     },
     {
-      "world": [-71.074498, 42.3396365],
-      "image": [6411, 3786]
+      "geo": [-71.074498, 42.3396365],
+      "resource": [6411, 3786]
     }
   ],
-  "image": {
-    "uri": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:9880z811p",
+  "resource": {
+    "id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:9880z811p",
     "type": "ImageService2",
     "width": 11550,
     "height": 7393
   },
-  "version": 1,
-  "pixelMask": [
+  "resourceMask": [
     [0, 0],
     [0, 7393],
     [11550, 7393],

@@ -2,7 +2,7 @@ import { Command } from 'commander'
 
 import svg from './transform/svg.js'
 import geojson from './transform/geojson.js'
-import pixelMask from './transform/pixel-mask.js'
+import resourceMask from './transform/resource-mask.js'
 
 export default function transform() {
   return new Command('transform')
@@ -12,5 +12,5 @@ export default function transform() {
     )
     .addCommand(svg())
     .addCommand(geojson())
-    .addCommand(pixelMask())
+    .addCommand(resourceMask())
 }

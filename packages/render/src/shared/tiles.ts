@@ -213,10 +213,13 @@ export function computeIiifTilesForMapGeoBBox(
   // TODO: make this work for maxOffsetRatio = 0
 
   const geoBBoxPolygon = bboxToSvgPolygon(geoBBox)
-  const geoBBoxPolygonToResource = transformer.toImagePolygon(geoBBoxPolygon, {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  })
+  const geoBBoxPolygonToResource = transformer.toResourcePolygon(
+    geoBBoxPolygon,
+    {
+      maxOffsetRatio: 0.00001,
+      maxDepth: 2
+    }
+  )
   const geoBBoxImageBBox = computeBBox(geoBBoxPolygonToResource)
 
   if (

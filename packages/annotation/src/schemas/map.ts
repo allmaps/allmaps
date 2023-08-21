@@ -1,31 +1,55 @@
-import { z } from 'zod'
+import {
+  MapSchema as Map1Schema,
+  MapsSchema as Maps1Schema,
+  GCPSchema as Map1GCPSchema,
+  ImageSchema as Map1ImageSchema
+} from './map/map.1.js'
+import {
+  MapSchema as Map2Schema,
+  MapsSchema as Maps2Schema,
+  GCPSchema as Map2GCPSchema,
+  ResourceSchema as Map2ResourceSchema
+} from './map/map.2.js'
+import {
+  PartOfSchema,
+  ResourceMaskSchema,
+  TransformationSchema
+} from './shared.js'
 
-import { PointSchema, ImageServiceSchema } from './shared.js'
+const DefaultMapSchema = Map2Schema
+const DefaultMapsSchema = Maps2Schema
 
-export const GCPSchema = z.object({
-  image: PointSchema,
-  world: PointSchema
-})
+const DefaultGCPSchema = Map2GCPSchema
+const DefaultResourceSchema = Map2ResourceSchema
 
-export const ImageSchema = z.object({
-  uri: z.string().url(),
-  width: z.number(),
-  height: z.number(),
-  type: ImageServiceSchema
-})
+const MapAllVersionsSchema = Map1Schema.or(Map2Schema)
+const MapsAllVersionsSchema = Maps1Schema.or(Maps2Schema)
 
-export const PixelMaskSchema = PointSchema.array().min(3)
+const GCPAllVersionsSchema = Map1GCPSchema.or(Map2GCPSchema)
 
-export const MapSchema = z.object({
-  // TODO: add JSON-LD context and type, remove version
-  // '@context': z.literal('http://schemas.allmaps.org/map/1/context.json').optional(),
-  // type: z.literal('Georef'),
+export {
+  Map1Schema,
+  Maps1Schema,
+  Map1GCPSchema,
+  Map1ImageSchema,
+  Map2Schema,
+  Maps2Schema,
+  Map2GCPSchema,
+  Map2ResourceSchema,
 
-  id: z.string().optional(),
-  version: z.number().min(1).max(1).default(1),
-  gcps: GCPSchema.array(),
-  pixelMask: PixelMaskSchema,
-  image: ImageSchema
-})
+  // Default schemas
+  DefaultMapSchema as MapSchema,
+  DefaultMapsSchema as MapsSchema,
+  DefaultGCPSchema as GCPSchema,
+  DefaultResourceSchema as ResourceSchema,
 
-export const MapsSchema = z.array(MapSchema)
+  // All versions
+  MapAllVersionsSchema,
+  MapsAllVersionsSchema,
+  GCPAllVersionsSchema,
+
+  // Shared schemas
+  PartOfSchema,
+  ResourceMaskSchema,
+  TransformationSchema
+}

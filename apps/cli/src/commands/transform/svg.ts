@@ -34,7 +34,7 @@ export default function svg() {
     const transformOptions = parseTransformOptions(options)
 
     const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
-    const transformer = new GCPTransformer(map.gcps)
+    const transformer = new GCPTransformer(map.gcps, map.transformation?.type)
 
     const svgs = await readInput(files as string[])
 

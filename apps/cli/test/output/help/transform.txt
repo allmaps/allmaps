@@ -6,12 +6,12 @@ Transforms SVGs with resource coordinates to GeoJSON and vice versa, using a
 Georeference Annotation
 
 Options:
-  -h, --help                       display help for command
+  -h, --help                          display help for command
 
 Commands:
-  svg [options] [files...]         transform SVG to GeoJSON
-  geojson [options] [files...]     transform GeoJSON to SVG
-  pixel-mask [options] [files...]  transform pixel masks to GeoJSON
-  help [command]                   display help for command
+  svg [options] [files...]            transform SVG to GeoJSON
+  geojson [options] [files...]        transform GeoJSON to SVG
+  resource-mask [options] [files...]  transform resource masks to GeoJSON
+  help [command]                      display help for command
 
 For more details about Allmaps, see https://allmaps.org

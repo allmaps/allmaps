@@ -10,11 +10,17 @@ export default function generate() {
     .argument('[files...]')
     .summary('generate Georeference Annotation')
     .description(`Generate a single Georeference Annotation from input files`)
-    .action(async (args) => {
-      const jsonValues = await parseJsonInput(args.files as string[])
+    .action(async (files) => {
+      const jsonValues = await parseJsonInput(files as string[])
       const maps = parseAnnotationsValidateMaps(jsonValues)
 
-      const annotation = generateAnnotation(maps)
+      let annotation: unknown
+      if (maps.length === 1) {
+        annotation = generateAnnotation(maps[0])
+      } else {
+        annotation = generateAnnotation(maps)
+      }
+
       printJson(annotation)
     })
 }

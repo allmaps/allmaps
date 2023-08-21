@@ -27,9 +27,9 @@ export async function getBackgroundColor(map: Map, parsedImage: Image) {
   const url = parsedImage.getImageUrl(imageRequest)
   const imageElement = await fetchImage(url)
 
-  const scale = imageElement.width / map.image.width
+  const scale = imageElement.width / map.resource.width
 
-  const mask: SVGPolygon = map.pixelMask.map((point) => [
+  const mask: SVGPolygon = map.resourceMask.map((point) => [
     point[0] * scale,
     point[1] * scale
   ])

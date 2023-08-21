@@ -11,9 +11,9 @@ import type { Map } from '@allmaps/annotation'
 
 export class DetectBackgroundColorWorker {
   detectBackgroundColor(map: Map, imageBitmap: ImageBitmap) {
-    const scale = imageBitmap.width / map.image.width
+    const scale = imageBitmap.width / map.resource.width
 
-    // const mask: SVGPolygon = map.pixelMask.map((point) => [
+    // const mask: SVGPolygon = map.resourceMask.map((point) => [
     //   point[0] * scale,
     //   point[1] * scale
     // ])

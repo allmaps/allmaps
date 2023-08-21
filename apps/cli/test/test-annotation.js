@@ -18,6 +18,15 @@ describe('allmaps annotation', () => {
 })
 
 describe('allmaps annotation generate', () => {
+  it("should read georeference data in Allmaps' internal format from a file and convert it to a Georeference Annotation", () => {
+    const expected = readFileJson('output/annotations/5610333850638ae2.json')
+    const output = execJson(
+      'annotation generate input/maps/5610333850638ae2.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
   it("should read georeference data in Allmaps' internal format from the standard input and convert it to a Georeference Annotation", () => {
     const expected = readFileJson('output/annotations/5610333850638ae2.json')
     const output = execJson(
@@ -30,6 +39,15 @@ describe('allmaps annotation generate', () => {
 })
 
 describe('allmaps annotation parse', () => {
+  it("should read a Georeference Annotation from a file and convert it to Allmaps' internal format", () => {
+    const expected = readFileJson('output/maps/7a69f9470b49a744.json')
+    const output = execJson(
+      'annotation parse input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
   it("should read a Georeference Annotation from the standard input and convert it to Allmaps' internal format", () => {
     const expected = readFileJson('output/maps/7a69f9470b49a744.json')
     const output = execJson(
@@ -42,7 +60,7 @@ describe('allmaps annotation parse', () => {
 })
 
 describe('allmaps annotation svg', () => {
-  it('should read a Georeference Annotation from the standard input and convert its pixel mask to an SVG polygon', () => {
+  it('should read a Georeference Annotation from the standard input and convert its resource mask to an SVG polygon', () => {
     const expected = readFile('output/svg/7a69f9470b49a744.svg')
     const output = exec(
       'annotation svg',

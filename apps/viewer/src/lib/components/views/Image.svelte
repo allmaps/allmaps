@@ -18,6 +18,8 @@
 
   import { computeBBox } from '@allmaps/stdlib'
 
+  import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
+
   import type { ViewerMap } from '$lib/shared/types.js'
 
   $: {
@@ -31,7 +33,7 @@
 
     const feature = new Feature({
       index: 0,
-      geometry: new Polygon(maskToPolygon(map.pixelMask))
+      geometry: new Polygon(maskToPolygon(map.resourceMask))
     })
 
     feature.setId(map.id)
@@ -46,22 +48,22 @@
 
       const map = viewerMap.map
 
-      const imageUri = map.image.uri
+      const imageUri = map.resource.id
       const imageInfo = await fetchImageInfo(imageUri, {
         cache: imageInfoCache
       })
 
-      imageIiifLayer.setImageInfo(imageInfo)
+      imageIiifLayer.setImageInfo(imageInfo as ImageInformationResponse)
 
-      const pixelMaskBbox = computeBBox(viewerMap.map.pixelMask)
-      const iiifLayerPixelMaskBbox = [
-        pixelMaskBbox[0],
-        -pixelMaskBbox[3],
-        pixelMaskBbox[2],
-        -pixelMaskBbox[1]
+      const resourceMaskBbox = computeBBox(viewerMap.map.resourceMask)
+      const iiifLayerresourceMaskBbox = [
+        resourceMaskBbox[0],
+        -resourceMaskBbox[3],
+        resourceMaskBbox[2],
+        -resourceMaskBbox[1]
       ]
 
-      imageOl.getView().fit(iiifLayerPixelMaskBbox, {
+      imageOl.getView().fit(iiifLayerresourceMaskBbox, {
         padding: [25, 25, 25, 25]
       })
     }

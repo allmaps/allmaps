@@ -1,3 +1,1 @@
-[
-  "Invalid enum value. Expected 'ImageService1' | 'ImageService2' | 'ImageService3', received 'invalid'"
-]
+"Validation error: Invalid enum value. Expected 'ImageService1' | 'ImageService2' | 'ImageService3', received 'invalid' at \"target.service[0].type\""

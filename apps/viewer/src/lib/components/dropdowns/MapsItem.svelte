@@ -3,8 +3,8 @@
   import { writable } from 'svelte/store'
 
   import {
-    setCustomPixelMask,
-    resetCustomPixelMask
+    setCustomResourceMask,
+    resetCustomResourceMask
   } from '$lib/shared/stores/maps.js'
   import {
     selectMap,
@@ -23,7 +23,7 @@
 
   import Thumbnail from '$lib/components/Thumbnail.svelte'
 
-  import { getFullPixelMask } from '@allmaps/stdlib'
+  import { getFullResourceMask } from '@allmaps/stdlib'
 
   import {
     Copy,
@@ -42,7 +42,7 @@
 
   const selected = writable(viewerMap.state.selected)
   const visible = writable(viewerMap.state.visible)
-  const useMask = writable(viewerMap.state.customPixelMask ? false : true)
+  const useMask = writable(viewerMap.state.customResourceMask ? false : true)
 
   // TODO: create function in stores/opacity.ts that creates opacity
   // for map opacity
@@ -57,14 +57,14 @@
     : writable(0)
 
   const mapId = viewerMap.mapId
-  const imageUri = viewerMap.map.image.uri
+  const imageUri = viewerMap.map.resource.id
   const warpedMap = mapWarpedMapSource.getMap(mapId)
   const geoMask = warpedMap?.geoMask
 
   const checkboxId = `dropdown-maps-${mapId}`
 
-  const imageWidth = viewerMap.map.image.width
-  const imageHeight = viewerMap.map.image.height
+  const imageWidth = viewerMap.map.resource.width
+  const imageHeight = viewerMap.map.resource.height
 
   $: {
     $hue
@@ -84,7 +84,7 @@
     })
   }
 
-  const fullPixelMask = getFullPixelMask(imageWidth, imageHeight)
+  const fullResourceMask = getFullResourceMask(imageWidth, imageHeight)
 
   selected.subscribe(($selected) => {
     if ($selected) {
@@ -104,9 +104,9 @@
 
   useMask.subscribe(($useMask) => {
     if ($useMask) {
-      resetCustomPixelMask(mapId)
+      resetCustomResourceMask(mapId)
     } else {
-      setCustomPixelMask(mapId, fullPixelMask)
+      setCustomResourceMask(mapId, fullResourceMask)
     }
   })
 
@@ -114,8 +114,8 @@
     mapWarpedMapLayer?.setMapOpacity(mapId, $opacity)
   })
 
-  function pixelMaskToPoints(
-    pixelMask: [number, number][],
+  function resourceMaskToPoints(
+    resourceMask: [number, number][],
     viewBox: [number, number]
   ): string {
     const maxViewBoxDimension = Math.max(viewBox[0], viewBox[1])
@@ -132,7 +132,9 @@
       point[1] * scale + translate[1]
     ]
 
-    return pixelMask.map((point) => transformPoint(point).join(',')).join(' ')
+    return resourceMask
+      .map((point) => transformPoint(point).join(','))
+      .join(' ')
   }
 
   function handleShowOnMap() {
@@ -190,15 +192,15 @@
         <div class="absolute block object-fill">
           {#if viewerMap}
             <Thumbnail
-              imageUri={viewerMap.map.image.uri}
+              imageUri={viewerMap.map.resource.id}
               width={192}
               height={192}
             />
           {/if}
           <svg class="absolute w-full h-full inset-0" viewBox="0 0 100 100">
             <polygon
-              points={pixelMaskToPoints(
-                $useMask ? viewerMap.map.pixelMask : fullPixelMask,
+              points={resourceMaskToPoints(
+                $useMask ? viewerMap.map.resourceMask : fullResourceMask,
                 [100, 100]
               )}
               class="fill-none stroke-2"

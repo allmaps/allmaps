@@ -87,12 +87,15 @@
       let polygon: Polygon | undefined
 
       if (map.gcps.length >= 3) {
-        if (map.pixelMask.length >= 3) {
+        if (map.resourceMask.length >= 3) {
           try {
-            const transformer = new GCPTransformer(map.gcps)
-            const pixelMask = [...map.pixelMask, map.pixelMask[0]]
+            const transformer = new GCPTransformer(
+              map.gcps,
+              map.transformation?.type
+            )
+            const resourceMask = [...map.resourceMask, map.resourceMask[0]]
 
-            polygon = transformer.toGeoJSONPolygon(pixelMask)
+            polygon = transformer.toGeoJSONPolygon(resourceMask)
 
             // d3-geo requires the opposite polygon winding order of
             // the GoeJSON spec: https://github.com/d3/d3-geo
@@ -105,7 +108,7 @@
             error = message
           }
         } else {
-          error = 'pixel mask should have more than 2 points'
+          error = 'resource mask should have more than 2 points'
         }
       } else {
         error = 'map should have more than 2 gcps'
@@ -142,7 +145,7 @@
       </div>
     {/if}
     <!-- Add config:
-    - switch between pixel mask and geo mask
+    - switch between resource mask and geo mask
     - sort!
     - hide errors
   -->
@@ -164,7 +167,7 @@
       } rounded-lg aspect-square p-1.5 relative overflow-hidden`}
     >
       <div
-        class="flex flex-col justify-between z-50 pointer-events-none [&>*]:pointer-events-auto h-full relative z-10"
+        class="flex flex-col justify-between pointer-events-none [&>*]:pointer-events-auto h-full relative z-10"
       >
         <div class="space-y-1">
           <div
@@ -186,7 +189,7 @@
         {:else}
           <div class="flex flex-row justify-between text-center">
             <span>{map.gcps.length} gcps</span>
-            <span>{map.pixelMask.length} mask pts</span>
+            <span>{map.resourceMask.length} mask pts</span>
             <span>{properties?.areaStr}</span>
           </div>
         {/if}

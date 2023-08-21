@@ -33,7 +33,7 @@ export async function parseJsonInput(files?: string[]) {
     return jsonValues
   } else {
     throw new Error(
-      'error: no input files supplied, and nothing to read from the standard input'
+      'No input files supplied, and nothing to read from the standard input'
     )
   }
 }

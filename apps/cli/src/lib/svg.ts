@@ -207,13 +207,13 @@ function elementToString(tag: string, attributes: SVGAttributes): string {
   return `<${tag} ${attributeStrings.join(' ')} />`
 }
 
-export function pixelMaskToSvgPolygon(map: Map): Polygon {
+export function resourceMaskToSvgPolygon(map: Map): Polygon {
   return {
     type: 'polygon',
     attributes: {
-      'data-image-uri': encodeURIComponent(map.image.uri)
+      'data-image-id': encodeURIComponent(map.resource.id)
     },
-    coordinates: map.pixelMask
+    coordinates: map.resourceMask
   }
 }
 

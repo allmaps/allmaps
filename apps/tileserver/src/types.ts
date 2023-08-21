@@ -30,7 +30,7 @@ export type XYZTile = {
 }
 
 // TODO: import transformation types from other package
-export type Transformation = 'polynomial' | 'thin-plate-spline'
+export type Transformation = 'polynomial' | 'thinPlateSpline'
 
 export type Options = {
   'transformation.type': Transformation

@@ -4,7 +4,7 @@ export enum WarpedMapEventType {
 
   // TODO: Maybe have one MAPSCHANGED event?
   ZINDICESCHANGES = 'zindiceschanged',
-  PIXELMASKUPDATED = 'pixelmaskupdated',
+  RESOURCEMASKUPDATED = 'resourcemaskupdated',
   VISIBILITYCHANGED = 'visibilitychanged',
   TRANSFORMATIONCHANGED = 'transformationchanged',
 

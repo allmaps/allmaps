@@ -56,7 +56,8 @@
     "@allmaps/transform": "^1.0.0-beta.14",
     "commander": "^10.0.0",
     "stream-json": "^1.7.4",
-    "svg-parser": "^2.0.4"
+    "svg-parser": "^2.0.4",
+    "zod-validation-error": "^1.5.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",

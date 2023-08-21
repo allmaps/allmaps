@@ -1,41 +1,37 @@
 import Helmert from '../shared/helmert.js'
 
-import type {
-  GCPTransformerInterface,
-  Position,
-  ImageWorldPosition
-} from '../shared/types.js'
+import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
 
 export default class HelmertGCPTransformer implements GCPTransformerInterface {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
 
-  worldGcps: Position[]
-  resourceGcps: Position[]
+  gcpGeoCoords: Position[]
+  gcpResourceCoords: Position[]
 
-  toWorldHelmert?: Helmert
+  toGeoHelmert?: Helmert
   toResourceHelmert?: Helmert
 
-  constructor(gcps: ImageWorldPosition[]) {
+  constructor(gcps: GCP[]) {
     this.gcps = gcps
 
-    this.worldGcps = gcps.map((gcp) => gcp.world)
-    this.resourceGcps = gcps.map((gcp) => gcp.image)
+    this.gcpGeoCoords = gcps.map((gcp) => gcp.geo)
+    this.gcpResourceCoords = gcps.map((gcp) => gcp.resource)
   }
 
-  createToWorldHelmert(): Helmert {
-    return new Helmert(this.resourceGcps, this.worldGcps)
+  createToGeoHelmert(): Helmert {
+    return new Helmert(this.gcpResourceCoords, this.gcpGeoCoords)
   }
 
   createToResourceHelmert(): Helmert {
-    return new Helmert(this.worldGcps, this.resourceGcps)
+    return new Helmert(this.gcpGeoCoords, this.gcpResourceCoords)
   }
 
-  toWorld(point: Position): Position {
-    if (!this.toWorldHelmert) {
-      this.toWorldHelmert = this.createToWorldHelmert()
+  toGeo(point: Position): Position {
+    if (!this.toGeoHelmert) {
+      this.toGeoHelmert = this.createToGeoHelmert()
     }
 
-    return this.toWorldHelmert.interpolant(point)
+    return this.toGeoHelmert.interpolant(point)
   }
 
   toResource(point: Position): Position {

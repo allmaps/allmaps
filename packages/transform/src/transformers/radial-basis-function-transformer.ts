@@ -7,37 +7,37 @@ import type {
   KernelFunction,
   NormFunction,
   Position,
-  ImageWorldPosition
+  GCP
 } from '../shared/types.js'
 
 export default class RadialBasisFunctionGCPTransformer
   implements GCPTransformerInterface
 {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
 
-  worldGcps: Position[]
-  resourceGcps: Position[]
+  gcpGeoCoords: Position[]
+  gcpResourceCoords: Position[]
 
   kernelFunction: KernelFunction
   normFunction: NormFunction
 
-  toWorldRbf?: RBF
+  toGeoRbf?: RBF
   toResourceRbf?: RBF
 
-  constructor(gcps: ImageWorldPosition[], kernelFunction: KernelFunction) {
+  constructor(gcps: GCP[], kernelFunction: KernelFunction) {
     this.gcps = gcps
 
-    this.worldGcps = gcps.map((gcp) => gcp.world)
-    this.resourceGcps = gcps.map((gcp) => gcp.image)
+    this.gcpGeoCoords = gcps.map((gcp) => gcp.geo)
+    this.gcpResourceCoords = gcps.map((gcp) => gcp.resource)
 
     this.kernelFunction = kernelFunction
     this.normFunction = euclideanNorm
   }
 
-  createToWorldRbf(): RBF {
+  createToGeoRbf(): RBF {
     return new RBF(
-      this.resourceGcps,
-      this.worldGcps,
+      this.gcpResourceCoords,
+      this.gcpGeoCoords,
       this.kernelFunction,
       this.normFunction
     )
@@ -45,19 +45,19 @@ export default class RadialBasisFunctionGCPTransformer
 
   createToResourceRbf(): RBF {
     return new RBF(
-      this.worldGcps,
-      this.resourceGcps,
+      this.gcpGeoCoords,
+      this.gcpResourceCoords,
       this.kernelFunction,
       this.normFunction
     )
   }
 
-  toWorld(point: Position): Position {
-    if (!this.toWorldRbf) {
-      this.toWorldRbf = this.createToWorldRbf()
+  toGeo(point: Position): Position {
+    if (!this.toGeoRbf) {
+      this.toGeoRbf = this.createToGeoRbf()
     }
 
-    return this.toWorldRbf.interpolant(point)
+    return this.toGeoRbf.interpolant(point)
   }
 
   toResource(point: Position): Position {

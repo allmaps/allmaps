@@ -33,18 +33,18 @@ export async function createWarpedTileResponse(
   }
 
   for (const map of maps) {
-    // Set pixelMask
-    let pixelMask
-    if (map.pixelMask) {
-      pixelMask = map.pixelMask
+    // Set resourceMask
+    let resourceMask
+    if (map.resourceMask) {
+      resourceMask = map.resourceMask
     } else {
       // TODO: create mask from full image
-      throw new Error('Map does not have pixelMask')
+      throw new Error('Map does not have resourceMask')
     }
 
     const imageInfoResponse = await cachedFetch(
       cache,
-      `${map.image.uri}/info.json`
+      `${map.resource.id}/info.json`
     )
 
     const imageInfo = await imageInfoResponse.json()
@@ -56,7 +56,7 @@ export async function createWarpedTileResponse(
     // Create transformer
     const transformer = new GCPTransformer(
       map.gcps,
-      options['transformation.type']
+      options['transformation.type'] || map.transformation?.type
     )
 
     // Compute necessary IIIF tiles
@@ -119,11 +119,11 @@ export async function createWarpedTileResponse(
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
         const [pixelX, pixelY] = transformer.toResource(warpedTilePixelGeo)
 
-        // Check if pixel inside pixel mask
+        // Check if pixel inside resource mask
         // TODO: improve efficiency
         // TODO: fix strange repeating error,
         //    remove pointInPolygon check and fix first
-        const inside = pointInPolygon([pixelX, pixelY], pixelMask)
+        const inside = pointInPolygon([pixelX, pixelY], resourceMask)
         if (!inside) {
           continue
         }

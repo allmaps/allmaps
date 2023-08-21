@@ -50,7 +50,7 @@
 
             $map = maps[0]
             $imageInfo = (await fetchImageInfo(
-              $map.image.uri
+              $map.resource.id
             )) as ImageInformationResponse
           }
         } catch (err) {

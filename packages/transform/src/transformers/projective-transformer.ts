@@ -1,43 +1,39 @@
 import Projective from '../shared/projective.js'
 
-import type {
-  GCPTransformerInterface,
-  Position,
-  ImageWorldPosition
-} from '../shared/types.js'
+import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
 
 export default class ProjectiveGCPTransformer
   implements GCPTransformerInterface
 {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
 
-  worldGcps: Position[]
-  resourceGcps: Position[]
+  gcpGeoCoords: Position[]
+  gcpResourceCoords: Position[]
 
-  toWorldProjective?: Projective
+  toGeoProjective?: Projective
   toResourceProjective?: Projective
 
-  constructor(gcps: ImageWorldPosition[]) {
+  constructor(gcps: GCP[]) {
     this.gcps = gcps
 
-    this.worldGcps = gcps.map((gcp) => gcp.world)
-    this.resourceGcps = gcps.map((gcp) => gcp.image)
+    this.gcpGeoCoords = gcps.map((gcp) => gcp.geo)
+    this.gcpResourceCoords = gcps.map((gcp) => gcp.resource)
   }
 
-  createToWorldProjective(): Projective {
-    return new Projective(this.resourceGcps, this.worldGcps)
+  createToGeoProjective(): Projective {
+    return new Projective(this.gcpResourceCoords, this.gcpGeoCoords)
   }
 
   createToResourceProjective(): Projective {
-    return new Projective(this.worldGcps, this.resourceGcps)
+    return new Projective(this.gcpGeoCoords, this.gcpResourceCoords)
   }
 
-  toWorld(point: Position): Position {
-    if (!this.toWorldProjective) {
-      this.toWorldProjective = this.createToWorldProjective()
+  toGeo(point: Position): Position {
+    if (!this.toGeoProjective) {
+      this.toGeoProjective = this.createToGeoProjective()
     }
 
-    return this.toWorldProjective.interpolant(point)
+    return this.toGeoProjective.interpolant(point)
   }
 
   toResource(point: Position): Position {

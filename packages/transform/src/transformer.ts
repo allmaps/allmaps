@@ -12,8 +12,8 @@ import {
   fromGeoJSONPoint,
   fromGeoJSONLineString,
   fromGeoJSONPolygon,
-  toWorldPolygon,
-  toImagePolygon
+  toGeoPolygon,
+  toResourcePolygon
 } from './shared/geojson.js'
 
 import type {
@@ -21,7 +21,7 @@ import type {
   TransformationType,
   OptionalTransformOptions,
   Position,
-  ImageWorldPosition,
+  GCP,
   GeoJSONGeometry,
   GeoJSONPoint,
   GeoJSONLineString,
@@ -29,12 +29,12 @@ import type {
 } from './shared/types.js'
 
 export default class GCPTransformer implements GCPTransformerInterface {
-  gcps: ImageWorldPosition[]
+  gcps: GCP[]
   type: TransformationType
   transformer: GCPTransformerInterface
 
   constructor(
-    gcps: ImageWorldPosition[],
+    gcps: GCP[],
     type: TransformationType = 'polynomial'
     // options: TransformationOptions
   ) {
@@ -51,7 +51,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
       this.transformer = new PolynomialGCPTransformer(gcps, 3)
     } else if (type === 'projective') {
       this.transformer = new ProjectiveGCPTransformer(gcps)
-    } else if (type === 'thin-plate-spline') {
+    } else if (type === 'thinPlateSpline') {
       this.transformer = new RadialBasisFunctionGCPTransformer(
         gcps,
         thinPlateKernel
@@ -61,8 +61,8 @@ export default class GCPTransformer implements GCPTransformerInterface {
     }
   }
 
-  toWorld(point: Position): Position {
-    return this.transformer.toWorld(point)
+  toGeo(point: Position): Position {
+    return this.transformer.toGeo(point)
   }
 
   toResource(point: Position): Position {
@@ -151,17 +151,17 @@ export default class GCPTransformer implements GCPTransformerInterface {
     return fromGeoJSONPolygon(this, geometry, options)
   }
 
-  toWorldPolygon(
+  toGeoPolygon(
     polygon: Position[],
     options?: OptionalTransformOptions
   ): Position[] {
-    return toWorldPolygon(this, polygon, options)
+    return toGeoPolygon(this, polygon, options)
   }
 
-  toImagePolygon(
+  toResourcePolygon(
     polygon: Position[],
     options?: OptionalTransformOptions
   ): Position[] {
-    return toImagePolygon(this, polygon, options)
+    return toResourcePolygon(this, polygon, options)
   }
 }

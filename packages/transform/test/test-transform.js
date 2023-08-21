@@ -17,7 +17,7 @@ describe('Helmert transformer', async () => {
   const output = [4.9385700843392435, 52.46580484503631]
 
   it(`should have the same output as distortionAnalysis Helmert`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })
 
@@ -29,7 +29,7 @@ describe('Polynomial transformer, order 1', async () => {
   const output = [4.92079391286352, 52.4654946986157]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })
 
@@ -41,7 +41,7 @@ describe('Polynomial transformer, order 2', async () => {
   const output = [4.36596042386853, 51.9550430503008]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })
 
@@ -53,7 +53,7 @@ describe('Polynomial transformer, order 3', async () => {
   const output = [-1.34357085609956, 49.7913344676161]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })
 
@@ -63,18 +63,18 @@ describe('Projective transformer', async () => {
   const output = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
 
   it(`should have the same output as (TODO: check reference)`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })
 
-describe('Thin-plate spline transformer', async () => {
-  const transformer = new GCPTransformer(gcps6, 'thin-plate-spline')
+describe('Thin plate spline transformer', async () => {
+  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
   const input = [1000, 1000]
   // from: gdaltransform -output_xy -tps -gcp 1344 4098 4.4091165 51.9017125 -gcp 4440 3441 4.5029222 51.9164451 -gcp 3549 4403 4.4764224 51.897309 -gcp 1794 2130 4.4199066 51.9391509 -gcp 3656 2558 4.4775683 51.9324358 -gcp 2656 3558 4.4572643 51.9143043
   // with input: 1000 1000
   const output = [4.38895777703007, 51.9590841915719]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.toWorld(input), output)
+    expectToBeCloseToArray(transformer.toGeo(input), output)
   })
 })

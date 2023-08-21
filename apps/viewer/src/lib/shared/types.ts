@@ -54,7 +54,7 @@ export type MapState = {
   visible: boolean
   selected: boolean
   highlighted: boolean
-  customPixelMask?: Position[]
+  customResourceMask?: Position[]
 }
 
 export type RemoveBackgroundOptions = {

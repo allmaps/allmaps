@@ -21,7 +21,6 @@
   },
   "body": {
     "type": "FeatureCollection",
-    "purpose": "gcp-georeferencing",
     "transformation": {
       "type": "polynomial",
       "options": {

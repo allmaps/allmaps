@@ -1,4 +1,4 @@
-export function getFullPixelMask(
+export function getFullResourceMask(
   imageWidth: number,
   imageHeight: number
 ): [number, number][] {

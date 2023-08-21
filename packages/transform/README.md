@@ -12,24 +12,14 @@ The algorithms correspond to those of **GDAL** and the results are (nearly) iden
 
 These are the **supported transformations**:
 
-| Type                | Options    | Description                                           | Properties                                                       | Min number of control points |
-| ------------------- | ---------- | ----------------------------------------------------- | ---------------------------------------------------------------- | -------------------- |
-| `helmert`           |            | Helmert transformation or 'similarity transformation' | Preserves shape and angle  |   2                   |
-| `polynomial`        | `order: 1` | First order polynomial transformation                 | Preserves lines and parallelism                                                                 |   3                  |
-| `polynomial`        | `order: 2` | Second order polynomial transformation                | Some bending flexibility                                                                 | 6                     |
-| `polynomial`        | `order: 3` | Third order polynomial transformation                 | More bending flexibility                                                                 |  10                    |
-| `thin-plate-spline` |            | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) |  3                    |
-| `projective`        |            | Projective or 'perspective' transformation, used for aerial images              | Preserves lines and cross-ratios                                         |  4                    |
-
-## Installation
-
-This is an ESM-only module that works in browsers or in Node.js.
-
-Installation in Node.js:
-
-```sh
-npm install @allmaps/transform
-```
+| Type              | Options    | Description                                                              | Properties                                                                       | Minimum number of GCPs |
+| ----------------- | ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
+| `helmert`         |            | Helmert transformation or 'similarity transformation'                    | Preserves shape and angle                                                        | 2                      |
+| `polynomial`      | `order: 1` | First order polynomial transformation                                    | Preserves lines and parallelism                                                  | 3                      |
+| `polynomial`      | `order: 2` | Second order polynomial transformation                                   | Some bending flexibility                                                         | 6                      |
+| `polynomial`      | `order: 3` | Third order polynomial transformation                                    | More bending flexibility                                                         | 10                     |
+| `thinPlateSpline` |            | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
+| `projective`      |            | Projective or 'perspective' transformation, used for aerial images       | Preserves lines and cross-ratios                                                 | 4                      |
 
 ## Usage
 
@@ -56,7 +46,7 @@ const gcps = [
 const transformer = new GCPTransformer(gcps, 'helmert')
 
 // forward transform
-const result = transformer.toWorld([100, 100])
+const result = transformer.toGeo([100, 100])
 // result = [4.9385700843392435, 52.46580484503631]
 
 // backward transform
@@ -73,8 +63,8 @@ const geoJSONPointGeometry = transformer.toGeoJSON([100, 100])
 //     coordinates: [4.9385700843392435, 52.46580484503631]
 //   }
 const geoJSONPoint = {
-  "type": "Feature",
-  "geometry": geojsonPointGeometry
+  type: 'Feature',
+  geometry: geojsonPointGeometry
 }
 // geojsonPoint = {
 //   "type": "Feature",
@@ -90,30 +80,37 @@ const point = transformer.fromGeoJSON(geoJSONPointGeometry)
 
 Both of these functions can take a second argument with options for this transformation
 
-| Option           | Description                                                     | Default
-|:-----------------|:----------------------------------------------------------------|:--------
-| `maxOffsetRatio` | Maximum offset ratio between original and transformed midpoints | 0
-| `maxDepth`       | Maximum recursion depth                                         | 6
+| Option           | Description                                                     | Default |
+| :--------------- | :-------------------------------------------------------------- | :------ |
+| `maxOffsetRatio` | Maximum offset ratio between original and transformed midpoints | 0       |
+| `maxDepth`       | Maximum recursion depth                                         | 6       |
 
 ```js
 const options = {
   maxOffsetRatio: 0.01,
   maxDepth: 6
 }
-const geoJSONLineGeometry = transformer.toGeoJSON([[100, 100], [110, 115], [120, 170]], options)
+const geoJSONLineGeometry = transformer.toGeoJSON(
+  [
+    [100, 100],
+    [110, 115],
+    [120, 170]
+  ],
+  options
+)
 /// geoJSONLineGeometry = ...
 ```
 
 ### CLI
 
-The [@allmaps/cli](../../apps/cli/) package exports an interface to transform **SVG** objects from the pixel coordinates space of a IIIF Resource to **GeoJSON** objects in the map coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG pixel mask included in a Georeference Annotation as a GeoJSON object.
+The [@allmaps/cli](../../apps/cli/) package exports an interface to transform **SVG** objects from the pixel coordinates space of a IIIF Resource to **GeoJSON** objects in the map coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
 
-In the future, we hope to add an interface to manually enter coordinates of points to transform forward or backwards and easily specify gcps and transformation type.
+In the future, we hope to add an interface to manually enter coordinates of points to transform forward or backwards and easily specify GCPs and transformation type.
 
 ### Notes
 
-*   Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-*   The examples here use `(longitude, latitude)` coordinates in the destination space, but it is important to stress that the functions `toWorld()` and `toResource()` are currently map-projection agnostic forward and backward transformations built for the general case of a transformation for one cartesian `(x, y)` plane to another (even though their name suggests otherwise). **When working in a geographic context** one can use control points with `(longitude, latitude)` coordinates in the destination space, which will build a transformation to the cartesian plane of an equidistant projection.  One could also transform such coordinates to a specific projection (for example Mercator) first and use control points with such projection coordinates in the destination space. This will build a transformation to the cartesian space of a Mercator projection. The output of the `toResource()` function is then also in these coordinates. Finally, since `toGeoJSON()` and `fromGeoJSON()` were specifically built with `(longitude, latitude)` coordinates in mind (as they are used in GeoJSON objects), these functions should only be used for such coordinates.
+- Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+- The examples here use `(longitude, latitude)` coordinates in the destination space, but it is important to stress that the functions `toGeo()` and `toResource()` are currently map-projection agnostic forward and backward transformations built for the general case of a transformation for one cartesian `(x, y)` plane to another (even though their name suggests otherwise). **When working in a geographic context** one can use control points with `(longitude, latitude)` coordinates in the destination space, which will build a transformation to the cartesian plane of an equidistant projection. One could also transform such coordinates to a specific projection (for example Mercator) first and use control points with such projection coordinates in the destination space. This will build a transformation to the cartesian space of a Mercator projection. The output of the `toResource()` function is then also in these coordinates. Finally, since `toGeoJSON()` and `fromGeoJSON()` were specifically built with `(longitude, latitude)` coordinates in mind (as they are used in GeoJSON objects), these functions should only be used for such coordinates.
 
 ### Benchmark
 
@@ -121,24 +118,24 @@ Here are some benchmarks on building and using a transformer.
 
 Create transformer with 10 points (and transform 1 point)
 
-| Type                | Options    | Ops/s |
-| ------------------- | ---------- | ----- |
-| `helmert`           |            | 20813 |
-| `polynomial`        | `order: 1` | 32631 |
-| `polynomial`        | `order: 2` | 20927 |
-| `polynomial`        | `order: 3` | 6682  |
-| `thin-plate-spline` |            | 4532  |
-| `projective`        |            | 7044  |
+| Type              | Options    | Ops/s |
+| ----------------- | ---------- | ----- |
+| `helmert`         |            | 20813 |
+| `polynomial`      | `order: 1` | 32631 |
+| `polynomial`      | `order: 2` | 20927 |
+| `polynomial`      | `order: 3` | 6682  |
+| `thinPlateSpline` |            | 4532  |
+| `projective`      |            | 7044  |
 
 Use transformer made with with 10 points
 
-| Type                | Options    | Ops/s   |
-| ------------------- | ---------- | ------- |
-| `helmert`           |            | 7561796 |
-| `polynomial`        | `order: 1` | 5546792 |
-| `polynomial`        | `order: 2` | 4811662 |
-| `polynomial`        | `order: 3` | 887390  |
-| `thin-plate-spline` |            | 154310  |
-| `projective`        |            | 5265895 |
+| Type              | Options    | Ops/s   |
+| ----------------- | ---------- | ------- |
+| `helmert`         |            | 7561796 |
+| `polynomial`      | `order: 1` | 5546792 |
+| `polynomial`      | `order: 2` | 4811662 |
+| `polynomial`      | `order: 3` | 887390  |
+| `thinPlateSpline` |            | 154310  |
+| `projective`      |            | 5265895 |
 
 See `./bench/index.js`

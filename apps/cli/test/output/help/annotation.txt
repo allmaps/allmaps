@@ -10,7 +10,7 @@ Options:
 Commands:
   parse [files...]     parse Georeference Annotation
   generate [files...]  generate Georeference Annotation
-  svg [files...]       generate SVG from pixel mask
+  svg [files...]       generate SVG from resource mask
   help [command]       display help for command
 
 For more details about Allmaps, see https://allmaps.org

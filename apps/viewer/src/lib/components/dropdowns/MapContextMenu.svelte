@@ -7,9 +7,9 @@
   import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
   import { hideMaps } from '$lib/shared/stores/visible.js'
   import { mapsById } from '$lib/shared/stores/maps.js'
-  import { setCustomPixelMask } from '$lib/shared/stores/maps.js'
+  import { setCustomResourceMask } from '$lib/shared/stores/maps.js'
 
-  import { getFullPixelMask } from '@allmaps/stdlib'
+  import { getFullResourceMask } from '@allmaps/stdlib'
 
   import {
     BringToFront,
@@ -33,11 +33,11 @@
 
   function handleUseMask() {
     if (viewerMap) {
-      const fullPixelMask = getFullPixelMask(
-        viewerMap.map.image.width,
-        viewerMap.map.image.height
+      const fullResourceMask = getFullResourceMask(
+        viewerMap.map.resource.width,
+        viewerMap.map.resource.height
       )
-      setCustomPixelMask(mapId, fullPixelMask)
+      setCustomResourceMask(mapId, fullResourceMask)
     }
   }
 

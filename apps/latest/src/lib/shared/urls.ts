@@ -4,7 +4,7 @@ import type { Map } from '@allmaps/annotation'
 
 export async function getUrls(map: Map) {
   const mapId = map.id
-  const imageUri = map.image.uri
+  const imageUri = map.resource.id
   const imageId = await generateId(imageUri)
 
   const annotationUrl = `https://annotations.allmaps.org/images/${imageId}`

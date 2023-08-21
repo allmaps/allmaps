@@ -1,20 +1,19 @@
 {
   "type": "Annotation",
+  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
   "@context": [
-    "http://www.w3.org/ns/anno.jsonld",
-    "http://geojson.org/geojson-ld/geojson-context.jsonld",
+    "http://iiif.io/api/extension/georef/1/context.json",
     "http://iiif.io/api/presentation/3/context.json"
   ],
   "motivation": "georeferencing",
   "target": {
-    "type": "Image",
-    "source": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3/full/full/0/default.jpg",
-    "service": [
-      {
-        "@id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
-        "type": "ImageService2"
-      }
-    ],
+    "type": "SpecificResource",
+    "source": {
+      "@id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+      "type": "ImageService2",
+      "height": 1860,
+      "width": 4708
+    },
     "selector": {
       "type": "SvgSelector",
       "value": "<svg width=\"4708\" height=\"1860\"><polygon points=\"117,120 113,1776 4587,1772 4568,101\" /></svg>"
@@ -22,18 +21,14 @@
   },
   "body": {
     "type": "FeatureCollection",
-    "purpose": "invalid",
     "transformation": {
-      "type": "polynomial",
-      "options": {
-        "order": 1
-      }
+      "type": "thinPlateSpline"
     },
     "features": [
       {
         "type": "Feature",
         "properties": {
-          "pixelCoords": [336, 1742]
+          "resourceCoords": [336, 1742]
         },
         "geometry": {
           "type": "Point",
@@ -43,7 +38,7 @@
       {
         "type": "Feature",
         "properties": {
-          "pixelCoords": [294, 227]
+          "resourceCoords": [294, 227]
         },
         "geometry": {
           "type": "Point",
@@ -53,7 +48,7 @@
       {
         "type": "Feature",
         "properties": {
-          "pixelCoords": [2252, 1108]
+          "resourceCoords": [2252, 1108]
         },
         "geometry": {
           "type": "Point",
@@ -63,7 +58,7 @@
       {
         "type": "Feature",
         "properties": {
-          "pixelCoords": [1892, 773]
+          "resourceCoords": [1892, 773]
         },
         "geometry": {
           "type": "Point",

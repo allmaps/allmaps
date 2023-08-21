@@ -1,1 +1,1 @@
-["Expected array, received number"]
+"Validation error: Expected array, received number at \"body.features[0].geometry.coordinates\""

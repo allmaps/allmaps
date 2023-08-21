@@ -46,7 +46,7 @@ export function getProperties(map: Map, polygon?: Polygon) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updatedAt = (map as any).updatedAt as string
 
-  const { hostname } = new URL(map.image.uri)
+  const { hostname } = new URL(map.resource.id)
   const timeAgo = formatTimeAgo(updatedAt)
 
   let areaStr

@@ -3,7 +3,7 @@ import type {
   TileZoomLevel,
   ImageRequest
 } from '@allmaps/iiif-parser'
-import type { GCPTransformer, ImageWorldPosition } from '@allmaps/transform'
+import type { GCPTransformer, GCP } from '@allmaps/transform'
 
 export type Position = [number, number]
 
@@ -80,10 +80,10 @@ export type Matrix4 = [
 export type WarpedMap = {
   imageId: string
   mapId: string
-  projectedGCPs: ImageWorldPosition[]
+  projectedGCPs: GCP[]
   visible: boolean
   parsedImage: IIIFImage
-  pixelMask: SVGPolygon
+  resourceMask: SVGPolygon
   transformer: GCPTransformer
   geoMask: GeoJSONPolygon
   geoMaskBBox: BBox

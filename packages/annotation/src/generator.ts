@@ -1,109 +1,163 @@
 import { z } from 'zod'
 
-import { ImageServiceSchema } from './schemas/shared.js'
-import { MapSchema, MapsSchema, PixelMaskSchema } from './schemas/map.js'
+import { ImageServiceSchema, ResourceMaskSchema } from './schemas/shared.js'
 import {
-  AnnotationSchema,
-  AnnotationPageSchema,
-  SvgSelectorSchema
+  Map1Schema,
+  Map2Schema,
+  Maps1Schema,
+  Maps2Schema,
+  MapAllVersionsSchema,
+  MapsAllVersionsSchema,
+  GCPAllVersionsSchema
+} from './schemas/map.js'
+import {
+  Annotation1Schema,
+  AnnotationPage1Schema,
+  SvgSelector1Schema,
+  TransformationSchema,
+  PartOfSchema
 } from './schemas/annotation.js'
+
+import { isMapsBeforeParse, isMap2BeforeParse } from './before-parse.js'
+import { isMap2 } from './guards.js'
 
 type ImageService = z.infer<typeof ImageServiceSchema>
 
-type Map = z.infer<typeof MapSchema>
-type PixelMask = z.infer<typeof PixelMaskSchema>
+type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
+type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
+type ResourceMask = z.infer<typeof ResourceMaskSchema>
+type GCP = z.infer<typeof GCPAllVersionsSchema>
 
-type Annotation = z.infer<typeof AnnotationSchema>
-type AnnotationPage = z.infer<typeof AnnotationPageSchema>
-type SvgSelector = z.infer<typeof SvgSelectorSchema>
+type Annotation1 = z.infer<typeof Annotation1Schema>
+type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
+type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
 
-const motivation = 'georeferencing' as const
+type Transformation = z.infer<typeof TransformationSchema>
+type PartOf = z.infer<typeof PartOfSchema>
 
-const context = [
-  'http://www.w3.org/ns/anno.jsonld',
-  'http://geojson.org/geojson-ld/geojson-context.jsonld',
-  'http://iiif.io/api/presentation/3/context.json'
-]
+function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
+  let width: number
+  let height: number
+  let resourceMask: ResourceMask
 
-function generateSvgSelector(
-  width: number,
-  height: number,
-  mask: PixelMask
-): SvgSelector {
+  if (isMap2(map)) {
+    width = map.resource.width
+    height = map.resource.height
+    resourceMask = map.resourceMask
+  } else {
+    width = map.image.width
+    height = map.image.height
+    resourceMask = map.pixelMask
+  }
+
   return {
     type: 'SvgSelector',
-    value: `<svg width="${width}" height="${height}"><polygon points="${mask
+    value: `<svg width="${width}" height="${height}"><polygon points="${resourceMask
       .map((point) => point.join(','))
       .join(' ')}" /></svg>`
   }
 }
 
-function generateGeorefAnnotation(map: Map): Annotation {
-  const region = 'full'
-  const imageQuality = 'default'
-  const imageFormat = 'jpg'
+function generateSource(map: MapAllVersions) {
+  let id: string
+  let type: ImageService
 
-  let size
-  if (map.image.type === 'ImageService2') {
-    size = 'full'
+  let width: number
+  let height: number
+
+  let partOf: PartOf[] | undefined
+
+  if (isMap2(map)) {
+    id = map.resource.id
+    type = map.resource.type
+
+    width = map.resource.width
+    height = map.resource.height
+
+    partOf = map.resource.partOf
   } else {
-    size = 'max'
+    id = map.image.uri
+    type = map.image.type
+    width = map.image.width
+    height = map.image.height
   }
 
-  const sourceSuffix = `/${region}/${size}/0/${imageQuality}.${imageFormat}`
-  const source = `${map.image.uri}${sourceSuffix}`
+  return {
+    '@id': id,
+    type,
+    height,
+    width,
+    partOf
+  }
+}
+
+export function generateContext() {
+  return [
+    'http://iiif.io/api/extension/georef/1/context.json',
+    'http://iiif.io/api/presentation/3/context.json'
+  ]
+}
+
+function generateTransformation(
+  map: MapAllVersions
+): Transformation | undefined {
+  if (isMap2(map)) {
+    return map.transformation
+  }
+}
+
+function generateFeature(gcp: GCP) {
+  let resourceCoords: [number, number]
+  let geoCoords: [number, number]
+
+  if ('resource' in gcp) {
+    resourceCoords = gcp.resource
+    geoCoords = gcp.geo
+  } else {
+    resourceCoords = gcp.image
+    geoCoords = gcp.world
+  }
+
+  return {
+    type: 'Feature' as const,
+    properties: {
+      resourceCoords
+    },
+    geometry: {
+      type: 'Point' as const,
+      coordinates: geoCoords
+    }
+  }
+}
+
+function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
+  const target = {
+    type: 'SpecificResource' as const,
+    source: generateSource(map),
+    selector: generateSvgSelector(map)
+  }
 
   const body = {
     type: 'FeatureCollection' as const,
-    transformation: {
-      type: 'polynomial',
-      options: {
-        order: 1
-      }
-    },
-    features: map.gcps.map((gcp) => ({
-      type: 'Feature' as const,
-      properties: {
-        pixelCoords: gcp.image
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: gcp.world
-      }
-    }))
-  }
-
-  const target = {
-    type: 'Image' as const,
-    source,
-    service: [
-      {
-        '@id': map.image.uri,
-        type: map.image.type as ImageService
-        // profile: map.image.profile
-      }
-    ],
-    selector: generateSvgSelector(
-      map.image.width,
-      map.image.height,
-      map.pixelMask
-    )
+    transformation: generateTransformation(map),
+    features: map.gcps.map((gcp) => generateFeature(gcp))
   }
 
   return {
     id: map.id,
     type: 'Annotation',
-    '@context': context,
-    motivation,
+    '@context': generateContext(),
+    motivation: 'georeferencing' as const,
     target,
     body
   }
 }
 
 /**
- * Generates a {@link Annotation georeference annotation} from a single {@link Map map} or an array of {@link Map maps}.
+ * Generates a {@link Annotation Georeference Annotation} from a single {@link Map map} or
+ * an {@link AnnotationPage AnnotationPage} containing multiple Georeference Annotations from an array of {@link Map maps}.
  * @param {Map | Map[]} mapOrMaps - Single map object, or array of maps
- * @returns {Annotation} Georeference annotation
+ * @returns {Annotation | AnnotationPage} Georeference Annotation
  * @example
  * import fs from 'fs'
  * import { generateAnnotation } from '@allmaps/annotation'
@@ -113,30 +167,34 @@ function generateGeorefAnnotation(map: Map): Annotation {
  */
 export function generateAnnotation(
   mapOrMaps: unknown
-): Annotation | AnnotationPage {
-  if (Array.isArray(mapOrMaps)) {
-    // eslint-disable-next-line no-useless-catch
-    try {
-      const maps = MapsSchema.parse(mapOrMaps)
+): Annotation1 | AnnotationPage1 {
+  if (isMapsBeforeParse(mapOrMaps)) {
+    // Seperate .parse for different versions for better Zod errors
+    let parsedMaps: MapsAllVersions
+    if (isMap2BeforeParse(mapOrMaps[0])) {
+      parsedMaps = Maps2Schema.parse(mapOrMaps)
+    } else {
+      parsedMaps = Maps1Schema.parse(mapOrMaps)
+    }
 
-      const annotations = maps.map((map) => generateGeorefAnnotation(map))
+    const annotations = parsedMaps.map((parsedMap) =>
+      generateGeoreferenceAnnotation(parsedMap)
+    )
 
-      return {
-        type: 'AnnotationPage',
-        '@context': ['http://www.w3.org/ns/anno.jsonld'],
-        items: annotations
-      }
-    } catch (err) {
-      throw err
+    return {
+      type: 'AnnotationPage',
+      '@context': ['http://www.w3.org/ns/anno.jsonld'],
+      items: annotations
     }
   } else {
-    // eslint-disable-next-line no-useless-catch
-    try {
-      const map = MapSchema.parse(mapOrMaps)
-
-      return generateGeorefAnnotation(map)
-    } catch (err) {
-      throw err
+    // Seperate .parse for different versions for better Zod errors
+    let parsedMap: MapAllVersions
+    if (isMap2BeforeParse(mapOrMaps)) {
+      parsedMap = Map2Schema.parse(mapOrMaps)
+    } else {
+      parsedMap = Map1Schema.parse(mapOrMaps)
     }
+
+    return generateGeoreferenceAnnotation(parsedMap)
   }
 }

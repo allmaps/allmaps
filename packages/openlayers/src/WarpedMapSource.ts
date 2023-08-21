@@ -91,8 +91,8 @@ export class WarpedMapSource extends Source {
     return warpedMap?.visible
   }
 
-  setPixelMask(mapId: string, pixelMask: Position[]) {
-    const result = this.world.setPixelMask(mapId, pixelMask)
+  setResourceMask(mapId: string, resourceMask: Position[]) {
+    const result = this.world.setResourceMask(mapId, resourceMask)
     this.changed()
 
     return result

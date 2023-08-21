@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
 import { Command, CommanderError } from 'commander'
+import { fromZodError } from 'zod-validation-error'
 
 import iiif from './commands/iiif.js'
 import annotation from './commands/annotation.js'
 import transform from './commands/transform.js'
+
+import type { ZodError } from 'zod'
 
 const fixedWidth = process.env.NODE_ENV === 'test'
 
@@ -33,12 +36,15 @@ async function parse() {
       // Ignore these errors!
     } else if (err instanceof Error) {
       if ('code' in err && err.code === 'ENOENT' && 'path' in err) {
-        console.error(`error: file not found "${err.path}"`)
+        console.error(`File not found "${err.path}"`)
+      } else if (err.name === 'ZodError') {
+        const validationError = fromZodError(err as ZodError)
+        console.error(validationError.message)
       } else {
-        console.error(err.message)
+        console.error('Error:', err.message)
       }
     } else {
-      console.error('Unkown error', err)
+      console.error('Unkown error:', err)
     }
     process.exit(1)
   }
