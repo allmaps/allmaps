@@ -41,7 +41,7 @@ export function triangulatePoly2tri(polygon: SVGPolygon, distance: number) {
 
   // add grid points as Steiner points if they are inside the polygon
   for (let i = 0; i < grid.length; i++) {
-    if (classifyPoint(polygon, grid[i]) == -1) {
+    if (classifyPoint(polygon, grid[i]) === -1) {
       swctx.addPoint(new poly2tri.Point(grid[i][0], grid[i][1]))
     }
   }
