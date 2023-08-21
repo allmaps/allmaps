@@ -1,6 +1,12 @@
 import * as crypto from 'crypto'
 import serialize from './checksum.js'
 
+/**
+ * Computes SHA-1 hash of input string.
+ *
+ * @param {string} str - Input string.
+ * @returns {string} SHA-1 hash of `str`.
+ */
 function generateHash(str: string): string {
   return crypto.createHash('sha1').update(str, 'utf-8').digest('hex')
 }
