@@ -1,0 +1,55 @@
+{
+  "name": "@allmaps/schemas",
+  "version": "1.0.0-beta.0",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "Allmaps JSON Schemas",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/schemas"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "preversion": "npm run types && npm run lint && npm test",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test",
+    "types": "tsc --noEmit"
+  },
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/annotation": "^1.0.0-beta.13",
+    "zod": "^3.20.6",
+    "zod-to-json-schema": "^3.20.6"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.35.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
+  }
+}

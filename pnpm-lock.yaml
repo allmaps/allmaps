@@ -38,6 +38,9 @@ importers:
       svg-parser:
         specifier: ^2.0.4
         version: 2.0.4
+      zod-validation-error:
+        specifier: ^1.5.0
+        version: 1.5.0(zod@3.20.6)
     devDependencies:
       '@types/node':
         specifier: ^18.14.2
@@ -677,6 +680,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.0.2
+      zod-validation-error:
+        specifier: ^1.5.0
+        version: 1.5.0(zod@3.20.6)
 
   packages/id:
     devDependencies:
@@ -845,6 +851,34 @@ importers:
       vite:
         specifier: ^4.3.0
         version: 4.3.0(@types/node@18.14.2)
+
+  packages/schemas:
+    dependencies:
+      '@allmaps/annotation':
+        specifier: ^1.0.0-beta.13
+        version: link:../annotation
+      zod:
+        specifier: ^3.20.6
+        version: 3.20.6
+      zod-to-json-schema:
+        specifier: ^3.20.6
+        version: 3.21.4(zod@3.20.6)
+    devDependencies:
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.45.0
+        version: 5.45.0(@typescript-eslint/parser@5.45.0)(eslint@8.35.0)(typescript@5.0.2)
+      '@typescript-eslint/parser':
+        specifier: ^5.45.0
+        version: 5.45.0(eslint@8.35.0)(typescript@5.0.2)
+      eslint:
+        specifier: ^8.35.0
+        version: 8.35.0
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.0
+      typescript:
+        specifier: ^5.0.0
+        version: 5.0.2
 
   packages/stdlib:
     dependencies:
@@ -9978,6 +10012,22 @@ packages:
       mustache: 4.2.0
       stack-trace: 0.0.10
     dev: true
+
+  /zod-to-json-schema@3.21.4(zod@3.20.6):
+    resolution: {integrity: sha512-fjUZh4nQ1s6HMccgIeE0VP4QG/YRGPmyjO9sAh890aQKPEk3nqbfUXhMFaC+Dr5KvYBm8BCyvfpZf2jY9aGSsw==}
+    peerDependencies:
+      zod: ^3.21.4
+    dependencies:
+      zod: 3.20.6
+    dev: false
+
+  /zod-validation-error@1.5.0(zod@3.20.6):
+    resolution: {integrity: sha512-/7eFkAI4qV0tcxMBB/3+d2c1P6jzzZYdYSlBuAklzMuCrJu5bzJfHS0yVAS87dRHVlhftd6RFJDIvv03JgkSbw==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      zod: ^3.18.0
+    dependencies:
+      zod: 3.20.6
 
   /zod@3.20.6:
     resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
