@@ -1,7 +1,6 @@
 {
   "name": "@allmaps/tailwind",
   "version": "1.0.0-beta.6",
-  "private": "true",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
