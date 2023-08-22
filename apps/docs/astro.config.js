@@ -18,6 +18,10 @@ export default defineConfig({
       social: {
         github: 'https://github.com/allmaps/allmaps'
       },
+      editLink: {
+        // Pick main or develop branch
+        baseUrl: 'https://github.com/allmaps/allmaps/tree/develop/apps/docs/'
+      },
       sidebar: [
         { label: 'Introduction', link: '/introduction/' },
         { label: 'Get Started', link: '/get-started/' },
