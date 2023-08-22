@@ -51,12 +51,24 @@ The browser version of @allmaps/id uses the [`SubtleCrypto.digest()`](https://de
 
 #### Table of Contents
 
-*   [generateId](#generateid)
+*   [generateHash](#generatehash)
     *   [Parameters](#parameters)
-*   [generateRandomId](#generaterandomid)
+*   [generateId](#generateid)
     *   [Parameters](#parameters-1)
-*   [generateChecksum](#generatechecksum)
+*   [generateRandomId](#generaterandomid)
     *   [Parameters](#parameters-2)
+*   [generateChecksum](#generatechecksum)
+    *   [Parameters](#parameters-3)
+
+### generateHash
+
+Computes SHA-1 hash of input string.
+
+#### Parameters
+
+*   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Input string.
+
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** SHA-1 hash of `str`.
 
 ### generateId
 
@@ -67,7 +79,7 @@ Generates an ID from a string using the SHA-1 algorithm. Given the same input, t
 *   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Input string.
 *   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash.  The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of `str`.
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of `str`.
 
 ### generateRandomId
 
@@ -77,7 +89,7 @@ Generates a random ID.
 
 *   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of a random UUID.
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of a random UUID.
 
 ### generateChecksum
 
@@ -88,4 +100,4 @@ Generates a checksum of a JSON object.
 *   `obj` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** JSON object.
 *   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.

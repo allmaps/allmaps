@@ -32,7 +32,8 @@
     "build": "astro build",
     "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "copy-readmes": "node ./scripts/copy-readmes.js"
   },
   "dependencies": {
     "@allmaps/tailwind": "^1.0.0-beta.7",

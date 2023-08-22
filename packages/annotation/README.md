@@ -1,16 +1,16 @@
 # @allmaps/annotation
 
-@allmaps/annotation is a JavaScript module that can generate and parse *georeference annotations*.
+@allmaps/annotation is a JavaScript module that can generate and parse [Georeference Annotations](https://iiif.io/api/extension/georef/).
 
-A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/). The [IIIF community](https://iiif.io/community/groups/maps-tsg/) is working on a turning georeference annotations into a specification and a [IIIF extension](https://iiif.io/api/index.html#approved-extensions).
+A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/).
 
-A georeference annotation contains the following data:
+A Georeference Annotation contains the following data:
 
 *   The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
-*   A list of ground control points (GCPs) that define the mapping between pixels and geospatial coordinates.
+*   A list of ground control points (GCPs) that define the mapping between resource coordinates and geospatial coordinates.
 *   A polygonal resource mask that defines the cartographic part of the image.
 
-Georeference annotation are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
+Georeference Annotations are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
 
 <!-- TODO: create Observable notebook that allows you to try out this module! -->
 
