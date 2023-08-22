@@ -1,0 +1,7 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "references": [
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/ui" }
+  ]
+}
