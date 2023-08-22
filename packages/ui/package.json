@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.16",
+  "version": "1.0.0-beta.17",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -74,7 +74,7 @@
     "svelte": "^3.55.0"
   },
   "dependencies": {
-    "@allmaps/tailwind": "^1.0.0-beta.6",
+    "@allmaps/tailwind": "^1.0.0-beta.7",
     "flowbite": "^1.6.4"
   }
 }
