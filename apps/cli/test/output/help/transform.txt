@@ -9,6 +9,8 @@ Options:
   -h, --help                          display help for command
 
 Commands:
+  position [options] [files...]       transform positions forwards (or
+                                      backwards)
   svg [options] [files...]            transform SVG to GeoJSON
   geojson [options] [files...]        transform GeoJSON to SVG
   resource-mask [options] [files...]  transform resource masks to GeoJSON

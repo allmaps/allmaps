@@ -1,0 +1,1 @@
+Error: No GCPs supplied. Specify an annotation or GCPs.
