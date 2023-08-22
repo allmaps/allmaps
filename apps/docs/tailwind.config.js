@@ -2,8 +2,6 @@ import starlightPlugin from '@astrojs/starlight-tailwind'
 
 import { theme } from '@allmaps/tailwind'
 
-console.log(theme)
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
