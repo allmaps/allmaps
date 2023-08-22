@@ -6,6 +6,7 @@
 
   import turfRewind from '@turf/rewind'
   import { GCPTransformer } from '@allmaps/transform'
+  import { validateMap } from '@allmaps/annotation'
 
   import { getUrls } from '$lib/shared/urls.js'
   import { getProperties } from '$lib/shared/properties.js'
@@ -77,11 +78,14 @@
 
   onMount(async () => {
     const response = await fetch(mapsUrl)
-    maps = await response.json()
+    const apiMaps = await response.json()
+    const mapOrMaps = validateMap(apiMaps)
+    maps = Array.isArray(mapOrMaps) ? mapOrMaps : [mapOrMaps]
 
     clearInterval(loadingInterval)
     loadingSteps = []
 
+    let index = 0
     for (const map of maps) {
       let error: string | undefined
       let polygon: Polygon | undefined
@@ -119,11 +123,13 @@
         error,
         polygon,
         urls: await getUrls(map),
-        properties: getProperties(map, polygon)
+        properties: getProperties(map, apiMaps[index], polygon)
       }
 
       displayMaps.push(displayMap)
       displayMaps = displayMaps
+
+      index++
     }
   })
 </script>
