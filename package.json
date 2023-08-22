@@ -7,6 +7,7 @@
     "dev": "lerna run dev --parallel",
     "types": "lerna run types --parallel",
     "lint": "lerna run lint --parallel",
+    "documentation": "lerna run documentation --parallel",
     "precommit": "npm run types && npm run lint && npm run test",
     "test": "lerna run test --parallel",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
