@@ -3,3 +3,8 @@
 
   /* --sl-color-bg-nav: #5677ff; */
 }
+
+:root[data-theme='light'] {
+  --sl-color-accent: black;
+  --sl-color-text-accent: black;
+}

@@ -12,20 +12,54 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
     starlight({
       title: 'Allmaps Docs',
+      logo: {
+        src: './src/assets/allmaps-logo.svg'
+      },
       social: {
         github: 'https://github.com/allmaps/allmaps'
       },
       sidebar: [
+        { label: 'Introduction', link: '/introduction/' },
+        { label: 'Get Started', link: '/get-started/' },
+        { label: 'FAQ', link: '/faq/' },
         {
           label: 'Guides',
+          // items: [{ label: 'Data', link: '/data/' }]
+          autogenerate: {
+            directory: 'guides'
+          }
+        },
+        {
+          label: 'Tutorials',
           items: [
-            // Each item here is one entry in the navigation menu.
-            { label: 'Example Guide', link: '/guides/example/' }
+            { label: 'For Historians', link: '/tutorials/for-historians/' },
+            { label: 'For Students', link: '/tutorials/for-students/' },
+            { label: 'For Developers', link: '/tutorials/for-developers/' },
+            { label: 'For Curators', link: '/tutorials/for-curators/' }
           ]
         },
         {
           label: 'Reference',
-          autogenerate: { directory: 'reference' }
+          items: [
+            {
+              label: 'REST API',
+              autogenerate: {
+                directory: 'reference/api'
+              }
+            },
+            {
+              label: 'Packages',
+              autogenerate: {
+                directory: 'reference/packages'
+              }
+            },
+            {
+              label: 'Apps',
+              autogenerate: {
+                directory: 'reference/apps'
+              }
+            }
+          ]
         }
       ],
       customCss: [
