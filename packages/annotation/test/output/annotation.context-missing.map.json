@@ -8,6 +8,12 @@
       "height": 1860,
       "type": "ImageService2"
     },
+    "transformation": {
+      "type": "polynomial",
+      "options": {
+        "order": 1
+      }
+    },
     "gcps": [
       {
         "resource": [336, 1742],

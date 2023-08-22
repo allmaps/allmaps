@@ -22,10 +22,7 @@
   "body": {
     "type": "FeatureCollection",
     "transformation": {
-      "type": "polynomial",
-      "options": {
-        "order": 1
-      }
+      "type": "thinPlateSpline"
     },
     "features": [
       {

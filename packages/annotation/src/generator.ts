@@ -14,7 +14,6 @@ import {
   Annotation1Schema,
   AnnotationPage1Schema,
   SvgSelector1Schema,
-  TransformationSchema,
   PartOfSchema
 } from './schemas/annotation.js'
 
@@ -32,7 +31,6 @@ type Annotation1 = z.infer<typeof Annotation1Schema>
 type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
 type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
 
-type Transformation = z.infer<typeof TransformationSchema>
 type PartOf = z.infer<typeof PartOfSchema>
 
 function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
@@ -98,14 +96,6 @@ export function generateContext() {
   ]
 }
 
-function generateTransformation(
-  map: MapAllVersions
-): Transformation | undefined {
-  if (isMap2(map)) {
-    return map.transformation
-  }
-}
-
 function generateFeature(gcp: GCP) {
   let resourceCoords: [number, number]
   let geoCoords: [number, number]
@@ -139,7 +129,7 @@ function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
 
   const body = {
     type: 'FeatureCollection' as const,
-    transformation: generateTransformation(map),
+    transformation: map.transformation,
     features: map.gcps.map((gcp) => generateFeature(gcp))
   }
 

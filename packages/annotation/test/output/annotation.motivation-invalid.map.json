@@ -26,6 +26,9 @@
         "geo": [2.2945164, 48.8590133]
       }
     ],
+    "transformation": {
+      "type": "thinPlateSpline"
+    },
     "resourceMask": [
       [117, 120],
       [113, 1776],

@@ -17,8 +17,7 @@ import {
   GCPSchema,
   ResourceSchema,
   PartOfSchema,
-  ResourceMaskSchema,
-  TransformationSchema
+  ResourceMaskSchema
 } from './schemas/map.js'
 
 import {
@@ -37,7 +36,6 @@ type GCP = z.infer<typeof GCPSchema>
 type PartOf = z.infer<typeof PartOfSchema>
 type FeatureProperties = z.infer<typeof FeaturePropertiesAllVersionsSchema>
 type ImageService = z.infer<typeof ImageServiceSchema>
-type Transformation = z.infer<typeof TransformationSchema>
 
 function parseResource(annotation: AnnotationAllVersions): Resource {
   return {
@@ -151,14 +149,6 @@ function parseResourceMask(annotation: AnnotationAllVersions): ResourceMask {
   }
 }
 
-function parseTransformation(
-  annotation: AnnotationAllVersions
-): Transformation | undefined {
-  if (isAnnotation1(annotation)) {
-    return annotation.body.transformation
-  }
-}
-
 function getMap(annotation: AnnotationAllVersions): Map2 {
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
@@ -167,7 +157,7 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
     resource: parseResource(annotation),
     gcps: parseGcps(annotation),
     resourceMask: parseResourceMask(annotation),
-    transformation: parseTransformation(annotation)
+    transformation: annotation.body.transformation
   }
 }
 

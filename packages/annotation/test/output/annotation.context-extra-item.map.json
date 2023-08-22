@@ -9,6 +9,9 @@
       "height": 1860,
       "type": "ImageService2"
     },
+    "transformation": {
+      "type": "thinPlateSpline"
+    },
     "gcps": [
       {
         "resource": [336, 1742],

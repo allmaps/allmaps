@@ -3,7 +3,8 @@ import { z } from 'zod'
 import {
   PointSchema,
   ImageServiceSchema,
-  PointGeometrySchema
+  PointGeometrySchema,
+  TransformationSchema
 } from '../shared.js'
 
 const svg =
@@ -33,6 +34,7 @@ export const FeaturePropertiesSchema = z.object({
 
 export const BodySchema = z.object({
   type: z.literal('FeatureCollection'),
+  transformation: TransformationSchema.optional(),
   features: z.array(
     z.object({
       type: z.literal('Feature'),

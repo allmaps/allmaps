@@ -3,7 +3,8 @@ import { z } from 'zod'
 import {
   PointSchema,
   ImageServiceSchema,
-  ResourceMaskSchema
+  ResourceMaskSchema,
+  TransformationSchema
 } from '../shared.js'
 
 export const GCPSchema = z.object({
@@ -23,7 +24,8 @@ export const MapSchema = z.object({
   version: z.number().min(1).max(1).default(1),
   image: ImageSchema,
   gcps: GCPSchema.array(),
-  pixelMask: ResourceMaskSchema
+  pixelMask: ResourceMaskSchema,
+  transformation: TransformationSchema.optional()
 })
 
 export const MapsSchema = z.array(MapSchema)
