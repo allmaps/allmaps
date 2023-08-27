@@ -1,3 +1,3 @@
-import AllmapsLayer from './AllmapsLayer.js'
+import WarpedMapLayer from './WarpedMapLayer.js'
 
-export { AllmapsLayer }
+export { WarpedMapLayer }
