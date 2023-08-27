@@ -1,4 +1,4 @@
 ---
-title: Frequenly Asked Questions
+title: Frequently Asked Questions
 description: ''
 ---

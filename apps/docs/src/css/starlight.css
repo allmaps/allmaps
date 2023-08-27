@@ -1,10 +1,15 @@
 :root {
   --sl-font: 'Geograph', serif;
-
-  /* --sl-color-bg-nav: #5677ff; */
 }
 
 :root[data-theme='light'] {
-  --sl-color-accent: black;
-  --sl-color-text-accent: black;
+  /* TODO: set colors to Allmaps colors */
+  /* Either here or in Tailwind theme */
+  /* --sl-color-accent: black; */
+  /* --sl-color-text-accent: black; */
+}
+
+header .site-title {
+  /* TODO: use black color from theme */
+  color: black;
 }

@@ -26,6 +26,7 @@ export default defineConfig({
         { label: 'Introduction', link: '/introduction/' },
         { label: 'Get Started', link: '/get-started/' },
         { label: 'FAQ', link: '/faq/' },
+        { label: 'Glossary', link: '/glossary/' },
         {
           label: 'Guides',
           // items: [{ label: 'Data', link: '/data/' }]
