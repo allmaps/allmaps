@@ -1,13 +1,12 @@
+import { defineConfig } from 'vite'
+
 import { sveltekit } from '@sveltejs/kit/vite'
 
 import ports from '../../ports.json'
 
-/** @type {import('vite').UserConfig} */
-const config = {
+export default defineConfig({
   server: {
     port: ports.explore
   },
   plugins: [sveltekit()]
-}
-
-export default config
+})
