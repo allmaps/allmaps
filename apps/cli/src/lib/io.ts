@@ -1,6 +1,8 @@
 import { createReadStream, readFileSync, ReadStream } from 'fs'
 import { Readable } from 'stream'
 import StreamValues from 'stream-json/streamers/StreamValues.js'
+import type { GCP } from '@allmaps/transform'
+import { parseCoordinatesArrayArray } from './parse.js'
 
 async function* concatStreams(readables: ReadStream[]) {
   for (const readable of readables) {
@@ -12,8 +14,10 @@ async function* concatStreams(readables: ReadStream[]) {
 
 export async function readInput(files: string[]): Promise<string[]> {
   if (process.stdin.isTTY) {
+    // Files are listed in command
     return readFromFiles(files)
   } else {
+    // Files are piped
     const input = await readFromStdin()
     return [input]
   }
@@ -57,6 +61,23 @@ export function parseJsonFromFile(file: string): unknown {
   return JSON.parse(readFileSync(file, { encoding: 'utf8', flag: 'r' }))
 }
 
+export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
+  return parseCoordinatesArrayArray(
+    readFileSync(file, { encoding: 'utf8', flag: 'r' })
+  )
+}
+
+export function parseGcpsFromFile(file: string): GCP[] {
+  return (
+    parseCoordinateArrayArrayFromFile(file) as [
+      [number, number, number, number]
+    ]
+  ).map((coordinateArray) => ({
+    resource: [coordinateArray[0], coordinateArray[1]],
+    geo: [coordinateArray[2], coordinateArray[3]]
+  }))
+}
+
 export function readFromFiles(files: string[]) {
   if (!files || !files.length) {
     return []
@@ -94,6 +115,32 @@ export function readFromStdin(): Promise<string> {
     process.stdin.on('end', function () {
       try {
         resolve(input)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  })
+}
+
+export function readFromStdinLine(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let input = ''
+
+    process.stdin.resume()
+    process.stdin.setEncoding('utf8')
+
+    process.stdin.on('data', (chunk) => {
+      input += chunk
+      try {
+        resolve(input.trim())
+      } catch (err) {
+        reject(err)
+      }
+    })
+
+    process.stdin.on('end', function () {
+      try {
+        resolve(input.trim())
       } catch (err) {
         reject(err)
       }

@@ -2,13 +2,14 @@ import { Command } from 'commander'
 
 import { GCPTransformer } from '@allmaps/transform'
 
-import { parseJsonFromFile, readInput, printJson } from '../../lib/io.js'
-import { parseAnnotationValidateMap } from '../../lib/parse.js'
+import { readInput, printJson } from '../../lib/io.js'
 import {
-  addAnnotationOption,
-  addTransformOptions,
-  parseTransformOptions
-} from '../../lib/options.js'
+  parseGcps,
+  parseMap,
+  parseTransformOptions,
+  parseTransformationType
+} from '../../lib/parse.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
 import { geomEach } from '../../lib/svg.js'
 import {
   transformSvgToGeoJson,
@@ -19,22 +20,20 @@ export default function svg() {
   let command = new Command('svg')
     .argument('[files...]')
     .summary('transform SVG to GeoJSON')
-    .description('Transforms SVG to GeoJSON using a Georeference Annotation')
+    .description(
+      'Transform SVG to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+    )
 
-  command = addAnnotationOption(command)
+  command = addAnnotationOptions(command)
+  command = addTransformOptions(command)
 
-  return addTransformOptions(command).action(async (files, options) => {
-    const annotation = parseJsonFromFile(options.annotation as string)
-    const mapOrMaps = parseAnnotationValidateMap(annotation)
-
-    if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
-      throw new Error('Annotation must contain exactly 1 georeferenced map')
-    }
-
+  return command.action(async (files, options) => {
+    const map = parseMap(options)
+    const gcps = parseGcps(options, map)
+    const transformationType = parseTransformationType(options, map)
     const transformOptions = parseTransformOptions(options)
 
-    const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
-    const transformer = new GCPTransformer(map.gcps, map.transformation?.type)
+    const transformer = new GCPTransformer(gcps, transformationType)
 
     const svgs = await readInput(files as string[])
 

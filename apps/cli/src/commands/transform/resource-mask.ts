@@ -3,21 +3,24 @@ import { Command } from 'commander'
 import { GCPTransformer } from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
-import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 import {
-  addTransformOptions,
+  parseAnnotationsValidateMaps,
   parseTransformOptions
-} from '../../lib/options.js'
+} from '../../lib/parse.js'
+import { addTransformOptions } from '../../lib/options.js'
 
 export default function resourceMask() {
-  const command = new Command('resource-mask')
+  let command = new Command('resource-mask')
     .argument('[files...]')
     .summary('transform resource masks to GeoJSON')
     .description(
-      'Transforms resource masks of input Georeference Annotations to GeoJSON'
+      'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n' +
+        "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
     )
 
-  return addTransformOptions(command).action(async (files, options) => {
+  command = addTransformOptions(command)
+
+  return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files as string[])
     const maps = parseAnnotationsValidateMaps(jsonValues)
 
@@ -44,6 +47,7 @@ export default function resourceMask() {
           geometry: polygon
         })
       } else {
+        // TODO: this can be removed because an error will be given by the transformer.
         console.error(
           'Encountered Georeference Annotation with less than 3 points'
         )

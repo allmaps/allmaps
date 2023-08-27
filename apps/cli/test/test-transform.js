@@ -16,7 +16,7 @@ describe('allmaps transform', () => {
 
 describe('allmaps transform svg', () => {
   it('should display help when no arguments are provided', () => {
-    expect(() => exec('transform svg')).to.throw(helpMessage('transform-svg'))
+    expect(() => exec('transform svg')).to.throw(helpMessage('no-gcps'))
   })
 
   // with -a, but no file
@@ -48,9 +48,7 @@ describe('allmaps transform svg', () => {
 
 describe('allmaps transform geojson', () => {
   it('should display help when no arguments are provided', () => {
-    expect(() => exec('transform geojson')).to.throw(
-      helpMessage('transform-geojson')
-    )
+    expect(() => exec('transform geojson')).to.throw(helpMessage('no-gcps'))
   })
 
   it('should read a GeoJSON Polygon from a filename and transform this to an SVG using the supplied Georeference Annotation', () => {
@@ -67,7 +65,7 @@ describe('allmaps transform geojson', () => {
 describe('allmaps transform resource-mask', () => {
   it('should display help when no arguments are provided', () => {
     expect(() => exec('transform resource-mask')).to.throw(
-      helpMessage('transform-resource-mask')
+      helpMessage('no-input-files')
     )
   })
 
@@ -147,5 +145,84 @@ describe('allmaps transform resource-mask', () => {
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
+  })
+})
+
+describe('allmaps transform position', () => {
+  it('should display help when no arguments are provided', () => {
+    expect(() => exec('transform position')).to.throw(helpMessage('no-gcps'))
+  })
+
+  it('should display an error when no annotation file is provided', () => {
+    expect(() => exec('transform position -a')).to.throw(
+      helpMessage('arguments-missing-annotation')
+    )
+  })
+
+  // TODO: Add test for promt from stdin
+  // TODO: Add test for muliple input files
+
+  it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation', () => {
+    const expected = readFile('output/coordinatesStringFiles/positionFile.txt')
+    const output = exec(
+      'transform position -a input/annotations/7a69f9470b49a744.json',
+      'input/coordinatesStringFiles/positionFile.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read positions from a filename and transform these positions backward using the supplied Georeference Annotation', () => {
+    const expected = readFile(
+      'output/coordinatesStringFiles/positionFileBackward.txt'
+    )
+    const output = exec(
+      'transform position -a input/annotations/7a69f9470b49a744.json -i',
+      'input/coordinatesStringFiles/positionFileBackward.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
+    const expected = readFile(
+      'output/coordinatesStringFiles/positionFileThinPlateSpline.txt'
+    )
+    const output = exec(
+      'transform position -a input/annotations/7a69f9470b49a744.json -t thinPlateSpline',
+      'input/coordinatesStringFiles/positionFile.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation transformation type but overwrittable GCPs', () => {
+    const expected = readFile(
+      'output/coordinatesStringFiles/positionFileOtherGcps.txt'
+    )
+    const output = exec(
+      'transform position -a input/annotations/7a69f9470b49a744.json -g input/coordinatesStringFiles/gcpFile.txt',
+      'input/coordinatesStringFiles/positionFile.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read positions from a filename and transform these positions forward using the supplied transformation type and GCPs, even without a provided annotation', () => {
+    const expected = readFile(
+      'output/coordinatesStringFiles/positionFileOtherGcpsThinPlateSpline.txt'
+    )
+    const output = exec(
+      'transform position -g input/coordinatesStringFiles/gcpFile.txt -t thinPlateSpline',
+      'input/coordinatesStringFiles/positionFile.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read positions from a filename and transform these positions forward using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
+    const expected = readFile(
+      'output/coordinatesStringFiles/positionFileOtherGcps.txt'
+    )
+    const output = exec(
+      'transform position -g input/coordinatesStringFiles/gcpFile.txt',
+      'input/coordinatesStringFiles/positionFile.txt'
+    )
+    expect(expected).to.equal(output)
   })
 })
