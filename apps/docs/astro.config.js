@@ -15,6 +15,7 @@ export default defineConfig({
       logo: {
         src: './src/assets/allmaps-logo.svg'
       },
+      favicon: '/favicon.png',
       social: {
         github: 'https://github.com/allmaps/allmaps'
       },
