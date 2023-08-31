@@ -29,6 +29,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "prebuild": "npm run copy-readmes",
     "build": "astro build",
     "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
     "preview": "astro preview",
