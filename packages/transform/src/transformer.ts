@@ -12,8 +12,8 @@ import {
   fromGeoJSONPoint,
   fromGeoJSONLineString,
   fromGeoJSONPolygon,
-  toGeoPolygon,
-  toResourcePolygon
+  transformRingToGeo,
+  transformRingToResource
 } from './shared/geojson.js'
 
 import type {
@@ -27,6 +27,8 @@ import type {
   GeoJSONLineString,
   GeoJSONPolygon
 } from './shared/types.js'
+
+import type { Ring } from '@allmaps/types'
 
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: GCP[]
@@ -155,13 +157,24 @@ export default class GCPTransformer implements GCPTransformerInterface {
     polygon: Position[],
     options?: OptionalTransformOptions
   ): Position[] {
-    return toGeoPolygon(this, polygon, options)
+    return this.transformRingtoGeo(polygon, options)
   }
 
   toResourcePolygon(
     polygon: Position[],
     options?: OptionalTransformOptions
   ): Position[] {
-    return toResourcePolygon(this, polygon, options)
+    return this.transformRingToResource(polygon, options)
+  }
+
+  transformRingtoGeo(ring: Ring, options?: OptionalTransformOptions): Ring {
+    return transformRingToGeo(this, ring, options)
+  }
+
+  transformRingToResource(
+    ring: Ring,
+    options?: OptionalTransformOptions
+  ): Ring {
+    return transformRingToResource(this, ring, options)
   }
 }
