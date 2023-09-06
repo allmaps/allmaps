@@ -215,18 +215,14 @@ export function transformRingToGeo(
     geo: transformer.toGeo(position)
   }))
 
-  const segments = pointsToSegments(points, false)
-  const segmentsWithMidpoints = recursivelyAddGeoMidpoints(
+  const segments = pointsToSegments(points, true)
+  const extendedSegments = recursivelyAddGeoMidpoints(
     transformer,
     segments,
     mergedOptions
   )
 
-  // TODO: replace with return segmentsToPoints(segmentsWithMidpoints).map(point => point.resource)
-  return [
-    segmentsWithMidpoints[0].from.geo,
-    ...segmentsWithMidpoints.map((segment) => segment.to.geo)
-  ]
+  return segmentsToPoints(extendedSegments, false).map((point) => point.geo)
 }
 
 export function transformRingToResource(
@@ -246,18 +242,16 @@ export function transformRingToResource(
     geo: position
   }))
 
-  const segments = pointsToSegments(points, false)
-  const segmentsWithMidpoints = recursivelyAddResourceMidpoints(
+  const segments = pointsToSegments(points, true)
+  const extendendSegements = recursivelyAddResourceMidpoints(
     transformer,
     segments,
     mergedOptions
   )
 
-  // TODO: replace with return segmentsToPoints(segmentsWithMidpoints).map(point => point.resource)
-  return [
-    segmentsWithMidpoints[0].from.resource,
-    ...segmentsWithMidpoints.map((segment) => segment.to.resource)
-  ]
+  return segmentsToPoints(extendendSegements, false).map(
+    (point) => point.resource
+  )
 }
 
 function pointsToSegments(points: GCP[], close = false): Segment[] {
@@ -274,13 +268,13 @@ function pointsToSegments(points: GCP[], close = false): Segment[] {
   return segments
 }
 
-// function segmentsToPoints(segments: Segment[], close = true): GCP[] {
-//   const points = segments.map((segment) => segment.from)
-//   if (close) {
-//     points.push(segments[segments.length - 1].to)
-//   }
-//   return points
-// }
+function segmentsToPoints(segments: Segment[], close = false): GCP[] {
+  const points = segments.map((segment) => segment.from)
+  if (close) {
+    points.push(segments[segments.length - 1].to)
+  }
+  return points
+}
 
 function recursivelyAddWorldMidpointsOld(
   transformer: GCPTransformerInterface,

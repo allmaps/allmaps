@@ -1,12 +1,18 @@
 import { describe, it } from 'mocha'
-import chai, { expect } from 'chai'
-import shallowDeepEqual from 'chai-shallow-deep-equal'
+import { expect } from 'chai'
 
 import { GCPTransformer } from '../dist/index.js'
 
 import { gcps6 } from './input/gcps-test.js'
 
-chai.use(shallowDeepEqual)
+function expectToBeCloseToArrayArray(actual, expected, epsilon = 0.00001) {
+  expect(actual.length).to.equal(expected.length)
+  actual.forEach((n0, i0) =>
+    n0.forEach((n1, i1) =>
+      expect(n1).to.be.approximately(expected[i0][i1], epsilon)
+    )
+  )
+}
 
 describe('To geo polygon transformer ', async () => {
   const transformOptions = {
@@ -27,13 +33,15 @@ describe('To geo polygon transformer ', async () => {
     [4.409493277493718, 51.94119110133424],
     [4.425874493300959, 51.94172557475595],
     [4.4230497784967655, 51.950815146974556],
-    [4.420666790347598, 51.959985351835975]
+    [4.420666790347598, 51.959985351835975],
+    [4.404906205946158, 51.959549039424715]
   ]
 
-  const result = transformer.toGeoPolygon(input, transformOptions)
-
   it(`should have the right output`, () => {
-    expect(result).to.shallowDeepEqual(output)
+    expectToBeCloseToArrayArray(
+      transformer.toGeoPolygon(input, transformOptions),
+      output
+    )
   })
 })
 
@@ -56,12 +64,14 @@ describe('To resource polygon transformer', async () => {
     [1520.5132800975002, 1995.126987432735],
     [1972.2719445148632, 2006.6657102722945],
     [1969.4605377858998, 1507.0986848843686],
-    [1957.822599920541, 1009.7982201488556]
+    [1957.822599920541, 1009.7982201488556],
+    [1495.754239007751, 1000.8172824356742]
   ]
 
-  const result = transformer.toResourcePolygon(input, transformOptions)
-
   it(`should have the right output`, () => {
-    expect(result).to.shallowDeepEqual(output)
+    expectToBeCloseToArrayArray(
+      transformer.toResourcePolygon(input, transformOptions),
+      output
+    )
   })
 })

@@ -5,9 +5,9 @@ import { GCPTransformer } from '../dist/index.js'
 
 import { gcps3, gcps6, gcps10 } from './input/gcps-test.js'
 
-function expectToBeCloseToArray(actual, expected) {
+function expectToBeCloseToArray(actual, expected, epsilon = 0.00001) {
   expect(actual.length).to.equal(expected.length)
-  actual.forEach((n, i) => expect(n).to.be.approximately(expected[i], 0.00001))
+  actual.forEach((n, i) => expect(n).to.be.approximately(expected[i], epsilon))
 }
 
 describe('Helmert transformer', async () => {
