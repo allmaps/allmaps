@@ -34,7 +34,7 @@ export default function resourceMask() {
           map.gcps,
           map.transformation?.type
         )
-        const polygon = transformer.toGeoJSONPolygon(
+        const polygon = transformer.transformForwardRingToGeoJSONPolygon(
           map.resourceMask,
           transformOptions
         )

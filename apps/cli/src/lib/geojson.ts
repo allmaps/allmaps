@@ -12,15 +12,29 @@ export function transformSvgToGeoJson(
   options?: OptionalTransformOptions
 ) {
   if (geometry.type === 'circle') {
-    return transformer.toGeoJSONPoint(geometry.coordinates)
+    return transformer.transformForwardPositionToGeoJSONPoint(
+      geometry.coordinates
+    )
   } else if (geometry.type === 'line') {
-    return transformer.toGeoJSONLineString(geometry.coordinates, options)
+    return transformer.transformForwardLineStringToGeoJSONLineString(
+      geometry.coordinates,
+      options
+    )
   } else if (geometry.type === 'polyline') {
-    return transformer.toGeoJSONLineString(geometry.coordinates, options)
+    return transformer.transformForwardLineStringToGeoJSONLineString(
+      geometry.coordinates,
+      options
+    )
   } else if (geometry.type === 'rect') {
-    return transformer.toGeoJSONPolygon(geometry.coordinates, options)
+    return transformer.transformForwardRingToGeoJSONPolygon(
+      geometry.coordinates,
+      options
+    )
   } else if (geometry.type === 'polygon') {
-    return transformer.toGeoJSONPolygon(geometry.coordinates, options)
+    return transformer.transformForwardRingToGeoJSONPolygon(
+      geometry.coordinates,
+      options
+    )
   } else {
     throw new Error(`Unsupported SVG geometry`)
   }

@@ -30,7 +30,8 @@
     if ($position && transformer) {
       const feature = positionToGeoJson($position)
       if (positionFeature) {
-        const imageCoordinates = transformer.fromGeoJSONPoint(feature.geometry)
+        const imageCoordinates =
+          transformer.transformBackwardGeoJSONPointToPosition(feature.geometry)
         positionFeature.setGeometry(
           new Point([imageCoordinates[0], -imageCoordinates[1]])
         )

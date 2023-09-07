@@ -225,17 +225,23 @@ export function transformGeoJsonToSvg(
   if (geometry.type === 'Point') {
     return {
       type: 'circle',
-      coordinates: transformer.fromGeoJSONPoint(geometry)
+      coordinates: transformer.transformBackwardGeoJSONPointToPosition(geometry)
     }
   } else if (geometry.type === 'LineString') {
     return {
       type: 'polyline',
-      coordinates: transformer.fromGeoJSONLineString(geometry, options)
+      coordinates: transformer.transformBackwardGeoJSONLineStringToLineString(
+        geometry,
+        options
+      )
     }
   } else if (geometry.type === 'Polygon') {
     return {
       type: 'polygon',
-      coordinates: transformer.fromGeoJSONPolygon(geometry, options)
+      coordinates: transformer.transformBackwardGeoJSONPolygonToRing(
+        geometry,
+        options
+      )
     }
   } else {
     throw new Error(`Unsupported GeoJSON geometry`)

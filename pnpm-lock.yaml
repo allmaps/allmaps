@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -979,6 +979,9 @@ importers:
 
   packages/transform:
     dependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.3
+        version: link:../types
       '@placemarkio/geojson-rewind':
         specifier: ^1.0.2
         version: 1.0.2
