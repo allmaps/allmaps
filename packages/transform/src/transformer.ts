@@ -9,16 +9,10 @@ import {
   makeGeoJSONPoint,
   makeGeoJSONLineString,
   makeGeoJSONPolygon,
-  toGeoJSONPoint,
-  toGeoJSONLineString,
-  toGeoJSONPolygon,
-  fromGeoJSONPoint,
-  fromGeoJSONLineString,
-  fromGeoJSONPolygon,
-  transformLineStringToGeo,
-  transformLineStringToResource,
-  transformRingToGeo,
-  transformRingToResource,
+  transformForwardLineStringToLineString,
+  transformBackwardLineStringToLineString,
+  transformForwardRingToRing,
+  transformBackwardRingToRing,
   geoJSONPointToPosition,
   geoJSONLineStringToLineString,
   geoJSONPolygonToRing
@@ -30,7 +24,6 @@ import type {
   OptionalTransformOptions,
   Position,
   GCP,
-  GeoJSONGeometry,
   GeoJSONPoint,
   GeoJSONLineString,
   GeoJSONPolygon
@@ -79,130 +72,134 @@ export default class GCPTransformer implements GCPTransformerInterface {
     return this.transformer.toResource(point)
   }
 
-  toGeoJSON(point: Position): GeoJSONGeometry
-  toGeoJSON(
-    points: Position[],
-    options?: OptionalTransformOptions
-  ): GeoJSONGeometry
+  // toGeoJSON(point: Position): GeoJSONGeometry
+  // toGeoJSON(
+  //   points: Position[],
+  //   options?: OptionalTransformOptions
+  // ): GeoJSONGeometry
 
-  toGeoJSON(
-    pointOrPoints: Position[] | Position,
-    options?: OptionalTransformOptions
-  ): GeoJSONGeometry {
-    // TODO: also support empty point and points arrays by throwing error
-    const isArray = Array.isArray(pointOrPoints[0])
+  // toGeoJSON(
+  //   pointOrPoints: Position[] | Position,
+  //   options?: OptionalTransformOptions
+  // ): GeoJSONGeometry {
+  //   // TODO: also support empty point and points arrays by throwing error
+  //   const isArray = Array.isArray(pointOrPoints[0])
 
-    let point: Position
-    let points: Position[]
+  //   let point: Position
+  //   let points: Position[]
 
-    if (isArray) {
-      points = pointOrPoints as Position[]
-      const close = options && options.close
+  //   if (isArray) {
+  //     points = pointOrPoints as Position[]
+  //     const close = options && options.close
 
-      if (close) {
-        return toGeoJSONPolygon(this, points, options)
-      } else {
-        return toGeoJSONLineString(this, points, options)
-      }
-    } else {
-      point = pointOrPoints as Position
-      return toGeoJSONPoint(this, point)
-    }
-  }
+  //     if (close) {
+  //       return toGeoJSONPolygon(this, points, options)
+  //     } else {
+  //       return toGeoJSONLineString(this, points, options)
+  //     }
+  //   } else {
+  //     point = pointOrPoints as Position
+  //     return toGeoJSONPoint(this, point)
+  //   }
+  // }
 
-  toGeoJSONPoint(point: Position): GeoJSONPoint {
-    return toGeoJSONPoint(this, point)
-  }
+  // toGeoJSONPoint(point: Position): GeoJSONPoint {
+  //   return toGeoJSONPoint(this, point)
+  // }
 
-  toGeoJSONLineString(
-    points: Position[],
-    options?: OptionalTransformOptions
-  ): GeoJSONLineString {
-    return toGeoJSONLineString(this, points, options)
-  }
+  // toGeoJSONLineString(
+  //   points: Position[],
+  //   options?: OptionalTransformOptions
+  // ): GeoJSONLineString {
+  //   return toGeoJSONLineString(this, points, options)
+  // }
 
-  toGeoJSONPolygon(
-    points: Position[],
-    options?: OptionalTransformOptions
-  ): GeoJSONPolygon {
-    return toGeoJSONPolygon(this, points, options)
-  }
+  // toGeoJSONPolygon(
+  //   points: Position[],
+  //   options?: OptionalTransformOptions
+  // ): GeoJSONPolygon {
+  //   return toGeoJSONPolygon(this, points, options)
+  // }
 
-  fromGeoJSON(
-    geometry: GeoJSONGeometry,
-    options?: OptionalTransformOptions
-  ): Position | Position[] {
-    if (geometry.type === 'Point') {
-      return fromGeoJSONPoint(this, geometry)
-    } else if (geometry.type === 'LineString') {
-      return fromGeoJSONLineString(this, geometry, options)
-    } else if (geometry.type === 'Polygon') {
-      return fromGeoJSONPolygon(this, geometry, options)
-    } else {
-      throw new Error(`Unsupported geometry`)
-    }
-  }
+  // fromGeoJSON(
+  //   geometry: GeoJSONGeometry,
+  //   options?: OptionalTransformOptions
+  // ): Position | Position[] {
+  //   if (geometry.type === 'Point') {
+  //     return fromGeoJSONPoint(this, geometry)
+  //   } else if (geometry.type === 'LineString') {
+  //     return fromGeoJSONLineString(this, geometry, options)
+  //   } else if (geometry.type === 'Polygon') {
+  //     return fromGeoJSONPolygon(this, geometry, options)
+  //   } else {
+  //     throw new Error(`Unsupported geometry`)
+  //   }
+  // }
 
-  fromGeoJSONPoint(geometry: GeoJSONPoint): Position {
-    return fromGeoJSONPoint(this, geometry)
-  }
+  // fromGeoJSONPoint(geometry: GeoJSONPoint): Position {
+  //   return fromGeoJSONPoint(this, geometry)
+  // }
 
-  fromGeoJSONLineString(
-    geometry: GeoJSONLineString,
-    options?: OptionalTransformOptions
-  ): Position[] {
-    return fromGeoJSONLineString(this, geometry, options)
-  }
+  // fromGeoJSONLineString(
+  //   geometry: GeoJSONLineString,
+  //   options?: OptionalTransformOptions
+  // ): Position[] {
+  //   return fromGeoJSONLineString(this, geometry, options)
+  // }
 
-  fromGeoJSONPolygon(
-    geometry: GeoJSONPolygon,
-    options?: OptionalTransformOptions
-  ): Position[] {
-    return fromGeoJSONPolygon(this, geometry, options)
-  }
+  // fromGeoJSONPolygon(
+  //   geometry: GeoJSONPolygon,
+  //   options?: OptionalTransformOptions
+  // ): Position[] {
+  //   return fromGeoJSONPolygon(this, geometry, options)
+  // }
 
   // Temp stuff
 
-  toGeoPolygon(
-    polygon: Position[],
-    options?: OptionalTransformOptions
-  ): Position[] {
-    return this.transformRingToGeo(polygon, options)
-  }
+  // toGeoPolygon(
+  //   polygon: Position[],
+  //   options?: OptionalTransformOptions
+  // ): Position[] {
+  //   return this.transformForwardRingToRing(polygon, options)
+  // }
 
-  toResourcePolygon(
-    polygon: Position[],
-    options?: OptionalTransformOptions
-  ): Position[] {
-    return this.transformRingToResource(polygon, options)
-  }
+  // toResourcePolygon(
+  //   polygon: Position[],
+  //   options?: OptionalTransformOptions
+  // ): Position[] {
+  //   return this.transformBackwardRingToRing(polygon, options)
+  // }
 
   // New stuff
 
-  transformPositionToGeo(position: Position): Position {
+  // Position
+
+  transformForwardPositionToPosition(position: Position): Position {
     return this.transformer.toGeo(position)
   }
 
-  transformPositionToGeoAsGeoJSONPoint(position: Position): GeoJSONPoint {
+  transformForwardPositionToGeoJSONPoint(position: Position): GeoJSONPoint {
     return makeGeoJSONPoint(this.transformer.toGeo(position))
   }
 
-  transformPositionToResource(position: Position): Position {
+  transformBackwardPositionToPosition(position: Position): Position {
     return this.transformer.toResource(position)
   }
 
-  transformPositionAsGeoJSONPointToResource(geometry: GeoJSONPoint): Position {
+  transformBackwardGeoJSONPointToPosition(geometry: GeoJSONPoint): Position {
     return this.transformer.toResource(geoJSONPointToPosition(geometry))
   }
 
-  transformLineStringToGeo(
+  // LineString
+
+  transformForwardLineStringToLineString(
     lineString: LineString,
     options?: OptionalTransformOptions
   ): LineString {
-    return transformLineStringToGeo(this, lineString, options)
+    return transformForwardLineStringToLineString(this, lineString, options)
   }
 
-  transformLineStringToGeoAsGeoJSONLineString(
+  transformForwardLineStringToGeoJSONLineString(
     lineString: LineString,
     options?: OptionalTransformOptions
   ): GeoJSONLineString {
@@ -210,60 +207,65 @@ export default class GCPTransformer implements GCPTransformerInterface {
       options.geographic = true
     }
     return makeGeoJSONLineString(
-      transformLineStringToGeo(this, lineString, options)
+      transformForwardLineStringToLineString(this, lineString, options)
     )
   }
 
-  transformLineStringToResource(
+  transformBackwardLineStringToLineString(
     lineString: LineString,
     options?: OptionalTransformOptions
   ): LineString {
-    return transformLineStringToResource(this, lineString, options)
+    return transformBackwardLineStringToLineString(this, lineString, options)
   }
 
-  transformLineStringAsGeoJSONLineStringToResource(
+  transformBackwardGeoJSONLineStringToLineString(
     geometry: GeoJSONLineString,
     options?: OptionalTransformOptions
   ): LineString {
     if (options && !('geographic' in options)) {
       options.geographic = true
     }
-    return transformLineStringToResource(
+    return transformBackwardLineStringToLineString(
       this,
       geoJSONLineStringToLineString(geometry),
       options
     )
   }
 
-  transformRingToGeo(ring: Ring, options?: OptionalTransformOptions): Ring {
-    return transformRingToGeo(this, ring, options)
+  // Ring
+
+  transformForwardRingToRing(
+    ring: Ring,
+    options?: OptionalTransformOptions
+  ): Ring {
+    return transformForwardRingToRing(this, ring, options)
   }
 
-  transformRingToGeoAsGeoJSONPolygon(
+  transformForwardRingToGeoJSONPolygon(
     ring: Ring,
     options?: OptionalTransformOptions
   ): GeoJSONPolygon {
     if (options && !('geographic' in options)) {
       options.geographic = true
     }
-    return makeGeoJSONPolygon(transformRingToGeo(this, ring, options))
+    return makeGeoJSONPolygon(transformForwardRingToRing(this, ring, options))
   }
 
-  transformRingToResource(
+  transformBackwardRingToRing(
     ring: Ring,
     options?: OptionalTransformOptions
   ): Ring {
-    return transformRingToResource(this, ring, options)
+    return transformBackwardRingToRing(this, ring, options)
   }
 
-  transformRingAsGeoJSONPolygonToResource(
+  transformBackwardGeoJSONPolygonToRing(
     geometry: GeoJSONPolygon,
     options?: OptionalTransformOptions
   ): Ring {
     if (options && !('geographic' in options)) {
       options.geographic = true
     }
-    return transformRingToResource(
+    return transformBackwardRingToRing(
       this,
       geoJSONPolygonToRing(geometry),
       options

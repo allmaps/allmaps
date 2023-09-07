@@ -97,156 +97,156 @@ export function geoJSONPolygonToRing(
   return close ? [...outerRing, outerRing[0]] : outerRing
 }
 
-export function toGeoJSONPoint(
-  transformer: GCPTransformerInterface,
-  point: Position
-): GeoJSONPoint {
-  return makeGeoJSONPoint(transformer.toGeo(point))
-}
+// export function toGeoJSONPoint(
+//   transformer: GCPTransformerInterface,
+//   point: Position
+// ): GeoJSONPoint {
+//   return makeGeoJSONPoint(transformer.toGeo(point))
+// }
 
-export function toGeoJSONLineString(
+// export function toGeoJSONLineString(
+//   transformer: GCPTransformerInterface,
+//   points: Position[],
+//   options?: OptionalTransformOptions
+// ): GeoJSONLineString {
+//   const mergedOptions = mergeDefaultOptions(options)
+
+//   if (!Array.isArray(points) || points.length < 2) {
+//     throw new Error('Line should contain at least 2 points')
+//   }
+
+//   const resourceGeoPoints = points.map((point) => ({
+//     resource: point,
+//     geo: transformer.toGeo(point)
+//   }))
+
+//   const segments = pointsToSegments(resourceGeoPoints)
+//   const segmentsWithMidpoints = recursivelyAddWorldMidpointsOld(
+//     transformer,
+//     segments,
+//     mergedOptions
+//   )
+
+//   return makeGeoJSONLineString([
+//     segmentsWithMidpoints[0].from.geo,
+//     ...segmentsWithMidpoints.map((segment) => segment.to.geo)
+//   ])
+// }
+
+// export function toGeoJSONPolygon(
+//   transformer: GCPTransformerInterface,
+//   points: Position[],
+//   options?: OptionalTransformOptions
+// ): GeoJSONPolygon {
+//   const mergedOptions = mergeDefaultOptions(options)
+
+//   if (!Array.isArray(points) || points.length < 3) {
+//     throw new Error('Polygon should contain at least 3 points')
+//   }
+
+//   const resourceGeoPoints = points.map((point) => ({
+//     resource: point,
+//     geo: transformer.toGeo(point)
+//   }))
+
+//   const segments = pointsToSegments(resourceGeoPoints, true)
+//   const segmentsWithMidpoints = recursivelyAddWorldMidpointsOld(
+//     transformer,
+//     segments,
+//     mergedOptions
+//   )
+
+//   return makeGeoJSONPolygon(
+//     [
+//       segmentsWithMidpoints[0].from.geo,
+//       ...segmentsWithMidpoints.map((segment) => segment.to.geo)
+//     ],
+//     false
+//   )
+// }
+
+// export function fromGeoJSONPoint(
+//   transformer: GCPTransformerInterface,
+//   point: GeoJSONPoint
+// ): Position {
+//   return transformer.toResource(point.coordinates)
+// }
+
+// export function fromGeoJSONLineString(
+//   transformer: GCPTransformerInterface,
+//   lineString: GeoJSONLineString,
+//   options?: OptionalTransformOptions
+// ): Position[] {
+//   const mergedOptions = mergeDefaultOptions(options)
+
+//   const coordinates = lineString.coordinates
+
+//   if (!Array.isArray(coordinates) || coordinates.length < 2) {
+//     throw new Error('LineString should contain at least 2 points')
+//   }
+
+//   const resourceGeoPoints = coordinates.map((coordinate) => ({
+//     resource: transformer.toResource(coordinate),
+//     geo: coordinate
+//   }))
+
+//   const segments = pointsToSegments(resourceGeoPoints)
+//   const segmentsWithMidpoints = recursivelyAddResourceMidpointsOld(
+//     transformer,
+//     segments,
+//     mergedOptions
+//   )
+
+//   return [
+//     segmentsWithMidpoints[0].from.resource,
+//     ...segmentsWithMidpoints.map((segment) => segment.to.resource)
+//   ]
+// }
+
+// export function fromGeoJSONPolygon(
+//   transformer: GCPTransformerInterface,
+//   polygon: GeoJSONPolygon,
+//   options?: OptionalTransformOptions
+// ): Position[] {
+//   const mergedOptions = mergeDefaultOptions(options)
+
+//   const coordinates = polygon.coordinates[0]
+
+//   if (!Array.isArray(coordinates) || coordinates.length < 4) {
+//     throw new Error('Polygon should contain at least 4 points')
+//   }
+
+//   const resourceGeoPoints = coordinates.map((coordinates) => ({
+//     resource: transformer.toResource(coordinates),
+//     geo: coordinates
+//   }))
+
+//   const segments = pointsToSegments(resourceGeoPoints)
+//   const segmentsWithMidpoints = recursivelyAddResourceMidpointsOld(
+//     transformer,
+//     segments,
+//     mergedOptions
+//   )
+
+//   return [
+//     segmentsWithMidpoints[0].from.resource,
+//     ...segmentsWithMidpoints.map((segment) => segment.to.resource)
+//   ]
+// }
+
+export function transformForwardLineStringToLineString(
   transformer: GCPTransformerInterface,
-  points: Position[],
+  LineString: LineString,
   options?: OptionalTransformOptions
-): GeoJSONLineString {
-  const mergedOptions = mergeDefaultOptions(options)
-
-  if (!Array.isArray(points) || points.length < 2) {
-    throw new Error('Line should contain at least 2 points')
-  }
-
-  const resourceGeoPoints = points.map((point) => ({
-    resource: point,
-    geo: transformer.toGeo(point)
-  }))
-
-  const segments = pointsToSegments(resourceGeoPoints)
-  const segmentsWithMidpoints = recursivelyAddWorldMidpointsOld(
-    transformer,
-    segments,
-    mergedOptions
-  )
-
-  return makeGeoJSONLineString([
-    segmentsWithMidpoints[0].from.geo,
-    ...segmentsWithMidpoints.map((segment) => segment.to.geo)
-  ])
-}
-
-export function toGeoJSONPolygon(
-  transformer: GCPTransformerInterface,
-  points: Position[],
-  options?: OptionalTransformOptions
-): GeoJSONPolygon {
-  const mergedOptions = mergeDefaultOptions(options)
-
-  if (!Array.isArray(points) || points.length < 3) {
-    throw new Error('Polygon should contain at least 3 points')
-  }
-
-  const resourceGeoPoints = points.map((point) => ({
-    resource: point,
-    geo: transformer.toGeo(point)
-  }))
-
-  const segments = pointsToSegments(resourceGeoPoints, true)
-  const segmentsWithMidpoints = recursivelyAddWorldMidpointsOld(
-    transformer,
-    segments,
-    mergedOptions
-  )
-
-  return makeGeoJSONPolygon(
-    [
-      segmentsWithMidpoints[0].from.geo,
-      ...segmentsWithMidpoints.map((segment) => segment.to.geo)
-    ],
-    false
-  )
-}
-
-export function fromGeoJSONPoint(
-  transformer: GCPTransformerInterface,
-  point: GeoJSONPoint
-): Position {
-  return transformer.toResource(point.coordinates)
-}
-
-export function fromGeoJSONLineString(
-  transformer: GCPTransformerInterface,
-  lineString: GeoJSONLineString,
-  options?: OptionalTransformOptions
-): Position[] {
-  const mergedOptions = mergeDefaultOptions(options)
-
-  const coordinates = lineString.coordinates
-
-  if (!Array.isArray(coordinates) || coordinates.length < 2) {
-    throw new Error('LineString should contain at least 2 points')
-  }
-
-  const resourceGeoPoints = coordinates.map((coordinate) => ({
-    resource: transformer.toResource(coordinate),
-    geo: coordinate
-  }))
-
-  const segments = pointsToSegments(resourceGeoPoints)
-  const segmentsWithMidpoints = recursivelyAddResourceMidpointsOld(
-    transformer,
-    segments,
-    mergedOptions
-  )
-
-  return [
-    segmentsWithMidpoints[0].from.resource,
-    ...segmentsWithMidpoints.map((segment) => segment.to.resource)
-  ]
-}
-
-export function fromGeoJSONPolygon(
-  transformer: GCPTransformerInterface,
-  polygon: GeoJSONPolygon,
-  options?: OptionalTransformOptions
-): Position[] {
-  const mergedOptions = mergeDefaultOptions(options)
-
-  const coordinates = polygon.coordinates[0]
-
-  if (!Array.isArray(coordinates) || coordinates.length < 4) {
-    throw new Error('Polygon should contain at least 4 points')
-  }
-
-  const resourceGeoPoints = coordinates.map((coordinates) => ({
-    resource: transformer.toResource(coordinates),
-    geo: coordinates
-  }))
-
-  const segments = pointsToSegments(resourceGeoPoints)
-  const segmentsWithMidpoints = recursivelyAddResourceMidpointsOld(
-    transformer,
-    segments,
-    mergedOptions
-  )
-
-  return [
-    segmentsWithMidpoints[0].from.resource,
-    ...segmentsWithMidpoints.map((segment) => segment.to.resource)
-  ]
-}
-
-export function transformLineStringToGeo(
-  transformer: GCPTransformerInterface,
-  linestring: Ring,
-  options?: OptionalTransformOptions
-): Ring {
+): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
   // TODO: replace this with more general checker for linestring
-  if (!Array.isArray(linestring) || linestring.length < 2) {
+  if (!Array.isArray(LineString) || LineString.length < 2) {
     throw new Error('LineString should contain at least 2 points')
   }
 
-  const points = linestring.map((position) => ({
+  const points = LineString.map((position) => ({
     resource: position,
     geo: transformer.toGeo(position)
   }))
@@ -262,19 +262,19 @@ export function transformLineStringToGeo(
   return segmentsToPoints(extendedSegments, true).map((point) => point.geo)
 }
 
-export function transformLineStringToResource(
+export function transformBackwardLineStringToLineString(
   transformer: GCPTransformerInterface,
-  linestring: Ring,
+  lineString: LineString,
   options?: OptionalTransformOptions
-): Ring {
+): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
   // TODO: replace this with more general checker for linestring
-  if (!Array.isArray(linestring) || linestring.length < 2) {
+  if (!Array.isArray(lineString) || lineString.length < 2) {
     throw new Error('LineString should contain at least 2 points')
   }
 
-  const points: GCP[] = linestring.map((position) => ({
+  const points: GCP[] = lineString.map((position) => ({
     resource: transformer.toResource(position),
     geo: position
   }))
@@ -292,7 +292,7 @@ export function transformLineStringToResource(
   )
 }
 
-export function transformRingToGeo(
+export function transformForwardRingToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
   options?: OptionalTransformOptions
@@ -320,7 +320,7 @@ export function transformRingToGeo(
   return segmentsToPoints(extendedSegments, false).map((point) => point.geo)
 }
 
-export function transformRingToResource(
+export function transformBackwardRingToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
   options?: OptionalTransformOptions
@@ -372,33 +372,33 @@ function segmentsToPoints(segments: Segment[], close = false): GCP[] {
   return points
 }
 
-function recursivelyAddWorldMidpointsOld(
-  transformer: GCPTransformerInterface,
-  segments: Segment[],
-  options: TransformOptions
-) {
-  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
-    return segments
-  }
+// function recursivelyAddWorldMidpointsOld(
+//   transformer: GCPTransformerInterface,
+//   segments: Segment[],
+//   options: TransformOptions
+// ) {
+//   if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+//     return segments
+//   }
 
-  return segments
-    .map((segment) => addWorldMidpointsOld(transformer, segment, options, 0))
-    .flat(1)
-}
+//   return segments
+//     .map((segment) => addWorldMidpointsOld(transformer, segment, options, 0))
+//     .flat(1)
+// }
 
-function recursivelyAddResourceMidpointsOld(
-  transformer: GCPTransformerInterface,
-  segments: Segment[],
-  options: TransformOptions
-) {
-  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
-    return segments
-  }
+// function recursivelyAddResourceMidpointsOld(
+//   transformer: GCPTransformerInterface,
+//   segments: Segment[],
+//   options: TransformOptions
+// ) {
+//   if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+//     return segments
+//   }
 
-  return segments
-    .map((segment) => addResourceMidpointsOld(transformer, segment, options, 0))
-    .flat(1)
-}
+//   return segments
+//     .map((segment) => addResourceMidpointsOld(transformer, segment, options, 0))
+//     .flat(1)
+// }
 
 function recursivelyAddMidpointsWithGeoMidPositionFromTransform(
   transformer: GCPTransformerInterface,
@@ -442,118 +442,118 @@ function recursivelyAddMidpointsWithResourceMidPositionFromTransform(
     .flat(1)
 }
 
-function addWorldMidpointsOld(
-  transformer: GCPTransformerInterface,
-  segment: Segment,
-  options: TransformOptions,
-  depth: number
-): Segment | Segment[] {
-  const imageMidpoint = getMidPosition(
-    segment.from.resource,
-    segment.to.resource
-  )
+// function addWorldMidpointsOld(
+//   transformer: GCPTransformerInterface,
+//   segment: Segment,
+//   options: TransformOptions,
+//   depth: number
+// ): Segment | Segment[] {
+//   const imageMidpoint = getMidPosition(
+//     segment.from.resource,
+//     segment.to.resource
+//   )
 
-  const segmentWorldMidpoint = getWorldMidpoint(
-    makeGeoJSONPoint(segment.from.geo),
-    makeGeoJSONPoint(segment.to.geo)
-  )
-  const actualWorldMidpoint = makeGeoJSONPoint(transformer.toGeo(imageMidpoint))
+//   const segmentWorldMidpoint = getWorldMidpoint(
+//     makeGeoJSONPoint(segment.from.geo),
+//     makeGeoJSONPoint(segment.to.geo)
+//   )
+//   const actualWorldMidpoint = makeGeoJSONPoint(transformer.toGeo(imageMidpoint))
 
-  const distanceSegment = getWorldDistance(
-    makeGeoJSONPoint(segment.from.geo),
-    makeGeoJSONPoint(segment.to.geo)
-  )
-  const distanceMidpoints = getWorldDistance(
-    segmentWorldMidpoint,
-    actualWorldMidpoint
-  )
+//   const distanceSegment = getWorldDistance(
+//     makeGeoJSONPoint(segment.from.geo),
+//     makeGeoJSONPoint(segment.to.geo)
+//   )
+//   const distanceMidpoints = getWorldDistance(
+//     segmentWorldMidpoint,
+//     actualWorldMidpoint
+//   )
 
-  if (
-    depth < options.maxDepth &&
-    (options.maxOffsetRatio
-      ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
-      : false) &&
-    distanceSegment > 0
-  ) {
-    const newSegmentMidpoint: GCP = {
-      resource: imageMidpoint,
-      geo: actualWorldMidpoint.coordinates
-    }
+//   if (
+//     depth < options.maxDepth &&
+//     (options.maxOffsetRatio
+//       ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
+//       : false) &&
+//     distanceSegment > 0
+//   ) {
+//     const newSegmentMidpoint: GCP = {
+//       resource: imageMidpoint,
+//       geo: actualWorldMidpoint.coordinates
+//     }
 
-    return [
-      addWorldMidpointsOld(
-        transformer,
-        { from: segment.from, to: newSegmentMidpoint },
-        options,
-        depth + 1
-      ),
-      addWorldMidpointsOld(
-        transformer,
-        { from: newSegmentMidpoint, to: segment.to },
-        options,
-        depth + 1
-      )
-    ].flat(1)
-  } else {
-    return segment
-  }
-}
+//     return [
+//       addWorldMidpointsOld(
+//         transformer,
+//         { from: segment.from, to: newSegmentMidpoint },
+//         options,
+//         depth + 1
+//       ),
+//       addWorldMidpointsOld(
+//         transformer,
+//         { from: newSegmentMidpoint, to: segment.to },
+//         options,
+//         depth + 1
+//       )
+//     ].flat(1)
+//   } else {
+//     return segment
+//   }
+// }
 
-function addResourceMidpointsOld(
-  transformer: GCPTransformerInterface,
-  segment: Segment,
-  options: TransformOptions,
-  depth: number
-): Segment | Segment[] {
-  const worldMidpoint = getWorldMidpoint(segment.from.geo, segment.to.geo)
+// function addResourceMidpointsOld(
+//   transformer: GCPTransformerInterface,
+//   segment: Segment,
+//   options: TransformOptions,
+//   depth: number
+// ): Segment | Segment[] {
+//   const worldMidpoint = getWorldMidpoint(segment.from.geo, segment.to.geo)
 
-  const segmentImageMidpoint = getMidPosition(
-    segment.from.resource,
-    segment.to.resource
-  )
-  const actualImageMidpoint = transformer.toResource(
-    worldMidpoint.geometry.coordinates as Position
-  )
+//   const segmentImageMidpoint = getMidPosition(
+//     segment.from.resource,
+//     segment.to.resource
+//   )
+//   const actualImageMidpoint = transformer.toResource(
+//     worldMidpoint.geometry.coordinates as Position
+//   )
 
-  const distanceSegment = getDistance(
-    segment.from.resource,
-    segment.to.resource
-  )
-  const distanceMidpoints = getDistance(
-    segmentImageMidpoint,
-    actualImageMidpoint
-  )
+//   const distanceSegment = getDistance(
+//     segment.from.resource,
+//     segment.to.resource
+//   )
+//   const distanceMidpoints = getDistance(
+//     segmentImageMidpoint,
+//     actualImageMidpoint
+//   )
 
-  if (
-    depth < options.maxDepth &&
-    (options.maxOffsetRatio
-      ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
-      : false) &&
-    distanceSegment > 0
-  ) {
-    const newSegmentMidpoint: GCP = {
-      resource: actualImageMidpoint,
-      geo: worldMidpoint.geometry.coordinates as Position
-    }
+//   if (
+//     depth < options.maxDepth &&
+//     (options.maxOffsetRatio
+//       ? distanceMidpoints / distanceSegment > options.maxOffsetRatio
+//       : false) &&
+//     distanceSegment > 0
+//   ) {
+//     const newSegmentMidpoint: GCP = {
+//       resource: actualImageMidpoint,
+//       geo: worldMidpoint.geometry.coordinates as Position
+//     }
 
-    return [
-      addResourceMidpointsOld(
-        transformer,
-        { from: segment.from, to: newSegmentMidpoint },
-        options,
-        depth + 1
-      ),
-      addResourceMidpointsOld(
-        transformer,
-        { from: newSegmentMidpoint, to: segment.to },
-        options,
-        depth + 1
-      )
-    ].flat(1)
-  } else {
-    return segment
-  }
-}
+//     return [
+//       addResourceMidpointsOld(
+//         transformer,
+//         { from: segment.from, to: newSegmentMidpoint },
+//         options,
+//         depth + 1
+//       ),
+//       addResourceMidpointsOld(
+//         transformer,
+//         { from: newSegmentMidpoint, to: segment.to },
+//         options,
+//         depth + 1
+//       )
+//     ].flat(1)
+//   } else {
+//     return segment
+//   }
+// }
 
 function addMidpointWithGeoMidPositionFromTransform(
   transformer: GCPTransformerInterface,

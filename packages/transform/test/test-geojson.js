@@ -37,7 +37,10 @@ describe('Transform line to geo', async () => {
 
   it(`should transform a line with midpoints, without closing it`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformLineStringToGeo(input, transformOptions),
+      transformer.transformForwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
       output
     )
   })
@@ -65,7 +68,10 @@ describe('Transform line to geo, with geographic functions', async () => {
 
   it(`should transform a line with midpoints, without closing it`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformLineStringToGeo(input, transformOptions),
+      transformer.transformForwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
       output
     )
   })
@@ -92,7 +98,10 @@ describe('Transform line to resource, with geographic functions', async () => {
 
   it(`should transform a horizontal line with midpoints (and without closing it)`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformLineStringToResource(input, transformOptions),
+      transformer.transformBackwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
       output
     )
   })
@@ -116,7 +125,10 @@ describe('Transform line to resource, with geographic functions', async () => {
 
   it(`should transform a vertical line without midpoints (and without closing it)`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformLineStringToResource(input, transformOptions),
+      transformer.transformBackwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
       output
     )
   })
@@ -147,7 +159,7 @@ describe('Transform polygon to geo ', async () => {
 
   it(`should have the right output`, () => {
     expectToBeCloseToArrayArray(
-      transformer.toGeoPolygon(input, transformOptions),
+      transformer.transformForwardRingToRing(input, transformOptions),
       output
     )
   })
@@ -184,7 +196,7 @@ describe('Transform polygon to geo as geojson ', async () => {
 
   it(`should have the right output`, () => {
     expect(
-      transformer.transformRingToGeoAsGeoJSONPolygon(input, transformOptions)
+      transformer.transformForwardRingToGeoJSONPolygon(input, transformOptions)
     ).to.deep.equal(output)
   })
 })
@@ -214,7 +226,7 @@ describe('Transform polygon to resource', async () => {
 
   it(`should have the right output`, () => {
     expectToBeCloseToArrayArray(
-      transformer.toResourcePolygon(input, transformOptions),
+      transformer.transformBackwardRingToRing(input, transformOptions),
       output
     )
   })
@@ -250,7 +262,7 @@ describe('Transform polygon to resource', async () => {
 
     it(`should have the right output`, () => {
       expect(
-        transformer.transformRingAsGeoJSONPolygonToResource(
+        transformer.transformBackwardGeoJSONPolygonToRing(
           input,
           transformOptions
         )
