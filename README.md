@@ -1,37 +1,40 @@
 # @allmaps/allmaps
 
-Allmaps is a project for **curating, georeferencing and exploring for IIIF maps**!
+**Curating, georeferencing and exploring for IIIF maps**
+
+100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to curate, georeference and explore collections of digitized maps.
 
 👉 **[allmaps.org](https://allmaps.org/)**
-
-[Observable Notebooks](https://observablehq.com/@allmaps?tab=notebooks)
 
 More documentation coming soon!
 
 ## Contents
 
-This is a mono repo with the following apps and packages:
+Allmaps is an open source project and consists of multiple apps and packages, all written in TypeScript and contained by this monorepo.
 
 Apps:
 
 - [Allmaps Viewer](apps/viewer)
 - [Allmaps Tile Server](apps/tileserver)
+- [Allmaps Latest](apps/latest)
+- [Allmaps CLI](apps/cli)
 - [Allmaps Explore](apps/explore)
 - [Allmaps Info](apps/info)
 - [Allmaps IIIF Viewer](apps/iiif)
-- [Allmaps CLI](apps/cli)
 - [Allmaps Here](apps/here)
-- [Allmaps Latest](apps/latest)
 
 Packages:
 
 - [@allmaps/annotation](packages/annotation)
 - [@allmaps/id](packages/id)
 - [@allmaps/iiif-parser](packages/iiif-parser)
+- [@allmaps/openlayers](packages/openlayers)
+- [@allmaps/render](packages/render)
+- [@allmaps/stdlib](packages/stdlib)
+- [@allmaps/tailwind](packages/tailwind)
 - [@allmaps/transform](packages/transform)
 - [@allmaps/triangulate](packages/triangulate)
-- [@allmaps/render](packages/render)
-- [@allmaps/openlayers](packages/openlayers)
+- [@allmaps/types](packages/types)
 - [@allmaps/ui](packages/ui)
 
 ## Installation
@@ -100,7 +103,6 @@ or
 ```sh
 npx lerna link
 ```
-
 
 ## Commit changes
 
