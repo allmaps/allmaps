@@ -17,6 +17,9 @@ export type BBox = [number, number, number, number]
 // Consider using @types/geojson!
 export type GeoJSONGeometry = GeoJSONPoint | GeoJSONLineString | GeoJSONPolygon
 
+// The (string) values of the 'type' field of the type GeoJSONGeometry
+export type GeoJSONGeometryType = GeoJSONGeometry['type']
+
 export type GeoJSONPoint = {
   type: 'Point'
   coordinates: Position
@@ -43,6 +46,7 @@ export type TransformOptions = {
   close: boolean
   maxOffsetRatio: number
   maxDepth: number
+  geographic: boolean // Assume this is a resource to geo setting with lonlat geo coordinates and use geographic distances and midpoints
 }
 
 export type OptionalTransformOptions = Partial<TransformOptions>

@@ -40,6 +40,39 @@ export const gcps6 = [
   }
 ]
 
+// There points are correct according to Helmert, except point i=4
+// The geo coordinates span big arc, so these can be used to test for geographic features
+export const gcps7 = [
+  {
+    resource: [0, 0],
+    geo: [0, 0]
+  },
+  {
+    resource: [100, 0],
+    geo: [20, 0]
+  },
+  {
+    resource: [200, 100],
+    geo: [40, 20]
+  },
+  {
+    resource: [200, 200],
+    geo: [40, 40]
+  },
+  {
+    resource: [150, 250],
+    geo: [40, 100]
+  },
+  {
+    resource: [100, 200],
+    geo: [20, 40]
+  },
+  {
+    resource: [0, 100],
+    geo: [0, 20]
+  }
+]
+
 export const gcps10 = [
   { resource: [6933, 3641], geo: [-5.6931398, 56.1290282] },
   {

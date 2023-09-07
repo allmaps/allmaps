@@ -6,14 +6,22 @@ import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-funct
 import { thinPlateKernel } from './shared/kernel-functions.js'
 
 import {
+  makeGeoJSONPoint,
+  makeGeoJSONLineString,
+  makeGeoJSONPolygon,
   toGeoJSONPoint,
   toGeoJSONLineString,
   toGeoJSONPolygon,
   fromGeoJSONPoint,
   fromGeoJSONLineString,
   fromGeoJSONPolygon,
+  transformLineStringToGeo,
+  transformLineStringToResource,
   transformRingToGeo,
-  transformRingToResource
+  transformRingToResource,
+  geoJSONPointToPosition,
+  geoJSONLineStringToLineString,
+  geoJSONPolygonToRing
 } from './shared/geojson.js'
 
 import type {
@@ -28,7 +36,7 @@ import type {
   GeoJSONPolygon
 } from './shared/types.js'
 
-import type { Ring } from '@allmaps/types'
+import type { LineString, Ring } from '@allmaps/types'
 
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: GCP[]
@@ -82,12 +90,12 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: OptionalTransformOptions
   ): GeoJSONGeometry {
     // TODO: also support empty point and points arrays by throwing error
-    const isPoints = Array.isArray(pointOrPoints[0])
+    const isArray = Array.isArray(pointOrPoints[0])
 
     let point: Position
     let points: Position[]
 
-    if (isPoints) {
+    if (isArray) {
       points = pointOrPoints as Position[]
       const close = options && options.close
 
@@ -153,11 +161,13 @@ export default class GCPTransformer implements GCPTransformerInterface {
     return fromGeoJSONPolygon(this, geometry, options)
   }
 
+  // Temp stuff
+
   toGeoPolygon(
     polygon: Position[],
     options?: OptionalTransformOptions
   ): Position[] {
-    return this.transformRingtoGeo(polygon, options)
+    return this.transformRingToGeo(polygon, options)
   }
 
   toResourcePolygon(
@@ -167,8 +177,76 @@ export default class GCPTransformer implements GCPTransformerInterface {
     return this.transformRingToResource(polygon, options)
   }
 
-  transformRingtoGeo(ring: Ring, options?: OptionalTransformOptions): Ring {
+  // New stuff
+
+  transformPositionToGeo(position: Position): Position {
+    return this.transformer.toGeo(position)
+  }
+
+  transformPositionToGeoAsGeoJSONPoint(position: Position): GeoJSONPoint {
+    return makeGeoJSONPoint(this.transformer.toGeo(position))
+  }
+
+  transformPositionToResource(position: Position): Position {
+    return this.transformer.toResource(position)
+  }
+
+  transformPositionAsGeoJSONPointToResource(geometry: GeoJSONPoint): Position {
+    return this.transformer.toResource(geoJSONPointToPosition(geometry))
+  }
+
+  transformLineStringToGeo(
+    lineString: LineString,
+    options?: OptionalTransformOptions
+  ): LineString {
+    return transformLineStringToGeo(this, lineString, options)
+  }
+
+  transformLineStringToGeoAsGeoJSONLineString(
+    lineString: LineString,
+    options?: OptionalTransformOptions
+  ): GeoJSONLineString {
+    if (options && !('geographic' in options)) {
+      options.geographic = true
+    }
+    return makeGeoJSONLineString(
+      transformLineStringToGeo(this, lineString, options)
+    )
+  }
+
+  transformLineStringToResource(
+    lineString: LineString,
+    options?: OptionalTransformOptions
+  ): LineString {
+    return transformLineStringToResource(this, lineString, options)
+  }
+
+  transformLineStringAsGeoJSONLineStringToResource(
+    geometry: GeoJSONLineString,
+    options?: OptionalTransformOptions
+  ): LineString {
+    if (options && !('geographic' in options)) {
+      options.geographic = true
+    }
+    return transformLineStringToResource(
+      this,
+      geoJSONLineStringToLineString(geometry),
+      options
+    )
+  }
+
+  transformRingToGeo(ring: Ring, options?: OptionalTransformOptions): Ring {
     return transformRingToGeo(this, ring, options)
+  }
+
+  transformRingToGeoAsGeoJSONPolygon(
+    ring: Ring,
+    options?: OptionalTransformOptions
+  ): GeoJSONPolygon {
+    if (options && !('geographic' in options)) {
+      options.geographic = true
+    }
+    return makeGeoJSONPolygon(transformRingToGeo(this, ring, options))
   }
 
   transformRingToResource(
@@ -176,5 +254,19 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: OptionalTransformOptions
   ): Ring {
     return transformRingToResource(this, ring, options)
+  }
+
+  transformRingAsGeoJSONPolygonToResource(
+    geometry: GeoJSONPolygon,
+    options?: OptionalTransformOptions
+  ): Ring {
+    if (options && !('geographic' in options)) {
+      options.geographic = true
+    }
+    return transformRingToResource(
+      this,
+      geoJSONPolygonToRing(geometry),
+      options
+    )
   }
 }
