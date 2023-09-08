@@ -70,43 +70,31 @@ export default class GCPTransformer implements GCPTransformerInterface {
   }
 
   createForwardTransform(): Transform {
-    if (this.type === 'helmert') {
-      return new Helmert(this.sourcePositions, this.destinationPositions)
-    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(this.sourcePositions, this.destinationPositions)
-    } else if (this.type === 'polynomial2') {
-      return new Polynomial(this.sourcePositions, this.destinationPositions, 2)
-    } else if (this.type === 'polynomial3') {
-      return new Polynomial(this.sourcePositions, this.destinationPositions, 3)
-    } else if (this.type === 'projective') {
-      return new Projective(this.sourcePositions, this.destinationPositions)
-    } else if (this.type === 'thinPlateSpline') {
-      return new RBF(
-        this.sourcePositions,
-        this.destinationPositions,
-        thinPlateKernel,
-        euclideanNorm
-      )
-    } else {
-      throw new Error(`Unsupported transformation type: ${this.type}`)
-    }
+    return this.createTransform(this.sourcePositions, this.destinationPositions)
   }
 
   createBackwardTransform(): Transform {
+    return this.createTransform(this.destinationPositions, this.sourcePositions)
+  }
+
+  createTransform(
+    sourcePositions: Position[],
+    destinationPositions: Position[]
+  ): Transform {
     if (this.type === 'helmert') {
-      return new Helmert(this.destinationPositions, this.sourcePositions)
+      return new Helmert(sourcePositions, destinationPositions)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(this.destinationPositions, this.sourcePositions)
+      return new Polynomial(sourcePositions, destinationPositions)
     } else if (this.type === 'polynomial2') {
-      return new Polynomial(this.destinationPositions, this.sourcePositions, 2)
+      return new Polynomial(sourcePositions, destinationPositions, 2)
     } else if (this.type === 'polynomial3') {
-      return new Polynomial(this.destinationPositions, this.sourcePositions, 3)
+      return new Polynomial(sourcePositions, destinationPositions, 3)
     } else if (this.type === 'projective') {
-      return new Projective(this.destinationPositions, this.sourcePositions)
+      return new Projective(sourcePositions, destinationPositions)
     } else if (this.type === 'thinPlateSpline') {
       return new RBF(
-        this.destinationPositions,
-        this.sourcePositions,
+        sourcePositions,
+        destinationPositions,
         thinPlateKernel,
         euclideanNorm
       )
