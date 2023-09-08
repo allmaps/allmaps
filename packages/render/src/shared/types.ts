@@ -3,7 +3,8 @@ import type {
   TileZoomLevel,
   ImageRequest
 } from '@allmaps/iiif-parser'
-import type { GCPTransformer, GCP } from '@allmaps/transform'
+import type { GCPTransformer } from '@allmaps/transform'
+import type { GCP } from '@allmaps/types'
 
 export type Position = [number, number]
 

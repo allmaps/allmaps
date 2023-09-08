@@ -1,7 +1,7 @@
 import { createReadStream, readFileSync, ReadStream } from 'fs'
 import { Readable } from 'stream'
 import StreamValues from 'stream-json/streamers/StreamValues.js'
-import type { GCP } from '@allmaps/transform'
+import type { GCP } from '@allmaps/types'
 import { parseCoordinatesArrayArray } from './parse.js'
 
 async function* concatStreams(readables: ReadStream[]) {

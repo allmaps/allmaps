@@ -1,4 +1,4 @@
-import type { Position } from './types.js'
+import type { Position } from '@allmaps/types'
 
 export function euclideanNorm(point1: Position, point2: Position): number {
   const sub = [point2[0] - point1[0], point2[1] - point1[1]]

@@ -1,5 +1,4 @@
-// TODO: consider moving these types and types from @allmaps/render
-// to new package @allmaps/types
+import type { Position, GCP } from '@allmaps/types'
 
 export type TransformationType =
   | 'helmert'
@@ -10,38 +9,6 @@ export type TransformationType =
   | 'projective'
   | 'thinPlateSpline'
 
-export type Position = [number, number]
-
-export type BBox = [number, number, number, number]
-
-// Consider using @types/geojson!
-export type GeoJSONGeometry = GeoJSONPoint | GeoJSONLineString | GeoJSONPolygon
-
-// The (string) values of the 'type' field of the type GeoJSONGeometry
-export type GeoJSONGeometryType = GeoJSONGeometry['type']
-
-export type GeoJSONPoint = {
-  type: 'Point'
-  coordinates: Position
-}
-
-export type GeoJSONLineString = {
-  type: 'LineString'
-  coordinates: Position[]
-}
-
-export type GeoJSONPolygon = {
-  type: 'Polygon'
-  coordinates: Position[][]
-}
-
-export type GCP = { resource: Position; geo: Position }
-
-export type Segment = {
-  from: GCP
-  to: GCP
-}
-
 export type TransformOptions = {
   maxOffsetRatio: number
   maxDepth: number
@@ -51,12 +18,14 @@ export type TransformOptions = {
 export type OptionalTransformOptions = Partial<TransformOptions>
 
 export type KernelFunction = (r: number, epsilon?: number) => number
-export type NormFunction = (point1: Position, point2: Position) => number
+export type NormFunction = (position1: Position, position2: Position) => number
 
 export type GCPTransformerInterface = {
   gcps: GCP[]
 
-  toGeo(point: Position): Position
+  transformForward(position: Position): Position
+  toGeo(position: Position): Position
 
-  toResource(point: Position): Position
+  transformBackward(position: Position): Position
+  toResource(position: Position): Position
 }

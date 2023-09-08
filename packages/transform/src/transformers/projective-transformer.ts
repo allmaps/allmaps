@@ -1,6 +1,8 @@
 import Projective from '../shared/projective.js'
 
-import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
+import type { GCPTransformerInterface } from '../shared/types.js'
+
+import type { Position, GCP } from '@allmaps/types'
 
 export default class ProjectiveGCPTransformer
   implements GCPTransformerInterface
@@ -36,11 +38,19 @@ export default class ProjectiveGCPTransformer
     return this.toGeoProjective.interpolant(point)
   }
 
+  transformForward(position: Position): Position {
+    return this.toGeo(position)
+  }
+
   toResource(point: Position): Position {
     if (!this.toResourceProjective) {
       this.toResourceProjective = this.createToResourceProjective()
     }
 
     return this.toResourceProjective.interpolant(point)
+  }
+
+  transformBackward(position: Position): Position {
+    return this.toResource(position)
   }
 }

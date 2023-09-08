@@ -1,8 +1,9 @@
 import type {
   GCPTransformer,
-  GeoJSONGeometry,
   OptionalTransformOptions
 } from '@allmaps/transform'
+
+import type { GeoJSONGeometry } from '@allmaps/types'
 
 import type { GeometryElement } from './svg.js'
 

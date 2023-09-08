@@ -1,6 +1,8 @@
 import Polynomial from '../shared/polynomial.js'
 
-import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
+import type { GCPTransformerInterface } from '../shared/types.js'
+
+import type { Position, GCP } from '@allmaps/types'
 
 export default class PolynomialGCPTransformer
   implements GCPTransformerInterface
@@ -42,11 +44,19 @@ export default class PolynomialGCPTransformer
     return this.toGeoPolynomial.interpolant(point)
   }
 
+  transformForward(position: Position): Position {
+    return this.toGeo(position)
+  }
+
   toResource(point: Position): Position {
     if (!this.toResourcePolynomial) {
       this.toResourcePolynomial = this.createToResourcePolynomial()
     }
 
     return this.toResourcePolynomial.interpolant(point)
+  }
+
+  transformBackward(position: Position): Position {
+    return this.toResource(position)
   }
 }

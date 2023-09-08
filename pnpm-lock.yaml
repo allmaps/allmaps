@@ -927,6 +927,9 @@ importers:
       '@allmaps/types':
         specifier: ^1.0.0-beta.3
         version: link:../types
+      '@placemarkio/geojson-rewind':
+        specifier: ^1.0.2
+        version: 1.0.2
     devDependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
@@ -979,12 +982,12 @@ importers:
 
   packages/transform:
     dependencies:
+      '@allmaps/stdlib':
+        specifier: ^1.0.0-beta.11
+        version: link:../stdlib
       '@allmaps/types':
         specifier: ^1.0.0-beta.3
         version: link:../types
-      '@placemarkio/geojson-rewind':
-        specifier: ^1.0.2
-        version: 1.0.2
       '@turf/distance':
         specifier: ^6.3.0
         version: 6.3.0

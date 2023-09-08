@@ -15,8 +15,9 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
-import type { TransformationType, GCP } from '@allmaps/transform'
-import type { Position, BBox, WarpedMap } from './shared/types.js'
+import type { TransformationType } from '@allmaps/transform'
+import type { Position, GCP, BBox } from '@allmaps/types'
+import type { WarpedMap } from './shared/types.js'
 
 export default class World extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()

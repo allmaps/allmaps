@@ -11,10 +11,11 @@ export type LineString = Position[]
 // - At least three positions
 export type Ring = Position[]
 
-// Todo: define all types, see transform/shared/types
-export type GeoJSONPolygon = {
-  type: 'Polygon'
-  coordinates: Position[][]
+export type GCP = { resource: Position; geo: Position }
+
+export type Segment = {
+  from: GCP
+  to: GCP
 }
 
 // TODO: replace by Ring and/or Polygon
@@ -27,6 +28,7 @@ export type Size = [number, number]
 
 export type Extent = [number, number]
 
+// TODO: change name to something like 'helmert transformation signature'
 export type Transform = [number, number, number, number, number, number]
 
 export type Matrix4 = [
@@ -47,3 +49,24 @@ export type Matrix4 = [
   number,
   number
 ]
+
+// Consider using @types/geojson!
+export type GeoJSONGeometry = GeoJSONPoint | GeoJSONLineString | GeoJSONPolygon
+
+// The (string) values of the 'type' field of the type GeoJSONGeometry
+export type GeoJSONGeometryType = GeoJSONGeometry['type']
+
+export type GeoJSONPoint = {
+  type: 'Point'
+  coordinates: [number, number]
+}
+
+export type GeoJSONLineString = {
+  type: 'LineString'
+  coordinates: [number, number][]
+}
+
+export type GeoJSONPolygon = {
+  type: 'Polygon'
+  coordinates: [number, number][][]
+}

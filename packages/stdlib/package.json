@@ -46,7 +46,8 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.16",
     "@allmaps/iiif-parser": "^1.0.0-beta.25",
-    "@allmaps/types": "^1.0.0-beta.3"
+    "@allmaps/types": "^1.0.0-beta.3",
+    "@placemarkio/geojson-rewind": "^1.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.45.0",

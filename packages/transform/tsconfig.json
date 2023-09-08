@@ -5,7 +5,8 @@
     "outDir": "./dist",
   },
   "references": [
-    { "path": "../types" }
+    { "path": "../types" },
+    { "path": "../stdlib" }
   ],
   "include": ["./src/**/*"]
 }

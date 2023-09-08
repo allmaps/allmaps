@@ -1,6 +1,8 @@
 import Helmert from '../shared/helmert.js'
 
-import type { GCPTransformerInterface, Position, GCP } from '../shared/types.js'
+import type { GCPTransformerInterface } from '../shared/types.js'
+
+import type { Position, GCP } from '@allmaps/types'
 
 export default class HelmertGCPTransformer implements GCPTransformerInterface {
   gcps: GCP[]
@@ -34,11 +36,19 @@ export default class HelmertGCPTransformer implements GCPTransformerInterface {
     return this.toGeoHelmert.interpolant(point)
   }
 
+  transformForward(position: Position): Position {
+    return this.toGeo(position)
+  }
+
   toResource(point: Position): Position {
     if (!this.toResourceHelmert) {
       this.toResourceHelmert = this.createToResourceHelmert()
     }
 
     return this.toResourceHelmert.interpolant(point)
+  }
+
+  transformBackward(position: Position): Position {
+    return this.toResource(position)
   }
 }

@@ -5,10 +5,10 @@ import { euclideanNorm } from '../shared/norm-functions.js'
 import type {
   GCPTransformerInterface,
   KernelFunction,
-  NormFunction,
-  Position,
-  GCP
+  NormFunction
 } from '../shared/types.js'
+
+import type { Position, GCP } from '@allmaps/types'
 
 export default class RadialBasisFunctionGCPTransformer
   implements GCPTransformerInterface
@@ -60,11 +60,19 @@ export default class RadialBasisFunctionGCPTransformer
     return this.toGeoRbf.interpolant(point)
   }
 
+  transformForward(position: Position): Position {
+    return this.toGeo(position)
+  }
+
   toResource(point: Position): Position {
     if (!this.toResourceRbf) {
       this.toResourceRbf = this.createToResourceRbf()
     }
 
     return this.toResourceRbf.interpolant(point)
+  }
+
+  transformBackward(position: Position): Position {
+    return this.toResource(position)
   }
 }

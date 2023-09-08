@@ -10,7 +10,7 @@ import {
   parseTransformationType
 } from '../../lib/parse.js'
 
-import type { Position } from '@allmaps/transform'
+import type { Position } from '@allmaps/types'
 import { addAnnotationOptions } from '../../lib/options.js'
 
 export default function position() {

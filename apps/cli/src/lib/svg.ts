@@ -2,10 +2,9 @@ import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
 import type { GCPTransformer } from '@allmaps/transform'
 
-import type {
-  GeoJSONGeometry,
-  OptionalTransformOptions
-} from '@allmaps/transform'
+import type { OptionalTransformOptions } from '@allmaps/transform'
+
+import type { GeoJSONGeometry } from '@allmaps/types'
 
 import type { Map } from '@allmaps/annotation'
 

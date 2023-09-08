@@ -2,10 +2,10 @@ import { parseAnnotation, validateMap } from '@allmaps/annotation'
 
 import type { Map } from '@allmaps/annotation'
 import type {
-  GCP,
   OptionalTransformOptions,
   TransformationType
 } from '@allmaps/transform'
+import type { GCP } from '@allmaps/types'
 import { parseGcpsFromFile, parseJsonFromFile } from './io.js'
 
 export function parseMap(options: { annotation: string }): Map {

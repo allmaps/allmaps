@@ -5,6 +5,7 @@
     "outDir": "./dist"
   },
   "references": [
+    { "path": "../types" },
     { "path": "../transform" },
     { "path": "../triangulate" },
     { "path": "../annotation" },

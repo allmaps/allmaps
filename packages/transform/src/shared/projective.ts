@@ -1,6 +1,6 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import type { Position } from './types.js'
+import type { Position } from '@allmaps/types'
 
 export default class Projective {
   sourcePoints: Position[]

@@ -1,7 +1,9 @@
 import { Matrix, inverse } from 'ml-matrix'
 import { multiplyMatricesElementwise } from './matrix.js'
 
-import type { KernelFunction, NormFunction, Position } from './types.js'
+import type { KernelFunction, NormFunction } from './types.js'
+
+import type { Position } from '@allmaps/types'
 
 export default class RBF {
   sourcePoints: Position[]
