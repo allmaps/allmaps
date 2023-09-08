@@ -1,39 +1,41 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
+import type { Transform } from './types'
+
 import type { Position } from '@allmaps/types'
 
-export default class Polynomial {
-  sourcePoints: Position[]
-  destinationPoints: Position[]
+export default class Polynomial implements Transform {
+  sourcePositions: Position[]
+  destinationPositions: Position[]
 
   polynomialParametersMatrices: [Matrix, Matrix]
 
-  nPoints: number
+  nPositions: number
   order: number
   nCoefs: number
 
   constructor(
-    sourcePoints: Position[],
-    destinationPoints: Position[],
+    sourcePositions: Position[],
+    destinationPositions: Position[],
     order?: number
   ) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
+    this.sourcePositions = sourcePositions
+    this.destinationPositions = destinationPositions
 
-    this.nPoints = this.sourcePoints.length
+    this.nPositions = this.sourcePositions.length
 
     this.order = order || 1
     this.nCoefs = ((this.order + 1) * (this.order + 2)) / 2
 
     // if there are less controle points then there are coefficients to be determined (for each dimension), the system can not be solved
-    if (this.nPoints < this.nCoefs) {
+    if (this.nPositions < this.nCoefs) {
       throw new Error(
         'Not enough controle points. A polynomial transformation of order ' +
           this.order +
           ' requires a minimum of ' +
           this.nCoefs +
           ' points, but ' +
-          this.nPoints +
+          this.nPositions +
           ' are given.'
       )
     }
@@ -48,12 +50,12 @@ export default class Polynomial {
     // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
 
     // The system of equations is solved for x and y separately (because they are independent)
-    // Hence destinationPointsMatrices and polynomialParametersMatrices are one Matrix
+    // Hence destinationPositionsMatrices and polynomialParametersMatrices are one Matrix
     // Since they both use the same coefficients, there is only one polynomialCoefsMatrix
 
-    const destinationPointsMatrices: [Matrix, Matrix] = [
-      Matrix.columnVector(destinationPoints.map((value) => value[0])),
-      Matrix.columnVector(destinationPoints.map((value) => value[1]))
+    const destinationPositionsMatrices: [Matrix, Matrix] = [
+      Matrix.columnVector(destinationPositions.map((value) => value[0])),
+      Matrix.columnVector(destinationPositions.map((value) => value[1]))
     ]
 
     // Construct Nx3 Matrix polynomialCoefsMatrix
@@ -68,50 +70,50 @@ export default class Polynomial {
     // for order = 3
     // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
     // ...
-    const polynomialCoefsMatrix = Matrix.zeros(this.nPoints, this.nCoefs)
-    for (let i = 0; i < this.nPoints; i++) {
+    const polynomialCoefsMatrix = Matrix.zeros(this.nPositions, this.nCoefs)
+    for (let i = 0; i < this.nPositions; i++) {
       switch (this.order) {
         case 1:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
+          polynomialCoefsMatrix.set(i, 1, sourcePositions[i][0])
+          polynomialCoefsMatrix.set(i, 2, sourcePositions[i][1])
           break
 
         case 2:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
-          polynomialCoefsMatrix.set(i, 3, sourcePoints[i][0] ** 2)
-          polynomialCoefsMatrix.set(i, 4, sourcePoints[i][1] ** 2)
+          polynomialCoefsMatrix.set(i, 1, sourcePositions[i][0])
+          polynomialCoefsMatrix.set(i, 2, sourcePositions[i][1])
+          polynomialCoefsMatrix.set(i, 3, sourcePositions[i][0] ** 2)
+          polynomialCoefsMatrix.set(i, 4, sourcePositions[i][1] ** 2)
           polynomialCoefsMatrix.set(
             i,
             5,
-            sourcePoints[i][0] * sourcePoints[i][1]
+            sourcePositions[i][0] * sourcePositions[i][1]
           )
           break
 
         case 3:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
-          polynomialCoefsMatrix.set(i, 3, sourcePoints[i][0] ** 2)
-          polynomialCoefsMatrix.set(i, 4, sourcePoints[i][1] ** 2)
+          polynomialCoefsMatrix.set(i, 1, sourcePositions[i][0])
+          polynomialCoefsMatrix.set(i, 2, sourcePositions[i][1])
+          polynomialCoefsMatrix.set(i, 3, sourcePositions[i][0] ** 2)
+          polynomialCoefsMatrix.set(i, 4, sourcePositions[i][1] ** 2)
           polynomialCoefsMatrix.set(
             i,
             5,
-            sourcePoints[i][0] * sourcePoints[i][1]
+            sourcePositions[i][0] * sourcePositions[i][1]
           )
-          polynomialCoefsMatrix.set(i, 6, sourcePoints[i][0] ** 3)
-          polynomialCoefsMatrix.set(i, 7, sourcePoints[i][1] ** 3)
+          polynomialCoefsMatrix.set(i, 6, sourcePositions[i][0] ** 3)
+          polynomialCoefsMatrix.set(i, 7, sourcePositions[i][1] ** 3)
           polynomialCoefsMatrix.set(
             i,
             8,
-            sourcePoints[i][0] ** 2 * sourcePoints[i][1]
+            sourcePositions[i][0] ** 2 * sourcePositions[i][1]
           )
           polynomialCoefsMatrix.set(
             i,
             9,
-            sourcePoints[i][0] * sourcePoints[i][1] ** 2
+            sourcePositions[i][0] * sourcePositions[i][1] ** 2
           )
           break
 
@@ -129,64 +131,70 @@ export default class Polynomial {
       polynomialCoefsMatrix
     )
     this.polynomialParametersMatrices = [
-      pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[1])
+      pseudoInversePolynomialCoefsMatrix.mmul(destinationPositionsMatrices[0]),
+      pseudoInversePolynomialCoefsMatrix.mmul(destinationPositionsMatrices[1])
     ]
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolant(newSourcePoint: Position): Position {
+  // The interpolant function will compute the value at any position.
+  interpolant(newSourcePosition: Position): Position {
     if (!this.polynomialParametersMatrices) {
       throw new Error('Polynomial parameters not computed')
     }
 
-    // Compute the interpolated value by applying the polynomial coefficients to the input point
-    const newDestinationPoint: Position = [0, 0]
+    // Compute the interpolated value by applying the polynomial coefficients to the input position
+    const newDestinationPosition: Position = [0, 0]
     for (let i = 0; i < 2; i++) {
       switch (this.order) {
         case 1:
-          newDestinationPoint[i] +=
+          newDestinationPosition[i] +=
             this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1]
+            this.polynomialParametersMatrices[i].get(1, 0) *
+              newSourcePosition[0] +
+            this.polynomialParametersMatrices[i].get(2, 0) *
+              newSourcePosition[1]
           break
 
         case 2:
-          newDestinationPoint[i] +=
+          newDestinationPosition[i] +=
             this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1] +
+            this.polynomialParametersMatrices[i].get(1, 0) *
+              newSourcePosition[0] +
+            this.polynomialParametersMatrices[i].get(2, 0) *
+              newSourcePosition[1] +
             this.polynomialParametersMatrices[i].get(3, 0) *
-              newSourcePoint[0] ** 2 +
+              newSourcePosition[0] ** 2 +
             this.polynomialParametersMatrices[i].get(4, 0) *
-              newSourcePoint[1] ** 2 +
+              newSourcePosition[1] ** 2 +
             this.polynomialParametersMatrices[i].get(5, 0) *
-              newSourcePoint[0] *
-              newSourcePoint[1]
+              newSourcePosition[0] *
+              newSourcePosition[1]
           break
 
         case 3:
-          newDestinationPoint[i] +=
+          newDestinationPosition[i] +=
             this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1] +
+            this.polynomialParametersMatrices[i].get(1, 0) *
+              newSourcePosition[0] +
+            this.polynomialParametersMatrices[i].get(2, 0) *
+              newSourcePosition[1] +
             this.polynomialParametersMatrices[i].get(3, 0) *
-              newSourcePoint[0] ** 2 +
+              newSourcePosition[0] ** 2 +
             this.polynomialParametersMatrices[i].get(4, 0) *
-              newSourcePoint[1] ** 2 +
+              newSourcePosition[1] ** 2 +
             this.polynomialParametersMatrices[i].get(5, 0) *
-              newSourcePoint[0] *
-              newSourcePoint[1] +
+              newSourcePosition[0] *
+              newSourcePosition[1] +
             this.polynomialParametersMatrices[i].get(6, 0) *
-              newSourcePoint[0] ** 3 +
+              newSourcePosition[0] ** 3 +
             this.polynomialParametersMatrices[i].get(7, 0) *
-              newSourcePoint[1] ** 3 +
+              newSourcePosition[1] ** 3 +
             this.polynomialParametersMatrices[i].get(8, 0) *
-              newSourcePoint[0] ** 2 *
-              newSourcePoint[1] +
+              newSourcePosition[0] ** 2 *
+              newSourcePosition[1] +
             this.polynomialParametersMatrices[i].get(9, 0) *
-              newSourcePoint[0] *
-              newSourcePoint[1] ** 2
+              newSourcePosition[0] *
+              newSourcePosition[1] ** 2
           break
 
         default:
@@ -194,6 +202,6 @@ export default class Polynomial {
       }
     }
 
-    return newDestinationPoint
+    return newDestinationPosition
   }
 }

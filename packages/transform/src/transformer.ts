@@ -1,9 +1,10 @@
-import HelmertGCPTransformer from './transformers/helmert-transformer.js'
-import PolynomialGCPTransformer from './transformers/polynomial-transformer.js'
-import ProjectiveGCPTransformer from './transformers/projective-transformer.js'
-import RadialBasisFunctionGCPTransformer from './transformers/radial-basis-function-transformer.js'
+import Helmert from './shared/helmert.js'
+import Polynomial from './shared/polynomial.js'
+import Projective from './shared/projective.js'
+import RBF from './shared/radial-basis-function.js'
 
 import { thinPlateKernel } from './shared/kernel-functions.js'
+import { euclideanNorm } from './shared/norm-functions.js'
 
 import {
   convertPositionToGeoJSONPoint,
@@ -23,6 +24,7 @@ import {
 
 import type {
   GCPTransformerInterface,
+  Transform,
   TransformationType,
   OptionalTransformOptions
 } from './shared/types.js'
@@ -39,77 +41,110 @@ import type {
 
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: GCP[]
+  sourcePositions: Position[]
+  destinationPositions: Position[]
   type: TransformationType
-  transformer: GCPTransformerInterface
 
-  constructor(
-    gcps: GCP[],
-    type: TransformationType = 'polynomial'
-    // options: TransformationOptions
-  ) {
+  forwardTransform?: Transform
+  backwardTransform?: Transform
+
+  constructor(gcps: GCP[], type: TransformationType = 'polynomial') {
     this.gcps = gcps
+    this.sourcePositions = gcps.map((gcp) => gcp.resource)
+    this.destinationPositions = gcps.map((gcp) => gcp.geo)
     this.type = type
+  }
 
-    if (type === 'helmert') {
-      this.transformer = new HelmertGCPTransformer(gcps)
-    } else if (type === 'polynomial1' || type === 'polynomial') {
-      this.transformer = new PolynomialGCPTransformer(gcps)
-    } else if (type === 'polynomial2') {
-      this.transformer = new PolynomialGCPTransformer(gcps, 2)
-    } else if (type === 'polynomial3') {
-      this.transformer = new PolynomialGCPTransformer(gcps, 3)
-    } else if (type === 'projective') {
-      this.transformer = new ProjectiveGCPTransformer(gcps)
-    } else if (type === 'thinPlateSpline') {
-      this.transformer = new RadialBasisFunctionGCPTransformer(
-        gcps,
-        thinPlateKernel
+  createForwardTransform(): Transform {
+    if (this.type === 'helmert') {
+      return new Helmert(this.sourcePositions, this.destinationPositions)
+    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
+      return new Polynomial(this.sourcePositions, this.destinationPositions)
+    } else if (this.type === 'polynomial2') {
+      return new Polynomial(this.sourcePositions, this.destinationPositions, 2)
+    } else if (this.type === 'polynomial3') {
+      return new Polynomial(this.sourcePositions, this.destinationPositions, 3)
+    } else if (this.type === 'projective') {
+      return new Projective(this.sourcePositions, this.destinationPositions)
+    } else if (this.type === 'thinPlateSpline') {
+      return new RBF(
+        this.sourcePositions,
+        this.destinationPositions,
+        thinPlateKernel,
+        euclideanNorm
       )
     } else {
-      throw new Error(`Unsupported transformation type: ${type}`)
+      throw new Error(`Unsupported transformation type: ${this.type}`)
+    }
+  }
+
+  createBackwardTransform(): Transform {
+    if (this.type === 'helmert') {
+      return new Helmert(this.destinationPositions, this.sourcePositions)
+    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
+      return new Polynomial(this.destinationPositions, this.sourcePositions)
+    } else if (this.type === 'polynomial2') {
+      return new Polynomial(this.destinationPositions, this.sourcePositions, 2)
+    } else if (this.type === 'polynomial3') {
+      return new Polynomial(this.destinationPositions, this.sourcePositions, 3)
+    } else if (this.type === 'projective') {
+      return new Projective(this.destinationPositions, this.sourcePositions)
+    } else if (this.type === 'thinPlateSpline') {
+      return new RBF(
+        this.destinationPositions,
+        this.sourcePositions,
+        thinPlateKernel,
+        euclideanNorm
+      )
+    } else {
+      throw new Error(`Unsupported transformation type: ${this.type}`)
     }
   }
 
   // Base
 
-  transformForward(point: Position): Position {
-    return this.transformer.transformForward(point)
+  transformForward(position: Position): Position {
+    if (!this.forwardTransform) {
+      this.forwardTransform = this.createForwardTransform()
+    }
+
+    return this.forwardTransform.interpolant(position)
   }
 
-  transformBackward(point: Position): Position {
-    return this.transformer.transformBackward(point)
+  transformBackward(position: Position): Position {
+    if (!this.backwardTransform) {
+      this.backwardTransform = this.createBackwardTransform()
+    }
+
+    return this.backwardTransform.interpolant(position)
   }
 
-  // Alternatives
+  // Alias
 
-  toGeo(point: Position): Position {
-    return this.transformer.toGeo(point)
+  toGeo(position: Position): Position {
+    return this.transformForward(position)
   }
 
-  toResource(point: Position): Position {
-    return this.transformer.toResource(point)
+  toResource(position: Position): Position {
+    return this.transformBackward(position)
   }
 
   // Position
 
   transformForwardPositionToPosition(position: Position): Position {
-    return this.transformer.transformForward(position)
+    return this.transformForward(position)
   }
 
   transformForwardPositionToGeoJSONPoint(position: Position): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(
-      this.transformer.transformForward(position)
-    )
+    return convertPositionToGeoJSONPoint(this.transformForward(position))
   }
 
   transformBackwardPositionToPosition(position: Position): Position {
-    return this.transformer.transformBackward(position)
+    return this.transformBackward(position)
   }
 
   transformBackwardGeoJSONPointToPosition(geometry: GeoJSONPoint): Position {
-    return this.transformer.transformBackward(
-      convertGeoJSONPointToPosition(geometry)
-    )
+    return this.transformBackward(convertGeoJSONPointToPosition(geometry))
   }
 
   // LineString
