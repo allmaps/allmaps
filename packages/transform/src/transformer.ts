@@ -7,6 +7,13 @@ import { thinPlateKernel } from './shared/kernel-functions.js'
 import { euclideanNorm } from './shared/norm-functions.js'
 
 import {
+  transformForwardLineStringToLineString,
+  transformBackwardLineStringToLineString,
+  transformForwardRingToRing,
+  transformBackwardRingToRing
+} from './shared/transform-helper-functions.js'
+
+import {
   convertPositionToGeoJSONPoint,
   convertLineStringToGeoJSONLineString,
   convertRingToGeoJSONPolygon,
@@ -15,18 +22,12 @@ import {
   convertGeoJSONPolygonToRing
 } from '@allmaps/stdlib'
 
-import {
-  transformForwardLineStringToLineString,
-  transformBackwardLineStringToLineString,
-  transformForwardRingToRing,
-  transformBackwardRingToRing
-} from './shared/transform-helper-functions.js'
-
 import type {
-  GCPTransformerInterface,
-  Transform,
+  TransformGCP,
   TransformationType,
-  OptionalTransformOptions
+  OptionalTransformOptions,
+  GCPTransformerInterface,
+  Transform
 } from './shared/types.js'
 
 import type {
@@ -40,7 +41,7 @@ import type {
 } from '@allmaps/types'
 
 export default class GCPTransformer implements GCPTransformerInterface {
-  gcps: GCP[]
+  gcps: TransformGCP[]
   sourcePositions: Position[]
   destinationPositions: Position[]
   type: TransformationType
@@ -48,10 +49,23 @@ export default class GCPTransformer implements GCPTransformerInterface {
   forwardTransform?: Transform
   backwardTransform?: Transform
 
-  constructor(gcps: GCP[], type: TransformationType = 'polynomial') {
-    this.gcps = gcps
-    this.sourcePositions = gcps.map((gcp) => gcp.resource)
-    this.destinationPositions = gcps.map((gcp) => gcp.geo)
+  constructor(
+    gcps: TransformGCP[] | GCP[],
+    type: TransformationType = 'polynomial'
+  ) {
+    if (gcps.length == 0) {
+      throw new Error('No controle points.')
+    }
+    if ('resource' in gcps[0]) {
+      this.gcps = gcps.map((p) => ({
+        source: (p as GCP).resource,
+        destination: (p as GCP).geo
+      }))
+    } else {
+      this.gcps = gcps as TransformGCP[]
+    }
+    this.sourcePositions = this.gcps.map((gcp) => gcp.source)
+    this.destinationPositions = this.gcps.map((gcp) => gcp.destination)
     this.type = type
   }
 

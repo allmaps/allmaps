@@ -5,12 +5,14 @@ import getWorldDistance from '@turf/distance'
 import { getMidPosition, getDistance } from '@allmaps/stdlib'
 
 import type {
+  TransformGCP,
+  Segment,
   TransformOptions,
   GCPTransformerInterface,
   OptionalTransformOptions
 } from './types.js'
 
-import type { Position, LineString, Ring, GCP, Segment } from '@allmaps/types'
+import type { Position, LineString, Ring } from '@allmaps/types'
 
 function mergeDefaultOptions(
   options?: OptionalTransformOptions
@@ -50,19 +52,21 @@ export function transformForwardLineStringToLineString(
   }
 
   const points = LineString.map((position) => ({
-    resource: position,
-    geo: transformer.transformForward(position)
+    source: position,
+    destination: transformer.transformForward(position)
   }))
 
   const segments = pointsToSegments(points, false)
   const extendedSegments =
-    recursivelyAddMidpointsWithGeoMidPositionFromTransform(
+    recursivelyAddMidpointsWithDestinationMidPositionFromTransform(
       transformer,
       segments,
       mergedOptions
     )
 
-  return segmentsToPoints(extendedSegments, true).map((point) => point.geo)
+  return segmentsToPoints(extendedSegments, true).map(
+    (point) => point.destination
+  )
 }
 
 export function transformBackwardLineStringToLineString(
@@ -77,22 +81,20 @@ export function transformBackwardLineStringToLineString(
     throw new Error('LineString should contain at least 2 points')
   }
 
-  const points: GCP[] = lineString.map((position) => ({
-    resource: transformer.transformBackward(position),
-    geo: position
+  const points: TransformGCP[] = lineString.map((position) => ({
+    source: transformer.transformBackward(position),
+    destination: position
   }))
 
   const segments = pointsToSegments(points, false)
   const extendendSegements =
-    recursivelyAddMidpointsWithResourceMidPositionFromTransform(
+    recursivelyAddMidpointsWithSourceMidPositionFromTransform(
       transformer,
       segments,
       mergedOptions
     )
 
-  return segmentsToPoints(extendendSegements, true).map(
-    (point) => point.resource
-  )
+  return segmentsToPoints(extendendSegements, true).map((point) => point.source)
 }
 
 export function transformForwardRingToRing(
@@ -108,19 +110,21 @@ export function transformForwardRingToRing(
   }
 
   const points = ring.map((position) => ({
-    resource: position,
-    geo: transformer.transformForward(position)
+    source: position,
+    destination: transformer.transformForward(position)
   }))
 
   const segments = pointsToSegments(points, true)
   const extendedSegments =
-    recursivelyAddMidpointsWithGeoMidPositionFromTransform(
+    recursivelyAddMidpointsWithDestinationMidPositionFromTransform(
       transformer,
       segments,
       mergedOptions
     )
 
-  return segmentsToPoints(extendedSegments, false).map((point) => point.geo)
+  return segmentsToPoints(extendedSegments, false).map(
+    (point) => point.destination
+  )
 }
 
 export function transformBackwardRingToRing(
@@ -135,25 +139,25 @@ export function transformBackwardRingToRing(
     throw new Error('Ring should contain at least 3 points')
   }
 
-  const points: GCP[] = ring.map((position) => ({
-    resource: transformer.transformBackward(position),
-    geo: position
+  const points: TransformGCP[] = ring.map((position) => ({
+    source: transformer.transformBackward(position),
+    destination: position
   }))
 
   const segments = pointsToSegments(points, true)
   const extendendSegements =
-    recursivelyAddMidpointsWithResourceMidPositionFromTransform(
+    recursivelyAddMidpointsWithSourceMidPositionFromTransform(
       transformer,
       segments,
       mergedOptions
     )
 
   return segmentsToPoints(extendendSegements, false).map(
-    (point) => point.resource
+    (point) => point.source
   )
 }
 
-function pointsToSegments(points: GCP[], close = false): Segment[] {
+function pointsToSegments(points: TransformGCP[], close = false): Segment[] {
   const segmentCount = points.length - (close ? 0 : 1)
 
   const segments: Segment[] = []
@@ -167,7 +171,7 @@ function pointsToSegments(points: GCP[], close = false): Segment[] {
   return segments
 }
 
-function segmentsToPoints(segments: Segment[], close = false): GCP[] {
+function segmentsToPoints(segments: Segment[], close = false): TransformGCP[] {
   const points = segments.map((segment) => segment.from)
   if (close) {
     points.push(segments[segments.length - 1].to)
@@ -175,7 +179,7 @@ function segmentsToPoints(segments: Segment[], close = false): GCP[] {
   return points
 }
 
-function recursivelyAddMidpointsWithGeoMidPositionFromTransform(
+function recursivelyAddMidpointsWithDestinationMidPositionFromTransform(
   transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
@@ -186,7 +190,7 @@ function recursivelyAddMidpointsWithGeoMidPositionFromTransform(
 
   return segments
     .map((segment) =>
-      addMidpointWithGeoMidPositionFromTransform(
+      addMidpointWithDestinationMidPositionFromTransform(
         transformer,
         segment,
         options,
@@ -196,7 +200,7 @@ function recursivelyAddMidpointsWithGeoMidPositionFromTransform(
     .flat(1)
 }
 
-function recursivelyAddMidpointsWithResourceMidPositionFromTransform(
+function recursivelyAddMidpointsWithSourceMidPositionFromTransform(
   transformer: GCPTransformerInterface,
   segments: Segment[],
   options: TransformOptions
@@ -207,7 +211,7 @@ function recursivelyAddMidpointsWithResourceMidPositionFromTransform(
 
   return segments
     .map((segment) =>
-      addMidpointWithResourceMidPositionFromTransform(
+      addMidpointWithSourceMidPositionFromTransform(
         transformer,
         segment,
         options,
@@ -217,60 +221,61 @@ function recursivelyAddMidpointsWithResourceMidPositionFromTransform(
     .flat(1)
 }
 
-function addMidpointWithGeoMidPositionFromTransform(
+function addMidpointWithDestinationMidPositionFromTransform(
   transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
-  const resourceMidPosition = getMidPosition(
-    segment.from.resource,
-    segment.to.resource
+  const sourceMidPosition = getMidPosition(
+    segment.from.source,
+    segment.to.source
   )
 
-  const geoMidPositionFunction = options.geographic
+  const destinationMidPositionFunction = options.geographic
     ? (position1: Position, position2: Position) =>
         getWorldMidpoint(position1, position2).geometry.coordinates as Position
     : getMidPosition
-  const geoMidPosition = geoMidPositionFunction(
-    segment.from.geo,
-    segment.to.geo
+  const destinationMidPosition = destinationMidPositionFunction(
+    segment.from.destination,
+    segment.to.destination
   )
-  const geoMidPositionFromTransform =
-    transformer.transformForward(resourceMidPosition)
+  const destinationMidPositionFromTransform =
+    transformer.transformForward(sourceMidPosition)
 
-  const geoDistanceFunction = options.geographic
+  const destinationDistanceFunction = options.geographic
     ? getWorldDistance
     : getDistance
-  const segmentGeoDistance = geoDistanceFunction(
-    segment.from.geo,
-    segment.to.geo
+  const segmentDestinationDistance = destinationDistanceFunction(
+    segment.from.destination,
+    segment.to.destination
   )
-  const geoMidPositionsDistance = geoDistanceFunction(
-    geoMidPosition,
-    geoMidPositionFromTransform
+  const destinationMidPositionsDistance = destinationDistanceFunction(
+    destinationMidPosition,
+    destinationMidPositionFromTransform
   )
 
   if (
     depth < options.maxDepth &&
     (options.maxOffsetRatio
-      ? geoMidPositionsDistance / segmentGeoDistance > options.maxOffsetRatio
+      ? destinationMidPositionsDistance / segmentDestinationDistance >
+        options.maxOffsetRatio
       : false) &&
-    segmentGeoDistance > 0
+    segmentDestinationDistance > 0
   ) {
-    const newSegmentMidpoint: GCP = {
-      resource: resourceMidPosition,
-      geo: geoMidPositionFromTransform
+    const newSegmentMidpoint: TransformGCP = {
+      source: sourceMidPosition,
+      destination: destinationMidPositionFromTransform
     }
 
     return [
-      addMidpointWithGeoMidPositionFromTransform(
+      addMidpointWithDestinationMidPositionFromTransform(
         transformer,
         { from: segment.from, to: newSegmentMidpoint },
         options,
         depth + 1
       ),
-      addMidpointWithGeoMidPositionFromTransform(
+      addMidpointWithDestinationMidPositionFromTransform(
         transformer,
         { from: newSegmentMidpoint, to: segment.to },
         options,
@@ -282,59 +287,59 @@ function addMidpointWithGeoMidPositionFromTransform(
   }
 }
 
-function addMidpointWithResourceMidPositionFromTransform(
+function addMidpointWithSourceMidPositionFromTransform(
   transformer: GCPTransformerInterface,
   segment: Segment,
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
-  const geoMidPositionFunction = options.geographic
+  const destinationMidPositionFunction = options.geographic
     ? (position1: Position, position2: Position) =>
         getWorldMidpoint(position1, position2).geometry.coordinates as Position
     : getMidPosition
-  const geoMidPosition = geoMidPositionFunction(
-    segment.from.geo,
-    segment.to.geo
+  const destinationMidPosition = destinationMidPositionFunction(
+    segment.from.destination,
+    segment.to.destination
   )
 
-  const resourceMidPosition = getMidPosition(
-    segment.from.resource,
-    segment.to.resource
+  const sourceMidPosition = getMidPosition(
+    segment.from.source,
+    segment.to.source
   )
-  const resourceMidPositionFromTransform = transformer.transformBackward(
-    geoMidPosition as Position
+  const sourceMidPositionFromTransform = transformer.transformBackward(
+    destinationMidPosition as Position
   )
 
-  const segmentResourceDistance = getDistance(
-    segment.from.resource,
-    segment.to.resource
+  const segmentSourceDistance = getDistance(
+    segment.from.source,
+    segment.to.source
   )
-  const resourceMidPositionsDistance = getDistance(
-    resourceMidPosition,
-    resourceMidPositionFromTransform
+  const sourceMidPositionsDistance = getDistance(
+    sourceMidPosition,
+    sourceMidPositionFromTransform
   )
 
   if (
     depth < options.maxDepth &&
     (options.maxOffsetRatio
-      ? resourceMidPositionsDistance / segmentResourceDistance >
+      ? sourceMidPositionsDistance / segmentSourceDistance >
         options.maxOffsetRatio
       : false) &&
-    segmentResourceDistance > 0
+    segmentSourceDistance > 0
   ) {
-    const newSegmentMidpoint: GCP = {
-      resource: resourceMidPositionFromTransform,
-      geo: geoMidPosition
+    const newSegmentMidpoint: TransformGCP = {
+      source: sourceMidPositionFromTransform,
+      destination: destinationMidPosition
     }
 
     return [
-      addMidpointWithResourceMidPositionFromTransform(
+      addMidpointWithSourceMidPositionFromTransform(
         transformer,
         { from: segment.from, to: newSegmentMidpoint },
         options,
         depth + 1
       ),
-      addMidpointWithResourceMidPositionFromTransform(
+      addMidpointWithSourceMidPositionFromTransform(
         transformer,
         { from: newSegmentMidpoint, to: segment.to },
         options,

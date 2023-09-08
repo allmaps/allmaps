@@ -40,6 +40,33 @@ export const gcps6 = [
   }
 ]
 
+export const transformGcps6 = [
+  {
+    source: [1344, 4098],
+    destination: [4.4091165, 51.9017125]
+  },
+  {
+    source: [4440, 3441],
+    destination: [4.5029222, 51.9164451]
+  },
+  {
+    source: [3549, 4403],
+    destination: [4.4764224, 51.897309]
+  },
+  {
+    source: [1794, 2130],
+    destination: [4.4199066, 51.9391509]
+  },
+  {
+    source: [3656, 2558],
+    destination: [4.4775683, 51.9324358]
+  },
+  {
+    source: [2656, 3558],
+    destination: [4.4572643, 51.9143043]
+  }
+]
+
 // There points are correct according to Helmert, except point i=4
 // The geo coordinates span big arc, so these can be used to test for geographic features
 export const gcps7 = [

@@ -13,11 +13,6 @@ export type Ring = Position[]
 
 export type GCP = { resource: Position; geo: Position }
 
-export type Segment = {
-  from: GCP
-  to: GCP
-}
-
 // TODO: replace by Ring and/or Polygon
 export type SVGPolygon = Position[]
 

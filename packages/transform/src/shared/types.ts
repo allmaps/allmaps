@@ -1,4 +1,11 @@
-import type { Position, GCP } from '@allmaps/types'
+import type { Position } from '@allmaps/types'
+
+export type TransformGCP = { source: Position; destination: Position }
+
+export type Segment = {
+  from: TransformGCP
+  to: TransformGCP
+}
 
 export type TransformationType =
   | 'helmert'
@@ -30,7 +37,7 @@ export type Transform = {
 }
 
 export type GCPTransformerInterface = {
-  gcps: GCP[]
+  gcps: TransformGCP[]
 
   transformForward(position: Position): Position
   toGeo(position: Position): Position

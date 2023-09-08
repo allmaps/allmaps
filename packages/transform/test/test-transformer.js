@@ -3,7 +3,7 @@ import { expect } from 'chai'
 
 import { GCPTransformer } from '../dist/index.js'
 
-import { gcps6, gcps7 } from './input/gcps-test.js'
+import { gcps6, transformGcps6, gcps7 } from './input/gcps-test.js'
 
 function expectToBeCloseToArrayArray(actual, expected, epsilon = 0.00001) {
   expect(actual.length).to.equal(expected.length)
@@ -21,6 +21,38 @@ describe('Transform line to geo', async () => {
     geographic: false
   }
   const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const input = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const output = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.4230497784967655, 51.950815146974556],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  it(`should transform a line with midpoints, without closing it`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformForwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
+      output
+    )
+  })
+})
+
+describe('Transform line to geo from transform gcps', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.01,
+    maxDepth: 1,
+    geographic: false
+  }
+  const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
