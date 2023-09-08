@@ -19,7 +19,7 @@ import {
   transformBackwardLineStringToLineString,
   transformForwardRingToRing,
   transformBackwardRingToRing
-} from './shared/geojson.js'
+} from './shared/transform-helper-functions.js'
 
 import type {
   GCPTransformerInterface,
