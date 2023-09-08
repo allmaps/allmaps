@@ -27,10 +27,6 @@ function mergeDefaultOptions(
     geographic: false
   }
 
-  if (options && options.close !== undefined) {
-    mergedOptions.close = options.close
-  }
-
   if (options && options.maxDepth !== undefined) {
     mergedOptions.maxDepth = options.maxDepth
   }

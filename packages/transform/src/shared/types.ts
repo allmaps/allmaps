@@ -43,7 +43,6 @@ export type Segment = {
 }
 
 export type TransformOptions = {
-  close: boolean
   maxOffsetRatio: number
   maxDepth: number
   geographic: boolean // Assume this is a resource to geo setting with lonlat geo coordinates and use geographic distances and midpoints
