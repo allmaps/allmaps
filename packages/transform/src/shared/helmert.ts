@@ -1,10 +1,10 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import type { Transform } from './types'
+import type { Transformation } from './types'
 
 import type { Position } from '@allmaps/types'
 
-export default class Helmert implements Transform {
+export default class Helmert implements Transformation {
   sourcePositions: Position[]
   destinationPositions: Position[]
 

@@ -1,10 +1,10 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import type { Transform } from './types'
+import type { Transformation } from './types'
 
 import type { Position } from '@allmaps/types'
 
-export default class Polynomial implements Transform {
+export default class Polynomial implements Transformation {
   sourcePositions: Position[]
   destinationPositions: Position[]
 

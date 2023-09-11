@@ -1,13 +1,13 @@
 import { Matrix, inverse } from 'ml-matrix'
 import { multiplyMatricesElementwise } from './matrix.js'
 
-import type { Transform } from './types'
+import type { Transformation } from './types'
 
 import type { KernelFunction, NormFunction } from './types.js'
 
 import type { Position } from '@allmaps/types'
 
-export default class RBF implements Transform {
+export default class RBF implements Transformation {
   sourcePositions: Position[]
   destinationPositions: Position[]
 

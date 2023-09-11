@@ -27,7 +27,7 @@ import type {
   TransformationType,
   PartialTransformOptions,
   GCPTransformerInterface,
-  Transform
+  Transformation
 } from './shared/types.js'
 
 import type {
@@ -40,15 +40,15 @@ import type {
   GeoJSONPolygon
 } from '@allmaps/types'
 
-/** A Ground Controle Point Transformer, containing a forward and backward transform and specifying functions to transform geometries using these transforms. */
+/** A Ground Controle Point Transformer, containing a forward and backward transformation and specifying functions to transform geometries using these transformations. */
 export default class GCPTransformer implements GCPTransformerInterface {
   gcps: TransformGCP[]
   sourcePositions: Position[]
   destinationPositions: Position[]
   type: TransformationType
 
-  forwardTransform?: Transform
-  backwardTransform?: Transform
+  forwardTransformation?: Transformation
+  backwardTransformation?: Transformation
 
   /**
    * Create a GCPTransforer
@@ -74,18 +74,18 @@ export default class GCPTransformer implements GCPTransformerInterface {
     this.type = type
   }
 
-  createForwardTransform(): Transform {
+  createForwardTransform(): Transformation {
     return this.createTransform(this.sourcePositions, this.destinationPositions)
   }
 
-  createBackwardTransform(): Transform {
+  createBackwardTransform(): Transformation {
     return this.createTransform(this.destinationPositions, this.sourcePositions)
   }
 
   createTransform(
     sourcePositions: Position[],
     destinationPositions: Position[]
-  ): Transform {
+  ): Transformation {
     if (this.type === 'helmert') {
       return new Helmert(sourcePositions, destinationPositions)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
@@ -116,11 +116,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Position} Forward transform of input position using this transformer's transformation
    */
   transformForward(position: Position): Position {
-    if (!this.forwardTransform) {
-      this.forwardTransform = this.createForwardTransform()
+    if (!this.forwardTransformation) {
+      this.forwardTransformation = this.createForwardTransform()
     }
 
-    return this.forwardTransform.interpolant(position)
+    return this.forwardTransformation.interpolant(position)
   }
 
   /**
@@ -129,11 +129,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Position} Backard transform of input position using this transformer's transformation
    */
   transformBackward(position: Position): Position {
-    if (!this.backwardTransform) {
-      this.backwardTransform = this.createBackwardTransform()
+    if (!this.backwardTransformation) {
+      this.backwardTransformation = this.createBackwardTransform()
     }
 
-    return this.backwardTransform.interpolant(position)
+    return this.backwardTransformation.interpolant(position)
   }
 
   // Alias

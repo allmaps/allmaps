@@ -29,7 +29,7 @@ export type PartialTransformOptions = Partial<TransformOptions>
 export type KernelFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (position1: Position, position2: Position) => number
 
-export type Transform = {
+export type Transformation = {
   sourcePositions: Position[]
   destinationPositions: Position[]
 

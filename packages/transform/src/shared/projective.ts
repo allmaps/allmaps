@@ -1,10 +1,10 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import type { Transform } from './types'
+import type { Transformation } from './types'
 
 import type { Position } from '@allmaps/types'
 
-export default class Projective implements Transform {
+export default class Projective implements Transformation {
   sourcePositions: Position[]
   destinationPositions: Position[]
 
