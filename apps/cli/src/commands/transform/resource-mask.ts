@@ -29,29 +29,19 @@ export default function resourceMask() {
     const transformOptions = parseTransformOptions(options)
 
     for (const map of maps) {
-      if (map.gcps.length >= 3) {
-        const transformer = new GCPTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
-        const polygon = transformer.transformForwardRingToGeoJSONPolygon(
-          map.resourceMask,
-          transformOptions
-        )
+      const transformer = new GCPTransformer(map.gcps, map.transformation?.type)
+      const polygon = transformer.transformForwardRingToGeoJSONPolygon(
+        map.resourceMask,
+        transformOptions
+      )
 
-        features.push({
-          type: 'Feature',
-          properties: {
-            imageId: map.resource.id
-          },
-          geometry: polygon
-        })
-      } else {
-        // TODO: this can be removed because an error will be given by the transformer.
-        console.error(
-          'Encountered Georeference Annotation with less than 3 points'
-        )
-      }
+      features.push({
+        type: 'Feature',
+        properties: {
+          imageId: map.resource.id
+        },
+        geometry: polygon
+      })
     }
 
     const featureCollection = {

@@ -2,7 +2,12 @@
 import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
-import { getMidPosition, getDistance } from '@allmaps/stdlib'
+import {
+  getMidPosition,
+  getDistance,
+  conformLineString,
+  conformRing
+} from '@allmaps/stdlib'
 
 import type {
   TransformGCP,
@@ -41,17 +46,14 @@ function mergeDefaultOptions(
 
 export function transformForwardLineStringToLineString(
   transformer: GCPTransformerInterface,
-  LineString: LineString,
+  lineString: LineString,
   options?: OptionalTransformOptions
 ): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
-  // TODO: replace this with more general checker for linestring
-  if (!Array.isArray(LineString) || LineString.length < 2) {
-    throw new Error('LineString should contain at least 2 points')
-  }
+  lineString = conformLineString(lineString)
 
-  const points = LineString.map((position) => ({
+  const points = lineString.map((position) => ({
     source: position,
     destination: transformer.transformForward(position)
   }))
@@ -76,10 +78,7 @@ export function transformBackwardLineStringToLineString(
 ): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
-  // TODO: replace this with more general checker for linestring
-  if (!Array.isArray(lineString) || lineString.length < 2) {
-    throw new Error('LineString should contain at least 2 points')
-  }
+  lineString = conformLineString(lineString)
 
   const points: TransformGCP[] = lineString.map((position) => ({
     source: transformer.transformBackward(position),
@@ -104,10 +103,7 @@ export function transformForwardRingToRing(
 ): Ring {
   const mergedOptions = mergeDefaultOptions(options)
 
-  // TODO: replace this with more general checker for rings
-  if (!Array.isArray(ring) || ring.length < 3) {
-    throw new Error('Polygon should contain at least 3 points')
-  }
+  ring = conformRing(ring)
 
   const points = ring.map((position) => ({
     source: position,
@@ -134,10 +130,7 @@ export function transformBackwardRingToRing(
 ): Ring {
   const mergedOptions = mergeDefaultOptions(options)
 
-  // TODO: replace this with more general checker for rings
-  if (!Array.isArray(ring) || ring.length < 3) {
-    throw new Error('Ring should contain at least 3 points')
-  }
+  ring = conformRing(ring)
 
   const points: TransformGCP[] = ring.map((position) => ({
     source: transformer.transformBackward(position),

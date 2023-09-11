@@ -1,6 +1,4 @@
-import type { BBox, SVGPolygon, Extent } from '@allmaps/types'
-
-// TODO: move to @allmaps/stdlib
+import type { BBox, Ring, Position, Extent } from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
@@ -18,7 +16,7 @@ export function computeExtent(values: number[]): Extent {
   return [min, max]
 }
 
-export function computeBBox(points: SVGPolygon): BBox {
+export function computeBBox(points: Position[]): BBox {
   const xs = []
   const ys = []
 
@@ -42,7 +40,7 @@ export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
   ]
 }
 
-export function bboxToSvgPolygon(bbox: BBox): SVGPolygon {
+export function bboxToRing(bbox: BBox): Ring {
   return [
     [bbox[0], bbox[1]],
     [bbox[2], bbox[1]],

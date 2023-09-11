@@ -2,13 +2,17 @@ export type Position = [number, number]
 
 export type Line = [Position, Position]
 
+// Note:
+// - At least 2 positions
+// - No duplicate positions
 export type LineString = Position[]
 
 // Note:
-// - Ring must be unclosed: last element is not a repition of the first
-// - No requirement on winding order
+// - At least 3 positions
 // - No duplicate positions
-// - At least three positions
+// - Unclosed: last element is not a repetition of the first
+// - So far no requirement on self-intersection although that may be useful in future
+// - So far no requirement on winding order. This is only applied when exporting to geojson
 export type Ring = Position[]
 
 export type GCP = { resource: Position; geo: Position }

@@ -9,6 +9,36 @@ import type {
   GeoJSONLineString,
   GeoJSONPolygon
 } from '@allmaps/types'
+import { isEqualPosition } from './geometry.js'
+
+export function conformLineString(lineString: LineString): LineString {
+  // Filter out repeated positions
+  lineString = lineString.filter(function (position, i, originalLineString) {
+    return i === 0 || position !== originalLineString[i - 1]
+  })
+
+  if (lineString.length < 2) {
+    throw new Error('LineString should contain at least 2 positions')
+  }
+  return lineString
+}
+
+export function conformRing(ring: Ring): Ring {
+  // Filter out repeated positions
+  ring = ring.filter(function (position, i, originalRing) {
+    return i === 0 || position !== originalRing[i - 1]
+  })
+
+  // Remove last position if input is closed ring
+  if (isEqualPosition(ring[0], ring[ring.length - 1])) {
+    ring.splice(-1)
+  }
+
+  if (ring.length < 3) {
+    throw new Error('LineString should contain at least 3 positions')
+  }
+  return ring
+}
 
 export function convertPositionToGeoJSONPoint(
   position: Position
@@ -56,13 +86,7 @@ export function convertGeoJSONPolygonToRing(
   geometry: GeoJSONPolygon,
   close = false
 ): Ring {
-  // Note: Assuming there's only an outer ring for now
-  const outerRing = geometry.coordinates[0]
-  if (
-    outerRing[0][0] === outerRing[outerRing.length - 1][0] &&
-    outerRing[0][1] === outerRing[outerRing.length - 1][1]
-  ) {
-    outerRing.splice(-1)
-  }
+  let outerRing = geometry.coordinates[0]
+  outerRing = conformRing(outerRing)
   return close ? [...outerRing, outerRing[0]] : outerRing
 }
