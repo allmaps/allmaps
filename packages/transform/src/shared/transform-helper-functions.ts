@@ -14,13 +14,13 @@ import type {
   Segment,
   TransformOptions,
   GCPTransformerInterface,
-  OptionalTransformOptions
+  PartialTransformOptions
 } from './types.js'
 
 import type { Position, LineString, Ring } from '@allmaps/types'
 
 function mergeDefaultOptions(
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): TransformOptions {
   const mergedOptions = {
     close: false,
@@ -47,7 +47,7 @@ function mergeDefaultOptions(
 export function transformForwardLineStringToLineString(
   transformer: GCPTransformerInterface,
   lineString: LineString,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
@@ -74,7 +74,7 @@ export function transformForwardLineStringToLineString(
 export function transformBackwardLineStringToLineString(
   transformer: GCPTransformerInterface,
   lineString: LineString,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): LineString {
   const mergedOptions = mergeDefaultOptions(options)
 
@@ -99,7 +99,7 @@ export function transformBackwardLineStringToLineString(
 export function transformForwardRingToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): Ring {
   const mergedOptions = mergeDefaultOptions(options)
 
@@ -126,7 +126,7 @@ export function transformForwardRingToRing(
 export function transformBackwardRingToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): Ring {
   const mergedOptions = mergeDefaultOptions(options)
 

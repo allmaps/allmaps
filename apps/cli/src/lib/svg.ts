@@ -2,7 +2,7 @@ import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
 import type { GCPTransformer } from '@allmaps/transform'
 
-import type { OptionalTransformOptions } from '@allmaps/transform'
+import type { PartialTransformOptions } from '@allmaps/transform'
 
 import type { GeoJSONGeometry } from '@allmaps/types'
 
@@ -219,7 +219,7 @@ export function resourceMaskToSvgPolygon(map: Map): Polygon {
 export function transformGeoJsonToSvg(
   transformer: GCPTransformer,
   geometry: GeoJSONGeometry,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ): GeometryElement {
   if (geometry.type === 'Point') {
     return {

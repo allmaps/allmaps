@@ -1,6 +1,6 @@
 import type {
   GCPTransformer,
-  OptionalTransformOptions
+  PartialTransformOptions
 } from '@allmaps/transform'
 
 import type { GeoJSONGeometry } from '@allmaps/types'
@@ -10,7 +10,7 @@ import type { GeometryElement } from './svg.js'
 export function transformSvgToGeoJson(
   transformer: GCPTransformer,
   geometry: GeometryElement,
-  options?: OptionalTransformOptions
+  options?: PartialTransformOptions
 ) {
   if (geometry.type === 'circle') {
     return transformer.transformForwardPositionToGeoJSONPoint(

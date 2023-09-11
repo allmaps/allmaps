@@ -1,5 +1,6 @@
 import type { Position } from '@allmaps/types'
 
+/** Ground Controle Point (GCP) (as used in the Transform package). */
 export type TransformGCP = { source: Position; destination: Position }
 
 export type Segment = {
@@ -7,6 +8,7 @@ export type Segment = {
   to: TransformGCP
 }
 
+/** Transformation Type. */
 export type TransformationType =
   | 'helmert'
   | 'polynomial'
@@ -22,7 +24,7 @@ export type TransformOptions = {
   geographic: boolean // Assume this is a resource to geo setting with lonlat geo coordinates and use geographic distances and midpoints
 }
 
-export type OptionalTransformOptions = Partial<TransformOptions>
+export type PartialTransformOptions = Partial<TransformOptions>
 
 export type KernelFunction = (r: number, epsilon?: number) => number
 export type NormFunction = (position1: Position, position2: Position) => number

@@ -2,7 +2,7 @@ import { parseAnnotation, validateMap } from '@allmaps/annotation'
 
 import type { Map } from '@allmaps/annotation'
 import type {
-  OptionalTransformOptions,
+  PartialTransformOptions,
   TransformationType
 } from '@allmaps/transform'
 import type { GCP } from '@allmaps/types'
@@ -106,8 +106,8 @@ export function parseCoordinatesArrayArray(
 
 export function parseTransformOptions(
   options: unknown
-): OptionalTransformOptions {
-  const transformOptions: OptionalTransformOptions = {}
+): PartialTransformOptions {
+  const transformOptions: PartialTransformOptions = {}
 
   if (options && typeof options === 'object') {
     if ('maxOffsetRatio' in options && options.maxOffsetRatio) {
