@@ -22,9 +22,11 @@ export const PartOfSchema = z.object({
 
 const PolynomialTransformationSchema = z.object({
   type: z.literal('polynomial'),
-  options: z.object({
-    order: z.number().min(1).max(3)
-  })
+  options: z
+    .object({
+      order: z.number().min(1).max(3)
+    })
+    .optional()
 })
 
 const ThinPlateSplineTransformationSchema = z.object({
