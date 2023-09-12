@@ -1,8 +1,10 @@
 # @allmaps/transform
 
-This module serves to **transform points**, lines, polygons and other spatial features from one cartesian `(x, y)` source-plane to a destination-plane **using a set of control points** who's coordinates are known in both planes.
+This module serves to **transform points, lines, polygons** and other spatial features from one cartesian `(x, y)` source-plane to a destination-plane **using a set of control points** who's coordinates are known in both planes.
 
 It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms positions **from the resource coordinate space** of a IIIF Resource **to the geo coordinate space** of an interactive map.
+
+But you can also use this package in your projects, outside of Allmaps!
 
 ## How it works
 
@@ -23,10 +25,12 @@ These are the **supported transformations**:
 
 ## Usage
 
-The transformer is built using a set of ground control points.
+This package exports the GCPTransformer class. It's instances (called 'transformers') are built from a set of ground control points an a specified transformation type.
 
 Ground control points can be supplied as an array of
 `{source: [number, number], destination: [number, number]}` objects. Alternatively an array of `{resource: [number, number], geo: [number, number]}` is supported too, which is clearer in the Allmaps use case.
+
+A transformer contain the forward and backward transformation, and has a variety of functions which allow the transformation of new points, lines and polygons.
 
 ### Points
 
