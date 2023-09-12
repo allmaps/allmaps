@@ -1,52 +1,11 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-
+import { expectToBeCloseToArrayArray } from '@allmaps/stdlib'
 import { GCPTransformer } from '../dist/index.js'
 
-import { gcps6, transformGcps6, gcps7 } from './input/gcps-test.js'
+import { transformGcps6, gcps6, transformGcps7 } from './input/gcps-test.js'
 
-function expectToBeCloseToArrayArray(actual, expected, epsilon = 0.00001) {
-  expect(actual.length).to.equal(expected.length)
-  actual.forEach((n0, i0) =>
-    n0.forEach((n1, i1) =>
-      expect(n1).to.be.approximately(expected[i0][i1], epsilon)
-    )
-  )
-}
-
-describe('Transform line to geo', async () => {
-  const transformOptions = {
-    maxOffsetRatio: 0.01,
-    maxDepth: 1,
-    geographic: false
-  }
-  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
-  const input = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-  const output = [
-    [4.388957777030093, 51.959084191571606],
-    [4.392938913951547, 51.94062947962427],
-    [4.425874493300959, 51.94172557475595],
-    [4.4230497784967655, 51.950815146974556],
-    [4.420666790347598, 51.959985351835975]
-  ]
-
-  it(`should transform a line with midpoints, without closing it`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformForwardLineStringToLineString(
-        input,
-        transformOptions
-      ),
-      output
-    )
-  })
-})
-
-describe('Transform line to geo from transform gcps', async () => {
+describe('Transform Forward LineString To LineString, with maxDepth = 1', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
@@ -67,7 +26,7 @@ describe('Transform line to geo from transform gcps', async () => {
     [4.420666790347598, 51.959985351835975]
   ]
 
-  it(`should transform a line with midpoints, without closing it`, () => {
+  it(`should transform the lineString (without closing) and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformForwardLineStringToLineString(
         input,
@@ -78,13 +37,45 @@ describe('Transform line to geo from transform gcps', async () => {
   })
 })
 
-describe('Transform line to geo, with geographic functions', async () => {
+describe('Transform Forward LineString To LineString, with maxDepth = 1 and input as GCP instead of TransformGCP', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.01,
+    maxDepth: 1,
+    geographic: false
+  }
+  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const input = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const output = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.4230497784967655, 51.950815146974556],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  it(`should give the same result as with input as TransformGCP`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformForwardLineStringToLineString(
+        input,
+        transformOptions
+      ),
+      output
+    )
+  })
+})
+
+describe('Transform Forward LineString To LineString, with maxDepth = 1 and geographic = true', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
     geographic: true
   }
-  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -98,7 +89,7 @@ describe('Transform line to geo, with geographic functions', async () => {
     [4.420666790347598, 51.959985351835975]
   ]
 
-  it(`should transform a line with midpoints, without closing it`, () => {
+  it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformForwardLineStringToLineString(
         input,
@@ -109,13 +100,13 @@ describe('Transform line to geo, with geographic functions', async () => {
   })
 })
 
-describe('Transform line to resource, with geographic functions', async () => {
+describe('Transform Backward LineString To LineString of horizontal line, with geographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
     geographic: true
   }
-  const transformer = new GCPTransformer(gcps7, 'polynomial')
+  const transformer = new GCPTransformer(transformGcps7, 'polynomial')
   const input = [
     [10, 50],
     [50, 50]
@@ -128,7 +119,7 @@ describe('Transform line to resource, with geographic functions', async () => {
     [237.12121212121218, 185.60606060606085]
   ]
 
-  it(`should transform a horizontal line with midpoints (and without closing it)`, () => {
+  it(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformBackwardLineStringToLineString(
         input,
@@ -139,13 +130,13 @@ describe('Transform line to resource, with geographic functions', async () => {
   })
 })
 
-describe('Transform line to resource, with geographic functions', async () => {
+describe('Transform Backward LineString To LineString of vertical line, with geographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
     geographic: true
   }
-  const transformer = new GCPTransformer(gcps7, 'polynomial')
+  const transformer = new GCPTransformer(transformGcps7, 'polynomial')
   const input = [
     [50, 10],
     [50, 50]
@@ -155,7 +146,7 @@ describe('Transform line to resource, with geographic functions', async () => {
     [237.12121212121218, 185.60606060606085]
   ]
 
-  it(`should transform a vertical line without midpoints (and without closing it)`, () => {
+  it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformBackwardLineStringToLineString(
         input,
@@ -166,12 +157,12 @@ describe('Transform line to resource, with geographic functions', async () => {
   })
 })
 
-describe('Transform polygon to geo ', async () => {
+describe('Transform Forward Ring To Ring, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -189,7 +180,7 @@ describe('Transform polygon to geo ', async () => {
     [4.404906205946158, 51.959549039424715]
   ]
 
-  it(`should have the right output`, () => {
+  it(`should transform the ring (without closing) and add midpoints everywhere, including on between first and last position`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformForwardRingToRing(input, transformOptions),
       output
@@ -197,12 +188,12 @@ describe('Transform polygon to geo ', async () => {
   })
 })
 
-describe('Transform polygon to geo as geojson ', async () => {
+describe('Transform Forward Ring To GeoJSON Polygon, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -226,19 +217,19 @@ describe('Transform polygon to geo as geojson ', async () => {
     ]
   }
 
-  it(`should have the right output`, () => {
+  it(`should give the same result as transforming to ring, but as GeoJSON Polygon and therefore closed`, () => {
     expect(
       transformer.transformForwardRingToGeoJSONPolygon(input, transformOptions)
     ).to.deep.equal(output)
   })
 })
 
-describe('Transform polygon to resource', async () => {
+describe('Transform Backward Ring To Ring, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+  const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
     [4.388957777030093, 51.959084191571606],
     [4.392938913951547, 51.94062947962427],
@@ -256,19 +247,19 @@ describe('Transform polygon to resource', async () => {
     [1495.754239007751, 1000.8172824356742]
   ]
 
-  it(`should have the right output`, () => {
+  it(`should transform the ring (without closing) and add midpoints everywhere, including on between first and last position`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformBackwardRingToRing(input, transformOptions),
       output
     )
   })
 
-  describe('Transform polygon as geojson to resource', async () => {
+  describe('Transform Backward GeoJSONPolygon To Ring', async () => {
     const transformOptions = {
       maxOffsetRatio: 0.00001,
       maxDepth: 1
     }
-    const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
+    const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
     const input = {
       type: 'Polygon',
       coordinates: [
@@ -292,7 +283,7 @@ describe('Transform polygon to resource', async () => {
       [1495.7555378955249, 1000.7599463685738]
     ]
 
-    it(`should have the right output`, () => {
+    it(`should give the same result as transforming from ring`, () => {
       expect(
         transformer.transformBackwardGeoJSONPolygonToRing(
           input,
