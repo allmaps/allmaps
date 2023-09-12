@@ -26,7 +26,8 @@ function mergeDefaultOptions(
     close: false,
     maxOffsetRatio: 0,
     maxDepth: 0,
-    geographic: false
+    destinationIsGeographic: false,
+    sourceIsGeographic: false
   }
 
   if (options && options.maxDepth !== undefined) {
@@ -37,8 +38,12 @@ function mergeDefaultOptions(
     mergedOptions.maxOffsetRatio = options.maxOffsetRatio
   }
 
-  if (options && options.geographic !== undefined) {
-    mergedOptions.geographic = options.geographic
+  if (options && options.destinationIsGeographic !== undefined) {
+    mergedOptions.destinationIsGeographic = options.destinationIsGeographic
+  }
+
+  if (options && options.sourceIsGeographic !== undefined) {
+    mergedOptions.sourceIsGeographic = options.sourceIsGeographic
   }
 
   return mergedOptions
@@ -220,12 +225,16 @@ function addMidpointWithDestinationMidPositionFromTransform(
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
-  const sourceMidPosition = getMidPosition(
+  const sourceMidPositionFunction = options.sourceIsGeographic
+    ? (position1: Position, position2: Position) =>
+        getWorldMidpoint(position1, position2).geometry.coordinates as Position
+    : getMidPosition
+  const sourceMidPosition = sourceMidPositionFunction(
     segment.from.source,
     segment.to.source
   )
 
-  const destinationMidPositionFunction = options.geographic
+  const destinationMidPositionFunction = options.destinationIsGeographic
     ? (position1: Position, position2: Position) =>
         getWorldMidpoint(position1, position2).geometry.coordinates as Position
     : getMidPosition
@@ -236,7 +245,7 @@ function addMidpointWithDestinationMidPositionFromTransform(
   const destinationMidPositionFromTransform =
     transformer.transformForward(sourceMidPosition)
 
-  const destinationDistanceFunction = options.geographic
+  const destinationDistanceFunction = options.destinationIsGeographic
     ? getWorldDistance
     : getDistance
   const segmentDestinationDistance = destinationDistanceFunction(
@@ -286,7 +295,7 @@ function addMidpointWithSourceMidPositionFromTransform(
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
-  const destinationMidPositionFunction = options.geographic
+  const destinationMidPositionFunction = options.destinationIsGeographic
     ? (position1: Position, position2: Position) =>
         getWorldMidpoint(position1, position2).geometry.coordinates as Position
     : getMidPosition
@@ -295,7 +304,11 @@ function addMidpointWithSourceMidPositionFromTransform(
     segment.to.destination
   )
 
-  const sourceMidPosition = getMidPosition(
+  const sourceMidPositionFunction = options.sourceIsGeographic
+    ? (position1: Position, position2: Position) =>
+        getWorldMidpoint(position1, position2).geometry.coordinates as Position
+    : getMidPosition
+  const sourceMidPosition = sourceMidPositionFunction(
     segment.from.source,
     segment.to.source
   )
@@ -303,11 +316,14 @@ function addMidpointWithSourceMidPositionFromTransform(
     destinationMidPosition as Position
   )
 
-  const segmentSourceDistance = getDistance(
+  const sourceDistanceFunction = options.sourceIsGeographic
+    ? getWorldDistance
+    : getDistance
+  const segmentSourceDistance = sourceDistanceFunction(
     segment.from.source,
     segment.to.source
   )
-  const sourceMidPositionsDistance = getDistance(
+  const sourceMidPositionsDistance = sourceDistanceFunction(
     sourceMidPosition,
     sourceMidPositionFromTransform
   )

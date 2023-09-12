@@ -21,7 +21,8 @@ export type TransformationType =
 export type TransformOptions = {
   maxOffsetRatio: number
   maxDepth: number
-  geographic: boolean // Assume this is a resource to geo setting with lonlat geo coordinates and use geographic distances and midpoints
+  destinationIsGeographic: boolean // Assume destination has lonlat coordinates and use geographic distances and midpoints there
+  sourceIsGeographic: boolean // Assume source has lonlat coordinates and use geographic distances and midpoints there
 }
 
 export type PartialTransformOptions = Partial<TransformOptions>

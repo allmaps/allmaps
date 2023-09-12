@@ -8,8 +8,7 @@ import { transformGcps6, gcps6, transformGcps7 } from './input/gcps-test.js'
 describe('Transform LineString Forward To LineString, with maxDepth = 1', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
-    maxDepth: 1,
-    geographic: false
+    maxDepth: 1
   }
   const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
@@ -40,8 +39,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1', async 
 describe('Transform LineString Forward To LineString, with maxDepth = 1 and input as GCP instead of TransformGCP', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
-    maxDepth: 1,
-    geographic: false
+    maxDepth: 1
   }
   const transformer = new GCPTransformer(gcps6, 'thinPlateSpline')
   const input = [
@@ -69,11 +67,11 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and inpu
   })
 })
 
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and geographic = true', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1 and destinationIsGeographic = true', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
-    geographic: true
+    destinationIsGeographic: true
   }
   const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
   const input = [
@@ -100,11 +98,11 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and geog
   })
 })
 
-describe('Transform LineString Backward To LineString of horizontal line, with geographic = true and maxDepth = 2', async () => {
+describe('Transform LineString Backward To LineString of horizontal line, with destinationIsGeographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
-    geographic: true
+    destinationIsGeographic: true
   }
   const transformer = new GCPTransformer(transformGcps7, 'polynomial')
   const input = [
@@ -130,11 +128,11 @@ describe('Transform LineString Backward To LineString of horizontal line, with g
   })
 })
 
-describe('Transform LineString Backward To LineString of vertical line, with geographic = true and maxDepth = 2', async () => {
+describe('Transform LineString Backward To LineString of vertical line, with destinationIsGeographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
-    geographic: true
+    destinationIsGeographic: true
   }
   const transformer = new GCPTransformer(transformGcps7, 'polynomial')
   const input = [
