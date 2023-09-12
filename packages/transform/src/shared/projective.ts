@@ -20,7 +20,7 @@ export default class Projective implements Transformation {
 
     if (this.nPositions < 4) {
       throw new Error(
-        'Not enough controle points. A projective transformation requires a minimum of 4 points, but ' +
+        'Not enough control points. A projective transformation requires a minimum of 4 points, but ' +
           this.nPositions +
           ' are given.'
       )

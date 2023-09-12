@@ -36,7 +36,7 @@ export default class RBF implements Transformation {
 
     if (this.nPositions < 3) {
       throw new Error(
-        `Not enough controle points. A thin plate spline transformation (with affine component) requires a minimum of 3 points, but ${this.nPositions} are given.`
+        `Not enough control points. A thin plate spline transformation (with affine component) requires a minimum of 3 points, but ${this.nPositions} are given.`
       )
     }
 

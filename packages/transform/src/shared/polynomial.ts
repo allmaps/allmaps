@@ -27,10 +27,10 @@ export default class Polynomial implements Transformation {
     this.order = order || 1
     this.nCoefs = ((this.order + 1) * (this.order + 2)) / 2
 
-    // if there are less controle points then there are coefficients to be determined (for each dimension), the system can not be solved
+    // if there are less control points then there are coefficients to be determined (for each dimension), the system can not be solved
     if (this.nPositions < this.nCoefs) {
       throw new Error(
-        'Not enough controle points. A polynomial transformation of order ' +
+        'Not enough control points. A polynomial transformation of order ' +
           this.order +
           ' requires a minimum of ' +
           this.nCoefs +

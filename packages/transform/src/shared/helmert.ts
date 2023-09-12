@@ -20,7 +20,7 @@ export default class Helmert implements Transformation {
 
     if (this.nPositions < 2) {
       throw new Error(
-        'Not enough controle points. A helmert transformation requires a minimum of 2 points, but ' +
+        'Not enough control points. A helmert transformation requires a minimum of 2 points, but ' +
           this.nPositions +
           ' are given.'
       )

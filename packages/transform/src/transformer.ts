@@ -52,14 +52,14 @@ export default class GCPTransformer implements GCPTransformerInterface {
 
   /**
    * Create a GCPTransforer
-   * @param {TransformGCP[] | GCP[]} gcps - An array of Ground Controle Points (GCPs)
+   * @param {TransformGCP[] | GCP[]} gcps - An array of Ground Control Points (GCPs)
    * @param {TransformationType} type='polynomial' - The transformation type
    */ constructor(
     gcps: TransformGCP[] | GCP[],
     type: TransformationType = 'polynomial'
   ) {
     if (gcps.length == 0) {
-      throw new Error('No controle points.')
+      throw new Error('No control points.')
     }
     if ('resource' in gcps[0]) {
       this.gcps = gcps.map((p) => ({
