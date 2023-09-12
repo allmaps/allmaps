@@ -117,7 +117,8 @@ export async function createWarpedTileResponse(
           tile2lat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
-        const [pixelX, pixelY] = transformer.toResource(warpedTilePixelGeo)
+        const [pixelX, pixelY] =
+          transformer.transformToResource(warpedTilePixelGeo)
 
         // Check if pixel inside resource mask
         // TODO: improve efficiency

@@ -10,7 +10,7 @@ function logBenchmarkCreateGCPTransformer(input, type) {
   ops = 0
   while (Date.now() - start < 1000) {
     const transformer = new GCPTransformer(input, type)
-    transformer.toGeo([100, 100])
+    transformer.transformToGeo([100, 100])
     ops++
   }
   console.log(
@@ -35,7 +35,7 @@ function logBenchmarkUseGCPTransformer(input, type) {
   ops = 0
   const transformer = new GCPTransformer(input, type)
   while (Date.now() - start < 1000) {
-    transformer.toGeo([100, 100])
+    transformer.transformToGeo([100, 100])
     ops++
   }
   console.log(
