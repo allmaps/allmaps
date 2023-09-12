@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { GCPTransformer } from '../dist/index.js'
 
-import { gcps10 } from '../test/input/gcps-test.js'
+import { transformGcps10 } from '../test/input/gcps-test.js'
 
 let start, ops
 
@@ -23,12 +23,12 @@ function logBenchmarkCreateGCPTransformer(input, type) {
   )
 }
 
-logBenchmarkCreateGCPTransformer(gcps10, 'helmert')
-logBenchmarkCreateGCPTransformer(gcps10, 'polynomial1')
-logBenchmarkCreateGCPTransformer(gcps10, 'polynomial2')
-logBenchmarkCreateGCPTransformer(gcps10, 'polynomial3')
-logBenchmarkCreateGCPTransformer(gcps10, 'thinPlateSpline')
-logBenchmarkCreateGCPTransformer(gcps10, 'projective')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'helmert')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial1')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial2')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial3')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'thinPlateSpline')
+logBenchmarkCreateGCPTransformer(transformGcps10, 'projective')
 
 function logBenchmarkUseGCPTransformer(input, type) {
   start = Date.now()
@@ -48,9 +48,9 @@ function logBenchmarkUseGCPTransformer(input, type) {
   )
 }
 
-logBenchmarkUseGCPTransformer(gcps10, 'helmert')
-logBenchmarkUseGCPTransformer(gcps10, 'polynomial1')
-logBenchmarkUseGCPTransformer(gcps10, 'polynomial2')
-logBenchmarkUseGCPTransformer(gcps10, 'polynomial3')
-logBenchmarkUseGCPTransformer(gcps10, 'thinPlateSpline')
-logBenchmarkUseGCPTransformer(gcps10, 'projective')
+logBenchmarkUseGCPTransformer(transformGcps10, 'helmert')
+logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial1')
+logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial2')
+logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial3')
+logBenchmarkUseGCPTransformer(transformGcps10, 'thinPlateSpline')
+logBenchmarkUseGCPTransformer(transformGcps10, 'projective')

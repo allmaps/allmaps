@@ -2,7 +2,7 @@
 
 This module serves to **transform points**, polygons and other spatial features from one cartesian `(x, y)` plane to another **using a set of control points** identified in both planes.
 
-It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from controle points in the annotation and transforms coordinates **from the pixel coordinates space** of a IIIF Resource **to the map coordinate space** of an interactive map.
+It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from controle points in the annotation and transforms coordinates **from the resource coordinates space** of a IIIF Resource **to the geo coordinate space** of an interactive map.
 
 ## How it works
 
@@ -103,7 +103,7 @@ const geoJSONLineGeometry = transformer.toGeoJSON(
 
 ### CLI
 
-The [@allmaps/cli](../../apps/cli/) package exports an interface to transform **SVG** objects from the pixel coordinates space of a IIIF Resource to **GeoJSON** objects in the map coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
+The [@allmaps/cli](../../apps/cli/) package exports an interface to transform **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the map coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
 
 In the future, we hope to add an interface to manually enter coordinates of points to transform forward or backwards and easily specify GCPs and transformation type.
 
