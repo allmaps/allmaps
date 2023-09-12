@@ -212,7 +212,7 @@ export function computeIiifTilesForMapGeoBBox(
   // TODO: make this work for maxOffsetRatio = 0
 
   const geoBBoxPolygon = bboxToSvgPolygon(geoBBox)
-  const geoBBoxPolygonToResource = transformer.transformBackwardRingToRing(
+  const geoBBoxPolygonToResource = transformer.transformRingBackwardToRing(
     geoBBoxPolygon,
     {
       maxOffsetRatio: 0.00001,

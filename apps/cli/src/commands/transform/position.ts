@@ -64,8 +64,8 @@ function processPositionString(
   positionArray.forEach((position) =>
     outputPositions.push(
       options.inverse
-        ? transformer.toResource(position as Position)
-        : transformer.toGeo(position as Position)
+        ? transformer.transformToResource(position as Position)
+        : transformer.transformToGeo(position as Position)
     )
   )
 

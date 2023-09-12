@@ -44,7 +44,7 @@ function mergeDefaultOptions(
   return mergedOptions
 }
 
-export function transformForwardLineStringToLineString(
+export function transformLineStringForwardToLineString(
   transformer: GCPTransformerInterface,
   lineString: LineString,
   options?: PartialTransformOptions
@@ -71,7 +71,7 @@ export function transformForwardLineStringToLineString(
   )
 }
 
-export function transformBackwardLineStringToLineString(
+export function transformLineStringBackwardToLineString(
   transformer: GCPTransformerInterface,
   lineString: LineString,
   options?: PartialTransformOptions
@@ -96,7 +96,7 @@ export function transformBackwardLineStringToLineString(
   return segmentsToPoints(extendendSegements, true).map((point) => point.source)
 }
 
-export function transformForwardRingToRing(
+export function transformRingForwardToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
   options?: PartialTransformOptions
@@ -123,7 +123,7 @@ export function transformForwardRingToRing(
   )
 }
 
-export function transformBackwardRingToRing(
+export function transformRingBackwardToRing(
   transformer: GCPTransformerInterface,
   ring: Ring,
   options?: PartialTransformOptions

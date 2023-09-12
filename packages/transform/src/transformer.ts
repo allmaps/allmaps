@@ -7,10 +7,10 @@ import { thinPlateKernel } from './shared/kernel-functions.js'
 import { euclideanNorm } from './shared/norm-functions.js'
 
 import {
-  transformForwardLineStringToLineString,
-  transformBackwardLineStringToLineString,
-  transformForwardRingToRing,
-  transformBackwardRingToRing
+  transformLineStringForwardToLineString,
+  transformLineStringBackwardToLineString,
+  transformRingForwardToRing,
+  transformRingBackwardToRing
 } from './shared/transform-helper-functions.js'
 
 import {
@@ -74,15 +74,21 @@ export default class GCPTransformer implements GCPTransformerInterface {
     this.type = type
   }
 
-  createForwardTransform(): Transformation {
-    return this.createTransform(this.sourcePositions, this.destinationPositions)
+  createForwardTransformation(): Transformation {
+    return this.createTransformation(
+      this.sourcePositions,
+      this.destinationPositions
+    )
   }
 
-  createBackwardTransform(): Transformation {
-    return this.createTransform(this.destinationPositions, this.sourcePositions)
+  createBackwardTransformation(): Transformation {
+    return this.createTransformation(
+      this.destinationPositions,
+      this.sourcePositions
+    )
   }
 
-  createTransform(
+  createTransformation(
     sourcePositions: Position[],
     destinationPositions: Position[]
   ): Transformation {
@@ -117,7 +123,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    */
   transformForward(position: Position): Position {
     if (!this.forwardTransformation) {
-      this.forwardTransformation = this.createForwardTransform()
+      this.forwardTransformation = this.createForwardTransformation()
     }
 
     return this.forwardTransformation.interpolant(position)
@@ -130,7 +136,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    */
   transformBackward(position: Position): Position {
     if (!this.backwardTransformation) {
-      this.backwardTransformation = this.createBackwardTransform()
+      this.backwardTransformation = this.createBackwardTransformation()
     }
 
     return this.backwardTransformation.interpolant(position)
@@ -139,20 +145,20 @@ export default class GCPTransformer implements GCPTransformerInterface {
   // Alias
 
   /**
-   * Transforms position forward
+   * Transforms position forward (i.e. to geo)
    * @param {Position} position - Position to transform
    * @returns {Position} Forward transform of input position
    */
-  toGeo(position: Position): Position {
+  transformToGeo(position: Position): Position {
     return this.transformForward(position)
   }
 
   /**
-   * Transforms position backward
+   * Transforms position backward (i.e. to resource)
    * @param {Position} position - Position to transform
    * @returns {Position} Backward transform of input position
    */
-  toResource(position: Position): Position {
+  transformToResource(position: Position): Position {
     return this.transformBackward(position)
   }
 
@@ -163,7 +169,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Position} position - Position to transform
    * @returns {Position} Forward transform of input position
    */
-  transformForwardPositionToPosition(position: Position): Position {
+  transformPositionForwardToPosition(position: Position): Position {
     return this.transformForward(position)
   }
 
@@ -172,7 +178,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Position} position - Position to transform
    * @returns {GeoJSONPoint} Forward transform of input position, as GeoJSON point
    */
-  transformForwardPositionToGeoJSONPoint(position: Position): GeoJSONPoint {
+  transformPositionForwardToGeoJSONPoint(position: Position): GeoJSONPoint {
     return convertPositionToGeoJSONPoint(this.transformForward(position))
   }
 
@@ -181,7 +187,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Position} position - Position to transform
    * @returns {Position} Backward transform of input position
    */
-  transformBackwardPositionToPosition(position: Position): Position {
+  transformPositionBackwardToPosition(position: Position): Position {
     return this.transformBackward(position)
   }
 
@@ -190,7 +196,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
    * @returns {Position} Backward transform of input position
    */
-  transformBackwardGeoJSONPointToPosition(geometry: GeoJSONPoint): Position {
+  transformGeoJSONPointBackwardToPosition(geometry: GeoJSONPoint): Position {
     return this.transformBackward(convertGeoJSONPointToPosition(geometry))
   }
 
@@ -202,11 +208,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    * @returns {LineString} Forward transform of input lineString
    */
-  transformForwardLineStringToLineString(
+  transformLineStringForwardToLineString(
     lineString: LineString,
     options?: PartialTransformOptions
   ): LineString {
-    return transformForwardLineStringToLineString(this, lineString, options)
+    return transformLineStringForwardToLineString(this, lineString, options)
   }
 
   /**
@@ -215,7 +221,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {GeoJSONLineString} Forward transform of input lineString, as GeoJSON lineString
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformForwardLineStringToGeoJSONLineString(
+  transformLineStringForwardToGeoJSONLineString(
     lineString: LineString,
     options?: PartialTransformOptions
   ): GeoJSONLineString {
@@ -223,7 +229,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
       options.geographic = true
     }
     return convertLineStringToGeoJSONLineString(
-      transformForwardLineStringToLineString(this, lineString, options)
+      transformLineStringForwardToLineString(this, lineString, options)
     )
   }
 
@@ -233,11 +239,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {LineString} Backward transform of input lineString
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformBackwardLineStringToLineString(
+  transformLineStringBackwardToLineString(
     lineString: LineString,
     options?: PartialTransformOptions
   ): LineString {
-    return transformBackwardLineStringToLineString(this, lineString, options)
+    return transformLineStringBackwardToLineString(this, lineString, options)
   }
 
   /**
@@ -246,14 +252,14 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {LineString} Backward transform of input lineString
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformBackwardGeoJSONLineStringToLineString(
+  transformGeoJSONLineStringBackwardToLineString(
     geometry: GeoJSONLineString,
     options?: PartialTransformOptions
   ): LineString {
     if (options && !('geographic' in options)) {
       options.geographic = true
     }
-    return transformBackwardLineStringToLineString(
+    return transformLineStringBackwardToLineString(
       this,
       convertGeoJSONLineStringToLineString(geometry),
       options
@@ -268,11 +274,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Ring} Forward transform of input ring
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformForwardRingToRing(
+  transformRingForwardToRing(
     ring: Ring,
     options?: PartialTransformOptions
   ): Ring {
-    return transformForwardRingToRing(this, ring, options)
+    return transformRingForwardToRing(this, ring, options)
   }
 
   /**
@@ -281,7 +287,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {GeoJSONPolygon} Forward transform of input ring, as GeoJSON polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformForwardRingToGeoJSONPolygon(
+  transformRingForwardToGeoJSONPolygon(
     ring: Ring,
     options?: PartialTransformOptions
   ): GeoJSONPolygon {
@@ -289,7 +295,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
       options.geographic = true
     }
     return convertRingToGeoJSONPolygon(
-      transformForwardRingToRing(this, ring, options)
+      transformRingForwardToRing(this, ring, options)
     )
   }
 
@@ -299,11 +305,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Ring} Backward transform of input ring
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformBackwardRingToRing(
+  transformRingBackwardToRing(
     ring: Ring,
     options?: PartialTransformOptions
   ): Ring {
-    return transformBackwardRingToRing(this, ring, options)
+    return transformRingBackwardToRing(this, ring, options)
   }
 
   /**
@@ -312,14 +318,14 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Ring} Backward transform of input ring
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformBackwardGeoJSONPolygonToRing(
+  transformGeoJSONPolygonBackwardToRing(
     geometry: GeoJSONPolygon,
     options?: PartialTransformOptions
   ): Ring {
     if (options && !('geographic' in options)) {
       options.geographic = true
     }
-    return transformBackwardRingToRing(
+    return transformRingBackwardToRing(
       this,
       convertGeoJSONPolygonToRing(geometry),
       options

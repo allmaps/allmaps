@@ -42,8 +42,8 @@ export type GCPTransformerInterface = {
   gcps: TransformGCP[]
 
   transformForward(position: Position): Position
-  toGeo(position: Position): Position
+  transformToGeo(position: Position): Position
 
   transformBackward(position: Position): Position
-  toResource(position: Position): Position
+  transformToResource(position: Position): Position
 }

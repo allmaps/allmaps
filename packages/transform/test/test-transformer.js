@@ -5,7 +5,7 @@ import { GCPTransformer } from '../dist/index.js'
 
 import { transformGcps6, gcps6, transformGcps7 } from './input/gcps-test.js'
 
-describe('Transform Forward LineString To LineString, with maxDepth = 1', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
@@ -28,7 +28,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1', async 
 
   it(`should transform the lineString (without closing) and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForwardLineStringToLineString(
+      transformer.transformLineStringForwardToLineString(
         input,
         transformOptions
       ),
@@ -37,7 +37,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1', async 
   })
 })
 
-describe('Transform Forward LineString To LineString, with maxDepth = 1 and input as GCP instead of TransformGCP', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1 and input as GCP instead of TransformGCP', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
@@ -60,7 +60,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1 and inpu
 
   it(`should give the same result as with input as TransformGCP`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForwardLineStringToLineString(
+      transformer.transformLineStringForwardToLineString(
         input,
         transformOptions
       ),
@@ -69,7 +69,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1 and inpu
   })
 })
 
-describe('Transform Forward LineString To LineString, with maxDepth = 1 and geographic = true', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1 and geographic = true', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.01,
     maxDepth: 1,
@@ -91,7 +91,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1 and geog
 
   it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForwardLineStringToLineString(
+      transformer.transformLineStringForwardToLineString(
         input,
         transformOptions
       ),
@@ -100,7 +100,7 @@ describe('Transform Forward LineString To LineString, with maxDepth = 1 and geog
   })
 })
 
-describe('Transform Backward LineString To LineString of horizontal line, with geographic = true and maxDepth = 2', async () => {
+describe('Transform LineString Backward To LineString of horizontal line, with geographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
@@ -121,7 +121,7 @@ describe('Transform Backward LineString To LineString of horizontal line, with g
 
   it(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackwardLineStringToLineString(
+      transformer.transformLineStringBackwardToLineString(
         input,
         transformOptions
       ),
@@ -130,7 +130,7 @@ describe('Transform Backward LineString To LineString of horizontal line, with g
   })
 })
 
-describe('Transform Backward LineString To LineString of vertical line, with geographic = true and maxDepth = 2', async () => {
+describe('Transform LineString Backward To LineString of vertical line, with geographic = true and maxDepth = 2', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
     maxDepth: 2,
@@ -148,7 +148,7 @@ describe('Transform Backward LineString To LineString of vertical line, with geo
 
   it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackwardLineStringToLineString(
+      transformer.transformLineStringBackwardToLineString(
         input,
         transformOptions
       ),
@@ -157,7 +157,7 @@ describe('Transform Backward LineString To LineString of vertical line, with geo
   })
 })
 
-describe('Transform Forward Ring To Ring, with maxOffsetRatio very small', async () => {
+describe('Transform Ring Forward To Ring, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
@@ -182,13 +182,13 @@ describe('Transform Forward Ring To Ring, with maxOffsetRatio very small', async
 
   it(`should transform the ring (without closing) and add midpoints everywhere, including on between first and last position`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForwardRingToRing(input, transformOptions),
+      transformer.transformRingForwardToRing(input, transformOptions),
       output
     )
   })
 })
 
-describe('Transform Forward Ring To GeoJSON Polygon, with maxOffsetRatio very small', async () => {
+describe('Transform Ring Forward To GeoJSON Polygon, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
@@ -219,12 +219,12 @@ describe('Transform Forward Ring To GeoJSON Polygon, with maxOffsetRatio very sm
 
   it(`should give the same result as transforming to ring, but as GeoJSON Polygon and therefore closed`, () => {
     expect(
-      transformer.transformForwardRingToGeoJSONPolygon(input, transformOptions)
+      transformer.transformRingForwardToGeoJSONPolygon(input, transformOptions)
     ).to.deep.equal(output)
   })
 })
 
-describe('Transform Backward Ring To Ring, with maxOffsetRatio very small', async () => {
+describe('Transform Ring Backward To Ring, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
     maxDepth: 1
@@ -249,12 +249,12 @@ describe('Transform Backward Ring To Ring, with maxOffsetRatio very small', asyn
 
   it(`should transform the ring (without closing) and add midpoints everywhere, including on between first and last position`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackwardRingToRing(input, transformOptions),
+      transformer.transformRingBackwardToRing(input, transformOptions),
       output
     )
   })
 
-  describe('Transform Backward GeoJSONPolygon To Ring', async () => {
+  describe('Transform GeoJSONPolygon Backward To Ring', async () => {
     const transformOptions = {
       maxOffsetRatio: 0.00001,
       maxDepth: 1
@@ -285,7 +285,7 @@ describe('Transform Backward Ring To Ring, with maxOffsetRatio very small', asyn
 
     it(`should give the same result as transforming from ring`, () => {
       expect(
-        transformer.transformBackwardGeoJSONPolygonToRing(
+        transformer.transformGeoJSONPolygonBackwardToRing(
           input,
           transformOptions
         )

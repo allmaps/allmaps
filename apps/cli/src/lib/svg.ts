@@ -224,12 +224,12 @@ export function transformGeoJsonToSvg(
   if (geometry.type === 'Point') {
     return {
       type: 'circle',
-      coordinates: transformer.transformBackwardGeoJSONPointToPosition(geometry)
+      coordinates: transformer.transformGeoJSONPointBackwardToPosition(geometry)
     }
   } else if (geometry.type === 'LineString') {
     return {
       type: 'polyline',
-      coordinates: transformer.transformBackwardGeoJSONLineStringToLineString(
+      coordinates: transformer.transformGeoJSONLineStringBackwardToLineString(
         geometry,
         options
       )
@@ -237,7 +237,7 @@ export function transformGeoJsonToSvg(
   } else if (geometry.type === 'Polygon') {
     return {
       type: 'polygon',
-      coordinates: transformer.transformBackwardGeoJSONPolygonToRing(
+      coordinates: transformer.transformGeoJSONPolygonBackwardToRing(
         geometry,
         options
       )

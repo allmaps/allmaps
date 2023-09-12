@@ -119,7 +119,7 @@ export default class World extends EventTarget {
       maxDepth: 6
     }
 
-    const geoMask = transformer.transformForwardRingToGeoJSONPolygon(
+    const geoMask = transformer.transformRingForwardToGeoJSONPolygon(
       resourceMask,
       transformerOptions
     )
@@ -135,7 +135,7 @@ export default class World extends EventTarget {
       [0, parsedImage.height]
     ]
 
-    const fullGeoMask = transformer.transformForwardRingToGeoJSONPolygon(
+    const fullGeoMask = transformer.transformRingForwardToGeoJSONPolygon(
       fullResourceMask,
       transformerOptions
     )
@@ -328,7 +328,7 @@ export default class World extends EventTarget {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       const geoMask =
-        warpedMap.transformer.transformForwardRingToGeoJSONPolygon(resourceMask)
+        warpedMap.transformer.transformRingForwardToGeoJSONPolygon(resourceMask)
       warpedMap.geoMask = geoMask
       warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
 
