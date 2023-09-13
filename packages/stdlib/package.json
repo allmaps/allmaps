@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -44,7 +44,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.15",
+    "@allmaps/annotation": "^1.0.0-beta.16",
     "@allmaps/iiif-parser": "^1.0.0-beta.25",
     "@allmaps/types": "^1.0.0-beta.3"
   },
