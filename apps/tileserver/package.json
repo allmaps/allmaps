@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.33",
+  "version": "1.0.0-beta.34",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -30,7 +30,7 @@
     "@allmaps/annotation": "^1.0.0-beta.16",
     "@allmaps/id": "^1.0.0-beta.16",
     "@allmaps/iiif-parser": "^1.0.0-beta.25",
-    "@allmaps/render": "^1.0.0-beta.34",
+    "@allmaps/render": "^1.0.0-beta.35",
     "@allmaps/transform": "^1.0.0-beta.15",
     "@cloudflare/workers-types": "^3.14.0",
     "@turf/bbox": "^6.5.0",
