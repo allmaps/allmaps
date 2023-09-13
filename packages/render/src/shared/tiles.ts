@@ -115,14 +115,13 @@ function findBestZoomLevel(
   mapTileScale: number
 ): TileZoomLevel | undefined {
   let smallestScaleDiff = Number.POSITIVE_INFINITY
-  let bestZoomLevel: TileZoomLevel | undefined
+  let bestZoomLevel = timeZoomLevels[timeZoomLevels.length - 1]
 
   for (const zoomLevel of timeZoomLevels) {
     const scaleFactor = zoomLevel.scaleFactor
-    const scaleDiff = Math.abs(Math.log2(scaleFactor) - Math.log2(mapTileScale))
-    // const scaleDiff = Math.abs(scaleFactor - mapTileScale)
+    const scaleDiff = Math.abs(scaleFactor - mapTileScale)
 
-    if (scaleDiff < smallestScaleDiff) {
+    if (scaleDiff < smallestScaleDiff && scaleFactor >= mapTileScale) {
       smallestScaleDiff = scaleDiff
       bestZoomLevel = zoomLevel
     }
