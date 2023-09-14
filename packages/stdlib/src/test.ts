@@ -2,14 +2,18 @@ import { expect } from 'chai'
 
 const EPSILON = 0.00001
 
-export function expectToBeCloseToArray(actual, expected, epsilon = EPSILON) {
+export function expectToBeCloseToArray(
+  actual: number[],
+  expected: number[],
+  epsilon = EPSILON
+) {
   expect(actual.length).to.equal(expected.length)
   actual.forEach((n, i) => expect(n).to.be.approximately(expected[i], epsilon))
 }
 
 export function expectToBeCloseToArrayArray(
-  actual,
-  expected,
+  actual: number[][],
+  expected: number[][],
   epsilon = EPSILON
 ) {
   expect(actual.length).to.equal(expected.length)
