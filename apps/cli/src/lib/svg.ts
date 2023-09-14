@@ -219,7 +219,7 @@ export function resourceMaskToSvgPolygon(map: Map): Polygon {
 export function transformGeoJsonToSvg(
   transformer: GCPTransformer,
   geometry: GeoJSONGeometry,
-  options?: PartialTransformOptions
+  transformOptions?: PartialTransformOptions
 ): GeometryElement {
   if (geometry.type === 'Point') {
     return {
@@ -231,7 +231,7 @@ export function transformGeoJsonToSvg(
       type: 'polyline',
       coordinates: transformer.transformGeoJSONLineStringBackwardToLineString(
         geometry,
-        options
+        transformOptions
       )
     }
   } else if (geometry.type === 'Polygon') {
@@ -239,7 +239,7 @@ export function transformGeoJsonToSvg(
       type: 'polygon',
       coordinates: transformer.transformGeoJSONPolygonBackwardToRing(
         geometry,
-        options
+        transformOptions
       )
     }
   } else {

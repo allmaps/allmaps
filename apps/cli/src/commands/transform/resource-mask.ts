@@ -28,6 +28,10 @@ export default function resourceMask() {
 
     const transformOptions = parseTransformOptions(options)
 
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
+
     for (const map of maps) {
       const transformer = new GCPTransformer(map.gcps, map.transformation?.type)
       const polygon = transformer.transformRingForwardToGeoJSONPolygon(

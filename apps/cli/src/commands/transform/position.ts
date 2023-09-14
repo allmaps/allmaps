@@ -56,7 +56,7 @@ export default function position() {
 function processPositionString(
   positionString: string,
   transformer: GCPTransformer,
-  options: { inverse: string }
+  options: { inverse: boolean }
 ) {
   // Parse positionString to Array of positions and transform them
   const outputPositions: Position[] = []

@@ -34,6 +34,10 @@ export default function geojson() {
 
     const geoJsonGeometries = await parseJsonInput(files as string[])
 
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
+
     const svgElements = []
     for (const geoJsonGeometry of geoJsonGeometries) {
       if (isGeoJSONGeometry(geoJsonGeometry)) {

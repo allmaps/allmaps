@@ -117,6 +117,19 @@ export function parseTransformOptions(
     if ('maxDepth' in options && options.maxDepth) {
       transformOptions.maxDepth = Math.round(Number(options.maxDepth))
     }
+
+    if (
+      'destinationIsGeographic' in options &&
+      options.destinationIsGeographic
+    ) {
+      transformOptions.destinationIsGeographic =
+        options.destinationIsGeographic as boolean
+    }
+
+    if ('sourceIsGeographic' in options && options.sourceIsGeographic) {
+      transformOptions.sourceIsGeographic =
+        options.sourceIsGeographic as boolean
+    }
   }
 
   return transformOptions

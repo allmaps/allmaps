@@ -10,7 +10,7 @@ import type { GeometryElement } from './svg.js'
 export function transformSvgToGeoJson(
   transformer: GCPTransformer,
   geometry: GeometryElement,
-  options?: PartialTransformOptions
+  transformOptions?: PartialTransformOptions
 ) {
   if (geometry.type === 'circle') {
     return transformer.transformPositionForwardToGeoJSONPoint(
@@ -19,22 +19,22 @@ export function transformSvgToGeoJson(
   } else if (geometry.type === 'line') {
     return transformer.transformLineStringForwardToGeoJSONLineString(
       geometry.coordinates,
-      options
+      transformOptions
     )
   } else if (geometry.type === 'polyline') {
     return transformer.transformLineStringForwardToGeoJSONLineString(
       geometry.coordinates,
-      options
+      transformOptions
     )
   } else if (geometry.type === 'rect') {
     return transformer.transformRingForwardToGeoJSONPolygon(
       geometry.coordinates,
-      options
+      transformOptions
     )
   } else if (geometry.type === 'polygon') {
     return transformer.transformRingForwardToGeoJSONPolygon(
       geometry.coordinates,
-      options
+      transformOptions
     )
   } else {
     throw new Error(`Unsupported SVG geometry`)

@@ -150,7 +150,7 @@ allmaps transform position -g path/to/gcpFile.json -t thinPlateSpline path/to/po
 
 #### Transform SVG
 
-Transform SVG to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform SVG forward to GeoJSON Geometry using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
 
 **Examples:**
 
@@ -169,7 +169,7 @@ allmaps transform svg -g path/to/gcpFile.json -t thinPlateSpline path/to/mySVG.s
 
 #### Transform GeoJSON
 
-Transform GeoJSON to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform GeoJSON Geometry backwars to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
 
 **Examples:**
 
@@ -187,7 +187,7 @@ allmaps transform geojson -g path/to/gcpFile.json -t thinPlateSpline path/to/myG
 
 #### Transform Resource Mask
 
-Transform SVG resource masks of input Georeference Annotations to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
+Transform SVG resource masks of input Georeference Annotations forward to GeoJSO Polygon using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
 
 This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG.
 
@@ -201,21 +201,24 @@ allmaps transform resource-mask [files...]
 allmaps transform resource-mask path/to/myAnnotation.json path/to/myAnnotation2.json
 ```
 
-All the commands above (except `resource-mask`) accept the following options for specifying the transformations:
+All the commands above accept the following options for specifying the transformations:
 
 | Option                                            | Description                                                                                                                                                                    | Default      |
-| :------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
+|:--------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
 | `-i, --inverse`                                   | Compute backward ("inverse") transformation                                                                                                                                    |              |
 | `-g, --gcps <filename>`                           | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
 | `-t, --transformationType <transformationType>`   | Transformation Type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
 | `-o, --transformationOrder <transformationOrder>` | Order of polynomial transformation. One of `1`, `2` or `3`.                                                                                                                    | `1`          |
 
-All the commands above (except `position`) accept the following options for transforming lines or polygons:
+All the commands above (except `position`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
-| Option                            | Description                                                     | Default |
-| :-------------------------------- | :-------------------------------------------------------------- | :------ |
-| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints | `0`     |
-| `-d, --max-depth <number>`        | Maximum recursion depth                                         | `6`     |
+| Option                            | Description                                                              | Default                                                 |
+|:----------------------------------|:-------------------------------------------------------------------------|:--------------------------------------------------------|
+| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints          | `0`                                                     |
+| `-d, --max-depth <number>`        | Maximum recursion depth                                                  | `6`                                                     |
+| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` for `geojson` command)                  |
+| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination positions | `false` (`true` for `svg` and `resource-mask` commands) |
+
 
 ### Parse and generate IIIF resources
 

@@ -37,6 +37,10 @@ export default function svg() {
 
     const svgs = await readInput(files as string[])
 
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
+
     const geoJsonGeometries = []
     for (const svg of svgs) {
       for (const geometry of geomEach(svg)) {
