@@ -43,7 +43,7 @@ export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
   ]
 }
 
-export function bboxToSvgPolygon(bbox: BBox): SVGPolygon {
+export function bboxToRing(bbox: BBox): SVGPolygon {
   return [
     [bbox[0], bbox[1]],
     [bbox[2], bbox[1]],
