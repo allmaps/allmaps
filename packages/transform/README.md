@@ -63,7 +63,7 @@ const transformedPosition = transformer.transformBackward([4.9385700843392435, 5
 
 Instead of `transformForward()` one can use `transformToGeo()` which is clearer in the Allmaps use case. For `transformBackward()` there is `transformToResource()`.
 
-## Lines and Polygons
+### Lines and Polygons
 
 The transformer Class also exports more general functions to transform points ('positions'), lines ('lineStrings') and polygons ('rings') forward or backward.
 
@@ -130,7 +130,7 @@ When transforming a line or polygon, it can happen that simply transforming ever
 | `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` when source is GeoJSON)      |
 | `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination positions | `false` (`true` when destination is GeoJSON) |
 
-## GeoJSON Geometries
+### GeoJSON Geometries
 
 Transformation functions also exist for transforming from and/or to GeoJSON Geometries. When supplying a GeoJSON input the corresponding 'geographic' option is set to true (but can be overwritten).
 
@@ -170,14 +170,14 @@ const transformedRing = transformer.transformGeoJSONPolygonBackwardToRing(geoJSO
 
 Overall there are functions for forward and backward of position, line and ring (each possibly GeoJSON): this totals to 24 transform functions!
 
-### CLI
-
-The [@allmaps/cli](../../apps/cli/) package exports an interface to transform positions, to transform **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the geo coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
-
 ### Notes
 
 - Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
 - The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more then as projection coordinates.)
+
+## CLI
+
+The [@allmaps/cli](../../apps/cli/) package exports an interface to transform positions, to transform **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the geo coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
 
 ### Benchmark
 
