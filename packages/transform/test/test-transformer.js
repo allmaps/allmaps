@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { expectToBeCloseToArrayArray } from '@allmaps/stdlib'
+import { expectToBeCloseToArrayArray } from './shared/helper-fuctions.js'
 import { GCPTransformer } from '../dist/index.js'
 
 import { transformGcps6, gcps6, transformGcps7 } from './input/gcps-test.js'
