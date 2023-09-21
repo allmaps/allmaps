@@ -147,24 +147,32 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: PartialTransformOptions
   ): Geometry {
     if (isPosition(input)) {
-      return this.transformPositionForwardToPosition(input as Position)
+      if (!this.forwardTransformation) {
+        this.forwardTransformation = this.createForwardTransformation()
+      }
+      return this.forwardTransformation.interpolant(input)
     } else if (isGeoJSONPoint(input)) {
-      return this.transformGeoJSONPointForwardToPosition(input as GeoJSONPoint)
+      return this.transformForward(convertGeoJSONPointToPosition(input))
     } else if (isLineString(input)) {
-      return this.transformLineStringForwardToLineString(
-        input as LineString,
-        options
-      )
+      return transformLineStringForwardToLineString(this, input, options)
     } else if (isGeoJSONLineString(input)) {
-      return this.transformGeoJSONLineStringForwardToLineString(
-        input as GeoJSONLineString,
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      return transformLineStringForwardToLineString(
+        this,
+        convertGeoJSONLineStringToLineString(input),
         options
       )
     } else if (isPolygon(input)) {
-      return this.transformPolygonForwardToPolygon(input as Polygon, options)
+      return transformPolygonForwardToPolygon(this, input, options)
     } else if (isGeoJSONPolygon(input)) {
-      return this.transformGeoJSONPolygonForwardToPolygon(
-        input as GeoJSONPolygon,
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      return transformPolygonForwardToPolygon(
+        this,
+        convertGeoJSONPolygonToPolygon(input),
         options
       )
     } else {
@@ -195,30 +203,52 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: PartialTransformOptions
   ): GeoJSONGeometry {
     if (isPosition(input)) {
-      return this.transformPositionForwardToGeoJSONPoint(input as Position)
+      return convertPositionToGeoJSONPoint(this.transformForward(input))
     } else if (isGeoJSONPoint(input)) {
-      return this.transformGeoJSONPointForwardToGeoJSONPoint(
-        input as GeoJSONPoint
+      return convertPositionToGeoJSONPoint(
+        this.transformForward(convertGeoJSONPointToPosition(input))
       )
     } else if (isLineString(input)) {
-      return this.transformLineStringForwardToGeoJSONLineString(
-        input as LineString,
-        options
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertLineStringToGeoJSONLineString(
+        transformLineStringForwardToLineString(this, input, options)
       )
     } else if (isGeoJSONLineString(input)) {
-      return this.transformGeoJSONLineStringForwardToGeoJSONLineString(
-        input as GeoJSONLineString,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertLineStringToGeoJSONLineString(
+        transformLineStringForwardToLineString(
+          this,
+          convertGeoJSONLineStringToLineString(input),
+          options
+        )
       )
     } else if (isPolygon(input)) {
-      return this.transformPolygonForwardToGeoJSONPolygon(
-        input as Polygon,
-        options
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertPolygonToGeoJSONPolygon(
+        transformPolygonForwardToPolygon(this, input, options)
       )
     } else if (isGeoJSONPolygon(input)) {
-      return this.transformGeoJSONPolygonForwardToGeoJSONPolygon(
-        input as GeoJSONPolygon,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertPolygonToGeoJSONPolygon(
+        transformPolygonForwardToPolygon(
+          this,
+          convertGeoJSONPolygonToPolygon(input),
+          options
+        )
       )
     } else {
       throw new Error('Input type not supported')
@@ -248,24 +278,33 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: PartialTransformOptions
   ): Geometry {
     if (isPosition(input)) {
-      return this.transformPositionBackwardToPosition(input as Position)
+      if (!this.backwardTransformation) {
+        this.backwardTransformation = this.createBackwardTransformation()
+      }
+
+      return this.backwardTransformation.interpolant(input)
     } else if (isGeoJSONPoint(input)) {
-      return this.transformGeoJSONPointBackwardToPosition(input as GeoJSONPoint)
+      return this.transformBackward(convertGeoJSONPointToPosition(input))
     } else if (isLineString(input)) {
-      return this.transformLineStringBackwardToLineString(
-        input as LineString,
-        options
-      )
+      return transformLineStringBackwardToLineString(this, input, options)
     } else if (isGeoJSONLineString(input)) {
-      return this.transformGeoJSONLineStringBackwardToLineString(
-        input as GeoJSONLineString,
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return transformLineStringBackwardToLineString(
+        this,
+        convertGeoJSONLineStringToLineString(input),
         options
       )
     } else if (isPolygon(input)) {
-      return this.transformPolygonBackwardToPolygon(input as Polygon, options)
+      return transformPolygonBackwardToPolygon(this, input, options)
     } else if (isGeoJSONPolygon(input)) {
-      return this.transformGeoJSONPolygonBackwardToPolygon(
-        input as GeoJSONPolygon,
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return transformPolygonBackwardToPolygon(
+        this,
+        convertGeoJSONPolygonToPolygon(input),
         options
       )
     } else {
@@ -296,30 +335,52 @@ export default class GCPTransformer implements GCPTransformerInterface {
     options?: PartialTransformOptions
   ): GeoJSONGeometry {
     if (isPosition(input)) {
-      return this.transformPositionBackwardToGeoJSONPoint(input as Position)
+      return convertPositionToGeoJSONPoint(this.transformBackward(input))
     } else if (isGeoJSONPoint(input)) {
-      return this.transformGeoJSONPointBackwardToGeoJSONPoint(
-        input as GeoJSONPoint
+      return convertPositionToGeoJSONPoint(
+        this.transformBackward(convertGeoJSONPointToPosition(input))
       )
     } else if (isLineString(input)) {
-      return this.transformLineStringBackwardToGeoJSONLineString(
-        input as LineString,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      return convertLineStringToGeoJSONLineString(
+        transformLineStringBackwardToLineString(this, input, options)
       )
     } else if (isGeoJSONLineString(input)) {
-      return this.transformGeoJSONLineStringBackwardToGeoJSONLineString(
-        input as GeoJSONLineString,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertLineStringToGeoJSONLineString(
+        transformLineStringBackwardToLineString(
+          this,
+          convertGeoJSONLineStringToLineString(input),
+          options
+        )
       )
     } else if (isPolygon(input)) {
-      return this.transformPolygonBackwardToGeoJSONPolygon(
-        input as Polygon,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      return convertPolygonToGeoJSONPolygon(
+        transformPolygonBackwardToPolygon(this, input, options)
       )
     } else if (isGeoJSONPolygon(input)) {
-      return this.transformGeoJSONPolygonBackwardToGeoJSONPolygon(
-        input as GeoJSONPolygon,
-        options
+      if (options && !('sourceIsGeographic' in options)) {
+        options.sourceIsGeographic = true
+      }
+      if (options && !('destinationIsGeographic' in options)) {
+        options.destinationIsGeographic = true
+      }
+      return convertPolygonToGeoJSONPolygon(
+        transformPolygonBackwardToPolygon(
+          this,
+          convertGeoJSONPolygonToPolygon(input),
+          options
+        )
       )
     } else {
       throw new Error('Input type not supported')
@@ -481,421 +542,5 @@ export default class GCPTransformer implements GCPTransformerInterface {
     } else {
       throw new Error('Input type not supported')
     }
-  }
-
-  // Position - Forward
-
-  /**
-   * Transforms position forward to position
-   * @param {Position} position - Position to transform
-   * @returns {Position} Forward transform of input position
-   */
-  transformPositionForwardToPosition(position: Position): Position {
-    if (!this.forwardTransformation) {
-      this.forwardTransformation = this.createForwardTransformation()
-    }
-
-    return this.forwardTransformation.interpolant(position)
-  }
-
-  /**
-   * Transforms position forward to GeoJSON point
-   * @param {Position} position - Position to transform
-   * @returns {GeoJSONPoint} Forward transform of input position, as GeoJSON point
-   */
-  transformPositionForwardToGeoJSONPoint(position: Position): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(
-      this.transformPositionForwardToPosition(position)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON point forward to position
-   * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
-   * @returns {Position} Forward transform of input position
-   */
-  transformGeoJSONPointForwardToPosition(geometry: GeoJSONPoint): Position {
-    return this.transformPositionForwardToPosition(
-      convertGeoJSONPointToPosition(geometry)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON point forward to GeoJSON point
-   * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
-   * @returns {GeoJSONPoint} Forward transform of input position, as GeoJSON point
-   */
-  transformGeoJSONPointForwardToGeoJSONPoint(
-    geometry: GeoJSONPoint
-  ): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(
-      this.transformPositionForwardToPosition(
-        convertGeoJSONPointToPosition(geometry)
-      )
-    )
-  }
-
-  // Position - Backward
-
-  /**
-   * Transforms position backward to position
-   * @param {Position} position - Position to transform
-   * @returns {Position} Backward transform of input position
-   */
-  transformPositionBackwardToPosition(position: Position): Position {
-    if (!this.backwardTransformation) {
-      this.backwardTransformation = this.createBackwardTransformation()
-    }
-
-    return this.backwardTransformation.interpolant(position)
-  }
-
-  /**
-   * Transforms GeoJSON point backward to position
-   * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
-   * @returns {Position} Backward transform of input position
-   */
-  transformGeoJSONPointBackwardToPosition(geometry: GeoJSONPoint): Position {
-    return this.transformPositionBackwardToPosition(
-      convertGeoJSONPointToPosition(geometry)
-    )
-  }
-
-  /**
-   * Transforms position backward to GeoJSON point
-   * @param {Position} position - Position to transform
-   * @returns {GeoJSONPoint} Backward transform of input position, as GeoJSON point
-   */
-  transformPositionBackwardToGeoJSONPoint(position: Position): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(
-      this.transformPositionBackwardToPosition(position)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON point backward to GeoJSON point
-   * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
-   * @returns {GeoJSONPoint} Backward transform of input position, as GeoJSON point
-   */
-  transformGeoJSONPointBackwardToGeoJSONPoint(
-    geometry: GeoJSONPoint
-  ): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(
-      this.transformPositionBackwardToPosition(
-        convertGeoJSONPointToPosition(geometry)
-      )
-    )
-  }
-
-  // LineString - Forward
-
-  /**
-   * Transforms lineString forward to lineString
-   * @param {LineString} lineString - LineString to transform
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   * @returns {LineString} Forward transform of input lineString
-   */
-  transformLineStringForwardToLineString(
-    lineString: LineString,
-    options?: PartialTransformOptions
-  ): LineString {
-    return transformLineStringForwardToLineString(this, lineString, options)
-  }
-
-  /**
-   * Transforms lineString forward to GeoJSON lineString
-   * @param {LineString} lineString - LineString to transform
-   * @returns {GeoJSONLineString} Forward transform of input lineString, as GeoJSON lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformLineStringForwardToGeoJSONLineString(
-    lineString: LineString,
-    options?: PartialTransformOptions
-  ): GeoJSONLineString {
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertLineStringToGeoJSONLineString(
-      transformLineStringForwardToLineString(this, lineString, options)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON lineString forward to lineString
-   * @param {GeoJSONLineString} geometry - LineString to transform, as GeoJSON lineString
-   * @returns {LineString} Forward transform of input lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONLineStringForwardToLineString(
-    geometry: GeoJSONLineString,
-    options?: PartialTransformOptions
-  ): LineString {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    return transformLineStringForwardToLineString(
-      this,
-      convertGeoJSONLineStringToLineString(geometry),
-      options
-    )
-  }
-
-  /**
-   * Transforms GeoJSON lineString forward to GeoJSON lineString
-   * @param {GeoJSONLineString} geometry - LineString to transform, as GeoJSON lineString
-   * @returns {GeoJSONLineString} Forward transform of input lineString, as GeoJSON lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options, as GeoJSON lineString
-   */
-  transformGeoJSONLineStringForwardToGeoJSONLineString(
-    geometry: GeoJSONLineString,
-    options?: PartialTransformOptions
-  ): GeoJSONLineString {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertLineStringToGeoJSONLineString(
-      transformLineStringForwardToLineString(
-        this,
-        convertGeoJSONLineStringToLineString(geometry),
-        options
-      )
-    )
-  }
-
-  // LineString - Backward
-
-  /**
-   * Transforms lineString backward to lineString
-   * @param {LineString} lineString - LineString to transform
-   * @returns {LineString} Backward transform of input lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformLineStringBackwardToLineString(
-    lineString: LineString,
-    options?: PartialTransformOptions
-  ): LineString {
-    return transformLineStringBackwardToLineString(this, lineString, options)
-  }
-
-  /**
-   * Transforms GeoJSON lineString backward to lineString
-   * @param {GeoJSONLineString} geometry - LineString to transform, as GeoJSON lineString
-   * @returns {LineString} Backward transform of input lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONLineStringBackwardToLineString(
-    geometry: GeoJSONLineString,
-    options?: PartialTransformOptions
-  ): LineString {
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return transformLineStringBackwardToLineString(
-      this,
-      convertGeoJSONLineStringToLineString(geometry),
-      options
-    )
-  }
-
-  /**
-   * Transforms lineString backward to GeoJSON lineString
-   * @param {LineString} lineString - LineString to transform
-   * @returns {GeoJSONLineString} Backward transform of input lineString, as GeoJSON lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformLineStringBackwardToGeoJSONLineString(
-    lineString: LineString,
-    options?: PartialTransformOptions
-  ): GeoJSONLineString {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    return convertLineStringToGeoJSONLineString(
-      transformLineStringBackwardToLineString(this, lineString, options)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON lineString backward to GeoJSON lineString
-   * @param {GeoJSONLineString} geometry - LineString to transform, as GeoJSON lineString
-   * @returns {GeoJSONLineString} Backward transform of input lineString, as GeoJSON lineString
-   * @param {PartialTransformOptions} [options] - Partial Transform Options, as GeoJSON lineString
-   */
-  transformGeoJSONLineStringBackwardToGeoJSONLineString(
-    geometry: GeoJSONLineString,
-    options?: PartialTransformOptions
-  ): GeoJSONLineString {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertLineStringToGeoJSONLineString(
-      transformLineStringBackwardToLineString(
-        this,
-        convertGeoJSONLineStringToLineString(geometry),
-        options
-      )
-    )
-  }
-
-  // Polygon - Forward
-
-  /**
-   * Transforms polygon forward to polygon
-   * @param {Polygon} polygon - polygon to transform
-   * @returns {Polygon} Forward transform of input polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformPolygonForwardToPolygon(
-    polygon: Polygon,
-    options?: PartialTransformOptions
-  ): Polygon {
-    return transformPolygonForwardToPolygon(this, polygon, options)
-  }
-
-  /**
-   * Transforms polygon forward to GeoJSON polygon
-   * @param {Polygon} polygon - Polygon to transform
-   * @returns {GeoJSONPolygon} Forward transform of input polygon, as GeoJSON polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformPolygonForwardToGeoJSONPolygon(
-    polygon: Polygon,
-    options?: PartialTransformOptions
-  ): GeoJSONPolygon {
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertPolygonToGeoJSONPolygon(
-      transformPolygonForwardToPolygon(this, polygon, options)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON polygon forward to polygon
-   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
-   * @returns {Polygon} Forward transform of input polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONPolygonForwardToPolygon(
-    geometry: GeoJSONPolygon,
-    options?: PartialTransformOptions
-  ): Polygon {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    return transformPolygonForwardToPolygon(
-      this,
-      convertGeoJSONPolygonToPolygon(geometry),
-      options
-    )
-  }
-
-  /**
-   * Transforms GeoJSON polygon forward to GeoJSON polygon
-   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
-   * @returns {GeoJSONPolygon} Forward transform of input polygon, as GeoJSON polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONPolygonForwardToGeoJSONPolygon(
-    geometry: GeoJSONPolygon,
-    options?: PartialTransformOptions
-  ): GeoJSONPolygon {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertPolygonToGeoJSONPolygon(
-      transformPolygonForwardToPolygon(
-        this,
-        convertGeoJSONPolygonToPolygon(geometry),
-        options
-      )
-    )
-  }
-
-  // Polygon - Backward
-
-  /**
-   * Transforms polygon backward to polygon
-   * @param {Polygon} polygon - Polygon to transform
-   * @returns {Polygon} Backward transform of input polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformPolygonBackwardToPolygon(
-    polygon: Polygon,
-    options?: PartialTransformOptions
-  ): Polygon {
-    return transformPolygonBackwardToPolygon(this, polygon, options)
-  }
-
-  /**
-   * Transforms GeoJSONPolygon backward to polygon
-   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
-   * @returns {Polygon} Backward transform of input polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONPolygonBackwardToPolygon(
-    geometry: GeoJSONPolygon,
-    options?: PartialTransformOptions
-  ): Polygon {
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return transformPolygonBackwardToPolygon(
-      this,
-      convertGeoJSONPolygonToPolygon(geometry),
-      options
-    )
-  }
-
-  /**
-   * Transforms polygon backward to GeoJSON polygon
-   * @param {Polygon} polygon - Polygon to transform
-   * @returns {GeoJSONPolygon} Backward transform of input polygon, as GeoJSON polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformPolygonBackwardToGeoJSONPolygon(
-    polygon: Polygon,
-    options?: PartialTransformOptions
-  ): GeoJSONPolygon {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    return convertPolygonToGeoJSONPolygon(
-      transformPolygonBackwardToPolygon(this, polygon, options)
-    )
-  }
-
-  /**
-   * Transforms GeoJSON polygon backward to GeoJSON polygon
-   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
-   * @returns {GeoJSONPolygon} Backward transform of input polygon, as GeoJSON polygon
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   */
-  transformGeoJSONPolygonBackwardToGeoJSONPolygon(
-    geometry: GeoJSONPolygon,
-    options?: PartialTransformOptions
-  ): GeoJSONPolygon {
-    if (options && !('sourceIsGeographic' in options)) {
-      options.sourceIsGeographic = true
-    }
-    if (options && !('destinationIsGeographic' in options)) {
-      options.destinationIsGeographic = true
-    }
-    return convertPolygonToGeoJSONPolygon(
-      transformPolygonBackwardToPolygon(
-        this,
-        convertGeoJSONPolygonToPolygon(geometry),
-        options
-      )
-    )
   }
 }

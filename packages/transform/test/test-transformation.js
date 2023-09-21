@@ -15,10 +15,7 @@ describe('Helmert transformation', async () => {
   const output = [1, 1]
 
   it(`should do an identity transform if input and output coordinates are the same`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -29,10 +26,7 @@ describe('Helmert transformation', async () => {
   const output = [4.9385700843392435, 52.46580484503631]
 
   it(`should have the same output as distortionAnalysis Helmert`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -44,10 +38,7 @@ describe('Polynomial transformation, order 1', async () => {
   const output = [4.92079391286352, 52.4654946986157]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -59,10 +50,7 @@ describe('Polynomial transformation, order 2', async () => {
   const output = [4.36596042386853, 51.9550430503008]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -74,10 +62,7 @@ describe('Polynomial transformation, order 3', async () => {
   const output = [-1.34357085609956, 49.7913344676161]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -87,10 +72,7 @@ describe('Projective transformation', async () => {
   const output = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
 
   it(`should have the same output as (TODO: check reference)`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
 
@@ -102,9 +84,6 @@ describe('Thin plate spline transformation', async () => {
   const output = [4.38895777703007, 51.9590841915719]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(
-      transformer.transformPositionForwardToPosition(input),
-      output
-    )
+    expectToBeCloseToArray(transformer.transformForward(input), output)
   })
 })
