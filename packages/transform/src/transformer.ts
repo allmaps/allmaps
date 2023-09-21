@@ -69,14 +69,18 @@ export default class GCPTransformer implements GCPTransformerInterface {
     if (gcps.length == 0) {
       throw new Error('No control points.')
     }
-    if ('resource' in gcps[0]) {
-      this.gcps = gcps.map((p) => ({
-        source: (p as GCP).resource,
-        destination: (p as GCP).geo
-      }))
-    } else {
-      this.gcps = gcps as TransformGCP[]
-    }
+    this.gcps = gcps.map((p) => {
+      if ('resource' in p && 'geo' in p) {
+        return {
+          source: (p as GCP).resource,
+          destination: (p as GCP).geo
+        }
+      } else if ('source' in p && 'destination' in p) {
+        return p as TransformGCP
+      } else {
+        throw new Error('Unsupported GCP type')
+      }
+    })
     this.sourcePositions = this.gcps.map((gcp) => gcp.source)
     this.destinationPositions = this.gcps.map((gcp) => gcp.destination)
     this.type = type
