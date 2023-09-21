@@ -141,6 +141,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    * @returns {Geometry} Forward transform of input as geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => Position;
+   * (input:LineString | GeoJSONLineString) => LineString;
+   * (input:Polygon | GeoJSONPolygon) => Polygon;
+   * }}
    */
   transformForward(
     input: Geometry | GeoJSONGeometry,
@@ -197,6 +202,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    * @returns {GeoJSONGeometry} Forward transform of input, as geojson geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => GeoJSONPoint;
+   * (input:LineString | GeoJSONLineString) => GeoJSONLineString;
+   * (input:Polygon | GeoJSONPolygon) => GeoJSONPolygon;
+   * }}
    */
   transformForwardAsGeoJSON(
     input: Geometry | GeoJSONGeometry,
@@ -272,6 +282,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    * @returns {Geometry} backward transform of input, as geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => Position;
+   * (input:LineString | GeoJSONLineString) => LineString;
+   * (input:Polygon | GeoJSONPolygon) => Polygon;
+   * }}
    */
   transformBackward(
     input: Geometry | GeoJSONGeometry,
@@ -329,6 +344,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    * @returns {GeoJSONGeometry} backward transform of input, as geojson geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => GeoJSONPoint;
+   * (input:LineString | GeoJSONLineString) => GeoJSONLineString;
+   * (input:Polygon | GeoJSONPolygon) => GeoJSONPolygon;
+   * }}
    */
   transformBackwardAsGeoJSON(
     input: Geometry | GeoJSONGeometry,
@@ -405,6 +425,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * Transforms geometry or geojson gemetry forward (i.e. to geo), as geometry
    * @param {Geometry | GeoJSONGeometry} input - Input to transform
    * @returns {Geometry} Forward transform of input, as geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => Position;
+   * (input:LineString | GeoJSONLineString) => LineString;
+   * (input:Polygon | GeoJSONPolygon) => Polygon;
+   * }}
    */
   transformToGeo(
     input: Geometry | GeoJSONGeometry,
@@ -443,6 +468,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * Transforms geometry or geojson gemetry forward (i.e. to geo), as geojson geometry
    * @param {Geometry | GeoJSONGeometry} input - Input to transform
    * @returns {Geometry} Forward transform of input, as geojson geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => GeoJSONPoint;
+   * (input:LineString | GeoJSONLineString) => GeoJSONLineString;
+   * (input:Polygon | GeoJSONPolygon) => GeoJSONPolygon;
+   * }}
    */
   transformToGeoAsGeoJSON(
     input: Geometry | GeoJSONGeometry,
@@ -481,6 +511,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * Transforms geometry or geojson gemetry backward (i.e. to geo), as geometry
    * @param {Geometry | GeoJSONGeometry} input - Input to transform
    * @returns {Geometry} Backward transform of input, as geometry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => Position;
+   * (input:LineString | GeoJSONLineString) => LineString;
+   * (input:Polygon | GeoJSONPolygon) => Polygon;
+   * }}
    */
   transformToResource(
     input: Geometry | GeoJSONGeometry,
@@ -519,6 +554,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * Transforms geometry or geojson gemetry backward (i.e. to geo), as geojson gemetry
    * @param {Geometry | GeoJSONGeometry} input - Input to transform
    * @returns {GeoJSONGeometry} Backward transform of input, as geojson gemetry
+   * @type {{
+   * (input:Position | GeoJSONPoint) => GeoJSONPoint;
+   * (input:LineString | GeoJSONLineString) => GeoJSONLineString;
+   * (input:Polygon | GeoJSONPolygon) => GeoJSONPolygon;
+   * }}
    */
   transformToResourceAsGeoJSON(
     input: Geometry | GeoJSONGeometry,
