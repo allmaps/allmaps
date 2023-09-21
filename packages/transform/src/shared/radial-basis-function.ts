@@ -142,7 +142,7 @@ export default class RBF implements Transformation {
   }
 
   // The interpolant function will compute the value at any position.
-  interpolant(newSourcePosition: Position): Position {
+  interpolate(newSourcePosition: Position): Position {
     if (!this.weightsMatrices) {
       throw new Error('Weights not computed')
     }

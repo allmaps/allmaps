@@ -36,7 +36,7 @@ export type Transformation = {
 
   nPositions: number
 
-  interpolant(position: Position): Position
+  interpolate(position: Position): Position
 }
 
 export type GCPTransformerInterface = {

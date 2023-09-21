@@ -155,7 +155,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
       if (!this.forwardTransformation) {
         this.forwardTransformation = this.#createForwardTransformation()
       }
-      return this.forwardTransformation.interpolant(input)
+      return this.forwardTransformation.interpolate(input)
     } else if (isGeoJSONPoint(input)) {
       return this.transformForward(convertGeoJSONPointToPosition(input))
     } else if (isLineString(input)) {
@@ -297,7 +297,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
         this.backwardTransformation = this.#createBackwardTransformation()
       }
 
-      return this.backwardTransformation.interpolant(input)
+      return this.backwardTransformation.interpolate(input)
     } else if (isGeoJSONPoint(input)) {
       return this.transformBackward(convertGeoJSONPointToPosition(input))
     } else if (isLineString(input)) {

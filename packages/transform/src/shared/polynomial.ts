@@ -137,7 +137,7 @@ export default class Polynomial implements Transformation {
   }
 
   // The interpolant function will compute the value at any position.
-  interpolant(newSourcePosition: Position): Position {
+  interpolate(newSourcePosition: Position): Position {
     if (!this.polynomialParametersMatrices) {
       throw new Error('Polynomial parameters not computed')
     }
