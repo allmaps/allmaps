@@ -1,4 +1,6 @@
-import type { BBox, Ring, Position, Extent } from '@allmaps/types'
+import { isPolygon } from './io.js'
+
+import type { Polygon, LineString, BBox, Extent } from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
@@ -16,11 +18,17 @@ export function computeExtent(values: number[]): Extent {
   return [min, max]
 }
 
-export function computeBBox(points: Position[]): BBox {
+export function computeBBox(points: LineString): BBox
+export function computeBBox(points: Polygon): BBox
+export function computeBBox(points: LineString | Polygon): BBox {
+  if (isPolygon(points)) {
+    points = points.flat()
+  }
+
   const xs = []
   const ys = []
 
-  for (const point of points) {
+  for (const point of points as LineString) {
     xs.push(point[0])
     ys.push(point[1])
   }
@@ -40,11 +48,13 @@ export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
   ]
 }
 
-export function bboxToRing(bbox: BBox): Ring {
+export function bboxToPolygon(bbox: BBox): Polygon {
   return [
-    [bbox[0], bbox[1]],
-    [bbox[2], bbox[1]],
-    [bbox[2], bbox[3]],
-    [bbox[0], bbox[3]]
+    [
+      [bbox[0], bbox[1]],
+      [bbox[2], bbox[1]],
+      [bbox[2], bbox[3]],
+      [bbox[0], bbox[3]]
+    ]
   ]
 }

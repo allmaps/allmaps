@@ -3,9 +3,10 @@ import { Image } from '@allmaps/iiif-parser'
 import type { GCPTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox, bboxToRing } from './bbox.js'
+import { computeBBox, bboxToPolygon } from '@allmaps/stdlib'
 
 import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
+import type { Polygon } from '@allmaps/types'
 
 type PositionByX = { [key: number]: Position }
 
@@ -204,19 +205,19 @@ export function computeIiifTilesForMapGeoBBox(
   geoBBox: BBox
 ): Tile[] {
   // geoBBox is a BBox of the extent viewport in World positions (in the projection that was given)
-  // geoBBoxRing is its ring
-  // geoBBoxRingToResource is the ring of it's backward transformation. Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points
+  // geoBBoxPolygon is its ring
+  // geoBBoxPolygonToResource is the ring of it's backward transformation. Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points
   // geoBBoxResourceBBox is the BBox of this polygon.
 
-  const geoBBoxRing = bboxToRing(geoBBox)
-  const geoBBoxRingToResource = transformer.transformRingBackwardToRing(
-    geoBBoxRing,
+  const geoBBoxPolygon = bboxToPolygon(geoBBox)
+  const geoBBoxPolygonToResource = transformer.transformBackward(
+    geoBBoxPolygon,
     {
       maxOffsetRatio: 0.00001,
       maxDepth: 2
     }
-  )
-  const geoBBoxResourceBBox = computeBBox(geoBBoxRingToResource)
+  ) as Polygon
+  const geoBBoxResourceBBox = computeBBox(geoBBoxPolygonToResource)
 
   if (
     (geoBBoxResourceBBox[0] > image.width || geoBBoxResourceBBox[2] < 0) &&
@@ -239,7 +240,7 @@ export function computeIiifTilesForMapGeoBBox(
   if (zoomLevel) {
     // TODO: maybe index all tiles in rtree?
 
-    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxRingToResource)
+    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxPolygonToResource[0])
 
     const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
     const iiifTiles = iiifTilesByXToArray(

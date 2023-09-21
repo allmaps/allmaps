@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha'
-import { expectToBeCloseToArray } from './shared/helper-fuctions.js'
+import { expectToBeCloseToArray } from '../../stdlib/test/helper-functions.js'
 import { GCPTransformer } from '../dist/index.js'
 
 import {

@@ -97,10 +97,8 @@
               map.gcps,
               map.transformation?.type
             )
-            const resourceMask = [...map.resourceMask, map.resourceMask[0]]
 
-            polygon =
-              transformer.transformRingForwardToGeoJSONPolygon(resourceMask)
+            polygon = transformer.transformForwardAsGeoJSON([map.resourceMask])
 
             // d3-geo requires the opposite polygon winding order of
             // the GoeJSON spec: https://github.com/d3/d3-geo

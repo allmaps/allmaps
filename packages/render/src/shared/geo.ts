@@ -1,4 +1,4 @@
-import { computeBBox } from './bbox.js'
+import { computeBBox } from '@allmaps/stdlib'
 
 import type {
   SVGPolygon,

@@ -1,4 +1,4 @@
-import type { Position } from '@allmaps/types'
+import type { Position, GeoJSONPoint } from '@allmaps/types'
 
 /** Ground Controle Point (GCP) (as used in the Transform package). */
 export type TransformGCP = { source: Position; destination: Position }
@@ -42,9 +42,9 @@ export type Transformation = {
 export type GCPTransformerInterface = {
   gcps: TransformGCP[]
 
-  transformForward(position: Position): Position
-  transformToGeo(position: Position): Position
+  transformForward(position: Position | GeoJSONPoint): Position
+  transformToGeo(position: Position | GeoJSONPoint): Position
 
-  transformBackward(position: Position): Position
-  transformToResource(position: Position): Position
+  transformBackward(position: Position | GeoJSONPoint): Position
+  transformToResource(position: Position | GeoJSONPoint): Position
 }

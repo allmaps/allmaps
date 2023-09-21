@@ -14,6 +14,22 @@ To learn more on how it works, check out this [Observable notebook](https://obse
 
 This is an ESM-only module that works in browsers or in Node.js.
 
+Use [pnpm](https://pnpm.io/) or [npm](https://www.npmjs.com/) to install this CLI tool globally in your system:
+
+```sh
+pnpm add @allmaps/triangulate
+```
+
+or
+
+```sh
+nnpm install @allmaps/triangulate
+```
+
+## Installation
+
+This is an ESM-only module that works in browsers or in Node.js.
+
 Installation in Node.js:
 
 ```sh

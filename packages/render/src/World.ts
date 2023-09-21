@@ -9,7 +9,7 @@ import { GCPTransformer } from '@allmaps/transform'
 import RTree from './RTree.js'
 
 import { fromLonLat, getPolygonBBox } from './shared/geo.js'
-import { combineBBoxes } from './shared/bbox.js'
+import { combineBBoxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import { fetchImageInfo } from '@allmaps/stdlib'
@@ -119,8 +119,8 @@ export default class World extends EventTarget {
       maxDepth: 6
     }
 
-    const geoMask = transformer.transformRingForwardToGeoJSONPolygon(
-      resourceMask,
+    const geoMask = transformer.transformForwardAsGeoJSON(
+      [resourceMask],
       transformerOptions
     )
 
@@ -135,8 +135,8 @@ export default class World extends EventTarget {
       [0, parsedImage.height]
     ]
 
-    const fullGeoMask = transformer.transformRingForwardToGeoJSONPolygon(
-      fullResourceMask,
+    const fullGeoMask = transformer.transformForwardAsGeoJSON(
+      [fullResourceMask],
       transformerOptions
     )
 
@@ -327,8 +327,9 @@ export default class World extends EventTarget {
   setResourceMask(mapId: string, resourceMask: Position[]) {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
-      const geoMask =
-        warpedMap.transformer.transformRingForwardToGeoJSONPolygon(resourceMask)
+      const geoMask = warpedMap.transformer.transformForwardAsGeoJSON([
+        resourceMask
+      ])
       warpedMap.geoMask = geoMask
       warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
 

@@ -17,7 +17,7 @@ import type {
   PartialTransformOptions
 } from './types.js'
 
-import type { Position, LineString, Ring } from '@allmaps/types'
+import type { Position, LineString, Ring, Polygon } from '@allmaps/types'
 
 function mergeDefaultOptions(
   options?: PartialTransformOptions
@@ -153,6 +153,26 @@ export function transformRingBackwardToRing(
   return segmentsToPoints(extendendSegements, false).map(
     (point) => point.source
   )
+}
+
+export function transformPolygonForwardToPolygon(
+  transformer: GCPTransformerInterface,
+  polygon: Polygon,
+  options?: PartialTransformOptions
+): Polygon {
+  return polygon.map((ring) => {
+    return transformRingForwardToRing(transformer, ring, options)
+  })
+}
+
+export function transformPolygonBackwardToPolygon(
+  transformer: GCPTransformerInterface,
+  polygon: Polygon,
+  options?: PartialTransformOptions
+): Polygon {
+  return polygon.map((ring) => {
+    return transformRingBackwardToRing(transformer, ring, options)
+  })
 }
 
 function pointsToSegments(points: TransformGCP[], close = false): Segment[] {

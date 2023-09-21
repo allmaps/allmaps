@@ -9,17 +9,23 @@ import { euclideanNorm } from './shared/norm-functions.js'
 import {
   transformLineStringForwardToLineString,
   transformLineStringBackwardToLineString,
-  transformRingForwardToRing,
-  transformRingBackwardToRing
+  transformPolygonForwardToPolygon,
+  transformPolygonBackwardToPolygon
 } from './shared/transform-helper-functions.js'
 
 import {
   convertPositionToGeoJSONPoint,
   convertLineStringToGeoJSONLineString,
-  convertRingToGeoJSONPolygon,
+  convertPolygonToGeoJSONPolygon,
   convertGeoJSONPointToPosition,
   convertGeoJSONLineStringToLineString,
-  convertGeoJSONPolygonToRing
+  convertGeoJSONPolygonToPolygon,
+  isPosition,
+  isLineString,
+  isPolygon,
+  isGeoJSONPoint,
+  isGeoJSONLineString,
+  isGeoJSONPolygon
 } from '@allmaps/stdlib'
 
 import type {
@@ -33,11 +39,13 @@ import type {
 import type {
   Position,
   LineString,
-  Ring,
+  Polygon,
+  Geometry,
   GCP,
   GeoJSONPoint,
   GeoJSONLineString,
-  GeoJSONPolygon
+  GeoJSONPolygon,
+  GeoJSONGeometry
 } from '@allmaps/types'
 
 /** A Ground Controle Point Transformer, containing a forward and backward transformation and specifying functions to transform geometries using these transformations. */
@@ -116,50 +124,363 @@ export default class GCPTransformer implements GCPTransformerInterface {
 
   // Base functions
 
+  transformForward(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): Position
+  transformForward(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): LineString
+  transformForward(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): Polygon
   /**
-   * Transforms position forward
-   * @param {Position} position - Position to transform
-   * @returns {Position} Forward transform of input position
+   * Transforms geometry or geojson geometry forward to geometry
+   * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
+   * @param {PartialTransformOptions} [options] - Partial Transform Options
+   * @returns {Geometry} Forward transform of input as geometry
    */
-  transformForward(position: Position): Position {
-    if (!this.forwardTransformation) {
-      this.forwardTransformation = this.createForwardTransformation()
+  transformForward(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): Geometry {
+    if (isPosition(input)) {
+      return this.transformPositionForwardToPosition(input as Position)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformGeoJSONPointForwardToPosition(input as GeoJSONPoint)
+    } else if (isLineString(input)) {
+      return this.transformLineStringForwardToLineString(
+        input as LineString,
+        options
+      )
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformGeoJSONLineStringForwardToLineString(
+        input as GeoJSONLineString,
+        options
+      )
+    } else if (isPolygon(input)) {
+      return this.transformPolygonForwardToPolygon(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformGeoJSONPolygonForwardToPolygon(
+        input as GeoJSONPolygon,
+        options
+      )
+    } else {
+      throw new Error('Input type not supported')
     }
-
-    return this.forwardTransformation.interpolant(position)
   }
 
+  transformForwardAsGeoJSON(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): GeoJSONPoint
+  transformForwardAsGeoJSON(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): GeoJSONLineString
+  transformForwardAsGeoJSON(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): GeoJSONPolygon
   /**
-   * Transforms position backward
-   * @param {Position} position - Position to transform
-   * @returns {Position} Backard transform of input position
+   * Transforms geometry or geojson geometry forward to geojson geometry
+   * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
+   * @param {PartialTransformOptions} [options] - Partial Transform Options
+   * @returns {GeoJSONGeometry} Forward transform of input, as geojson geometry
    */
-  transformBackward(position: Position): Position {
-    if (!this.backwardTransformation) {
-      this.backwardTransformation = this.createBackwardTransformation()
+  transformForwardAsGeoJSON(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): GeoJSONGeometry {
+    if (isPosition(input)) {
+      return this.transformPositionForwardToGeoJSONPoint(input as Position)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformGeoJSONPointForwardToGeoJSONPoint(
+        input as GeoJSONPoint
+      )
+    } else if (isLineString(input)) {
+      return this.transformLineStringForwardToGeoJSONLineString(
+        input as LineString,
+        options
+      )
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformGeoJSONLineStringForwardToGeoJSONLineString(
+        input as GeoJSONLineString,
+        options
+      )
+    } else if (isPolygon(input)) {
+      return this.transformPolygonForwardToGeoJSONPolygon(
+        input as Polygon,
+        options
+      )
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformGeoJSONPolygonForwardToGeoJSONPolygon(
+        input as GeoJSONPolygon,
+        options
+      )
+    } else {
+      throw new Error('Input type not supported')
     }
+  }
 
-    return this.backwardTransformation.interpolant(position)
+  transformBackward(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): Position
+  transformBackward(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): LineString
+  transformBackward(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): Polygon
+  /**
+   * Transforms geometry or geojson geometry backward to geometry
+   * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
+   * @param {PartialTransformOptions} [options] - Partial Transform Options
+   * @returns {Geometry} backward transform of input, as geometry
+   */
+  transformBackward(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): Geometry {
+    if (isPosition(input)) {
+      return this.transformPositionBackwardToPosition(input as Position)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformGeoJSONPointBackwardToPosition(input as GeoJSONPoint)
+    } else if (isLineString(input)) {
+      return this.transformLineStringBackwardToLineString(
+        input as LineString,
+        options
+      )
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformGeoJSONLineStringBackwardToLineString(
+        input as GeoJSONLineString,
+        options
+      )
+    } else if (isPolygon(input)) {
+      return this.transformPolygonBackwardToPolygon(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformGeoJSONPolygonBackwardToPolygon(
+        input as GeoJSONPolygon,
+        options
+      )
+    } else {
+      throw new Error('Input type not supported')
+    }
+  }
+
+  transformBackwardAsGeoJSON(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): GeoJSONPoint
+  transformBackwardAsGeoJSON(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): GeoJSONLineString
+  transformBackwardAsGeoJSON(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): GeoJSONPolygon
+  /**
+   * Transforms geometry or geojson geometry backward to geojson geometry
+   * @param {Geometry | GeoJSONGeometry} input - Geometry or geojson geometry to transform
+   * @param {PartialTransformOptions} [options] - Partial Transform Options
+   * @returns {GeoJSONGeometry} backward transform of input, as geojson geometry
+   */
+  transformBackwardAsGeoJSON(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): GeoJSONGeometry {
+    if (isPosition(input)) {
+      return this.transformPositionBackwardToGeoJSONPoint(input as Position)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformGeoJSONPointBackwardToGeoJSONPoint(
+        input as GeoJSONPoint
+      )
+    } else if (isLineString(input)) {
+      return this.transformLineStringBackwardToGeoJSONLineString(
+        input as LineString,
+        options
+      )
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformGeoJSONLineStringBackwardToGeoJSONLineString(
+        input as GeoJSONLineString,
+        options
+      )
+    } else if (isPolygon(input)) {
+      return this.transformPolygonBackwardToGeoJSONPolygon(
+        input as Polygon,
+        options
+      )
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformGeoJSONPolygonBackwardToGeoJSONPolygon(
+        input as GeoJSONPolygon,
+        options
+      )
+    } else {
+      throw new Error('Input type not supported')
+    }
   }
 
   // Alias
 
+  transformToGeo(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): Position
+  transformToGeo(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): LineString
+  transformToGeo(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): Polygon
   /**
-   * Transforms position forward (i.e. to geo)
-   * @param {Position} position - Position to transform
-   * @returns {Position} Forward transform of input position
+   * Transforms geometry or geojson gemetry forward (i.e. to geo), as geometry
+   * @param {Geometry | GeoJSONGeometry} input - Input to transform
+   * @returns {Geometry} Forward transform of input, as geometry
    */
-  transformToGeo(position: Position): Position {
-    return this.transformForward(position)
+  transformToGeo(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): Geometry {
+    if (isPosition(input)) {
+      return this.transformForward(input as Position, options)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformForward(input as GeoJSONPoint, options)
+    } else if (isLineString(input)) {
+      return this.transformForward(input as LineString, options)
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformForward(input as GeoJSONLineString, options)
+    } else if (isPolygon(input)) {
+      return this.transformForward(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformForward(input as GeoJSONPolygon, options)
+    } else {
+      throw new Error('Input type not supported')
+    }
   }
 
+  transformToGeoAsGeoJSON(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): GeoJSONPoint
+  transformToGeoAsGeoJSON(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): GeoJSONLineString
+  transformToGeoAsGeoJSON(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): GeoJSONPolygon
   /**
-   * Transforms position backward (i.e. to resource)
-   * @param {Position} position - Position to transform
-   * @returns {Position} Backward transform of input position
+   * Transforms geometry or geojson gemetry forward (i.e. to geo), as geojson geometry
+   * @param {Geometry | GeoJSONGeometry} input - Input to transform
+   * @returns {Geometry} Forward transform of input, as geojson geometry
    */
-  transformToResource(position: Position): Position {
-    return this.transformBackward(position)
+  transformToGeoAsGeoJSON(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): GeoJSONGeometry {
+    if (isPosition(input)) {
+      return this.transformForwardAsGeoJSON(input as Position, options)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformForwardAsGeoJSON(input as GeoJSONPoint, options)
+    } else if (isLineString(input)) {
+      return this.transformForwardAsGeoJSON(input as LineString, options)
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformForwardAsGeoJSON(input as GeoJSONLineString, options)
+    } else if (isPolygon(input)) {
+      return this.transformForwardAsGeoJSON(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformForwardAsGeoJSON(input as GeoJSONPolygon, options)
+    } else {
+      throw new Error('Input type not supported')
+    }
+  }
+
+  transformToResource(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): Position
+  transformToResource(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): LineString
+  transformToResource(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): Polygon
+  /**
+   * Transforms geometry or geojson gemetry backward (i.e. to geo), as geometry
+   * @param {Geometry | GeoJSONGeometry} input - Input to transform
+   * @returns {Geometry} Backward transform of input, as geometry
+   */
+  transformToResource(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): Geometry {
+    if (isPosition(input)) {
+      return this.transformBackward(input as Position, options)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformBackward(input as GeoJSONPoint, options)
+    } else if (isLineString(input)) {
+      return this.transformBackward(input as LineString, options)
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformBackward(input as GeoJSONLineString, options)
+    } else if (isPolygon(input)) {
+      return this.transformBackward(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformBackward(input as GeoJSONPolygon, options)
+    } else {
+      throw new Error('Input type not supported')
+    }
+  }
+
+  transformToResourceAsGeoJSON(
+    input: Position | GeoJSONPoint,
+    options?: PartialTransformOptions
+  ): GeoJSONPoint
+  transformToResourceAsGeoJSON(
+    input: LineString | GeoJSONLineString,
+    options?: PartialTransformOptions
+  ): GeoJSONLineString
+  transformToResourceAsGeoJSON(
+    input: Polygon | GeoJSONPolygon,
+    options?: PartialTransformOptions
+  ): GeoJSONPolygon
+  /**
+   * Transforms geometry or geojson gemetry backward (i.e. to geo), as geojson gemetry
+   * @param {Geometry | GeoJSONGeometry} input - Input to transform
+   * @returns {GeoJSONGeometry} Backward transform of input, as geojson gemetry
+   */
+  transformToResourceAsGeoJSON(
+    input: Geometry | GeoJSONGeometry,
+    options?: PartialTransformOptions
+  ): GeoJSONGeometry {
+    if (isPosition(input)) {
+      return this.transformBackwardAsGeoJSON(input as Position, options)
+    } else if (isGeoJSONPoint(input)) {
+      return this.transformBackwardAsGeoJSON(input as GeoJSONPoint, options)
+    } else if (isLineString(input)) {
+      return this.transformBackwardAsGeoJSON(input as LineString, options)
+    } else if (isGeoJSONLineString(input)) {
+      return this.transformBackwardAsGeoJSON(
+        input as GeoJSONLineString,
+        options
+      )
+    } else if (isPolygon(input)) {
+      return this.transformBackwardAsGeoJSON(input as Polygon, options)
+    } else if (isGeoJSONPolygon(input)) {
+      return this.transformBackwardAsGeoJSON(input as GeoJSONPolygon, options)
+    } else {
+      throw new Error('Input type not supported')
+    }
   }
 
   // Position - Forward
@@ -170,7 +491,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Position} Forward transform of input position
    */
   transformPositionForwardToPosition(position: Position): Position {
-    return this.transformForward(position)
+    if (!this.forwardTransformation) {
+      this.forwardTransformation = this.createForwardTransformation()
+    }
+
+    return this.forwardTransformation.interpolant(position)
   }
 
   /**
@@ -179,7 +504,9 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {GeoJSONPoint} Forward transform of input position, as GeoJSON point
    */
   transformPositionForwardToGeoJSONPoint(position: Position): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(this.transformForward(position))
+    return convertPositionToGeoJSONPoint(
+      this.transformPositionForwardToPosition(position)
+    )
   }
 
   /**
@@ -187,8 +514,10 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
    * @returns {Position} Forward transform of input position
    */
-  transformGeoJSONPositionForwardToPosition(geometry: GeoJSONPoint): Position {
-    return this.transformForward(convertGeoJSONPointToPosition(geometry))
+  transformGeoJSONPointForwardToPosition(geometry: GeoJSONPoint): Position {
+    return this.transformPositionForwardToPosition(
+      convertGeoJSONPointToPosition(geometry)
+    )
   }
 
   /**
@@ -196,11 +525,13 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @param {GeoJSONPoint} geometry - Position to transform, as GeoJSON point
    * @returns {GeoJSONPoint} Forward transform of input position, as GeoJSON point
    */
-  transformGeoJSONPositionForwardToGeoJSONPoint(
+  transformGeoJSONPointForwardToGeoJSONPoint(
     geometry: GeoJSONPoint
   ): GeoJSONPoint {
     return convertPositionToGeoJSONPoint(
-      this.transformForward(convertGeoJSONPointToPosition(geometry))
+      this.transformPositionForwardToPosition(
+        convertGeoJSONPointToPosition(geometry)
+      )
     )
   }
 
@@ -212,7 +543,11 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Position} Backward transform of input position
    */
   transformPositionBackwardToPosition(position: Position): Position {
-    return this.transformBackward(position)
+    if (!this.backwardTransformation) {
+      this.backwardTransformation = this.createBackwardTransformation()
+    }
+
+    return this.backwardTransformation.interpolant(position)
   }
 
   /**
@@ -221,7 +556,9 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {Position} Backward transform of input position
    */
   transformGeoJSONPointBackwardToPosition(geometry: GeoJSONPoint): Position {
-    return this.transformBackward(convertGeoJSONPointToPosition(geometry))
+    return this.transformPositionBackwardToPosition(
+      convertGeoJSONPointToPosition(geometry)
+    )
   }
 
   /**
@@ -230,7 +567,9 @@ export default class GCPTransformer implements GCPTransformerInterface {
    * @returns {GeoJSONPoint} Backward transform of input position, as GeoJSON point
    */
   transformPositionBackwardToGeoJSONPoint(position: Position): GeoJSONPoint {
-    return convertPositionToGeoJSONPoint(this.transformBackward(position))
+    return convertPositionToGeoJSONPoint(
+      this.transformPositionBackwardToPosition(position)
+    )
   }
 
   /**
@@ -242,7 +581,9 @@ export default class GCPTransformer implements GCPTransformerInterface {
     geometry: GeoJSONPoint
   ): GeoJSONPoint {
     return convertPositionToGeoJSONPoint(
-      this.transformBackward(convertGeoJSONPointToPosition(geometry))
+      this.transformPositionBackwardToPosition(
+        convertGeoJSONPointToPosition(geometry)
+      )
     )
   }
 
@@ -402,63 +743,63 @@ export default class GCPTransformer implements GCPTransformerInterface {
     )
   }
 
-  // Ring - Forward
+  // Polygon - Forward
 
   /**
-   * Transforms ring forward to ring
-   * @param {Ring} ring - Ring to transform
-   * @returns {Ring} Forward transform of input ring
+   * Transforms polygon forward to polygon
+   * @param {Polygon} polygon - polygon to transform
+   * @returns {Polygon} Forward transform of input polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformRingForwardToRing(
-    ring: Ring,
+  transformPolygonForwardToPolygon(
+    polygon: Polygon,
     options?: PartialTransformOptions
-  ): Ring {
-    return transformRingForwardToRing(this, ring, options)
+  ): Polygon {
+    return transformPolygonForwardToPolygon(this, polygon, options)
   }
 
   /**
-   * Transforms ring forward to GeoJSON polygon
-   * @param {Ring} ring - Ring to transform
-   * @returns {GeoJSONPolygon} Forward transform of input ring, as GeoJSON polygon
+   * Transforms polygon forward to GeoJSON polygon
+   * @param {Polygon} polygon - Polygon to transform
+   * @returns {GeoJSONPolygon} Forward transform of input polygon, as GeoJSON polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformRingForwardToGeoJSONPolygon(
-    ring: Ring,
+  transformPolygonForwardToGeoJSONPolygon(
+    polygon: Polygon,
     options?: PartialTransformOptions
   ): GeoJSONPolygon {
     if (options && !('destinationIsGeographic' in options)) {
       options.destinationIsGeographic = true
     }
-    return convertRingToGeoJSONPolygon(
-      transformRingForwardToRing(this, ring, options)
+    return convertPolygonToGeoJSONPolygon(
+      transformPolygonForwardToPolygon(this, polygon, options)
     )
   }
 
   /**
-   * Transforms GeoJSON polygon forward to ring
-   * @param {GeoJSONPolygon} geometry - Ring to transform, as GeoJSON polygon
-   * @returns {Ring} Forward transform of input ring
+   * Transforms GeoJSON polygon forward to polygon
+   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
+   * @returns {Polygon} Forward transform of input polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformGeoJSONPolygonForwardToRing(
+  transformGeoJSONPolygonForwardToPolygon(
     geometry: GeoJSONPolygon,
     options?: PartialTransformOptions
-  ): Ring {
+  ): Polygon {
     if (options && !('sourceIsGeographic' in options)) {
       options.sourceIsGeographic = true
     }
-    return transformRingForwardToRing(
+    return transformPolygonForwardToPolygon(
       this,
-      convertGeoJSONPolygonToRing(geometry),
+      convertGeoJSONPolygonToPolygon(geometry),
       options
     )
   }
 
   /**
    * Transforms GeoJSON polygon forward to GeoJSON polygon
-   * @param {GeoJSONPolygon} geometry - Ring to transform, as GeoJSON polygon
-   * @returns {GeoJSONPolygon} Forward transform of input ring, as GeoJSON polygon
+   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
+   * @returns {GeoJSONPolygon} Forward transform of input polygon, as GeoJSON polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
   transformGeoJSONPolygonForwardToGeoJSONPolygon(
@@ -471,72 +812,72 @@ export default class GCPTransformer implements GCPTransformerInterface {
     if (options && !('destinationIsGeographic' in options)) {
       options.destinationIsGeographic = true
     }
-    return convertRingToGeoJSONPolygon(
-      transformRingForwardToRing(
+    return convertPolygonToGeoJSONPolygon(
+      transformPolygonForwardToPolygon(
         this,
-        convertGeoJSONPolygonToRing(geometry),
+        convertGeoJSONPolygonToPolygon(geometry),
         options
       )
     )
   }
 
-  // Ring - Backward
+  // Polygon - Backward
 
   /**
-   * Transforms ring backward to ring
-   * @param {Ring} ring - Ring to transform
-   * @returns {Ring} Backward transform of input ring
+   * Transforms polygon backward to polygon
+   * @param {Polygon} polygon - Polygon to transform
+   * @returns {Polygon} Backward transform of input polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformRingBackwardToRing(
-    ring: Ring,
+  transformPolygonBackwardToPolygon(
+    polygon: Polygon,
     options?: PartialTransformOptions
-  ): Ring {
-    return transformRingBackwardToRing(this, ring, options)
+  ): Polygon {
+    return transformPolygonBackwardToPolygon(this, polygon, options)
   }
 
   /**
-   * Transforms GeoJSONPolygon backward to ring
-   * @param {GeoJSONPolygon} geometry - Ring to transform, as GeoJSON polygon
-   * @returns {Ring} Backward transform of input ring
+   * Transforms GeoJSONPolygon backward to polygon
+   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
+   * @returns {Polygon} Backward transform of input polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformGeoJSONPolygonBackwardToRing(
+  transformGeoJSONPolygonBackwardToPolygon(
     geometry: GeoJSONPolygon,
     options?: PartialTransformOptions
-  ): Ring {
+  ): Polygon {
     if (options && !('destinationIsGeographic' in options)) {
       options.destinationIsGeographic = true
     }
-    return transformRingBackwardToRing(
+    return transformPolygonBackwardToPolygon(
       this,
-      convertGeoJSONPolygonToRing(geometry),
+      convertGeoJSONPolygonToPolygon(geometry),
       options
     )
   }
 
   /**
-   * Transforms ring backward to GeoJSON polygon
-   * @param {Ring} ring - Ring to transform
-   * @returns {GeoJSONPolygon} Backward transform of input ring, as GeoJSON polygon
+   * Transforms polygon backward to GeoJSON polygon
+   * @param {Polygon} polygon - Polygon to transform
+   * @returns {GeoJSONPolygon} Backward transform of input polygon, as GeoJSON polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
-  transformRingBackwardToGeoJSONPolygon(
-    ring: Ring,
+  transformPolygonBackwardToGeoJSONPolygon(
+    polygon: Polygon,
     options?: PartialTransformOptions
   ): GeoJSONPolygon {
     if (options && !('sourceIsGeographic' in options)) {
       options.sourceIsGeographic = true
     }
-    return convertRingToGeoJSONPolygon(
-      transformRingBackwardToRing(this, ring, options)
+    return convertPolygonToGeoJSONPolygon(
+      transformPolygonBackwardToPolygon(this, polygon, options)
     )
   }
 
   /**
    * Transforms GeoJSON polygon backward to GeoJSON polygon
-   * @param {GeoJSONPolygon} geometry - Ring to transform, as GeoJSON polygon
-   * @returns {GeoJSONPolygon} Backward transform of input ring, as GeoJSON polygon
+   * @param {GeoJSONPolygon} geometry - Polygon to transform, as GeoJSON polygon
+   * @returns {GeoJSONPolygon} Backward transform of input polygon, as GeoJSON polygon
    * @param {PartialTransformOptions} [options] - Partial Transform Options
    */
   transformGeoJSONPolygonBackwardToGeoJSONPolygon(
@@ -549,10 +890,10 @@ export default class GCPTransformer implements GCPTransformerInterface {
     if (options && !('destinationIsGeographic' in options)) {
       options.destinationIsGeographic = true
     }
-    return convertRingToGeoJSONPolygon(
-      transformRingBackwardToRing(
+    return convertPolygonToGeoJSONPolygon(
+      transformPolygonBackwardToPolygon(
         this,
-        convertGeoJSONPolygonToRing(geometry),
+        convertGeoJSONPolygonToPolygon(geometry),
         options
       )
     )

@@ -11,37 +11,42 @@ import type { Map } from '@allmaps/annotation'
 type Coord = [number, number]
 type SVGAttributes = Record<string, string | number>
 
-type Circle = {
+type SVGCircle = {
   type: 'circle'
   attributes?: SVGAttributes
   coordinates: Coord
 }
 
-type Line = {
+type SVGLine = {
   type: 'line'
   attributes?: SVGAttributes
   coordinates: [Coord, Coord]
 }
 
-type PolyLine = {
+type SVGPolyLine = {
   type: 'polyline'
   attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
-type Polygon = {
+type SVGPolygon = {
   type: 'polygon'
   attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
-type Rect = {
+type SVGRect = {
   type: 'rect'
   attributes?: SVGAttributes
   coordinates: Coord[]
 }
 
-export type GeometryElement = Circle | Line | PolyLine | Polygon | Rect
+export type GeometryElement =
+  | SVGCircle
+  | SVGLine
+  | SVGPolyLine
+  | SVGPolygon
+  | SVGRect
 
 function getNodeNumberProperty(node: ElementNode, prop: string): number {
   const value = node?.properties?.[prop]
@@ -206,7 +211,7 @@ function elementToString(tag: string, attributes: SVGAttributes): string {
   return `<${tag} ${attributeStrings.join(' ')} />`
 }
 
-export function resourceMaskToSvgPolygon(map: Map): Polygon {
+export function resourceMaskToSvgPolygon(map: Map): SVGPolygon {
   return {
     type: 'polygon',
     attributes: {
@@ -224,23 +229,17 @@ export function transformGeoJsonToSvg(
   if (geometry.type === 'Point') {
     return {
       type: 'circle',
-      coordinates: transformer.transformGeoJSONPointBackwardToPosition(geometry)
+      coordinates: transformer.transformBackward(geometry)
     }
   } else if (geometry.type === 'LineString') {
     return {
       type: 'polyline',
-      coordinates: transformer.transformGeoJSONLineStringBackwardToLineString(
-        geometry,
-        transformOptions
-      )
+      coordinates: transformer.transformBackward(geometry, transformOptions)
     }
   } else if (geometry.type === 'Polygon') {
     return {
       type: 'polygon',
-      coordinates: transformer.transformGeoJSONPolygonBackwardToRing(
-        geometry,
-        transformOptions
-      )
+      coordinates: transformer.transformBackward(geometry, transformOptions)[0]
     }
   } else {
     throw new Error(`Unsupported GeoJSON geometry`)

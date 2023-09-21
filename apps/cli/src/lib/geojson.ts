@@ -13,27 +13,25 @@ export function transformSvgToGeoJson(
   transformOptions?: PartialTransformOptions
 ) {
   if (geometry.type === 'circle') {
-    return transformer.transformPositionForwardToGeoJSONPoint(
-      geometry.coordinates
-    )
+    return transformer.transformForwardAsGeoJSON(geometry.coordinates)
   } else if (geometry.type === 'line') {
-    return transformer.transformLineStringForwardToGeoJSONLineString(
+    return transformer.transformForwardAsGeoJSON(
       geometry.coordinates,
       transformOptions
     )
   } else if (geometry.type === 'polyline') {
-    return transformer.transformLineStringForwardToGeoJSONLineString(
+    return transformer.transformForwardAsGeoJSON(
       geometry.coordinates,
       transformOptions
     )
   } else if (geometry.type === 'rect') {
-    return transformer.transformRingForwardToGeoJSONPolygon(
-      geometry.coordinates,
+    return transformer.transformForwardAsGeoJSON(
+      [geometry.coordinates],
       transformOptions
     )
   } else if (geometry.type === 'polygon') {
-    return transformer.transformRingForwardToGeoJSONPolygon(
-      geometry.coordinates,
+    return transformer.transformForwardAsGeoJSON(
+      [geometry.coordinates],
       transformOptions
     )
   } else {

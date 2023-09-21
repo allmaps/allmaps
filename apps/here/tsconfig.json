@@ -18,6 +18,7 @@
   "references": [
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/tailwind" }
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/types" }
   ]
 }

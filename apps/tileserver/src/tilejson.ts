@@ -31,12 +31,9 @@ export function generateTileJson(
       options['transformation.type'] || map.transformation?.type
     )
 
-    const geoMask = transformer.transformRingForwardToGeoJSONPolygon(
-      map.resourceMask,
-      {
-        maxOffsetRatio: 0.01
-      }
-    )
+    const geoMask = transformer.transformForwardAsGeoJSON([map.resourceMask], {
+      maxOffsetRatio: 0.01
+    })
     geoMasks.push(geoMask)
   }
 
