@@ -82,21 +82,21 @@ export default class GCPTransformer implements GCPTransformerInterface {
     this.type = type
   }
 
-  createForwardTransformation(): Transformation {
-    return this.createTransformation(
+  #createForwardTransformation(): Transformation {
+    return this.#createTransformation(
       this.sourcePositions,
       this.destinationPositions
     )
   }
 
-  createBackwardTransformation(): Transformation {
-    return this.createTransformation(
+  #createBackwardTransformation(): Transformation {
+    return this.#createTransformation(
       this.destinationPositions,
       this.sourcePositions
     )
   }
 
-  createTransformation(
+  #createTransformation(
     sourcePositions: Position[],
     destinationPositions: Position[]
   ): Transformation {
@@ -153,7 +153,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
   ): Geometry {
     if (isPosition(input)) {
       if (!this.forwardTransformation) {
-        this.forwardTransformation = this.createForwardTransformation()
+        this.forwardTransformation = this.#createForwardTransformation()
       }
       return this.forwardTransformation.interpolant(input)
     } else if (isGeoJSONPoint(input)) {
@@ -294,7 +294,7 @@ export default class GCPTransformer implements GCPTransformerInterface {
   ): Geometry {
     if (isPosition(input)) {
       if (!this.backwardTransformation) {
-        this.backwardTransformation = this.createBackwardTransformation()
+        this.backwardTransformation = this.#createBackwardTransformation()
       }
 
       return this.backwardTransformation.interpolant(input)
