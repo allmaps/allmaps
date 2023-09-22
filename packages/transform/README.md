@@ -8,7 +8,7 @@ Care was taken to make this module **usable and useful outside of the Allmaps co
 
 ## How it works
 
-This package exports the GCPTransformer class. It's instances (called 'transformers') are built from a set of ground control points an a specified transformation type. Once a transformer is built, it's methods (functions) can be used for transforming a geometry.
+This package exports the GcpTransformer class. It's instances (called 'transformers') are built from a set of ground control points an a specified transformation type. Once a transformer is built, it's methods (functions) can be used for transforming a geometry.
 
 ### Transform vs GDAL
 
@@ -38,9 +38,9 @@ Alternatively an array of `{resource: [number, number], geo: [number, number]}` 
 
 A transformer contain the forward and backward transformation. They all accepts points, lines and polygons, both as Allmaps geometries or GeoJSON geometries. There are separate functions for transforming to Allmaps geometries or to GeoJSON geometries. There are also separate functions for transforming forward or backward.
 
-Hence, the main functions are: `transformForward()`, `transformForwardAsGeoJSON()`, `transformBackward()` and `transformBackwardAsGeoJSON()`
+Hence, the main functions are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
 
-Alternatively the same four functions are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeoJSON()`.
+Alternatively the same four functions are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
 
 The Allmaps geometries are:
 
@@ -89,7 +89,7 @@ nnpm install @allmaps/transform
 ### Point
 
 ```js
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 const transformGcps3 = [
   {
@@ -106,7 +106,7 @@ const transformGcps3 = [
   }
 ]
 
-const transformer = new GCPTransformer(transformGcps3, 'helmert')
+const transformer = new GcpTransformer(transformGcps3, 'helmert')
 
 const transformedPosition = transformer.transformForward([100, 100])
 // transformedPosition = [4.9385700843392435, 52.46580484503631]
@@ -158,7 +158,7 @@ const transformOptions = {
 // We transform backward (from destination to source) and have GeoJSON input.
 // Hence `destinationIsGeographic: true` will be set automatically
 
-const transformer = new GCPTransformer(transformGcps7, 'polynomial')
+const transformer = new GcpTransformer(transformGcps7, 'polynomial')
 
 const lineStringGeoJSON = {
   type: 'LineString',
@@ -217,7 +217,7 @@ const transformOptions = {
   maxDepth: 1
 }
 
-const transformer = new GCPTransformer(transformGcps6, 'thinPlateSpline')
+const transformer = new GcpTransformer(transformGcps6, 'thinPlateSpline')
 
 const polygon = [
   [
@@ -228,7 +228,7 @@ const polygon = [
   ]
 ]
 
-const transformedPolygonGeoJSON = transformer.transformForwardAsGeoJSON(polygon, transformOptions)
+const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(polygon, transformOptions)
 // const transformedPolygonGeoJSON = {
 //   type: 'Polygon',
 //   coordinates: [
