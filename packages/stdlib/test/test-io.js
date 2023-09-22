@@ -6,24 +6,27 @@ import {
   isPosition,
   isLineString,
   isPolygon,
-  isGeoJSONPoint,
-  isGeoJSONLineString,
-  isGeoJSONPolygon,
   conformLineString,
   conformPolygon,
-  convertGeoJSONPolygonToPolygon,
-  convertPolygonToGeoJSONPolygon
-} from '../dist/io.js'
+  convertPolygonToGeojsonPolygon
+} from '../dist/geometry.js'
+
+import {
+  isGeojsonPoint,
+  isGeojsonLineString,
+  isGeojsonPolygon,
+  convertGeojsonPolygonToPolygon
+} from '../dist/geojson.js'
 
 import {
   positionGeo,
-  geoJSONPointGeo,
+  geojsonPointGeo,
   lineStringGeo,
-  geoJSONLineStringGeo,
+  geojsonLineStringGeo,
   ringGeo,
   ringGeoClosed,
   polygonGeo,
-  geoJSONPolygonGeo,
+  geojsonPolygonGeo,
   lineStringGeoUnconformed,
   lineStringGeoWrong,
   polygonGeoClosed,
@@ -53,14 +56,14 @@ describe('isPosition()', async () => {
   it(`should return false on Polygon`, () => {
     expect(isPosition(polygonGeo)).to.be.false
   })
-  it(`should return false on GeoJSON point`, () => {
-    expect(isPosition(geoJSONPointGeo)).to.be.false
+  it(`should return false on Geojson point`, () => {
+    expect(isPosition(geojsonPointGeo)).to.be.false
   })
-  it(`should return false on GeoJSON lineString`, () => {
-    expect(isPosition(geoJSONLineStringGeo)).to.be.false
+  it(`should return false on Geojson lineString`, () => {
+    expect(isPosition(geojsonLineStringGeo)).to.be.false
   })
-  it(`should return false on GeoJSON polygon`, () => {
-    expect(isPosition(geoJSONPolygonGeo)).to.be.false
+  it(`should return false on Geojson polygon`, () => {
+    expect(isPosition(geojsonPolygonGeo)).to.be.false
   })
 })
 
@@ -77,14 +80,14 @@ describe('isLineString()', async () => {
   it(`should return false on Polygon`, () => {
     expect(isLineString(polygonGeo)).to.be.false
   })
-  it(`should return false on GeoJSON point`, () => {
-    expect(isLineString(geoJSONPointGeo)).to.be.false
+  it(`should return false on Geojson point`, () => {
+    expect(isLineString(geojsonPointGeo)).to.be.false
   })
-  it(`should return false on GeoJSON lineString`, () => {
-    expect(isLineString(geoJSONLineStringGeo)).to.be.false
+  it(`should return false on Geojson lineString`, () => {
+    expect(isLineString(geojsonLineStringGeo)).to.be.false
   })
-  it(`should return false on GeoJSON polygon`, () => {
-    expect(isLineString(geoJSONPolygonGeo)).to.be.false
+  it(`should return false on Geojson polygon`, () => {
+    expect(isLineString(geojsonPolygonGeo)).to.be.false
   })
 })
 
@@ -101,77 +104,77 @@ describe('isPolygon()', async () => {
   // it(`should return false on closed Polygon`, () => {
   //   expect(isPolygon(polygonGeoClosed)).to.be.false
   // })
-  it(`should return false on GeoJSON point`, () => {
-    expect(isPolygon(geoJSONPointGeo)).to.be.false
+  it(`should return false on Geojson point`, () => {
+    expect(isPolygon(geojsonPointGeo)).to.be.false
   })
-  it(`should return false on GeoJSON lineString`, () => {
-    expect(isPolygon(geoJSONLineStringGeo)).to.be.false
+  it(`should return false on Geojson lineString`, () => {
+    expect(isPolygon(geojsonLineStringGeo)).to.be.false
   })
-  it(`should return false on GeoJSON polygon`, () => {
-    expect(isPolygon(geoJSONPolygonGeo)).to.be.false
-  })
-})
-
-describe('isGeoJSONPoint()', async () => {
-  it(`should return false on Position`, () => {
-    expect(isGeoJSONPoint(positionGeo)).to.be.false
-  })
-  it(`should return false on LineString`, () => {
-    expect(isGeoJSONPoint(lineStringGeo)).to.be.false
-  })
-  it(`should return false on Polygon`, () => {
-    expect(isGeoJSONPoint(polygonGeo)).to.be.false
-  })
-  it(`should return true on GeoJSON Point`, () => {
-    expect(isGeoJSONPoint(geoJSONPointGeo)).to.be.true
-  })
-  it(`should return false on GeoJSON LineString`, () => {
-    expect(isGeoJSONPoint(geoJSONLineStringGeo)).to.be.false
-  })
-  it(`should return false on GeoJSON Polygon`, () => {
-    expect(isGeoJSONPoint(geoJSONPolygonGeo)).to.be.false
+  it(`should return false on Geojson polygon`, () => {
+    expect(isPolygon(geojsonPolygonGeo)).to.be.false
   })
 })
 
-describe('isGeoJSONLineString()', async () => {
+describe('isGeojsonPoint()', async () => {
   it(`should return false on Position`, () => {
-    expect(isGeoJSONLineString(positionGeo)).to.be.false
+    expect(isGeojsonPoint(positionGeo)).to.be.false
   })
   it(`should return false on LineString`, () => {
-    expect(isGeoJSONLineString(lineStringGeo)).to.be.false
+    expect(isGeojsonPoint(lineStringGeo)).to.be.false
   })
   it(`should return false on Polygon`, () => {
-    expect(isGeoJSONLineString(polygonGeo)).to.be.false
+    expect(isGeojsonPoint(polygonGeo)).to.be.false
   })
-  it(`should return false on GeoJSON Point`, () => {
-    expect(isGeoJSONLineString(geoJSONPointGeo)).to.be.false
+  it(`should return true on Geojson Point`, () => {
+    expect(isGeojsonPoint(geojsonPointGeo)).to.be.true
   })
-  it(`should return true on GeoJSON LineString`, () => {
-    expect(isGeoJSONLineString(geoJSONLineStringGeo)).to.be.true
+  it(`should return false on Geojson LineString`, () => {
+    expect(isGeojsonPoint(geojsonLineStringGeo)).to.be.false
   })
-  it(`should return false on GeoJSON Polygon`, () => {
-    expect(isGeoJSONLineString(geoJSONPolygonGeo)).to.be.false
+  it(`should return false on Geojson Polygon`, () => {
+    expect(isGeojsonPoint(geojsonPolygonGeo)).to.be.false
   })
 })
 
-describe('isGeoJSONPolygon()', async () => {
+describe('isGeojsonLineString()', async () => {
   it(`should return false on Position`, () => {
-    expect(isGeoJSONPolygon(positionGeo)).to.be.false
+    expect(isGeojsonLineString(positionGeo)).to.be.false
   })
   it(`should return false on LineString`, () => {
-    expect(isGeoJSONPolygon(lineStringGeo)).to.be.false
+    expect(isGeojsonLineString(lineStringGeo)).to.be.false
   })
   it(`should return false on Polygon`, () => {
-    expect(isGeoJSONPolygon(polygonGeo)).to.be.false
+    expect(isGeojsonLineString(polygonGeo)).to.be.false
   })
-  it(`should return false on GeoJSON Point`, () => {
-    expect(isGeoJSONPolygon(geoJSONPointGeo)).to.be.false
+  it(`should return false on Geojson Point`, () => {
+    expect(isGeojsonLineString(geojsonPointGeo)).to.be.false
   })
-  it(`should return false on GeoJSON LineString`, () => {
-    expect(isGeoJSONPolygon(geoJSONLineStringGeo)).to.be.false
+  it(`should return true on Geojson LineString`, () => {
+    expect(isGeojsonLineString(geojsonLineStringGeo)).to.be.true
   })
-  it(`should return true on GeoJSON Polygon`, () => {
-    expect(isGeoJSONPolygon(geoJSONPolygonGeo)).to.be.true
+  it(`should return false on Geojson Polygon`, () => {
+    expect(isGeojsonLineString(geojsonPolygonGeo)).to.be.false
+  })
+})
+
+describe('isGeojsonPolygon()', async () => {
+  it(`should return false on Position`, () => {
+    expect(isGeojsonPolygon(positionGeo)).to.be.false
+  })
+  it(`should return false on LineString`, () => {
+    expect(isGeojsonPolygon(lineStringGeo)).to.be.false
+  })
+  it(`should return false on Polygon`, () => {
+    expect(isGeojsonPolygon(polygonGeo)).to.be.false
+  })
+  it(`should return false on Geojson Point`, () => {
+    expect(isGeojsonPolygon(geojsonPointGeo)).to.be.false
+  })
+  it(`should return false on Geojson LineString`, () => {
+    expect(isGeojsonPolygon(geojsonLineStringGeo)).to.be.false
+  })
+  it(`should return true on Geojson Polygon`, () => {
+    expect(isGeojsonPolygon(geojsonPolygonGeo)).to.be.true
   })
 })
 
@@ -201,26 +204,26 @@ describe('conformPolygon()', async () => {
   })
 })
 
-describe('convertGeoJSONPolygonToPolygon()', async () => {
+describe('convertGeojsonPolygonToPolygon()', async () => {
   it(`should not close`, () => {
-    expect(convertGeoJSONPolygonToPolygon(geoJSONPolygonGeo)).to.deep.equal(
+    expect(convertGeojsonPolygonToPolygon(geojsonPolygonGeo)).to.deep.equal(
       polygonGeo
     )
   })
 })
 
-describe('convertGeoJSONPolygonToPolygon()', async () => {
+describe('convertGeojsonPolygonToPolygon()', async () => {
   it(`should close when asked`, () => {
     expect(
-      convertGeoJSONPolygonToPolygon(geoJSONPolygonGeo, true)
+      convertGeojsonPolygonToPolygon(geojsonPolygonGeo, true)
     ).to.deep.equal(polygonGeoClosed)
   })
 })
 
-describe('convertPolygonToGeoJSONPolygon()', async () => {
-  it(`should respect GeoJSON spec`, () => {
-    expect(convertPolygonToGeoJSONPolygon(polygonGeo)).to.deep.equal(
-      geoJSONPolygonGeo
+describe('convertPolygonToGeojsonPolygon()', async () => {
+  it(`should respect Geojson spec`, () => {
+    expect(convertPolygonToGeojsonPolygon(polygonGeo)).to.deep.equal(
+      geojsonPolygonGeo
     )
   })
 })

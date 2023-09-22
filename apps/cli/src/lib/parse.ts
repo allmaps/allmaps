@@ -5,8 +5,8 @@ import type {
   PartialTransformOptions,
   TransformationType
 } from '@allmaps/transform'
-import type { GCP } from '@allmaps/types'
-import { parseGcpsFromFile, parseJsonFromFile } from './io.js'
+import type { Gcp } from '@allmaps/types'
+import { readFromFile, parseJsonFromFile } from './io.js'
 
 export function parseMap(options: { annotation: string }): Map {
   let map
@@ -25,7 +25,7 @@ export function parseMap(options: { annotation: string }): Map {
 export function parseGcps(
   options: { gcps: string; annotation: string },
   map: Map
-): GCP[] {
+): Gcp[] {
   let gcps
   if (options.gcps) {
     gcps = parseGcpsFromFile(options.gcps as string)
@@ -35,6 +35,35 @@ export function parseGcps(
     throw new Error('No GCPs supplied. Specify an annotation or GCPs.')
   }
   return gcps
+}
+
+export function parseGcpsFromFile(file: string): Gcp[] {
+  return (
+    parseCoordinateArrayArrayFromFile(file) as [
+      [number, number, number, number]
+    ]
+  ).map((coordinateArray) => ({
+    resource: [coordinateArray[0], coordinateArray[1]],
+    geo: [coordinateArray[2], coordinateArray[3]]
+  }))
+}
+
+export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
+  return parseCoordinatesArrayArray(readFromFile(file))
+}
+
+export function parseCoordinatesArrayArray(
+  coordinatesString: string
+): number[][] {
+  // String from mutli line file where each line contains multiple coordinates separated by space (or multiple spaces or tabs)
+  return coordinatesString
+    .trim()
+    .split('\n')
+    .map((coordinatesLineString) =>
+      coordinatesLineString
+        .split(/[ \t]+/)
+        .map((coordinateString) => Number(coordinateString.trim()))
+    )
 }
 
 export function parseTransformationType(
@@ -88,20 +117,6 @@ export function parseAnnotationsValidateMaps(jsonValues: unknown[]): Map[] {
   const maps = jsonValues.map(parseAnnotationValidateMap).flat()
 
   return maps
-}
-
-export function parseCoordinatesArrayArray(
-  coordinatesString: string
-): number[][] {
-  // String from mutli line file where each line contains multiple coordinates separated by space (or multiple spaces or tabs)
-  return coordinatesString
-    .trim()
-    .split('\n')
-    .map((coordinatesLineString) =>
-      coordinatesLineString
-        .split(/[ \t]+/)
-        .map((coordinateString) => Number(coordinateString.trim()))
-    )
 }
 
 export function parseTransformOptions(

@@ -1,4 +1,4 @@
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 import bbox from '@turf/bbox'
 
@@ -26,12 +26,12 @@ export function generateTileJson(
   const geoMasks = []
 
   for (const map of maps) {
-    const transformer = new GCPTransformer(
+    const transformer = new GcpTransformer(
       map.gcps,
       options['transformation.type'] || map.transformation?.type
     )
 
-    const geoMask = transformer.transformForwardAsGeoJSON([map.resourceMask], {
+    const geoMask = transformer.transformForwardAsGeojson([map.resourceMask], {
       maxOffsetRatio: 0.01
     })
     geoMasks.push(geoMask)

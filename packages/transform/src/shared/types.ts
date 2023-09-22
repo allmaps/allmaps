@@ -1,11 +1,11 @@
-import type { Position, GeoJSONPoint } from '@allmaps/types'
+import type { Position, GeojsonPoint } from '@allmaps/types'
 
 /** Ground Controle Point (GCP) (as used in the Transform package). */
-export type TransformGCP = { source: Position; destination: Position }
+export type TransformGcp = { source: Position; destination: Position }
 
 export type Segment = {
-  from: TransformGCP
-  to: TransformGCP
+  from: TransformGcp
+  to: TransformGcp
 }
 
 /** Transformation Type. */
@@ -34,17 +34,17 @@ export type Transformation = {
   sourcePositions: Position[]
   destinationPositions: Position[]
 
-  nPositions: number
+  positionCount: number
 
   interpolate(position: Position): Position
 }
 
-export type GCPTransformerInterface = {
-  gcps: TransformGCP[]
+export type GcpTransformerInterface = {
+  gcps: TransformGcp[]
 
-  transformForward(position: Position | GeoJSONPoint): Position
-  transformToGeo(position: Position | GeoJSONPoint): Position
+  transformForward(position: Position | GeojsonPoint): Position
+  transformToGeo(position: Position | GeojsonPoint): Position
 
-  transformBackward(position: Position | GeoJSONPoint): Position
-  transformToResource(position: Position | GeoJSONPoint): Position
+  transformBackward(position: Position | GeojsonPoint): Position
+  transformToResource(position: Position | GeojsonPoint): Position
 }

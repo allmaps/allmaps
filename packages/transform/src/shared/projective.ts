@@ -10,18 +10,18 @@ export default class Projective implements Transformation {
 
   projectiveParametersMatrix: Matrix
 
-  nPositions: number
+  positionCount: number
 
   constructor(sourcePositions: Position[], destinationPositions: Position[]) {
     this.sourcePositions = sourcePositions
     this.destinationPositions = destinationPositions
 
-    this.nPositions = this.sourcePositions.length
+    this.positionCount = this.sourcePositions.length
 
-    if (this.nPositions < 4) {
+    if (this.positionCount < 4) {
       throw new Error(
         'Not enough control points. A projective transformation requires a minimum of 4 points, but ' +
-          this.nPositions +
+          this.positionCount +
           ' are given.'
       )
     }
@@ -36,8 +36,8 @@ export default class Projective implements Transformation {
     // −x0 −y0 −1  0   0   0  x'0x0 x'0y0 x'0
     // 0   0   0   −x0 −y0 −1 y'0x0 y'0y0 y'0
     // ...
-    const projectiveCoefsMatrix = Matrix.zeros(2 * this.nPositions, 9)
-    for (let i = 0; i < this.nPositions; i++) {
+    const projectiveCoefsMatrix = Matrix.zeros(2 * this.positionCount, 9)
+    for (let i = 0; i < this.positionCount; i++) {
       projectiveCoefsMatrix.set(2 * i, 0, -sourcePositions[i][0])
       projectiveCoefsMatrix.set(2 * i, 1, -sourcePositions[i][1])
       projectiveCoefsMatrix.set(2 * i, 2, -1)

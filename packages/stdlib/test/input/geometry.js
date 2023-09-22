@@ -1,6 +1,6 @@
 export const positionResource = [518, 991]
 export const positionGeo = [4.9516614, 52.4633102]
-export const geoJSONPointGeo = {
+export const geojsonPointGeo = {
   type: 'Point',
   coordinates: [4.9516614, 52.4633102]
 }
@@ -18,7 +18,7 @@ export const lineStringGeo = [
   [4.4230497784967655, 51.950815146974556],
   [4.420666790347598, 51.959985351835975]
 ]
-export const lineStringGeoBBox = [
+export const lineStringGeoBbox = [
   4.388957777030093, 51.94062947962427, 4.425874493300959, 51.959985351835975
 ]
 export const lineStringGeoUnconformed = [
@@ -30,7 +30,7 @@ export const lineStringGeoUnconformed = [
   [4.420666790347598, 51.959985351835975]
 ]
 export const lineStringGeoWrong = [[4.388957777030093, 51.959084191571606]]
-export const geoJSONLineStringGeo = {
+export const geojsonLineStringGeo = {
   type: 'LineString',
   coordinates: [
     [4.388957777030093, 51.959084191571606],
@@ -123,7 +123,7 @@ export const polygonGeoWrong = [
   ]
 ]
 
-export const geoJSONPolygonGeo = {
+export const geojsonPolygonGeo = {
   type: 'Polygon',
   coordinates: [
     [

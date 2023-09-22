@@ -1,11 +1,11 @@
 import { Image } from '@allmaps/iiif-parser'
 
-import type { GCPTransformer } from '@allmaps/transform'
+import type { GcpTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox, bboxToPolygon } from '@allmaps/stdlib'
+import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
 
-import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
+import type { Size, BBox, Position, Tile, Line, Ring } from './types.js'
 import type { Polygon } from '@allmaps/types'
 
 type PositionByX = { [key: number]: Position }
@@ -131,17 +131,14 @@ function findBestZoomLevel(
   return bestZoomLevel
 }
 
-function scaleToTiles(
-  zoomLevel: TileZoomLevel,
-  points: SVGPolygon
-): SVGPolygon {
+function scaleToTiles(zoomLevel: TileZoomLevel, points: Ring): Ring {
   return points.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
 }
 
-function findNeededIiifTilesByX(tilePixelExtent: SVGPolygon) {
+function findNeededIiifTilesByX(tilePixelExtent: Ring) {
   // TODO: use Map
   const tiles: PositionByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
@@ -199,7 +196,7 @@ function iiifTilesByXToArray(
 }
 
 export function computeIiifTilesForMapGeoBBox(
-  transformer: GCPTransformer,
+  transformer: GcpTransformer,
   image: Image,
   viewportSize: Size,
   geoBBox: BBox
@@ -217,7 +214,7 @@ export function computeIiifTilesForMapGeoBBox(
       maxDepth: 2
     }
   ) as Polygon
-  const geoBBoxResourceBBox = computeBBox(geoBBoxPolygonToResource)
+  const geoBBoxResourceBBox = computeBbox(geoBBoxPolygonToResource)
 
   if (
     (geoBBoxResourceBBox[0] > image.width || geoBBoxResourceBBox[2] < 0) &&

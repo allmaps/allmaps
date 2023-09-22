@@ -1,7 +1,7 @@
 import { Stroke, Fill, Style } from 'ol/style.js'
 import type Feature from 'ol/Feature.js'
 
-import type { SVGPolygon } from '@allmaps/render'
+import type { Ring } from '@allmaps/render'
 
 export function invisiblePolygonStyle() {
   return new Style({
@@ -35,7 +35,7 @@ export function selectedPolygonStyle() {
   })
 }
 
-export function maskToPolygon(resourceMask: SVGPolygon) {
+export function maskToPolygon(resourceMask: Ring) {
   return [
     [
       ...resourceMask.map((coordinate) => [coordinate[0], -coordinate[1]]),

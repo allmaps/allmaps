@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { GCPTransformer } from '../dist/index.js'
+import { GcpTransformer } from '../dist/index.js'
 
 import { transformGcps10 } from '../test/input/gcps-test.js'
 
 let start, ops
 
-function logBenchmarkCreateGCPTransformer(input, type) {
+function logBenchmarkCreateGcpTransformer(input, type) {
   start = Date.now()
   ops = 0
   while (Date.now() - start < 1000) {
-    const transformer = new GCPTransformer(input, type)
+    const transformer = new GcpTransformer(input, type)
     transformer.transformToGeo([100, 100])
     ops++
   }
@@ -23,17 +23,17 @@ function logBenchmarkCreateGCPTransformer(input, type) {
   )
 }
 
-logBenchmarkCreateGCPTransformer(transformGcps10, 'helmert')
-logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial1')
-logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial2')
-logBenchmarkCreateGCPTransformer(transformGcps10, 'polynomial3')
-logBenchmarkCreateGCPTransformer(transformGcps10, 'thinPlateSpline')
-logBenchmarkCreateGCPTransformer(transformGcps10, 'projective')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'helmert')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'polynomial1')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'polynomial2')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'polynomial3')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'thinPlateSpline')
+logBenchmarkCreateGcpTransformer(transformGcps10, 'projective')
 
-function logBenchmarkUseGCPTransformer(input, type) {
+function logBenchmarkUseGcpTransformer(input, type) {
   start = Date.now()
   ops = 0
-  const transformer = new GCPTransformer(input, type)
+  const transformer = new GcpTransformer(input, type)
   while (Date.now() - start < 1000) {
     transformer.transformToGeo([100, 100])
     ops++
@@ -48,9 +48,9 @@ function logBenchmarkUseGCPTransformer(input, type) {
   )
 }
 
-logBenchmarkUseGCPTransformer(transformGcps10, 'helmert')
-logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial1')
-logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial2')
-logBenchmarkUseGCPTransformer(transformGcps10, 'polynomial3')
-logBenchmarkUseGCPTransformer(transformGcps10, 'thinPlateSpline')
-logBenchmarkUseGCPTransformer(transformGcps10, 'projective')
+logBenchmarkUseGcpTransformer(transformGcps10, 'helmert')
+logBenchmarkUseGcpTransformer(transformGcps10, 'polynomial1')
+logBenchmarkUseGcpTransformer(transformGcps10, 'polynomial2')
+logBenchmarkUseGcpTransformer(transformGcps10, 'polynomial3')
+logBenchmarkUseGcpTransformer(transformGcps10, 'thinPlateSpline')
+logBenchmarkUseGcpTransformer(transformGcps10, 'projective')

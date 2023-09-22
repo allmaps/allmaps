@@ -10,18 +10,18 @@ export default class Helmert implements Transformation {
 
   helmertParametersMatrix: Matrix
 
-  nPositions: number
+  positionCount: number
 
   constructor(sourcePositions: Position[], destinationPositions: Position[]) {
     this.sourcePositions = sourcePositions
     this.destinationPositions = destinationPositions
 
-    this.nPositions = this.sourcePositions.length
+    this.positionCount = this.sourcePositions.length
 
-    if (this.nPositions < 2) {
+    if (this.positionCount < 2) {
       throw new Error(
         'Not enough control points. A helmert transformation requires a minimum of 2 points, but ' +
-          this.nPositions +
+          this.positionCount +
           ' are given.'
       )
     }
@@ -42,8 +42,8 @@ export default class Helmert implements Transformation {
     // 1 0 x1 -y1
     // 0 1 y1 x1
     // ...
-    const helmertCoefsMatrix = Matrix.zeros(2 * this.nPositions, 4)
-    for (let i = 0; i < this.nPositions; i++) {
+    const helmertCoefsMatrix = Matrix.zeros(2 * this.positionCount, 4)
+    for (let i = 0; i < this.positionCount; i++) {
       helmertCoefsMatrix.set(2 * i, 0, 1)
       helmertCoefsMatrix.set(2 * i, 1, 0)
       helmertCoefsMatrix.set(2 * i, 2, sourcePositions[i][0])

@@ -17,15 +17,12 @@ export type Ring = Position[]
 
 export type Polygon = Position[][]
 
-// TODO: replace by Ring and/or Polygon
-export type SVGPolygon = Position[]
-
 export type Geometry = Position | LineString | Polygon
 
-export type GCP = { resource: Position; geo: Position }
+export type Gcp = { resource: Position; geo: Position }
 
-// export type BBox = [number, number, number, number] | [number, number, number, number, number, number];
-export type BBox = [number, number, number, number]
+// export type Bbox = [number, number, number, number] | [number, number, number, number, number, number];
+export type Bbox = [number, number, number, number]
 
 export type Size = [number, number]
 
@@ -52,24 +49,3 @@ export type Matrix4 = [
   number,
   number
 ]
-
-export type GeoJSONPoint = {
-  type: 'Point'
-  coordinates: [number, number]
-}
-
-export type GeoJSONLineString = {
-  type: 'LineString'
-  coordinates: [number, number][]
-}
-
-export type GeoJSONPolygon = {
-  type: 'Polygon'
-  coordinates: [number, number][][]
-}
-
-// Consider using @types/geojson!
-export type GeoJSONGeometry = GeoJSONPoint | GeoJSONLineString | GeoJSONPolygon
-
-// The (string) values of the 'type' field of the type GeoJSONGeometry
-export type GeoJSONGeometryType = GeoJSONGeometry['type']

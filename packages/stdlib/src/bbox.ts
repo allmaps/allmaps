@@ -1,6 +1,6 @@
-import { isPolygon } from './io.js'
+import { isPolygon } from './geometry.js'
 
-import type { Polygon, LineString, BBox, Extent } from '@allmaps/types'
+import type { Polygon, LineString, Bbox, Extent } from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
@@ -18,9 +18,9 @@ export function computeExtent(values: number[]): Extent {
   return [min, max]
 }
 
-export function computeBBox(points: LineString): BBox
-export function computeBBox(points: Polygon): BBox
-export function computeBBox(points: LineString | Polygon): BBox {
+export function computeBbox(points: LineString): Bbox
+export function computeBbox(points: Polygon): Bbox
+export function computeBbox(points: LineString | Polygon): Bbox {
   if (isPolygon(points)) {
     points = points.flat()
   }
@@ -39,7 +39,7 @@ export function computeBBox(points: LineString | Polygon): BBox {
   return [minX, minY, maxX, maxY]
 }
 
-export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
+export function combineBBoxes(bbox1: Bbox, bbox2: Bbox): Bbox {
   return [
     Math.min(bbox1[0], bbox2[0]),
     Math.min(bbox1[1], bbox2[1]),
@@ -48,7 +48,7 @@ export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
   ]
 }
 
-export function bboxToPolygon(bbox: BBox): Polygon {
+export function bboxToPolygon(bbox: Bbox): Polygon {
   return [
     [
       [bbox[0], bbox[1]],

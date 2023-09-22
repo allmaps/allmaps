@@ -10,7 +10,7 @@ export default class Polynomial implements Transformation {
 
   polynomialParametersMatrices: [Matrix, Matrix]
 
-  nPositions: number
+  positionCount: number
   order: number
   nCoefs: number
 
@@ -22,20 +22,20 @@ export default class Polynomial implements Transformation {
     this.sourcePositions = sourcePositions
     this.destinationPositions = destinationPositions
 
-    this.nPositions = this.sourcePositions.length
+    this.positionCount = this.sourcePositions.length
 
     this.order = order || 1
     this.nCoefs = ((this.order + 1) * (this.order + 2)) / 2
 
     // if there are less control points then there are coefficients to be determined (for each dimension), the system can not be solved
-    if (this.nPositions < this.nCoefs) {
+    if (this.positionCount < this.nCoefs) {
       throw new Error(
         'Not enough control points. A polynomial transformation of order ' +
           this.order +
           ' requires a minimum of ' +
           this.nCoefs +
           ' points, but ' +
-          this.nPositions +
+          this.positionCount +
           ' are given.'
       )
     }
@@ -70,8 +70,8 @@ export default class Polynomial implements Transformation {
     // for order = 3
     // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
     // ...
-    const polynomialCoefsMatrix = Matrix.zeros(this.nPositions, this.nCoefs)
-    for (let i = 0; i < this.nPositions; i++) {
+    const polynomialCoefsMatrix = Matrix.zeros(this.positionCount, this.nCoefs)
+    for (let i = 0; i < this.positionCount; i++) {
       switch (this.order) {
         case 1:
           polynomialCoefsMatrix.set(i, 0, 1)

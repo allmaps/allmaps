@@ -9,4 +9,4 @@ toc:
     children:
       - Triangle
       - poly2tri.Triangle
-      - SVGPolygon
+      - Ring

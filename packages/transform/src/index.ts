@@ -1,7 +1,7 @@
-import GCPTransformer from './transformer.js'
+import GcpTransformer from './transformer.js'
 
 /** @module allmaps/transform */
 
-export { GCPTransformer }
+export { GcpTransformer }
 
 export * from './shared/types.js'

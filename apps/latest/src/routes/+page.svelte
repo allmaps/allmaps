@@ -5,7 +5,7 @@
   import { MapMonster } from '@allmaps/ui'
 
   import turfRewind from '@turf/rewind'
-  import { GCPTransformer } from '@allmaps/transform'
+  import { GcpTransformer } from '@allmaps/transform'
   import { validateMap } from '@allmaps/annotation'
 
   import { getUrls } from '$lib/shared/urls.js'
@@ -93,12 +93,12 @@
       if (map.gcps.length >= 3) {
         if (map.resourceMask.length >= 3) {
           try {
-            const transformer = new GCPTransformer(
+            const transformer = new GcpTransformer(
               map.gcps,
               map.transformation?.type
             )
 
-            polygon = transformer.transformForwardAsGeoJSON([map.resourceMask])
+            polygon = transformer.transformForwardAsGeojson([map.resourceMask])
 
             // d3-geo requires the opposite polygon winding order of
             // the GoeJSON spec: https://github.com/d3/d3-geo

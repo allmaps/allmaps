@@ -28,7 +28,7 @@ export function pointInPolygon(point: Coord, polygon: Coord[]) {
   return inside
 }
 
-export function xyzTileToGeoJSON({ z, x, y }: XYZTile) {
+export function xyzTileToGeojson({ z, x, y }: XYZTile) {
   const topLeft = xyzTileTopLeft({ z, x, y })
   const bottomRight = xyzTileBottomRight({ z, x, y })
 

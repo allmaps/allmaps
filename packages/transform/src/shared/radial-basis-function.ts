@@ -16,7 +16,7 @@ export default class RBF implements Transformation {
 
   weightsMatrices: [Matrix, Matrix]
 
-  nPositions: number
+  positionCount: number
   epsilon?: number
 
   constructor(
@@ -32,11 +32,11 @@ export default class RBF implements Transformation {
     this.kernelFunction = kernelFunction
     this.normFunction = normFunction
 
-    this.nPositions = this.sourcePositions.length
+    this.positionCount = this.sourcePositions.length
 
-    if (this.nPositions < 3) {
+    if (this.positionCount < 3) {
       throw new Error(
-        `Not enough control points. A thin plate spline transformation (with affine component) requires a minimum of 3 points, but ${this.nPositions} are given.`
+        `Not enough control points. A thin plate spline transformation (with affine component) requires a minimum of 3 points, but ${this.positionCount} are given.`
       )
     }
 
@@ -60,10 +60,10 @@ export default class RBF implements Transformation {
       )
     ]
 
-    // Pre-compute kernelsMatrix: fill it with the position to position distances between all controle positions
-    const kernelsMatrix = Matrix.zeros(this.nPositions, this.nPositions)
-    for (let i = 0; i < this.nPositions; i++) {
-      for (let j = 0; j < this.nPositions; j++) {
+    // Pre-compute kernelsMatrix: fill it with the position to position distances between all control positions
+    const kernelsMatrix = Matrix.zeros(this.positionCount, this.positionCount)
+    for (let i = 0; i < this.positionCount; i++) {
+      for (let j = 0; j < this.positionCount; j++) {
         kernelsMatrix.set(
           i,
           j,
@@ -72,17 +72,18 @@ export default class RBF implements Transformation {
       }
     }
 
-    // If it's not provided, and if it's an input to the kernelFunction, compute epsilon as the average distance between the controle positions
+    // If it's not provided, and if it's an input to the kernelFunction, compute epsilon as the average distance between the control positions
     if (epsilon === undefined) {
       epsilon =
-        kernelsMatrix.sum() / (Math.pow(this.nPositions, 2) - this.nPositions)
+        kernelsMatrix.sum() /
+        (Math.pow(this.positionCount, 2) - this.positionCount)
     }
 
     this.epsilon = epsilon
 
     // Finish the computation of kernelsMatrix by applying the requested kernel function
-    for (let i = 0; i < this.nPositions; i++) {
-      for (let j = 0; j < this.nPositions; j++) {
+    for (let i = 0; i < this.positionCount; i++) {
+      for (let j = 0; j < this.positionCount; j++) {
         kernelsMatrix.set(
           i,
           j,
@@ -92,17 +93,17 @@ export default class RBF implements Transformation {
     }
 
     // Extend kernelsMatrix to include the affine transformation
-    const affineCoefsMatrix = Matrix.zeros(this.nPositions, 3)
+    const affineCoefsMatrix = Matrix.zeros(this.positionCount, 3)
     const kernelsAndAffineCoefsMatrix = Matrix.zeros(
-      this.nPositions + 3,
-      this.nPositions + 3
+      this.positionCount + 3,
+      this.positionCount + 3
     )
     // Construct Nx3 Matrix affineCoefsMatrix
     // 1 x0 y0
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    for (let i = 0; i < this.nPositions; i++) {
+    for (let i = 0; i < this.positionCount; i++) {
       affineCoefsMatrix.set(i, 0, 1)
       affineCoefsMatrix.set(i, 1, sourcePositions[i][0])
       affineCoefsMatrix.set(i, 2, sourcePositions[i][1])
@@ -110,21 +111,21 @@ export default class RBF implements Transformation {
     // Combine kernelsMatrix and affineCoefsMatrix into new matrix kernelsAndAffineCoefsMatrix
     // Note: mlMatrix has no knowledge of block matrices, but this approach is good enough
     // To speed this up, we could maybe use kernelsMatrix.addRow() and kernelsMatrix.addVector()
-    for (let i = 0; i < this.nPositions + 3; i++) {
-      for (let j = 0; j < this.nPositions + 3; j++) {
-        if (i < this.nPositions && j < this.nPositions) {
+    for (let i = 0; i < this.positionCount + 3; i++) {
+      for (let j = 0; j < this.positionCount + 3; j++) {
+        if (i < this.positionCount && j < this.positionCount) {
           kernelsAndAffineCoefsMatrix.set(i, j, kernelsMatrix.get(i, j))
-        } else if (i >= this.nPositions && j < this.nPositions) {
+        } else if (i >= this.positionCount && j < this.positionCount) {
           kernelsAndAffineCoefsMatrix.set(
             i,
             j,
-            affineCoefsMatrix.transpose().get(i - this.nPositions, j)
+            affineCoefsMatrix.transpose().get(i - this.positionCount, j)
           )
-        } else if (i < this.nPositions && j >= this.nPositions) {
+        } else if (i < this.positionCount && j >= this.positionCount) {
           kernelsAndAffineCoefsMatrix.set(
             i,
             j,
-            affineCoefsMatrix.get(i, j - this.nPositions)
+            affineCoefsMatrix.get(i, j - this.positionCount)
           )
         }
       }
@@ -147,9 +148,9 @@ export default class RBF implements Transformation {
       throw new Error('Weights not computed')
     }
 
-    // Make a column matrix with the distances of that position to all controle positions
-    const newDistancesMatrix = Matrix.zeros(this.nPositions, 1)
-    for (let i = 0; i < this.nPositions; i++) {
+    // Make a column matrix with the distances of that position to all control positions
+    const newDistancesMatrix = Matrix.zeros(this.positionCount, 1)
+    for (let i = 0; i < this.positionCount; i++) {
       newDistancesMatrix.set(
         i,
         0,
@@ -168,14 +169,14 @@ export default class RBF implements Transformation {
       newDestinationPosition[i] = multiplyMatricesElementwise(
         newDistancesMatrix,
         this.weightsMatrices[i].selection(
-          [...Array(this.nPositions).keys()],
+          [...Array(this.positionCount).keys()],
           [0]
         )
       ).sum()
       // Add the affine part
-      const a0 = this.weightsMatrices[i].get(this.nPositions, 0)
-      const ax = this.weightsMatrices[i].get(this.nPositions + 1, 0)
-      const ay = this.weightsMatrices[i].get(this.nPositions + 2, 0)
+      const a0 = this.weightsMatrices[i].get(this.positionCount, 0)
+      const ax = this.weightsMatrices[i].get(this.positionCount + 1, 0)
+      const ay = this.weightsMatrices[i].get(this.positionCount + 2, 0)
       newDestinationPosition[i] +=
         a0 + ax * newSourcePosition[0] + ay * newSourcePosition[1]
     }

@@ -1,8 +1,8 @@
 import { Command } from 'commander'
 
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
-import { parseJsonInput, print } from '../../lib/io.js'
+import { parseJsonInput, printString } from '../../lib/io.js'
 import {
   parseGcps,
   parseMap,
@@ -10,8 +10,7 @@ import {
   parseTransformationType
 } from '../../lib/parse.js'
 import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
-import { createSvgString, transformGeoJsonToSvg } from '../../lib/svg.js'
-import { isGeoJSONGeometry } from '../../lib/geojson.js'
+import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
 
 export default function geojson() {
   let command = new Command('geojson')
@@ -30,23 +29,22 @@ export default function geojson() {
     const transformationType = parseTransformationType(options, map)
     const transformOptions = parseTransformOptions(options)
 
-    const transformer = new GCPTransformer(gcps, transformationType)
-
-    const geoJsonGeometries = await parseJsonInput(files as string[])
+    const transformer = new GcpTransformer(gcps, transformationType)
 
     if (options.inverse) {
       throw new Error('Inverse transformation not supported for this command')
     }
 
-    const svgElements = []
+    const geoJsonGeometries = await parseJsonInput(files as string[])
+
+    const svgGeometries = []
     for (const geoJsonGeometry of geoJsonGeometries) {
-      if (isGeoJSONGeometry(geoJsonGeometry)) {
-        const svgElement = transformGeoJsonToSvg(
-          transformer,
+      if (isGeojsonGeometry(geoJsonGeometry)) {
+        const svgGeometry = transformer.transformGeojsonToSvg(
           geoJsonGeometry,
           transformOptions
         )
-        svgElements.push(svgElement)
+        svgGeometries.push(svgGeometry)
       } else {
         throw new Error(
           'Unsupported input. Only GeoJSON Points, LineStrings and Polygons are supported.'
@@ -54,7 +52,7 @@ export default function geojson() {
       }
     }
 
-    const svg = createSvgString(svgElements)
-    print(svg)
+    const svg = svgGeometriesToSvgString(svgGeometries)
+    printString(svg)
   })
 }

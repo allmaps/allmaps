@@ -4,7 +4,7 @@ import {
   validateMap,
   type Map as Georef
 } from '@allmaps/annotation'
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 import RTree from './RTree.js'
 
@@ -16,7 +16,7 @@ import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Position, GCP, BBox } from '@allmaps/types'
+import type { Position, Gcp, Bbox } from '@allmaps/types'
 import type { WarpedMap } from './shared/types.js'
 
 export default class World extends EventTarget {
@@ -109,17 +109,17 @@ export default class World extends EventTarget {
     mapId: string,
     resourceMask: Position[],
     parsedImage: IIIFImage,
-    projectedGcps: GCP[],
+    projectedGcps: Gcp[],
     transformation: TransformationType
   ) {
-    const transformer = new GCPTransformer(projectedGcps, transformation)
+    const transformer = new GcpTransformer(projectedGcps, transformation)
 
     const transformerOptions = {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
 
-    const geoMask = transformer.transformForwardAsGeoJSON(
+    const geoMask = transformer.transformForwardAsGeojson(
       [resourceMask],
       transformerOptions
     )
@@ -135,7 +135,7 @@ export default class World extends EventTarget {
       [0, parsedImage.height]
     ]
 
-    const fullGeoMask = transformer.transformForwardAsGeoJSON(
+    const fullGeoMask = transformer.transformForwardAsGeojson(
       [fullResourceMask],
       transformerOptions
     )
@@ -327,7 +327,7 @@ export default class World extends EventTarget {
   setResourceMask(mapId: string, resourceMask: Position[]) {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
-      const geoMask = warpedMap.transformer.transformForwardAsGeoJSON([
+      const geoMask = warpedMap.transformer.transformForwardAsGeojson([
         resourceMask
       ])
       warpedMap.geoMask = geoMask
@@ -388,7 +388,7 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
   }
 
-  getPossibleVisibleWarpedMapIds(geoBBox: BBox) {
+  getPossibleVisibleWarpedMapIds(geoBBox: Bbox) {
     if (this.rtree) {
       return this.rtree.searchBBox(geoBBox)
     } else {
@@ -413,7 +413,7 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
   }
 
-  getBBox(): BBox | undefined {
+  getBBox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.warpedMapsById.values()) {
