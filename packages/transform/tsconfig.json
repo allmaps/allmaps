@@ -4,5 +4,9 @@
     "rootDir": "./src",
     "outDir": "./dist",
   },
+  "references": [
+    { "path": "../types" },
+    { "path": "../stdlib" }
+  ],
   "include": ["./src/**/*"]
 }

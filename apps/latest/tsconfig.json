@@ -17,6 +17,7 @@
   "references": [
     { "path": "../../packages/transform" },
     { "path": "../../packages/annotation" },
-    { "path": "../../packages/tailwind" }
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/types" }
   ]
 }

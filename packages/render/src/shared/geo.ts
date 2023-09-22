@@ -1,12 +1,6 @@
-import { computeBBox } from './bbox.js'
+import { computeBbox } from '@allmaps/stdlib'
 
-import type {
-  SVGPolygon,
-  Position,
-  BBox,
-  XYZTile,
-  GeoJSONPolygon
-} from './types.js'
+import type { Ring, Position, BBox, XYZTile, GeoJSONPolygon } from './types.js'
 
 function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
@@ -40,10 +34,10 @@ export function toLonLat([x, y]: Position): Position {
 }
 
 export function getPolygonBBox(polygon: GeoJSONPolygon): BBox {
-  return computeBBox(polygon.coordinates[0])
+  return computeBbox(polygon.coordinates[0])
 }
 
-export function pointInPolygon(point: Position, polygon: SVGPolygon): boolean {
+export function pointInPolygon(point: Position, polygon: Ring): boolean {
   // From:
   //  https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
   // Ray-casting algorithm based on:

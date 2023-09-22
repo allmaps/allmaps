@@ -1,10 +1,7 @@
 import { describe, it } from 'mocha'
-import chai, { expect } from 'chai'
-import shallowDeepEqual from 'chai-shallow-deep-equal'
+import { expectToBeCloseToArrayArrayArray } from '../../stdlib/test/helper-functions.js'
 
 import { triangulate } from '../dist/index.js'
-
-chai.use(shallowDeepEqual)
 
 const rectangle = [
   [0.592, 0.953],
@@ -128,17 +125,20 @@ const rectangleOnGridNoDistanceResult = [
 
 describe('Rectangle', async () => {
   it(`should work for average polygons with no distance provided`, () => {
-    expect(triangulate(rectangle)).to.shallowDeepEqual(
+    expectToBeCloseToArrayArrayArray(
+      triangulate(rectangle),
       rectangleNoDistanceResult
     )
   })
   it(`should work for average polygons with a distance provided`, () => {
-    expect(triangulate(rectangle, 1)).to.shallowDeepEqual(
+    expectToBeCloseToArrayArrayArray(
+      triangulate(rectangle, 1),
       rectangleDistanceResult
     )
   })
   it(`should work with rectangles on grid (collinearity check) with no distance provided`, () => {
-    expect(triangulate(rectangleOnGrid)).to.shallowDeepEqual(
+    expectToBeCloseToArrayArrayArray(
+      triangulate(rectangleOnGrid),
       rectangleOnGridNoDistanceResult
     )
   })

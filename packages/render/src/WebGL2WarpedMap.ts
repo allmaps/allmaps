@@ -1,6 +1,6 @@
 import potpack from 'potpack'
 import { triangulate } from '@allmaps/triangulate'
-import { computeBBox } from '@allmaps/stdlib'
+import { computeBbox } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import { createBuffer } from './shared/webgl2.js'
@@ -9,7 +9,7 @@ import { applyTransform } from './shared/matrix.js'
 import type CachedTile from './CachedTile.js'
 
 import type { Transform, WarpedMap, RenderOptions } from './shared/types.js'
-import { BBox } from '@allmaps/types'
+import { Bbox } from '@allmaps/types'
 
 // TODO: Move to stdlib?
 const THROTTLE_WAIT_MS = 50
@@ -91,7 +91,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   updateTriangulation(warpedMap: WarpedMap, immediately = true) {
-    const bbox: BBox = computeBBox(warpedMap.resourceMask)
+    const bbox: Bbox = computeBbox(warpedMap.resourceMask)
     const bboxDiameter: number = Math.sqrt(
       (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
     )
@@ -102,7 +102,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     ).flat()
 
     const newGeoMaskVertices = trianglesPositions.map((point) =>
-      warpedMap.transformer.toGeo(point as [number, number])
+      warpedMap.transformer.transformToGeo(point as [number, number])
     )
 
     this.newGeoMaskTriangles = newGeoMaskVertices.flat()

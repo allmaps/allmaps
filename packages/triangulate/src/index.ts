@@ -1,8 +1,8 @@
-import { createGrid, interpolatePolygon } from './shared.js'
+import { createGrid, makePointsOnPolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
-import type { SVGPolygon, Position } from '@allmaps/types'
+import type { Ring, Position } from '@allmaps/types'
 
 /**
  * Triangle as `[[x0, y0], [x1, y1], [x2, y2]]`
@@ -15,8 +15,8 @@ import type { SVGPolygon, Position } from '@allmaps/types'
  */
 
 /**
- * Polygon object as `[[number, number], ...]`
- * @typedef {Object} SVGPolygon
+ * Polygon object, as an outer Ring only `[[number, number], ...]`
+ * @typedef {Object} Ring
  */
 
 /**
@@ -24,17 +24,17 @@ import type { SVGPolygon, Position } from '@allmaps/types'
  *
  * @remark Use this function to access the ritch poly2tri triangulation output (information on constrained edges, neighbours, interiour, ...).
  *
- * @param {SVGPolygon} polygon - Polygon
+ * @param {Ring} polygon - Polygon
  * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
  * @returns {poly2tri.Triangle[]} Array of triangles partitionning the polygon
  */
-export function triangulatePoly2tri(polygon: SVGPolygon, distance: number) {
+export function triangulatePoly2tri(polygon: Ring, distance: number) {
   // create grid
   const grid: Position[] = createGrid(polygon, distance)
 
   // initialise Constrained Delaunay Triangulation with polygon
   const swctx = new poly2tri.SweepContext(
-    interpolatePolygon(polygon, distance).map(
+    makePointsOnPolygon(polygon, distance).map(
       (p) => new poly2tri.Point(p[0], p[1])
     )
   )
@@ -56,11 +56,11 @@ export function triangulatePoly2tri(polygon: SVGPolygon, distance: number) {
  *
  * @remark Polygons with < 3 points just return an empty array.
  *
- * @param {SVGPolygon} polygon - Polygon
+ * @param {Ring} polygon - Polygon
  * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
  * @returns {Triangle[]} Array of triangles partitionning the polygon
  */
-export function triangulate(polygon: SVGPolygon, distance: number) {
+export function triangulate(polygon: Ring, distance: number) {
   return triangulatePoly2tri(polygon, distance).map((t) =>
     t.getPoints().map((p) => [p.x, p.y])
   )

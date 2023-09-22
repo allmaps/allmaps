@@ -1,5 +1,5 @@
-import { computeBBox } from '@allmaps/stdlib'
-import type { BBox, Line, SVGPolygon, Position } from '@allmaps/types'
+import { computeBbox } from '@allmaps/stdlib'
+import type { Bbox, Line, Ring, Position } from '@allmaps/types'
 
 function computeLineDistance(line: Line): number {
   return Math.sqrt(
@@ -24,7 +24,7 @@ function computeNextPoint(
   ]
 }
 
-function interpolateLine(line: Line, distance: number): Position[] {
+function makePointsOnLine(line: Line, distance: number): Position[] {
   let currentPoint = line[0]
   const result = [currentPoint]
 
@@ -41,22 +41,22 @@ function interpolateLine(line: Line, distance: number): Position[] {
   return result
 }
 
-export function interpolatePolygon(polygon: SVGPolygon, distance: number) {
+export function makePointsOnPolygon(polygon: Ring, distance: number) {
   // close polygon
   polygon = [...polygon, polygon[0]]
 
-  let result: SVGPolygon = []
+  let result: Ring = []
   for (let i = 0; i < polygon.length - 1; i++) {
     result = result.concat(
-      interpolateLine([polygon[i], polygon[i + 1]], distance)
+      makePointsOnLine([polygon[i], polygon[i + 1]], distance)
     )
   }
   return result
 }
 
-export function createGrid(polygon: SVGPolygon, gridSize: number): Position[] {
+export function createGrid(polygon: Ring, gridSize: number): Position[] {
   const grid = []
-  const bbox: BBox = computeBBox(polygon)
+  const bbox: Bbox = computeBbox(polygon)
   for (let x = bbox[0] + gridSize, i = 0; x <= bbox[2]; i++, x += gridSize) {
     for (let y = bbox[1] + gridSize, j = 0; y <= bbox[3]; j++, y += gridSize) {
       grid.push([x, y] as Position)

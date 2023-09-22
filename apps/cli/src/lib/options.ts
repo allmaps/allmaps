@@ -10,10 +10,6 @@ export function addAnnotationOptions(command: Command): Command {
       '-a, --annotation <filename>',
       'Filename of Georeference Annotation'
     )
-    .option(
-      '-a, --annotation <filename>',
-      'Filename of Georeference Annotation'
-    )
     .option('-i, --inverse', 'Compute backward ("inverse") transformation.')
     .option(
       '-g, --gcps <filename>',
@@ -43,4 +39,6 @@ export function addTransformOptions(command: Command) {
       'Maximum recursion depth',
       `${DEFAULT_MAX_DEPTH}`
     )
+    .option('--destination-is-geographic', 'Destination is geographic')
+    .option('--source-is-geographic', 'Source is geographic')
 }

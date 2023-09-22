@@ -163,65 +163,67 @@ describe('allmaps transform position', () => {
   // TODO: Add test for muliple input files
 
   it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation', () => {
-    const expected = readFile('output/coordinatesStringFiles/positionFile.txt')
+    const expected = readFile(
+      'output/coordinates-string-files/position-file.txt'
+    )
     const output = exec(
       'transform position -a input/annotations/7a69f9470b49a744.json',
-      'input/coordinatesStringFiles/positionFile.txt'
+      'input/coordinates-string-files/position-file.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read positions from a filename and transform these positions backward using the supplied Georeference Annotation', () => {
     const expected = readFile(
-      'output/coordinatesStringFiles/positionFileBackward.txt'
+      'output/coordinates-string-files/position-file-backward.txt'
     )
     const output = exec(
       'transform position -a input/annotations/7a69f9470b49a744.json -i',
-      'input/coordinatesStringFiles/positionFileBackward.txt'
+      'input/coordinates-string-files/position-file-backward.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
     const expected = readFile(
-      'output/coordinatesStringFiles/positionFileThinPlateSpline.txt'
+      'output/coordinates-string-files/position-file-thin-plate-spline.txt'
     )
     const output = exec(
       'transform position -a input/annotations/7a69f9470b49a744.json -t thinPlateSpline',
-      'input/coordinatesStringFiles/positionFile.txt'
+      'input/coordinates-string-files/position-file.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read positions from a filename and transform these positions forward using the supplied Georeference Annotation transformation type but overwrittable GCPs', () => {
     const expected = readFile(
-      'output/coordinatesStringFiles/positionFileOtherGcps.txt'
+      'output/coordinates-string-files/position-file-other-gcps.txt'
     )
     const output = exec(
-      'transform position -a input/annotations/7a69f9470b49a744.json -g input/coordinatesStringFiles/gcpFile.txt',
-      'input/coordinatesStringFiles/positionFile.txt'
+      'transform position -a input/annotations/7a69f9470b49a744.json -g input/coordinates-string-files/gcp-file.txt',
+      'input/coordinates-string-files/position-file.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read positions from a filename and transform these positions forward using the supplied transformation type and GCPs, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinatesStringFiles/positionFileOtherGcpsThinPlateSpline.txt'
+      'output/coordinates-string-files/position-file-other-gcps-thin-plate-spline.txt'
     )
     const output = exec(
-      'transform position -g input/coordinatesStringFiles/gcpFile.txt -t thinPlateSpline',
-      'input/coordinatesStringFiles/positionFile.txt'
+      'transform position -g input/coordinates-string-files/gcp-file.txt -t thinPlateSpline',
+      'input/coordinates-string-files/position-file.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read positions from a filename and transform these positions forward using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinatesStringFiles/positionFileOtherGcps.txt'
+      'output/coordinates-string-files/position-file-other-gcps.txt'
     )
     const output = exec(
-      'transform position -g input/coordinatesStringFiles/gcpFile.txt',
-      'input/coordinatesStringFiles/positionFile.txt'
+      'transform position -g input/coordinates-string-files/gcp-file.txt',
+      'input/coordinates-string-files/position-file.txt'
     )
     expect(expected).to.equal(output)
   })

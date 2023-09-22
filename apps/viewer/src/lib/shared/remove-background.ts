@@ -10,7 +10,7 @@ import {
 import type { Map } from '@allmaps/annotation'
 import type { Image } from '@allmaps/iiif-parser'
 
-import type { SVGPolygon } from '@allmaps/render'
+import type { Ring } from '@allmaps/render'
 
 const thumbnailSize = 400
 
@@ -29,7 +29,7 @@ export async function getBackgroundColor(map: Map, parsedImage: Image) {
 
   const scale = imageElement.width / map.resource.width
 
-  const mask: SVGPolygon = map.resourceMask.map((point) => [
+  const mask: Ring = map.resourceMask.map((point) => [
     point[0] * scale,
     point[1] * scale
   ])

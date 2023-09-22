@@ -1,6 +1,6 @@
-import type { BBox, SVGPolygon, Extent } from '@allmaps/types'
+import { isPolygon } from './geometry.js'
 
-// TODO: move to @allmaps/stdlib
+import type { Polygon, LineString, Bbox, Extent } from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
@@ -18,11 +18,17 @@ export function computeExtent(values: number[]): Extent {
   return [min, max]
 }
 
-export function computeBBox(points: SVGPolygon): BBox {
+export function computeBbox(points: LineString): Bbox
+export function computeBbox(points: Polygon): Bbox
+export function computeBbox(points: LineString | Polygon): Bbox {
+  if (isPolygon(points)) {
+    points = points.flat()
+  }
+
   const xs = []
   const ys = []
 
-  for (const point of points) {
+  for (const point of points as LineString) {
     xs.push(point[0])
     ys.push(point[1])
   }
@@ -33,7 +39,7 @@ export function computeBBox(points: SVGPolygon): BBox {
   return [minX, minY, maxX, maxY]
 }
 
-export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
+export function combineBBoxes(bbox1: Bbox, bbox2: Bbox): Bbox {
   return [
     Math.min(bbox1[0], bbox2[0]),
     Math.min(bbox1[1], bbox2[1]),
@@ -42,11 +48,13 @@ export function combineBBoxes(bbox1: BBox, bbox2: BBox): BBox {
   ]
 }
 
-export function bboxToSvgPolygon(bbox: BBox): SVGPolygon {
+export function bboxToPolygon(bbox: Bbox): Polygon {
   return [
-    [bbox[0], bbox[1]],
-    [bbox[2], bbox[1]],
-    [bbox[2], bbox[3]],
-    [bbox[0], bbox[3]]
+    [
+      [bbox[0], bbox[1]],
+      [bbox[2], bbox[1]],
+      [bbox[2], bbox[3]],
+      [bbox[0], bbox[3]]
+    ]
   ]
 }

@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
@@ -8,6 +8,7 @@ import {
   parseTransformOptions
 } from '../../lib/parse.js'
 import { addTransformOptions } from '../../lib/options.js'
+import { featuresToFeatureCollection, geometryToFeature } from '@allmaps/stdlib'
 
 export default function resourceMask() {
   let command = new Command('resource-mask')
@@ -23,42 +24,28 @@ export default function resourceMask() {
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files as string[])
     const maps = parseAnnotationsValidateMaps(jsonValues)
-
-    const features = []
-
     const transformOptions = parseTransformOptions(options)
 
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
+
+    const features = []
     for (const map of maps) {
-      if (map.gcps.length >= 3) {
-        const transformer = new GCPTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
-        const polygon = transformer.toGeoJSONPolygon(
-          map.resourceMask,
-          transformOptions
-        )
+      const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+      const polygon = transformer.transformForwardAsGeojson(
+        [map.resourceMask],
+        transformOptions
+      )
 
-        features.push({
-          type: 'Feature',
-          properties: {
-            imageId: map.resource.id
-          },
-          geometry: polygon
+      features.push(
+        geometryToFeature(polygon, {
+          imageId: map.resource.id
         })
-      } else {
-        // TODO: this can be removed because an error will be given by the transformer.
-        console.error(
-          'Encountered Georeference Annotation with less than 3 points'
-        )
-      }
+      )
     }
 
-    const featureCollection = {
-      type: 'FeatureCollection',
-      features
-    }
-
+    const featureCollection = featuresToFeatureCollection(features)
     printJson(featureCollection)
   })
 }

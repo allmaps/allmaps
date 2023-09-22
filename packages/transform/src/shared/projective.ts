@@ -1,25 +1,27 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import type { Position } from './types.js'
+import type { Transformation } from './types'
 
-export default class Projective {
-  sourcePoints: Position[]
-  destinationPoints: Position[]
+import type { Position } from '@allmaps/types'
+
+export default class Projective implements Transformation {
+  sourcePositions: Position[]
+  destinationPositions: Position[]
 
   projectiveParametersMatrix: Matrix
 
-  nPoints: number
+  positionCount: number
 
-  constructor(sourcePoints: Position[], destinationPoints: Position[]) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
+  constructor(sourcePositions: Position[], destinationPositions: Position[]) {
+    this.sourcePositions = sourcePositions
+    this.destinationPositions = destinationPositions
 
-    this.nPoints = this.sourcePoints.length
+    this.positionCount = this.sourcePositions.length
 
-    if (this.nPoints < 4) {
+    if (this.positionCount < 4) {
       throw new Error(
-        'Not enough controle points. A projective transformation requires a minimum of 4 points, but ' +
-          this.nPoints +
+        'Not enough control points. A projective transformation requires a minimum of 4 points, but ' +
+          this.positionCount +
           ' are given.'
       )
     }
@@ -34,10 +36,10 @@ export default class Projective {
     // −x0 −y0 −1  0   0   0  x'0x0 x'0y0 x'0
     // 0   0   0   −x0 −y0 −1 y'0x0 y'0y0 y'0
     // ...
-    const projectiveCoefsMatrix = Matrix.zeros(2 * this.nPoints, 9)
-    for (let i = 0; i < this.nPoints; i++) {
-      projectiveCoefsMatrix.set(2 * i, 0, -sourcePoints[i][0])
-      projectiveCoefsMatrix.set(2 * i, 1, -sourcePoints[i][1])
+    const projectiveCoefsMatrix = Matrix.zeros(2 * this.positionCount, 9)
+    for (let i = 0; i < this.positionCount; i++) {
+      projectiveCoefsMatrix.set(2 * i, 0, -sourcePositions[i][0])
+      projectiveCoefsMatrix.set(2 * i, 1, -sourcePositions[i][1])
       projectiveCoefsMatrix.set(2 * i, 2, -1)
       projectiveCoefsMatrix.set(2 * i, 3, 0)
       projectiveCoefsMatrix.set(2 * i, 4, 0)
@@ -45,31 +47,31 @@ export default class Projective {
       projectiveCoefsMatrix.set(
         2 * i,
         6,
-        destinationPoints[i][0] * sourcePoints[i][0]
+        destinationPositions[i][0] * sourcePositions[i][0]
       )
       projectiveCoefsMatrix.set(
         2 * i,
         7,
-        destinationPoints[i][0] * sourcePoints[i][1]
+        destinationPositions[i][0] * sourcePositions[i][1]
       )
-      projectiveCoefsMatrix.set(2 * i, 8, destinationPoints[i][0])
+      projectiveCoefsMatrix.set(2 * i, 8, destinationPositions[i][0])
       projectiveCoefsMatrix.set(2 * i + 1, 0, 0)
       projectiveCoefsMatrix.set(2 * i + 1, 1, 0)
       projectiveCoefsMatrix.set(2 * i + 1, 2, 0)
-      projectiveCoefsMatrix.set(2 * i + 1, 3, -sourcePoints[i][0])
-      projectiveCoefsMatrix.set(2 * i + 1, 4, -sourcePoints[i][1])
+      projectiveCoefsMatrix.set(2 * i + 1, 3, -sourcePositions[i][0])
+      projectiveCoefsMatrix.set(2 * i + 1, 4, -sourcePositions[i][1])
       projectiveCoefsMatrix.set(2 * i + 1, 5, -1)
       projectiveCoefsMatrix.set(
         2 * i + 1,
         6,
-        destinationPoints[i][1] * sourcePoints[i][0]
+        destinationPositions[i][1] * sourcePositions[i][0]
       )
       projectiveCoefsMatrix.set(
         2 * i + 1,
         7,
-        destinationPoints[i][1] * sourcePoints[i][1]
+        destinationPositions[i][1] * sourcePositions[i][1]
       )
-      projectiveCoefsMatrix.set(2 * i + 1, 8, destinationPoints[i][1])
+      projectiveCoefsMatrix.set(2 * i + 1, 8, destinationPositions[i][1])
     }
     // Compute the last (i.e. 9th) 'right singular vector', i.e. the one with the smallest singular value. (For a set of gcps that exactly follow a projective transformations, the singular value is null and this vector spans the null-space)
     const svd = new SingularValueDecomposition(projectiveCoefsMatrix)
@@ -80,28 +82,28 @@ export default class Projective {
     ).transpose()
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolant(newSourcePoint: Position): Position {
+  // The interpolant function will compute the value at any position.
+  interpolate(newSourcePosition: Position): Position {
     if (!this.projectiveParametersMatrix) {
       throw new Error('projective parameters not computed')
     }
 
-    // Compute the interpolated value by applying the coefficients to the input point
+    // Compute the interpolated value by applying the coefficients to the input position
     const c =
-      this.projectiveParametersMatrix.get(0, 2) * newSourcePoint[0] +
-      this.projectiveParametersMatrix.get(1, 2) * newSourcePoint[1] +
+      this.projectiveParametersMatrix.get(0, 2) * newSourcePosition[0] +
+      this.projectiveParametersMatrix.get(1, 2) * newSourcePosition[1] +
       this.projectiveParametersMatrix.get(2, 2)
-    const newDestinationPoint: Position = [
-      (this.projectiveParametersMatrix.get(0, 0) * newSourcePoint[0] +
-        this.projectiveParametersMatrix.get(1, 0) * newSourcePoint[1] +
+    const newDestinationPosition: Position = [
+      (this.projectiveParametersMatrix.get(0, 0) * newSourcePosition[0] +
+        this.projectiveParametersMatrix.get(1, 0) * newSourcePosition[1] +
         this.projectiveParametersMatrix.get(2, 0)) /
         c,
-      (this.projectiveParametersMatrix.get(0, 1) * newSourcePoint[0] +
-        this.projectiveParametersMatrix.get(1, 1) * newSourcePoint[1] +
+      (this.projectiveParametersMatrix.get(0, 1) * newSourcePosition[0] +
+        this.projectiveParametersMatrix.get(1, 1) * newSourcePosition[1] +
         this.projectiveParametersMatrix.get(2, 1)) /
         c
     ]
 
-    return newDestinationPoint
+    return newDestinationPosition
   }
 }

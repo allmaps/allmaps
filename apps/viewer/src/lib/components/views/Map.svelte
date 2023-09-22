@@ -19,7 +19,7 @@
 
   import { idsFromFeatures } from '$lib/shared/openlayers.js'
 
-  import { computeBBox } from '@allmaps/stdlib'
+  import { computeBbox } from '@allmaps/stdlib'
 
   import MapContextMenu from '$lib/components/dropdowns/MapContextMenu.svelte'
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
@@ -48,7 +48,7 @@
     if (mapOl && $activeMap && $activeMap.updateView) {
       const warpedMap = mapWarpedMapSource?.getMap($activeMap.viewerMap.mapId)
       if (warpedMap) {
-        const bbox = computeBBox(warpedMap.geoMask.coordinates[0])
+        const bbox = computeBbox(warpedMap.geoMask.coordinates[0])
         mapOl.getView().fit(bbox, {
           duration: 200,
           padding: [25, 25, 25, 25]

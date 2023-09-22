@@ -1,16 +1,16 @@
 import { Command } from 'commander'
 
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
-import { readInput, print, readFromStdinLine } from '../../lib/io.js'
+import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
 import {
-  parseCoordinatesArrayArray,
-  parseGcps,
   parseMap,
+  parseGcps,
+  parseCoordinatesArrayArray,
   parseTransformationType
 } from '../../lib/parse.js'
 
-import type { Position } from '@allmaps/transform'
+import type { Position } from '@allmaps/types'
 import { addAnnotationOptions } from '../../lib/options.js'
 
 export default function position() {
@@ -33,7 +33,7 @@ export default function position() {
     const gcps = parseGcps(options, map)
     const transformationType = parseTransformationType(options, map)
 
-    const transformer = new GCPTransformer(gcps, transformationType)
+    const transformer = new GcpTransformer(gcps, transformationType)
 
     const positionStrings = await readInput(files as string[])
 
@@ -42,11 +42,11 @@ export default function position() {
         processPositionString(positionString, transformer, options)
       }
     } else {
-      print('Enter X Y values separated by space, and press Return.')
+      printString('Enter X Y values separated by space, and press Return.')
       let positionString = await readFromStdinLine()
       while (positionString) {
         processPositionString(positionString, transformer, options)
-        print('')
+        printString('')
         positionString = await readFromStdinLine()
       }
     }
@@ -55,8 +55,8 @@ export default function position() {
 
 function processPositionString(
   positionString: string,
-  transformer: GCPTransformer,
-  options: { inverse: string }
+  transformer: GcpTransformer,
+  options: { inverse: boolean }
 ) {
   // Parse positionString to Array of positions and transform them
   const outputPositions: Position[] = []
@@ -64,13 +64,13 @@ function processPositionString(
   positionArray.forEach((position) =>
     outputPositions.push(
       options.inverse
-        ? transformer.toResource(position as Position)
-        : transformer.toGeo(position as Position)
+        ? transformer.transformToResource(position as Position)
+        : transformer.transformToGeo(position as Position)
     )
   )
 
   // Print transformed positions
   outputPositions.forEach((outputPosition) =>
-    print(outputPosition[0] + ' ' + outputPosition[1])
+    printString(outputPosition[0] + ' ' + outputPosition[1])
   )
 }

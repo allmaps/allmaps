@@ -1,8 +1,11 @@
 import { Command } from 'commander'
 
-import { parseJsonInput, print } from '../../lib/io.js'
+import { parseJsonInput, printString } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
-import { createSvgString, resourceMaskToSvgPolygon } from '../../lib/svg.js'
+import {
+  svgGeometriesToSvgString,
+  mapToResourceMaskSvgPolygon
+} from '@allmaps/stdlib'
 
 export default function svg() {
   return new Command('svg')
@@ -15,8 +18,8 @@ export default function svg() {
       const jsonValues = await parseJsonInput(files as string[])
       const maps = parseAnnotationsValidateMaps(jsonValues)
 
-      const polygons = maps.map(resourceMaskToSvgPolygon)
-      const svg = createSvgString(polygons)
-      print(svg)
+      const polygons = maps.map(mapToResourceMaskSvgPolygon)
+      const svg = svgGeometriesToSvgString(polygons)
+      printString(svg)
     })
 }

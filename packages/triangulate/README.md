@@ -14,6 +14,22 @@ To learn more on how it works, check out this [Observable notebook](https://obse
 
 This is an ESM-only module that works in browsers or in Node.js.
 
+Use [pnpm](https://pnpm.io/) or [npm](https://www.npmjs.com/) to install this CLI tool globally in your system:
+
+```sh
+pnpm add @allmaps/triangulate
+```
+
+or
+
+```sh
+nnpm install @allmaps/triangulate
+```
+
+## Installation
+
+This is an ESM-only module that works in browsers or in Node.js.
+
 Installation in Node.js:
 
 ```sh
@@ -80,7 +96,7 @@ See `./bench/index.js`
 *   [Types](#types)
     *   [Triangle](#triangle)
     *   [poly2tri.Triangle](#poly2tritriangle)
-    *   [SVGPolygon](#svgpolygon)
+    *   [Ring](#ring)
 
 ### Triangulation
 
@@ -92,7 +108,7 @@ Triangulates a polygon
 
 ##### Parameters
 
-*   `polygon` **[SVGPolygon](#svgpolygon)** Polygon
+*   `polygon` **[Ring](#ring)** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Triangle](#triangle)>** Array of triangles partitionning the polygon
@@ -103,7 +119,7 @@ Triangulates a polygon (and returns the full Poly2tri output)
 
 ##### Parameters
 
-*   `polygon` **[SVGPolygon](#svgpolygon)** Polygon
+*   `polygon` **[Ring](#ring)** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[poly2tri.Triangle](#poly2tritriangle)>** Array of triangles partitionning the polygon
@@ -124,7 +140,7 @@ Triangle object from [poly2tri](https://github.com/r3mi/poly2tri.js/) package
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
-#### SVGPolygon
+#### Ring
 
 Polygon object as `[[number, number], ...]`
 

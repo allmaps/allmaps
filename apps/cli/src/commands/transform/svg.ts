@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 import { readInput, printJson } from '../../lib/io.js'
 import {
@@ -10,11 +10,10 @@ import {
   parseTransformationType
 } from '../../lib/parse.js'
 import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
-import { geomEach } from '../../lib/svg.js'
 import {
-  transformSvgToGeoJson,
-  createFeatureCollection
-} from '../../lib/geojson.js'
+  stringToSvgGeometriesGenerator,
+  geometriesToFeatureCollection
+} from '@allmaps/stdlib'
 
 export default function svg() {
   let command = new Command('svg')
@@ -33,23 +32,26 @@ export default function svg() {
     const transformationType = parseTransformationType(options, map)
     const transformOptions = parseTransformOptions(options)
 
-    const transformer = new GCPTransformer(gcps, transformationType)
+    const transformer = new GcpTransformer(gcps, transformationType)
+
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
 
     const svgs = await readInput(files as string[])
 
-    const geoJsonGeometries = []
+    const geojsonGeometries = []
     for (const svg of svgs) {
-      for (const geometry of geomEach(svg)) {
-        const geoJsonGeometry = transformSvgToGeoJson(
-          transformer,
-          geometry,
+      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
+        const geojsonGeometry = transformer.transformSvgToGeojson(
+          svgGeometry,
           transformOptions
         )
-        geoJsonGeometries.push(geoJsonGeometry)
+        geojsonGeometries.push(geojsonGeometry)
       }
     }
 
-    const featureCollection = createFeatureCollection(geoJsonGeometries)
+    const featureCollection = geometriesToFeatureCollection(geojsonGeometries)
     printJson(featureCollection)
   })
 }

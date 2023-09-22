@@ -2,7 +2,7 @@ import { decode as decodeJpeg } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
 import { Image } from '@allmaps/iiif-parser'
-import { GCPTransformer } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
@@ -54,7 +54,7 @@ export async function createWarpedTileResponse(
     const extent = xyzTileToGeoExtent({ x, y, z })
 
     // Create transformer
-    const transformer = new GCPTransformer(
+    const transformer = new GcpTransformer(
       map.gcps,
       options['transformation.type'] || map.transformation?.type
     )
@@ -117,7 +117,8 @@ export async function createWarpedTileResponse(
           tile2lat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
-        const [pixelX, pixelY] = transformer.toResource(warpedTilePixelGeo)
+        const [pixelX, pixelY] =
+          transformer.transformToResource(warpedTilePixelGeo)
 
         // Check if pixel inside resource mask
         // TODO: improve efficiency

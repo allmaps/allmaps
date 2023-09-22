@@ -1,11 +1,12 @@
 import { Image } from '@allmaps/iiif-parser'
 
-import type { GCPTransformer } from '@allmaps/transform'
+import type { GcpTransformer } from '@allmaps/transform'
 import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBBox, bboxToSvgPolygon } from './bbox.js'
+import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
 
-import type { Size, BBox, Position, Tile, Line, SVGPolygon } from './types.js'
+import type { Size, BBox, Position, Tile, Line, Ring } from './types.js'
+import type { Polygon } from '@allmaps/types'
 
 type PositionByX = { [key: number]: Position }
 
@@ -130,17 +131,14 @@ function findBestZoomLevel(
   return bestZoomLevel
 }
 
-function scaleToTiles(
-  zoomLevel: TileZoomLevel,
-  points: SVGPolygon
-): SVGPolygon {
+function scaleToTiles(zoomLevel: TileZoomLevel, points: Ring): Ring {
   return points.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
 }
 
-function findNeededIiifTilesByX(tilePixelExtent: SVGPolygon) {
+function findNeededIiifTilesByX(tilePixelExtent: Ring) {
   // TODO: use Map
   const tiles: PositionByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
@@ -198,41 +196,40 @@ function iiifTilesByXToArray(
 }
 
 export function computeIiifTilesForMapGeoBBox(
-  transformer: GCPTransformer,
+  transformer: GcpTransformer,
   image: Image,
   viewportSize: Size,
   geoBBox: BBox
 ): Tile[] {
   // geoBBox is a BBox of the extent viewport in World positions (in the projection that was given)
-  // geoBBoxPolygon is its GeoJSON geometry (in the projection that was given, so not necesarilly WGS84 as requested by GeoJSON!)
-  // geoBBoxPolygonToResource is a SVG Polygon of it's transformation, in image positions. Due to transformerOptions this in not necessarilly a 4-point SVG polygon, but can have more points
-  // geoBBoxImageBBox is the bounding box of this polygon.
+  // geoBBoxPolygon is its ring
+  // geoBBoxPolygonToResource is the ring of it's backward transformation. Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points
+  // geoBBoxResourceBBox is the BBox of this polygon.
 
-  // TODO: rename function bboxToSvgPolygon > bboxToPolygon
-  // TODO: make this work for maxOffsetRatio = 0
-
-  const geoBBoxPolygon = bboxToSvgPolygon(geoBBox)
-  const geoBBoxPolygonToResource = transformer.toResourcePolygon(
+  const geoBBoxPolygon = bboxToPolygon(geoBBox)
+  const geoBBoxPolygonToResource = transformer.transformBackward(
     geoBBoxPolygon,
     {
       maxOffsetRatio: 0.00001,
       maxDepth: 2
     }
-  )
-  const geoBBoxImageBBox = computeBBox(geoBBoxPolygonToResource)
+  ) as Polygon
+  const geoBBoxResourceBBox = computeBbox(geoBBoxPolygonToResource)
 
   if (
-    (geoBBoxImageBBox[0] > image.width || geoBBoxImageBBox[2] < 0) &&
-    (geoBBoxImageBBox[1] > image.height || geoBBoxImageBBox[3] < 0)
+    (geoBBoxResourceBBox[0] > image.width || geoBBoxResourceBBox[2] < 0) &&
+    (geoBBoxResourceBBox[1] > image.height || geoBBoxResourceBBox[3] < 0)
   ) {
     return []
   }
 
-  const geoBBoxImageBBoxWidth = geoBBoxImageBBox[2] - geoBBoxImageBBox[0]
-  const geoBBoxImageBBoxHeight = geoBBoxImageBBox[3] - geoBBoxImageBBox[1]
+  const geoBBoxResourceBBoxWidth =
+    geoBBoxResourceBBox[2] - geoBBoxResourceBBox[0]
+  const geoBBoxResourceBBoxHeight =
+    geoBBoxResourceBBox[3] - geoBBoxResourceBBox[1]
 
-  const mapScaleX = geoBBoxImageBBoxWidth / viewportSize[0]
-  const mapScaleY = geoBBoxImageBBoxHeight / viewportSize[1]
+  const mapScaleX = geoBBoxResourceBBoxWidth / viewportSize[0]
+  const mapScaleY = geoBBoxResourceBBoxHeight / viewportSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
   const zoomLevel = findBestZoomLevel(image.tileZoomLevels, mapScale)
@@ -240,7 +237,7 @@ export function computeIiifTilesForMapGeoBBox(
   if (zoomLevel) {
     // TODO: maybe index all tiles in rtree?
 
-    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxPolygonToResource)
+    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxPolygonToResource[0])
 
     const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
     const iiifTiles = iiifTilesByXToArray(
@@ -250,8 +247,8 @@ export function computeIiifTilesForMapGeoBBox(
     )
 
     const imageBBoxCenter: Position = [
-      geoBBoxImageBBoxWidth / 2 + geoBBoxImageBBox[0],
-      geoBBoxImageBBoxHeight / 2 + geoBBoxImageBBox[1]
+      geoBBoxResourceBBoxWidth / 2 + geoBBoxResourceBBox[0],
+      geoBBoxResourceBBoxHeight / 2 + geoBBoxResourceBBox[1]
     ]
 
     // sort tiles to load tiles in order of their distance to center

@@ -17,7 +17,7 @@
 
   import 'ol/ol.css'
 
-  import { GCPTransformer } from '@allmaps/transform'
+  import { GcpTransformer } from '@allmaps/transform'
   import { pink } from '@allmaps/tailwind'
 
   import { positionToGeoJson } from '$lib/shared/position.js'
@@ -30,7 +30,7 @@
     if ($position && transformer) {
       const feature = positionToGeoJson($position)
       if (positionFeature) {
-        const imageCoordinates = transformer.fromGeoJSONPoint(feature.geometry)
+        const imageCoordinates = transformer.transformBackward(feature.geometry)
         positionFeature.setGeometry(
           new Point([imageCoordinates[0], -imageCoordinates[1]])
         )
@@ -38,7 +38,7 @@
     }
   }
 
-  let transformer: GCPTransformer
+  let transformer: GcpTransformer
 
   let ol: HTMLElement
   let positionFeature: Feature
@@ -48,7 +48,7 @@
       return
     }
 
-    transformer = new GCPTransformer($map.gcps, $map.transformation?.type)
+    transformer = new GcpTransformer($map.gcps, $map.transformation?.type)
 
     const tileLayer = new TileLayer()
 
