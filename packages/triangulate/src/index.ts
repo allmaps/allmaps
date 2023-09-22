@@ -1,4 +1,4 @@
-import { createGrid, interpolatePolygon } from './shared.js'
+import { createGrid, makePointsOnPolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
@@ -15,7 +15,7 @@ import type { Ring, Position } from '@allmaps/types'
  */
 
 /**
- * Polygon object as `[[number, number], ...]`
+ * Polygon object, as an outer Ring only `[[number, number], ...]`
  * @typedef {Object} Ring
  */
 
@@ -34,7 +34,7 @@ export function triangulatePoly2tri(polygon: Ring, distance: number) {
 
   // initialise Constrained Delaunay Triangulation with polygon
   const swctx = new poly2tri.SweepContext(
-    interpolatePolygon(polygon, distance).map(
+    makePointsOnPolygon(polygon, distance).map(
       (p) => new poly2tri.Point(p[0], p[1])
     )
   )

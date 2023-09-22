@@ -24,7 +24,7 @@ function computeNextPoint(
   ]
 }
 
-function interpolateLine(line: Line, distance: number): Position[] {
+function makePointsOnLine(line: Line, distance: number): Position[] {
   let currentPoint = line[0]
   const result = [currentPoint]
 
@@ -41,14 +41,14 @@ function interpolateLine(line: Line, distance: number): Position[] {
   return result
 }
 
-export function interpolatePolygon(polygon: Ring, distance: number) {
+export function makePointsOnPolygon(polygon: Ring, distance: number) {
   // close polygon
   polygon = [...polygon, polygon[0]]
 
   let result: Ring = []
   for (let i = 0; i < polygon.length - 1; i++) {
     result = result.concat(
-      interpolateLine([polygon[i], polygon[i + 1]], distance)
+      makePointsOnLine([polygon[i], polygon[i + 1]], distance)
     )
   }
   return result
