@@ -16,7 +16,7 @@
 
   import { maskToPolygon } from '$lib/shared/openlayers.js'
 
-  import { computeBBox } from '@allmaps/stdlib'
+  import { computeBbox } from '@allmaps/stdlib'
 
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
 
@@ -55,7 +55,7 @@
 
       imageIiifLayer.setImageInfo(imageInfo as ImageInformationResponse)
 
-      const resourceMaskBbox = computeBBox(viewerMap.map.resourceMask)
+      const resourceMaskBbox = computeBbox(viewerMap.map.resourceMask)
       const iiifLayerresourceMaskBbox = [
         resourceMaskBbox[0],
         -resourceMaskBbox[3],
