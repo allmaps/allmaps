@@ -593,7 +593,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
 
   /**
    * Transforms svg geometry forward to geojson geometry
-   * @param {SvgGeometry} input - Input to transform
+   * @param {SvgGeometry} geometry - Geometry to transform
    * @returns {GeojsonGeometry} Forward transform of input, as geojson gemetry
    */
   transformSvgToGeojson(
@@ -629,7 +629,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
 
   /**
    * Transforms geojson geometry backward to svg geometry
-   * @param {GeojsonGeometry} input - Input to transform
+   * @param {GeojsonGeometry} geometry - Geometry to transform
    * @returns {SvgGeometry} Backward transform of input, as svg gemetry
    */
   transformGeojsonToSvg(

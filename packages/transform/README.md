@@ -1,6 +1,6 @@
 # @allmaps/transform
 
-This module serves to **transform points, lines, polygons** and other spatial features from one cartesian `(x, y)` source-plane to a destination-plane **using a set of control points** who's coordinates are known in both planes.
+This module serves to **transform points, lines, polygons** and other spatial features from a cartesian `(x, y)` source-plane to a destination-plane. It does this **using a set of control points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
 It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms positions from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
 
@@ -8,13 +8,20 @@ Care was taken to make this module **usable and useful outside of the Allmaps co
 
 ## How it works
 
-This package exports the GcpTransformer class. It's instances (called 'transformers') are built from a set of ground control points an a specified transformation type. Once a transformer is built, it's methods (functions) can be used for transforming a geometry.
+This package exports the GcpTransformer class. It's instances (called 'transformers') are built from a set of ground control points and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary positions in one plane to the corresponding positions in the other plane. The transformer has dedicated methods (functions) that use this transformation to transform Points, or more complex geometries like LineString and Polygons.
 
 ### Transform vs GDAL
 
 The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical, as is be checked in the [tests](./test/test-transform.js).
 
-For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library applied for creating and solving the linear systems of equations which are the essence of each of these transformations.
+For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library. This library is used for creating and solving the linear systems of equations that are at the heart of each of each of these transformations.
+
+### Defining Ground Control Points
+
+Ground control points can be supplied as an array of
+`{source: [number, number], destination: [number, number]}` objects.
+
+Alternatively an array of `{resource: [number, number], geo: [number, number]}` is supported too, which is more expressive in the Allmaps use case.
 
 ### Supported transformation types
 
@@ -27,34 +34,29 @@ For a little history: this library started out as a JavaScript port of [gdaltran
 | `thinPlateSpline`      |            | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
 | `projective`           |            | Projective or 'perspective' transformation, used for aerial images       | Preserves lines and cross-ratios                                                 | 4                      |
 
-### Defining Ground Controle Points
-
-Ground control points can be supplied as an array of
-`{source: [number, number], destination: [number, number]}` objects.
-
-Alternatively an array of `{resource: [number, number], geo: [number, number]}` is supported too, which is more expressive in the Allmaps use case.
-
 ### Transformation methods
 
-A transformer contain the forward and backward transformation. They all accepts points, lines and polygons, both as Allmaps geometries or GeoJSON geometries. There are separate functions for transforming to Allmaps geometries or to GeoJSON geometries. There are also separate functions for transforming forward or backward.
+A transformer is build from a set of Ground Control Points and a transformation type. It contains the forward and backward transformation, and has specific methods to apply it to transform geometries forward and backward.
 
-Hence, the main functions are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
+All transformer methods accepts points, lines as well as polygons, both as Allmaps geometries or GeoJSON geometries. There are, however, separate methods for transforming to Allmaps geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
 
-Alternatively the same four functions are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
+Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
+
+Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
 
 The Allmaps geometries are:
 
 ```js
-export type Position = [number, number]
+type Position = [number, number]
 
-export type LineString = Position[]
+type LineString = Position[]
 
-export type Polygon = Position[][]
+type Polygon = Position[][]
 // A polygon is an array of rings of at least three positions
 // Rings are not closed: the first position is not repeated at the end.
 // There is no requirement on winding order.
 
-export type Geometry = Position | LineString | Polygon
+type Geometry = Position | LineString | Polygon
 ```
 
 ### Refined transfromation of LineStrings and Polygons
@@ -117,7 +119,7 @@ const transformedPosition = transformer.transformBackward([4.9385700843392435, 5
 
 ### LineString
 
-In this example we transform Backward, and from a GeoJSON Geometry.
+In this example we transform backward, and from a GeoJSON Geometry.
 
 ```js
 export const transformGcps7 = [
@@ -178,6 +180,8 @@ const transformedLineString = transformer.transformBackward(lineStringGeoJSON, t
 // ]
 
 // Notice how the result has two layers of midpoints!
+// In a first step the point [133.16, 174.55] is added between the start and end point
+// Then [80.91, 165.79] and [185.89, 181.22] are added in between.
 ```
 
 ### Polygon
@@ -254,13 +258,18 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(polygon,
 
 ## CLI
 
-The [@allmaps/cli](../../apps/cli/) package exports an interface to transform positions, to transform **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the geo coordinate space of an interactive map or vise versa **given (the ground control points and transformation type from) a Georeference Annotation**, and to export the SVG resource mask included in a Georeference Annotation as a GeoJSON object.
+The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific usecases:
+- Transforming positions to positions.
+- Transforming **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
+- Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF Resource, **given (the ground control points and transformation type from) a Georeference Annotation**
+- Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
+- Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON object in the geo coordinate space of it's interactive map.
 
 ### Benchmark
 
 Here are some benchmarks on building and using a transformer, as computed on a 2023 Macbook Air M2.
 
-Create transformer with 10 points (and transform 1 point)
+Creating a transformer (with 10 points) (and transform 1 point)
 
 | Type              | Options    | Ops/s  |
 |-------------------|------------|--------|
@@ -271,7 +280,7 @@ Create transformer with 10 points (and transform 1 point)
 | `thinPlateSpline` |            | 27905  |
 | `projective`      |            | 36202  |
 
-Use transformer made with with 10 points
+Using a transformer (with 10 points) to transform 1 point
 
 | Type              | Options    | Ops/s    |
 |-------------------|------------|----------|

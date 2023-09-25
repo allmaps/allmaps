@@ -1,3 +1,5 @@
+import type { Position } from '@allmaps/types'
+
 type Color = [number, number, number]
 
 type ColorCount = {
@@ -8,8 +10,6 @@ type ColorCount = {
 type Histogram = {
   [bin: string]: ColorCount
 }
-
-type Position = [number, number]
 
 const DEFAULT_BIN_SIZE = 5
 const DEFAULT_RESOLUTION = 2
