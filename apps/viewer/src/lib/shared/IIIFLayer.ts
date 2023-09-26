@@ -17,7 +17,7 @@ function createIIIFTileSource(imageInfo: ImageInfo) {
   return new IIIFSource(options)
 }
 
-export class IIIFLayer extends TileLayer<IIIFSource> {
+export default class IIIFLayer extends TileLayer<IIIFSource> {
   constructor(imageInfo?: ImageInfo) {
     super()
 

@@ -1,7 +1,6 @@
 import { writable, derived, get } from 'svelte/store'
 
 import {
-  IIIFLayer,
   WarpedMapSource,
   WarpedMapLayer,
   WarpedMapEvent,
@@ -18,6 +17,12 @@ import View from 'ol/View.js'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import Select from 'ol/interaction/Select.js'
 import { click } from 'ol/events/condition.js'
+import {
+  DblClickDragZoom,
+  defaults as defaultInteractions
+} from 'ol/interaction.js'
+
+import IIIFLayer from '$lib/shared/IIIFLayer.js'
 
 import {
   selectedPolygonStyle,
@@ -147,34 +152,37 @@ export function createMapOl() {
 
   mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
 
-  // TODO: emit this event directly from WarpedMapLayer?
-  mapWarpedMapLayer.renderer.tileCache.addEventListener(
-    WarpedMapEventType.FIRSTTILELOADED,
-    mapWarpedMapLayerFirstTileLoaded
-  )
+  if (mapWarpedMapLayer) {
+    // TODO: emit this event directly from WarpedMapLayer?
+    mapWarpedMapLayer.renderer.tileCache.addEventListener(
+      WarpedMapEventType.FIRSTTILELOADED,
+      mapWarpedMapLayerFirstTileLoaded
+    )
 
-  mapVectorLayer = new VectorLayer({
-    source: mapVectorSource,
-    style: invisiblePolygonStyle,
-    renderOrder: mapVectorLayerOrderFunction as OrderFunction
-  })
+    mapVectorLayer = new VectorLayer({
+      source: mapVectorSource,
+      style: invisiblePolygonStyle,
+      renderOrder: mapVectorLayerOrderFunction as OrderFunction
+    })
 
-  mapOl = new Map({
-    layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
-    controls: [],
-    view: new View({
-      maxZoom: 24,
-      zoom: 12
-    }),
-    keyboardEventTarget: document
-  })
+    mapOl = new Map({
+      interactions: defaultInteractions().extend([new DblClickDragZoom()]),
+      layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
+      controls: [],
+      view: new View({
+        maxZoom: 24,
+        zoom: 12
+      }),
+      keyboardEventTarget: document
+    })
 
-  mapSelect = new Select({
-    condition: click,
-    style: selectedPolygonStyle
-  })
+    mapSelect = new Select({
+      condition: click,
+      style: selectedPolygonStyle
+    })
 
-  mapOl.addInteraction(mapSelect)
+    mapOl.addInteraction(mapSelect)
+  }
 }
 
 export const mapVectorLayerOutlinesVisible = writable(false)
@@ -205,6 +213,7 @@ export function createImageOl() {
   imageIiifLayer = new IIIFLayer()
 
   imageOl = new Map({
+    interactions: defaultInteractions().extend([new DblClickDragZoom()]),
     controls: [],
     layers: [imageIiifLayer, imageVectorLayer],
     keyboardEventTarget: document

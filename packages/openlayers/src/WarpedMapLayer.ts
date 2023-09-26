@@ -16,7 +16,7 @@ import { WebGL2Renderer } from '@allmaps/render'
 
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
-import type { FrameState } from 'ol/PluggableMap.js'
+import type { FrameState } from 'ol/Map.js'
 
 import type {
   Size,

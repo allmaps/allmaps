@@ -75,7 +75,7 @@
     featureContextMenu = undefined
   }
 
-  onMount(async () => {
+  onMount(() => {
     mapOl?.setTarget(ol)
     mapSelect?.on('select', handleSelect)
 

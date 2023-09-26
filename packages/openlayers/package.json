@@ -44,7 +44,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
-    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop",
+    "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "preversion": "npm run types && npm run lint && npm test",
@@ -55,7 +55,7 @@
   "dependencies": {
     "@allmaps/render": "^1.0.0-beta.35",
     "lodash-es": "^4.17.21",
-    "ol": "^6.15.1"
+    "ol": "^8.1.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
