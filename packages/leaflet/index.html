@@ -35,21 +35,23 @@
   <body>
     <div id="map"></div>
     <script type="module">
-      import GeoreferenceAnnotationLayer from './src/index.ts'
+      import WarpedMapLayer from './src/index.ts'
 
-      const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-      const osmAttrib = 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+      var map = L.map('map').setView([51.505, -0.09], 13);
 
-      map.setView(L.latLng(51, 4), 3)
-      map.addLayer(
-        new L.TileLayer(osmUrl, {
-          attribution: osmAttrib
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const annotationUrl =
+        'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
+
+      fetch(annotationUrl)
+        .then((response) => response.json())
+        .then((annotation) => {
+          warpedMapLayer = new WarpedMapLayer(annotation)
+          map.addLayer(warpedMapLayer)
         })
-      )
-      L.control.scale().addTo(map)
-
-      georeferenceAnnotationLayer = new GeoreferenceAnnotationLayer()
-      map.addLayer(georeferenceAnnotationLayer)
     </script>
   </body>
 </html>

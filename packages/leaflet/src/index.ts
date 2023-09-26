@@ -1,1 +1,3 @@
-export * from './GeoreferenceAnnotation.js'
+import WarpedMapLayer from './WarpedMapLayer.js'
+
+export default WarpedMapLayer
