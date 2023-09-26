@@ -4,8 +4,8 @@ import { exec } from 'child_process'
 import ports from '../../ports.json'
 
 // TODO: move to @allmaps/stdlib?
-const dts: PluginOption = {
-  name: 'dts-generator',
+const buildTypes: PluginOption = {
+  name: 'build:types',
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
@@ -67,5 +67,5 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [dts]
+  plugins: [buildTypes]
 })
