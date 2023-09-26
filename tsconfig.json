@@ -1,15 +1,17 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/types" },
-    { "path": "./packages/id" },
-    { "path": "./packages/transform" },
-    { "path": "./packages/triangulate" },
-    { "path": "./packages/render" },
     { "path": "./packages/annotation" },
+    { "path": "./packages/id" },
     { "path": "./packages/iiif-parser" },
     { "path": "./packages/openlayers" },
-    { "path": "./packages/ui" },
+    { "path": "./packages/render" },
+    { "path": "./packages/schemas" },
+    { "path": "./packages/stdlib" },
     { "path": "./packages/tailwind" },
+    { "path": "./packages/transform" },
+    { "path": "./packages/triangulate" },
+    { "path": "./packages/types" },
+    { "path": "./packages/ui" }
   ]
 }
