@@ -41,6 +41,7 @@
     "test": "NODE_ENV=test mocha",
     "pretest": "npm run build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "format": "prettier --write src test"
   },
   "license": "GPL-3.0-or-later",
@@ -50,6 +51,7 @@
     "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
+    "documentation": "^14.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
