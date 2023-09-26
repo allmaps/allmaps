@@ -2,11 +2,17 @@ import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import tailwind from '@astrojs/tailwind'
 import svelte from '@astrojs/svelte'
+import remarkShikiTwoslash from 'remark-shiki-twoslash'
 
 import ports from '../../ports.json'
 
 // https://astro.build/config
 export default defineConfig({
+  markdown: {
+    syntaxHighlight: 'prism',
+    remarkPlugins: [remarkShikiTwoslash],
+    gfm: true
+  },
   server: { port: ports.docs, host: true },
   integrations: [
     tailwind({ applyBaseStyles: false }),
@@ -71,10 +77,10 @@ export default defineConfig({
       customCss: [
         './src/css/tailwind.css',
         './src/css/fonts.css',
-        './src/css/starlight.css'
+        './src/css/starlight.css',
+        './src/css/twoslash.css'
       ]
     }),
-
     svelte()
   ]
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp

@@ -47,5 +47,8 @@
     "sharp": "^0.32.3",
     "svelte": "^4.1.1",
     "tailwindcss": "^3.3.3"
+  },
+  "devDependencies": {
+    "remark-shiki-twoslash": "^3.1.3"
   }
 }
