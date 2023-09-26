@@ -162,7 +162,6 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
 }
 
 /**
- *
  * Parses a {@link Annotation Georeference Annotation} or an {@link AnnotationPage AnnotationPage}
  * containing multiple Georeference Annotations and returns an array of {@link Map maps}.
  * @param {Annotation | AnnotationPage} annotation - Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
