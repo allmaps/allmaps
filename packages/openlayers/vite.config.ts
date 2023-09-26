@@ -29,9 +29,7 @@ export default defineConfig({
       name: 'Allmaps',
       fileName: (format) =>
         `bundled/allmaps-openlayers-8.${format}.${
-          // format === 'umd' ? 'cjs' : 'js'
-          // TODO: always js? or somethings cjs?
-          format === 'umd' ? 'js' : 'js'
+          format === 'umd' ? 'cjs' : 'js'
         }`,
       formats: ['es', 'umd']
     },

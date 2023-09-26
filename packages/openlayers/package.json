@@ -11,12 +11,12 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "unpkg": "./dist/allmaps-openlayers-6.umd.cjs",
+  "unpkg": "./dist/allmaps-openlayers-8.umd.cjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/bundled/allmaps-openlayers-6.umd.cjs",
-      "import": "./dist/bundled/allmaps-openlayers-6.es.js"
+      "require": "./dist/bundled/allmaps-openlayers-8.umd.cjs",
+      "import": "./dist/bundled/allmaps-openlayers-8.es.js"
     }
   },
   "files": [
