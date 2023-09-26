@@ -4,8 +4,8 @@ import { exec } from 'child_process'
 import ports from '../../ports.json'
 
 // TODO: move to @allmaps/stdlib?
-const dts: PluginOption = {
-  name: 'dts-generator',
+const buildTypes: PluginOption = {
+  name: 'build:types',
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
@@ -13,6 +13,27 @@ const dts: PluginOption = {
       })
     }
   }
+}
+
+type OLVersion = '6' | '7' | '8'
+
+function getOLVersion(envVar: string | undefined): OLVersion {
+  if (envVar === '6') {
+    return '6'
+  } else if (envVar === '7') {
+    return '7'
+  } else {
+    return '8'
+  }
+}
+
+// OpenLayers version
+const olVersion: OLVersion = getOLVersion(process.env.OL_VERSION) || '8'
+
+console.log(`Building for OpenLayers ${olVersion}`)
+
+function getOLPath(olModule: string) {
+  return `ol${olVersion}/${olModule}`
 }
 
 export default defineConfig({
@@ -25,37 +46,31 @@ export default defineConfig({
     emptyOutDir: false,
     // minify: false,
     lib: {
-      entry: './src/index.ts',
+      entry: `./src/${olVersion}/index.ts`,
       name: 'Allmaps',
       fileName: (format) =>
-        `bundled/allmaps-openlayers-6.${format}.${
+        `bundled/allmaps-openlayers-${olVersion}.${format}.${
           format === 'umd' ? 'cjs' : 'js'
         }`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
       external: [
-        'ol/View.js',
-        'ol/layer/Layer.js',
-        'ol/layer/Tile.js',
-        'ol/source/IIIF.js',
-        'ol/format/IIIFInfo.js',
-        'ol/Object.js',
-        'ol/events/Event.js',
-        'ol/proj.js',
-        'ol/transform.js'
+        getOLPath('View.js'),
+        getOLPath('layer/Layer.js'),
+        getOLPath('Object.js'),
+        getOLPath('events/Event.js'),
+        getOLPath('proj.js'),
+        getOLPath('transform.js')
       ],
       output: {
         globals: {
-          'ol/View.js': 'ol.View',
-          'ol/layer/Layer.js': 'ol.layer.Layer',
-          'ol/layer/Tile.js': 'ol.layer.Tile',
-          'ol/source/IIIF.js': 'ol.source.IIIF',
-          'ol/format/IIIFInfo.js': 'ol.format.IIIFInfo',
-          'ol/Object.js': 'ol.Object',
-          'ol/events/Event.js': 'ol.events.Event',
-          'ol/proj.js': 'ol.proj',
-          'ol/transform.js': 'ol.transform'
+          [getOLPath('View.js')]: 'ol.View',
+          [getOLPath('layer/Layer.js')]: 'ol.layer.Layer',
+          [getOLPath('Object.js')]: 'ol.Object',
+          [getOLPath('events/Event.js')]: 'ol.events.Event',
+          [getOLPath('proj.js')]: 'ol.proj',
+          [getOLPath('transform.js')]: 'ol.transform'
         }
       }
     }
@@ -67,5 +82,5 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [dts]
+  plugins: [buildTypes]
 })
