@@ -63,6 +63,8 @@ export class WarpedMapLayer extends Layer {
 
   private previousExtent: number[] | null = null
 
+  private resizeObserver: ResizeObserver
+
   constructor(options: object) {
     options = options || {}
 
@@ -92,8 +94,8 @@ export class WarpedMapLayer extends Layer {
       throw new Error('WebGL 2 not available')
     }
 
-    const resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    resizeObserver.observe(canvas, { box: 'content-box' })
+    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    this.resizeObserver.observe(canvas, { box: 'content-box' })
 
     this.canvas = canvas
     this.gl = gl
@@ -410,22 +412,28 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  // disposeInternal() {
-  // for (let warpedMapWebGLRenderer of this.warpedMapWebGLRenderers.values()) {
-  //   warpedMapWebGLRenderer.dispose()
-  // }
+  dispose() {
+    this.renderer.dispose()
 
-  // if (this.gl) {
-  //   for (let uboBuffer of this.uboBuffers.values()) {
-  //     this.gl.deleteBuffer(uboBuffer)
-  //   }
+    const extension = this.gl.getExtension('WEBGL_lose_context')
+    if (extension) {
+      extension.loseContext()
+    }
+    const canvas = this.gl.canvas
+    canvas.width = 1
+    canvas.height = 1
 
-  //   this.gl.deleteProgram(this.program)
-  //   this.gl.getExtension('WEBGL_lose_context')?.loseContext()
-  // }
+    this.resizeObserver.disconnect()
 
-  // super.disposeInternal()
-  // }
+    // TODO: remove event listeners
+    //  - this.viewport
+    //  - this.tileCache
+    //  - this.world
+
+    this.tileCache.clear()
+
+    super.disposeInternal()
+  }
 
   // TODO: use OL's own makeProjectionTransform function?
   makeProjectionTransform(frameState: FrameState): Transform {

@@ -43,6 +43,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   newGeoMaskTriangles: number[] = []
   newTransformedGeoMaskTriangles: Float32Array = new Float32Array()
 
+  // TODO: do we need to keep this?
   pixelTriangleIndex: Float32Array = new Float32Array() // DEV
 
   vao: WebGLVertexArrayObject | null
@@ -409,11 +410,18 @@ export default class WebGL2WarpedMap extends EventTarget {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 
-  // TODO: correctly dispose webgl objects
-  //   dispose() {
-  //     this.gl.deleteTexture(this.tilesTexture)
-  //     this.gl.deleteTexture(this.scaleFactorsTexture)
-  //     this.gl.deleteTexture(this.tilePositionsTexture)
-  //     this.gl.deleteTexture(this.imagePositionsTexture)
-  //   }
+  dispose() {
+    this.resourceMaskTriangles = []
+    this.transformedResourceMaskTriangles = new Float32Array()
+    this.currentGeoMaskTriangles = []
+    this.currentTransformedGeoMaskTriangles = new Float32Array()
+    this.newGeoMaskTriangles = []
+    this.newTransformedGeoMaskTriangles = new Float32Array()
+
+    this.gl.deleteVertexArray(this.vao)
+    this.gl.deleteTexture(this.tilesTexture)
+    this.gl.deleteTexture(this.scaleFactorsTexture)
+    this.gl.deleteTexture(this.tilePositionsTexture)
+    this.gl.deleteTexture(this.imagePositionsTexture)
+  }
 }

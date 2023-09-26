@@ -15,6 +15,8 @@ const buildTypes: PluginOption = {
   }
 }
 
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+
 export default defineConfig({
   server: {
     port: ports.openlayers
@@ -28,8 +30,10 @@ export default defineConfig({
       entry: './src/index.ts',
       name: 'Allmaps',
       fileName: (format) =>
-        `bundled/allmaps-openlayers-6.${format}.${
-          format === 'umd' ? 'cjs' : 'js'
+        `bundled/allmaps-openlayers-8.${format}.${
+          // format === 'umd' ? 'cjs' : 'js'
+          // TODO: always js? or somethings cjs?
+          format === 'umd' ? 'js' : 'js'
         }`,
       formats: ['es', 'umd']
     },
@@ -59,7 +63,6 @@ export default defineConfig({
         }
       }
     }
-    // assetsDir: ''
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -67,5 +70,9 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [buildTypes]
+  plugins: [buildTypes],
+  define: {
+    // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:
+    global: 'globalThis'
+  }
 })

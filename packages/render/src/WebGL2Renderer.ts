@@ -497,6 +497,16 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  dispose() {
+    for (const warpedMapWebGLRenderer of this.webGLWarpedMapsById.values()) {
+      warpedMapWebGLRenderer.dispose()
+    }
+
+    // TODO: remove vertexShader, fragmentShader, program
+    // TODO: remove event listeners
+    //  - this.tileCache
+  }
+
   render(
     projectionTransform: Transform,
     mapIds: IterableIterator<string>
