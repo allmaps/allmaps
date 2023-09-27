@@ -102,7 +102,7 @@
     }
   }
 
-  onMount(async () => {
+  onMount(() => {
     createMapOl()
     createImageOl()
     createImageInfoCache()
