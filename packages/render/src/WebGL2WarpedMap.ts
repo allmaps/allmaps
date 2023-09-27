@@ -202,6 +202,8 @@ export default class WebGL2WarpedMap extends EventTarget {
       //   this.pixelTriangleIndex[3 * index + 2] = index
       // }
 
+      console.log(this.currentTransformedGeoMaskTriangles)
+
       createBuffer(
         this.gl,
         this.program,

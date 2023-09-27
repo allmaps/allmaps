@@ -20,7 +20,7 @@ export default defineConfig({
     port: ports.openlayers
   },
   build: {
-    target: 'es2020',
+    target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
     // minify: false,
@@ -62,7 +62,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'es2020'
+      target: 'es2022'
     }
   },
   base: '',

@@ -599,7 +599,8 @@ export class WarpedMapLayer extends Layer {
       this.renderInternal(frameState, true)
     }, THROTTLE_WAIT_MS)
 
-    console.log(frameState)
+    // TODO: remove this console.log
+    // console.log(frameState)
 
     return this.renderInternal(frameState)
   }

@@ -30,12 +30,13 @@ import type {
 //   tileUrls: string[]
 // }
 
-// export interface GeoreferenceAnnotationLayer extends Layer {
-//   GeoreferenceAnnotation: GeoreferenceAnnotationLayer
-//   // constructor(options?: GeoreferenceAnnotationLayerOptions)
-//   // bringToFront(): this;
-//   // getTileSize(): Point;
-//   // protected createTile(coords: Coords, done: DoneCallback): HTMLElement;
+// interface WarpedMapLayerType extends Layer {
+// mapIdsInViewport: Set<string> = new Set()
+// GeoreferenceAnnotation: GeoreferenceAnnotationLayer
+// constructor(options?: GeoreferenceAnnotationLayerOptions)
+// bringToFront(): this;
+// getTileSize(): Point;
+// protected createTile(coords: Coords, done: DoneCallback): HTMLElement;
 // }
 
 type FrameState = {
@@ -50,20 +51,33 @@ type FrameState = {
 const WarpedMapLayer = L.Layer.extend({
   options: { imageInfoCache: Cache },
   initialize: function (annotation: Annotation, options: any) {
+    // Setting class specific things
+    this.mapIdsInViewport = new Set()
+    // TODO: fix auto setting canvasSize
+    this.canvasSize = [641 * 2, 802 * 2]
+
+    // Code ported from OpenLayers
+
     this.annotation = annotation
     L.setOptions(this, options)
 
     this.container = L.DomUtil.create('div')
 
     this.container.style.position = 'absolute'
-    this.container.style.width = '100%'
-    this.container.style.height = '100%'
+    this.container.style.width = '641px' // TODO: 100%
+    this.container.style.height = '802px' // TODO: 100%
     this.container.classList.add('leaflet-layer')
     this.container.classList.add('allmaps-warped-layer')
 
     this.canvas = L.DomUtil.create('canvas', undefined, this.container)
 
-    this.gl = this.canvas.getContext('webgl', {
+    this.canvas.style.position = 'absolute'
+    this.canvas.style.left = '0'
+
+    this.canvas.style.width = '641px' // TODO: 100%
+    this.canvas.style.height = '802px' // TODO: 100%
+
+    this.gl = this.canvas.getContext('webgl2', {
       premultipliedAlpha: true
     })
 
@@ -71,8 +85,9 @@ const WarpedMapLayer = L.Layer.extend({
       throw new Error('WebGL 2 not available')
     }
 
-    const resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    resizeObserver.observe(this.canvas, { box: 'content-box' })
+    // TODO: check of onResize can indeed be ommitted
+    // const resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    // resizeObserver.observe(this.canvas, { box: 'content-box' })
 
     this.tileCache = new TileCache()
     this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
@@ -83,7 +98,7 @@ const WarpedMapLayer = L.Layer.extend({
     )
 
     this.rtree = new RTree()
-    this.world = new World(this.rtree, options.imageInfoCache)
+    this.world = new World(this.rtree)
 
     this.world.addGeoreferenceAnnotation(annotation)
 
@@ -425,50 +440,64 @@ const WarpedMapLayer = L.Layer.extend({
 
   // TODO: Use OL's renderer class, move this function there?
   prepareFrameInternal(frameState: FrameState) {
-    const vectorSource = this.source
-    // TODO: animation and interaction
-    // const viewNotMoving =
-    //   !frameState.viewHints[ViewHint.ANIMATING] &&
-    //   !frameState.viewHints[ViewHint.INTERACTING]
-    const extentChanged = !this.arraysEqual(
-      this.previousExtent,
-      frameState.extent
-    )
+    // eslint-disable-next-line no-debugger
+    // debugger
+    // const vectorSource = this.source
+    // // TODO: animation and interaction
+    // const viewNotMoving = true
+    // // !frameState.viewHints[ViewHint.ANIMATING] &&
+    // // !frameState.viewHints[ViewHint.INTERACTING]
+    // const extentChanged = !this.arraysEqual(
+    //   this.previousExtent,
+    //   frameState.extent
+    // )
 
-    let sourceChanged = false
-    if (vectorSource) {
-      sourceChanged =
-        this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
+    // const sourceChanged = true
+    // TODO: check
+    // if (vectorSource) {
+    //   sourceChanged =
+    //     this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
 
-      if (sourceChanged) {
-        this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
-      }
-    }
+    //   if (sourceChanged) {
+    //     this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
+    //   }
+    // }
 
-    const layerChanged =
-      this.lastPreparedFrameLayerRevision < this.getRevision()
+    // const layerChanged = true
+    // const layerChanged =
+    //   this.lastPreparedFrameLayerRevision < this.getRevision()
 
-    if (layerChanged) {
-      this.lastPreparedFrameLayerRevision = this.getRevision()
-    }
+    // if (layerChanged) {
+    //   this.lastPreparedFrameLayerRevision = this.getRevision()
+    // }
 
     // TODO: interaction
     // if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
-    if (layerChanged || extentChanged || sourceChanged) {
-      this.previousExtent = frameState.extent?.slice() || null
+    // if (layerChanged || extentChanged || sourceChanged) {
+    this.previousExtent = frameState.extent?.slice() || null
 
-      const projectionTransform = this.makeProjectionTransform(frameState)
-      this.renderer.updateVertexBuffers(
-        projectionTransform,
-        this.mapIdsInViewport.values()
-      )
-    }
+    const projectionTransform = this.makeProjectionTransform(frameState)
+    // console.log(
+    //   'projectionTransform in prepareFrameInternal',
+    //   projectionTransform
+    // )
+    // eslint-disable-next-line no-debugger
+    // debugger
+    this.renderer.updateVertexBuffers(
+      projectionTransform,
+      this.mapIdsInViewport.values()
+    )
+    // }
   },
 
-  renderInternal(frameState: FrameState, last = false): HTMLElement {
+  // TODO: throttled
+  // renderInternal(frameState: FrameState, last = false): HTMLElement {
+  renderInternal(frameState: FrameState): HTMLElement {
+    // TODO: check if this could indeed be commented out?
     this.prepareFrameInternal(frameState)
 
     const projectionTransform = this.makeProjectionTransform(frameState)
+    // console.log('projectionTransform in renderInternal', projectionTransform)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -480,20 +509,22 @@ const WarpedMapLayer = L.Layer.extend({
         frameState.size[1] * window.devicePixelRatio
       ] as Size
 
-      let tilesNeeded: NeededTile[] | undefined
-      if (last) {
-        tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
+      // TODO: throttled
+      // const tilesNeeded: NeededTile[] | undefined
+      // if (last) {
+      const tilesNeeded: NeededTile[] | undefined =
+        this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-      } else {
-        tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
-          viewportSize,
-          extent,
-          frameState.coordinateToPixelTransform as Transform
-        )
-      }
+      // } else {
+      //   tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
+      //     viewportSize,
+      //     extent,
+      //     frameState.coordinateToPixelTransform as Transform
+      //   )
+      // }
 
       if (tilesNeeded && tilesNeeded.length) {
         this.tileCache.setTiles(tilesNeeded)
@@ -527,19 +558,42 @@ const WarpedMapLayer = L.Layer.extend({
   },
 
   computeFrameState(): FrameState {
+    // const bounds = this._map.getPixelBounds()
+    // let newBounds: [number, number, number, number] = [0, 0, 0, 0]
+    // if (bounds.min && bounds.max) {
+    //   newBounds = [bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y]
+    // }
     return {
-      size: this._map.getSize(), // [number, number] // [width, height]
+      // size: this._map.getSize(), // [number, number] // [width, height]
+      // Like [694, 725]
+      size: [694, 725], // [number, number] // [width, height]
       rotation: 0, // number // rotation in radians
-      resolution: this._map.options.crs.scale(), // number // projection units per pixel
-      center: this._map.getCenter(), // [number, number] // position
-      extent: this._map.getPixelBounds().map((bounds: L.Bounds) => {
-        bounds.min && bounds.max
-          ? [bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y]
-          : new Error('Bounds error')
-      }), // [number, number, number, number] // [minx, miny, maxx, maxy]
+      // Like 0
+      // resolution: this._map.options.crs.scale(), // number // projection units per pixel
+      // Like 9.554628535647032
+      resolution: 9.554628535647032,
+      // center: this._map.getCenter(), // [number, number] // position
+      // Like [-7910351.883820941, 5214893.4606114365]
+      center: [-7910351.883820941, 5214893.4606114365],
+      // extent: newBounds, // [number, number, number, number] // [minx, miny, maxx, maxy]
+      // Like [-16926.31764914887, 6704667.521487348, -2949.109148459849, 6718421.689426856]
+      extent: [
+        -7913667.33992281, 5211429.907767264, -7907036.4277190715,
+        5218357.013455609
+      ], // [number, number, number, number] // [minx, miny, maxx, maxy]
       // TODO build this from latLngToLayerPoint or latLngToContainerPoint
-      coordinateToPixelTransform: [1, 0, 1, 0, 0, 0] // Transform
+      // coordinateToPixelTransform: [1, 0, 1, 0, 0, 0] // Transform
+      // Like [0.10466131637343458, 0, 0, -0.10466131637343458, 828254.8411377777, 546160.1143348087]
+      coordinateToPixelTransform: [
+        0.10466131637343458, 0, 0, -0.10466131637343458, 828254.8411377777,
+        546160.1143348087
+      ]
     }
+  },
+
+  // TODO: implement layer opacity
+  getOpacity(): number {
+    return 1
   },
 
   /////////////////////
@@ -554,7 +608,7 @@ const WarpedMapLayer = L.Layer.extend({
     this._map = map
 
     // TODO: check: Calculate initial position of container with `L.Map.latLngToLayerPoint()`, `getPixelOrigin()` and/or `getPixelBounds()`
-    L.DomUtil.setPosition(this.canvas, map.getPixelOrigin())
+    // L.DomUtil.setPosition(this.canvas, map.getPixelOrigin())
 
     map.on('zoomend viewreset', this._update, this)
   },
@@ -568,13 +622,20 @@ const WarpedMapLayer = L.Layer.extend({
     // Recalculate position of container
     // L.DomUtil.setPosition(this.canvas, map.getPixelOrigin())
     // TODO: call render function here and reference this.canvas
-    this.computeFrameState()
-    this.render()
+    if (!this._map) {
+      return
+    }
+
+    const frameState = this.computeFrameState()
+
+    // console.log(frameState)
+
+    this.render(frameState)
   }
 })
 
-// L.Layer.georeferenceAnnotation = function () {
-//   return new L.Layer.GeoreferenceAnnotation()
+// L.warpedMapLayer = function () {
+//   return new L.WarpedMapLayer()
 // }
 
 export default WarpedMapLayer
