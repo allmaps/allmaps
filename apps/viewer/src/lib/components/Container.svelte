@@ -4,7 +4,8 @@
   import { mapCount } from '$lib/shared/stores/maps.js'
 
   import MapView from '$lib/components/views/Map.svelte'
-  import ListView from '$lib/components/views/List.svelte'
+  // Temporarily turned off list view
+  // import ListView from '$lib/components/views/List.svelte'
   import ImageView from '$lib/components/views/Image.svelte'
 
   import MapControl from '$lib/components/controls/Map.svelte'
@@ -27,8 +28,9 @@
   <div class="w-full h-full relative flex flex-col">
     {#if $view === 'map'}
       <MapView />
-    {:else if $view === 'list'}
-      <ListView />
+      <!-- Temporarily turned off list view -->
+      <!-- {:else if $view === 'list'}
+      <ListView /> -->
     {:else}
       <ImageView />
     {/if}

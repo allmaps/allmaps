@@ -91,9 +91,10 @@
       setNextMapActive({ updateView, hideOthers })
     } else if (event.key === '1') {
       $view = 'map'
+      // Temporarily turned off list view
+      // } else if (event.key === '2') {
+      //   $view = 'list'
     } else if (event.key === '2') {
-      $view = 'list'
-    } else if (event.key === '3') {
       $view = 'image'
     } else if (event.key === 'm') {
       $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
