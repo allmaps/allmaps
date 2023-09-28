@@ -85,9 +85,8 @@ const WarpedMapLayer = L.Layer.extend({
       throw new Error('WebGL 2 not available')
     }
 
-    // TODO: check of onResize can indeed be ommitted
-    // const resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    // resizeObserver.observe(this.canvas, { box: 'content-box' })
+    const resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    resizeObserver.observe(this.canvas, { box: 'content-box' })
 
     this.tileCache = new TileCache()
     this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
@@ -403,22 +402,28 @@ const WarpedMapLayer = L.Layer.extend({
     this._update()
   },
 
-  // disposeInternal() {
-  // for (let warpedMapWebGLRenderer of this.warpedMapWebGLRenderers.values()) {
-  //   warpedMapWebGLRenderer.dispose()
-  // }
+  dispose() {
+    this.renderer.dispose()
 
-  // if (this.gl) {
-  //   for (let uboBuffer of this.uboBuffers.values()) {
-  //     this.gl.deleteBuffer(uboBuffer)
-  //   }
+    const extension = this.gl.getExtension('WEBGL_lose_context')
+    if (extension) {
+      extension.loseContext()
+    }
+    const canvas = this.gl.canvas
+    canvas.width = 1
+    canvas.height = 1
 
-  //   this.gl.deleteProgram(this.program)
-  //   this.gl.getExtension('WEBGL_lose_context')?.loseContext()
-  // }
+    this.resizeObserver.disconnect()
 
-  // super.disposeInternal()
-  // }
+    // TODO: remove event listeners
+    //  - this.viewport
+    //  - this.tileCache
+    //  - this.world
+
+    this.tileCache.clear()
+
+    super.disposeInternal()
+  },
 
   // TODO: use OL's own makeProjectionTransform function?
   makeProjectionTransform(frameState: FrameState): Transform {
@@ -440,10 +445,8 @@ const WarpedMapLayer = L.Layer.extend({
 
   // TODO: Use OL's renderer class, move this function there?
   prepareFrameInternal(frameState: FrameState) {
-    // eslint-disable-next-line no-debugger
-    // debugger
+    // TODO: animation and interaction
     // const vectorSource = this.source
-    // // TODO: animation and interaction
     // const viewNotMoving = true
     // // !frameState.viewHints[ViewHint.ANIMATING] &&
     // // !frameState.viewHints[ViewHint.INTERACTING]
@@ -453,7 +456,6 @@ const WarpedMapLayer = L.Layer.extend({
     // )
 
     // const sourceChanged = true
-    // TODO: check
     // if (vectorSource) {
     //   sourceChanged =
     //     this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
@@ -471,18 +473,11 @@ const WarpedMapLayer = L.Layer.extend({
     //   this.lastPreparedFrameLayerRevision = this.getRevision()
     // }
 
-    // TODO: interaction
     // if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
     // if (layerChanged || extentChanged || sourceChanged) {
     this.previousExtent = frameState.extent?.slice() || null
 
     const projectionTransform = this.makeProjectionTransform(frameState)
-    // console.log(
-    //   'projectionTransform in prepareFrameInternal',
-    //   projectionTransform
-    // )
-    // eslint-disable-next-line no-debugger
-    // debugger
     this.renderer.updateVertexBuffers(
       projectionTransform,
       this.mapIdsInViewport.values()
@@ -493,11 +488,9 @@ const WarpedMapLayer = L.Layer.extend({
   // TODO: throttled
   // renderInternal(frameState: FrameState, last = false): HTMLElement {
   renderInternal(frameState: FrameState): HTMLElement {
-    // TODO: check if this could indeed be commented out?
     this.prepareFrameInternal(frameState)
 
     const projectionTransform = this.makeProjectionTransform(frameState)
-    // console.log('projectionTransform in renderInternal', projectionTransform)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -557,37 +550,47 @@ const WarpedMapLayer = L.Layer.extend({
     return this.renderInternal(frameState)
   },
 
+  // Functions to align Leaflet with OpenLayers
+
   computeFrameState(): FrameState {
-    // const bounds = this._map.getPixelBounds()
-    // let newBounds: [number, number, number, number] = [0, 0, 0, 0]
-    // if (bounds.min && bounds.max) {
-    //   newBounds = [bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y]
-    // }
+    const size = [this._map.getSize().x, this._map.getSize().y] as [
+      number,
+      number
+    ]
+    const rotation = 0
+    const boundsLatLng = this._map.getBounds()
+    const northEast = this._map.options.crs.project(boundsLatLng.getNorthEast())
+    const southWest = this._map.options.crs.project(boundsLatLng.getSouthWest())
+    const extent = [southWest.x, southWest.y, northEast.x, northEast.y] as [
+      number,
+      number,
+      number,
+      number
+    ]
+    const xResolution = (extent[2] - extent[0]) / size[0]
+    const yResolution = (extent[3] - extent[1]) / size[1]
+    const resolution = Math.max(xResolution, yResolution)
+    const center = [
+      (extent[0] + extent[2]) / 2,
+      (extent[1] + extent[3]) / 2
+    ] as [number, number]
+    const coordinateToPixelTransform = composeTransform(
+      size[0] / 2,
+      size[1] / 2,
+      1 / resolution,
+      -1 / resolution,
+      -rotation,
+      -center[0],
+      -center[1]
+    )
+
     return {
-      // size: this._map.getSize(), // [number, number] // [width, height]
-      // Like [694, 725]
-      size: [694, 725], // [number, number] // [width, height]
-      rotation: 0, // number // rotation in radians
-      // Like 0
-      // resolution: this._map.options.crs.scale(), // number // projection units per pixel
-      // Like 9.554628535647032
-      resolution: 9.554628535647032,
-      // center: this._map.getCenter(), // [number, number] // position
-      // Like [-7910351.883820941, 5214893.4606114365]
-      center: [-7910351.883820941, 5214893.4606114365],
-      // extent: newBounds, // [number, number, number, number] // [minx, miny, maxx, maxy]
-      // Like [-16926.31764914887, 6704667.521487348, -2949.109148459849, 6718421.689426856]
-      extent: [
-        -7913667.33992281, 5211429.907767264, -7907036.4277190715,
-        5218357.013455609
-      ], // [number, number, number, number] // [minx, miny, maxx, maxy]
-      // TODO build this from latLngToLayerPoint or latLngToContainerPoint
-      // coordinateToPixelTransform: [1, 0, 1, 0, 0, 0] // Transform
-      // Like [0.10466131637343458, 0, 0, -0.10466131637343458, 828254.8411377777, 546160.1143348087]
-      coordinateToPixelTransform: [
-        0.10466131637343458, 0, 0, -0.10466131637343458, 828254.8411377777,
-        546160.1143348087
-      ]
+      size: size, // size in pixels: [width, height]
+      rotation: rotation, // rotation in radians: number
+      resolution: resolution, // projection units per pixel: number
+      center: center, // center position in projected coordinates: [x, y]
+      extent: extent, // extent in projected coordinates: [minx, miny, maxx, maxy]
+      coordinateToPixelTransform: coordinateToPixelTransform // Transform discribing this transformation, see ol/renderer/Map.js line 58
     }
   },
 
@@ -596,7 +599,7 @@ const WarpedMapLayer = L.Layer.extend({
     return 1
   },
 
-  /////////////////////
+  // Leaflet specific Layer functions
 
   onAdd: function (map: Map) {
     const pane = map.getPane(this.options.pane)
@@ -607,9 +610,6 @@ const WarpedMapLayer = L.Layer.extend({
 
     this._map = map
 
-    // TODO: check: Calculate initial position of container with `L.Map.latLngToLayerPoint()`, `getPixelOrigin()` and/or `getPixelBounds()`
-    // L.DomUtil.setPosition(this.canvas, map.getPixelOrigin())
-
     map.on('zoomend viewreset', this._update, this)
   },
 
@@ -619,17 +619,10 @@ const WarpedMapLayer = L.Layer.extend({
   },
 
   _update: function () {
-    // Recalculate position of container
-    // L.DomUtil.setPosition(this.canvas, map.getPixelOrigin())
-    // TODO: call render function here and reference this.canvas
     if (!this._map) {
       return
     }
-
     const frameState = this.computeFrameState()
-
-    // console.log(frameState)
-
     this.render(frameState)
   }
 })
