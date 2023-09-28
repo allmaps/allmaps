@@ -44,6 +44,12 @@ export default class TileCache extends EventTarget {
       this.cachedTilesByUrl.set(tileUrl, cachedTile)
     } else {
       this.addTileUrlForMapId(mapId, tileUrl)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
+          mapId,
+          tileUrl
+        })
+      )
     }
 
     this.addMapIdForTileUrl(mapId, tileUrl)
