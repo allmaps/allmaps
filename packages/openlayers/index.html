@@ -94,10 +94,10 @@
     <script type="module">
       import { WarpedMapLayer, WarpedMapSource } from './src/index.ts'
 
-      const reload = await initialize(WarpedMapLayer, WarpedMapSource)
-
-      const reloadButton = document.getElementById('reload')
-      reloadButton.addEventListener('click', reload)
+      initialize(WarpedMapLayer, WarpedMapSource).then((reload) => {
+        const reloadButton = document.getElementById('reload')
+        reloadButton.addEventListener('click', reload)
+      })
     </script>
   </body>
 </html>
