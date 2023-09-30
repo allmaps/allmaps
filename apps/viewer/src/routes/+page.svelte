@@ -52,15 +52,28 @@
 
   let annotationString = ''
 
+  let urlInput: URLInput
+
+  let urlInputValue = ''
+
   function resetForm() {
     error = null
     annotationString = ''
+    urlInputValue = ''
 
     showForm = true
   }
 
-  async function handleAnnotationStringSubmit() {
-    dataStore.set(annotationString)
+  function handleUrlInputValue() {
+    urlInputValue = urlInput.getValue()
+  }
+
+  async function handleSubmit() {
+    if (urlInputValue.trim()) {
+      urlInput.submit()
+    } else {
+      dataStore.set(annotationString)
+    }
   }
 
   function hasTouch() {
@@ -161,12 +174,16 @@
           <p class="mb-3">
             Open a IIIF Resource or Georeference Annotation from a URL:
           </p>
-          <URLInput {autofocus} />
+          <URLInput
+            {autofocus}
+            bind:this={urlInput}
+            on:value={handleUrlInputValue}
+          />
 
           <p class="mt-3 mb-3">
-            Or, paste a Georeference Annotation in the text box:
+            Or, paste the contents of a complete Georeference Annotation below:
           </p>
-          <form on:submit|preventDefault={handleAnnotationStringSubmit}>
+          <form on:submit|preventDefault={handleSubmit}>
             <textarea
               bind:value={annotationString}
               placeholder="Paste a Georeference Annotation here"

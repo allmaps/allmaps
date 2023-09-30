@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, createEventDispatcher } from 'svelte'
 
   import urlStore from '$lib/shared/stores/url.js'
+
+  const dispatch = createEventDispatcher()
 
   let urlValue: string
   let input: HTMLInputElement
@@ -9,6 +11,12 @@
   export let autofocus: boolean | undefined = undefined
 
   $: urlValue = $urlStore
+
+  $: {
+    dispatch('value', {
+      value: urlValue
+    })
+  }
 
   if (autofocus === undefined) {
     autofocus = $urlStore === ''
@@ -36,7 +44,11 @@
     event.preventDefault()
   }
 
-  function submit() {
+  export function getValue() {
+    return urlValue
+  }
+
+  export function submit() {
     if (urlValue) {
       setStoreValue(urlValue)
     }
