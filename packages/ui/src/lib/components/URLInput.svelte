@@ -63,7 +63,7 @@
 </script>
 
 <form
-  class="flex items-center gap-2 w-full rounded-lg border border-gray-300 focus-within:border-blue-dark focus-within:ring-1 focus-within:ring-blue-dark text-sm"
+  class="flex items-center gap-2 w-full rounded-lg border border-gray-300 focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500 text-sm"
   on:submit|preventDefault={submit}
 >
   <!-- svelte-ignore a11y-autofocus -->

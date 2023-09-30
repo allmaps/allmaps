@@ -24,16 +24,14 @@
     'border',
     'border-gray-200',
     'hover:bg-gray-100',
-    'hover:text-blue-700',
     'text-center',
     'inline-flex',
     'items-center',
     'justify-center',
     'relative',
     'focus:z-50',
-    'focus:ring-2',
-    'focus:ring-blue-700',
-    'focus:text-blue-700'
+    'focus:ring',
+    'focus:ring-pink-200'
   ]
 
   let rotateButtonMouseMoveStartX: number

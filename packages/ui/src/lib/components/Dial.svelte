@@ -246,11 +246,10 @@
       {step}
     />
 
-    <!-- focus:ring-2 focus:ring-blue-700 focus:text-blue-700 -->
     <div
       data-tooltip-target="tooltip-animation"
       bind:this={tooltipTrigger}
-      class="select-none relative bg-white w-7 h-7 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
+      class="select-none relative bg-white w-7 h-7 peer-focus:outline-none peer-focus:ring peer-focus:ring-pink-500 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
       on:mousedown={handleMousedown}
       on:touchstart|passive={handleTouchstart}
       on:mouseenter={handleMouseenter}

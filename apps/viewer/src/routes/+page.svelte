@@ -169,7 +169,8 @@
           <form on:submit|preventDefault={handleAnnotationStringSubmit}>
             <textarea
               bind:value={annotationString}
-              class="font-mono block mb-3 w-full h-60 bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
+              placeholder="Paste a Georeference Annotation here"
+              class="font-mono block mb-3 w-full h-60 rounded-lg border border-gray-300 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 text-sm"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
@@ -177,8 +178,9 @@
             />
             <button
               type="submit"
-              disabled={annotationString.length === 0}
-              class="text-white bg-green-500 hover:bg-green-600 transition-colors disabled:bg-gray-500 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
+              disabled={annotationString.length === 0 &&
+                urlInputValue.length === 0}
+              class="text-white bg-pink-500 hover:bg-pink-400 transition-colors disabled:bg-gray-500 focus:ring focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
               >View</button
             >
           </form>
