@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/maplibre</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
+      type="text/css"
+    />
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      const map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://demotiles.maplibre.org/style.json',
+        center: [-71.0599, 42.3589],
+        zoom: 14
+      })
+    </script>
+    <script type="module">
+      import { WarpedMapLayer } from './src/index.ts'
+
+      async function fetchJson(url) {
+        return fetch(url).then((response) => response.json())
+      }
+
+      async function addGeoreferenceAnnotationByUrl(warpedMapLayer, url) {
+        const annotation = await fetchJson(url)
+        warpedMapLayer.addGeoreferenceAnnotation(annotation)
+      }
+
+      map.on('load', async () => {
+        const warpedMapLayer = new WarpedMapLayer()
+        map.addLayer(warpedMapLayer)
+
+        console.log('now adding first annotation')
+        await addGeoreferenceAnnotationByUrl(
+          warpedMapLayer,
+          'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
+        )
+        console.log('Done adding first annotation')
+        await addGeoreferenceAnnotationByUrl(
+          warpedMapLayer,
+          'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79'
+        )
+        console.log('Done adding second annotation')
+      })
+    </script>
+  </body>
+</html>
