@@ -2,16 +2,11 @@ import { execSync } from 'child_process'
 
 import { baseDir, cliPath, readFile } from './fs.js'
 
-export function exec(command, inputFilename) {
+function execInput(command, input = null) {
   let cliCommand = cliPath
 
   if (command) {
     cliCommand = `${cliCommand} ${command}`
-  }
-
-  let input
-  if (inputFilename) {
-    input = readFile(inputFilename)
   }
 
   try {
@@ -29,6 +24,21 @@ export function exec(command, inputFilename) {
   }
 }
 
-export function execJson(command, inputFilename) {
-  return JSON.parse(exec(command, inputFilename))
+export function execString(command, input = null) {
+  return execInput(command, input).trim()
+}
+
+export function execFilename(command, inputFilename = null) {
+  let input
+  if (inputFilename) {
+    input = readFile(inputFilename)
+  }
+
+  return execInput(command, input)
+}
+
+export const exec = execFilename
+
+export function execJson(command, inputFilename = null) {
+  return JSON.parse(execFilename(command, inputFilename))
 }

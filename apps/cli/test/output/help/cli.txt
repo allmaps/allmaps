@@ -7,6 +7,7 @@ Options:
 
 Commands:
   annotation      parse and generate Georeference Annotations
+  id [urls...]    generate Allmaps IDs from input URLs
   transform       transform SVG to GeoJSON and vice versa
   iiif            parse and generate IIIF resources
   help [command]  display help for command

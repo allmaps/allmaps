@@ -55,6 +55,7 @@
     "@allmaps/iiif-parser": "^1.0.0-beta.25",
     "@allmaps/transform": "^1.0.0-beta.15",
     "@allmaps/stdlib": "^1.0.0-beta.12",
+    "@allmaps/id": "^1.0.0-beta.16",
     "commander": "^10.0.0",
     "stream-json": "^1.7.4",
     "zod-validation-error": "^1.5.0"

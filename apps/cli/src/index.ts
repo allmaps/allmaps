@@ -3,8 +3,9 @@
 import { Command, CommanderError } from 'commander'
 import { fromZodError } from 'zod-validation-error'
 
-import iiif from './commands/iiif.js'
 import annotation from './commands/annotation.js'
+import id from './commands/id.js'
+import iiif from './commands/iiif.js'
 import transform from './commands/transform.js'
 
 import type { ZodError } from 'zod'
@@ -14,8 +15,8 @@ const fixedWidth = process.env.NODE_ENV === 'test'
 const program = new Command()
   .name('allmaps')
   .exitOverride()
-  // .showHelpAfterError()
   .addCommand(annotation())
+  .addCommand(id())
   .addCommand(transform())
   .addCommand(iiif())
   .configureHelp({
