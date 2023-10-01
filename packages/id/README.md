@@ -4,16 +4,16 @@ Uses the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) algorithm to generate IDs 
 
 Allmaps uses this module to create IDs from IIIF URIs. For example:
 
-*   Given the following manifest URL: https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json,
-*   The output of the [`generateId`](#generateid) function will be: `4ac2770ae8624e38`,
-*   We can use this ID to view the annotation for the georeferenced maps in the manifest in Allmaps:
-    https://dev.annotations.allmaps.org/manifests/4ac2770ae8624e38.
+*   Given the following manifest URL: https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/,
+*   The output of the [`generateId`](#generateid) function will be: `6f5a7b547c8f6fbe`,
+*   We can use this ID to lookup the [Georeference Annotation](https://iiif.io/api/extension/georef/) for the georeferenced maps in this manifest using Allmaps API:
+    https://annotations.allmaps.org/manifests/6f5a7b547c8f6fbe.
 
-To see @allmaps/id in action, view this [Observable notebook](https://observablehq.com/@bertspaan/ids-for-allmaps?collection=@bertspaan/allmaps).
+To see @allmaps/id in action, view this [Observable notebook](https://observablehq.com/@allmaps/the-allmaps-id-module).
 
 ## Usage
 
-This is an ESM-only module that works in browsers or in Node.js.
+This is an ESM-only module that works in browsers and Node.js.
 
 Node.js:
 
@@ -21,10 +21,9 @@ The Node.js version of @allmaps/id uses[`crypto.createHash()`](https://nodejs.or
 
 ```js
 import { generateId } from '@allmaps/id'
-const url =
-  'https://orka.bibliothek.uni-kassel.de/viewer/rest/iiif/manifests/1535113582549/manifest/'
+const url = 'https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/'
 const id = await generateId(url)
-console.log(id)
+// id = '6f5a7b547c8f6fbe'
 ```
 
 Browser:
@@ -40,6 +39,16 @@ The browser version of @allmaps/id uses the [`SubtleCrypto.digest()`](https://de
   const id = await generateId(url)
   console.log(id)
 </script>
+```
+
+## CLI
+
+Generating Allmaps IDs is also possible using the [Allmaps CLI](https://github.com/allmaps/allmaps/tree/main/apps/cli).
+
+For example:
+
+```sh
+echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
 ```
 
 ## API

@@ -41,6 +41,7 @@
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
+    "prebuild": "npm run documentation",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "keywords": [
