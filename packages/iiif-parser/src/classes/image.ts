@@ -40,6 +40,20 @@ type EmbeddedImageType =
 
 const ImageTypeString = 'image'
 
+/**
+ * Parsed IIIF Image, embedded in a Canvas
+ * @class EmbeddedImage
+ * @property {boolean} embedded - Whether the Image is embedded in a Canvas
+ * @property {string} [type] - Resource type, equals 'image'
+ * @property {string} uri - URI of Image
+ * @property {MajorVersion} majorVersion - IIIF API version of Image
+ * @property {boolean} supportsAnyRegionAndSize - Whether the associated Image Service supports any region and size
+ * @property {number} [maxWidth] - Maximum width of the associated Image Service
+ * @property {number} [maxHeight] - Maximum height of the associated Image Service
+ * @property {number} [maxArea] - Maximum area of the associated Image Service
+ * @property {number} width - Width of Image
+ * @property {number} height - Height of Image
+ */
 export class EmbeddedImage {
   embedded = true
 
@@ -183,7 +197,14 @@ export class EmbeddedImage {
     }
   }
 
-  getImageUrl({ region, size }: ImageRequest): string {
+  /**
+   * Generates a IIIF Image API URL for the requested region and size
+   * @param {ImageRequest} imageRequest - Image request object containing the desired region and size of the requested image
+   * @returns {string} Image API URL that can be used to fetch the requested image
+   */
+  getImageUrl(imageRequest: ImageRequest): string {
+    const { region, size } = imageRequest
+
     let width
     let height
 
@@ -281,6 +302,13 @@ export class EmbeddedImage {
   }
 }
 
+/**
+ * Parsed IIIF Image
+ * @class Image
+ * @extends EmbeddedImage
+ * @property {TileZoomLevel[]} tileZoomLevels - Array of parsed tile zoom levels
+ * @property {Size[]} [sizes] - Array of parsed sizes
+ */
 export class Image extends EmbeddedImage {
   tileZoomLevels: TileZoomLevel[]
   sizes?: Size[]
@@ -308,22 +336,36 @@ export class Image extends EmbeddedImage {
     }
   }
 
-  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
+  /**
+   * Parses a IIIF image and returns a [Image](#image) containing the parsed version
+   * @param {any} iiifImage - Source data of IIIF Image
+   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Image. If not provided, it will be determined automatically
+   * @returns {Image} Parsed IIIF Image
+   * @static
+   */
+  static parse(iiifImage: unknown, majorVersion: MajorVersion | null = null) {
     let parsedImage
 
     if (majorVersion === 1) {
-      parsedImage = Image1Schema.parse(iiifData)
+      parsedImage = Image1Schema.parse(iiifImage)
     } else if (majorVersion === 2) {
-      parsedImage = Image2Schema.parse(iiifData)
+      parsedImage = Image2Schema.parse(iiifImage)
     } else if (majorVersion === 3) {
-      parsedImage = Image3Schema.parse(iiifData)
+      parsedImage = Image3Schema.parse(iiifImage)
     } else {
-      parsedImage = ImageSchema.parse(iiifData)
+      parsedImage = ImageSchema.parse(iiifImage)
     }
 
     return new Image(parsedImage)
   }
 
+  /**
+   * Returns a Image request object for a tile with the requested zoom level, column, and row
+   * @param {TileZoomLevel} zoomLevel - Desired zoom level of the requested tile
+   * @param {number} column - Column of the requested tile
+   * @param {number} row - Row of the requested tile
+   * @returns {ImageRequest} Image request object that can be used to fetch the requested tile
+   */
   getIiifTile(
     zoomLevel: TileZoomLevel,
     column: number,
@@ -337,6 +379,12 @@ export class Image extends EmbeddedImage {
     )
   }
 
+  /**
+   * Returns a Image request object for the requested region and size
+   * @param {Size} size - Size of the requested thumbnail
+   * @param {'cover' | 'contain'} mode - Desired fit mode of the requested thumbnail
+   * @returns {ImageRequest} Image request object that can be used to fetch the requested thumbnail
+   */
   getThumbnail(
     size: Size,
     mode: Fit = 'cover'

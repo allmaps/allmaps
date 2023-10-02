@@ -28,6 +28,15 @@ const defaulfFetchNextOptions = {
   fetchImages: true
 }
 
+/**
+ * Parsed IIIF Collection
+ * @class Collection
+ * @property {string} [uri] - URI of Collection
+ * @property {LanguageString} [label] - Label of Collection
+ * @property {Collection[] | Manifest[] | EmbeddedManifest[]} [items] - Items in Collection
+ * @property {MajorVersion} [majorVersion] - IIIF API version of Collection
+ * @property {string} [type] - Resource type, equals 'collection'
+ */
 export class Collection {
   uri: string
   type: typeof CollectionTypeString = CollectionTypeString
@@ -35,7 +44,8 @@ export class Collection {
 
   items: (Collection | Manifest | EmbeddedManifest)[] = []
 
-  // TODO: add description? Add metadata?
+  // TODO: add description?
+  // TODO: add metadata?
   label?: LanguageString
 
   constructor(parsedCollection: CollectionType) {
@@ -79,15 +89,25 @@ export class Collection {
     }
   }
 
-  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
+  /**
+   * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
+   * @param {any} iiifCollection - Source data of IIIF Collection
+   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns {Collection} Parsed IIIF Collection
+   * @static
+   */
+  static parse(
+    iiifCollection: unknown,
+    majorVersion: MajorVersion | null = null
+  ) {
     let parsedCollection
 
     if (majorVersion === 2) {
-      parsedCollection = Collection2Schema.parse(iiifData)
+      parsedCollection = Collection2Schema.parse(iiifCollection)
     } else if (majorVersion === 3) {
-      parsedCollection = Collection3Schema.parse(iiifData)
+      parsedCollection = Collection3Schema.parse(iiifCollection)
     } else {
-      parsedCollection = CollectionSchema.parse(iiifData)
+      parsedCollection = CollectionSchema.parse(iiifCollection)
     }
 
     return new Collection(parsedCollection)
@@ -140,13 +160,13 @@ export class Collection {
         }
       } else if (item instanceof EmbeddedManifest && options.fetchManifests) {
         const manifestUri = item.uri
-        const iiifData = await fetch(manifestUri)
-        const newManifest = Manifest.parse(iiifData)
+        const iiifManifest = await fetch(manifestUri)
+        const newParsedManifest = Manifest.parse(iiifManifest)
 
-        this.items[itemIndex] = newManifest
+        this.items[itemIndex] = newParsedManifest
 
         yield {
-          item: newManifest,
+          item: newParsedManifest,
           depth: depth + 1,
           parent: {
             uri: this.uri,
@@ -155,20 +175,20 @@ export class Collection {
         }
 
         if (depth + 1 < options.maxDepth && options.fetchImages) {
-          yield* newManifest.fetchNext(fetch, depth + 2)
+          yield* newParsedManifest.fetchNext(fetch, depth + 2)
         }
       } else if (item instanceof Collection) {
         // item is Collection
         // TODO: use embedded
         if (!item.items.length) {
           const collectionUri = item.uri
-          const iiifData = await fetch(collectionUri)
-          const newCollection = Collection.parse(iiifData)
+          const iiifCollection = await fetch(collectionUri)
+          const newParsedCollection = Collection.parse(iiifCollection)
 
-          this.items[itemIndex] = newCollection
+          this.items[itemIndex] = newParsedCollection
 
           yield {
-            item: newCollection,
+            item: newParsedCollection,
             depth: depth + 1,
             parent: {
               uri: this.uri,
@@ -176,7 +196,7 @@ export class Collection {
             }
           }
 
-          item = newCollection
+          item = newParsedCollection
         }
 
         if (depth + 1 < options.maxDepth) {

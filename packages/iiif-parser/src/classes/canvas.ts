@@ -15,6 +15,17 @@ type CanvasType = z.infer<typeof CanvasSchema>
 
 const CanvasTypeString = 'canvas'
 
+/**
+ * Parsed IIIF Canvas
+ * @class Canvas
+ * @property {string} [uri] - URI of Canvas
+ * @property {LanguageString} [label] - Label of Manifest
+ * @property {Metadata} [metadata] - Metadata of Manifest
+ * @property {EmbeddedImage | Image} [image] - Image of painted on Canvas
+ * @property {number} [height] - Height of Canvas
+ * @property {number} [width] - Width of Canvas
+ * @property {string} [type] - Resource type, equals 'canvas'
+ */
 export class Canvas {
   uri: string
   type: typeof CanvasTypeString = CanvasTypeString

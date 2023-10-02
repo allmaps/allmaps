@@ -41,6 +41,7 @@
     "test": "NODE_ENV=test mocha",
     "pretest": "npm run build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "prebuild": "npm run documentation",
     "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "format": "prettier --write src test"
   },

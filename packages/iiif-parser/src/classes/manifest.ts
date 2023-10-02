@@ -34,6 +34,16 @@ type EmbeddedManifestType =
 
 const ManifestTypeString = 'manifest'
 
+/**
+ * Parsed IIIF Manifest, embedded in a Collection
+ * @class EmbeddedManifest
+ * @property {boolean} embedded - Whether the Manifest is embedded in a Collection
+ * @property {string} [uri] - URI of Manifest
+ * @property {LanguageString} [label] - Label of Manifest
+ * @property {MajorVersion} [majorVersion] - IIIF API version of Manifest
+ * @property {boolean} [embedded] - Whether Manifest is embedded in a Collection*
+ * @property {string} [type] - Resource type, equals 'manifest'
+ */
 export class EmbeddedManifest {
   embedded = true
 
@@ -65,6 +75,14 @@ export class EmbeddedManifest {
   }
 }
 
+/**
+ * Parsed IIIF Manifest
+ * @class Manifest
+ * @extends EmbeddedManifest
+ * @property {Canvas[]} canvases - Array of parsed canvases
+ * @property {LanguageString} [description] - Description of Manifest
+ * @property {Metadata} [metadata] - Metadata of Manifest
+ */
 export class Manifest extends EmbeddedManifest {
   canvases: Canvas[] = []
 
@@ -98,15 +116,25 @@ export class Manifest extends EmbeddedManifest {
     }
   }
 
-  static parse(iiifData: unknown, majorVersion: MajorVersion | null = null) {
+  /**
+   * Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed version
+   * @param {any} iiifManifest - Source data of IIIF Manifest
+   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Manifest. If not provided, it will be determined automatically
+   * @returns {Manifest} Parsed IIIF Manifest
+   * @static
+   */
+  static parse(
+    iiifManifest: unknown,
+    majorVersion: MajorVersion | null = null
+  ) {
     let parsedManifest
 
     if (majorVersion === 2) {
-      parsedManifest = Manifest2Schema.parse(iiifData)
+      parsedManifest = Manifest2Schema.parse(iiifManifest)
     } else if (majorVersion === 3) {
-      parsedManifest = Manifest3Schema.parse(iiifData)
+      parsedManifest = Manifest3Schema.parse(iiifManifest)
     } else {
-      parsedManifest = ManifestSchema.parse(iiifData)
+      parsedManifest = ManifestSchema.parse(iiifManifest)
     }
 
     return new Manifest(parsedManifest)
@@ -123,8 +151,8 @@ export class Manifest extends EmbeddedManifest {
       if (image.embedded) {
         const url = `${image.uri}/info.json`
 
-        const iiifData = await fetch(url)
-        const newImage = Image.parse(iiifData)
+        const iiifManifest = await fetch(url)
+        const newImage = Image.parse(iiifManifest)
 
         canvas.image = newImage
 
