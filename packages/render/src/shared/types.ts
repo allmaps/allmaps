@@ -6,9 +6,10 @@ import type {
 import type { GcpTransformer } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
 
+export type { TileZoomLevel } from '@allmaps/iiif-parser'
+
 export type Position = [number, number]
 
-// export type BBox = [number, number, number, number] | [number, number, number, number, number, number];
 export type BBox = [number, number, number, number]
 
 export type GeoJSONPolygon = {

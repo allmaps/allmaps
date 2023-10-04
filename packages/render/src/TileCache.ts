@@ -8,6 +8,7 @@ import {
 import type { NeededTile } from './shared/types.js'
 
 export default class TileCache extends EventTarget {
+  // keep geo extent and scale factor for each CachedTile
   protected cachedTilesByUrl: Map<string, CachedTile> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()

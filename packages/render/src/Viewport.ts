@@ -1,6 +1,10 @@
 import World from './World.js'
 
-import { computeIiifTilesForMapGeoBBox } from './shared/tiles.js'
+import {
+  getResourcePolygon,
+  getBestZoomLevel,
+  computeIiifTilesForPolygonAndZoomLevel
+} from './shared/tiles.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { applyTransform } from './shared/matrix.js'
 
@@ -9,7 +13,8 @@ import type {
   Size,
   BBox,
   Transform,
-  NeededTile
+  NeededTile,
+  TileZoomLevel
 } from './shared/types.js'
 
 const MIN_COMBINED_PIXEL_SIZE = 5
@@ -17,7 +22,9 @@ const MIN_COMBINED_PIXEL_SIZE = 5
 export default class Viewport extends EventTarget {
   world: World
 
+  projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
   visibleWarpedMapIds: Set<string> = new Set()
+  bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
 
   constructor(world: World) {
     super()
@@ -25,8 +32,32 @@ export default class Viewport extends EventTarget {
     this.world = world
   }
 
+  /**
+   * Returns the mapIds of the warped maps that are visible in the viewport, sorted by z-index
+   * @returns {Iterable<string>}
+   */
   getVisibleWarpedMapIds() {
-    return this.visibleWarpedMapIds
+    const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
+      (mapIdA, mapIdB) => {
+        const zIndexA = this.world.getZIndex(mapIdA)
+        const zIndexB = this.world.getZIndex(mapIdB)
+        if (zIndexA !== undefined && zIndexB !== undefined) {
+          return zIndexA - zIndexB
+        }
+
+        return 0
+      }
+    )
+
+    return sortedVisibleWarpedMapIds
+  }
+
+  setProjectionTransform(projectionTransform: Transform) {
+    this.projectionTransform = projectionTransform
+  }
+
+  getProjectionTransform() {
+    return this.projectionTransform
   }
 
   // TODO: split function in two?
@@ -75,12 +106,26 @@ export default class Viewport extends EventTarget {
         continue
       }
 
-      // TODO: rename function
-      const tiles = computeIiifTilesForMapGeoBBox(
+      const geoBBoxResourcePolygon = getResourcePolygon(
         warpedMap.transformer,
+        geoBBox
+      )
+
+      const zoomLevel = getBestZoomLevel(
         warpedMap.parsedImage,
         viewportSize,
-        geoBBox
+        geoBBoxResourcePolygon
+      )
+
+      // TODO: remove maps from this list when they're removed from World
+      // or not visible anymore
+      this.bestZoomLevelByMapId.set(mapId, zoomLevel)
+
+      // TODO: rename function
+      const tiles = computeIiifTilesForPolygonAndZoomLevel(
+        warpedMap.parsedImage,
+        geoBBoxResourcePolygon,
+        zoomLevel
       )
 
       if (tiles.length) {

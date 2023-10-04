@@ -46,7 +46,7 @@ export function xyzTileToGeojson({ z, x, y }: XYZTile) {
   }
 }
 
-export function xyzTileToGeoExtent({ z, x, y }: XYZTile): Extent {
+export function xyzTileToGeoBBox({ z, x, y }: XYZTile): Extent {
   const topLeft = xyzTileTopLeft({ z, x, y })
   const bottomRight = xyzTileBottomRight({ z, x, y })
 
@@ -54,20 +54,20 @@ export function xyzTileToGeoExtent({ z, x, y }: XYZTile): Extent {
 }
 
 function xyzTileTopLeft({ z, x, y }: XYZTile): Coord {
-  return [tile2long({ x, z }), tile2lat({ y, z })]
+  return [tileToLongitude({ x, z }), tileToLatitude({ y, z })]
 }
 
 function xyzTileBottomRight({ z, x, y }: XYZTile): Coord {
-  return [tile2long({ x: x + 1, z }), tile2lat({ y: y + 1, z })]
+  return [tileToLongitude({ x: x + 1, z }), tileToLatitude({ y: y + 1, z })]
 }
 
 // From:
 //   https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-export function tile2long({ x, z }: { x: number; z: number }): number {
+export function tileToLongitude({ x, z }: { x: number; z: number }): number {
   return (x / Math.pow(2, z)) * 360 - 180
 }
 
-export function tile2lat({ y, z }: { y: number; z: number }): number {
+export function tileToLatitude({ y, z }: { y: number; z: number }): number {
   const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
   return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
 }
