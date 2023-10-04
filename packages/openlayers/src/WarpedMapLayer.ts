@@ -35,6 +35,11 @@ const THROTTLE_OPTIONS = {
   trailing: true
 }
 
+/**
+ * WarpedMapLayer class. Together with a WarpedMapSource, this class
+ * renders a warped map on an OpenLayers map. WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+ * @class WarpedMapLayer
+ */
 export class WarpedMapLayer extends Layer {
   source: WarpedMapSource | null = null
 
@@ -50,8 +55,6 @@ export class WarpedMapLayer extends Layer {
   viewport: Viewport
   tileCache: TileCache
 
-  mapIdsInViewport: Set<string> = new Set()
-
   throttledUpdateViewportAndGetTilesNeeded: DebouncedFunc<
     typeof this.viewport.updateViewportAndGetTilesNeeded
   >
@@ -65,9 +68,12 @@ export class WarpedMapLayer extends Layer {
 
   private resizeObserver: ResizeObserver
 
-  constructor(options: object) {
-    options = options || {}
-
+  /**
+   * Creates a WarpedMapSource
+   * @param {Object} options
+   * @param {WarpedMapSource} options.source - source that holds the warped maps
+   */
+  constructor(options: { source: WarpedMapSource }) {
     super(options)
 
     const container = document.createElement('div')
@@ -77,7 +83,7 @@ export class WarpedMapLayer extends Layer {
     container.style.width = '100%'
     container.style.height = '100%'
     container.classList.add('ol-layer')
-    container.classList.add('allmaps-warped-layer')
+    container.classList.add('allmaps-warped-map-layer')
     const canvas = document.createElement('canvas')
 
     canvas.style.position = 'absolute'
@@ -118,10 +124,10 @@ export class WarpedMapLayer extends Layer {
       this.warpedMapAdded.bind(this)
     )
 
-    this.world.addEventListener(
-      WarpedMapEventType.ZINDICESCHANGES,
-      this.zIndicesChanged.bind(this)
-    )
+    // this.world.addEventListener(
+    //   WarpedMapEventType.ZINDICESCHANGES,
+    //   this.zIndicesChanged.bind(this)
+    // )
 
     this.world.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
@@ -161,14 +167,14 @@ export class WarpedMapLayer extends Layer {
       THROTTLE_OPTIONS
     )
 
-    this.viewport.addEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
-      this.warpedMapEnter.bind(this)
-    )
-    this.viewport.addEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
-      this.warpedMapLeave.bind(this)
-    )
+    // this.viewport.addEventListener(
+    //   WarpedMapEventType.WARPEDMAPENTER,
+    //   this.warpedMapEnter.bind(this)
+    // )
+    // this.viewport.addEventListener(
+    //   WarpedMapEventType.WARPEDMAPLEAVE,
+    //   this.warpedMapLeave.bind(this)
+    // )
 
     for (const warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
@@ -212,22 +218,22 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  private zIndicesChanged() {
-    const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
-      (mapIdA, mapIdB) => {
-        const zIndexA = this.world.getZIndex(mapIdA)
-        const zIndexB = this.world.getZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
+  // private zIndicesChanged() {
+  //   const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
+  //     (mapIdA, mapIdB) => {
+  //       const zIndexA = this.world.getZIndex(mapIdA)
+  //       const zIndexB = this.world.getZIndex(mapIdB)
+  //       if (zIndexA !== undefined && zIndexB !== undefined) {
+  //         return zIndexA - zIndexB
+  //       }
 
-        return 0
-      }
-    )
+  //       return 0
+  //     }
+  //   )
 
-    this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
-    this.changed()
-  }
+  //   this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
+  //   this.changed()
+  // }
 
   private visibilityChanged() {
     this.changed()
@@ -259,20 +265,20 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  private warpedMapEnter(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.mapIdsInViewport.add(mapId)
-      this.zIndicesChanged()
-    }
-  }
+  // private warpedMapEnter(event: Event) {
+  //   if (event instanceof WarpedMapEvent) {
+  //     const mapId = event.data as string
+  //     this.mapIdsInViewport.add(mapId)
+  //     this.zIndicesChanged()
+  //   }
+  // }
 
-  private warpedMapLeave(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.mapIdsInViewport.delete(mapId)
-    }
-  }
+  // private warpedMapLeave(event: Event) {
+  //   if (event instanceof WarpedMapEvent) {
+  //     const mapId = event.data as string
+  //     this.mapIdsInViewport.delete(mapId)
+  //   }
+  // }
 
   private worldCleared() {
     this.renderer.clear()
@@ -313,7 +319,10 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  resizeCanvas(canvas: HTMLCanvasElement, [width, height]: [number, number]) {
+  private resizeCanvas(
+    canvas: HTMLCanvasElement,
+    [width, height]: [number, number]
+  ) {
     const needResize = canvas.width !== width || canvas.height !== height
 
     if (needResize) {
@@ -339,16 +348,32 @@ export class WarpedMapLayer extends Layer {
       : undefined
   }
 
+  /**
+   * Sets the opacity of a single warped map
+   * @param {string} mapId - ID of the warped map
+   * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+   */
   setMapOpacity(mapId: string, opacity: number) {
     this.renderer.setMapOpacity(mapId, opacity)
     this.changed()
   }
 
+  /**
+   * Resets the opacity of a single warped map to 1
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapOpacity(mapId: string) {
     this.renderer.resetMapOpacity(mapId)
     this.changed()
   }
 
+  /**
+   * Removes a background color from all maps in the layer
+   * @param {Object} options - remove background options
+   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
   setRemoveBackground(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
@@ -362,14 +387,24 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
+  /**
+   * Resets the background color for all maps in the layer
+   */
   resetRemoveBackground() {
     this.renderer.resetRemoveBackground()
     this.changed()
   }
 
+  /**
+   * Removes a background color from a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   * @param {Object} options - remove background options
+   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
   setMapRemoveBackground(
     mapId: string,
-
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
     const color = this.hexToRgb(options.hexColor)
@@ -382,10 +417,18 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
+  /**
+   * Resets the background color for a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapRemoveBackground(mapId: string) {
     this.renderer.resetMapRemoveBackground(mapId)
   }
 
+  /**
+   * Sets the colorization for all maps in the layer
+   * @param {string} hexColor - desired hex color
+   */
   setColorize(hexColor: string) {
     const color = this.hexToRgb(hexColor)
     if (color) {
@@ -394,11 +437,19 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
+  /**
+   * Resets the colorization for all maps in the layer
+   */
   resetColorize() {
     this.renderer.resetColorize()
     this.changed()
   }
 
+  /**
+   * Sets the colorization for a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   * @param {string} hexColor - desired hex color
+   */
   setMapColorize(mapId: string, hexColor: string) {
     const color = this.hexToRgb(hexColor)
     if (color) {
@@ -407,11 +458,18 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
+  /**
+   * Resets the colorization of a single warped map
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapColorize(mapId: string) {
     this.renderer.resetMapColorize(mapId)
     this.changed()
   }
 
+  /**
+   * Disposes all WebGL resources and cached tiles
+   */
   dispose() {
     this.renderer.dispose()
 
@@ -436,7 +494,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   // TODO: use OL's own makeProjectionTransform function?
-  makeProjectionTransform(frameState: FrameState): Transform {
+  private makeProjectionTransform(frameState: FrameState): Transform {
     const size = frameState.size
     const rotation = frameState.viewState.rotation
     const resolution = frameState.viewState.resolution
@@ -484,18 +542,15 @@ export class WarpedMapLayer extends Layer {
     if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
       this.previousExtent = frameState.extent?.slice() || null
 
-      const projectionTransform = this.makeProjectionTransform(frameState)
-      this.renderer.updateVertexBuffers(
-        projectionTransform,
-        this.mapIdsInViewport.values()
-      )
+      this.renderer.updateVertexBuffers(this.viewport)
     }
   }
 
   private renderInternal(frameState: FrameState, last = false): HTMLElement {
-    this.prepareFrameInternal(frameState)
-
     const projectionTransform = this.makeProjectionTransform(frameState)
+    this.viewport.setProjectionTransform(projectionTransform)
+
+    this.prepareFrameInternal(frameState)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -529,12 +584,17 @@ export class WarpedMapLayer extends Layer {
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(projectionTransform, this.mapIdsInViewport.values())
+      this.renderer.render(this.viewport)
     }
 
     return this.container
   }
 
+  /**
+   * Render the layer.
+   * @param {import("ol/Map.js").FrameState} frameState - OpenLayers frame state
+   * @return {HTMLElement} The rendered element
+   */
   render(frameState: FrameState): HTMLElement {
     if (this.throttledRenderTimeoutId) {
       clearTimeout(this.throttledRenderTimeoutId)
