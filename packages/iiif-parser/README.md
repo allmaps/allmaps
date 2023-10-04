@@ -480,7 +480,6 @@ Parsed IIIF Manifest, embedded in a Collection
 *   `uri` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** URI of Manifest
 *   `label` **[LanguageString](#languagestring)?** Label of Manifest
 *   `majorVersion` **[MajorVersion](#majorversion)?** IIIF API version of Manifest
-*   `embedded` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Whether Manifest is embedded in a Collection\*
 *   `type` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Resource type, equals 'manifest'
 
 ### Manifest

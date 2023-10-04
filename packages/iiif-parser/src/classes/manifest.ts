@@ -41,7 +41,6 @@ const ManifestTypeString = 'manifest'
  * @property {string} [uri] - URI of Manifest
  * @property {LanguageString} [label] - Label of Manifest
  * @property {MajorVersion} [majorVersion] - IIIF API version of Manifest
- * @property {boolean} [embedded] - Whether Manifest is embedded in a Collection*
  * @property {string} [type] - Resource type, equals 'manifest'
  */
 export class EmbeddedManifest {
