@@ -49,7 +49,7 @@ Browser:
 *   [Types](#types)
     *   [Map](#map)
     *   [Annotation](#annotation)
-*   [AnnotationPage](#annotationpage)
+    *   [AnnotationPage](#annotationpage)
 
 ### Generating & parsing Georeference Annotations
 
@@ -99,7 +99,7 @@ Returns **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Geor
 
 ### Types
 
-The two types this module converts between, [Annotation](#annotation) and [Map](#map), are described below.
+The two types this module converts between, [Annotation](#annotation), [AnnotationPage](#annotationpage) and [Map](#map), are described below.
 
 #### Map
 
@@ -113,7 +113,7 @@ Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
-### AnnotationPage
+#### AnnotationPage
 
 An [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page) that contains multiple [Georeference Annotations](https://iiif.io/api/extension/georef/).
 
