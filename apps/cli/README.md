@@ -1,26 +1,16 @@
 # @allmaps/cli
 
-This module enables you to use the allmaps functionallity in your terminal!
+Command-line interface for [Allmaps](https://allmaps.org/).
 
 ## Installation
 
-This is an ESM-only module that works in browsers or in Node.js.
-
-Use [pnpm](https://pnpm.io/) or [npm](https://www.npmjs.com/) to install this CLI tool globally in your system:
+Use npm to install Allmaps CLI globally:
 
 ```sh
-pnpm add -g @allmaps/cli
-```
-
-or
-
-```sh
-nnpm install -g @allmaps/cli
+npm install -g @allmaps/cli
 ```
 
 ## Usage
-
-### General Usage and Help
 
 Run Allmaps CLI in your terminal using:
 
@@ -38,9 +28,9 @@ allmaps --help
 allmaps <command> --help
 ```
 
-### Input and Output
+### Input and output
 
-All CLI commands accept one or more files as input. You can supply these files in two ways:
+Most CLI commands accept one or more files as input. You can supply these files in two ways:
 
 - Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`.
 - Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI.
@@ -65,7 +55,7 @@ Generate Georeference Annotations from input files:
 allmaps annotation generate [files...]
 ```
 
-Parse input files and output them in the format used internally by Allmaps:
+Parse input files and output them in parsed Georeference Annotations (the format used internally by Allmaps):
 
 ```sh
 allmaps annotation parse [files...]
@@ -87,16 +77,19 @@ Show help:
 allmaps transform --help
 ```
 
-#### Transform Position
+#### Transform coordinates
 
-Transform positions from input files forward (or backward) using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform coordinates from input files forward (or backward) using a transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
 
-Position-files are expected to contain one position on each line, formatted as pairs of coordinates in decimal form separated by spaces. E.g. `X_origin Y_origin`
+Input files with coordinates are expected to contain one coordinate on each line, formatted as pairs of coordinates in decimal form separated by spaces:
+
+E.g. `X_origin Y_origin`.
+
 GCP-files are similar: `X_origin Y_origin X_destination Y_destination`
 
-For this specific command, if no input-files are supplied in the a promt will show up in stdin, enabling you to enter positions one by one in the same format as above and read the transformed result.
+For this specific command, if no input files are supplied in the a prompt will show up in stdin, enabling you to enter coordinates one by one in the same format as above and read the transformed result.
 
-This command (and position format) was inspired by gdaltransform.
+This command was inspired by [gdaltransform](https://gdal.org/programs/gdaltransform.html).
 
 **Examples:**
 
@@ -104,23 +97,22 @@ This command (and position format) was inspired by gdaltransform.
 allmaps transform svg -a <filename> [files...]
 ```
 
-For example, with
+For example, with a file `/path/to/coordinates.txt` that contains two coordinates:
 
 ```
-// positionFile.txt
 100 100
 200 200
 ```
 
-You can use the command as follows
+You can use the command as follows:
 
 ```sh
-allmaps transform position -a path/to/myAnnotation.json path/to/positionsFile.txt
+allmaps transform coordinates -a /path/to/annotation.json /path/to/coordinates.txt
 ```
 
-Returns, e.g.
+This will output:
 
-```sh
+```
 4.35748950266836 52.00802521697614
 4.357492297361325 52.008035790231254
 ```
@@ -128,31 +120,31 @@ Returns, e.g.
 You can also pipe the input and store the output:
 
 ```sh
-cat path/to/positionFile.txt | allmaps transform position -a path/to/myAnnotation.json > path/to/outputPositionsFile.txt
+cat /path/to/coordinates.txt | allmaps transform coordinates -a /path/to/annotation.json \
+  > /path/to/transformed-coordinates.txt
 ```
 
-Or transform using a specific set of GCPs and specified transformation type, instead of reading those from an annotation
+Or transform using a specific set of GCPs and specified transformation type, instead of reading those from a Georeference Annotation:
 
-With
+With a file `/path/to/gcps.txt` that contains four GCPs:
 
-```sh
-// gcpFile.txt
+```
 3899 6412 9.9301538 53.5814021
 6584 819 25.4101689 71.0981125
 6491 4782 22.2380717 60.4764844
 1409 5436 -3.2014645 55.959946
-1765 1737 -18.1014216 64.3331759```
+1765 1737 -18.1014216 64.3331759
 ```
 
-This is done via
+This is done with the following command:
 
 ```sh
-allmaps transform position -g path/to/gcpFile.json -t thinPlateSpline path/to/positionsFile.txt
+allmaps transform coordinates -g /path/to/gcps.txt -t thinPlateSpline /path/to/coordinates.txt
 ```
 
 #### Transform SVG
 
-Transform SVG forward to GeoJSON Geometry using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform SVG forward to GeoJSON Geometry using a transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
 
 **Examples:**
 
@@ -161,17 +153,16 @@ allmaps transform svg -a <filename> [files...]
 ```
 
 ```sh
-allmaps transform svg -a path/to/myAnnotation.json path/to/mySVG.svg
+allmaps transform svg -a /path/to/annotation.json /path/to/svg.svg
 ```
 
 ```sh
-allmaps transform svg -g path/to/gcpFile.json -t thinPlateSpline path/to/mySVG.svg
+allmaps transform svg -g /path/to/gcps.txt -t thinPlateSpline /path/to/svg.svg
 ```
-
 
 #### Transform GeoJSON
 
-Transform GeoJSON Geometry backwars to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform GeoJSON Geometry backwards to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
 
 **Examples:**
 
@@ -180,11 +171,11 @@ allmaps transform geojson -a <filename> [files...]
 ```
 
 ```sh
-allmaps transform geojson -a path/to/myAnnotation.json path/to/myGeoJSON.geosjon
+allmaps transform geojson -a /path/to/annotation.json path/to/myGeoJSON.geosjon
 ```
 
 ```sh
-allmaps transform geojson -g path/to/gcpFile.json -t thinPlateSpline path/to/myGeoJSON.geosjon
+allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline /path/to/myGeoJSON.geosjon
 ```
 
 #### Transform Resource Mask
@@ -205,22 +196,21 @@ allmaps transform resource-mask path/to/myAnnotation.json path/to/myAnnotation2.
 
 All the commands above accept the following options for specifying the transformations:
 
-| Option                                            | Description                                                                                                                                                                    | Default      |
-|:--------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-i, --inverse`                                   | Compute backward ("inverse") transformation                                                                                                                                    |              |
-| `-g, --gcps <filename>`                           | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
-| `-t, --transformationType <transformationType>`   | Transformation Type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
-| `-o, --transformationOrder <transformationOrder>` | Order of polynomial transformation. One of `1`, `2` or `3`.                                                                                                                    | `1`          |
+| Option                                           | Description                                                                                                                                                                    | Default      |
+| :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
+| `-i, --inverse`                                  | Compute backward ("inverse") transformation                                                                                                                                    |              |
+| `-g, --gcps <filename>`                          | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
+| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
+| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
 
 All the commands above (except `position`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
 | Option                            | Description                                                              | Default                                                 |
-|:----------------------------------|:-------------------------------------------------------------------------|:--------------------------------------------------------|
+| :-------------------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------ |
 | `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints          | `0`                                                     |
 | `-d, --max-depth <number>`        | Maximum recursion depth                                                  | `6`                                                     |
 | `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` for `geojson` command)                  |
 | `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination positions | `false` (`true` for `svg` and `resource-mask` commands) |
-
 
 ### Parse and generate IIIF resources
 
@@ -229,6 +219,7 @@ Show help:
 ```sh
 allmaps iiif --help
 ```
+
 Parse IIIF resources and output them in the format used internally by Allmaps:
 
 ```sh
@@ -243,9 +234,31 @@ allmaps manifest -d <id> [files...]
 
 The ID of the IIIF Manifest can be supplied with the `-i` or `--id` option.
 
+### Generate Allmaps IDs
+
+Allmaps CLI can generate Allmaps IDs for input strings.
+
+Show help:
+
+```sh
+allmaps id --help
+```
+
+Generate the Allmaps ID for a IIIF Manifest URL:
+
+```sh
+allmaps id https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/
+```
+
+Using the same URL, but using standard input:
+
+```sh
+echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
+```
+
 ## Examples
 
-### Turn masks of georeferenced maps into GeoJSON
+### Turn resource masks of georeferenced maps into GeoJSON
 
 Manifest URL:
 
@@ -269,7 +282,7 @@ Manifest URLs:
 - https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 - https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest
 
-Georef Annotations:
+Georeference Annotations:
 
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:4t64k3596/manifest
 - https://annotations.allmaps.org/?url=https://collections.leventhalmap.org/search/commonwealth:6108xt43s/manifest
