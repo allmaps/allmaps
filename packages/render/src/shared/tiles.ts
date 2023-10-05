@@ -124,7 +124,26 @@ function getBestZoomLevelForMapScale(
     const scaleFactor = zoomLevel.scaleFactor
     const scaleDiff = Math.abs(scaleFactor - mapTileScale)
 
-    if (scaleDiff < smallestScaleDiff && scaleFactor >= mapTileScale) {
+    // scaleFactors:
+    // 1.......2.......4.......8.......16
+    //
+    // Example mapTileScale = 3
+    // 1.......2..|....4.......8.......16
+    //
+    // scaleFactor 2:
+    //   scaleDiff = 1
+    //   scaleFactor * 1.25 = 2.5 => 2.5 >= 3 === false
+    //
+    // scaleFactor 4:
+    //   scaleDiff = 1
+    //   scaleFactor * 1.25 = 5 => 5 >= 3 === true
+    //
+    // Pick scaleFactor 4!
+
+    // TODO: read 1.25 from config
+    // TODO: maybe use a smaller value when the scaleFactor is low and a higher value when the scaleFactor is high?
+    // TODO: use lgoarithmic scale?
+    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= mapTileScale) {
       smallestScaleDiff = scaleDiff
       bestZoomLevel = zoomLevel
     }
