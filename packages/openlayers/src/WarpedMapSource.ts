@@ -70,7 +70,7 @@ export class WarpedMapSource extends Source {
   }
 
   /**
-   * Clears the source, removed all warped maps
+   * Clears the source, removes all warped maps
    */
   clear() {
     this.world.clear()
