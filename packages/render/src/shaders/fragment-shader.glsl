@@ -3,6 +3,7 @@
 precision highp float;
 precision highp isampler2D;
 
+uniform int u_bestScaleFactor;
 uniform float u_opacity;
 
 uniform bool u_removeBackgroundColor;
@@ -19,7 +20,7 @@ uniform isampler2D u_imagePositionsTexture;
 uniform isampler2D u_scaleFactorsTexture;
 
 in vec2 v_pixel_position;
-in float v_pixel_triangle_index; // DEV
+// in float v_pixel_triangle_index; // DEV
 
 out vec4 outColor;
 
@@ -37,12 +38,14 @@ void main() {
   int tileRegionX = 0;
   int tileRegionY = 0;
 
-  float diffX = 0.0;
-  float diffY = 0.0;
+  float diffX = 0.0f;
+  float diffY = 0.0f;
 
   ivec2 tilePosition = ivec2(0, 0);
 
   int scaleFactor = 0;
+  // A very high scale factor that's higher than any possible scale factor
+  int smallestScaleFactorDiff = 256 * 256;
 
   bool found = false;
 
@@ -58,16 +61,23 @@ void main() {
     if(imageX >= tileRegionX && imageX < tileRegionX + tileRegionWidth && imageY >= tileRegionY && imageY < tileRegionY + tileRegionHeight) {
       found = true;
 
-      scaleFactor = texelFetch(u_scaleFactorsTexture, ivec2(0, tileIndex), 0).r;
+      int tileIndexScaleFactor = texelFetch(u_scaleFactorsTexture, ivec2(0, tileIndex), 0).r;
 
-      diffX = float(imageX - tileRegionX) / float(scaleFactor);
-      diffY = float(imageY - tileRegionY) / float(scaleFactor);
+      int scaleFactorDiff = abs(u_bestScaleFactor - tileIndexScaleFactor);
+      if(scaleFactorDiff < smallestScaleFactorDiff || scaleFactor == 0) {
 
-      tilePosition = texelFetch(u_tilePositionsTexture, ivec2(0, tileIndex), 0).rg;
+        smallestScaleFactorDiff = scaleFactorDiff;
+        scaleFactor = tileIndexScaleFactor;
+
+        diffX = float(imageX - tileRegionX) / float(scaleFactor);
+        diffY = float(imageY - tileRegionY) / float(scaleFactor);
+
+        tilePosition = texelFetch(u_tilePositionsTexture, ivec2(0, tileIndex), 0).rg;
+      }
     }
   }
 
-  outColor = vec4(0.0, 0.0, 0.0, 0.0);
+  outColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
   if(found == true) {
     float texturePixelX = float(tilePosition.r) + diffX;
@@ -80,11 +90,11 @@ void main() {
     outColor = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
 
     // Remove background color
-    if(u_backgroundColorThreshold > 0.0) {
+    if(u_backgroundColorThreshold > 0.0f) {
       vec3 backgroundColorDiff = outColor.rgb - u_backgroundColor.rgb;
       float backgroundColorDistance = length(backgroundColorDiff);
       if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0 - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
+        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0f - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
         outColor = vec4(outColor.rgb * amount, amount);
       }
     }

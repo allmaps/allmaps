@@ -1,1 +1,1 @@
-Error: No GCPs supplied. Specify an annotation or GCPs.
+Error: No GCPs supplied. Supply a Georeference Annotation or a file containing GCPs.

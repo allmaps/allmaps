@@ -2,18 +2,17 @@ Allmaps CLI
 
 Usage: allmaps transform [options] [command]
 
-Transforms SVGs with resource coordinates to GeoJSON and vice versa, using a
-Georeference Annotation
+Transforms resource coordinates to geospatial coordinates and vice versa
 
 Options:
   -h, --help                          display help for command
 
 Commands:
-  position [options] [files...]       transform positions forwards (or
-                                      backwards)
   svg [options] [files...]            transform SVG to GeoJSON
   geojson [options] [files...]        transform GeoJSON to SVG
   resource-mask [options] [files...]  transform resource masks to GeoJSON
+  coordinates [options] [files...]    transform coordinates forwards (or
+                                      backwards)
   help [command]                      display help for command
 
 For more details about Allmaps, see https://allmaps.org

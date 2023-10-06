@@ -10,6 +10,15 @@ import type { Polygon } from '@allmaps/types'
 
 type PositionByX = { [key: number]: Position }
 
+function distanceFromPoint(tile: Tile, point: Position) {
+  const center = tileCenter(tile)
+
+  const dx = center[0] - point[0]
+  const dy = center[1] - point[1]
+
+  return Math.sqrt(dx ** 2 + dy ** 2)
+}
+
 export function imageCoordinatesToTileCoordinates(
   tile: Tile,
   imageCoordinates: Position,
@@ -102,18 +111,39 @@ function tilesIntersect([a, b]: Line): Position[] {
   return points
 }
 
-function findBestZoomLevel(
-  timeZoomLevels: TileZoomLevel[],
+function getBestZoomLevelForMapScale(
+  image: Image,
   mapTileScale: number
-): TileZoomLevel | undefined {
-  let smallestScaleDiff = Number.POSITIVE_INFINITY
-  let bestZoomLevel = timeZoomLevels[timeZoomLevels.length - 1]
+): TileZoomLevel {
+  const tileZoomLevels = image.tileZoomLevels
 
-  for (const zoomLevel of timeZoomLevels) {
+  let smallestScaleDiff = Number.POSITIVE_INFINITY
+  let bestZoomLevel = tileZoomLevels[tileZoomLevels.length - 1]
+
+  for (const zoomLevel of tileZoomLevels) {
     const scaleFactor = zoomLevel.scaleFactor
     const scaleDiff = Math.abs(scaleFactor - mapTileScale)
 
-    if (scaleDiff < smallestScaleDiff && scaleFactor >= mapTileScale) {
+    // scaleFactors:
+    // 1.......2.......4.......8.......16
+    //
+    // Example mapTileScale = 3
+    // 1.......2..|....4.......8.......16
+    //
+    // scaleFactor 2:
+    //   scaleDiff = 1
+    //   scaleFactor * 1.25 = 2.5 => 2.5 >= 3 === false
+    //
+    // scaleFactor 4:
+    //   scaleDiff = 1
+    //   scaleFactor * 1.25 = 5 => 5 >= 3 === true
+    //
+    // Pick scaleFactor 4!
+
+    // TODO: read 1.25 from config
+    // TODO: maybe use a smaller value when the scaleFactor is low and a higher value when the scaleFactor is high?
+    // TODO: use lgoarithmic scale?
+    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= mapTileScale) {
       smallestScaleDiff = scaleDiff
       bestZoomLevel = zoomLevel
     }
@@ -185,59 +215,64 @@ function iiifTilesByXToArray(
   return neededIiifTiles
 }
 
-export function computeIiifTilesForMapGeoBBox(
-  transformer: GcpTransformer,
-  image: Image,
-  viewportSize: Size,
-  geoBBox: BBox
-): Tile[] {
-  // geoBBox is a BBox of the extent viewport in World positions (in the projection that was given)
-  // geoBBoxPolygon is its ring
-  // geoBBoxPolygonToResource is the ring of it's backward transformation. Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points
-  // geoBBoxResourceBBox is the BBox of this polygon.
+export function getResourcePolygon(transformer: GcpTransformer, geoBBox: BBox) {
+  // geoBBox is a BBox of the extent viewport in geospatial coordinates (in the projection that was given)
+  // geoBBoxResourcePolygon is a polygon of this BBox, transformed to resource coordinates.
+  // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
   const geoBBoxPolygon = bboxToPolygon(geoBBox)
-  const geoBBoxPolygonToResource = transformer.transformBackward(
-    geoBBoxPolygon,
-    {
-      maxOffsetRatio: 0.00001,
-      maxDepth: 2
-    }
-  ) as Polygon
-  const geoBBoxResourceBBox = computeBbox(geoBBoxPolygonToResource)
+  const geoBBoxResourcePolygon = transformer.transformBackward(geoBBoxPolygon, {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 2
+  }) as Polygon
 
-  if (
-    (geoBBoxResourceBBox[0] > image.width || geoBBoxResourceBBox[2] < 0) &&
-    (geoBBoxResourceBBox[1] > image.height || geoBBoxResourceBBox[3] < 0)
-  ) {
-    return []
-  }
+  return geoBBoxResourcePolygon
+}
 
-  const geoBBoxResourceBBoxWidth =
-    geoBBoxResourceBBox[2] - geoBBoxResourceBBox[0]
-  const geoBBoxResourceBBoxHeight =
-    geoBBoxResourceBBox[3] - geoBBoxResourceBBox[1]
+export function getBestZoomLevel(
+  image: Image,
+  viewportSize: Size,
+  resourcePolygon: Polygon
+): TileZoomLevel {
+  const resourceBBox = computeBbox(resourcePolygon)
 
-  const mapScaleX = geoBBoxResourceBBoxWidth / viewportSize[0]
-  const mapScaleY = geoBBoxResourceBBoxHeight / viewportSize[1]
+  const resourceBBoxWidth = resourceBBox[2] - resourceBBox[0]
+  const resourceBBoxHeight = resourceBBox[3] - resourceBBox[1]
+
+  const mapScaleX = resourceBBoxWidth / viewportSize[0]
+  const mapScaleY = resourceBBoxHeight / viewportSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
-  const zoomLevel = findBestZoomLevel(image.tileZoomLevels, mapScale)
+  return getBestZoomLevelForMapScale(image, mapScale)
+}
 
-  if (zoomLevel) {
-    // TODO: maybe index all tiles in rtree?
+export function computeIiifTilesForPolygonAndZoomLevel(
+  image: Image,
+  resourcePolygon: Polygon,
+  zoomLevel: TileZoomLevel
+): Tile[] {
+  const tilePixelExtent = scaleToTiles(zoomLevel, resourcePolygon[0])
 
-    const tilePixelExtent = scaleToTiles(zoomLevel, geoBBoxPolygonToResource[0])
+  const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
+  const iiifTiles = iiifTilesByXToArray(
+    zoomLevel,
+    [image.width, image.height],
+    iiifTilesByX
+  )
 
-    const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
-    const iiifTiles = iiifTilesByXToArray(
-      zoomLevel,
-      [image.width, image.height],
-      iiifTilesByX
-    )
+  // sort tiles to load tiles in order of their distance to center
+  // TODO: move to new SortedFetch class
+  const resourceBBox = computeBbox(resourcePolygon)
+  const resourceCenter: Position = [
+    (resourceBBox[0] + resourceBBox[2]) / 2,
+    (resourceBBox[1] + resourceBBox[3]) / 2
+  ]
 
-    return iiifTiles
-  } else {
-    return []
-  }
+  iiifTiles.sort(
+    (tileA, tileB) =>
+      distanceFromPoint(tileA, resourceCenter) -
+      distanceFromPoint(tileB, resourceCenter)
+  )
+
+  return iiifTiles
 }

@@ -1,36 +1,20 @@
 # @allmaps/triangulate
 
-This module 'triangulates' a polygon: it returns a set of small triangule that partition the polygon.
+This module triangulates a polygon: it returns a set of small triangule that partition the polygon.
 
-It is used in [@allmaps/render](../../packages/render/) to triangulate the resource mask into a set of triangles that can be drawn by WebGL.
+It is used in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
 
 ## How it works
 
 It uses a simple **constrained Delaunay triangulation algorithm** for polygons, built using [poly2tri.js](https://github.com/r3mi/poly2tri.js).
 
-To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/199e169d58f0bf0d).
+To learn more on how it works, check out this [Observable notebook](https://observablehq.com/@allmaps/a-simple-polygon-triangulation-algorithm).
 
 ## Installation
 
-This is an ESM-only module that works in browsers or in Node.js.
+This is an ESM-only module that works in browsers and Node.js.
 
-Use [pnpm](https://pnpm.io/) or [npm](https://www.npmjs.com/) to install this CLI tool globally in your system:
-
-```sh
-pnpm add @allmaps/triangulate
-```
-
-or
-
-```sh
-nnpm install @allmaps/triangulate
-```
-
-## Installation
-
-This is an ESM-only module that works in browsers or in Node.js.
-
-Installation in Node.js:
+Install using npm:
 
 ```sh
 npm install @allmaps/triangulate
@@ -51,7 +35,7 @@ const polygon = [
 
 const distance = 1
 
-// compute constrained triangulation of 'polygon' using a mesh of size 'distance'
+// compute constrained triangulation of `polygon` using a mesh of size `distance`
 const triangles = triangulate(polygon, distance)
 
 // triangles = [
@@ -63,24 +47,6 @@ const triangles = triangulate(polygon, distance)
 //   ...
 // ]
 ```
-
-## Notes
-
-### Stability
-
-*   `poly2tri` doesn't allow self-intersection polygons and will raise an error for such inputs.
-*   For certain polygon vertex configurations an especially for round numbers or small distance sizes, poly2tri is known to throw errors such as 'point collinearity' or 'pointerror'.
-
-### Benchmark
-
-For a 10 point polygon, here are some benchmarks for computing the triangulation with the distance as a fraction of the polygon's bbox diameter:
-
-*   `triangulate(polygon, 1)`: 66719 ops/s to compute 8 triangles
-*   `triangulate(polygon, bboxDiameter / 10)`: 10924 ops/s to compute 86 triangles
-*   `triangulate(polygon, bboxDiameter / 40)`: 1115 ops/s to compute 1048 triangles
-*   `triangulate(polygon, bboxDiameter / 100)`: 167 ops/s to compute 6216 triangles
-
-See `./bench/index.js`
 
 ## API
 
@@ -111,7 +77,7 @@ Triangulates a polygon
 *   `polygon` **[Ring](#ring)** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Triangle](#triangle)>** Array of triangles partitionning the polygon
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Triangle](#triangle)>** Array of triangles partitioning the polygon
 
 #### triangulatePoly2tri
 
@@ -122,7 +88,7 @@ Triangulates a polygon (and returns the full Poly2tri output)
 *   `polygon` **[Ring](#ring)** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[poly2tri.Triangle](#poly2tritriangle)>** Array of triangles partitionning the polygon
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[poly2tri.Triangle](#poly2tritriangle)>** Array of triangles partitioning the polygon
 
 ### Types
 
@@ -142,6 +108,26 @@ Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### Ring
 
-Polygon object as `[[number, number], ...]`
+Polygon object, as an outer Ring only `[[number, number], ...]`
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+## Notes
+
+### Stability
+
+*   `poly2tri` doesn't allow self-intersection polygons and will raise an error for such inputs.
+*   For certain polygon vertex configurations an especially for round numbers or small distance sizes, poly2tri is known to throw errors such as 'point collinearity' or 'pointerror'.
+
+### Benchmark
+
+For a 10 point polygon, here are some benchmarks for computing the triangulation with the distance as a fraction of the polygon's bbox diameter:
+
+*   `triangulate(polygon, 1)`: 66719 ops/s to compute 8 triangles
+*   `triangulate(polygon, bboxDiameter / 10)`: 10924 ops/s to compute 86 triangles
+*   `triangulate(polygon, bboxDiameter / 40)`: 1115 ops/s to compute 1048 triangles
+*   `triangulate(polygon, bboxDiameter / 100)`: 167 ops/s to compute 6216 triangles
+
+See [`./bench/index.js`](`./bench/index.js`).
+
+To run the benchmark, run `npm run bench`.

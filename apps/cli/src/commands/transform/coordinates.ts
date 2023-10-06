@@ -9,21 +9,27 @@ import {
   parseCoordinatesArrayArray,
   parseTransformationType
 } from '../../lib/parse.js'
-
-import type { Position } from '@allmaps/types'
 import { addAnnotationOptions } from '../../lib/options.js'
 
-export default function position() {
-  let command = new Command('position')
+import type { Position } from '@allmaps/types'
+
+export default function coordinates() {
+  let command = new Command('coordinates')
     .argument('[files...]')
-    .summary('transform positions forwards (or backwards)')
+    .summary('transform coordinates forwards (or backwards)')
     .description(
-      'Transform positions from input files forward (or backward) using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.\n\n' +
-        'Position-files are expected to contain one position on each line, formatted as pairs of coordinates in decimal form separated by spaces. E.g.: X_origin Y_origin\n' +
-        'GCP-files are similar: X_origin Y_origin X_destination Y_destination\n\n' +
-        'Inputs can be supplied at the end of the command or piped to stdin. If no input is given a promt will show up in stdin.\n' +
-        'Output can be stored by redirecting stdout using: allmaps transform position ... > SomeFile.txt\n\n' +
-        'This command was inspired by gdaltransform.'
+      `Transforms coordinates from input files forward or backward using a transformation built from the GCPs and transformation type specified in a Georeference Annotation.
+
+Coordinates files are expected to contain one coordinate (x, y) on each line, separated by a space, e.g.:
+
+4.8787 3.78792
+
+GCP files are similar, they contain two coordinates (sourceX, sourceY) (destinationX, destinationY) on each line, separated by a spaces, e.g.:
+
+4.8787 3.78792 500 600
+
+Input filenames can be supplied as arguments or piped to the standard input. If no input is given you will be prompted to enter coordinates manually.
+This command was inspired by gdaltransform.`
     )
 
   command = addAnnotationOptions(command)
@@ -42,7 +48,7 @@ export default function position() {
         processPositionString(positionString, transformer, options)
       }
     } else {
-      printString('Enter X Y values separated by space, and press Return.')
+      printString('Enter X and Y values separated by space, and press Return.')
       let positionString = await readFromStdinLine()
       while (positionString) {
         processPositionString(positionString, transformer, options)
@@ -58,7 +64,7 @@ function processPositionString(
   transformer: GcpTransformer,
   options: { inverse: boolean }
 ) {
-  // Parse positionString to Array of positions and transform them
+  // Parse positionString to array of positions and transform them
   const outputPositions: Position[] = []
   const positionArray = parseCoordinatesArrayArray(positionString) as Position[]
   positionArray.forEach((position) =>

@@ -3,14 +3,18 @@ import { encode as encodePng } from 'upng-js'
 
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
-import { computeIiifTilesForMapGeoBBox } from '@allmaps/render'
+import {
+  getResourcePolygon,
+  getBestZoomLevel,
+  computeIiifTilesForPolygonAndZoomLevel
+} from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
 import {
-  xyzTileToGeoExtent,
+  xyzTileToGeoBBox,
   pointInPolygon,
-  tile2long,
-  tile2lat
+  tileToLongitude,
+  tileToLatitude
 } from './geo.js'
 
 import type { Coord, XYZTile, Cache, Tile, Options } from './types.js'
@@ -51,7 +55,7 @@ export async function createWarpedTileResponse(
     const parsedImage: Image = Image.parse(imageInfo)
 
     // Compute xyz tile extent
-    const extent = xyzTileToGeoExtent({ x, y, z })
+    const geoBBox = xyzTileToGeoBBox({ x, y, z })
 
     // Create transformer
     const transformer = new GcpTransformer(
@@ -60,11 +64,18 @@ export async function createWarpedTileResponse(
     )
 
     // Compute necessary IIIF tiles
-    const iiifTiles = computeIiifTilesForMapGeoBBox(
-      transformer,
+    const geoBBoxResourcePolygon = getResourcePolygon(transformer, geoBBox)
+
+    const zoomLevel = getBestZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      extent
+      geoBBoxResourcePolygon
+    )
+
+    const iiifTiles = computeIiifTilesForPolygonAndZoomLevel(
+      parsedImage,
+      geoBBoxResourcePolygon,
+      zoomLevel
     )
 
     // Get IIIF tile urls
@@ -113,8 +124,8 @@ export async function createWarpedTileResponse(
         // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles, in two steps
         // 1) Detemine lonlat of warped tile pixel location
         const warpedTilePixelGeo: Coord = [
-          tile2long({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
-          tile2lat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
+          tileToLongitude({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
+          tileToLatitude({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
         const [pixelX, pixelY] =

@@ -124,11 +124,6 @@ export class WarpedMapLayer extends Layer {
       this.warpedMapAdded.bind(this)
     )
 
-    // this.world.addEventListener(
-    //   WarpedMapEventType.ZINDICESCHANGES,
-    //   this.zIndicesChanged.bind(this)
-    // )
-
     this.world.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
       this.visibilityChanged.bind(this)
@@ -166,15 +161,6 @@ export class WarpedMapLayer extends Layer {
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
-
-    // this.viewport.addEventListener(
-    //   WarpedMapEventType.WARPEDMAPENTER,
-    //   this.warpedMapEnter.bind(this)
-    // )
-    // this.viewport.addEventListener(
-    //   WarpedMapEventType.WARPEDMAPLEAVE,
-    //   this.warpedMapLeave.bind(this)
-    // )
 
     for (const warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
@@ -218,23 +204,6 @@ export class WarpedMapLayer extends Layer {
     this.changed()
   }
 
-  // private zIndicesChanged() {
-  //   const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
-  //     (mapIdA, mapIdB) => {
-  //       const zIndexA = this.world.getZIndex(mapIdA)
-  //       const zIndexB = this.world.getZIndex(mapIdB)
-  //       if (zIndexA !== undefined && zIndexB !== undefined) {
-  //         return zIndexA - zIndexB
-  //       }
-
-  //       return 0
-  //     }
-  //   )
-
-  //   this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
-  //   this.changed()
-  // }
-
   private visibilityChanged() {
     this.changed()
   }
@@ -264,21 +233,6 @@ export class WarpedMapLayer extends Layer {
       }
     }
   }
-
-  // private warpedMapEnter(event: Event) {
-  //   if (event instanceof WarpedMapEvent) {
-  //     const mapId = event.data as string
-  //     this.mapIdsInViewport.add(mapId)
-  //     this.zIndicesChanged()
-  //   }
-  // }
-
-  // private warpedMapLeave(event: Event) {
-  //   if (event instanceof WarpedMapEvent) {
-  //     const mapId = event.data as string
-  //     this.mapIdsInViewport.delete(mapId)
-  //   }
-  // }
 
   private worldCleared() {
     this.renderer.clear()

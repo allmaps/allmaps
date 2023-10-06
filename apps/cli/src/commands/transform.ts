@@ -1,18 +1,20 @@
 import { Command } from 'commander'
 
-import position from './transform/position.js'
 import svg from './transform/svg.js'
 import geojson from './transform/geojson.js'
 import resourceMask from './transform/resource-mask.js'
+import coordinates from './transform/coordinates.js'
 
 export default function transform() {
   return new Command('transform')
-    .summary('transform SVG to GeoJSON and vice versa')
-    .description(
-      'Transforms SVGs with resource coordinates to GeoJSON and vice versa, using a Georeference Annotation'
+    .summary(
+      'transform resource coordinates to geospatial coordinates and vice versa'
     )
-    .addCommand(position())
+    .description(
+      'Transforms resource coordinates to geospatial coordinates and vice versa'
+    )
     .addCommand(svg())
     .addCommand(geojson())
     .addCommand(resourceMask())
+    .addCommand(coordinates())
 }

@@ -1,6 +1,9 @@
 import type { Position, GeojsonPoint } from '@allmaps/types'
 
-/** Ground Controle Point (GCP) (as used in the Transform package). */
+/**
+ * Ground Control Point (GCP).
+ * A GCP contains a mapping between a sourcer and destination position.
+ */
 export type TransformGcp = { source: Position; destination: Position }
 
 export type Segment = {
@@ -8,7 +11,7 @@ export type Segment = {
   to: TransformGcp
 }
 
-/** Transformation Type. */
+/** Transformation type. */
 export type TransformationType =
   | 'helmert'
   | 'polynomial'
@@ -21,8 +24,10 @@ export type TransformationType =
 export type TransformOptions = {
   maxOffsetRatio: number
   maxDepth: number
-  destinationIsGeographic: boolean // Assume destination positions are in lonlat coordinates and use geographic distances and midpoints there
-  sourceIsGeographic: boolean // Assume source positions are in lonlat coordinates and use geographic distances and midpoints there
+  // Assume destination positions are in lon/lat coordinates and use geographic distances and midpoints there
+  destinationIsGeographic: boolean
+  // Assume source positions are in lon/lat coordinates and use geographic distances and midpoints there
+  sourceIsGeographic: boolean
 }
 
 export type PartialTransformOptions = Partial<TransformOptions>

@@ -18,6 +18,8 @@ import {
   transformToMatrix4
 } from './shared/matrix.js'
 
+import type Viewport from './Viewport.js'
+
 import type {
   WarpedMap,
   Transform,
@@ -44,9 +46,7 @@ export default class WebGL2Renderer extends EventTarget {
   // TODO: move to Viewport?
   invertedRenderTransform: Transform
 
-  // Last render atrributes
-  projectionTransform: Transform | undefined
-  mapIds: string[] = []
+  viewport: Viewport | undefined
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
@@ -381,13 +381,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  updateVertexBuffers(
-    projectionTransform: Transform,
-    mapIds: IterableIterator<string>
-  ) {
+  updateVertexBuffers(viewport: Viewport) {
+    const projectionTransform = viewport.getProjectionTransform()
+
     this.invertedRenderTransform = invertTransform(projectionTransform)
 
-    for (const mapId of mapIds) {
+    for (const mapId of viewport.visibleWarpedMapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
@@ -399,12 +398,19 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private renderInternal(): void {
-    if (!this.projectionTransform) {
+    if (!this.viewport) {
+      return
+    }
+
+    const projectionTransform = this.viewport.getProjectionTransform()
+    const mapIds = this.viewport.getVisibleWarpedMapIds()
+
+    if (!projectionTransform) {
       return
     }
 
     const renderTransform = multiplyTransform(
-      this.projectionTransform,
+      projectionTransform,
       this.invertedRenderTransform
     )
 
@@ -412,8 +418,6 @@ export default class WebGL2Renderer extends EventTarget {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-    gl.clearColor(0, 0, 0, 0)
-    gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(this.program)
 
     const projectionMatrixLocation = gl.getUniformLocation(
@@ -432,7 +436,7 @@ export default class WebGL2Renderer extends EventTarget {
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
-    for (const mapId of this.mapIds) {
+    for (const mapId of mapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
@@ -449,6 +453,15 @@ export default class WebGL2Renderer extends EventTarget {
         this.renderOptions,
         webglWarpedMap.renderOptions
       )
+
+      const bestScaleFactorLocation = gl.getUniformLocation(
+        this.program,
+        'u_bestScaleFactor'
+      )
+      // TODO: make proper getter for bestScaleFactor for mapId
+      const bestZoomLevel = this.viewport.bestZoomLevelByMapId.get(mapId)
+      const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
+      gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.opacity * webglWarpedMap.opacity)
@@ -507,12 +520,8 @@ export default class WebGL2Renderer extends EventTarget {
     //  - this.tileCache
   }
 
-  render(
-    projectionTransform: Transform,
-    mapIds: IterableIterator<string>
-  ): void {
-    this.projectionTransform = projectionTransform
-    this.mapIds = [...mapIds]
+  render(viewport: Viewport): void {
+    this.viewport = viewport
 
     this.renderInternal()
   }

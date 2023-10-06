@@ -44,7 +44,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   newTransformedGeoMaskTriangles: Float32Array = new Float32Array()
 
   // TODO: do we need to keep this?
-  pixelTriangleIndex: Float32Array = new Float32Array() // DEV
+  // pixelTriangleIndex: Float32Array = new Float32Array() // DEV
 
   vao: WebGLVertexArrayObject | null
 
@@ -189,15 +189,15 @@ export default class WebGL2WarpedMap extends EventTarget {
       }
 
       // DEV Compute triangle indeces, used for development purposes
-      this.pixelTriangleIndex = new Float32Array(
-        this.resourceMaskTriangles.length
-      )
+      // this.pixelTriangleIndex = new Float32Array(
+      //   this.resourceMaskTriangles.length
+      // )
 
-      for (let index = 0; index < this.resourceMaskTriangles.length; index++) {
-        this.pixelTriangleIndex[3 * index] = index
-        this.pixelTriangleIndex[3 * index + 1] = index
-        this.pixelTriangleIndex[3 * index + 2] = index
-      }
+      // for (let index = 0; index < this.resourceMaskTriangles.length; index++) {
+      //   this.pixelTriangleIndex[3 * index] = index
+      //   this.pixelTriangleIndex[3 * index + 1] = index
+      //   this.pixelTriangleIndex[3 * index + 2] = index
+      // }
 
       createBuffer(
         this.gl,
@@ -225,14 +225,14 @@ export default class WebGL2WarpedMap extends EventTarget {
         'a_pixel_position'
       )
 
-      // DEV
-      createBuffer(
-        this.gl,
-        this.program,
-        this.pixelTriangleIndex,
-        1,
-        'a_pixel_triangle_index'
-      )
+      // // DEV
+      // createBuffer(
+      //   this.gl,
+      //   this.program,
+      //   this.pixelTriangleIndex,
+      //   1,
+      //   'a_pixel_triangle_index'
+      // )
     }
   }
 

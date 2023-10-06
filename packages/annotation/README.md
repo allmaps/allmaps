@@ -2,7 +2,7 @@
 
 @allmaps/annotation is a JavaScript module that can generate and parse [Georeference Annotations](https://iiif.io/api/extension/georef/).
 
-A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/).
+A Georeference Annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/).
 
 A Georeference Annotation contains the following data:
 
@@ -16,7 +16,7 @@ Georeference Annotations are a core part of [Allmaps](https://allmaps.org). For 
 
 ## Installation & usage
 
-This is an ESM-only module that works in browsers or in Node.js.
+This is an ESM-only module that works in browsers and Node.js.
 
 Node.js:
 
@@ -49,7 +49,7 @@ Browser:
 *   [Types](#types)
     *   [Map](#map)
     *   [Annotation](#annotation)
-*   [AnnotationPage](#annotationpage)
+    *   [AnnotationPage](#annotationpage)
 
 ### Generating & parsing Georeference Annotations
 
@@ -99,7 +99,7 @@ Returns **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Geor
 
 ### Types
 
-The two types this module converts between, [Annotation](#annotation) and [Map](#map), are described below.
+The two types this module converts between, [Annotation](#annotation), [AnnotationPage](#annotationpage) and [Map](#map), are described below.
 
 #### Map
 
@@ -113,7 +113,7 @@ Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
-### AnnotationPage
+#### AnnotationPage
 
 An [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page) that contains multiple [Georeference Annotations](https://iiif.io/api/extension/georef/).
 

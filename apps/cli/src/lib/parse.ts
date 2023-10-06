@@ -28,16 +28,19 @@ export function parseGcps(
 ): Gcp[] {
   let gcps
   if (options.gcps) {
-    gcps = parseGcpsFromFile(options.gcps as string)
+    gcps = parseGcpsFromFile(options.gcps)
   } else if (options.annotation && map) {
     gcps = map.gcps
   } else {
-    throw new Error('No GCPs supplied. Specify an annotation or GCPs.')
+    throw new Error(
+      'No GCPs supplied. Supply a Georeference Annotation or a file containing GCPs.'
+    )
   }
   return gcps
 }
 
 export function parseGcpsFromFile(file: string): Gcp[] {
+  // TODO: also allow file to contain GCPs in the Georeference Annotation GCP format
   return (
     parseCoordinateArrayArrayFromFile(file) as [
       [number, number, number, number]
@@ -55,13 +58,13 @@ export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
 export function parseCoordinatesArrayArray(
   coordinatesString: string
 ): number[][] {
-  // String from mutli line file where each line contains multiple coordinates separated by space (or multiple spaces or tabs)
+  // String from mutliline file where each line contains multiple coordinates separated by whitespace
   return coordinatesString
     .trim()
     .split('\n')
     .map((coordinatesLineString) =>
       coordinatesLineString
-        .split(/[ \t]+/)
+        .split(/\s+/)
         .map((coordinateString) => Number(coordinateString.trim()))
     )
 }

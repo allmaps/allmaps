@@ -49,7 +49,10 @@ import type {
   SvgGeometry
 } from '@allmaps/types'
 
-/** A Ground Controle Point Transformer, containing a forward and backward transformation and specifying functions to transform geometries using these transformations. */
+/**
+ * A Ground Control Point Transformer, containing a forward and backward transformation and
+ * specifying functions to transform geometries using these transformations.
+ * */
 export default class GcpTransformer implements GcpTransformerInterface {
   gcps: TransformGcp[]
   sourcePositions: Position[]
@@ -62,7 +65,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   /**
    * Create a GcpTransformer
    * @param {TransformGcp[] | Gcp[]} gcps - An array of Ground Control Points (GCPs)
-   * @param {TransformationType} type='polynomial' - The transformation type
+   * @param {TransformationType} [type='polynomial'] - The transformation type
    */ constructor(
     gcps: TransformGcp[] | Gcp[],
     type: TransformationType = 'polynomial'
@@ -70,14 +73,14 @@ export default class GcpTransformer implements GcpTransformerInterface {
     if (gcps.length == 0) {
       throw new Error('No control points.')
     }
-    this.gcps = gcps.map((p) => {
-      if ('resource' in p && 'geo' in p) {
+    this.gcps = gcps.map((gcp) => {
+      if ('resource' in gcp && 'geo' in gcp) {
         return {
-          source: (p as Gcp).resource,
-          destination: (p as Gcp).geo
+          source: gcp.resource,
+          destination: gcp.geo
         }
-      } else if ('source' in p && 'destination' in p) {
-        return p as TransformGcp
+      } else if ('source' in gcp && 'destination' in gcp) {
+        return gcp
       } else {
         throw new Error('Unsupported GCP type')
       }
@@ -128,7 +131,6 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   // Base functions
-
   transformForward(
     input: Position | GeojsonPoint,
     options?: PartialTransformOptions
@@ -142,10 +144,10 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): Polygon
   /**
-   * Transforms geometry or geojson geometry forward to geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or geojson geometry to transform
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   * @returns {Geometry} Forward transform of input as geometry
+   * Transforms a Geometry or a GeoJSON geometry forward to a Geometry
+   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
+   * @param {PartialTransformOptions} [options] - Transform options
+   * @returns {Geometry} Forward transform of input as Geometry
    * @type {{
    * (input:Position | GeojsonPoint) => Position;
    * (input:LineString | GeojsonLineString) => LineString;
@@ -203,10 +205,10 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): GeojsonPolygon
   /**
-   * Transforms geometry or geojson geometry forward to geojson geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or geojson geometry to transform
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   * @returns {GeojsonGeometry} Forward transform of input, as geojson geometry
+   * Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
+   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
+   * @param {PartialTransformOptions} [options] - Transform options
+   * @returns {GeojsonGeometry} Forward transform of input, as GeoJSON geometry
    * @type {{
    * (input:Position | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
@@ -283,9 +285,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): Polygon
   /**
-   * Transforms geometry or geojson geometry backward to geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or geojson geometry to transform
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
+   * Transforms a geometry or a GeoJSON geometry backward to a Geometry
+   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
+   * @param {PartialTransformOptions} [options] - Transform options
    * @returns {Geometry} backward transform of input, as geometry
    * @type {{
    * (input:Position | GeojsonPoint) => Position;
@@ -345,10 +347,10 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): GeojsonPolygon
   /**
-   * Transforms geometry or geojson geometry backward to geojson geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or geojson geometry to transform
-   * @param {PartialTransformOptions} [options] - Partial Transform Options
-   * @returns {GeojsonGeometry} backward transform of input, as geojson geometry
+   * Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
+   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
+   * @param {PartialTransformOptions} [options] - Transform options
+   * @returns {GeojsonGeometry} backward transform of input, as GeoJSON geometry
    * @type {{
    * (input:Position | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
@@ -427,9 +429,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): Polygon
   /**
-   * Transforms geometry or geojson gemetry forward (i.e. to geo), as geometry
+   * Transforms Geometry or GeoJSON geometry forward, as Geometry
    * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @returns {Geometry} Forward transform of input, as geometry
+   * @returns {Geometry} Forward transform of input, as Geometry
    * @type {{
    * (input:Position | GeojsonPoint) => Position;
    * (input:LineString | GeojsonLineString) => LineString;
@@ -470,9 +472,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): GeojsonPolygon
   /**
-   * Transforms geometry or geojson gemetry forward (i.e. to geo), as geojson geometry
+   * Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
    * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @returns {Geometry} Forward transform of input, as geojson geometry
+   * @returns {Geometry} Forward transform of input, as GeoJSON geometry
    * @type {{
    * (input:Position | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
@@ -513,9 +515,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): Polygon
   /**
-   * Transforms geometry or geojson gemetry backward (i.e. to geo), as geometry
+   * Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
    * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @returns {Geometry} Backward transform of input, as geometry
+   * @returns {Geometry} Backward transform of input, as a Geometry
    * @type {{
    * (input:Position | GeojsonPoint) => Position;
    * (input:LineString | GeojsonLineString) => LineString;
@@ -556,9 +558,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
     options?: PartialTransformOptions
   ): GeojsonPolygon
   /**
-   * Transforms geometry or geojson gemetry backward (i.e. to geo), as geojson gemetry
+   * Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
    * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @returns {GeojsonGeometry} Backward transform of input, as geojson gemetry
+   * @returns {GeojsonGeometry} Backward transform of input, as a GeoJSON geometry
    * @type {{
    * (input:Position | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
@@ -592,9 +594,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
   // Shortcuts for SVG <> GeoJSON
 
   /**
-   * Transforms svg geometry forward to geojson geometry
-   * @param {SvgGeometry} geometry - Geometry to transform
-   * @returns {GeojsonGeometry} Forward transform of input, as geojson gemetry
+   * Transforms a SVG geometry forward to a GeoJSON geometry
+   * @param {SvgGeometry} geometry - SVG geometry to transform
+   * @returns {GeojsonGeometry} Forward transform of input, as a GeoJSON geometry
    */
   transformSvgToGeojson(
     geometry: SvgGeometry,
@@ -628,9 +630,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   /**
-   * Transforms geojson geometry backward to svg geometry
-   * @param {GeojsonGeometry} geometry - Geometry to transform
-   * @returns {SvgGeometry} Backward transform of input, as svg gemetry
+   * Transforms a GeoJSON geometry backward to a SVG geometry
+   * @param {GeojsonGeometry} geometry - GeoJSON geometry to transform
+   * @returns {SvgGeometry} Backward transform of input, as SVG geometry
    */
   transformGeojsonToSvg(
     geometry: GeojsonGeometry,

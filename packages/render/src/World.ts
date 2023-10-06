@@ -344,7 +344,10 @@ export default class World extends EventTarget {
     }
   }
 
-  setTransformation(mapIds: string[], transformation: TransformationType) {
+  setTransformation(
+    mapIds: Iterable<string>,
+    transformation: TransformationType
+  ) {
     for (const mapId of mapIds) {
       let warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap) {
