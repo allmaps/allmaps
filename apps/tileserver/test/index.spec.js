@@ -35,7 +35,7 @@ test('Responds with name', async () => {
   expect(await response.json()).toStrictEqual({ name: 'Allmaps Tile Server' })
 })
 
-test('responds correct PNG', async () => {
+test('responds with correct PNG', async () => {
   const url = `${baseUrl}/maps/a38b4ed7ea01a36a/16/33583/21671.png`
   const response = await request(url)
 
