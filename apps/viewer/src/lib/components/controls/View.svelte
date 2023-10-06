@@ -13,8 +13,7 @@
     Map
   </button>
 
-  <!-- Temporarily turned off list view -->
-  <!-- <button
+  <button
     on:click={() => ($view = 'list')}
     aria-current={$view === 'list' ? 'page' : 'false'}
     class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 hover:bg-gray-100 hover:text-green-600 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-600"
@@ -22,7 +21,7 @@
     class:text-green-600={$view === 'list'}
   >
     List
-  </button> -->
+  </button>
 
   <button
     on:click={() => ($view = 'image')}

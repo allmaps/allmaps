@@ -7,8 +7,7 @@
   import Zoom from 'ol/control/Zoom.js'
   import Rotate from 'ol/control/Rotate.js'
 
-  // Temporarily turned off list view
-  // import Transformation from '$lib/components/controls/Transformation.svelte'
+  import Transformation from '$lib/components/controls/Transformation.svelte'
 
   let zoom: Zoom
   let rotate: Rotate
@@ -141,8 +140,7 @@
     role="group"
   />
 
-  <!-- Temporarily turned off list view -->
-  <!-- <Transformation /> -->
+  <Transformation />
 </div>
 <!-- <div class="select-container">
   <div class="select">
