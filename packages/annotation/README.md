@@ -6,9 +6,9 @@ A Georeference Annotation is a [Web Annotation](https://www.w3.org/TR/annotation
 
 A Georeference Annotation contains the following data:
 
-- The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
-- A list of ground control points (GCPs) that define the mapping between resource coordinates and geospatial coordinates.
-- A polygonal resource mask that defines the cartographic part of the image.
+*   The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
+*   A list of ground control points (GCPs) that define the mapping between resource coordinates and geospatial coordinates.
+*   A polygonal resource mask that defines the cartographic part of the image.
 
 Georeference Annotations are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
 
@@ -43,15 +43,17 @@ Browser:
 
 #### Table of Contents
 
-- [Generating & parsing Georeference Annotations](#generating--parsing-georeference-annotations)
-  - [parseAnnotation](#parseannotation)
-  - [generateAnnotation](#generateannotation)
-- [Types](#types)
-  - [Map](#map)
-  - [Annotation](#annotation)
-  - [AnnotationPage](#annotationpage)
+*   [Generating & parsing Georeference Annotations](#generating--parsing-georeference-annotations)
+    *   [parseAnnotation](#parseannotation)
+    *   [generateAnnotation](#generateannotation)
+*   [Types](#types)
+    *   [Map](#map)
+    *   [Annotation](#annotation)
+    *   [AnnotationPage](#annotationpage)
 
 ### Generating & parsing Georeference Annotations
+
+
 
 #### parseAnnotation
 
@@ -60,7 +62,7 @@ containing multiple Georeference Annotations and returns an array of [maps](#map
 
 ##### Parameters
 
-- `annotation` **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
+*   `annotation` **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
 
 ##### Examples
 
@@ -68,9 +70,7 @@ containing multiple Georeference Annotations and returns an array of [maps](#map
 import fs from 'fs'
 import { parseAnnotation } from '@allmaps/annotation'
 
-const annotation = JSON.parse(
-  fs.readFileSync('./examples/annotation.example.json')
-)
+const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
 const maps = parseAnnotation(annotation)
 ```
 
@@ -83,7 +83,7 @@ an [AnnotationPage](#annotationpage) containing multiple Georeference Annotation
 
 ##### Parameters
 
-- `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
+*   `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
 
 ##### Examples
 

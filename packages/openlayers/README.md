@@ -225,7 +225,7 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### clear
 
-Clears the source, removed all warped maps
+Clears the source, removes all warped maps
 
 #### getWorld
 
