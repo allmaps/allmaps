@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/docs",
   "description": "Allmaps Documentation",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "private": true,
   "contributors": [
     {
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/ui": "^1.0.0-beta.18",
+    "@allmaps/ui": "^1.0.0-beta.19",
     "@astrojs/starlight": "^0.8.0",
     "@astrojs/starlight-tailwind": "^1.0.2",
     "@astrojs/svelte": "^3.1.0",

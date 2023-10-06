@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/explore",
-  "version": "0.0.2-alpha.20",
+  "version": "0.0.2-alpha.21",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -44,7 +44,7 @@
     "vite": "^4.3.0"
   },
   "dependencies": {
-    "@allmaps/ui": "^1.0.0-beta.18",
+    "@allmaps/ui": "^1.0.0-beta.19",
     "ol": "^8.1.0"
   }
 }

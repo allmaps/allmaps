@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/schemas",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -42,7 +42,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.16",
+    "@allmaps/annotation": "^1.0.0-beta.17",
     "zod": "^3.20.6",
     "zod-to-json-schema": "^3.20.6"
   },
