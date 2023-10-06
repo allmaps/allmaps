@@ -5,7 +5,10 @@
     "lib": ["ES2020"],
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["@cloudflare/workers-types"]
+    "types": [
+      "@cloudflare/workers-types"
+      // "vitest-environment-miniflare/globals"
+    ]
   },
   "references": [
     { "path": "../../packages/transform" },

@@ -1,1 +1,1 @@
-["Expected array, received number"]
+"Validation error: Expected array, received number at \"pixelMask[3]\""

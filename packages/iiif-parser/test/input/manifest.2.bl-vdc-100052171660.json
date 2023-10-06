@@ -1,0 +1,186 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171660.0x000001/manifest.json",
+  "@type": "sc:Manifest",
+  "label": "CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences",
+  "description": "Item supplied by the British Library",
+  "seeAlso": [],
+  "metadata": [
+    {
+      "label": "Identifier",
+      "value": "Digital Store Maps K.Top.124.4.a."
+    },
+    {
+      "label": "Held by",
+      "value": "<span><a href=\"https://www.bl.uk\">The British Library</a></span>"
+    },
+    {
+      "label": "Title",
+      "value": "CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences"
+    },
+    {
+      "label": "Creator",
+      "value": "L'Isle, Guillaume de"
+    },
+    {
+      "label": "Place",
+      "value": "Paris"
+    },
+    {
+      "label": "Publisher",
+      "value": "Chez l'Auteur sur le Quai de l'Horloge. avec Privilege du Roi pour 20 ans 1703"
+    },
+    {
+      "label": "Date",
+      "value": "[1703-[1708.]"
+    },
+    {
+      "label": "Language",
+      "value": "French"
+    },
+    {
+      "label": "Catalogue record",
+      "value": "<a href=\"http://explore.bl.uk/primo_library/libweb/action/dlDisplay.do?docId=BLL01018640954&amp;vid=BLVU1&amp;lang=en_US&amp;institution=BL\">View the catalogue record</a>"
+    },
+    {
+      "label": "Digitised from",
+      "value": "<a href=\"http://explore.bl.uk/primo_library/libweb/action/dlDisplay.do?docId=BLL01004908105&amp;vid=BLVU1&amp;lang=en_US&amp;institution=BL\">CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c. : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c. /</a>"
+    },
+    {
+      "label": "Citation",
+      "value": "<span>L'Isle, Guillaume de, <i>CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences</i>, (Paris: Chez l'Auteur sur le Quai de l'Horloge. avec Privilege du Roi pour 20 ans 1703, [1703-[1708.]) &lt;http://access.bl.uk/item/viewer/ark:/81055/vdc_100052171660.0x000001&gt;</span>"
+    },
+    {
+      "label": "Digitisation funded by",
+      "value": "The King's Topographical Collection has been digitised with the generous support of several trusts and individuals: https://www.bl.uk/projects/kings-topographical-collection-cataloguing-and-digitisation"
+    },
+    {
+      "label": "Digitised by",
+      "value": "The British Library"
+    }
+  ],
+  "related": [
+    {
+      "@id": "http://access.bl.uk/item/viewer/ark:/81055/vdc_100052171660.0x000001",
+      "format": "text/html",
+      "label": "View at the British Library"
+    }
+  ],
+  "service": [
+    {
+      "@context": "http://iiif.io/api/auth/0/context.json",
+      "@id": "https://api.bl.uk/auth/iiif/login",
+      "profile": "http://iiif.io/api/auth/0/login",
+      "description": "Some content may only be available to registered readers or staff. Please log-in to The British Library to continue.",
+      "header": "Please Log-In",
+      "label": "Login to The British Library",
+      "service": {
+        "@id": "https://api.bl.uk/auth/iiif/token",
+        "profile": "http://iiif.io/api/auth/0/token"
+      }
+    },
+    {
+      "@context": "http://universalviewer.io/context.json",
+      "@id": "http://access.bl.uk/item/share/ark:/81055/vdc_100052171660.0x000001",
+      "profile": "http://universalviewer.io/share-extensions-profile"
+    },
+    {
+      "@context": "http://universalviewer.io/context.json",
+      "@id": "http://access.bl.uk/item/feedback/ark:/81055/vdc_100052171660.0x000001",
+      "profile": "http://universalviewer.io/feedback-extensions-profile"
+    },
+    {
+      "@context": "http://universalviewer.io/context.json",
+      "@id": "http://access.bl.uk/item/print/ark:/81055/vdc_100052171660.0x000001",
+      "profile": "http://universalviewer.io/print-extensions-profile"
+    }
+  ],
+  "logo": "https://www.bl.uk/images/bl_logo_100.gif",
+  "license": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "attribution": "<span>Public Domain<br/><br/><img src=\"https://i.creativecommons.org/p/mark/1.0/88x31.png\"/></span>",
+  "thumbnail": {
+    "@id": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001/full/max/0/default.jpg",
+    "@type": "dctypes:Image",
+    "format": "image/jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001",
+      "protocol": "http://iiif.io/api/image",
+      "width": 8586,
+      "height": 6543,
+      "tiles": [
+        {
+          "scaleFactors": [1, 2, 4, 8, 16, 32],
+          "width": 256
+        }
+      ],
+      "profile": [
+        "http://iiif.io/api/image/2/level2.json",
+        {
+          "qualities": ["gray", "color", "bitonal"],
+          "supports": [
+            "profileLinkHeader",
+            "rotationArbitrary",
+            "regionSquare",
+            "mirroring"
+          ]
+        }
+      ]
+    }
+  },
+  "sequences": [
+    {
+      "@id": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171687.0x000001",
+      "@type": "sc:Sequence",
+      "label": "Current Page Order",
+      "viewingDirection": "left-to-right",
+      "startCanvas": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171687.0x000002",
+      "canvases": [
+        {
+          "@id": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171687.0x000002",
+          "@type": "sc:Canvas",
+          "label": "-",
+          "width": 8586,
+          "height": 6543,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001/full/max/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 8586,
+                  "height": 6543,
+                  "tiles": [
+                    {
+                      "scaleFactors": [1, 2, 4, 8, 16, 32],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": ["gray", "color", "bitonal"],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100052171687.0x000002"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

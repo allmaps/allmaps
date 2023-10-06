@@ -1,1 +1,1 @@
-["Expected number, received boolean", "Expected number, received boolean"]
+"Validation error: Expected number, received boolean at \"pixelMask[3][0]\"; Expected number, received boolean at \"pixelMask[3][1]\""

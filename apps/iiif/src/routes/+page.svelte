@@ -49,7 +49,7 @@
         const json = await fetchJson(url)
 
         if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
-          // JSON might be a Georef Annotation
+          // JSON might be a Georeference Annotation
           const maps = parseAnnotation(json)
           type = 'annotation'
           maps.forEach((map) => addImageUri(map.image.uri))

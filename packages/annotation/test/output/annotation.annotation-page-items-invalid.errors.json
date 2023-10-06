@@ -1,1 +1,1 @@
-["Expected array, received string"]
+"Validation error: Expected array, received string at \"items\""

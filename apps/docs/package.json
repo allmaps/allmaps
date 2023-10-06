@@ -1,0 +1,51 @@
+{
+  "name": "@allmaps/docs",
+  "description": "Allmaps Documentation",
+  "version": "1.0.0-beta.1",
+  "private": true,
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "apps/docs"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "documenation"
+  ],
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "prebuild": "npm run copy-readmes",
+    "build": "astro build",
+    "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
+    "preview": "astro preview",
+    "astro": "astro",
+    "copy-readmes": "node ./scripts/copy-readmes.js"
+  },
+  "dependencies": {
+    "@allmaps/tailwind": "^1.0.0-beta.8",
+    "@allmaps/ui": "^1.0.0-beta.18",
+    "@astrojs/starlight": "^0.8.0",
+    "@astrojs/starlight-tailwind": "^1.0.2",
+    "@astrojs/svelte": "^3.1.0",
+    "@astrojs/tailwind": "^4.0.0",
+    "astro": "^2.10.3",
+    "sharp": "^0.32.3",
+    "svelte": "^4.1.1",
+    "tailwindcss": "^3.3.3"
+  }
+}

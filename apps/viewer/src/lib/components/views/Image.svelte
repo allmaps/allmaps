@@ -1,98 +1,80 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
 
-  import { ol } from '$lib/shared/stores/openlayers.js'
-  import { highlightedMap } from '$lib/shared/stores/highlighted.js'
+  import Feature from 'ol/Feature.js'
+  import Polygon from 'ol/geom/Polygon.js'
 
-  import OLMap from 'ol/Map.js'
-  import Feature from 'ol/Feature'
-  import { Vector as VectorLayer } from 'ol/layer'
-  import { Polygon } from 'ol/geom'
-  import { Vector as VectorSource } from 'ol/source'
+  import { fetchImageInfo } from '@allmaps/stdlib'
 
   import {
-    selectedPolygonStyle,
-    maskToPolygon
-  } from '$lib/shared/openlayers.js'
+    imageInfoCache,
+    imageOl,
+    imageIiifLayer,
+    imageVectorSource
+  } from '$lib/shared/stores/openlayers.js'
+  import { activeMap } from '$lib/shared/stores/active.js'
 
-  import { IIIFLayer } from '@allmaps/openlayers'
+  import { maskToPolygon } from '$lib/shared/openlayers.js'
+
+  import { computeBbox } from '@allmaps/stdlib'
+
+  import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
 
   import type { ViewerMap } from '$lib/shared/types.js'
 
-  let iiifLayer: IIIFLayer
-  let vectorSource: VectorSource
-  let vectorLayer: VectorLayer<VectorSource>
+  $: {
+    if (imageOl && $activeMap) {
+      updateMap($activeMap.viewerMap)
+    }
+  }
 
-  $: updateMap($highlightedMap)
-
-  function updateVectorLayer(viewerMap: ViewerMap) {
+  function updateVectorSource(viewerMap: ViewerMap) {
     const map = viewerMap.map
 
     const feature = new Feature({
       index: 0,
-      geometry: new Polygon(maskToPolygon(map.pixelMask))
+      geometry: new Polygon(maskToPolygon(map.resourceMask))
     })
 
     feature.setId(map.id)
 
-    vectorSource.clear()
-    vectorSource.addFeature(feature)
+    imageVectorSource.clear()
+    imageVectorSource.addFeature(feature)
   }
 
   async function updateMap(viewerMap: ViewerMap) {
-    if ($ol && iiifLayer) {
-      $ol.removeLayer(iiifLayer)
-    }
+    if (imageOl && imageIiifLayer) {
+      updateVectorSource(viewerMap)
 
-    if ($ol) {
       const map = viewerMap.map
 
-      const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(imageUri)
+      const imageUri = map.resource.id
+      const imageInfo = await fetchImageInfo(imageUri, {
+        cache: imageInfoCache
+      })
 
-      updateVectorLayer(viewerMap)
+      imageIiifLayer.setImageInfo(imageInfo as ImageInformationResponse)
 
-      iiifLayer = new IIIFLayer(imageInfo)
-      $ol.addLayer(iiifLayer)
+      const resourceMaskBbox = computeBbox(viewerMap.map.resourceMask)
+      const iiifLayerresourceMaskBbox = [
+        resourceMaskBbox[0],
+        -resourceMaskBbox[3],
+        resourceMaskBbox[2],
+        -resourceMaskBbox[1]
+      ]
 
-      iiifLayer.setZIndex(1)
-      vectorLayer.setZIndex(2)
-
-      const extent = iiifLayer.getExtent()
-
-      if (extent) {
-        $ol.getView().fit(extent, {
-          padding: [25, 25, 25, 25]
-        })
-      }
+      imageOl.getView().fit(iiifLayerresourceMaskBbox, {
+        padding: [25, 25, 25, 25]
+      })
     }
   }
 
-  // TODO: move to stdlib
-  async function fetchImageInfo(imageUri: string) {
-    const response = await fetch(`${imageUri}/info.json`)
-    const image = await response.json()
-    return image
-  }
+  onMount(() => {
+    imageOl?.setTarget('ol')
 
-  onMount(async () => {
-    vectorSource = new VectorSource()
-    vectorLayer = new VectorLayer({
-      source: vectorSource,
-      style: selectedPolygonStyle
-    })
-
-    $ol = new OLMap({
-      controls: [],
-      layers: [vectorLayer],
-      target: 'ol'
-    })
-
-    await updateMap($highlightedMap)
-  })
-
-  onDestroy(() => {
-    $ol = undefined
+    return () => {
+      imageOl?.setTarget()
+    }
   })
 </script>
 

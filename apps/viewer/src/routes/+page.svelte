@@ -8,23 +8,39 @@
     Loading,
     URLInput,
     URLType,
-    Navigation,
     dataStore,
     paramStore
   } from '@allmaps/ui'
 
+  import { Navigation } from '@allmaps/ui/kit'
+
+  import { view } from '$lib/shared/stores/view.js'
   import {
     addUrlSource,
     addStringSource,
-    resetSources
+    resetSources,
+    sourcesCount,
+    firstSource
   } from '$lib/shared/stores/sources.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
-  import { renderOptions, resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
+  import { resetRenderOptionsLayer } from '$lib/shared/stores/render-options.js'
+  import {
+    setPrevMapActive,
+    setNextMapActive
+  } from '$lib/shared/stores/active.js'
+  import {
+    createMapOl,
+    createImageOl,
+    createImageInfoCache,
+    mapVectorLayerOutlinesVisible
+  } from '$lib/shared/stores/openlayers.js'
+  import { nextTransformation } from '$lib/shared/stores/transformation.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
 
-  import ShowError from '$lib/components/elements/Error.svelte'
+  import ErrorElement from '$lib/components/elements/Error.svelte'
+  import SourceError from '$lib/components/elements/SourceError.svelte'
 
   import 'ol/ol.css'
 
@@ -34,19 +50,30 @@
   let showForm = false
   let error: Error | null
 
-  let annotationUrl = ''
   let annotationString = ''
+
+  let urlInput: URLInput
+
+  let urlInputValue = ''
 
   function resetForm() {
     error = null
-    annotationUrl = ''
     annotationString = ''
+    urlInputValue = ''
 
     showForm = true
   }
 
-  async function handleAnnotationStringSubmit() {
-    dataStore.set(annotationString)
+  function handleUrlInputValue() {
+    urlInputValue = urlInput.getValue()
+  }
+
+  async function handleSubmit() {
+    if (urlInputValue.trim()) {
+      urlInput.submit()
+    } else {
+      dataStore.set(annotationString)
+    }
   }
 
   function hasTouch() {
@@ -62,7 +89,38 @@
 
   let autofocus = !hasTouch()
 
-  onMount(async () => {
+  function handleKeyup(event: KeyboardEvent) {
+    const target = event.target as Element
+    if (target.nodeName.toLowerCase() === 'input') {
+      return
+    }
+
+    const updateView = !event.altKey
+    const hideOthers = event.shiftKey
+
+    if (event.code === 'BracketLeft') {
+      setPrevMapActive({ updateView, hideOthers })
+    } else if (event.code === 'BracketRight') {
+      setNextMapActive({ updateView, hideOthers })
+    } else if (event.key === '1') {
+      $view = 'map'
+      // Temporarily turned off list view
+      // } else if (event.key === '2') {
+      //   $view = 'list'
+    } else if (event.key === '2') {
+      $view = 'image'
+    } else if (event.key === 'm') {
+      $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
+    } else if (event.key === 't') {
+      nextTransformation()
+    }
+  }
+
+  onMount(() => {
+    createMapOl()
+    createImageOl()
+    createImageInfoCache()
+
     paramStore.subscribe(async (value) => {
       resetRenderOptionsLayer()
       resetSources()
@@ -86,55 +144,77 @@
         }
       }
     })
+
+    document.addEventListener('keyup', handleKeyup)
+
+    return () => {
+      document.removeEventListener('keyup', handleKeyup)
+    }
   })
 </script>
 
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
-  <Header appName="Viewer">
-    {#if !showForm && initialized}
-      <URLInput>
-        <URLType {type} />
-      </URLInput>
-    {/if}
-  </Header>
-  <main class="grow relative">
+  <div class="z-10">
+    <Header appName="Viewer">
+      {#if !showForm && initialized}
+        <URLInput>
+          <URLType {type} />
+        </URLInput>
+      {/if}
+    </Header>
+  </div>
+  <main class="relative h-full overflow-hidden">
     {#if showForm}
-      <div
-        class="container mx-auto mt-10 p-2"
-        transition:fade={{ duration: 120 }}
-      >
-        <p class="mb-3">Open a Georeference Annotation from a URL:</p>
-        <URLInput {autofocus} />
-
-        <p class="mt-3 mb-3">
-          Or, paste an Georeference Annotation in the text box:
-        </p>
-        <form on:submit|preventDefault={handleAnnotationStringSubmit}>
-          <textarea
-            bind:value={annotationString}
-            class="font-mono block mb-3 w-full h-60 bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
+      <div class="h-full flex overflow-y-auto">
+        <div
+          class="container mx-auto mt-10 p-2"
+          transition:fade={{ duration: 120 }}
+        >
+          <p class="mb-3">
+            Open a IIIF Resource or Georeference Annotation from a URL:
+          </p>
+          <URLInput
+            {autofocus}
+            bind:this={urlInput}
+            on:value={handleUrlInputValue}
           />
-          <button
-            type="submit"
-            disabled={annotationString.length === 0}
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            >View</button
-          >
-        </form>
-        <section>
-          <Examples />
-        </section>
+
+          <p class="mt-3 mb-3">
+            Or, paste the contents of a complete Georeference Annotation below:
+          </p>
+          <form on:submit|preventDefault={handleSubmit}>
+            <textarea
+              bind:value={annotationString}
+              placeholder="Paste a Georeference Annotation here"
+              class="font-mono block mb-3 w-full h-60 rounded-lg border border-gray-300 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 text-sm"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+            <button
+              type="submit"
+              disabled={annotationString.length === 0 &&
+                urlInputValue.length === 0}
+              class="text-white bg-pink-500 hover:bg-pink-400 transition-colors disabled:bg-gray-500 focus:ring focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
+              >View</button
+            >
+          </form>
+          <section>
+            <Examples />
+          </section>
+        </div>
       </div>
     {:else if $mapCount}
       <Container />
+    {:else if $mapCount === 0 && $sourcesCount > 0}
+      <div class="h-full flex flex-col gap-2 items-center justify-center">
+        <SourceError source={$firstSource} />
+      </div>
     {:else if error}
       <div class="h-full flex flex-col gap-2 items-center justify-center">
-        <ShowError {error} />
+        <ErrorElement {error} />
       </div>
     {:else if initialized}
       <div class="h-full flex items-center justify-center">

@@ -1,16 +1,16 @@
 # @allmaps/annotation
 
-@allmaps/annotation is a JavaScript module that can generate and parse _georeference annotations_.
+@allmaps/annotation is a JavaScript module that can generate and parse [Georeference Annotations](https://iiif.io/api/extension/georef/).
 
-A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/). The [IIIF community](https://iiif.io/community/groups/maps-tsg/) is working on a turning georeference annotations into a specification and a [IIIF extension](https://iiif.io/api/index.html#approved-extensions).
+A georeference annotation is a [Web Annotation](https://www.w3.org/TR/annotation-model/) that stores the metadata needed to [georeference](https://en.wikipedia.org/wiki/Georeferencing) a [IIIF image](https://iiif.io/api/image/3.0/).
 
-A georeference annotation contains the following data:
+A Georeference Annotation contains the following data:
 
-- The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
-- A list of ground control points (GCPs) that define the mapping between pixels and geospatial coordinates.
-- A polygonal pixel mask that defines the cartographic part of the image.
+*   The [URI of an IIIF Image](https://iiif.io/api/image/3.0/#3-identifier), as well as its dimensions in pixels.
+*   A list of ground control points (GCPs) that define the mapping between resource coordinates and geospatial coordinates.
+*   A polygonal resource mask that defines the cartographic part of the image.
 
-Georeference annotation are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
+Georeference Annotations are a core part of [Allmaps](https://allmaps.org). For example, [Allmaps Viewer](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) can warp maps IIIF maps in the browser, just by loading a georeference annotation.
 
 <!-- TODO: create Observable notebook that allows you to try out this module! -->
 
@@ -43,26 +43,26 @@ Browser:
 
 #### Table of Contents
 
-- [Generating & parsing georeference annotations](#generating--parsing-georeference-annotations)
-  - [parseAnnotation](#parseannotation)
-    - [Parameters](#parameters)
-    - [Examples](#examples)
-  - [generateAnnotation](#generateannotation)
-    - [Parameters](#parameters-1)
-    - [Examples](#examples-1)
-- [Types](#types)
-  - [Map](#map)
-  - [Annotation](#annotation)
+*   [Generating & parsing Georeference Annotations](#generating--parsing-georeference-annotations)
+    *   [parseAnnotation](#parseannotation)
+    *   [generateAnnotation](#generateannotation)
+*   [Types](#types)
+    *   [Map](#map)
+    *   [Annotation](#annotation)
+*   [AnnotationPage](#annotationpage)
 
-### Generating & parsing georeference annotations
+### Generating & parsing Georeference Annotations
+
+
 
 #### parseAnnotation
 
-Parses a [georeference annotation](#annotation) and returns an array of [maps](#map).
+Parses a [Georeference Annotation](#annotation) or an [AnnotationPage](#annotationpage)
+containing multiple Georeference Annotations and returns an array of [maps](#map).
 
 ##### Parameters
 
-- `annotation` **[Annotation](#annotation)** Georeference annotation
+*   `annotation` **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
 
 ##### Examples
 
@@ -70,9 +70,7 @@ Parses a [georeference annotation](#annotation) and returns an array of [maps](#
 import fs from 'fs'
 import { parseAnnotation } from '@allmaps/annotation'
 
-const annotation = JSON.parse(
-  fs.readFileSync('./examples/annotation.example.json')
-)
+const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
 const maps = parseAnnotation(annotation)
 ```
 
@@ -80,11 +78,12 @@ Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Gl
 
 #### generateAnnotation
 
-Generates a [georeference annotation](#annotation) from a single [map](#map) or an array of [maps](#map).
+Generates a [Georeference Annotation](#annotation) from a single [map](#map) or
+an [AnnotationPage](#annotationpage) containing multiple Georeference Annotations from an array of [maps](#map).
 
 ##### Parameters
 
-- `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
+*   `mapOrMaps` **([Map](#map) | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Map](#map)>)** Single map object, or array of maps
 
 ##### Examples
 
@@ -96,7 +95,7 @@ const map = JSON.parse(fs.readFileSync('./examples/map.example.json'))
 const annotation = generateAnnotation(map)
 ```
 
-Returns **[Annotation](#annotation)** Georeference annotation
+Returns **([Annotation](#annotation) | [AnnotationPage](#annotationpage))** Georeference Annotation
 
 ### Types
 
@@ -104,12 +103,18 @@ The two types this module converts between, [Annotation](#annotation) and [Map](
 
 #### Map
 
-Object that contains the data needed to georeference a IIIF map. For details, see its [JSON Schema](schemas/map.json) or the [example](examples/map.example.json) in the `examples` directory.
+Object that contains the data needed to georeference a IIIF resource in the format that is used by Allmaps internally.
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
 #### Annotation
 
-[Web Annotation](https://www.w3.org/TR/annotation-model/) that contains a single georeference annotation or an [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page) with georeference annotation. For details, see its [JSON Schema](schemas/annotation.json) or the [example](examples/annotation.example.json) in the `examples` directory.
+[Web Annotation](https://www.w3.org/TR/annotation-model/) that contains a single [Georeference Annotation](https://iiif.io/api/extension/georef/).
+
+Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+### AnnotationPage
+
+An [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page) that contains multiple [Georeference Annotations](https://iiif.io/api/extension/georef/).
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)

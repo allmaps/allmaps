@@ -1,4 +1,4 @@
-export default function serialize(obj: {}): string {
+export default function serialize(obj: unknown): string {
   if (Array.isArray(obj)) {
     return `[${obj.map((i) => serialize(i)).join(',')}]`
   } else if (typeof obj === 'number') {

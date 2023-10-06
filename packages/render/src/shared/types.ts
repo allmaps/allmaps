@@ -3,7 +3,8 @@ import type {
   TileZoomLevel,
   ImageRequest
 } from '@allmaps/iiif-parser'
-import type { GCPTransformInfo } from '@allmaps/transform'
+import type { GcpTransformer } from '@allmaps/transform'
+import type { Gcp } from '@allmaps/types'
 
 export type Position = [number, number]
 
@@ -16,7 +17,7 @@ export type GeoJSONPolygon = {
 }
 
 // TODO: rename?
-export type SVGPolygon = Position[]
+export type Ring = Position[]
 
 export type Line = [Position, Position]
 
@@ -25,7 +26,7 @@ export type Size = [number, number]
 export type Extent = [number, number]
 
 export type Color = [number, number, number]
-export type OptionalColor = Color | null
+export type OptionalColor = Color | undefined
 
 export type Tile = {
   column: number
@@ -41,32 +42,20 @@ export type NeededTile = {
   url: string
 }
 
-export type CachedTile = {
-  mapId: string
-  tile: Tile
-  imageRequest: ImageRequest
-  url: string
-  // TODO: can imageData be removed?
-  // imageData?: ImageData
-  imageBitmap?: ImageBitmap
-  loading: boolean
-}
-
-export type RemoveBackgroundOptions = {
+export type RemoveBackgroundOptions = Partial<{
   color: Color
-  threshold?: number
-  hardness?: number
-}
+  threshold: number
+  hardness: number
+}>
 
-export type ColorizeOptions = {
+export type ColorizeOptions = Partial<{
   color: Color
-}
+}>
 
-export type RenderOptions = {
-  opacity?: number
+export type RenderOptions = Partial<{
   removeBackground?: RemoveBackgroundOptions
   colorize?: ColorizeOptions
-}
+}>
 
 export type Transform = [number, number, number, number, number, number]
 
@@ -92,10 +81,15 @@ export type Matrix4 = [
 export type WarpedMap = {
   imageId: string
   mapId: string
+  projectedGCPs: Gcp[]
+  visible: boolean
   parsedImage: IIIFImage
-  pixelMask: SVGPolygon
-  transformer: GCPTransformInfo
+  resourceMask: Ring
+  transformer: GcpTransformer
   geoMask: GeoJSONPolygon
+  geoMaskBBox: BBox
+  fullGeoMask: GeoJSONPolygon
+  fullGeoMaskBBox: BBox
 }
 
 export type XYZTile = {

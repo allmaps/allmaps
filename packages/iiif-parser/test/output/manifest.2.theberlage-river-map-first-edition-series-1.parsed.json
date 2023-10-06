@@ -1,0 +1,455 @@
+{
+  "embedded": false,
+  "type": "manifest",
+  "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-1.json",
+  "majorVersion": 2,
+  "label": {
+    "none": ["Eerste druk, Serie 1"]
+  },
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 7280,
+      "height": 5064,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=0",
+      "label": {
+        "none": [
+          "00A. Titelblad met bladwijzer en verklaring van de zamenstelling der kaart (1830)"
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 5064
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7936,
+      "height": 4992,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=1",
+      "label": {
+        "none": [
+          "00B. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Waal, Merwede, Oude- en Nieuwe Maas van Emmerik tot Brielle (1863)"
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7936,
+        "height": 4992
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7768,
+      "height": 4572,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=2",
+      "label": {
+        "none": [
+          "00C. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn, Lek, Nieuwe-Maas en Scheur van Emmerik tot aan zee (1863)"
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7768,
+        "height": 4572
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7248,
+      "height": 4512,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=3",
+      "label": {
+        "none": [
+          "00D. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn en Geldersche IJssel van Emmerik tot de Zuiderzee (1863)"
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7248,
+        "height": 4512
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7480,
+      "height": 4920,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=4",
+      "label": {
+        "none": ["01. Schenkenschans (1830)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7480,
+        "height": 4920
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7008,
+      "height": 5040,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=5",
+      "label": {
+        "none": ["02. Kekerdom (1830)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7008,
+        "height": 5040
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4260,
+      "height": 3088,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=6",
+      "label": {
+        "none": [
+          "02A. Suplementair Blad, behoorende bij het blad No. 2 Kekerdom (1830)"
+        ]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 4260,
+        "height": 3088
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7280,
+      "height": 4980,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=7",
+      "label": {
+        "none": ["03. Nijmegen (1830)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 4980
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7328,
+      "height": 5604,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=8",
+      "label": {
+        "none": ["04. Herveld (1830)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7328,
+        "height": 5604
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7264,
+      "height": 5052,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=9",
+      "label": {
+        "none": ["05. Dodewaard (1831)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7264,
+        "height": 5052
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7344,
+      "height": 5100,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=10",
+      "label": {
+        "none": ["06. Leeuwen (1831)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7344,
+        "height": 5100
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5316,
+      "height": 6592,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=11",
+      "label": {
+        "none": ["07. Tiel (1831)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 5316,
+        "height": 6592
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7320,
+      "height": 5088,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=12",
+      "label": {
+        "none": ["08. Varik (1831)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7320,
+        "height": 5088
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7328,
+      "height": 5004,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=13",
+      "label": {
+        "none": ["09. Zalt-Boemel (1832)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7328,
+        "height": 5004
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7272,
+      "height": 6336,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=14",
+      "label": {
+        "none": ["10. Zuilichem (1832)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7272,
+        "height": 6336
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7312,
+      "height": 5856,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=15",
+      "label": {
+        "none": ["11. Brakel (1832)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7312,
+        "height": 5856
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7320,
+      "height": 5376,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=16",
+      "label": {
+        "none": ["12. Gorinchem (1833)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7320,
+        "height": 5376
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7256,
+      "height": 5088,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=17",
+      "label": {
+        "none": ["13. Giesendam (1833)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7256,
+        "height": 5088
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 6856,
+      "height": 4980,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=18",
+      "label": {
+        "none": ["14. Dordrecht (1833)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 6856,
+        "height": 4980
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 6680,
+      "height": 4944,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=19",
+      "label": {
+        "none": ["15. Puttershoek (1833)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 6680,
+        "height": 4944
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 6696,
+      "height": 4956,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=20",
+      "label": {
+        "none": ["16. Heinenoord (1834)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 6696,
+        "height": 4956
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 7280,
+      "height": 5040,
+      "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=21",
+      "label": {
+        "none": ["17. Poortugaal (1834)"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 5040
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "none": [
+          "Kaart van de rivieren de Boven Rijn, de Waal, de Merwede, de Oude en een gedeelte van de Nieuwe Maas van Lobith tot Brielle : in twintig bladen benevens twee supplementaire bladen voor de Dordtsche Kil / vervaardigd op last van zijne excellentie den Minister van Binnenlandse Zaken, onder directie van den Hoofd-Ingenieur bij de Algemeene Dienst van den Waterstaat B.H. Goudriaan. – Schaal 1:10.000. - [Delft] : Algemeene Dienst van den Waterstaat, 1830-1835. ([Delft] : het Bureau en de drukkerij van de Directie der Militaire Verkenningen). -1 kaartserie, in 27 bladen : lithografie ; diverse formaten."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Editie"]
+      },
+      "value": {
+        "none": ["EERSTE DRUK"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Serie"]
+      },
+      "value": {
+        "none": ["1"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Geoplaza Kaartseries"]
+      },
+      "value": {
+        "none": [
+          "<a href=\"https://geoplaza.vu.nl/mapseries/search?&fs[base_series]=Rivierkaarten&fs[base_set]=rvr^EERSTE DRUK,%20serie%201\">EERSTE DRUK, serie 1</a>"
+        ]
+      }
+    }
+  ]
+}

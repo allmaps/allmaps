@@ -1,18 +1,16 @@
-import {
-  createTransformer,
-  svgPolygonToGeoJSONPolygon
-} from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
-import center from '@turf/center'
 import bbox from '@turf/bbox'
+
+import type { Options } from './types.js'
 
 import type { Map } from '@allmaps/annotation'
 
-interface TileJSON {
+type TileJSON = {
   tilejson: '3.0.0'
   id: string | undefined
   tiles: string[]
-  fields: {}
+  fields: object
   bounds: number[]
   center: number[]
   // maxzoom
@@ -20,19 +18,44 @@ interface TileJSON {
 }
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(urlTemplate: string, map: Map): TileJSON {
-  const transformer = createTransformer(map.gcps)
-  const geoMask = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask, 0.01)
+export function generateTileJson(
+  urlTemplate: string,
+  maps: Map[],
+  options: Options
+): TileJSON {
+  const geoMasks = []
 
-  bbox(geoMask)
+  for (const map of maps) {
+    const transformer = new GcpTransformer(
+      map.gcps,
+      options['transformation.type'] || map.transformation?.type
+    )
+
+    const geoMask = transformer.transformForwardAsGeojson([map.resourceMask], {
+      maxOffsetRatio: 0.01
+    })
+    geoMasks.push(geoMask)
+  }
+
+  const bounds = bbox({
+    type: 'FeatureCollection',
+    features: geoMasks.map((geoMask) => ({
+      type: 'Feature',
+      properties: {},
+      geometry: geoMask
+    }))
+  })
 
   return {
     tilejson: '3.0.0',
     id: urlTemplate,
     tiles: [urlTemplate],
     fields: {},
-    bounds: bbox(geoMask),
-    center: center(geoMask).geometry.coordinates
+    bounds,
+    center: [
+      (bounds[2] - bounds[0]) / 2 + bounds[0],
+      (bounds[3] - bounds[1]) / 2 + bounds[1]
+    ]
     // TODO: add minzoom and maxzoom
   }
 }

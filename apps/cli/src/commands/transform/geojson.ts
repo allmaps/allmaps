@@ -1,59 +1,58 @@
-import { generateAnnotation } from '@allmaps/annotation'
+import { Command } from 'commander'
 
-import { parseJsonFromStdin, printJson } from '../../lib/io.js'
-import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
+import { GcpTransformer } from '@allmaps/transform'
 
-import type { ArgumentsCamelCase } from 'yargs'
+import { parseJsonInput, printString } from '../../lib/io.js'
+import {
+  parseGcps,
+  parseMap,
+  parseTransformOptions,
+  parseTransformationType
+} from '../../lib/parse.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
 
-const command = 'geojson -a <annotation> [file...]'
+export default function geojson() {
+  let command = new Command('geojson')
+    .argument('[files...]')
+    .summary('transform GeoJSON to SVG')
+    .description(
+      'Transform GeoJSON to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+    )
 
-const describe = "Transforms GeoJSON to SVG"
+  command = addAnnotationOptions(command)
+  command = addTransformOptions(command)
 
-const builder = {
-  annotation: {
-    alias: 'a',
-    description: 'Filename of Georeference Annotation',
-    demandOption: true
-  }
+  return command.action(async (files, options) => {
+    const map = parseMap(options)
+    const gcps = parseGcps(options, map)
+    const transformationType = parseTransformationType(options, map)
+    const transformOptions = parseTransformOptions(options)
+
+    const transformer = new GcpTransformer(gcps, transformationType)
+
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
+    }
+
+    const geoJsonGeometries = await parseJsonInput(files as string[])
+
+    const svgGeometries = []
+    for (const geoJsonGeometry of geoJsonGeometries) {
+      if (isGeojsonGeometry(geoJsonGeometry)) {
+        const svgGeometry = transformer.transformGeojsonToSvg(
+          geoJsonGeometry,
+          transformOptions
+        )
+        svgGeometries.push(svgGeometry)
+      } else {
+        throw new Error(
+          'Unsupported input. Only GeoJSON Points, LineStrings and Polygons are supported.'
+        )
+      }
+    }
+
+    const svg = svgGeometriesToSvgString(svgGeometries)
+    printString(svg)
+  })
 }
-
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonFromStdin()
-
-  // geomEach
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
-}
-
-
-
-//   } else if (argv.format === 'geojson') {
-//     const maps = jsonValues.map(parseAnnotation).flat()
-
-//     let features = []
-
-//     for (let map of maps) {
-//       const transformer = createTransformer(map.gcps)
-//       const polygon = svgPolygonToGeoJSONPolygon(transformer, map.pixelMask)
-
-//       features.push({
-//         type: 'Feature',
-//         properties: map,
-//         geometry: polygon
-//       })
-//     }
-
-//     let featureCollection = {
-//       type: 'FeatureCollection',
-//       features
-//     }
-
-//     printJson(featureCollection)
-//   } else if (argv.format === 'svg') {
-//     console.log('svg')
-//   }

@@ -22,12 +22,8 @@
   },
   "body": {
     "type": "FeatureCollection",
-    "purpose": "gcp-georeferencing",
     "transformation": {
-      "type": "polynomial",
-      "options": {
-        "order": 1
-      }
+      "type": "thinPlateSpline"
     },
     "features": [
       {

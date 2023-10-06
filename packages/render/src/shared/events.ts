@@ -1,22 +1,41 @@
 export enum WarpedMapEventType {
   WARPEDMAPADDED = 'warpedmapadded',
-  GEOREFANNOTATIONADDED = 'georefannotationadded',
+  WARPEDMAPREMOVED = 'warpedmapremoved',
+
+  // TODO: Maybe have one MAPSCHANGED event?
+  ZINDICESCHANGES = 'zindiceschanged',
+  RESOURCEMASKUPDATED = 'resourcemaskupdated',
+  VISIBILITYCHANGED = 'visibilitychanged',
+  TRANSFORMATIONCHANGED = 'transformationchanged',
+
+  GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
+  GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
 
   WARPEDMAPENTER = 'warpedmapenter',
   WARPEDMAPLEAVE = 'warpedmapleave',
 
-  TILELOADED = 'tileloaded',
+  TILENEEDED = 'tileneeded',
   TILEREMOVED = 'tileremoved',
-  TILELOADINGERROR = 'tileloadingerror',
+  TILELOADED = 'tileloaded',
+  TILEFETCHERROR = 'tilefetcherror',
   ALLTILESLOADED = 'alltilesloaded',
 
+  // Emits when the first tile of a map is added
+  FIRSTTILELOADED = 'firsttileloaded',
+
+  CLEARED = 'cleared',
   CHANGED = 'changed'
 }
 
-export class WarpedMapEvent extends Event {
-  data: any
+export type WarpedMapTileEventDetail = {
+  mapId: string
+  tileUrl: string
+}
 
-  constructor(type: WarpedMapEventType, data?: any) {
+export class WarpedMapEvent extends Event {
+  data?: unknown
+
+  constructor(type: WarpedMapEventType, data?: unknown) {
     super(type)
 
     this.data = data

@@ -1,0 +1,82 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/manifest",
+  "@type": "sc:Manifest",
+  "label": "Town plan of Bonifacio",
+  "metadata": [
+    {
+      "label": "Creator or Contributor",
+      "value": "Geographical Section, General Staff"
+    },
+    { "label": "Type of Resource", "value": "cartographic" },
+    { "label": "Genre", "value": "map" },
+    { "label": "Date", "value": "1943 Jun 1st" },
+    { "label": "Scale", "value": "1:5,000" },
+    {
+      "label": "Holding Institution",
+      "value": "Map & Data Library, University of Toronto Libraries"
+    },
+    { "label": "Call Number", "value": "2159" },
+    {
+      "label": "Permalink",
+      "value": "https://collections.library.utoronto.ca/view/mdl:2159"
+    },
+    { "label": "Digital Object Identifier", "value": "mdl:2159" },
+    {
+      "label": "Rights",
+      "value": "For rights and reproduction information please contact mdl@library.utoronto.ca"
+    },
+    { "label": "Part Of Digital Collection" },
+    {
+      "label": "Digital Collection URL",
+      "value": "https://collections.library.utoronto.ca/view/mdl:maps"
+    }
+  ],
+  "thumbnail": "https://iiif.library.utoronto.ca/image/v2/mdl:2159/full/80,/0/default.jpg",
+  "attribution": "For rights and reproduction information please contact mdl@library.utoronto.ca",
+  "logo": "https://content.library.utoronto.ca/collections/utl-logo.png",
+  "sequences": [
+    {
+      "@id": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/sequence/sequence_f12c780c-133d-4cd4-92e6-a56f8210c36b",
+      "@type": "sc:Sequence",
+      "label": "Town plan of Bonifacio, in order",
+      "canvases": [
+        {
+          "@id": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/canvas/mdl:2159",
+          "@type": "sc:Canvas",
+          "label": "Town plan of Bonifacio",
+          "thumbnail": {
+            "@id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159/full/80,/0/default.jpg",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159",
+              "profile": "http://iiif.io/api/image/2/level2.json"
+            }
+          },
+          "height": 4800,
+          "width": 6590,
+          "images": [
+            {
+              "@id": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/annotation/annotation_bc4d30d0-937d-4998-bf8e-8e7880d20187",
+              "@type": "oa:Annotation",
+              "motivation": "sc:Painting",
+              "resource": {
+                "@id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159/full/512,/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 4800,
+                "width": 6590,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/canvas/mdl:2159"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

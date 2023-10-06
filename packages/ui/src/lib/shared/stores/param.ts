@@ -35,7 +35,7 @@ export default {
     if ($param && $param.type === 'url') {
       url.set($param.url)
       data.set('')
-    } else if ($param && $param.type == 'data') {
+    } else if ($param && $param.type === 'data') {
       url.set('')
       data.set($param.data)
     } else {

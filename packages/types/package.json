@@ -1,0 +1,55 @@
+{
+  "name": "@allmaps/types",
+  "version": "1.0.0-beta.3",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "Allmaps TypeScript types",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/types"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "typescript",
+    "types"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "preversion": "npm run types && npm run lint && npm test",
+    "test": "NODE_ENV=test mocha",
+    "pretest": "npm run build"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.35.0",
+    "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,1 +1,1 @@
-["Array must contain at least 2 element(s)"]
+"Validation error: Array must contain at least 2 element(s) at \"pixelMask[3]\""

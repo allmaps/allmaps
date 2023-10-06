@@ -1,0 +1,188 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif",
+  "type": "Manifest",
+  "label": { "none": ["Use of property, 1922"] },
+  "metadata": [
+    {
+      "label": { "none": ["Contributor"] },
+      "value": {
+        "none": [
+          "Comey, Arthur C. (Arthur Coleman), 1886-1954 (Cartographer)",
+          "Boston (Mass.). City Planning Board (Contributor)",
+          "Walker Lith. & Pub. Co. (Contributor)"
+        ]
+      }
+    },
+    { "label": { "none": ["Date"] }, "value": { "none": ["1923"] } },
+    {
+      "label": { "none": ["Department"] },
+      "value": { "none": ["Government & Geographic Information Collection"] }
+    },
+    {
+      "label": { "none": ["Dimensions"] },
+      "value": { "none": ["60 x 52 cm"] }
+    },
+    {
+      "label": { "none": ["Genre"] },
+      "value": { "none": ["maps (documents)"] }
+    },
+    {
+      "label": { "none": ["Last Modified"] },
+      "value": { "none": ["2021-06-10T16:43:09.761465Z"] }
+    },
+    { "label": { "none": ["Materials"] }, "value": { "none": ["color map"] } },
+    {
+      "label": { "none": ["Publisher"] },
+      "value": { "none": ["Boston : City Planning Board"] }
+    },
+    {
+      "label": { "none": ["Rights Statement"] },
+      "value": { "none": ["No Copyright - United States"] }
+    },
+    {
+      "label": { "none": ["Subject"] },
+      "value": { "none": ["Massachusetts--Boston", "Land use, Urban", "Maps"] }
+    }
+  ],
+  "summary": {
+    "none": [
+      "Scale not given (W 71°11'09\"--W 70°59'17\"/N 42°23'42\"--N 42°14'02\")  ; approved, Arthur C. Comey, zoning director. ; Base map: Boston and surroundings published by Walker Lith. & Pub. Co. ; \"14-5-23.\""
+    ]
+  },
+  "requiredStatement": {
+    "label": { "none": ["Attribution"] },
+    "value": { "none": ["Courtesy of Northwestern University Libraries"] }
+  },
+  "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
+  "thumbnail": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4/thumbnail",
+      "type": "Image",
+      "format": "image/jpeg",
+      "height": 300,
+      "width": 300
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4",
+      "type": "Dataset",
+      "format": "application/json",
+      "label": {
+        "none": ["Northwestern University Libraries Digital Collections API"]
+      }
+    }
+  ],
+  "homepage": [
+    {
+      "id": "https://dc.library.northwestern.edu/items/faf0c573-76e7-4002-933f-2bdff0d656e4",
+      "type": "Text",
+      "format": "text/html",
+      "label": {
+        "none": [
+          "Homepage at Northwestern University Libraries Digital Collections"
+        ]
+      }
+    }
+  ],
+  "partOf": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2?as=iiif",
+      "type": "Collection",
+      "label": { "none": ["Map and Atlas Collection"] },
+      "summary": {
+        "none": [
+          "Northwestern University Libraries’ Map & Atlas Collection allows access to an ever-growing selection of our cartographic resources in high resolution."
+        ]
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0",
+      "type": "Canvas",
+      "height": 11333,
+      "width": 9731,
+      "label": { "none": ["P0234-gmap-G3764_B6G4_1922.tif"] },
+      "thumbnail": [
+        {
+          "id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e/full/!300,300/0/default.jpg",
+          "type": "Image",
+          "format": "image/jpeg",
+          "height": 300,
+          "width": 300,
+          "service": [
+            {
+              "@id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
+              "@type": "ImageService2",
+              "profile": "http://iiif.io/api/image/2/level2.json"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/annotation-page",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/annotation/0",
+              "type": "Annotation",
+              "motivation": "painting",
+              "target": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0",
+              "body": {
+                "id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e/full/600,/0/default.jpg",
+                "type": "Image",
+                "format": "image/tiff",
+                "height": 11333,
+                "width": 9731,
+                "service": [
+                  {
+                    "@id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
+                    "@type": "ImageService2",
+                    "profile": "http://iiif.io/api/image/2/level2.json"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "placeholderCanvas": {
+        "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/placeholder",
+        "type": "Canvas",
+        "width": 640,
+        "height": 745,
+        "items": [
+          {
+            "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/placeholder/annotation-page/0",
+            "type": "AnnotationPage",
+            "items": [
+              {
+                "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/placeholder/annotation/0",
+                "type": "Annotation",
+                "motivation": "painting",
+                "body": {
+                  "id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e/full/!640,745/0/default.jpg",
+                  "type": "Image",
+                  "format": "image/tiff",
+                  "width": 640,
+                  "height": 745,
+                  "service": [
+                    {
+                      "@id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
+                      "@type": "ImageService2",
+                      "profile": "http://iiif.io/api/image/2/level2.json"
+                    }
+                  ]
+                },
+                "target": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0/placeholder"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,3 +1,6 @@
-import preset from './preset.js'
+import themeColors from './theme-colors.js'
+import theme from './theme.js'
 
-export { preset }
+export { theme, themeColors }
+export * from './colors.js'
+export * from './types.js'

@@ -2,12 +2,14 @@
   import { Image } from '@allmaps/iiif-parser'
   import { fetchImageInfo } from '@allmaps/stdlib'
 
+  import { imageInfoCache } from '$lib/shared/stores/openlayers.js'
+
   export let imageUri: string
   export let width: number
   export let height: number
 
   async function parseImage(imageUri: string) {
-    const imageInfo = await fetchImageInfo(imageUri)
+    const imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
     return Image.parse(imageInfo)
   }
 </script>

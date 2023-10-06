@@ -1,58 +1,46 @@
-import { IIIF, Image } from '@allmaps/iiif-parser'
+import { Command } from 'commander'
+
+import { IIIF } from '@allmaps/iiif-parser'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
-import { generateManifest } from '../../lib/iiif.js'
-import { getIssues, formatIssue } from '../../lib/errors.js'
-
-import type { ArgumentsCamelCase } from 'yargs'
 
 import type { ZodError } from 'zod'
 
-const command = 'parse [file...]'
+export default function parse() {
+  return new Command('parse')
+    .argument('[files...]')
+    .summary('parse IIIF resources')
+    .description(
+      'Parses IIIF resources and outputs them in the internal format used by Allmaps'
+    )
+    .action(async (files) => {
+      const jsonValues = await parseJsonInput(files as string[])
 
-const describe = 'Parses and generates IIIF data'
+      const parsedIiif = []
+      for (const jsonValue of jsonValues) {
+        try {
+          parsedIiif.push(IIIF.parse(jsonValue))
+        } catch (err) {
+          if (err instanceof Error && err.name === 'ZodError') {
+            const zodError = err as ZodError
+            const formatted = zodError.format()
+            const errors = formatted._errors
 
-const builder = {
-  // format: {
-  //   alias: 'f',
-  //   choices: ['parse', 'manifest'],
-  //   default: 'parse',
-  //   description: 'Choose output format'
-  // }
-}
-
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonInput(argv.file as string[])
-
-  let parsedIiif = []
-
-  for (let jsonValue of jsonValues) {
-    try {
-      parsedIiif.push(IIIF.parse(jsonValue))
-    } catch (err) {
-      if (err instanceof Error && err.name === 'ZodError') {
-        const zodError = err as ZodError
-        const issues = getIssues(jsonValue, zodError)
-
-        issues.forEach((issue) => {
-          console.log(formatIssue(issue))
-        })
+            errors.forEach((error) => {
+              console.error(error)
+            })
+          } else if (err instanceof Error) {
+            console.error(err.message)
+          }
+        }
       }
-    }
-  }
 
-  if (parsedIiif.length) {
-    if (jsonValues.length === 1) {
-      printJson({ ...parsedIiif[0] })
-    } else {
-      printJson({ ...parsedIiif })
-    }
-  }
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
+      if (parsedIiif.length) {
+        if (jsonValues.length === 1) {
+          printJson({ ...parsedIiif[0] })
+        } else {
+          printJson({ ...parsedIiif })
+        }
+      }
+    })
 }

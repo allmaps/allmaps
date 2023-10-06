@@ -1,60 +1,98 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id/browser'
-import { parseAnnotation } from '@allmaps/annotation'
-import { fetchImageInfo } from '@allmaps/stdlib'
-import { Image } from '@allmaps/iiif-parser'
+import {
+  parseAnnotation,
+  generateAnnotation,
+  type Map as Georef
+} from '@allmaps/annotation'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
-import { getBackgroundColor } from '$lib/shared/remove-background.js'
+import { fromHue } from '$lib/shared/color.js'
+import {
+  mapWarpedMapSource,
+  mapWarpedMapLayer,
+  addMap,
+  removeMap
+} from '$lib/shared/stores/openlayers.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
+
+import type { Position } from '@allmaps/render'
 
 type SourceMaps = Map<string, ViewerMap>
 
 export const mapsById = writable<SourceMaps>(new Map())
 
-export async function addAnnotation(sourceId: string, json: any) {
+export const mapIndex = writable<number[]>([])
+
+// async function addMap () {
+export type MapIDOrError = string | Error
+// }
+
+async function createAndAddViewerMap(
+  sourceId: string,
+  index: number,
+  map: Georef
+): Promise<ViewerMap> {
+  const mapIdOrError = await addMap(map)
+
+  let mapId
+  if (typeof mapIdOrError === 'string') {
+    mapId = mapIdOrError
+  } else {
+    mapId = await generateChecksum(map)
+  }
+
+  const viewerMap: ViewerMap = {
+    sourceId,
+    mapId,
+    error: mapIdOrError instanceof Error ? mapIdOrError : undefined,
+    index,
+    map,
+    annotation: generateAnnotation(map),
+    opacity: 1,
+    state: {
+      visible: true,
+      selected: false,
+      highlighted: false
+    },
+    renderOptions: getDefaultRenderOptions({
+      colorize: {
+        enabled: false,
+        color: fromHue((index * 60) % 360)
+      }
+    })
+  }
+
+  return viewerMap
+}
+
+export async function addAnnotation(sourceId: string, json: unknown) {
+  let startIndex = get(mapCount)
+
   const maps = parseAnnotation(json)
 
-  let mapIds: string[] = []
+  const mapIds: MapIDOrError[] = []
 
   if (maps.length) {
-    let newViewerMaps: ViewerMap[] = []
+    const newViewerMaps: ViewerMap[] = []
 
-    for (let map of maps) {
-      const mapId = map.id || (await generateChecksum(map))
+    const settledResults = await Promise.allSettled(
+      maps.map((map) => createAndAddViewerMap(sourceId, startIndex++, map))
+    )
 
-      // TODO: get info.json or parsedImage from WarpedMapSource via event
-      const imageUri = map.image.uri
-      const imageInfo = await fetchImageInfo(imageUri)
-      const parsedImage = Image.parse(imageInfo)
-
-      const viewerMap: ViewerMap = {
-        sourceId,
-        mapId,
-        map,
-        state: {
-          selected: false
-        },
-        // TODO: detect background color of map?
-        renderOptions: getDefaultRenderOptions()
+    for (const settledResult of settledResults) {
+      if (settledResult.status === 'fulfilled') {
+        const viewerMap = settledResult.value
+        newViewerMaps.push(viewerMap)
+      } else {
+        console.warn('Error adding map', settledResult.reason)
       }
-
-      newViewerMaps.push(viewerMap)
-      mapIds.push(mapId)
-
-      // Process image once, also when the same image is used
-      // in multiple georeferenced maps
-      getBackgroundColor(map, parsedImage).then((color) =>
-        setRemoveBackgroundColor(mapId, color)
-      ).catch((err) => {
-        console.error(`Couldn't detect background color for map ${mapId}`, err)
-      })
     }
 
     mapsById.update(($mapsById) => {
-      for (let viewerMap of newViewerMaps) {
+      for (const viewerMap of newViewerMaps) {
         $mapsById.set(viewerMap.mapId, viewerMap)
       }
 
@@ -63,6 +101,35 @@ export async function addAnnotation(sourceId: string, json: any) {
   }
 
   return mapIds
+}
+
+export function resetCustomResourceMask(mapId: string) {
+  mapsById.update(($mapsById) => {
+    const viewerMap = $mapsById.get(mapId)
+
+    if (viewerMap) {
+      viewerMap.state.customResourceMask = undefined
+      mapWarpedMapSource.setResourceMask(mapId, viewerMap.map.resourceMask)
+    }
+
+    return $mapsById
+  })
+}
+
+export function setCustomResourceMask(
+  mapId: string,
+  customResourceMask: Position[]
+) {
+  mapsById.update(($mapsById) => {
+    const viewerMap = $mapsById.get(mapId)
+
+    if (viewerMap) {
+      viewerMap.state.customResourceMask = customResourceMask
+      mapWarpedMapSource.setResourceMask(mapId, customResourceMask)
+    }
+
+    return $mapsById
+  })
 }
 
 export function setRemoveBackgroundColor(
@@ -74,17 +141,23 @@ export function setRemoveBackgroundColor(
 
     if (viewerMap) {
       viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
+      mapWarpedMapLayer?.setMapRemoveBackground(mapId, {
+        hexColor: removeBackgroundColor,
+        threshold: viewerMap.renderOptions.removeBackground.threshold,
+        hardness: viewerMap.renderOptions.removeBackground.hardness
+      })
     }
 
     return $mapsById
   })
 }
 
-export function removeAnnotation(sourceId: string) {
+export async function removeAnnotation(sourceId: string) {
   mapsById.update(($mapsById) => {
-    for (let [id, map] of $mapsById.entries()) {
-      if (map.sourceId === sourceId) {
+    for (const [id, viewerMap] of $mapsById.entries()) {
+      if (viewerMap.sourceId === sourceId) {
         $mapsById.delete(id)
+        removeMap(viewerMap.map)
       }
     }
 
@@ -96,8 +169,17 @@ export function resetMaps() {
   mapsById.set(new Map())
 }
 
-export const mapIds = derived(mapsById, ($mapsById) => $mapsById.keys())
+export const mapIds = derived(mapsById, ($mapsById) => [...$mapsById.keys()])
 
 export const maps = derived(mapsById, ($mapsById) => [...$mapsById.values()])
 
 export const mapCount = derived(mapsById, ($mapsById) => $mapsById.size)
+
+export const visibleMaps = derived(mapsById, ($mapsById) =>
+  [...$mapsById.values()].filter((map) => map.state.visible)
+)
+
+export const visibleMapCount = derived(
+  visibleMaps,
+  ($visibleMaps) => $visibleMaps.length
+)

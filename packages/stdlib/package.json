@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.12",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -12,7 +12,8 @@
   "module": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -34,17 +35,30 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "lint": "eslint dist test"
+    "preversion": "npm run types && npm run lint && npm test",
+    "test": "NODE_ENV=test mocha",
+    "pretest": "npm run build",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test",
+    "types": "tsc --noEmit"
   },
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/annotation": "^1.0.0-beta.16",
+    "@allmaps/iiif-parser": "^1.0.0-beta.25",
+    "@allmaps/types": "^1.0.0-beta.3",
+    "@placemarkio/geojson-rewind": "^1.0.2",
+    "svg-parser": "^2.0.4"
+  },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@types/svg-parser": "^2.0.3",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
-    "typescript": "^4.9.5"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
   }
 }

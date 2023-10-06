@@ -1,165 +1,240 @@
-import { fetchImage } from '@allmaps/stdlib'
+import CachedTile from './CachedTile.js'
+import {
+  WarpedMapEvent,
+  WarpedMapEventType,
+  WarpedMapTileEventDetail
+} from './shared/events.js'
 
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
-
-import type { NeededTile, CachedTile } from './shared/types.js'
+import type { NeededTile } from './shared/types.js'
 
 export default class TileCache extends EventTarget {
-  cachedTilesByUrl: Map<string, CachedTile> = new Map()
-  cachedTileUrlsByMapId: Map<string, Set<string>> = new Map()
+  protected cachedTilesByUrl: Map<string, CachedTile> = new Map()
+  protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
+  protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
-  abortControllersByUrl: Map<string, AbortController> = new Map()
-
-  tilesLoadingCount = 0
+  protected tilesLoadingCount = 0
 
   // TODO: support multiple scaleFactors
   // keep distance between each tile and viewport
   // different zoom levels also have a distance to current
   // zoom level.
 
-  async addTile(tile: NeededTile) {
-    const cachedTile = this.cachedTilesByUrl.get(tile.url)
+  private addTile(neededTile: NeededTile) {
+    const mapId = neededTile.mapId
+    const tileUrl = neededTile.url
+
+    const cachedTile = this.cachedTilesByUrl.get(tileUrl)
 
     if (!cachedTile) {
-      await this.fetchTile(tile)
+      const cachedTile = new CachedTile(neededTile)
+
+      this.updateTilesLoadingCount(1)
+
+      cachedTile.addEventListener(
+        WarpedMapEventType.TILELOADED,
+        this.tileLoaded.bind(this)
+      )
+      cachedTile.addEventListener(
+        WarpedMapEventType.TILEFETCHERROR,
+        this.tileFetchError.bind(this)
+      )
+
+      cachedTile.fetch()
+
+      this.cachedTilesByUrl.set(tileUrl, cachedTile)
+    } else {
+      this.addTileUrlForMapId(mapId, tileUrl)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
+          mapId,
+          tileUrl
+        })
+      )
     }
+
+    this.addMapIdForTileUrl(mapId, tileUrl)
   }
 
-  async removeTile(tileUrl: string) {
+  private removeTile(mapId: string, tileUrl: string) {
     const cachedTile = this.cachedTilesByUrl.get(tileUrl)
 
     if (!cachedTile) {
       return
     }
 
-    if (cachedTile.loading) {
-      // Cancel fetch if tile is still being fetched
-      const abortController = this.abortControllersByUrl.get(tileUrl)
-      if (abortController) {
-        abortController.abort()
-        this.abortControllersByUrl.delete(tileUrl)
-      }
-    }
+    const mapIds = this.removeMapIdForTileUrl(mapId, tileUrl)
+    this.removeTileUrlForMapId(mapId, tileUrl)
 
-    const mapId = cachedTile.mapId
-    this.cachedTilesByUrl.delete(tileUrl)
-
-    if (mapId) {
-      const cachedTileUrlsForMapId = this.cachedTileUrlsByMapId.get(mapId)
-      cachedTileUrlsForMapId?.delete(tileUrl)
-      if (!cachedTileUrlsForMapId?.size) {
-        this.cachedTileUrlsByMapId.delete(mapId)
+    if (!mapIds.size) {
+      if (cachedTile.loading) {
+        // Cancel fetch if tile is still being fetched
+        cachedTile.abort()
+        this.updateTilesLoadingCount(-1)
       }
+
+      this.cachedTilesByUrl.delete(tileUrl)
     }
 
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.TILEREMOVED, {
-        tileUrl,
-        mapId
+        mapId,
+        tileUrl
       })
     )
   }
 
-  setTiles(tilesNeeded: NeededTile[]) {
-    const tilesNeededUrls = new Set()
-    for (let tile of tilesNeeded) {
-      tilesNeededUrls.add(tile.url)
+  private tileLoaded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const { tileUrl } = event.data as WarpedMapTileEventDetail
+
+      this.updateTilesLoadingCount(-1)
+
+      for (const mapId of this.mapIdsByTileUrl.get(tileUrl) || []) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
+            mapId,
+            tileUrl
+          })
+        )
+
+        this.addTileUrlForMapId(mapId, tileUrl)
+
+        // Emit FIRSTTILELOADED events for mapId
+        const tileUrls = this.tileUrlsByMapId.get(mapId)
+        const firstTileUrl = tileUrls?.values().next().value
+
+        if (firstTileUrl === tileUrl) {
+          this.dispatchEvent(
+            new WarpedMapEvent(WarpedMapEventType.FIRSTTILELOADED, {
+              mapId,
+              tileUrl
+            })
+          )
+        }
+      }
+    }
+  }
+
+  private tileFetchError(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const { tileUrl } = event.data as WarpedMapTileEventDetail
+
+      if (!this.cachedTilesByUrl.has(tileUrl)) {
+        this.cachedTilesByUrl.delete(tileUrl)
+        this.updateTilesLoadingCount(-1)
+      }
+    }
+  }
+
+  private addMapIdForTileUrl(mapId: string, tileUrl: string) {
+    let mapIds = this.mapIdsByTileUrl.get(tileUrl)
+
+    if (!mapIds) {
+      mapIds = new Set([mapId])
+    } else {
+      mapIds.add(mapId)
     }
 
-    for (let url of this.cachedTilesByUrl.keys()) {
-      if (!tilesNeededUrls.has(url)) {
-        this.removeTile(url)
+    this.mapIdsByTileUrl.set(tileUrl, mapIds)
+
+    return mapIds
+  }
+
+  private removeMapIdForTileUrl(mapId: string, tileUrl: string) {
+    const mapIds = this.mapIdsByTileUrl.get(tileUrl)
+
+    if (!mapIds) {
+      return new Set()
+    } else {
+      mapIds.delete(mapId)
+    }
+
+    if (!mapIds.size) {
+      this.mapIdsByTileUrl.delete(tileUrl)
+    } else {
+      this.mapIdsByTileUrl.set(tileUrl, mapIds)
+    }
+
+    return mapIds
+  }
+
+  private addTileUrlForMapId(mapId: string, tileUrl: string) {
+    let tileUrls = this.tileUrlsByMapId.get(mapId)
+
+    if (!tileUrls) {
+      tileUrls = new Set([tileUrl])
+    } else {
+      tileUrls.add(tileUrl)
+    }
+
+    this.tileUrlsByMapId.set(mapId, tileUrls)
+
+    return tileUrls
+  }
+
+  private removeTileUrlForMapId(mapId: string, tileUrl: string) {
+    const tileUrls = this.tileUrlsByMapId.get(mapId)
+
+    if (!tileUrls) {
+      return new Set()
+    } else {
+      tileUrls.delete(tileUrl)
+
+      if (!tileUrls.size) {
+        this.tileUrlsByMapId.delete(mapId)
+      } else {
+        this.tileUrlsByMapId.set(mapId, tileUrls)
+      }
+
+      return tileUrls
+    }
+  }
+
+  private createKey(mapId: string, tileUrl: string) {
+    return `${mapId}:${tileUrl}`
+  }
+
+  setTiles(neededTiles: NeededTile[]) {
+    const neededTileMapIdsUrls = new Set()
+    for (const neededTile of neededTiles) {
+      neededTileMapIdsUrls.add(this.createKey(neededTile.mapId, neededTile.url))
+    }
+
+    for (const [tileUrl, mapIds] of this.mapIdsByTileUrl) {
+      for (const mapId of mapIds) {
+        if (!neededTileMapIdsUrls.has(this.createKey(mapId, tileUrl))) {
+          this.removeTile(mapId, tileUrl)
+        }
       }
     }
 
-    for (let tile of tilesNeeded) {
-      if (!this.cachedTilesByUrl.has(tile.url)) {
-        this.fetchTile(tile)
+    for (const neededTile of neededTiles) {
+      if (!this.mapIdsByTileUrl.get(neededTile.url)?.has(neededTile.mapId)) {
+        this.addTile(neededTile)
       }
     }
+  }
+
+  clear() {
+    this.cachedTilesByUrl = new Map()
+    this.mapIdsByTileUrl = new Map()
+    this.tileUrlsByMapId = new Map()
+    this.tilesLoadingCount = 0
   }
 
   getCachedTileUrls() {
     return this.cachedTilesByUrl.keys()
   }
 
-  getCachedTile(url: string) {
-    return this.cachedTilesByUrl.get(url)
+  getCachedTile(tileUrl: string) {
+    return this.cachedTilesByUrl.get(tileUrl)
   }
 
-  *getCachedTilesForMapId(mapId: string) {
-    const cachedTileUrlsForMapId = this.cachedTileUrlsByMapId.get(mapId)
-
-    if (cachedTileUrlsForMapId) {
-      for (let url of cachedTileUrlsForMapId) {
-        const cachedTile = this.cachedTilesByUrl.get(url)
-        if (cachedTile) {
-          yield cachedTile
-        }
-      }
-    }
-  }
-
-  private async fetchTile(tile: NeededTile) {
-    await this.storeTile(tile)
-
-    const abortController = new AbortController()
-    this.abortControllersByUrl.set(tile.url, abortController)
-
-    try {
-      const image = await fetchImage(tile.url, abortController.signal)
-
-      const imageBitmap = await createImageBitmap(image)
-      await this.storeTile(tile, imageBitmap)
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        // fetchImage was aborted because viewport was moved and tile
-        // is no longer needed. This error can be ignored, nothing to do.
-      } else {
-        // Something else happend
-        console.error(err)
-      }
-    }
-  }
-
-  private async storeTile(tile: NeededTile, imageBitmap?: ImageBitmap) {
-    const tileUrl = tile.url
-    const mapId = tile.mapId
-    const loading = imageBitmap ? false : true
-
-    this.cachedTilesByUrl.set(tileUrl, {
-      mapId,
-      tile: tile.tile,
-      imageRequest: tile.imageRequest,
-      url: tile.url,
-      loading,
-      imageBitmap
-    })
-
-    if (!this.cachedTileUrlsByMapId.has(mapId)) {
-      this.cachedTileUrlsByMapId.set(mapId, new Set())
-    }
-    this.cachedTileUrlsByMapId.get(mapId)?.add(tileUrl)
-
-    this.tilesLoadingCount += loading ? 1 : -1
-
-    if (!loading) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
-          tileUrl,
-          mapId
-        })
-      )
-    }
+  private updateTilesLoadingCount(delta: number) {
+    this.tilesLoadingCount += delta
 
     if (this.tilesLoadingCount === 0) {
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ALLTILESLOADED))
     }
-
-    // Remove tile from rtree
-    // if (this.rtree && !loading) {
-    //   geoBBox
-    //   this.rtree.addItem(url, )
-    // }
   }
 }

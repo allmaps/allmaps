@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.14",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -13,7 +13,8 @@
   "unpkg": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -34,9 +35,12 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "mocha && npm run lint",
+    "test": "NODE_ENV=test mocha --slow 200ms",
     "pretest": "npm run build",
-    "lint": "eslint dist test"
+    "preversion": "npm run types && npm run lint && npm test",
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test"
   },
   "keywords": [
     "allmaps",
@@ -47,21 +51,26 @@
   ],
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.12",
-    "@allmaps/iiif-parser": "^1.0.0-beta.22",
-    "@allmaps/transform": "^1.0.0-beta.12",
+    "@allmaps/annotation": "^1.0.0-beta.16",
+    "@allmaps/iiif-parser": "^1.0.0-beta.25",
+    "@allmaps/transform": "^1.0.0-beta.15",
+    "@allmaps/stdlib": "^1.0.0-beta.12",
+    "@allmaps/id": "^1.0.0-beta.16",
+    "commander": "^10.0.0",
     "stream-json": "^1.7.4",
-    "svg-parser": "^2.0.4",
-    "yargs": "^17.5.1"
+    "zod-validation-error": "^1.5.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",
     "@types/stream-json": "^1.7.2",
-    "@types/svg-parser": "^2.0.3",
-    "@types/yargs": "^17.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
+    "chai-roughly": "^1.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0",
     "zod": "^3.20.6"
   }
 }

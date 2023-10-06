@@ -6,6 +6,9 @@
     "outDir": "./dist"
   },
   "references": [
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/types" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/annotation" }

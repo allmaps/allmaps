@@ -4,12 +4,28 @@ import { EmbeddedImage, Image } from './image.js'
 import { CanvasSchema } from '../schemas/iiif.js'
 
 import type { LanguageString, Metadata } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
+import {
+  parseVersion2String,
+  parseVersion3String,
+  parseVersion2Metadata,
+  filterInvalidMetadata
+} from '../lib/strings.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
 
 const CanvasTypeString = 'canvas'
 
+/**
+ * Parsed IIIF Canvas
+ * @class Canvas
+ * @property {string} [uri] - URI of Canvas
+ * @property {LanguageString} [label] - Label of Manifest
+ * @property {Metadata} [metadata] - Metadata of Manifest
+ * @property {EmbeddedImage | Image} [image] - Image of painted on Canvas
+ * @property {number} [height] - Height of Canvas
+ * @property {number} [width] - Width of Canvas
+ * @property {string} [type] - Resource type, equals 'canvas'
+ */
 export class Canvas {
   uri: string
   type: typeof CanvasTypeString = CanvasTypeString
@@ -35,16 +51,21 @@ export class Canvas {
         this.label = parseVersion2String(parsedCanvas.label)
       }
 
-      this.metadata = parseVersion2Metadata(parsedCanvas.metadata)
+      this.metadata = filterInvalidMetadata(
+        parseVersion2Metadata(parsedCanvas.metadata)
+      )
 
-      this.image = new EmbeddedImage(parsedCanvas.images[0].resource)
+      this.image = new EmbeddedImage(
+        parsedCanvas.images[0].resource,
+        parsedCanvas
+      )
     } else if ('id' in parsedCanvas) {
       // IIIF Presentation API 3.0
 
       this.uri = parsedCanvas.id
 
-      this.label = parsedCanvas.label
-      this.metadata = parsedCanvas.metadata
+      this.label = parseVersion3String(parsedCanvas.label)
+      this.metadata = filterInvalidMetadata(parsedCanvas.metadata)
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
 
@@ -55,7 +76,7 @@ export class Canvas {
         annotationBody = annotationBodyOrBodies
       }
 
-      this.image = new EmbeddedImage(annotationBody)
+      this.image = new EmbeddedImage(annotationBody, parsedCanvas)
     } else {
       throw new Error('Invalid IIIF Canvas')
     }

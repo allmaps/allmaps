@@ -1,7 +1,24 @@
-export async function fetchUrl(url: string, abortSignal?: AbortSignal) {
-  const response = await fetch(url, {
-    signal: abortSignal
-  })
+type FetchOptions = {
+  abortSignal?: AbortSignal
+  cache?: Cache
+}
+
+export async function fetchUrl(url: string, options: FetchOptions = {}) {
+  let response: Response | undefined
+
+  if (options.cache) {
+    response = await options.cache.match(url)
+  }
+
+  if (!response) {
+    response = await fetch(url, {
+      signal: options.abortSignal
+    })
+
+    if (options.cache) {
+      options.cache.put(url, response.clone())
+    }
+  }
 
   if (!response.ok) {
     throw new Error(response.statusText)
@@ -12,17 +29,17 @@ export async function fetchUrl(url: string, abortSignal?: AbortSignal) {
 
 export async function fetchJson(
   url: string,
-  abortSignal?: AbortSignal
+  options: FetchOptions = {}
 ): Promise<unknown> {
-  const response = await fetchUrl(url, abortSignal)
+  const response = await fetchUrl(url, options)
   return await response.json()
 }
 
 export async function fetchImageInfo(
   imageUri: string,
-  abortSignal?: AbortSignal
+  options: FetchOptions = {}
 ) {
-  const json = await fetchJson(`${imageUri}/info.json`, abortSignal)
+  const json = await fetchJson(`${imageUri}/info.json`, options)
   return json
 }
 
@@ -40,7 +57,7 @@ export function fetchImage(
         // image.src errors are not at all descriptive
         // load image again using fetch
         try {
-          await fetchUrl(url, abortSignal)
+          await fetchUrl(url, { abortSignal })
           throw new Error(
             'Image failed to load by setting Image src but downloaded successfully using fetch'
           )

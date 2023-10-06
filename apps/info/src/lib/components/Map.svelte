@@ -50,5 +50,5 @@
   <!-- TODO: add GeoJSON polygon -->
   <li><a href={viewerUrl}>Allmaps Viewer</a></li>
   <li><a href={editorUrl}>Allmaps Editor</a></li>
-  <!-- <li>XYZ tiles: <code>{tileServerUrl}</code></li> -->
+  <li>XYZ tiles: <code>{tileServerUrl}</code></li>
 </ul>

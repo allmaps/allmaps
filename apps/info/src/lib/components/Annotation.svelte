@@ -6,7 +6,7 @@
   export let maps: MapType[]
 </script>
 
-<p>This is a Georef Annotation.</p>
+<p>This is a Georeference Annotation.</p>
 
 {#if maps}
   <p>

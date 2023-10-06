@@ -6,11 +6,11 @@
     <title>@allmaps/openlayers</title>
     <link
       rel="stylesheet"
-      href="https://openlayers.org/en/v6.15.1/css/ol.css"
+      href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css"
       type="text/css"
     />
     <link rel="stylesheet" href="examples/style.css" type="text/css" />
-    <script src="https://openlayers.org/en/v6.15.1/build/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v8.1.0/dist/ol.js"></script>
   </head>
   <body>
     <div id="map"></div>
@@ -87,13 +87,17 @@
         />
         <label for="colorize-color">Colorize color</label>
       </div>
+      <div><button id="reload">Reload</button></div>
     </div>
     <script src="examples/controls.js" defer></script>
     <script src="examples/examples.js" defer></script>
     <script type="module">
       import { WarpedMapLayer, WarpedMapSource } from './src/index.ts'
 
-      initialize(WarpedMapLayer, WarpedMapSource)
+      initialize(WarpedMapLayer, WarpedMapSource).then((reload) => {
+        const reloadButton = document.getElementById('reload')
+        reloadButton.addEventListener('click', reload)
+      })
     </script>
   </body>
 </html>

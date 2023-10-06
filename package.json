@@ -1,16 +1,22 @@
 {
   "name": "@allmaps/allmaps",
+  "type": "module",
   "private": true,
   "scripts": {
-    "tsc": "tsc -b --watch",
+    "watch": "lerna run watch --parallel",
+    "dev": "lerna run dev --parallel",
+    "types": "lerna run types --parallel",
+    "lint": "lerna run lint --parallel",
+    "documentation": "lerna run documentation --parallel",
+    "precommit": "npm run types && npm run lint && npm run test",
+    "test": "lerna run test --parallel",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
-    "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete"
+    "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "husky": "^8.0.3",
     "lerna": "^5.1.0",
     "nx": "^14.3.6"
-  },
-  "engines": {
-    "node": ">=18.3"
   }
 }

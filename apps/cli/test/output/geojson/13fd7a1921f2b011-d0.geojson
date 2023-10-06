@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "imageId": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digikart_gaa0010000899_0001_F_01"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-23.196352437355618, 66.70747024843503],
+            [-12.438026109544248, 51.08775405266541],
+            [45.35194540833802, 56.792847140046305],
+            [35.02916750887597, 72.58936181567654],
+            [-23.196352437355618, 66.70747024843503]
+          ]
+        ]
+      }
+    }
+  ]
+}

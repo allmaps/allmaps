@@ -1,0 +1,15 @@
+Allmaps CLI
+
+Usage: allmaps iiif [options] [command]
+
+Parses and generates IIIF resources
+
+Options:
+  -h, --help                     display help for command
+
+Commands:
+  parse [files...]               parse IIIF resources
+  manifest [options] [files...]  generate IIIF Manifest
+  help [command]                 display help for command
+
+For more details about Allmaps, see https://allmaps.org

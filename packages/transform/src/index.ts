@@ -1,4 +1,7 @@
-export * from './transformer.js'
-export * from './polygon.js'
+import GcpTransformer from './transformer.js'
 
-export type { GCPTransformInfo } from './gdaltransform.js'
+/** @module allmaps/transform */
+
+export { GcpTransformer }
+
+export * from './shared/types.js'

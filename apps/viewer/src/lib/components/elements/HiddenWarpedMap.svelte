@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
 
-  import type { Vector as VectorSource } from 'ol/source'
+  import type VectorSource from 'ol/source/Vector.js'
   import type Select from 'ol/interaction/Select.js'
   import type { ViewerMap } from '$lib/shared/types.js'
 
@@ -16,11 +16,11 @@
     if (feature) {
       select.getFeatures().push(feature)
     }
-  })
 
-  onDestroy(() => {
-    if (feature) {
-      select.getFeatures().remove(feature)
+    return () => {
+      if (feature) {
+        select.getFeatures().remove(feature)
+      }
     }
   })
 </script>

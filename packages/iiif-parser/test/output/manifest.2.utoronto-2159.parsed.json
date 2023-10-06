@@ -1,0 +1,121 @@
+{
+  "embedded": false,
+  "type": "manifest",
+  "uri": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/manifest",
+  "majorVersion": 2,
+  "label": {
+    "none": ["Town plan of Bonifacio"]
+  },
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 6590,
+      "height": 4800,
+      "uri": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/canvas/mdl:2159",
+      "label": {
+        "none": ["Town plan of Bonifacio"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.library.utoronto.ca/image/v2/mdl:2159",
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "width": 6590,
+        "height": 4800
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "none": ["Creator or Contributor"]
+      },
+      "value": {
+        "none": ["Geographical Section, General Staff"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type of Resource"]
+      },
+      "value": {
+        "none": ["cartographic"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Genre"]
+      },
+      "value": {
+        "none": ["map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date"]
+      },
+      "value": {
+        "none": ["1943 Jun 1st"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Scale"]
+      },
+      "value": {
+        "none": ["1:5,000"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Holding Institution"]
+      },
+      "value": {
+        "none": ["Map & Data Library, University of Toronto Libraries"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Call Number"]
+      },
+      "value": {
+        "none": ["2159"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Permalink"]
+      },
+      "value": {
+        "none": ["https://collections.library.utoronto.ca/view/mdl:2159"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Digital Object Identifier"]
+      },
+      "value": {
+        "none": ["mdl:2159"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Rights"]
+      },
+      "value": {
+        "none": [
+          "For rights and reproduction information please contact mdl@library.utoronto.ca"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Digital Collection URL"]
+      },
+      "value": {
+        "none": ["https://collections.library.utoronto.ca/view/mdl:maps"]
+      }
+    }
+  ]
+}

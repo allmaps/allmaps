@@ -9,7 +9,7 @@ import type { BBox, Position, GeoJSONPolygon } from './shared/types.js'
 
 const DEFAULT_FILTER_INSIDE_POLYGON = true
 
-interface RTreeItem {
+type RTreeItem = {
   minX: number
   minY: number
   maxX: number
@@ -25,6 +25,8 @@ export default class RTree {
   itemsById: Map<string, RTreeItem> = new Map()
 
   addItem(id: string, polygon: GeoJSONPolygon) {
+    this.removeItem(id)
+
     const bbox = getPolygonBBox(polygon)
 
     const item = {
@@ -52,6 +54,10 @@ export default class RTree {
       this.bboxesById.delete(id)
       this.itemsById.delete(id)
     }
+  }
+
+  clear() {
+    this.rbush.clear()
   }
 
   private search(

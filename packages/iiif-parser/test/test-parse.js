@@ -78,24 +78,29 @@ function runTests(file) {
         expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
       })
     } else if (file.output && file.expected.errors) {
-      console.log('File parsed correctly, but expected errors:', file.basename)
+      it('should not parse', (done) => {
+        done(new Error(file.expected.errors))
+      })
     } else if (file.errors && file.expected.output) {
-      console.log(
-        'File failed to parse, but expected no errors:',
-        file.basename
-      )
+      it('should parse correctly', (done) => {
+        let message
 
-      console.log(file)
+        if (file.zodError) {
+          message = JSON.stringify(file.zodError.issues, null, 2)
+        } else {
+          message = file.errors[0]
+        }
 
-      if (file.zodError) {
-        console.error(JSON.stringify(file.zodError.format(), null, 2))
-        // console.log(JSON.stringify(file.zodError.issues, null, 2))
-      }
+        done(new Error(message))
+      })
     } else {
-      console.log(
-        'Input file should have either matching output or errors JSON file:\n  ',
-        file.basename
-      )
+      it('should have a matching output or errors JSON file', (done) => {
+        done(
+          new Error(
+            `File not found "${file.basename}.parsed.json" or "${file.basename}.errors.json"`
+          )
+        )
+      })
     }
   })
 }

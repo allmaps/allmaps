@@ -23,7 +23,6 @@
   },
   "body": {
     "type": "FeatureCollection",
-    "purpose": "gcp-georeferencing",
     "transformation": "invalid",
     "features": [
       {

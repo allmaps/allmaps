@@ -1,0 +1,73 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://test.allmaps.org/manifest/1",
+  "items": [
+    {
+      "height": 2203,
+      "id": "https://test.allmaps.org/manifest/1/canvases/0",
+      "items": [
+        {
+          "id": "https://test.allmaps.org/manifest/1/canvases/0/annotation-page",
+          "items": [
+            {
+              "body": {
+                "height": 2203,
+                "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+                "service": [
+                  {
+                    "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd385:g3851:g3851e:ct004586",
+                    "profile": "level1",
+                    "type": "ImageService2"
+                  }
+                ],
+                "type": "Image",
+                "width": 2115
+              },
+              "id": "https://test.allmaps.org/manifest/1/canvases/0/annotation",
+              "motivation": "painting",
+              "target": "https://test.allmaps.org/manifest/1/canvases/0",
+              "type": "Annotation"
+            }
+          ],
+          "type": "AnnotationPage"
+        }
+      ],
+      "type": "Canvas",
+      "width": 2115
+    },
+    {
+      "height": 7953,
+      "id": "https://test.allmaps.org/manifest/1/canvases/1",
+      "items": [
+        {
+          "id": "https://test.allmaps.org/manifest/1/canvases/1/annotation-page",
+          "items": [
+            {
+              "body": {
+                "height": 7953,
+                "id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+                "service": [
+                  {
+                    "id": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
+                    "profile": "level1",
+                    "type": "ImageService2"
+                  }
+                ],
+                "type": "Image",
+                "width": 6710
+              },
+              "id": "https://test.allmaps.org/manifest/1/canvases/1/annotation",
+              "motivation": "painting",
+              "target": "https://test.allmaps.org/manifest/1/canvases/1",
+              "type": "Annotation"
+            }
+          ],
+          "type": "AnnotationPage"
+        }
+      ],
+      "type": "Canvas",
+      "width": 6710
+    }
+  ],
+  "type": "Manifest"
+}

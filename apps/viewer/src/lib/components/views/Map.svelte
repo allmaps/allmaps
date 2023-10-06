@@ -1,118 +1,59 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
+
+  import type { SelectEvent } from 'ol/interaction/Select.js'
+  import type { FeatureLike } from 'ol/Feature.js'
 
   import {
-    renderOptionsLayer,
-    renderOptionsSelectedMaps,
-    renderOptionsScope
-  } from '$lib/shared/stores/render-options.js'
-  import { ol, xyzLayer } from '$lib/shared/stores/openlayers.js'
-  import { sourcesById } from '$lib/shared/stores/sources.js'
-
+    mapOl,
+    mapWarpedMapSource,
+    mapVectorSource,
+    mapSelect
+  } from '$lib/shared/stores/openlayers.js'
+  import { sourceLoading, sourcesCount } from '$lib/shared/stores/sources.js'
+  import { activeMap } from '$lib/shared/stores/active.js'
   import {
-    selectedMapIds,
     selectedMaps,
     updateSelectedMaps
   } from '$lib/shared/stores/selected.js'
 
-  import OLMap from 'ol/Map.js'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
-  import XYZ from 'ol/source/XYZ.js'
-  import View from 'ol/View.js'
-  import { GeoJSON } from 'ol/format'
-  import { Vector as VectorSource } from 'ol/source'
-  import Select, { SelectEvent } from 'ol/interaction/Select.js'
-  import { click } from 'ol/events/condition.js'
+  import { idsFromFeatures } from '$lib/shared/openlayers.js'
 
-  import {
-    invisiblePolygonStyle,
-    selectedPolygonStyle,
-    idsFromFeatures
-  } from '$lib/shared/openlayers.js'
+  import { computeBbox } from '@allmaps/stdlib'
 
-  import {
-    WarpedMapLayer,
-    WarpedMapSource,
-    OLWarpedMapEvent,
-    WarpedMapEventType
-  } from '@allmaps/openlayers'
-
+  import MapContextMenu from '$lib/components/dropdowns/MapContextMenu.svelte'
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
 
-  import type { WarpedMap } from '@allmaps/render'
-  import type { Source } from '$lib/shared/types.js'
+  import type { FeatureContextMenu } from '$lib/shared/types.js'
 
-  let warpedMapLayer: WarpedMapLayer
-  let warpedMapSource: WarpedMapSource
+  let ol: HTMLElement
+  let featureContextMenu: FeatureContextMenu | undefined
 
-  let vectorSource: VectorSource
-  let vectorLayer: VectorLayer<VectorSource>
-
-  let select: Select
-
-  let xyz: XYZ
-  let baseLayer
-
-  type IDs = Set<string>
-
-  const sourcesInWarpedMapSource: IDs = new Set()
-
-  function updateVectorLayer(warpedMap: WarpedMap) {
-    const geoMask = warpedMap.geoMask
-    const feature = new GeoJSON().readFeature(geoMask)
-
-    feature.setId(warpedMap.mapId)
-    vectorSource.addFeature(feature)
-  }
-
-  async function updateWarpedMapLayer(sourcesById: Map<string, Source>) {
-    if ($ol && warpedMapSource) {
-      const addSourceIds: IDs = new Set()
-      const deleteSourceIds: IDs = new Set()
-
-      for (let currentSourceId of sourcesById.keys()) {
-        if (!sourcesInWarpedMapSource.has(currentSourceId)) {
-          addSourceIds.add(currentSourceId)
-        }
-      }
-
-      for (let warpedMapSourceId of sourcesInWarpedMapSource) {
-        if (!sourcesById.has(warpedMapSourceId)) {
-          deleteSourceIds.add(warpedMapSourceId)
-        }
-      }
-
-      for (let addSourceId of addSourceIds) {
-        const source = sourcesById.get(addSourceId)
-        if (source) {
-          await warpedMapSource.addGeorefAnnotation(source.json)
-        }
-
-        sourcesInWarpedMapSource.add(addSourceId)
-      }
-
-      for (let deleteSourceId of deleteSourceIds) {
-        // TODO: remove maps from warpedMapSource
-
-        sourcesInWarpedMapSource.delete(deleteSourceId)
-      }
-
-      const extent = warpedMapSource.getExtent()
-      if (extent) {
-        $ol.getView().fit(extent, {
-          padding: [25, 25, 25, 25]
-        })
-      }
+  function fitExtent() {
+    const extent = mapWarpedMapSource.getExtent()
+    if (extent && mapOl) {
+      mapOl.getView().fit(extent, {
+        padding: [25, 25, 25, 25]
+      })
     }
   }
 
   $: {
-    updateWarpedMapLayer($sourcesById)
+    if (!$sourceLoading && $sourcesCount > 0) {
+      fitExtent()
+    }
   }
 
   $: {
-    if (xyz) {
-      xyz.setUrl($xyzLayer.url)
+    if (mapOl && $activeMap && $activeMap.updateView) {
+      const warpedMap = mapWarpedMapSource?.getMap($activeMap.viewerMap.mapId)
+      if (warpedMap) {
+        const bbox = computeBbox(warpedMap.geoMask.coordinates[0])
+        mapOl.getView().fit(bbox, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
     }
   }
 
@@ -120,124 +61,70 @@
     const selectedMapIds = idsFromFeatures(event.selected)
     const deselectedMapIds = idsFromFeatures(event.deselected)
 
-    updateSelectedMaps(selectedMapIds, deselectedMapIds)
+    updateSelectedMaps(selectedMapIds, deselectedMapIds, false)
   }
 
-  $: {
-    if (warpedMapLayer) {
-      if ($renderOptionsScope === 'layer') {
-        warpedMapLayer.setOpacity($renderOptionsLayer.opacity)
-
-        if ($renderOptionsLayer.removeBackground.enabled) {
-          warpedMapLayer.setRemoveBackground(
-            $renderOptionsLayer.removeBackground.color,
-            {
-              threshold: $renderOptionsLayer.removeBackground.threshold,
-              hardness: $renderOptionsLayer.removeBackground.hardness
-            }
-          )
-        } else {
-          warpedMapLayer.resetRemoveBackground()
-        }
-        if ($renderOptionsLayer.colorize.enabled) {
-          warpedMapLayer.setColorize($renderOptionsLayer.colorize.color)
-        } else {
-          warpedMapLayer.resetColorize()
-        }
-      } else {
-        const renderOptions = $renderOptionsSelectedMaps[0]
-
-        for (let selectedMapId of $selectedMapIds) {
-          warpedMapLayer.setMapOpacity(selectedMapId, renderOptions.opacity)
-          warpedMapLayer.setMapRemoveBackground(
-            selectedMapId,
-            renderOptions.removeBackground.color,
-            {
-              threshold: renderOptions.removeBackground.threshold,
-              hardness: renderOptions.removeBackground.hardness
-            }
-          )
-          warpedMapLayer.setMapColorize(
-            selectedMapId,
-            renderOptions.colorize.color
-          )
-        }
-      }
+  function showContextMenu(event: MouseEvent, feature: FeatureLike) {
+    featureContextMenu = {
+      event,
+      feature
     }
   }
 
-  onMount(async () => {
-    // TODO: set attribution
-    xyz = new XYZ({
-      url: $xyzLayer.url,
-      maxZoom: 19
-    })
+  function hideContextMenu() {
+    featureContextMenu = undefined
+  }
 
-    baseLayer = new TileLayer({
-      source: xyz
-    })
+  onMount(() => {
+    mapOl?.setTarget(ol)
+    mapSelect?.on('select', handleSelect)
 
-    warpedMapSource = new WarpedMapSource()
-    warpedMapLayer = new WarpedMapLayer({
-      source: warpedMapSource
-    })
+    ol.addEventListener('contextmenu', (event) => {
+      if (mapOl) {
+        event.preventDefault()
 
-    vectorSource = new VectorSource()
-    vectorLayer = new VectorLayer({
-      source: vectorSource,
-      style: invisiblePolygonStyle
-    })
+        // TODO: use selected maps
+        const feature = mapOl.forEachFeatureAtPixel(
+          mapOl.getEventPixel(event),
+          (feature) => feature
+        )
 
-    $ol = new OLMap({
-      layers: [baseLayer, warpedMapLayer, vectorLayer],
-      target: 'ol',
-      controls: [],
-      view: new View({
-        maxZoom: 24,
-        zoom: 12
-      })
-    })
-
-    select = new Select({
-      condition: click,
-      style: selectedPolygonStyle
-    })
-
-    // TODO: enable select
-    // $ol.addInteraction(select)
-    // select.on('select', handleSelect)
-
-    // TODO: fix typescript error
-    warpedMapLayer.on(
-      // @ts-ignore
-      WarpedMapEventType.WARPEDMAPADDED,
-      (event: OLWarpedMapEvent) => {
-        const mapId = event.data as string
-        const warpedMap = warpedMapSource.getWarpedMap(mapId)
-
-        if (warpedMap) {
-          updateVectorLayer(warpedMap)
+        if (feature) {
+          showContextMenu(event, feature)
         }
       }
-    )
+    })
 
-    updateWarpedMapLayer($sourcesById)
-  })
+    mapOl?.on('movestart', hideContextMenu)
 
-  onDestroy(() => {
-    $ol = undefined
+    fitExtent()
+
+    return () => {
+      mapSelect?.un('select', handleSelect)
+      mapOl?.un('movestart', hideContextMenu)
+      mapOl?.setTarget()
+    }
   })
 </script>
 
-<div id="ol" class="w-full h-full" />
-{#if vectorSource && select}
+<div id="ol" bind:this={ol} class="w-full h-full" />
+{#if featureContextMenu}
+  <MapContextMenu {featureContextMenu} />
+{/if}
+{#if mapVectorSource && mapSelect}
   <div class="hidden">
     <ol>
       {#each $selectedMaps as viewerMap (viewerMap.mapId)}
         <li>
-          <HiddenWarpedMap {vectorSource} {select} {viewerMap} />
+          <HiddenWarpedMap
+            vectorSource={mapVectorSource}
+            select={mapSelect}
+            {viewerMap}
+          />
         </li>
       {/each}
     </ol>
   </div>
 {/if}
+
+<svelte:window on:keypress={hideContextMenu} on:click={hideContextMenu} />

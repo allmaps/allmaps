@@ -1,39 +1,42 @@
 import type { EmbeddedImage } from '@allmaps/iiif-parser'
 
-export function generateManifest(uri: string, images: EmbeddedImage[]) {
+function generateImageService(image: EmbeddedImage) {
+  const profile = image.supportsAnyRegionAndSize ? 'level1' : 'level0'
+  const type = `ImageService${image.majorVersion}`
+
   return {
-    id: uri,
+    id: image.uri,
+    profile,
+    type
+  }
+}
+
+export function generateManifest(id: string, images: EmbeddedImage[]) {
+  return {
+    '@context': 'http://iiif.io/api/presentation/3/context.json',
+    id,
     type: 'Manifest',
-    items: images.map((image) => ({
-      id: `${image.uri}/canvas`,
+    items: images.map((image, index) => ({
+      id: `${id}/canvases/${index}`,
       type: 'Canvas',
       width: image.width,
       height: image.height,
       items: [
         {
           type: 'AnnotationPage',
-          id: `${image.uri}/annotations`,
+          id: `${id}/canvases/${index}/annotation-page`,
           items: [
             {
               type: 'Annotation',
-              id: `${image.uri}/annotation`,
+              id: `${id}/canvases/${index}/annotation`,
               motivation: 'painting',
-              target: `${image.uri}/canvas`,
+              target: `${id}/canvases/${index}`,
               body: {
                 type: 'Image',
                 id: image.uri,
-                format: 'image/tiff',
                 width: image.width,
                 height: image.height,
-                service: [
-                  {
-                    id: image.uri,
-                    // TODO: get from image
-                    profile: 'level2',
-                    // TODO: get from image
-                    type: 'ImageService2'
-                  }
-                ]
+                service: [generateImageService(image)]
               }
             }
           ]

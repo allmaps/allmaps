@@ -1,0 +1,107 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/manifest",
+  "@type": "sc:Manifest",
+  "label": "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027",
+  "logo": "https://iiifviewer.universiteitleiden.nl/logo/",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027"
+    },
+    {
+      "label": "Author/creator",
+      "value": "Keulen, Gerard van."
+    },
+    {
+      "label": "Subject (topical)",
+      "value": "Maps (documents)"
+    },
+    {
+      "label": "Country",
+      "value": {
+        "@value": "Netherlands",
+        "@language": "eng"
+      }
+    },
+    {
+      "label": "Published (digital)",
+      "value": "Leiden University Libraries"
+    },
+    {
+      "label": "Date issued",
+      "value": "[ca. 2013?] "
+    },
+    {
+      "label": "Language",
+      "value": {
+        "@value": "Dutch",
+        "@language": "eng"
+      }
+    },
+    {
+      "label": "Extent",
+      "value": "1 elektronische bron"
+    },
+    {
+      "label": "Note",
+      "value": "Oud signatuur: Port 282 N 17."
+    },
+    {
+      "label": "Published",
+      "value": 1723
+    },
+    {
+      "label": "Shelfmark",
+      "value": "COLLBN 003-02-027"
+    },
+    {
+      "label": "Persistent URL",
+      "value": "http://hdl.handle.net/1887.1/item:130206"
+    }
+  ],
+  "license": "Download provided. <a href='https://creativecommons.org/licenses/by/4.0/'>Use of this resource is governed by the terms and conditions of the Creative Commons CC BY License</a>",
+  "attribution": "Leiden University Libraries",
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "label": "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027",
+      "canvases": [
+        {
+          "@type": "sc:Canvas",
+          "@id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/canvas/default",
+          "label": "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027",
+          "height": 8706,
+          "width": 11901,
+          "thumbnail": {
+            "@id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206/full/80,/0/default.jpg",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206",
+              "profile": "http://iiif.io/api/image/2/level2.json"
+            }
+          },
+          "images": [
+            {
+              "@id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206/full/pct:50/0/default.jpg",
+                "@type": "dctypes:Image",
+                "height": 8706,
+                "width": 11901,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/canvas/default"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

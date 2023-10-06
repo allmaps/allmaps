@@ -7,10 +7,9 @@
 <header class="shadow-md p-1 md:p-2">
   <nav class="mx-auto flex flex-wrap justify-between items-center gap-3">
     <a href="/" class="flex gap-2 no-underline">
+      <!-- TODO: use Logo.svelte -->
       <img class="w-8 inline" alt="Allmaps logo" src={logo} />
-      <h1
-        class="self-center whitespace-nowrap text-xl font-medium dark:text-white inline"
-      >
+      <h1 class="self-center whitespace-nowrap text-xl font-medium inline">
         <span class="hidden sm:inline">Allmaps</span>
         <span class="font-light">{appName}</span>
       </h1>

@@ -2,8 +2,10 @@ import { Router } from 'itty-router'
 
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { createJsonResponse, createErrorResponse } from './json-response.js'
-import { mapFromParams, mapsFromQuery } from './map-from-request.js'
+import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
+import { optionsFromQuery } from './options.js'
 import { generateTileJson } from './tilejson.js'
+import { generateTilesHtml } from './html.js'
 
 import type { XYZTile, Caches } from './types.js'
 
@@ -30,68 +32,117 @@ function xyzFromParams(params: unknown): XYZTile {
   }
 }
 
-router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
-  return createJsonResponse(
-    {
-      error: 'Encountered unprocessed template URL. Please read documentation.'
-    },
-    400,
-    'Bad Request'
-  )
+// -------------------------------------------------------------------------------------------
+// Direct template URL requests - redirect to tiles.allmaps.org
+// -------------------------------------------------------------------------------------------
+
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
 })
 
-router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', () => {
-  return createJsonResponse(
-    {
-      error: 'Encountered unprocessed template URL. Please read documentation.'
-    },
-    400,
-    'Bad Request'
-  )
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
 })
+
+router.get('/images/:imageId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+router.get('/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+// -------------------------------------------------------------------------------------------
+// TileJSON
+// -------------------------------------------------------------------------------------------
 
 router.get('/tiles.json', async (req, env) => {
   const maps = await mapsFromQuery(cache, req.query)
-
-  if (maps.length !== 1) {
-    throw new Error('Annotation must contain exactly one map')
-  }
-  const map = maps[0]
+  const options = optionsFromQuery(req.query)
 
   const url = new URL(req.url)
-  const templateUrl: string = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
+  const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(templateUrl, map))
+  return createJsonResponse(generateTileJson(templateUrl, maps, options))
 })
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const mapId = req.params?.mapId
-  const map = await mapFromParams(cache, env, req.params)
+  const maps = await mapsFromParams(cache, env, req.params)
+  const options = optionsFromQuery(req.query)
 
-  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png`
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, map))
+  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
 })
+
+router.get('/images/:imageId/tiles.json', async (req, env) => {
+  const imageId = req.params?.imageId
+  const maps = await mapsFromParams(cache, env, req.params)
+  const options = optionsFromQuery(req.query)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`
+
+  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
+})
+
+router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
+  const manifestId = req.params?.manifestId
+  const maps = await mapsFromParams(cache, env, req.params)
+  const options = optionsFromQuery(req.query)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`
+
+  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
+})
+
+// -------------------------------------------------------------------------------------------
+// PNG tiles
+// -------------------------------------------------------------------------------------------
 
 // TODO: support retina tiles @2x
-router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
-  const map = await mapFromParams(cache, env, req.params)
-  const { x, y, z } = xyzFromParams(req.params)
-
-  return await createWarpedTileResponse(map, { x, y, z }, cache)
-})
-
 router.get('/:z/:x/:y.png', async (req) => {
   const maps = await mapsFromQuery(cache, req.query)
   const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
 
-  if (maps.length !== 1) {
-    throw new Error('Annotation must contain exactly one map')
-  }
-  const map = maps[0]
-
-  return await createWarpedTileResponse(map, { x, y, z }, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
 })
+
+router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
+  const maps = await mapsFromParams(cache, env, req.params)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
+
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+})
+
+router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
+  const maps = await mapsFromParams(cache, env, req.params)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
+
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+})
+
+router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
+  const maps = await mapsFromParams(cache, env, req.params)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req.query)
+
+  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+})
+
+// -------------------------------------------------------------------------------------------
+// Root and wildcard routes
+// -------------------------------------------------------------------------------------------
 
 router.get('/', () => createJsonResponse({ name: 'Allmaps Tile Server' }))
 
@@ -100,7 +151,7 @@ router.all('*', () =>
 )
 
 export default {
-  fetch: async (req: Request, ...extra: any) => {
+  fetch: async (req: Request, ...extra: []) => {
     const url = req.url
 
     const cacheResponse = await cache.match(req.url)

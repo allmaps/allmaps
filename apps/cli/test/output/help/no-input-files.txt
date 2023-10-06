@@ -1,0 +1,1 @@
+No input files supplied, and nothing to read from the standard input

@@ -1,1 +1,1 @@
-["Required"]
+"Validation error: Invalid literal value, expected \"SpecificResource\" at \"target.type\"; Required at \"target.source\"; Required at \"body.features[0].properties.resourceCoords\"; Required at \"body.features[1].properties.resourceCoords\"; Required at \"body.features[2].properties.resourceCoords\"; Required at \"body.features[3].properties.resourceCoords\""

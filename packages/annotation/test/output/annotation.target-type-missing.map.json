@@ -1,32 +1,35 @@
 [
   {
-    "version": 1,
-    "gcps": [
-      {
-        "image": [336, 1742],
-        "world": [2.2860069, 48.860451]
-      },
-      {
-        "image": [294, 227],
-        "world": [2.2906458, 48.8637277]
-      },
-      {
-        "image": [2252, 1108],
-        "world": [2.2945555, 48.8574745]
-      },
-      {
-        "image": [1892, 773],
-        "world": [2.2945164, 48.8590133]
-      }
-    ],
-    "image": {
-      "uri": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
-      "type": "ImageService2",
+    "@context": "https://schemas.allmaps.org/map/2/context.json",
+    "type": "GeoreferencedMap",
+    "resource": {
+      "id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
       "width": 4708,
       "height": 1860,
-      "version": 2
+      "type": "ImageService2"
     },
-    "pixelMask": [
+    "gcps": [
+      {
+        "resource": [336, 1742],
+        "geo": [2.2860069, 48.860451]
+      },
+      {
+        "resource": [294, 227],
+        "geo": [2.2906458, 48.8637277]
+      },
+      {
+        "resource": [2252, 1108],
+        "geo": [2.2945555, 48.8574745]
+      },
+      {
+        "resource": [1892, 773],
+        "geo": [2.2945164, 48.8590133]
+      }
+    ],
+    "transformation": {
+      "type": "thinPlateSpline"
+    },
+    "resourceMask": [
       [117, 120],
       [113, 1776],
       [4587, 1772],

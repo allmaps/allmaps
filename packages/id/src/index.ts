@@ -1,6 +1,12 @@
 import * as crypto from 'crypto'
 import serialize from './checksum.js'
 
+/**
+ * Computes SHA-1 hash of input string.
+ *
+ * @param {string} str - Input string.
+ * @returns {string} SHA-1 hash of `str`.
+ */
 function generateHash(str: string): string {
   return crypto.createHash('sha1').update(str, 'utf-8').digest('hex')
 }
@@ -10,12 +16,9 @@ function generateHash(str: string): string {
  *
  * @param {string} str - Input string.
  * @param {number} [length=16] - Length of returned hash.  The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of `str`.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of `str`.
  */
-export async function generateId(
-  str: string,
-  length: number = 16
-): Promise<string> {
+export async function generateId(str: string, length = 16): Promise<string> {
   const hash = await generateHash(String(str))
   return hash.slice(0, length)
 }
@@ -25,7 +28,7 @@ export async function generateId(
  *
  * @async
  * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of a random UUID.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of a random UUID.
  */
 export async function generateRandomId(length?: number): Promise<string> {
   const uuid = crypto.randomUUID()
@@ -39,10 +42,10 @@ export async function generateRandomId(length?: number): Promise<string> {
  * @async
  * @param {Object} obj - JSON object.
  * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
- * @returns {string} First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
+ * @returns {Promise<string>} First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
  */
 export async function generateChecksum(
-  obj: {},
+  obj: unknown,
   length?: number
 ): Promise<string> {
   const checksum = await generateId(serialize(obj), length)

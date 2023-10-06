@@ -1,1 +1,1 @@
-["Required", "Required", "Required"]
+"Validation error: Required at \"image\"; Required at \"gcps\"; Required at \"pixelMask\""

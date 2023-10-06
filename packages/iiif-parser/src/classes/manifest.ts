@@ -12,15 +12,20 @@ import { EmbeddedManifest3Schema } from '../schemas/presentation.3.js'
 import { Image } from './image.js'
 import { Canvas } from './canvas.js'
 
+import {
+  parseVersion2String,
+  parseVersion3String,
+  parseVersion2Metadata,
+  filterInvalidMetadata
+} from '../lib/strings.js'
+
 import type {
   LanguageString,
   Metadata,
   MajorVersion,
   FetchFunction,
-  FetchNextOptions,
   FetchNextResults
 } from '../lib/types.js'
-import { parseVersion2String, parseVersion2Metadata } from '../lib/strings.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
 type EmbeddedManifestType =
@@ -29,6 +34,15 @@ type EmbeddedManifestType =
 
 const ManifestTypeString = 'manifest'
 
+/**
+ * Parsed IIIF Manifest, embedded in a Collection
+ * @class EmbeddedManifest
+ * @property {boolean} embedded - Whether the Manifest is embedded in a Collection
+ * @property {string} [uri] - URI of Manifest
+ * @property {LanguageString} [label] - Label of Manifest
+ * @property {MajorVersion} [majorVersion] - IIIF API version of Manifest
+ * @property {string} [type] - Resource type, equals 'manifest'
+ */
 export class EmbeddedManifest {
   embedded = true
 
@@ -53,23 +67,31 @@ export class EmbeddedManifest {
       this.uri = parsedManifest.id
       this.majorVersion = 3
 
-      this.label = parsedManifest.label
+      this.label = parseVersion3String(parsedManifest.label)
     } else {
       throw new Error('Unsupported Manifest')
     }
   }
 }
 
+/**
+ * Parsed IIIF Manifest
+ * @class Manifest
+ * @extends EmbeddedManifest
+ * @property {Canvas[]} canvases - Array of parsed canvases
+ * @property {LanguageString} [description] - Description of Manifest
+ * @property {Metadata} [metadata] - Metadata of Manifest
+ */
 export class Manifest extends EmbeddedManifest {
   canvases: Canvas[] = []
 
   description?: LanguageString
   metadata?: Metadata
 
+  embedded = false
+
   constructor(parsedManifest: ManifestType) {
     super(parsedManifest)
-
-    this.embedded = false
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
@@ -77,13 +99,15 @@ export class Manifest extends EmbeddedManifest {
         this.description = parseVersion2String(parsedManifest.description)
       }
 
-      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
+      this.metadata = filterInvalidMetadata(
+        parseVersion2Metadata(parsedManifest.metadata)
+      )
 
       const sequence = parsedManifest.sequences[0]
       this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
-      this.metadata = parsedManifest.metadata
+      this.metadata = filterInvalidMetadata(parsedManifest.metadata)
 
       this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))
     } else {
@@ -91,15 +115,25 @@ export class Manifest extends EmbeddedManifest {
     }
   }
 
-  static parse(iiifData: any, majorVersion: MajorVersion | null = null) {
+  /**
+   * Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed version
+   * @param {any} iiifManifest - Source data of IIIF Manifest
+   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Manifest. If not provided, it will be determined automatically
+   * @returns {Manifest} Parsed IIIF Manifest
+   * @static
+   */
+  static parse(
+    iiifManifest: unknown,
+    majorVersion: MajorVersion | null = null
+  ) {
     let parsedManifest
 
     if (majorVersion === 2) {
-      parsedManifest = Manifest2Schema.parse(iiifData)
+      parsedManifest = Manifest2Schema.parse(iiifManifest)
     } else if (majorVersion === 3) {
-      parsedManifest = Manifest3Schema.parse(iiifData)
+      parsedManifest = Manifest3Schema.parse(iiifManifest)
     } else {
-      parsedManifest = ManifestSchema.parse(iiifData)
+      parsedManifest = ManifestSchema.parse(iiifManifest)
     }
 
     return new Manifest(parsedManifest)
@@ -107,7 +141,7 @@ export class Manifest extends EmbeddedManifest {
 
   async *fetchNext(
     fetch: FetchFunction,
-    depth: number = 0
+    depth = 0
   ): AsyncGenerator<FetchNextResults<Image>, void, void> {
     for (const canvasIndex in this.canvases) {
       const canvas = this.canvases[canvasIndex]
@@ -116,8 +150,8 @@ export class Manifest extends EmbeddedManifest {
       if (image.embedded) {
         const url = `${image.uri}/info.json`
 
-        const iiifData = await fetch(url)
-        const newImage = Image.parse(iiifData)
+        const iiifManifest = await fetch(url)
+        const newImage = Image.parse(iiifManifest)
 
         canvas.image = newImage
 

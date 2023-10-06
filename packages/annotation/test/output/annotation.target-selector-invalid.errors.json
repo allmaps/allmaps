@@ -1,1 +1,1 @@
-["Expected object, received string"]
+"Validation error: Expected object, received string at \"target.selector\""

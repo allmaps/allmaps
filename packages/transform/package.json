@@ -1,19 +1,27 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.12",
-  "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
-  },
-  "description": "Coordinate transformation functions, based on gdaltransform",
+  "version": "1.0.0-beta.15",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "description": "Coordinate transformation functions",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "unpkg": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -33,23 +41,35 @@
     "map"
   ],
   "dependencies": {
+    "@allmaps/types": "^1.0.0-beta.3",
+    "@allmaps/stdlib": "^1.0.0-beta.11",
     "@turf/distance": "^6.3.0",
-    "@turf/midpoint": "^6.3.0"
+    "@turf/midpoint": "^6.3.0",
+    "ml-matrix": "^6.10.4"
   },
   "scripts": {
     "watch": "tsc --watch",
+    "bench": "node bench/index.js",
     "build": "tsc",
-    "test": "mocha && eslint dist test",
-    "pretest": "npm run build"
+    "test": "NODE_ENV=test mocha",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "pretest": "npm run build",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
+    "preversion": "npm run types && npm run lint && npm test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/geojson": "^7946.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "documentation": "^14.0.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",
-    "mocha": "^8.4.0"
-  },
-  "engines": {
-    "node": "^14.13.1 || >=16.0.0"
+    "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0"
   }
 }

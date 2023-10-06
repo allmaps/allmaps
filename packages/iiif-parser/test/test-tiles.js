@@ -1,4 +1,3 @@
-
 // const tilesDir = './test/tiles'
 // const tilesFilename = `${tilesDir}/${basename}.tiles.json`
 // if (file.parsed) {

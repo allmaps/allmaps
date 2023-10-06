@@ -1,0 +1,134 @@
+{
+  "canvases": [
+    {
+      "height": 8706,
+      "image": {
+        "embedded": true,
+        "height": 8706,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206",
+        "width": 11901
+      },
+      "label": {
+        "none": [
+          "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027"
+        ]
+      },
+
+      "type": "canvas",
+      "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/canvas/default",
+      "width": 11901
+    }
+  ],
+  "embedded": false,
+  "label": {
+    "none": [
+      "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027"
+    ]
+  },
+  "majorVersion": 2,
+  "metadata": [
+    {
+      "label": {
+        "none": ["Title"]
+      },
+      "value": {
+        "none": [
+          "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Author/creator"]
+      },
+      "value": {
+        "none": ["Keulen, Gerard van."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subject (topical)"]
+      },
+      "value": {
+        "none": ["Maps (documents)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Country"]
+      },
+      "value": {
+        "eng": ["Netherlands"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Published (digital)"]
+      },
+      "value": {
+        "none": ["Leiden University Libraries"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date issued"]
+      },
+      "value": {
+        "none": ["[ca. 2013?] "]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "eng": ["Dutch"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Extent"]
+      },
+      "value": {
+        "none": ["1 elektronische bron"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Note"]
+      },
+      "value": {
+        "none": ["Oud signatuur: Port 282 N 17."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Published"]
+      },
+      "value": {
+        "none": ["1723"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Shelfmark"]
+      },
+      "value": {
+        "none": ["COLLBN 003-02-027"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Persistent URL"]
+      },
+      "value": {
+        "none": ["http://hdl.handle.net/1887.1/item:130206"]
+      }
+    }
+  ],
+  "type": "manifest",
+  "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/manifest"
+}

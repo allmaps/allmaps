@@ -1,6 +1,1 @@
-[
-  "Array must contain at least 3 element(s)",
-  "Required",
-  "Required",
-  "Required"
-]
+"Validation error: Required at \"image.uri\"; Required at \"image.type\"; Required at \"gcps[3].image\"; Array must contain at least 3 element(s) at \"pixelMask\""

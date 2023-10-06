@@ -2,7 +2,19 @@ export * from './WarpedMapLayer.js'
 export * from './WarpedMapSource.js'
 export * from './OLWarpedMapEvent.js'
 
-export { WarpedMapEventType } from '@allmaps/render'
+export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
-// TODO: consider removing/moving this file
-export * from './IIIFLayer.js'
+/**
+ * Position
+ * @typedef {[number, number]} Position
+ */
+
+/**
+ * Bounding box
+ * @typedef {[number, number, number, number ]} BBox
+ */
+
+/**
+ * Transformation type
+ * @typedef {'helmert' | 'polynomial' | 'polynomial1' | 'polynomial2' | 'polynomial3' | 'projective' | 'thinPlateSpline'} TransformationType
+ */

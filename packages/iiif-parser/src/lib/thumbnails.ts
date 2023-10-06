@@ -78,7 +78,7 @@ export function getThumbnail(
 
   if (sizes) {
     let matchingSize
-    for (let size of sizes) {
+    for (const size of sizes) {
       const scaleFactor = size.width / width
       if (
         scaleFactor >= maxThumbnailDownscale &&
@@ -126,9 +126,9 @@ export function getThumbnail(
       imageSize.height / (zoomLevel.scaleFactor * tileZoomLevels[0].height)
     )
 
-    let thumbnailTiles = []
+    const thumbnailTiles = []
     for (let y = 0; y < tilesY; y++) {
-      let thumbnailRow = []
+      const thumbnailRow = []
       for (let x = 0; x < tilesX; x++) {
         const thumbnailTile = getIiifTile(imageSize, zoomLevel, x, y)
         thumbnailRow.push(thumbnailTile)

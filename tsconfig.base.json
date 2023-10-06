@@ -7,9 +7,12 @@
     "composite": true,
     "declaration": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "paths": {
+      "@allmaps/types": ["./packages/types/src"],
       "@allmaps/id": ["./packages/id/src"],
       "@allmaps/transform": ["./packages/transform/src"],
+      "@allmaps/triangulate": ["./packages/triangulate/src"],
       "@allmaps/render": ["./packages/render/src"],
       "@allmaps/stdlib": ["./packages/stdlib/src"],
       "@allmaps/annotation": ["./packages/annotation/src"],
@@ -18,8 +21,9 @@
       "@allmaps/ui": ["./packages/ui/src"],
       "@allmaps/tailwind": ["./packages/tailwind/src"],
 
-      "@allmaps/id/*": ["./packages/id/src/*"],
+      "@allmaps/types/*": ["./packages/types/src/*"],
       "@allmaps/transform/*": ["./packages/transform/src/*"],
+      "@allmaps/triangulate/*": ["./packages/triangulate/src/*"],
       "@allmaps/render/*": ["./packages/render/src/*"],
       "@allmaps/stdlib/*": ["./packages/stdlib/src/*"],
       "@allmaps/annotation/*": ["./packages/annotation/src/*"],

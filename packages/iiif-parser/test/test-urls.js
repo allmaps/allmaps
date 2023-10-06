@@ -25,6 +25,20 @@ const tests = [
     size: { width: 334, height: 512 },
     expectedUrl:
       'https://rotterdamspubliek.nl/iiif/AD0567937AFC415096DCC6E6686FE32E/4096,0,2666,4096/334,/0/default.jpg'
+  },
+  {
+    filename: 'image.3.uvacreate-mmph-wae681.json',
+    region: { x: 0, y: 0, width: 128, height: 128 },
+    size: { width: 128, height: 128 },
+    expectedUrl:
+      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/0,0,128,128/128,128/0/default.jpg'
+  },
+  {
+    filename: 'image.2.sfo-176-270-383-1.json',
+    region: { x: 1536, y: 0, width: 162, height: 256 },
+    size: { width: 162, height: 256 },
+    expectedUrl:
+      'https://static.sfomuseum.org/media/176/270/383/1/tiles/1536,0,162,256/162,/0/default.jpg'
   }
 ]
 

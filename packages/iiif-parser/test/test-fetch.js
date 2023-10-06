@@ -9,7 +9,6 @@
 
 // let iiif0 = IIIF.parse(iiifData0)
 
-
 // function fetchJson(url) {
 //   return fetch(url).then((response) => response.json())
 // }

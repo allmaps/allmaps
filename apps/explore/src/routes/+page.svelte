@@ -17,8 +17,6 @@
 
   import 'ol/ol.css'
 
-  let ol: Map
-
   onMount(async () => {
     const vtLayer = new VectorTileLayer({
       declutter: false,
@@ -34,7 +32,7 @@
       })
     })
 
-    ol = new Map({
+    new Map({
       layers: [
         new TileLayer({
           source: new OSMSource()

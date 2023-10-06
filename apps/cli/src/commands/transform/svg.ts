@@ -1,43 +1,57 @@
-import { parseJsonFromFile, readInput, printJson } from '../../lib/io.js'
-import { parseAnnotationValidateMap } from '../../lib/parse.js'
-import { geomEach } from '../../lib/svg.js'
+import { Command } from 'commander'
 
-import type { ArgumentsCamelCase } from 'yargs'
+import { GcpTransformer } from '@allmaps/transform'
 
-const command = 'svg [file...]'
+import { readInput, printJson } from '../../lib/io.js'
+import {
+  parseGcps,
+  parseMap,
+  parseTransformOptions,
+  parseTransformationType
+} from '../../lib/parse.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+import {
+  stringToSvgGeometriesGenerator,
+  geometriesToFeatureCollection
+} from '@allmaps/stdlib'
 
-const describe = 'Transforms SVG to GeoJSON'
+export default function svg() {
+  let command = new Command('svg')
+    .argument('[files...]')
+    .summary('transform SVG to GeoJSON')
+    .description(
+      'Transform SVG to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+    )
 
-const builder = {
-  annotation: {
-    alias: 'a',
-    description: 'Filename of Georeference Annotation',
-    demandOption: true
-  }
-}
+  command = addAnnotationOptions(command)
+  command = addTransformOptions(command)
 
-async function handler(argv: ArgumentsCamelCase) {
-  const annotation = parseJsonFromFile(argv.annotation as string)
-  const mapOrMaps = parseAnnotationValidateMap(annotation)
+  return command.action(async (files, options) => {
+    const map = parseMap(options)
+    const gcps = parseGcps(options, map)
+    const transformationType = parseTransformationType(options, map)
+    const transformOptions = parseTransformOptions(options)
 
-  if (Array.isArray(mapOrMaps)) {
-    throw new Error('Annotation must contain exactly 1 georeferenced map')
-  }
+    const transformer = new GcpTransformer(gcps, transformationType)
 
-  const svgs = await readInput(argv.file as string[])
-
-  for (let svg of svgs) {
-    for (let geometry of geomEach(svg)) {
-      console.log(geometry)
+    if (options.inverse) {
+      throw new Error('Inverse transformation not supported for this command')
     }
-  }
 
-  // read SVG from input
-}
+    const svgs = await readInput(files as string[])
 
-export default {
-  command,
-  describe,
-  builder,
-  handler
+    const geojsonGeometries = []
+    for (const svg of svgs) {
+      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
+        const geojsonGeometry = transformer.transformSvgToGeojson(
+          svgGeometry,
+          transformOptions
+        )
+        geojsonGeometries.push(geojsonGeometry)
+      }
+    }
+
+    const featureCollection = geometriesToFeatureCollection(geojsonGeometries)
+    printJson(featureCollection)
+  })
 }

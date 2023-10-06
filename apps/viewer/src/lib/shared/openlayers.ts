@@ -1,7 +1,7 @@
-import { Stroke, Fill, Style } from 'ol/style'
-import type Feature from 'ol/feature'
+import { Stroke, Fill, Style } from 'ol/style.js'
+import type Feature from 'ol/Feature.js'
 
-import type { SVGPolygon } from '@allmaps/render'
+import type { Ring } from '@allmaps/render'
 
 export function invisiblePolygonStyle() {
   return new Style({
@@ -35,11 +35,11 @@ export function selectedPolygonStyle() {
   })
 }
 
-export function maskToPolygon(pixelMask: SVGPolygon) {
+export function maskToPolygon(resourceMask: Ring) {
   return [
     [
-      ...pixelMask.map((coordinate) => [coordinate[0], -coordinate[1]]),
-      [pixelMask[0][0], -pixelMask[0][1]]
+      ...resourceMask.map((coordinate) => [coordinate[0], -coordinate[1]]),
+      [resourceMask[0][0], -resourceMask[0][1]]
     ]
   ]
 }

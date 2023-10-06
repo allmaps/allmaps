@@ -13,17 +13,18 @@ uniform float u_backgroundColorHardness;
 uniform bool u_colorize;
 uniform vec3 u_colorizeColor;
 
-uniform mat4 u_pixelToImageMatrix;
-
 uniform sampler2D u_tilesTexture;
 uniform isampler2D u_tilePositionsTexture;
 uniform isampler2D u_imagePositionsTexture;
 uniform isampler2D u_scaleFactorsTexture;
 
+in vec2 v_pixel_position;
+in float v_pixel_triangle_index; // DEV
+
 out vec4 outColor;
 
 void main() {
-  vec2 imageCoords = (u_pixelToImageMatrix * vec4(gl_FragCoord.xy, 0.0, 1.0)).xy;
+  vec2 imageCoords = v_pixel_position;
 
   ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
   int tileCount = tilePositionsTextureSize.y;
@@ -95,5 +96,9 @@ void main() {
 
     // Set opacity
     outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
+
+    // DEV: draw triangles in random color
+    // float color = sin(v_pixel_triangle_index * 4.0);
+    // outColor = vec4(color, fract(color + 0.3), fract(color + 0.6), 1);
   }
 }

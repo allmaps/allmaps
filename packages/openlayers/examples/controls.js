@@ -20,7 +20,11 @@ function initializeControls(warpedMapLayer) {
         '#background-color-hardness'
       ).valueAsNumber
 
-      warpedMapLayer.setRemoveBackground(color, { threshold, hardness })
+      warpedMapLayer.setRemoveBackground({
+        hexColor: color,
+        threshold,
+        hardness
+      })
     } else {
       warpedMapLayer.resetRemoveBackground()
     }

@@ -32,7 +32,7 @@
       const json = await fetch(url).then((response) => response.json())
 
       if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
-        // The JSON data might be a Georef Annotation
+        // The JSON data might be a Georeference Annotation
         maps = parseAnnotation(json)
         parsedIiif = undefined
 
@@ -75,6 +75,8 @@
     {:else}
       <Annotation {maps} />
     {/if}
+  {:else if error}
+    <div>{error}</div>
   {:else}
     <URLInput />
   {/if}

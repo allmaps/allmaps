@@ -1,69 +1,93 @@
 <script lang="ts">
-  import { browser } from '$app/environment'
-  import { get } from 'svelte/store'
+  import { onMount, createEventDispatcher } from 'svelte'
 
-  import url from '$lib/shared/stores/url.js'
+  import urlStore from '$lib/shared/stores/url.js'
+
+  const dispatch = createEventDispatcher()
 
   let urlValue: string
   let input: HTMLInputElement
 
   export let autofocus: boolean | undefined = undefined
 
-  const hasInitialUrl = get(url) ? true : false
+  $: urlValue = $urlStore
+
+  $: {
+    dispatch('value', {
+      value: urlValue
+    })
+  }
 
   if (autofocus === undefined) {
-    autofocus = !hasInitialUrl
+    autofocus = $urlStore === ''
   }
 
   export let placeholder =
     'Type the URL of a IIIF Image, Manifest, Collection or Georeference Annotation'
 
-  url.subscribe((value) => {
-    urlValue = value
-  })
+  function selectInputText() {
+    input.focus()
+    input.setSelectionRange(0, urlValue.length)
+  }
 
-  function inputClick(event: Event) {
+  function handleFocus() {
     selectInputText()
+  }
+
+  function handleInputKeyup(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      urlValue = $urlStore
+    }
+  }
+
+  function handleMouseup(event: Event) {
     event.preventDefault()
   }
 
-  function selectInputText() {
-    input.focus()
-    input.select()
+  export function getValue() {
+    return urlValue
   }
 
-  function submit() {
+  export function submit() {
     if (urlValue) {
       setStoreValue(urlValue)
     }
   }
 
   function setStoreValue(urlValue: string) {
-    $url = urlValue
+    $urlStore = urlValue
   }
 
-  if (browser) {
-    document.addEventListener('keyup', (event: KeyboardEvent) => {
-      const target = event.target as Element
-      if (event.key === '/' && target.tagName !== 'INPUT') {
-        selectInputText()
-      }
-    })
+  function handleDocumentKeyup(event: KeyboardEvent) {
+    const target = event.target as Element
+    if (event.key === '/' && target.nodeName.toLowerCase() !== 'input') {
+      selectInputText()
+    }
   }
+
+  onMount(() => {
+    document.addEventListener('keyup', handleDocumentKeyup)
+
+    return () => {
+      document.removeEventListener('keyup', handleDocumentKeyup)
+    }
+  })
 </script>
 
 <form
-  class="flex items-center gap-2 w-full bg-gray-50 rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 text-sm"
+  class="flex items-center gap-2 w-full rounded-lg border border-gray-300 focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500 text-sm"
   on:submit|preventDefault={submit}
 >
   <!-- svelte-ignore a11y-autofocus -->
   <input
     type="input"
     {autofocus}
-    on:click={inputClick}
+    on:focus|preventDefault={handleFocus}
+    on:keyup={handleInputKeyup}
+    on:mouseup={handleMouseup}
     bind:value={urlValue}
     bind:this={input}
-    class="bg-transparent w-full px-2 py-1 focus:outline-none truncate"
+    class="bg-transparent w-full rounded-lg px-2 py-1 focus:outline-none truncate"
     {placeholder}
   />
   <div class="shrink-0">

@@ -1,26 +1,25 @@
-import { parseJsonInput } from '../../lib/io.js'
+import { Command } from 'commander'
+
+import { parseJsonInput, printString } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
-import { generatePixelMapSvg } from '../../lib/svg.js'
+import {
+  svgGeometriesToSvgString,
+  mapToResourceMaskSvgPolygon
+} from '@allmaps/stdlib'
 
-import type { ArgumentsCamelCase } from 'yargs'
+export default function svg() {
+  return new Command('svg')
+    .argument('[files...]')
+    .summary('generate SVG from resource mask')
+    .description(
+      'Generates SVG from resource masks of input Georeference Annotations'
+    )
+    .action(async (files) => {
+      const jsonValues = await parseJsonInput(files as string[])
+      const maps = parseAnnotationsValidateMaps(jsonValues)
 
-const command = 'svg [file...]'
-
-const describe = 'Generates SVG from pixel masks of input Georef Annotations'
-
-const builder = {}
-
-async function handler(argv: ArgumentsCamelCase) {
-  const jsonValues = await parseJsonInput(argv.file as string[])
-  const maps = parseAnnotationsValidateMaps(jsonValues)
-
-  const svg = generatePixelMapSvg(maps)
-  console.log(svg)
-}
-
-export default {
-  command,
-  describe,
-  builder,
-  handler
+      const polygons = maps.map(mapToResourceMaskSvgPolygon)
+      const svg = svgGeometriesToSvgString(polygons)
+      printString(svg)
+    })
 }

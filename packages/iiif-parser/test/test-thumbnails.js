@@ -55,6 +55,12 @@ const tests = [
     expectedUrl:
       'https://ids.si.edu/ids/iiif/NASM-NASM2013-00143/full/400,/0/default.jpg'
     // Expected size: 400 × 579
+  },
+  {
+    filename: 'image.3.uvacreate-mmph-wae681.json',
+    thumbnailSize: { width: 400, height: 400 },
+    expectedUrl:
+      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/full/500,372/0/default.jpg'
   }
 ]
 

@@ -1,1 +1,1 @@
-["Invalid literal value, expected \"Feature\""]
+"Validation error: Invalid literal value, expected \"Feature\" at \"body.features[0].type\""

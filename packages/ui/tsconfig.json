@@ -14,5 +14,6 @@
       "$lib": ["./src/lib"],
       "$lib/*": ["./src/lib/*"]
     }
-  }
+  },
+  "references": [{ "path": "../../packages/tailwind" }]
 }
