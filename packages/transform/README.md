@@ -1,6 +1,6 @@
 # @allmaps/transform
 
-This module serves to **transform points, lines, polygons** and other spatial features from a cartesian `(x, y)` source-plane to a destination-plane. It does this **using a set of control points**, who's coordinates are known in both planes, and a specific transformation algorithm.
+This module serves to **transform points, lines, polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of control points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
 It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms positions from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
 
@@ -8,25 +8,38 @@ Care was taken to make this module **usable and useful outside of the Allmaps co
 
 ## How it works
 
-This package exports the GcpTransformer class. It's instances (called 'transformers') are built from a set of ground control points and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary positions in one plane to the corresponding positions in the other plane. The transformer has dedicated methods (functions) that use this transformation to transform Points, or more complex geometries like LineString and Polygons.
+This package exports the `GcpTransformer` class. Its instances (called `transformers`) are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary positions in one plane to the corresponding positions in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
 
-### Transform vs GDAL
+## Transform vs. GDAL
 
-The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical, as is be checked in the [tests](./test/test-transform.js).
+The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical. See the [tests](./test/test-transform.js) for details.
 
 For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library. This library is used for creating and solving the linear systems of equations that are at the heart of each of each of these transformations.
 
 ### Defining Ground Control Points
 
-Ground control points can be supplied as an array of
-`{source: [number, number], destination: [number, number]}` objects.
+GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
 
-Alternatively an array of `{resource: [number, number], geo: [number, number]}` is supported too, which is more expressive in the Allmaps use case.
+```ts
+type TransformGcp = {
+  source: [number, number]
+  destination: [number, number]
+}
+```
+
+Or you can supply an array of objects containing `resource` and `geo` coordinates. This is the format used in [Georeference Annotations](https://iiif.io/api/extension/georef/):
+
+```js
+type Gcp = {
+  resource: [number, number],
+  geo: [number, number]
+}
+```
 
 ### Supported transformation types
 
 | Type                   | Options    | Description                                                              | Properties                                                                       | Minimum number of GCPs |
-|------------------------|------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------|
+| ---------------------- | ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
 | `helmert`              |            | Helmert transformation or 'similarity transformation'                    | Preserves shape and angle                                                        | 2                      |
 | `polynomial` (default) | `order: 1` | First order polynomial transformation                                    | Preserves lines and parallelism                                                  | 3                      |
 | `polynomial`           | `order: 2` | Second order polynomial transformation                                   | Some bending flexibility                                                         | 6                      |
@@ -36,15 +49,15 @@ Alternatively an array of `{resource: [number, number], geo: [number, number]}` 
 
 ### Transformation methods
 
-A transformer is build from a set of Ground Control Points and a transformation type. It contains the forward and backward transformation, and has specific methods to apply it to transform geometries forward and backward.
+A transformer is build from a set of GCPs and a transformation type. It contains the forward and backward transformation, and has specific methods to apply it to transform geometries forward and backward.
 
-All transformer methods accepts points, lines as well as polygons, both as Allmaps geometries or GeoJSON geometries. There are, however, separate methods for transforming to Allmaps geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
+All transformer methods accepts points, line strings as well as polygons, both as simple geometries or GeoJSON geometries. There are, however, separate methods for transforming to simple geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
 
 Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
 
 Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
 
-The Allmaps geometries are:
+The simple geometries are:
 
 ```js
 type Position = [number, number]
@@ -64,7 +77,7 @@ type Geometry = Position | LineString | Polygon
 When transforming a line or polygon, it can happen that simply transforming every position is not sufficient. Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines). An algorithm will therefore recursively add midpoints in each segment (i.e. between two positions) to make the line more granular. A midpoint is added at the transformed middle position of the original segment on the condition that the ratio of (the distance between the middle position of the transformed segment and the transformed transformed middle position of the original segment) to the length of the transformed segment, is larger then a given ratio. The following options specify if and with what degree of detail such extra points should be added.
 
 | Option                    | Description                                                              | Default                                      |
-|:--------------------------|:-------------------------------------------------------------------------|:---------------------------------------------|
+| :------------------------ | :----------------------------------------------------------------------- | :------------------------------------------- |
 | `maxOffsetRatio`          | Maximum offset ratio (smaller means more midpoints)                      | `0`                                          |
 | `maxDepth`                | Maximum recursion depth (higher means more midpoints)                    | `6`                                          |
 | `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` when source is GeoJSON)      |
@@ -72,18 +85,12 @@ When transforming a line or polygon, it can happen that simply transforming ever
 
 ## Installation
 
-This is an ESM-only module that works in browsers or in Node.js.
+This is an ESM-only module that works in browsers and in Node.js.
 
-Use [pnpm](https://pnpm.io/) or [npm](https://www.npmjs.com/) to install this CLI tool globally in your system:
-
-```sh
-pnpm add @allmaps/transform
-```
-
-or
+Install with npm:
 
 ```sh
-nnpm install @allmaps/transform
+npm install @allmaps/transform
 ```
 
 ## Usage
@@ -113,7 +120,9 @@ const transformer = new GcpTransformer(transformGcps3, 'helmert')
 const transformedPosition = transformer.transformForward([100, 100])
 // transformedPosition = [4.9385700843392435, 52.46580484503631]
 
-const transformedPosition = transformer.transformBackward([4.9385700843392435, 52.46580484503631])
+const transformedPosition = transformer.transformBackward([
+  4.9385700843392435, 52.46580484503631
+])
 // transformedPosition = [100, 100]
 ```
 
@@ -155,7 +164,7 @@ export const transformGcps7 = [
 
 const transformOptions = {
   maxOffsetRatio: 0.001,
-  maxDepth: 2,
+  maxDepth: 2
 }
 // We transform backward (from destination to source) and have GeoJSON input.
 // Hence `destinationIsGeographic: true` will be set automatically
@@ -170,7 +179,10 @@ const lineStringGeoJSON = {
   ]
 }
 
-const transformedLineString = transformer.transformBackward(lineStringGeoJSON, transformOptions)
+const transformedLineString = transformer.transformBackward(
+  lineStringGeoJSON,
+  transformOptions
+)
 // transformedLineString = [
 //   [31.06060606060611, 155.30303030303048],
 //   [80.91200458875993, 165.7903106766409],
@@ -232,7 +244,10 @@ const polygon = [
   ]
 ]
 
-const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(polygon, transformOptions)
+const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
+  polygon,
+  transformOptions
+)
 // const transformedPolygonGeoJSON = {
 //   type: 'Polygon',
 //   coordinates: [
@@ -251,28 +266,171 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(polygon,
 // }
 ```
 
-### Notes
+## API
 
-- Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-- The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more then as projection coordinates.)
+<!-- Generated by documentation.js. Update this documentation by updating the source code. -->
+
+#### Table of Contents
+
+*   [allmaps/transform](#allmapstransform)
+*   [GcpTransformer](#gcptransformer)
+    *   [Parameters](#parameters)
+    *   [transformForward](#transformforward)
+    *   [transformForwardAsGeojson](#transformforwardasgeojson)
+    *   [transformBackward](#transformbackward)
+    *   [transformBackwardAsGeojson](#transformbackwardasgeojson)
+    *   [transformToGeo](#transformtogeo)
+    *   [transformToGeoAsGeojson](#transformtogeoasgeojson)
+    *   [transformToResource](#transformtoresource)
+    *   [transformToResourceAsGeojson](#transformtoresourceasgeojson)
+    *   [transformSvgToGeojson](#transformsvgtogeojson)
+    *   [transformGeojsonToSvg](#transformgeojsontosvg)
+
+### allmaps/transform
+
+### GcpTransformer
+
+A Ground Control Point Transformer, containing a forward and backward transformation and
+specifying functions to transform geometries using these transformations.
+
+#### Parameters
+
+*   `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<TransformGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
+*   `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
+
+#### transformForward
+
+Transforms a Geometry or a GeoJSON geometry forward to a Geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+*   `options` **PartialTransformOptions?** Transform options
+
+Returns **Geometry** Forward transform of input as Geometry
+
+#### transformForwardAsGeojson
+
+Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+*   `options` **PartialTransformOptions?** Transform options
+
+Returns **GeojsonGeometry** Forward transform of input, as GeoJSON geometry
+
+#### transformBackward
+
+Transforms a geometry or a GeoJSON geometry backward to a Geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+*   `options` **PartialTransformOptions?** Transform options
+
+Returns **Geometry** backward transform of input, as geometry
+
+#### transformBackwardAsGeojson
+
+Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+*   `options` **PartialTransformOptions?** Transform options
+
+Returns **GeojsonGeometry** backward transform of input, as GeoJSON geometry
+
+#### transformToGeo
+
+Transforms Geometry or GeoJSON geometry forward, as Geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Input to transform
+*   `options` &#x20;
+
+Returns **Geometry** Forward transform of input, as Geometry
+
+#### transformToGeoAsGeojson
+
+Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Input to transform
+*   `options` &#x20;
+
+Returns **Geometry** Forward transform of input, as GeoJSON geometry
+
+#### transformToResource
+
+Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Input to transform
+*   `options` &#x20;
+
+Returns **Geometry** Backward transform of input, as a Geometry
+
+#### transformToResourceAsGeojson
+
+Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
+
+##### Parameters
+
+*   `input` **(Geometry | GeojsonGeometry)** Input to transform
+*   `options` &#x20;
+
+Returns **GeojsonGeometry** Backward transform of input, as a GeoJSON geometry
+
+#### transformSvgToGeojson
+
+Transforms a SVG geometry forward to a GeoJSON geometry
+
+##### Parameters
+
+*   `geometry` **SvgGeometry** SVG geometry to transform
+*   `transformOptions` &#x20;
+
+Returns **GeojsonGeometry** Forward transform of input, as a GeoJSON geometry
+
+#### transformGeojsonToSvg
+
+Transforms a GeoJSON geometry backward to a SVG geometry
+
+##### Parameters
+
+*   `geometry` **GeojsonGeometry** GeoJSON geometry to transform
+*   `transformOptions` &#x20;
+
+Returns **SvgGeometry** Backward transform of input, as SVG geometry
+
+## Notes
+
+*   Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+*   The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ## CLI
 
-The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific usecases:
-- Transforming positions to positions.
-- Transforming **SVG** objects from the resource coordinates space of a IIIF Resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
-- Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF Resource, **given (the ground control points and transformation type from) a Georeference Annotation**
-- Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
-- Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON object in the geo coordinate space of it's interactive map.
+The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific use cases:
 
-### Benchmark
+*   Transforming positions to positions.
+*   Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
+*   Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
+*   Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
+*   Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
 
-Here are some benchmarks on building and using a transformer, as computed on a 2023 Macbook Air M2.
+## Benchmark
+
+Here are some benchmarks on building and using a transformer, as computed on a 2023 MacBook Air M2.
 
 Creating a transformer (with 10 points) (and transform 1 point)
 
 | Type              | Options    | Ops/s  |
-|-------------------|------------|--------|
+| ----------------- | ---------- | ------ |
 | `helmert`         |            | 71338  |
 | `polynomial`      | `order: 1` | 163419 |
 | `polynomial`      | `order: 2` | 86815  |
@@ -283,7 +441,7 @@ Creating a transformer (with 10 points) (and transform 1 point)
 Using a transformer (with 10 points) to transform 1 point
 
 | Type              | Options    | Ops/s    |
-|-------------------|------------|----------|
+| ----------------- | ---------- | -------- |
 | `helmert`         |            | 27398212 |
 | `polynomial`      | `order: 1` | 22364872 |
 | `polynomial`      | `order: 2` | 19126410 |
@@ -291,4 +449,6 @@ Using a transformer (with 10 points) to transform 1 point
 | `thinPlateSpline` |            | 484141   |
 | `projective`      |            | 22657850 |
 
-See `./bench/index.js`
+See [`./bench/index.js`](`./bench/index.js`).
+
+The benchmark can be run with `pnpm run bench`.
