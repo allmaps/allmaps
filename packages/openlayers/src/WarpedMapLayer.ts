@@ -237,6 +237,7 @@ export class WarpedMapLayer extends Layer {
   private worldCleared() {
     this.renderer.clear()
     this.tileCache.clear()
+    this.changed()
   }
 
   private rendererChanged() {

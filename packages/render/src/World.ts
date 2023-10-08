@@ -1,4 +1,4 @@
-import { generateId, generateChecksum } from '@allmaps/id/browser'
+import { generateId, generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
   validateMap,

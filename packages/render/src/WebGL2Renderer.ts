@@ -132,6 +132,8 @@ export default class WebGL2Renderer extends EventTarget {
 
   clear() {
     this.webGLWarpedMapsById = new Map()
+    this.viewport?.clear()
+    this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
   }
 
   updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {

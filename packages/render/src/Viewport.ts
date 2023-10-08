@@ -167,4 +167,8 @@ export default class Viewport extends EventTarget {
 
     return neededTiles
   }
+
+  clear() {
+    this.visibleWarpedMapIds = new Set()
+  }
 }
