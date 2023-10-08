@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { generateId } from '@allmaps/id/browser'
+  import { generateId } from '@allmaps/id'
 
   import { env } from '$lib/shared/variables.js'
 
@@ -67,7 +67,7 @@
 {#if maps}
   <Maps {maps} api={true} />
 {:else}
-  No georeferenced maps found in the Allmaps API for this ID. You can georeference this image with
-  in Allmaps Editor.
+  No georeferenced maps found in the Allmaps API for this ID. You can
+  georeference this image with in Allmaps Editor.
   <!-- <a href={editorUrl}>Allmaps Editor</a>. -->
 {/if}

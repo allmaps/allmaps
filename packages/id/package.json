@@ -5,24 +5,15 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "unpkg": "./dist/browser.js",
+  "unpkg": "./dist/index.js",
   "exports": {
-    "./browser": {
-      "types": "./dist/browser.d.ts",
-      "default": "./dist/browser.js"
-    },
     ".": {
-      "browser": {
-        "types": "./dist/browser.d.ts",
-        "default": "./dist/browser.js"
-      },
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     }
   },
   "files": [
-    "dist",
-    "*.d.ts"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -60,7 +51,7 @@
   },
   "homepage": "https://allmaps.org",
   "devDependencies": {
-    "@types/node": "^18.14.2",
+    "@types/node": "^20.8.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",
@@ -69,5 +60,8 @@
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
     "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=v20.8.0"
   }
 }

@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store'
 
-import { generateId } from '@allmaps/id/browser'
+import { generateId } from '@allmaps/id'
 import { fetchJson, fetchAnnotationsFromApi } from '@allmaps/stdlib'
 
 import {

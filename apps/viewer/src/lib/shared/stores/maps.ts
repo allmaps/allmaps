@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store'
 
-import { generateChecksum } from '@allmaps/id/browser'
+import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
   generateAnnotation,
