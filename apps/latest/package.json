@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.17",
-    "@allmaps/id": "^1.0.0-beta.17",
+    "@allmaps/id": "^1.0.0-beta.18",
     "@allmaps/tailwind": "^1.0.0-beta.8",
     "@allmaps/transform": "^1.0.0-beta.16",
     "@allmaps/types": "^1.0.0-beta.4",

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.35",
+  "version": "1.0.0-beta.36",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -28,9 +28,9 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@allmaps/annotation": "^1.0.0-beta.17",
-    "@allmaps/id": "^1.0.0-beta.17",
+    "@allmaps/id": "^1.0.0-beta.18",
     "@allmaps/iiif-parser": "^1.0.0-beta.26",
-    "@allmaps/render": "^1.0.0-beta.36",
+    "@allmaps/render": "^1.0.0-beta.37",
     "@allmaps/transform": "^1.0.0-beta.16",
     "@cloudflare/workers-types": "^3.14.0",
     "@turf/bbox": "^6.5.0",
