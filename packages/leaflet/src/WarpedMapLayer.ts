@@ -50,22 +50,25 @@ type FrameState = {
 
 const WarpedMapLayer = L.Layer.extend({
   options: { imageInfoCache: Cache },
-  initialize: function (annotation: Annotation, options: any) {
+
+  // Functions from WarpedMapLayers in @Allmaps/openlayers
+
+  // TODO: check if you want to pass options, see options further
+  // initialize: function (annotation: Annotation, options: any) {
+  initialize: function (annotation?: Annotation) {
     // Setting class specific things
     this.mapIdsInViewport = new Set()
-    // TODO: fix auto setting canvasSize
-    this.canvasSize = [641 * 2, 802 * 2]
 
     // Code ported from OpenLayers
 
-    this.annotation = annotation
-    L.setOptions(this, options)
+    // TODO: check if you want to pass options, see options earlier
+    // L.setOptions(this, options)
 
     this.container = L.DomUtil.create('div')
 
     this.container.style.position = 'absolute'
-    this.container.style.width = '641px' // TODO: 100%
-    this.container.style.height = '802px' // TODO: 100%
+    this.container.style.width = '100%' // TODO: 100%
+    this.container.style.height = '100%' // TODO: 100%
     this.container.classList.add('leaflet-layer')
     this.container.classList.add('allmaps-warped-layer')
 
@@ -74,8 +77,8 @@ const WarpedMapLayer = L.Layer.extend({
     this.canvas.style.position = 'absolute'
     this.canvas.style.left = '0'
 
-    this.canvas.style.width = '641px' // TODO: 100%
-    this.canvas.style.height = '802px' // TODO: 100%
+    // this.canvas.style.width = '100%' // TODO: 100%
+    // this.canvas.style.height = '100%' // TODO: 100%
 
     this.gl = this.canvas.getContext('webgl2', {
       premultipliedAlpha: true
@@ -84,9 +87,6 @@ const WarpedMapLayer = L.Layer.extend({
     if (!this.gl) {
       throw new Error('WebGL 2 not available')
     }
-
-    const resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    resizeObserver.observe(this.canvas, { box: 'content-box' })
 
     this.tileCache = new TileCache()
     this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
@@ -99,9 +99,8 @@ const WarpedMapLayer = L.Layer.extend({
     this.rtree = new RTree()
     this.world = new World(this.rtree)
 
-    this.world.addGeoreferenceAnnotation(annotation)
-
-    this.viewport = new Viewport(this.world)
+    // TODO: imageInfoCache
+    // this.world = new World(this.rtree, imageInfoCache)
 
     this.world.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
@@ -143,6 +142,8 @@ const WarpedMapLayer = L.Layer.extend({
       this._update.bind(this)
     )
 
+    this.viewport = new Viewport(this.world)
+
     // TODO: throttling
     // this.throttledUpdateViewportAndGetTilesNeeded = throttle(
     //   this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
@@ -159,11 +160,17 @@ const WarpedMapLayer = L.Layer.extend({
       this.warpedMapLeave.bind(this)
     )
 
+    if (annotation) {
+      this.addGeoreferenceAnnotation(annotation)
+    }
+
+    // TODO: this can go because it's triggered by an event at the end of addGeoreferenceAnnotation()
     for (const warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
   },
 
+  // TODO: this can go to stdlib (also in OpenLayers)
   arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
     if (!arr1 || !arr2) {
       return false
@@ -298,20 +305,13 @@ const WarpedMapLayer = L.Layer.extend({
       const displayWidth = Math.round(width * dpr)
       const displayHeight = Math.round(height * dpr)
 
-      this.canvasSize = [displayWidth, displayHeight]
+      this.canvas.width = displayWidth
+      this.canvas.height = displayHeight
+
+      this.canvas.style.width = width + 'px'
+      this.canvas.style.height = height + 'px'
     }
     this._update()
-  },
-
-  resizeCanvas(canvas: HTMLCanvasElement, [width, height]: [number, number]) {
-    const needResize = canvas.width !== width || canvas.height !== height
-
-    if (needResize) {
-      canvas.width = width
-      canvas.height = height
-    }
-
-    return needResize
   },
 
   hexToRgb(hex: string | undefined): OptionalColor {
@@ -538,10 +538,6 @@ const WarpedMapLayer = L.Layer.extend({
     //   clearTimeout(this.throttledRenderTimeoutId)
     // }
 
-    if (this.canvas) {
-      this.resizeCanvas(this.canvas, this.canvasSize)
-    }
-
     // TODO: throttled
     // this.throttledRenderTimeoutId = setTimeout(() => {
     //   this.renderInternal(frameState, true)
@@ -549,6 +545,28 @@ const WarpedMapLayer = L.Layer.extend({
 
     return this.renderInternal(frameState)
   },
+
+  // Functions from WaredMapSource in @Allmaps/openlayers
+
+  async addGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results = this.world.addGeoreferenceAnnotation(annotation)
+    this._update()
+
+    return results
+  },
+
+  async removeGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results = this.world.removeGeoreferenceAnnotation(annotation)
+    this._update()
+
+    return results
+  },
+
+  // TODO: make it possible to add multiple annotations (adding annotaiton can be via initialise, but also multiple other times via an extra function on this class that calls addGeoreferenceAnnotation())
 
   // Functions to align Leaflet with OpenLayers
 
@@ -610,19 +628,34 @@ const WarpedMapLayer = L.Layer.extend({
 
     this._map = map
 
-    map.on('zoomend viewreset', this._update, this)
+    map.on('zoomend viewreset moveend', this._update, this)
+
+    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    this.resizeObserver.observe(this._map.getContainer(), {
+      box: 'content-box'
+    })
+    // Note: Leaflet has a resize map state change event which we could also use, but wortking with a resizeObserver is better when dealing with device pixel ratios
+    // map.on('resize', this._update, this)
+
+    this._update()
+    return this
   },
 
   onRemove: function (map: Map) {
     this.container.remove()
-    map.off('zoomend viewreset', this._update, this)
+    map.off('zoomend viewreset moveend', this._update, this)
   },
 
   _update: function () {
     if (!this._map) {
       return
     }
+
+    const topLeft = this._map.containerPointToLayerPoint([0, 0])
+    L.DomUtil.setPosition(this.canvas, topLeft)
+
     const frameState = this.computeFrameState()
+
     this.render(frameState)
   }
 })
