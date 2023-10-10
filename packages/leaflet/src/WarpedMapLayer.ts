@@ -57,7 +57,6 @@ const WarpedMapLayer = L.Layer.extend({
   // initialize: function (annotation: Annotation, options: any) {
   initialize: function (annotation?: Annotation) {
     // Setting class specific things
-    this.mapIdsInViewport = new Set()
 
     // Code ported from OpenLayers
 
@@ -70,7 +69,7 @@ const WarpedMapLayer = L.Layer.extend({
     this.container.style.width = '100%' // TODO: 100%
     this.container.style.height = '100%' // TODO: 100%
     this.container.classList.add('leaflet-layer')
-    this.container.classList.add('allmaps-warped-layer')
+    this.container.classList.add('allmaps-warped-map-layer')
 
     this.canvas = L.DomUtil.create('canvas', undefined, this.container)
 
@@ -107,10 +106,10 @@ const WarpedMapLayer = L.Layer.extend({
       this.warpedMapAdded.bind(this)
     )
 
-    this.world.addEventListener(
-      WarpedMapEventType.ZINDICESCHANGES,
-      this.zIndicesChanged.bind(this)
-    )
+    // this.world.addEventListener(
+    //   WarpedMapEventType.ZINDICESCHANGES,
+    //   this.zIndicesChanged.bind(this)
+    // )
 
     this.world.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
@@ -151,14 +150,14 @@ const WarpedMapLayer = L.Layer.extend({
     //   THROTTLE_OPTIONS
     // )
 
-    this.viewport.addEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
-      this.warpedMapEnter.bind(this)
-    )
-    this.viewport.addEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
-      this.warpedMapLeave.bind(this)
-    )
+    // this.viewport.addEventListener(
+    //   WarpedMapEventType.WARPEDMAPENTER,
+    //   this.warpedMapEnter.bind(this)
+    // )
+    // this.viewport.addEventListener(
+    //   WarpedMapEventType.WARPEDMAPLEAVE,
+    //   this.warpedMapLeave.bind(this)
+    // )
 
     if (annotation) {
       this.addGeoreferenceAnnotation(annotation)
@@ -209,22 +208,22 @@ const WarpedMapLayer = L.Layer.extend({
     this._update()
   },
 
-  zIndicesChanged() {
-    const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
-      (mapIdA, mapIdB) => {
-        const zIndexA = this.world.getZIndex(mapIdA)
-        const zIndexB = this.world.getZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
+  // zIndicesChanged() {
+  //   const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
+  //     (mapIdA, mapIdB) => {
+  //       const zIndexA = this.world.getZIndex(mapIdA)
+  //       const zIndexB = this.world.getZIndex(mapIdB)
+  //       if (zIndexA !== undefined && zIndexB !== undefined) {
+  //         return zIndexA - zIndexB
+  //       }
 
-        return 0
-      }
-    )
+  //       return 0
+  //     }
+  //   )
 
-    this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
-    this._update()
-  },
+  //   this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
+  //   this._update()
+  // },
 
   visibilityChanged() {
     this._update()
@@ -241,20 +240,20 @@ const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  warpedMapEnter(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.mapIdsInViewport.add(mapId)
-      this.zIndicesChanged()
-    }
-  },
+  // warpedMapEnter(event: Event) {
+  //   if (event instanceof WarpedMapEvent) {
+  //     const mapId = event.data as string
+  //     this.mapIdsInViewport.add(mapId)
+  //     this.zIndicesChanged()
+  //   }
+  // },
 
-  warpedMapLeave(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.mapIdsInViewport.delete(mapId)
-    }
-  },
+  // warpedMapLeave(event: Event) {
+  //   if (event instanceof WarpedMapEvent) {
+  //     const mapId = event.data as string
+  //     this.mapIdsInViewport.delete(mapId)
+  //   }
+  // },
 
   worldCleared() {
     this.renderer.clear()
@@ -477,20 +476,17 @@ const WarpedMapLayer = L.Layer.extend({
     // if (layerChanged || extentChanged || sourceChanged) {
     this.previousExtent = frameState.extent?.slice() || null
 
-    const projectionTransform = this.makeProjectionTransform(frameState)
-    this.renderer.updateVertexBuffers(
-      projectionTransform,
-      this.mapIdsInViewport.values()
-    )
+    this.renderer.updateVertexBuffers(this.viewport)
     // }
   },
 
   // TODO: throttled
   // renderInternal(frameState: FrameState, last = false): HTMLElement {
   renderInternal(frameState: FrameState): HTMLElement {
-    this.prepareFrameInternal(frameState)
-
     const projectionTransform = this.makeProjectionTransform(frameState)
+    this.viewport.setProjectionTransform(projectionTransform)
+
+    this.prepareFrameInternal(frameState)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -526,7 +522,7 @@ const WarpedMapLayer = L.Layer.extend({
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(projectionTransform, this.mapIdsInViewport.values())
+      this.renderer.render(this.viewport)
     }
 
     return this.container
