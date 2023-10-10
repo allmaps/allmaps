@@ -314,11 +314,47 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the opacity of a single warped map to 1
+   * Resets the opacity of a single warped map to fully opaque
    * @param {string} mapId - ID of the warped map
    */
   resetMapOpacity(mapId: string) {
     this.renderer.resetMapOpacity(mapId)
+    this.changed()
+  }
+
+  /**
+   * Sets the saturation of a single warped map
+   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   */
+  setSaturation(saturation: number) {
+    this.renderer.setSaturation(saturation)
+    this.changed()
+  }
+
+  /**
+   * Resets the saturation of a single warped to the original colors
+   */
+  resetSaturation() {
+    this.renderer.resetSaturation()
+    this.changed()
+  }
+
+  /**
+   * Sets the opacity of a single warped map
+   * @param {string} mapId - ID of the warped map
+   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   */
+  setMapSaturation(mapId: string, saturation: number) {
+    this.renderer.setMapSaturation(mapId, saturation)
+    this.changed()
+  }
+
+  /**
+   * Resets the saturation of a single warped map to the original colors
+   * @param {string} mapId - ID of the warped map
+   */
+  resetMapSaturation(mapId: string) {
+    this.renderer.resetMapSaturation(mapId)
     this.changed()
   }
 

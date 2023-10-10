@@ -29,6 +29,7 @@ import type {
 } from './shared/types.js'
 
 const DEFAULT_OPACITY = 1
+const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
 
@@ -41,6 +42,7 @@ export default class WebGL2Renderer extends EventTarget {
   webGLWarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
   opacity: number = DEFAULT_OPACITY
+  saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
   // TODO: move to Viewport?
@@ -291,6 +293,37 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Set the saturation of the all warped maps
+   * @param saturation 0 - grayscale, 1 - original colors
+   */
+  setSaturation(saturation: number): void {
+    this.saturation = saturation
+  }
+
+  resetSaturation(): void {
+    this.saturation = DEFAULT_SATURATION
+  }
+
+  /**
+   * Set the saturation of a single warped map
+   * @param mapId the ID of the warped map
+   * @param saturation 0 - grayscale, 1 - original colors
+   */
+  setMapSaturation(mapId: string, saturation: number): void {
+    const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
+    if (webGLWarpedMap) {
+      webGLWarpedMap.saturation = saturation
+    }
+  }
+
+  resetMapSaturation(mapId: string): void {
+    const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
+    if (webGLWarpedMap) {
+      webGLWarpedMap.saturation = DEFAULT_SATURATION
+    }
+  }
+
   max(
     number1: number | undefined,
     number2: number | undefined
@@ -467,6 +500,15 @@ export default class WebGL2Renderer extends EventTarget {
 
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.opacity * webglWarpedMap.opacity)
+
+      const saturationLocation = gl.getUniformLocation(
+        this.program,
+        'u_saturation'
+      )
+      gl.uniform1f(
+        saturationLocation,
+        this.saturation * webglWarpedMap.saturation
+      )
 
       const u_tilesTextureLocation = gl.getUniformLocation(
         this.program,

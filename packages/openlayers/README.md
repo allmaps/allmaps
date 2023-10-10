@@ -48,6 +48,10 @@ fetch(annotationUrl)
 *   [WarpedMapLayer](#warpedmaplayer)
     *   [setMapOpacity](#setmapopacity)
     *   [resetMapOpacity](#resetmapopacity)
+    *   [setSaturation](#setsaturation)
+    *   [resetSaturation](#resetsaturation)
+    *   [setMapSaturation](#setmapsaturation)
+    *   [resetMapSaturation](#resetmapsaturation)
     *   [setRemoveBackground](#setremovebackground)
     *   [resetRemoveBackground](#resetremovebackground)
     *   [setMapRemoveBackground](#setmapremovebackground)
@@ -112,7 +116,36 @@ Sets the opacity of a single warped map
 
 #### resetMapOpacity
 
-Resets the opacity of a single warped map to 1
+Resets the opacity of a single warped map to fully opaque
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+#### setSaturation
+
+Sets the saturation of a single warped map
+
+##### Parameters
+
+*   `saturation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+
+#### resetSaturation
+
+Resets the saturation of a single warped to the original colors
+
+#### setMapSaturation
+
+Sets the opacity of a single warped map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `saturation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+
+#### resetMapSaturation
+
+Resets the saturation of a single warped map to the original colors
 
 ##### Parameters
 

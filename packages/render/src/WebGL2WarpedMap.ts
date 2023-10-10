@@ -18,7 +18,9 @@ const THROTTLE_OPTIONS = {
   trailing: true
 }
 
+// TODO: read defaults from config
 const DEFAULT_OPACITY = 1
+const DEFAULT_SATURATION = 1
 
 // TODO: Consider making this tunable by the user.
 const DIAMETER_FRACTION = 40
@@ -51,6 +53,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   tilesForTexture: Map<string, CachedTile> = new Map()
 
   opacity: number = DEFAULT_OPACITY
+  saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
   tilesTexture: WebGLTexture | null

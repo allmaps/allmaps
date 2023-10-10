@@ -5,6 +5,7 @@ precision highp isampler2D;
 
 uniform int u_bestScaleFactor;
 uniform float u_opacity;
+uniform float u_saturation;
 
 uniform bool u_removeBackgroundColor;
 uniform vec3 u_backgroundColor;
@@ -98,6 +99,10 @@ void main() {
         outColor = vec4(outColor.rgb * amount, amount);
       }
     }
+
+    // Saturation
+    float gray = 0.21f * outColor.r + 0.71f * outColor.g + 0.07f * outColor.b;
+    outColor = vec4(outColor.rgb * (u_saturation) + (gray * (1.0f - u_saturation)), outColor.a);
 
     // Colorize
     if(u_colorize) {
