@@ -148,15 +148,6 @@ const WarpedMapLayer = L.Layer.extend({
     //   WarpedMapEventType.WARPEDMAPLEAVE,
     //   this.warpedMapLeave.bind(this)
     // )
-
-    if (this.options.annotation) {
-      this.addGeoreferenceAnnotation(this.options.annotation)
-    }
-
-    // TODO: this can go because it's triggered by an event at the end of addGeoreferenceAnnotation()
-    for (const warpedMap of this.world.getMaps()) {
-      this.renderer.addWarpedMap(warpedMap)
-    }
   },
 
   // TODO: this can go to stdlib (also in OpenLayers)
@@ -643,6 +634,7 @@ const WarpedMapLayer = L.Layer.extend({
   onRemove: function (map: Map) {
     this.container.remove()
     map.off('zoomend viewreset moveend', this._update, this)
+    map.off('zoomanim', this._animateZoom, this)
   },
 
   _update: function () {
