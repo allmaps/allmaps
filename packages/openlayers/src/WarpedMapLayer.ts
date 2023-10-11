@@ -555,17 +555,21 @@ export class WarpedMapLayer extends Layer {
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
+        // console.log('normal')
         tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        // console.log('tilesNeeded', tilesNeeded)
       } else {
+        // console.log('throttled')
         tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        // console.log('tilesNeeded', tilesNeeded)
       }
 
       if (tilesNeeded && tilesNeeded.length) {

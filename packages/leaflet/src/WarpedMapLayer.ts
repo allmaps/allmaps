@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
-// import { throttle, type DebouncedFunc } from 'lodash-es'
 
 import { Annotation } from '@allmaps/annotation'
 import {
@@ -49,7 +48,7 @@ type FrameState = {
 }
 
 const WarpedMapLayer = L.Layer.extend({
-  options: { imageInfoCache: Cache },
+  options: { imageInfoCache: Cache, THROTTLE_WAIT_MS: 500 },
 
   // Functions from WarpedMapLayers in @Allmaps/openlayers
 
@@ -143,12 +142,11 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.viewport = new Viewport(this.world)
 
-    // TODO: throttling
-    // this.throttledUpdateViewportAndGetTilesNeeded = throttle(
-    //   this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
-    //   THROTTLE_WAIT_MS,
-    //   THROTTLE_OPTIONS
-    // )
+    this.throttledUpdateViewportAndGetTilesNeeded = L.Util.throttle(
+      this.viewport.updateViewportAndGetTilesNeeded,
+      this.options.THROTTLE_WAIT_MS,
+      this.viewport
+    )
 
     // this.viewport.addEventListener(
     //   WarpedMapEventType.WARPEDMAPENTER,
@@ -480,9 +478,7 @@ const WarpedMapLayer = L.Layer.extend({
     // }
   },
 
-  // TODO: throttled
-  // renderInternal(frameState: FrameState, last = false): HTMLElement {
-  renderInternal(frameState: FrameState): HTMLElement {
+  renderInternal(frameState: FrameState, last = false): HTMLElement {
     const projectionTransform = this.makeProjectionTransform(frameState)
     this.viewport.setProjectionTransform(projectionTransform)
 
@@ -498,22 +494,24 @@ const WarpedMapLayer = L.Layer.extend({
         frameState.size[1] * window.devicePixelRatio
       ] as Size
 
-      // TODO: throttled
-      // const tilesNeeded: NeededTile[] | undefined
-      // if (last) {
-      const tilesNeeded: NeededTile[] | undefined =
-        this.viewport.updateViewportAndGetTilesNeeded(
+      let tilesNeeded: NeededTile[] | undefined
+      if (last) {
+        // console.log('normal')
+        tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-      // } else {
-      //   tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
-      //     viewportSize,
-      //     extent,
-      //     frameState.coordinateToPixelTransform as Transform
-      //   )
-      // }
+        // console.log('tilesNeeded', tilesNeeded)
+      } else {
+        // console.log('throttled')
+        tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
+          viewportSize,
+          extent,
+          frameState.coordinateToPixelTransform as Transform
+        )
+        // console.log('tilesNeeded', tilesNeeded)
+      }
 
       if (tilesNeeded && tilesNeeded.length) {
         this.tileCache.setTiles(tilesNeeded)
@@ -529,15 +527,13 @@ const WarpedMapLayer = L.Layer.extend({
   },
 
   render(frameState: FrameState): HTMLElement {
-    // TODO: throttled
-    // if (this.throttledRenderTimeoutId) {
-    //   clearTimeout(this.throttledRenderTimeoutId)
-    // }
+    if (this.throttledRenderTimeoutId) {
+      clearTimeout(this.throttledRenderTimeoutId)
+    }
 
-    // TODO: throttled
-    // this.throttledRenderTimeoutId = setTimeout(() => {
-    //   this.renderInternal(frameState, true)
-    // }, THROTTLE_WAIT_MS)
+    this.throttledRenderTimeoutId = setTimeout(() => {
+      this.renderInternal(frameState, true)
+    }, this.options.THROTTLE_WAIT_MS)
 
     return this.renderInternal(frameState)
   },
