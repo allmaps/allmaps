@@ -43,14 +43,12 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      const annotationUrl =
-        // 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8' // London
-        'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8' // Boston
+      const annotationUrl = 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8' // Boston
 
       fetch(annotationUrl)
         .then((response) => response.json())
         .then((annotation) => {
-          const warpedMapLayer = new WarpedMapLayer(annotation)
+          const warpedMapLayer = new WarpedMapLayer({annotation: annotation})
           map.addLayer(warpedMapLayer)
         })
     </script>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
 
-import { Annotation } from '@allmaps/annotation'
+// import { Annotation } from '@allmaps/annotation'
 import {
   TileCache,
   World,
@@ -13,7 +13,7 @@ import {
   RTree
 } from '@allmaps/render'
 
-import type { Map } from 'leaflet'
+import type { Map, ZoomAnimEvent } from 'leaflet'
 
 import type {
   Size,
@@ -52,15 +52,8 @@ const WarpedMapLayer = L.Layer.extend({
 
   // Functions from WarpedMapLayers in @Allmaps/openlayers
 
-  // TODO: check if you want to pass options, see options further
-  // initialize: function (annotation: Annotation, options: any) {
-  initialize: function (annotation?: Annotation) {
-    // Setting class specific things
-
-    // Code ported from OpenLayers
-
-    // TODO: check if you want to pass options, see options earlier
-    // L.setOptions(this, options)
+  initialize: function (options: any) {
+    L.setOptions(this, options)
 
     this.container = L.DomUtil.create('div')
 
@@ -74,9 +67,8 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.canvas.style.position = 'absolute'
     this.canvas.style.left = '0'
-
-    // this.canvas.style.width = '100%' // TODO: 100%
-    // this.canvas.style.height = '100%' // TODO: 100%
+    this.canvas.classList.add('leaflet-zoom-animated') // Treat canvas element like L.ImageOverlay
+    this.canvas.classList.add('leaflet-image-layer') // Treat canvas element like L.ImageOverlay
 
     this.gl = this.canvas.getContext('webgl2', {
       premultipliedAlpha: true
@@ -157,8 +149,8 @@ const WarpedMapLayer = L.Layer.extend({
     //   this.warpedMapLeave.bind(this)
     // )
 
-    if (annotation) {
-      this.addGeoreferenceAnnotation(annotation)
+    if (this.options.annotation) {
+      this.addGeoreferenceAnnotation(this.options.annotation)
     }
 
     // TODO: this can go because it's triggered by an event at the end of addGeoreferenceAnnotation()
@@ -618,9 +610,11 @@ const WarpedMapLayer = L.Layer.extend({
     }
     pane.appendChild(this.container)
 
-    this._map = map
+    // TODO: remove, because this is done automatically
+    // this._map = map
 
     map.on('zoomend viewreset moveend', this._update, this)
+    map.on('zoomanim', this._animateZoom, this)
 
     this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
     this.resizeObserver.observe(this._map.getContainer(), {
@@ -631,6 +625,19 @@ const WarpedMapLayer = L.Layer.extend({
 
     this._update()
     return this
+  },
+
+  // borrowed from L.ImageOverlay
+  // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
+  _animateZoom: function (e: ZoomAnimEvent) {
+    const scale = this._map.getZoomScale(e.zoom)
+    const offset = this._map._latLngBoundsToNewLayerBounds(
+      this._map.getBounds(),
+      e.zoom,
+      e.center
+    ).min
+
+    L.DomUtil.setTransform(this.canvas, offset, scale)
   },
 
   onRemove: function (map: Map) {
