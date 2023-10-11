@@ -59,6 +59,7 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.15",
     "@allmaps/render": "^1.0.0-beta.32",
+    "@allmaps/stdlib": "^1.0.0-beta.13",
     "leaflet": "^1.9.4"
   },
   "license": "GPL-3.0-or-later",

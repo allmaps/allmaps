@@ -14,17 +14,13 @@ import {
 
 import { WebGL2Renderer } from '@allmaps/render'
 
+import { hexToFractionalRgb } from '@allmaps/stdlib'
+
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
 import type { FrameState } from 'ol/Map.js'
 
-import type {
-  Size,
-  BBox,
-  Transform,
-  OptionalColor,
-  NeededTile
-} from '@allmaps/render'
+import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
 
 import type { WarpedMapSource } from './WarpedMapSource.js'
 
@@ -288,21 +284,6 @@ export class WarpedMapLayer extends Layer {
     return needResize
   }
 
-  private hexToRgb(hex: string | undefined): OptionalColor {
-    if (!hex) {
-      return
-    }
-
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? [
-          parseInt(result[1], 16) / 256,
-          parseInt(result[2], 16) / 256,
-          parseInt(result[3], 16) / 256
-        ]
-      : undefined
-  }
-
   /**
    * Sets the opacity of a single warped map
    * @param {string} mapId - ID of the warped map
@@ -368,7 +349,10 @@ export class WarpedMapLayer extends Layer {
   setRemoveBackground(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(options.hexColor)
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
+    console.log(color)
 
     this.renderer.setRemoveBackground({
       color,
@@ -398,7 +382,9 @@ export class WarpedMapLayer extends Layer {
     mapId: string,
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(options.hexColor)
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
 
     this.renderer.setMapRemoveBackground(mapId, {
       color,
@@ -421,7 +407,7 @@ export class WarpedMapLayer extends Layer {
    * @param {string} hexColor - desired hex color
    */
   setColorize(hexColor: string) {
-    const color = this.hexToRgb(hexColor)
+    const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setColorize({ color })
       this.changed()
@@ -442,7 +428,7 @@ export class WarpedMapLayer extends Layer {
    * @param {string} hexColor - desired hex color
    */
   setMapColorize(mapId: string, hexColor: string) {
-    const color = this.hexToRgb(hexColor)
+    const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setMapColorize(mapId, { color })
       this.changed()

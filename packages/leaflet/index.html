@@ -51,7 +51,7 @@
       const annotation2 = await fetch(annotationUrl2).then((response) => response.json());
       const annotation3 = await fetch(annotationUrl3).then((response) => response.json());
 
-      const warpedMapLayer = await new WarpedMapLayer()
+      const warpedMapLayer = new WarpedMapLayer()
       map.addLayer(warpedMapLayer)
       await warpedMapLayer.addGeoreferenceAnnotation(annotation)
       await warpedMapLayer.addGeoreferenceAnnotation(annotation2)

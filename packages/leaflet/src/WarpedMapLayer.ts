@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
 
-// import { Annotation } from '@allmaps/annotation'
 import {
   TileCache,
   World,
@@ -13,31 +12,13 @@ import {
   RTree
 } from '@allmaps/render'
 
+import { hexToFractionalRgb } from '@allmaps/stdlib'
+
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
-import type {
-  Size,
-  BBox,
-  Transform,
-  OptionalColor,
-  NeededTile
-} from '@allmaps/render'
+import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
 
-// export interfacetype GeoreferenceAnnotationLayerOptions extends LayerOptions {
-//   tileSize: object
-//   tileLayers: object[]
-//   tileUrls: string[]
-// }
-
-// interface WarpedMapLayerType extends Layer {
-// mapIdsInViewport: Set<string> = new Set()
-// GeoreferenceAnnotation: GeoreferenceAnnotationLayer
-// constructor(options?: GeoreferenceAnnotationLayerOptions)
-// bringToFront(): this;
-// getTileSize(): Point;
-// protected createTile(coords: Coords, done: DoneCallback): HTMLElement;
-// }
-
+// TODO: make class or integrate in Viewport
 type FrameState = {
   size: [number, number] // [width, height]
   rotation: number // rotation in radians
@@ -48,7 +29,7 @@ type FrameState = {
 }
 
 const WarpedMapLayer = L.Layer.extend({
-  options: { imageInfoCache: Cache, THROTTLE_WAIT_MS: 500 },
+  options: { THROTTLE_WAIT_MS: 500, opacity: 1 },
 
   // Functions from WarpedMapLayers in @Allmaps/openlayers
 
@@ -83,18 +64,15 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
-      this.rendererChanged.bind(this)
+      this._rendererChanged.bind(this)
     )
 
     this.rtree = new RTree()
-    this.world = new World(this.rtree)
-
-    // TODO: imageInfoCache
-    // this.world = new World(this.rtree, imageInfoCache)
+    this.world = new World(this.rtree, this.options.imageInfoCache)
 
     this.world.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this._warpedMapAdded.bind(this)
     )
 
     // this.world.addEventListener(
@@ -104,22 +82,22 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.world.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
-      this.visibilityChanged.bind(this)
+      this._visibilityChanged.bind(this)
     )
 
     this.world.addEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
+      this._transformationChanged.bind(this)
     )
 
     this.world.addEventListener(
       WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
+      this._resourceMaskUpdated.bind(this)
     )
 
     this.world.addEventListener(
       WarpedMapEventType.CLEARED,
-      this.worldCleared.bind(this)
+      this._worldCleared.bind(this)
     )
 
     this.tileCache.addEventListener(
@@ -139,15 +117,6 @@ const WarpedMapLayer = L.Layer.extend({
       this.options.THROTTLE_WAIT_MS,
       this.viewport
     )
-
-    // this.viewport.addEventListener(
-    //   WarpedMapEventType.WARPEDMAPENTER,
-    //   this.warpedMapEnter.bind(this)
-    // )
-    // this.viewport.addEventListener(
-    //   WarpedMapEventType.WARPEDMAPLEAVE,
-    //   this.warpedMapLeave.bind(this)
-    // )
   },
 
   // TODO: this can go to stdlib (also in OpenLayers)
@@ -168,7 +137,7 @@ const WarpedMapLayer = L.Layer.extend({
     return true
   },
 
-  warpedMapAdded(event: Event) {
+  _warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
@@ -178,7 +147,7 @@ const WarpedMapLayer = L.Layer.extend({
         this.renderer.addWarpedMap(warpedMap)
       }
 
-      // TODO: event
+      // TODO: Make a Leaflet event of this?
       // const olEvent = new OLWarpedMapEvent(
       //   WarpedMapEventType.WARPEDMAPADDED,
       //   mapId
@@ -206,11 +175,11 @@ const WarpedMapLayer = L.Layer.extend({
   //   this._update()
   // },
 
-  visibilityChanged() {
+  _visibilityChanged() {
     this._update()
   },
 
-  resourceMaskUpdated(event: Event) {
+  _resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       const warpedMap = this.world.getMap(mapId)
@@ -236,16 +205,16 @@ const WarpedMapLayer = L.Layer.extend({
   //   }
   // },
 
-  worldCleared() {
+  _worldCleared() {
     this.renderer.clear()
     this.tileCache.clear()
   },
 
-  rendererChanged() {
+  _rendererChanged() {
     this._update()
   },
 
-  transformationChanged(event: Event) {
+  _transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const mapId of mapIds) {
@@ -260,7 +229,7 @@ const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  onResize(entries: ResizeObserverEntry[]) {
+  _onResize(entries: ResizeObserverEntry[]) {
     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
     // TODO: read + understand https://web.dev/device-pixel-content-box/
     for (const entry of entries) {
@@ -294,21 +263,6 @@ const WarpedMapLayer = L.Layer.extend({
     this._update()
   },
 
-  hexToRgb(hex: string | undefined): OptionalColor {
-    if (!hex) {
-      return
-    }
-
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? [
-          parseInt(result[1], 16) / 256,
-          parseInt(result[2], 16) / 256,
-          parseInt(result[3], 16) / 256
-        ]
-      : undefined
-  },
-
   setMapOpacity(mapId: string, opacity: number) {
     this.renderer.setMapOpacity(mapId, opacity)
     this._update()
@@ -322,7 +276,9 @@ const WarpedMapLayer = L.Layer.extend({
   setRemoveBackground(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(options.hexColor)
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
 
     this.renderer.setRemoveBackground({
       color,
@@ -342,7 +298,9 @@ const WarpedMapLayer = L.Layer.extend({
 
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    const color = this.hexToRgb(options.hexColor)
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
 
     this.renderer.setMapRemoveBackground(mapId, {
       color,
@@ -382,31 +340,7 @@ const WarpedMapLayer = L.Layer.extend({
     this._update()
   },
 
-  dispose() {
-    this.renderer.dispose()
-
-    const extension = this.gl.getExtension('WEBGL_lose_context')
-    if (extension) {
-      extension.loseContext()
-    }
-    const canvas = this.gl.canvas
-    canvas.width = 1
-    canvas.height = 1
-
-    this.resizeObserver.disconnect()
-
-    // TODO: remove event listeners
-    //  - this.viewport
-    //  - this.tileCache
-    //  - this.world
-
-    this.tileCache.clear()
-
-    super.disposeInternal()
-  },
-
-  // TODO: use OL's own makeProjectionTransform function?
-  makeProjectionTransform(frameState: FrameState): Transform {
+  _makeProjectionTransform(frameState: FrameState): Transform {
     const size = frameState.size
     const rotation = frameState.rotation
     const resolution = frameState.resolution
@@ -423,8 +357,7 @@ const WarpedMapLayer = L.Layer.extend({
     )
   },
 
-  // TODO: Use OL's renderer class, move this function there?
-  prepareFrameInternal(frameState: FrameState) {
+  _prepareFrameInternal(frameState: FrameState) {
     // TODO: animation and interaction
     // const vectorSource = this.source
     // const viewNotMoving = true
@@ -461,11 +394,11 @@ const WarpedMapLayer = L.Layer.extend({
     // }
   },
 
-  renderInternal(frameState: FrameState, last = false): HTMLElement {
-    const projectionTransform = this.makeProjectionTransform(frameState)
+  _renderInternal(frameState: FrameState, last = false): HTMLElement {
+    const projectionTransform = this._makeProjectionTransform(frameState)
     this.viewport.setProjectionTransform(projectionTransform)
 
-    this.prepareFrameInternal(frameState)
+    this._prepareFrameInternal(frameState)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -515,10 +448,10 @@ const WarpedMapLayer = L.Layer.extend({
     }
 
     this.throttledRenderTimeoutId = setTimeout(() => {
-      this.renderInternal(frameState, true)
+      this._renderInternal(frameState, true)
     }, this.options.THROTTLE_WAIT_MS)
 
-    return this.renderInternal(frameState)
+    return this._renderInternal(frameState)
   },
 
   // Functions from WaredMapSource in @Allmaps/openlayers
@@ -540,8 +473,6 @@ const WarpedMapLayer = L.Layer.extend({
 
     return results
   },
-
-  // TODO: make it possible to add multiple annotations (adding annotaiton can be via initialise, but also multiple other times via an extra function on this class that calls addGeoreferenceAnnotation())
 
   // Functions to align Leaflet with OpenLayers
 
@@ -587,9 +518,13 @@ const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  // TODO: implement layer opacity
   getOpacity(): number {
-    return 1
+    return this.options.opacity
+  },
+
+  setOpacity(opacity: number) {
+    this.options.opacity = opacity
+    this._update()
   },
 
   // Leaflet specific Layer functions
@@ -607,7 +542,7 @@ const WarpedMapLayer = L.Layer.extend({
     map.on('zoomend viewreset moveend', this._update, this)
     map.on('zoomanim', this._animateZoom, this)
 
-    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    this.resizeObserver = new ResizeObserver(this._onResize.bind(this))
     this.resizeObserver.observe(this._map.getContainer(), {
       box: 'content-box'
     })
@@ -616,6 +551,12 @@ const WarpedMapLayer = L.Layer.extend({
 
     this._update()
     return this
+  },
+
+  onRemove: function (map: Map) {
+    this.container.remove()
+    map.off('zoomend viewreset moveend', this._update, this)
+    map.off('zoomanim', this._animateZoom, this)
   },
 
   // borrowed from L.ImageOverlay
@@ -631,12 +572,6 @@ const WarpedMapLayer = L.Layer.extend({
     L.DomUtil.setTransform(this.canvas, offset, scale)
   },
 
-  onRemove: function (map: Map) {
-    this.container.remove()
-    map.off('zoomend viewreset moveend', this._update, this)
-    map.off('zoomanim', this._animateZoom, this)
-  },
-
   _update: function () {
     if (!this._map) {
       return
@@ -650,9 +585,5 @@ const WarpedMapLayer = L.Layer.extend({
     this.render(frameState)
   }
 })
-
-// L.warpedMapLayer = function () {
-//   return new L.WarpedMapLayer()
-// }
 
 export default WarpedMapLayer
