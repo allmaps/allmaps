@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
 
+import { throttle } from 'lodash-es'
+
 import {
   TileCache,
   World,
@@ -29,7 +31,14 @@ type FrameState = {
 }
 
 const WarpedMapLayer = L.Layer.extend({
-  options: { THROTTLE_WAIT_MS: 500, opacity: 1 },
+  options: {
+    THROTTLE_WAIT_MS: 500,
+    THROTTLE_OPTIONS: {
+      leading: true,
+      trailing: true
+    },
+    opacity: 1
+  },
 
   // Functions from WarpedMapLayers in @Allmaps/openlayers
 
@@ -112,29 +121,11 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.viewport = new Viewport(this.world)
 
-    this.throttledUpdateViewportAndGetTilesNeeded = L.Util.throttle(
-      this.viewport.updateViewportAndGetTilesNeeded,
-      this.options.THROTTLE_WAIT_MS,
-      this.viewport
+    this.throttledUpdateViewportAndGetTilesNeeded = throttle(
+      this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
+      this.THROTTLE_WAIT_MS,
+      this.THROTTLE_OPTIONS
     )
-  },
-
-  // TODO: this can go to stdlib (also in OpenLayers)
-  arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
-    if (!arr1 || !arr2) {
-      return false
-    }
-
-    const len1 = arr1.length
-    if (len1 !== arr2.length) {
-      return false
-    }
-    for (let i = 0; i < len1; i++) {
-      if (arr1[i] !== arr2[i]) {
-        return false
-      }
-    }
-    return true
   },
 
   _warpedMapAdded(event: Event) {
@@ -357,48 +348,15 @@ const WarpedMapLayer = L.Layer.extend({
     )
   },
 
-  _prepareFrameInternal(frameState: FrameState) {
-    // TODO: animation and interaction
-    // const vectorSource = this.source
-    // const viewNotMoving = true
-    // // !frameState.viewHints[ViewHint.ANIMATING] &&
-    // // !frameState.viewHints[ViewHint.INTERACTING]
-    // const extentChanged = !this.arraysEqual(
-    //   this.previousExtent,
-    //   frameState.extent
-    // )
-
-    // const sourceChanged = true
-    // if (vectorSource) {
-    //   sourceChanged =
-    //     this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
-
-    //   if (sourceChanged) {
-    //     this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
-    //   }
-    // }
-
-    // const layerChanged = true
-    // const layerChanged =
-    //   this.lastPreparedFrameLayerRevision < this.getRevision()
-
-    // if (layerChanged) {
-    //   this.lastPreparedFrameLayerRevision = this.getRevision()
-    // }
-
-    // if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
-    // if (layerChanged || extentChanged || sourceChanged) {
-    this.previousExtent = frameState.extent?.slice() || null
-
+  _prepareFrameInternal() {
     this.renderer.updateVertexBuffers(this.viewport)
-    // }
   },
 
   _renderInternal(frameState: FrameState, last = false): HTMLElement {
     const projectionTransform = this._makeProjectionTransform(frameState)
     this.viewport.setProjectionTransform(projectionTransform)
 
-    this._prepareFrameInternal(frameState)
+    this._prepareFrameInternal()
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -412,21 +370,17 @@ const WarpedMapLayer = L.Layer.extend({
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        // console.log('normal')
         tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-        // console.log('tilesNeeded', tilesNeeded)
       } else {
-        // console.log('throttled')
         tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-        // console.log('tilesNeeded', tilesNeeded)
       }
 
       if (tilesNeeded && tilesNeeded.length) {
@@ -525,6 +479,10 @@ const WarpedMapLayer = L.Layer.extend({
   setOpacity(opacity: number) {
     this.options.opacity = opacity
     this._update()
+  },
+
+  setImageInfoCache(cache: Cache) {
+    this.world.setImageInfoCache(cache)
   },
 
   // Leaflet specific Layer functions

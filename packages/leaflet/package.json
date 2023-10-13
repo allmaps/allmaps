@@ -60,11 +60,13 @@
     "@allmaps/annotation": "^1.0.0-beta.15",
     "@allmaps/render": "^1.0.0-beta.32",
     "@allmaps/stdlib": "^1.0.0-beta.13",
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "lodash-es": "^4.17.21"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/leaflet": "^1.9.3",
+    "@types/lodash-es": "^4.17.6",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",

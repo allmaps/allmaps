@@ -14,7 +14,7 @@ import {
 
 import { WebGL2Renderer } from '@allmaps/render'
 
-import { hexToFractionalRgb } from '@allmaps/stdlib'
+import { hexToFractionalRgb, equalArray } from '@allmaps/stdlib'
 
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
@@ -161,23 +161,6 @@ export class WarpedMapLayer extends Layer {
     for (const warpedMap of this.world.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
-  }
-
-  private arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
-    if (!arr1 || !arr2) {
-      return false
-    }
-
-    const len1 = arr1.length
-    if (len1 !== arr2.length) {
-      return false
-    }
-    for (let i = 0; i < len1; i++) {
-      if (arr1[i] !== arr2[i]) {
-        return false
-      }
-    }
-    return true
   }
 
   private warpedMapAdded(event: Event) {
@@ -352,7 +335,6 @@ export class WarpedMapLayer extends Layer {
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
-    console.log(color)
 
     this.renderer.setRemoveBackground({
       color,
@@ -494,10 +476,7 @@ export class WarpedMapLayer extends Layer {
     const viewNotMoving =
       !frameState.viewHints[ViewHint.ANIMATING] &&
       !frameState.viewHints[ViewHint.INTERACTING]
-    const extentChanged = !this.arraysEqual(
-      this.previousExtent,
-      frameState.extent
-    )
+    const extentChanged = !equalArray(this.previousExtent, frameState.extent)
 
     let sourceChanged = false
     if (vectorSource) {
@@ -541,21 +520,17 @@ export class WarpedMapLayer extends Layer {
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        // console.log('normal')
         tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-        // console.log('tilesNeeded', tilesNeeded)
       } else {
-        // console.log('throttled')
         tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
-        // console.log('tilesNeeded', tilesNeeded)
       }
 
       if (tilesNeeded && tilesNeeded.length) {
