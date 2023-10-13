@@ -503,6 +503,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   private renderInternal(frameState: FrameState, last = false): HTMLElement {
+    // console.log('renderInternal()')
     const projectionTransform = this.makeProjectionTransform(frameState)
     this.viewport.setProjectionTransform(projectionTransform)
 
@@ -552,6 +553,7 @@ export class WarpedMapLayer extends Layer {
    * @return {HTMLElement} The rendered element
    */
   render(frameState: FrameState): HTMLElement {
+    // console.log('render()')
     if (this.throttledRenderTimeoutId) {
       clearTimeout(this.throttledRenderTimeoutId)
     }

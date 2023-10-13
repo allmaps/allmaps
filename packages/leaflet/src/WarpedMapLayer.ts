@@ -32,7 +32,7 @@ type FrameState = {
 
 const WarpedMapLayer = L.Layer.extend({
   options: {
-    THROTTLE_WAIT_MS: 500,
+    THROTTLE_WAIT_MS: 100,
     THROTTLE_OPTIONS: {
       leading: true,
       trailing: true
@@ -123,8 +123,20 @@ const WarpedMapLayer = L.Layer.extend({
 
     this.throttledUpdateViewportAndGetTilesNeeded = throttle(
       this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
-      this.THROTTLE_WAIT_MS,
-      this.THROTTLE_OPTIONS
+      this.options.THROTTLE_WAIT_MS,
+      this.options.THROTTLE_OPTIONS
+    )
+
+    this.throttledUpdateVertexBuffers = throttle(
+      this.renderer.updateVertexBuffers.bind(this.renderer),
+      this.options.THROTTLE_WAIT_MS,
+      this.options.THROTTLE_OPTIONS
+    )
+
+    this.throttledSetTiles = throttle(
+      this.tileCache.setTiles.bind(this.tileCache),
+      this.options.THROTTLE_WAIT_MS,
+      this.options.THROTTLE_OPTIONS
     )
   },
 
@@ -349,14 +361,21 @@ const WarpedMapLayer = L.Layer.extend({
   },
 
   _prepareFrameInternal() {
-    this.renderer.updateVertexBuffers(this.viewport)
+    // const extentChanged = !equalArray(this.previousExtent, frameState.extent)
+
+    // if (extentChanged) {
+    //   this.previousExtent = frameState.extent?.slice() || null
+
+    //   this.throttledUpdateVertexBuffers(this.viewport)
+    // }
+    this.throttledUpdateVertexBuffers(this.viewport)
   },
 
   _renderInternal(frameState: FrameState, last = false): HTMLElement {
     const projectionTransform = this._makeProjectionTransform(frameState)
     this.viewport.setProjectionTransform(projectionTransform)
 
-    this._prepareFrameInternal()
+    this._prepareFrameInternal(frameState)
 
     if (frameState.extent) {
       const extent = frameState.extent as BBox
@@ -384,7 +403,7 @@ const WarpedMapLayer = L.Layer.extend({
       }
 
       if (tilesNeeded && tilesNeeded.length) {
-        this.tileCache.setTiles(tilesNeeded)
+        this.throttledSetTiles(tilesNeeded)
       }
 
       // TODO: reset maps not in viewport, make sure these only
@@ -497,7 +516,7 @@ const WarpedMapLayer = L.Layer.extend({
     // TODO: remove, because this is done automatically
     // this._map = map
 
-    map.on('zoomend viewreset moveend', this._update, this)
+    map.on('zoomend viewreset move', this._update, this)
     map.on('zoomanim', this._animateZoom, this)
 
     this.resizeObserver = new ResizeObserver(this._onResize.bind(this))
@@ -513,7 +532,7 @@ const WarpedMapLayer = L.Layer.extend({
 
   onRemove: function (map: Map) {
     this.container.remove()
-    map.off('zoomend viewreset moveend', this._update, this)
+    map.off('zoomend viewreset move', this._update, this)
     map.off('zoomanim', this._animateZoom, this)
   },
 
