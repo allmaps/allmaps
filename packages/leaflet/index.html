@@ -47,15 +47,24 @@
       const annotationUrl2 = 'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79';
       const annotationUrl3 = 'https://allmaps.org/webgl2-preview/west-roxbury.json';
 
-      const annotation = await fetch(annotationUrl).then((response) => response.json());
-      const annotation2 = await fetch(annotationUrl2).then((response) => response.json());
-      const annotation3 = await fetch(annotationUrl3).then((response) => response.json());
+      // There are 3 options to add an annotation
 
-      const warpedMapLayer = new WarpedMapLayer()
+      // Option 1: Specify annotation or annotationUrl when creating a WarpedMapLayer
+
+      const warpedMapLayer = await new WarpedMapLayer(annotationUrl)
       map.addLayer(warpedMapLayer)
-      await warpedMapLayer.addGeoreferenceAnnotation(annotation)
-      await warpedMapLayer.addGeoreferenceAnnotation(annotation2)
-      await warpedMapLayer.addGeoreferenceAnnotation(annotation3)
+
+      // Option 2: Fetch an annotation, parse it and add it.
+
+      fetch(annotationUrl2)
+      .then((response) => response.json())
+      .then((annotation2) => {
+        warpedMapLayer.addGeoreferenceAnnotation(annotation2)
+      })
+
+      // Option 3: Use (the new top-level await and) the specific function to add an annotation using it's URL
+
+      await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl3)
 
     </script>
   </body>

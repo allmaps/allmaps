@@ -12,3 +12,15 @@ export function equalArray<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
   }
   return true
 }
+
+export function isValidHttpUrl(string: string) {
+  let url
+
+  try {
+    url = new URL(string)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}

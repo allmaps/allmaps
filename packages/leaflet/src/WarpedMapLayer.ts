@@ -14,7 +14,7 @@ import {
   RTree
 } from '@allmaps/render'
 
-import { hexToFractionalRgb } from '@allmaps/stdlib'
+import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
@@ -42,7 +42,7 @@ const WarpedMapLayer = L.Layer.extend({
 
   // Functions from WarpedMapLayers in @Allmaps/openlayers
 
-  initialize: function (options: any) {
+  initialize: async function (annotation: any, options: any) {
     L.setOptions(this, options)
 
     this.container = L.DomUtil.create('div')
@@ -138,6 +138,14 @@ const WarpedMapLayer = L.Layer.extend({
       this.options.THROTTLE_WAIT_MS,
       this.options.THROTTLE_OPTIONS
     )
+
+    if (annotation) {
+      if (isValidHttpUrl(annotation)) {
+        this.addGeoreferenceAnnotationByUrl(annotation)
+      } else {
+        this.addGeoreferenceAnnotation(annotation)
+      }
+    }
   },
 
   _warpedMapAdded(event: Event) {
@@ -443,6 +451,28 @@ const WarpedMapLayer = L.Layer.extend({
   ): Promise<(string | Error)[]> {
     const results = this.world.removeGeoreferenceAnnotation(annotation)
     this._update()
+
+    return results
+  },
+
+  async addGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.addGeoreferenceAnnotation(annotation)
+
+    return results
+  },
+
+  async removeGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.removeGeoreferenceAnnotation(annotation)
 
     return results
   },
