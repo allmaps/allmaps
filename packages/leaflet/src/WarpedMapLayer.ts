@@ -346,6 +346,27 @@ export const WarpedMapLayer = L.Layer.extend({
     this._update()
   },
 
+  dispose() {
+    this.renderer.dispose()
+
+    const extension = this.gl.getExtension('WEBGL_lose_context')
+    if (extension) {
+      extension.loseContext()
+    }
+    const canvas = this.gl.canvas
+    canvas.width = 1
+    canvas.height = 1
+
+    this.resizeObserver.disconnect()
+
+    // TODO: remove event listeners
+    //  - this.viewport
+    //  - this.tileCache
+    //  - this.world
+
+    this.tileCache.clear()
+  },
+
   _makeProjectionTransform(frameState: FrameState): Transform {
     const size = frameState.size
     const rotation = frameState.rotation
@@ -543,6 +564,7 @@ export const WarpedMapLayer = L.Layer.extend({
 
     map.on('zoomend viewreset move', this._update, this)
     map.on('zoomanim', this._animateZoom, this)
+    map.on('unload', this.dispose, this)
 
     this.resizeObserver = new ResizeObserver(this._onResize.bind(this))
     this.resizeObserver.observe(this._map.getContainer(), {
