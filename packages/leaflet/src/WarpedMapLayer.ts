@@ -30,7 +30,7 @@ type FrameState = {
   coordinateToPixelTransform: Transform
 }
 
-const WarpedMapLayer = L.Layer.extend({
+export const WarpedMapLayer = L.Layer.extend({
   options: {
     THROTTLE_WAIT_MS: 100,
     THROTTLE_OPTIONS: {
@@ -158,12 +158,7 @@ const WarpedMapLayer = L.Layer.extend({
         this.renderer.addWarpedMap(warpedMap)
       }
 
-      // TODO: Make a Leaflet event of this?
-      // const olEvent = new OLWarpedMapEvent(
-      //   WarpedMapEventType.WARPEDMAPADDED,
-      //   mapId
-      // )
-      // this.dispatchEvent(olEvent)
+      this._map.fire(WarpedMapEventType.WARPEDMAPADDED, { mapId })
     }
 
     this._update()
@@ -592,5 +587,3 @@ const WarpedMapLayer = L.Layer.extend({
     this.render(frameState)
   }
 })
-
-export default WarpedMapLayer

@@ -1,3 +1,3 @@
-import WarpedMapLayer from './WarpedMapLayer.js'
+export * from './WarpedMapLayer.js'
 
-export default WarpedMapLayer
+export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'

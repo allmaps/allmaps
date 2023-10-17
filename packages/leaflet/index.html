@@ -35,7 +35,7 @@
   <body>
     <div id="map"></div>
     <script type="module">
-      import WarpedMapLayer from './src/index.ts'
+      import {WarpedMapLayer} from './src/index.ts'
 
       var map = L.map('map').setView([42.35921, -71.05882], 13);
 
@@ -56,15 +56,15 @@
 
       // Option 2: Fetch an annotation, parse it and add it.
 
-      fetch(annotationUrl2)
-      .then((response) => response.json())
-      .then((annotation2) => {
-        warpedMapLayer.addGeoreferenceAnnotation(annotation2)
-      })
+      // fetch(annotationUrl2)
+      // .then((response) => response.json())
+      // .then((annotation2) => {
+      //   warpedMapLayer.addGeoreferenceAnnotation(annotation2)
+      // })
 
       // Option 3: Use (the new top-level await and) the specific function to add an annotation using it's URL
 
-      await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl3)
+      // await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl3)
 
     </script>
   </body>
