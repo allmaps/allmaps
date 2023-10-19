@@ -44,14 +44,14 @@ export const WarpedMapLayer = L.Layer.extend({
     zIndex: '1'
   },
 
-  initialize: async function (annotation: any, options: any) {
+  initialize: function (annotation: any, options: any) {
     this._annotation = annotation
     L.setOptions(this, options)
 
     this._initGl()
   },
 
-  onAdd: function (map: Map) {
+  onAdd: async function (map: Map) {
     const paneName = this.getPaneName()
     this._map.getPane(paneName).appendChild(this.container)
 
@@ -68,9 +68,9 @@ export const WarpedMapLayer = L.Layer.extend({
 
     if (this._annotation) {
       if (isValidHttpUrl(this._annotation)) {
-        this.addGeoreferenceAnnotationByUrl(this._annotation)
+        await this.addGeoreferenceAnnotationByUrl(this._annotation)
       } else {
-        this.addGeoreferenceAnnotation(this._annotation)
+        await this.addGeoreferenceAnnotation(this._annotation)
       }
     }
 
