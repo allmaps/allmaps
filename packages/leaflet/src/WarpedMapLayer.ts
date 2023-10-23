@@ -61,7 +61,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {unknown} [annotation] - Georeference Annotation or URL pointing to an Annotation
    * @param {WarpedMapLayerOptions} options
    */
-  initialize: function (annotation: unknown, options: WarpedMapLayerOptions) {
+  initialize(annotation: unknown, options: WarpedMapLayerOptions) {
     this._annotation = annotation
     L.setOptions(this, options)
 
@@ -70,8 +70,9 @@ export const WarpedMapLayer = L.Layer.extend({
 
   /**
    * Contains all code code that creates DOM elements for the layer, adds them to map panes where they should belong and puts listeners on relevant map events
+   * @async
    */
-  onAdd: async function (map: Map) {
+  async onAdd(map: Map) {
     const paneName = this.getPaneName()
     this._map.getPane(paneName).appendChild(this.container)
 
@@ -101,7 +102,7 @@ export const WarpedMapLayer = L.Layer.extend({
   /**
    * Contains all cleanup code that removes the layer's elements from the DOM and removes listeners previously added in onAdd.
    */
-  onRemove: function (map: Map) {
+  onRemove(map: Map) {
     this.container.remove()
     map.off('zoomend viewreset move', this._update, this)
     map.off('zoomanim', this._animateZoom, this)
@@ -111,7 +112,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * Gets the HTML container element of the layer
    * @return {HTMLDivElement} HTML Div Element
    */
-  getContainer: function (): HTMLDivElement {
+  getContainer(): HTMLDivElement {
     return this.container
   },
 
@@ -119,7 +120,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * Gets the HTML canvas element of the layer
    * @return {HTMLCanvasElement} HTML Canvas Element
    */
-  getCanvas: function (): HTMLCanvasElement {
+  getCanvas(): HTMLCanvasElement {
     return this.canvas
   },
 
@@ -161,7 +162,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * Gets the pane name the layer is attached to. Defaults to 'tilePane'
    * @returns {string} Pane name
    */
-  getPaneName: function (): string {
+  getPaneName(): string {
     return this._map.getPane(this.options.pane) ? this.options.pane : 'tilePane'
   },
 
@@ -589,7 +590,7 @@ export const WarpedMapLayer = L.Layer.extend({
 
   // Note: borrowed from L.ImageOverlay
   // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
-  _animateZoom: function (e: ZoomAnimEvent) {
+  _animateZoom(e: ZoomAnimEvent) {
     const scale = this._map.getZoomScale(e.zoom)
     const offset = this._map._latLngBoundsToNewLayerBounds(
       this._map.getBounds(),
@@ -729,7 +730,7 @@ export const WarpedMapLayer = L.Layer.extend({
     return this._renderInternal(frameState)
   },
 
-  _update: function () {
+  _update() {
     if (!this._map) {
       return
     }
