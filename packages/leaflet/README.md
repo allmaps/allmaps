@@ -25,7 +25,7 @@ import { WarpedMapLayer } from '@allmaps/leaflet'
 Alternatively, ESM and UMD bundled versions of the code are also provided under `/dist/bundled`. You can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading leaflet.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.cjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js"></script>
 ```
 
 When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
@@ -84,7 +84,7 @@ async function asyncAddGeoreferenceAnnotationByUrl() {
 asyncAddGeoreferenceAnnotationByUrl()
 ```
 
-See `index.html` for an example of a minimal html file that loads a Leaflet maps and adds a Georeference Annotation.
+See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an example of a minimal html file that loads a Leaflet maps and adds a Georeference Annotation.
 
 ## API
 
