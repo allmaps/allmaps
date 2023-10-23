@@ -65,6 +65,8 @@ fetch(annotationUrl)
 *   [WarpedMapSource](#warpedmapsource)
     *   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
     *   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+    *   [addGeoreferenceAnnotationByUrl](#addgeoreferenceannotationbyurl)
+    *   [removeGeoreferenceAnnotationByUrl](#removegeoreferenceannotationbyurl)
     *   [clear](#clear)
     *   [getWorld](#getworld)
     *   [getMap](#getmap)
@@ -253,6 +255,26 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 ##### Parameters
 
 *   `annotation` **any** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
+
+#### addGeoreferenceAnnotationByUrl
+
+Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+
+##### Parameters
+
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
+
+#### removeGeoreferenceAnnotationByUrl
+
+Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+
+##### Parameters
+
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
 

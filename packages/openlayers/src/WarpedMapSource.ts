@@ -70,6 +70,38 @@ export class WarpedMapSource extends Source {
   }
 
   /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
+  async addGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.addGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.removeGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
    * Clears the source, removes all warped maps
    */
   clear() {

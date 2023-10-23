@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -24,7 +24,7 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
@@ -246,7 +246,7 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
@@ -313,7 +313,7 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
@@ -380,7 +380,7 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.8
@@ -529,13 +529,13 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
         version: link:../../packages/iiif-parser
       '@allmaps/render':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/render
       '@allmaps/transform':
         specifier: ^1.0.0-beta.16
@@ -598,16 +598,16 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/openlayers
       '@allmaps/render':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/render
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.13
@@ -796,11 +796,57 @@ importers:
         specifier: ^5.0.0
         version: 5.0.2
 
+  packages/leaflet:
+    dependencies:
+      '@allmaps/annotation':
+        specifier: ^1.0.0-beta.15
+        version: link:../annotation
+      '@allmaps/render':
+        specifier: ^1.0.0-beta.32
+        version: link:../render
+      '@allmaps/stdlib':
+        specifier: ^1.0.0-beta.13
+        version: link:../stdlib
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/leaflet':
+        specifier: ^1.9.3
+        version: 1.9.3
+      '@types/lodash-es':
+        specifier: ^4.17.6
+        version: 4.17.6
+      documentation:
+        specifier: ^14.0.0
+        version: 14.0.0
+      eslint:
+        specifier: ^8.35.0
+        version: 8.35.0
+      mocha:
+        specifier: ^8.4.0
+        version: 8.4.0
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.0
+      typescript:
+        specifier: ^5.0.0
+        version: 5.0.2
+      vite:
+        specifier: ^4.3.0
+        version: 4.3.0(@types/node@18.14.2)
+
   packages/openlayers:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../render
+      '@allmaps/stdlib':
+        specifier: ^1.0.0-beta.13
+        version: link:../stdlib
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -842,7 +888,7 @@ importers:
         specifier: ^1.0.0-beta.17
         version: link:../annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.17
+        specifier: ^1.0.0-beta.18
         version: link:../id
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.26
@@ -3903,6 +3949,12 @@ packages:
   /@types/json5@0.0.30:
     resolution: {integrity: sha512-sqm9g7mHlPY/43fcSNrCYfOeX9zkTTK+euO5E6+CVijSMm5tTjkVdwdqRkY3ljjIAf8679vps5jKUoJBCLsMDA==}
     dev: false
+
+  /@types/leaflet@1.9.3:
+    resolution: {integrity: sha512-Caa1lYOgKVqDkDZVWkto2Z5JtVo09spEaUt2S69LiugbBpoqQu92HYFMGUbYezZbnBkyOxMNPXHSgRrRY5UyIA==}
+    dependencies:
+      '@types/geojson': 7946.0.10
+    dev: true
 
   /@types/lodash-es@4.17.6:
     resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
@@ -7373,6 +7425,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /leaflet@1.9.4:
+    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
+    dev: false
 
   /lerc@3.0.0:
     resolution: {integrity: sha512-Rm4J/WaHhRa93nCN2mwWDZFoRVF18G1f47C+kvQWyHGEZxFpTUi73p7lMVSAndyxGt6lJ2/CFbOcf9ra5p8aww==}

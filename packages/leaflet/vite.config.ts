@@ -3,9 +3,10 @@ import { exec } from 'child_process'
 
 import ports from '../../ports.json'
 
+// Create TypeScript defintion files
 // TODO: move to @allmaps/stdlib?
-const buildTypes: PluginOption = {
-  name: 'build:types',
+const dts: PluginOption = {
+  name: 'dts-generator',
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
@@ -15,12 +16,13 @@ const buildTypes: PluginOption = {
   }
 }
 
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   server: {
-    port: ports.openlayers
+    port: ports.leaflet
   },
   build: {
-    target: 'es2022',
+    target: 'es2020',
     sourcemap: true,
     emptyOutDir: false,
     // minify: false,
@@ -28,45 +30,27 @@ export default defineConfig({
       entry: './src/index.ts',
       name: 'Allmaps',
       fileName: (format) =>
-        `bundled/allmaps-openlayers-8.${format}.${
+        `bundled/allmaps-leaflet-1.9.${format}.${
           format === 'umd' ? 'cjs' : 'js'
         }`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
-      external: [
-        'ol/View.js',
-        'ol/layer/Layer.js',
-        'ol/layer/Tile.js',
-        'ol/source/IIIF.js',
-        'ol/format/IIIFInfo.js',
-        'ol/Object.js',
-        'ol/events/Event.js',
-        'ol/proj.js',
-        'ol/transform.js'
-      ],
+      external: ['leaflet'],
       output: {
         globals: {
-          'ol/View.js': 'ol.View',
-          'ol/layer/Layer.js': 'ol.layer.Layer',
-          'ol/layer/Tile.js': 'ol.layer.Tile',
-          'ol/source/IIIF.js': 'ol.source.IIIF',
-          'ol/format/IIIFInfo.js': 'ol.format.IIIFInfo',
-          'ol/Object.js': 'ol.Object',
-          'ol/events/Event.js': 'ol.events.Event',
-          'ol/proj.js': 'ol.proj',
-          'ol/transform.js': 'ol.transform'
+          leaflet: 'L'
         }
       }
     }
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'es2022'
+      target: 'es2020'
     }
   },
   base: '',
-  plugins: [buildTypes],
+  plugins: [dts],
   define: {
     // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:
     global: 'globalThis'
