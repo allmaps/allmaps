@@ -39,14 +39,15 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && npm run build:types",
+    "build": "vite build",
     "preview": "vite preview",
-    "build:types": "tsc --declaration --emitDeclarationOnly --esModuleInterop --outDir dist",
-    "test": "NODE_ENV=test mocha",
     "types": "tsc --noEmit",
+    "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "preversion": "npm run types && npm run lint && npm test",
+    "test": "NODE_ENV=test mocha",
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "pretest": "npm run build"
   },
   "homepage": "https://allmaps.org",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "@types/leaflet": "^1.9.3",
     "@types/lodash-es": "^4.17.6",
+    "documentation": "^14.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",

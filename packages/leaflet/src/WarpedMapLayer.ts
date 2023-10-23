@@ -30,6 +30,18 @@ type FrameState = {
   coordinateToPixelTransform: Transform
 }
 
+type WarpedMapLayerOptions = {
+  opacity: number
+  interactive: boolean
+  className: string
+  pane: string
+  zIndex: string
+}
+
+/**
+ * WarpedMapLayer class. Renders a warped map on a Leaflet map. WarpedMapLayer extends Leaflet's [L.Layer](https://leafletjs.com/reference.html#layer).
+ * @class WarpedMapLayer
+ */
 export const WarpedMapLayer = L.Layer.extend({
   options: {
     THROTTLE_WAIT_MS: 100,
@@ -44,13 +56,21 @@ export const WarpedMapLayer = L.Layer.extend({
     zIndex: '1'
   },
 
-  initialize: function (annotation: any, options: any) {
+  /**
+   * Creates a WarpedMapLayer
+   * @param {unknown} [annotation] - Georeference Annotation or URL pointing to an Annotation
+   * @param {WarpedMapLayerOptions} options
+   */
+  initialize: function (annotation: unknown, options: WarpedMapLayerOptions) {
     this._annotation = annotation
     L.setOptions(this, options)
 
     this._initGl()
   },
 
+  /**
+   * Contains all code code that creates DOM elements for the layer, adds them to map panes where they should belong and puts listeners on relevant map events
+   */
   onAdd: async function (map: Map) {
     const paneName = this.getPaneName()
     this._map.getPane(paneName).appendChild(this.container)
@@ -78,26 +98,44 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Contains all cleanup code that removes the layer's elements from the DOM and removes listeners previously added in onAdd.
+   */
   onRemove: function (map: Map) {
     this.container.remove()
     map.off('zoomend viewreset move', this._update, this)
     map.off('zoomanim', this._animateZoom, this)
   },
 
-  getContainer: function () {
+  /**
+   * Gets the HTML container element of the layer
+   * @return {HTMLDivElement} HTML Div Element
+   */
+  getContainer: function (): HTMLDivElement {
     return this.container
   },
 
-  getCanvas: function () {
+  /**
+   * Gets the HTML canvas element of the layer
+   * @return {HTMLCanvasElement} HTML Canvas Element
+   */
+  getCanvas: function (): HTMLCanvasElement {
     return this.canvas
   },
 
+  /**
+   * Changes the zIndex of the image overlay.
+   * @param {number} value - zIndex
+   */
   setZIndex(value: number) {
     this.options.zIndex = value
     this._updateZIndex()
     return this
   },
 
+  /**
+   * Brings the layer in front of other overlays (in the same map pane).
+   */
   bringToFront() {
     if (this._map) {
       L.DomUtil.toFront(this.container)
@@ -105,6 +143,9 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Brings the layer to the back of other overlays (in the same map pane).
+   */
   bringToBack() {
     if (this._map) {
       L.DomUtil.toBack(this.container)
@@ -116,32 +157,60 @@ export const WarpedMapLayer = L.Layer.extend({
     this.world.setImageInfoCache(cache)
   },
 
-  getPaneName: function () {
+  /**
+   * Gets the pane name the layer is attached to. Defaults to 'tilePane'
+   * @returns {string} Pane name
+   */
+  getPaneName: function (): string {
     return this._map.getPane(this.options.pane) ? this.options.pane : 'tilePane'
   },
 
+  /**
+   * Gets the opacity of the layer
+   * @returns {number} Layer opacity
+   */
   getOpacity(): number {
     return this.options.opacity
   },
 
+  /**
+   * Sets the opacity of the layer
+   * @param {number} opacity - Layer opacity
+   */
   setOpacity(opacity: number) {
     this.options.opacity = opacity
     this._update()
     return this
   },
 
+  /**
+   * Sets the opacity of a single warped map
+   * @param {string} mapId - ID of the warped map
+   * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+   */
   setMapOpacity(mapId: string, opacity: number) {
     this.renderer.setMapOpacity(mapId, opacity)
     this._update()
     return this
   },
 
+  /**
+   * Resets the opacity of a single warped map to 1
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapOpacity(mapId: string) {
     this.renderer.resetMapOpacity(mapId)
     this._update()
     return this
   },
 
+  /**
+   * Removes a background color from all maps in the layer
+   * @param {Object} options - remove background options
+   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
   setRemoveBackground(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
@@ -158,12 +227,23 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Resets the background color for all maps in the layer
+   */
   resetRemoveBackground() {
     this.renderer.resetRemoveBackground()
     this._update()
     return this
   },
 
+  /**
+   * Removes a background color from a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   * @param {Object} options - remove background options
+   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
   setMapRemoveBackground(
     mapId: string,
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
@@ -181,11 +261,19 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Resets the background color for a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapRemoveBackground(mapId: string) {
     this.renderer.resetMapRemoveBackground(mapId)
     return this
   },
 
+  /**
+   * Sets the colorization for all maps in the layer
+   * @param {string} hexColor - desired hex color
+   */
   setColorize(hexColor: string) {
     const color = this.hexToRgb(hexColor)
     if (color) {
@@ -195,12 +283,20 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Resets the colorization for all maps in the layer
+   */
   resetColorize() {
     this.renderer.resetColorize()
     this._update()
     return this
   },
 
+  /**
+   * Sets the colorization for a single map in the layer
+   * @param {string} mapId - ID of the warped map
+   * @param {string} hexColor - desired hex color
+   */
   setMapColorize(mapId: string, hexColor: string) {
     const color = this.hexToRgb(hexColor)
     if (color) {
@@ -210,12 +306,22 @@ export const WarpedMapLayer = L.Layer.extend({
     return this
   },
 
+  /**
+   * Resets the colorization of a single warped map
+   * @param {string} mapId - ID of the warped map
+   */
   resetMapColorize(mapId: string) {
     this.renderer.resetMapColorize(mapId)
     this._update()
     return this
   },
 
+  /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @async
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
@@ -225,6 +331,12 @@ export const WarpedMapLayer = L.Layer.extend({
     return results
   },
 
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @async
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
@@ -234,6 +346,12 @@ export const WarpedMapLayer = L.Layer.extend({
     return results
   },
 
+  /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @async
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
   async addGeoreferenceAnnotationByUrl(
     annotationUrl: string
   ): Promise<(string | Error)[]> {
@@ -245,6 +363,12 @@ export const WarpedMapLayer = L.Layer.extend({
     return results
   },
 
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @async
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
   async removeGeoreferenceAnnotationByUrl(
     annotationUrl: string
   ): Promise<(string | Error)[]> {
