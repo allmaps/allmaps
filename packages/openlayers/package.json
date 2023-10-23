@@ -11,7 +11,7 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "unpkg": "./dist/allmaps-openlayers-8.umd.cjs",
+  "unpkg": "./dist/bundled/allmaps-openlayers-8.umd.cjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
