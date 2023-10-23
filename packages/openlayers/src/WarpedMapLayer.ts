@@ -511,7 +511,7 @@ export class WarpedMapLayer extends Layer {
     if (frameState.extent) {
       const extent = frameState.extent as BBox
 
-      this.renderer.setOpacity(this.getOpacity())
+      this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
       const viewportSize = [
         frameState.size[0] * window.devicePixelRatio,

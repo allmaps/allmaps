@@ -211,7 +211,7 @@ export default class WebGL2Renderer extends EventTarget {
   setMapOpacity(mapId: string, opacity: number): void {
     const webGLWarpedMap = this.webGLWarpedMapsById.get(mapId)
     if (webGLWarpedMap) {
-      webGLWarpedMap.opacity = opacity
+      webGLWarpedMap.opacity = Math.min(Math.max(opacity, 0), 1)
     }
   }
 
