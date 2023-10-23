@@ -18,6 +18,7 @@ export function computeExtent(values: number[]): Extent {
   return [min, max]
 }
 
+// Note: bbox order is minX, minY, maxX, maxY
 export function computeBbox(points: LineString): Bbox
 export function computeBbox(points: Polygon): Bbox
 export function computeBbox(points: LineString | Polygon): Bbox {

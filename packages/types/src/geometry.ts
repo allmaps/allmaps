@@ -21,6 +21,7 @@ export type Geometry = Position | LineString | Polygon
 
 export type Gcp = { resource: Position; geo: Position }
 
+// Note: bbox order is minX, minY, maxX, maxY
 // export type Bbox = [number, number, number, number] | [number, number, number, number, number, number];
 export type Bbox = [number, number, number, number]
 

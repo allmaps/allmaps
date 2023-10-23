@@ -11,7 +11,8 @@ import {
   WarpedMapEventType,
   composeTransform,
   WebGL2Renderer,
-  RTree
+  RTree,
+  toLonLat
 } from '@allmaps/render'
 
 import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
@@ -122,6 +123,30 @@ export const WarpedMapLayer = L.Layer.extend({
    */
   getCanvas(): HTMLCanvasElement {
     return this.canvas
+  },
+
+  /**
+   * Returns the World object that contains a list of all warped maps
+   */
+  getWorld(): World {
+    return this.world
+  },
+
+  /**
+   * Returns the bounds of all maps of the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
+   * @returns {L.LatLngBounds | undefined} Bounds
+   */
+  getBounds(): L.LatLngBounds | undefined {
+    const bbox = this.world.getBBox()
+    if (!bbox) {
+      return undefined
+    } else {
+      // Switch from WarpedMap's lng-lat webmercator to Leaflet's lat-lng wgs84
+      // TODO: remove this call for toLonLat when WarpedMap will store unprojected geoMask
+      const [bbox0, bbox1] = toLonLat([bbox[0], bbox[1]])
+      const [bbox2, bbox3] = toLonLat([bbox[2], bbox[3]])
+      return L.latLngBounds(L.latLng(bbox1, bbox0), L.latLng(bbox3, bbox2))
+    }
   },
 
   /**
