@@ -16,6 +16,7 @@
   import { imageInfo } from '$lib/shared/stores/image-info.js'
 
   import Here from '$lib/components/Here.svelte'
+  import Suggestions from '$lib/components/Suggestions.svelte'
 
   let initialized = false
   let showForm = false
@@ -27,12 +28,6 @@
 
     error = null
     showForm = true
-  }
-
-  $: {
-    if ($position) {
-      // call API to get maps at position
-    }
   }
 
   onMount(async () => {
@@ -83,6 +78,7 @@
             Open a IIIF Resource or Georeference Annotation from a URL:
           </p>
           <URLInput />
+          <Suggestions />
         </div>
       </div>
     {:else if $map && $imageInfo}
