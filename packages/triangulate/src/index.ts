@@ -46,8 +46,15 @@ export function triangulatePoly2tri(polygon: Ring, distance: number) {
     }
   }
   // triangulate
-  swctx.triangulate()
 
+  try {
+    swctx.triangulate()
+  } catch (e) {
+    // This is a poly2tri PointError. Check e.message and e.points for more information.
+    throw new Error(
+      'A Point Error occured during resource mask triangulation. This is typically because the resource mask contains duplicate or collinear points, or is self-intersecting.'
+    )
+  }
   return swctx.getTriangles()
 }
 
