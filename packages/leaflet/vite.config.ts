@@ -29,10 +29,7 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) =>
-        `bundled/allmaps-leaflet-1.9.${format}.${
-          format === 'umd' ? 'cjs' : 'js'
-        }`,
+      fileName: (format) => `bundled/allmaps-leaflet-1.9.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {

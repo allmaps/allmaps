@@ -18,11 +18,11 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "unpkg": "./dist/bundled/allmaps-leaflet-1.9.umd.cjs",
+  "unpkg": "./dist/bundled/allmaps-leaflet-1.9.umd.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/bundled/allmaps-leaflet-1.9.umd.cjs",
+      "require": "./dist/bundled/allmaps-leaflet-1.9.umd.js",
       "import": "./dist/bundled/allmaps-leaflet-1.9.es.js"
     }
   },
