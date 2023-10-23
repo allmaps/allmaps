@@ -8,13 +8,34 @@ This plugin creates a new class `WarpedMapLayer` which extends and behaves like 
 
 ## Installation
 
-This is an ESM-only module that works in browsers and in Node.js.
+This package works in browsers and in Node.js as an ESM module.
 
 Install with npm:
 
 ```sh
 npm install @allmaps/leaflet
 ```
+
+And load using:
+
+```js
+import { WarpedMapLayer } from '@allmaps/leaflet'
+```
+
+Alternatively, ESM and UMD bundled versions of the code are also provided under `/dist/bundled`. You can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading leaflet.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.cjs"></script>
+```
+
+When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
+
+```js
+// ... (see 'Usage' below)
+const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
+// ...
+```
+
 
 ## Usage
 
@@ -62,5 +83,7 @@ async function asyncAddGeoreferenceAnnotationByUrl() {
 }
 asyncAddGeoreferenceAnnotationByUrl()
 ```
+
+See `index.html` for an example of a minimal html file that loads a Leaflet maps and adds a Georeference Annotation.
 
 ## API

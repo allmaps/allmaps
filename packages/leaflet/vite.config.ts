@@ -36,11 +36,10 @@ export default defineConfig({
       formats: ['es', 'umd']
     },
     rollupOptions: {
-      external: ['L', 'Layer'],
+      external: ['leaflet'],
       output: {
         globals: {
-          L: 'L',
-          Layer: 'L.Layer'
+          leaflet: 'L'
         }
       }
     }
