@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.17",
+  "version": "1.0.0-beta.18",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -54,8 +54,8 @@
     "@allmaps/annotation": "^1.0.0-beta.17",
     "@allmaps/id": "^1.0.0-beta.19",
     "@allmaps/iiif-parser": "^1.0.0-beta.26",
-    "@allmaps/stdlib": "^1.0.0-beta.13",
-    "@allmaps/transform": "^1.0.0-beta.16",
+    "@allmaps/stdlib": "^1.0.0-beta.14",
+    "@allmaps/transform": "^1.0.0-beta.17",
     "commander": "^10.0.0",
     "stream-json": "^1.7.4",
     "zod-validation-error": "^1.5.0"
