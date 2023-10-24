@@ -8,17 +8,14 @@ import {
   getBestZoomLevel,
   computeIiifTilesForPolygonAndZoomLevel
 } from '@allmaps/render'
+import { pointInRing } from './geo.js'
 
 import { cachedFetch } from './fetch.js'
-import {
-  xyzTileToGeoBBox,
-  pointInPolygon,
-  tileToLongitude,
-  tileToLatitude
-} from './geo.js'
+import { xyzTileToGeoBbox, tileToLongitude, tileToLatitude } from './geo.js'
 
-import type { Coord, XYZTile, Cache, Tile, Options } from './types.js'
+import type { Point, XYZTile, Tile } from '@allmaps/types'
 import type { Map } from '@allmaps/annotation'
+import type { Cache, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 const CHANNELS = 4
@@ -26,7 +23,7 @@ const CHANNELS = 4
 export async function createWarpedTileResponse(
   maps: Map[],
   { x, y, z }: XYZTile,
-  options: Options,
+  options: TilejsonOptions,
   cache: Cache
 ): Promise<Response> {
   // Create resulting warped tile
@@ -55,7 +52,7 @@ export async function createWarpedTileResponse(
     const parsedImage: Image = Image.parse(imageInfo)
 
     // Compute xyz tile extent
-    const geoBBox = xyzTileToGeoBBox({ x, y, z })
+    const geoBbox = xyzTileToGeoBbox({ x, y, z })
 
     // Create transformer
     const transformer = new GcpTransformer(
@@ -64,17 +61,17 @@ export async function createWarpedTileResponse(
     )
 
     // Compute necessary IIIF tiles
-    const geoBBoxResourcePolygon = getResourcePolygon(transformer, geoBBox)
+    const geoBboxResourcePolygon = getResourcePolygon(transformer, geoBbox)
 
     const zoomLevel = getBestZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      geoBBoxResourcePolygon
+      geoBboxResourcePolygon
     )
 
     const iiifTiles = computeIiifTilesForPolygonAndZoomLevel(
       parsedImage,
-      geoBBoxResourcePolygon,
+      geoBboxResourcePolygon,
       zoomLevel
     )
 
@@ -123,7 +120,7 @@ export async function createWarpedTileResponse(
       ) {
         // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles, in two steps
         // 1) Detemine lonlat of warped tile pixel location
-        const warpedTilePixelGeo: Coord = [
+        const warpedTilePixelGeo: Point = [
           tileToLongitude({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
           tileToLatitude({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
@@ -135,7 +132,7 @@ export async function createWarpedTileResponse(
         // TODO: improve efficiency
         // TODO: fix strange repeating error,
         //    remove pointInPolygon check and fix first
-        const inside = pointInPolygon([pixelX, pixelY], resourceMask)
+        const inside = pointInRing([pixelX, pixelY], resourceMask)
         if (!inside) {
           continue
         }

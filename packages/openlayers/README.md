@@ -43,7 +43,7 @@ fetch(annotationUrl)
 #### Table of Contents
 
 *   [Point](#point)
-*   [BBox](#bbox)
+*   [Bbox](#bbox)
 *   [TransformationType](#transformationtype)
 *   [WarpedMapLayer](#warpedmaplayer)
     *   [setMapOpacity](#setmapopacity)
@@ -90,7 +90,7 @@ Point
 
 Type: \[[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)]
 
-### BBox
+### Bbox
 
 Bounding box
 
@@ -358,7 +358,7 @@ Sets the transformation type of multiple maps
 
 Return the extent of all maps in the source
 
-Returns **([BBox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
 
 #### bringMapsToFront
 

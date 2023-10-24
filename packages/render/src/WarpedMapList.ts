@@ -8,11 +8,11 @@ import { GcpTransformer } from '@allmaps/transform'
 
 import RTree from './RTree.js'
 
-import { fromLonLat, getPolygonBBox } from './shared/geo.js'
-import { combineBBoxes } from '@allmaps/stdlib'
+import { computeBbox } from '@allmaps/stdlib'
+import { combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import { fetchImageInfo } from '@allmaps/stdlib'
+import { fetchImageInfo, lonLatToWebMecator } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import type { TransformationType } from '@allmaps/transform'
@@ -45,7 +45,7 @@ export default class WarpedMapList extends EventTarget {
       const resourceMask = map.resourceMask
 
       const projectedGCPs = gcps.map(({ geo, resource }) => ({
-        geo: fromLonLat(geo),
+        geo: lonLatToWebMecator(geo),
         resource
       }))
 
@@ -143,9 +143,9 @@ export default class WarpedMapList extends EventTarget {
     return {
       transformer,
       geoMask,
-      geoMaskBBox: getPolygonBBox(geoMask),
+      geoMaskBbox: computeBbox(geoMask),
       fullGeoMask,
-      fullGeoMaskBBox: getPolygonBBox(fullGeoMask)
+      fullGeoMaskBbox: computeBbox(fullGeoMask)
     }
   }
 
@@ -331,7 +331,7 @@ export default class WarpedMapList extends EventTarget {
         resourceMask
       ])
       warpedMap.geoMask = geoMask
-      warpedMap.geoMaskBBox = getPolygonBBox(geoMask)
+      warpedMap.geoMaskBbox = computeBbox(geoMask)
 
       if (this.rtree) {
         this.rtree.removeItem(mapId)
@@ -391,9 +391,9 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
   }
 
-  getPossibleVisibleWarpedMapIds(geoBBox: Bbox) {
+  getPossibleVisibleWarpedMapIds(geoBbox: Bbox) {
     if (this.rtree) {
-      return this.rtree.searchBBox(geoBBox)
+      return this.rtree.searchBbox(geoBbox)
     } else {
       return this.warpedMapsById.keys()
     }
@@ -416,15 +416,15 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
   }
 
-  getBBox(): Bbox | undefined {
+  getBbox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.warpedMapsById.values()) {
       if (warpedMap.visible) {
         if (!bbox) {
-          bbox = warpedMap.geoMaskBBox
+          bbox = warpedMap.geoMaskBbox
         } else {
-          bbox = combineBBoxes(bbox, warpedMap.geoMaskBBox)
+          bbox = combineBboxes(bbox, warpedMap.geoMaskBbox)
         }
       }
     }

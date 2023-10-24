@@ -1,21 +1,22 @@
-import type { Coord, Extent, XYZTile } from './types.js'
+import type { Point, Ring, Bbox, XYZTile } from '@allmaps/types'
 
-export function pointInPolygon(point: Coord, polygon: Coord[]) {
+// Repeating this function from stdlib here such that we don't have to load stdlib, which uses dom.
+export function pointInRing(point: Point, ring: Ring) {
   // From:
   //  https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
   // Ray-casting algorithm based on:
   //  https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
 
-  if (!polygon) {
+  if (!ring) {
     return true
   }
 
   const [x, y] = point
 
   let inside = false
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const [xi, yi] = polygon[i]
-    const [xj, yj] = polygon[j]
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i]
+    const [xj, yj] = ring[j]
 
     const intersect =
       yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
@@ -46,18 +47,18 @@ export function xyzTileToGeojson({ z, x, y }: XYZTile) {
   }
 }
 
-export function xyzTileToGeoBBox({ z, x, y }: XYZTile): Extent {
+export function xyzTileToGeoBbox({ z, x, y }: XYZTile): Bbox {
   const topLeft = xyzTileTopLeft({ z, x, y })
   const bottomRight = xyzTileBottomRight({ z, x, y })
 
   return [...topLeft, ...bottomRight]
 }
 
-function xyzTileTopLeft({ z, x, y }: XYZTile): Coord {
+function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
   return [tileToLongitude({ x, z }), tileToLatitude({ y, z })]
 }
 
-function xyzTileBottomRight({ z, x, y }: XYZTile): Coord {
+function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
   return [tileToLongitude({ x: x + 1, z }), tileToLatitude({ y: y + 1, z })]
 }
 

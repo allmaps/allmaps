@@ -2,10 +2,9 @@
 // https://github.com/mourner/flatbush
 import RBush from 'rbush'
 
-import { getPolygonBBox } from './shared/geo.js'
-import { pointInPolygon } from './shared/geo.js'
+import { pointInRing, computeBbox } from '@allmaps/stdlib'
 
-import type { BBox, Point, GeoJSONPolygon } from './shared/types.js'
+import type { Bbox, Point, GeojsonPolygon } from '@allmaps/types'
 
 const DEFAULT_FILTER_INSIDE_POLYGON = true
 
@@ -20,14 +19,14 @@ type RTreeItem = {
 export default class RTree {
   rbush: RBush<RTreeItem> = new RBush()
 
-  polygonsById: Map<string, GeoJSONPolygon> = new Map()
-  bboxesById: Map<string, BBox> = new Map()
+  polygonsById: Map<string, GeojsonPolygon> = new Map()
+  bboxesById: Map<string, Bbox> = new Map()
   itemsById: Map<string, RTreeItem> = new Map()
 
-  addItem(id: string, polygon: GeoJSONPolygon) {
+  addItem(id: string, polygon: GeojsonPolygon) {
     this.removeItem(id)
 
-    const bbox = getPolygonBBox(polygon)
+    const bbox = computeBbox(polygon)
 
     const item = {
       minX: bbox[0],
@@ -74,7 +73,7 @@ export default class RTree {
     })
   }
 
-  getBBox(id: string) {
+  getBbox(id: string) {
     return this.bboxesById.get(id)
   }
 
@@ -82,8 +81,8 @@ export default class RTree {
     return this.polygonsById.get(id)
   }
 
-  searchBBox(geoBBox: BBox): string[] {
-    const [minX, minY, maxX, maxY] = geoBBox
+  searchBbox(geoBbox: Bbox): string[] {
+    const [minX, minY, maxX, maxY] = geoBbox
     return this.search(minX, minY, maxX, maxY).map((item) => item.id)
   }
 
@@ -101,7 +100,7 @@ export default class RTree {
           const polygon = this.polygonsById.get(item.id)
 
           if (polygon) {
-            return pointInPolygon(point, polygon.coordinates[0])
+            return pointInRing(point, polygon.coordinates[0])
           } else {
             return false
           }

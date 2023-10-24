@@ -540,6 +540,9 @@ importers:
       '@allmaps/transform':
         specifier: ^1.0.0-beta.17
         version: link:../../packages/transform
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../../packages/types
       '@cloudflare/workers-types':
         specifier: ^3.14.0
         version: 3.14.0
@@ -618,6 +621,9 @@ importers:
       '@allmaps/transform':
         specifier: ^1.0.0-beta.17
         version: link:../../packages/transform
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../../packages/types
       '@allmaps/ui':
         specifier: ^1.0.0-beta.19
         version: link:../../packages/ui
@@ -730,6 +736,10 @@ importers:
         version: 1.5.0(zod@3.20.6)
 
   packages/id:
+    dependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
     devDependencies:
       '@types/node':
         specifier: ^20.8.0
@@ -761,6 +771,9 @@ importers:
 
   packages/iiif-parser:
     dependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
       zod:
         specifier: ^3.20.6
         version: 3.20.6
@@ -908,6 +921,9 @@ importers:
       '@allmaps/triangulate':
         specifier: ^1.0.0-beta.6
         version: link:../triangulate
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21

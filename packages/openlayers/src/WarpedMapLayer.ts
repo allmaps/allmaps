@@ -20,7 +20,7 @@ import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
 import type { FrameState } from 'ol/Map.js'
 
-import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
+import type { Size, Bbox, Transform, NeededTile } from '@allmaps/types'
 
 import type { WarpedMapSource } from './WarpedMapSource.js'
 
@@ -509,7 +509,7 @@ export class WarpedMapLayer extends Layer {
     this.prepareFrameInternal(frameState)
 
     if (frameState.extent) {
-      const extent = frameState.extent as BBox
+      const extent = frameState.extent as Bbox
 
       this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 

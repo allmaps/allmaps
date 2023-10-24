@@ -18,7 +18,7 @@ import {
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
-import type { Point } from '@allmaps/render'
+import type { Point } from '@allmaps/types'
 
 type SourceMaps = Map<string, ViewerMap>
 

@@ -55,6 +55,7 @@
     "@allmaps/stdlib": "^1.0.0-beta.14",
     "@allmaps/transform": "^1.0.0-beta.17",
     "@allmaps/triangulate": "^1.0.0-beta.6",
+    "@allmaps/types": "^1.0.0-beta.5",
     "lodash-es": "^4.17.21",
     "potpack": "^2.0.0",
     "rbush": "^3.0.1"

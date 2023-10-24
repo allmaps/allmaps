@@ -8,14 +8,9 @@ import {
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { applyTransform } from './shared/matrix.js'
 
-import type {
-  Point,
-  Size,
-  BBox,
-  Transform,
-  NeededTile,
-  TileZoomLevel
-} from './shared/types.js'
+import type { Point, Size, Bbox, Transform, NeededTile } from '@allmaps/types'
+
+import type { TileZoomLevel } from '@allmaps/types'
 
 const MIN_COMBINED_PIXEL_SIZE = 5
 
@@ -64,14 +59,14 @@ export default class Viewport extends EventTarget {
   // Find better name?
   updateViewportAndGetTilesNeeded(
     viewportSize: Size,
-    geoBBox: BBox,
+    geoBbox: Bbox,
     coordinateToPixelTransform: Transform
   ): NeededTile[] {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
     possibleVisibleWarpedMapIds =
-      this.warpedMapList.getPossibleVisibleWarpedMapIds(geoBBox)
+      this.warpedMapList.getPossibleVisibleWarpedMapIds(geoBbox)
 
     const neededTiles: NeededTile[] = []
     for (const mapId of possibleVisibleWarpedMapIds) {
@@ -83,12 +78,12 @@ export default class Viewport extends EventTarget {
 
       // Don't show maps when they're too small
       const topLeft: Point = [
-        warpedMap.geoMaskBBox[0],
-        warpedMap.geoMaskBBox[1]
+        warpedMap.geoMaskBbox[0],
+        warpedMap.geoMaskBbox[1]
       ]
       const bottomRight: Point = [
-        warpedMap.geoMaskBBox[2],
-        warpedMap.geoMaskBBox[3]
+        warpedMap.geoMaskBbox[2],
+        warpedMap.geoMaskBbox[3]
       ]
 
       const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
@@ -106,15 +101,15 @@ export default class Viewport extends EventTarget {
         continue
       }
 
-      const geoBBoxResourcePolygon = getResourcePolygon(
+      const geoBboxResourcePolygon = getResourcePolygon(
         warpedMap.transformer,
-        geoBBox
+        geoBbox
       )
 
       const zoomLevel = getBestZoomLevel(
         warpedMap.parsedImage,
         viewportSize,
-        geoBBoxResourcePolygon
+        geoBboxResourcePolygon
       )
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
@@ -124,7 +119,7 @@ export default class Viewport extends EventTarget {
       // TODO: rename function
       const tiles = computeIiifTilesForPolygonAndZoomLevel(
         warpedMap.parsedImage,
-        geoBBoxResourcePolygon,
+        geoBboxResourcePolygon,
         zoomLevel
       )
 

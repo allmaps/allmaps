@@ -253,7 +253,7 @@ Sets the transformation type of multiple maps
 
 Return the extent of all maps in the layer
 
-Returns **(BBox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
 
 #### getBounds
 

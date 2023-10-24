@@ -7,8 +7,8 @@ import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
-
-import type { Transform, WarpedMap, RenderOptions } from './shared/types.js'
+import type { Transform } from '@allmaps/types'
+import type { WarpedMap, RenderOptions } from './shared/types.js'
 import { Bbox } from '@allmaps/types'
 
 // TODO: Move to stdlib?

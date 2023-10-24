@@ -13,6 +13,5 @@ export { WebGL2Renderer }
 
 export * from './shared/types.js'
 export * from './shared/events.js'
-export * from './shared/geo.js'
 export * from './shared/matrix.js'
 export * from './shared/tiles.js'

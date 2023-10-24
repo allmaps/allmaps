@@ -3,7 +3,7 @@ import Source from 'ol/source/Source.js'
 import { RTree, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Point, BBox } from '@allmaps/render'
+import type { Point, Bbox } from '@allmaps/types'
 
 /**
  * WarpedMapSource class. Together with a [WarpedMapLayer](#warpedmaplayer), this class
@@ -194,10 +194,10 @@ export class WarpedMapSource extends Source {
 
   /**
    * Return the extent of all maps in the source
-   * @returns {BBox | undefined} - extent of all warped maps
+   * @returns {Bbox | undefined} - extent of all warped maps
    */
-  getExtent(): BBox | undefined {
-    return this.warpedMapList.getBBox()
+  getExtent(): Bbox | undefined {
+    return this.warpedMapList.getBbox()
   }
 
   /**

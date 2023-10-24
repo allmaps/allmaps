@@ -1,14 +1,19 @@
 import { Image } from '@allmaps/iiif-parser'
-
-import type { GcpTransformer } from '@allmaps/transform'
-import type { TileZoomLevel } from '@allmaps/iiif-parser'
-
 import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
 
-import type { Size, BBox, Point, Tile, Line, Ring } from './types.js'
-import type { Polygon } from '@allmaps/types'
-
-type PointByX = { [key: number]: Point }
+import type {
+  Point,
+  Line,
+  Ring,
+  Polygon,
+  Bbox,
+  Size,
+  XYZTile,
+  Tile,
+  PointByX
+} from '@allmaps/types'
+import type { GcpTransformer } from '@allmaps/transform'
+import type { TileZoomLevel } from '@allmaps/types'
 
 function distanceFromPoint(tile: Tile, point: Point) {
   const center = tileCenter(tile)
@@ -43,7 +48,7 @@ export function imageCoordinatesToTileCoordinates(
   }
 }
 
-export function tileBBox(tile: Tile): BBox {
+export function tileBbox(tile: Tile): Bbox {
   const tileXMin = tile.column * tile.zoomLevel.originalWidth
   const tileYMin = tile.row * tile.zoomLevel.originalHeight
 
@@ -60,7 +65,7 @@ export function tileBBox(tile: Tile): BBox {
 }
 
 export function tileCenter(tile: Tile): Point {
-  const bbox = tileBBox(tile)
+  const bbox = tileBbox(tile)
 
   return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
 }
@@ -215,18 +220,18 @@ function iiifTilesByXToArray(
   return neededIiifTiles
 }
 
-export function getResourcePolygon(transformer: GcpTransformer, geoBBox: BBox) {
-  // geoBBox is a BBox of the extent viewport in geospatial coordinates (in the projection that was given)
-  // geoBBoxResourcePolygon is a polygon of this BBox, transformed to resource coordinates.
+export function getResourcePolygon(transformer: GcpTransformer, geoBbox: Bbox) {
+  // geoBbox is a Bbox of the extent viewport in geospatial coordinates (in the projection that was given)
+  // geoBboxResourcePolygon is a polygon of this Bbox, transformed to resource coordinates.
   // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
-  const geoBBoxPolygon = bboxToPolygon(geoBBox)
-  const geoBBoxResourcePolygon = transformer.transformBackward(geoBBoxPolygon, {
+  const geoBboxPolygon = bboxToPolygon(geoBbox)
+  const geoBboxResourcePolygon = transformer.transformBackward(geoBboxPolygon, {
     maxOffsetRatio: 0.00001,
     maxDepth: 2
   }) as Polygon
 
-  return geoBBoxResourcePolygon
+  return geoBboxResourcePolygon
 }
 
 export function getBestZoomLevel(
@@ -234,13 +239,13 @@ export function getBestZoomLevel(
   viewportSize: Size,
   resourcePolygon: Polygon
 ): TileZoomLevel {
-  const resourceBBox = computeBbox(resourcePolygon)
+  const resourceBbox = computeBbox(resourcePolygon)
 
-  const resourceBBoxWidth = resourceBBox[2] - resourceBBox[0]
-  const resourceBBoxHeight = resourceBBox[3] - resourceBBox[1]
+  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
+  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
 
-  const mapScaleX = resourceBBoxWidth / viewportSize[0]
-  const mapScaleY = resourceBBoxHeight / viewportSize[1]
+  const mapScaleX = resourceBboxWidth / viewportSize[0]
+  const mapScaleY = resourceBboxHeight / viewportSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
   return getBestZoomLevelForMapScale(image, mapScale)
@@ -262,10 +267,10 @@ export function computeIiifTilesForPolygonAndZoomLevel(
 
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
-  const resourceBBox = computeBbox(resourcePolygon)
+  const resourceBbox = computeBbox(resourcePolygon)
   const resourceCenter: Point = [
-    (resourceBBox[0] + resourceBBox[2]) / 2,
-    (resourceBBox[1] + resourceBBox[3]) / 2
+    (resourceBbox[0] + resourceBbox[2]) / 2,
+    (resourceBbox[1] + resourceBbox[3]) / 2
   ]
 
   iiifTiles.sort(
@@ -275,4 +280,30 @@ export function computeIiifTilesForPolygonAndZoomLevel(
   )
 
   return iiifTiles
+}
+
+export function xyzTileToLonLatBbox({ z, x, y }: XYZTile): Bbox {
+  const topLeft = xyzTileTopLeft({ z, x, y })
+  const bottomRight = xyzTileBottomRight({ z, x, y })
+
+  return [topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]]
+}
+
+function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
+  return [tileToLng({ x, z }), tileToLat({ y, z })]
+}
+
+function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
+  return [tileToLng({ x: x + 1, z }), tileToLat({ y: y + 1, z })]
+}
+
+// From:
+//   https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+function tileToLng({ x, z }: { x: number; z: number }): number {
+  return (x / Math.pow(2, z)) * 360 - 180
+}
+
+function tileToLat({ y, z }: { y: number; z: number }): number {
+  const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
+  return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
 }

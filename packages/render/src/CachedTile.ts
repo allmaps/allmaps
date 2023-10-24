@@ -1,12 +1,10 @@
 import { fetchImage } from '@allmaps/stdlib'
 
-import type { ImageRequest } from '@allmaps/iiif-parser'
+import type { ImageRequest } from '@allmaps/types'
 
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import type { Tile, NeededTile } from './shared/types.js'
-
-type StoredTile = Omit<NeededTile, 'mapId'>
+import type { Tile, StoredTile } from '@allmaps/types'
 
 export default class CachedTile extends EventTarget {
   readonly tile: Tile

@@ -1,6 +1,19 @@
+import {
+  isGeojsonLineString,
+  isGeojsonPolygon,
+  convertGeojsonLineStringToLineString,
+  convertGeojsonPolygonToPolygon
+} from './geojson.js'
 import { isPolygon } from './geometry.js'
 
-import type { Polygon, LineString, Bbox, Extent } from '@allmaps/types'
+import type {
+  Polygon,
+  LineString,
+  Bbox,
+  Extent,
+  GeojsonLineString,
+  GeojsonPolygon
+} from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
@@ -21,9 +34,19 @@ export function computeExtent(values: number[]): Extent {
 // Note: bbox order is minX, minY, maxX, maxY
 export function computeBbox(points: LineString): Bbox
 export function computeBbox(points: Polygon): Bbox
-export function computeBbox(points: LineString | Polygon): Bbox {
+export function computeBbox(points: GeojsonLineString): Bbox
+export function computeBbox(points: GeojsonPolygon): Bbox
+export function computeBbox(
+  points: LineString | Polygon | GeojsonLineString | GeojsonPolygon
+): Bbox {
   if (isPolygon(points)) {
     points = points.flat()
+  }
+  if (isGeojsonLineString(points)) {
+    points = convertGeojsonLineStringToLineString(points)
+  }
+  if (isGeojsonPolygon(points)) {
+    points = convertGeojsonPolygonToPolygon(points).flat()
   }
 
   const xs = []
@@ -40,7 +63,7 @@ export function computeBbox(points: LineString | Polygon): Bbox {
   return [minX, minY, maxX, maxY]
 }
 
-export function combineBBoxes(bbox1: Bbox, bbox2: Bbox): Bbox {
+export function combineBboxes(bbox1: Bbox, bbox2: Bbox): Bbox {
   return [
     Math.min(bbox1[0], bbox2[0]),
     Math.min(bbox1[1], bbox2[1]),

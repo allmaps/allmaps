@@ -5,7 +5,7 @@ import {
   WarpedMapTileEventDetail
 } from './shared/events.js'
 
-import type { NeededTile } from './shared/types.js'
+import type { NeededTile } from '@allmaps/types'
 
 export default class TileCache extends EventTarget {
   // keep geo extent and scale factor for each CachedTile

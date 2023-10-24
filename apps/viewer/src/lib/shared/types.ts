@@ -1,6 +1,6 @@
 import type { Image, Manifest, Collection } from '@allmaps/iiif-parser'
 import type { Map, Annotation, AnnotationPage } from '@allmaps/annotation'
-import type { Point } from '@allmaps/render'
+import type { Point } from '@allmaps/types'
 
 import type { FeatureLike } from 'ol/Feature.js'
 

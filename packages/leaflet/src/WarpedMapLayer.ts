@@ -10,14 +10,17 @@ import {
   WarpedMapEventType,
   composeTransform,
   WebGL2Renderer,
-  RTree,
-  toLonLat
+  RTree
 } from '@allmaps/render'
-import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
+import {
+  hexToFractionalRgb,
+  isValidHttpUrl,
+  webMercatorToLonLat
+} from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
-import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
+import type { Size, Bbox, Transform, NeededTile } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 import type { Point } from '@allmaps/types'
 
@@ -210,10 +213,10 @@ export const WarpedMapLayer = L.Layer.extend({
 
   /**
    * Return the extent of all maps in the layer
-   * @returns {BBox | undefined} - extent of all warped maps
+   * @returns {Bbox | undefined} - extent of all warped maps
    */
-  getExtent(): BBox | undefined {
-    return this.warpedMapList.getBBox()
+  getExtent(): Bbox | undefined {
+    return this.warpedMapList.getBbox()
   },
 
   /**
@@ -221,14 +224,14 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {L.LatLngBounds | undefined} Bounds
    */
   getBounds(): L.LatLngBounds | undefined {
-    const bbox = this.warpedMapList.getBBox()
+    const bbox = this.warpedMapList.getBbox()
     if (!bbox) {
       return undefined
     } else {
       // Switch from WarpedMap's lng-lat webmercator to Leaflet's lat-lng wgs84
       // TODO: remove this call for toLonLat when WarpedMap will store unprojected geoMask
-      const [bbox0, bbox1] = toLonLat([bbox[0], bbox[1]])
-      const [bbox2, bbox3] = toLonLat([bbox[2], bbox[3]])
+      const [bbox0, bbox1] = webMercatorToLonLat([bbox[0], bbox[1]])
+      const [bbox2, bbox3] = webMercatorToLonLat([bbox[2], bbox[3]])
       return L.latLngBounds(L.latLng(bbox1, bbox0), L.latLng(bbox3, bbox2))
     }
   },
@@ -845,7 +848,7 @@ export const WarpedMapLayer = L.Layer.extend({
     this._prepareFrameInternal(frameState)
 
     if (frameState.extent) {
-      const extent = frameState.extent as BBox
+      const extent = frameState.extent as Bbox
 
       this.renderer.setOpacity(this.getOpacity())
 

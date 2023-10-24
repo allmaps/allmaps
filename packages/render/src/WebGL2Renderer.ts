@@ -22,11 +22,11 @@ import type Viewport from './Viewport.js'
 
 import type {
   WarpedMap,
-  Transform,
   RenderOptions,
   RemoveBackgroundOptions,
   ColorizeOptions
 } from './shared/types.js'
+import type { Transform } from '@allmaps/types'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1

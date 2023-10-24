@@ -11,7 +11,7 @@ export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
 /**
  * Bounding box
- * @typedef {[number, number, number, number ]} BBox
+ * @typedef {[number, number, number, number ]} Bbox
  */
 
 /**
