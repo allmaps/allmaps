@@ -2,13 +2,13 @@
 
 This module serves to **transform points, lines, polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of control points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
-It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms positions from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
+It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
 
 Care was taken to make this module **usable and useful outside of the Allmaps context** as well! Feel free to incorporate it in your project.
 
 ## How it works
 
-This package exports the `GcpTransformer` class. Its instances (called `transformers`) are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary positions in one plane to the corresponding positions in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
+This package exports the `GcpTransformer` class. Its instances (called `transformers`) are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary points in one plane to the corresponding points in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
 
 ## Transform vs. GDAL
 
@@ -60,28 +60,28 @@ Alternatively the same four methods are available with more expressive term for 
 The simple geometries are:
 
 ```js
-type Position = [number, number]
+type Point = [number, number]
 
-type LineString = Position[]
+type LineString = Point[]
 
-type Polygon = Position[][]
-// A polygon is an array of rings of at least three positions
-// Rings are not closed: the first position is not repeated at the end.
+type Polygon = Point[][]
+// A polygon is an array of rings of at least three points
+// Rings are not closed: the first point is not repeated at the end.
 // There is no requirement on winding order.
 
-type Geometry = Position | LineString | Polygon
+type Geometry = Point | LineString | Polygon
 ```
 
 ### Refined transfromation of LineStrings and Polygons
 
-When transforming a line or polygon, it can happen that simply transforming every position is not sufficient. Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines). An algorithm will therefore recursively add midpoints in each segment (i.e. between two positions) to make the line more granular. A midpoint is added at the transformed middle position of the original segment on the condition that the ratio of (the distance between the middle position of the transformed segment and the transformed transformed middle position of the original segment) to the length of the transformed segment, is larger then a given ratio. The following options specify if and with what degree of detail such extra points should be added.
+When transforming a line or polygon, it can happen that simply transforming every point is not sufficient. Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines). An algorithm will therefore recursively add midpoints in each segment (i.e. between two points) to make the line more granular. A midpoint is added at the transformed middle point of the original segment on the condition that the ratio of (the distance between the middle point of the transformed segment and the transformed transformed middle point of the original segment) to the length of the transformed segment, is larger then a given ratio. The following options specify if and with what degree of detail such extra points should be added.
 
 | Option                    | Description                                                              | Default                                      |
 | :------------------------ | :----------------------------------------------------------------------- | :------------------------------------------- |
 | `maxOffsetRatio`          | Maximum offset ratio (smaller means more midpoints)                      | `0`                                          |
 | `maxDepth`                | Maximum recursion depth (higher means more midpoints)                    | `6`                                          |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` when source is GeoJSON)      |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination positions | `false` (`true` when destination is GeoJSON) |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` when source is GeoJSON)      |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` when destination is GeoJSON) |
 
 ## Installation
 
@@ -117,13 +117,13 @@ const transformGcps3 = [
 
 const transformer = new GcpTransformer(transformGcps3, 'helmert')
 
-const transformedPosition = transformer.transformForward([100, 100])
-// transformedPosition = [4.9385700843392435, 52.46580484503631]
+const transformedPoint = transformer.transformForward([100, 100])
+// transformedPoint = [4.9385700843392435, 52.46580484503631]
 
-const transformedPosition = transformer.transformBackward([
+const transformedPoint = transformer.transformBackward([
   4.9385700843392435, 52.46580484503631
 ])
-// transformedPosition = [100, 100]
+// transformedPoint = [100, 100]
 ```
 
 ### LineString
@@ -417,7 +417,7 @@ Returns **SvgGeometry** Backward transform of input, as SVG geometry
 
 The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific use cases:
 
-*   Transforming positions to positions.
+*   Transforming points to points.
 *   Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
 *   Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
 *   Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.

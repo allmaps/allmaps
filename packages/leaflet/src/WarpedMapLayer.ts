@@ -19,14 +19,14 @@ import type { Map, ZoomAnimEvent } from 'leaflet'
 
 import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
 import type { TransformationType } from '@allmaps/transform'
-import type { Position } from '@allmaps/types'
+import type { Point } from '@allmaps/types'
 
 // TODO: make class or integrate in Viewport
 type FrameState = {
   size: [number, number] // [width, height]
   rotation: number // rotation in radians
   resolution: number
-  center: [number, number] // position
+  center: [number, number] // point
   extent: [number, number, number, number] // [minx, miny, maxx, maxy]
   coordinateToPixelTransform: Transform
 }
@@ -188,9 +188,9 @@ export const WarpedMapLayer = L.Layer.extend({
   /**
    * Sets the resource mask of a single map
    * @param {string} mapId - ID of the warped map
-   * @param {Position[]} resourceMask - new resource mask
+   * @param {Point[]} resourceMask - new resource mask
    */
-  setResourceMask(mapId: string, resourceMask: Position[]) {
+  setResourceMask(mapId: string, resourceMask: Point[]) {
     this.warpedMapList.setResourceMask(mapId, resourceMask)
     this._update()
   },
@@ -828,7 +828,7 @@ export const WarpedMapLayer = L.Layer.extend({
       size: size, // size in pixels: [width, height]
       rotation: rotation, // rotation in radians: number
       resolution: resolution, // projection units per pixel: number
-      center: center, // center position in projected coordinates: [x, y]
+      center: center, // center point in projected coordinates: [x, y]
       extent: extent, // extent in projected coordinates: [minx, miny, maxx, maxy]
       coordinateToPixelTransform: coordinateToPixelTransform // Transform discribing this transformation, see ol/renderer/Map.js line 58
     }

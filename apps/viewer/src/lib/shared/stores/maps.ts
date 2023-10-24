@@ -18,7 +18,7 @@ import {
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
-import type { Position } from '@allmaps/render'
+import type { Point } from '@allmaps/render'
 
 type SourceMaps = Map<string, ViewerMap>
 
@@ -118,7 +118,7 @@ export function resetCustomResourceMask(mapId: string) {
 
 export function setCustomResourceMask(
   mapId: string,
-  customResourceMask: Position[]
+  customResourceMask: Point[]
 ) {
   mapsById.update(($mapsById) => {
     const viewerMap = $mapsById.get(mapId)

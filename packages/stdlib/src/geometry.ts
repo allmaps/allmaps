@@ -2,7 +2,7 @@
 import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
 
 import type {
-  Position,
+  Point,
   LineString,
   Ring,
   Polygon,
@@ -13,7 +13,7 @@ import type {
 
 // Assert
 
-export function isPosition(input: any): input is Position {
+export function isPoint(input: any): input is Point {
   return (
     Array.isArray(input) &&
     input.length === 2 &&
@@ -23,7 +23,7 @@ export function isPosition(input: any): input is Position {
 }
 
 export function isLineString(input: any): input is LineString {
-  return Array.isArray(input) && input.every(isPosition)
+  return Array.isArray(input) && input.every(isPoint)
   // && !isClosed(input) // Possible addition if we want to check for closedness
 }
 
@@ -31,7 +31,7 @@ export function isLineString(input: any): input is LineString {
 // This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
 function isRing(input: any): input is Ring {
   return (
-    Array.isArray(input) && input.every(isPosition)
+    Array.isArray(input) && input.every(isPoint)
     // && isClosed(input) == closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
   )
 }
@@ -43,30 +43,30 @@ export function isPolygon(input: any): input is Polygon {
 // Conform
 
 export function conformLineString(lineString: LineString): LineString {
-  // Filter out repeated positions
-  lineString = lineString.filter(function (position, i, originalLineString) {
-    return i === 0 || !isEqualPosition(position, originalLineString[i - 1])
+  // Filter out repeated points
+  lineString = lineString.filter(function (point, i, originalLineString) {
+    return i === 0 || !isEqualPoint(point, originalLineString[i - 1])
   })
 
   if (lineString.length < 2) {
-    throw new Error('LineString should contain at least 2 positions')
+    throw new Error('LineString should contain at least 2 points')
   }
   return lineString
 }
 
 export function conformRing(ring: Ring): Ring {
-  // Filter out repeated positions
-  ring = ring.filter(function (position, i, originalRing) {
-    return i === 0 || !isEqualPosition(position, originalRing[i - 1])
+  // Filter out repeated points
+  ring = ring.filter(function (point, i, originalRing) {
+    return i === 0 || !isEqualPoint(point, originalRing[i - 1])
   })
 
-  // Remove last position if input is closed ring
+  // Remove last point if input is closed ring
   if (isClosed(ring)) {
     ring.splice(-1)
   }
 
   if (ring.length < 3) {
-    throw new Error('Ring should contain at least 3 positions')
+    throw new Error('Ring should contain at least 3 points')
   }
   return ring
 }
@@ -79,12 +79,10 @@ export function conformPolygon(polygon: Polygon): Polygon {
 
 // Convert to GeoJSON
 
-export function convertPositionToGeojsonPoint(
-  position: Position
-): GeojsonPoint {
+export function convertPointToGeojsonPoint(point: Point): GeojsonPoint {
   return {
     type: 'Point',
-    coordinates: position
+    coordinates: point
   }
 }
 
@@ -126,48 +124,45 @@ export function convertPolygonToGeojsonPolygon(
 
 // Check
 
-export function isClosed(input: Position[]): boolean {
+export function isClosed(input: Point[]): boolean {
   return (
     Array.isArray(input) &&
     input.length >= 2 &&
-    isEqualPosition(input[0], input[input.length - 1])
+    isEqualPoint(input[0], input[input.length - 1])
   )
 }
 
-export function isEqualPosition(
-  position1: Position,
-  position2: Position
-): boolean {
-  if (position1 === position2) return true
-  if (position1 == null || position2 == null) return false
+export function isEqualPoint(point1: Point, point: Point): boolean {
+  if (point1 === point) return true
+  if (point1 == null || point == null) return false
 
-  return position1[0] == position2[0] && position1[1] == position2[1]
+  return point1[0] == point[0] && point1[1] == point[1]
 }
 
-export function isEqualPositionArray(
-  positionArray1: Position[],
-  positionArray2: Position[]
+export function isEqualPointArray(
+  pointArray1: Point[],
+  pointArray2: Point[]
 ): boolean {
-  if (positionArray1 === positionArray2) return true
-  if (positionArray1 == null || positionArray2 == null) return false
-  if (positionArray1.length !== positionArray2.length) return false
+  if (pointArray1 === pointArray2) return true
+  if (pointArray1 == null || pointArray2 == null) return false
+  if (pointArray1.length !== pointArray2.length) return false
 
-  for (let i = 0; i < positionArray1.length; ++i) {
-    if (isEqualPosition(positionArray1[i], positionArray2[i])) return false
+  for (let i = 0; i < pointArray1.length; ++i) {
+    if (isEqualPoint(pointArray1[i], pointArray2[i])) return false
   }
   return true
 }
 
-export function isEqualPositionArrayArray(
-  positionArrayArray1: Position[][],
-  positionArrayArray2: Position[][]
+export function isEqualPointArrayArray(
+  pointArrayArray1: Point[][],
+  pointArrayArray2: Point[][]
 ): boolean {
-  if (positionArrayArray1 === positionArrayArray2) return true
-  if (positionArrayArray1 == null || positionArrayArray2 == null) return false
-  if (positionArrayArray1.length !== positionArrayArray2.length) return false
+  if (pointArrayArray1 === pointArrayArray2) return true
+  if (pointArrayArray1 == null || pointArrayArray2 == null) return false
+  if (pointArrayArray1.length !== pointArrayArray2.length) return false
 
-  for (let i = 0; i < positionArrayArray1.length; ++i) {
-    if (isEqualPositionArray(positionArrayArray1[i], positionArrayArray2[i]))
+  for (let i = 0; i < pointArrayArray1.length; ++i) {
+    if (isEqualPointArray(pointArrayArray1[i], pointArrayArray2[i]))
       return false
   }
   return true
@@ -175,16 +170,13 @@ export function isEqualPositionArrayArray(
 
 // Compute
 
-export function getMidPosition(
-  position1: Position,
-  position2: Position
-): Position {
+export function getMidPoit(point1: Point, point2: Point): Point {
   return [
-    (position2[0] - position1[0]) / 2 + position1[0],
-    (position2[1] - position1[1]) / 2 + position1[1]
+    (point2[0] - point1[0]) / 2 + point1[0],
+    (point2[1] - point1[1]) / 2 + point1[1]
   ]
 }
 
-export function getDistance(from: Position, to: Position): number {
+export function getDistance(from: Point, to: Point): number {
   return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
 }

@@ -14,13 +14,13 @@ import {
 } from './shared/transform-helper-functions.js'
 
 import {
-  convertPositionToGeojsonPoint,
+  convertPointToGeojsonPoint,
   convertLineStringToGeojsonLineString,
   convertPolygonToGeojsonPolygon,
-  convertGeojsonPointToPosition,
+  convertGeojsonPointToPoint,
   convertGeojsonLineStringToLineString,
   convertGeojsonPolygonToPolygon,
-  isPosition,
+  isPoint,
   isLineString,
   isPolygon,
   isGeojsonPoint,
@@ -37,7 +37,7 @@ import type {
 } from './shared/types.js'
 
 import type {
-  Position,
+  Point,
   LineString,
   Polygon,
   Geometry,
@@ -55,8 +55,8 @@ import type {
  * */
 export default class GcpTransformer implements GcpTransformerInterface {
   gcps: TransformGcp[]
-  sourcePositions: Position[]
-  destinationPositions: Position[]
+  sourcePoints: Point[]
+  destinationPoints: Point[]
   type: TransformationType
 
   forwardTransformation?: Transformation
@@ -85,43 +85,37 @@ export default class GcpTransformer implements GcpTransformerInterface {
         throw new Error('Unsupported GCP type')
       }
     })
-    this.sourcePositions = this.gcps.map((gcp) => gcp.source)
-    this.destinationPositions = this.gcps.map((gcp) => gcp.destination)
+    this.sourcePoints = this.gcps.map((gcp) => gcp.source)
+    this.destinationPoints = this.gcps.map((gcp) => gcp.destination)
     this.type = type
   }
 
   #createForwardTransformation(): Transformation {
-    return this.#createTransformation(
-      this.sourcePositions,
-      this.destinationPositions
-    )
+    return this.#createTransformation(this.sourcePoints, this.destinationPoints)
   }
 
   #createBackwardTransformation(): Transformation {
-    return this.#createTransformation(
-      this.destinationPositions,
-      this.sourcePositions
-    )
+    return this.#createTransformation(this.destinationPoints, this.sourcePoints)
   }
 
   #createTransformation(
-    sourcePositions: Position[],
-    destinationPositions: Position[]
+    sourcePoints: Point[],
+    destinationPoints: Point[]
   ): Transformation {
     if (this.type === 'helmert') {
-      return new Helmert(sourcePositions, destinationPositions)
+      return new Helmert(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(sourcePositions, destinationPositions)
+      return new Polynomial(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial2') {
-      return new Polynomial(sourcePositions, destinationPositions, 2)
+      return new Polynomial(sourcePoints, destinationPoints, 2)
     } else if (this.type === 'polynomial3') {
-      return new Polynomial(sourcePositions, destinationPositions, 3)
+      return new Polynomial(sourcePoints, destinationPoints, 3)
     } else if (this.type === 'projective') {
-      return new Projective(sourcePositions, destinationPositions)
+      return new Projective(sourcePoints, destinationPoints)
     } else if (this.type === 'thinPlateSpline') {
       return new RBF(
-        sourcePositions,
-        destinationPositions,
+        sourcePoints,
+        destinationPoints,
         thinPlateKernel,
         euclideanNorm
       )
@@ -132,9 +126,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
 
   // Base functions
   transformForward(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
-  ): Position
+  ): Point
   transformForward(
     input: LineString | GeojsonLineString,
     options?: PartialTransformOptions
@@ -149,7 +143,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {PartialTransformOptions} [options] - Transform options
    * @returns {Geometry} Forward transform of input as Geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => Position;
+   * (input:Point | GeojsonPoint) => Point;
    * (input:LineString | GeojsonLineString) => LineString;
    * (input:Polygon | GeojsonPolygon) => Polygon;
    * }}
@@ -158,13 +152,13 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPosition(input)) {
+    if (isPoint(input)) {
       if (!this.forwardTransformation) {
         this.forwardTransformation = this.#createForwardTransformation()
       }
       return this.forwardTransformation.interpolate(input)
     } else if (isGeojsonPoint(input)) {
-      return this.transformForward(convertGeojsonPointToPosition(input))
+      return this.transformForward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {
       return transformLineStringForwardToLineString(this, input, options)
     } else if (isGeojsonLineString(input)) {
@@ -193,7 +187,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformForwardAsGeojson(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
   ): GeojsonPoint
   transformForwardAsGeojson(
@@ -210,7 +204,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {PartialTransformOptions} [options] - Transform options
    * @returns {GeojsonGeometry} Forward transform of input, as GeoJSON geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => GeojsonPoint;
+   * (input:Point | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
    * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
    * }}
@@ -219,11 +213,11 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPosition(input)) {
-      return convertPositionToGeojsonPoint(this.transformForward(input))
+    if (isPoint(input)) {
+      return convertPointToGeojsonPoint(this.transformForward(input))
     } else if (isGeojsonPoint(input)) {
-      return convertPositionToGeojsonPoint(
-        this.transformForward(convertGeojsonPointToPosition(input))
+      return convertPointToGeojsonPoint(
+        this.transformForward(convertGeojsonPointToPoint(input))
       )
     } else if (isLineString(input)) {
       if (options && !('destinationIsGeographic' in options)) {
@@ -273,9 +267,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformBackward(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
-  ): Position
+  ): Point
   transformBackward(
     input: LineString | GeojsonLineString,
     options?: PartialTransformOptions
@@ -290,7 +284,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {PartialTransformOptions} [options] - Transform options
    * @returns {Geometry} backward transform of input, as geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => Position;
+   * (input:Point | GeojsonPoint) => Point;
    * (input:LineString | GeojsonLineString) => LineString;
    * (input:Polygon | GeojsonPolygon) => Polygon;
    * }}
@@ -299,14 +293,14 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPosition(input)) {
+    if (isPoint(input)) {
       if (!this.backwardTransformation) {
         this.backwardTransformation = this.#createBackwardTransformation()
       }
 
       return this.backwardTransformation.interpolate(input)
     } else if (isGeojsonPoint(input)) {
-      return this.transformBackward(convertGeojsonPointToPosition(input))
+      return this.transformBackward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {
       return transformLineStringBackwardToLineString(this, input, options)
     } else if (isGeojsonLineString(input)) {
@@ -335,7 +329,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformBackwardAsGeojson(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
   ): GeojsonPoint
   transformBackwardAsGeojson(
@@ -352,7 +346,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {PartialTransformOptions} [options] - Transform options
    * @returns {GeojsonGeometry} backward transform of input, as GeoJSON geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => GeojsonPoint;
+   * (input:Point | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
    * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
    * }}
@@ -361,11 +355,11 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPosition(input)) {
-      return convertPositionToGeojsonPoint(this.transformBackward(input))
+    if (isPoint(input)) {
+      return convertPointToGeojsonPoint(this.transformBackward(input))
     } else if (isGeojsonPoint(input)) {
-      return convertPositionToGeojsonPoint(
-        this.transformBackward(convertGeojsonPointToPosition(input))
+      return convertPointToGeojsonPoint(
+        this.transformBackward(convertGeojsonPointToPoint(input))
       )
     } else if (isLineString(input)) {
       if (options && !('sourceIsGeographic' in options)) {
@@ -417,9 +411,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
   // Alias
 
   transformToGeo(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
-  ): Position
+  ): Point
   transformToGeo(
     input: LineString | GeojsonLineString,
     options?: PartialTransformOptions
@@ -433,7 +427,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {Geometry | GeojsonGeometry} input - Input to transform
    * @returns {Geometry} Forward transform of input, as Geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => Position;
+   * (input:Point | GeojsonPoint) => Point;
    * (input:LineString | GeojsonLineString) => LineString;
    * (input:Polygon | GeojsonPolygon) => Polygon;
    * }}
@@ -442,8 +436,8 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPosition(input)) {
-      return this.transformForward(input as Position, options)
+    if (isPoint(input)) {
+      return this.transformForward(input as Point, options)
     } else if (isGeojsonPoint(input)) {
       return this.transformForward(input as GeojsonPoint, options)
     } else if (isLineString(input)) {
@@ -460,7 +454,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformToGeoAsGeojson(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
   ): GeojsonPoint
   transformToGeoAsGeojson(
@@ -476,7 +470,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {Geometry | GeojsonGeometry} input - Input to transform
    * @returns {Geometry} Forward transform of input, as GeoJSON geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => GeojsonPoint;
+   * (input:Point | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
    * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
    * }}
@@ -485,8 +479,8 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPosition(input)) {
-      return this.transformForwardAsGeojson(input as Position, options)
+    if (isPoint(input)) {
+      return this.transformForwardAsGeojson(input as Point, options)
     } else if (isGeojsonPoint(input)) {
       return this.transformForwardAsGeojson(input as GeojsonPoint, options)
     } else if (isLineString(input)) {
@@ -503,9 +497,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformToResource(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
-  ): Position
+  ): Point
   transformToResource(
     input: LineString | GeojsonLineString,
     options?: PartialTransformOptions
@@ -519,7 +513,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {Geometry | GeojsonGeometry} input - Input to transform
    * @returns {Geometry} Backward transform of input, as a Geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => Position;
+   * (input:Point | GeojsonPoint) => Point;
    * (input:LineString | GeojsonLineString) => LineString;
    * (input:Polygon | GeojsonPolygon) => Polygon;
    * }}
@@ -528,8 +522,8 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPosition(input)) {
-      return this.transformBackward(input as Position, options)
+    if (isPoint(input)) {
+      return this.transformBackward(input as Point, options)
     } else if (isGeojsonPoint(input)) {
       return this.transformBackward(input as GeojsonPoint, options)
     } else if (isLineString(input)) {
@@ -546,7 +540,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   }
 
   transformToResourceAsGeojson(
-    input: Position | GeojsonPoint,
+    input: Point | GeojsonPoint,
     options?: PartialTransformOptions
   ): GeojsonPoint
   transformToResourceAsGeojson(
@@ -562,7 +556,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {Geometry | GeojsonGeometry} input - Input to transform
    * @returns {GeojsonGeometry} Backward transform of input, as a GeoJSON geometry
    * @type {{
-   * (input:Position | GeojsonPoint) => GeojsonPoint;
+   * (input:Point | GeojsonPoint) => GeojsonPoint;
    * (input:LineString | GeojsonLineString) => GeojsonLineString;
    * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
    * }}
@@ -571,8 +565,8 @@ export default class GcpTransformer implements GcpTransformerInterface {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPosition(input)) {
-      return this.transformBackwardAsGeojson(input as Position, options)
+    if (isPoint(input)) {
+      return this.transformBackwardAsGeojson(input as Point, options)
     } else if (isGeojsonPoint(input)) {
       return this.transformBackwardAsGeojson(input as GeojsonPoint, options)
     } else if (isLineString(input)) {

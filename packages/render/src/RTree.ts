@@ -5,7 +5,7 @@ import RBush from 'rbush'
 import { getPolygonBBox } from './shared/geo.js'
 import { pointInPolygon } from './shared/geo.js'
 
-import type { BBox, Position, GeoJSONPolygon } from './shared/types.js'
+import type { BBox, Point, GeoJSONPolygon } from './shared/types.js'
 
 const DEFAULT_FILTER_INSIDE_POLYGON = true
 
@@ -88,7 +88,7 @@ export default class RTree {
   }
 
   searchPoint(
-    point: Position,
+    point: Point,
     filterInsidePolygon = DEFAULT_FILTER_INSIDE_POLYGON
   ): string[] {
     const [minX, minY, maxX, maxY] = [point[0], point[1], point[0], point[1]]

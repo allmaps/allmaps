@@ -1,18 +1,18 @@
-import type { Position } from './geometry'
+import type { Point } from './geometry'
 
 export type GeojsonPoint = {
   type: 'Point'
-  coordinates: Position
+  coordinates: Point
 }
 
 export type GeojsonLineString = {
   type: 'LineString'
-  coordinates: Position[]
+  coordinates: Point[]
 }
 
 export type GeojsonPolygon = {
   type: 'Polygon'
-  coordinates: Position[][]
+  coordinates: Point[][]
 }
 
 // Consider using @types/geojson!

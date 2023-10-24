@@ -16,7 +16,7 @@ import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Position, Gcp, Bbox } from '@allmaps/types'
+import type { Point, Gcp, Bbox } from '@allmaps/types'
 import type { WarpedMap } from './shared/types.js'
 
 export default class WarpedMapList extends EventTarget {
@@ -107,7 +107,7 @@ export default class WarpedMapList extends EventTarget {
 
   private computeWarpedMapTransformer(
     mapId: string,
-    resourceMask: Position[],
+    resourceMask: Point[],
     parsedImage: IIIFImage,
     projectedGcps: Gcp[],
     transformation: TransformationType
@@ -128,7 +128,7 @@ export default class WarpedMapList extends EventTarget {
       this.rtree.addItem(mapId, geoMask)
     }
 
-    const fullResourceMask: Position[] = [
+    const fullResourceMask: Point[] = [
       [0, 0],
       [parsedImage.width, 0],
       [parsedImage.width, parsedImage.height],
@@ -324,7 +324,7 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
   }
 
-  setResourceMask(mapId: string, resourceMask: Position[]) {
+  setResourceMask(mapId: string, resourceMask: Point[]) {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       const geoMask = warpedMap.transformer.transformForwardAsGeojson([

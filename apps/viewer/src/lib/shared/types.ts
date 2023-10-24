@@ -1,6 +1,6 @@
 import type { Image, Manifest, Collection } from '@allmaps/iiif-parser'
 import type { Map, Annotation, AnnotationPage } from '@allmaps/annotation'
-import type { Position } from '@allmaps/render'
+import type { Point } from '@allmaps/render'
 
 import type { FeatureLike } from 'ol/Feature.js'
 
@@ -54,7 +54,7 @@ export type MapState = {
   visible: boolean
   selected: boolean
   highlighted: boolean
-  customResourceMask?: Position[]
+  customResourceMask?: Point[]
 }
 
 export type RemoveBackgroundOptions = {

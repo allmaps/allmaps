@@ -445,7 +445,7 @@ export class WarpedMapLayer extends Layer {
     // TODO: remove event listeners
     //  - this.viewport
     //  - this.tileCache
-    //  - this.world
+    //  - this.warpedMapList
 
     this.tileCache.clear()
 

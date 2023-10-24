@@ -5,8 +5,8 @@ export * from './OLWarpedMapEvent.js'
 export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
 /**
- * Position
- * @typedef {[number, number]} Position
+ * Point
+ * @typedef {[number, number]} Point
  */
 
 /**

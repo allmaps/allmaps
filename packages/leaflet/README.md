@@ -98,7 +98,7 @@ See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an exa
     *   [onRemove](#onremove)
     *   [getContainer](#getcontainer)
     *   [getCanvas](#getcanvas)
-    *   [getWorld](#getworld)
+    *   [getWarpedMapList](#getwarpedmaplist)
     *   [getMap](#getmap)
     *   [showMap](#showmap)
     *   [showMaps](#showmaps)
@@ -177,9 +177,9 @@ Gets the HTML canvas element of the layer
 
 Returns **[HTMLCanvasElement](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement)** HTML Canvas Element
 
-#### getWorld
+#### getWarpedMapList
 
-Returns the World object that contains a list of all maps
+Returns the WarpedMapList object that contains a list of all maps
 
 #### getMap
 
@@ -238,7 +238,7 @@ Sets the resource mask of a single map
 ##### Parameters
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-*   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Position](https://developer.mozilla.org/docs/Web/API/Position)>** new resource mask
+*   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** new resource mask
 
 #### setMapsTransformation
 

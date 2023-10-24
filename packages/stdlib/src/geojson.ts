@@ -1,14 +1,14 @@
 import {
   isLineString,
   isPolygon,
-  isPosition,
+  isPoint as isPoint,
   conformRing,
   conformPolygon
 } from './geometry.js'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
-  Position,
+  Point,
   LineString,
   Ring,
   Polygon,
@@ -28,7 +28,7 @@ export function isGeojsonPoint(input: any): input is GeojsonPoint {
     typeof input === 'object' &&
     input !== null &&
     input.type === 'Point' &&
-    isPosition(input.coordinates)
+    isPoint(input.coordinates)
   )
 }
 
@@ -68,9 +68,7 @@ export function isGeojsonGeometry(obj: unknown): obj is GeojsonGeometry {
 
 // Convert to Geometry
 
-export function convertGeojsonPointToPosition(
-  geometry: GeojsonPoint
-): Position {
+export function convertGeojsonPointToPoint(geometry: GeojsonPoint): Point {
   return geometry.coordinates
 }
 

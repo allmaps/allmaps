@@ -9,7 +9,7 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { applyTransform } from './shared/matrix.js'
 
 import type {
-  Position,
+  Point,
   Size,
   BBox,
   Transform,
@@ -82,11 +82,11 @@ export default class Viewport extends EventTarget {
       }
 
       // Don't show maps when they're too small
-      const topLeft: Position = [
+      const topLeft: Point = [
         warpedMap.geoMaskBBox[0],
         warpedMap.geoMaskBBox[1]
       ]
-      const bottomRight: Position = [
+      const bottomRight: Point = [
         warpedMap.geoMaskBBox[2],
         warpedMap.geoMaskBBox[3]
       ]

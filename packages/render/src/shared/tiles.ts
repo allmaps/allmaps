@@ -5,12 +5,12 @@ import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
 import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
 
-import type { Size, BBox, Position, Tile, Line, Ring } from './types.js'
+import type { Size, BBox, Point, Tile, Line, Ring } from './types.js'
 import type { Polygon } from '@allmaps/types'
 
-type PositionByX = { [key: number]: Position }
+type PointByX = { [key: number]: Point }
 
-function distanceFromPoint(tile: Tile, point: Position) {
+function distanceFromPoint(tile: Tile, point: Point) {
   const center = tileCenter(tile)
 
   const dx = center[0] - point[0]
@@ -21,9 +21,9 @@ function distanceFromPoint(tile: Tile, point: Position) {
 
 export function imageCoordinatesToTileCoordinates(
   tile: Tile,
-  imageCoordinates: Position,
+  imageCoordinates: Point,
   clip = true
-): Position | undefined {
+): Point | undefined {
   const tileXMin = tile.column * tile.zoomLevel.originalWidth
   const tileYMin = tile.row * tile.zoomLevel.originalHeight
 
@@ -59,7 +59,7 @@ export function tileBBox(tile: Tile): BBox {
   return [tileXMin, tileYMin, tileXMax, tileYMax]
 }
 
-export function tileCenter(tile: Tile): Position {
+export function tileCenter(tile: Tile): Point {
   const bbox = tileBBox(tile)
 
   return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
@@ -69,13 +69,13 @@ export function tileCenter(tile: Tile): Position {
 //  https://github.com/vHawk/tiles-intersect
 // See also:
 //  https://www.redblobgames.com/grids/line-drawing.html
-function tilesIntersect([a, b]: Line): Position[] {
+function tilesIntersect([a, b]: Line): Point[] {
   let x = Math.floor(a[0])
   let y = Math.floor(a[1])
   const endX = Math.floor(b[0])
   const endY = Math.floor(b[1])
 
-  const points: Position[] = [[x, y]]
+  const points: Point[] = [[x, y]]
 
   if (x === endX && y === endY) {
     return points
@@ -160,7 +160,7 @@ function scaleToTiles(zoomLevel: TileZoomLevel, points: Ring): Ring {
 }
 
 function findNeededIiifTilesByX(tilePixelExtent: Ring) {
-  const tiles: PositionByX = {}
+  const tiles: PointByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
     const line: Line = [
       tilePixelExtent[i],
@@ -189,7 +189,7 @@ function findNeededIiifTilesByX(tilePixelExtent: Ring) {
 function iiifTilesByXToArray(
   zoomLevel: TileZoomLevel,
   imageSize: Size,
-  iiifTilesByX: PositionByX
+  iiifTilesByX: PointByX
 ): Tile[] {
   const neededIiifTiles: Tile[] = []
   for (const xKey in iiifTilesByX) {
@@ -263,7 +263,7 @@ export function computeIiifTilesForPolygonAndZoomLevel(
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
   const resourceBBox = computeBbox(resourcePolygon)
-  const resourceCenter: Position = [
+  const resourceCenter: Point = [
     (resourceBBox[0] + resourceBBox[2]) / 2,
     (resourceBBox[1] + resourceBBox[3]) / 2
   ]

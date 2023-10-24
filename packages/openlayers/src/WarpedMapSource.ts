@@ -3,7 +3,7 @@ import Source from 'ol/source/Source.js'
 import { RTree, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Position, BBox } from '@allmaps/render'
+import type { Point, BBox } from '@allmaps/render'
 
 /**
  * WarpedMapSource class. Together with a [WarpedMapLayer](#warpedmaplayer), this class
@@ -172,9 +172,9 @@ export class WarpedMapSource extends Source {
   /**
    * Sets the resource mask of a single map
    * @param {string} mapId - ID of the warped map
-   * @param {Position[]} resourceMask - new resource mask
+   * @param {Point[]} resourceMask - new resource mask
    */
-  setResourceMask(mapId: string, resourceMask: Position[]) {
+  setResourceMask(mapId: string, resourceMask: Point[]) {
     this.warpedMapList.setResourceMask(mapId, resourceMask)
     this.changed()
   }

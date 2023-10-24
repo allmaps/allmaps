@@ -1,6 +1,6 @@
 import { computeBbox } from '@allmaps/stdlib'
 
-import type { Ring, Position, BBox, XYZTile, GeoJSONPolygon } from './types.js'
+import type { Ring, Point, BBox, XYZTile, GeoJSONPolygon } from './types.js'
 
 function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
@@ -8,7 +8,7 @@ function degreesToRadians(degrees: number) {
 
 // From:
 //   https://gis.stackexchange.com/questions/156035/calculating-mercator-coordinates-from-lat-lon
-export function fromLonLat([lon, lat]: Position): Position {
+export function fromLonLat([lon, lat]: Point): Point {
   const rMajor = 6378137.0
   const x = rMajor * degreesToRadians(lon)
   const scale = x / lon
@@ -21,7 +21,7 @@ export function fromLonLat([lon, lat]: Position): Position {
 }
 
 // From: https://gist.github.com/mudpuddle/6115083
-export function toLonLat([x, y]: Position): Position {
+export function toLonLat([x, y]: Point): Point {
   const rMajor = 6378137.0
   const shift = Math.PI * rMajor
   const lon = (x / shift) * 180.0
@@ -37,7 +37,7 @@ export function getPolygonBBox(polygon: GeoJSONPolygon): BBox {
   return computeBbox(polygon.coordinates[0])
 }
 
-export function pointInPolygon(point: Position, polygon: Ring): boolean {
+export function pointInPolygon(point: Point, polygon: Ring): boolean {
   // From:
   //  https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon
   // Ray-casting algorithm based on:
@@ -72,11 +72,11 @@ export function xyzTileToLonLatBBox({ z, x, y }: XYZTile): BBox {
   return [topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]]
 }
 
-function xyzTileTopLeft({ z, x, y }: XYZTile): Position {
+function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
   return [tile2long({ x, z }), tile2lat({ y, z })]
 }
 
-function xyzTileBottomRight({ z, x, y }: XYZTile): Position {
+function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
   return [tile2long({ x: x + 1, z }), tile2lat({ y: y + 1, z })]
 }
 

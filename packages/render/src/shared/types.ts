@@ -8,19 +8,19 @@ import type { Gcp } from '@allmaps/types'
 
 export type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-export type Position = [number, number]
+export type Point = [number, number]
 
 export type BBox = [number, number, number, number]
 
 export type GeoJSONPolygon = {
   type: 'Polygon'
-  coordinates: Position[][]
+  coordinates: Point[][]
 }
 
 // TODO: rename?
-export type Ring = Position[]
+export type Ring = Point[]
 
-export type Line = [Position, Position]
+export type Line = [Point, Point]
 
 export type Size = [number, number]
 

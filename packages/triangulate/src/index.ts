@@ -2,7 +2,7 @@ import { createGrid, makePointsOnPolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
-import type { Ring, Position } from '@allmaps/types'
+import type { Ring, Point } from '@allmaps/types'
 
 /**
  * Triangle as `[[x0, y0], [x1, y1], [x2, y2]]`
@@ -30,7 +30,7 @@ import type { Ring, Position } from '@allmaps/types'
  */
 export function triangulatePoly2tri(polygon: Ring, distance: number) {
   // create grid
-  const grid: Position[] = createGrid(polygon, distance)
+  const grid: Point[] = createGrid(polygon, distance)
 
   // Initialize Constrained Delaunay Triangulation with polygon
   const swctx = new poly2tri.SweepContext(
