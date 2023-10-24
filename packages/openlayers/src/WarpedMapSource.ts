@@ -102,7 +102,7 @@ export class WarpedMapSource extends Source {
   }
 
   /**
-   * Clears the source, removes all warped maps
+   * Clears the source, removes all maps
    */
   clear() {
     this.world.clear()
@@ -110,14 +110,14 @@ export class WarpedMapSource extends Source {
   }
 
   /**
-   * Returns the World object that contains a list of all warped maps
+   * Returns the World object that contains a list of all maps
    */
   getWorld() {
     return this.world
   }
 
   /**
-   * Returns a single warped map
+   * Returns a single map
    * @param {string} mapId - ID of the warped map
    */
   getMap(mapId: string) {
@@ -162,9 +162,9 @@ export class WarpedMapSource extends Source {
 
   /**
    * Returns visibility of a single map
-   * @returns {boolean} - whether the map is visible
+   * @returns {boolean | undefined} - whether the map is visible
    */
-  isVisible(mapId: string) {
+  isMapVisible(mapId: string): boolean | undefined {
     const warpedMap = this.world.getMap(mapId)
     return warpedMap?.visible
   }
@@ -184,16 +184,16 @@ export class WarpedMapSource extends Source {
    * @param {Iterable<string>} mapIds - IDs of the warped maps
    * @param {TransformationType} transformation - new transformation type
    */
-  setTransformation(
+  setMapsTransformation(
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.world.setTransformation(mapIds, transformation)
+    this.world.setMapsTransformation(mapIds, transformation)
     this.changed()
   }
 
   /**
-   * Return the extent of all warped maps in the source
+   * Return the extent of all maps in the source
    * @returns {BBox | undefined} - extent of all warped maps
    */
   getExtent(): BBox | undefined {
@@ -204,8 +204,8 @@ export class WarpedMapSource extends Source {
    * Bring maps to front
    * @param {Iterable<string>} mapIds - IDs of the warped maps to bring to front
    */
-  bringToFront(mapIds: Iterable<string>) {
-    this.world.bringToFront(mapIds)
+  bringMapsToFront(mapIds: Iterable<string>) {
+    this.world.bringMapsToFront(mapIds)
     this.changed()
   }
 
@@ -213,8 +213,8 @@ export class WarpedMapSource extends Source {
    * Send maps to back
    * @param {Iterable<string>} mapIds - IDs of the warped maps to send to back
    */
-  sendToBack(mapIds: string[]) {
-    this.world.sendToBack(mapIds)
+  sendMapsToBack(mapIds: string[]) {
+    this.world.sendMapsToBack(mapIds)
     this.changed()
   }
 
@@ -222,8 +222,8 @@ export class WarpedMapSource extends Source {
    * Bring maps forward
    * @param {Iterable<string>} mapIds - IDs of the warped maps to bring forward
    */
-  bringForward(mapIds: Iterable<string>) {
-    this.world.bringForward(mapIds)
+  bringMapsForward(mapIds: Iterable<string>) {
+    this.world.bringMapsForward(mapIds)
     this.changed()
   }
 
@@ -231,8 +231,8 @@ export class WarpedMapSource extends Source {
    * Send maps backward
    * @param {Iterable<string>} mapIds - IDs of the warped maps to send backward
    */
-  sendBackward(mapIds: Iterable<string>) {
-    this.world.sendBackward(mapIds)
+  sendMapsBackward(mapIds: Iterable<string>) {
+    this.world.sendMapsBackward(mapIds)
     this.changed()
   }
 
@@ -241,8 +241,8 @@ export class WarpedMapSource extends Source {
    * @param {string} mapId - ID of the warped map
    * @returns {number | undefined} - z-index of the warped map
    */
-  getZIndex(mapId: string) {
-    return this.world.getZIndex(mapId)
+  getMapZIndex(mapId: string): number | undefined {
+    return this.world.getMapZIndex(mapId)
   }
 
   setImageInfoCache(cache: Cache) {

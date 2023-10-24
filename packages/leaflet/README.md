@@ -98,6 +98,23 @@ See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an exa
     *   [onRemove](#onremove)
     *   [getContainer](#getcontainer)
     *   [getCanvas](#getcanvas)
+    *   [getWorld](#getworld)
+    *   [getMap](#getmap)
+    *   [showMap](#showmap)
+    *   [showMaps](#showmaps)
+    *   [hideMap](#hidemap)
+    *   [hideMaps](#hidemaps)
+    *   [isMapVisible](#ismapvisible)
+    *   [setResourceMask](#setresourcemask)
+    *   [setMapsTransformation](#setmapstransformation)
+    *   [getExtent](#getextent)
+    *   [getBounds](#getbounds)
+    *   [bringMapsToFront](#bringmapstofront)
+    *   [sendMapsToBack](#sendmapstoback)
+    *   [bringMapsForward](#bringmapsforward)
+    *   [sendMapsBackward](#sendmapsbackward)
+    *   [getMapZIndex](#getmapzindex)
+    *   [getZIndex](#getzindex)
     *   [setZIndex](#setzindex)
     *   [bringToFront](#bringtofront)
     *   [bringToBack](#bringtoback)
@@ -160,9 +177,139 @@ Gets the HTML canvas element of the layer
 
 Returns **[HTMLCanvasElement](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement)** HTML Canvas Element
 
+#### getWorld
+
+Returns the World object that contains a list of all maps
+
+#### getMap
+
+Returns a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+#### showMap
+
+Make a single map visible
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+#### showMaps
+
+Make multiple maps visible
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+
+#### hideMap
+
+Make a single map invisible
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+#### hideMaps
+
+Make multiple maps invisible
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+
+#### isMapVisible
+
+Returns visibility of a single map
+
+##### Parameters
+
+*   `mapId` &#x20;
+
+Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
+
+#### setResourceMask
+
+Sets the resource mask of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Position](https://developer.mozilla.org/docs/Web/API/Position)>** new resource mask
+
+#### setMapsTransformation
+
+Sets the transformation type of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+*   `transformation` **TransformationType** new transformation type
+
+#### getExtent
+
+Return the extent of all maps in the layer
+
+Returns **(BBox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+
+#### getBounds
+
+Returns the bounds of all maps in the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
+
+Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounds
+
+#### bringMapsToFront
+
+Bring maps to front
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring to front
+
+#### sendMapsToBack
+
+Send maps to back
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send to back
+
+#### bringMapsForward
+
+Bring maps forward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring forward
+
+#### sendMapsBackward
+
+Send maps backward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send backward
+
+#### getMapZIndex
+
+Returns the z-index of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
+
+#### getZIndex
+
+Gets the zIndex of the layer.
+
 #### setZIndex
 
-Changes the zIndex of the image overlay.
+Changes the zIndex of the layer.
 
 ##### Parameters
 
@@ -198,7 +345,7 @@ Sets the opacity of the layer
 
 #### setMapOpacity
 
-Sets the opacity of a single warped map
+Sets the opacity of a single map
 
 ##### Parameters
 
@@ -207,7 +354,7 @@ Sets the opacity of a single warped map
 
 #### resetMapOpacity
 
-Resets the opacity of a single warped map to 1
+Resets the opacity of a single map to 1
 
 ##### Parameters
 
@@ -273,7 +420,7 @@ Sets the colorization for a single map in the layer
 
 #### resetMapColorize
 
-Resets the colorization of a single warped map
+Resets the colorization of a single map
 
 ##### Parameters
 

@@ -604,7 +604,7 @@ importers:
         specifier: ^1.0.0-beta.26
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.42
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/openlayers
       '@allmaps/render':
         specifier: ^1.0.0-beta.39
@@ -807,6 +807,12 @@ importers:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.14
         version: link:../stdlib
+      '@allmaps/transform':
+        specifier: ^1.0.0-beta.17
+        version: link:../transform
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4

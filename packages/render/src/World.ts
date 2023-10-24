@@ -260,11 +260,11 @@ export default class World extends EventTarget {
     }
   }
 
-  getZIndex(mapId: string) {
+  getMapZIndex(mapId: string) {
     return this.zIndices.get(mapId)
   }
 
-  bringToFront(mapIds: Iterable<string>) {
+  bringMapsToFront(mapIds: Iterable<string>) {
     let newZIndex = this.warpedMapsById.size
 
     for (const mapId of mapIds) {
@@ -278,7 +278,7 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
   }
 
-  sendToBack(mapIds: string[]) {
+  sendMapsToBack(mapIds: string[]) {
     let newZIndex = -mapIds.length
 
     for (const mapId of mapIds) {
@@ -292,7 +292,7 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
   }
 
-  bringForward(mapIds: Iterable<string>) {
+  bringMapsForward(mapIds: Iterable<string>) {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
@@ -308,7 +308,7 @@ export default class World extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
   }
 
-  sendBackward(mapIds: Iterable<string>) {
+  sendMapsBackward(mapIds: Iterable<string>) {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
@@ -344,7 +344,7 @@ export default class World extends EventTarget {
     }
   }
 
-  setTransformation(
+  setMapsTransformation(
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {

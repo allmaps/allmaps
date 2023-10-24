@@ -39,5 +39,5 @@ export function nextTransformation() {
 
 transformation.subscribe(($transformation) => {
   const $mapIds = get(mapIds)
-  mapWarpedMapSource.setTransformation($mapIds, $transformation)
+  mapWarpedMapSource.setMapsTransformation($mapIds, $transformation)
 })

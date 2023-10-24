@@ -142,7 +142,7 @@ export const activeMap = derived(
 activeMapId.subscribe(($activeMapId) => {
   if ($activeMapId) {
     if (mapWarpedMapSource && $activeMapId.updateView) {
-      mapWarpedMapSource.bringToFront([$activeMapId.mapId])
+      mapWarpedMapSource.bringMapsToFront([$activeMapId.mapId])
     }
   }
 })

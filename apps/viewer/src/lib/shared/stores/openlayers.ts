@@ -100,8 +100,8 @@ function mapVectorLayerOrderFunction(
   const mapId2 = feature2.getId() as string
 
   if (mapId1 && mapId2) {
-    const zIndex1 = mapWarpedMapSource.getZIndex(mapId1)
-    const zIndex2 = mapWarpedMapSource.getZIndex(mapId2)
+    const zIndex1 = mapWarpedMapSource.getMapZIndex(mapId1)
+    const zIndex2 = mapWarpedMapSource.getMapZIndex(mapId2)
 
     if (zIndex1 !== undefined && zIndex2 !== undefined) {
       return zIndex1 - zIndex2
@@ -231,14 +231,14 @@ export const ol = derived(view, ($view) => {
 // Exported functions
 
 export function showMap(mapId: string) {
-  if (!mapWarpedMapSource.isVisible(mapId)) {
+  if (!mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.showMap(mapId)
     addMapToVectorSource(mapId)
   }
 }
 
 export function hideMap(mapId: string) {
-  if (mapWarpedMapSource.isVisible(mapId)) {
+  if (mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.hideMap(mapId)
     removeMapFromVectorSource(mapId)
   }

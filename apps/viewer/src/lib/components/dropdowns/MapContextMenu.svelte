@@ -13,10 +13,10 @@
   // import { getFullResourceMask } from '@allmaps/stdlib'
 
   import {
-    BringToFront,
-    BringForward,
-    SendBackward,
-    SendToBack
+    BringMapsToFront,
+    BringMapsForward,
+    SendMapsBackward,
+    SendMapsToBack
   } from '@allmaps/ui'
 
   import type { FeatureContextMenu } from '$lib/shared/types.js'
@@ -42,20 +42,20 @@
   //   }
   // }
 
-  function handleBringToFront() {
-    mapWarpedMapSource.bringToFront([mapId])
+  function handleBringMapsToFront() {
+    mapWarpedMapSource.bringMapsToFront([mapId])
   }
 
-  function handleBringForward() {
-    mapWarpedMapSource.bringForward([mapId])
+  function handleBringMapsForward() {
+    mapWarpedMapSource.bringMapsForward([mapId])
   }
 
-  function handleSendBackward() {
-    mapWarpedMapSource.sendBackward([mapId])
+  function handleSendMapsBackward() {
+    mapWarpedMapSource.sendMapsBackward([mapId])
   }
 
-  function handleSendToBack() {
-    mapWarpedMapSource.sendToBack([mapId])
+  function handleSendMapsToBack() {
+    mapWarpedMapSource.sendMapsToBack([mapId])
   }
 </script>
 
@@ -65,17 +65,17 @@
     <MenuItem label="Use mask" on:click={handleUseMask} />
 
     <MenuSeparator /> -->
-    <MenuItem label="Bring to Front" on:click={handleBringToFront}
-      ><BringToFront /></MenuItem
+    <MenuItem label="Bring Maps to Front" on:click={handleBringMapsToFront}
+      ><BringMapsToFront /></MenuItem
     >
-    <MenuItem label="Bring Forward" on:click={handleBringForward}
-      ><BringForward /></MenuItem
+    <MenuItem label="Bring Maps Forward" on:click={handleBringMapsForward}
+      ><BringMapsForward /></MenuItem
     >
-    <MenuItem label="Send Backward" on:click={handleSendBackward}
-      ><SendBackward /></MenuItem
+    <MenuItem label="Send Maps Backward" on:click={handleSendMapsBackward}
+      ><SendMapsBackward /></MenuItem
     >
-    <MenuItem label="Send to Back" on:click={handleSendToBack}
-      ><SendToBack /></MenuItem
+    <MenuItem label="Send Maps to Back" on:click={handleSendMapsToBack}
+      ><SendMapsToBack /></MenuItem
     >
   </ol>
 </ContextMenu>

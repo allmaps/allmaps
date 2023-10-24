@@ -12,10 +12,10 @@ import Copy from '$lib/components/Copy.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 
 // Arrange icons
-import BringToFront from '$lib/components/icons/BringToFront.svelte'
-import BringForward from '$lib/components/icons/BringForward.svelte'
-import SendBackward from '$lib/components/icons/SendBackward.svelte'
-import SendToBack from '$lib/components/icons/SendToBack.svelte'
+import BringMapsToFront from '$lib/components/icons/BringMapsToFront.svelte'
+import BringMapsForward from '$lib/components/icons/BringMapsForward.svelte'
+import SendMapsBackward from '$lib/components/icons/SendMapsBackward.svelte'
+import SendMapsToBack from '$lib/components/icons/SendMapsToBack.svelte'
 
 // Transformation icons
 import Helmert from '$lib/components/icons/transformations/Helmert.svelte'
@@ -38,10 +38,10 @@ export {
   MapMonster,
 
   // Arrange icons
-  BringToFront,
-  BringForward,
-  SendBackward,
-  SendToBack,
+  BringMapsToFront,
+  BringMapsForward,
+  SendMapsBackward,
+  SendMapsToBack,
 
   // Transformation icons
   Helmert,

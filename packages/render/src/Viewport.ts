@@ -39,8 +39,8 @@ export default class Viewport extends EventTarget {
   getVisibleWarpedMapIds() {
     const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
       (mapIdA, mapIdB) => {
-        const zIndexA = this.world.getZIndex(mapIdA)
-        const zIndexB = this.world.getZIndex(mapIdB)
+        const zIndexA = this.world.getMapZIndex(mapIdA)
+        const zIndexB = this.world.getMapZIndex(mapIdB)
         if (zIndexA !== undefined && zIndexB !== undefined) {
           return zIndexA - zIndexB
         }

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
-
 import { throttle } from 'lodash-es'
 
 import {
@@ -14,12 +13,13 @@ import {
   RTree,
   toLonLat
 } from '@allmaps/render'
-
 import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
 import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
+import type { TransformationType } from '@allmaps/transform'
+import type { Position } from '@allmaps/types'
 
 // TODO: make class or integrate in Viewport
 type FrameState = {
@@ -126,14 +126,98 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Returns the World object that contains a list of all warped maps
+   * Returns the World object that contains a list of all maps
    */
   getWorld(): World {
     return this.world
   },
 
   /**
-   * Returns the bounds of all maps of the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
+   * Returns a single map
+   * @param {string} mapId - ID of the warped map
+   */
+  getMap(mapId: string) {
+    return this.world.getMap(mapId)
+  },
+
+  /**
+   * Make a single map visible
+   * @param {string} mapId - ID of the warped map
+   */
+  showMap(mapId: string) {
+    this.world.showMaps([mapId])
+    this._update()
+  },
+
+  /**
+   * Make multiple maps visible
+   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   */
+  showMaps(mapIds: Iterable<string>) {
+    this.world.showMaps(mapIds)
+    this._update()
+  },
+
+  /**
+   * Make a single map invisible
+   * @param {string} mapId - ID of the warped map
+   */
+  hideMap(mapId: string) {
+    this.world.hideMaps([mapId])
+    this._update()
+  },
+
+  /**
+   * Make multiple maps invisible
+   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   */
+  hideMaps(mapIds: Iterable<string>) {
+    this.world.hideMaps(mapIds)
+    this._update()
+  },
+
+  /**
+   * Returns visibility of a single map
+   * @returns {boolean | undefined} - whether the map is visible
+   */
+  isMapVisible(mapId: string): boolean | undefined {
+    const warpedMap = this.world.getMap(mapId)
+    return warpedMap?.visible
+  },
+
+  /**
+   * Sets the resource mask of a single map
+   * @param {string} mapId - ID of the warped map
+   * @param {Position[]} resourceMask - new resource mask
+   */
+  setResourceMask(mapId: string, resourceMask: Position[]) {
+    this.world.setResourceMask(mapId, resourceMask)
+    this._update()
+  },
+
+  /**
+   * Sets the transformation type of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   * @param {TransformationType} transformation - new transformation type
+   */
+  setMapsTransformation(
+    mapIds: Iterable<string>,
+    transformation: TransformationType
+  ) {
+    this.world.setMapsTransformation(mapIds, transformation)
+    this._update()
+  },
+
+  /**
+   * Return the extent of all maps in the layer
+   * @returns {BBox | undefined} - extent of all warped maps
+   */
+  getExtent(): BBox | undefined {
+    return this.world.getBBox()
+  },
+
+  /**
+   * Returns the bounds of all maps in the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
    * @returns {L.LatLngBounds | undefined} Bounds
    */
   getBounds(): L.LatLngBounds | undefined {
@@ -150,7 +234,59 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Changes the zIndex of the image overlay.
+   * Bring maps to front
+   * @param {Iterable<string>} mapIds - IDs of the warped maps to bring to front
+   */
+  bringMapsToFront(mapIds: Iterable<string>) {
+    this.world.bringMapsToFront(mapIds)
+    this._update()
+  },
+
+  /**
+   * Send maps to back
+   * @param {Iterable<string>} mapIds - IDs of the warped maps to send to back
+   */
+  sendMapsToBack(mapIds: string[]) {
+    this.world.sendMapsToBack(mapIds)
+    this._update()
+  },
+
+  /**
+   * Bring maps forward
+   * @param {Iterable<string>} mapIds - IDs of the warped maps to bring forward
+   */
+  bringMapsForward(mapIds: Iterable<string>) {
+    this.world.bringMapsForward(mapIds)
+    this._update()
+  },
+
+  /**
+   * Send maps backward
+   * @param {Iterable<string>} mapIds - IDs of the warped maps to send backward
+   */
+  sendMapsBackward(mapIds: Iterable<string>) {
+    this.world.sendMapsBackward(mapIds)
+    this._update()
+  },
+
+  /**
+   * Returns the z-index of a single map
+   * @param {string} mapId - ID of the warped map
+   * @returns {number | undefined} - z-index of the warped map
+   */
+  getMapZIndex(mapId: string): number | undefined {
+    return this.world.getMapZIndex(mapId)
+  },
+
+  /**
+   * Gets the zIndex of the layer.
+   */
+  getZIndex() {
+    return this.options.zIndex
+  },
+
+  /**
+   * Changes the zIndex of the layer.
    * @param {number} value - zIndex
    */
   setZIndex(value: number) {
@@ -210,7 +346,7 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Sets the opacity of a single warped map
+   * Sets the opacity of a single map
    * @param {string} mapId - ID of the warped map
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
@@ -221,7 +357,7 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Resets the opacity of a single warped map to 1
+   * Resets the opacity of a single map to 1
    * @param {string} mapId - ID of the warped map
    */
   resetMapOpacity(mapId: string) {
@@ -333,7 +469,7 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Resets the colorization of a single warped map
+   * Resets the colorization of a single map
    * @param {string} mapId - ID of the warped map
    */
   resetMapColorize(mapId: string) {
