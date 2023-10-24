@@ -4,7 +4,7 @@ import { throttle } from 'lodash-es'
 
 import {
   TileCache,
-  World,
+  WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
@@ -126,10 +126,10 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Returns the World object that contains a list of all maps
+   * Returns the WarpedMapList object that contains a list of all maps
    */
-  getWorld(): World {
-    return this.world
+  getWarpedMapList(): WarpedMapList {
+    return this.warpedMapList
   },
 
   /**
@@ -137,7 +137,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} mapId - ID of the warped map
    */
   getMap(mapId: string) {
-    return this.world.getMap(mapId)
+    return this.warpedMapList.getMap(mapId)
   },
 
   /**
@@ -145,7 +145,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} mapId - ID of the warped map
    */
   showMap(mapId: string) {
-    this.world.showMaps([mapId])
+    this.warpedMapList.showMaps([mapId])
     this._update()
   },
 
@@ -154,7 +154,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps
    */
   showMaps(mapIds: Iterable<string>) {
-    this.world.showMaps(mapIds)
+    this.warpedMapList.showMaps(mapIds)
     this._update()
   },
 
@@ -163,7 +163,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} mapId - ID of the warped map
    */
   hideMap(mapId: string) {
-    this.world.hideMaps([mapId])
+    this.warpedMapList.hideMaps([mapId])
     this._update()
   },
 
@@ -172,7 +172,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps
    */
   hideMaps(mapIds: Iterable<string>) {
-    this.world.hideMaps(mapIds)
+    this.warpedMapList.hideMaps(mapIds)
     this._update()
   },
 
@@ -181,7 +181,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {boolean | undefined} - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
-    const warpedMap = this.world.getMap(mapId)
+    const warpedMap = this.warpedMapList.getMap(mapId)
     return warpedMap?.visible
   },
 
@@ -191,7 +191,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Position[]} resourceMask - new resource mask
    */
   setResourceMask(mapId: string, resourceMask: Position[]) {
-    this.world.setResourceMask(mapId, resourceMask)
+    this.warpedMapList.setResourceMask(mapId, resourceMask)
     this._update()
   },
 
@@ -204,7 +204,7 @@ export const WarpedMapLayer = L.Layer.extend({
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.world.setMapsTransformation(mapIds, transformation)
+    this.warpedMapList.setMapsTransformation(mapIds, transformation)
     this._update()
   },
 
@@ -213,7 +213,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {BBox | undefined} - extent of all warped maps
    */
   getExtent(): BBox | undefined {
-    return this.world.getBBox()
+    return this.warpedMapList.getBBox()
   },
 
   /**
@@ -221,7 +221,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {L.LatLngBounds | undefined} Bounds
    */
   getBounds(): L.LatLngBounds | undefined {
-    const bbox = this.world.getBBox()
+    const bbox = this.warpedMapList.getBBox()
     if (!bbox) {
       return undefined
     } else {
@@ -238,7 +238,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps to bring to front
    */
   bringMapsToFront(mapIds: Iterable<string>) {
-    this.world.bringMapsToFront(mapIds)
+    this.warpedMapList.bringMapsToFront(mapIds)
     this._update()
   },
 
@@ -247,7 +247,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps to send to back
    */
   sendMapsToBack(mapIds: string[]) {
-    this.world.sendMapsToBack(mapIds)
+    this.warpedMapList.sendMapsToBack(mapIds)
     this._update()
   },
 
@@ -256,7 +256,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps to bring forward
    */
   bringMapsForward(mapIds: Iterable<string>) {
-    this.world.bringMapsForward(mapIds)
+    this.warpedMapList.bringMapsForward(mapIds)
     this._update()
   },
 
@@ -265,7 +265,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps to send backward
    */
   sendMapsBackward(mapIds: Iterable<string>) {
-    this.world.sendMapsBackward(mapIds)
+    this.warpedMapList.sendMapsBackward(mapIds)
     this._update()
   },
 
@@ -275,7 +275,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {number | undefined} - z-index of the warped map
    */
   getMapZIndex(mapId: string): number | undefined {
-    return this.world.getMapZIndex(mapId)
+    return this.warpedMapList.getMapZIndex(mapId)
   },
 
   /**
@@ -316,7 +316,7 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   setImageInfoCache(cache: Cache) {
-    this.world.setImageInfoCache(cache)
+    this.warpedMapList.setImageInfoCache(cache)
   },
 
   /**
@@ -487,7 +487,7 @@ export const WarpedMapLayer = L.Layer.extend({
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.world.addGeoreferenceAnnotation(annotation)
+    const results = this.warpedMapList.addGeoreferenceAnnotation(annotation)
     this._update()
 
     return results
@@ -502,7 +502,7 @@ export const WarpedMapLayer = L.Layer.extend({
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.world.removeGeoreferenceAnnotation(annotation)
+    const results = this.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this._update()
 
     return results
@@ -574,9 +574,12 @@ export const WarpedMapLayer = L.Layer.extend({
     this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
 
     this.rtree = new RTree()
-    this.world = new World(this.rtree, this.options.imageInfoCache)
+    this.warpedMapList = new WarpedMapList(
+      this.rtree,
+      this.options.imageInfoCache
+    )
 
-    this.viewport = new Viewport(this.world)
+    this.viewport = new Viewport(this.warpedMapList)
 
     this.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
@@ -593,29 +596,29 @@ export const WarpedMapLayer = L.Layer.extend({
       this._rendererChanged.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this._warpedMapAdded.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
       this._visibilityChanged.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this._transformationChanged.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.RESOURCEMASKUPDATED,
       this._resourceMaskUpdated.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
-      this._worldCleared.bind(this)
+      this._warpedMapListCleared.bind(this)
     )
 
     this.throttledUpdateViewportAndGetTilesNeeded = throttle(
@@ -653,7 +656,7 @@ export const WarpedMapLayer = L.Layer.extend({
     // TODO: remove event listeners
     //  - this.viewport
     //  - this.tileCache
-    //  - this.world
+    //  - this.warpedMapList
 
     this.tileCache.clear()
   },
@@ -666,7 +669,7 @@ export const WarpedMapLayer = L.Layer.extend({
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
-      const warpedMap = this.world.getMap(mapId)
+      const warpedMap = this.warpedMapList.getMap(mapId)
 
       if (warpedMap) {
         this.renderer.addWarpedMap(warpedMap)
@@ -688,7 +691,7 @@ export const WarpedMapLayer = L.Layer.extend({
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const mapId of mapIds) {
-        const warpedMap = this.world.getMap(mapId)
+        const warpedMap = this.warpedMapList.getMap(mapId)
 
         if (warpedMap) {
           this.renderer.updateTriangulation(warpedMap, false)
@@ -702,7 +705,7 @@ export const WarpedMapLayer = L.Layer.extend({
   _resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const warpedMap = this.world.getMap(mapId)
+      const warpedMap = this.warpedMapList.getMap(mapId)
 
       if (warpedMap) {
         this.renderer.updateTriangulation(warpedMap)
@@ -710,7 +713,7 @@ export const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  _worldCleared() {
+  _warpedMapListCleared() {
     this.renderer.clear()
     this.tileCache.clear()
   },

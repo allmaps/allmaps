@@ -1,4 +1,4 @@
-import World from './World.js'
+import WarpedMapList from './WarpedMapList.js'
 
 import {
   getResourcePolygon,
@@ -20,16 +20,16 @@ import type {
 const MIN_COMBINED_PIXEL_SIZE = 5
 
 export default class Viewport extends EventTarget {
-  world: World
+  warpedMapList: WarpedMapList
 
   projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
   visibleWarpedMapIds: Set<string> = new Set()
   bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
 
-  constructor(world: World) {
+  constructor(warpedMapList: WarpedMapList) {
     super()
 
-    this.world = world
+    this.warpedMapList = warpedMapList
   }
 
   /**
@@ -39,8 +39,8 @@ export default class Viewport extends EventTarget {
   getVisibleWarpedMapIds() {
     const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
       (mapIdA, mapIdB) => {
-        const zIndexA = this.world.getMapZIndex(mapIdA)
-        const zIndexB = this.world.getMapZIndex(mapIdB)
+        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
         if (zIndexA !== undefined && zIndexB !== undefined) {
           return zIndexA - zIndexB
         }
@@ -71,11 +71,11 @@ export default class Viewport extends EventTarget {
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
     possibleVisibleWarpedMapIds =
-      this.world.getPossibleVisibleWarpedMapIds(geoBBox)
+      this.warpedMapList.getPossibleVisibleWarpedMapIds(geoBBox)
 
     const neededTiles: NeededTile[] = []
     for (const mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.world.getMap(mapId)
+      const warpedMap = this.warpedMapList.getMap(mapId)
 
       if (!warpedMap) {
         continue
@@ -117,7 +117,7 @@ export default class Viewport extends EventTarget {
         geoBBoxResourcePolygon
       )
 
-      // TODO: remove maps from this list when they're removed from World
+      // TODO: remove maps from this list when they're removed from WarpedMapList
       // or not visible anymore
       this.bestZoomLevelByMapId.set(mapId, zoomLevel)
 

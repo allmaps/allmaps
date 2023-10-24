@@ -19,7 +19,7 @@ import type { TransformationType } from '@allmaps/transform'
 import type { Position, Gcp, Bbox } from '@allmaps/types'
 import type { WarpedMap } from './shared/types.js'
 
-export default class World extends EventTarget {
+export default class WarpedMapList extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()
   zIndices: Map<string, number> = new Map()
 

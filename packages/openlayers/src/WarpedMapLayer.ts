@@ -5,7 +5,7 @@ import { throttle, type DebouncedFunc } from 'lodash-es'
 
 import {
   TileCache,
-  World,
+  WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
@@ -46,7 +46,7 @@ export class WarpedMapLayer extends Layer {
 
   canvasSize: [number, number] = [0, 0]
 
-  world: World
+  warpedMapList: WarpedMapList
   renderer: WebGL2Renderer
   viewport: Viewport
   tileCache: TileCache
@@ -113,31 +113,31 @@ export class WarpedMapLayer extends Layer {
     this.source = this.getSource() as WarpedMapSource
     // TODO: listen to change:source
 
-    this.world = this.source.getWorld()
+    this.warpedMapList = this.source.getWarpedMapList()
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.warpedMapAdded.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
       this.visibilityChanged.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.RESOURCEMASKUPDATED,
       this.resourceMaskUpdated.bind(this)
     )
 
-    this.world.addEventListener(
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
-      this.worldCleared.bind(this)
+      this.warpedMapListCleared.bind(this)
     )
 
     this.tileCache.addEventListener(
@@ -150,7 +150,7 @@ export class WarpedMapLayer extends Layer {
       this.changed.bind(this)
     )
 
-    this.viewport = new Viewport(this.world)
+    this.viewport = new Viewport(this.warpedMapList)
 
     this.throttledUpdateViewportAndGetTilesNeeded = throttle(
       this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
@@ -158,7 +158,7 @@ export class WarpedMapLayer extends Layer {
       THROTTLE_OPTIONS
     )
 
-    for (const warpedMap of this.world.getMaps()) {
+    for (const warpedMap of this.warpedMapList.getMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
   }
@@ -167,7 +167,7 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
-      const warpedMap = this.world.getMap(mapId)
+      const warpedMap = this.warpedMapList.getMap(mapId)
 
       if (warpedMap) {
         this.renderer.addWarpedMap(warpedMap)
@@ -191,7 +191,7 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const mapId of mapIds) {
-        const warpedMap = this.world.getMap(mapId)
+        const warpedMap = this.warpedMapList.getMap(mapId)
 
         if (warpedMap) {
           this.renderer.updateTriangulation(warpedMap, false)
@@ -205,7 +205,7 @@ export class WarpedMapLayer extends Layer {
   private resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const warpedMap = this.world.getMap(mapId)
+      const warpedMap = this.warpedMapList.getMap(mapId)
 
       if (warpedMap) {
         this.renderer.updateTriangulation(warpedMap)
@@ -213,7 +213,7 @@ export class WarpedMapLayer extends Layer {
     }
   }
 
-  private worldCleared() {
+  private warpedMapListCleared() {
     this.renderer.clear()
     this.tileCache.clear()
     this.changed()
