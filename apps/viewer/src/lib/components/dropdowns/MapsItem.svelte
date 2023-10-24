@@ -298,7 +298,7 @@
       <div class="inline-flex rounded-md shadow-sm" role="group">
         <button
           type="button"
-          title="Bring Maps To Front"
+          title="Bring To Front"
           on:click={handleBringMapsToFront}
           class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
@@ -306,7 +306,7 @@
         </button>
         <button
           type="button"
-          title="Bring Maps Forward"
+          title="Bring Forward"
           on:click={handleBringMapsForward}
           class="p-1.5 w-8 h-8 bg-white border-t border-b border-r border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
@@ -314,7 +314,7 @@
         </button>
         <button
           type="button"
-          title="Send Maps Backward"
+          title="Send Backward"
           on:click={handleSendMapsBackward}
           class="p-1.5 w-8 h-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
@@ -322,7 +322,7 @@
         </button>
         <button
           type="button"
-          title="Send Maps to Back"
+          title="Send to Back"
           on:click={handleSendMapsToBack}
           class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
