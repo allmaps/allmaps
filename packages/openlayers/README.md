@@ -74,15 +74,15 @@ fetch(annotationUrl)
     *   [showMaps](#showmaps)
     *   [hideMap](#hidemap)
     *   [hideMaps](#hidemaps)
-    *   [isVisible](#isvisible)
+    *   [isMapVisible](#ismapvisible)
     *   [setResourceMask](#setresourcemask)
-    *   [setTransformation](#settransformation)
+    *   [setMapsTransformation](#setmapstransformation)
     *   [getExtent](#getextent)
-    *   [bringToFront](#bringtofront)
-    *   [sendToBack](#sendtoback)
-    *   [bringForward](#bringforward)
-    *   [sendBackward](#sendbackward)
-    *   [getZIndex](#getzindex)
+    *   [bringMapsToFront](#bringmapstofront)
+    *   [sendMapsToBack](#sendmapstoback)
+    *   [bringMapsForward](#bringmapsforward)
+    *   [sendMapsBackward](#sendmapsbackward)
+    *   [getMapZIndex](#getmapzindex)
 
 ### Position
 
@@ -280,15 +280,15 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### clear
 
-Clears the source, removes all warped maps
+Clears the source, removes all maps
 
 #### getWorld
 
-Returns the World object that contains a list of all warped maps
+Returns the World object that contains a list of all maps
 
 #### getMap
 
-Returns a single warped map
+Returns a single map
 
 ##### Parameters
 
@@ -326,7 +326,7 @@ Make multiple maps invisible
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
 
-#### isVisible
+#### isMapVisible
 
 Returns visibility of a single map
 
@@ -334,7 +334,7 @@ Returns visibility of a single map
 
 *   `mapId` &#x20;
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether the map is visible
+Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
 
 #### setResourceMask
 
@@ -345,7 +345,7 @@ Sets the resource mask of a single map
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 *   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Position](#position)>** new resource mask
 
-#### setTransformation
+#### setMapsTransformation
 
 Sets the transformation type of multiple maps
 
@@ -356,11 +356,11 @@ Sets the transformation type of multiple maps
 
 #### getExtent
 
-Return the extent of all warped maps in the source
+Return the extent of all maps in the source
 
 Returns **([BBox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
 
-#### bringToFront
+#### bringMapsToFront
 
 Bring maps to front
 
@@ -368,7 +368,7 @@ Bring maps to front
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring to front
 
-#### sendToBack
+#### sendMapsToBack
 
 Send maps to back
 
@@ -376,7 +376,7 @@ Send maps to back
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send to back
 
-#### bringForward
+#### bringMapsForward
 
 Bring maps forward
 
@@ -384,7 +384,7 @@ Bring maps forward
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring forward
 
-#### sendBackward
+#### sendMapsBackward
 
 Send maps backward
 
@@ -392,7 +392,7 @@ Send maps backward
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send backward
 
-#### getZIndex
+#### getMapZIndex
 
 Returns the z-index of a single map
 
