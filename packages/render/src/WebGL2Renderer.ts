@@ -1,4 +1,5 @@
 import TileCache from './TileCache.js'
+import WarpedMap from './WarpedMap.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
 import { createShader, createProgram } from './shared/webgl2.js'
@@ -21,7 +22,6 @@ import {
 import type Viewport from './Viewport.js'
 
 import type {
-  WarpedMap,
   RenderOptions,
   RemoveBackgroundOptions,
   ColorizeOptions
@@ -119,6 +119,23 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       webglWarpedMap.removeCachedTile(tileUrl)
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    }
+  }
+
+  async imageInfoNeeded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+
+      const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
+
+      if (!webglWarpedMap) {
+        return
+      }
+
+      const warpedMap = webglWarpedMap.warpedMap
+
+      await warpedMap.fetchImageInfo()
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
   }
@@ -566,6 +583,12 @@ export default class WebGL2Renderer extends EventTarget {
 
   render(viewport: Viewport): void {
     this.viewport = viewport
+
+    // Move this from viewer to renderer as updateViewportAndGetTilesNeeded part 2 is moved to render
+    viewport.addEventListener(
+      WarpedMapEventType.IMAGEINFONEEDED,
+      this.imageInfoNeeded.bind(this)
+    )
 
     this.renderInternal()
   }

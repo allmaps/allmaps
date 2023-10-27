@@ -3,12 +3,13 @@ import { triangulate } from '@allmaps/triangulate'
 import { computeBbox } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
+import WarpedMap from './WarpedMap.js'
 import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
 import type { Transform } from '@allmaps/types'
-import type { WarpedMap, RenderOptions } from './shared/types.js'
+import type { RenderOptions } from './shared/types.js'
 import { Bbox } from '@allmaps/types'
 
 // TODO: Move to stdlib?
@@ -75,8 +76,8 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.gl = gl
     this.program = program
 
-    this.imageWidth = warpedMap.parsedImage.width
-    this.imageHeight = warpedMap.parsedImage.height
+    this.imageWidth = warpedMap.georeferencedMap.resource.width
+    this.imageHeight = warpedMap.georeferencedMap.resource.height
 
     this.updateTriangulation(warpedMap)
 

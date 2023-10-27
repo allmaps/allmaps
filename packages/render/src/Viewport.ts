@@ -1,5 +1,6 @@
 import WarpedMapList from './WarpedMapList.js'
 
+import { hasImageInfo } from './WarpedMap.js'
 import {
   getResourcePolygon,
   getBestZoomLevel,
@@ -105,6 +106,13 @@ export default class Viewport extends EventTarget {
         warpedMap.transformer,
         geoBbox
       )
+
+      if (!hasImageInfo(warpedMap)) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
+        )
+        continue
+      }
 
       const zoomLevel = getBestZoomLevel(
         warpedMap.parsedImage,

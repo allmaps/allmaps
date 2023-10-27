@@ -1,23 +1,19 @@
-import { generateId, generateChecksum } from '@allmaps/id'
+import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
   validateMap,
   type Map as Georef
 } from '@allmaps/annotation'
-import { GcpTransformer } from '@allmaps/transform'
 
 import RTree from './RTree.js'
+import WarpedMap from './WarpedMap.js'
 
 import { computeBbox } from '@allmaps/stdlib'
 import { combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import { fetchImageInfo, lonLatToWebMecator } from '@allmaps/stdlib'
-import { Image as IIIFImage } from '@allmaps/iiif-parser'
-
 import type { TransformationType } from '@allmaps/transform'
-import type { Point, Gcp, Bbox } from '@allmaps/types'
-import type { WarpedMap } from './shared/types.js'
+import type { Point, Bbox } from '@allmaps/types'
 
 export default class WarpedMapList extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()
@@ -41,55 +37,12 @@ export default class WarpedMapList extends EventTarget {
     try {
       const mapId = await this.getMapId(map)
 
-      const gcps = map.gcps
-      const resourceMask = map.resourceMask
-
-      const projectedGCPs = gcps.map(({ geo, resource }) => ({
-        geo: lonLatToWebMecator(geo),
-        resource
-      }))
-
-      // TODO: to make sure only tiles for visible parts of the map are requested
-      // (and not for parts hidden behind maps on top of it)
-      // Subtract geoMasks of maps that have been added before the current map:
-      // Map A (topmost): show completely
-      // Map B: B - A
-      // Map C: C - B - A
-      // Map D: D - C - B - A
-      //
-      // Possible libraries:
-      //  - https://github.com/w8r/martinez
-      //  - https://github.com/mfogel/polygon-clipping
-
-      // TODO: only load info.json when its needed
-      const imageUri = map.resource.id
-      const imageInfoJson = await fetchImageInfo(imageUri, {
-        cache: this.imageInfoCache
-      })
-      const parsedImage = IIIFImage.parse(imageInfoJson)
-      const imageId = await generateId(imageUri)
-
-      const warpedMap: WarpedMap = {
-        imageId,
-        mapId,
-        projectedGCPs,
-        visible: true,
-        parsedImage,
-        resourceMask,
-        // TODO: clean up!
-        ...this.computeWarpedMapTransformer(
-          mapId,
-          resourceMask,
-          parsedImage,
-          projectedGCPs,
-          map.transformation?.type || 'polynomial'
-        )
-      }
+      const warpedMap = new WarpedMap(mapId, map, this.imageInfoCache)
 
       this.warpedMapsById.set(mapId, warpedMap)
+      this.zIndices.set(mapId, this.warpedMapsById.size - 1)
 
-      const zIndex = this.warpedMapsById.size - 1
-      this.zIndices.set(mapId, zIndex)
+      this.updateRtree(warpedMap)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
@@ -105,50 +58,6 @@ export default class WarpedMapList extends EventTarget {
     }
   }
 
-  private computeWarpedMapTransformer(
-    mapId: string,
-    resourceMask: Point[],
-    parsedImage: IIIFImage,
-    projectedGcps: Gcp[],
-    transformation: TransformationType
-  ) {
-    const transformer = new GcpTransformer(projectedGcps, transformation)
-
-    const transformerOptions = {
-      maxOffsetRatio: 0.01,
-      maxDepth: 6
-    }
-
-    const geoMask = transformer.transformForwardAsGeojson(
-      [resourceMask],
-      transformerOptions
-    )
-
-    if (this.rtree) {
-      this.rtree.addItem(mapId, geoMask)
-    }
-
-    const fullResourceMask: Point[] = [
-      [0, 0],
-      [parsedImage.width, 0],
-      [parsedImage.width, parsedImage.height],
-      [0, parsedImage.height]
-    ]
-
-    const fullGeoMask = transformer.transformForwardAsGeojson(
-      [fullResourceMask],
-      transformerOptions
-    )
-
-    return {
-      transformer,
-      geoMask,
-      geoMaskBbox: computeBbox(geoMask),
-      fullGeoMask,
-      fullGeoMaskBbox: computeBbox(fullGeoMask)
-    }
-  }
-
   private async removeMapInternal(map: Georef) {
     try {
       const mapId = await this.getMapId(map)
@@ -159,9 +68,7 @@ export default class WarpedMapList extends EventTarget {
         this.warpedMapsById.delete(mapId)
         this.zIndices.delete(mapId)
 
-        if (this.rtree) {
-          this.rtree.removeItem(mapId)
-        }
+        this.removeFromRtree(warpedMap)
 
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
@@ -244,6 +151,19 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
 
     return results
+  }
+
+  private updateRtree(warpedMap: WarpedMap) {
+    if (this.rtree) {
+      this.rtree.removeItem(warpedMap.mapId)
+      this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
+    }
+  }
+
+  private removeFromRtree(warpedMap: WarpedMap) {
+    if (this.rtree) {
+      this.rtree.removeItem(warpedMap.mapId)
+    }
   }
 
   private removeZIndexHoles() {
@@ -333,10 +253,7 @@ export default class WarpedMapList extends EventTarget {
       warpedMap.geoMask = geoMask
       warpedMap.geoMaskBbox = computeBbox(geoMask)
 
-      if (this.rtree) {
-        this.rtree.removeItem(mapId)
-        this.rtree.addItem(mapId, geoMask)
-      }
+      this.updateRtree(warpedMap)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
@@ -346,23 +263,13 @@ export default class WarpedMapList extends EventTarget {
 
   setMapsTransformation(
     mapIds: Iterable<string>,
-    transformation: TransformationType
+    transformationType: TransformationType
   ) {
     for (const mapId of mapIds) {
-      let warpedMap = this.warpedMapsById.get(mapId)
+      const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap) {
-        warpedMap = {
-          ...warpedMap,
-          ...this.computeWarpedMapTransformer(
-            mapId,
-            warpedMap.resourceMask,
-            warpedMap.parsedImage,
-            warpedMap.projectedGCPs,
-            transformation
-          )
-        }
-
-        this.warpedMapsById.set(mapId, warpedMap)
+        warpedMap.updateTransformationType(transformationType)
+        this.updateRtree(warpedMap)
       }
     }
 
@@ -392,6 +299,20 @@ export default class WarpedMapList extends EventTarget {
   }
 
   getPossibleVisibleWarpedMapIds(geoBbox: Bbox) {
+    // TODO: to make sure only tiles for visible parts of the map are requested
+    // (and not for parts hidden behind maps on top of it)
+    // Subtract geoMasks of maps that have been added before the current map:
+    // Map A (topmost): show completely
+    // Map B: B - A
+    // Map C: C - B - A
+    // Map D: D - C - B - A
+    //
+    // Possible libraries:
+    //  - https://github.com/w8r/martinez
+    //  - https://github.com/mfogel/polygon-clipping
+    //
+    // Do this only if transparancy of upper map is 0
+
     if (this.rtree) {
       return this.rtree.searchBbox(geoBbox)
     } else {
