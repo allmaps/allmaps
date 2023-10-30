@@ -1,5 +1,6 @@
 import TileCache from './TileCache.js'
 import WarpedMap, { hasImageInfo } from './WarpedMap.js'
+import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
 import { createShader, createProgram } from './shared/webgl2.js'
@@ -32,7 +33,12 @@ import type {
   RemoveBackgroundOptions,
   ColorizeOptions
 } from './shared/types.js'
-import type { Point, Transform, NeededTile } from '@allmaps/types'
+import type {
+  Point,
+  Transform,
+  NeededTile,
+  TileZoomLevel
+} from '@allmaps/types'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -42,6 +48,10 @@ const MIN_COMBINED_PIXEL_SIZE = 5
 
 export default class WebGL2Renderer extends EventTarget {
   tileCache: TileCache
+
+  warpedMapList: WarpedMapList
+  visibleWarpedMapIds: Set<string> = new Set()
+  bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
 
   gl: WebGL2RenderingContext
   program: WebGLProgram
@@ -63,8 +73,14 @@ export default class WebGL2Renderer extends EventTarget {
   transformationTransitionDuration = 750
   animationProgress = 1
 
-  constructor(gl: WebGL2RenderingContext, tileCache: TileCache) {
+  constructor(
+    warpedMapList: WarpedMapList,
+    gl: WebGL2RenderingContext,
+    tileCache: TileCache
+  ) {
     super()
+
+    this.warpedMapList = warpedMapList
 
     this.gl = gl
 
@@ -100,8 +116,28 @@ export default class WebGL2Renderer extends EventTarget {
     this.invertedRenderTransform = createTransform()
   }
 
+  /**
+   * Returns the mapIds of the warped maps that are visible in the viewport, sorted by z-index
+   * @returns {Iterable<string>}
+   */
+  getVisibleWarpedMapIds() {
+    const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
+      (mapIdA, mapIdB) => {
+        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
+        if (zIndexA !== undefined && zIndexB !== undefined) {
+          return zIndexA - zIndexB
+        }
+
+        return 0
+      }
+    )
+
+    return sortedVisibleWarpedMapIds
+  }
+
   getTilesNeeded(): NeededTile[] {
-    // TODO: make these checks more elegant
+    // TODO: make these checks more elegant. Maybe by making values in viewport mandatory and making new viewport every render?
     if (
       !this.viewport ||
       this.viewport.geoBbox === undefined ||
@@ -110,18 +146,18 @@ export default class WebGL2Renderer extends EventTarget {
       return []
     }
 
-    let possibleVisibleWarpedMapIds: Iterable<string> = []
-    const possibleInvisibleWarpedMapIds = new Set(
-      this.viewport.visibleWarpedMapIds
-    )
+    // TODO: rename visibleWarpedMapIds because not filtering on visible or on bbox
 
-    possibleVisibleWarpedMapIds = this.viewport.warpedMapList.getMapIdsByBbox(
+    let possibleVisibleWarpedMapIds: Iterable<string> = []
+    const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
+
+    possibleVisibleWarpedMapIds = this.warpedMapList.getMapIdsByBbox(
       this.viewport.geoBbox
     )
 
     const neededTiles: NeededTile[] = []
     for (const mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.viewport.warpedMapList.getWarpedMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
         continue
@@ -175,7 +211,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
       // or not visible anymore
-      this.viewport.bestZoomLevelByMapId.set(mapId, zoomLevel)
+      this.bestZoomLevelByMapId.set(mapId, zoomLevel)
 
       // TODO: rename function
       const tiles = computeIiifTilesForPolygonAndZoomLevel(
@@ -185,8 +221,8 @@ export default class WebGL2Renderer extends EventTarget {
       )
 
       if (tiles.length) {
-        if (!this.viewport.visibleWarpedMapIds.has(mapId)) {
-          this.viewport.visibleWarpedMapIds.add(mapId)
+        if (!this.visibleWarpedMapIds.has(mapId)) {
+          this.visibleWarpedMapIds.add(mapId)
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
           )
@@ -213,8 +249,8 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     for (const mapId of possibleInvisibleWarpedMapIds) {
-      if (this.viewport.visibleWarpedMapIds.has(mapId)) {
-        this.viewport.visibleWarpedMapIds.delete(mapId)
+      if (this.visibleWarpedMapIds.has(mapId)) {
+        this.visibleWarpedMapIds.delete(mapId)
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
         )
@@ -289,7 +325,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   clear() {
     this.webGLWarpedMapsById = new Map()
-    this.viewport?.clear()
+    this.visibleWarpedMapIds = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
   }
 
@@ -572,11 +608,11 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   updateVertexBuffers(viewport: Viewport) {
-    const projectionTransform = viewport.getProjectionTransform()
+    const projectionTransform = viewport.projectionTransform
 
     this.invertedRenderTransform = invertTransform(projectionTransform)
 
-    for (const mapId of viewport.visibleWarpedMapIds) {
+    for (const mapId of this.visibleWarpedMapIds) {
       const webglWarpedMap = this.webGLWarpedMapsById.get(mapId)
 
       if (!webglWarpedMap) {
@@ -592,8 +628,8 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    const projectionTransform = this.viewport.getProjectionTransform()
-    const mapIds = this.viewport.getVisibleWarpedMapIds()
+    const projectionTransform = this.viewport.projectionTransform
+    const mapIds = this.getVisibleWarpedMapIds()
 
     if (!projectionTransform) {
       return
@@ -649,7 +685,7 @@ export default class WebGL2Renderer extends EventTarget {
         'u_bestScaleFactor'
       )
       // TODO: make proper getter for bestScaleFactor for mapId
-      const bestZoomLevel = this.viewport.bestZoomLevelByMapId.get(mapId)
+      const bestZoomLevel = this.bestZoomLevelByMapId.get(mapId)
       const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 

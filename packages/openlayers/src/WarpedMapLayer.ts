@@ -51,7 +51,6 @@ export class WarpedMapLayer extends Layer {
   viewport: Viewport
   tileCache: TileCache
 
-  throttledUpdateViewport: DebouncedFunc<typeof this.viewport.updateViewport>
   throttledGetTilesNeeded: DebouncedFunc<typeof this.renderer.getTilesNeeded>
 
   private throttledRenderTimeoutId: number | undefined
@@ -101,8 +100,19 @@ export class WarpedMapLayer extends Layer {
     this.canvas = canvas
     this.gl = gl
 
+    this.source = this.getSource() as WarpedMapSource
+    // TODO: listen to change:source
+
+    this.warpedMapList = this.source.getWarpedMapList()
+
     this.tileCache = new TileCache()
-    this.renderer = new WebGL2Renderer(gl, this.tileCache)
+    this.renderer = new WebGL2Renderer(
+      this.warpedMapList,
+      this.gl,
+      this.tileCache
+    )
+
+    this.viewport = new Viewport()
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -113,11 +123,6 @@ export class WarpedMapLayer extends Layer {
       WarpedMapEventType.IMAGEINFOLOADED,
       this.rendererImageInfoLoaded.bind(this)
     )
-
-    this.source = this.getSource() as WarpedMapSource
-    // TODO: listen to change:source
-
-    this.warpedMapList = this.source.getWarpedMapList()
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
@@ -154,13 +159,6 @@ export class WarpedMapLayer extends Layer {
       this.changed.bind(this)
     )
 
-    this.viewport = new Viewport(this.warpedMapList)
-
-    this.throttledUpdateViewport = throttle(
-      this.viewport.updateViewport.bind(this.viewport),
-      THROTTLE_WAIT_MS,
-      THROTTLE_OPTIONS
-    )
     this.throttledGetTilesNeeded = throttle(
       this.renderer.getTilesNeeded.bind(this.renderer),
       THROTTLE_WAIT_MS,
@@ -517,34 +515,28 @@ export class WarpedMapLayer extends Layer {
 
   private renderInternal(frameState: FrameState, last = false): HTMLElement {
     const projectionTransform = this.makeProjectionTransform(frameState)
-    this.viewport.setProjectionTransform(projectionTransform)
+    const extent = frameState.extent as Bbox
+    const viewportSize = [
+      frameState.size[0] * window.devicePixelRatio,
+      frameState.size[1] * window.devicePixelRatio
+    ] as Size
+
+    this.viewport.updateViewport(
+      viewportSize,
+      extent,
+      frameState.coordinateToPixelTransform as Transform,
+      projectionTransform
+    )
 
     this.prepareFrameInternal(frameState)
 
     if (frameState.extent) {
-      const extent = frameState.extent as Bbox
-
       this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
-
-      const viewportSize = [
-        frameState.size[0] * window.devicePixelRatio,
-        frameState.size[1] * window.devicePixelRatio
-      ] as Size
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        this.viewport.updateViewport(
-          viewportSize,
-          extent,
-          frameState.coordinateToPixelTransform as Transform
-        )
         tilesNeeded = this.renderer.getTilesNeeded()
       } else {
-        this.throttledUpdateViewport(
-          viewportSize,
-          extent,
-          frameState.coordinateToPixelTransform as Transform
-        )
         tilesNeeded = this.throttledGetTilesNeeded()
       }
 

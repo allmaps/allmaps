@@ -575,16 +575,20 @@ export const WarpedMapLayer = L.Layer.extend({
       throw new Error('WebGL 2 not available')
     }
 
-    this.tileCache = new TileCache()
-    this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
-
     this.rtree = new RTree()
     this.warpedMapList = new WarpedMapList(
       this.rtree,
       this.options.imageInfoCache
     )
 
-    this.viewport = new Viewport(this.warpedMapList)
+    this.tileCache = new TileCache()
+    this.renderer = new WebGL2Renderer(
+      this.warpedMapList,
+      this.gl,
+      this.tileCache
+    )
+
+    this.viewport = new Viewport()
 
     this.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
@@ -629,12 +633,6 @@ export const WarpedMapLayer = L.Layer.extend({
     this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
       this._warpedMapListCleared.bind(this)
-    )
-
-    this.throttledUpdateViewport = throttle(
-      this.viewport.updateViewport.bind(this.viewport),
-      this.options.THROTTLE_WAIT_MS,
-      this.options.THROTTLE_OPTIONS
     )
 
     this.throttledGetTilesNeeded = throttle(
@@ -860,34 +858,28 @@ export const WarpedMapLayer = L.Layer.extend({
 
   _renderInternal(frameState: FrameState, last = false): HTMLElement {
     const projectionTransform = this._makeProjectionTransform(frameState)
-    this.viewport.setProjectionTransform(projectionTransform)
+    const extent = frameState.extent as Bbox
+    const viewportSize = [
+      frameState.size[0] * window.devicePixelRatio,
+      frameState.size[1] * window.devicePixelRatio
+    ] as Size
+
+    this.viewport.updateViewport(
+      viewportSize,
+      extent,
+      frameState.coordinateToPixelTransform as Transform,
+      projectionTransform
+    )
 
     this._prepareFrameInternal(frameState)
 
     if (frameState.extent) {
-      const extent = frameState.extent as Bbox
-
       this.renderer.setOpacity(this.getOpacity())
-
-      const viewportSize = [
-        frameState.size[0] * window.devicePixelRatio,
-        frameState.size[1] * window.devicePixelRatio
-      ] as Size
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        this.viewport.updateViewport(
-          viewportSize,
-          extent,
-          frameState.coordinateToPixelTransform as Transform
-        )
         tilesNeeded = this.renderer.getTilesNeeded()
       } else {
-        this.throttledUpdateViewport(
-          viewportSize,
-          extent,
-          frameState.coordinateToPixelTransform as Transform
-        )
         tilesNeeded = this.throttledGetTilesNeeded()
       }
 

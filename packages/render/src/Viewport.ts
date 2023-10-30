@@ -1,8 +1,4 @@
-import WarpedMapList from './WarpedMapList.js'
-
 import type { Size, Bbox, Transform } from '@allmaps/types'
-
-import type { TileZoomLevel } from '@allmaps/types'
 
 export default class Viewport extends EventTarget {
   size?: Size
@@ -10,55 +6,21 @@ export default class Viewport extends EventTarget {
   coordinateToPixelTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
 
-  warpedMapList: WarpedMapList
-  visibleWarpedMapIds: Set<string> = new Set()
-  bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
-
-  constructor(warpedMapList: WarpedMapList) {
+  constructor() {
     super()
-
-    this.warpedMapList = warpedMapList
-  }
-
-  /**
-   * Returns the mapIds of the warped maps that are visible in the viewport, sorted by z-index
-   * @returns {Iterable<string>}
-   */
-  getVisibleWarpedMapIds() {
-    const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
-      (mapIdA, mapIdB) => {
-        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
-
-        return 0
-      }
-    )
-
-    return sortedVisibleWarpedMapIds
-  }
-
-  setProjectionTransform(projectionTransform: Transform) {
-    this.projectionTransform = projectionTransform
-  }
-
-  getProjectionTransform() {
-    return this.projectionTransform
+    // TODO: add size and geoBbox here?
+    // TODO: should this still extend EventTartget and hence include super()?
   }
 
   updateViewport(
     size: Size,
     geoBbox: Bbox,
-    coordinateToPixelTransform: Transform
+    coordinateToPixelTransform: Transform,
+    projectionTransform: Transform
   ): void {
     this.size = size
     this.geoBbox = geoBbox
     this.coordinateToPixelTransform = coordinateToPixelTransform
-  }
-
-  clear() {
-    this.visibleWarpedMapIds = new Set()
+    this.projectionTransform = projectionTransform
   }
 }
