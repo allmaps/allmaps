@@ -105,8 +105,8 @@ See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an exa
     *   [hideMap](#hidemap)
     *   [hideMaps](#hidemaps)
     *   [isMapVisible](#ismapvisible)
-    *   [setResourceMask](#setresourcemask)
-    *   [setMapsTransformation](#setmapstransformation)
+    *   [setMapResourceMask](#setmapresourcemask)
+    *   [setMapsTransformationType](#setmapstransformationtype)
     *   [getExtent](#getextent)
     *   [getBounds](#getbounds)
     *   [bringMapsToFront](#bringmapstofront)
@@ -231,7 +231,7 @@ Returns visibility of a single map
 
 Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
 
-#### setResourceMask
+#### setMapResourceMask
 
 Sets the resource mask of a single map
 
@@ -240,7 +240,7 @@ Sets the resource mask of a single map
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 *   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** new resource mask
 
-#### setMapsTransformation
+#### setMapsTransformationType
 
 Sets the transformation type of multiple maps
 

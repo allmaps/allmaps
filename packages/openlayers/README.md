@@ -69,14 +69,14 @@ fetch(annotationUrl)
     *   [removeGeoreferenceAnnotationByUrl](#removegeoreferenceannotationbyurl)
     *   [clear](#clear)
     *   [getWarpedMapList](#getwarpedmaplist)
-    *   [getMap](#getmap)
+    *   [getWarpedMap](#getwarpedmap)
     *   [showMap](#showmap)
     *   [showMaps](#showmaps)
     *   [hideMap](#hidemap)
     *   [hideMaps](#hidemaps)
     *   [isMapVisible](#ismapvisible)
-    *   [setResourceMask](#setresourcemask)
-    *   [setMapsTransformation](#setmapstransformation)
+    *   [setMapResourceMask](#setmapresourcemask)
+    *   [setMapsTransformationType](#setmapstransformationtype)
     *   [getExtent](#getextent)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
@@ -286,13 +286,17 @@ Clears the source, removes all maps
 
 Returns the WarpedMapList object that contains a list of all maps
 
-#### getMap
+Returns **WarpedMapList** the warped map list
+
+#### getWarpedMap
 
 Returns a single map
 
 ##### Parameters
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
 
 #### showMap
 
@@ -336,7 +340,7 @@ Returns visibility of a single map
 
 Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
 
-#### setResourceMask
+#### setMapResourceMask
 
 Sets the resource mask of a single map
 
@@ -345,7 +349,7 @@ Sets the resource mask of a single map
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 *   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Point](#point)>** new resource mask
 
-#### setMapsTransformation
+#### setMapsTransformationType
 
 Sets the transformation type of multiple maps
 
