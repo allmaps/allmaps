@@ -1,7 +1,6 @@
 import Source from 'ol/source/Source.js'
 
-import { RTree, WarpedMapList } from '@allmaps/render'
-import { WarpedMap } from '@allmaps/render'
+import { RTree, WarpedMap, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
 import type { Point, Bbox } from '@allmaps/types'

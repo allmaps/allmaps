@@ -51,9 +51,8 @@ export class WarpedMapLayer extends Layer {
   viewport: Viewport
   tileCache: TileCache
 
-  throttledUpdateViewportAndGetTilesNeeded: DebouncedFunc<
-    typeof this.viewport.updateViewportAndGetTilesNeeded
-  >
+  throttledUpdateViewport: DebouncedFunc<typeof this.viewport.updateViewport>
+  throttledGetTilesNeeded: DebouncedFunc<typeof this.renderer.getTilesNeeded>
 
   private throttledRenderTimeoutId: number | undefined
 
@@ -152,8 +151,13 @@ export class WarpedMapLayer extends Layer {
 
     this.viewport = new Viewport(this.warpedMapList)
 
-    this.throttledUpdateViewportAndGetTilesNeeded = throttle(
-      this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
+    this.throttledUpdateViewport = throttle(
+      this.viewport.updateViewport.bind(this.viewport),
+      THROTTLE_WAIT_MS,
+      THROTTLE_OPTIONS
+    )
+    this.throttledGetTilesNeeded = throttle(
+      this.renderer.getTilesNeeded.bind(this.renderer),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
@@ -520,17 +524,19 @@ export class WarpedMapLayer extends Layer {
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
+        this.viewport.updateViewport(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        tilesNeeded = this.renderer.getTilesNeeded()
       } else {
-        tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
+        this.throttledUpdateViewport(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        tilesNeeded = this.throttledGetTilesNeeded()
       }
 
       if (tilesNeeded && tilesNeeded.length) {

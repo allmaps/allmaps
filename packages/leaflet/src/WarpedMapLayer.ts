@@ -4,6 +4,7 @@ import { throttle } from 'lodash-es'
 
 import {
   TileCache,
+  WarpedMap,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
@@ -138,8 +139,9 @@ export const WarpedMapLayer = L.Layer.extend({
   /**
    * Returns a single map
    * @param {string} mapId - ID of the warped map
+   * @returns {WarpedMap | undefined} the warped map
    */
-  getMap(mapId: string) {
+  getWarpedMap(mapId: string): WarpedMap | undefined {
     return this.warpedMapList.getWarpedMap(mapId)
   },
 
@@ -624,8 +626,14 @@ export const WarpedMapLayer = L.Layer.extend({
       this._warpedMapListCleared.bind(this)
     )
 
-    this.throttledUpdateViewportAndGetTilesNeeded = throttle(
-      this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
+    this.throttledUpdateViewport = throttle(
+      this.viewport.updateViewport.bind(this.viewport),
+      this.options.THROTTLE_WAIT_MS,
+      this.options.THROTTLE_OPTIONS
+    )
+
+    this.throttledGetTilesNeeded = throttle(
+      this.renderer.getTilesNeeded.bind(this.renderer),
       this.options.THROTTLE_WAIT_MS,
       this.options.THROTTLE_OPTIONS
     )
@@ -859,17 +867,19 @@ export const WarpedMapLayer = L.Layer.extend({
 
       let tilesNeeded: NeededTile[] | undefined
       if (last) {
-        tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
+        this.viewport.updateViewport(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        tilesNeeded = this.renderer.getTilesNeeded()
       } else {
-        tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
+        this.throttledUpdateViewport(
           viewportSize,
           extent,
           frameState.coordinateToPixelTransform as Transform
         )
+        tilesNeeded = this.throttledGetTilesNeeded()
       }
 
       if (tilesNeeded && tilesNeeded.length) {

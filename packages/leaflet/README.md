@@ -99,7 +99,7 @@ See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an exa
     *   [getContainer](#getcontainer)
     *   [getCanvas](#getcanvas)
     *   [getWarpedMapList](#getwarpedmaplist)
-    *   [getMap](#getmap)
+    *   [getWarpedMap](#getwarpedmap)
     *   [showMap](#showmap)
     *   [showMaps](#showmaps)
     *   [hideMap](#hidemap)
@@ -181,13 +181,15 @@ Returns **[HTMLCanvasElement](https://developer.mozilla.org/docs/Web/API/HTMLCan
 
 Returns the WarpedMapList object that contains a list of all maps
 
-#### getMap
+#### getWarpedMap
 
 Returns a single map
 
 ##### Parameters
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
 
 #### showMap
 

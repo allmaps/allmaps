@@ -1,24 +1,16 @@
 import WarpedMapList from './WarpedMapList.js'
 
-import { hasImageInfo } from './WarpedMap.js'
-import {
-  getResourcePolygon,
-  getBestZoomLevel,
-  computeIiifTilesForPolygonAndZoomLevel
-} from './shared/tiles.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
-import { applyTransform } from './shared/matrix.js'
-
-import type { Point, Size, Bbox, Transform, NeededTile } from '@allmaps/types'
+import type { Size, Bbox, Transform } from '@allmaps/types'
 
 import type { TileZoomLevel } from '@allmaps/types'
 
-const MIN_COMBINED_PIXEL_SIZE = 5
-
 export default class Viewport extends EventTarget {
-  warpedMapList: WarpedMapList
-
+  size?: Size
+  geoBbox?: Bbox
+  coordinateToPixelTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
+
+  warpedMapList: WarpedMapList
   visibleWarpedMapIds: Set<string> = new Set()
   bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
 
@@ -56,118 +48,14 @@ export default class Viewport extends EventTarget {
     return this.projectionTransform
   }
 
-  // TODO: split function in two?
-  // Find better name?
-  updateViewportAndGetTilesNeeded(
-    viewportSize: Size,
+  updateViewport(
+    size: Size,
     geoBbox: Bbox,
     coordinateToPixelTransform: Transform
-  ): NeededTile[] {
-    let possibleVisibleWarpedMapIds: Iterable<string> = []
-    const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
-
-    possibleVisibleWarpedMapIds = this.warpedMapList.getMapIdsByBbox(geoBbox)
-
-    const neededTiles: NeededTile[] = []
-    for (const mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (!warpedMap) {
-        continue
-      }
-
-      // Don't show maps when they're too small
-      const topLeft: Point = [
-        warpedMap.geoMaskBbox[0],
-        warpedMap.geoMaskBbox[1]
-      ]
-      const bottomRight: Point = [
-        warpedMap.geoMaskBbox[2],
-        warpedMap.geoMaskBbox[3]
-      ]
-
-      const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
-      const pixelBottomRight = applyTransform(
-        coordinateToPixelTransform,
-        bottomRight
-      )
-
-      const pixelWidth = Math.abs(pixelBottomRight[0] - pixelTopLeft[0])
-      const pixelHeight = Math.abs(pixelTopLeft[1] - pixelBottomRight[1])
-
-      // Only draw maps that are larger than MIN_COMBINED_PIXEL_SIZE pixels
-      // in combined width and height
-      if (pixelWidth + pixelHeight < MIN_COMBINED_PIXEL_SIZE) {
-        continue
-      }
-
-      const geoBboxResourcePolygon = getResourcePolygon(
-        warpedMap.transformer,
-        geoBbox
-      )
-
-      if (!hasImageInfo(warpedMap)) {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
-        )
-        continue
-      }
-
-      const zoomLevel = getBestZoomLevel(
-        warpedMap.parsedImage,
-        viewportSize,
-        geoBboxResourcePolygon
-      )
-
-      // TODO: remove maps from this list when they're removed from WarpedMapList
-      // or not visible anymore
-      this.bestZoomLevelByMapId.set(mapId, zoomLevel)
-
-      // TODO: rename function
-      const tiles = computeIiifTilesForPolygonAndZoomLevel(
-        warpedMap.parsedImage,
-        geoBboxResourcePolygon,
-        zoomLevel
-      )
-
-      if (tiles.length) {
-        if (!this.visibleWarpedMapIds.has(mapId)) {
-          this.visibleWarpedMapIds.add(mapId)
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-          )
-        }
-
-        possibleInvisibleWarpedMapIds.delete(mapId)
-
-        for (const tile of tiles) {
-          const imageRequest = warpedMap.parsedImage.getIiifTile(
-            tile.zoomLevel,
-            tile.column,
-            tile.row
-          )
-          const url = warpedMap.parsedImage.getImageUrl(imageRequest)
-
-          neededTiles.push({
-            mapId,
-            tile,
-            imageRequest,
-            url
-          })
-        }
-      }
-    }
-
-    for (const mapId of possibleInvisibleWarpedMapIds) {
-      if (this.visibleWarpedMapIds.has(mapId)) {
-        this.visibleWarpedMapIds.delete(mapId)
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-        )
-      }
-    }
-
-    return neededTiles
+  ): void {
+    this.size = size
+    this.geoBbox = geoBbox
+    this.coordinateToPixelTransform = coordinateToPixelTransform
   }
 
   clear() {

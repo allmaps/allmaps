@@ -106,7 +106,7 @@ export default class WarpedMap {
     this.fullGeoMaskBbox = computeBbox(this.fullGeoMask)
   }
 
-  async fetchImageInfo(): Promise<void> {
+  async completeImageInfo(): Promise<void> {
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
       cache: this.imageInfoCache

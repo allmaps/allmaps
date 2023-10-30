@@ -1,5 +1,5 @@
 import TileCache from './TileCache.js'
-import WarpedMap from './WarpedMap.js'
+import WarpedMap, { hasImageInfo } from './WarpedMap.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
 import { createShader, createProgram } from './shared/webgl2.js'
@@ -16,8 +16,14 @@ import {
   createTransform,
   multiplyTransform,
   invertTransform,
-  transformToMatrix4
+  transformToMatrix4,
+  applyTransform
 } from './shared/matrix.js'
+import {
+  getResourcePolygon,
+  getBestZoomLevel,
+  computeIiifTilesForPolygonAndZoomLevel
+} from './shared/tiles.js'
 
 import type Viewport from './Viewport.js'
 
@@ -26,12 +32,13 @@ import type {
   RemoveBackgroundOptions,
   ColorizeOptions
 } from './shared/types.js'
-import type { Transform } from '@allmaps/types'
+import type { Point, Transform, NeededTile } from '@allmaps/types'
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
+const MIN_COMBINED_PIXEL_SIZE = 5
 
 export default class WebGL2Renderer extends EventTarget {
   tileCache: TileCache
@@ -84,7 +91,137 @@ export default class WebGL2Renderer extends EventTarget {
       this.tileRemoved.bind(this)
     )
 
+    // Move this from viewer to renderer as updateViewportAndGetTilesNeeded part 2 is moved to render
+    this.addEventListener(
+      WarpedMapEventType.IMAGEINFONEEDED,
+      this.imageInfoNeeded.bind(this)
+    )
+
     this.invertedRenderTransform = createTransform()
+  }
+
+  getTilesNeeded(): NeededTile[] {
+    // TODO: make these checks more elegant
+    if (
+      !this.viewport ||
+      this.viewport.geoBbox === undefined ||
+      this.viewport.size === undefined
+    ) {
+      return []
+    }
+
+    let possibleVisibleWarpedMapIds: Iterable<string> = []
+    const possibleInvisibleWarpedMapIds = new Set(
+      this.viewport.visibleWarpedMapIds
+    )
+
+    possibleVisibleWarpedMapIds = this.viewport.warpedMapList.getMapIdsByBbox(
+      this.viewport.geoBbox
+    )
+
+    const neededTiles: NeededTile[] = []
+    for (const mapId of possibleVisibleWarpedMapIds) {
+      const warpedMap = this.viewport.warpedMapList.getWarpedMap(mapId)
+
+      if (!warpedMap) {
+        continue
+      }
+
+      // Don't show maps when they're too small
+      const topLeft: Point = [
+        warpedMap.geoMaskBbox[0],
+        warpedMap.geoMaskBbox[1]
+      ]
+      const bottomRight: Point = [
+        warpedMap.geoMaskBbox[2],
+        warpedMap.geoMaskBbox[3]
+      ]
+
+      const pixelTopLeft = applyTransform(
+        this.viewport.coordinateToPixelTransform,
+        topLeft
+      )
+      const pixelBottomRight = applyTransform(
+        this.viewport.coordinateToPixelTransform,
+        bottomRight
+      )
+
+      const pixelWidth = Math.abs(pixelBottomRight[0] - pixelTopLeft[0])
+      const pixelHeight = Math.abs(pixelTopLeft[1] - pixelBottomRight[1])
+
+      // Only draw maps that are larger than MIN_COMBINED_PIXEL_SIZE pixels
+      // in combined width and height
+      if (pixelWidth + pixelHeight < MIN_COMBINED_PIXEL_SIZE) {
+        continue
+      }
+
+      const geoBboxResourcePolygon = getResourcePolygon(
+        warpedMap.transformer,
+        this.viewport.geoBbox
+      )
+
+      if (!hasImageInfo(warpedMap)) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
+        )
+        continue
+      }
+
+      const zoomLevel = getBestZoomLevel(
+        warpedMap.parsedImage,
+        this.viewport.size,
+        geoBboxResourcePolygon
+      )
+
+      // TODO: remove maps from this list when they're removed from WarpedMapList
+      // or not visible anymore
+      this.viewport.bestZoomLevelByMapId.set(mapId, zoomLevel)
+
+      // TODO: rename function
+      const tiles = computeIiifTilesForPolygonAndZoomLevel(
+        warpedMap.parsedImage,
+        geoBboxResourcePolygon,
+        zoomLevel
+      )
+
+      if (tiles.length) {
+        if (!this.viewport.visibleWarpedMapIds.has(mapId)) {
+          this.viewport.visibleWarpedMapIds.add(mapId)
+          this.dispatchEvent(
+            new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+          )
+        }
+
+        possibleInvisibleWarpedMapIds.delete(mapId)
+
+        for (const tile of tiles) {
+          const imageRequest = warpedMap.parsedImage.getIiifTile(
+            tile.zoomLevel,
+            tile.column,
+            tile.row
+          )
+          const url = warpedMap.parsedImage.getImageUrl(imageRequest)
+
+          neededTiles.push({
+            mapId,
+            tile,
+            imageRequest,
+            url
+          })
+        }
+      }
+    }
+
+    for (const mapId of possibleInvisibleWarpedMapIds) {
+      if (this.viewport.visibleWarpedMapIds.has(mapId)) {
+        this.viewport.visibleWarpedMapIds.delete(mapId)
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+        )
+      }
+    }
+
+    return neededTiles
   }
 
   tileLoaded(event: Event) {
@@ -135,7 +272,8 @@ export default class WebGL2Renderer extends EventTarget {
 
       const warpedMap = webglWarpedMap.warpedMap
 
-      await warpedMap.fetchImageInfo()
+      await warpedMap.completeImageInfo()
+
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
   }
@@ -583,12 +721,6 @@ export default class WebGL2Renderer extends EventTarget {
 
   render(viewport: Viewport): void {
     this.viewport = viewport
-
-    // Move this from viewer to renderer as updateViewportAndGetTilesNeeded part 2 is moved to render
-    viewport.addEventListener(
-      WarpedMapEventType.IMAGEINFONEEDED,
-      this.imageInfoNeeded.bind(this)
-    )
 
     this.renderInternal()
   }
