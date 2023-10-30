@@ -220,20 +220,27 @@ function iiifTilesByXToArray(
   return neededIiifTiles
 }
 
-export function getResourcePolygon(transformer: GcpTransformer, geoBbox: Bbox) {
-  // geoBbox is a Bbox of the extent viewport in geospatial coordinates (in the projection that was given)
-  // geoBboxResourcePolygon is a polygon of this Bbox, transformed to resource coordinates.
+// TODO: move to render
+export function getProjectedGeoBboxResourcePolygon(
+  projectedTransformer: GcpTransformer,
+  projectedGeoBbox: Bbox
+) {
+  // projectedTransformer is the transformer built from the projected Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from projected geo coordinates to resource coordinates.
+  // projectedGeoBbox is a Bbox of the viewport in projected geo coordinates
+  // projectedGeoBboxResourcePolygon is a polygon of this Bbox, transformed backward to resource coordinates.
   // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
-  const geoBboxPolygon = bboxToPolygon(geoBbox)
-  const geoBboxResourcePolygon = transformer.transformBackward(geoBboxPolygon, {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  }) as Polygon
+  const projectedGeoBboxPolygon = bboxToPolygon(projectedGeoBbox)
+  const projectedGeoBboxResourcePolygon =
+    projectedTransformer.transformBackward(projectedGeoBboxPolygon, {
+      maxOffsetRatio: 0.00001,
+      maxDepth: 2
+    }) as Polygon
 
-  return geoBboxResourcePolygon
+  return projectedGeoBboxResourcePolygon
 }
 
+// TODO: move to render
 export function getBestZoomLevel(
   image: Image,
   viewportSize: Size,
@@ -251,6 +258,7 @@ export function getBestZoomLevel(
   return getBestZoomLevelForMapScale(image, mapScale)
 }
 
+// TODO: move to render
 export function computeIiifTilesForPolygonAndZoomLevel(
   image: Image,
   resourcePolygon: Polygon,

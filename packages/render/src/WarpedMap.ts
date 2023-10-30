@@ -26,7 +26,7 @@ export default class WarpedMap {
   parsedImage?: IIIFImage
   visible: boolean
   transformationType: TransformationType
-  transformer!: GcpTransformer
+  projectedTransformer!: GcpTransformer
   transformOptions: PartialTransformOptions
   geoMask!: GeojsonPolygon
   fullGeoMask!: GeojsonPolygon
@@ -64,23 +64,25 @@ export default class WarpedMap {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
-    this.makeTransformer()
+    this.makeProjectedTransformer()
     this.updateGeoMask()
     this.updateFullGeoMask()
   }
 
-  private makeTransformer(transformationType?: TransformationType): void {
+  private makeProjectedTransformer(
+    transformationType?: TransformationType
+  ): void {
     if (!transformationType) {
       transformationType = this.transformationType
     }
-    this.transformer = new GcpTransformer(
+    this.projectedTransformer = new GcpTransformer(
       this.projectedGcps,
       transformationType
     )
   }
 
   setTransformationType(transformationType: TransformationType): void {
-    this.makeTransformer(transformationType)
+    this.makeProjectedTransformer(transformationType)
     this.updateGeoMask()
     this.updateFullGeoMask()
   }
@@ -91,7 +93,7 @@ export default class WarpedMap {
   }
 
   private updateGeoMask(): void {
-    this.geoMask = this.transformer.transformForwardAsGeojson(
+    this.geoMask = this.projectedTransformer.transformForwardAsGeojson(
       [this.resourceMask],
       this.transformOptions
     )
@@ -99,7 +101,7 @@ export default class WarpedMap {
   }
 
   private updateFullGeoMask(): void {
-    this.fullGeoMask = this.transformer.transformForwardAsGeojson(
+    this.fullGeoMask = this.projectedTransformer.transformForwardAsGeojson(
       [this.fullResourceMask],
       this.transformOptions
     )

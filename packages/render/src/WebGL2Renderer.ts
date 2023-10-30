@@ -21,7 +21,7 @@ import {
   applyTransform
 } from './shared/matrix.js'
 import {
-  getResourcePolygon,
+  getProjectedGeoBboxResourcePolygon,
   getBestZoomLevel,
   computeIiifTilesForPolygonAndZoomLevel
 } from './shared/tiles.js'
@@ -137,12 +137,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   getTilesNeeded(): NeededTile[] {
-    // TODO: make these checks more elegant. Maybe by making values in viewport mandatory and making new viewport every render?
-    if (
-      !this.viewport ||
-      this.viewport.geoBbox === undefined ||
-      this.viewport.size === undefined
-    ) {
+    if (!this.viewport) {
       return []
     }
 
@@ -152,7 +147,7 @@ export default class WebGL2Renderer extends EventTarget {
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
     possibleVisibleWarpedMapIds = this.warpedMapList.getMapIdsByBbox(
-      this.viewport.geoBbox
+      this.viewport.projectedGeoBbox
     )
 
     const neededTiles: NeededTile[] = []
@@ -191,9 +186,9 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      const geoBboxResourcePolygon = getResourcePolygon(
-        warpedMap.transformer,
-        this.viewport.geoBbox
+      const geoBboxResourcePolygon = getProjectedGeoBboxResourcePolygon(
+        warpedMap.projectedTransformer,
+        this.viewport.projectedGeoBbox
       )
 
       if (!hasImageInfo(warpedMap)) {
@@ -205,7 +200,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       const zoomLevel = getBestZoomLevel(
         warpedMap.parsedImage,
-        this.viewport.size,
+        this.viewport.canvasSize,
         geoBboxResourcePolygon
       )
 
@@ -607,8 +602,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  updateVertexBuffers(viewport: Viewport) {
-    const projectionTransform = viewport.projectionTransform
+  updateVertexBuffers() {
+    if (!this.viewport) {
+      return
+    }
+
+    const projectionTransform = this.viewport.projectionTransform
 
     this.invertedRenderTransform = invertTransform(projectionTransform)
 
@@ -755,9 +754,12 @@ export default class WebGL2Renderer extends EventTarget {
     //  - this.tileCache
   }
 
-  render(viewport: Viewport): void {
+  // TODO: maybe this function can be included in the render call.
+  setViewport(viewport: Viewport) {
     this.viewport = viewport
+  }
 
+  render(): void {
     this.renderInternal()
   }
 }

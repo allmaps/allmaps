@@ -8,8 +8,7 @@ import {
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
-  WarpedMapEventType,
-  composeTransform
+  WarpedMapEventType
 } from '@allmaps/render'
 
 import { WebGL2Renderer } from '@allmaps/render'
@@ -20,7 +19,7 @@ import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
 import type { FrameState } from 'ol/Map.js'
 
-import type { Size, Bbox, Transform, NeededTile } from '@allmaps/types'
+import type { NeededTile } from '@allmaps/types'
 
 import type { WarpedMapSource } from './WarpedMapSource.js'
 
@@ -48,7 +47,6 @@ export class WarpedMapLayer extends Layer {
 
   warpedMapList: WarpedMapList
   renderer: WebGL2Renderer
-  viewport: Viewport
   tileCache: TileCache
 
   throttledGetTilesNeeded: DebouncedFunc<typeof this.renderer.getTilesNeeded>
@@ -111,8 +109,6 @@ export class WarpedMapLayer extends Layer {
       this.gl,
       this.tileCache
     )
-
-    this.viewport = new Viewport()
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -463,24 +459,6 @@ export class WarpedMapLayer extends Layer {
     super.disposeInternal()
   }
 
-  // TODO: use OL's own makeProjectionTransform function?
-  private makeProjectionTransform(frameState: FrameState): Transform {
-    const size = frameState.size
-    const rotation = frameState.viewState.rotation
-    const resolution = frameState.viewState.resolution
-    const center = frameState.viewState.center
-
-    return composeTransform(
-      0,
-      0,
-      2 / (resolution * size[0]),
-      2 / (resolution * size[1]),
-      -rotation,
-      -center[0],
-      -center[1]
-    )
-  }
-
   // TODO: Use OL's renderer class, move this function there?
   private prepareFrameInternal(frameState: FrameState) {
     const vectorSource = this.source
@@ -509,27 +487,23 @@ export class WarpedMapLayer extends Layer {
     if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
       this.previousExtent = frameState.extent?.slice() || null
 
-      this.renderer.updateVertexBuffers(this.viewport)
+      this.renderer.updateVertexBuffers()
     }
   }
 
   private renderInternal(frameState: FrameState, last = false): HTMLElement {
-    const projectionTransform = this.makeProjectionTransform(frameState)
-    const extent = frameState.extent as Bbox
-    const viewportSize = [
-      frameState.size[0] * window.devicePixelRatio,
-      frameState.size[1] * window.devicePixelRatio
-    ] as Size
-
-    this.viewport.updateViewport(
-      viewportSize,
-      extent,
-      frameState.coordinateToPixelTransform as Transform,
-      projectionTransform
+    this.renderer.setViewport(
+      new Viewport(
+        frameState.extent as [number, number, number, number],
+        frameState.size as [number, number],
+        frameState.viewState.rotation,
+        window.devicePixelRatio
+      )
     )
 
     this.prepareFrameInternal(frameState)
 
+    // TODO: remove this 'if'?
     if (frameState.extent) {
       this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
@@ -547,7 +521,7 @@ export class WarpedMapLayer extends Layer {
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(this.viewport)
+      this.renderer.render()
     }
 
     return this.container

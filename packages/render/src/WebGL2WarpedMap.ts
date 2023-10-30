@@ -107,7 +107,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     ).flat()
 
     const newGeoMaskVertices = trianglesPositions.map((point) =>
-      warpedMap.transformer.transformToGeo(point as [number, number])
+      warpedMap.projectedTransformer.transformToGeo(point as [number, number])
     )
 
     this.newGeoMaskTriangles = newGeoMaskVertices.flat()

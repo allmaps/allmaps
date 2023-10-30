@@ -9,7 +9,6 @@ import {
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  composeTransform,
   WebGL2Renderer,
   RTree
 } from '@allmaps/render'
@@ -21,19 +20,9 @@ import {
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
-import type { Size, Bbox, Transform, NeededTile } from '@allmaps/types'
+import type { Bbox, NeededTile } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 import type { Point } from '@allmaps/types'
-
-// TODO: make class or integrate in Viewport
-type FrameState = {
-  size: [number, number] // [width, height]
-  rotation: number // rotation in radians
-  resolution: number
-  center: [number, number] // point
-  extent: [number, number, number, number] // [minx, miny, maxx, maxy]
-  coordinateToPixelTransform: Transform
-}
 
 type WarpedMapLayerOptions = {
   opacity: number
@@ -588,8 +577,6 @@ export const WarpedMapLayer = L.Layer.extend({
       this.tileCache
     )
 
-    this.viewport = new Viewport()
-
     this.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
       this._update.bind(this)
@@ -793,87 +780,39 @@ export const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  _makeProjectionTransform(frameState: FrameState): Transform {
-    const size = frameState.size
-    const rotation = frameState.rotation
-    const resolution = frameState.resolution
-    const center = frameState.center
-
-    return composeTransform(
-      0,
-      0,
-      2 / (resolution * size[0]),
-      2 / (resolution * size[1]),
-      -rotation,
-      -center[0],
-      -center[1]
-    )
+  _prepareFrameInternal() {
+    this.throttledUpdateVertexBuffers()
   },
 
-  _computeFrameState(): FrameState {
+  _renderInternal(last = false): HTMLElement {
+    // TODO: can this be simplified with this._map.getPixelBounds() or this._map.getPixelWorldBounds()
+    const geoBbox = this._map.getBounds()
+    const projectedNorthEast = this._map.options.crs.project(
+      geoBbox.getNorthEast()
+    )
+    const projectedSouthWest = this._map.options.crs.project(
+      geoBbox.getSouthWest()
+    )
+    const projectedGeoBbox = [
+      projectedSouthWest.x,
+      projectedSouthWest.y,
+      projectedNorthEast.x,
+      projectedNorthEast.y
+    ] as [number, number, number, number]
+    console.log(projectedGeoBbox, this._map.getPixelBounds())
+
     const size = [this._map.getSize().x, this._map.getSize().y] as [
       number,
       number
     ]
-    const rotation = 0
-    const boundsLatLng = this._map.getBounds()
-    const northEast = this._map.options.crs.project(boundsLatLng.getNorthEast())
-    const southWest = this._map.options.crs.project(boundsLatLng.getSouthWest())
-    const extent = [southWest.x, southWest.y, northEast.x, northEast.y] as [
-      number,
-      number,
-      number,
-      number
-    ]
-    const xResolution = (extent[2] - extent[0]) / size[0]
-    const yResolution = (extent[3] - extent[1]) / size[1]
-    const resolution = Math.max(xResolution, yResolution)
-    const center = [
-      (extent[0] + extent[2]) / 2,
-      (extent[1] + extent[3]) / 2
-    ] as [number, number]
-    const coordinateToPixelTransform = composeTransform(
-      size[0] / 2,
-      size[1] / 2,
-      1 / resolution,
-      -1 / resolution,
-      -rotation,
-      -center[0],
-      -center[1]
+
+    this.renderer.setViewport(
+      new Viewport(projectedGeoBbox, size, 0, window.devicePixelRatio)
     )
 
-    return {
-      size: size, // size in pixels: [width, height]
-      rotation: rotation, // rotation in radians: number
-      resolution: resolution, // projection units per pixel: number
-      center: center, // center point in projected coordinates: [x, y]
-      extent: extent, // extent in projected coordinates: [minx, miny, maxx, maxy]
-      coordinateToPixelTransform: coordinateToPixelTransform // Transform discribing this transformation, see ol/renderer/Map.js line 58
-    }
-  },
+    this._prepareFrameInternal()
 
-  _prepareFrameInternal() {
-    this.throttledUpdateVertexBuffers(this.viewport)
-  },
-
-  _renderInternal(frameState: FrameState, last = false): HTMLElement {
-    const projectionTransform = this._makeProjectionTransform(frameState)
-    const extent = frameState.extent as Bbox
-    const viewportSize = [
-      frameState.size[0] * window.devicePixelRatio,
-      frameState.size[1] * window.devicePixelRatio
-    ] as Size
-
-    this.viewport.updateViewport(
-      viewportSize,
-      extent,
-      frameState.coordinateToPixelTransform as Transform,
-      projectionTransform
-    )
-
-    this._prepareFrameInternal(frameState)
-
-    if (frameState.extent) {
+    if (projectedGeoBbox) {
       this.renderer.setOpacity(this.getOpacity())
 
       let tilesNeeded: NeededTile[] | undefined
@@ -890,22 +829,22 @@ export const WarpedMapLayer = L.Layer.extend({
       // TODO: reset maps not in viewport, make sure these only
       // get drawn when they are visible AND when they have their buffers
       // updated.
-      this.renderer.render(this.viewport)
+      this.renderer.render()
     }
 
     return this.container
   },
 
-  _render(frameState: FrameState): HTMLElement {
+  _render(): HTMLElement {
     if (this.throttledRenderTimeoutId) {
       clearTimeout(this.throttledRenderTimeoutId)
     }
 
     this.throttledRenderTimeoutId = setTimeout(() => {
-      this._renderInternal(frameState, true)
+      this._renderInternal(true)
     }, this.options.THROTTLE_WAIT_MS)
 
-    return this._renderInternal(frameState)
+    return this._renderInternal()
   },
 
   _update() {
@@ -916,8 +855,6 @@ export const WarpedMapLayer = L.Layer.extend({
     const topLeft = this._map.containerPointToLayerPoint([0, 0])
     L.DomUtil.setPosition(this.canvas, topLeft)
 
-    const frameState = this._computeFrameState()
-
-    this._render(frameState)
+    this._render()
   }
 })
