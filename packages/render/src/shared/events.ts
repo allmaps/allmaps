@@ -15,6 +15,7 @@ export enum WarpedMapEventType {
   WARPEDMAPLEAVE = 'warpedmapleave',
 
   IMAGEINFONEEDED = 'imageinfoneeded',
+  IMAGEINFOLOADED = 'imageinfoloaded',
 
   TILENEEDED = 'tileneeded',
   TILEREMOVED = 'tileremoved',

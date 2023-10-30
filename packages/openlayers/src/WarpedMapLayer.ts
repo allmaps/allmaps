@@ -109,6 +109,11 @@ export class WarpedMapLayer extends Layer {
       this.rendererChanged.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.rendererImageInfoLoaded.bind(this)
+    )
+
     this.source = this.getSource() as WarpedMapSource
     // TODO: listen to change:source
 
@@ -224,6 +229,10 @@ export class WarpedMapLayer extends Layer {
   }
 
   private rendererChanged() {
+    this.changed()
+  }
+
+  private rendererImageInfoLoaded() {
     this.changed()
   }
 

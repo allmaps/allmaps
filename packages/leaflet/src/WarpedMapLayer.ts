@@ -601,6 +601,11 @@ export const WarpedMapLayer = L.Layer.extend({
       this._rendererChanged.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this._imageInfoLoaded.bind(this)
+    )
+
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this._warpedMapAdded.bind(this)
@@ -673,6 +678,10 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   _rendererChanged() {
+    this._update()
+  },
+
+  _imageInfoLoaded() {
     this._update()
   },
 

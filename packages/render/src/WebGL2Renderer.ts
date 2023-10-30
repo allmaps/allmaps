@@ -274,7 +274,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       await warpedMap.completeImageInfo()
 
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
     }
   }
 
