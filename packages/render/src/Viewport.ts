@@ -66,12 +66,11 @@ export default class Viewport extends EventTarget {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
-    possibleVisibleWarpedMapIds =
-      this.warpedMapList.getPossibleVisibleWarpedMapIds(geoBbox)
+    possibleVisibleWarpedMapIds = this.warpedMapList.getMapIdsByBbox(geoBbox)
 
     const neededTiles: NeededTile[] = []
     for (const mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.warpedMapList.getMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
         continue

@@ -140,7 +140,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} mapId - ID of the warped map
    */
   getMap(mapId: string) {
-    return this.warpedMapList.getMap(mapId)
+    return this.warpedMapList.getWarpedMap(mapId)
   },
 
   /**
@@ -184,7 +184,7 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {boolean | undefined} - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
-    const warpedMap = this.warpedMapList.getMap(mapId)
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
     return warpedMap?.visible
   },
 
@@ -193,8 +193,8 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} mapId - ID of the warped map
    * @param {Point[]} resourceMask - new resource mask
    */
-  setResourceMask(mapId: string, resourceMask: Point[]) {
-    this.warpedMapList.setResourceMask(mapId, resourceMask)
+  setMapResourceMask(mapId: string, resourceMask: Point[]) {
+    this.warpedMapList.setMapResourceMask(mapId, resourceMask)
     this._update()
   },
 
@@ -203,11 +203,11 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Iterable<string>} mapIds - IDs of the warped maps
    * @param {TransformationType} transformation - new transformation type
    */
-  setMapsTransformation(
+  setMapsTransformationType(
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.warpedMapList.setMapsTransformation(mapIds, transformation)
+    this.warpedMapList.setMapsTransformationType(mapIds, transformation)
     this._update()
   },
 
@@ -672,7 +672,7 @@ export const WarpedMapLayer = L.Layer.extend({
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
-      const warpedMap = this.warpedMapList.getMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (warpedMap) {
         this.renderer.addWarpedMap(warpedMap)
@@ -694,7 +694,7 @@ export const WarpedMapLayer = L.Layer.extend({
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapList.getMap(mapId)
+        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
         if (warpedMap) {
           this.renderer.updateTriangulation(warpedMap, false)
@@ -708,7 +708,7 @@ export const WarpedMapLayer = L.Layer.extend({
   _resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (warpedMap) {
         this.renderer.updateTriangulation(warpedMap)

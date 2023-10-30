@@ -58,7 +58,7 @@
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.resource.id
-  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
   const geoMask = warpedMap?.geoMask
 
   const checkboxId = `dropdown-maps-${mapId}`

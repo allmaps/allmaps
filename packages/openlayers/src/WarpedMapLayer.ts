@@ -158,7 +158,7 @@ export class WarpedMapLayer extends Layer {
       THROTTLE_OPTIONS
     )
 
-    for (const warpedMap of this.warpedMapList.getMaps()) {
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
       this.renderer.addWarpedMap(warpedMap)
     }
   }
@@ -167,7 +167,7 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
 
-      const warpedMap = this.warpedMapList.getMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (warpedMap) {
         this.renderer.addWarpedMap(warpedMap)
@@ -191,7 +191,7 @@ export class WarpedMapLayer extends Layer {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapList.getMap(mapId)
+        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
         if (warpedMap) {
           this.renderer.updateTriangulation(warpedMap, false)
@@ -205,7 +205,7 @@ export class WarpedMapLayer extends Layer {
   private resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getMap(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (warpedMap) {
         this.renderer.updateTriangulation(warpedMap)

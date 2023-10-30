@@ -46,7 +46,9 @@
 
   $: {
     if (mapOl && $activeMap && $activeMap.updateView) {
-      const warpedMap = mapWarpedMapSource?.getMap($activeMap.viewerMap.mapId)
+      const warpedMap = mapWarpedMapSource?.getWarpedMap(
+        $activeMap.viewerMap.mapId
+      )
       if (warpedMap) {
         const bbox = computeBbox(warpedMap.geoMask.coordinates[0])
         mapOl.getView().fit(bbox, {

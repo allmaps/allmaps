@@ -109,7 +109,7 @@ export function resetCustomResourceMask(mapId: string) {
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = undefined
-      mapWarpedMapSource.setResourceMask(mapId, viewerMap.map.resourceMask)
+      mapWarpedMapSource.setMapResourceMask(mapId, viewerMap.map.resourceMask)
     }
 
     return $mapsById
@@ -125,7 +125,7 @@ export function setCustomResourceMask(
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = customResourceMask
-      mapWarpedMapSource.setResourceMask(mapId, customResourceMask)
+      mapWarpedMapSource.setMapResourceMask(mapId, customResourceMask)
     }
 
     return $mapsById

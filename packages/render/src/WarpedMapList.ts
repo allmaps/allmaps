@@ -8,12 +8,11 @@ import {
 import RTree from './RTree.js'
 import WarpedMap from './WarpedMap.js'
 
-import { computeBbox } from '@allmaps/stdlib'
 import { combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Point, Bbox } from '@allmaps/types'
+import type { Ring, Bbox } from '@allmaps/types'
 
 export default class WarpedMapList extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()
@@ -28,63 +27,161 @@ export default class WarpedMapList extends EventTarget {
     this.imageInfoCache = imageInfoCache
   }
 
-  private async getMapId(map: Georef) {
-    const mapId = map.id || (await generateChecksum(map))
-    return mapId
+  getMapIds(): Iterable<string> {
+    return this.warpedMapsById.keys()
   }
 
-  private async addMapInternal(map: Georef) {
-    try {
-      const mapId = await this.getMapId(map)
+  getWarpedMaps(): Iterable<WarpedMap> {
+    return this.warpedMapsById.values()
+  }
 
-      const warpedMap = new WarpedMap(mapId, map, this.imageInfoCache)
+  getWarpedMap(mapId: string): WarpedMap | undefined {
+    return this.warpedMapsById.get(mapId)
+  }
 
-      this.warpedMapsById.set(mapId, warpedMap)
-      this.zIndices.set(mapId, this.warpedMapsById.size - 1)
+  getMapZIndex(mapId: string) {
+    return this.zIndices.get(mapId)
+  }
 
+  getBbox(): Bbox | undefined {
+    let bbox
+
+    for (const warpedMap of this.getWarpedMaps()) {
+      if (warpedMap.visible) {
+        if (!bbox) {
+          bbox = warpedMap.geoMaskBbox
+        } else {
+          bbox = combineBboxes(bbox, warpedMap.geoMaskBbox)
+        }
+      }
+    }
+
+    return bbox
+  }
+
+  getMapIdsByBbox(geoBbox: Bbox): Iterable<string> {
+    // TODO: to make sure only tiles for visible parts of the map are requested
+    // (and not for parts hidden behind maps on top of it)
+    // Subtract geoMasks of maps that have been added before the current map:
+    // Map A (topmost): show completely
+    // Map B: B - A
+    // Map C: C - B - A
+    // Map D: D - C - B - A
+    //
+    // Possible libraries:
+    //  - https://github.com/w8r/martinez
+    //  - https://github.com/mfogel/polygon-clipping
+    //
+    // Do this only if transparancy of upper map is 0
+
+    if (this.rtree) {
+      return this.rtree.searchBbox(geoBbox)
+    } else {
+      return Array.from(this.warpedMapsById.keys())
+    }
+  }
+
+  setImageInfoCache(cache: Cache): void {
+    this.imageInfoCache = cache
+  }
+
+  setMapResourceMask(mapId: string, resourceMask: Ring): void {
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      warpedMap.setResourceMask(resourceMask)
       this.updateRtree(warpedMap)
-
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
       )
-
-      return mapId
-    } catch (err) {
-      if (err instanceof Error) {
-        return err
-      } else {
-        throw err
-      }
     }
   }
 
-  private async removeMapInternal(map: Georef) {
-    try {
-      const mapId = await this.getMapId(map)
-
+  setMapsTransformationType(
+    mapIds: Iterable<string>,
+    transformationType: TransformationType
+  ): void {
+    for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
-
       if (warpedMap) {
-        this.warpedMapsById.delete(mapId)
-        this.zIndices.delete(mapId)
-
-        this.removeFromRtree(warpedMap)
-
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
-        )
-      } else {
-        throw new Error(`No map found with ID ${mapId}`)
-      }
-
-      return mapId
-    } catch (err) {
-      if (err instanceof Error) {
-        return err
-      } else {
-        throw err
+        warpedMap.setTransformationType(transformationType)
+        this.updateRtree(warpedMap)
       }
     }
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.TRANSFORMATIONCHANGED, mapIds)
+    )
+  }
+
+  bringMapsToFront(mapIds: Iterable<string>): void {
+    let newZIndex = this.warpedMapsById.size
+    for (const mapId of mapIds) {
+      if (this.zIndices.has(mapId)) {
+        this.zIndices.set(mapId, newZIndex)
+        newZIndex++
+      }
+    }
+    this.removeZIndexHoles()
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+  }
+
+  sendMapsToBack(mapIds: Iterable<string>): void {
+    let newZIndex = -Array.from(mapIds).length
+    for (const mapId of mapIds) {
+      if (this.zIndices.has(mapId)) {
+        this.zIndices.set(mapId, newZIndex)
+        newZIndex++
+      }
+    }
+    this.removeZIndexHoles()
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+  }
+
+  bringMapsForward(mapIds: Iterable<string>): void {
+    for (const [mapId, zIndex] of this.zIndices.entries()) {
+      this.zIndices.set(mapId, zIndex * 2)
+    }
+    for (const mapId of mapIds) {
+      const zIndex = this.zIndices.get(mapId)
+      if (zIndex !== undefined) {
+        this.zIndices.set(mapId, zIndex + 3)
+      }
+    }
+    this.removeZIndexHoles()
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+  }
+
+  sendMapsBackward(mapIds: Iterable<string>): void {
+    for (const [mapId, zIndex] of this.zIndices.entries()) {
+      this.zIndices.set(mapId, zIndex * 2)
+    }
+    for (const mapId of mapIds) {
+      const zIndex = this.zIndices.get(mapId)
+      if (zIndex !== undefined) {
+        this.zIndices.set(mapId, zIndex - 3)
+      }
+    }
+    this.removeZIndexHoles()
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+  }
+
+  showMaps(mapIds: Iterable<string>): void {
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap) {
+        warpedMap.visible = true
+      }
+    }
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
+  }
+
+  hideMaps(mapIds: Iterable<string>): void {
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap) {
+        warpedMap.visible = false
+      }
+    }
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
   }
 
   async addMap(map: unknown): Promise<string | Error> {
@@ -107,13 +204,10 @@ export default class WarpedMapList extends EventTarget {
     annotation: unknown
   ): Promise<(string | Error)[]> {
     const results: (string | Error)[] = []
-
     const maps = parseAnnotation(annotation)
-
     const settledResults = await Promise.allSettled(
       maps.map((map) => this.addMapInternal(map))
     )
-
     // TODO: make sure reason contains Error
     for (const settledResult of settledResults) {
       if (settledResult.status === 'fulfilled') {
@@ -122,12 +216,10 @@ export default class WarpedMapList extends EventTarget {
         results.push(settledResult.reason)
       }
     }
-
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
     )
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-
     return results
   }
 
@@ -135,44 +227,70 @@ export default class WarpedMapList extends EventTarget {
     annotation: unknown
   ): Promise<(string | Error)[]> {
     const results: (string | Error)[] = []
-
     const maps = parseAnnotation(annotation)
-
     for (const map of maps) {
       const mapIdOrError = await this.removeMapInternal(map)
       results.push(mapIdOrError)
     }
-
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
     )
-
-    this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-
     return results
   }
 
-  private updateRtree(warpedMap: WarpedMap) {
+  private async addMapInternal(map: Georef): Promise<string> {
+    const mapId = await this.getMapId(map)
+    const warpedMap = new WarpedMap(mapId, map, this.imageInfoCache)
+    this.warpedMapsById.set(mapId, warpedMap)
+    this.zIndices.set(mapId, this.warpedMapsById.size - 1)
+    this.updateRtree(warpedMap)
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
+    )
+    return mapId
+  }
+
+  private async removeMapInternal(map: Georef): Promise<string> {
+    const mapId = await this.getMapId(map)
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      this.warpedMapsById.delete(mapId)
+      this.zIndices.delete(mapId)
+      this.removeFromRtree(warpedMap)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
+      )
+      this.removeZIndexHoles()
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    } else {
+      throw new Error(`No map found with ID ${mapId}`)
+    }
+    return mapId
+  }
+
+  private async getMapId(map: Georef): Promise<string> {
+    const mapId = map.id || (await generateChecksum(map))
+    return mapId
+  }
+
+  private updateRtree(warpedMap: WarpedMap): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
       this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
     }
   }
 
-  private removeFromRtree(warpedMap: WarpedMap) {
+  private removeFromRtree(warpedMap: WarpedMap): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
     }
   }
 
-  private removeZIndexHoles() {
+  private removeZIndexHoles(): void {
     const sortedZIndices = [...this.zIndices.entries()].sort(
       (entryA, entryB) => entryA[1] - entryB[1]
     )
-
     let zIndex = 0
-
     for (const entry of sortedZIndices) {
       const mapId = entry[0]
       this.zIndices.set(mapId, zIndex)
@@ -180,180 +298,10 @@ export default class WarpedMapList extends EventTarget {
     }
   }
 
-  getMapZIndex(mapId: string) {
-    return this.zIndices.get(mapId)
-  }
-
-  bringMapsToFront(mapIds: Iterable<string>) {
-    let newZIndex = this.warpedMapsById.size
-
-    for (const mapId of mapIds) {
-      if (this.zIndices.has(mapId)) {
-        this.zIndices.set(mapId, newZIndex)
-        newZIndex++
-      }
-    }
-
-    this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-  }
-
-  sendMapsToBack(mapIds: string[]) {
-    let newZIndex = -mapIds.length
-
-    for (const mapId of mapIds) {
-      if (this.zIndices.has(mapId)) {
-        this.zIndices.set(mapId, newZIndex)
-        newZIndex++
-      }
-    }
-
-    this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-  }
-
-  bringMapsForward(mapIds: Iterable<string>) {
-    for (const [mapId, zIndex] of this.zIndices.entries()) {
-      this.zIndices.set(mapId, zIndex * 2)
-    }
-
-    for (const mapId of mapIds) {
-      const zIndex = this.zIndices.get(mapId)
-      if (zIndex !== undefined) {
-        this.zIndices.set(mapId, zIndex + 3)
-      }
-    }
-
-    this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-  }
-
-  sendMapsBackward(mapIds: Iterable<string>) {
-    for (const [mapId, zIndex] of this.zIndices.entries()) {
-      this.zIndices.set(mapId, zIndex * 2)
-    }
-
-    for (const mapId of mapIds) {
-      const zIndex = this.zIndices.get(mapId)
-      if (zIndex !== undefined) {
-        this.zIndices.set(mapId, zIndex - 3)
-      }
-    }
-
-    this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
-  }
-
-  setResourceMask(mapId: string, resourceMask: Point[]) {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      const geoMask = warpedMap.transformer.transformForwardAsGeojson([
-        resourceMask
-      ])
-      warpedMap.geoMask = geoMask
-      warpedMap.geoMaskBbox = computeBbox(geoMask)
-
-      this.updateRtree(warpedMap)
-
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
-      )
-    }
-  }
-
-  setMapsTransformation(
-    mapIds: Iterable<string>,
-    transformationType: TransformationType
-  ) {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.updateTransformationType(transformationType)
-        this.updateRtree(warpedMap)
-      }
-    }
-
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.TRANSFORMATIONCHANGED, mapIds)
-    )
-  }
-
-  showMaps(mapIds: Iterable<string>) {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.visible = true
-      }
-    }
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
-  }
-
-  hideMaps(mapIds: Iterable<string>) {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.visible = false
-      }
-    }
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
-  }
-
-  getPossibleVisibleWarpedMapIds(geoBbox: Bbox) {
-    // TODO: to make sure only tiles for visible parts of the map are requested
-    // (and not for parts hidden behind maps on top of it)
-    // Subtract geoMasks of maps that have been added before the current map:
-    // Map A (topmost): show completely
-    // Map B: B - A
-    // Map C: C - B - A
-    // Map D: D - C - B - A
-    //
-    // Possible libraries:
-    //  - https://github.com/w8r/martinez
-    //  - https://github.com/mfogel/polygon-clipping
-    //
-    // Do this only if transparancy of upper map is 0
-
-    if (this.rtree) {
-      return this.rtree.searchBbox(geoBbox)
-    } else {
-      return this.warpedMapsById.keys()
-    }
-  }
-
-  getMaps() {
-    return this.warpedMapsById.values()
-  }
-
-  getMap(mapId: string) {
-    return this.warpedMapsById.get(mapId)
-  }
-
-  clear() {
+  clear(): void {
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
-
     this.rtree?.clear()
-
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
-  }
-
-  getBbox(): Bbox | undefined {
-    let bbox
-
-    for (const warpedMap of this.warpedMapsById.values()) {
-      if (warpedMap.visible) {
-        if (!bbox) {
-          bbox = warpedMap.geoMaskBbox
-        } else {
-          bbox = combineBboxes(bbox, warpedMap.geoMaskBbox)
-        }
-      }
-    }
-
-    return bbox
-  }
-
-  setImageInfoCache(cache: Cache) {
-    this.imageInfoCache = cache
   }
 }

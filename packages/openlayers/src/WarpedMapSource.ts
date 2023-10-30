@@ -1,6 +1,7 @@
 import Source from 'ol/source/Source.js'
 
 import { RTree, WarpedMapList } from '@allmaps/render'
+import { WarpedMap } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
 import type { Point, Bbox } from '@allmaps/types'
@@ -111,17 +112,19 @@ export class WarpedMapSource extends Source {
 
   /**
    * Returns the WarpedMapList object that contains a list of all maps
+   * @returns {WarpedMapList} the warped map list
    */
-  getWarpedMapList() {
+  getWarpedMapList(): WarpedMapList {
     return this.warpedMapList
   }
 
   /**
    * Returns a single map
    * @param {string} mapId - ID of the warped map
+   * @returns {WarpedMap | undefined} the warped map
    */
-  getMap(mapId: string) {
-    return this.warpedMapList.getMap(mapId)
+  getWarpedMap(mapId: string): WarpedMap | undefined {
+    return this.warpedMapList.getWarpedMap(mapId)
   }
 
   /**
@@ -165,7 +168,7 @@ export class WarpedMapSource extends Source {
    * @returns {boolean | undefined} - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
-    const warpedMap = this.warpedMapList.getMap(mapId)
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
     return warpedMap?.visible
   }
 
@@ -174,8 +177,8 @@ export class WarpedMapSource extends Source {
    * @param {string} mapId - ID of the warped map
    * @param {Point[]} resourceMask - new resource mask
    */
-  setResourceMask(mapId: string, resourceMask: Point[]) {
-    this.warpedMapList.setResourceMask(mapId, resourceMask)
+  setMapResourceMask(mapId: string, resourceMask: Point[]) {
+    this.warpedMapList.setMapResourceMask(mapId, resourceMask)
     this.changed()
   }
 
@@ -184,11 +187,11 @@ export class WarpedMapSource extends Source {
    * @param {Iterable<string>} mapIds - IDs of the warped maps
    * @param {TransformationType} transformation - new transformation type
    */
-  setMapsTransformation(
+  setMapsTransformationType(
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.warpedMapList.setMapsTransformation(mapIds, transformation)
+    this.warpedMapList.setMapsTransformationType(mapIds, transformation)
     this.changed()
   }
 

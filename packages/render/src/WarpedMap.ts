@@ -64,10 +64,12 @@ export default class WarpedMap {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
-    this.updateTransformationType()
+    this.makeTransformer()
+    this.updateGeoMask()
+    this.updateFullGeoMask()
   }
 
-  private makeTransformer(transformationType?: TransformationType) {
+  private makeTransformer(transformationType?: TransformationType): void {
     if (!transformationType) {
       transformationType = this.transformationType
     }
@@ -77,13 +79,18 @@ export default class WarpedMap {
     )
   }
 
-  updateTransformationType(transformationType?: TransformationType) {
+  setTransformationType(transformationType: TransformationType): void {
     this.makeTransformer(transformationType)
     this.updateGeoMask()
     this.updateFullGeoMask()
   }
 
-  private updateGeoMask() {
+  setResourceMask(resourceMask: Ring): void {
+    this.resourceMask = resourceMask
+    this.updateGeoMask()
+  }
+
+  private updateGeoMask(): void {
     this.geoMask = this.transformer.transformForwardAsGeojson(
       [this.resourceMask],
       this.transformOptions
@@ -91,7 +98,7 @@ export default class WarpedMap {
     this.geoMaskBbox = computeBbox(this.geoMask)
   }
 
-  private updateFullGeoMask() {
+  private updateFullGeoMask(): void {
     this.fullGeoMask = this.transformer.transformForwardAsGeojson(
       [this.fullResourceMask],
       this.transformOptions
@@ -99,7 +106,7 @@ export default class WarpedMap {
     this.fullGeoMaskBbox = computeBbox(this.fullGeoMask)
   }
 
-  async fetchImageInfo() {
+  async fetchImageInfo(): Promise<void> {
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
       cache: this.imageInfoCache
