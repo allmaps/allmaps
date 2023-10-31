@@ -33,7 +33,7 @@ export default class Viewport extends EventTarget {
    *
    * @constructor
    * @param {Bbox} projectedGeoBbox - Bbox displayed in the viewport, in projected geo coordinates.
-   * @param {Size} viewportSize - Size as [width, height] of the viewport in pixels of the viewport.
+   * @param {Size} viewportSize - Size of the viewport in pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
    * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
    */

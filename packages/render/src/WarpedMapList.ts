@@ -27,7 +27,7 @@ export default class WarpedMapList extends EventTarget {
     this.imageInfoCache = imageInfoCache
   }
 
-  getMapIds(): Iterable<string> {
+  getMaps(): Iterable<string> {
     return this.warpedMapsById.keys()
   }
 
@@ -59,7 +59,7 @@ export default class WarpedMapList extends EventTarget {
     return bbox
   }
 
-  getMapIdsByBbox(geoBbox: Bbox): Iterable<string> {
+  getMapsByBbox(geoBbox: Bbox): Iterable<string> {
     // TODO: to make sure only tiles for visible parts of the map are requested
     // (and not for parts hidden behind maps on top of it)
     // Subtract geoMasks of maps that have been added before the current map:

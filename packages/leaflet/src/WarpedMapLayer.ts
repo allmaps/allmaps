@@ -785,7 +785,6 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   _renderInternal(last = false): HTMLElement {
-    // TODO: can this be simplified with this._map.getPixelBounds() or this._map.getPixelWorldBounds()
     const geoBbox = this._map.getBounds()
     const projectedNorthEast = this._map.options.crs.project(
       geoBbox.getNorthEast()
@@ -799,15 +798,12 @@ export const WarpedMapLayer = L.Layer.extend({
       projectedNorthEast.x,
       projectedNorthEast.y
     ] as [number, number, number, number]
-    console.log(projectedGeoBbox, this._map.getPixelBounds())
 
-    const size = [this._map.getSize().x, this._map.getSize().y] as [
-      number,
-      number
-    ]
+    const size = this._map.getSize()
+    const viewportSize = [size.x, size.y] as [number, number]
 
     this.renderer.setViewport(
-      new Viewport(projectedGeoBbox, size, 0, window.devicePixelRatio)
+      new Viewport(projectedGeoBbox, viewportSize, 0, window.devicePixelRatio)
     )
 
     this._prepareFrameInternal()

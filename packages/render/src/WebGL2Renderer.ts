@@ -107,7 +107,6 @@ export default class WebGL2Renderer extends EventTarget {
       this.tileRemoved.bind(this)
     )
 
-    // Move this from viewer to renderer as updateViewportAndGetTilesNeeded part 2 is moved to render
     this.addEventListener(
       WarpedMapEventType.IMAGEINFONEEDED,
       this.imageInfoNeeded.bind(this)
@@ -146,7 +145,7 @@ export default class WebGL2Renderer extends EventTarget {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
-    possibleVisibleWarpedMapIds = this.warpedMapList.getMapIdsByBbox(
+    possibleVisibleWarpedMapIds = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
 
