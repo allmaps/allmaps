@@ -77,7 +77,8 @@ fetch(annotationUrl)
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
-    *   [getExtent](#getextent)
+    *   [getTotalBbox](#gettotalbbox)
+    *   [getTotalProjectedBbox](#gettotalprojectedbbox)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -358,9 +359,15 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
 *   `transformation` **[TransformationType](#transformationtype)** new transformation type
 
-#### getExtent
+#### getTotalBbox
 
-Return the extent of all maps in the source
+Return the Bbox of all visible maps in the layer, in lon lat coordinates.
+
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+
+#### getTotalProjectedBbox
+
+Return the Bbox of all visible maps in the layer, in projected coordinates.
 
 Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
 

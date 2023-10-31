@@ -119,8 +119,10 @@ map.on('warpedmapadded', () => {console.log(warpedMapLayer.getTotalBounds())}, m
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
-    *   [getExtent](#getextent)
-    *   [getBounds](#getbounds)
+    *   [getTotalBbox](#gettotalbbox)
+    *   [getTotalProjectedBbox](#gettotalprojectedbbox)
+    *   [getTotalBounds](#gettotalbounds)
+    *   [getTotalProjectedBounds](#gettotalprojectedbounds)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -263,15 +265,27 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
 *   `transformation` **TransformationType** new transformation type
 
-#### getExtent
+#### getTotalBbox
 
-Return the extent of all maps in the layer
+Return the Bbox of all visible maps in the layer, in lon lat coordinates.
 
 Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
 
-#### getBounds
+#### getTotalProjectedBbox
 
-Returns the bounds of all maps in the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
+Return the Bbox of all visible maps in the layer, in projected coordinates.
+
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+
+#### getTotalBounds
+
+Returns the bounds of all visible maps in the layer, in lon lat coordinates.
+
+Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounds
+
+#### getTotalProjectedBounds
+
+Returns the bounds of all visible maps in the layer, in projected coordinates.
 
 Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounds
 
