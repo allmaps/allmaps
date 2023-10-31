@@ -14,17 +14,26 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import type { TransformationType } from '@allmaps/transform'
 import type { Ring, Bbox } from '@allmaps/types'
 
+type WarpedMapListOptions = {
+  createRTree: boolean
+}
+
 export default class WarpedMapList extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()
-  zIndices: Map<string, number> = new Map()
 
+  zIndices: Map<string, number> = new Map()
   rtree?: RTree
   imageInfoCache?: Cache
 
-  constructor(rtree?: RTree, imageInfoCache?: Cache) {
+  constructor(imageInfoCache?: Cache, options?: WarpedMapListOptions) {
     super()
-    this.rtree = rtree
+    options = Object.assign({ createRTree: true }, options)
+
     this.imageInfoCache = imageInfoCache
+
+    if (options.createRTree) {
+      this.rtree = new RTree()
+    }
   }
 
   getMaps(): Iterable<string> {

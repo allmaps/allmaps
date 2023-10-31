@@ -1,6 +1,6 @@
 import Source from 'ol/source/Source.js'
 
-import { RTree, WarpedMap, WarpedMapList } from '@allmaps/render'
+import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
 import type { Point, Bbox } from '@allmaps/types'
@@ -12,7 +12,6 @@ import type { Point, Bbox } from '@allmaps/types'
  * @extends import("ol/source/Source.js")
  */
 export class WarpedMapSource extends Source {
-  rtree: RTree
   warpedMapList: WarpedMapList
 
   constructor(imageInfoCache?: Cache) {
@@ -23,8 +22,7 @@ export class WarpedMapSource extends Source {
       wrapX: true
     })
 
-    this.rtree = new RTree()
-    this.warpedMapList = new WarpedMapList(this.rtree, imageInfoCache)
+    this.warpedMapList = new WarpedMapList(imageInfoCache)
   }
 
   async addMap(map: unknown): Promise<string | Error> {

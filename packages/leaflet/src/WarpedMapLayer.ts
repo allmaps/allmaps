@@ -9,8 +9,7 @@ import {
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2Renderer,
-  RTree
+  WebGL2Renderer
 } from '@allmaps/render'
 import {
   hexToFractionalRgb,
@@ -564,11 +563,7 @@ export const WarpedMapLayer = L.Layer.extend({
       throw new Error('WebGL 2 not available')
     }
 
-    this.rtree = new RTree()
-    this.warpedMapList = new WarpedMapList(
-      this.rtree,
-      this.options.imageInfoCache
-    )
+    this.warpedMapList = new WarpedMapList(this.options.imageInfoCache)
 
     this.tileCache = new TileCache()
     this.renderer = new WebGL2Renderer(
