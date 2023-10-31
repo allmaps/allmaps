@@ -244,9 +244,10 @@ export function getProjectedGeoBboxResourcePolygon(
 export function getBestZoomLevel(
   image: Image,
   viewportSize: Size,
-  resourcePolygon: Polygon
+  projectedResourcePolygon: Polygon
 ): TileZoomLevel {
-  const resourceBbox = computeBbox(resourcePolygon)
+  // TODO: apply 'projected' in names
+  const resourceBbox = computeBbox(projectedResourcePolygon)
 
   const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
   const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
@@ -261,10 +262,11 @@ export function getBestZoomLevel(
 // TODO: move to render
 export function computeIiifTilesForPolygonAndZoomLevel(
   image: Image,
-  resourcePolygon: Polygon,
+  projectedResourcePolygon: Polygon,
   zoomLevel: TileZoomLevel
 ): Tile[] {
-  const tilePixelExtent = scaleToTiles(zoomLevel, resourcePolygon[0])
+  // TODO: apply 'projected' in names
+  const tilePixelExtent = scaleToTiles(zoomLevel, projectedResourcePolygon[0])
 
   const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
   const iiifTiles = iiifTilesByXToArray(
@@ -275,7 +277,7 @@ export function computeIiifTilesForPolygonAndZoomLevel(
 
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
-  const resourceBbox = computeBbox(resourcePolygon)
+  const resourceBbox = computeBbox(projectedResourcePolygon)
   const resourceCenter: Point = [
     (resourceBbox[0] + resourceBbox[2]) / 2,
     (resourceBbox[1] + resourceBbox[3]) / 2

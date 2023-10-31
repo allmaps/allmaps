@@ -40,6 +40,8 @@ const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
 
 Built for Leaflet 1.9, but should work with earlier versions as well.
 
+### Loading an annotation
+
 A first way to add an annotation to a WarpedMapLayer is to specify the annotation or annotationUrl when creating the WarpedMapLayer.
 
 ```js
@@ -85,6 +87,16 @@ asyncAddGeoreferenceAnnotationByUrl()
 ```
 
 See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an example of a minimal html file that loads a Leaflet maps and adds a Georeference Annotation.
+
+### Interacting with the map
+
+Many functions are available on this layer type to get and set aspects of the layer - both classic Leaflet functions and functions related to warped maps. Many of the functions specified in the API require loading a map first. You can make sure a function is run only after maps are loaded e.g. by listening for the `'warpedmapadded'` event.
+
+Here's an example:
+
+```js
+map.on('warpedmapadded', () => {console.log(warpedMapLayer.getTotalBounds())}, map)
+```
 
 ## API
 

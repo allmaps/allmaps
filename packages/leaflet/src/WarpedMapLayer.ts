@@ -11,11 +11,7 @@ import {
   WarpedMapEventType,
   WebGL2Renderer
 } from '@allmaps/render'
-import {
-  hexToFractionalRgb,
-  isValidHttpUrl,
-  webMercatorToLonLat
-} from '@allmaps/stdlib'
+import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 
@@ -202,28 +198,43 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Return the extent of all maps in the layer
+   * Return the Bbox of all visible maps in the layer, in lon lat coordinates.
    * @returns {Bbox | undefined} - extent of all warped maps
    */
-  getExtent(): Bbox | undefined {
+  getTotalBbox(): Bbox | undefined {
     return this.warpedMapList.getBbox()
   },
 
   /**
-   * Returns the bounds of all maps in the layer. Run after loading a map, e.g. by listening for the 'warpedmapadded' event.
+   * Return the Bbox of all visible maps in the layer, in projected coordinates.
+   * @returns {Bbox | undefined} - extent of all warped maps
+   */
+  getTotalProjectedBbox(): Bbox | undefined {
+    return this.warpedMapList.getProjectedBbox()
+  },
+
+  /**
+   * Returns the bounds of all visible maps in the layer, in lon lat coordinates.
    * @returns {L.LatLngBounds | undefined} Bounds
    */
-  getBounds(): L.LatLngBounds | undefined {
-    const bbox = this.warpedMapList.getBbox()
-    if (!bbox) {
-      return undefined
-    } else {
-      // Switch from WarpedMap's lng-lat webmercator to Leaflet's lat-lng wgs84
-      // TODO: remove this call for toLonLat when WarpedMap will store unprojected geoMask
-      const [bbox0, bbox1] = webMercatorToLonLat([bbox[0], bbox[1]])
-      const [bbox2, bbox3] = webMercatorToLonLat([bbox[2], bbox[3]])
-      return L.latLngBounds(L.latLng(bbox1, bbox0), L.latLng(bbox3, bbox2))
-    }
+  getTotalBounds(): L.LatLngBounds | undefined {
+    const bbox = this.getTotalBbox()
+    return L.latLngBounds(
+      L.latLng(bbox[1], bbox[0]),
+      L.latLng(bbox[3], bbox[2])
+    )
+  },
+
+  /**
+   * Returns the bounds of all visible maps in the layer, in projected coordinates.
+   * @returns {L.LatLngBounds | undefined} Bounds
+   */
+  getTotalProjectedBounds(): L.LatLngBounds | undefined {
+    const bbox = this.getTotalProjectedBbox()
+    return L.latLngBounds(
+      L.latLng(bbox[1], bbox[0]),
+      L.latLng(bbox[3], bbox[2])
+    )
   },
 
   /**

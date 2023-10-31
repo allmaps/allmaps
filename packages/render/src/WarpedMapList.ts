@@ -52,6 +52,22 @@ export default class WarpedMapList extends EventTarget {
     return this.zIndices.get(mapId)
   }
 
+  getProjectedBbox(): Bbox | undefined {
+    let bbox
+
+    for (const warpedMap of this.getWarpedMaps()) {
+      if (warpedMap.visible) {
+        if (!bbox) {
+          bbox = warpedMap.projectedGeoMaskBbox
+        } else {
+          bbox = combineBboxes(bbox, warpedMap.projectedGeoMaskBbox)
+        }
+      }
+    }
+
+    return bbox
+  }
+
   getBbox(): Bbox | undefined {
     let bbox
 
@@ -285,7 +301,7 @@ export default class WarpedMapList extends EventTarget {
   private updateRtree(warpedMap: WarpedMap): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
-      this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
+      this.rtree.addItem(warpedMap.mapId, warpedMap.projectedGeoMask)
     }
   }
 

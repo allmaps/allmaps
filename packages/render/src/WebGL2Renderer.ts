@@ -145,6 +145,7 @@ export default class WebGL2Renderer extends EventTarget {
     let possibleVisibleWarpedMapIds: Iterable<string> = []
     const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
 
+    // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
     possibleVisibleWarpedMapIds = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
@@ -159,12 +160,12 @@ export default class WebGL2Renderer extends EventTarget {
 
       // Don't show maps when they're too small
       const topLeft: Point = [
-        warpedMap.geoMaskBbox[0],
-        warpedMap.geoMaskBbox[1]
+        warpedMap.projectedGeoMaskBbox[0],
+        warpedMap.projectedGeoMaskBbox[1]
       ]
       const bottomRight: Point = [
-        warpedMap.geoMaskBbox[2],
-        warpedMap.geoMaskBbox[3]
+        warpedMap.projectedGeoMaskBbox[2],
+        warpedMap.projectedGeoMaskBbox[3]
       ]
 
       const pixelTopLeft = applyTransform(
@@ -185,10 +186,11 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      const geoBboxResourcePolygon = getProjectedGeoBboxResourcePolygon(
-        warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox
-      )
+      const projectedGeoBboxResourcePolygon =
+        getProjectedGeoBboxResourcePolygon(
+          warpedMap.projectedTransformer,
+          this.viewport.projectedGeoBbox
+        )
 
       if (!hasImageInfo(warpedMap)) {
         this.dispatchEvent(
@@ -200,7 +202,7 @@ export default class WebGL2Renderer extends EventTarget {
       const zoomLevel = getBestZoomLevel(
         warpedMap.parsedImage,
         this.viewport.canvasSize,
-        geoBboxResourcePolygon
+        projectedGeoBboxResourcePolygon
       )
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
@@ -210,7 +212,7 @@ export default class WebGL2Renderer extends EventTarget {
       // TODO: rename function
       const tiles = computeIiifTilesForPolygonAndZoomLevel(
         warpedMap.parsedImage,
-        geoBboxResourcePolygon,
+        projectedGeoBboxResourcePolygon,
         zoomLevel
       )
 

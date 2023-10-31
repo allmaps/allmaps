@@ -106,6 +106,7 @@ export default class WebGL2WarpedMap extends EventTarget {
       bboxDiameter / DIAMETER_FRACTION
     ).flat()
 
+    // TODO: apply 'projected' in names
     const newGeoMaskVertices = trianglesPositions.map((point) =>
       warpedMap.projectedTransformer.transformToGeo(point as [number, number])
     )

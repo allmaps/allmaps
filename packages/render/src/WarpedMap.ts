@@ -26,12 +26,17 @@ export default class WarpedMap {
   parsedImage?: IIIFImage
   visible: boolean
   transformationType: TransformationType
+  transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
   transformOptions: PartialTransformOptions
   geoMask!: GeojsonPolygon
   fullGeoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
   fullGeoMaskBbox!: Bbox
+  projectedGeoMask!: GeojsonPolygon
+  projectedFullGeoMask!: GeojsonPolygon
+  projectedGeoMaskBbox!: Bbox
+  projectedFullGeoMaskBbox!: Bbox
 
   constructor(
     mapId: string,
@@ -64,9 +69,37 @@ export default class WarpedMap {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
-    this.makeProjectedTransformer()
+    this.setTransformationType()
+  }
+
+  async completeImageInfo(): Promise<void> {
+    const imageUri = this.georeferencedMap.resource.id
+    const imageInfoJson = await fetchImageInfo(imageUri, {
+      cache: this.imageInfoCache
+    })
+    this.parsedImage = IIIFImage.parse(imageInfoJson)
+    this.imageId = await generateId(imageUri)
+  }
+
+  setResourceMask(resourceMask: Ring): void {
+    this.resourceMask = resourceMask
+    this.updateProjectedGeoMask()
+  }
+
+  setTransformationType(transformationType?: TransformationType): void {
+    this.makeTransformer(transformationType)
+    this.makeProjectedTransformer(transformationType)
     this.updateGeoMask()
     this.updateFullGeoMask()
+    this.updateProjectedGeoMask()
+    this.updateProjectedFullGeoMask()
+  }
+
+  private makeTransformer(transformationType?: TransformationType): void {
+    if (!transformationType) {
+      transformationType = this.transformationType
+    }
+    this.transformer = new GcpTransformer(this.gcps, transformationType)
   }
 
   private makeProjectedTransformer(
@@ -81,19 +114,8 @@ export default class WarpedMap {
     )
   }
 
-  setTransformationType(transformationType: TransformationType): void {
-    this.makeProjectedTransformer(transformationType)
-    this.updateGeoMask()
-    this.updateFullGeoMask()
-  }
-
-  setResourceMask(resourceMask: Ring): void {
-    this.resourceMask = resourceMask
-    this.updateGeoMask()
-  }
-
   private updateGeoMask(): void {
-    this.geoMask = this.projectedTransformer.transformForwardAsGeojson(
+    this.geoMask = this.transformer.transformForwardAsGeojson(
       [this.resourceMask],
       this.transformOptions
     )
@@ -101,20 +123,28 @@ export default class WarpedMap {
   }
 
   private updateFullGeoMask(): void {
-    this.fullGeoMask = this.projectedTransformer.transformForwardAsGeojson(
+    this.fullGeoMask = this.transformer.transformForwardAsGeojson(
       [this.fullResourceMask],
       this.transformOptions
     )
     this.fullGeoMaskBbox = computeBbox(this.fullGeoMask)
   }
 
-  async completeImageInfo(): Promise<void> {
-    const imageUri = this.georeferencedMap.resource.id
-    const imageInfoJson = await fetchImageInfo(imageUri, {
-      cache: this.imageInfoCache
-    })
-    this.parsedImage = IIIFImage.parse(imageInfoJson)
-    this.imageId = await generateId(imageUri)
+  private updateProjectedGeoMask(): void {
+    this.projectedGeoMask = this.projectedTransformer.transformForwardAsGeojson(
+      [this.resourceMask],
+      this.transformOptions
+    )
+    this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
+  }
+
+  private updateProjectedFullGeoMask(): void {
+    this.projectedFullGeoMask =
+      this.projectedTransformer.transformForwardAsGeojson(
+        [this.fullResourceMask],
+        this.transformOptions
+      )
+    this.projectedFullGeoMaskBbox = computeBbox(this.projectedFullGeoMask)
   }
 }
 
