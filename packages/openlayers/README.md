@@ -139,7 +139,7 @@ Resets the saturation of a single warped to the original colors
 
 #### setMapSaturation
 
-Sets the opacity of a single warped map
+Sets the saturation of a single warped map
 
 ##### Parameters
 

@@ -1,34 +1,17 @@
 import Layer from 'ol/layer/Layer.js'
-import ViewHint from 'ol/ViewHint.js'
-
-import { throttle, type DebouncedFunc } from 'lodash-es'
-
 import {
   TileCache,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
-  WarpedMapEventType
+  WarpedMapEventType,
+  WebGL2Renderer
 } from '@allmaps/render'
-
-import { WebGL2Renderer } from '@allmaps/render'
-
-import { hexToFractionalRgb, equalArray } from '@allmaps/stdlib'
-
+import { hexToFractionalRgb } from '@allmaps/stdlib'
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
 import type { FrameState } from 'ol/Map.js'
-
-import type { NeededTile } from '@allmaps/types'
-
 import type { WarpedMapSource } from './WarpedMapSource.js'
-
-// TODO: Move to stdlib?
-const THROTTLE_WAIT_MS = 500
-const THROTTLE_OPTIONS = {
-  leading: true,
-  trailing: true
-}
 
 /**
  * WarpedMapLayer class. Together with a WarpedMapSource, this class
@@ -48,15 +31,6 @@ export class WarpedMapLayer extends Layer {
   warpedMapList: WarpedMapList
   renderer: WebGL2Renderer
   tileCache: TileCache
-
-  throttledGetTilesNeeded: DebouncedFunc<typeof this.renderer.getTilesNeeded>
-
-  private throttledRenderTimeoutId: number | undefined
-
-  private lastPreparedFrameLayerRevision = 0
-  private lastPreparedFrameSourceRevision = 0
-
-  private previousExtent: number[] | null = null
 
   private resizeObserver: ResizeObserver
 
@@ -153,12 +127,6 @@ export class WarpedMapLayer extends Layer {
     this.tileCache.addEventListener(
       WarpedMapEventType.ALLTILESLOADED,
       this.changed.bind(this)
-    )
-
-    this.throttledGetTilesNeeded = throttle(
-      this.renderer.getTilesNeeded.bind(this.renderer),
-      THROTTLE_WAIT_MS,
-      THROTTLE_OPTIONS
     )
 
     for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
@@ -311,7 +279,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Sets the opacity of a single warped map
+   * Sets the saturation of a single warped map
    * @param {string} mapId - ID of the warped map
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
@@ -459,39 +427,18 @@ export class WarpedMapLayer extends Layer {
     super.disposeInternal()
   }
 
-  // TODO: Use OL's renderer class, move this function there?
-  private prepareFrameInternal(frameState: FrameState) {
-    const vectorSource = this.source
-    const viewNotMoving =
-      !frameState.viewHints[ViewHint.ANIMATING] &&
-      !frameState.viewHints[ViewHint.INTERACTING]
-    const extentChanged = !equalArray(this.previousExtent, frameState.extent)
-
-    let sourceChanged = false
-    if (vectorSource) {
-      sourceChanged =
-        this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
-
-      if (sourceChanged) {
-        this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
-      }
+  /**
+   * Render the layer.
+   * @param {import("ol/Map.js").FrameState} frameState - OpenLayers frame state
+   * @return {HTMLElement} The rendered element
+   */
+  render(frameState: FrameState): HTMLElement {
+    if (this.canvas) {
+      this.resizeCanvas(this.canvas, this.canvasSize)
     }
 
-    const layerChanged =
-      this.lastPreparedFrameLayerRevision < this.getRevision()
+    this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
-    if (layerChanged) {
-      this.lastPreparedFrameLayerRevision = this.getRevision()
-    }
-
-    if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
-      this.previousExtent = frameState.extent?.slice() || null
-
-      this.renderer.updateVertexBuffers()
-    }
-  }
-
-  private renderInternal(frameState: FrameState, last = false): HTMLElement {
     this.renderer.setViewport(
       new Viewport(
         frameState.extent as [number, number, number, number],
@@ -500,51 +447,8 @@ export class WarpedMapLayer extends Layer {
         window.devicePixelRatio
       )
     )
-
-    this.prepareFrameInternal(frameState)
-
-    // TODO: remove this 'if'?
-    if (frameState.extent) {
-      this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
-
-      let tilesNeeded: NeededTile[] | undefined
-      if (last) {
-        tilesNeeded = this.renderer.getTilesNeeded()
-      } else {
-        tilesNeeded = this.throttledGetTilesNeeded()
-      }
-
-      if (tilesNeeded && tilesNeeded.length) {
-        this.tileCache.setTiles(tilesNeeded)
-      }
-
-      // TODO: reset maps not in viewport, make sure these only
-      // get drawn when they are visible AND when they have their buffers
-      // updated.
-      this.renderer.render()
-    }
+    this.renderer.render()
 
     return this.container
-  }
-
-  /**
-   * Render the layer.
-   * @param {import("ol/Map.js").FrameState} frameState - OpenLayers frame state
-   * @return {HTMLElement} The rendered element
-   */
-  render(frameState: FrameState): HTMLElement {
-    if (this.throttledRenderTimeoutId) {
-      clearTimeout(this.throttledRenderTimeoutId)
-    }
-
-    if (this.canvas) {
-      this.resizeCanvas(this.canvas, this.canvasSize)
-    }
-
-    this.throttledRenderTimeoutId = setTimeout(() => {
-      this.renderInternal(frameState, true)
-    }, THROTTLE_WAIT_MS)
-
-    return this.renderInternal(frameState)
   }
 }

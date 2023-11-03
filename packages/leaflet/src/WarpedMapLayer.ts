@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
-import { throttle } from 'lodash-es'
-
 import {
   TileCache,
   WarpedMap,
@@ -14,10 +12,8 @@ import {
 import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-
-import type { Bbox, NeededTile } from '@allmaps/types'
+import type { Point, Bbox } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
-import type { Point } from '@allmaps/types'
 
 type WarpedMapLayerOptions = {
   opacity: number
@@ -33,11 +29,6 @@ type WarpedMapLayerOptions = {
  */
 export const WarpedMapLayer = L.Layer.extend({
   options: {
-    THROTTLE_WAIT_MS: 100,
-    THROTTLE_OPTIONS: {
-      leading: true,
-      trailing: true
-    },
     opacity: 1,
     interactive: false,
     className: '',
@@ -627,24 +618,6 @@ export const WarpedMapLayer = L.Layer.extend({
       WarpedMapEventType.CLEARED,
       this._warpedMapListCleared.bind(this)
     )
-
-    this.throttledGetTilesNeeded = throttle(
-      this.renderer.getTilesNeeded.bind(this.renderer),
-      this.options.THROTTLE_WAIT_MS,
-      this.options.THROTTLE_OPTIONS
-    )
-
-    this.throttledUpdateVertexBuffers = throttle(
-      this.renderer.updateVertexBuffers.bind(this.renderer),
-      this.options.THROTTLE_WAIT_MS,
-      this.options.THROTTLE_OPTIONS
-    )
-
-    this.throttledSetTiles = throttle(
-      this.tileCache.setTiles.bind(this.tileCache),
-      this.options.THROTTLE_WAIT_MS,
-      this.options.THROTTLE_OPTIONS
-    )
   },
 
   _unload() {
@@ -786,11 +759,16 @@ export const WarpedMapLayer = L.Layer.extend({
     }
   },
 
-  _prepareFrameInternal() {
-    this.throttledUpdateVertexBuffers()
-  },
+  _update() {
+    if (!this._map) {
+      return
+    }
 
-  _renderInternal(last = false): HTMLElement {
+    const topLeft = this._map.containerPointToLayerPoint([0, 0])
+    L.DomUtil.setPosition(this.canvas, topLeft)
+
+    this.renderer.setOpacity(this.getOpacity())
+
     const geoBbox = this._map.getBounds()
     const projectedNorthEast = this._map.options.crs.project(
       geoBbox.getNorthEast()
@@ -811,52 +789,8 @@ export const WarpedMapLayer = L.Layer.extend({
     this.renderer.setViewport(
       new Viewport(projectedGeoBbox, viewportSize, 0, window.devicePixelRatio)
     )
-
-    this._prepareFrameInternal()
-
-    if (projectedGeoBbox) {
-      this.renderer.setOpacity(this.getOpacity())
-
-      let tilesNeeded: NeededTile[] | undefined
-      if (last) {
-        tilesNeeded = this.renderer.getTilesNeeded()
-      } else {
-        tilesNeeded = this.throttledGetTilesNeeded()
-      }
-
-      if (tilesNeeded && tilesNeeded.length) {
-        this.throttledSetTiles(tilesNeeded)
-      }
-
-      // TODO: reset maps not in viewport, make sure these only
-      // get drawn when they are visible AND when they have their buffers
-      // updated.
-      this.renderer.render()
-    }
+    this.renderer.render()
 
     return this.container
-  },
-
-  _render(): HTMLElement {
-    if (this.throttledRenderTimeoutId) {
-      clearTimeout(this.throttledRenderTimeoutId)
-    }
-
-    this.throttledRenderTimeoutId = setTimeout(() => {
-      this._renderInternal(true)
-    }, this.options.THROTTLE_WAIT_MS)
-
-    return this._renderInternal()
-  },
-
-  _update() {
-    if (!this._map) {
-      return
-    }
-
-    const topLeft = this._map.containerPointToLayerPoint([0, 0])
-    L.DomUtil.setPosition(this.canvas, topLeft)
-
-    this._render()
   }
 })

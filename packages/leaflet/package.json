@@ -64,13 +64,11 @@
     "@allmaps/stdlib": "^1.0.0-beta.14",
     "@allmaps/types": "^1.0.0-beta.5",
     "@allmaps/transform": "^1.0.0-beta.17",
-    "leaflet": "^1.9.4",
-    "lodash-es": "^4.17.21"
+    "leaflet": "^1.9.4"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/leaflet": "^1.9.3",
-    "@types/lodash-es": "^4.17.6",
     "documentation": "^14.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",

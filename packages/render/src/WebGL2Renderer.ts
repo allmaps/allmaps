@@ -1,3 +1,5 @@
+import { throttle, debounce, type DebouncedFunc } from 'lodash-es'
+
 import TileCache from './TileCache.js'
 import WarpedMap, { hasImageInfo } from './WarpedMap.js'
 import WarpedMapList from './WarpedMapList.js'
@@ -40,6 +42,17 @@ import type {
   TileZoomLevel
 } from '@allmaps/types'
 
+const THROTTLE_WAIT_MS = 50
+const THROTTLE_OPTIONS = {
+  leading: true,
+  trailing: true
+}
+const DEBOUNCE_WAIT_MS = 100
+const DEBOUNCE_OPTIONS = {
+  leading: true,
+  trailing: true
+}
+
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
@@ -72,6 +85,9 @@ export default class WebGL2Renderer extends EventTarget {
   transformationTransitionStart: number | undefined
   transformationTransitionDuration = 750
   animationProgress = 1
+
+  throttledPrepareRender: DebouncedFunc<typeof this.prepareRender>
+  debouncedRenderInternal: DebouncedFunc<typeof this.prepareRender>
 
   constructor(
     warpedMapList: WarpedMapList,
@@ -113,6 +129,18 @@ export default class WebGL2Renderer extends EventTarget {
     )
 
     this.invertedRenderTransform = createTransform()
+
+    this.throttledPrepareRender = throttle(
+      this.prepareRender.bind(this),
+      THROTTLE_WAIT_MS,
+      THROTTLE_OPTIONS
+    )
+
+    this.debouncedRenderInternal = debounce(
+      this.renderInternal.bind(this),
+      DEBOUNCE_WAIT_MS,
+      DEBOUNCE_OPTIONS
+    )
   }
 
   /**
@@ -186,6 +214,7 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      // TODO: move this funtion to WarpedMap, and store result
       const projectedGeoBboxResourcePolygon =
         getProjectedGeoBboxResourcePolygon(
           warpedMap.projectedTransformer,
@@ -760,7 +789,22 @@ export default class WebGL2Renderer extends EventTarget {
     this.viewport = viewport
   }
 
+  prepareRender(): void {
+    // TODO: reset maps not in viewport, make sure these only
+    // get drawn when they are visible AND when they have their buffers
+    // updated.
+    this.updateVertexBuffers()
+    const tilesNeeded = this.getTilesNeeded()
+    // TODO: inclide this if setTiles
+    if (tilesNeeded && tilesNeeded.length) {
+      this.tileCache.setTiles(tilesNeeded)
+    }
+    console.log('rendering')
+  }
+
   render(): void {
+    this.throttledPrepareRender()
     this.renderInternal()
+    this.debouncedRenderInternal()
   }
 }
