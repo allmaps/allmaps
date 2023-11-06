@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { fetchJson } from '@allmaps/stdlib'
+  import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
   import { parseAnnotation, type Map } from '@allmaps/annotation'
 
   import { position } from '$lib/shared/stores/geolocation.js'
+  import { maps } from '$lib/shared/stores/maps.js'
 
-  let parsedAnnotations: Map[] = []
+  import Thumbnail from '$lib/components/Thumbnail.svelte'
 
   async function handleGeolocation(position: GeolocationPosition) {
     const latLon = [position.coords.latitude, position.coords.longitude]
@@ -14,7 +15,7 @@
     )}`
 
     const annotations = await fetchJson(url)
-    parsedAnnotations = parseAnnotation(annotations)
+    $maps = parseAnnotation(annotations)
   }
 
   $: {
@@ -24,10 +25,18 @@
   }
 </script>
 
-<ol class="list-decimal">
-  {#each parsedAnnotations as map}
-    <li>
-      <a class="underline" href="/?url={map.id}">{map.id}</a>
+<ol class="grid grid-cols-6 gap-2">
+  {#each $maps as map}
+    <li class="aspect-square overflow-hidden">
+      <a class="underline" href="/?url={map.id}">
+        {#await fetchImageInfo(map.resource.id)}
+          <p>...waiting</p>
+        {:then imageInfo}
+          <Thumbnail {imageInfo} width={210} height={210} />
+        {:catch error}
+          <p style="color: red">{error.message}</p>
+        {/await}
+      </a>
     </li>
   {/each}
 </ol>

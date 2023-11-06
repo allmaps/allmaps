@@ -43,10 +43,13 @@
             const annotation = await fetchJson(value.url)
             const maps = parseAnnotation(annotation)
 
-            $map = maps[0]
+            const newMap = maps[0]
+
             $imageInfo = (await fetchImageInfo(
-              $map.resource.id
+              newMap.resource.id
             )) as ImageInformationResponse
+
+            $map = newMap
           }
         } catch (err) {
           if (err instanceof Error) {
@@ -74,10 +77,16 @@
           class="container mx-auto mt-10 p-2"
           transition:fade={{ duration: 120 }}
         >
+          <p class="mb-3 text-2xl">Follow your location on a map</p>
           <p class="mb-3">
             Open a IIIF Resource or Georeference Annotation from a URL:
           </p>
-          <URLInput />
+          <div class="mb-4">
+            <URLInput />
+          </div>
+          <p class="mb-3">
+            Or pick one of these suggestions around your location:
+          </p>
           <Suggestions />
         </div>
       </div>

@@ -29,6 +29,7 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.17",
     "@allmaps/stdlib": "^1.0.0-beta.13",
+    "@allmaps/iiif-parser": "^1.0.0-beta.26",
     "@allmaps/tailwind": "^1.0.0-beta.8",
     "@allmaps/transform": "^1.0.0-beta.16",
     "@allmaps/types": "^1.0.0-beta.4",
