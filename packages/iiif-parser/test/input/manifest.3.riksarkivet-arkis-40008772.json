@@ -1,0 +1,198 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://lbiiif.riksarkivet.se/arkis!40008772/manifest",
+  "type": "Manifest",
+  "label": {
+    "sv": [
+      "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+    ],
+    "en": [
+      "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+    ]
+  },
+  "thumbnail": [
+    {
+      "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/square/350,/0/default.jpg",
+      "type": "Thumbnail",
+      "format": "image/jpg"
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "sv": ["Arkiv"],
+        "en": ["Archive"]
+      },
+      "value": { "none": ["Lantmäteristyrelsen"] }
+    },
+    {
+      "label": {
+        "sv": ["Serie"],
+        "en": ["Serie"]
+      },
+      "value": { "none": ["Lantmäteristyrelsens leverans 1892"] }
+    },
+    {
+      "label": {
+        "sv": ["Referenskod"],
+        "en": ["Reference code"]
+      },
+      "value": { "none": ["SE/RA/420571/02/2/0027:00001"] }
+    },
+    {
+      "label": {
+        "sv": ["Titel"],
+        "en": ["Title"]
+      },
+      "value": {
+        "none": [
+          "[Helsingfors] Geometrisk grundrijtning öfver stapelstaden Hellsingfors i Nyhland,\noch alle des tillhörige åkrar, afmätte anno 1696 af sahl. Lars\nForsell, renoverat och beskrefven anno 1701. [Stadsplan. Papper,\nritad, 155 x 134.] 44, 27. [Beskrivning, se lantmäteristyrelsens\nleverans 1892/61.]"
+        ]
+      }
+    },
+    {
+      "label": {
+        "sv": ["Datering"],
+        "en": ["Date"]
+      },
+      "value": { "none": ["1696"] }
+    },
+    {
+      "label": {
+        "sv": ["Källhänvisning"],
+        "en": ["Source reference"]
+      },
+      "value": {
+        "none": [
+          "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "sv": ["Rättighetsmärkning"],
+        "en": ["Rights"]
+      },
+      "value": {
+        "none": ["https://creativecommons.org/publicdomain/mark/1.0/"]
+      }
+    },
+    {
+      "label": {
+        "sv": ["IIIF-manifest"],
+        "en": ["IIIF Manifest"]
+      },
+      "value": {
+        "none": ["https://lbiiif.riksarkivet.se/arkis!40008772/manifest"]
+      }
+    }
+  ],
+  "rights": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "provider": [
+    {
+      "id": "http://data.riksarkivet.se/agent/Riksarkivet",
+      "type": "Agent",
+      "label": {
+        "sv": ["Riksarkivet"],
+        "en": ["National Archives of Sweden"]
+      },
+      "homepage": [
+        {
+          "id": "https://riksarkivet.se",
+          "type": "Homepage",
+          "label": {
+            "sv": ["Riksarkivet"],
+            "en": ["National Archives of Sweden"]
+          },
+          "format": "text/html",
+          "language": ["sv"]
+        }
+      ],
+      "logo": [
+        {
+          "id": "https://riksarkivet.se/Administration/Images/Layout/logo.png",
+          "type": "Image",
+          "format": "image/png"
+        }
+      ]
+    }
+  ],
+  "viewingDirection": "left-to-right",
+  "items": [
+    {
+      "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/canvas",
+      "type": "Canvas",
+      "label": {
+        "sv": ["Bild 1"],
+        "en": ["Image 1"]
+      },
+      "width": 15162,
+      "height": 18194,
+      "metadata": [
+        {
+          "label": {
+            "sv": ["Bildid"],
+            "en": ["Image ID"]
+          },
+          "value": { "none": ["40008772_00001"] }
+        },
+        {
+          "label": {
+            "sv": ["Länk"],
+            "en": ["Link"]
+          },
+          "value": {
+            "none": ["https://sok.riksarkivet.se/bildvisning/40008772_00001"]
+          }
+        },
+        {
+          "label": {
+            "sv": ["Källhänvisning"],
+            "en": ["Source reference"]
+          },
+          "value": {
+            "sv": [
+              "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696), bildid: 40008772_00001"
+            ],
+            "en": [
+              "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696), Image ID: 40008772_00001"
+            ]
+          }
+        }
+      ],
+      "items": [
+        {
+          "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/annotationpage",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/annotation",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/full/max/0/default.jpg",
+                "type": "Image",
+                "width": 15162,
+                "height": 18194,
+                "format": "image/jpeg",
+                "service": [
+                  {
+                    "id": "https://lbiiif.riksarkivet.se/v3/arkis!40008772_00001",
+                    "type": "ImageService3",
+                    "profile": "level1"
+                  },
+                  {
+                    "@id": "https://lbiiif.riksarkivet.se/v2/arkis!40008772_00001",
+                    "@type": "ImageService2",
+                    "profile": "http://iiif.io/api/image/2/level1.json"
+                  }
+                ]
+              },
+              "target": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/canvas"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

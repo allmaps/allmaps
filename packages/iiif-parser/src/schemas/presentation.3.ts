@@ -22,7 +22,7 @@ export const AnnotationBody3Schema = z.object({
   type: z.literal('Image'),
   width: z.number().int(),
   height: z.number().int(),
-  service: ImageServiceSchema.array().length(1)
+  service: ImageServiceSchema.array()
 })
 
 const Annotation3Schema = z.object({

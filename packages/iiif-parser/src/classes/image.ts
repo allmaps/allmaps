@@ -16,12 +16,16 @@ import {
   Image2ContextString,
   image2ProfileUriRegex
 } from '../schemas/image.2.js'
+import { ImageServiceSchema } from '../schemas/image-service.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
 import { getTileZoomLevels, getIiifTile } from '../lib/tiles.js'
 import { getThumbnail } from '../lib/thumbnails.js'
-import { getProfileProperties } from '../lib/profile.js'
+import {
+  getProfileProperties,
+  getMajorIiifVersionFromImageService
+} from '../lib/profile.js'
 
 import type {
   Size,
@@ -32,6 +36,7 @@ import type {
   TileZoomLevel
 } from '../lib/types.js'
 
+type ImageServiceType = z.infer<typeof ImageServiceSchema>
 type CanvasType = z.infer<typeof CanvasSchema>
 type ImageType = z.infer<typeof ImageSchema>
 type EmbeddedImageType =
@@ -78,11 +83,27 @@ export class EmbeddedImage {
     if (parsedCanvas) {
       const parsedEmbeddedImage = parsedImage as EmbeddedImageType
 
-      let imageService
+      let imageService: ImageServiceType | undefined
+      let majorVersion: MajorVersion | undefined
       if (Array.isArray(parsedEmbeddedImage.service)) {
-        imageService = parsedEmbeddedImage.service[0]
+        parsedEmbeddedImage.service.forEach((currentImageService) => {
+          try {
+            const currentMajorVersion =
+              getMajorIiifVersionFromImageService(currentImageService)
+            if (!majorVersion || currentMajorVersion > majorVersion) {
+              majorVersion = currentMajorVersion
+              imageService = currentImageService
+            }
+          } catch (err) {
+            // Ignore this error, throw error later if no valid image service is found
+          }
+        })
       } else {
         imageService = parsedEmbeddedImage.service
+      }
+
+      if (!imageService) {
+        throw new Error('Unsupported IIIF Image Service')
       }
 
       if ('@id' in imageService) {
