@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store'
+import { writable, derived } from 'svelte/store'
 
 import type { Map } from '@allmaps/annotation'
 

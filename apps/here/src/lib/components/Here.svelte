@@ -47,6 +47,7 @@
     setNewMap($map)
   }
 
+  // eslint-disable-next-line no-undef
   function updatePosition(position: GeolocationPosition) {
     if (position && transformer) {
       const feature = positionToGeoJson(position)

@@ -1,16 +1,19 @@
 <script lang="ts">
+  import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
+
   import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
-  import { parseAnnotation, type Map } from '@allmaps/annotation'
+  import { parseAnnotation } from '@allmaps/annotation'
 
   import { position } from '$lib/shared/stores/geolocation.js'
   import { maps } from '$lib/shared/stores/maps.js'
 
   import Thumbnail from '$lib/components/Thumbnail.svelte'
 
+  // eslint-disable-next-line no-undef
   async function handleGeolocation(position: GeolocationPosition) {
     const latLon = [position.coords.latitude, position.coords.longitude]
 
-    const url = `http://annotations.localhost:9584/maps?limit=25&intersects=${latLon.join(
+    const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=25&intersects=${latLon.join(
       ','
     )}`
 

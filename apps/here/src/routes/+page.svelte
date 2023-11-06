@@ -11,7 +11,6 @@
 
   import { Navigation } from '@allmaps/ui/kit'
 
-  import { position } from '$lib/shared/stores/geolocation.js'
   import { map } from '$lib/shared/stores/maps.js'
   import { imageInfo } from '$lib/shared/stores/image-info.js'
 

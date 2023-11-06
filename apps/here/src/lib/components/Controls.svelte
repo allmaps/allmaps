@@ -2,12 +2,7 @@
   import { onMount } from 'svelte'
   import { goto } from '$app/navigation'
 
-  import {
-    maps,
-    mapIndex,
-    previousMapId,
-    nextMapId
-  } from '$lib/shared/stores/maps.js'
+  import { maps, previousMapId, nextMapId } from '$lib/shared/stores/maps.js'
 
   const hasMaps = $maps.length > 0
 
