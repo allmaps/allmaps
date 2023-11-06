@@ -1,6 +1,5 @@
 import Layer from 'ol/layer/Layer.js'
 import {
-  TileCache,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
@@ -30,7 +29,6 @@ export class WarpedMapLayer extends Layer {
 
   warpedMapList: WarpedMapList
   renderer: WebGL2Renderer
-  tileCache: TileCache
 
   private resizeObserver: ResizeObserver
 
@@ -77,12 +75,7 @@ export class WarpedMapLayer extends Layer {
 
     this.warpedMapList = this.source.getWarpedMapList()
 
-    this.tileCache = new TileCache()
-    this.renderer = new WebGL2Renderer(
-      this.warpedMapList,
-      this.gl,
-      this.tileCache
-    )
+    this.renderer = new WebGL2Renderer(this.warpedMapList, this.gl)
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -92,6 +85,16 @@ export class WarpedMapLayer extends Layer {
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
       this.rendererImageInfoLoaded.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.TILELOADED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.ALLTILESLOADED,
+      this.changed.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -117,16 +120,6 @@ export class WarpedMapLayer extends Layer {
     this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
       this.warpedMapListCleared.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.TILELOADED,
-      this.changed.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.ALLTILESLOADED,
-      this.changed.bind(this)
     )
 
     for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
@@ -186,7 +179,6 @@ export class WarpedMapLayer extends Layer {
 
   private warpedMapListCleared() {
     this.renderer.clear()
-    this.tileCache.clear()
     this.changed()
   }
 
@@ -419,10 +411,10 @@ export class WarpedMapLayer extends Layer {
 
     // TODO: remove event listeners
     //  - this.viewport
-    //  - this.tileCache
+    //  - this.renderer.tileCache
     //  - this.warpedMapList
 
-    this.tileCache.clear()
+    this.renderer.tileCache.clear()
 
     super.disposeInternal()
   }

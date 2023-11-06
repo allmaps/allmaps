@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
 import {
-  TileCache,
   WarpedMap,
   WarpedMapList,
   Viewport,
@@ -567,19 +566,14 @@ export const WarpedMapLayer = L.Layer.extend({
 
     this.warpedMapList = new WarpedMapList(this.options.imageInfoCache)
 
-    this.tileCache = new TileCache()
-    this.renderer = new WebGL2Renderer(
-      this.warpedMapList,
-      this.gl,
-      this.tileCache
-    )
+    this.renderer = new WebGL2Renderer(this.warpedMapList, this.gl)
 
-    this.tileCache.addEventListener(
+    this.renderer.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
       this._update.bind(this)
     )
 
-    this.tileCache.addEventListener(
+    this.renderer.tileCache.addEventListener(
       WarpedMapEventType.ALLTILESLOADED,
       this._update.bind(this)
     )
@@ -635,10 +629,10 @@ export const WarpedMapLayer = L.Layer.extend({
 
     // TODO: remove event listeners
     //  - this.viewport
-    //  - this.tileCache
+    //  - this.renderer.tileCache
     //  - this.warpedMapList
 
-    this.tileCache.clear()
+    this.renderer.tileCache.clear()
   },
 
   _rendererChanged() {
@@ -699,7 +693,6 @@ export const WarpedMapLayer = L.Layer.extend({
 
   _warpedMapListCleared() {
     this.renderer.clear()
-    this.tileCache.clear()
   },
 
   _resize(entries: ResizeObserverEntry[]) {

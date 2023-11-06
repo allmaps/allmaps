@@ -62,7 +62,7 @@ const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
 const MIN_COMBINED_PIXEL_SIZE = 5
 
 export default class WebGL2Renderer extends EventTarget {
-  tileCache: TileCache
+  tileCache: TileCache = new TileCache()
 
   warpedMapList: WarpedMapList
   visibleWarpedMapIds: Set<string> = new Set()
@@ -91,11 +91,7 @@ export default class WebGL2Renderer extends EventTarget {
   throttledPrepareRender: DebouncedFunc<typeof this.prepareRender>
   debouncedRenderInternal: DebouncedFunc<typeof this.prepareRender>
 
-  constructor(
-    warpedMapList: WarpedMapList,
-    gl: WebGL2RenderingContext,
-    tileCache: TileCache
-  ) {
+  constructor(warpedMapList: WarpedMapList, gl: WebGL2RenderingContext) {
     super()
 
     this.warpedMapList = warpedMapList
@@ -112,8 +108,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.program = createProgram(gl, vertexShader, fragmentShader)
 
     gl.disable(gl.DEPTH_TEST)
-
-    this.tileCache = tileCache
 
     this.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
@@ -354,6 +348,7 @@ export default class WebGL2Renderer extends EventTarget {
     this.webGLWarpedMapsById = new Map()
     this.visibleWarpedMapIds = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
+    this.tileCache.clear()
   }
 
   updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {
@@ -801,7 +796,6 @@ export default class WebGL2Renderer extends EventTarget {
     if (tilesNeeded && tilesNeeded.length) {
       this.tileCache.setTiles(tilesNeeded)
     }
-    console.log('rendering')
   }
 
   render(): void {
