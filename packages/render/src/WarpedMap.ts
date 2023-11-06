@@ -69,7 +69,7 @@ export default class WarpedMap {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
-    this.setTransformationType()
+    this.updateTransformerProperties()
   }
 
   async completeImageInfo(): Promise<void> {
@@ -83,34 +83,37 @@ export default class WarpedMap {
 
   setResourceMask(resourceMask: Ring): void {
     this.resourceMask = resourceMask
+    this.updateGeoMask()
     this.updateProjectedGeoMask()
   }
 
-  setTransformationType(transformationType?: TransformationType): void {
-    this.makeTransformer(transformationType)
-    this.makeProjectedTransformer(transformationType)
+  setTransformationType(transformationType: TransformationType): void {
+    this.transformationType = transformationType
+    this.updateTransformerProperties()
+  }
+
+  setGcps(gcps: Gcp[]): void {
+    this.gcps = gcps
+    this.updateTransformerProperties()
+  }
+
+  private updateTransformerProperties(): void {
+    this.updateTransformer()
+    this.updateProjectedTransformer()
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
     this.updateProjectedFullGeoMask()
   }
 
-  private makeTransformer(transformationType?: TransformationType): void {
-    if (!transformationType) {
-      transformationType = this.transformationType
-    }
-    this.transformer = new GcpTransformer(this.gcps, transformationType)
+  private updateTransformer(): void {
+    this.transformer = new GcpTransformer(this.gcps, this.transformationType)
   }
 
-  private makeProjectedTransformer(
-    transformationType?: TransformationType
-  ): void {
-    if (!transformationType) {
-      transformationType = this.transformationType
-    }
+  private updateProjectedTransformer(): void {
     this.projectedTransformer = new GcpTransformer(
       this.projectedGcps,
-      transformationType
+      this.transformationType
     )
   }
 

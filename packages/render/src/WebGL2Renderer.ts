@@ -1,4 +1,4 @@
-import { throttle, debounce, type DebouncedFunc } from 'lodash-es'
+import { throttle, debounce } from 'lodash-es'
 
 import TileCache from './TileCache.js'
 import WarpedMap, { hasImageInfo } from './WarpedMap.js'
@@ -27,6 +27,8 @@ import {
   getBestZoomLevel,
   computeIiifTilesForPolygonAndZoomLevel
 } from './shared/tiles.js'
+
+import type { DebouncedFunc } from 'lodash-es'
 
 import type Viewport from './Viewport.js'
 
