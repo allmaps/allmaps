@@ -157,8 +157,8 @@ function getBestZoomLevelForMapScale(
   return bestZoomLevel
 }
 
-function scaleToTiles(zoomLevel: TileZoomLevel, points: Ring): Ring {
-  return points.map((point) => [
+function scaleRingToTileZoomLevel(ring: Ring, zoomLevel: TileZoomLevel): Ring {
+  return ring.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
@@ -221,33 +221,30 @@ function iiifTilesByXToArray(
 }
 
 // TODO: move to render
-export function getProjectedGeoBboxResourcePolygon(
-  projectedTransformer: GcpTransformer,
-  projectedGeoBbox: Bbox
+export function geoBboxToResourcePolygon(
+  transformer: GcpTransformer,
+  geoBbox: Bbox
 ) {
-  // projectedTransformer is the transformer built from the projected Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from projected geo coordinates to resource coordinates.
-  // projectedGeoBbox is a Bbox of the viewport in projected geo coordinates
-  // projectedGeoBboxResourcePolygon is a polygon of this Bbox, transformed backward to resource coordinates.
+  // transformer is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
+  // geoBbox is a Bbox of the viewport in (projected) geo coordinates
+  // geoBboxResourcePolygon is a polygon of this Bbox, transformed backward to resource coordinates.
   // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
-  const projectedGeoBboxPolygon = bboxToPolygon(projectedGeoBbox)
-  const projectedGeoBboxResourcePolygon =
-    projectedTransformer.transformBackward(projectedGeoBboxPolygon, {
-      maxOffsetRatio: 0.00001,
-      maxDepth: 2
-    }) as Polygon
+  const geoBboxPolygon = bboxToPolygon(geoBbox)
+  const geoBboxResourcePolygon = transformer.transformBackward(geoBboxPolygon, {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 2
+  }) as Polygon
 
-  return projectedGeoBboxResourcePolygon
+  return geoBboxResourcePolygon
 }
 
-// TODO: move to render
 export function getBestZoomLevel(
   image: Image,
   viewportSize: Size,
-  projectedResourcePolygon: Polygon
+  resourcePolygon: Polygon
 ): TileZoomLevel {
-  // TODO: apply 'projected' in names
-  const resourceBbox = computeBbox(projectedResourcePolygon)
+  const resourceBbox = computeBbox(resourcePolygon)
 
   const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
   const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
@@ -259,25 +256,27 @@ export function getBestZoomLevel(
   return getBestZoomLevelForMapScale(image, mapScale)
 }
 
-// TODO: move to render
 export function computeIiifTilesForPolygonAndZoomLevel(
   image: Image,
-  projectedResourcePolygon: Polygon,
-  zoomLevel: TileZoomLevel
+  viewportResourcePolygon: Polygon,
+  tileZoomLevel: TileZoomLevel
 ): Tile[] {
   // TODO: apply 'projected' in names
-  const tilePixelExtent = scaleToTiles(zoomLevel, projectedResourcePolygon[0])
+  const scaledViewportTesourcePolygon = scaleRingToTileZoomLevel(
+    viewportResourcePolygon[0],
+    tileZoomLevel
+  )
 
-  const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
+  const iiifTilesByX = findNeededIiifTilesByX(scaledViewportTesourcePolygon)
   const iiifTiles = iiifTilesByXToArray(
-    zoomLevel,
+    tileZoomLevel,
     [image.width, image.height],
     iiifTilesByX
   )
 
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
-  const resourceBbox = computeBbox(projectedResourcePolygon)
+  const resourceBbox = computeBbox(viewportResourcePolygon)
   const resourceCenter: Point = [
     (resourceBbox[0] + resourceBbox[2]) / 2,
     (resourceBbox[1] + resourceBbox[3]) / 2
