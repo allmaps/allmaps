@@ -5,7 +5,7 @@ import {
   type Map as Georef
 } from '@allmaps/annotation'
 
-import RTree from './RTree.js'
+import GeojsonPolygonRTree from './RTree.js'
 import WarpedMap from './WarpedMap.js'
 
 import { combineBboxes } from '@allmaps/stdlib'
@@ -22,7 +22,7 @@ export default class WarpedMapList extends EventTarget {
   warpedMapsById: Map<string, WarpedMap> = new Map()
 
   zIndices: Map<string, number> = new Map()
-  rtree?: RTree
+  rtree?: GeojsonPolygonRTree
   imageInfoCache?: Cache
 
   constructor(imageInfoCache?: Cache, options?: WarpedMapListOptions) {
@@ -32,7 +32,7 @@ export default class WarpedMapList extends EventTarget {
     this.imageInfoCache = imageInfoCache
 
     if (options.createRTree) {
-      this.rtree = new RTree()
+      this.rtree = new GeojsonPolygonRTree()
     }
   }
 
@@ -100,7 +100,7 @@ export default class WarpedMapList extends EventTarget {
     // Do this only if transparancy of upper map is 0
 
     if (this.rtree) {
-      return this.rtree.searchBbox(geoBbox)
+      return this.rtree.searchFromBbox(geoBbox)
     } else {
       return Array.from(this.warpedMapsById.keys())
     }

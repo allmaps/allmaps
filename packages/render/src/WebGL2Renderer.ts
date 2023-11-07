@@ -268,6 +268,9 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
+    if ([...possibleMapsOutOfViewport].length) {
+      console.log('woooww!!!!!!!!!!!!!')
+    }
     console.log('residual possibleMapsOutOfViewport', possibleMapsOutOfViewport)
     for (const mapId of possibleMapsOutOfViewport) {
       if (this.mapsInViewport.has(mapId)) {

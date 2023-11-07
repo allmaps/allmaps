@@ -1,8 +1,9 @@
 // TODO: consider using
 // https://github.com/mourner/flatbush
 import RBush from 'rbush'
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 
-import { pointInRing, computeBbox } from '@allmaps/stdlib'
+import { computeBbox } from '@allmaps/stdlib'
 
 import type { Bbox, Point, GeojsonPolygon } from '@allmaps/types'
 
@@ -16,7 +17,7 @@ type RTreeItem = {
   id: string
 }
 
-export default class RTree {
+export default class GeojsonPolygonRTree {
   rbush: RBush<RTreeItem> = new RBush()
 
   polygonsById: Map<string, GeojsonPolygon> = new Map()
@@ -81,12 +82,12 @@ export default class RTree {
     return this.polygonsById.get(id)
   }
 
-  searchBbox(geoBbox: Bbox): string[] {
-    const [minX, minY, maxX, maxY] = geoBbox
+  searchFromBbox(bbox: Bbox): string[] {
+    const [minX, minY, maxX, maxY] = bbox
     return this.search(minX, minY, maxX, maxY).map((item) => item.id)
   }
 
-  searchPoint(
+  searchFromPoint(
     point: Point,
     filterInsidePolygon = DEFAULT_FILTER_INSIDE_POLYGON
   ): string[] {
@@ -100,7 +101,7 @@ export default class RTree {
           const polygon = this.polygonsById.get(item.id)
 
           if (polygon) {
-            return pointInRing(point, polygon.coordinates[0])
+            return booleanPointInPolygon(point, polygon)
           } else {
             return false
           }

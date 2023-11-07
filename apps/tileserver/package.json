@@ -39,6 +39,7 @@
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "robust-point-in-polygon": "^1.0.3",
     "eslint": "^8.35.0",
     "itty-router": "^2.6.1",
     "jpeg-js": "^0.4.3",

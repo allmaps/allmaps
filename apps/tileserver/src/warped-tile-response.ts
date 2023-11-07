@@ -8,7 +8,7 @@ import {
   getBestZoomLevel,
   computeIiifTilesForPolygonAndZoomLevel
 } from '@allmaps/render'
-import { pointInRing } from './geo.js'
+import classifyPoint from 'robust-point-in-polygon'
 
 import { cachedFetch } from './fetch.js'
 import { xyzTileToGeoBbox, tileToLongitude, tileToLatitude } from './geo.js'
@@ -133,10 +133,13 @@ export async function createWarpedTileResponse(
 
         // Check if pixel inside resource mask
         // TODO: improve efficiency
-        // TODO: fix strange repeating error,
-        //    remove pointInPolygon check and fix first
-        const inside = pointInRing([pixelX, pixelY], resourceMask)
-        if (!inside) {
+
+        // classifyPoint: Returns An integer which determines the position of point relative to polygon. This has the following interpretation:
+        // -1 if point is contained inside loop
+        // 0 if point is on the boundary of loop
+        // 1 if point is outside loop
+        // TODO: check if =0 is ok to
+        if (classifyPoint(resourceMask, [pixelX, pixelY]) == 1) {
           continue
         }
 
