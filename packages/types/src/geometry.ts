@@ -2,6 +2,8 @@ export type Point = [number, number]
 
 export type Line = [Point, Point]
 
+export type Rectangle = [Point, Point, Point, Point]
+
 // Note:
 // - At least 2 points
 // - No duplicate points

@@ -162,10 +162,6 @@ export default class WebGL2Renderer extends EventTarget {
 
     let possibleMapsInViewport: Iterable<string> = []
     const possibleMapsOutOfViewport = new Set(this.mapsInViewport)
-    console.log(
-      'setting possibleMapsOutOfViewport as copy of mapsInViewport',
-      possibleMapsOutOfViewport
-    )
 
     // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
     possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
@@ -252,7 +248,6 @@ export default class WebGL2Renderer extends EventTarget {
           )
         }
 
-        console.log('deleting', mapId)
         possibleMapsOutOfViewport.delete(mapId)
 
         for (const tile of tiles) {
@@ -262,10 +257,6 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     // TODO: can this ever contain something?
-    if ([...possibleMapsOutOfViewport].length) {
-      console.log('woooww!!!!!!!!!!!!!')
-    }
-    console.log('residual possibleMapsOutOfViewport', possibleMapsOutOfViewport)
     for (const mapId of possibleMapsOutOfViewport) {
       if (this.mapsInViewport.has(mapId)) {
         this.mapsInViewport.delete(mapId)

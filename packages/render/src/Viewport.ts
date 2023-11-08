@@ -1,5 +1,7 @@
-import type { Point, Size, Bbox, Transform } from '@allmaps/types'
 import { composeTransform } from './shared/matrix.js'
+import { computeBbox } from '@allmaps/stdlib'
+
+import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
 
 /**
  * The viewport describes the view on the rendered map.
@@ -7,20 +9,22 @@ import { composeTransform } from './shared/matrix.js'
  * @class Viewport
  * @typedef {Viewport}
  * @extends {EventTarget}
- * @property {Bbox} projectedGeoBbox - Bbox displayed in the viewport, in projected geo coordinates.
- * @property {Point} projectedGeoCenter - Center of of bbox displayed in the viewport point, in projected coordinates
- * @property {Size} size - Size as [width, height] of the viewport in pixels of the viewport.
- * @property {number} resolution - Resolution of the viewport, in projection units per pixel
+ * @property {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
+ * @property {Point} projectedGeoRotatedRectangle - Rotated rectangle of the viewport point, in projected coordinates.
+ * @property {Bbox} projectedGeoBbox - Bbox of the rotated rectangle of the viewport, in projected geo coordinates.
+ * @property {Size} pixelSize - Size of the viewport in pixels, as [width, height].
  * @property {number} rotation - Rotation of the viewport with respect to the project coordinate system.
- * @property {number} devicePixelRatio - The devicePixelRatio of the viewport
- * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (pixels*devicePixelRatio).
+ * @property {number} resolution - Resolution of the viewport, in projection coordinates per pixel.
+ * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
+ * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (pixelSize*devicePixelRatio), as [width, height].
  * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to pixels. Equivalent to OpenLayer coordinateToPixelTransform.
  * @property {Transform} projectionTransform - Transform from projected geo coordinates to view coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
  */
 export default class Viewport extends EventTarget {
-  projectedGeoBbox: Bbox
   projectedGeoCenter: Point
-  size: Size
+  projectedGeoRotatedRectangle: Rectangle
+  projectedGeoBbox: Bbox
+  pixelSize: Size
   resolution: number
   rotation: number
   devicePixelRatio: number
@@ -32,38 +36,39 @@ export default class Viewport extends EventTarget {
    * Creates an instance of Viewport.
    *
    * @constructor
-   * @param {Bbox} projectedGeoBbox - Bbox displayed in the viewport, in projected geo coordinates.
-   * @param {Size} size - Size of the viewport in pixels, as [width, height].
+   * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
+   * @param {Size} pixelSize - Size of the viewport in pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
+   * @param {number} resolution - Resolution of the viewport, in projection coordinates per pixel.
    * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
    */
   constructor(
-    projectedGeoBbox: Bbox,
-    size: Size,
+    projectedGeoCenter: Point,
+    pixelSize: Size,
     rotation: number,
-    devicePixelRatio: number
+    resolution: number,
+    devicePixelRatio = 1
   ) {
     super()
     // TODO: should this still extend EventTartget and hence include super()?
 
-    this.projectedGeoBbox = projectedGeoBbox
-    this.size = size
+    this.projectedGeoCenter = projectedGeoCenter
+    this.resolution = resolution
     this.rotation = rotation
+    this.pixelSize = pixelSize
     this.devicePixelRatio = devicePixelRatio
 
-    this.projectedGeoCenter = [
-      (this.projectedGeoBbox[0] + this.projectedGeoBbox[2]) / 2,
-      (this.projectedGeoBbox[1] + this.projectedGeoBbox[3]) / 2
-    ] as [number, number]
-    const xResolution =
-      (this.projectedGeoBbox[2] - this.projectedGeoBbox[0]) / this.size[0]
-    const yResolution =
-      (this.projectedGeoBbox[3] - this.projectedGeoBbox[1]) / this.size[1]
-    this.resolution = Math.max(xResolution, yResolution)
+    this.projectedGeoRotatedRectangle = this.getProjectedGeoRotatedRectangle(
+      this.projectedGeoCenter,
+      this.resolution,
+      this.rotation,
+      this.pixelSize
+    )
+    this.projectedGeoBbox = computeBbox(this.projectedGeoRotatedRectangle)
 
     this.canvasSize = [
-      this.size[0] * this.devicePixelRatio,
-      this.size[1] * this.devicePixelRatio
+      this.pixelSize[0] * this.devicePixelRatio,
+      this.pixelSize[1] * this.devicePixelRatio
     ]
 
     this.setCoordinateToPixelTransform()
@@ -72,8 +77,8 @@ export default class Viewport extends EventTarget {
 
   private setCoordinateToPixelTransform(): void {
     this.coordinateToPixelTransform = composeTransform(
-      this.size[0] / 2,
-      this.size[1] / 2,
+      this.pixelSize[0] / 2,
+      this.pixelSize[1] / 2,
       1 / this.resolution,
       -1 / this.resolution,
       -this.rotation,
@@ -86,11 +91,35 @@ export default class Viewport extends EventTarget {
     this.projectionTransform = composeTransform(
       0,
       0,
-      2 / (this.resolution * this.size[0]),
-      2 / (this.resolution * this.size[1]),
+      2 / (this.resolution * this.pixelSize[0]),
+      2 / (this.resolution * this.pixelSize[1]),
       -this.rotation,
       -this.projectedGeoCenter[0],
       -this.projectedGeoCenter[1]
     )
+  }
+
+  private getProjectedGeoRotatedRectangle(
+    center: Point,
+    resolution: number,
+    rotation: number,
+    pixelSize: Size
+  ): Rectangle {
+    const dx = (resolution * pixelSize[0]) / 2
+    const dy = (resolution * pixelSize[1]) / 2
+    const cosRotation = Math.cos(rotation)
+    const sinRotation = Math.sin(rotation)
+    const xCos = dx * cosRotation
+    const xSin = dx * sinRotation
+    const yCos = dy * cosRotation
+    const ySin = dy * sinRotation
+    const x = center[0]
+    const y = center[1]
+    return [
+      [x - xCos + ySin, y - xSin - yCos],
+      [x - xCos - ySin, y - xSin + yCos],
+      [x + xCos - ySin, y + xSin + yCos],
+      [x + xCos + ySin, y + xSin - yCos]
+    ]
   }
 }

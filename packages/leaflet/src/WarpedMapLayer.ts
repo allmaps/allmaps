@@ -762,25 +762,48 @@ export const WarpedMapLayer = L.Layer.extend({
 
     this.renderer.setOpacity(this.getOpacity())
 
-    const geoBbox = this._map.getBounds()
-    const projectedNorthEast = this._map.options.crs.project(
-      geoBbox.getNorthEast()
+    // Prepare Viewport input
+    const geoCenterAsPoint = this._map.getCenter()
+    const projectedGeoCenterAsPoint =
+      this._map.options.crs.project(geoCenterAsPoint)
+    const projectedGeoCenter = [
+      projectedGeoCenterAsPoint.x,
+      projectedGeoCenterAsPoint.y
+    ] as [number, number]
+
+    const pixelSizeAsPoint = this._map.getSize()
+    const pixelSize = [pixelSizeAsPoint.x, pixelSizeAsPoint.y] as [
+      number,
+      number
+    ]
+
+    const geoBboxAsLatLngBounds = this._map.getBounds()
+    const projectedNorthEastAsPoint = this._map.options.crs.project(
+      geoBboxAsLatLngBounds.getNorthEast()
     )
-    const projectedSouthWest = this._map.options.crs.project(
-      geoBbox.getSouthWest()
+    const projectedSouthWestAsPoint = this._map.options.crs.project(
+      geoBboxAsLatLngBounds.getSouthWest()
     )
     const projectedGeoBbox = [
-      projectedSouthWest.x,
-      projectedSouthWest.y,
-      projectedNorthEast.x,
-      projectedNorthEast.y
+      projectedSouthWestAsPoint.x,
+      projectedSouthWestAsPoint.y,
+      projectedNorthEastAsPoint.x,
+      projectedNorthEastAsPoint.y
     ] as [number, number, number, number]
-
-    const mapSize = this._map.getSize()
-    const size = [mapSize.x, mapSize.y] as [number, number]
+    const xResolution =
+      (projectedGeoBbox[2] - projectedGeoBbox[0]) / pixelSize[0]
+    const yResolution =
+      (projectedGeoBbox[3] - projectedGeoBbox[1]) / pixelSize[1]
+    const resolution = Math.max(xResolution, yResolution)
 
     this.renderer.setViewport(
-      new Viewport(projectedGeoBbox, size, 0, window.devicePixelRatio)
+      new Viewport(
+        projectedGeoCenter,
+        pixelSize,
+        0,
+        resolution,
+        window.devicePixelRatio
+      )
     )
     this.renderer.render()
 

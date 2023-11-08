@@ -433,9 +433,10 @@ export class WarpedMapLayer extends Layer {
 
     this.renderer.setViewport(
       new Viewport(
-        frameState.extent as [number, number, number, number],
+        frameState.viewState.center as [number, number],
         frameState.size as [number, number],
         frameState.viewState.rotation,
+        frameState.viewState.resolution,
         window.devicePixelRatio
       )
     )
