@@ -3,8 +3,8 @@ import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
 import {
-  getMidPoit,
-  getDistance,
+  midPoit,
+  distance,
   conformLineString,
   conformRing
 } from '@allmaps/stdlib'
@@ -248,7 +248,7 @@ function addMidpointWithDestinationMidPointFromTransform(
   const sourceMidPointFunction = options.sourceIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : getMidPoit
+    : midPoit
   const sourceMidPoint = sourceMidPointFunction(
     segment.from.source,
     segment.to.source
@@ -257,7 +257,7 @@ function addMidpointWithDestinationMidPointFromTransform(
   const destinationMidPointFunction = options.destinationIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : getMidPoit
+    : midPoit
   const destinationMidPoint = destinationMidPointFunction(
     segment.from.destination,
     segment.to.destination
@@ -267,7 +267,7 @@ function addMidpointWithDestinationMidPointFromTransform(
 
   const destinationDistanceFunction = options.destinationIsGeographic
     ? getWorldDistance
-    : getDistance
+    : distance
   const segmentDestinationDistance = destinationDistanceFunction(
     segment.from.destination,
     segment.to.destination
@@ -318,7 +318,7 @@ function addMidpointWithSourceMidPointFromTransform(
   const destinationMidPointFunction = options.destinationIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : getMidPoit
+    : midPoit
   const destinationMidPoint = destinationMidPointFunction(
     segment.from.destination,
     segment.to.destination
@@ -327,7 +327,7 @@ function addMidpointWithSourceMidPointFromTransform(
   const sourceMidPointFunction = options.sourceIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : getMidPoit
+    : midPoit
   const sourceMidPoint = sourceMidPointFunction(
     segment.from.source,
     segment.to.source
@@ -338,7 +338,7 @@ function addMidpointWithSourceMidPointFromTransform(
 
   const sourceDistanceFunction = options.sourceIsGeographic
     ? getWorldDistance
-    : getDistance
+    : distance
   const segmentSourceDistance = sourceDistanceFunction(
     segment.from.source,
     segment.to.source

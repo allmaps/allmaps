@@ -1,5 +1,6 @@
 import { Image } from '@allmaps/iiif-parser'
-import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
+import { computeBbox, bboxToPolygon, distance } from '@allmaps/stdlib'
+import { WarpedMapWithImageInfo } from '../WarpedMap'
 
 import type {
   Point,
@@ -8,41 +9,36 @@ import type {
   Polygon,
   Bbox,
   Size,
-  XYZTile,
   Tile,
+  TileZoomLevel,
+  NeededTile,
   PointByX
 } from '@allmaps/types'
 import type { GcpTransformer } from '@allmaps/transform'
-import type { TileZoomLevel } from '@allmaps/types'
 
-function distanceFromPoint(tile: Tile, point: Point) {
-  const center = tileCenter(tile)
-
-  const dx = center[0] - point[0]
-  const dy = center[1] - point[1]
-
-  return Math.sqrt(dx ** 2 + dy ** 2)
+function distanceTilePoint(tile: Tile, point: Point): number {
+  return distance(tileCenter(tile), point)
 }
 
-export function imageCoordinatesToTileCoordinates(
+export function resourcePointToTilePoint(
   tile: Tile,
-  imageCoordinates: Point,
+  resourcePoint: Point,
   clip = true
 ): Point | undefined {
   const tileXMin = tile.column * tile.zoomLevel.originalWidth
   const tileYMin = tile.row * tile.zoomLevel.originalHeight
 
-  const tileX = (imageCoordinates[0] - tileXMin) / tile.zoomLevel.scaleFactor
-  const tileY = (imageCoordinates[1] - tileYMin) / tile.zoomLevel.scaleFactor
+  const tileX = (resourcePoint[0] - tileXMin) / tile.zoomLevel.scaleFactor
+  const tileY = (resourcePoint[1] - tileYMin) / tile.zoomLevel.scaleFactor
 
   if (
     !clip ||
-    (imageCoordinates[0] >= tileXMin &&
-      imageCoordinates[0] <= tileXMin + tile.zoomLevel.originalWidth &&
-      imageCoordinates[1] >= tileYMin &&
-      imageCoordinates[1] <= tileYMin + tile.zoomLevel.originalHeight &&
-      imageCoordinates[0] <= tile.imageSize[0] &&
-      imageCoordinates[1] <= tile.imageSize[1])
+    (resourcePoint[0] >= tileXMin &&
+      resourcePoint[0] <= tileXMin + tile.zoomLevel.originalWidth &&
+      resourcePoint[1] >= tileYMin &&
+      resourcePoint[1] <= tileYMin + tile.zoomLevel.originalHeight &&
+      resourcePoint[0] <= tile.imageSize[0] &&
+      resourcePoint[1] <= tile.imageSize[1])
   ) {
     return [tileX, tileY]
   }
@@ -157,14 +153,17 @@ function getBestZoomLevelForMapScale(
   return bestZoomLevel
 }
 
-function scaleRingToTileZoomLevel(ring: Ring, zoomLevel: TileZoomLevel): Ring {
-  return ring.map((point) => [
+function scalePointsToTileZoomLevel(
+  points: Point[],
+  zoomLevel: TileZoomLevel
+): Point[] {
+  return points.map((point) => [
     point[0] / zoomLevel.originalWidth,
     point[1] / zoomLevel.originalHeight
   ])
 }
 
-function findNeededIiifTilesByX(tilePixelExtent: Ring) {
+function findNeededTilesByX(tilePixelExtent: Ring) {
   const tiles: PointByX = {}
   for (let i = 0; i < tilePixelExtent.length; i++) {
     const line: Line = [
@@ -191,24 +190,24 @@ function findNeededIiifTilesByX(tilePixelExtent: Ring) {
   return tiles
 }
 
-function iiifTilesByXToArray(
+function tilesByXToArray(
   zoomLevel: TileZoomLevel,
   imageSize: Size,
-  iiifTilesByX: PointByX
+  tilesByX: PointByX
 ): Tile[] {
-  const neededIiifTiles: Tile[] = []
-  for (const xKey in iiifTilesByX) {
+  const neededTiles: Tile[] = []
+  for (const xKey in tilesByX) {
     const x = parseInt(xKey)
 
     if (x < 0 || x >= zoomLevel.columns) {
       break
     }
 
-    const fromY = Math.max(iiifTilesByX[x][0], 0)
-    const toY = Math.min(iiifTilesByX[x][1], zoomLevel.rows - 1)
+    const fromY = Math.max(tilesByX[x][0], 0)
+    const toY = Math.min(tilesByX[x][1], zoomLevel.rows - 1)
 
     for (let y = fromY; y <= toY; y++) {
-      neededIiifTiles.push({
+      neededTiles.push({
         column: x,
         row: y,
         zoomLevel,
@@ -217,7 +216,7 @@ function iiifTilesByXToArray(
     }
   }
 
-  return neededIiifTiles
+  return neededTiles
 }
 
 // TODO: move to render
@@ -241,7 +240,7 @@ export function geoBboxToResourcePolygon(
 
 export function getBestZoomLevel(
   image: Image,
-  viewportSize: Size,
+  size: Size,
   resourcePolygon: Polygon
 ): TileZoomLevel {
   const resourceBbox = computeBbox(resourcePolygon)
@@ -249,70 +248,62 @@ export function getBestZoomLevel(
   const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
   const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
 
-  const mapScaleX = resourceBboxWidth / viewportSize[0]
-  const mapScaleY = resourceBboxHeight / viewportSize[1]
+  const mapScaleX = resourceBboxWidth / size[0]
+  const mapScaleY = resourceBboxHeight / size[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
   return getBestZoomLevelForMapScale(image, mapScale)
 }
 
-export function computeIiifTilesForPolygonAndZoomLevel(
+export function computeTilesForPolygonAndZoomLevel(
   image: Image,
-  viewportResourcePolygon: Polygon,
+  resourcePolygon: Polygon,
   tileZoomLevel: TileZoomLevel
 ): Tile[] {
-  // TODO: apply 'projected' in names
-  const scaledViewportTesourcePolygon = scaleRingToTileZoomLevel(
-    viewportResourcePolygon[0],
+  const scaledViewportTesourcePolygon = scalePointsToTileZoomLevel(
+    resourcePolygon[0],
     tileZoomLevel
   )
 
-  const iiifTilesByX = findNeededIiifTilesByX(scaledViewportTesourcePolygon)
-  const iiifTiles = iiifTilesByXToArray(
+  const tilesByX = findNeededTilesByX(scaledViewportTesourcePolygon)
+  const tiles = tilesByXToArray(
     tileZoomLevel,
     [image.width, image.height],
-    iiifTilesByX
+    tilesByX
   )
 
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
-  const resourceBbox = computeBbox(viewportResourcePolygon)
+  const resourceBbox = computeBbox(resourcePolygon)
   const resourceCenter: Point = [
     (resourceBbox[0] + resourceBbox[2]) / 2,
     (resourceBbox[1] + resourceBbox[3]) / 2
   ]
 
-  iiifTiles.sort(
+  tiles.sort(
     (tileA, tileB) =>
-      distanceFromPoint(tileA, resourceCenter) -
-      distanceFromPoint(tileB, resourceCenter)
+      distanceTilePoint(tileA, resourceCenter) -
+      distanceTilePoint(tileB, resourceCenter)
   )
 
-  return iiifTiles
+  return tiles
 }
 
-export function xyzTileToLonLatBbox({ z, x, y }: XYZTile): Bbox {
-  const topLeft = xyzTileTopLeft({ z, x, y })
-  const bottomRight = xyzTileBottomRight({ z, x, y })
-
-  return [topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]]
-}
-
-function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
-  return [tileToLng({ x, z }), tileToLat({ y, z })]
-}
-
-function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
-  return [tileToLng({ x: x + 1, z }), tileToLat({ y: y + 1, z })]
-}
-
-// From:
-//   https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-function tileToLng({ x, z }: { x: number; z: number }): number {
-  return (x / Math.pow(2, z)) * 360 - 180
-}
-
-function tileToLat({ y, z }: { y: number; z: number }): number {
-  const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
-  return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
+export function makeNeededTile(
+  tile: Tile,
+  warpedMap: WarpedMapWithImageInfo
+): NeededTile {
+  const mapId = warpedMap.mapId
+  const imageRequest = warpedMap.parsedImage.getIiifTile(
+    tile.zoomLevel,
+    tile.column,
+    tile.row
+  )
+  const url = warpedMap.parsedImage.getImageUrl(imageRequest)
+  return {
+    mapId,
+    tile,
+    imageRequest,
+    url
+  }
 }

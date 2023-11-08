@@ -6,12 +6,12 @@ import { GcpTransformer } from '@allmaps/transform'
 import {
   geoBboxToResourcePolygon,
   getBestZoomLevel,
-  computeIiifTilesForPolygonAndZoomLevel
+  computeTilesForPolygonAndZoomLevel
 } from '@allmaps/render'
 import classifyPoint from 'robust-point-in-polygon'
 
 import { cachedFetch } from './fetch.js'
-import { xyzTileToGeoBbox, tileToLongitude, tileToLatitude } from './geo.js'
+import { xyzTileToGeoBbox, tileToLng, tileToLat } from './geo.js'
 
 import type { Point, XYZTile, Tile } from '@allmaps/types'
 import type { Map } from '@allmaps/annotation'
@@ -61,20 +61,17 @@ export async function createWarpedTileResponse(
     )
 
     // Compute necessary IIIF tiles
-    const geoBboxResourcePolygon = geoBboxToResourcePolygon(
-      transformer,
-      geoBbox
-    )
+    const resourcePolygon = geoBboxToResourcePolygon(transformer, geoBbox)
 
     const zoomLevel = getBestZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      geoBboxResourcePolygon
+      resourcePolygon
     )
 
-    const iiifTiles = computeIiifTilesForPolygonAndZoomLevel(
+    const iiifTiles = computeTilesForPolygonAndZoomLevel(
       parsedImage,
-      geoBboxResourcePolygon,
+      resourcePolygon,
       zoomLevel
     )
 
@@ -124,8 +121,8 @@ export async function createWarpedTileResponse(
         // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles, in two steps
         // 1) Detemine lonlat of warped tile pixel location
         const warpedTilePixelGeo: Point = [
-          tileToLongitude({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
-          tileToLatitude({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
+          tileToLng({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
+          tileToLat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
         const [pixelX, pixelY] =

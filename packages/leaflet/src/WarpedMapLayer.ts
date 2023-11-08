@@ -776,11 +776,11 @@ export const WarpedMapLayer = L.Layer.extend({
       projectedNorthEast.y
     ] as [number, number, number, number]
 
-    const size = this._map.getSize()
-    const viewportSize = [size.x, size.y] as [number, number]
+    const mapSize = this._map.getSize()
+    const size = [mapSize.x, mapSize.y] as [number, number]
 
     this.renderer.setViewport(
-      new Viewport(projectedGeoBbox, viewportSize, 0, window.devicePixelRatio)
+      new Viewport(projectedGeoBbox, size, 0, window.devicePixelRatio)
     )
     this.renderer.render()
 

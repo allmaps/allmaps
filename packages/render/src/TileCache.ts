@@ -9,7 +9,7 @@ import type { NeededTile } from '@allmaps/types'
 
 export default class TileCache extends EventTarget {
   // keep geo extent and scale factor for each CachedTile
-  protected cachedTilesByUrl: Map<string, CachedTile> = new Map()
+  protected cachedTilesByTileUrl: Map<string, CachedTile> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
@@ -24,7 +24,7 @@ export default class TileCache extends EventTarget {
     const mapId = neededTile.mapId
     const tileUrl = neededTile.url
 
-    const cachedTile = this.cachedTilesByUrl.get(tileUrl)
+    const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)
 
     if (!cachedTile) {
       const cachedTile = new CachedTile(neededTile)
@@ -42,7 +42,7 @@ export default class TileCache extends EventTarget {
 
       cachedTile.fetch()
 
-      this.cachedTilesByUrl.set(tileUrl, cachedTile)
+      this.cachedTilesByTileUrl.set(tileUrl, cachedTile)
     } else {
       this.addTileUrlForMapId(mapId, tileUrl)
       this.dispatchEvent(
@@ -57,7 +57,7 @@ export default class TileCache extends EventTarget {
   }
 
   private removeTile(mapId: string, tileUrl: string) {
-    const cachedTile = this.cachedTilesByUrl.get(tileUrl)
+    const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)
 
     if (!cachedTile) {
       return
@@ -73,7 +73,7 @@ export default class TileCache extends EventTarget {
         this.updateTilesLoadingCount(-1)
       }
 
-      this.cachedTilesByUrl.delete(tileUrl)
+      this.cachedTilesByTileUrl.delete(tileUrl)
     }
 
     this.dispatchEvent(
@@ -120,8 +120,8 @@ export default class TileCache extends EventTarget {
     if (event instanceof WarpedMapEvent) {
       const { tileUrl } = event.data as WarpedMapTileEventDetail
 
-      if (!this.cachedTilesByUrl.has(tileUrl)) {
-        this.cachedTilesByUrl.delete(tileUrl)
+      if (!this.cachedTilesByTileUrl.has(tileUrl)) {
+        this.cachedTilesByTileUrl.delete(tileUrl)
         this.updateTilesLoadingCount(-1)
       }
     }
@@ -191,6 +191,7 @@ export default class TileCache extends EventTarget {
     }
   }
 
+  // TODO: why this instead of creating neededTileMapIdsUrls as a map?
   private createKey(mapId: string, tileUrl: string) {
     return `${mapId}:${tileUrl}`
   }
@@ -217,18 +218,22 @@ export default class TileCache extends EventTarget {
   }
 
   clear() {
-    this.cachedTilesByUrl = new Map()
+    this.cachedTilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.tilesLoadingCount = 0
   }
 
+  getCachedTiles() {
+    return this.cachedTilesByTileUrl.values()
+  }
+
   getCachedTileUrls() {
-    return this.cachedTilesByUrl.keys()
+    return this.cachedTilesByTileUrl.keys()
   }
 
   getCachedTile(tileUrl: string) {
-    return this.cachedTilesByUrl.get(tileUrl)
+    return this.cachedTilesByTileUrl.get(tileUrl)
   }
 
   private updateTilesLoadingCount(delta: number) {

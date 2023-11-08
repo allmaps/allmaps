@@ -20,7 +20,8 @@ import {
 import {
   geoBboxToResourcePolygon,
   getBestZoomLevel,
-  computeIiifTilesForPolygonAndZoomLevel
+  computeTilesForPolygonAndZoomLevel,
+  makeNeededTile
 } from './shared/tiles.js'
 import { createShader, createProgram } from './shared/webgl2.js'
 
@@ -66,9 +67,6 @@ export default class WebGL2Renderer extends EventTarget {
 
   warpedMapList: WarpedMapList
 
-  mapsInViewport: Set<string> = new Set()
-  bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
-
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
@@ -81,6 +79,9 @@ export default class WebGL2Renderer extends EventTarget {
   invertedRenderTransform: Transform
 
   viewport: Viewport | undefined
+
+  mapsInViewport: Set<string> = new Set()
+  bestZoomLevelByMapIdAtViewport: Map<string, TileZoomLevel> = new Map()
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
@@ -154,14 +155,17 @@ export default class WebGL2Renderer extends EventTarget {
     })
   }
 
-  getTilesNeeded(): NeededTile[] {
+  getNeededTiles(): NeededTile[] {
     if (!this.viewport) {
       return []
     }
 
     let possibleMapsInViewport: Iterable<string> = []
     const possibleMapsOutOfViewport = new Set(this.mapsInViewport)
-    console.log('setting possibleMapsOutOfViewport', possibleMapsOutOfViewport)
+    console.log(
+      'setting possibleMapsOutOfViewport as copy of mapsInViewport',
+      possibleMapsOutOfViewport
+    )
 
     // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
     possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
@@ -183,6 +187,7 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      // TODO: put this in a cleaner function
       // Don't show maps when they're too small
       const projectedGeoTopLeft: Point = [
         warpedMap.projectedGeoMaskBbox[0],
@@ -229,10 +234,10 @@ export default class WebGL2Renderer extends EventTarget {
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
       // or not visible anymore
-      this.bestZoomLevelByMapId.set(mapId, zoomLevel)
+      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
       // TODO: rename function
-      const tiles = computeIiifTilesForPolygonAndZoomLevel(
+      const tiles = computeTilesForPolygonAndZoomLevel(
         warpedMap.parsedImage,
         viewportResourcePolygon,
         zoomLevel
@@ -251,23 +256,12 @@ export default class WebGL2Renderer extends EventTarget {
         possibleMapsOutOfViewport.delete(mapId)
 
         for (const tile of tiles) {
-          const imageRequest = warpedMap.parsedImage.getIiifTile(
-            tile.zoomLevel,
-            tile.column,
-            tile.row
-          )
-          const url = warpedMap.parsedImage.getImageUrl(imageRequest)
-
-          neededTiles.push({
-            mapId,
-            tile,
-            imageRequest,
-            url
-          })
+          neededTiles.push(makeNeededTile(tile, warpedMap))
         }
       }
     }
 
+    // TODO: can this ever contain something?
     if ([...possibleMapsOutOfViewport].length) {
       console.log('woooww!!!!!!!!!!!!!')
     }
@@ -723,7 +717,7 @@ export default class WebGL2Renderer extends EventTarget {
         'u_bestScaleFactor'
       )
       // TODO: make proper getter for bestScaleFactor for mapId
-      const bestZoomLevel = this.bestZoomLevelByMapId.get(mapId)
+      const bestZoomLevel = this.bestZoomLevelByMapIdAtViewport.get(mapId)
       const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
@@ -803,10 +797,10 @@ export default class WebGL2Renderer extends EventTarget {
     // get drawn when they are visible AND when they have their buffers
     // updated.
     this.updateVertexBuffers()
-    const tilesNeeded = this.getTilesNeeded()
+    const neededTiles = this.getNeededTiles()
     // TODO: inclide this if setTiles
-    if (tilesNeeded && tilesNeeded.length) {
-      this.tileCache.setTiles(tilesNeeded)
+    if (neededTiles && neededTiles.length) {
+      this.tileCache.setTiles(neededTiles)
     }
   }
 

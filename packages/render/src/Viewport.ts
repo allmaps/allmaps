@@ -9,7 +9,7 @@ import { composeTransform } from './shared/matrix.js'
  * @extends {EventTarget}
  * @property {Bbox} projectedGeoBbox - Bbox displayed in the viewport, in projected geo coordinates.
  * @property {Point} projectedGeoCenter - Center of of bbox displayed in the viewport point, in projected coordinates
- * @property {Size} viewportSize - Size as [width, height] of the viewport in pixels of the viewport.
+ * @property {Size} size - Size as [width, height] of the viewport in pixels of the viewport.
  * @property {number} resolution - Resolution of the viewport, in projection units per pixel
  * @property {number} rotation - Rotation of the viewport with respect to the project coordinate system.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport
@@ -20,7 +20,7 @@ import { composeTransform } from './shared/matrix.js'
 export default class Viewport extends EventTarget {
   projectedGeoBbox: Bbox
   projectedGeoCenter: Point
-  viewportSize: Size
+  size: Size
   resolution: number
   rotation: number
   devicePixelRatio: number
@@ -33,13 +33,13 @@ export default class Viewport extends EventTarget {
    *
    * @constructor
    * @param {Bbox} projectedGeoBbox - Bbox displayed in the viewport, in projected geo coordinates.
-   * @param {Size} viewportSize - Size of the viewport in pixels, as [width, height].
+   * @param {Size} size - Size of the viewport in pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
    * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
    */
   constructor(
     projectedGeoBbox: Bbox,
-    viewportSize: Size,
+    size: Size,
     rotation: number,
     devicePixelRatio: number
   ) {
@@ -47,7 +47,7 @@ export default class Viewport extends EventTarget {
     // TODO: should this still extend EventTartget and hence include super()?
 
     this.projectedGeoBbox = projectedGeoBbox
-    this.viewportSize = viewportSize
+    this.size = size
     this.rotation = rotation
     this.devicePixelRatio = devicePixelRatio
 
@@ -56,16 +56,14 @@ export default class Viewport extends EventTarget {
       (this.projectedGeoBbox[1] + this.projectedGeoBbox[3]) / 2
     ] as [number, number]
     const xResolution =
-      (this.projectedGeoBbox[2] - this.projectedGeoBbox[0]) /
-      this.viewportSize[0]
+      (this.projectedGeoBbox[2] - this.projectedGeoBbox[0]) / this.size[0]
     const yResolution =
-      (this.projectedGeoBbox[3] - this.projectedGeoBbox[1]) /
-      this.viewportSize[1]
+      (this.projectedGeoBbox[3] - this.projectedGeoBbox[1]) / this.size[1]
     this.resolution = Math.max(xResolution, yResolution)
 
     this.canvasSize = [
-      this.viewportSize[0] * this.devicePixelRatio,
-      this.viewportSize[1] * this.devicePixelRatio
+      this.size[0] * this.devicePixelRatio,
+      this.size[1] * this.devicePixelRatio
     ]
 
     this.setCoordinateToPixelTransform()
@@ -74,8 +72,8 @@ export default class Viewport extends EventTarget {
 
   private setCoordinateToPixelTransform(): void {
     this.coordinateToPixelTransform = composeTransform(
-      this.viewportSize[0] / 2,
-      this.viewportSize[1] / 2,
+      this.size[0] / 2,
+      this.size[1] / 2,
       1 / this.resolution,
       -1 / this.resolution,
       -this.rotation,
@@ -88,8 +86,8 @@ export default class Viewport extends EventTarget {
     this.projectionTransform = composeTransform(
       0,
       0,
-      2 / (this.resolution * this.viewportSize[0]),
-      2 / (this.resolution * this.viewportSize[1]),
+      2 / (this.resolution * this.size[0]),
+      2 / (this.resolution * this.size[1]),
       -this.rotation,
       -this.projectedGeoCenter[0],
       -this.projectedGeoCenter[1]
