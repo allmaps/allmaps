@@ -771,8 +771,8 @@ export const WarpedMapLayer = L.Layer.extend({
       projectedGeoCenterAsPoint.y
     ] as [number, number]
 
-    const pixelSizeAsPoint = this._map.getSize()
-    const pixelSize = [pixelSizeAsPoint.x, pixelSizeAsPoint.y] as [
+    const viewportSizeAsPoint = this._map.getSize()
+    const viewportSize = [viewportSizeAsPoint.x, viewportSizeAsPoint.y] as [
       number,
       number
     ]
@@ -791,15 +791,15 @@ export const WarpedMapLayer = L.Layer.extend({
       projectedNorthEastAsPoint.y
     ] as [number, number, number, number]
     const xResolution =
-      (projectedGeoBbox[2] - projectedGeoBbox[0]) / pixelSize[0]
+      (projectedGeoBbox[2] - projectedGeoBbox[0]) / viewportSize[0]
     const yResolution =
-      (projectedGeoBbox[3] - projectedGeoBbox[1]) / pixelSize[1]
+      (projectedGeoBbox[3] - projectedGeoBbox[1]) / viewportSize[1]
     const resolution = Math.max(xResolution, yResolution)
 
     this.renderer.setViewport(
       new Viewport(
         projectedGeoCenter,
-        pixelSize,
+        viewportSize,
         0,
         resolution,
         window.devicePixelRatio
