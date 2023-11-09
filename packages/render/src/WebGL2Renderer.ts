@@ -770,19 +770,26 @@ export default class WebGL2Renderer extends EventTarget {
       this.previousSignificantViewport = this.viewport
       return false
     } else {
-      const dist =
-        distance(
-          this.previousSignificantViewport.projectedGeoCenter,
-          this.viewport.projectedGeoCenter
-        ) / this.viewport.resolution
+      const rectangleDistances = []
+      for (let i = 0; i < 4; i++) {
+        rectangleDistances.push(
+          distance(
+            this.previousSignificantViewport.projectedGeoRectangle[i],
+            this.viewport.projectedGeoRectangle[i]
+          ) / this.viewport.resolution
+        )
+      }
+      const dist = Math.max(...rectangleDistances)
       if (dist == 0) {
         // No move should also pass, since this is called multiple tiles at start
         return true
       }
       if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
         this.previousSignificantViewport = this.viewport
+        console.log('s')
         return true
       } else {
+        console.log('is')
         return false
       }
     }
