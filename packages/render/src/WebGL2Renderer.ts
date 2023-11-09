@@ -14,8 +14,7 @@ import {
   createTransform,
   multiplyTransform,
   invertTransform,
-  transformToMatrix4,
-  applyTransform
+  transformToMatrix4
 } from './shared/matrix.js'
 import {
   geoBboxToResourcePolygon,
@@ -28,6 +27,8 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
+import { bboxDiameter } from '@allmaps/stdlib'
+
 import type { DebouncedFunc } from 'lodash-es'
 
 import type Viewport from './Viewport.js'
@@ -38,12 +39,7 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-import type {
-  Point,
-  Transform,
-  NeededTile,
-  TileZoomLevel
-} from '@allmaps/types'
+import type { Transform, NeededTile, TileZoomLevel } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -60,7 +56,7 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
-const MIN_COMBINED_RESOURCE_SIZE = 5
+const MIN_RESOURCE_SIZE = 5
 
 export default class WebGL2Renderer extends EventTarget {
   tileCache: TileCache = new TileCache()
@@ -176,6 +172,7 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      // Get warped map image info if lacking
       if (!hasImageInfo(warpedMap)) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
@@ -183,36 +180,11 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // TODO: put this in a cleaner function
-      // Don't show maps when they're too small
-      const projectedGeoTopLeft: Point = [
-        warpedMap.projectedGeoMaskBbox[0],
-        warpedMap.projectedGeoMaskBbox[1]
-      ]
-      const projectedGeoBottomRight: Point = [
-        warpedMap.projectedGeoMaskBbox[2],
-        warpedMap.projectedGeoMaskBbox[3]
-      ]
-
-      const resourceTopLeft = applyTransform(
-        this.viewport.coordinateToPixelTransform,
-        projectedGeoTopLeft
-      )
-      const resourceBottomRight = applyTransform(
-        this.viewport.coordinateToPixelTransform,
-        projectedGeoBottomRight
-      )
-
-      const resourceWidth = Math.abs(
-        resourceBottomRight[0] - resourceTopLeft[0]
-      )
-      const resourceHeight = Math.abs(
-        resourceTopLeft[1] - resourceBottomRight[1]
-      )
-
-      // Only draw maps that are larger than MIN_COMBINED_RESOURCE_SIZE pixels
-      // in combined width and height
-      if (resourceWidth + resourceHeight < MIN_COMBINED_RESOURCE_SIZE) {
+      // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
+      if (
+        bboxDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
+        MIN_RESOURCE_SIZE
+      ) {
         continue
       }
 
@@ -227,6 +199,10 @@ export default class WebGL2Renderer extends EventTarget {
         this.viewport.canvasSize,
         viewportResourcePolygon
       )
+      // console.log(
+      //   'mapScale new',
+      //   this.viewport.resolution / this.viewport.devicePixelRatio
+      // )
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
       // or not visible anymore

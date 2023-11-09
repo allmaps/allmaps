@@ -33,6 +33,12 @@ export type Bbox = [number, number, number, number]
 
 export type Size = [number, number]
 
+/**
+ * Two numbers indicating the exent of a Bbox. Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
+ *
+ * @export
+ * @typedef {Extent}
+ */
 export type Extent = [number, number]
 
 // TODO: change name to something like 'helmert transformation signature'

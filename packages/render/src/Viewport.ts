@@ -14,10 +14,10 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Bbox} projectedGeoBbox - Bbox of the rotated rectangle of the viewport, in projected geo coordinates.
  * @property {Size} viewportSize - Size of the viewport in pixels, as [width, height].
  * @property {number} rotation - Rotation of the viewport with respect to the project coordinate system.
- * @property {number} resolution - Resolution of the viewport, in projection coordinates per pixel.
+ * @property {number} resolution - Resolution of the viewport, in projection coordinates per viewport pixel.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
  * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (viewportSize*devicePixelRatio), as [width, height].
- * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to pixels. Equivalent to OpenLayer coordinateToPixelTransform.
+ * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
  * @property {Transform} projectionTransform - Transform from projected geo coordinates to view coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
  */
 export default class Viewport extends EventTarget {
@@ -37,9 +37,9 @@ export default class Viewport extends EventTarget {
    *
    * @constructor
    * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
-   * @param {Size} viewportSize - Size of the viewport in pixels, as [width, height].
+   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
-   * @param {number} resolution - Resolution of the viewport, in projection coordinates per pixel.
+   * @param {number} resolution - Resolution of the viewport, in projection coordinates per viewport pixel.
    * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
    */
   constructor(

@@ -4,12 +4,16 @@ import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider i
 import type {
   Point,
   LineString,
+  Line,
   Ring,
   Polygon,
+  Geometry,
   GeojsonPoint,
   GeojsonLineString,
-  GeojsonPolygon
+  GeojsonPolygon,
+  GeojsonGeometry
 } from '@allmaps/types'
+import { computeBbox, bboxToLine } from './bbox.js'
 
 // Assert
 
@@ -38,6 +42,10 @@ function isRing(input: any): input is Ring {
 
 export function isPolygon(input: any): input is Polygon {
   return Array.isArray(input) && input.every(isRing)
+}
+
+export function isGeometry(input: any): input is Geometry {
+  return isPoint(input) || isLineString(input) || isPolygon(input)
 }
 
 // Conform
@@ -122,6 +130,22 @@ export function convertPolygonToGeojsonPolygon(
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
+export function convertGeometryToGeojsonGeometry(
+  geometry: Geometry
+): GeojsonGeometry {
+  if (isPoint(geometry)) {
+    return convertPointToGeojsonPoint(geometry)
+  }
+  if (isLineString(geometry)) {
+    return convertLineStringToGeojsonLineString(geometry)
+  }
+  if (isPolygon(geometry)) {
+    return convertPolygonToGeojsonPolygon(geometry)
+  } else {
+    throw new Error('Geometry type not supported')
+  }
+}
+
 // Check
 
 export function isClosed(input: Point[]): boolean {
@@ -177,8 +201,20 @@ export function midPoit(point1: Point, point2: Point): Point {
   ]
 }
 
-export function distance(from: Point, to: Point): number {
-  return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
+export function distance(line: Line): number
+export function distance(from: Point, to: Point): number
+export function distance(from: Point | Line, to?: Point): number {
+  if (isLineString(from) && from.length == 2) {
+    return distance(from[0], from[1])
+  } else if (isPoint(from) && isPoint(to)) {
+    return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
+  } else {
+    throw new Error('Input type not supported')
+  }
+}
+
+export function bboxDiameter(geometry: Geometry | GeojsonGeometry): number {
+  return distance(bboxToLine(computeBbox(geometry)))
 }
 
 export function degreesToRadians(degrees: number) {

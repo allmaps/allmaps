@@ -1,18 +1,17 @@
 import {
-  isGeojsonLineString,
-  isGeojsonPolygon,
-  convertGeojsonLineStringToLineString,
-  convertGeojsonPolygonToPolygon
+  isGeojsonGeometry,
+  convertGeojsonGeometryToGeometry
 } from './geojson.js'
-import { isPolygon } from './geometry.js'
+import { isPoint, isPolygon } from './geometry.js'
 
 import type {
-  Polygon,
   LineString,
+  Polygon,
+  Geometry,
+  Line,
   Bbox,
   Extent,
-  GeojsonLineString,
-  GeojsonPolygon
+  GeojsonGeometry
 } from '@allmaps/types'
 
 export function computeExtent(values: number[]): Extent {
@@ -32,21 +31,15 @@ export function computeExtent(values: number[]): Extent {
 }
 
 // Note: bbox order is minX, minY, maxX, maxY
-export function computeBbox(points: LineString): Bbox
-export function computeBbox(points: Polygon): Bbox
-export function computeBbox(points: GeojsonLineString): Bbox
-export function computeBbox(points: GeojsonPolygon): Bbox
-export function computeBbox(
-  points: LineString | Polygon | GeojsonLineString | GeojsonPolygon
-): Bbox {
+export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
+  if (isPoint(points)) {
+    points = [points]
+  }
   if (isPolygon(points)) {
     points = points.flat()
   }
-  if (isGeojsonLineString(points)) {
-    points = convertGeojsonLineStringToLineString(points)
-  }
-  if (isGeojsonPolygon(points)) {
-    points = convertGeojsonPolygonToPolygon(points).flat()
+  if (isGeojsonGeometry(points)) {
+    return computeBbox(convertGeojsonGeometryToGeometry(points))
   }
 
   const xs = []
@@ -80,5 +73,12 @@ export function bboxToPolygon(bbox: Bbox): Polygon {
       [bbox[2], bbox[3]],
       [bbox[0], bbox[3]]
     ]
+  ]
+}
+
+export function bboxToLine(bbox: Bbox): Line {
+  return [
+    [bbox[0], bbox[1]],
+    [bbox[2], bbox[3]]
   ]
 }

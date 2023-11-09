@@ -240,7 +240,7 @@ export function geoBboxToResourcePolygon(
 
 export function getBestZoomLevel(
   image: Image,
-  size: Size,
+  canvasSize: Size,
   resourcePolygon: Polygon
 ): TileZoomLevel {
   const resourceBbox = computeBbox(resourcePolygon)
@@ -248,9 +248,11 @@ export function getBestZoomLevel(
   const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
   const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
 
-  const mapScaleX = resourceBboxWidth / size[0]
-  const mapScaleY = resourceBboxHeight / size[1]
+  const mapScaleX = resourceBboxWidth / canvasSize[0]
+  const mapScaleY = resourceBboxHeight / canvasSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
+
+  // console.log('mapScale old', mapScale)
 
   return getBestZoomLevelForMapScale(image, mapScale)
 }

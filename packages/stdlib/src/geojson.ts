@@ -12,6 +12,7 @@ import type {
   LineString,
   Ring,
   Polygon,
+  Geometry,
   GeojsonPoint,
   GeojsonLineString,
   GeojsonPolygon,
@@ -94,6 +95,22 @@ export function convertGeojsonPolygonToPolygon(
   let polygon = geometry.coordinates
   polygon = conformPolygon(polygon)
   return close ? polygon.map((ring) => [...ring, ring[0]]) : polygon
+}
+
+export function convertGeojsonGeometryToGeometry(
+  geometry: GeojsonGeometry
+): Geometry {
+  if (isGeojsonPoint(geometry)) {
+    return convertGeojsonPointToPoint(geometry)
+  }
+  if (isGeojsonLineString(geometry)) {
+    return convertGeojsonLineStringToLineString(geometry)
+  }
+  if (isGeojsonPolygon(geometry)) {
+    return convertGeojsonPolygonToPolygon(geometry)
+  } else {
+    throw new Error('Geometry type not supported')
+  }
 }
 
 // Convert to SVG
