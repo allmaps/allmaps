@@ -112,9 +112,9 @@ function tilesIntersect([a, b]: Line): Point[] {
   return points
 }
 
-function getBestZoomLevelForMapScale(
+export function getBestZoomLevelForScale(
   image: Image,
-  mapTileScale: number
+  scale: number
 ): TileZoomLevel {
   const tileZoomLevels = image.tileZoomLevels
 
@@ -123,12 +123,12 @@ function getBestZoomLevelForMapScale(
 
   for (const zoomLevel of tileZoomLevels) {
     const scaleFactor = zoomLevel.scaleFactor
-    const scaleDiff = Math.abs(scaleFactor - mapTileScale)
+    const scaleDiff = Math.abs(scaleFactor - scale)
 
     // scaleFactors:
     // 1.......2.......4.......8.......16
     //
-    // Example mapTileScale = 3
+    // Example mapScale = 3
     // 1.......2..|....4.......8.......16
     //
     // scaleFactor 2:
@@ -144,7 +144,7 @@ function getBestZoomLevelForMapScale(
     // TODO: read 1.25 from config
     // TODO: maybe use a smaller value when the scaleFactor is low and a higher value when the scaleFactor is high?
     // TODO: use lgoarithmic scale?
-    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= mapTileScale) {
+    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= scale) {
       smallestScaleDiff = scaleDiff
       bestZoomLevel = zoomLevel
     }
@@ -238,6 +238,7 @@ export function geoBboxToResourcePolygon(
   return geoBboxResourcePolygon
 }
 
+// TODO: point tileserver directly to getBestZoomLevelForMapScale too and remove this function
 export function getBestZoomLevel(
   image: Image,
   canvasSize: Size,
@@ -252,9 +253,7 @@ export function getBestZoomLevel(
   const mapScaleY = resourceBboxHeight / canvasSize[1]
   const mapScale = Math.min(mapScaleX, mapScaleY)
 
-  // console.log('mapScale old', mapScale)
-
-  return getBestZoomLevelForMapScale(image, mapScale)
+  return getBestZoomLevelForScale(image, mapScale)
 }
 
 export function computeTilesForPolygonAndZoomLevel(

@@ -16,6 +16,7 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {number} rotation - Rotation of the viewport with respect to the project coordinate system.
  * @property {number} resolution - Resolution of the viewport, in projection coordinates per viewport pixel.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
+ * @property {number} scale - Scale of the viewport, in projection coordinates per canvas pixel (resolution/devicePixelRatio).
  * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (viewportSize*devicePixelRatio), as [width, height].
  * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
  * @property {Transform} projectionTransform - Transform from projected geo coordinates to view coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
@@ -28,6 +29,7 @@ export default class Viewport extends EventTarget {
   resolution: number
   rotation: number
   devicePixelRatio: number
+  scale: number
   canvasSize: Size
   coordinateToPixelTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
@@ -66,6 +68,7 @@ export default class Viewport extends EventTarget {
     )
     this.projectedGeoBbox = computeBbox(this.projectedGeoRotatedRectangle)
 
+    this.scale = this.resolution / this.devicePixelRatio
     this.canvasSize = [
       this.viewportSize[0] * this.devicePixelRatio,
       this.viewportSize[1] * this.devicePixelRatio

@@ -18,7 +18,7 @@ import {
 } from './shared/matrix.js'
 import {
   geoBboxToResourcePolygon,
-  getBestZoomLevel,
+  getBestZoomLevelForScale,
   computeTilesForPolygonAndZoomLevel,
   makeNeededTile
 } from './shared/tiles.js'
@@ -188,25 +188,20 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      const zoomLevel = getBestZoomLevelForScale(
+        warpedMap.parsedImage,
+        this.viewport.scale
+      )
+
+      // TODO: remove maps from this list when they're removed from WarpedMapList
+      // or not visible anymore
+      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
+
       // TODO: this could be the normal transformer and normal geobbox
       const viewportResourcePolygon = geoBboxToResourcePolygon(
         warpedMap.projectedTransformer,
         this.viewport.projectedGeoBbox
       )
-
-      const zoomLevel = getBestZoomLevel(
-        warpedMap.parsedImage,
-        this.viewport.canvasSize,
-        viewportResourcePolygon
-      )
-      // console.log(
-      //   'mapScale new',
-      //   this.viewport.resolution / this.viewport.devicePixelRatio
-      // )
-
-      // TODO: remove maps from this list when they're removed from WarpedMapList
-      // or not visible anymore
-      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
       // TODO: rename function
       const tiles = computeTilesForPolygonAndZoomLevel(
