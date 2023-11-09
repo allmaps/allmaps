@@ -27,7 +27,7 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
-import { bboxDiameter } from '@allmaps/stdlib'
+import { bboxDiameter, distance } from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -57,6 +57,7 @@ const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
 const MIN_RESOURCE_SIZE = 5
+const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 
 export default class WebGL2Renderer extends EventTarget {
   tileCache: TileCache = new TileCache()
@@ -75,6 +76,7 @@ export default class WebGL2Renderer extends EventTarget {
   invertedRenderTransform: Transform
 
   viewport: Viewport | undefined
+  previousSignificantViewport: Viewport | undefined
 
   mapsInViewport: Set<string> = new Set()
   bestZoomLevelByMapIdAtViewport: Map<string, TileZoomLevel> = new Map()
@@ -138,6 +140,10 @@ export default class WebGL2Renderer extends EventTarget {
 
   updateNeededTiles(): void {
     if (!this.viewport) {
+      return
+    }
+
+    if (!this.viewportMovedSignificantly()) {
       return
     }
 
@@ -239,8 +245,6 @@ export default class WebGL2Renderer extends EventTarget {
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
     }
-    // TODO: check with console.log
-    // TODO: add sorting here
   }
 
   tileLoaded(event: Event) {
@@ -755,6 +759,33 @@ export default class WebGL2Renderer extends EventTarget {
   // TODO: maybe this function can be included in the render call.
   setViewport(viewport: Viewport) {
     this.viewport = viewport
+  }
+
+  // TODO: this could be a problem if the viewport is quickly and continously moved within the tolerance during initial loading
+  viewportMovedSignificantly(): boolean {
+    if (!this.viewport) {
+      return false
+    }
+    if (!this.previousSignificantViewport) {
+      this.previousSignificantViewport = this.viewport
+      return false
+    } else {
+      const dist =
+        distance(
+          this.previousSignificantViewport.projectedGeoCenter,
+          this.viewport.projectedGeoCenter
+        ) / this.viewport.resolution
+      if (dist == 0) {
+        // No move should also pass, since this is called multiple tiles at start
+        return true
+      }
+      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
+        this.previousSignificantViewport = this.viewport
+        return true
+      } else {
+        return false
+      }
+    }
   }
 
   prepareRender(): void {

@@ -9,12 +9,13 @@ import type {
   Polygon,
   Geometry,
   Line,
+  Rectangle,
   Bbox,
   Extent,
   GeojsonGeometry
 } from '@allmaps/types'
 
-export function computeExtent(values: number[]): Extent {
+export function computeMinMax(values: number[]): Extent {
   let min: number = Number.POSITIVE_INFINITY
   let max: number = Number.NEGATIVE_INFINITY
 
@@ -50,8 +51,8 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
     ys.push(point[1])
   }
 
-  const [minX, maxX] = computeExtent(xs)
-  const [minY, maxY] = computeExtent(ys)
+  const [minX, maxX] = computeMinMax(xs)
+  const [minY, maxY] = computeMinMax(ys)
 
   return [minX, minY, maxX, maxY]
 }
@@ -65,15 +66,17 @@ export function combineBboxes(bbox1: Bbox, bbox2: Bbox): Bbox {
   ]
 }
 
-export function bboxToPolygon(bbox: Bbox): Polygon {
+export function bboxToRectangle(bbox: Bbox): Rectangle {
   return [
-    [
-      [bbox[0], bbox[1]],
-      [bbox[2], bbox[1]],
-      [bbox[2], bbox[3]],
-      [bbox[0], bbox[3]]
-    ]
+    [bbox[0], bbox[1]],
+    [bbox[2], bbox[1]],
+    [bbox[2], bbox[3]],
+    [bbox[0], bbox[3]]
   ]
+}
+
+export function bboxToPolygon(bbox: Bbox): Polygon {
+  return [bboxToRectangle(bbox)]
 }
 
 export function bboxToLine(bbox: Bbox): Line {
