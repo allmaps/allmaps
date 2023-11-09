@@ -136,9 +136,9 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
-  getNeededTiles(): NeededTile[] {
+  updateNeededTiles(): void {
     if (!this.viewport) {
-      return []
+      return
     }
 
     // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
@@ -197,7 +197,8 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
-    return neededTiles
+    this.tileCache.setTiles(neededTiles)
+    this.updateMapsInViewport(neededTiles)
   }
 
   updateMapsInViewport(neededTiles: NeededTile[]) {
@@ -761,12 +762,7 @@ export default class WebGL2Renderer extends EventTarget {
     // get drawn when they are visible AND when they have their buffers
     // updated.
     this.updateVertexBuffers()
-    const neededTiles = this.getNeededTiles()
-    this.updateMapsInViewport(neededTiles)
-    // TODO: inclide this if setTiles
-    if (neededTiles && neededTiles.length) {
-      this.tileCache.setTiles(neededTiles)
-    }
+    this.updateNeededTiles()
   }
 
   render(): void {
