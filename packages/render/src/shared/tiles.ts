@@ -6,7 +6,6 @@ import type {
   Point,
   Line,
   Ring,
-  Polygon,
   Bbox,
   Size,
   Tile,
@@ -220,31 +219,31 @@ function tilesByXToArray(
 }
 
 // TODO: move to render
-export function geoBboxToResourcePolygon(
+export function geoBboxToResourceRing(
   transformer: GcpTransformer,
   geoBbox: Bbox
 ) {
   // transformer is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
-  // geoBbox is a Bbox of the viewport in (projected) geo coordinates
-  // geoBboxResourcePolygon is a polygon of this Bbox, transformed backward to resource coordinates.
+  // geoBbox is a Bbox (e.g. of the viewport) in (projected) geo coordinates
+  // geoBboxResourceRing is a ring of this Bbox, transformed backward to resource coordinates.
   // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
-  const geoBboxPolygon = bboxToPolygon(geoBbox)
-  const geoBboxResourcePolygon = transformer.transformBackward(geoBboxPolygon, {
+  const geoBboxRing = bboxToPolygon(geoBbox)[0]
+  const geoBboxResourceRing = transformer.transformBackward(geoBboxRing, {
     maxOffsetRatio: 0.00001,
     maxDepth: 2
-  }) as Polygon
+  }) as Ring
 
-  return geoBboxResourcePolygon
+  return geoBboxResourceRing
 }
 
 // TODO: point tileserver directly to getBestZoomLevelForMapScale too and remove this function
 export function getBestZoomLevel(
   image: Image,
   canvasSize: Size,
-  resourcePolygon: Polygon
+  resourceRing: Ring
 ): TileZoomLevel {
-  const resourceBbox = computeBbox(resourcePolygon)
+  const resourceBbox = computeBbox(resourceRing)
 
   const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
   const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
@@ -258,15 +257,15 @@ export function getBestZoomLevel(
 
 export function computeTilesForPolygonAndZoomLevel(
   image: Image,
-  resourcePolygon: Polygon,
+  resourceRing: Ring,
   tileZoomLevel: TileZoomLevel
 ): Tile[] {
-  const scaledViewportTesourcePolygon = scalePointsToTileZoomLevel(
-    resourcePolygon[0],
+  const scaledResourcePolygon = scalePointsToTileZoomLevel(
+    resourceRing,
     tileZoomLevel
   )
 
-  const tilesByX = findNeededTilesByX(scaledViewportTesourcePolygon)
+  const tilesByX = findNeededTilesByX(scaledResourcePolygon)
   const tiles = tilesByXToArray(
     tileZoomLevel,
     [image.width, image.height],
@@ -275,7 +274,7 @@ export function computeTilesForPolygonAndZoomLevel(
 
   // sort tiles to load tiles in order of their distance to center
   // TODO: move to new SortedFetch class
-  const resourceBbox = computeBbox(resourcePolygon)
+  const resourceBbox = computeBbox(resourceRing)
   const resourceCenter: Point = [
     (resourceBbox[0] + resourceBbox[2]) / 2,
     (resourceBbox[1] + resourceBbox[3]) / 2

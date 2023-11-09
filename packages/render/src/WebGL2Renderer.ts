@@ -17,7 +17,7 @@ import {
   transformToMatrix4
 } from './shared/matrix.js'
 import {
-  geoBboxToResourcePolygon,
+  geoBboxToResourceRing,
   getBestZoomLevelForScale,
   computeTilesForPolygonAndZoomLevel,
   makeNeededTile
@@ -136,31 +136,13 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
-  /**
-   * Returns the maps that are visible in the viewport, sorted by z-index, by mapId's
-   * @returns {Iterable<string>}
-   */
-  sortMapsInViewport(): Iterable<string> {
-    return [...this.mapsInViewport].sort((mapIdA, mapIdB) => {
-      const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-      const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-      if (zIndexA !== undefined && zIndexB !== undefined) {
-        return zIndexA - zIndexB
-      }
-      return 0
-    })
-  }
-
   getNeededTiles(): NeededTile[] {
     if (!this.viewport) {
       return []
     }
 
-    let possibleMapsInViewport: Iterable<string> = []
-    const possibleMapsOutOfViewport = new Set(this.mapsInViewport)
-
     // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
-    possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
+    const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
 
@@ -198,7 +180,7 @@ export default class WebGL2Renderer extends EventTarget {
       this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
       // TODO: this could be the normal transformer and normal geobbox
-      const viewportResourcePolygon = geoBboxToResourcePolygon(
+      const resourceViewportPolygon = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
         this.viewport.projectedGeoBbox
       )
@@ -206,38 +188,58 @@ export default class WebGL2Renderer extends EventTarget {
       // TODO: rename function
       const tiles = computeTilesForPolygonAndZoomLevel(
         warpedMap.parsedImage,
-        viewportResourcePolygon,
+        resourceViewportPolygon,
         zoomLevel
       )
 
-      // TODO: can this ever be empty?
-      if (tiles.length) {
-        if (!this.mapsInViewport.has(mapId)) {
-          this.mapsInViewport.add(mapId)
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-          )
-        }
-
-        possibleMapsOutOfViewport.delete(mapId)
-
-        for (const tile of tiles) {
-          neededTiles.push(makeNeededTile(tile, warpedMap))
-        }
-      }
-    }
-
-    // TODO: can this ever contain something?
-    for (const mapId of possibleMapsOutOfViewport) {
-      if (this.mapsInViewport.has(mapId)) {
-        this.mapsInViewport.delete(mapId)
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-        )
+      for (const tile of tiles) {
+        neededTiles.push(makeNeededTile(tile, warpedMap))
       }
     }
 
     return neededTiles
+  }
+
+  updateMapsInViewport(neededTiles: NeededTile[]) {
+    // TODO: handle everything as Set() once JS supports filter on sets.
+    const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
+    const newMapsInViewportAsArray = neededTiles
+      .map((tile) => tile.mapId)
+      .filter((v, i, a) => {
+        // filter out duplicate mapIds
+        return a.indexOf(v) === i
+      })
+
+    this.mapsInViewport = new Set(
+      newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
+        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
+        if (zIndexA !== undefined && zIndexB !== undefined) {
+          return zIndexA - zIndexB
+        }
+        return 0
+      })
+    )
+
+    const enteringMapsInViewport = newMapsInViewportAsArray.filter(
+      (mapId) => !oldMapsInViewportAsArray.includes(mapId)
+    )
+    const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
+      (mapId) => !newMapsInViewportAsArray.includes(mapId)
+    )
+
+    for (const mapId in enteringMapsInViewport) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+      )
+    }
+    for (const mapId in leavingMapsInViewport) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+      )
+    }
+    // TODO: check with console.log
+    // TODO: add sorting here
   }
 
   tileLoaded(event: Event) {
@@ -656,7 +658,7 @@ export default class WebGL2Renderer extends EventTarget {
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
-    for (const mapId of this.sortMapsInViewport()) {
+    for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
@@ -760,6 +762,7 @@ export default class WebGL2Renderer extends EventTarget {
     // updated.
     this.updateVertexBuffers()
     const neededTiles = this.getNeededTiles()
+    this.updateMapsInViewport(neededTiles)
     // TODO: inclide this if setTiles
     if (neededTiles && neededTiles.length) {
       this.tileCache.setTiles(neededTiles)

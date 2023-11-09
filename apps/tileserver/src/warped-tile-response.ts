@@ -4,7 +4,7 @@ import { encode as encodePng } from 'upng-js'
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
-  geoBboxToResourcePolygon,
+  geoBboxToResourceRing,
   getBestZoomLevel,
   computeTilesForPolygonAndZoomLevel
 } from '@allmaps/render'
@@ -61,17 +61,17 @@ export async function createWarpedTileResponse(
     )
 
     // Compute necessary IIIF tiles
-    const resourcePolygon = geoBboxToResourcePolygon(transformer, geoBbox)
+    const resourceRing = geoBboxToResourceRing(transformer, geoBbox)
 
     const zoomLevel = getBestZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      resourcePolygon
+      resourceRing
     )
 
     const iiifTiles = computeTilesForPolygonAndZoomLevel(
       parsedImage,
-      resourcePolygon,
+      resourceRing,
       zoomLevel
     )
 
