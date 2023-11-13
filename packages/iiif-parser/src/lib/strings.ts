@@ -93,7 +93,11 @@ export function parseVersion3String(
 export function parseVersion2Metadata(
   metadata: Metadata2Type | undefined
 ): Metadata | undefined {
-  if (metadata?.length) {
+  if (Array.isArray(metadata)) {
+    if (metadata.length === 0) {
+      return undefined
+    }
+
     return (
       metadata
         // Only process metadata entries that have both label & value
