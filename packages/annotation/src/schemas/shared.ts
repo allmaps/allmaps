@@ -17,7 +17,8 @@ export const ImageServiceSchema = z.enum([
 
 export const PartOfSchema = z.object({
   id: z.string().url(),
-  type: z.literal('Manifest')
+  type: z.string(),
+  label: z.string().optional()
 })
 
 const PolynomialTransformationSchema = z.object({
