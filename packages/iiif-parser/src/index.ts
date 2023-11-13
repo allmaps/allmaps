@@ -11,7 +11,8 @@ export type {
   ImageRequest,
   MajorVersion,
   TileZoomLevel,
-  ProfileProperties
+  ProfileProperties,
+  LanguageString
 } from './lib/types.js'
 
 /**
