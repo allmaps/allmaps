@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.45",
+  "version": "1.0.0-beta.46",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -27,15 +27,15 @@
     "preversion": "npm run types && npm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.17",
-    "@allmaps/id": "^1.0.0-beta.19",
-    "@allmaps/iiif-parser": "^1.0.0-beta.26",
-    "@allmaps/openlayers": "^1.0.0-beta.43",
-    "@allmaps/render": "^1.0.0-beta.39",
-    "@allmaps/stdlib": "^1.0.0-beta.14",
+    "@allmaps/annotation": "^1.0.0-beta.18",
+    "@allmaps/id": "^1.0.0-beta.20",
+    "@allmaps/iiif-parser": "^1.0.0-beta.27",
+    "@allmaps/openlayers": "^1.0.0-beta.44",
+    "@allmaps/render": "^1.0.0-beta.40",
+    "@allmaps/stdlib": "^1.0.0-beta.15",
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/transform": "^1.0.0-beta.17",
-    "@allmaps/ui": "^1.0.0-beta.19",
+    "@allmaps/transform": "^1.0.0-beta.18",
+    "@allmaps/ui": "^1.0.0-beta.20",
     "comlink": "^4.4.1",
     "flowbite": "^1.6.4",
     "ol": "^8.1.0",

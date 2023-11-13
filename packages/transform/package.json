@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.17",
+  "version": "1.0.0-beta.18",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -41,8 +41,8 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.14",
-    "@allmaps/types": "^1.0.0-beta.5",
+    "@allmaps/stdlib": "^1.0.0-beta.15",
+    "@allmaps/types": "^1.0.0-beta.6",
     "@turf/distance": "^6.3.0",
     "@turf/midpoint": "^6.3.0",
     "ml-matrix": "^6.10.4"
