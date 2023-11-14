@@ -2,7 +2,7 @@ import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
   validateMap,
-  type Map as Georef
+  type Map as GeoreferencedMap
 } from '@allmaps/annotation'
 
 import GeojsonPolygonRTree from './RTree.js'
@@ -209,20 +209,28 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
   }
 
-  async addMap(map: unknown): Promise<string | Error> {
-    const validatedMapOrMaps = validateMap(map)
-    const validatedMap = Array.isArray(validatedMapOrMaps)
-      ? validatedMapOrMaps[0]
-      : validatedMapOrMaps
-    return this.addMapInternal(validatedMap)
+  async addGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMap = Array.isArray(
+      validatedGeoreferencedMapOrMaps
+    )
+      ? validatedGeoreferencedMapOrMaps[0]
+      : validatedGeoreferencedMapOrMaps
+    return this.addGeoreferencedMapInternal(validatedGeoreferencedMap)
   }
 
-  async removeMap(map: unknown): Promise<string | Error> {
-    const validatedMapOrMaps = validateMap(map)
-    const validatedMap = Array.isArray(validatedMapOrMaps)
-      ? validatedMapOrMaps[0]
-      : validatedMapOrMaps
-    return this.removeMapInternal(validatedMap)
+  async removeGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMap = Array.isArray(
+      validatedGeoreferencedMapOrMaps
+    )
+      ? validatedGeoreferencedMapOrMaps[0]
+      : validatedGeoreferencedMapOrMaps
+    return this.removeGeoreferencedMapInternal(validatedGeoreferencedMap)
   }
 
   async addGeoreferenceAnnotation(
@@ -231,7 +239,7 @@ export default class WarpedMapList extends EventTarget {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const settledResults = await Promise.allSettled(
-      maps.map((map) => this.addMapInternal(map))
+      maps.map((map) => this.addGeoreferencedMapInternal(map))
     )
     // TODO: make sure reason contains Error
     for (const settledResult of settledResults) {
@@ -254,7 +262,7 @@ export default class WarpedMapList extends EventTarget {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     for (const map of maps) {
-      const mapIdOrError = await this.removeMapInternal(map)
+      const mapIdOrError = await this.removeGeoreferencedMapInternal(map)
       results.push(mapIdOrError)
     }
     this.dispatchEvent(
@@ -263,9 +271,15 @@ export default class WarpedMapList extends EventTarget {
     return results
   }
 
-  private async addMapInternal(map: Georef): Promise<string> {
-    const mapId = await this.getMapId(map)
-    const warpedMap = new WarpedMap(mapId, map, this.imageInfoCache)
+  private async addGeoreferencedMapInternal(
+    georeferencedMap: GeoreferencedMap
+  ): Promise<string> {
+    const mapId = await this.getOrComputeMapId(georeferencedMap)
+    const warpedMap = new WarpedMap(
+      mapId,
+      georeferencedMap,
+      this.imageInfoCache
+    )
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
     this.updateRtree(warpedMap)
@@ -275,8 +289,10 @@ export default class WarpedMapList extends EventTarget {
     return mapId
   }
 
-  private async removeMapInternal(map: Georef): Promise<string> {
-    const mapId = await this.getMapId(map)
+  private async removeGeoreferencedMapInternal(
+    georeferencedMap: GeoreferencedMap
+  ): Promise<string> {
+    const mapId = await this.getOrComputeMapId(georeferencedMap)
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       this.warpedMapsById.delete(mapId)
@@ -293,8 +309,11 @@ export default class WarpedMapList extends EventTarget {
     return mapId
   }
 
-  private async getMapId(map: Georef): Promise<string> {
-    const mapId = map.id || (await generateChecksum(map))
+  private async getOrComputeMapId(
+    georeferencedMap: GeoreferencedMap
+  ): Promise<string> {
+    const mapId =
+      georeferencedMap.id || (await generateChecksum(georeferencedMap))
     return mapId
   }
 

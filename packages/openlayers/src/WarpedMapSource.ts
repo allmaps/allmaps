@@ -26,14 +26,14 @@ export class WarpedMapSource extends Source {
   }
 
   async addMap(map: unknown): Promise<string | Error> {
-    const result = this.warpedMapList.addMap(map)
+    const result = this.warpedMapList.addGeoreferencedMap(map)
     this.changed()
 
     return result
   }
 
   async removeMap(map: unknown): Promise<string | Error> {
-    const result = this.warpedMapList.removeMap(map)
+    const result = this.warpedMapList.removeGeoreferencedMap(map)
     this.changed()
 
     return result

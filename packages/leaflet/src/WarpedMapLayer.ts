@@ -60,8 +60,8 @@ export const WarpedMapLayer = L.Layer.extend({
     map.on('unload', this._unload, this)
 
     // Note: Leaflet has a resize map state change event which we could also use, but wortking with a resizeObserver is better when dealing with device pixel ratios
-    // map.on('resize', this._resize, this)
-    this.resizeObserver = new ResizeObserver(this._resize.bind(this))
+    // map.on('resize', this._resized, this)
+    this.resizeObserver = new ResizeObserver(this._resized.bind(this))
     this.resizeObserver.observe(this._map.getContainer(), {
       box: 'content-box'
     })
@@ -580,12 +580,12 @@ export const WarpedMapLayer = L.Layer.extend({
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
-      this._rendererChanged.bind(this)
+      this._update.bind(this)
     )
 
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this._imageInfoLoaded.bind(this)
+      this._update.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -595,22 +595,12 @@ export const WarpedMapLayer = L.Layer.extend({
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
-      this._visibilityChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this._transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this._resourceMaskUpdated.bind(this)
+      this._update.bind(this)
     )
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
-      this._warpedMapListCleared.bind(this)
+      this._update.bind(this)
     )
   },
 
@@ -633,123 +623,6 @@ export const WarpedMapLayer = L.Layer.extend({
     //  - this.warpedMapList
 
     this.renderer.tileCache.clear()
-  },
-
-  _rendererChanged() {
-    this._update()
-  },
-
-  _imageInfoLoaded() {
-    this._update()
-  },
-
-  _warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (warpedMap) {
-        this.renderer.addWarpedMap(warpedMap)
-      }
-
-      if (this._map) {
-        this._map.fire(WarpedMapEventType.WARPEDMAPADDED, { mapId })
-      }
-    }
-
-    this._update()
-  },
-
-  _visibilityChanged() {
-    this._update()
-  },
-
-  _transformationChanged(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
-      for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-        if (warpedMap) {
-          this.renderer.updateTriangulation(warpedMap, false)
-        }
-      }
-
-      this.renderer.startTransformationTransition()
-    }
-  },
-
-  _resourceMaskUpdated(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (warpedMap) {
-        this.renderer.updateTriangulation(warpedMap)
-      }
-    }
-  },
-
-  _warpedMapListCleared() {
-    this.renderer.clear()
-  },
-
-  _resize(entries: ResizeObserverEntry[]) {
-    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-    // TODO: read + understand https://web.dev/device-pixel-content-box/
-    for (const entry of entries) {
-      const width = entry.contentRect.width
-      const height = entry.contentRect.height
-      const dpr = window.devicePixelRatio
-
-      // if (entry.devicePixelContentBoxSize) {
-      //   // NOTE: Only this path gives the correct answer
-      //   // The other paths are imperfect fallbacks
-      //   // for browsers that don't provide anyway to do this
-      //   width = entry.devicePixelContentBoxSize[0].inlineSize
-      //   height = entry.devicePixelContentBoxSize[0].blockSize
-      //   dpr = 1 // it's already in width and height
-      // } else if (entry.contentBoxSize) {
-      //   if (entry.contentBoxSize[0]) {
-      //     width = entry.contentBoxSize[0].inlineSize
-      //     height = entry.contentBoxSize[0].blockSize
-      //   }
-      // }
-
-      const displayWidth = Math.round(width * dpr)
-      const displayHeight = Math.round(height * dpr)
-
-      this.canvas.width = displayWidth
-      this.canvas.height = displayHeight
-
-      this.canvas.style.width = width + 'px'
-      this.canvas.style.height = height + 'px'
-    }
-    this._update()
-  },
-
-  // Note: borrowed from L.ImageOverlay
-  // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
-  _animateZoom(e: ZoomAnimEvent) {
-    const scale = this._map.getZoomScale(e.zoom)
-    const offset = this._map._latLngBoundsToNewLayerBounds(
-      this._map.getBounds(),
-      e.zoom,
-      e.center
-    ).min
-
-    L.DomUtil.setTransform(this.canvas, offset, scale)
-  },
-
-  _updateZIndex() {
-    if (
-      this.container &&
-      this.options.zIndex !== undefined &&
-      this.options.zIndex !== null
-    ) {
-      this.container.style.zIndex = this.options.zIndex
-    }
   },
 
   _update() {
@@ -808,5 +681,74 @@ export const WarpedMapLayer = L.Layer.extend({
     this.renderer.render()
 
     return this.container
+  },
+
+  _warpedMapAdded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+
+      if (this._map) {
+        this._map.fire(WarpedMapEventType.WARPEDMAPADDED, { mapId })
+      }
+    }
+
+    this._update()
+  },
+
+  _resized(entries: ResizeObserverEntry[]) {
+    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    // TODO: read + understand https://web.dev/device-pixel-content-box/
+    for (const entry of entries) {
+      const width = entry.contentRect.width
+      const height = entry.contentRect.height
+      const dpr = window.devicePixelRatio
+
+      // if (entry.devicePixelContentBoxSize) {
+      //   // NOTE: Only this path gives the correct answer
+      //   // The other paths are imperfect fallbacks
+      //   // for browsers that don't provide anyway to do this
+      //   width = entry.devicePixelContentBoxSize[0].inlineSize
+      //   height = entry.devicePixelContentBoxSize[0].blockSize
+      //   dpr = 1 // it's already in width and height
+      // } else if (entry.contentBoxSize) {
+      //   if (entry.contentBoxSize[0]) {
+      //     width = entry.contentBoxSize[0].inlineSize
+      //     height = entry.contentBoxSize[0].blockSize
+      //   }
+      // }
+
+      const displayWidth = Math.round(width * dpr)
+      const displayHeight = Math.round(height * dpr)
+
+      this.canvas.width = displayWidth
+      this.canvas.height = displayHeight
+
+      this.canvas.style.width = width + 'px'
+      this.canvas.style.height = height + 'px'
+    }
+    this._update()
+  },
+
+  // Note: borrowed from L.ImageOverlay
+  // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
+  _animateZoom(e: ZoomAnimEvent) {
+    const scale = this._map.getZoomScale(e.zoom)
+    const offset = this._map._latLngBoundsToNewLayerBounds(
+      this._map.getBounds(),
+      e.zoom,
+      e.center
+    ).min
+
+    L.DomUtil.setTransform(this.canvas, offset, scale)
+  },
+
+  _updateZIndex() {
+    if (
+      this.container &&
+      this.options.zIndex !== undefined &&
+      this.options.zIndex !== null
+    ) {
+      this.container.style.zIndex = this.options.zIndex
+    }
   }
 })

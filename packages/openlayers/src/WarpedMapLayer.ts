@@ -64,7 +64,7 @@ export class WarpedMapLayer extends Layer {
       throw new Error('WebGL 2 not available')
     }
 
-    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+    this.resizeObserver = new ResizeObserver(this.resized.bind(this))
     this.resizeObserver.observe(canvas, { box: 'content-box' })
 
     this.canvas = canvas
@@ -79,12 +79,12 @@ export class WarpedMapLayer extends Layer {
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
-      this.rendererChanged.bind(this)
+      this.changed.bind(this)
     )
 
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.rendererImageInfoLoaded.bind(this)
+      this.changed.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
@@ -104,134 +104,13 @@ export class WarpedMapLayer extends Layer {
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
-      this.visibilityChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
+      this.changed.bind(this)
     )
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
-      this.warpedMapListCleared.bind(this)
+      this.changed.bind(this)
     )
-
-    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-      this.renderer.addWarpedMap(warpedMap)
-    }
-  }
-
-  private warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (warpedMap) {
-        this.renderer.addWarpedMap(warpedMap)
-      }
-
-      const olEvent = new OLWarpedMapEvent(
-        WarpedMapEventType.WARPEDMAPADDED,
-        mapId
-      )
-      this.dispatchEvent(olEvent)
-    }
-
-    this.changed()
-  }
-
-  private visibilityChanged() {
-    this.changed()
-  }
-
-  private transformationChanged(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
-      for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-        if (warpedMap) {
-          this.renderer.updateTriangulation(warpedMap, false)
-        }
-      }
-
-      this.renderer.startTransformationTransition()
-    }
-  }
-
-  private resourceMaskUpdated(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (warpedMap) {
-        this.renderer.updateTriangulation(warpedMap)
-      }
-    }
-  }
-
-  private warpedMapListCleared() {
-    this.renderer.clear()
-    this.changed()
-  }
-
-  private rendererChanged() {
-    this.changed()
-  }
-
-  private rendererImageInfoLoaded() {
-    this.changed()
-  }
-
-  private onResize(entries: ResizeObserverEntry[]) {
-    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-    // TODO: read + understand https://web.dev/device-pixel-content-box/
-    for (const entry of entries) {
-      const width = entry.contentRect.width
-      const height = entry.contentRect.height
-      const dpr = window.devicePixelRatio
-
-      // if (entry.devicePixelContentBoxSize) {
-      //   // NOTE: Only this path gives the correct answer
-      //   // The other paths are imperfect fallbacks
-      //   // for browsers that don't provide anyway to do this
-      //   width = entry.devicePixelContentBoxSize[0].inlineSize
-      //   height = entry.devicePixelContentBoxSize[0].blockSize
-      //   dpr = 1 // it's already in width and height
-      // } else if (entry.contentBoxSize) {
-      //   if (entry.contentBoxSize[0]) {
-      //     width = entry.contentBoxSize[0].inlineSize
-      //     height = entry.contentBoxSize[0].blockSize
-      //   }
-      // }
-
-      const displayWidth = Math.round(width * dpr)
-      const displayHeight = Math.round(height * dpr)
-
-      this.canvasSize = [displayWidth, displayHeight]
-    }
-    this.changed()
-  }
-
-  private resizeCanvas(
-    canvas: HTMLCanvasElement,
-    [width, height]: [number, number]
-  ) {
-    const needResize = canvas.width !== width || canvas.height !== height
-
-    if (needResize) {
-      canvas.width = width
-      canvas.height = height
-    }
-
-    return needResize
   }
 
   /**
@@ -443,5 +322,63 @@ export class WarpedMapLayer extends Layer {
     this.renderer.render()
 
     return this.container
+  }
+
+  private warpedMapAdded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+
+      const olEvent = new OLWarpedMapEvent(
+        WarpedMapEventType.WARPEDMAPADDED,
+        mapId
+      )
+      this.dispatchEvent(olEvent)
+    }
+
+    this.changed()
+  }
+
+  private resized(entries: ResizeObserverEntry[]) {
+    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    // TODO: read + understand https://web.dev/device-pixel-content-box/
+    for (const entry of entries) {
+      const width = entry.contentRect.width
+      const height = entry.contentRect.height
+      const dpr = window.devicePixelRatio
+
+      // if (entry.devicePixelContentBoxSize) {
+      //   // NOTE: Only this path gives the correct answer
+      //   // The other paths are imperfect fallbacks
+      //   // for browsers that don't provide anyway to do this
+      //   width = entry.devicePixelContentBoxSize[0].inlineSize
+      //   height = entry.devicePixelContentBoxSize[0].blockSize
+      //   dpr = 1 // it's already in width and height
+      // } else if (entry.contentBoxSize) {
+      //   if (entry.contentBoxSize[0]) {
+      //     width = entry.contentBoxSize[0].inlineSize
+      //     height = entry.contentBoxSize[0].blockSize
+      //   }
+      // }
+
+      const displayWidth = Math.round(width * dpr)
+      const displayHeight = Math.round(height * dpr)
+
+      this.canvasSize = [displayWidth, displayHeight]
+    }
+    this.changed()
+  }
+
+  private resizeCanvas(
+    canvas: HTMLCanvasElement,
+    [width, height]: [number, number]
+  ) {
+    const needResize = canvas.width !== width || canvas.height !== height
+
+    if (needResize) {
+      canvas.width = width
+      canvas.height = height
+    }
+
+    return needResize
   }
 }

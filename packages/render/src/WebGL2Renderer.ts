@@ -27,7 +27,7 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
-import { bboxDiameter, distance } from '@allmaps/stdlib'
+import { bboxDiameter, distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -95,6 +95,10 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.warpedMapList = warpedMapList
 
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      this.addWarpedMap(warpedMap)
+    }
+
     this.gl = gl
 
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
@@ -110,6 +114,11 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.invertedRenderTransform = createTransform()
 
+    this.addEventListener(
+      WarpedMapEventType.IMAGEINFONEEDED,
+      this.imageInfoNeeded.bind(this)
+    )
+
     this.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,
       this.tileLoaded.bind(this)
@@ -120,9 +129,24 @@ export default class WebGL2Renderer extends EventTarget {
       this.tileRemoved.bind(this)
     )
 
-    this.addEventListener(
-      WarpedMapEventType.IMAGEINFONEEDED,
-      this.imageInfoNeeded.bind(this)
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.warpedMapAdded.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.clear.bind(this)
     )
 
     this.throttledPrepareRender = throttle(
@@ -138,239 +162,9 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
-  updateNeededTiles(): void {
-    if (!this.viewport) {
-      return
-    }
-
-    if (!this.viewportMovedSignificantly()) {
-      return
-    }
-
-    // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
-    const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
-      this.viewport.projectedGeoBbox
-    )
-
-    const neededTiles: NeededTile[] = []
-    for (const mapId of possibleMapsInViewport) {
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (!warpedMap) {
-        continue
-      }
-
-      // Get warped map image info if lacking
-      if (!hasImageInfo(warpedMap)) {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
-        )
-        continue
-      }
-
-      // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
-      if (
-        bboxDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
-        MIN_RESOURCE_SIZE
-      ) {
-        continue
-      }
-
-      const zoomLevel = getBestZoomLevelForScale(
-        warpedMap.parsedImage,
-        this.viewport.scale
-      )
-
-      // TODO: remove maps from this list when they're removed from WarpedMapList
-      // or not visible anymore
-      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
-
-      // TODO: this could be the normal transformer and normal geobbox
-      const resourceViewportPolygon = geoBboxToResourceRing(
-        warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox
-      )
-
-      // TODO: rename function
-      const tiles = computeTilesForPolygonAndZoomLevel(
-        warpedMap.parsedImage,
-        resourceViewportPolygon,
-        zoomLevel
-      )
-
-      for (const tile of tiles) {
-        neededTiles.push(makeNeededTile(tile, warpedMap))
-      }
-    }
-
-    this.tileCache.setTiles(neededTiles)
-    this.updateMapsInViewport(neededTiles)
-  }
-
-  updateMapsInViewport(neededTiles: NeededTile[]) {
-    // TODO: handle everything as Set() once JS supports filter on sets.
-    const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
-    const newMapsInViewportAsArray = neededTiles
-      .map((tile) => tile.mapId)
-      .filter((v, i, a) => {
-        // filter out duplicate mapIds
-        return a.indexOf(v) === i
-      })
-
-    this.mapsInViewport = new Set(
-      newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
-        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
-        return 0
-      })
-    )
-
-    const enteringMapsInViewport = newMapsInViewportAsArray.filter(
-      (mapId) => !oldMapsInViewportAsArray.includes(mapId)
-    )
-    const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
-      (mapId) => !newMapsInViewportAsArray.includes(mapId)
-    )
-
-    for (const mapId in enteringMapsInViewport) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-      )
-    }
-    for (const mapId in leavingMapsInViewport) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-      )
-    }
-  }
-
-  tileLoaded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-
-      const cachedTile = this.tileCache.getCachedTile(tileUrl)
-
-      if (!cachedTile) {
-        return
-      }
-
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-
-      if (!webgl2WarpedMap) {
-        return
-      }
-
-      webgl2WarpedMap.addCachedTile(tileUrl, cachedTile)
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
-    }
-  }
-
-  tileRemoved(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-
-      if (!webgl2WarpedMap) {
-        return
-      }
-
-      webgl2WarpedMap.removeCachedTile(tileUrl)
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
-    }
-  }
-
-  async imageInfoNeeded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-
-      if (!webgl2WarpedMap) {
-        return
-      }
-
-      const warpedMap = webgl2WarpedMap.warpedMap
-
-      await warpedMap.completeImageInfo()
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
-    }
-  }
-
-  addWarpedMap(warpedMap: WarpedMap) {
-    const webgl2WarpedMap = new WebGL2WarpedMap(
-      this.gl,
-      this.program,
-      warpedMap
-    )
-    this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
-  }
-
-  removeWarpedMap(mapId: string) {
-    this.webGL2WarpedMapsById.delete(mapId)
-  }
-
-  clear() {
-    this.webGL2WarpedMapsById = new Map()
-    this.mapsInViewport = new Set()
-    this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
-    this.tileCache.clear()
-  }
-
-  updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(warpedMap.mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.updateTriangulation(warpedMap, immediately)
-    }
-  }
-
-  private transformationTransitionFrame(now: number) {
-    if (!this.transformationTransitionStart) {
-      this.transformationTransitionStart = now
-    }
-
-    if (
-      now - this.transformationTransitionStart >
-      this.transformationTransitionDuration
-    ) {
-      for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
-        webGL2WarpedMap.resetCurrentTriangles()
-      }
-
-      this.animating = false
-      this.animationProgress = 0
-
-      this.transformationTransitionStart = undefined
-    } else {
-      this.animationProgress =
-        (now - this.transformationTransitionStart) /
-        this.transformationTransitionDuration
-
-      this.renderInternal()
-
-      this.lastAnimationFrameRequestId = requestAnimationFrame(
-        this.transformationTransitionFrame.bind(this)
-      )
-    }
-  }
-
-  startTransformationTransition() {
-    if (this.lastAnimationFrameRequestId !== undefined) {
-      cancelAnimationFrame(this.lastAnimationFrameRequestId)
-    }
-
-    this.animating = true
-    // this.animationProgress = 0
-    this.transformationTransitionStart = undefined
-    this.lastAnimationFrameRequestId = requestAnimationFrame(
-      this.transformationTransitionFrame.bind(this)
-    )
+  // TODO: maybe this function can be included in the render call.
+  setViewport(viewport: Viewport) {
+    this.viewport = viewport
   }
 
   getOpacity(): number | undefined {
@@ -478,6 +272,10 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  getSaturation(): number {
+    return this.saturation
+  }
+
   /**
    * Set the saturation of the all warped maps
    * @param saturation 0 - grayscale, 1 - original colors
@@ -488,6 +286,13 @@ export default class WebGL2Renderer extends EventTarget {
 
   resetSaturation(): void {
     this.saturation = DEFAULT_SATURATION
+  }
+
+  getMapSaturation(mapId: string): number | undefined {
+    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    if (webGL2WarpedMap) {
+      return webGL2WarpedMap.saturation
+    }
   }
 
   /**
@@ -509,99 +314,97 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  max(
-    number1: number | undefined,
-    number2: number | undefined
-  ): number | undefined {
-    if (number1 !== undefined && number2 !== undefined) {
-      return Math.max(number1, number2)
-    } else if (number1 !== undefined) {
-      return number1
-    } else if (number2 !== undefined) {
-      return number2
+  updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {
+    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(warpedMap.mapId)
+    if (webGL2WarpedMap) {
+      webGL2WarpedMap.updateTriangulation(warpedMap, immediately)
     }
   }
 
-  setRenderOptionsUniforms(
-    layerRenderOptions: RenderOptions,
-    mapRenderOptions: RenderOptions
-  ) {
-    const gl = this.gl
+  render(): void {
+    this.throttledPrepareRender()
+    this.renderInternal()
+    this.debouncedRenderInternal()
+  }
 
-    const renderOptions: RenderOptions = {
-      removeBackground: {
-        color:
-          mapRenderOptions.removeBackground?.color ||
-          layerRenderOptions.removeBackground?.color,
-        hardness: this.max(
-          mapRenderOptions.removeBackground?.hardness,
-          layerRenderOptions.removeBackground?.hardness
-        ),
-        threshold: this.max(
-          mapRenderOptions.removeBackground?.threshold,
-          layerRenderOptions.removeBackground?.threshold
-        )
-      },
-      colorize: {
-        ...layerRenderOptions.colorize,
-        ...mapRenderOptions.colorize
-      }
+  clear() {
+    this.webGL2WarpedMapsById = new Map()
+    this.mapsInViewport = new Set()
+    this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
+    this.tileCache.clear()
+  }
+
+  dispose() {
+    for (const warpedMapWebGLRenderer of this.webGL2WarpedMapsById.values()) {
+      warpedMapWebGLRenderer.dispose()
     }
 
-    // Remove background color
-    const removeBackgroundColor = renderOptions.removeBackground?.color
+    // TODO: remove vertexShader, fragmentShader, program
+    // TODO: remove event listeners
+    //  - this.tileCache
+  }
 
-    const removeBackgroundColorLocation = gl.getUniformLocation(
+  private addWarpedMap(warpedMap: WarpedMap) {
+    const webgl2WarpedMap = new WebGL2WarpedMap(
+      this.gl,
       this.program,
-      'u_removeBackgroundColor'
+      warpedMap
     )
-    gl.uniform1f(removeBackgroundColorLocation, removeBackgroundColor ? 1 : 0)
+    this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
+  }
 
-    if (removeBackgroundColor) {
-      const backgroundColorLocation = gl.getUniformLocation(
-        this.program,
-        'u_backgroundColor'
-      )
-      gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
-
-      const backgroundColorThresholdLocation = gl.getUniformLocation(
-        this.program,
-        'u_backgroundColorThreshold'
-      )
-
-      gl.uniform1f(
-        backgroundColorThresholdLocation,
-        renderOptions.removeBackground?.threshold ||
-          DEFAULT_REMOVE_BACKGROUND_THRESHOLD
-      )
-
-      const backgroundColorHardnessLocation = gl.getUniformLocation(
-        this.program,
-        'u_backgroundColorHardness'
-      )
-      gl.uniform1f(
-        backgroundColorHardnessLocation,
-        renderOptions.removeBackground?.hardness ||
-          DEFAULT_REMOVE_BACKGROUND_HARDNESS
-      )
+  private transformationTransitionFrame(now: number) {
+    if (!this.transformationTransitionStart) {
+      this.transformationTransitionStart = now
     }
 
-    // Colorize
-    const colorizeColor = renderOptions.colorize?.color
+    if (
+      now - this.transformationTransitionStart >
+      this.transformationTransitionDuration
+    ) {
+      for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
+        webGL2WarpedMap.resetCurrentTriangles()
+      }
 
-    const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
-    gl.uniform1f(colorizeLocation, colorizeColor ? 1 : 0)
+      this.animating = false
+      this.animationProgress = 0
 
-    if (colorizeColor) {
-      const colorizeColorLocation = gl.getUniformLocation(
-        this.program,
-        'u_colorizeColor'
+      this.transformationTransitionStart = undefined
+    } else {
+      this.animationProgress =
+        (now - this.transformationTransitionStart) /
+        this.transformationTransitionDuration
+
+      this.renderInternal()
+
+      this.lastAnimationFrameRequestId = requestAnimationFrame(
+        this.transformationTransitionFrame.bind(this)
       )
-      gl.uniform3fv(colorizeColorLocation, colorizeColor)
     }
   }
 
-  updateVertexBuffers() {
+  private startTransformationTransition() {
+    if (this.lastAnimationFrameRequestId !== undefined) {
+      cancelAnimationFrame(this.lastAnimationFrameRequestId)
+    }
+
+    this.animating = true
+    // this.animationProgress = 0
+    this.transformationTransitionStart = undefined
+    this.lastAnimationFrameRequestId = requestAnimationFrame(
+      this.transformationTransitionFrame.bind(this)
+    )
+  }
+
+  private prepareRender(): void {
+    // TODO: reset maps not in viewport, make sure these only
+    // get drawn when they are visible AND when they have their buffers
+    // updated.
+    this.updateVertexBuffers()
+    this.updateNeededTiles()
+  }
+
+  private updateVertexBuffers() {
     if (!this.viewport) {
       return
     }
@@ -618,6 +421,149 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       webgl2WarpedMap.updateVertexBuffers(projectionTransform)
+    }
+  }
+
+  private updateNeededTiles(): void {
+    if (!this.viewport) {
+      return
+    }
+
+    if (!this.viewportMovedSignificantly()) {
+      return
+    }
+
+    // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
+    const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
+      this.viewport.projectedGeoBbox
+    )
+
+    const neededTiles: NeededTile[] = []
+    for (const mapId of possibleMapsInViewport) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (!warpedMap) {
+        continue
+      }
+
+      // Get warped map image info if lacking
+      if (!hasImageInfo(warpedMap)) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
+        )
+        continue
+      }
+
+      // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
+      if (
+        bboxDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
+        MIN_RESOURCE_SIZE
+      ) {
+        continue
+      }
+
+      const zoomLevel = getBestZoomLevelForScale(
+        warpedMap.parsedImage,
+        this.viewport.scale
+      )
+
+      // TODO: remove maps from this list when they're removed from WarpedMapList
+      // or not visible anymore
+      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
+
+      // TODO: this could be the normal transformer and normal geobbox
+      const resourceViewportPolygon = geoBboxToResourceRing(
+        warpedMap.projectedTransformer,
+        this.viewport.projectedGeoBbox
+      )
+
+      // TODO: rename function
+      const tiles = computeTilesForPolygonAndZoomLevel(
+        warpedMap.parsedImage,
+        resourceViewportPolygon,
+        zoomLevel
+      )
+
+      for (const tile of tiles) {
+        neededTiles.push(makeNeededTile(tile, warpedMap))
+      }
+    }
+
+    this.tileCache.setTiles(neededTiles)
+    this.updateMapsInViewport(neededTiles)
+  }
+
+  private viewportMovedSignificantly(): boolean {
+    // TODO: this could be a problem if the viewport is quickly and continously moved
+    // within the tolerance during initial loading.
+    // Possible solution: adding a 'allrendered' event and listening to it.
+    if (!this.viewport) {
+      return false
+    }
+    if (!this.previousSignificantViewport) {
+      this.previousSignificantViewport = this.viewport
+      return false
+    } else {
+      const rectangleDistances = []
+      for (let i = 0; i < 4; i++) {
+        rectangleDistances.push(
+          distance(
+            this.previousSignificantViewport.projectedGeoRectangle[i],
+            this.viewport.projectedGeoRectangle[i]
+          ) / this.viewport.resolution
+        )
+      }
+      const dist = Math.max(...rectangleDistances)
+      if (dist == 0) {
+        // No move should also pass, since this is called multiple tiles at start
+        return true
+      }
+      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
+        this.previousSignificantViewport = this.viewport
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+
+  private updateMapsInViewport(neededTiles: NeededTile[]) {
+    // TODO: handle everything as Set() once JS supports filter on sets.
+    const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
+    const newMapsInViewportAsArray = neededTiles
+      .map((tile) => tile.mapId)
+      .filter((v, i, a) => {
+        // filter out duplicate mapIds
+        return a.indexOf(v) === i
+      })
+
+    this.mapsInViewport = new Set(
+      newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
+        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
+        if (zIndexA !== undefined && zIndexB !== undefined) {
+          return zIndexA - zIndexB
+        }
+        return 0
+      })
+    )
+
+    const enteringMapsInViewport = newMapsInViewportAsArray.filter(
+      (mapId) => !oldMapsInViewportAsArray.includes(mapId)
+    )
+    const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
+      (mapId) => !newMapsInViewportAsArray.includes(mapId)
+    )
+
+    for (const mapId in enteringMapsInViewport) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+      )
+    }
+    for (const mapId in leavingMapsInViewport) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+      )
     }
   }
 
@@ -746,66 +692,170 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  dispose() {
-    for (const warpedMapWebGLRenderer of this.webGL2WarpedMapsById.values()) {
-      warpedMapWebGLRenderer.dispose()
-    }
+  private setRenderOptionsUniforms(
+    layerRenderOptions: RenderOptions,
+    mapRenderOptions: RenderOptions
+  ) {
+    const gl = this.gl
 
-    // TODO: remove vertexShader, fragmentShader, program
-    // TODO: remove event listeners
-    //  - this.tileCache
-  }
-
-  // TODO: maybe this function can be included in the render call.
-  setViewport(viewport: Viewport) {
-    this.viewport = viewport
-  }
-
-  // TODO: this could be a problem if the viewport is quickly and continously moved within the tolerance during initial loading
-  viewportMovedSignificantly(): boolean {
-    if (!this.viewport) {
-      return false
-    }
-    if (!this.previousSignificantViewport) {
-      this.previousSignificantViewport = this.viewport
-      return false
-    } else {
-      const rectangleDistances = []
-      for (let i = 0; i < 4; i++) {
-        rectangleDistances.push(
-          distance(
-            this.previousSignificantViewport.projectedGeoRectangle[i],
-            this.viewport.projectedGeoRectangle[i]
-          ) / this.viewport.resolution
+    const renderOptions: RenderOptions = {
+      removeBackground: {
+        color:
+          mapRenderOptions.removeBackground?.color ||
+          layerRenderOptions.removeBackground?.color,
+        hardness: maxOfNumberOrUndefined(
+          mapRenderOptions.removeBackground?.hardness,
+          layerRenderOptions.removeBackground?.hardness
+        ),
+        threshold: maxOfNumberOrUndefined(
+          mapRenderOptions.removeBackground?.threshold,
+          layerRenderOptions.removeBackground?.threshold
         )
+      },
+      colorize: {
+        ...layerRenderOptions.colorize,
+        ...mapRenderOptions.colorize
       }
-      const dist = Math.max(...rectangleDistances)
-      if (dist == 0) {
-        // No move should also pass, since this is called multiple tiles at start
-        return true
+    }
+
+    // Remove background color
+    const removeBackgroundColor = renderOptions.removeBackground?.color
+
+    const removeBackgroundColorLocation = gl.getUniformLocation(
+      this.program,
+      'u_removeBackgroundColor'
+    )
+    gl.uniform1f(removeBackgroundColorLocation, removeBackgroundColor ? 1 : 0)
+
+    if (removeBackgroundColor) {
+      const backgroundColorLocation = gl.getUniformLocation(
+        this.program,
+        'u_backgroundColor'
+      )
+      gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
+
+      const backgroundColorThresholdLocation = gl.getUniformLocation(
+        this.program,
+        'u_backgroundColorThreshold'
+      )
+
+      gl.uniform1f(
+        backgroundColorThresholdLocation,
+        renderOptions.removeBackground?.threshold ||
+          DEFAULT_REMOVE_BACKGROUND_THRESHOLD
+      )
+
+      const backgroundColorHardnessLocation = gl.getUniformLocation(
+        this.program,
+        'u_backgroundColorHardness'
+      )
+      gl.uniform1f(
+        backgroundColorHardnessLocation,
+        renderOptions.removeBackground?.hardness ||
+          DEFAULT_REMOVE_BACKGROUND_HARDNESS
+      )
+    }
+
+    // Colorize
+    const colorizeColor = renderOptions.colorize?.color
+
+    const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
+    gl.uniform1f(colorizeLocation, colorizeColor ? 1 : 0)
+
+    if (colorizeColor) {
+      const colorizeColorLocation = gl.getUniformLocation(
+        this.program,
+        'u_colorizeColor'
+      )
+      gl.uniform3fv(colorizeColorLocation, colorizeColor)
+    }
+  }
+
+  private async imageInfoNeeded(event: Event) {
+    // TODO: why do we need webgl2warpedmap here? warpedmap seems to suffice!
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      if (!webgl2WarpedMap) {
+        return
       }
-      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
-        this.previousSignificantViewport = this.viewport
-        console.log('s')
-        return true
-      } else {
-        console.log('is')
-        return false
+
+      const warpedMap = webgl2WarpedMap.warpedMap
+      await warpedMap.completeImageInfo()
+
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+    }
+  }
+
+  private tileLoaded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
+      const cachedTile = this.tileCache.getCachedTile(tileUrl)
+
+      if (!cachedTile) {
+        return
+      }
+
+      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      if (!webgl2WarpedMap) {
+        return
+      }
+
+      webgl2WarpedMap.addCachedTile(tileUrl, cachedTile)
+
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    }
+  }
+
+  private tileRemoved(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
+      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+
+      if (!webgl2WarpedMap) {
+        return
+      }
+
+      webgl2WarpedMap.removeCachedTile(tileUrl)
+
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    }
+  }
+
+  private warpedMapAdded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (warpedMap) {
+        this.addWarpedMap(warpedMap)
       }
     }
   }
 
-  prepareRender(): void {
-    // TODO: reset maps not in viewport, make sure these only
-    // get drawn when they are visible AND when they have their buffers
-    // updated.
-    this.updateVertexBuffers()
-    this.updateNeededTiles()
+  private transformationChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      for (const mapId of mapIds) {
+        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+        if (warpedMap) {
+          this.updateTriangulation(warpedMap, false)
+        }
+      }
+
+      this.startTransformationTransition()
+    }
   }
 
-  render(): void {
-    this.throttledPrepareRender()
-    this.renderInternal()
-    this.debouncedRenderInternal()
+  private resourceMaskUpdated(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (warpedMap) {
+        this.updateTriangulation(warpedMap)
+      }
+    }
   }
 }
