@@ -15,6 +15,11 @@ import type {
 } from '@allmaps/types'
 import type { GcpTransformer } from '@allmaps/transform'
 
+/**
+ * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, ...
+ */
+const SCALE_FACTOR_SHARPENING = 2
+
 function distanceTilePoint(tile: Tile, point: Point): number {
   return distance(tileCenter(tile), point)
 }
@@ -111,45 +116,91 @@ function tilesIntersect([a, b]: Line): Point[] {
   return points
 }
 
-export function getBestZoomLevelForScale(
+// TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
+export function getBestTileZoomLevel(
+  image: Image,
+  canvasSize: Size,
+  resourceRing: Ring
+): TileZoomLevel {
+  const resourceBbox = computeBbox(resourceRing)
+
+  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
+  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
+
+  const resourceToCanvasScaleX = resourceBboxWidth / canvasSize[0]
+  const resourceToCanvasScaleY = resourceBboxHeight / canvasSize[1]
+  const resourceToCanvasScale = Math.min(
+    resourceToCanvasScaleX,
+    resourceToCanvasScaleY
+  )
+
+  return getBestTileZoomLevelForScale(image, resourceToCanvasScale)
+}
+
+/**
+ * Returns the best TileZoomLevel for a given resource-to-canvas scale.
+ *
+ * @export
+ * @param {Image} image - A parsed IIIF Image
+ * @param {number} scale - The resource-to-canvas scale, relating resource pixels to canvas pixels.
+ * @returns {TileZoomLevel}
+ */
+export function getBestTileZoomLevelForScale(
   image: Image,
   scale: number
 ): TileZoomLevel {
-  const tileZoomLevels = image.tileZoomLevels
+  // Returning the TileZoomLevel with the scalefactor closest to the current scale.
+  //
+  // Available scaleFactors in tileZoomLevels:
+  // 1---------2---------4---------8---------16
+  // Math.log() of those scaleFactors
+  // 0---------0.69------1.38------2.07------2.77
+  //
+  // Current scale of the map = 3
+  // 1---------2----|----4---------8---------16
+  // Math.log(3) = 1.09
+  // 0------*--0.69---|--1.38------2.07------2.77
+  //
+  // scaleFactor = 1
+  // Math.log(1) = 0
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(0 - (1.09 - 0.69)) = abs(-0.4) = 0.4
+  //
+  // scaleFactor = 2
+  // Math.log(2) = 0.69
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(0.69 - (1.09 - 0.69)) = abs(0.29) = 0.29
+  //
+  // scaleFactor = 4
+  // Math.log(4) = 1.38
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(1.38 - (1.09 - 0.69)) = abs(0.98) = 0.98
+  //
+  // => Pick scale factor 2, with minimum diff.
+  // Notice how 3 lies in the middle of 2 and 4, but on the log scale log(3) lies closer to log(4) then log(2)
+  // Notice how the SCALE_FACTOR_SHARPENING makes the actual current log scale for which the closest scaleFactor is searched move one factor of two sharper
+  // On the schematic drawing above, this is represented with a '*', left of the '|'.
+  //
+  // Math reminder: log(A)-log(B)=log(A/B)
 
-  let smallestScaleDiff = Number.POSITIVE_INFINITY
-  let bestZoomLevel = tileZoomLevels[tileZoomLevels.length - 1]
+  let smallestdiffLogScaleFactor = Number.POSITIVE_INFINITY
+  let bestTileZoomLevel = image.tileZoomLevels.at(-1) as TileZoomLevel
 
-  for (const zoomLevel of tileZoomLevels) {
-    const scaleFactor = zoomLevel.scaleFactor
-    const scaleDiff = Math.abs(scaleFactor - scale)
-
-    // scaleFactors:
-    // 1.......2.......4.......8.......16
-    //
-    // Example mapScale = 3
-    // 1.......2..|....4.......8.......16
-    //
-    // scaleFactor 2:
-    //   scaleDiff = 1
-    //   scaleFactor * 1.25 = 2.5 => 2.5 >= 3 === false
-    //
-    // scaleFactor 4:
-    //   scaleDiff = 1
-    //   scaleFactor * 1.25 = 5 => 5 >= 3 === true
-    //
-    // Pick scaleFactor 4!
-
-    // TODO: read 1.25 from config
-    // TODO: maybe use a smaller value when the scaleFactor is low and a higher value when the scaleFactor is high?
-    // TODO: use lgoarithmic scale?
-    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= scale) {
-      smallestScaleDiff = scaleDiff
-      bestZoomLevel = zoomLevel
+  for (const tileZoomLevel of image.tileZoomLevels) {
+    const diffLogScaleFactor = Math.abs(
+      Math.log(tileZoomLevel.scaleFactor) -
+        (Math.log(scale) - Math.log(SCALE_FACTOR_SHARPENING))
+    )
+    if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
+      smallestdiffLogScaleFactor = diffLogScaleFactor
+      bestTileZoomLevel = tileZoomLevel
     }
   }
 
-  return bestZoomLevel
+  return bestTileZoomLevel
 }
 
 function scalePointsToTileZoomLevel(
@@ -222,7 +273,7 @@ function tilesByXToArray(
 export function geoBboxToResourceRing(
   transformer: GcpTransformer,
   geoBbox: Bbox
-) {
+): Ring {
   // transformer is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
   // geoBbox is a Bbox (e.g. of the viewport) in (projected) geo coordinates
   // geoBboxResourceRing is a ring of this Bbox, transformed backward to resource coordinates.
@@ -235,24 +286,6 @@ export function geoBboxToResourceRing(
   }) as Ring
 
   return geoBboxResourceRing
-}
-
-// TODO: point tileserver directly to getBestZoomLevelForMapScale too and remove this function
-export function getBestZoomLevel(
-  image: Image,
-  canvasSize: Size,
-  resourceRing: Ring
-): TileZoomLevel {
-  const resourceBbox = computeBbox(resourceRing)
-
-  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
-  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
-
-  const mapScaleX = resourceBboxWidth / canvasSize[0]
-  const mapScaleY = resourceBboxHeight / canvasSize[1]
-  const mapScale = Math.min(mapScaleX, mapScaleY)
-
-  return getBestZoomLevelForScale(image, mapScale)
 }
 
 export function computeTilesForPolygonAndZoomLevel(

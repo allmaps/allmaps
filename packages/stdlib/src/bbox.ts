@@ -2,7 +2,7 @@ import {
   isGeojsonGeometry,
   convertGeojsonGeometryToGeometry
 } from './geojson.js'
-import { isPoint, isPolygon } from './geometry.js'
+import { isPoint, isPolygon, distance } from './geometry.js'
 
 import type {
   LineString,
@@ -84,4 +84,22 @@ export function bboxToLine(bbox: Bbox): Line {
     [bbox[0], bbox[1]],
     [bbox[2], bbox[3]]
   ]
+}
+
+export function bboxToDiameter(geometry: Geometry | GeojsonGeometry): number {
+  return distance(bboxToLine(computeBbox(geometry)))
+}
+
+export function bboxToExtent(bbox: Bbox): Extent {
+  return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
+}
+
+export function extentsToScale(extent0: Extent, extent1: Extent): number {
+  const scaleX = extent0[0] / extent1[0]
+  const scaleY = extent0[1] / extent1[1]
+  return Math.min(scaleX, scaleY)
+}
+
+export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {
+  return extentsToScale(bboxToExtent(bbox0), bboxToExtent(bbox1))
 }

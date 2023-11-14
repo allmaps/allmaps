@@ -18,7 +18,7 @@ import {
 } from './shared/matrix.js'
 import {
   geoBboxToResourceRing,
-  getBestZoomLevelForScale,
+  getBestTileZoomLevelForScale,
   computeTilesForPolygonAndZoomLevel,
   makeNeededTile
 } from './shared/tiles.js'
@@ -27,7 +27,14 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
-import { bboxDiameter, distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
+import {
+  computeBbox,
+  bboxToDiameter,
+  bboxToExtent,
+  extentsToScale,
+  distance,
+  maxOfNumberOrUndefined
+} from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -456,31 +463,34 @@ export default class WebGL2Renderer extends EventTarget {
 
       // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
       if (
-        bboxDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
+        bboxToDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
         MIN_RESOURCE_SIZE
       ) {
         continue
       }
 
-      const zoomLevel = getBestZoomLevelForScale(
+      // TODO: this could be the normal transformer and normal geobbox
+      const resourceViewportRing = geoBboxToResourceRing(
+        warpedMap.projectedTransformer,
+        this.viewport.projectedGeoBbox
+      )
+
+      const zoomLevel = getBestTileZoomLevelForScale(
         warpedMap.parsedImage,
-        this.viewport.scale
+        extentsToScale(
+          bboxToExtent(computeBbox(resourceViewportRing)),
+          this.viewport.canvasSize
+        )
       )
 
       // TODO: remove maps from this list when they're removed from WarpedMapList
       // or not visible anymore
       this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
-      // TODO: this could be the normal transformer and normal geobbox
-      const resourceViewportPolygon = geoBboxToResourceRing(
-        warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox
-      )
-
       // TODO: rename function
       const tiles = computeTilesForPolygonAndZoomLevel(
         warpedMap.parsedImage,
-        resourceViewportPolygon,
+        resourceViewportRing,
         zoomLevel
       )
 

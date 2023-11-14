@@ -13,7 +13,6 @@ import type {
   GeojsonPolygon,
   GeojsonGeometry
 } from '@allmaps/types'
-import { computeBbox, bboxToLine } from './bbox.js'
 
 // Assert
 
@@ -211,10 +210,6 @@ export function distance(from: Point | Line, to?: Point): number {
   } else {
     throw new Error('Input type not supported')
   }
-}
-
-export function bboxDiameter(geometry: Geometry | GeojsonGeometry): number {
-  return distance(bboxToLine(computeBbox(geometry)))
 }
 
 export function degreesToRadians(degrees: number) {
