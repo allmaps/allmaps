@@ -1,5 +1,12 @@
 import { z } from 'zod'
 
+// Copied from presentation.3.ts in @allmaps/iiif-parser
+const SingleValueSchema = z.string().or(z.number()).or(z.boolean())
+export const LanguageValueSchema = z.record(
+  z.string(),
+  SingleValueSchema.array()
+)
+
 export const PointSchema = z.tuple([z.number(), z.number()])
 
 export const PointGeometrySchema = z.object({
@@ -15,10 +22,20 @@ export const ImageServiceSchema = z.enum([
   'ImageService3'
 ])
 
-export const PartOfSchema = z.object({
+// partOf can recursively contain nested partOfs
+// From: https://github.com/colinhacks/zod#recursive-types
+const basePartOfSchema = z.object({
   id: z.string().url(),
   type: z.string(),
-  label: z.string().optional()
+  label: LanguageValueSchema.optional()
+})
+
+type PartOf = z.infer<typeof basePartOfSchema> & {
+  partOf?: PartOf[]
+}
+
+export const PartOfSchema: z.ZodType<PartOf> = basePartOfSchema.extend({
+  partOf: z.lazy(() => PartOfSchema.array()).optional()
 })
 
 const PolynomialTransformationSchema = z.object({
