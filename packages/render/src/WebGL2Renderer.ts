@@ -1,7 +1,7 @@
 import { throttle, debounce } from 'lodash-es'
 
 import TileCache from './TileCache.js'
-import WarpedMap, { hasImageInfo } from './WarpedMap.js'
+import { hasImageInfo } from './WarpedMap.js'
 import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
@@ -165,11 +165,6 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
-  // TODO: maybe this function can be included in the render call.
-  setViewport(viewport: Viewport) {
-    this.viewport = viewport
-  }
-
   getOpacity(): number | undefined {
     return this.opacity
   }
@@ -317,14 +312,8 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  updateTriangulation(warpedMap: WarpedMap, immediately?: boolean) {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(warpedMap.mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.updateTriangulation(warpedMap, immediately)
-    }
-  }
-
-  render(): void {
+  render(viewport: Viewport): void {
+    this.viewport = viewport
     this.throttledPrepareRender()
     this.renderInternal()
     this.debouncedRenderInternal()
@@ -345,15 +334,6 @@ export default class WebGL2Renderer extends EventTarget {
     // TODO: remove vertexShader, fragmentShader, program
     // TODO: remove event listeners
     //  - this.tileCache
-  }
-
-  private prepareWarpedMapRender(warpedMap: WarpedMap) {
-    const webgl2WarpedMap = new WebGL2WarpedMap(
-      this.gl,
-      this.program,
-      warpedMap
-    )
-    this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
   }
 
   private startTransformationTransition() {
@@ -448,6 +428,10 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      if (!warpedMap.visible) {
+        continue
+      }
+
       // Get warped map image info if lacking
       if (!hasImageInfo(warpedMap)) {
         this.dispatchEvent(
@@ -477,8 +461,6 @@ export default class WebGL2Renderer extends EventTarget {
         )
       )
 
-      // TODO: remove maps from this list when they're removed from WarpedMapList
-      // or not visible anymore
       this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
       const tiles = computeTiles(
@@ -577,10 +559,6 @@ export default class WebGL2Renderer extends EventTarget {
 
     const projectionTransform = this.viewport.projectionTransform
 
-    if (!projectionTransform) {
-      return
-    }
-
     // This transform is almost [1, 0, 0, 1, 0, 0]
     // since invertedRenderTransform is set as the inverse of the viewport's projectionTransform at every updateVertexBuffers()
     // But due to throttling this can be a different viewport then that over renderInternal()
@@ -595,6 +573,8 @@ export default class WebGL2Renderer extends EventTarget {
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.useProgram(this.program)
+
+    // Global uniform
 
     const projectionMatrixLocation = gl.getUniformLocation(
       this.program,
@@ -612,16 +592,12 @@ export default class WebGL2Renderer extends EventTarget {
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
+    // Map specific uniforms
+
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
-        continue
-      }
-
-      // TODO: we can also exclude hidden maps earlier, in RTree or before
-      // passing mapIds to render function
-      if (!webgl2WarpedMap.warpedMap.visible) {
         continue
       }
 
@@ -634,7 +610,6 @@ export default class WebGL2Renderer extends EventTarget {
         this.program,
         'u_bestScaleFactor'
       )
-      // TODO: make proper getter for bestScaleFactor for mapId
       const bestZoomLevel = this.bestZoomLevelByMapIdAtViewport.get(mapId)
       const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
@@ -721,7 +696,8 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
-    // Remove background color
+    // Remove background color uniforms
+
     const removeBackgroundColor = renderOptions.removeBackground?.color
 
     const removeBackgroundColorLocation = gl.getUniformLocation(
@@ -759,7 +735,8 @@ export default class WebGL2Renderer extends EventTarget {
       )
     }
 
-    // Colorize
+    // Colorize uniforms
+
     const colorizeColor = renderOptions.colorize?.color
 
     const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
@@ -829,9 +806,13 @@ export default class WebGL2Renderer extends EventTarget {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
       if (warpedMap) {
-        this.prepareWarpedMapRender(warpedMap)
+        const webgl2WarpedMap = new WebGL2WarpedMap(
+          this.gl,
+          this.program,
+          warpedMap
+        )
+        this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
       }
     }
   }
@@ -839,8 +820,11 @@ export default class WebGL2Renderer extends EventTarget {
   private transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
-        this.updateTriangulation(warpedMap, false)
+      for (const mapId of mapIds) {
+        const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+        if (webGL2WarpedMap) {
+          webGL2WarpedMap.updateTriangulation(false)
+        }
       }
 
       this.startTransformationTransition()
@@ -850,10 +834,9 @@ export default class WebGL2Renderer extends EventTarget {
   private resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (warpedMap) {
-        this.updateTriangulation(warpedMap)
+      const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      if (webGL2WarpedMap) {
+        webGL2WarpedMap.updateTriangulation(false)
       }
     }
   }

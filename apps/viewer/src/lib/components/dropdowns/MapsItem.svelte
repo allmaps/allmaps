@@ -84,6 +84,8 @@
     })
   }
 
+  // TODO: the fullResourceMask is available directly in WarpedMap class!
+  // This also means this function can be removed from stdlib.
   const fullResourceMask = getFullResourceMask(imageWidth, imageHeight)
 
   selected.subscribe(($selected) => {

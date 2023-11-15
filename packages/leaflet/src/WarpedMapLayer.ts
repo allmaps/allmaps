@@ -669,16 +669,14 @@ export const WarpedMapLayer = L.Layer.extend({
       (projectedGeoBbox[3] - projectedGeoBbox[1]) / viewportSize[1]
     const resolution = Math.max(xResolution, yResolution)
 
-    this.renderer.setViewport(
-      new Viewport(
-        projectedGeoCenter,
-        viewportSize,
-        0,
-        resolution,
-        window.devicePixelRatio
-      )
+    const viewport = new Viewport(
+      projectedGeoCenter,
+      viewportSize,
+      0,
+      resolution,
+      window.devicePixelRatio
     )
-    this.renderer.render()
+    this.renderer.render(viewport)
 
     return this.container
   },

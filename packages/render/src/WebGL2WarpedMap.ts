@@ -12,14 +12,12 @@ import type { Transform } from '@allmaps/types'
 import type { RenderOptions } from './shared/types.js'
 import { Bbox } from '@allmaps/types'
 
-// TODO: Move to stdlib?
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
 }
 
-// TODO: read defaults from config
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
@@ -31,9 +29,6 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   gl: WebGL2RenderingContext
   program: WebGLProgram
-
-  imageWidth: number
-  imageHeight: number
 
   vertexBufferTransform: Transform | undefined
 
@@ -76,10 +71,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.gl = gl
     this.program = program
 
-    this.imageWidth = warpedMap.georeferencedMap.resource.width
-    this.imageHeight = warpedMap.georeferencedMap.resource.height
-
-    this.updateTriangulation(warpedMap)
+    this.updateTriangulation()
 
     this.tilesTexture = gl.createTexture()
     this.scaleFactorsTexture = gl.createTexture()
@@ -95,20 +87,22 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
-  updateTriangulation(warpedMap: WarpedMap, immediately = true) {
-    const bbox: Bbox = computeBbox(warpedMap.resourceMask)
+  updateTriangulation(immediately = true) {
+    const bbox: Bbox = computeBbox(this.warpedMap.resourceMask)
     const bboxDiameter: number = Math.sqrt(
       (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
     )
 
     const trianglesPositions = triangulate(
-      warpedMap.resourceMask,
+      this.warpedMap.resourceMask,
       bboxDiameter / DIAMETER_FRACTION
     ).flat()
 
     // TODO: apply 'projected' in names
     const newGeoMaskVertices = trianglesPositions.map((point) =>
-      warpedMap.projectedTransformer.transformToGeo(point as [number, number])
+      this.warpedMap.projectedTransformer.transformToGeo(
+        point as [number, number]
+      )
     )
 
     this.newGeoMaskTriangles = newGeoMaskVertices.flat()

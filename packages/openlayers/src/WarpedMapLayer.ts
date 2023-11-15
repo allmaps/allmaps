@@ -310,16 +310,14 @@ export class WarpedMapLayer extends Layer {
 
     this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
-    this.renderer.setViewport(
-      new Viewport(
-        frameState.viewState.center as [number, number],
-        frameState.size as [number, number],
-        frameState.viewState.rotation,
-        frameState.viewState.resolution,
-        window.devicePixelRatio
-      )
+    const viewport = new Viewport(
+      frameState.viewState.center as [number, number],
+      frameState.size as [number, number],
+      frameState.viewState.rotation,
+      frameState.viewState.resolution,
+      window.devicePixelRatio
     )
-    this.renderer.render()
+    this.renderer.render(viewport)
 
     return this.container
   }
