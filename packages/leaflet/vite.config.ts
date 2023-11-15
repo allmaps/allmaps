@@ -25,7 +25,7 @@ export default defineConfig({
     target: 'es2020',
     sourcemap: true,
     emptyOutDir: false,
-    // minify: false,
+    minify: true,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',

@@ -23,7 +23,7 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
-    // minify: false,
+    minify: true,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
