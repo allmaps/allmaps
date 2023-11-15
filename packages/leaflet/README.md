@@ -101,49 +101,49 @@ See `index.html` or this [JSFiddle](https://jsfiddle.net/snrg4mjL/1/) for an exa
 
 #### Table of Contents
 
-- [WarpedMapLayer](#warpedmaplayer)
-  - [initialize](#initialize)
-  - [onAdd](#onadd)
-  - [onRemove](#onremove)
-  - [getContainer](#getcontainer)
-  - [getCanvas](#getcanvas)
-  - [getWorld](#getworld)
-  - [getMap](#getmap)
-  - [showMap](#showmap)
-  - [showMaps](#showmaps)
-  - [hideMap](#hidemap)
-  - [hideMaps](#hidemaps)
-  - [isMapVisible](#ismapvisible)
-  - [setResourceMask](#setresourcemask)
-  - [setMapsTransformation](#setmapstransformation)
-  - [getExtent](#getextent)
-  - [getBounds](#getbounds)
-  - [bringMapsToFront](#bringmapstofront)
-  - [sendMapsToBack](#sendmapstoback)
-  - [bringMapsForward](#bringmapsforward)
-  - [sendMapsBackward](#sendmapsbackward)
-  - [getMapZIndex](#getmapzindex)
-  - [getZIndex](#getzindex)
-  - [setZIndex](#setzindex)
-  - [bringToFront](#bringtofront)
-  - [bringToBack](#bringtoback)
-  - [getPaneName](#getpanename)
-  - [getOpacity](#getopacity)
-  - [setOpacity](#setopacity)
-  - [setMapOpacity](#setmapopacity)
-  - [resetMapOpacity](#resetmapopacity)
-  - [setRemoveBackground](#setremovebackground)
-  - [resetRemoveBackground](#resetremovebackground)
-  - [setMapRemoveBackground](#setmapremovebackground)
-  - [resetMapRemoveBackground](#resetmapremovebackground)
-  - [setColorize](#setcolorize)
-  - [resetColorize](#resetcolorize)
-  - [setMapColorize](#setmapcolorize)
-  - [resetMapColorize](#resetmapcolorize)
-  - [addGeoreferenceAnnotation](#addgeoreferenceannotation)
-  - [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
-  - [addGeoreferenceAnnotationByUrl](#addgeoreferenceannotationbyurl)
-  - [removeGeoreferenceAnnotationByUrl](#removegeoreferenceannotationbyurl)
+*   [WarpedMapLayer](#warpedmaplayer)
+    *   [initialize](#initialize)
+    *   [onAdd](#onadd)
+    *   [onRemove](#onremove)
+    *   [getContainer](#getcontainer)
+    *   [getCanvas](#getcanvas)
+    *   [getWorld](#getworld)
+    *   [getMap](#getmap)
+    *   [showMap](#showmap)
+    *   [showMaps](#showmaps)
+    *   [hideMap](#hidemap)
+    *   [hideMaps](#hidemaps)
+    *   [isMapVisible](#ismapvisible)
+    *   [setResourceMask](#setresourcemask)
+    *   [setMapsTransformation](#setmapstransformation)
+    *   [getExtent](#getextent)
+    *   [getBounds](#getbounds)
+    *   [bringMapsToFront](#bringmapstofront)
+    *   [sendMapsToBack](#sendmapstoback)
+    *   [bringMapsForward](#bringmapsforward)
+    *   [sendMapsBackward](#sendmapsbackward)
+    *   [getMapZIndex](#getmapzindex)
+    *   [getZIndex](#getzindex)
+    *   [setZIndex](#setzindex)
+    *   [bringToFront](#bringtofront)
+    *   [bringToBack](#bringtoback)
+    *   [getPaneName](#getpanename)
+    *   [getOpacity](#getopacity)
+    *   [setOpacity](#setopacity)
+    *   [setMapOpacity](#setmapopacity)
+    *   [resetMapOpacity](#resetmapopacity)
+    *   [setRemoveBackground](#setremovebackground)
+    *   [resetRemoveBackground](#resetremovebackground)
+    *   [setMapRemoveBackground](#setmapremovebackground)
+    *   [resetMapRemoveBackground](#resetmapremovebackground)
+    *   [setColorize](#setcolorize)
+    *   [resetColorize](#resetcolorize)
+    *   [setMapColorize](#setmapcolorize)
+    *   [resetMapColorize](#resetmapcolorize)
+    *   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+    *   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+    *   [addGeoreferenceAnnotationByUrl](#addgeoreferenceannotationbyurl)
+    *   [removeGeoreferenceAnnotationByUrl](#removegeoreferenceannotationbyurl)
 
 ### WarpedMapLayer
 
@@ -155,8 +155,8 @@ Creates a WarpedMapLayer
 
 ##### Parameters
 
-- `annotation` **unknown?** Georeference Annotation or URL pointing to an Annotation
-- `options` **WarpedMapLayerOptions**&#x20;
+*   `annotation` **unknown?** Georeference Annotation or URL pointing to an Annotation
+*   `options` **WarpedMapLayerOptions**&#x20;
 
 #### onAdd
 
@@ -164,7 +164,7 @@ Contains all code code that creates DOM elements for the layer, adds them to map
 
 ##### Parameters
 
-- `map` &#x20;
+*   `map` &#x20;
 
 #### onRemove
 
@@ -172,7 +172,7 @@ Contains all cleanup code that removes the layer's elements from the DOM and rem
 
 ##### Parameters
 
-- `map` &#x20;
+*   `map` &#x20;
 
 #### getContainer
 
@@ -196,7 +196,7 @@ Returns a single map
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### showMap
 
@@ -204,7 +204,7 @@ Make a single map visible
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### showMaps
 
@@ -212,7 +212,7 @@ Make multiple maps visible
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
 
 #### hideMap
 
@@ -220,7 +220,7 @@ Make a single map invisible
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### hideMaps
 
@@ -228,7 +228,7 @@ Make multiple maps invisible
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
 
 #### isMapVisible
 
@@ -236,7 +236,7 @@ Returns visibility of a single map
 
 ##### Parameters
 
-- `mapId` &#x20;
+*   `mapId` &#x20;
 
 Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
 
@@ -246,8 +246,8 @@ Sets the resource mask of a single map
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-- `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Position](https://developer.mozilla.org/docs/Web/API/Position)>** new resource mask
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `resourceMask` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Position](https://developer.mozilla.org/docs/Web/API/Position)>** new resource mask
 
 #### setMapsTransformation
 
@@ -255,8 +255,8 @@ Sets the transformation type of multiple maps
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
-- `transformation` **TransformationType** new transformation type
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps
+*   `transformation` **TransformationType** new transformation type
 
 #### getExtent
 
@@ -276,7 +276,7 @@ Bring maps to front
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring to front
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring to front
 
 #### sendMapsToBack
 
@@ -284,7 +284,7 @@ Send maps to back
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send to back
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send to back
 
 #### bringMapsForward
 
@@ -292,7 +292,7 @@ Bring maps forward
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring forward
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to bring forward
 
 #### sendMapsBackward
 
@@ -300,7 +300,7 @@ Send maps backward
 
 ##### Parameters
 
-- `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send backward
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the warped maps to send backward
 
 #### getMapZIndex
 
@@ -308,7 +308,7 @@ Returns the z-index of a single map
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
 
@@ -322,7 +322,7 @@ Changes the zIndex of the layer.
 
 ##### Parameters
 
-- `value` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zIndex
+*   `value` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zIndex
 
 #### bringToFront
 
@@ -350,7 +350,7 @@ Sets the opacity of the layer
 
 ##### Parameters
 
-- `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Layer opacity
+*   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Layer opacity
 
 #### setMapOpacity
 
@@ -358,8 +358,8 @@ Sets the opacity of a single map
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-- `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
 
 #### resetMapOpacity
 
@@ -367,7 +367,7 @@ Resets the opacity of a single map to 1
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### setRemoveBackground
 
@@ -375,11 +375,11 @@ Removes a background color from all maps in the layer
 
 ##### Parameters
 
-- `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** remove background options
+*   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** remove background options
 
-  - `options.hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** hex color of the background color to remove
-  - `options.threshold` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** threshold between 0 and 1
-  - `options.hardness` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** hardness between 0 and 1
+    *   `options.hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** hex color of the background color to remove
+    *   `options.threshold` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** threshold between 0 and 1
+    *   `options.hardness` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** hardness between 0 and 1
 
 #### resetRemoveBackground
 
@@ -391,12 +391,12 @@ Removes a background color from a single map in the layer
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-- `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** remove background options
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** remove background options
 
-  - `options.hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** hex color of the background color to remove
-  - `options.threshold` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** threshold between 0 and 1
-  - `options.hardness` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** hardness between 0 and 1
+    *   `options.hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** hex color of the background color to remove
+    *   `options.threshold` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** threshold between 0 and 1
+    *   `options.hardness` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** hardness between 0 and 1
 
 #### resetMapRemoveBackground
 
@@ -404,7 +404,7 @@ Resets the background color for a single map in the layer
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### setColorize
 
@@ -412,7 +412,7 @@ Sets the colorization for all maps in the layer
 
 ##### Parameters
 
-- `hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** desired hex color
+*   `hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** desired hex color
 
 #### resetColorize
 
@@ -424,8 +424,8 @@ Sets the colorization for a single map in the layer
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-- `hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** desired hex color
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `hexColor` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** desired hex color
 
 #### resetMapColorize
 
@@ -433,7 +433,7 @@ Resets the colorization of a single map
 
 ##### Parameters
 
-- `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
 
 #### addGeoreferenceAnnotation
 
@@ -441,7 +441,7 @@ Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ##### Parameters
 
-- `annotation` **any** Georeference Annotation
+*   `annotation` **any** Georeference Annotation
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
 
@@ -451,7 +451,7 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ##### Parameters
 
-- `annotation` **any** Georeference Annotation
+*   `annotation` **any** Georeference Annotation
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
 
@@ -461,7 +461,7 @@ Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
 
 ##### Parameters
 
-- `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
 
@@ -471,6 +471,6 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by UR
 
 ##### Parameters
 
-- `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
