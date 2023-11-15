@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -27,10 +27,10 @@
     "preversion": "npm run types && npm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.18",
+    "@allmaps/annotation": "^1.0.0-beta.19",
     "@allmaps/id": "^1.0.0-beta.20",
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/transform": "^1.0.0-beta.18",
+    "@allmaps/transform": "^1.0.0-beta.19",
     "@allmaps/types": "^1.0.0-beta.6",
     "@allmaps/ui": "^1.0.0-beta.20",
     "@turf/area": "^6.5.0",

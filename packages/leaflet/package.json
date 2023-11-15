@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/leaflet",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -59,10 +59,10 @@
     "leaflet"
   ],
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.18",
-    "@allmaps/render": "^1.0.0-beta.40",
-    "@allmaps/stdlib": "^1.0.0-beta.15",
-    "@allmaps/transform": "^1.0.0-beta.18",
+    "@allmaps/annotation": "^1.0.0-beta.19",
+    "@allmaps/render": "^1.0.0-beta.41",
+    "@allmaps/stdlib": "^1.0.0-beta.16",
+    "@allmaps/transform": "^1.0.0-beta.19",
     "@allmaps/types": "^1.0.0-beta.6",
     "leaflet": "^1.9.4",
     "lodash-es": "^4.17.21"
