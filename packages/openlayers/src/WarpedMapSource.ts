@@ -197,7 +197,7 @@ export class WarpedMapSource extends Source {
    * @returns {Bbox | undefined} - extent of all warped maps
    */
   getTotalBbox(): Bbox | undefined {
-    return this.warpedMapList.getBbox()
+    return this.warpedMapList.getTotalBbox()
   }
 
   /**
@@ -205,7 +205,7 @@ export class WarpedMapSource extends Source {
    * @returns {Bbox | undefined} - extent of all warped maps
    */
   getTotalProjectedBbox(): Bbox | undefined {
-    return this.warpedMapList.getProjectedBbox()
+    return this.warpedMapList.getTotalProjectedGeoMaskBbox()
   }
 
   /**

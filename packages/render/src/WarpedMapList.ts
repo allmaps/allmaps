@@ -40,8 +40,21 @@ export default class WarpedMapList extends EventTarget {
     return this.warpedMapsById.keys()
   }
 
-  getWarpedMaps(): Iterable<WarpedMap> {
-    return this.warpedMapsById.values()
+  getWarpedMaps(): Iterable<WarpedMap>
+  getWarpedMaps(mapIds: string[]): Iterable<WarpedMap>
+  getWarpedMaps(mapIds?: string[]): Iterable<WarpedMap> {
+    if (mapIds === undefined) {
+      return this.warpedMapsById.values()
+    } else {
+      const warpedMaps: WarpedMap[] = []
+      for (const mapId of mapIds) {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMaps.push(warpedMap)
+        }
+      }
+      return warpedMaps
+    }
   }
 
   getWarpedMap(mapId: string): WarpedMap | undefined {
@@ -52,7 +65,7 @@ export default class WarpedMapList extends EventTarget {
     return this.zIndices.get(mapId)
   }
 
-  getProjectedBbox(): Bbox | undefined {
+  getTotalProjectedGeoMaskBbox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.getWarpedMaps()) {
@@ -68,7 +81,7 @@ export default class WarpedMapList extends EventTarget {
     return bbox
   }
 
-  getBbox(): Bbox | undefined {
+  getTotalBbox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.getWarpedMaps()) {

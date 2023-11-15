@@ -6,7 +6,7 @@ import { GcpTransformer } from '@allmaps/transform'
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevel,
-  computeTilesForPolygonAndZoomLevel
+  computeTiles
 } from '@allmaps/render'
 import classifyPoint from 'robust-point-in-polygon'
 
@@ -69,11 +69,7 @@ export async function createWarpedTileResponse(
       resourceRing
     )
 
-    const iiifTiles = computeTilesForPolygonAndZoomLevel(
-      parsedImage,
-      resourceRing,
-      zoomLevel
-    )
+    const iiifTiles = computeTiles(resourceRing, parsedImage, zoomLevel)
 
     // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {

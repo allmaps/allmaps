@@ -5,6 +5,7 @@ import {
 import { isPoint, isPolygon, distance } from './geometry.js'
 
 import type {
+  Point,
   LineString,
   Polygon,
   Geometry,
@@ -88,6 +89,10 @@ export function bboxToLine(bbox: Bbox): Line {
 
 export function bboxToDiameter(geometry: Geometry | GeojsonGeometry): number {
   return distance(bboxToLine(computeBbox(geometry)))
+}
+
+export function bboxToCenter(bbox: Bbox): Point {
+  return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
 }
 
 export function bboxToExtent(bbox: Bbox): Extent {

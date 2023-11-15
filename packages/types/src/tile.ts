@@ -6,13 +6,23 @@ export type XYZTile = {
   y: number
 }
 
-export type PointByX = { [key: number]: Point }
+export type TileByColumn = { [key: number]: Point }
 
 export type Tile = {
   column: number
   row: number
   zoomLevel: TileZoomLevel
   imageSize: Size
+}
+
+export type TileZoomLevel = {
+  scaleFactor: number
+  width: number
+  height: number
+  originalWidth: number
+  originalHeight: number
+  columns: number
+  rows: number
 }
 
 export type NeededTile = {
@@ -39,14 +49,4 @@ export type Region = {
   y: number
   width: number
   height: number
-}
-
-export type TileZoomLevel = {
-  scaleFactor: number
-  width: number
-  height: number
-  originalWidth: number
-  originalHeight: number
-  columns: number
-  rows: number
 }

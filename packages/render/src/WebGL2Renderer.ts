@@ -18,9 +18,9 @@ import {
 } from './shared/matrix.js'
 import {
   geoBboxToResourceRing,
-  getBestTileZoomLevelForScale,
-  computeTilesForPolygonAndZoomLevel,
-  makeNeededTile
+  getBestTileZoomLevelForScale as getBestTileZoomLevel,
+  computeTiles,
+  tileToNeededTile
 } from './shared/tiles.js'
 import { createShader, createProgram } from './shared/webgl2.js'
 
@@ -356,6 +356,19 @@ export default class WebGL2Renderer extends EventTarget {
     this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
   }
 
+  private startTransformationTransition() {
+    if (this.lastAnimationFrameRequestId !== undefined) {
+      cancelAnimationFrame(this.lastAnimationFrameRequestId)
+    }
+
+    this.animating = true
+    // this.animationProgress = 0
+    this.transformationTransitionStart = undefined
+    this.lastAnimationFrameRequestId = requestAnimationFrame(
+      this.transformationTransitionFrame.bind(this)
+    )
+  }
+
   private transformationTransitionFrame(now: number) {
     if (!this.transformationTransitionStart) {
       this.transformationTransitionStart = now
@@ -384,19 +397,6 @@ export default class WebGL2Renderer extends EventTarget {
         this.transformationTransitionFrame.bind(this)
       )
     }
-  }
-
-  private startTransformationTransition() {
-    if (this.lastAnimationFrameRequestId !== undefined) {
-      cancelAnimationFrame(this.lastAnimationFrameRequestId)
-    }
-
-    this.animating = true
-    // this.animationProgress = 0
-    this.transformationTransitionStart = undefined
-    this.lastAnimationFrameRequestId = requestAnimationFrame(
-      this.transformationTransitionFrame.bind(this)
-    )
   }
 
   private prepareRenderInternal(): void {
@@ -469,7 +469,7 @@ export default class WebGL2Renderer extends EventTarget {
         this.viewport.projectedGeoBbox
       )
 
-      const zoomLevel = getBestTileZoomLevelForScale(
+      const zoomLevel = getBestTileZoomLevel(
         warpedMap.parsedImage,
         extentsToScale(
           bboxToExtent(computeBbox(resourceViewportRing)),
@@ -481,15 +481,14 @@ export default class WebGL2Renderer extends EventTarget {
       // or not visible anymore
       this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
 
-      // TODO: rename function
-      const tiles = computeTilesForPolygonAndZoomLevel(
-        warpedMap.parsedImage,
+      const tiles = computeTiles(
         resourceViewportRing,
+        warpedMap.parsedImage,
         zoomLevel
       )
 
       for (const tile of tiles) {
-        neededTiles.push(makeNeededTile(tile, warpedMap))
+        neededTiles.push(tileToNeededTile(tile, warpedMap))
       }
     }
 
@@ -840,12 +839,8 @@ export default class WebGL2Renderer extends EventTarget {
   private transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-        if (warpedMap) {
-          this.updateTriangulation(warpedMap, false)
-        }
+      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        this.updateTriangulation(warpedMap, false)
       }
 
       this.startTransformationTransition()
