@@ -27,10 +27,7 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) =>
-        `bundled/allmaps-openlayers-8.${format}.${
-          format === 'umd' ? 'cjs' : 'js'
-        }`,
+      fileName: (format) => `bundled/allmaps-openlayers-8.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {

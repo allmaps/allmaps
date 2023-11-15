@@ -11,10 +11,10 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "unpkg": "./dist/index.cjs",
+  "unpkg": "./dist/bundled/index.umd.js",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
+      "require": "./dist/bundled/index.umd.js",
       "import": "./dist/index.js"
     }
   },

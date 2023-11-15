@@ -27,13 +27,7 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) => {
-        if (format === 'umd') {
-          return `index.cjs`
-        }
-
-        return `index.js`
-      },
+      fileName: (format) => `bundled/index.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
