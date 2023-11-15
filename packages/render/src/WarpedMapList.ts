@@ -114,7 +114,7 @@ export default class WarpedMapList extends EventTarget {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       warpedMap.setResourceMask(resourceMask)
-      this.updateRtree(warpedMap)
+      this.addToOrUpdateRtree(warpedMap)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
       )
@@ -129,7 +129,7 @@ export default class WarpedMapList extends EventTarget {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap) {
         warpedMap.setTransformationType(transformationType)
-        this.updateRtree(warpedMap)
+        this.addToOrUpdateRtree(warpedMap)
       }
     }
     this.dispatchEvent(
@@ -282,7 +282,7 @@ export default class WarpedMapList extends EventTarget {
     )
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
-    this.updateRtree(warpedMap)
+    this.addToOrUpdateRtree(warpedMap)
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
     )
@@ -317,7 +317,7 @@ export default class WarpedMapList extends EventTarget {
     return mapId
   }
 
-  private updateRtree(warpedMap: WarpedMap): void {
+  private addToOrUpdateRtree(warpedMap: WarpedMap): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
       this.rtree.addItem(warpedMap.mapId, warpedMap.projectedGeoMask)

@@ -2,6 +2,12 @@ export type Point = [number, number]
 
 export type Line = [Point, Point]
 
+/**
+ * Rectangle (or possibly quadrilateral). Winding order of points is free.
+ *
+ * @export
+ * @typedef {Rectangle}
+ */
 export type Rectangle = [Point, Point, Point, Point]
 
 // Note:
@@ -24,7 +30,7 @@ export type Geometry = Point | LineString | Polygon
 export type Gcp = { resource: Point; geo: Point }
 
 /**
- * Bboxx. Defined as [minx, miny, maxx, maxy]
+ * Bboxx. Defined as [xMin, yMin, xMax, yMax]
  *
  * @export
  * @typedef {Bbox}
@@ -34,7 +40,7 @@ export type Bbox = [number, number, number, number]
 export type Size = [number, number]
 
 /**
- * Two numbers indicating the exent of a Bbox. Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
+ * Two numbers indicating the exent of a Bbox as [xExt, yExt]. Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
  *
  * @export
  * @typedef {Extent}

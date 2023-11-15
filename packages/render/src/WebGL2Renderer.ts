@@ -94,17 +94,13 @@ export default class WebGL2Renderer extends EventTarget {
   transformationTransitionDuration = 750
   animationProgress = 1
 
-  throttledPrepareRender: DebouncedFunc<typeof this.prepareRender>
-  debouncedRenderInternal: DebouncedFunc<typeof this.prepareRender>
+  throttledPrepareRender: DebouncedFunc<typeof this.prepareRenderInternal>
+  debouncedRenderInternal: DebouncedFunc<typeof this.prepareRenderInternal>
 
   constructor(warpedMapList: WarpedMapList, gl: WebGL2RenderingContext) {
     super()
 
     this.warpedMapList = warpedMapList
-
-    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-      this.addWarpedMap(warpedMap)
-    }
 
     this.gl = gl
 
@@ -157,7 +153,7 @@ export default class WebGL2Renderer extends EventTarget {
     )
 
     this.throttledPrepareRender = throttle(
-      this.prepareRender.bind(this),
+      this.prepareRenderInternal.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
@@ -351,7 +347,7 @@ export default class WebGL2Renderer extends EventTarget {
     //  - this.tileCache
   }
 
-  private addWarpedMap(warpedMap: WarpedMap) {
+  private prepareWarpedMapRender(warpedMap: WarpedMap) {
     const webgl2WarpedMap = new WebGL2WarpedMap(
       this.gl,
       this.program,
@@ -403,7 +399,7 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
-  private prepareRender(): void {
+  private prepareRenderInternal(): void {
     // TODO: reset maps not in viewport, make sure these only
     // get drawn when they are visible AND when they have their buffers
     // updated.
@@ -440,7 +436,6 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    // TODO: change to geoBbox if we make RTree store geoBbox instead of projectedGeoBbox
     const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
@@ -469,7 +464,6 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // TODO: this could be the normal transformer and normal geobbox
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
         this.viewport.projectedGeoBbox
@@ -525,7 +519,7 @@ export default class WebGL2Renderer extends EventTarget {
       }
       const dist = Math.max(...rectangleDistances)
       if (dist == 0) {
-        // No move should also pass, since this is called multiple tiles at start
+        // No move should also pass, e.g. when this function is called multiple times during startup, without changes to the viewport
         return true
       }
       if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
@@ -838,7 +832,7 @@ export default class WebGL2Renderer extends EventTarget {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (warpedMap) {
-        this.addWarpedMap(warpedMap)
+        this.prepareWarpedMapRender(warpedMap)
       }
     }
   }
