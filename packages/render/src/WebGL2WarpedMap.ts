@@ -1,6 +1,7 @@
 import potpack from 'potpack'
+
 import { triangulate } from '@allmaps/triangulate'
-import { computeBbox } from '@allmaps/stdlib'
+import { geometryToDiameter } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import WarpedMap from './WarpedMap.js'
@@ -8,9 +9,8 @@ import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
-import type { Transform } from '@allmaps/types'
 import type { RenderOptions } from './shared/types.js'
-import { Bbox } from '@allmaps/types'
+import type { Point, Transform } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -30,34 +30,26 @@ export default class WebGL2WarpedMap extends EventTarget {
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
-  vertexBufferTransform: Transform | undefined
-
-  resourceMaskTriangles: number[] = []
-  transformedResourceMaskTriangles: Float32Array = new Float32Array()
-
-  currentGeoMaskTriangles: number[] = []
-  currentTransformedGeoMaskTriangles: Float32Array = new Float32Array()
-
-  newGeoMaskTriangles: number[] = []
-  newTransformedGeoMaskTriangles: Float32Array = new Float32Array()
-
-  // TODO: do we need to keep this?
-  // pixelTriangleIndex: Float32Array = new Float32Array() // DEV
-
   vao: WebGLVertexArrayObject | null
 
   tilesForTexture: Map<string, CachedTile> = new Map()
-
-  opacity: number = DEFAULT_OPACITY
-  saturation: number = DEFAULT_SATURATION
-  renderOptions: RenderOptions = {}
 
   tilesTexture: WebGLTexture | null
   scaleFactorsTexture: WebGLTexture | null
   tilePositionsTexture: WebGLTexture | null
   imagePositionsTexture: WebGLTexture | null
 
-  throttledUpdateTextures: () => Promise<void> | undefined
+  resourceTrianglePoints: Point[] = []
+  projectedGeoCurrentTrianglePoints: Point[] = []
+  projectedGeoNewTrianglePoints: Point[] = []
+
+  opacity: number = DEFAULT_OPACITY
+  saturation: number = DEFAULT_SATURATION
+  renderOptions: RenderOptions = {}
+
+  projectionTransform: Transform | undefined
+
+  private throttledUpdateTextures: () => Promise<void> | undefined
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -71,14 +63,14 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.gl = gl
     this.program = program
 
-    this.updateTriangulation()
+    this.vao = gl.createVertexArray()
 
     this.tilesTexture = gl.createTexture()
     this.scaleFactorsTexture = gl.createTexture()
     this.tilePositionsTexture = gl.createTexture()
     this.imagePositionsTexture = gl.createTexture()
 
-    this.vao = gl.createVertexArray()
+    this.updateTriangulation()
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -88,171 +80,57 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   updateTriangulation(immediately = true) {
-    const bbox: Bbox = computeBbox(this.warpedMap.resourceMask)
-    const bboxDiameter: number = Math.sqrt(
-      (bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2
-    )
-
-    const trianglesPositions = triangulate(
+    this.resourceTrianglePoints = triangulate(
       this.warpedMap.resourceMask,
-      bboxDiameter / DIAMETER_FRACTION
-    ).flat()
+      geometryToDiameter(this.warpedMap.resourceMask) / DIAMETER_FRACTION
+    ).flat() as Point[]
 
-    // TODO: apply 'projected' in names
-    const newGeoMaskVertices = trianglesPositions.map((point) =>
-      this.warpedMap.projectedTransformer.transformToGeo(
-        point as [number, number]
-      )
+    this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
+      (point) =>
+        this.warpedMap.projectedTransformer.transformToGeo(point as Point)
     )
 
-    this.newGeoMaskTriangles = newGeoMaskVertices.flat()
-    this.resourceMaskTriangles = trianglesPositions.flat()
-
-    this.newTransformedGeoMaskTriangles = new Float32Array(
-      this.newGeoMaskTriangles.length
-    )
-
-    this.transformedResourceMaskTriangles = new Float32Array(
-      this.resourceMaskTriangles.length
-    )
-
-    if (immediately || !this.currentGeoMaskTriangles.length) {
-      this.currentGeoMaskTriangles = this.newGeoMaskTriangles
-      this.currentTransformedGeoMaskTriangles =
-        this.newTransformedGeoMaskTriangles
+    if (immediately || !this.projectedGeoCurrentTrianglePoints.length) {
+      this.projectedGeoCurrentTrianglePoints =
+        this.projectedGeoNewTrianglePoints
     }
   }
 
-  resetCurrentTriangles() {
-    this.currentGeoMaskTriangles = this.newGeoMaskTriangles
-    this.currentTransformedGeoMaskTriangles =
-      this.newTransformedGeoMaskTriangles
-
-    this.newGeoMaskTriangles = []
-    this.newTransformedGeoMaskTriangles = new Float32Array()
-
+  resetCurrentTrianglePoints() {
+    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
+    this.projectedGeoNewTrianglePoints = []
     this.updateVertexBuffersInternal()
   }
 
-  private updateVertexBuffersInternal() {
-    if (this.vao && this.vertexBufferTransform) {
-      this.gl.bindVertexArray(this.vao)
-
-      for (
-        let index = 0;
-        index < this.currentGeoMaskTriangles.length;
-        index += 2
-      ) {
-        const currentTransformedPoint = applyTransform(
-          this.vertexBufferTransform,
-          [
-            this.currentGeoMaskTriangles[index],
-            this.currentGeoMaskTriangles[index + 1]
-          ]
-        )
-
-        this.currentTransformedGeoMaskTriangles[index] =
-          currentTransformedPoint[0]
-        this.currentTransformedGeoMaskTriangles[index + 1] =
-          currentTransformedPoint[1]
-
-        if (this.newGeoMaskTriangles.length) {
-          // TODO: find a way to only do this during transition
-          const transformedPoint = applyTransform(this.vertexBufferTransform, [
-            this.newGeoMaskTriangles[index],
-            this.newGeoMaskTriangles[index + 1]
-          ])
-
-          this.newTransformedGeoMaskTriangles[index] = transformedPoint[0]
-          this.newTransformedGeoMaskTriangles[index + 1] = transformedPoint[1]
-        }
-      }
-
-      for (
-        let index = 0;
-        index < this.resourceMaskTriangles.length;
-        index += 2
-      ) {
-        // const transformedPoint = applyTransform(transform, [
-        //   this.resourceMaskTriangles[index],
-        //   this.resourceMaskTriangles[index + 1]
-        // ])
-
-        const transformedPoint = [
-          this.resourceMaskTriangles[index],
-          this.resourceMaskTriangles[index + 1]
-        ]
-
-        this.transformedResourceMaskTriangles[index] = transformedPoint[0]
-        this.transformedResourceMaskTriangles[index + 1] = transformedPoint[1]
-      }
-
-      // DEV Compute triangle indeces, used for development purposes
-      // this.pixelTriangleIndex = new Float32Array(
-      //   this.resourceMaskTriangles.length
-      // )
-
-      // for (let index = 0; index < this.resourceMaskTriangles.length; index++) {
-      //   this.pixelTriangleIndex[3 * index] = index
-      //   this.pixelTriangleIndex[3 * index + 1] = index
-      //   this.pixelTriangleIndex[3 * index + 2] = index
-      // }
-
-      createBuffer(
-        this.gl,
-        this.program,
-        this.currentTransformedGeoMaskTriangles,
-        2,
-        'a_position_current'
-      )
-
-      if (this.newTransformedGeoMaskTriangles.length) {
-        createBuffer(
-          this.gl,
-          this.program,
-          this.newTransformedGeoMaskTriangles,
-          2,
-          'a_position_new'
-        )
-      }
-
-      createBuffer(
-        this.gl,
-        this.program,
-        this.transformedResourceMaskTriangles,
-        2,
-        'a_pixel_position'
-      )
-
-      // // DEV
-      // createBuffer(
-      //   this.gl,
-      //   this.program,
-      //   this.pixelTriangleIndex,
-      //   1,
-      //   'a_pixel_triangle_index'
-      // )
-    }
-  }
-
-  updateVertexBuffers(transform: Transform) {
-    this.vertexBufferTransform = transform
+  updateVertexBuffers(projectionTransform: Transform) {
+    this.projectionTransform = projectionTransform
     this.updateVertexBuffersInternal()
   }
 
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {
     this.tilesForTexture.set(tileUrl, cachedTile)
-
     this.throttledUpdateTextures()
   }
 
   removeCachedTile(tileUrl: string) {
     this.tilesForTexture.delete(tileUrl)
-
     this.throttledUpdateTextures()
   }
 
-  async updateTextures() {
+  dispose() {
+    this.resourceTrianglePoints = []
+    this.projectedGeoCurrentTrianglePoints = []
+    this.projectedGeoNewTrianglePoints = []
+
+    this.gl.deleteVertexArray(this.vao)
+    this.gl.deleteTexture(this.tilesTexture)
+    this.gl.deleteTexture(this.scaleFactorsTexture)
+    this.gl.deleteTexture(this.tilePositionsTexture)
+    this.gl.deleteTexture(this.imagePositionsTexture)
+  }
+
+  private async updateTextures() {
+    // This is a costly function, so it's throttled using throttledUpdateTextures()
     const gl = this.gl
 
     const tilesForTextureCount = this.tilesForTexture.size
@@ -260,10 +138,6 @@ export default class WebGL2WarpedMap extends EventTarget {
     if (tilesForTextureCount === 0) {
       return
     }
-
-    // else if (tilesForTextureCount > MAX_TILES) {
-    //  throw new Error('too many tiles')
-    // }
 
     const tilesForTexture = [...this.tilesForTexture.values()]
 
@@ -409,18 +283,65 @@ export default class WebGL2WarpedMap extends EventTarget {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 
-  dispose() {
-    this.resourceMaskTriangles = []
-    this.transformedResourceMaskTriangles = new Float32Array()
-    this.currentGeoMaskTriangles = []
-    this.currentTransformedGeoMaskTriangles = new Float32Array()
-    this.newGeoMaskTriangles = []
-    this.newTransformedGeoMaskTriangles = new Float32Array()
+  private updateVertexBuffersInternal() {
+    // This is a costly function, so it's throttled in render as part of throttledPrepareRender()
+    if (!this.vao || !this.projectionTransform) {
+      return
+    }
 
-    this.gl.deleteVertexArray(this.vao)
-    this.gl.deleteTexture(this.tilesTexture)
-    this.gl.deleteTexture(this.scaleFactorsTexture)
-    this.gl.deleteTexture(this.tilePositionsTexture)
-    this.gl.deleteTexture(this.imagePositionsTexture)
+    this.gl.bindVertexArray(this.vao)
+
+    const resourceTriangleCoordinates = new Float32Array(
+      this.resourceTrianglePoints.flat()
+    )
+    createBuffer(
+      this.gl,
+      this.program,
+      resourceTriangleCoordinates,
+      2,
+      'a_resource_triangle_coordinates'
+    )
+
+    const webGL2CurrentTrianglePoints =
+      this.projectedGeoCurrentTrianglePoints.map((point) => {
+        return applyTransform(this.projectionTransform as Transform, point)
+      })
+    const webGL2CurrentTriangleCoordinates = new Float32Array(
+      webGL2CurrentTrianglePoints.flat()
+    )
+    createBuffer(
+      this.gl,
+      this.program,
+      webGL2CurrentTriangleCoordinates,
+      2,
+      'a_webgl2_current_triangle_coordinates'
+    )
+
+    if (this.projectedGeoNewTrianglePoints.length) {
+      // TODO: find a way to only do this during transition
+
+      const webGL2NewTrianglePoints = this.projectedGeoNewTrianglePoints.map(
+        (point) => {
+          return applyTransform(this.projectionTransform as Transform, point)
+        }
+      )
+      const webGL2NewTriangleCoordinates = new Float32Array(
+        webGL2NewTrianglePoints.flat()
+      )
+      createBuffer(
+        this.gl,
+        this.program,
+        webGL2NewTriangleCoordinates,
+        2,
+        'a_webgl2_new_triangle_coordinates'
+      )
+    }
+
+    // For debugging purposes, a triangle index is passed.
+    let triangleIndex = new Float32Array(this.resourceTrianglePoints.length)
+    triangleIndex = triangleIndex.map((v, i) => {
+      return Math.round((i - 1) / 3)
+    })
+    createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangle_index')
   }
 }

@@ -29,7 +29,7 @@ import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
 import {
   computeBbox,
-  bboxToDiameter,
+  geometryToDiameter,
   bboxToExtent,
   extentsToScale,
   distance,
@@ -67,8 +67,6 @@ const MIN_RESOURCE_SIZE = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 
 export default class WebGL2Renderer extends EventTarget {
-  tileCache: TileCache = new TileCache()
-
   warpedMapList: WarpedMapList
 
   gl: WebGL2RenderingContext
@@ -76,11 +74,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   webGL2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
-  opacity: number = DEFAULT_OPACITY
-  saturation: number = DEFAULT_SATURATION
-  renderOptions: RenderOptions = {}
-
-  invertedRenderTransform: Transform
+  tileCache: TileCache = new TileCache()
 
   viewport: Viewport | undefined
   previousSignificantViewport: Viewport | undefined
@@ -88,16 +82,26 @@ export default class WebGL2Renderer extends EventTarget {
   mapsInViewport: Set<string> = new Set()
   bestZoomLevelByMapIdAtViewport: Map<string, TileZoomLevel> = new Map()
 
+  opacity: number = DEFAULT_OPACITY
+  saturation: number = DEFAULT_SATURATION
+  renderOptions: RenderOptions = {}
+
+  invertedRenderTransform: Transform
+
   lastAnimationFrameRequestId: number | undefined
   animating = false
   transformationTransitionStart: number | undefined
   transformationTransitionDuration = 750
   animationProgress = 1
 
-  throttledPrepareRender: DebouncedFunc<typeof this.prepareRenderInternal>
-  debouncedRenderInternal: DebouncedFunc<typeof this.prepareRenderInternal>
+  private throttledPrepareRender: DebouncedFunc<
+    typeof this.prepareRenderInternal
+  >
+  private debouncedRenderInternal: DebouncedFunc<
+    typeof this.prepareRenderInternal
+  >
 
-  constructor(warpedMapList: WarpedMapList, gl: WebGL2RenderingContext) {
+  constructor(gl: WebGL2RenderingContext, warpedMapList: WarpedMapList) {
     super()
 
     this.warpedMapList = warpedMapList
@@ -359,7 +363,7 @@ export default class WebGL2Renderer extends EventTarget {
       this.transformationTransitionDuration
     ) {
       for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
-        webGL2WarpedMap.resetCurrentTriangles()
+        webGL2WarpedMap.resetCurrentTrianglePoints()
       }
 
       this.animating = false
@@ -392,9 +396,9 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    const projectionTransform = this.viewport.projectionTransform
-
-    this.invertedRenderTransform = invertTransform(projectionTransform)
+    this.invertedRenderTransform = invertTransform(
+      this.viewport.projectionTransform
+    )
 
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
@@ -403,7 +407,7 @@ export default class WebGL2Renderer extends EventTarget {
         break
       }
 
-      webgl2WarpedMap.updateVertexBuffers(projectionTransform)
+      webgl2WarpedMap.updateVertexBuffers(this.viewport.projectionTransform)
     }
   }
 
@@ -442,7 +446,8 @@ export default class WebGL2Renderer extends EventTarget {
 
       // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
       if (
-        bboxToDiameter(warpedMap.projectedGeoMask) / this.viewport.resolution <
+        geometryToDiameter(warpedMap.projectedGeoMask) /
+          this.viewport.resolution <
         MIN_RESOURCE_SIZE
       ) {
         continue
@@ -557,14 +562,15 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    const projectionTransform = this.viewport.projectionTransform
-
-    // This transform is almost [1, 0, 0, 1, 0, 0]
-    // since invertedRenderTransform is set as the inverse of the viewport's projectionTransform at every updateVertexBuffers()
-    // But due to throttling this can be a different viewport then that over renderInternal()
-    // TODO: replace this with [1, 0, 0, 1, 0, 0] if these fuctions ever fall under the same throttle function.
+    // renderTransform is the product of:
+    // - the viewport's projectionTransform (projected geo coordinates -> webgl2 coordinates)
+    // - the saved invertedRenderTransform (projected webgl2 coordinates -> geo coordinates)
+    // since invertedRenderTransform is set as the inverse of the viewport's projectionTransform in updateVertexBuffers(), so every every frame.
+    // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
+    // This is often a slightly different viewport (e.g. due to throttling?) then the current viewport at the current rendering stage.
+    // Hence this extra (small) transformation.
     const renderTransform = multiplyTransform(
-      projectionTransform,
+      this.viewport.projectionTransform,
       this.invertedRenderTransform
     )
 
@@ -576,12 +582,12 @@ export default class WebGL2Renderer extends EventTarget {
 
     // Global uniform
 
-    const projectionMatrixLocation = gl.getUniformLocation(
+    const renderTransformLocation = gl.getUniformLocation(
       this.program,
-      'u_projectionMatrix'
+      'u_renderTransform'
     )
     gl.uniformMatrix4fv(
-      projectionMatrixLocation,
+      renderTransformLocation,
       false,
       transformToMatrix4(renderTransform)
     )
@@ -592,14 +598,14 @@ export default class WebGL2Renderer extends EventTarget {
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
-    // Map specific uniforms
-
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
         continue
       }
+
+      // Map specific uniforms
 
       this.setRenderOptionsUniforms(
         this.renderOptions,
@@ -658,9 +664,10 @@ export default class WebGL2Renderer extends EventTarget {
       gl.activeTexture(gl.TEXTURE3)
       gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.scaleFactorsTexture)
 
+      // Draw each map
+
       const vao = webgl2WarpedMap.vao
-      const triangles = webgl2WarpedMap.currentGeoMaskTriangles
-      const count = triangles.length / 2
+      const count = webgl2WarpedMap.resourceTrianglePoints.length
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0

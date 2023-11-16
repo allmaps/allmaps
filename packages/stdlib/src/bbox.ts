@@ -87,7 +87,13 @@ export function bboxToLine(bbox: Bbox): Line {
   ]
 }
 
-export function bboxToDiameter(geometry: Geometry | GeojsonGeometry): number {
+export function bboxToDiameter(bbox: Bbox): number {
+  return distance(bboxToLine(bbox))
+}
+
+export function geometryToDiameter(
+  geometry: Geometry | GeojsonGeometry
+): number {
   return distance(bboxToLine(computeBbox(geometry)))
 }
 

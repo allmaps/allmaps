@@ -566,7 +566,7 @@ export const WarpedMapLayer = L.Layer.extend({
 
     this.warpedMapList = new WarpedMapList(this.options.imageInfoCache)
 
-    this.renderer = new WebGL2Renderer(this.warpedMapList, this.gl)
+    this.renderer = new WebGL2Renderer(this.gl, this.warpedMapList)
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.TILELOADED,

@@ -29,10 +29,11 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
  * @property {Bbox} viewportBbox - Bbox of the viewport, in viewport pixels.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
- * @property {number} scale - Scale of the viewport, in projection coordinates per canvas pixel (resolution/devicePixelRatio).
+ * @property {number} scale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
+//  * @property {number} resourceToCanvasScale - Scale of the viewport, in resource pixel per canvas pixel.
  * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (viewportSize*devicePixelRatio), as [width, height].
  * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
- * @property {Transform} projectionTransform - Transform from projected geo coordinates to view coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+ * @property {Transform} projectionTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
  */
 export default class Viewport extends EventTarget {
   projectedGeoCenter: Point
@@ -50,8 +51,9 @@ export default class Viewport extends EventTarget {
   viewportSize: Size
   viewportBbox: Bbox
   devicePixelRatio: number
-  canvasSize: Size
   scale: number
+  // resourceToCanvasScale: number
+  canvasSize: Size
   coordinateToPixelTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
 
@@ -110,6 +112,7 @@ export default class Viewport extends EventTarget {
       this.viewportSize[1] * this.devicePixelRatio
     ]
     this.scale = this.resolution / this.devicePixelRatio
+    // this.resourceToCanvasScale = this.resolution / this.devicePixelRatio
 
     this.setCoordinateToPixelTransform()
     this.setProjectionTransform()

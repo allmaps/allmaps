@@ -20,13 +20,13 @@ uniform isampler2D u_tilePositionsTexture;
 uniform isampler2D u_imagePositionsTexture;
 uniform isampler2D u_scaleFactorsTexture;
 
-in vec2 v_pixel_position;
-// in float v_pixel_triangle_index; // DEV
+in vec2 v_resource_triangle_coordinates;
+in float v_triangle_index;
 
 out vec4 outColor;
 
 void main() {
-  vec2 imageCoords = v_pixel_position;
+  vec2 imageCoords = v_resource_triangle_coordinates;
 
   ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
   int tileCount = tilePositionsTextureSize.y;
@@ -112,8 +112,8 @@ void main() {
     // Set opacity
     outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
 
-    // DEV: draw triangles in random color
-    // float color = sin(v_pixel_triangle_index * 4.0);
-    // outColor = vec4(color, fract(color + 0.3), fract(color + 0.6), 1);
+    // Debugging: uncomment to show triangles
+    float color = sin(v_triangle_index * 4.0f);
+    outColor = vec4(color, fract(color + 0.3f), fract(color + 0.6f), 1);
   }
 }

@@ -75,7 +75,7 @@ export class WarpedMapLayer extends Layer {
 
     this.warpedMapList = this.source.getWarpedMapList()
 
-    this.renderer = new WebGL2Renderer(this.warpedMapList, this.gl)
+    this.renderer = new WebGL2Renderer(this.gl, this.warpedMapList)
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
