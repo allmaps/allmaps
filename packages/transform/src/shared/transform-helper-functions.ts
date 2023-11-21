@@ -3,7 +3,7 @@ import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
 import {
-  midPoit,
+  midPoint,
   distance,
   conformLineString,
   conformRing
@@ -248,7 +248,7 @@ function addMidpointWithDestinationMidPointFromTransform(
   const sourceMidPointFunction = options.sourceIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : midPoit
+    : midPoint
   const sourceMidPoint = sourceMidPointFunction(
     segment.from.source,
     segment.to.source
@@ -257,7 +257,7 @@ function addMidpointWithDestinationMidPointFromTransform(
   const destinationMidPointFunction = options.destinationIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : midPoit
+    : midPoint
   const destinationMidPoint = destinationMidPointFunction(
     segment.from.destination,
     segment.to.destination
@@ -318,7 +318,7 @@ function addMidpointWithSourceMidPointFromTransform(
   const destinationMidPointFunction = options.destinationIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : midPoit
+    : midPoint
   const destinationMidPoint = destinationMidPointFunction(
     segment.from.destination,
     segment.to.destination
@@ -327,7 +327,7 @@ function addMidpointWithSourceMidPointFromTransform(
   const sourceMidPointFunction = options.sourceIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
-    : midPoit
+    : midPoint
   const sourceMidPoint = sourceMidPointFunction(
     segment.from.source,
     segment.to.source

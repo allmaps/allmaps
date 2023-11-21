@@ -1,7 +1,7 @@
 import potpack from 'potpack'
 
 import { triangulate } from '@allmaps/triangulate'
-import { geometryToDiameter } from '@allmaps/stdlib'
+import { geometryToDiameter, mixPoints } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import WarpedMap from './WarpedMap.js'
@@ -32,12 +32,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   vao: WebGLVertexArrayObject | null
 
-  tilesForTexture: Map<string, CachedTile> = new Map()
-
-  tilesTexture: WebGLTexture | null
-  scaleFactorsTexture: WebGLTexture | null
-  tilePositionsTexture: WebGLTexture | null
-  imagePositionsTexture: WebGLTexture | null
+  CachedTilesByTileUrl: Map<string, CachedTile> = new Map()
 
   resourceTrianglePoints: Point[] = []
   projectedGeoCurrentTrianglePoints: Point[] = []
@@ -46,6 +41,11 @@ export default class WebGL2WarpedMap extends EventTarget {
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
+
+  packedTilesTexture: WebGLTexture | null
+  packedTilesPositionsTexture: WebGLTexture | null
+  packedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
+  packedTilesScaleFactorsTexture: WebGLTexture | null
 
   projectionTransform: Transform | undefined
 
@@ -65,10 +65,10 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     this.vao = gl.createVertexArray()
 
-    this.tilesTexture = gl.createTexture()
-    this.scaleFactorsTexture = gl.createTexture()
-    this.tilePositionsTexture = gl.createTexture()
-    this.imagePositionsTexture = gl.createTexture()
+    this.packedTilesTexture = gl.createTexture()
+    this.packedTilesScaleFactorsTexture = gl.createTexture()
+    this.packedTilesPositionsTexture = gl.createTexture()
+    this.packedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
     this.updateTriangulation()
 
@@ -96,9 +96,20 @@ export default class WebGL2WarpedMap extends EventTarget {
     }
   }
 
+  mixCurrentTrianglePoints(t: number) {
+    this.projectedGeoCurrentTrianglePoints =
+      this.projectedGeoNewTrianglePoints.map((point, index) => {
+        return mixPoints(
+          point,
+          this.projectedGeoCurrentTrianglePoints[index],
+          t
+        )
+      })
+    this.updateVertexBuffersInternal()
+  }
+
   resetCurrentTrianglePoints() {
     this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
-    this.projectedGeoNewTrianglePoints = []
     this.updateVertexBuffersInternal()
   }
 
@@ -108,12 +119,12 @@ export default class WebGL2WarpedMap extends EventTarget {
   }
 
   addCachedTile(tileUrl: string, cachedTile: CachedTile) {
-    this.tilesForTexture.set(tileUrl, cachedTile)
+    this.CachedTilesByTileUrl.set(tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
   removeCachedTile(tileUrl: string) {
-    this.tilesForTexture.delete(tileUrl)
+    this.CachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
   }
 
@@ -123,28 +134,78 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.projectedGeoNewTrianglePoints = []
 
     this.gl.deleteVertexArray(this.vao)
-    this.gl.deleteTexture(this.tilesTexture)
-    this.gl.deleteTexture(this.scaleFactorsTexture)
-    this.gl.deleteTexture(this.tilePositionsTexture)
-    this.gl.deleteTexture(this.imagePositionsTexture)
+    this.gl.deleteTexture(this.packedTilesTexture)
+    this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
+    this.gl.deleteTexture(this.packedTilesPositionsTexture)
+    this.gl.deleteTexture(this.packedTilesResourcePositionsAndDimensionsTexture)
+  }
+
+  private updateVertexBuffersInternal() {
+    // This is a costly function, so it's throttled in render as part of throttledPrepareRender()
+    // And it's called once at the end off a transformation transition
+    if (!this.vao || !this.projectionTransform) {
+      return
+    }
+
+    this.gl.bindVertexArray(this.vao)
+
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(this.resourceTrianglePoints.flat()),
+      2,
+      'a_resource_triangle_coordinates'
+    )
+
+    const webGL2CurrentTrianglePoints =
+      this.projectedGeoCurrentTrianglePoints.map((point) => {
+        return applyTransform(this.projectionTransform as Transform, point)
+      })
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(webGL2CurrentTrianglePoints.flat()),
+      2,
+      'a_webgl2_current_triangle_coordinates'
+    )
+
+    const webGL2NewTrianglePoints = this.projectedGeoNewTrianglePoints.map(
+      (point) => {
+        return applyTransform(this.projectionTransform as Transform, point)
+      }
+    )
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(webGL2NewTrianglePoints.flat()),
+      2,
+      'a_webgl2_new_triangle_coordinates'
+    )
+
+    // For debugging purposes, a triangle index is passed.
+    let triangleIndex = new Float32Array(this.resourceTrianglePoints.length)
+    triangleIndex = triangleIndex.map((v, i) => {
+      return Math.round((i - 1) / 3)
+    })
+    createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangle_index')
   }
 
   private async updateTextures() {
     // This is a costly function, so it's throttled using throttledUpdateTextures()
     const gl = this.gl
 
-    const tilesForTextureCount = this.tilesForTexture.size
+    const CachedTilesByTileUrlCount = this.CachedTilesByTileUrl.size
 
-    if (tilesForTextureCount === 0) {
+    if (CachedTilesByTileUrlCount === 0) {
       return
     }
 
-    const tilesForTexture = [...this.tilesForTexture.values()]
+    const cachedTiles = [...this.CachedTilesByTileUrl.values()]
 
-    const packedTiles = tilesForTexture.map((tile, index) => ({
+    const packedTiles = cachedTiles.map((tile, index) => ({
       w: tile.imageBitmap?.width || 0,
       h: tile.imageBitmap?.height || 0,
-      // calling potpack will add x and y properties
+      // Calling potpack will add x and y properties
       // By adding them here already, we'll make TypeScript happy!
       x: 0,
       y: 0,
@@ -155,40 +216,15 @@ export default class WebGL2WarpedMap extends EventTarget {
     // values with the texture position in pixel values
     const { w: textureWidth, h: textureHeight } = potpack(packedTiles)
 
-    const scaleFactors = packedTiles.map(
-      ({ index }) => tilesForTexture[index].tile.zoomLevel.scaleFactor
-    )
-
-    gl.bindTexture(gl.TEXTURE_2D, this.scaleFactorsTexture)
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.R32I,
-      1,
-      tilesForTextureCount,
-      0,
-      gl.RED_INTEGER,
-      gl.INT,
-      new Int32Array(scaleFactors)
-    )
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    // Packed Tiles Texture
 
     // if (Math.max(textureWidth, textureHeight) > MAX_TEXTURE_SIZE) {
     //   throw new Error('tile texture too large')
     // }
 
-    gl.bindTexture(gl.TEXTURE_2D, this.tilesTexture)
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
+    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesTexture)
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
@@ -200,22 +236,16 @@ export default class WebGL2WarpedMap extends EventTarget {
       gl.UNSIGNED_BYTE,
       null
     )
-
     for (const packedTile of packedTiles) {
-      const index = packedTile.index
-      const cachedTile = tilesForTexture[index]
-
+      // Fill with the TileImageBitmap of each packed tile
+      const cachedTile = cachedTiles[packedTile.index]
       const tileImageBitmap = cachedTile.imageBitmap
-
       if (tileImageBitmap) {
-        const textureX = packedTile.x
-        const textureY = packedTile.y
-
         gl.texSubImage2D(
           gl.TEXTURE_2D,
           0,
-          textureX,
-          textureY,
+          packedTile.x,
+          packedTile.y,
           tileImageBitmap.width,
           tileImageBitmap.height,
           gl.RGBA,
@@ -224,124 +254,97 @@ export default class WebGL2WarpedMap extends EventTarget {
         )
       }
     }
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    const tilePositions = packedTiles.map((packedTile) => [
+    // Packed Tiles Positions Texture
+
+    const packedTilesPositions = packedTiles.map((packedTile) => [
       packedTile.x,
       packedTile.y
     ])
 
-    gl.bindTexture(gl.TEXTURE_2D, this.tilePositionsTexture)
+    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesPositionsTexture)
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.RG32I,
       1,
-      tilesForTextureCount,
+      CachedTilesByTileUrlCount,
       0,
       gl.RG_INTEGER,
       gl.INT,
-      new Int32Array(tilePositions.flat())
+      new Int32Array(packedTilesPositions.flat())
     )
-
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    const imagePositions: number[][] = []
+    // Packed Tiles Resource Positions And Dimensions Texture
 
-    packedTiles.forEach(({ index }) => {
-      const tile = tilesForTexture[index]
-
-      // TODO: is this correct? Added to fix TypeScript error
-      if (tile && tile.imageRequest && tile.imageRequest.region) {
-        imagePositions.push([
-          tile.imageRequest.region.x,
-          tile.imageRequest.region.y,
-          tile.imageRequest.region.width,
-          tile.imageRequest.region.height
-        ])
+    const packedTilesResourcePositionsAndDimensions = packedTiles.map(
+      (packedTile) => {
+        const cachedTile = cachedTiles[packedTile.index]
+        // TODO: is this correct? Added to fix TypeScript error
+        if (
+          cachedTile &&
+          cachedTile.imageRequest &&
+          cachedTile.imageRequest.region
+        ) {
+          return [
+            cachedTile.imageRequest.region.x,
+            cachedTile.imageRequest.region.y,
+            cachedTile.imageRequest.region.width,
+            cachedTile.imageRequest.region.height
+          ]
+        }
       }
-    })
+    ) as number[][]
 
-    gl.bindTexture(gl.TEXTURE_2D, this.imagePositionsTexture)
+    gl.bindTexture(
+      gl.TEXTURE_2D,
+      this.packedTilesResourcePositionsAndDimensionsTexture
+    )
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.RGBA32I,
       1,
-      tilesForTextureCount,
+      CachedTilesByTileUrlCount,
       0,
       gl.RGBA_INTEGER,
       gl.INT,
-      new Int32Array(imagePositions.flat())
+      new Int32Array(packedTilesResourcePositionsAndDimensions.flat())
     )
-
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  }
 
-  private updateVertexBuffersInternal() {
-    // This is a costly function, so it's throttled in render as part of throttledPrepareRender()
-    if (!this.vao || !this.projectionTransform) {
-      return
-    }
+    // Packed Tiles Scale Factors Texture
 
-    this.gl.bindVertexArray(this.vao)
-
-    const resourceTriangleCoordinates = new Float32Array(
-      this.resourceTrianglePoints.flat()
-    )
-    createBuffer(
-      this.gl,
-      this.program,
-      resourceTriangleCoordinates,
-      2,
-      'a_resource_triangle_coordinates'
+    const packedTilesScaleFactors = packedTiles.map(
+      ({ index }) => cachedTiles[index].tile.zoomLevel.scaleFactor
     )
 
-    const webGL2CurrentTrianglePoints =
-      this.projectedGeoCurrentTrianglePoints.map((point) => {
-        return applyTransform(this.projectionTransform as Transform, point)
-      })
-    const webGL2CurrentTriangleCoordinates = new Float32Array(
-      webGL2CurrentTrianglePoints.flat()
+    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesScaleFactorsTexture)
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.R32I,
+      1,
+      CachedTilesByTileUrlCount,
+      0,
+      gl.RED_INTEGER,
+      gl.INT,
+      new Int32Array(packedTilesScaleFactors)
     )
-    createBuffer(
-      this.gl,
-      this.program,
-      webGL2CurrentTriangleCoordinates,
-      2,
-      'a_webgl2_current_triangle_coordinates'
-    )
-
-    if (this.projectedGeoNewTrianglePoints.length) {
-      // TODO: find a way to only do this during transition
-
-      const webGL2NewTrianglePoints = this.projectedGeoNewTrianglePoints.map(
-        (point) => {
-          return applyTransform(this.projectionTransform as Transform, point)
-        }
-      )
-      const webGL2NewTriangleCoordinates = new Float32Array(
-        webGL2NewTrianglePoints.flat()
-      )
-      createBuffer(
-        this.gl,
-        this.program,
-        webGL2NewTriangleCoordinates,
-        2,
-        'a_webgl2_new_triangle_coordinates'
-      )
-    }
-
-    // For debugging purposes, a triangle index is passed.
-    let triangleIndex = new Float32Array(this.resourceTrianglePoints.length)
-    triangleIndex = triangleIndex.map((v, i) => {
-      return Math.round((i - 1) / 3)
-    })
-    createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangle_index')
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
   }
 }

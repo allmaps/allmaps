@@ -40,6 +40,7 @@ export default class TileCache extends EventTarget {
         this.tileFetchError.bind(this)
       )
 
+      // TODO: should this be await?
       cachedTile.fetch()
 
       this.cachedTilesByTileUrl.set(tileUrl, cachedTile)

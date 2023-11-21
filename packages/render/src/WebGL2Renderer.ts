@@ -65,6 +65,7 @@ const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
 const MIN_RESOURCE_SIZE = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
+const ANIMATION_DURATION = 750
 
 export default class WebGL2Renderer extends EventTarget {
   warpedMapList: WarpedMapList
@@ -91,7 +92,6 @@ export default class WebGL2Renderer extends EventTarget {
   lastAnimationFrameRequestId: number | undefined
   animating = false
   transformationTransitionStart: number | undefined
-  transformationTransitionDuration = 750
   animationProgress = 1
 
   private throttledPrepareRender: DebouncedFunc<
@@ -346,7 +346,6 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     this.animating = true
-    // this.animationProgress = 0
     this.transformationTransitionStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
       this.transformationTransitionFrame.bind(this)
@@ -358,28 +357,22 @@ export default class WebGL2Renderer extends EventTarget {
       this.transformationTransitionStart = now
     }
 
-    if (
-      now - this.transformationTransitionStart >
-      this.transformationTransitionDuration
-    ) {
-      for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
-        webGL2WarpedMap.resetCurrentTrianglePoints()
-      }
-
-      this.animating = false
-      this.animationProgress = 0
-
-      this.transformationTransitionStart = undefined
-    } else {
+    if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
       this.animationProgress =
-        (now - this.transformationTransitionStart) /
-        this.transformationTransitionDuration
+        (now - this.transformationTransitionStart) / ANIMATION_DURATION
 
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
         this.transformationTransitionFrame.bind(this)
       )
+    } else {
+      for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
+        webGL2WarpedMap.resetCurrentTrianglePoints()
+      }
+      this.animating = false
+      this.animationProgress = 0
+      this.transformationTransitionStart = undefined
     }
   }
 
@@ -565,10 +558,9 @@ export default class WebGL2Renderer extends EventTarget {
     // renderTransform is the product of:
     // - the viewport's projectionTransform (projected geo coordinates -> webgl2 coordinates)
     // - the saved invertedRenderTransform (projected webgl2 coordinates -> geo coordinates)
-    // since invertedRenderTransform is set as the inverse of the viewport's projectionTransform in updateVertexBuffers(), so every every frame.
+    // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
+    // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectionTransform in updateVertexBuffers()
     // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
-    // This is often a slightly different viewport (e.g. due to throttling?) then the current viewport at the current rendering stage.
-    // Hence this extra (small) transformation.
     const renderTransform = multiplyTransform(
       this.viewport.projectionTransform,
       this.invertedRenderTransform
@@ -580,17 +572,21 @@ export default class WebGL2Renderer extends EventTarget {
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.useProgram(this.program)
 
-    // Global uniform
+    // # Global uniform
+
+    // Render Transform
 
     const renderTransformLocation = gl.getUniformLocation(
       this.program,
-      'u_renderTransform'
+      'u_render_transform'
     )
     gl.uniformMatrix4fv(
       renderTransformLocation,
       false,
       transformToMatrix4(renderTransform)
     )
+
+    // Animation Progress
 
     const animationProgressLocation = gl.getUniformLocation(
       this.program,
@@ -605,23 +601,19 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // Map specific uniforms
+      // # Map specific uniforms
 
       this.setRenderOptionsUniforms(
         this.renderOptions,
         webgl2WarpedMap.renderOptions
       )
 
-      const bestScaleFactorLocation = gl.getUniformLocation(
-        this.program,
-        'u_bestScaleFactor'
-      )
-      const bestZoomLevel = this.bestZoomLevelByMapIdAtViewport.get(mapId)
-      const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
-      gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
+      // Opacity
 
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.opacity * webgl2WarpedMap.opacity)
+
+      // Satuation
 
       const saturationLocation = gl.getUniformLocation(
         this.program,
@@ -632,39 +624,64 @@ export default class WebGL2Renderer extends EventTarget {
         this.saturation * webgl2WarpedMap.saturation
       )
 
-      const u_tilesTextureLocation = gl.getUniformLocation(
+      // Best Scale Factor
+
+      const bestScaleFactorLocation = gl.getUniformLocation(
         this.program,
-        'u_tilesTexture'
+        'u_best_scale_factor'
       )
-      gl.uniform1i(u_tilesTextureLocation, 0)
+      const bestZoomLevel = this.bestZoomLevelByMapIdAtViewport.get(mapId)
+      const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
+      gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
+
+      // Packed Tiles Texture
+
+      const packedTilesTextureLocation = gl.getUniformLocation(
+        this.program,
+        'u_packed_tiles_texture'
+      )
+      gl.uniform1i(packedTilesTextureLocation, 0)
       gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.tilesTexture)
+      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesTexture)
 
-      const u_tilePositionsTextureLocation = gl.getUniformLocation(
+      // Packed Tiles Positions Texture
+
+      const packedTilesPositionsTextureLocation = gl.getUniformLocation(
         this.program,
-        'u_tilePositionsTexture'
+        'u_packed_tiles_positions_texture'
       )
-      gl.uniform1i(u_tilePositionsTextureLocation, 1)
+      gl.uniform1i(packedTilesPositionsTextureLocation, 1)
       gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.tilePositionsTexture)
+      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesPositionsTexture)
 
-      const u_imagePositionsTextureLocation = gl.getUniformLocation(
-        this.program,
-        'u_imagePositionsTexture'
-      )
-      gl.uniform1i(u_imagePositionsTextureLocation, 2)
+      // Packed Tiles Resource Positions And Dimensions Texture
+
+      const packedTilesResourcePositionsAndDimensionsLocation =
+        gl.getUniformLocation(
+          this.program,
+          'u_packed_tiles_resource_positions_and_dimensions_texture'
+        )
+      gl.uniform1i(packedTilesResourcePositionsAndDimensionsLocation, 2)
       gl.activeTexture(gl.TEXTURE2)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.imagePositionsTexture)
-
-      const u_scaleFactorsTextureLocation = gl.getUniformLocation(
-        this.program,
-        'u_scaleFactorsTexture'
+      gl.bindTexture(
+        gl.TEXTURE_2D,
+        webgl2WarpedMap.packedTilesResourcePositionsAndDimensionsTexture
       )
-      gl.uniform1i(u_scaleFactorsTextureLocation, 3)
-      gl.activeTexture(gl.TEXTURE3)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.scaleFactorsTexture)
 
-      // Draw each map
+      // Packed Tiles Scale Factors Texture
+
+      const packedTileScaleFactorsTextureLocation = gl.getUniformLocation(
+        this.program,
+        'u_packed_tiles_scale_factors_texture'
+      )
+      gl.uniform1i(packedTileScaleFactorsTextureLocation, 3)
+      gl.activeTexture(gl.TEXTURE3)
+      gl.bindTexture(
+        gl.TEXTURE_2D,
+        webgl2WarpedMap.packedTilesScaleFactorsTexture
+      )
+
+      // # Draw each map
 
       const vao = webgl2WarpedMap.vao
       const count = webgl2WarpedMap.resourceTrianglePoints.length
@@ -709,20 +726,20 @@ export default class WebGL2Renderer extends EventTarget {
 
     const removeBackgroundColorLocation = gl.getUniformLocation(
       this.program,
-      'u_removeBackgroundColor'
+      'u_remove_background_color'
     )
     gl.uniform1f(removeBackgroundColorLocation, removeBackgroundColor ? 1 : 0)
 
     if (removeBackgroundColor) {
       const backgroundColorLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColor'
+        'u_background_color'
       )
       gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
 
       const backgroundColorThresholdLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColorThreshold'
+        'u_background_color_threshold'
       )
 
       gl.uniform1f(
@@ -733,7 +750,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       const backgroundColorHardnessLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColorHardness'
+        'u_background_color_hardness'
       )
       gl.uniform1f(
         backgroundColorHardnessLocation,
@@ -752,7 +769,7 @@ export default class WebGL2Renderer extends EventTarget {
     if (colorizeColor) {
       const colorizeColorLocation = gl.getUniformLocation(
         this.program,
-        'u_colorizeColor'
+        'u_colorize_color'
       )
       gl.uniform3fv(colorizeColorLocation, colorizeColor)
     }
@@ -830,6 +847,9 @@ export default class WebGL2Renderer extends EventTarget {
       for (const mapId of mapIds) {
         const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
         if (webGL2WarpedMap) {
+          if (this.animating) {
+            webGL2WarpedMap.mixCurrentTrianglePoints(this.animationProgress)
+          }
           webGL2WarpedMap.updateTriangulation(false)
         }
       }

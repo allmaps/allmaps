@@ -193,10 +193,17 @@ export function isEqualPointArrayArray(
 
 // Compute
 
-export function midPoit(point1: Point, point2: Point): Point {
+export function midPoint(point0: Point, point1: Point): Point {
   return [
-    (point2[0] - point1[0]) / 2 + point1[0],
-    (point2[1] - point1[1]) / 2 + point1[1]
+    (point1[0] - point0[0]) / 2 + point0[0],
+    (point1[1] - point0[1]) / 2 + point0[1]
+  ]
+}
+
+export function mixPoints(point0: Point, point1: Point, t: number): Point {
+  return [
+    point0[0] * t + point1[0] * (1 - t),
+    point0[1] * t + point1[1] * (1 - t)
   ]
 }
 
