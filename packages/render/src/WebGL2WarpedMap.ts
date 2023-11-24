@@ -22,15 +22,18 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
 // TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 40
+const DIAMETER_FRACTION = 80
 
-export default class WebGL2WarpedMap extends EventTarget {
+export default class WebGL2WarpedMap {
   warpedMap: WarpedMap
 
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
   vao: WebGLVertexArrayObject | null
+
+  bestScaleFactor!: number
+  resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
 
   CachedTilesByTileUrl: Map<string, CachedTile> = new Map()
 
@@ -47,7 +50,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   packedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
   packedTilesScaleFactorsTexture: WebGLTexture | null
 
-  projectionTransform: Transform | undefined
+  projectedGeoToWebGL2Transform: Transform | undefined
 
   private throttledUpdateTextures: () => Promise<void> | undefined
 
@@ -56,8 +59,6 @@ export default class WebGL2WarpedMap extends EventTarget {
     program: WebGLProgram,
     warpedMap: WarpedMap
   ) {
-    super()
-
     this.warpedMap = warpedMap
 
     this.gl = gl
@@ -70,7 +71,10 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.packedTilesPositionsTexture = gl.createTexture()
     this.packedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
-    this.updateTriangulation()
+    // Triangulating before rendering is not strictly necessary
+    // But creating the triangulation on the highest zoom level once assures the vertex buffers are long enough
+    // TODO: Could this be simplified?
+    this.setBestScaleFactor(1)
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -79,18 +83,46 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
-  updateTriangulation(immediately = true) {
-    this.resourceTrianglePoints = triangulate(
-      this.warpedMap.resourceMask,
-      geometryToDiameter(this.warpedMap.resourceMask) / DIAMETER_FRACTION
-    ).flat() as Point[]
+  setBestScaleFactor(scaleFactor: number) {
+    if (this.bestScaleFactor != scaleFactor) {
+      this.bestScaleFactor = scaleFactor
+      this.updateTriangulation(true)
+    }
+  }
 
+  updateTriangulation(currentIsNew = false) {
+    if (
+      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
+    ) {
+      this.resourceTrianglePoints =
+        this.resourceTrianglePointsByBestScaleFactor.get(this.bestScaleFactor)!
+    } else {
+      const diameter =
+        (geometryToDiameter(this.warpedMap.resourceMask) *
+          this.bestScaleFactor) /
+        DIAMETER_FRACTION
+
+      this.resourceTrianglePoints = triangulate(
+        this.warpedMap.resourceMask,
+        diameter
+      ).flat()
+
+      this.resourceTrianglePointsByBestScaleFactor.set(
+        this.bestScaleFactor,
+        this.resourceTrianglePoints
+      )
+    }
+
+    this.updateProjectedGeo(currentIsNew)
+  }
+
+  updateProjectedGeo(currentIsNew = false) {
     this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
       (point) =>
         this.warpedMap.projectedTransformer.transformToGeo(point as Point)
     )
 
-    if (immediately || !this.projectedGeoCurrentTrianglePoints.length) {
+    if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
       this.projectedGeoCurrentTrianglePoints =
         this.projectedGeoNewTrianglePoints
     }
@@ -113,8 +145,8 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.updateVertexBuffersInternal()
   }
 
-  updateVertexBuffers(projectionTransform: Transform) {
-    this.projectionTransform = projectionTransform
+  updateVertexBuffers(projectedGeoToWebGL2Transform: Transform) {
+    this.projectedGeoToWebGL2Transform = projectedGeoToWebGL2Transform
     this.updateVertexBuffersInternal()
   }
 
@@ -143,7 +175,7 @@ export default class WebGL2WarpedMap extends EventTarget {
   private updateVertexBuffersInternal() {
     // This is a costly function, so it's throttled in render as part of throttledPrepareRender()
     // And it's called once at the end off a transformation transition
-    if (!this.vao || !this.projectionTransform) {
+    if (!this.vao || !this.projectedGeoToWebGL2Transform) {
       return
     }
 
@@ -159,7 +191,10 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     const webGL2CurrentTrianglePoints =
       this.projectedGeoCurrentTrianglePoints.map((point) => {
-        return applyTransform(this.projectionTransform as Transform, point)
+        return applyTransform(
+          this.projectedGeoToWebGL2Transform as Transform,
+          point
+        )
       })
     createBuffer(
       this.gl,
@@ -171,7 +206,10 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     const webGL2NewTrianglePoints = this.projectedGeoNewTrianglePoints.map(
       (point) => {
-        return applyTransform(this.projectionTransform as Transform, point)
+        return applyTransform(
+          this.projectedGeoToWebGL2Transform as Transform,
+          point
+        )
       }
     )
     createBuffer(

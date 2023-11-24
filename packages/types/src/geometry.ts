@@ -3,6 +3,14 @@ export type Point = [number, number]
 export type Line = [Point, Point]
 
 /**
+ * Triangle. Winding order of points is free.
+ *
+ * @export
+ * @typedef {Trianle}
+ */
+export type Triangle = [Point, Point, Point]
+
+/**
  * Rectangle (or possibly quadrilateral). Winding order of points is free.
  *
  * @export

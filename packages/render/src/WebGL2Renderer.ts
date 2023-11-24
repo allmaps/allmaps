@@ -46,7 +46,7 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-import type { Transform, NeededTile, TileZoomLevel } from '@allmaps/types'
+import type { Transform, NeededTile } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -63,7 +63,7 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
 const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
-const MIN_RESOURCE_SIZE = 5
+const MIN_VIEWPORT_DIAMETER = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
@@ -81,7 +81,7 @@ export default class WebGL2Renderer extends EventTarget {
   previousSignificantViewport: Viewport | undefined
 
   mapsInViewport: Set<string> = new Set()
-  bestZoomLevelByMapIdAtViewport: Map<string, TileZoomLevel> = new Map()
+  bestScaleFactorAtViewportByMapId: Map<string, number> = new Map()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -390,7 +390,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     this.invertedRenderTransform = invertTransform(
-      this.viewport.projectionTransform
+      this.viewport.projectedGeoToWebGL2Transform
     )
 
     for (const mapId of this.mapsInViewport) {
@@ -400,7 +400,9 @@ export default class WebGL2Renderer extends EventTarget {
         break
       }
 
-      webgl2WarpedMap.updateVertexBuffers(this.viewport.projectionTransform)
+      webgl2WarpedMap.updateVertexBuffers(
+        this.viewport.projectedGeoToWebGL2Transform
+      )
     }
   }
 
@@ -437,11 +439,11 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // Only draw maps that are larger than MIN_RESOURCE_SIZE pixels
+      // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels
       if (
         geometryToDiameter(warpedMap.projectedGeoMask) /
-          this.viewport.resolution <
-        MIN_RESOURCE_SIZE
+          this.viewport.projectedGeoPerViewportScale <
+        MIN_VIEWPORT_DIAMETER
       ) {
         continue
       }
@@ -459,7 +461,7 @@ export default class WebGL2Renderer extends EventTarget {
         )
       )
 
-      this.bestZoomLevelByMapIdAtViewport.set(mapId, zoomLevel)
+      this.bestScaleFactorAtViewportByMapId.set(mapId, zoomLevel.scaleFactor)
 
       const tiles = computeTiles(
         resourceViewportRing,
@@ -493,7 +495,7 @@ export default class WebGL2Renderer extends EventTarget {
           distance(
             this.previousSignificantViewport.projectedGeoRectangle[i],
             this.viewport.projectedGeoRectangle[i]
-          ) / this.viewport.resolution
+          ) / this.viewport.projectedGeoPerViewportScale
         )
       }
       const dist = Math.max(...rectangleDistances)
@@ -556,13 +558,13 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     // renderTransform is the product of:
-    // - the viewport's projectionTransform (projected geo coordinates -> webgl2 coordinates)
+    // - the viewport's projectedGeoToWebGL2Transform (projected geo coordinates -> webgl2 coordinates)
     // - the saved invertedRenderTransform (projected webgl2 coordinates -> geo coordinates)
     // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
-    // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectionTransform in updateVertexBuffers()
+    // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToWebGL2Transform in updateVertexBuffers()
     // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
     const renderTransform = multiplyTransform(
-      this.viewport.projectionTransform,
+      this.viewport.projectedGeoToWebGL2Transform,
       this.invertedRenderTransform
     )
 
@@ -601,6 +603,10 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      webgl2WarpedMap.setBestScaleFactor(
+        this.bestScaleFactorAtViewportByMapId.get(mapId) as number
+      )
+
       // # Map specific uniforms
 
       this.setRenderOptionsUniforms(
@@ -630,8 +636,8 @@ export default class WebGL2Renderer extends EventTarget {
         this.program,
         'u_best_scale_factor'
       )
-      const bestZoomLevel = this.bestZoomLevelByMapIdAtViewport.get(mapId)
-      const bestScaleFactor = bestZoomLevel?.scaleFactor || 1
+      const bestScaleFactor =
+        this.bestScaleFactorAtViewportByMapId.get(mapId) || 1
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
       // Packed Tiles Texture
@@ -850,7 +856,7 @@ export default class WebGL2Renderer extends EventTarget {
           if (this.animating) {
             webGL2WarpedMap.mixCurrentTrianglePoints(this.animationProgress)
           }
-          webGL2WarpedMap.updateTriangulation(false)
+          webGL2WarpedMap.updateProjectedGeo(false)
         }
       }
 

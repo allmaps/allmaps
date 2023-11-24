@@ -2,7 +2,7 @@ import { createGrid, makePointsOnPolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
-import type { Ring, Point } from '@allmaps/types'
+import type { Ring, Point, Triangle } from '@allmaps/types'
 
 /**
  * Triangle as `[[x0, y0], [x1, y1], [x2, y2]]`
@@ -67,8 +67,8 @@ export function triangulatePoly2tri(polygon: Ring, distance: number) {
  * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
  * @returns {Triangle[]} Array of triangles partitioning the polygon
  */
-export function triangulate(polygon: Ring, distance: number) {
-  return triangulatePoly2tri(polygon, distance).map((t) =>
-    t.getPoints().map((p) => [p.x, p.y])
+export function triangulate(polygon: Ring, distance: number): Triangle[] {
+  return triangulatePoly2tri(polygon, distance).map(
+    (t) => t.getPoints().map((p) => [p.x, p.y]) as Triangle
   )
 }

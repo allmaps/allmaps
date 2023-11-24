@@ -23,17 +23,16 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Size} geoSize - Size of the viewport in lon lat geo coordinates, as [width, height]. (This is the size of the bbox of the rectangle, since lon lat only makes sense in in that case).
  * @property {Bbox} geoBbox - Bbox of the rotated rectangle of the viewport, in lon lat geo coordinates.
  * @property {number} rotation - Rotation of the viewport with respect to the projected coordinate system.
- * @property {number} resolution - Resolution of the viewport, in projected geo coordinates per viewport pixel.
+ * @property {number} projectedGeoPerViewportScale - Resolution of the viewport, in projected geo coordinates per viewport pixel.
  * @property {Point} viewportGeoCenter - Center point of the viewport, in viewport pixels.
  * @property {Rectangle} viewportRectangle - Rectangle of the viewport point, in viewport pixels.
  * @property {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
  * @property {Bbox} viewportBbox - Bbox of the viewport, in viewport pixels.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
- * @property {number} scale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
-//  * @property {number} resourceToCanvasScale - Scale of the viewport, in resource pixel per canvas pixel.
+ * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
  * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport (viewportSize*devicePixelRatio), as [width, height].
- * @property {Transform} coordinateToPixelTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
- * @property {Transform} projectionTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+ * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
+ * @property {Transform} projectedGeoToWebGL2Transform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
  */
 export default class Viewport extends EventTarget {
   projectedGeoCenter: Point
@@ -45,17 +44,16 @@ export default class Viewport extends EventTarget {
   geoSize: Size
   geoBbox: Bbox
   rotation: number
-  resolution: number
+  projectedGeoPerViewportScale: number
   viewportCenter: Point
   viewportRectangle: Rectangle
   viewportSize: Size
   viewportBbox: Bbox
   devicePixelRatio: number
-  scale: number
-  // resourceToCanvasScale: number
+  projectedGeoPerCanvasScale: number
   canvasSize: Size
-  coordinateToPixelTransform: Transform = [1, 0, 0, 1, 0, 0]
-  projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
+  projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
+  projectedGeoToWebGL2Transform: Transform = [1, 0, 0, 1, 0, 0]
 
   /**
    * Creates an instance of Viewport.
@@ -64,35 +62,35 @@ export default class Viewport extends EventTarget {
    * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
-   * @param {number} resolution - Resolution of the viewport, in projection coordinates per viewport pixel.
+   * @param {number} projectedGeoPerViewportScale - Resolution of the viewport, in projection coordinates per viewport pixel.
    * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
    */
   constructor(
     projectedGeoCenter: Point,
     viewportSize: Size,
     rotation: number,
-    resolution: number,
+    projectedGeoPerViewportScale: number,
     devicePixelRatio = 1
   ) {
     super()
     // TODO: should this still extend EventTartget and hence include super()?
 
     this.projectedGeoCenter = projectedGeoCenter
-    this.resolution = resolution
+    this.projectedGeoPerViewportScale = projectedGeoPerViewportScale
     this.rotation = rotation
     this.viewportSize = viewportSize
     this.devicePixelRatio = devicePixelRatio
 
     this.projectedGeoRectangle = this.computeProjectedGeoRectangle(
       this.projectedGeoCenter,
-      this.resolution,
+      this.projectedGeoPerViewportScale,
       this.rotation,
       this.viewportSize
     )
     this.projectedGeoBbox = computeBbox(this.projectedGeoRectangle)
     this.projectedGeoSize = [
-      this.viewportSize[0] * resolution,
-      this.viewportSize[1] * resolution
+      this.viewportSize[0] * projectedGeoPerViewportScale,
+      this.viewportSize[1] * projectedGeoPerViewportScale
     ]
 
     this.geoCenter = webMercatorToLonLat(this.projectedGeoCenter)
@@ -111,19 +109,19 @@ export default class Viewport extends EventTarget {
       this.viewportSize[0] * this.devicePixelRatio,
       this.viewportSize[1] * this.devicePixelRatio
     ]
-    this.scale = this.resolution / this.devicePixelRatio
-    // this.resourceToCanvasScale = this.resolution / this.devicePixelRatio
+    this.projectedGeoPerCanvasScale =
+      this.projectedGeoPerViewportScale / this.devicePixelRatio
 
     this.setCoordinateToPixelTransform()
     this.setProjectionTransform()
   }
 
   private setCoordinateToPixelTransform(): void {
-    this.coordinateToPixelTransform = composeTransform(
+    this.projectedGeoToViewportTransform = composeTransform(
       this.viewportSize[0] / 2,
       this.viewportSize[1] / 2,
-      1 / this.resolution,
-      -1 / this.resolution,
+      1 / this.projectedGeoPerViewportScale,
+      -1 / this.projectedGeoPerViewportScale,
       -this.rotation,
       -this.projectedGeoCenter[0],
       -this.projectedGeoCenter[1]
@@ -131,11 +129,11 @@ export default class Viewport extends EventTarget {
   }
 
   private setProjectionTransform(): void {
-    this.projectionTransform = composeTransform(
+    this.projectedGeoToWebGL2Transform = composeTransform(
       0,
       0,
-      2 / (this.resolution * this.viewportSize[0]),
-      2 / (this.resolution * this.viewportSize[1]),
+      2 / (this.projectedGeoPerViewportScale * this.viewportSize[0]),
+      2 / (this.projectedGeoPerViewportScale * this.viewportSize[1]),
       -this.rotation,
       -this.projectedGeoCenter[0],
       -this.projectedGeoCenter[1]
@@ -144,21 +142,21 @@ export default class Viewport extends EventTarget {
 
   /** Returns a rotated rectangle in projected geo coordinates */
   private computeProjectedGeoRectangle(
-    center: Point,
-    resolution: number,
+    projectedGeoCenter: Point,
+    projectedGeoPerViewportScale: number,
     rotation: number,
     viewportSize: Size
   ): Rectangle {
-    const dx = (resolution * viewportSize[0]) / 2
-    const dy = (resolution * viewportSize[1]) / 2
+    const dx = (projectedGeoPerViewportScale * viewportSize[0]) / 2
+    const dy = (projectedGeoPerViewportScale * viewportSize[1]) / 2
     const cosRotation = Math.cos(rotation)
     const sinRotation = Math.sin(rotation)
     const xCos = dx * cosRotation
     const xSin = dx * sinRotation
     const yCos = dy * cosRotation
     const ySin = dy * sinRotation
-    const x = center[0]
-    const y = center[1]
+    const x = projectedGeoCenter[0]
+    const y = projectedGeoCenter[1]
     return [
       [x - xCos + ySin, y - xSin - yCos],
       [x - xCos - ySin, y - xSin + yCos],

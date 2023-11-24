@@ -1,12 +1,17 @@
+import { applyTransform } from './shared/matrix.js'
+
 import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
   computeBbox,
+  convertGeojsonPolygonToRing,
   fetchImageInfo,
   lonLatToWebMecator
 } from '@allmaps/stdlib'
+
+import type Viewport from './Viewport.js'
 
 import type { Gcp, Ring, Bbox, GeojsonPolygon } from '@allmaps/types'
 import type {
@@ -20,7 +25,7 @@ export default class WarpedMap {
   gcps: Gcp[]
   projectedGcps: Gcp[]
   resourceMask: Ring
-  fullResourceMask: Ring
+  resourceFullMask: Ring
   imageInfoCache?: Cache
   imageId?: string
   parsedImage?: IIIFImage
@@ -30,13 +35,13 @@ export default class WarpedMap {
   projectedTransformer!: GcpTransformer
   transformOptions: PartialTransformOptions
   geoMask!: GeojsonPolygon
-  fullGeoMask!: GeojsonPolygon
+  geoFullMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
-  fullGeoMaskBbox!: Bbox
+  geoFullMaskBbox!: Bbox
   projectedGeoMask!: GeojsonPolygon
-  projectedFullGeoMask!: GeojsonPolygon
+  projectedGeoFullMask!: GeojsonPolygon
   projectedGeoMaskBbox!: Bbox
-  projectedFullGeoMaskBbox!: Bbox
+  projectedGeoFullMaskBbox!: Bbox
 
   constructor(
     mapId: string,
@@ -52,7 +57,7 @@ export default class WarpedMap {
       resource
     }))
     this.resourceMask = this.georeferencedMap.resourceMask
-    this.fullResourceMask = [
+    this.resourceFullMask = [
       [0, 0],
       [this.georeferencedMap.resource.width, 0],
       [
@@ -70,6 +75,28 @@ export default class WarpedMap {
       maxDepth: 6
     }
     this.updateTransformerProperties()
+  }
+
+  getViewportMask(viewport: Viewport): Ring {
+    return convertGeojsonPolygonToRing(this.projectedGeoMask).map((point) => {
+      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+    })
+  }
+
+  getViewportFullMask(viewport: Viewport): Ring {
+    return convertGeojsonPolygonToRing(this.projectedGeoFullMask).map(
+      (point) => {
+        return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      }
+    )
+  }
+
+  getViewportMaskBbox(viewport: Viewport): Bbox {
+    return computeBbox(this.getViewportMask(viewport))
+  }
+
+  getViewportFullMaskBbox(viewport: Viewport): Bbox {
+    return computeBbox(this.getViewportFullMask(viewport))
   }
 
   async completeImageInfo(): Promise<void> {
@@ -126,11 +153,11 @@ export default class WarpedMap {
   }
 
   private updateFullGeoMask(): void {
-    this.fullGeoMask = this.transformer.transformForwardAsGeojson(
-      [this.fullResourceMask],
+    this.geoFullMask = this.transformer.transformForwardAsGeojson(
+      [this.resourceFullMask],
       this.transformOptions
     )
-    this.fullGeoMaskBbox = computeBbox(this.fullGeoMask)
+    this.geoFullMaskBbox = computeBbox(this.geoFullMask)
   }
 
   private updateProjectedGeoMask(): void {
@@ -142,12 +169,12 @@ export default class WarpedMap {
   }
 
   private updateProjectedFullGeoMask(): void {
-    this.projectedFullGeoMask =
+    this.projectedGeoFullMask =
       this.projectedTransformer.transformForwardAsGeojson(
-        [this.fullResourceMask],
+        [this.resourceFullMask],
         this.transformOptions
       )
-    this.projectedFullGeoMaskBbox = computeBbox(this.projectedFullGeoMask)
+    this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
   }
 }
 
