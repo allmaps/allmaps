@@ -78,7 +78,6 @@ export default class WebGL2Renderer extends EventTarget {
   previousSignificantViewport: Viewport | undefined
 
   mapsInViewport: Set<string> = new Set()
-  bestScaleFactorAtViewportByMapId: Map<string, number> = new Map()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -364,9 +363,11 @@ export default class WebGL2Renderer extends EventTarget {
         this.transformationTransitionFrame.bind(this)
       )
     } else {
-      for (const webGL2WarpedMap of this.webGL2WarpedMapsById.values()) {
-        webGL2WarpedMap.resetCurrentTrianglePoints()
+      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+        warpedMap.resetCurrentTrianglePoints()
       }
+      this.updateVertexBuffers()
+
       this.animating = false
       this.animationProgress = 0
       this.transformationTransitionStart = undefined
@@ -374,9 +375,6 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private prepareRenderInternal(): void {
-    // TODO: reset maps not in viewport, make sure these only
-    // get drawn when they are visible AND when they have their buffers
-    // updated.
     this.updateVertexBuffers()
     this.updateNeededTiles()
   }
@@ -453,10 +451,7 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      this.bestScaleFactorAtViewportByMapId.set(
-        mapId,
-        tileZoomLevel.scaleFactor
-      )
+      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
@@ -603,10 +598,6 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      webgl2WarpedMap.setBestScaleFactor(
-        this.bestScaleFactorAtViewportByMapId.get(mapId) as number
-      )
-
       // # Map specific uniforms
 
       this.setRenderOptionsUniforms(
@@ -636,8 +627,7 @@ export default class WebGL2Renderer extends EventTarget {
         this.program,
         'u_best_scale_factor'
       )
-      const bestScaleFactor =
-        this.bestScaleFactorAtViewportByMapId.get(mapId) || 1
+      const bestScaleFactor = webgl2WarpedMap.warpedMap.bestScaleFactor
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
       // Packed Tiles Texture
@@ -690,7 +680,7 @@ export default class WebGL2Renderer extends EventTarget {
       // # Draw each map
 
       const vao = webgl2WarpedMap.vao
-      const count = webgl2WarpedMap.resourceTrianglePoints.length
+      const count = webgl2WarpedMap.warpedMap.resourceTrianglePoints.length
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
@@ -850,16 +840,14 @@ export default class WebGL2Renderer extends EventTarget {
   private transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      for (const mapId of mapIds) {
-        const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-        if (webGL2WarpedMap) {
-          if (this.animating) {
-            webGL2WarpedMap.mixCurrentTrianglePoints(this.animationProgress)
-          }
-          webGL2WarpedMap.updateProjectedGeo(false)
+      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        if (this.animating) {
+          warpedMap.mixCurrentTrianglePoints(this.animationProgress)
         }
+        warpedMap.updateProjectedGeo(false)
       }
 
+      this.updateVertexBuffers()
       this.startTransformationTransition()
     }
   }
@@ -867,9 +855,9 @@ export default class WebGL2Renderer extends EventTarget {
   private resourceMaskUpdated(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-      if (webGL2WarpedMap) {
-        webGL2WarpedMap.updateTriangulation(false)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (warpedMap) {
+        warpedMap.updateTriangulation(false)
       }
     }
   }

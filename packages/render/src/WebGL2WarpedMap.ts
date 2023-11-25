@@ -1,7 +1,5 @@
 import potpack from 'potpack'
 
-import { triangulate } from '@allmaps/triangulate'
-import { geometryToDiameter, mixPoints } from '@allmaps/stdlib'
 import { throttle } from 'lodash-es'
 
 import WarpedMap from './WarpedMap.js'
@@ -10,7 +8,7 @@ import { applyTransform } from './shared/matrix.js'
 
 import type CachedTile from './CachedTile.js'
 import type { RenderOptions } from './shared/types.js'
-import type { Point, Transform } from '@allmaps/types'
+import type { Transform } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -21,9 +19,6 @@ const THROTTLE_OPTIONS = {
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
-// TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 80
-
 export default class WebGL2WarpedMap {
   warpedMap: WarpedMap
 
@@ -32,14 +27,7 @@ export default class WebGL2WarpedMap {
 
   vao: WebGLVertexArrayObject | null
 
-  bestScaleFactor!: number
-  resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
-
   CachedTilesByTileUrl: Map<string, CachedTile> = new Map()
-
-  resourceTrianglePoints: Point[] = []
-  projectedGeoCurrentTrianglePoints: Point[] = []
-  projectedGeoNewTrianglePoints: Point[] = []
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -52,7 +40,7 @@ export default class WebGL2WarpedMap {
 
   projectedGeoToWebGL2Transform: Transform | undefined
 
-  private throttledUpdateTextures: () => Promise<void> | undefined
+  private throttledUpdateTextures: () => void | undefined
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -71,78 +59,11 @@ export default class WebGL2WarpedMap {
     this.packedTilesPositionsTexture = gl.createTexture()
     this.packedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
-    // Triangulating before rendering is not strictly necessary
-    // But creating the triangulation on the highest zoom level once assures the vertex buffers are long enough
-    // TODO: Could this be simplified?
-    this.setBestScaleFactor(1)
-
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
-  }
-
-  setBestScaleFactor(scaleFactor: number) {
-    if (this.bestScaleFactor != scaleFactor) {
-      this.bestScaleFactor = scaleFactor
-      this.updateTriangulation(true)
-    }
-  }
-
-  updateTriangulation(currentIsNew = false) {
-    if (
-      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
-    ) {
-      this.resourceTrianglePoints =
-        this.resourceTrianglePointsByBestScaleFactor.get(this.bestScaleFactor)!
-    } else {
-      const diameter =
-        (geometryToDiameter(this.warpedMap.resourceMask) *
-          this.bestScaleFactor) /
-        DIAMETER_FRACTION
-
-      this.resourceTrianglePoints = triangulate(
-        this.warpedMap.resourceMask,
-        diameter
-      ).flat()
-
-      this.resourceTrianglePointsByBestScaleFactor.set(
-        this.bestScaleFactor,
-        this.resourceTrianglePoints
-      )
-    }
-
-    this.updateProjectedGeo(currentIsNew)
-  }
-
-  updateProjectedGeo(currentIsNew = false) {
-    this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-      (point) =>
-        this.warpedMap.projectedTransformer.transformToGeo(point as Point)
-    )
-
-    if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
-      this.projectedGeoCurrentTrianglePoints =
-        this.projectedGeoNewTrianglePoints
-    }
-  }
-
-  mixCurrentTrianglePoints(t: number) {
-    this.projectedGeoCurrentTrianglePoints =
-      this.projectedGeoNewTrianglePoints.map((point, index) => {
-        return mixPoints(
-          point,
-          this.projectedGeoCurrentTrianglePoints[index],
-          t
-        )
-      })
-    this.updateVertexBuffersInternal()
-  }
-
-  resetCurrentTrianglePoints() {
-    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
-    this.updateVertexBuffersInternal()
   }
 
   updateVertexBuffers(projectedGeoToWebGL2Transform: Transform) {
@@ -161,10 +82,6 @@ export default class WebGL2WarpedMap {
   }
 
   dispose() {
-    this.resourceTrianglePoints = []
-    this.projectedGeoCurrentTrianglePoints = []
-    this.projectedGeoNewTrianglePoints = []
-
     this.gl.deleteVertexArray(this.vao)
     this.gl.deleteTexture(this.packedTilesTexture)
     this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
@@ -184,13 +101,13 @@ export default class WebGL2WarpedMap {
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(this.resourceTrianglePoints.flat()),
+      new Float32Array(this.warpedMap.resourceTrianglePoints.flat()),
       2,
       'a_resource_triangle_coordinates'
     )
 
     const webGL2CurrentTrianglePoints =
-      this.projectedGeoCurrentTrianglePoints.map((point) => {
+      this.warpedMap.projectedGeoCurrentTrianglePoints.map((point) => {
         return applyTransform(
           this.projectedGeoToWebGL2Transform as Transform,
           point
@@ -204,14 +121,13 @@ export default class WebGL2WarpedMap {
       'a_webgl2_current_triangle_coordinates'
     )
 
-    const webGL2NewTrianglePoints = this.projectedGeoNewTrianglePoints.map(
-      (point) => {
+    const webGL2NewTrianglePoints =
+      this.warpedMap.projectedGeoNewTrianglePoints.map((point) => {
         return applyTransform(
           this.projectedGeoToWebGL2Transform as Transform,
           point
         )
-      }
-    )
+      })
     createBuffer(
       this.gl,
       this.program,
@@ -221,14 +137,16 @@ export default class WebGL2WarpedMap {
     )
 
     // For debugging purposes, a triangle index is passed.
-    let triangleIndex = new Float32Array(this.resourceTrianglePoints.length)
+    let triangleIndex = new Float32Array(
+      this.warpedMap.resourceTrianglePoints.length
+    )
     triangleIndex = triangleIndex.map((v, i) => {
       return Math.round((i - 1) / 3)
     })
     createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangle_index')
   }
 
-  private async updateTextures() {
+  private updateTextures() {
     // This is a costly function, so it's throttled using throttledUpdateTextures()
     const gl = this.gl
 

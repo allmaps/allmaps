@@ -4,49 +4,70 @@ import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
+import { triangulate } from '@allmaps/triangulate'
 import {
   computeBbox,
   bboxToRectangle,
+  bboxesToScale,
+  geometryToDiameter,
   convertGeojsonPolygonToRing,
   fetchImageInfo,
   lonLatToWebMecator,
-  bboxesToScale
+  mixPoints
 } from '@allmaps/stdlib'
 
 import type Viewport from './Viewport.js'
 
-import type { Gcp, Ring, Bbox, GeojsonPolygon } from '@allmaps/types'
+import type { Point, Gcp, Ring, Bbox, GeojsonPolygon } from '@allmaps/types'
 import type {
   TransformationType,
   PartialTransformOptions
 } from '@allmaps/transform'
 
+// TODO: Consider making this tunable by the user.
+const DIAMETER_FRACTION = 80
+
 export default class WarpedMap {
   mapId: string
   georeferencedMap: GeoreferencedMap
+
   gcps: Gcp[]
   projectedGcps: Gcp[]
+
   resourceMask: Ring
   resourceMaskBbox: Bbox
   resourceFullMask: Ring
   resourceFullMaskBbox: Bbox
+
   imageInfoCache?: Cache
   imageId?: string
   parsedImage?: IIIFImage
+
   visible: boolean
+
   transformationType: TransformationType
   transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
   transformOptions: PartialTransformOptions
+
   geoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
   geoFullMask!: GeojsonPolygon
   geoFullMaskBbox!: Bbox
+
   projectedGeoMask!: GeojsonPolygon
   projectedGeoMaskBbox!: Bbox
   projectedGeoFullMask!: GeojsonPolygon
   projectedGeoFullMaskBbox!: Bbox
+
   resourceToProjectedGeoScale!: number
+
+  bestScaleFactor!: number // At current viewport
+  resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
+
+  resourceTrianglePoints: Point[] = []
+  projectedGeoCurrentTrianglePoints: Point[] = []
+  projectedGeoNewTrianglePoints: Point[] = []
 
   constructor(
     mapId: string,
@@ -56,11 +77,13 @@ export default class WarpedMap {
   ) {
     this.mapId = mapId
     this.georeferencedMap = georeferencedMap
+
     this.gcps = this.georeferencedMap.gcps
     this.projectedGcps = this.gcps.map(({ geo, resource }) => ({
       geo: lonLatToWebMecator(geo),
       resource
     }))
+
     this.resourceMask = this.georeferencedMap.resourceMask
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceFullMask = [
@@ -73,15 +96,24 @@ export default class WarpedMap {
       [0, this.georeferencedMap.resource.height]
     ]
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
+
     this.imageInfoCache = imageInfoCache
+
     this.visible = visible
+
     this.transformationType =
       this.georeferencedMap.transformation?.type || 'polynomial'
     this.transformOptions = {
       maxOffsetRatio: 0.01,
       maxDepth: 6
     }
+
     this.updateTransformerProperties()
+
+    // Triangulating before rendering is not strictly necessary
+    // But creating the triangulation on the highest zoom level once assures the vertex buffers are long enough
+    // TODO: Could this be simplified?
+    this.setBestScaleFactor(1)
   }
 
   getViewportMask(viewport: Viewport): Ring {
@@ -151,13 +183,62 @@ export default class WarpedMap {
     )
   }
 
-  async completeImageInfo(): Promise<void> {
-    const imageUri = this.georeferencedMap.resource.id
-    const imageInfoJson = await fetchImageInfo(imageUri, {
-      cache: this.imageInfoCache
-    })
-    this.parsedImage = IIIFImage.parse(imageInfoJson)
-    this.imageId = await generateId(imageUri)
+  setBestScaleFactor(scaleFactor: number) {
+    if (this.bestScaleFactor != scaleFactor) {
+      this.bestScaleFactor = scaleFactor
+      this.updateTriangulation(true)
+    }
+  }
+
+  updateTriangulation(currentIsNew = false) {
+    if (
+      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
+    ) {
+      this.resourceTrianglePoints =
+        this.resourceTrianglePointsByBestScaleFactor.get(this.bestScaleFactor)!
+    } else {
+      const diameter =
+        (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
+        DIAMETER_FRACTION
+
+      this.resourceTrianglePoints = triangulate(
+        this.resourceMask,
+        diameter
+      ).flat()
+
+      this.resourceTrianglePointsByBestScaleFactor.set(
+        this.bestScaleFactor,
+        this.resourceTrianglePoints
+      )
+    }
+
+    this.updateProjectedGeo(currentIsNew)
+  }
+
+  updateProjectedGeo(currentIsNew = false) {
+    this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
+      (point) => this.projectedTransformer.transformToGeo(point as Point)
+    )
+
+    if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
+      this.projectedGeoCurrentTrianglePoints =
+        this.projectedGeoNewTrianglePoints
+    }
+  }
+
+  mixCurrentTrianglePoints(t: number) {
+    this.projectedGeoCurrentTrianglePoints =
+      this.projectedGeoNewTrianglePoints.map((point, index) => {
+        return mixPoints(
+          point,
+          this.projectedGeoCurrentTrianglePoints[index],
+          t
+        )
+      })
+  }
+
+  resetCurrentTrianglePoints() {
+    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
   }
 
   setResourceMask(resourceMask: Ring): void {
@@ -174,6 +255,21 @@ export default class WarpedMap {
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
     this.updateTransformerProperties()
+  }
+
+  async completeImageInfo(): Promise<void> {
+    const imageUri = this.georeferencedMap.resource.id
+    const imageInfoJson = await fetchImageInfo(imageUri, {
+      cache: this.imageInfoCache
+    })
+    this.parsedImage = IIIFImage.parse(imageInfoJson)
+    this.imageId = await generateId(imageUri)
+  }
+
+  dispose() {
+    this.resourceTrianglePoints = []
+    this.projectedGeoCurrentTrianglePoints = []
+    this.projectedGeoNewTrianglePoints = []
   }
 
   private updateTransformerProperties(): void {
