@@ -445,6 +445,9 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
+      // Note the equivalence of the following two:
+      // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
+      // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
       const tileZoomLevel = getBestTileZoomLevel(
         warpedMap.parsedImage,
         warpedMap.getApproxResourceToCanvasScale(this.viewport)

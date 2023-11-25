@@ -46,6 +46,7 @@ export default class WarpedMap {
   projectedGeoMaskBbox!: Bbox
   projectedGeoFullMask!: GeojsonPolygon
   projectedGeoFullMaskBbox!: Bbox
+  resourceToProjectedGeoScale!: number
 
   constructor(
     mapId: string,
@@ -182,6 +183,7 @@ export default class WarpedMap {
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
     this.updateProjectedFullGeoMask()
+    this.updateResourceToProjectedGeoScale()
   }
 
   private updateTransformer(): void {
@@ -226,6 +228,13 @@ export default class WarpedMap {
         this.transformOptions
       )
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
+  }
+
+  private updateResourceToProjectedGeoScale(): void {
+    this.resourceToProjectedGeoScale = bboxesToScale(
+      this.resourceMaskBbox,
+      this.projectedGeoMaskBbox
+    )
   }
 }
 
