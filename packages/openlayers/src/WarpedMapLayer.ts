@@ -1,6 +1,5 @@
 import Layer from 'ol/layer/Layer.js'
 import {
-  WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
@@ -27,7 +26,6 @@ export class WarpedMapLayer extends Layer {
 
   canvasSize: [number, number] = [0, 0]
 
-  warpedMapList: WarpedMapList
   renderer: WebGL2Renderer
 
   private resizeObserver: ResizeObserver
@@ -73,9 +71,9 @@ export class WarpedMapLayer extends Layer {
     this.source = this.getSource() as WarpedMapSource
     // TODO: listen to change:source
 
-    this.warpedMapList = this.source.getWarpedMapList()
+    const warpedMapList = this.source.getWarpedMapList()
 
-    this.renderer = new WebGL2Renderer(this.gl, this.warpedMapList)
+    this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -97,17 +95,17 @@ export class WarpedMapLayer extends Layer {
       this.changed.bind(this)
     )
 
-    this.warpedMapList.addEventListener(
+    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.warpedMapAdded.bind(this)
     )
 
-    this.warpedMapList.addEventListener(
+    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
       this.changed.bind(this)
     )
 
-    this.warpedMapList.addEventListener(
+    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
       this.changed.bind(this)
     )
