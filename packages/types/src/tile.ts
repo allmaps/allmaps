@@ -11,7 +11,7 @@ export type TileByColumn = { [key: number]: Point }
 export type Tile = {
   column: number
   row: number
-  zoomLevel: TileZoomLevel
+  tileZoomLevel: TileZoomLevel
   imageSize: Size
 }
 

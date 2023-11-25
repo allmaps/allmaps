@@ -19,7 +19,7 @@ import {
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale as getBestTileZoomLevel,
-  computeTiles,
+  computeTilesConveringRingAtTileZoomLevel,
   tileToNeededTile
 } from './shared/tiles.js'
 import { createShader, createProgram } from './shared/webgl2.js'
@@ -28,12 +28,9 @@ import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 
 import {
-  computeBbox,
-  geometryToDiameter,
-  bboxToExtent,
-  extentsToScale,
   distance,
-  maxOfNumberOrUndefined
+  maxOfNumberOrUndefined,
+  bboxToDiameter
 } from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
@@ -68,10 +65,10 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 export default class WebGL2Renderer extends EventTarget {
-  warpedMapList: WarpedMapList
-
   gl: WebGL2RenderingContext
   program: WebGLProgram
+
+  warpedMapList: WarpedMapList
 
   webGL2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
@@ -440,33 +437,33 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels
+      // Diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
       if (
-        geometryToDiameter(warpedMap.projectedGeoMask) /
-          this.viewport.projectedGeoPerViewportScale <
+        bboxToDiameter(warpedMap.getApproxViewportMaskBbox(this.viewport)) <
         MIN_VIEWPORT_DIAMETER
       ) {
         continue
       }
+
+      const tileZoomLevel = getBestTileZoomLevel(
+        warpedMap.parsedImage,
+        warpedMap.getApproxResourceToCanvasScale(this.viewport)
+      )
+
+      this.bestScaleFactorAtViewportByMapId.set(
+        mapId,
+        tileZoomLevel.scaleFactor
+      )
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
         this.viewport.projectedGeoBbox
       )
 
-      const zoomLevel = getBestTileZoomLevel(
-        warpedMap.parsedImage,
-        extentsToScale(
-          bboxToExtent(computeBbox(resourceViewportRing)),
-          this.viewport.canvasSize
-        )
-      )
-
-      this.bestScaleFactorAtViewportByMapId.set(mapId, zoomLevel.scaleFactor)
-
-      const tiles = computeTiles(
+      const tiles = computeTilesConveringRingAtTileZoomLevel(
         resourceViewportRing,
-        warpedMap.parsedImage,
-        zoomLevel
+        tileZoomLevel,
+        warpedMap.parsedImage
       )
 
       for (const tile of tiles) {

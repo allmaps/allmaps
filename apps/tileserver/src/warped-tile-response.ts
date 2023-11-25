@@ -6,7 +6,7 @@ import { GcpTransformer } from '@allmaps/transform'
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevel,
-  computeTiles
+  computeTilesConveringRingAtTileZoomLevel
 } from '@allmaps/render'
 import classifyPoint from 'robust-point-in-polygon'
 
@@ -69,12 +69,16 @@ export async function createWarpedTileResponse(
       resourceRing
     )
 
-    const iiifTiles = computeTiles(resourceRing, parsedImage, zoomLevel)
+    const iiifTiles = computeTilesConveringRingAtTileZoomLevel(
+      resourceRing,
+      zoomLevel,
+      parsedImage
+    )
 
     // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {
       const { region, size } = parsedImage.getIiifTile(
-        tile.zoomLevel,
+        tile.tileZoomLevel,
         tile.column,
         tile.row
       )
@@ -144,13 +148,13 @@ export async function createWarpedTileResponse(
         let foundTile = false
         for (tileIndex = 0; tileIndex < iiifTiles.length; tileIndex++) {
           tile = iiifTiles[tileIndex]
-          tileXMin = tile.column * tile.zoomLevel.originalWidth
-          tileYMin = tile.row * tile.zoomLevel.originalHeight
+          tileXMin = tile.column * tile.tileZoomLevel.originalWidth
+          tileYMin = tile.row * tile.tileZoomLevel.originalHeight
           if (
             pixelX >= tileXMin &&
-            pixelX <= tileXMin + tile.zoomLevel.originalWidth &&
+            pixelX <= tileXMin + tile.tileZoomLevel.originalWidth &&
             pixelY >= tileYMin &&
-            pixelY <= tileYMin + tile.zoomLevel.originalHeight
+            pixelY <= tileYMin + tile.tileZoomLevel.originalHeight
           ) {
             foundTile = true
             break
@@ -169,7 +173,7 @@ export async function createWarpedTileResponse(
 
           if (decodedJpeg) {
             // Get resource tile size
-            const resourceTileSize = tile.zoomLevel.width
+            const resourceTileSize = tile.tileZoomLevel.width
 
             // Schematic drawing of resource tile and sub-pixel location of (pixelTileX, pixelTileY)
             //
@@ -185,8 +189,10 @@ export async function createWarpedTileResponse(
             // 0 *---------* 1 > X
             //
             // Determine (sub-)pixel coordinates on resource tile
-            const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
-            const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
+            const pixelTileX =
+              (pixelX - tileXMin) / tile.tileZoomLevel.scaleFactor
+            const pixelTileY =
+              (pixelY - tileYMin) / tile.tileZoomLevel.scaleFactor
             // Determine coordinates of four surrounding pixels 0, 1, 2, 3 on the resource tile
             const pixelTileXFloor = Math.max(Math.floor(pixelTileX), 0)
             const pixelTileXCeil = Math.min(

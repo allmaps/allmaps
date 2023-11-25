@@ -365,7 +365,7 @@ export default class WebGL2WarpedMap {
     // Packed Tiles Scale Factors Texture
 
     const packedTilesScaleFactors = packedTiles.map(
-      ({ index }) => cachedTiles[index].tile.zoomLevel.scaleFactor
+      ({ index }) => cachedTiles[index].tile.tileZoomLevel.scaleFactor
     )
 
     gl.bindTexture(gl.TEXTURE_2D, this.packedTilesScaleFactorsTexture)

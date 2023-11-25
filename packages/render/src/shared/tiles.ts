@@ -21,9 +21,9 @@ import type {
 import type { GcpTransformer } from '@allmaps/transform'
 
 /**
- * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, ...
+ * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
  */
-const SCALE_FACTOR_SHARPENING = 2
+const SCALE_FACTOR_SHARPENING = 1.25
 
 // Functions for preparing to make tiles
 
@@ -73,14 +73,14 @@ export function getBestTileZoomLevel(
  *
  * @export
  * @param {Image} image - A parsed IIIF Image
- * @param {number} scale - The resource-to-canvas scale, relating resource pixels to canvas pixels.
+ * @param {number} resourceToCanvasScale - The resource to canvas scale, relating resource pixels to canvas pixels.
  * @returns {TileZoomLevel}
  */
 export function getBestTileZoomLevelForScale(
   image: Image,
-  scale: number
+  resourceToCanvasScale: number
 ): TileZoomLevel {
-  // Returning the TileZoomLevel with the scalefactor closest to the current scale.
+  // Returning the TileZoomLevel with the scaleFactor closest to the current scale.
   //
   // Available scaleFactors in tileZoomLevels:
   // 1---------2---------4---------8---------16
@@ -123,7 +123,7 @@ export function getBestTileZoomLevelForScale(
   for (const tileZoomLevel of image.tileZoomLevels) {
     const diffLogScaleFactor = Math.abs(
       Math.log(tileZoomLevel.scaleFactor) -
-        (Math.log(scale) - Math.log(SCALE_FACTOR_SHARPENING))
+        (Math.log(resourceToCanvasScale) - Math.log(SCALE_FACTOR_SHARPENING))
     )
     if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
       smallestdiffLogScaleFactor = diffLogScaleFactor
@@ -136,10 +136,10 @@ export function getBestTileZoomLevelForScale(
 
 // Making tiles
 
-export function computeTiles(
+export function computeTilesConveringRingAtTileZoomLevel(
   resourceRing: Ring,
-  image: Image,
-  tileZoomLevel: TileZoomLevel
+  tileZoomLevel: TileZoomLevel,
+  image: Image
 ): Tile[] {
   const scaledResourceRing = scaleResourcePoints(resourceRing, tileZoomLevel)
   const tilesByColumn = ringToTilesByColumn(scaledResourceRing)
@@ -259,7 +259,7 @@ function tilesByColumnToTiles(
       tiles.push({
         column: x,
         row: y,
-        zoomLevel,
+        tileZoomLevel: zoomLevel,
         imageSize: [image.width, image.height]
       })
     }
@@ -274,7 +274,7 @@ export function tileToNeededTile(
 ): NeededTile {
   const mapId = warpedMap.mapId
   const imageRequest = warpedMap.parsedImage.getIiifTile(
-    tile.zoomLevel,
+    tile.tileZoomLevel,
     tile.column,
     tile.row
   )
@@ -300,15 +300,15 @@ export function tileCenter(tile: Tile): Point {
 }
 
 export function computeBboxTile(tile: Tile): Bbox {
-  const tileXMin = tile.column * tile.zoomLevel.originalWidth
-  const tileYMin = tile.row * tile.zoomLevel.originalHeight
+  const tileXMin = tile.column * tile.tileZoomLevel.originalWidth
+  const tileYMin = tile.row * tile.tileZoomLevel.originalHeight
 
   const tileXMax = Math.min(
-    tileXMin + tile.zoomLevel.originalWidth,
+    tileXMin + tile.tileZoomLevel.originalWidth,
     tile.imageSize[0]
   )
   const tileYMax = Math.min(
-    tileYMin + tile.zoomLevel.originalHeight,
+    tileYMin + tile.tileZoomLevel.originalHeight,
     tile.imageSize[1]
   )
 
@@ -320,18 +320,18 @@ export function resourcePointToTilePoint(
   resourcePoint: Point,
   clip = true
 ): Point | undefined {
-  const tileXMin = tile.column * tile.zoomLevel.originalWidth
-  const tileYMin = tile.row * tile.zoomLevel.originalHeight
+  const tileXMin = tile.column * tile.tileZoomLevel.originalWidth
+  const tileYMin = tile.row * tile.tileZoomLevel.originalHeight
 
-  const tileX = (resourcePoint[0] - tileXMin) / tile.zoomLevel.scaleFactor
-  const tileY = (resourcePoint[1] - tileYMin) / tile.zoomLevel.scaleFactor
+  const tileX = (resourcePoint[0] - tileXMin) / tile.tileZoomLevel.scaleFactor
+  const tileY = (resourcePoint[1] - tileYMin) / tile.tileZoomLevel.scaleFactor
 
   if (
     !clip ||
     (resourcePoint[0] >= tileXMin &&
-      resourcePoint[0] <= tileXMin + tile.zoomLevel.originalWidth &&
+      resourcePoint[0] <= tileXMin + tile.tileZoomLevel.originalWidth &&
       resourcePoint[1] >= tileYMin &&
-      resourcePoint[1] <= tileYMin + tile.zoomLevel.originalHeight &&
+      resourcePoint[1] <= tileYMin + tile.tileZoomLevel.originalHeight &&
       resourcePoint[0] <= tile.imageSize[0] &&
       resourcePoint[1] <= tile.imageSize[1])
   ) {

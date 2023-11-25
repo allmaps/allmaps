@@ -6,9 +6,11 @@ import { Image as IIIFImage } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
   computeBbox,
+  bboxToRectangle,
   convertGeojsonPolygonToRing,
   fetchImageInfo,
-  lonLatToWebMecator
+  lonLatToWebMecator,
+  bboxesToScale
 } from '@allmaps/stdlib'
 
 import type Viewport from './Viewport.js'
@@ -25,7 +27,9 @@ export default class WarpedMap {
   gcps: Gcp[]
   projectedGcps: Gcp[]
   resourceMask: Ring
+  resourceMaskBbox: Bbox
   resourceFullMask: Ring
+  resourceFullMaskBbox: Bbox
   imageInfoCache?: Cache
   imageId?: string
   parsedImage?: IIIFImage
@@ -35,12 +39,12 @@ export default class WarpedMap {
   projectedTransformer!: GcpTransformer
   transformOptions: PartialTransformOptions
   geoMask!: GeojsonPolygon
-  geoFullMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
+  geoFullMask!: GeojsonPolygon
   geoFullMaskBbox!: Bbox
   projectedGeoMask!: GeojsonPolygon
-  projectedGeoFullMask!: GeojsonPolygon
   projectedGeoMaskBbox!: Bbox
+  projectedGeoFullMask!: GeojsonPolygon
   projectedGeoFullMaskBbox!: Bbox
 
   constructor(
@@ -57,6 +61,7 @@ export default class WarpedMap {
       resource
     }))
     this.resourceMask = this.georeferencedMap.resourceMask
+    this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceFullMask = [
       [0, 0],
       [this.georeferencedMap.resource.width, 0],
@@ -66,6 +71,7 @@ export default class WarpedMap {
       ],
       [0, this.georeferencedMap.resource.height]
     ]
+    this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.imageInfoCache = imageInfoCache
     this.visible = visible
     this.transformationType =
@@ -83,6 +89,20 @@ export default class WarpedMap {
     })
   }
 
+  getViewportMaskBbox(viewport: Viewport): Bbox {
+    return computeBbox(this.getViewportMask(viewport))
+  }
+
+  getApproxViewportMaskBbox(viewport: Viewport): Bbox {
+    // Approx since transform of bbox is not as precise as bbox of transform
+    // (which is more expensive to compute)
+    return computeBbox(
+      bboxToRectangle(this.projectedGeoMaskBbox).map((point) => {
+        return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      })
+    )
+  }
+
   getViewportFullMask(viewport: Viewport): Ring {
     return convertGeojsonPolygonToRing(this.projectedGeoFullMask).map(
       (point) => {
@@ -91,12 +111,43 @@ export default class WarpedMap {
     )
   }
 
-  getViewportMaskBbox(viewport: Viewport): Bbox {
-    return computeBbox(this.getViewportMask(viewport))
-  }
-
   getViewportFullMaskBbox(viewport: Viewport): Bbox {
     return computeBbox(this.getViewportFullMask(viewport))
+  }
+
+  getApproxViewportFullMaskBbox(viewport: Viewport): Bbox {
+    // Approx since transform of bbox is not as precise as bbox of transform
+    // (which is more expensive to compute)
+    return computeBbox(
+      bboxToRectangle(this.projectedGeoFullMaskBbox).map((point) => {
+        return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      })
+    )
+  }
+
+  getResourceToViewportScale(viewport: Viewport): number {
+    return bboxesToScale(
+      this.resourceMaskBbox,
+      this.getViewportMaskBbox(viewport)
+    )
+  }
+
+  getResourceToCanvasScale(viewport: Viewport): number {
+    return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
+  }
+
+  getApproxResourceToViewportScale(viewport: Viewport): number {
+    return bboxesToScale(
+      this.resourceMaskBbox,
+      this.getApproxViewportMaskBbox(viewport)
+    )
+  }
+
+  getApproxResourceToCanvasScale(viewport: Viewport): number {
+    return (
+      this.getApproxResourceToViewportScale(viewport) /
+      viewport.devicePixelRatio
+    )
   }
 
   async completeImageInfo(): Promise<void> {
