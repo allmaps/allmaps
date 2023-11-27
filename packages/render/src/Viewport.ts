@@ -35,7 +35,7 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Bbox} canvasBbox - Bbox of the HTMLCanvasElement of the viewport, in canvas pixels.
  * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
  * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
- * @property {Transform} projectedGeoToWebGL2Transform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+ * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
  */
 export default class Viewport extends EventTarget {
   geoCenter: Point
@@ -59,7 +59,7 @@ export default class Viewport extends EventTarget {
   canvasBbox: Bbox
   projectedGeoPerCanvasScale: number
   projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
-  projectedGeoToWebGL2Transform: Transform = [1, 0, 0, 1, 0, 0]
+  projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
 
   /**
    * Creates an instance of Viewport.
@@ -69,7 +69,7 @@ export default class Viewport extends EventTarget {
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
    * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
    * @param {number} projectedGeoPerViewportScale - Resolution of the viewport, in projection coordinates per viewport pixel.
-   * @param {number} devicePixelRatio - The devicePixelRatio of the viewport.
+   * @param {number} [devicePixelRatio=1] - The devicePixelRatio of the viewport.
    */
   constructor(
     projectedGeoCenter: Point,
@@ -127,8 +127,7 @@ export default class Viewport extends EventTarget {
 
     this.projectedGeoToViewportTransform =
       this.composeProjectedGeoToViewportTransform()
-    this.projectedGeoToWebGL2Transform =
-      this.composeProjectedGeoToWebGL2Transform()
+    this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
   }
 
   private composeProjectedGeoToViewportTransform(): Transform {
@@ -143,7 +142,7 @@ export default class Viewport extends EventTarget {
     )
   }
 
-  private composeProjectedGeoToWebGL2Transform(): Transform {
+  private composeProjectedGeoToClipTransform(): Transform {
     return composeTransform(
       0,
       0,
