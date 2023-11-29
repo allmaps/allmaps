@@ -13,9 +13,9 @@ import classifyPoint from 'robust-point-in-polygon'
 import { cachedFetch } from './fetch.js'
 import { xyzTileToGeoBbox, tileToLng, tileToLat } from './geo.js'
 
-import type { Point, XYZTile, Tile } from '@allmaps/types'
+import type { Point, Tile } from '@allmaps/types'
 import type { Map } from '@allmaps/annotation'
-import type { Cache, TilejsonOptions } from './types.js'
+import type { XYZTile, Cache, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 const CHANNELS = 4

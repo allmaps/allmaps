@@ -15,9 +15,9 @@ import type {
   Size,
   Tile,
   TileZoomLevel,
-  NeededTile,
   TileByColumn
 } from '@allmaps/types'
+import type { FetchableMapTile } from '../CachedTile'
 import type { GcpTransformer } from '@allmaps/transform'
 
 /**
@@ -146,7 +146,6 @@ export function computeTilesConveringRingAtTileZoomLevel(
   const tiles = tilesByColumnToTiles(tilesByColumn, image, tileZoomLevel)
 
   // Sort tiles to load tiles in order of their distance to center
-  // TODO: move to new SortedFetch class
   const resourceRingCenter = bboxToCenter(computeBbox(resourceRing))
   tiles.sort(
     (tileA, tileB) =>
@@ -268,10 +267,10 @@ function tilesByColumnToTiles(
   return tiles
 }
 
-export function tileToNeededTile(
+export function tileToFetchableMapTile(
   tile: Tile,
   warpedMap: WarpedMapWithImageInfo
-): NeededTile {
+): FetchableMapTile {
   const mapId = warpedMap.mapId
   const imageRequest = warpedMap.parsedImage.getIiifTile(
     tile.tileZoomLevel,
@@ -283,7 +282,7 @@ export function tileToNeededTile(
     mapId,
     tile,
     imageRequest,
-    url
+    tileUrl: url
   }
 }
 

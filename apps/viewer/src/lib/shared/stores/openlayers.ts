@@ -119,8 +119,7 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
-      const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+      const cachedTile = mapWarpedMapLayer?.renderer.tileCache.getTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {
@@ -155,7 +154,7 @@ export function createMapOl() {
   if (mapWarpedMapLayer) {
     // TODO: emit this event directly from WarpedMapLayer?
     mapWarpedMapLayer.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTTILELOADED,
+      WarpedMapEventType.FIRSTMAPTILELOADED,
       mapWarpedMapLayerFirstTileLoaded
     )
 

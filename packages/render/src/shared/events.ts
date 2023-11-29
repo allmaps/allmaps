@@ -17,14 +17,12 @@ export enum WarpedMapEventType {
   IMAGEINFONEEDED = 'imageinfoneeded',
   IMAGEINFOLOADED = 'imageinfoloaded',
 
-  TILENEEDED = 'tileneeded',
-  TILEREMOVED = 'tileremoved',
-  TILELOADED = 'tileloaded',
+  TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
-  ALLTILESLOADED = 'alltilesloaded',
-
-  // Emits when the first tile of a map is added
-  FIRSTTILELOADED = 'firsttileloaded',
+  MAPTILELOADED = 'maptileloaded',
+  MAPTILEREMOVED = 'maptileremoved',
+  FIRSTMAPTILELOADED = 'firstmaptileloaded',
+  ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
 
   CLEARED = 'cleared',
   CHANGED = 'changed'

@@ -1,6 +1,12 @@
 import type { TransformationType } from '@allmaps/transform'
 
-// TODO: remove this. Kept a copy here to note that this version doesn't have imageSize as compared to @allmaps/types
+export type XYZTile = {
+  z: number
+  x: number
+  y: number
+}
+
+// Keeping this here to note that the original version of Tile in this package didn't have imageSize as compared to @allmaps/types
 // export type Tile = {
 //   column: number
 //   row: number

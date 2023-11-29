@@ -584,13 +584,13 @@ export const WarpedMapLayer = L.Layer.extend({
     )
 
     this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.TILELOADED,
-      this._update.bind(this)
+      WarpedMapEventType.FIRSTMAPTILELOADED,
+      this._firstMapTileLoaded.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.ALLTILESLOADED,
-      this._update.bind(this)
+      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+      this._allRequestedTilesLoaded.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
@@ -683,6 +683,24 @@ export const WarpedMapLayer = L.Layer.extend({
     return this.container
   },
 
+  _firstMapTileLoaded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+
+      if (this._map) {
+        this._map.fire(WarpedMapEventType.FIRSTMAPTILELOADED, { mapId })
+      }
+    }
+  },
+
+  _allRequestedTilesLoaded(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      if (this._map) {
+        this._map.fire(WarpedMapEventType.ALLREQUESTEDTILESLOADED, {})
+      }
+    }
+  },
+
   _warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
@@ -691,8 +709,6 @@ export const WarpedMapLayer = L.Layer.extend({
         this._map.fire(WarpedMapEventType.WARPEDMAPADDED, { mapId })
       }
     }
-
-    this._update()
   },
 
   _resized(entries: ResizeObserverEntry[]) {

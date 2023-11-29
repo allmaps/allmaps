@@ -6,7 +6,7 @@ import WarpedMap from './WarpedMap.js'
 import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
-import type CachedTile from './CachedTile.js'
+import type { CachedTile } from './CachedTile.js'
 import type { RenderOptions } from './shared/types.js'
 import type { Transform } from '@allmaps/types'
 
@@ -71,8 +71,8 @@ export default class WebGL2WarpedMap {
     this.updateVertexBuffersInternal()
   }
 
-  addCachedTile(tileUrl: string, cachedTile: CachedTile) {
-    this.CachedTilesByTileUrl.set(tileUrl, cachedTile)
+  addCachedTile(cachedTile: CachedTile) {
+    this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
@@ -90,8 +90,6 @@ export default class WebGL2WarpedMap {
   }
 
   private updateVertexBuffersInternal() {
-    // This is a costly function, so it's throttled in render as part of throttledPrepareRender()
-    // And it's called once at the end off a transformation transition
     if (!this.vao || !this.projectedGeoToClipTransform) {
       return
     }
@@ -147,7 +145,6 @@ export default class WebGL2WarpedMap {
   }
 
   private updateTextures() {
-    // This is a costly function, so it's throttled using throttledUpdateTextures()
     const gl = this.gl
 
     const CachedTilesByTileUrlCount = this.CachedTilesByTileUrl.size
@@ -158,9 +155,9 @@ export default class WebGL2WarpedMap {
 
     const cachedTiles = [...this.CachedTilesByTileUrl.values()]
 
-    const packedTiles = cachedTiles.map((tile, index) => ({
-      w: tile.imageBitmap?.width || 0,
-      h: tile.imageBitmap?.height || 0,
+    const packedTiles = cachedTiles.map((cachedTile, index) => ({
+      w: cachedTile.imageBitmap.width,
+      h: cachedTile.imageBitmap.height,
       // Calling potpack will add x and y properties
       // with the position of the tile's origin in the pack
       // By adding them here already, we'll make TypeScript happy!

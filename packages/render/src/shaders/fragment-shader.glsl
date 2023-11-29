@@ -3,7 +3,7 @@
 precision highp float;
 precision highp isampler2D;
 
-uniform bool u_RemoveBackgroundColor;
+uniform bool u_removeBackgroundColor;
 uniform vec3 u_backgroundColor;
 uniform float u_backgroundColorThreshold;
 uniform float u_backgroundColorHardness;
@@ -101,7 +101,7 @@ void main() {
     if(u_backgroundColorThreshold > 0.0f) {
       vec3 backgroundColorDiff = color.rgb - u_backgroundColor.rgb;
       float backgroundColorDistance = length(backgroundColorDiff);
-      if(u_RemoveBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
+      if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
         float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0f - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
         color = vec4(color.rgb * amount, amount);
       }

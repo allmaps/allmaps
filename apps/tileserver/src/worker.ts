@@ -7,8 +7,7 @@ import { optionsFromQuery } from './options.js'
 import { generateTileJson } from './tilejson.js'
 import { generateTilesHtml } from './html.js'
 
-import type { XYZTile } from '@allmaps/types'
-import type { Caches } from './types.js'
+import type { XYZTile, Caches } from './types.js'
 
 const router = Router()
 

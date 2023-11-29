@@ -1,4 +1,5 @@
-import type { Point, Bbox, XYZTile, GeojsonPolygon } from '@allmaps/types'
+import type { Point, Bbox, GeojsonPolygon } from '@allmaps/types'
+import type { XYZTile } from './types'
 
 export function xyzTileToGeojson({ z, x, y }: XYZTile): GeojsonPolygon {
   const topLeft = xyzTileTopLeft({ z, x, y })

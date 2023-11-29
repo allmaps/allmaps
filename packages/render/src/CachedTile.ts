@@ -1,12 +1,17 @@
 import { fetchImage } from '@allmaps/stdlib'
-
-import type { ImageRequest } from '@allmaps/types'
-
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import type { Tile, StoredTile } from '@allmaps/types'
+import type { Tile, ImageRequest } from '@allmaps/types'
 
-export default class CachedTile extends EventTarget {
+export type FetchableTile = {
+  tile: Tile
+  imageRequest: ImageRequest
+  tileUrl: string
+}
+
+export type FetchableMapTile = FetchableTile & { mapId: string }
+
+export default class CacheableTile extends EventTarget {
   readonly tile: Tile
   readonly imageRequest: ImageRequest
   readonly tileUrl: string
@@ -14,12 +19,12 @@ export default class CachedTile extends EventTarget {
 
   protected abortController: AbortController
 
-  constructor(storedTile: StoredTile) {
+  constructor(fetchableTile: FetchableTile) {
     super()
 
-    this.tile = storedTile.tile
-    this.imageRequest = storedTile.imageRequest
-    this.tileUrl = storedTile.url
+    this.tile = fetchableTile.tile
+    this.imageRequest = fetchableTile.imageRequest
+    this.tileUrl = fetchableTile.tileUrl
 
     this.abortController = new AbortController()
   }
@@ -30,9 +35,7 @@ export default class CachedTile extends EventTarget {
       this.imageBitmap = await createImageBitmap(image)
 
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILELOADED, {
-          tileUrl: this.tileUrl
-        })
+        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
       )
 
       return this.imageBitmap
@@ -42,15 +45,13 @@ export default class CachedTile extends EventTarget {
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.tileUrl
-          })
+          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, this.tileUrl)
         )
       }
     }
   }
 
-  get loading() {
+  get fetching() {
     return this.imageBitmap ? false : true
   }
 
@@ -59,4 +60,17 @@ export default class CachedTile extends EventTarget {
       this.abortController.abort()
     }
   }
+}
+
+export class CachedTile extends CacheableTile {
+  imageBitmap!: ImageBitmap
+  constructor(fetchableTile: FetchableTile) {
+    super(fetchableTile)
+  }
+}
+
+export function isCachedTile(
+  cacheableTile: CacheableTile
+): cacheableTile is CachedTile {
+  return cacheableTile.imageBitmap !== undefined
 }

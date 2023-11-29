@@ -195,7 +195,9 @@ export default class WarpedMap {
       this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
     ) {
       this.resourceTrianglePoints =
-        this.resourceTrianglePointsByBestScaleFactor.get(this.bestScaleFactor)!
+        this.resourceTrianglePointsByBestScaleFactor.get(
+          this.bestScaleFactor
+        ) as Point[]
     } else {
       const diameter =
         (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /

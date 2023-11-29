@@ -1,6 +1,7 @@
 import { throttle, debounce } from 'lodash-es'
 
 import TileCache from './TileCache.js'
+import { isCachedTile } from './CachedTile.js'
 import { hasImageInfo } from './WarpedMap.js'
 import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
@@ -20,7 +21,7 @@ import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale as getBestTileZoomLevel,
   computeTilesConveringRingAtTileZoomLevel,
-  tileToNeededTile
+  tileToFetchableMapTile
 } from './shared/tiles.js'
 import { createShader, createProgram } from './shared/webgl2.js'
 
@@ -43,7 +44,8 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-import type { Transform, NeededTile } from '@allmaps/types'
+import type { Transform } from '@allmaps/types'
+import type { FetchableMapTile } from './CachedTile.js'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -70,7 +72,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   warpedMapList: WarpedMapList
 
-  webGL2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
+  webgl2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
   tileCache: TileCache = new TileCache()
 
@@ -90,7 +92,7 @@ export default class WebGL2Renderer extends EventTarget {
   transformationTransitionStart: number | undefined
   animationProgress = 1
 
-  private throttledPrepareRender: DebouncedFunc<
+  private throttledPrepareRenderInternal: DebouncedFunc<
     typeof this.prepareRenderInternal
   >
   private debouncedRenderInternal: DebouncedFunc<
@@ -123,13 +125,13 @@ export default class WebGL2Renderer extends EventTarget {
     )
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.TILELOADED,
-      this.tileLoaded.bind(this)
+      WarpedMapEventType.MAPTILELOADED,
+      this.mapTileLoaded.bind(this)
     )
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.TILEREMOVED,
-      this.tileRemoved.bind(this)
+      WarpedMapEventType.MAPTILEREMOVED,
+      this.mapTileRemoved.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -152,7 +154,7 @@ export default class WebGL2Renderer extends EventTarget {
       this.clear.bind(this)
     )
 
-    this.throttledPrepareRender = throttle(
+    this.throttledPrepareRenderInternal = throttle(
       this.prepareRenderInternal.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
@@ -178,7 +180,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   getMapOpacity(mapId: string): number | undefined {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
 
     if (webGL2WarpedMap) {
       return webGL2WarpedMap.opacity
@@ -186,14 +188,14 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   setMapOpacity(mapId: string, opacity: number): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.opacity = Math.min(Math.max(opacity, 0), 1)
     }
   }
 
   resetMapOpacity(mapId: string): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.opacity = DEFAULT_OPACITY
     }
@@ -214,7 +216,7 @@ export default class WebGL2Renderer extends EventTarget {
   getMapRemoveBackground(
     mapId: string
   ): Partial<RemoveBackgroundOptions> | undefined {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       return webGL2WarpedMap.renderOptions.removeBackground
     }
@@ -224,14 +226,14 @@ export default class WebGL2Renderer extends EventTarget {
     mapId: string,
     removeBackgroundOptions: RemoveBackgroundOptions
   ): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.renderOptions.removeBackground = removeBackgroundOptions
     }
   }
 
   resetMapRemoveBackground(mapId: string): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.renderOptions.removeBackground = undefined
     }
@@ -250,21 +252,21 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   getMapColorize(mapId: string): Partial<ColorizeOptions> | undefined {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       return webGL2WarpedMap.renderOptions.colorize
     }
   }
 
   setMapColorize(mapId: string, colorizeOptions: ColorizeOptions): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.renderOptions.colorize = colorizeOptions
     }
   }
 
   resetMapColorize(mapId: string): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.renderOptions.colorize = undefined
     }
@@ -287,7 +289,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   getMapSaturation(mapId: string): number | undefined {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       return webGL2WarpedMap.saturation
     }
@@ -299,14 +301,14 @@ export default class WebGL2Renderer extends EventTarget {
    * @param saturation 0 - grayscale, 1 - original colors
    */
   setMapSaturation(mapId: string, saturation: number): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.saturation = saturation
     }
   }
 
   resetMapSaturation(mapId: string): void {
-    const webGL2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.saturation = DEFAULT_SATURATION
     }
@@ -314,20 +316,22 @@ export default class WebGL2Renderer extends EventTarget {
 
   render(viewport: Viewport): void {
     this.viewport = viewport
-    this.throttledPrepareRender()
+    this.throttledPrepareRenderInternal()
     this.renderInternal()
+    // The reason why this debounced function is needed is unclear.
+    // Maybe because textures are not ready when the CHANGED event is emitted in mapTileLoaded.
     this.debouncedRenderInternal()
   }
 
   clear() {
-    this.webGL2WarpedMapsById = new Map()
+    this.webgl2WarpedMapsById = new Map()
     this.mapsInViewport = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
 
   dispose() {
-    for (const warpedMapWebGLRenderer of this.webGL2WarpedMapsById.values()) {
+    for (const warpedMapWebGLRenderer of this.webgl2WarpedMapsById.values()) {
       warpedMapWebGLRenderer.dispose()
     }
 
@@ -375,8 +379,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private prepareRenderInternal(): void {
-    this.updateVertexBuffers()
-    this.updateNeededTiles()
+    this.updateRequestedTiles()
   }
 
   private updateVertexBuffers() {
@@ -389,7 +392,7 @@ export default class WebGL2Renderer extends EventTarget {
     )
 
     for (const mapId of this.mapsInViewport) {
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
         break
@@ -401,7 +404,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private updateNeededTiles(): void {
+  private updateRequestedTiles(): void {
     if (!this.viewport) {
       return
     }
@@ -414,7 +417,7 @@ export default class WebGL2Renderer extends EventTarget {
       this.viewport.projectedGeoBbox
     )
 
-    const neededTiles: NeededTile[] = []
+    const requestedTiles: FetchableMapTile[] = []
     for (const mapId of possibleMapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
@@ -458,6 +461,7 @@ export default class WebGL2Renderer extends EventTarget {
         this.viewport.projectedGeoBbox
       )
 
+      // This returns tiles sorted by distance from center of resourceViewportRing
       const tiles = computeTilesConveringRingAtTileZoomLevel(
         resourceViewportRing,
         tileZoomLevel,
@@ -465,12 +469,12 @@ export default class WebGL2Renderer extends EventTarget {
       )
 
       for (const tile of tiles) {
-        neededTiles.push(tileToNeededTile(tile, warpedMap))
+        requestedTiles.push(tileToFetchableMapTile(tile, warpedMap))
       }
     }
 
-    this.tileCache.setTiles(neededTiles)
-    this.updateMapsInViewport(neededTiles)
+    this.tileCache.requestTiles(requestedTiles)
+    this.updateMapsInViewport(requestedTiles)
   }
 
   private viewportMovedSignificantly(): boolean {
@@ -507,10 +511,10 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private updateMapsInViewport(neededTiles: NeededTile[]) {
+  private updateMapsInViewport(tiles: FetchableMapTile[]) {
     // TODO: handle everything as Set() once JS supports filter on sets.
     const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
-    const newMapsInViewportAsArray = neededTiles
+    const newMapsInViewportAsArray = tiles
       .map((tile) => tile.mapId)
       .filter((v, i, a) => {
         // filter out duplicate mapIds
@@ -552,6 +556,8 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
+    this.updateVertexBuffers()
+
     // renderTransform is the product of:
     // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
     // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
@@ -592,7 +598,7 @@ export default class WebGL2Renderer extends EventTarget {
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
     for (const mapId of this.mapsInViewport) {
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
         continue
@@ -772,45 +778,47 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private async imageInfoNeeded(event: Event) {
-    // TODO: why do we need webgl2warpedmap here? warpedmap seems to suffice!
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
-      if (!webgl2WarpedMap) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (!warpedMap) {
         return
       }
 
-      const warpedMap = webgl2WarpedMap.warpedMap
       await warpedMap.completeImageInfo()
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
     }
   }
 
-  private tileLoaded(event: Event) {
+  private mapTileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-      const cachedTile = this.tileCache.getCachedTile(tileUrl)
+      const tile = this.tileCache.getTile(tileUrl)
 
-      if (!cachedTile) {
+      if (!tile) {
         return
       }
 
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      if (!isCachedTile(tile)) {
+        return
+      }
+
+      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
       if (!webgl2WarpedMap) {
         return
       }
 
-      webgl2WarpedMap.addCachedTile(tileUrl, cachedTile)
+      webgl2WarpedMap.addCachedTile(tile)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
   }
 
-  private tileRemoved(event: Event) {
+  private mapTileRemoved(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-      const webgl2WarpedMap = this.webGL2WarpedMapsById.get(mapId)
+      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
 
       if (!webgl2WarpedMap) {
         return
@@ -832,7 +840,7 @@ export default class WebGL2Renderer extends EventTarget {
           this.program,
           warpedMap
         )
-        this.webGL2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
+        this.webgl2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
       }
     }
   }
