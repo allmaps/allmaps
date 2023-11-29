@@ -5,7 +5,6 @@ import {
   bboxToCenter,
   distance
 } from '@allmaps/stdlib'
-import { WarpedMapWithImageInfo } from '../WarpedMap'
 
 import type {
   Point,
@@ -17,7 +16,6 @@ import type {
   TileZoomLevel,
   TileByColumn
 } from '@allmaps/types'
-import type { FetchableMapTile } from '../CachedTile'
 import type { GcpTransformer } from '@allmaps/transform'
 
 /**
@@ -265,25 +263,6 @@ function tilesByColumnToTiles(
   }
 
   return tiles
-}
-
-export function tileToFetchableMapTile(
-  tile: Tile,
-  warpedMap: WarpedMapWithImageInfo
-): FetchableMapTile {
-  const mapId = warpedMap.mapId
-  const imageRequest = warpedMap.parsedImage.getIiifTile(
-    tile.tileZoomLevel,
-    tile.column,
-    tile.row
-  )
-  const url = warpedMap.parsedImage.getImageUrl(imageRequest)
-  return {
-    mapId,
-    tile,
-    imageRequest,
-    tileUrl: url
-  }
 }
 
 // Geometric computations

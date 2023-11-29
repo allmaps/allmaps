@@ -1,7 +1,7 @@
-import CacheableTile from './CachedTile.js'
+import CacheableTile, { CachedTile, isCachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import type { FetchableMapTile } from './CachedTile.js'
+import FetchableMapTile from './FetchableTile.js'
 
 export default class TileCache extends EventTarget {
   protected tilesByTileUrl: Map<string, CacheableTile> = new Map()
@@ -10,12 +10,30 @@ export default class TileCache extends EventTarget {
 
   protected tilesFetchingCount = 0
 
-  getTile(tileUrl: string) {
+  getCacheableTile(tileUrl: string) {
     return this.tilesByTileUrl.get(tileUrl)
   }
 
-  getTiles() {
+  getCachedTile(tileUrl: string) {
+    const cacheableTile = this.tilesByTileUrl.get(tileUrl)
+    if (cacheableTile && isCachedTile(cacheableTile)) {
+      return cacheableTile as CachedTile
+    }
+  }
+
+  getCacheableTiles() {
     return this.tilesByTileUrl.values()
+  }
+
+  getCachedTiles() {
+    const cacheableTiles = Array.from(this.tilesByTileUrl.values())
+    const cachedTiles: CachedTile[] = []
+    cacheableTiles.forEach((cacheableTile) => {
+      if (isCachedTile(cacheableTile)) {
+        cachedTiles.push(cacheableTile)
+      }
+    })
+    return cachedTiles
   }
 
   getTileUrls() {

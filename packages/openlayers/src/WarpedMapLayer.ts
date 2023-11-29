@@ -85,19 +85,39 @@ export class WarpedMapLayer extends Layer {
       this.changed.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this.passWarpedMapEvent.bind(this)
+    )
+
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
-      this.firstMapTileLoaded.bind(this)
+      this.passWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.ALLREQUESTEDTILESLOADED,
-      this.allRequestedTilesLoaded.bind(this)
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.passWarpedMapEvent.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.passWarpedMapEvent.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
@@ -320,36 +340,9 @@ export class WarpedMapLayer extends Layer {
     return this.container
   }
 
-  private firstMapTileLoaded(event: Event) {
+  private passWarpedMapEvent(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      const olEvent = new OLWarpedMapEvent(
-        WarpedMapEventType.FIRSTMAPTILELOADED,
-        mapId
-      )
-      this.dispatchEvent(olEvent)
-    }
-  }
-
-  private allRequestedTilesLoaded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const olEvent = new OLWarpedMapEvent(
-        WarpedMapEventType.WARPEDMAPADDED,
-        {}
-      )
-      this.dispatchEvent(olEvent)
-    }
-  }
-
-  private warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      const olEvent = new OLWarpedMapEvent(
-        WarpedMapEventType.WARPEDMAPADDED,
-        mapId
-      )
+      const olEvent = new OLWarpedMapEvent(event.type, event.data)
       this.dispatchEvent(olEvent)
     }
   }

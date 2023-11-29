@@ -583,19 +583,34 @@ export const WarpedMapLayer = L.Layer.extend({
       this._update.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this._passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this._passWarpedMapEvent.bind(this)
+    )
+
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
-      this._firstMapTileLoaded.bind(this)
+      this._passWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.ALLREQUESTEDTILESLOADED,
-      this._allRequestedTilesLoaded.bind(this)
+      this._passWarpedMapEvent.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this._warpedMapAdded.bind(this)
+      this._passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this._passWarpedMapEvent.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
@@ -683,30 +698,10 @@ export const WarpedMapLayer = L.Layer.extend({
     return this.container
   },
 
-  _firstMapTileLoaded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      if (this._map) {
-        this._map.fire(WarpedMapEventType.FIRSTMAPTILELOADED, { mapId })
-      }
-    }
-  },
-
-  _allRequestedTilesLoaded(event: Event) {
+  _passWarpedMapEvent(event: Event) {
     if (event instanceof WarpedMapEvent) {
       if (this._map) {
-        this._map.fire(WarpedMapEventType.ALLREQUESTEDTILESLOADED, {})
-      }
-    }
-  },
-
-  _warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-
-      if (this._map) {
-        this._map.fire(WarpedMapEventType.WARPEDMAPADDED, { mapId })
+        this._map.fire(event.type, event.data)
       }
     }
   },

@@ -1,7 +1,8 @@
 import { throttle, debounce } from 'lodash-es'
 
 import TileCache from './TileCache.js'
-import { isCachedTile } from './CachedTile.js'
+import FetchableMapTile from './FetchableTile.js'
+import { isCachedTile } from './CacheableTile.js'
 import { hasImageInfo } from './WarpedMap.js'
 import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
@@ -20,8 +21,7 @@ import {
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale as getBestTileZoomLevel,
-  computeTilesConveringRingAtTileZoomLevel,
-  tileToFetchableMapTile
+  computeTilesConveringRingAtTileZoomLevel
 } from './shared/tiles.js'
 import { createShader, createProgram } from './shared/webgl2.js'
 
@@ -45,7 +45,6 @@ import type {
 } from './shared/types.js'
 
 import type { Transform } from '@allmaps/types'
-import type { FetchableMapTile } from './CachedTile.js'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -469,7 +468,7 @@ export default class WebGL2Renderer extends EventTarget {
       )
 
       for (const tile of tiles) {
-        requestedTiles.push(tileToFetchableMapTile(tile, warpedMap))
+        requestedTiles.push(new FetchableMapTile(tile, warpedMap))
       }
     }
 
@@ -735,13 +734,13 @@ export default class WebGL2Renderer extends EventTarget {
     if (removeBackgroundColor) {
       const backgroundColorLocation = gl.getUniformLocation(
         this.program,
-        'u_background_color'
+        'u_backgroundColor'
       )
       gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
 
       const backgroundColorThresholdLocation = gl.getUniformLocation(
         this.program,
-        'u_background_colorThreshold'
+        'u_backgroundColorThreshold'
       )
 
       gl.uniform1f(
@@ -752,7 +751,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       const backgroundColorHardnessLocation = gl.getUniformLocation(
         this.program,
-        'u_background_colorHardness'
+        'u_backgroundColorHardness'
       )
       gl.uniform1f(
         backgroundColorHardnessLocation,
@@ -794,7 +793,7 @@ export default class WebGL2Renderer extends EventTarget {
   private mapTileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-      const tile = this.tileCache.getTile(tileUrl)
+      const tile = this.tileCache.getCacheableTile(tileUrl)
 
       if (!tile) {
         return

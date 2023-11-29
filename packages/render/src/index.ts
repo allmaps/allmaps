@@ -3,15 +3,17 @@ import WarpedMapList from './WarpedMapList.js'
 import Viewport from './Viewport.js'
 import GeojsonPolygonRTree from './RTree.js'
 import TileCache from './TileCache.js'
-import CacheableTile from './CachedTile.js'
+import CacheableTile from './CacheableTile.js'
+import FetchableTile from './FetchableTile.js'
 
 export {
   WarpedMap,
   WarpedMapList,
   Viewport,
-  GeojsonPolygonRTree as RTree,
+  GeojsonPolygonRTree,
   TileCache,
-  CacheableTile as CachedTile
+  CacheableTile,
+  FetchableTile
 }
 
 import WebGL2Renderer from './WebGL2Renderer.js'

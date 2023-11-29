@@ -119,7 +119,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
-      const cachedTile = mapWarpedMapLayer?.renderer.tileCache.getTile(tileUrl)
+      // TODO: Consider using ...tileCache.getCachedTile(tileUrl)
+      const cachedTile =
+        mapWarpedMapLayer?.renderer.tileCache.getCacheableTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {

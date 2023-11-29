@@ -1,15 +1,9 @@
 export enum WarpedMapEventType {
-  WARPEDMAPADDED = 'warpedmapadded',
-  WARPEDMAPREMOVED = 'warpedmapremoved',
-
-  // TODO: Maybe have one MAPSCHANGED event?
-  ZINDICESCHANGES = 'zindiceschanged',
-  RESOURCEMASKUPDATED = 'resourcemaskupdated',
-  VISIBILITYCHANGED = 'visibilitychanged',
-  TRANSFORMATIONCHANGED = 'transformationchanged',
-
   GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
   GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
+
+  WARPEDMAPADDED = 'warpedmapadded',
+  WARPEDMAPREMOVED = 'warpedmapremoved',
 
   WARPEDMAPENTER = 'warpedmapenter',
   WARPEDMAPLEAVE = 'warpedmapleave',
@@ -24,8 +18,15 @@ export enum WarpedMapEventType {
   FIRSTMAPTILELOADED = 'firstmaptileloaded',
   ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
 
-  CLEARED = 'cleared',
-  CHANGED = 'changed'
+  // TODO: Maybe have one OPTIONSCHANGED event?
+  ZINDICESCHANGES = 'zindiceschanged',
+  RESOURCEMASKUPDATED = 'resourcemaskupdated',
+  VISIBILITYCHANGED = 'visibilitychanged',
+  TRANSFORMATIONCHANGED = 'transformationchanged',
+
+  CHANGED = 'changed',
+
+  CLEARED = 'cleared'
 }
 
 export type WarpedMapTileEventDetail = {

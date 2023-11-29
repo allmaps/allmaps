@@ -1,15 +1,8 @@
 import { fetchImage } from '@allmaps/stdlib'
+import FetchableMapTile from './FetchableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import type { Tile, ImageRequest } from '@allmaps/types'
-
-export type FetchableTile = {
-  tile: Tile
-  imageRequest: ImageRequest
-  tileUrl: string
-}
-
-export type FetchableMapTile = FetchableTile & { mapId: string }
 
 export default class CacheableTile extends EventTarget {
   readonly tile: Tile
@@ -19,12 +12,12 @@ export default class CacheableTile extends EventTarget {
 
   protected abortController: AbortController
 
-  constructor(fetchableTile: FetchableTile) {
+  constructor(fetchableMapTile: FetchableMapTile) {
     super()
 
-    this.tile = fetchableTile.tile
-    this.imageRequest = fetchableTile.imageRequest
-    this.tileUrl = fetchableTile.tileUrl
+    this.tile = fetchableMapTile.tile
+    this.imageRequest = fetchableMapTile.imageRequest
+    this.tileUrl = fetchableMapTile.tileUrl
 
     this.abortController = new AbortController()
   }
@@ -64,8 +57,8 @@ export default class CacheableTile extends EventTarget {
 
 export class CachedTile extends CacheableTile {
   imageBitmap!: ImageBitmap
-  constructor(fetchableTile: FetchableTile) {
-    super(fetchableTile)
+  constructor(fetchableMapTile: FetchableMapTile) {
+    super(fetchableMapTile)
   }
 }
 

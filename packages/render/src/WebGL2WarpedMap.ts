@@ -6,7 +6,7 @@ import WarpedMap from './WarpedMap.js'
 import { createBuffer } from './shared/webgl2.js'
 import { applyTransform } from './shared/matrix.js'
 
-import type { CachedTile } from './CachedTile.js'
+import type { CachedTile } from './CacheableTile.js'
 import type { RenderOptions } from './shared/types.js'
 import type { Transform } from '@allmaps/types'
 
@@ -191,21 +191,18 @@ export default class WebGL2WarpedMap {
     )
     for (const packedTile of packedTiles) {
       // Fill with the TileImageBitmap of each packed tile
-      const cachedTile = cachedTiles[packedTile.index]
-      const tileImageBitmap = cachedTile.imageBitmap
-      if (tileImageBitmap) {
-        gl.texSubImage2D(
-          gl.TEXTURE_2D,
-          0,
-          packedTile.x,
-          packedTile.y,
-          tileImageBitmap.width,
-          tileImageBitmap.height,
-          gl.RGBA,
-          gl.UNSIGNED_BYTE,
-          tileImageBitmap
-        )
-      }
+      const imageBitmap = cachedTiles[packedTile.index].imageBitmap
+      gl.texSubImage2D(
+        gl.TEXTURE_2D,
+        0,
+        packedTile.x,
+        packedTile.y,
+        imageBitmap.width,
+        imageBitmap.height,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        imageBitmap
+      )
     }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
@@ -241,7 +238,6 @@ export default class WebGL2WarpedMap {
     const packedTilesResourcePositionsAndDimensions = packedTiles.map(
       (packedTile) => {
         const cachedTile = cachedTiles[packedTile.index]
-        // TODO: is this correct? Added to fix TypeScript error
         if (
           cachedTile &&
           cachedTile.imageRequest &&
