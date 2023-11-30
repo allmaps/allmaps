@@ -472,7 +472,7 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
-    this.tileCache.requestTiles(requestedTiles)
+    this.tileCache.requestFetcableMapTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
   }
 
