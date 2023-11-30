@@ -3,7 +3,7 @@ import {
   computeBbox,
   bboxToRectangle,
   webMercatorToLonLat,
-  bboxToExtent
+  bboxToSize
 } from '@allmaps/stdlib'
 
 import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
@@ -105,7 +105,7 @@ export default class Viewport extends EventTarget {
       return webMercatorToLonLat(point)
     }) as Rectangle
     this.geoBbox = computeBbox(this.geoRectangle)
-    this.geoSize = bboxToExtent(this.geoBbox)
+    this.geoSize = bboxToSize(this.geoBbox)
 
     this.viewportCenter = [this.viewportSize[0] / 2, this.viewportSize[1] / 2]
     this.viewportBbox = [0, 0, ...this.viewportSize]

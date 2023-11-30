@@ -12,11 +12,11 @@ import type {
   Line,
   Rectangle,
   Bbox,
-  Extent,
+  Size,
   GeojsonGeometry
 } from '@allmaps/types'
 
-export function computeMinMax(values: number[]): Extent {
+export function computeMinMax(values: number[]): Size {
   let min: number = Number.POSITIVE_INFINITY
   let max: number = Number.NEGATIVE_INFINITY
 
@@ -101,16 +101,16 @@ export function bboxToCenter(bbox: Bbox): Point {
   return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
 }
 
-export function bboxToExtent(bbox: Bbox): Extent {
+export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
-export function extentsToScale(extent0: Extent, extent1: Extent): number {
-  const scaleX = extent0[0] / extent1[0]
-  const scaleY = extent0[1] / extent1[1]
+export function sizesToScale(size0: Size, size1: Size): number {
+  const scaleX = size0[0] / size1[0]
+  const scaleY = size0[1] / size1[1]
   return Math.min(scaleX, scaleY)
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {
-  return extentsToScale(bboxToExtent(bbox0), bboxToExtent(bbox1))
+  return sizesToScale(bboxToSize(bbox0), bboxToSize(bbox1))
 }

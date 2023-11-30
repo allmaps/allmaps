@@ -8,7 +8,12 @@ import {
   WarpedMapEventType,
   WebGL2Renderer
 } from '@allmaps/render'
-import { hexToFractionalRgb, isValidHttpUrl } from '@allmaps/stdlib'
+import {
+  bboxToSize,
+  sizesToScale,
+  hexToFractionalRgb,
+  isValidHttpUrl
+} from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 import type { Point, Bbox } from '@allmaps/types'
@@ -192,7 +197,7 @@ export const WarpedMapLayer = L.Layer.extend({
 
   /**
    * Return the Bbox of all visible maps in the layer, in lon lat coordinates.
-   * @returns {Bbox | undefined} - extent of all warped maps
+   * @returns {Bbox | undefined} - bbox of all warped maps
    */
   getTotalBbox(): Bbox | undefined {
     return this.renderer.warpedMapList.getBbox()
@@ -200,7 +205,7 @@ export const WarpedMapLayer = L.Layer.extend({
 
   /**
    * Return the Bbox of all visible maps in the layer, in projected coordinates.
-   * @returns {Bbox | undefined} - extent of all warped maps
+   * @returns {Bbox | undefined} - bbox of all warped maps
    */
   getTotalProjectedBbox(): Bbox | undefined {
     return this.renderer.warpedMapList.getProjectedBbox()
@@ -680,17 +685,17 @@ export const WarpedMapLayer = L.Layer.extend({
       projectedNorthEastAsPoint.x,
       projectedNorthEastAsPoint.y
     ] as [number, number, number, number]
-    const xResolution =
-      (projectedGeoBbox[2] - projectedGeoBbox[0]) / viewportSize[0]
-    const yResolution =
-      (projectedGeoBbox[3] - projectedGeoBbox[1]) / viewportSize[1]
-    const resolution = Math.max(xResolution, yResolution)
+    const projectedGeoSize = bboxToSize(projectedGeoBbox)
+    const projectedGeoPerViewportScale = sizesToScale(
+      projectedGeoSize,
+      viewportSize
+    )
 
     const viewport = new Viewport(
       projectedGeoCenter,
       viewportSize,
       0,
-      resolution,
+      projectedGeoPerViewportScale,
       window.devicePixelRatio
     )
     this.renderer.render(viewport)

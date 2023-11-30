@@ -45,15 +45,14 @@ export type Gcp = { resource: Point; geo: Point }
  */
 export type Bbox = [number, number, number, number]
 
-export type Size = [number, number]
-
 /**
- * Two numbers indicating the exent of a Bbox as [xExt, yExt]. Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
+ * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
+ * Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
  *
  * @export
- * @typedef {Extent}
+ * @typedef {Size}
  */
-export type Extent = [number, number]
+export type Size = [number, number]
 
 // TODO: change name to something like 'helmert transformation signature'
 export type Transform = [number, number, number, number, number, number]

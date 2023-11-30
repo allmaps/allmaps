@@ -363,13 +363,13 @@ Sets the transformation type of multiple maps
 
 Return the Bbox of all visible maps in the layer, in lon lat coordinates.
 
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
 
 #### getTotalProjectedBbox
 
 Return the Bbox of all visible maps in the layer, in projected coordinates.
 
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** extent of all warped maps
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
 
 #### bringMapsToFront
 
