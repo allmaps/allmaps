@@ -16,7 +16,9 @@ import type {
   GeojsonGeometry
 } from '@allmaps/types'
 
-export function computeMinMax(values: number[]): Size {
+// Compute
+
+export function computeMinMax(values: number[]): [number, number] {
   let min: number = Number.POSITIVE_INFINITY
   let max: number = Number.NEGATIVE_INFINITY
 
@@ -58,14 +60,24 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
   return [minX, minY, maxX, maxY]
 }
 
-export function combineBboxes(bbox1: Bbox, bbox2: Bbox): Bbox {
+export function combineBboxes(bbox0: Bbox, bbox1: Bbox): Bbox {
   return [
-    Math.min(bbox1[0], bbox2[0]),
-    Math.min(bbox1[1], bbox2[1]),
-    Math.max(bbox1[2], bbox2[2]),
-    Math.max(bbox1[3], bbox2[3])
+    Math.min(bbox0[0], bbox1[0]),
+    Math.min(bbox0[1], bbox1[1]),
+    Math.max(bbox0[2], bbox1[2]),
+    Math.max(bbox0[3], bbox1[3])
   ]
 }
+
+//[xMin, yMin, xMax, yMax]
+export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
+  const isOverlappingInX = bbox0[2] >= bbox1[0] && bbox1[2] >= bbox0[0]
+  const isOverlappingInY = bbox0[3] >= bbox1[1] && bbox1[3] >= bbox0[1]
+
+  return isOverlappingInX && isOverlappingInY
+}
+
+// Transform
 
 export function bboxToRectangle(bbox: Bbox): Rectangle {
   return [
@@ -104,6 +116,8 @@ export function bboxToCenter(bbox: Bbox): Point {
 export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
+
+// Scales
 
 export function sizesToScale(size0: Size, size1: Size): number {
   const scaleX = size0[0] / size1[0]

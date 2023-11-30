@@ -65,6 +65,9 @@ export default class WarpedMap {
   bestScaleFactor!: number // At current viewport
   resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
 
+  resourceViewportRing: Ring = [] // At current viewport
+  resourceViewportRingBbox?: Bbox
+
   resourceTrianglePoints: Point[] = []
   projectedGeoCurrentTrianglePoints: Point[] = []
   projectedGeoNewTrianglePoints: Point[] = []
@@ -188,6 +191,11 @@ export default class WarpedMap {
       this.bestScaleFactor = scaleFactor
       this.updateTriangulation(true)
     }
+  }
+
+  setResourceViewportRing(resourceViewportRing: Ring) {
+    this.resourceViewportRing = resourceViewportRing
+    this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
   }
 
   updateTriangulation(currentIsNew = false) {

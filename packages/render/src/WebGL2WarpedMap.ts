@@ -2,13 +2,19 @@ import potpack from 'potpack'
 
 import { throttle } from 'lodash-es'
 
+import { isOverlapping } from '@allmaps/stdlib'
+
 import WarpedMap from './WarpedMap.js'
-import { createBuffer } from './shared/webgl2.js'
+import { computeBboxTile } from './shared/tiles.js'
 import { applyTransform } from './shared/matrix.js'
+import { createBuffer } from './shared/webgl2.js'
+
+import type { DebouncedFunc } from 'lodash-es'
+
+import type { Transform } from '@allmaps/types'
 
 import type { CachedTile } from './CacheableTile.js'
 import type { RenderOptions } from './shared/types.js'
-import type { Transform } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -18,6 +24,8 @@ const THROTTLE_OPTIONS = {
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
+
+const MAX_SCALE_FACTOR_DIFFERENCE = 1
 
 export default class WebGL2WarpedMap {
   warpedMap: WarpedMap
@@ -40,7 +48,7 @@ export default class WebGL2WarpedMap {
 
   projectedGeoToClipTransform: Transform | undefined
 
-  private throttledUpdateTextures: () => void | undefined
+  throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -71,12 +79,12 @@ export default class WebGL2WarpedMap {
     this.updateVertexBuffersInternal()
   }
 
-  addCachedTile(cachedTile: CachedTile) {
+  addCachedTileAndUpdateTextures(cachedTile: CachedTile) {
     this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
-  removeCachedTile(tileUrl: string) {
+  removeCachedTileAndUpdateTextures(tileUrl: string) {
     this.CachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
   }
@@ -147,13 +155,32 @@ export default class WebGL2WarpedMap {
   private updateTextures() {
     const gl = this.gl
 
-    const CachedTilesByTileUrlCount = this.CachedTilesByTileUrl.size
-
-    if (CachedTilesByTileUrlCount === 0) {
+    if (this.CachedTilesByTileUrl.size === 0) {
       return
     }
 
-    const cachedTiles = [...this.CachedTilesByTileUrl.values()]
+    let cachedTiles = [...this.CachedTilesByTileUrl.values()]
+
+    // Only pack tiles that are inside the viewport (as drawn on the resource)
+    // And don't differ too much in scale level from the optimal one at this viewport
+    cachedTiles = cachedTiles.filter((cachedTile) => {
+      return this.warpedMap.resourceViewportRingBbox
+        ? isOverlapping(
+            computeBboxTile(cachedTile.tile),
+            this.warpedMap.resourceViewportRingBbox
+          )
+        : true
+    })
+    cachedTiles = cachedTiles.filter((cachedTile) => {
+      return (
+        Math.abs(
+          cachedTile.tile.tileZoomLevel.scaleFactor -
+            this.warpedMap.bestScaleFactor
+        ) <= MAX_SCALE_FACTOR_DIFFERENCE
+      )
+    })
+
+    const CachedTilesByTileUrlCount = cachedTiles.length
 
     const packedTiles = cachedTiles.map((cachedTile, index) => ({
       w: cachedTile.imageBitmap.width,

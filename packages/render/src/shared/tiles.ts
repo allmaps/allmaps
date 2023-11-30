@@ -277,42 +277,59 @@ export function tileCenter(tile: Tile): Point {
   return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
 }
 
-export function computeBboxTile(tile: Tile): Bbox {
-  const tileXMin = tile.column * tile.tileZoomLevel.originalWidth
-  const tileYMin = tile.row * tile.tileZoomLevel.originalHeight
+export function tilePosition(tile: Tile): Point {
+  const resourceTilePositionX = tile.column * tile.tileZoomLevel.originalWidth
+  const resourceTilePositionY = tile.row * tile.tileZoomLevel.originalHeight
 
-  const tileXMax = Math.min(
-    tileXMin + tile.tileZoomLevel.originalWidth,
+  return [resourceTilePositionX, resourceTilePositionY]
+}
+
+export function computeBboxTile(tile: Tile): Bbox {
+  const resourceTilePosition = tilePosition(tile)
+
+  const resourceTileMaxX = Math.min(
+    resourceTilePosition[0] + tile.tileZoomLevel.originalWidth,
     tile.imageSize[0]
   )
-  const tileYMax = Math.min(
-    tileYMin + tile.tileZoomLevel.originalHeight,
+  const resourceTileMaxY = Math.min(
+    resourceTilePosition[1] + tile.tileZoomLevel.originalHeight,
     tile.imageSize[1]
   )
 
-  return [tileXMin, tileYMin, tileXMax, tileYMax]
+  return [
+    resourceTilePosition[0],
+    resourceTilePosition[1],
+    resourceTileMaxX,
+    resourceTileMaxY
+  ]
 }
 
+// Currently unused
 export function resourcePointToTilePoint(
   tile: Tile,
   resourcePoint: Point,
   clip = true
 ): Point | undefined {
-  const tileXMin = tile.column * tile.tileZoomLevel.originalWidth
-  const tileYMin = tile.row * tile.tileZoomLevel.originalHeight
+  const resourceTilePosition = tilePosition(tile)
 
-  const tileX = (resourcePoint[0] - tileXMin) / tile.tileZoomLevel.scaleFactor
-  const tileY = (resourcePoint[1] - tileYMin) / tile.tileZoomLevel.scaleFactor
+  const tilePointX =
+    (resourcePoint[0] - resourceTilePosition[0]) /
+    tile.tileZoomLevel.scaleFactor
+  const tilePointY =
+    (resourcePoint[1] - resourceTilePosition[1]) /
+    tile.tileZoomLevel.scaleFactor
 
   if (
     !clip ||
-    (resourcePoint[0] >= tileXMin &&
-      resourcePoint[0] <= tileXMin + tile.tileZoomLevel.originalWidth &&
-      resourcePoint[1] >= tileYMin &&
-      resourcePoint[1] <= tileYMin + tile.tileZoomLevel.originalHeight &&
+    (resourcePoint[0] >= resourceTilePosition[0] &&
+      resourcePoint[0] <=
+        resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
+      resourcePoint[1] >= resourceTilePosition[1] &&
+      resourcePoint[1] <=
+        resourceTilePosition[1] + tile.tileZoomLevel.originalHeight &&
       resourcePoint[0] <= tile.imageSize[0] &&
       resourcePoint[1] <= tile.imageSize[1])
   ) {
-    return [tileX, tileY]
+    return [tilePointX, tilePointY]
   }
 }

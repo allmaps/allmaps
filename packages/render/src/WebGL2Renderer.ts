@@ -460,6 +460,8 @@ export default class WebGL2Renderer extends EventTarget {
         this.viewport.projectedGeoBbox
       )
 
+      warpedMap.setResourceViewportRing(resourceViewportRing)
+
       // This returns tiles sorted by distance from center of resourceViewportRing
       const tiles = computeTilesConveringRingAtTileZoomLevel(
         resourceViewportRing,
@@ -474,6 +476,11 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.tileCache.requestFetcableMapTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
+
+    // Update textures also when viewport changes, to makes textures lighter if possible.
+    for (const mapId of this.mapsInViewport) {
+      this.webgl2WarpedMapsById.get(mapId)?.throttledUpdateTextures()
+    }
   }
 
   private viewportMovedSignificantly(): boolean {
@@ -808,7 +815,7 @@ export default class WebGL2Renderer extends EventTarget {
         return
       }
 
-      webgl2WarpedMap.addCachedTile(tile)
+      webgl2WarpedMap.addCachedTileAndUpdateTextures(tile)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
@@ -823,7 +830,7 @@ export default class WebGL2Renderer extends EventTarget {
         return
       }
 
-      webgl2WarpedMap.removeCachedTile(tileUrl)
+      webgl2WarpedMap.removeCachedTileAndUpdateTextures(tileUrl)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
