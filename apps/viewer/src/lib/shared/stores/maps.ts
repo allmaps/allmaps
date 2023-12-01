@@ -141,7 +141,7 @@ export function setRemoveBackgroundColor(
 
     if (viewerMap) {
       viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
-      mapWarpedMapLayer?.setMapRemoveBackground(mapId, {
+      mapWarpedMapLayer?.setMapRemoveColor(mapId, {
         hexColor: removeBackgroundColor,
         threshold: viewerMap.renderOptions.removeBackground.threshold,
         hardness: viewerMap.renderOptions.removeBackground.hardness

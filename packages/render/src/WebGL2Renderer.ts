@@ -34,7 +34,7 @@ import type Viewport from './Viewport.js'
 
 import type {
   RenderOptions,
-  RemoveBackgroundOptions,
+  RemoveColorOptions,
   ColorizeOptions
 } from './shared/types.js'
 
@@ -61,8 +61,8 @@ const DEBOUNCE_OPTIONS = {
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
-const DEFAULT_REMOVE_BACKGROUND_THRESHOLD = 0
-const DEFAULT_REMOVE_BACKGROUND_HARDNESS = 0.7
+const DEFAULT_REMOVE_COLOR_THRESHOLD = 0
+const DEFAULT_REMOVE_COLOR_HARDNESS = 0.7
 const MIN_VIEWPORT_DIAMETER = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
@@ -179,74 +179,74 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  getRemoveBackground(): Partial<RemoveBackgroundOptions> | undefined {
-    return this.renderOptions.removeBackground
+  getRemoveColorOptions(): Partial<RemoveColorOptions> | undefined {
+    return this.renderOptions.removeColorOptions
   }
 
-  setRemoveBackground(removeBackgroundOptions: RemoveBackgroundOptions) {
-    this.renderOptions.removeBackground = removeBackgroundOptions
+  setRemoveColorOptions(removeColorOptions: RemoveColorOptions) {
+    this.renderOptions.removeColorOptions = removeColorOptions
   }
 
-  resetRemoveBackground() {
-    this.renderOptions.removeBackground = undefined
+  resetRemoveColorOptions() {
+    this.renderOptions.removeColorOptions = undefined
   }
 
-  getMapRemoveBackground(
+  getMapRemoveColorOptions(
     mapId: string
-  ): Partial<RemoveBackgroundOptions> | undefined {
+  ): Partial<RemoveColorOptions> | undefined {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      return webGL2WarpedMap.renderOptions.removeBackground
+      return webGL2WarpedMap.renderOptions.removeColorOptions
     }
   }
 
-  setMapRemoveBackground(
+  setMapRemoveColorOptions(
     mapId: string,
-    removeBackgroundOptions: RemoveBackgroundOptions
+    removeColorOptions: RemoveColorOptions
   ): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.removeBackground = removeBackgroundOptions
+      webGL2WarpedMap.renderOptions.removeColorOptions = removeColorOptions
     }
   }
 
-  resetMapRemoveBackground(mapId: string): void {
+  resetMapRemoveColorOptions(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.removeBackground = undefined
+      webGL2WarpedMap.renderOptions.removeColorOptions = undefined
     }
   }
 
-  getColorize(): Partial<ColorizeOptions> | undefined {
-    return this.renderOptions.colorize
+  getColorizeOptions(): Partial<ColorizeOptions> | undefined {
+    return this.renderOptions.colorizeOptions
   }
 
-  setColorize(colorizeOptions: ColorizeOptions): void {
-    this.renderOptions.colorize = colorizeOptions
+  setColorizeOptions(colorizeOptions: ColorizeOptions): void {
+    this.renderOptions.colorizeOptions = colorizeOptions
   }
 
-  resetColorize(): void {
-    this.renderOptions.colorize = undefined
+  resetColorizeOptions(): void {
+    this.renderOptions.colorizeOptions = undefined
   }
 
-  getMapColorize(mapId: string): Partial<ColorizeOptions> | undefined {
+  getMapColorizeOptions(mapId: string): Partial<ColorizeOptions> | undefined {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      return webGL2WarpedMap.renderOptions.colorize
+      return webGL2WarpedMap.renderOptions.colorizeOptions
     }
   }
 
-  setMapColorize(mapId: string, colorizeOptions: ColorizeOptions): void {
+  setMapColorizeOptions(mapId: string, colorizeOptions: ColorizeOptions): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.colorize = colorizeOptions
+      webGL2WarpedMap.renderOptions.colorizeOptions = colorizeOptions
     }
   }
 
-  resetMapColorize(mapId: string): void {
+  resetMapColorizeOptions(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.colorize = undefined
+      webGL2WarpedMap.renderOptions.colorizeOptions = undefined
     }
   }
 
@@ -255,7 +255,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Set the saturation of the all warped maps
+   * Set the saturation of the all maps
    * @param saturation 0 - grayscale, 1 - original colors
    */
   setSaturation(saturation: number): void {
@@ -274,8 +274,8 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Set the saturation of a single warped map
-   * @param mapId the ID of the warped map
+   * Set the saturation of a single map
+   * @param mapId the ID of the map
    * @param saturation 0 - grayscale, 1 - original colors
    */
   setMapSaturation(mapId: string, saturation: number): void {
@@ -771,77 +771,76 @@ export default class WebGL2Renderer extends EventTarget {
     const gl = this.gl
 
     const renderOptions: RenderOptions = {
-      removeBackground: {
+      removeColorOptions: {
         color:
-          mapRenderOptions.removeBackground?.color ||
-          layerRenderOptions.removeBackground?.color,
+          mapRenderOptions.removeColorOptions?.color ||
+          layerRenderOptions.removeColorOptions?.color,
         hardness: maxOfNumberOrUndefined(
-          mapRenderOptions.removeBackground?.hardness,
-          layerRenderOptions.removeBackground?.hardness
+          mapRenderOptions.removeColorOptions?.hardness,
+          layerRenderOptions.removeColorOptions?.hardness
         ),
         threshold: maxOfNumberOrUndefined(
-          mapRenderOptions.removeBackground?.threshold,
-          layerRenderOptions.removeBackground?.threshold
+          mapRenderOptions.removeColorOptions?.threshold,
+          layerRenderOptions.removeColorOptions?.threshold
         )
       },
-      colorize: {
-        ...layerRenderOptions.colorize,
-        ...mapRenderOptions.colorize
+      colorizeOptions: {
+        ...layerRenderOptions.colorizeOptions,
+        ...mapRenderOptions.colorizeOptions
       }
     }
 
-    // Remove background color uniforms
+    // Remove color uniforms
 
-    const removeBackgroundColor = renderOptions.removeBackground?.color
+    const removeColorOptionsColor = renderOptions.removeColorOptions?.color
 
-    const removeBackgroundColorLocation = gl.getUniformLocation(
+    const removeColorLocation = gl.getUniformLocation(
       this.program,
-      'u_removeBackgroundColor'
+      'u_removeColor'
     )
-    gl.uniform1f(removeBackgroundColorLocation, removeBackgroundColor ? 1 : 0)
+    gl.uniform1f(removeColorLocation, removeColorOptionsColor ? 1 : 0)
 
-    if (removeBackgroundColor) {
-      const backgroundColorLocation = gl.getUniformLocation(
+    if (removeColorOptionsColor) {
+      const removeColorOptionsColorLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColor'
+        'u_removeColorOptionsColor'
       )
-      gl.uniform3fv(backgroundColorLocation, removeBackgroundColor)
+      gl.uniform3fv(removeColorOptionsColorLocation, removeColorOptionsColor)
 
-      const backgroundColorThresholdLocation = gl.getUniformLocation(
+      const removeColorOptionsThresholdLocation = gl.getUniformLocation(
         this.program,
-        'u_backgroundColorThreshold'
-      )
-
-      gl.uniform1f(
-        backgroundColorThresholdLocation,
-        renderOptions.removeBackground?.threshold ||
-          DEFAULT_REMOVE_BACKGROUND_THRESHOLD
-      )
-
-      const backgroundColorHardnessLocation = gl.getUniformLocation(
-        this.program,
-        'u_backgroundColorHardness'
+        'u_removeColorOptionsThreshold'
       )
       gl.uniform1f(
-        backgroundColorHardnessLocation,
-        renderOptions.removeBackground?.hardness ||
-          DEFAULT_REMOVE_BACKGROUND_HARDNESS
+        removeColorOptionsThresholdLocation,
+        renderOptions.removeColorOptions?.threshold ||
+          DEFAULT_REMOVE_COLOR_THRESHOLD
+      )
+
+      const removeColorOptionsHardnessLocation = gl.getUniformLocation(
+        this.program,
+        'u_removeColorOptionsHardness'
+      )
+      gl.uniform1f(
+        removeColorOptionsHardnessLocation,
+        renderOptions.removeColorOptions?.hardness ||
+          DEFAULT_REMOVE_COLOR_HARDNESS
       )
     }
 
     // Colorize uniforms
 
-    const colorizeColor = renderOptions.colorize?.color
+    const colorizeOptionsColor = renderOptions.colorizeOptions?.color
 
     const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
-    gl.uniform1f(colorizeLocation, colorizeColor ? 1 : 0)
+    gl.uniform1f(colorizeLocation, colorizeOptionsColor ? 1 : 0)
 
-    if (colorizeColor) {
-      const colorizeColorLocation = gl.getUniformLocation(
+    if (colorizeOptionsColor) {
+      const colorizeOptionsColorLocation = gl.getUniformLocation(
         this.program,
-        'u_colorizeColor'
+        'u_colorizeOptionsColor'
       )
-      gl.uniform3fv(colorizeColorLocation, colorizeColor)
+      gl.uniform3fv(colorizeOptionsColorLocation, colorizeOptionsColor)
     }
   }
 

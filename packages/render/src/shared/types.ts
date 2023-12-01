@@ -1,6 +1,6 @@
 import type { Color } from '@allmaps/types'
 
-export type RemoveBackgroundOptions = Partial<{
+export type RemoveColorOptions = Partial<{
   color: Color
   threshold: number
   hardness: number
@@ -11,6 +11,6 @@ export type ColorizeOptions = Partial<{
 }>
 
 export type RenderOptions = Partial<{
-  removeBackground?: RemoveBackgroundOptions
-  colorize?: ColorizeOptions
+  removeColorOptions?: RemoveColorOptions
+  colorizeOptions?: ColorizeOptions
 }>

@@ -12,8 +12,11 @@ import type { FrameState } from 'ol/Map.js'
 import type { WarpedMapSource } from './WarpedMapSource.js'
 
 /**
- * WarpedMapLayer class. Together with a WarpedMapSource, this class
- * renders a warped map on an OpenLayers map. WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+ * WarpedMapLayer class.
+ *
+ * Together with a WarpedMapSource, this class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
+ * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+ *
  * @class WarpedMapLayer
  */
 export class WarpedMapLayer extends Layer {
@@ -31,9 +34,9 @@ export class WarpedMapLayer extends Layer {
   private resizeObserver: ResizeObserver
 
   /**
-   * Creates a WarpedMapSource
+   * Creates a WarpedMapLayer instance
    * @param {Object} options
-   * @param {WarpedMapSource} options.source - source that holds the warped maps
+   * @param {WarpedMapSource} options.source - source that holds the maps
    */
   constructor(options: { source: WarpedMapSource }) {
     super(options)
@@ -79,8 +82,26 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Sets the opacity of a single warped map
-   * @param {string} mapId - ID of the warped map
+   * Gets the HTML container element of the layer
+   * @return {HTMLElement} HTML Div Element
+   */
+  getContainer(): HTMLElement {
+    return this.container
+  }
+
+  /**
+   * Gets the HTML canvas element of the layer
+   * @return {HTMLCanvasElement | null} HTML Canvas Element
+   */
+  getCanvas(): HTMLCanvasElement | null {
+    return this.canvas
+  }
+
+  // No setOpacity() and getOpacity() here since default for OL Layer class
+
+  /**
+   * Sets the opacity of a single map
+   * @param {string} mapId - ID of the map
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
   setMapOpacity(mapId: string, opacity: number) {
@@ -89,8 +110,8 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the opacity of a single warped map to fully opaque
-   * @param {string} mapId - ID of the warped map
+   * Resets the opacity of a single map to fully opaque
+   * @param {string} mapId - ID of the map
    */
   resetMapOpacity(mapId: string) {
     this.renderer.resetMapOpacity(mapId)
@@ -98,7 +119,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Sets the saturation of a single warped map
+   * Sets the saturation of a single map
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setSaturation(saturation: number) {
@@ -107,7 +128,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the saturation of a single warped to the original colors
+   * Resets the saturation of a single map to the original colors
    */
   resetSaturation() {
     this.renderer.resetSaturation()
@@ -115,8 +136,8 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Sets the saturation of a single warped map
-   * @param {string} mapId - ID of the warped map
+   * Sets the saturation of a single map
+   * @param {string} mapId - ID of the map
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setMapSaturation(mapId: string, saturation: number) {
@@ -125,8 +146,8 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the saturation of a single warped map to the original colors
-   * @param {string} mapId - ID of the warped map
+   * Resets the saturation of a single map to the original colors
+   * @param {string} mapId - ID of the map
    */
   resetMapSaturation(mapId: string) {
     this.renderer.resetMapSaturation(mapId)
@@ -134,20 +155,20 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Removes a background color from all maps in the layer
-   * @param {Object} options - remove background options
-   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * Removes a color from all maps
+   * @param {Object} options - remove color options
+   * @param {string} [options.hexColor] - hex color to remove
    * @param {number} [options.threshold] - threshold between 0 and 1
    * @param {number} [options.hardness] - hardness between 0 and 1
    */
-  setRemoveBackground(
+  setRemoveColor(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
 
-    this.renderer.setRemoveBackground({
+    this.renderer.setRemoveColorOptions({
       color,
       threshold: options.threshold,
       hardness: options.hardness
@@ -156,22 +177,22 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the background color for all maps in the layer
+   * Resets the color removal for all maps
    */
-  resetRemoveBackground() {
-    this.renderer.resetRemoveBackground()
+  resetRemoveColor() {
+    this.renderer.resetRemoveColorOptions()
     this.changed()
   }
 
   /**
-   * Removes a background color from a single map in the layer
-   * @param {string} mapId - ID of the warped map
-   * @param {Object} options - remove background options
-   * @param {string} [options.hexColor] - hex color of the background color to remove
+   * Removes a color from a single map
+   * @param {string} mapId - ID of the map
+   * @param {Object} options - remove color options
+   * @param {string} [options.hexColor] - hex color to remove
    * @param {number} [options.threshold] - threshold between 0 and 1
    * @param {number} [options.hardness] - hardness between 0 and 1
    */
-  setMapRemoveBackground(
+  setMapRemoveColor(
     mapId: string,
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
@@ -179,7 +200,7 @@ export class WarpedMapLayer extends Layer {
       ? hexToFractionalRgb(options.hexColor)
       : undefined
 
-    this.renderer.setMapRemoveBackground(mapId, {
+    this.renderer.setMapRemoveColorOptions(mapId, {
       color,
       threshold: options.threshold,
       hardness: options.hardness
@@ -188,52 +209,52 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the background color for a single map in the layer
-   * @param {string} mapId - ID of the warped map
+   * Resets the color for a single map
+   * @param {string} mapId - ID of the map
    */
-  resetMapRemoveBackground(mapId: string) {
-    this.renderer.resetMapRemoveBackground(mapId)
+  resetMapRemoveColor(mapId: string) {
+    this.renderer.resetMapRemoveColorOptions(mapId)
   }
 
   /**
-   * Sets the colorization for all maps in the layer
+   * Sets the colorization for all maps
    * @param {string} hexColor - desired hex color
    */
   setColorize(hexColor: string) {
     const color = hexToFractionalRgb(hexColor)
     if (color) {
-      this.renderer.setColorize({ color })
+      this.renderer.setColorizeOptions({ color })
       this.changed()
     }
   }
 
   /**
-   * Resets the colorization for all maps in the layer
+   * Resets the colorization for all maps
    */
   resetColorize() {
-    this.renderer.resetColorize()
+    this.renderer.resetColorizeOptions()
     this.changed()
   }
 
   /**
-   * Sets the colorization for a single map in the layer
-   * @param {string} mapId - ID of the warped map
+   * Sets the colorization for a single mapID of the map
+   * @param {string} mapId - ID of the map
    * @param {string} hexColor - desired hex color
    */
   setMapColorize(mapId: string, hexColor: string) {
     const color = hexToFractionalRgb(hexColor)
     if (color) {
-      this.renderer.setMapColorize(mapId, { color })
+      this.renderer.setMapColorizeOptions(mapId, { color })
       this.changed()
     }
   }
 
   /**
    * Resets the colorization of a single warped map
-   * @param {string} mapId - ID of the warped map
+   * @param {string} mapId - ID of the map
    */
   resetMapColorize(mapId: string) {
-    this.renderer.resetMapColorize(mapId)
+    this.renderer.resetMapColorizeOptions(mapId)
     this.changed()
   }
 
@@ -280,6 +301,50 @@ export class WarpedMapLayer extends Layer {
     this.renderer.render(viewport)
 
     return this.container
+  }
+
+  private resized(entries: ResizeObserverEntry[]) {
+    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    // TODO: read + understand https://web.dev/device-pixel-content-box/
+    for (const entry of entries) {
+      const width = entry.contentRect.width
+      const height = entry.contentRect.height
+      const dpr = window.devicePixelRatio
+
+      // if (entry.devicePixelContentBoxSize) {
+      //   // NOTE: Only this path gives the correct answer
+      //   // The other paths are imperfect fallbacks
+      //   // for browsers that don't provide anyway to do this
+      //   width = entry.devicePixelContentBoxSize[0].inlineSize
+      //   height = entry.devicePixelContentBoxSize[0].blockSize
+      //   dpr = 1 // it's already in width and height
+      // } else if (entry.contentBoxSize) {
+      //   if (entry.contentBoxSize[0]) {
+      //     width = entry.contentBoxSize[0].inlineSize
+      //     height = entry.contentBoxSize[0].blockSize
+      //   }
+      // }
+
+      const displayWidth = Math.round(width * dpr)
+      const displayHeight = Math.round(height * dpr)
+
+      this.canvasSize = [displayWidth, displayHeight]
+    }
+    this.changed()
+  }
+
+  private resizeCanvas(
+    canvas: HTMLCanvasElement,
+    [width, height]: [number, number]
+  ) {
+    const needResize = canvas.width !== width || canvas.height !== height
+
+    if (needResize) {
+      canvas.width = width
+      canvas.height = height
+    }
+
+    return needResize
   }
 
   private addEventListeners() {
@@ -401,49 +466,5 @@ export class WarpedMapLayer extends Layer {
       const olEvent = new OLWarpedMapEvent(event.type, event.data)
       this.dispatchEvent(olEvent)
     }
-  }
-
-  private resized(entries: ResizeObserverEntry[]) {
-    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-    // TODO: read + understand https://web.dev/device-pixel-content-box/
-    for (const entry of entries) {
-      const width = entry.contentRect.width
-      const height = entry.contentRect.height
-      const dpr = window.devicePixelRatio
-
-      // if (entry.devicePixelContentBoxSize) {
-      //   // NOTE: Only this path gives the correct answer
-      //   // The other paths are imperfect fallbacks
-      //   // for browsers that don't provide anyway to do this
-      //   width = entry.devicePixelContentBoxSize[0].inlineSize
-      //   height = entry.devicePixelContentBoxSize[0].blockSize
-      //   dpr = 1 // it's already in width and height
-      // } else if (entry.contentBoxSize) {
-      //   if (entry.contentBoxSize[0]) {
-      //     width = entry.contentBoxSize[0].inlineSize
-      //     height = entry.contentBoxSize[0].blockSize
-      //   }
-      // }
-
-      const displayWidth = Math.round(width * dpr)
-      const displayHeight = Math.round(height * dpr)
-
-      this.canvasSize = [displayWidth, displayHeight]
-    }
-    this.changed()
-  }
-
-  private resizeCanvas(
-    canvas: HTMLCanvasElement,
-    [width, height]: [number, number]
-  ) {
-    const needResize = canvas.width !== width || canvas.height !== height
-
-    if (needResize) {
-      canvas.width = width
-      canvas.height = height
-    }
-
-    return needResize
   }
 }

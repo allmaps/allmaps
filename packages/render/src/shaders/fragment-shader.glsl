@@ -3,16 +3,17 @@
 precision highp float;
 precision highp isampler2D;
 
-uniform bool u_removeBackgroundColor;
-uniform vec3 u_backgroundColor;
-uniform float u_backgroundColorThreshold;
-uniform float u_backgroundColorHardness;
+uniform bool u_removeColor;
+uniform vec3 u_removeColorOptionsColor;
+uniform float u_removeColorOptionsThreshold;
+uniform float u_removeColorOptionsHardness;
 
 uniform bool u_colorize;
-uniform vec3 u_colorizeColor;
+uniform vec3 u_colorizeOptionsColor;
 
 uniform float u_opacity;
 uniform float u_saturation;
+
 uniform int u_bestScaleFactor;
 
 uniform sampler2D u_packedTilesTexture;
@@ -98,11 +99,11 @@ void main() {
     color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
     // Remove background color
-    if(u_backgroundColorThreshold > 0.0f) {
-      vec3 backgroundColorDiff = color.rgb - u_backgroundColor.rgb;
+    if(u_removeColorOptionsThreshold > 0.0f) {
+      vec3 backgroundColorDiff = color.rgb - u_removeColorOptionsColor.rgb;
       float backgroundColorDistance = length(backgroundColorDiff);
-      if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0f - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
+      if(u_removeColor && backgroundColorDistance < u_removeColorOptionsThreshold) {
+        float amount = smoothstep(u_removeColorOptionsThreshold - u_removeColorOptionsThreshold * (1.0f - u_removeColorOptionsHardness), u_removeColorOptionsThreshold, backgroundColorDistance);
         color = vec4(color.rgb * amount, amount);
       }
     }
@@ -113,7 +114,7 @@ void main() {
 
     // Colorize
     if(u_colorize) {
-      color = vec4((u_colorizeColor + color.rgb) * color.a, color.a);
+      color = vec4((u_colorizeOptionsColor + color.rgb) * color.a, color.a);
     }
 
     // Opacity
