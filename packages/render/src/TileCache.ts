@@ -148,6 +148,13 @@ export default class TileCache extends EventTarget {
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.tilesFetchingCount = 0
+    this.requestedTilesHistory = []
+  }
+
+  dispose() {
+    for (const cacheableTile of this.getCacheableTiles()) {
+      this.removeEventListenersFromTile(cacheableTile)
+    }
   }
 
   private addMapTile(fetchableMapTile: FetchableMapTile) {
@@ -157,14 +164,7 @@ export default class TileCache extends EventTarget {
     if (!this.tilesByTileUrl.has(tileUrl)) {
       const cacheableTile = new CacheableTile(fetchableMapTile)
 
-      cacheableTile.addEventListener(
-        WarpedMapEventType.TILEFETCHED,
-        this.tileFetched.bind(this)
-      )
-      cacheableTile.addEventListener(
-        WarpedMapEventType.TILEFETCHERROR,
-        this.tileFetchError.bind(this)
-      )
+      this.addEventListenersToTile(cacheableTile)
 
       this.tilesByTileUrl.set(tileUrl, cacheableTile)
       this.updateTilesFetchingCount(1)
@@ -336,5 +336,27 @@ export default class TileCache extends EventTarget {
         new WarpedMapEvent(WarpedMapEventType.ALLREQUESTEDTILESLOADED)
       )
     }
+  }
+
+  private addEventListenersToTile(cacheableTile: CacheableTile) {
+    cacheableTile.addEventListener(
+      WarpedMapEventType.TILEFETCHED,
+      this.tileFetched.bind(this)
+    )
+    cacheableTile.addEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.tileFetchError.bind(this)
+    )
+  }
+
+  private removeEventListenersFromTile(cacheableTile: CacheableTile) {
+    cacheableTile.removeEventListener(
+      WarpedMapEventType.TILEFETCHED,
+      this.tileFetched.bind(this)
+    )
+    cacheableTile.removeEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.tileFetchError.bind(this)
+    )
   }
 }

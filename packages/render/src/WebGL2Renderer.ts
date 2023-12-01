@@ -13,12 +13,6 @@ import {
   WarpedMapTileEventDetail
 } from './shared/events.js'
 import {
-  createTransform,
-  multiplyTransform,
-  invertTransform,
-  transformToMatrix4
-} from './shared/matrix.js'
-import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale as getBestTileZoomLevel,
   computeTilesConveringRingAtTileZoomLevel
@@ -44,7 +38,15 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-import type { Transform } from '@allmaps/types'
+// Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+//
+// import {
+//   createTransform,
+//   multiplyTransform,
+//   invertTransform,
+//   transformToMatrix4
+// } from './shared/matrix.js'
+// import type { Transform } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -53,7 +55,7 @@ const THROTTLE_OPTIONS = {
 }
 const DEBOUNCE_WAIT_MS = 100
 const DEBOUNCE_OPTIONS = {
-  leading: true,
+  leading: false,
   trailing: true
 }
 
@@ -84,7 +86,9 @@ export default class WebGL2Renderer extends EventTarget {
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
-  invertedRenderTransform: Transform
+  // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+  //
+  // invertedRenderTransform: Transform
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
@@ -114,44 +118,19 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.program = createProgram(gl, vertexShader, fragmentShader)
 
+    // Unclear how to remove shaders, possibly already after linking to program, see:
+    // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
+    // https://stackoverflow.com/questions/27237696/webgl-detach-and-delete-shaders-after-linking
+    gl.deleteShader(vertexShader)
+    gl.deleteShader(fragmentShader)
+
     gl.disable(gl.DEPTH_TEST)
 
-    this.invertedRenderTransform = createTransform()
+    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+    //
+    // this.invertedRenderTransform = createTransform()
 
-    this.addEventListener(
-      WarpedMapEventType.IMAGEINFONEEDED,
-      this.imageInfoNeeded.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.CLEARED,
-      this.clear.bind(this)
-    )
+    this.addEventListeners()
 
     this.throttledPrepareRenderInternal = throttle(
       this.prepareRenderInternal.bind(this),
@@ -334,9 +313,88 @@ export default class WebGL2Renderer extends EventTarget {
       warpedMapWebGLRenderer.dispose()
     }
 
-    // TODO: remove vertexShader, fragmentShader, program
-    // TODO: remove event listeners
-    //  - this.tileCache
+    this.tileCache.clear()
+    this.tileCache.dispose()
+
+    this.removeEventListeners()
+
+    this.gl.deleteProgram(this.program)
+    // Can't delete context, see:
+    // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
+  }
+
+  private addEventListeners() {
+    this.addEventListener(
+      WarpedMapEventType.IMAGEINFONEEDED,
+      this.imageInfoNeeded.bind(this)
+    )
+
+    this.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.mapTileLoaded.bind(this)
+    )
+
+    this.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILEREMOVED,
+      this.mapTileRemoved.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.warpedMapAdded.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.clear.bind(this)
+    )
+  }
+
+  private removeEventListeners() {
+    this.removeEventListener(
+      WarpedMapEventType.IMAGEINFONEEDED,
+      this.imageInfoNeeded.bind(this)
+    )
+
+    this.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.mapTileLoaded.bind(this)
+    )
+
+    this.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILEREMOVED,
+      this.mapTileRemoved.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.warpedMapAdded.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.CLEARED,
+      this.clear.bind(this)
+    )
   }
 
   private startTransformationTransition() {
@@ -386,9 +444,11 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    this.invertedRenderTransform = invertTransform(
-      this.viewport.projectedGeoToClipTransform
-    )
+    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+    //
+    // this.invertedRenderTransform = invertTransform(
+    //   this.viewport.projectedGeoToClipTransform
+    // )
 
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
@@ -564,16 +624,18 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.updateVertexBuffers()
 
+    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+    //
     // renderTransform is the product of:
     // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
     // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
     // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
     // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
     // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
-    const renderTransform = multiplyTransform(
-      this.viewport.projectedGeoToClipTransform,
-      this.invertedRenderTransform
-    )
+    // const renderTransform = multiplyTransform(
+    //   this.viewport.projectedGeoToClipTransform,
+    //   this.invertedRenderTransform
+    // )
 
     const gl = this.gl
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
@@ -585,15 +647,15 @@ export default class WebGL2Renderer extends EventTarget {
 
     // Render Transform
 
-    const renderTransformLocation = gl.getUniformLocation(
-      this.program,
-      'u_renderTransform'
-    )
-    gl.uniformMatrix4fv(
-      renderTransformLocation,
-      false,
-      transformToMatrix4(renderTransform)
-    )
+    // const renderTransformLocation = gl.getUniformLocation(
+    //   this.program,
+    //   'u_renderTransform'
+    // )
+    // gl.uniformMatrix4fv(
+    //   renderTransformLocation,
+    //   false,
+    //   transformToMatrix4(renderTransform)
+    // )
 
     // Animation Progress
 
@@ -871,6 +933,7 @@ export default class WebGL2Renderer extends EventTarget {
       const mapId = event.data as string
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (warpedMap) {
+        warpedMap.clearResourceTrianglePointsByBestScaleFactor()
         warpedMap.updateTriangulation(false)
       }
     }

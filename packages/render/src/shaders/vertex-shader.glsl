@@ -2,7 +2,10 @@
 
 precision highp float;
 
-uniform mat4 u_renderTransform;
+// Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+//
+// uniform mat4 u_renderTransform;
+
 uniform float u_animationProgress;
 
 in vec2 a_clipCurrentTrianglePoint;
@@ -28,5 +31,10 @@ void main() {
   // Set triangle points coordinates
   // Variables that start with gl_ are special global variables
   // gl_Position stores the vertex (or 'point') positions (or 'coordinates') in clip coordinates (which go from -1 to 1.)
-  gl_Position = u_renderTransform * vec4(clipTrianglePoint, 0.0f, 1.0f);
+
+  // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
+  //
+  // gl_Position = u_renderTransform * vec4(clipTrianglePoint, 0.0f, 1.0f);
+
+  gl_Position = vec4(clipTrianglePoint, 0.0f, 1.0f);
 }

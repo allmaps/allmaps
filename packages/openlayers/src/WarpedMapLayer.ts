@@ -75,60 +75,7 @@ export class WarpedMapLayer extends Layer {
 
     this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
 
-    this.renderer.addEventListener(
-      WarpedMapEventType.CHANGED,
-      this.changed.bind(this)
-    )
-
-    this.renderer.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.changed.bind(this)
-    )
-
-    this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTMAPTILELOADED,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPREMOVED,
-      this.passWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.VISIBILITYCHANGED,
-      this.changed.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.CLEARED,
-      this.changed.bind(this)
-    )
+    this.addEventListeners()
   }
 
   /**
@@ -306,12 +253,7 @@ export class WarpedMapLayer extends Layer {
 
     this.resizeObserver.disconnect()
 
-    // TODO: remove event listeners
-    //  - this.viewport
-    //  - this.renderer.tileCache
-    //  - this.warpedMapList
-
-    this.renderer.tileCache.clear()
+    this.removeEventListeners()
 
     super.disposeInternal()
   }
@@ -338,6 +280,120 @@ export class WarpedMapLayer extends Layer {
     this.renderer.render(viewport)
 
     return this.container
+  }
+
+  private addEventListeners() {
+    this.renderer.addEventListener(
+      WarpedMapEventType.CHANGED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.VISIBILITYCHANGED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.changed.bind(this)
+    )
+  }
+
+  private removeEventListeners() {
+    this.renderer.removeEventListener(
+      WarpedMapEventType.CHANGED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.VISIBILITYCHANGED,
+      this.changed.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.CLEARED,
+      this.changed.bind(this)
+    )
   }
 
   private passWarpedMapEvent(event: Event) {

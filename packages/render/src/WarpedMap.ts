@@ -267,6 +267,10 @@ export default class WarpedMap {
     this.updateTransformerProperties()
   }
 
+  clearResourceTrianglePointsByBestScaleFactor() {
+    this.resourceTrianglePointsByBestScaleFactor = new Map()
+  }
+
   async completeImageInfo(): Promise<void> {
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
