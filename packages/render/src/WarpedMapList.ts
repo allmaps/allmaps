@@ -209,7 +209,9 @@ export default class WarpedMapList extends EventTarget {
         warpedMap.visible = true
       }
     }
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
+    )
   }
 
   hideMaps(mapIds: Iterable<string>): void {
@@ -219,7 +221,9 @@ export default class WarpedMapList extends EventTarget {
         warpedMap.visible = false
       }
     }
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED))
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
+    )
   }
 
   async addGeoreferencedMap(
