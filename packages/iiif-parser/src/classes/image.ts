@@ -27,14 +27,8 @@ import {
   getMajorIiifVersionFromImageService
 } from '../lib/profile.js'
 
-import type {
-  Size,
-  Fit,
-  ImageRequest,
-  MajorVersion,
-  Tileset,
-  TileZoomLevel
-} from '../lib/types.js'
+import type { SizeObject, ImageRequest, TileZoomLevel } from '@allmaps/types'
+import type { Fit, MajorVersion, Tileset } from '../lib/types.js'
 
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 type CanvasType = z.infer<typeof CanvasSchema>
@@ -306,7 +300,7 @@ export class EmbeddedImage {
   }
 
   getThumbnail(
-    size: Size,
+    size: SizeObject,
     mode: Fit = 'cover'
   ): ImageRequest | ImageRequest[][] {
     return getThumbnail(
@@ -332,7 +326,7 @@ export class EmbeddedImage {
  */
 export class Image extends EmbeddedImage {
   tileZoomLevels: TileZoomLevel[]
-  sizes?: Size[]
+  sizes?: SizeObject[]
 
   embedded = false
 
@@ -402,12 +396,12 @@ export class Image extends EmbeddedImage {
 
   /**
    * Returns a Image request object for the requested region and size
-   * @param {Size} size - Size of the requested thumbnail
+   * @param {SizeObject} size - Size of the requested thumbnail
    * @param {'cover' | 'contain'} mode - Desired fit mode of the requested thumbnail
    * @returns {ImageRequest} Image request object that can be used to fetch the requested thumbnail
    */
   getThumbnail(
-    size: Size,
+    size: SizeObject,
     mode: Fit = 'cover'
   ): ImageRequest | ImageRequest[][] {
     return getThumbnail(

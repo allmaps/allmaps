@@ -11,7 +11,7 @@ import {
 } from '../../lib/parse.js'
 import { addAnnotationOptions } from '../../lib/options.js'
 
-import type { Position } from '@allmaps/types'
+import type { Point } from '@allmaps/types'
 
 export default function coordinates() {
   let command = new Command('coordinates')
@@ -41,42 +41,42 @@ This command was inspired by gdaltransform.`
 
     const transformer = new GcpTransformer(gcps, transformationType)
 
-    const positionStrings = await readInput(files as string[])
+    const pointStrings = await readInput(files as string[])
 
-    if (positionStrings.length) {
-      for (const positionString of positionStrings) {
-        processPositionString(positionString, transformer, options)
+    if (pointStrings.length) {
+      for (const pointString of pointStrings) {
+        processPointString(pointString, transformer, options)
       }
     } else {
       printString('Enter X and Y values separated by space, and press Return.')
-      let positionString = await readFromStdinLine()
-      while (positionString) {
-        processPositionString(positionString, transformer, options)
+      let pointString = await readFromStdinLine()
+      while (pointString) {
+        processPointString(pointString, transformer, options)
         printString('')
-        positionString = await readFromStdinLine()
+        pointString = await readFromStdinLine()
       }
     }
   })
 }
 
-function processPositionString(
-  positionString: string,
+function processPointString(
+  pointString: string,
   transformer: GcpTransformer,
   options: { inverse: boolean }
 ) {
-  // Parse positionString to array of positions and transform them
-  const outputPositions: Position[] = []
-  const positionArray = parseCoordinatesArrayArray(positionString) as Position[]
-  positionArray.forEach((position) =>
-    outputPositions.push(
+  // Parse pointString to array of points and transform them
+  const outputPoints: Point[] = []
+  const pointArray = parseCoordinatesArrayArray(pointString) as Point[]
+  pointArray.forEach((point) =>
+    outputPoints.push(
       options.inverse
-        ? transformer.transformToResource(position as Position)
-        : transformer.transformToGeo(position as Position)
+        ? transformer.transformToResource(point as Point)
+        : transformer.transformToGeo(point as Point)
     )
   )
 
-  // Print transformed positions
-  outputPositions.forEach((outputPosition) =>
-    printString(outputPosition[0] + ' ' + outputPosition[1])
+  // Print transformed points
+  outputPoints.forEach((outputPoint) =>
+    printString(outputPoint[0] + ' ' + outputPoint[1])
   )
 }

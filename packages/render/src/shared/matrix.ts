@@ -1,9 +1,6 @@
-import type { Transform, Position, Matrix4 } from './types.js'
+import type { Transform, Point, Matrix4 } from '@allmaps/types'
 
-export function applyTransform(
-  transform: Transform,
-  coordinate: Position
-): Position {
+export function applyTransform(transform: Transform, coordinate: Point): Point {
   const x = coordinate[0]
   const y = coordinate[1]
 

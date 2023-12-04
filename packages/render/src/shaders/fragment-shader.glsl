@@ -3,117 +3,125 @@
 precision highp float;
 precision highp isampler2D;
 
-uniform int u_bestScaleFactor;
+uniform bool u_removeColor;
+uniform vec3 u_removeColorOptionsColor;
+uniform float u_removeColorOptionsThreshold;
+uniform float u_removeColorOptionsHardness;
+
+uniform bool u_colorize;
+uniform vec3 u_colorizeOptionsColor;
+
 uniform float u_opacity;
 uniform float u_saturation;
 
-uniform bool u_removeBackgroundColor;
-uniform vec3 u_backgroundColor;
-uniform float u_backgroundColorThreshold;
-uniform float u_backgroundColorHardness;
+uniform int u_bestScaleFactor;
 
-uniform bool u_colorize;
-uniform vec3 u_colorizeColor;
+uniform sampler2D u_packedTilesTexture;
+uniform isampler2D u_packedTilesPositionsTexture;
+uniform isampler2D u_packedTilesResourcePositionsAndDimensionsTexture;
+uniform isampler2D u_packedTilesScaleFactorsTexture;
 
-uniform sampler2D u_tilesTexture;
-uniform isampler2D u_tilePositionsTexture;
-uniform isampler2D u_imagePositionsTexture;
-uniform isampler2D u_scaleFactorsTexture;
+in vec2 v_resourceTrianglePoint;
+in float v_triangleIndex;
 
-in vec2 v_pixel_position;
-// in float v_pixel_triangle_index; // DEV
-
-out vec4 outColor;
+out vec4 color;
 
 void main() {
-  vec2 imageCoords = v_pixel_position;
+  // The treated triangle point
+  int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
+  int resourceTrianglePointY = int(round(v_resourceTrianglePoint.y));
 
-  ivec2 tilePositionsTextureSize = textureSize(u_tilePositionsTexture, 0);
-  int tileCount = tilePositionsTextureSize.y;
+  // Reading information on packed tiles from textures
+  int packedTilesCount = textureSize(u_packedTilesPositionsTexture, 0).y;
+  ivec2 packedTilesTextureSize = textureSize(u_packedTilesTexture, 0);
 
-  int imageX = int(round(imageCoords.x));
-  int imageY = int(round(imageCoords.y));
+  // Setting references for the for loop
+  int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
+  int bestScaleFactor = 0;
 
-  ivec2 tileTextureSize = textureSize(u_tilesTexture, 0);
+  // Prepare storage for the resulting packed tiles texture point that corresponds to the treated triangle point
+  vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
 
-  int tileRegionX = 0;
-  int tileRegionY = 0;
-
-  float diffX = 0.0f;
-  float diffY = 0.0f;
-
-  ivec2 tilePosition = ivec2(0, 0);
-
-  int scaleFactor = 0;
-  // A very high scale factor that's higher than any possible scale factor
-  int smallestScaleFactorDiff = 256 * 256;
+  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
   bool found = false;
 
-  for(int tileIndex = 0; tileIndex < tileCount; tileIndex += 1) {
-    ivec4 imagePosition = texelFetch(u_imagePositionsTexture, ivec2(0, tileIndex), 0);
+  // Loop through all packed tiles
+  for(int index = 0; index < packedTilesCount; index += 1) {
 
-    tileRegionX = imagePosition.r;
-    tileRegionY = imagePosition.g;
+    // Read the information of the tile
+    ivec2 packedTilePosition = texelFetch(u_packedTilesPositionsTexture, ivec2(0, index), 0).rg;
+    ivec4 packedTileResourcePositionAndDimension = texelFetch(u_packedTilesResourcePositionsAndDimensionsTexture, ivec2(0, index), 0);
+    int packedTileScaleFactor = texelFetch(u_packedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
 
-    int tileRegionWidth = imagePosition.b;
-    int tileRegionHeight = imagePosition.a;
+    float packedTilePositionX = float(packedTilePosition.r);
+    float packedTilePositionY = float(packedTilePosition.g);
 
-    if(imageX >= tileRegionX && imageX < tileRegionX + tileRegionWidth && imageY >= tileRegionY && imageY < tileRegionY + tileRegionHeight) {
+    int packedTileResourcePositionX = packedTileResourcePositionAndDimension.r;
+    int packedTileResourcePositionY = packedTileResourcePositionAndDimension.g;
+
+    int packedTileDimensionWidth = packedTileResourcePositionAndDimension.b;
+    int packedTileDimensionHeight = packedTileResourcePositionAndDimension.a;
+
+    // If the treated triangle point is inside the tile, consider to use the tile:
+    // if the scale factor is closer to the best scale factor for this map then currently known one
+    // update the smallest scale factor diff
+    // and compute the packed tiles texture point that corresponds to the treated triangle point
+    if(resourceTrianglePointX >= packedTileResourcePositionX &&
+      resourceTrianglePointX < packedTileResourcePositionX + packedTileDimensionWidth &&
+      resourceTrianglePointY >= packedTileResourcePositionY &&
+      resourceTrianglePointY < packedTileResourcePositionY + packedTileDimensionHeight) {
       found = true;
 
-      int tileIndexScaleFactor = texelFetch(u_scaleFactorsTexture, ivec2(0, tileIndex), 0).r;
+      int scaleFactorDiff = abs(u_bestScaleFactor - packedTileScaleFactor);
 
-      int scaleFactorDiff = abs(u_bestScaleFactor - tileIndexScaleFactor);
-      if(scaleFactorDiff < smallestScaleFactorDiff || scaleFactor == 0) {
+      if(scaleFactorDiff < smallestScaleFactorDiff || bestScaleFactor == 0) {
 
         smallestScaleFactorDiff = scaleFactorDiff;
-        scaleFactor = tileIndexScaleFactor;
+        bestScaleFactor = packedTileScaleFactor;
 
-        diffX = float(imageX - tileRegionX) / float(scaleFactor);
-        diffY = float(imageY - tileRegionY) / float(scaleFactor);
+        float packedTilePointX = float(resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
+        float packedTilePointY = float(resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
 
-        tilePosition = texelFetch(u_tilePositionsTexture, ivec2(0, tileIndex), 0).rg;
+        float packedTilesPointX = packedTilePositionX + packedTilePointX;
+        float packedTilesPointY = packedTilePositionY + packedTilePointY;
+
+        float packedTilesTexturePointX = round(packedTilesPointX) / float(packedTilesTextureSize.x);
+        float packedTilesTexturePointY = round(packedTilesPointY) / float(packedTilesTextureSize.y);
+
+        packedTilesTexturePoint = vec2(packedTilesTexturePointX, packedTilesTexturePointY);
       }
     }
   }
 
-  outColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
   if(found == true) {
-    float texturePixelX = float(tilePosition.r) + diffX;
-    float texturePixelY = float(tilePosition.g) + diffY;
-
-    int texturePixelXRounded = int(round(texturePixelX));
-    int texturePixelYRounded = int(round(texturePixelY));
-
-    // Read pixel from texture
-    outColor = texture(u_tilesTexture, vec2(float(texturePixelXRounded) / float(tileTextureSize.x), float(texturePixelYRounded) / float(tileTextureSize.y)));
+    // Read color of the treated point at it's packed tiles texture point coordinates in the packed tiles texture
+    color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
     // Remove background color
-    if(u_backgroundColorThreshold > 0.0f) {
-      vec3 backgroundColorDiff = outColor.rgb - u_backgroundColor.rgb;
+    if(u_removeColorOptionsThreshold > 0.0f) {
+      vec3 backgroundColorDiff = color.rgb - u_removeColorOptionsColor.rgb;
       float backgroundColorDistance = length(backgroundColorDiff);
-      if(u_removeBackgroundColor && backgroundColorDistance < u_backgroundColorThreshold) {
-        float amount = smoothstep(u_backgroundColorThreshold - u_backgroundColorThreshold * (1.0f - u_backgroundColorHardness), u_backgroundColorThreshold, backgroundColorDistance);
-        outColor = vec4(outColor.rgb * amount, amount);
+      if(u_removeColor && backgroundColorDistance < u_removeColorOptionsThreshold) {
+        float amount = smoothstep(u_removeColorOptionsThreshold - u_removeColorOptionsThreshold * (1.0f - u_removeColorOptionsHardness), u_removeColorOptionsThreshold, backgroundColorDistance);
+        color = vec4(color.rgb * amount, amount);
       }
     }
 
     // Saturation
-    float gray = 0.21f * outColor.r + 0.71f * outColor.g + 0.07f * outColor.b;
-    outColor = vec4(outColor.rgb * (u_saturation) + (gray * (1.0f - u_saturation)), outColor.a);
+    float gray = 0.21f * color.r + 0.71f * color.g + 0.07f * color.b;
+    color = vec4(color.rgb * (u_saturation) + (gray * (1.0f - u_saturation)), color.a);
 
     // Colorize
     if(u_colorize) {
-      outColor = vec4((u_colorizeColor + outColor.rgb) * outColor.a, outColor.a);
+      color = vec4((u_colorizeOptionsColor + color.rgb) * color.a, color.a);
     }
 
-    // Set opacity
-    outColor = vec4(outColor.rgb * u_opacity, outColor.a * u_opacity);
+    // Opacity
+    color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
-    // DEV: draw triangles in random color
-    // float color = sin(v_pixel_triangle_index * 4.0);
-    // outColor = vec4(color, fract(color + 0.3), fract(color + 0.6), 1);
+    // Debugging: uncomment to override color of the treated point with a color made from the point's triangle index
+    vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    // color = debugColor;
   }
 }

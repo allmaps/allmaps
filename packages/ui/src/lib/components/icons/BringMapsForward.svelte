@@ -2,4 +2,4 @@
   import icon from '$lib/shared/images/arrange/bring-forward.svg'
 </script>
 
-<img alt="Bring maps forward" src={icon} />
+<img alt="Bring forward" src={icon} />

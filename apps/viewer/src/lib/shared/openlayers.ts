@@ -1,7 +1,7 @@
 import { Stroke, Fill, Style } from 'ol/style.js'
 import type Feature from 'ol/Feature.js'
 
-import type { Ring } from '@allmaps/render'
+import type { Ring } from '@allmaps/types'
 
 export function invisiblePolygonStyle() {
   return new Style({

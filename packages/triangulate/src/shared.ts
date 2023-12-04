@@ -1,5 +1,5 @@
 import { computeBbox } from '@allmaps/stdlib'
-import type { Bbox, Line, Ring, Position } from '@allmaps/types'
+import type { Bbox, Line, Ring, Point } from '@allmaps/types'
 
 function computeLineDistance(line: Line): number {
   return Math.sqrt(
@@ -14,17 +14,17 @@ function computeLineAngle(line: Line): number {
 }
 
 function computeNextPoint(
-  point: Position,
+  point: Point,
   distance: number,
   angle: number
-): Position {
+): Point {
   return [
     point[0] + Math.cos(angle) * distance,
     point[1] + Math.sin(angle) * distance
   ]
 }
 
-function makePointsOnLine(line: Line, distance: number): Position[] {
+function makePointsOnLine(line: Line, distance: number): Point[] {
   let currentPoint = line[0]
   const result = [currentPoint]
 
@@ -54,12 +54,12 @@ export function makePointsOnPolygon(polygon: Ring, distance: number) {
   return result
 }
 
-export function createGrid(polygon: Ring, gridSize: number): Position[] {
+export function createGrid(polygon: Ring, gridSize: number): Point[] {
   const grid = []
   const bbox: Bbox = computeBbox(polygon)
   for (let x = bbox[0] + gridSize, i = 0; x <= bbox[2]; i++, x += gridSize) {
     for (let y = bbox[1] + gridSize, j = 0; y <= bbox[3]; j++, y += gridSize) {
-      grid.push([x, y] as Position)
+      grid.push([x, y] as Point)
     }
   }
   return grid

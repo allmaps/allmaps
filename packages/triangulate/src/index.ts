@@ -2,7 +2,7 @@ import { createGrid, makePointsOnPolygon } from './shared.js'
 
 import classifyPoint from 'robust-point-in-polygon'
 import * as poly2tri from 'poly2tri'
-import type { Ring, Position } from '@allmaps/types'
+import type { Ring, Point, Triangle } from '@allmaps/types'
 
 /**
  * Triangle as `[[x0, y0], [x1, y1], [x2, y2]]`
@@ -30,7 +30,7 @@ import type { Ring, Position } from '@allmaps/types'
  */
 export function triangulatePoly2tri(polygon: Ring, distance: number) {
   // create grid
-  const grid: Position[] = createGrid(polygon, distance)
+  const grid: Point[] = createGrid(polygon, distance)
 
   // Initialize Constrained Delaunay Triangulation with polygon
   const swctx = new poly2tri.SweepContext(
@@ -67,8 +67,8 @@ export function triangulatePoly2tri(polygon: Ring, distance: number) {
  * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
  * @returns {Triangle[]} Array of triangles partitioning the polygon
  */
-export function triangulate(polygon: Ring, distance: number) {
-  return triangulatePoly2tri(polygon, distance).map((t) =>
-    t.getPoints().map((p) => [p.x, p.y])
+export function triangulate(polygon: Ring, distance: number): Triangle[] {
+  return triangulatePoly2tri(polygon, distance).map(
+    (t) => t.getPoints().map((p) => [p.x, p.y]) as Triangle
   )
 }

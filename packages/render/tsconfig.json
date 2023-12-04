@@ -5,13 +5,13 @@
     "outDir": "./dist"
   },
   "references": [
-    { "path": "../types" },
-    { "path": "../transform" },
-    { "path": "../triangulate" },
-    { "path": "../annotation" },
-    { "path": "../iiif-parser" },
-    { "path": "../id" },
-    { "path": "../stdlib" }
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/triangulate" },
+    { "path": "../../packages/types" }
   ],
   "include": ["./src/**/*"]
 }

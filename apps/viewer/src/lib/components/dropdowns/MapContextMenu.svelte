@@ -65,16 +65,16 @@
     <MenuItem label="Use mask" on:click={handleUseMask} />
 
     <MenuSeparator /> -->
-    <MenuItem label="Bring Maps to Front" on:click={handleBringMapsToFront}
+    <MenuItem label="Bring to Front" on:click={handleBringMapsToFront}
       ><BringMapsToFront /></MenuItem
     >
-    <MenuItem label="Bring Maps Forward" on:click={handleBringMapsForward}
+    <MenuItem label="Bring Forward" on:click={handleBringMapsForward}
       ><BringMapsForward /></MenuItem
     >
-    <MenuItem label="Send Maps Backward" on:click={handleSendMapsBackward}
+    <MenuItem label="Send Backward" on:click={handleSendMapsBackward}
       ><SendMapsBackward /></MenuItem
     >
-    <MenuItem label="Send Maps to Back" on:click={handleSendMapsToBack}
+    <MenuItem label="Send to Back" on:click={handleSendMapsToBack}
       ><SendMapsToBack /></MenuItem
     >
   </ol>

@@ -9,8 +9,7 @@ import {
 
 import type { Map } from '@allmaps/annotation'
 import type { Image } from '@allmaps/iiif-parser'
-
-import type { Ring } from '@allmaps/render'
+import type { Ring } from '@allmaps/types'
 
 const thumbnailSize = 400
 

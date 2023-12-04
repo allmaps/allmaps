@@ -36,6 +36,7 @@
     "@allmaps/tailwind": "^1.0.0-beta.8",
     "@allmaps/transform": "^1.0.0-beta.19",
     "@allmaps/ui": "^1.0.0-beta.20",
+    "@allmaps/types": "^1.0.0-beta.6",
     "comlink": "^4.4.1",
     "flowbite": "^1.6.4",
     "ol": "^8.1.0",
