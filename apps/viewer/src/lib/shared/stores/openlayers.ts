@@ -141,7 +141,7 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
 }
 
 export function createMapOl() {
-  const mapBaseLayer = new VectorTile({ declutter: true, maxZoom: 20 })
+  const mapBaseLayer = new VectorTile({ declutter: true })
   applyStyle(mapBaseLayer, style)
 
   mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
