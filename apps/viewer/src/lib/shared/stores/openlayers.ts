@@ -37,6 +37,7 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
 import type { MapIDOrError } from '$lib/shared/types.js'
+import type Feature from 'ol/Feature.js'
 import type { FeatureLike } from 'ol/Feature.js'
 import type { OrderFunction } from 'ol/render.js'
 
@@ -268,7 +269,7 @@ export function addMapToVectorSource(mapId: string) {
   const warpedMap = mapWarpedMapSource.getMap(mapId)
   if (warpedMap) {
     const geoMask = warpedMap.geoMask
-    const feature = new GeoJSON().readFeature(geoMask)
+    const feature = new GeoJSON().readFeature(geoMask) as Feature
     feature.setId(warpedMap.mapId)
 
     if (!mapVectorSource.hasFeature(feature)) {
@@ -281,5 +282,6 @@ export function removeMapFromVectorSource(mapId: string) {
   const feature = mapVectorSource.getFeatureById(mapId)
   if (feature) {
     mapVectorSource.removeFeature(feature)
+    mapVectorSource.removeFeature(feature as Feature)
   }
 }

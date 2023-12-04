@@ -57,7 +57,7 @@
     "@allmaps/render": "^1.0.0-beta.41",
     "@allmaps/stdlib": "^1.0.0-beta.16",
     "lodash-es": "^4.17.21",
-    "ol": "^8.1.0"
+    "ol": "^8.2.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",

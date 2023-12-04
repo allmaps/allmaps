@@ -34,7 +34,7 @@
     "@allmaps/transform": "^1.0.0-beta.19",
     "@allmaps/types": "^1.0.0-beta.6",
     "@allmaps/ui": "^1.0.0-beta.20",
-    "ol": "^8.1.0"
+    "ol": "^8.2.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",
