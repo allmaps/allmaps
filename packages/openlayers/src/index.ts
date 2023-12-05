@@ -5,13 +5,13 @@ export * from './OLWarpedMapEvent.js'
 export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
 /**
- * Position
- * @typedef {[number, number]} Position
+ * Point
+ * @typedef {[number, number]} Point
  */
 
 /**
  * Bounding box
- * @typedef {[number, number, number, number ]} BBox
+ * @typedef {[number, number, number, number ]} Bbox
  */
 
 /**

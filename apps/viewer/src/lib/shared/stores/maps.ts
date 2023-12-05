@@ -18,7 +18,7 @@ import {
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
-import type { Position } from '@allmaps/render'
+import type { Point } from '@allmaps/types'
 
 type SourceMaps = Map<string, ViewerMap>
 
@@ -109,7 +109,7 @@ export function resetCustomResourceMask(mapId: string) {
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = undefined
-      mapWarpedMapSource.setResourceMask(mapId, viewerMap.map.resourceMask)
+      mapWarpedMapSource.setMapResourceMask(mapId, viewerMap.map.resourceMask)
     }
 
     return $mapsById
@@ -118,14 +118,14 @@ export function resetCustomResourceMask(mapId: string) {
 
 export function setCustomResourceMask(
   mapId: string,
-  customResourceMask: Position[]
+  customResourceMask: Point[]
 ) {
   mapsById.update(($mapsById) => {
     const viewerMap = $mapsById.get(mapId)
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = customResourceMask
-      mapWarpedMapSource.setResourceMask(mapId, customResourceMask)
+      mapWarpedMapSource.setMapResourceMask(mapId, customResourceMask)
     }
 
     return $mapsById
@@ -141,7 +141,7 @@ export function setRemoveBackgroundColor(
 
     if (viewerMap) {
       viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
-      mapWarpedMapLayer?.setMapRemoveBackground(mapId, {
+      mapWarpedMapLayer?.setMapRemoveColor(mapId, {
         hexColor: removeBackgroundColor,
         threshold: viewerMap.renderOptions.removeBackground.threshold,
         hardness: viewerMap.renderOptions.removeBackground.hardness

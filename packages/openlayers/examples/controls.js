@@ -4,7 +4,7 @@ function initializeControls(warpedMapLayer) {
     warpedMapLayer.setOpacity(opacity)
   })
 
-  function setRemoveBackground() {
+  function setRemoveColor() {
     const removeBackground = document.querySelector(
       '#remove-background-color'
     ).checked
@@ -20,13 +20,13 @@ function initializeControls(warpedMapLayer) {
         '#background-color-hardness'
       ).valueAsNumber
 
-      warpedMapLayer.setRemoveBackground({
+      warpedMapLayer.setRemoveColor({
         hexColor: color,
         threshold,
         hardness
       })
     } else {
-      warpedMapLayer.resetRemoveBackground()
+      warpedMapLayer.resetRemoveColor()
     }
   }
 
@@ -42,19 +42,19 @@ function initializeControls(warpedMapLayer) {
 
   document
     .querySelector('#remove-background-color')
-    .addEventListener('input', (event) => setRemoveBackground())
+    .addEventListener('input', (event) => setRemoveColor())
 
   document
     .querySelector('#background-color')
-    .addEventListener('input', () => setRemoveBackground())
+    .addEventListener('input', () => setRemoveColor())
 
   document
     .querySelector('#background-color-threshold')
-    .addEventListener('input', (event) => setRemoveBackground())
+    .addEventListener('input', (event) => setRemoveColor())
 
   document
     .querySelector('#background-color-hardness')
-    .addEventListener('input', (event) => setRemoveBackground())
+    .addEventListener('input', (event) => setRemoveColor())
 
   document
     .querySelector('#colorize')

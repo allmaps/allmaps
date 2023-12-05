@@ -30,7 +30,7 @@
   let featureContextMenu: FeatureContextMenu | undefined
 
   function fitExtent() {
-    const extent = mapWarpedMapSource.getExtent()
+    const extent = mapWarpedMapSource.getTotalProjectedBbox()
     if (extent && mapOl) {
       mapOl.getView().fit(extent, {
         padding: [25, 25, 25, 25]
@@ -46,7 +46,9 @@
 
   $: {
     if (mapOl && $activeMap && $activeMap.updateView) {
-      const warpedMap = mapWarpedMapSource?.getMap($activeMap.viewerMap.mapId)
+      const warpedMap = mapWarpedMapSource?.getWarpedMap(
+        $activeMap.viewerMap.mapId
+      )
       if (warpedMap) {
         const bbox = computeBbox(warpedMap.geoMask.coordinates[0])
         mapOl.getView().fit(bbox, {

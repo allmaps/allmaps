@@ -44,7 +44,10 @@
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map)
 
-      // Georeference Annotation to add to a WarpedMapLayer,
+      // map.on('warpedmapadded', (e) => {console.log(e)}, map)
+      // map.on('warpedmapadded', () => {console.log(warpedMapLayer.getTotalBounds())}, map)
+
+      // Georeference Annotations to add to a WarpedMapLayer.
       //   Map by Jacob van Deventer map of the city of Ghent in Belgium:
       const annotationUrl =
         'https://annotations.allmaps.org/manifests/8f9faeba73d67031'

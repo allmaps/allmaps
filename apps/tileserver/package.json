@@ -30,6 +30,7 @@
   "devDependencies": {
     "@allmaps/annotation": "^1.0.0-beta.19",
     "@allmaps/id": "^1.0.0-beta.20",
+    "@allmaps/types": "^1.0.0-beta.6",
     "@allmaps/iiif-parser": "^1.0.0-beta.28",
     "@allmaps/render": "^1.0.0-beta.42",
     "@allmaps/transform": "^1.0.0-beta.20",
@@ -39,6 +40,7 @@
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "robust-point-in-polygon": "^1.0.3",
     "eslint": "^8.35.0",
     "itty-router": "^2.6.1",
     "jpeg-js": "^0.4.3",

@@ -35,7 +35,7 @@ Most CLI commands accept one or more files as input. You can supply these files 
 - Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`.
 - Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI.
 
-Commands that require SVG input only accept one file, commands that require JSON or positions input accept multiple files.
+Commands that require SVG input only accept one file, commands that require JSON or points input accept multiple files.
 
 Output can be stored by redirecting stdout using: `allmaps <command> <options> [files ...] > outputFile.json`
 
@@ -203,14 +203,14 @@ All the commands above accept the following options for specifying the transform
 | `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
 | `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
 
-All the commands above (except `position`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
+All the commands above (except `point`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
 | Option                            | Description                                                              | Default                                                 |
 | :-------------------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------ |
 | `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints          | `0`                                                     |
 | `-d, --max-depth <number>`        | Maximum recursion depth                                                  | `6`                                                     |
-| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source positions      | `false` (`true` for `geojson` command)                  |
-| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination positions | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` for `geojson` command)                  |
+| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` for `svg` and `resource-mask` commands) |
 
 ### Parse and generate IIIF resources
 

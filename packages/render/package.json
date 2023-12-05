@@ -52,6 +52,8 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.19",
     "@allmaps/id": "^1.0.0-beta.20",
+    "@allmaps/types": "^1.0.0-beta.6",
+    "@turf/boolean-point-in-polygon": "^6.5.0",
     "@allmaps/iiif-parser": "^1.0.0-beta.28",
     "@allmaps/stdlib": "^1.0.0-beta.17",
     "@allmaps/transform": "^1.0.0-beta.20",

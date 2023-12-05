@@ -543,6 +543,9 @@ importers:
       '@allmaps/transform':
         specifier: ^1.0.0-beta.19
         version: link:../../packages/transform
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.6
+        version: link:../../packages/types
       '@cloudflare/workers-types':
         specifier: ^3.14.0
         version: 3.14.0
@@ -579,6 +582,9 @@ importers:
       prettier:
         specifier: ^2.8.0
         version: 2.8.0
+      robust-point-in-polygon:
+        specifier: ^1.0.3
+        version: 1.0.3
       typescript:
         specifier: ^5.0.0
         version: 5.0.2
@@ -621,6 +627,9 @@ importers:
       '@allmaps/transform':
         specifier: ^1.0.0-beta.19
         version: link:../../packages/transform
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.6
+        version: link:../../packages/types
       '@allmaps/ui':
         specifier: ^1.0.0-beta.20
         version: link:../../packages/ui
@@ -736,6 +745,10 @@ importers:
         version: 1.5.0(zod@3.20.6)
 
   packages/id:
+    dependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
     devDependencies:
       '@types/node':
         specifier: ^20.8.0
@@ -767,6 +780,9 @@ importers:
 
   packages/iiif-parser:
     dependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.5
+        version: link:../types
       zod:
         specifier: ^3.20.6
         version: 3.20.6
@@ -822,16 +838,10 @@ importers:
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@types/leaflet':
         specifier: ^1.9.3
         version: 1.9.3
-      '@types/lodash-es':
-        specifier: ^4.17.6
-        version: 4.17.6
       documentation:
         specifier: ^14.0.0
         version: 14.0.0
@@ -859,16 +869,10 @@ importers:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.16
         version: link:../stdlib
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
       ol:
         specifier: ^8.2.0
         version: 8.2.0
     devDependencies:
-      '@types/lodash-es':
-        specifier: ^4.17.6
-        version: 4.17.6
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.45.0(@typescript-eslint/parser@5.45.0)(eslint@8.35.0)(typescript@5.0.2)
@@ -914,6 +918,12 @@ importers:
       '@allmaps/triangulate':
         specifier: ^1.0.0-beta.8
         version: link:../triangulate
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.6
+        version: link:../types
+      '@turf/boolean-point-in-polygon':
+        specifier: ^6.5.0
+        version: 6.5.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3832,6 +3842,13 @@ packages:
 
   /@turf/boolean-clockwise@6.5.0:
     resolution: {integrity: sha512-45+C7LC5RMbRWrxh3Z0Eihsc8db1VGBO5d9BLTOAwU4jR6SgsunTfRWR16X7JUwIDYlCVEmnjcXJNi/kIU3VIw==}
+    dependencies:
+      '@turf/helpers': 6.5.0
+      '@turf/invariant': 6.5.0
+    dev: false
+
+  /@turf/boolean-point-in-polygon@6.5.0:
+    resolution: {integrity: sha512-DtSuVFB26SI+hj0SjrvXowGTUCHlgevPAIsukssW6BG5MlNSBQAo70wpICBNJL6RjukXg8d2eXaAWuD/CqL00A==}
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
@@ -10530,28 +10547,23 @@ packages:
       robust-subtract: 1.0.0
       robust-sum: 1.0.0
       two-product: 1.0.2
-    dev: false
 
   /robust-point-in-polygon@1.0.3:
     resolution: {integrity: sha512-pPzz7AevOOcPYnFv4Vs5L0C7BKOq6C/TfAw5EUE58CylbjGiPyMjAnPLzzSuPZ2zftUGwWbmLWPOjPOz61tAcA==}
     dependencies:
       robust-orientation: 1.2.1
-    dev: false
 
   /robust-scale@1.0.2:
     resolution: {integrity: sha512-jBR91a/vomMAzazwpsPTPeuTPPmWBacwA+WYGNKcRGSh6xweuQ2ZbjRZ4v792/bZOhRKXRiQH0F48AvuajY0tQ==}
     dependencies:
       two-product: 1.0.2
       two-sum: 1.0.0
-    dev: false
 
   /robust-subtract@1.0.0:
     resolution: {integrity: sha512-xhKUno+Rl+trmxAIVwjQMiVdpF5llxytozXJOdoT4eTIqmqsndQqFb1A0oiW3sZGlhMRhOi6pAD4MF1YYW6o/A==}
-    dev: false
 
   /robust-sum@1.0.0:
     resolution: {integrity: sha512-AvLExwpaqUqD1uwLU6MwzzfRdaI6VEZsyvQ3IAQ0ZJ08v1H+DTyqskrf2ZJyh0BDduFVLN7H04Zmc+qTiahhAw==}
-    dev: false
 
   /rollup@3.28.1:
     resolution: {integrity: sha512-R9OMQmIHJm9znrU3m3cpE8uhN0fGdXiawME7aZIpQqvpS/85+Vt1Hq1/yVIcYfOmaQiHjvXkQAoJukvLpau6Yw==}
@@ -11723,11 +11735,9 @@ packages:
 
   /two-product@1.0.2:
     resolution: {integrity: sha512-vOyrqmeYvzjToVM08iU52OFocWT6eB/I5LUWYnxeAPGXAhAxXYU/Yr/R2uY5/5n4bvJQL9AQulIuxpIsMoT8XQ==}
-    dev: false
 
   /two-sum@1.0.0:
     resolution: {integrity: sha512-phP48e8AawgsNUjEY2WvoIWqdie8PoiDZGxTDv70LDr01uX5wLEQbOgSP7Z/B6+SW5oLtbe8qaYX2fKJs3CGTw==}
-    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}

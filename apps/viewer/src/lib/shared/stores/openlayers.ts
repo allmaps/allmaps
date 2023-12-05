@@ -120,8 +120,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
+      // TODO: Consider using ...tileCache.getCachedTile(tileUrl)
       const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+        mapWarpedMapLayer?.renderer.tileCache.getCacheableTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {
@@ -149,7 +150,7 @@ export function createMapOl() {
   if (mapWarpedMapLayer) {
     // TODO: emit this event directly from WarpedMapLayer?
     mapWarpedMapLayer.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTTILELOADED,
+      WarpedMapEventType.FIRSTMAPTILELOADED,
       mapWarpedMapLayerFirstTileLoaded
     )
 
@@ -239,7 +240,7 @@ export function hideMap(mapId: string) {
 }
 
 export async function addMap(map: Georef): Promise<MapIDOrError> {
-  const mapIdOrError = await mapWarpedMapSource.addMap(map)
+  const mapIdOrError = await mapWarpedMapSource.addGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     addMapToVectorSource(mapId)
@@ -249,7 +250,7 @@ export async function addMap(map: Georef): Promise<MapIDOrError> {
 }
 
 export async function removeMap(map: Georef) {
-  const mapIdOrError = await mapWarpedMapSource.removeMap(map)
+  const mapIdOrError = await mapWarpedMapSource.removeGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     removeMapFromVectorSource(mapId)
@@ -259,7 +260,7 @@ export async function removeMap(map: Georef) {
 }
 
 export function addMapToVectorSource(mapId: string) {
-  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
   if (warpedMap) {
     const geoMask = warpedMap.geoMask
     const feature = new GeoJSON().readFeature(geoMask) as Feature

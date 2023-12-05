@@ -1,9 +1,10 @@
 import type { Obj } from 'itty-router'
 
-import type { Transformation, Options } from './types.js'
+import type { TilejsonOptions } from './types.js'
+import type { TransformationType } from '@allmaps/transform'
 
-export function optionsFromQuery(query: Obj | undefined): Options {
-  let transformationType: Transformation = 'polynomial'
+export function optionsFromQuery(query: Obj | undefined): TilejsonOptions {
+  let transformationType: TransformationType = 'polynomial'
 
   const queryTransformationType = query?.['transformation.type']
 

@@ -31,13 +31,13 @@ export function setRenderOptionsForMap(
 
       if (mapWarpedMapLayer) {
         if (viewerMap.renderOptions.removeBackground.color) {
-          mapWarpedMapLayer.setMapRemoveBackground(mapId, {
+          mapWarpedMapLayer.setMapRemoveColor(mapId, {
             hexColor: viewerMap.renderOptions.removeBackground.color,
             threshold: viewerMap.renderOptions.removeBackground.threshold,
             hardness: viewerMap.renderOptions.removeBackground.hardness
           })
         } else {
-          mapWarpedMapLayer.resetMapRemoveBackground(mapId)
+          mapWarpedMapLayer.resetMapRemoveColor(mapId)
         }
 
         if (
@@ -81,11 +81,9 @@ export const renderOptions = {
 
       if (mapWarpedMapLayer) {
         if ($renderOptionsLayer.removeBackground.threshold > 0) {
-          mapWarpedMapLayer.setRemoveBackground(
-            $renderOptionsLayer.removeBackground
-          )
+          mapWarpedMapLayer.setRemoveColor($renderOptionsLayer.removeBackground)
         } else {
-          mapWarpedMapLayer.resetRemoveBackground()
+          mapWarpedMapLayer.resetRemoveColor()
         }
 
         if (
