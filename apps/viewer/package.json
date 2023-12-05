@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.47",
+  "version": "1.0.0-beta.48",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -29,17 +29,18 @@
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.19",
     "@allmaps/id": "^1.0.0-beta.20",
-    "@allmaps/iiif-parser": "^1.0.0-beta.27",
-    "@allmaps/openlayers": "^1.0.0-beta.45",
-    "@allmaps/render": "^1.0.0-beta.41",
-    "@allmaps/stdlib": "^1.0.0-beta.16",
+    "@allmaps/iiif-parser": "^1.0.0-beta.28",
+    "@allmaps/openlayers": "^1.0.0-beta.46",
+    "@allmaps/render": "^1.0.0-beta.42",
+    "@allmaps/stdlib": "^1.0.0-beta.17",
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/transform": "^1.0.0-beta.19",
+    "@allmaps/transform": "^1.0.0-beta.20",
     "@allmaps/ui": "^1.0.0-beta.20",
     "@allmaps/types": "^1.0.0-beta.6",
     "comlink": "^4.4.1",
     "flowbite": "^1.6.4",
-    "ol": "^8.1.0",
+    "ol": "^8.2.0",
+    "ol-mapbox-style": "^12.1.1",
     "svelte-floating-ui": "^1.5.2",
     "tinycolor2": "^1.6.0"
   },

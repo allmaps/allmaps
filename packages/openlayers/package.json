@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.45",
+  "version": "1.0.0-beta.46",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -54,9 +54,10 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.41",
-    "@allmaps/stdlib": "^1.0.0-beta.16",
-    "ol": "^8.1.0"
+    "@allmaps/render": "^1.0.0-beta.42",
+    "@allmaps/stdlib": "^1.0.0-beta.17",
+    "lodash-es": "^4.17.21",
+    "ol": "^8.2.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.45.0",
