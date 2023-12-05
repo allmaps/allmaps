@@ -407,7 +407,7 @@ export class WarpedMapLayer extends Layer {
   private removeEventListeners() {
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
-      this.passWarpedMapEvent.bind(this)
+      this.changed.bind(this)
     )
 
     this.renderer.removeEventListener(

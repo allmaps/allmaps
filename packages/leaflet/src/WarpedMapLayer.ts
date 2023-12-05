@@ -170,7 +170,8 @@ export const WarpedMapLayer = L.Layer.extend({
   async addGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const result = this.warpedMapList.addGeoreferencedMap(georeferencedMap)
+    const result =
+      this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this._update()
 
     return result
@@ -184,7 +185,8 @@ export const WarpedMapLayer = L.Layer.extend({
   async removeGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const result = this.warpedMapList.removeGeoreferencedMap(georeferencedMap)
+    const result =
+      this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
     this._update()
 
     return result
@@ -828,7 +830,7 @@ export const WarpedMapLayer = L.Layer.extend({
   _removeEventListeners() {
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
-      this._passWarpedMapEvent.bind(this)
+      this._update.bind(this)
     )
 
     this.renderer.removeEventListener(
