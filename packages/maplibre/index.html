@@ -26,42 +26,31 @@
   </head>
   <body>
     <div id="map"></div>
-    <script>
-      const map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://demotiles.maplibre.org/style.json',
-        center: [-71.0599, 42.3589],
-        zoom: 14
-      })
-    </script>
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
-      async function fetchJson(url) {
-        return fetch(url).then((response) => response.json())
-      }
+      const map = new maplibregl.Map({
+        container: 'map',
+        style:
+            'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+        center: [-71.0599, 42.3589],
+        zoom: 13,
+        pitchWithRotate: false
+      })
 
-      async function addGeoreferenceAnnotationByUrl(warpedMapLayer, url) {
-        const annotation = await fetchJson(url)
-        warpedMapLayer.addGeoreferenceAnnotation(annotation)
-      }
+      const warpedMapLayer = new WarpedMapLayer()
+      const annotationUrl = 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
 
       map.on('load', async () => {
-        const warpedMapLayer = new WarpedMapLayer()
         map.addLayer(warpedMapLayer)
 
-        console.log('now adding first annotation')
-        await addGeoreferenceAnnotationByUrl(
-          warpedMapLayer,
-          'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
-        )
-        console.log('Done adding first annotation')
-        await addGeoreferenceAnnotationByUrl(
-          warpedMapLayer,
-          'https://annotations.allmaps.org/images/25b19ade19654e66@6a6b14487e882f79'
-        )
-        console.log('Done adding second annotation')
+        fetch(annotationUrl)
+          .then((response) => response.json())
+          .then((annotation) => {
+            warpedMapLayer.addGeoreferenceAnnotation(annotation)
+          })
       })
+
     </script>
   </body>
 </html>

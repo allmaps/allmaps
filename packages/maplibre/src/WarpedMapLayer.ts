@@ -1,717 +1,746 @@
-import type { Map, CustomLayerInterface } from 'maplibre-gl'
-import { mat4 } from 'gl-matrix'
-
+import { Map, CustomLayerInterface } from 'maplibre-gl'
+// import { MercatorCoordinate } from 'maplibre-gl'
 import {
-  TileCache,
-  World,
-  RTree,
   Viewport,
-  WebGL2Renderer,
   WarpedMapEvent,
   WarpedMapEventType,
-  composeTransform
+  WebGL2Renderer
 } from '@allmaps/render'
+import {
+  bboxToSize,
+  hexToFractionalRgb,
+  lonLatToWebMecator,
+  sizesToScale
+} from '@allmaps/stdlib'
+// import { OLWarpedMapEvent } from './OLWarpedMapEvent.js' // TODO
 
-import type { Size, BBox, Transform, NeededTile } from '@allmaps/render'
+import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
-type FrameState = {
-  size: Size
-  viewState: {
-    rotation: number
-    resolution: number
-    center: number[]
-  }
-  extent: BBox | null
-  coordinateToPixelTransform: Transform | null
-}
+import type { TransformationType } from '@allmaps/transform'
+import type { Bbox, Ring } from '@allmaps/types'
 
+/**
+ * WarpedMapLayer class.
+ *
+ * Together with a WarpedMapSource, this class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
+ * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+ *
+ * @class WarpedMapLayer
+ */
 export class WarpedMapLayer implements CustomLayerInterface {
-  id = 'warped-map' as const
+  id = 'warped-map' as const // TODO: make this unique
   type = 'custom' as const
   renderingMode = '2d' as const
 
-  gl: WebGL2RenderingContext | null = null
+  map?: Map
 
-  rtree: RTree
-  world: World
-  viewport: Viewport
-  renderer: WebGL2Renderer | null = null
-  tileCache: TileCache
+  // todo
+  gl?: WebGL2RenderingContext
 
-  constructor() {
-    this.rtree = new RTree()
-    this.world = new World(this.rtree)
-    this.viewport = new Viewport(this.world)
-    this.tileCache = new TileCache()
+  // TODO
+  renderer!: WebGL2Renderer
 
-    this.world.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
+  private imageInfoCache?: Cache
+
+  /**
+   * Creates a WarpedMapLayer instance
+   * @param {Object} options
+   * @param {WarpedMapSource} options.source - source that holds the maps
+   */
+  constructor(imageInfoCache?: Cache) {
+    this.imageInfoCache = imageInfoCache
   }
 
+  /**
+   * Method called when the layer has been added to the Map.
+   * @param {Map} map - The Map this custom layer was just added to.
+   * @param {WebGL2RenderingContext} gl - The gl context for the map.
+   */
   onAdd(map: Map, gl: WebGL2RenderingContext) {
+    console.log('onAdd')
+    this.map = map
+    // TODO
     this.gl = gl
-    this.renderer = new WebGL2Renderer(this.gl, this.tileCache)
+
+    const warpedMapList = new WarpedMapList(this.imageInfoCache)
+
+    this.renderer = new WebGL2Renderer(gl, warpedMapList)
+
+    this.addEventListeners()
   }
 
+  /**
+   * Method called when the layer has been removed from the Map.
+   * @param {Map} _map - The Map this custom layer was just added to.
+   * @param {WebGL2RenderingContext} _gl - The gl context for the map.
+   */
+  onRemove(_map: Map, _gl: WebGL2RenderingContext): void {
+    this.removeEventListeners()
+  }
+
+  /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.world.addGeoreferenceAnnotation(annotation)
+    const results =
+      this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
+    this.renderInternal()
 
     return results
   }
 
-  private warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.world.getMap(mapId)
-      if (warpedMap && this.renderer) {
-        this.renderer.addWarpedMap(warpedMap)
-      }
-    }
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results =
+      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+    this.renderInternal()
+
+    return results
   }
 
-  private makeProjectionTransform(frameState: FrameState): Transform {
-    const size = frameState.size
-    const rotation = frameState.viewState.rotation
-    const resolution = frameState.viewState.resolution
-    const center = frameState.viewState.center
-
-    return composeTransform(
-      0,
-      0,
-      2 / (resolution * size[0]),
-      2 / (resolution * size[1]),
-      -rotation,
-      -center[0],
-      -center[1]
+  /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
+  async addGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
     )
+    const results = this.addGeoreferenceAnnotation(annotation)
+
+    return results
   }
 
-  private prepareFrameInternal() {
-    if (this.renderer) {
-      this.renderer.updateVertexBuffers(this.viewport)
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.removeGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Adds a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was added, or an error
+   */
+  async addGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result =
+      this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
+    this.renderInternal()
+
+    return result
+  }
+
+  /**
+   * Removes a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was remvoed, or an error
+   */
+  async removeGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result =
+      this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
+    this.renderInternal()
+
+    return result
+  }
+
+  /**
+   * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
+   * @returns {WarpedMapList} the warped map list
+   */
+  getWarpedMapList(): WarpedMapList {
+    return this.renderer.warpedMapList
+  }
+
+  /**
+   * Returns a single map's warped map
+   * @param {string} mapId - ID of the map
+   * @returns {WarpedMap | undefined} the warped map
+   */
+  getWarpedMap(mapId: string): WarpedMap | undefined {
+    return this.renderer.warpedMapList.getWarpedMap(mapId)
+  }
+
+  /**
+   * Make a single map visible
+   * @param {string} mapId - ID of the map
+   */
+  showMap(mapId: string) {
+    this.renderer.warpedMapList.showMaps([mapId])
+    this.renderInternal()
+  }
+
+  /**
+   * Make multiple maps visible
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  showMaps(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.showMaps(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Make a single map invisible
+   * @param {string} mapId - ID of the map
+   */
+  hideMap(mapId: string) {
+    this.renderer.warpedMapList.hideMaps([mapId])
+    this.renderInternal()
+  }
+
+  /**
+   * Make multiple maps invisible
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  hideMaps(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.hideMaps(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Returns the visibility of a single map
+   * @returns {boolean | undefined} - whether the map is visible
+   */
+  isMapVisible(mapId: string): boolean | undefined {
+    const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
+    return warpedMap?.visible
+  }
+
+  /**
+   * Sets the resource mask of a single map
+   * @param {string} mapId - ID of the map
+   * @param {Ring} resourceMask - new resource mask
+   */
+  setMapResourceMask(mapId: string, resourceMask: Ring) {
+    this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
+    this.renderInternal()
+  }
+
+  /**
+   * Sets the transformation type of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {TransformationType} transformation - new transformation type
+   */
+  setMapsTransformationType(
+    mapIds: Iterable<string>,
+    transformation: TransformationType
+  ) {
+    this.renderer.warpedMapList.setMapsTransformationType(
+      mapIds,
+      transformation
+    )
+    this.renderInternal()
+  }
+
+  /**
+   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in lon lat coordinates.
+   * @returns {Bbox | undefined} - bbox of all warped maps
+   */
+  getTotalBbox(): Bbox | undefined {
+    return this.renderer.warpedMapList.getTotalBbox()
+  }
+
+  /**
+   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+   * @returns {Bbox | undefined} - bbox of all warped maps
+   */
+  getTotalProjectedBbox(): Bbox | undefined {
+    return this.renderer.warpedMapList.getTotalProjectedGeoMaskBbox()
+  }
+
+  /**
+   * Bring maps to front
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  bringMapsToFront(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.bringMapsToFront(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Send maps to back
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  sendMapsToBack(mapIds: string[]) {
+    this.renderer.warpedMapList.sendMapsToBack(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Bring maps forward
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  bringMapsForward(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.bringMapsForward(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Send maps backward
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  sendMapsBackward(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.sendMapsBackward(mapIds)
+    this.renderInternal()
+  }
+
+  /**
+   * Returns the z-index of a single map
+   * @param {string} mapId - ID of the warped map
+   * @returns {number | undefined} - z-index of the warped map
+   */
+  getMapZIndex(mapId: string): number | undefined {
+    return this.renderer.warpedMapList.getMapZIndex(mapId)
+  }
+
+  // not getZIndex() here since default for OL Layer
+
+  /**
+   * Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+   * @param {Cache} cache - the image info cache
+   */
+  setImageInfoCache(cache: Cache) {
+    this.renderer.warpedMapList.setImageInfoCache(cache)
+  }
+
+  /**
+   * Clears the source, removes all maps
+   */
+  clear() {
+    this.renderer.warpedMapList.clear()
+    this.renderInternal()
+  }
+
+  // /**
+  //  * Gets the HTML container element of the layer
+  //  * @return {HTMLElement} HTML Div Element
+  //  */
+  // getContainer(): HTMLElement {
+  //   return this.container
+  // }
+
+  // /**
+  //  * Gets the HTML canvas element of the layer
+  //  * @return {HTMLCanvasElement | null} HTML Canvas Element
+  //  */
+  // getCanvas(): HTMLCanvasElement | null {
+  //   return this.canvas
+  // }
+
+  // No setOpacity() and getOpacity() here since default for OL Layer class
+
+  /**
+   * Sets the opacity of a single map
+   * @param {string} mapId - ID of the map
+   * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+   */
+  setMapOpacity(mapId: string, opacity: number) {
+    this.renderer.setMapOpacity(mapId, opacity)
+    this.renderInternal()
+  }
+
+  /**
+   * Resets the opacity of a single map to fully opaque
+   * @param {string} mapId - ID of the map
+   */
+  resetMapOpacity(mapId: string) {
+    this.renderer.resetMapOpacity(mapId)
+    this.renderInternal()
+  }
+
+  /**
+   * Sets the saturation of a single map
+   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   */
+  setSaturation(saturation: number) {
+    this.renderer.setSaturation(saturation)
+    this.renderInternal()
+  }
+
+  /**
+   * Resets the saturation of a single map to the original colors
+   */
+  resetSaturation() {
+    this.renderer.resetSaturation()
+    this.renderInternal()
+  }
+
+  /**
+   * Sets the saturation of a single map
+   * @param {string} mapId - ID of the map
+   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   */
+  setMapSaturation(mapId: string, saturation: number) {
+    this.renderer.setMapSaturation(mapId, saturation)
+    this.renderInternal()
+  }
+
+  /**
+   * Resets the saturation of a single map to the original colors
+   * @param {string} mapId - ID of the map
+   */
+  resetMapSaturation(mapId: string) {
+    this.renderer.resetMapSaturation(mapId)
+    this.renderInternal()
+  }
+
+  /**
+   * Removes a color from all maps
+   * @param {Object} options - remove color options
+   * @param {string} [options.hexColor] - hex color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
+  setRemoveColor(
+    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
+  ) {
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
+
+    this.renderer.setRemoveColorOptions({
+      color,
+      threshold: options.threshold,
+      hardness: options.hardness
+    })
+    this.renderInternal()
+  }
+
+  /**
+   * Resets the color removal for all maps
+   */
+  resetRemoveColor() {
+    this.renderer.resetRemoveColorOptions()
+    this.renderInternal()
+  }
+
+  /**
+   * Removes a color from a single map
+   * @param {string} mapId - ID of the map
+   * @param {Object} options - remove color options
+   * @param {string} [options.hexColor] - hex color to remove
+   * @param {number} [options.threshold] - threshold between 0 and 1
+   * @param {number} [options.hardness] - hardness between 0 and 1
+   */
+  setMapRemoveColor(
+    mapId: string,
+    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
+  ) {
+    const color = options.hexColor
+      ? hexToFractionalRgb(options.hexColor)
+      : undefined
+
+    this.renderer.setMapRemoveColorOptions(mapId, {
+      color,
+      threshold: options.threshold,
+      hardness: options.hardness
+    })
+    this.renderInternal()
+  }
+
+  /**
+   * Resets the color for a single map
+   * @param {string} mapId - ID of the map
+   */
+  resetMapRemoveColor(mapId: string) {
+    this.renderer.resetMapRemoveColorOptions(mapId)
+  }
+
+  /**
+   * Sets the colorization for all maps
+   * @param {string} hexColor - desired hex color
+   */
+  setColorize(hexColor: string) {
+    const color = hexToFractionalRgb(hexColor)
+    if (color) {
+      this.renderer.setColorizeOptions({ color })
+      this.renderInternal()
     }
   }
 
-  private renderInternal(frameState: FrameState): void {
-    if (!this.renderer) {
+  /**
+   * Resets the colorization for all maps
+   */
+  resetColorize() {
+    this.renderer.resetColorizeOptions()
+    this.renderInternal()
+  }
+
+  /**
+   * Sets the colorization for a single mapID of the map
+   * @param {string} mapId - ID of the map
+   * @param {string} hexColor - desired hex color
+   */
+  setMapColorize(mapId: string, hexColor: string) {
+    const color = hexToFractionalRgb(hexColor)
+    if (color) {
+      this.renderer.setMapColorizeOptions(mapId, { color })
+      this.renderInternal()
+    }
+  }
+
+  /**
+   * Resets the colorization of a single warped map
+   * @param {string} mapId - ID of the map
+   */
+  resetMapColorize(mapId: string) {
+    this.renderer.resetMapColorizeOptions(mapId)
+    this.renderInternal()
+  }
+
+  /**
+   * Disposes all WebGL resources and cached tiles
+   */
+  dispose() {
+    this.renderer.dispose()
+  }
+
+  /**
+   * Render the layer.
+   */
+  renderInternal(): void {
+    this.render()
+  }
+
+  /**
+   * Render the layer.
+   */
+  render(): void {
+    console.log('render')
+
+    if (!this.map) {
       return
     }
 
-    const projectionTransform = this.makeProjectionTransform(frameState)
+    // TODO
+    // this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
-    console.log('projectionTransform', projectionTransform)
-    this.viewport.setProjectionTransform(projectionTransform)
+    const projectedGeoCenterAsLngLat = this.map.getCenter()
+    const projectedGeoCenter = lonLatToWebMecator([
+      projectedGeoCenterAsLngLat.lng,
+      projectedGeoCenterAsLngLat.lat
+    ])
 
-    this.prepareFrameInternal()
+    // Gettig the viewportSize should also be possible through getting the bounds
+    // And using project() to go to pixel coordintas
+    const canvas = this.map.getCanvas()
+    const viewportSize = [
+      canvas.width / window.devicePixelRatio,
+      canvas.height / window.devicePixelRatio
+    ] as [number, number]
 
-    if (frameState.extent) {
-      const extent = frameState.extent as BBox
+    // TODO: check radian/degrees and sign
+    const rotation = -(this.map.getBearing() / 180) * Math.PI
 
-      // this.renderer.setOpacity(this.getOpacity())
+    // TODO: project using map projection instead of supposing Mercator
+    // Possible first step could be to use Mapbox's Mercator compuation
+    // (but this delivers results in Mercator coordinates that are rescaled to fit in a [0, 0] to [1, 1] rectangle):
+    // const projectedNorthEastAsMercatorCoordinate =
+    //   MercatorCoordinate.fromLngLat(projectedNorthEastAsLngLat)
+    // const projectedSouthWestAsMercatorCoordinate =
+    //   MercatorCoordinate.fromLngLat(projectedSouthWestAsLngLat)
+    // const projectedNorthEastAsPoint = [
+    //   projectedNorthEastAsMercatorCoordinate.x,
+    //   projectedNorthEastAsMercatorCoordinate.y
+    // ]
+    // const projectedSouthWestAsPoint = [
+    //   projectedSouthWestAsMercatorCoordinate.x,
+    //   projectedSouthWestAsMercatorCoordinate.y
+    // ]
+    // TODO: improve scale computation when rotation is non-zero
+    const geoBboxAsLngLatBounds = this.map.getBounds()
+    const projectedNorthEastAsLngLat = geoBboxAsLngLatBounds.getNorthEast()
+    const projectedSouthWestAsLngLat = geoBboxAsLngLatBounds.getSouthWest()
 
-      const viewportSize = [
-        frameState.size[0] * window.devicePixelRatio,
-        frameState.size[1] * window.devicePixelRatio
-      ] as Size
+    const projectedNorthEastAsPoint = lonLatToWebMecator([
+      projectedNorthEastAsLngLat.lng,
+      projectedNorthEastAsLngLat.lat
+    ])
+    const projectedSouthWestAsPoint = lonLatToWebMecator([
+      projectedSouthWestAsLngLat.lng,
+      projectedSouthWestAsLngLat.lat
+    ])
+    const projectedGeoBbox = [
+      projectedSouthWestAsPoint[0],
+      projectedSouthWestAsPoint[1],
+      projectedNorthEastAsPoint[0],
+      projectedNorthEastAsPoint[1]
+    ] as [number, number, number, number]
+    const projectedGeoSize = bboxToSize(projectedGeoBbox)
+    const projectedGeoPerViewportScale = sizesToScale(
+      projectedGeoSize,
+      viewportSize
+    )
 
-      let tilesNeeded: NeededTile[] | undefined
+    const viewport = new Viewport(
+      projectedGeoCenter,
+      viewportSize,
+      rotation,
+      projectedGeoPerViewportScale,
+      window.devicePixelRatio
+    )
 
-      tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
-        viewportSize,
-        extent,
-        frameState.coordinateToPixelTransform as Transform
-      )
+    // TODO
+    // console.log(
+    //   viewport,
+    //   projectedGeoCenter,
+    //   viewportSize,
+    //   rotation,
+    //   projectedGeoPerViewportScale,
+    //   window.devicePixelRatio
+    // )
 
-      if (tilesNeeded && tilesNeeded.length) {
-        console.log(tilesNeeded)
-        this.tileCache.setTiles(tilesNeeded)
-      }
-
-      // TODO: reset maps not in viewport, make sure these only
-      // get drawn when they are visible AND when they have their buffers
-      // updated.
-      this.renderer.render(this.viewport)
-    }
+    this.renderer.render(viewport)
   }
 
-  render(gl: WebGL2RenderingContext | WebGLRenderingContext, matrix: mat4) {
-    console.log(matrix)
+  private addEventListeners() {
+    this.renderer.addEventListener(
+      WarpedMapEventType.CHANGED,
+      this.renderInternal.bind(this)
+    )
+    // TODO: renderInternal
 
-    gl.getParameter(gl.VIEWPORT)
+    this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.renderInternal.bind(this)
+    )
+    // TODO: renderInternal
 
-    const frameState = {
-      size: [1512, 557] as Size,
-      viewState: {
-        rotation: 0,
-        resolution: 9.554628535647032,
-        center: [-7910351.883820941, 5214893.4606114365]
-      },
-      extent: [
-        -7917575.18299389, 5212232.496564259, -7903128.584647992,
-        5217554.424658614
-      ] as [number, number, number, number],
-      coordinateToPixelTransform: [
-        0.10466131637343458, 0, 0, -0.10466131637343458, 828663.8411377777,
-        546076.1143348087
-      ] as Transform
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.VISIBILITYCHANGED,
+      this.renderInternal.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.renderInternal.bind(this)
+    )
+  }
+
+  private removeEventListeners() {
+    this.renderer.removeEventListener(
+      WarpedMapEventType.CHANGED,
+      this.renderInternal.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.renderInternal.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.WARPEDMAPENTER,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.WARPEDMAPLEAVE,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.VISIBILITYCHANGED,
+      this.renderInternal.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.CLEARED,
+      this.renderInternal.bind(this)
+    )
+  }
+
+  private passWarpedMapEvent(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      console.log('event', event)
+      // TODO
+      // const olEvent = new OLWarpedMapEvent(event.type, event.data)
+      // this.dispatchEvent(olEvent)
     }
-
-    return this.renderInternal(frameState)
   }
 }
-
-// import {
-//   TileCache,
-//   World,
-//   Viewport,
-//   WarpedMapEvent,
-//   WarpedMapEventType,
-//   composeTransform
-// } from '@allmaps/render'
-
-// import { WebGL2Renderer } from '@allmaps/render'
-
-// import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
-
-// import type { FrameState } from 'ol/Map.js'
-
-// import type {
-//   Size,
-//   BBox,
-//   Transform,
-//   OptionalColor,
-//   NeededTile
-// } from '@allmaps/render'
-
-// import type { WarpedMapSource } from './WarpedMapSource.js'
-
-// // TODO: Move to stdlib?
-// const THROTTLE_WAIT_MS = 500
-// const THROTTLE_OPTIONS = {
-//   leading: true,
-//   trailing: true
-// }
-
-// export class WarpedMapLayer extends Layer {
-//   source: WarpedMapSource | null = null
-
-//   container: HTMLElement
-
-//   canvas: HTMLCanvasElement | null = null
-//   gl: WebGL2RenderingContext
-
-//   canvasSize: [number, number] = [0, 0]
-
-//   world: World
-//   renderer: WebGL2Renderer
-//   viewport: Viewport
-//   tileCache: TileCache
-
-//   // TODO: move to Viewport
-//   // mapIdsInViewport: Set<string> = new Set()
-
-//   throttledUpdateViewportAndGetTilesNeeded: DebouncedFunc<
-//     typeof this.viewport.updateViewportAndGetTilesNeeded
-//   >
-
-//   private throttledRenderTimeoutId: number | undefined
-
-//   private lastPreparedFrameLayerRevision = 0
-//   private lastPreparedFrameSourceRevision = 0
-
-//   private previousExtent: number[] | null = null
-
-//   private resizeObserver: ResizeObserver
-
-//   constructor(options: object) {
-//     options = options || {}
-
-//     super(options)
-
-//     const container = document.createElement('div')
-//     this.container = container
-
-//     container.style.position = 'absolute'
-//     container.style.width = '100%'
-//     container.style.height = '100%'
-//     container.classList.add('ol-layer')
-//     container.classList.add('allmaps-warped-map-layer')
-//     const canvas = document.createElement('canvas')
-
-//     canvas.style.position = 'absolute'
-//     canvas.style.left = '0'
-
-//     canvas.style.width = '100%'
-//     canvas.style.height = '100%'
-
-//     container.appendChild(canvas)
-
-//     const gl = canvas.getContext('webgl2', { premultipliedAlpha: true })
-
-//     if (!gl) {
-//       throw new Error('WebGL 2 not available')
-//     }
-
-//     this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
-//     this.resizeObserver.observe(canvas, { box: 'content-box' })
-
-//     this.canvas = canvas
-//     this.gl = gl
-
-//     this.tileCache = new TileCache()
-//     this.renderer = new WebGL2Renderer(gl, this.tileCache)
-
-//     this.renderer.addEventListener(
-//       WarpedMapEventType.CHANGED,
-//       this.rendererChanged.bind(this)
-//     )
-
-//     this.source = this.getSource() as WarpedMapSource
-//     // TODO: listen to change:source
-
-//     this.world = this.source.getWorld()
-
-//     this.world.addEventListener(
-//       WarpedMapEventType.WARPEDMAPADDED,
-//       this.warpedMapAdded.bind(this)
-//     )
-
-//     // this.world.addEventListener(
-//     //   WarpedMapEventType.ZINDICESCHANGES,
-//     //   this.zIndicesChanged.bind(this)
-//     // )
-
-//     this.world.addEventListener(
-//       WarpedMapEventType.VISIBILITYCHANGED,
-//       this.visibilityChanged.bind(this)
-//     )
-
-//     this.world.addEventListener(
-//       WarpedMapEventType.TRANSFORMATIONCHANGED,
-//       this.transformationChanged.bind(this)
-//     )
-
-//     this.world.addEventListener(
-//       WarpedMapEventType.RESOURCEMASKUPDATED,
-//       this.resourceMaskUpdated.bind(this)
-//     )
-
-//     this.world.addEventListener(
-//       WarpedMapEventType.CLEARED,
-//       this.worldCleared.bind(this)
-//     )
-
-//     this.tileCache.addEventListener(
-//       WarpedMapEventType.TILELOADED,
-//       this.changed.bind(this)
-//     )
-
-//     this.tileCache.addEventListener(
-//       WarpedMapEventType.ALLTILESLOADED,
-//       this.changed.bind(this)
-//     )
-
-//     this.viewport = new Viewport(this.world)
-
-//     this.throttledUpdateViewportAndGetTilesNeeded = throttle(
-//       this.viewport.updateViewportAndGetTilesNeeded.bind(this.viewport),
-//       THROTTLE_WAIT_MS,
-//       THROTTLE_OPTIONS
-//     )
-
-//     // this.viewport.addEventListener(
-//     //   WarpedMapEventType.WARPEDMAPENTER,
-//     //   this.warpedMapEnter.bind(this)
-//     // )
-//     // this.viewport.addEventListener(
-//     //   WarpedMapEventType.WARPEDMAPLEAVE,
-//     //   this.warpedMapLeave.bind(this)
-//     // )
-
-//     for (const warpedMap of this.world.getMaps()) {
-//       this.renderer.addWarpedMap(warpedMap)
-//     }
-//   }
-
-//   private arraysEqual<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
-//     if (!arr1 || !arr2) {
-//       return false
-//     }
-
-//     const len1 = arr1.length
-//     if (len1 !== arr2.length) {
-//       return false
-//     }
-//     for (let i = 0; i < len1; i++) {
-//       if (arr1[i] !== arr2[i]) {
-//         return false
-//       }
-//     }
-//     return true
-//   }
-
-//   private warpedMapAdded(event: Event) {
-//     if (event instanceof WarpedMapEvent) {
-//       const mapId = event.data as string
-
-//       const warpedMap = this.world.getMap(mapId)
-
-//       if (warpedMap) {
-//         this.renderer.addWarpedMap(warpedMap)
-//       }
-
-//       const olEvent = new OLWarpedMapEvent(
-//         WarpedMapEventType.WARPEDMAPADDED,
-//         mapId
-//       )
-//       this.dispatchEvent(olEvent)
-//     }
-
-//     this.changed()
-//   }
-
-//   // private zIndicesChanged() {
-//   //   const sortedMapIdsInViewport = [...this.mapIdsInViewport].sort(
-//   //     (mapIdA, mapIdB) => {
-//   //       const zIndexA = this.world.getZIndex(mapIdA)
-//   //       const zIndexB = this.world.getZIndex(mapIdB)
-//   //       if (zIndexA !== undefined && zIndexB !== undefined) {
-//   //         return zIndexA - zIndexB
-//   //       }
-
-//   //       return 0
-//   //     }
-//   //   )
-
-//   //   this.mapIdsInViewport = new Set(sortedMapIdsInViewport)
-//   //   this.changed()
-//   // }
-
-//   private visibilityChanged() {
-//     this.changed()
-//   }
-
-//   private transformationChanged(event: Event) {
-//     if (event instanceof WarpedMapEvent) {
-//       const mapIds = event.data as string[]
-//       for (const mapId of mapIds) {
-//         const warpedMap = this.world.getMap(mapId)
-
-//         if (warpedMap) {
-//           this.renderer.updateTriangulation(warpedMap, false)
-//         }
-//       }
-
-//       this.renderer.startTransformationTransition()
-//     }
-//   }
-
-//   private resourceMaskUpdated(event: Event) {
-//     if (event instanceof WarpedMapEvent) {
-//       const mapId = event.data as string
-//       const warpedMap = this.world.getMap(mapId)
-
-//       if (warpedMap) {
-//         this.renderer.updateTriangulation(warpedMap)
-//       }
-//     }
-//   }
-
-//   // private warpedMapEnter(event: Event) {
-//   //   if (event instanceof WarpedMapEvent) {
-//   //     const mapId = event.data as string
-//   //     this.mapIdsInViewport.add(mapId)
-//   //     this.zIndicesChanged()
-//   //   }
-//   // }
-
-//   // private warpedMapLeave(event: Event) {
-//   //   if (event instanceof WarpedMapEvent) {
-//   //     const mapId = event.data as string
-//   //     this.mapIdsInViewport.delete(mapId)
-//   //   }
-//   // }
-
-//   private worldCleared() {
-//     this.renderer.clear()
-//     this.tileCache.clear()
-//   }
-
-//   private rendererChanged() {
-//     this.changed()
-//   }
-
-//   private onResize(entries: ResizeObserverEntry[]) {
-//     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-//     // TODO: read + understand https://web.dev/device-pixel-content-box/
-//     for (const entry of entries) {
-//       const width = entry.contentRect.width
-//       const height = entry.contentRect.height
-//       const dpr = window.devicePixelRatio
-
-//       // if (entry.devicePixelContentBoxSize) {
-//       //   // NOTE: Only this path gives the correct answer
-//       //   // The other paths are imperfect fallbacks
-//       //   // for browsers that don't provide anyway to do this
-//       //   width = entry.devicePixelContentBoxSize[0].inlineSize
-//       //   height = entry.devicePixelContentBoxSize[0].blockSize
-//       //   dpr = 1 // it's already in width and height
-//       // } else if (entry.contentBoxSize) {
-//       //   if (entry.contentBoxSize[0]) {
-//       //     width = entry.contentBoxSize[0].inlineSize
-//       //     height = entry.contentBoxSize[0].blockSize
-//       //   }
-//       // }
-
-//       const displayWidth = Math.round(width * dpr)
-//       const displayHeight = Math.round(height * dpr)
-
-//       this.canvasSize = [displayWidth, displayHeight]
-//     }
-//     this.changed()
-//   }
-
-//   resizeCanvas(canvas: HTMLCanvasElement, [width, height]: [number, number]) {
-//     const needResize = canvas.width !== width || canvas.height !== height
-
-//     if (needResize) {
-//       canvas.width = width
-//       canvas.height = height
-//     }
-
-//     return needResize
-//   }
-
-//   private hexToRgb(hex: string | undefined): OptionalColor {
-//     if (!hex) {
-//       return
-//     }
-
-//     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-//     return result
-//       ? [
-//           parseInt(result[1], 16) / 256,
-//           parseInt(result[2], 16) / 256,
-//           parseInt(result[3], 16) / 256
-//         ]
-//       : undefined
-//   }
-
-//   setMapOpacity(mapId: string, opacity: number) {
-//     this.renderer.setMapOpacity(mapId, opacity)
-//     this.changed()
-//   }
-
-//   resetMapOpacity(mapId: string) {
-//     this.renderer.resetMapOpacity(mapId)
-//     this.changed()
-//   }
-
-//   setRemoveBackground(
-//     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
-//   ) {
-//     const color = this.hexToRgb(options.hexColor)
-
-//     this.renderer.setRemoveBackground({
-//       color,
-//       threshold: options.threshold,
-//       hardness: options.hardness
-//     })
-//     this.changed()
-//   }
-
-//   resetRemoveBackground() {
-//     this.renderer.resetRemoveBackground()
-//     this.changed()
-//   }
-
-//   setMapRemoveBackground(
-//     mapId: string,
-
-//     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
-//   ) {
-//     const color = this.hexToRgb(options.hexColor)
-
-//     this.renderer.setMapRemoveBackground(mapId, {
-//       color,
-//       threshold: options.threshold,
-//       hardness: options.hardness
-//     })
-//     this.changed()
-//   }
-
-//   resetMapRemoveBackground(mapId: string) {
-//     this.renderer.resetMapRemoveBackground(mapId)
-//   }
-
-//   setColorize(hexColor: string) {
-//     const color = this.hexToRgb(hexColor)
-//     if (color) {
-//       this.renderer.setColorize({ color })
-//       this.changed()
-//     }
-//   }
-
-//   resetColorize() {
-//     this.renderer.resetColorize()
-//     this.changed()
-//   }
-
-//   setMapColorize(mapId: string, hexColor: string) {
-//     const color = this.hexToRgb(hexColor)
-//     if (color) {
-//       this.renderer.setMapColorize(mapId, { color })
-//       this.changed()
-//     }
-//   }
-
-//   resetMapColorize(mapId: string) {
-//     this.renderer.resetMapColorize(mapId)
-//     this.changed()
-//   }
-
-//   dispose() {
-//     this.renderer.dispose()
-
-//     const extension = this.gl.getExtension('WEBGL_lose_context')
-//     if (extension) {
-//       extension.loseContext()
-//     }
-//     const canvas = this.gl.canvas
-//     canvas.width = 1
-//     canvas.height = 1
-
-//     this.resizeObserver.disconnect()
-
-//     // TODO: remove event listeners
-//     //  - this.viewport
-//     //  - this.tileCache
-//     //  - this.world
-
-//     this.tileCache.clear()
-
-//     super.disposeInternal()
-//   }
-
-//   // TODO: use OL's own makeProjectionTransform function?
-//   makeProjectionTransform(frameState: FrameState): Transform {
-//     const size = frameState.size
-//     const rotation = frameState.viewState.rotation
-//     const resolution = frameState.viewState.resolution
-//     const center = frameState.viewState.center
-
-//     return composeTransform(
-//       0,
-//       0,
-//       2 / (resolution * size[0]),
-//       2 / (resolution * size[1]),
-//       -rotation,
-//       -center[0],
-//       -center[1]
-//     )
-//   }
-
-//   // TODO: Use OL's renderer class, move this function there?
-//   private prepareFrameInternal(frameState: FrameState) {
-//     const vectorSource = this.source
-//     const viewNotMoving =
-//       !frameState.viewHints[ViewHint.ANIMATING] &&
-//       !frameState.viewHints[ViewHint.INTERACTING]
-//     const extentChanged = !this.arraysEqual(
-//       this.previousExtent,
-//       frameState.extent
-//     )
-
-//     let sourceChanged = false
-//     if (vectorSource) {
-//       sourceChanged =
-//         this.lastPreparedFrameSourceRevision < vectorSource.getRevision()
-
-//       if (sourceChanged) {
-//         this.lastPreparedFrameSourceRevision = vectorSource.getRevision()
-//       }
-//     }
-
-//     const layerChanged =
-//       this.lastPreparedFrameLayerRevision < this.getRevision()
-
-//     if (layerChanged) {
-//       this.lastPreparedFrameLayerRevision = this.getRevision()
-//     }
-
-//     if (layerChanged || (viewNotMoving && (extentChanged || sourceChanged))) {
-//       this.previousExtent = frameState.extent?.slice() || null
-
-//       this.renderer.updateVertexBuffers(this.viewport)
-
-//       // this.renderer.updateVertexBuffers(
-//       //   projectionTransform,
-//       //   this.mapIdsInViewport.values()
-//       // )
-//     }
-//   }
-
-//   private renderInternal(frameState: FrameState, last = false): HTMLElement {
-//     const projectionTransform = this.makeProjectionTransform(frameState)
-//     this.viewport.setProjectionTransform(projectionTransform)
-
-//     this.prepareFrameInternal(frameState)
-
-//     if (frameState.extent) {
-//       const extent = frameState.extent as BBox
-
-//       this.renderer.setOpacity(this.getOpacity())
-
-//       const viewportSize = [
-//         frameState.size[0] * window.devicePixelRatio,
-//         frameState.size[1] * window.devicePixelRatio
-//       ] as Size
-
-//       let tilesNeeded: NeededTile[] | undefined
-//       if (last) {
-//         tilesNeeded = this.viewport.updateViewportAndGetTilesNeeded(
-//           viewportSize,
-//           extent,
-//           frameState.coordinateToPixelTransform as Transform
-//         )
-//       } else {
-//         tilesNeeded = this.throttledUpdateViewportAndGetTilesNeeded(
-//           viewportSize,
-//           extent,
-//           frameState.coordinateToPixelTransform as Transform
-//         )
-//       }
-
-//       if (tilesNeeded && tilesNeeded.length) {
-//         this.tileCache.setTiles(tilesNeeded)
-//       }
-
-//       // TODO: reset maps not in viewport, make sure these only
-//       // get drawn when they are visible AND when they have their buffers
-//       // updated.
-//       this.renderer.render(this.viewport)
-//     }
-
-//     return this.container
-//   }
-
-//   render(frameState: FrameState): HTMLElement {
-//     if (this.throttledRenderTimeoutId) {
-//       clearTimeout(this.throttledRenderTimeoutId)
-//     }
-
-//     if (this.canvas) {
-//       this.resizeCanvas(this.canvas, this.canvasSize)
-//     }
-
-//     this.throttledRenderTimeoutId = setTimeout(() => {
-//       this.renderInternal(frameState, true)
-//     }, THROTTLE_WAIT_MS)
-
-//     return this.renderInternal(frameState)
-//   }
-// }

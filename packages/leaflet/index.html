@@ -37,40 +37,36 @@
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
-      const map = L.map('map').setView([51.0518, 3.7278], 14)
+      const map = L.map('map').setView([42.35921, -71.05882], 14)
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map)
 
-      // map.on('warpedmapadded', (e) => {console.log(e)}, map)
-      // map.on('warpedmapadded', () => {console.log(warpedMapLayer.getTotalBounds())}, map)
-
       // Georeference Annotations to add to a WarpedMapLayer.
-      //   Map by Jacob van Deventer map of the city of Ghent in Belgium:
       const annotationUrl =
-        'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+        'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
 
       const warpedMapLayer = new WarpedMapLayer(annotationUrl)
       map.addLayer(warpedMapLayer)
 
       // It's also possible to add a Georeference Annotation to an
       // existing WarpedMapLayer:
-      function addGeoreferenceAnnotationByUrl1(annotationUrl) {
-        fetch(annotationUrl)
-          .then((response) => response.json())
-          .then((annotation) =>
-            warpedMapLayer.addGeoreferenceAnnotation(annotation)
-          )
-      }
+      // function addGeoreferenceAnnotationByUrl1(annotationUrl) {
+      //   fetch(annotationUrl)
+      //     .then((response) => response.json())
+      //     .then((annotation) =>
+      //       warpedMapLayer.addGeoreferenceAnnotation(annotation)
+      //     )
+      // }
 
       // Or to do the same by just using the URL of a Georeference Annotation:
-      async function addGeoreferenceAnnotationByUrl2(annotationUrl) {
-        return await warpedMapLayer.addGeoreferenceAnnotationByUrl(
-          annotationUrl
-        )
-      }
+      // async function addGeoreferenceAnnotationByUrl2(annotationUrl) {
+      //   return await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+      //     annotationUrl
+      //   )
+      // }
     </script>
   </body>
 </html>

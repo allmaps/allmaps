@@ -10,7 +10,8 @@
     { "path": "../id" },
     { "path": "../iiif-parser" },
     { "path": "../transform" },
-    { "path": "../annotation" }
+    { "path": "../annotation" },
+    { "path": "../stdlib" }
   ],
   "include": ["./src/**/*"]
 }

@@ -1,12 +1,19 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.0",
-  "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
-  },
-  "description": "OpenLayers classes for MapLibre",
+  "version": "1.0.0-beta.1",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "description": "MapLibre classes for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
@@ -54,7 +61,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@allmaps/render": "^1.0.0-beta.35",
-    "gl-matrix": "^3.4.3",
+    "@allmaps/stdlib": "^1.0.0-beta.16",
     "maplibre-gl": "^3.3.1"
   },
   "devDependencies": {
