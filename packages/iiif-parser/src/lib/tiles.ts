@@ -53,7 +53,7 @@ export function getIiifTile(
 }
 
 function getDefaultTileset(
-  { width: imageWidth, height: imageHeight }: Size,
+  { width: imageWidth, height: imageHeight }: SizeObject,
   tileWidth = 768
 ): Tileset {
   const maxTilesPerSide = Math.max(imageWidth, imageHeight) / tileWidth
