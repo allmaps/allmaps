@@ -62,12 +62,16 @@
       {/if}
     </ul>
   {:else}
-    <p><i>Please enter a valid URL, e.g. <a href="#" on:click={doTest}>{testUrl}</a></i></p>
+    <p><i>Please enter a valid URL, e.g. <a class="testlink" on:click={doTest}>{testUrl}</a></i></p>
   {/if}
 </div>
 
 <style>
   input {
     width: 100%;
+  }
+  .testlink {
+    cursor: pointer;
+    text-decoration: underline;
   }
 </style>
