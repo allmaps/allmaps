@@ -1,0 +1,49 @@
+---
+title: Finding Maps
+description: ''
+---
+
+import UrlFinder from '../../../components/UrlFinder.svelte'
+
+## Internet Archive
+
+As of September 2023 the IIIF API of the [Internet Archive](https://archive.org/) was upgraded in collaboration with the IIIF Consortium. The implementation is still under development and some items might throw an error when opening them in Allmaps. Please notify us when this happens and we'll make sure to investigate and publish a fix when possible.
+
+Some collections containing maps:
+
+- [Center for Sacramento History](https://archive.org/details/cshmaps)
+- [United States Geological Survey](https://archive.org/details/maps_usgs)
+- [Digital Piranesi](https://archive.org/details/digital-piranesi-v17)
+
+#### Open in Allmaps
+Please enter a valid URL below to an object in the Internet Archive. Please note that IIIF Collection Manifests are currently not supported in Allmaps.
+
+<p></p>
+
+<UrlFinder client:load regexPattern='https:\/\/archive.org\/details\/([^/?]*)' manifestTemplate='https://iiif.archive.org/iiif/{id}/manifest.json' testUrl='https://archive.org/details/map2002023007/'/>
+
+#### Links
+
+  - [Making IIIF Official at the Internet Archive](https://blog.archive.org/2023/09/18/making-iiif-official-at-the-internet-archive/)
+  - [Documentation](https://iiif.archive.org/iiif/documentation)
+
+## La Bibliothèque nationale de France
+
+The digital collections of the BnF can be found in [Gallica](gallica.bnf.fr).
+
+Map collections:
+
+- [Overview of digitized maps](https://gallica.bnf.fr/html/und/cartes/cartes)
+- [Collection of Parisian maps](https://gallica.bnf.fr/html/und/cartes/cartographier-paris-atlas-et-recueils-de-plans-de-la-capitale) _NB: Only the maps in Gallica can be accessed through IIIF_
+
+<p></p>
+
+<UrlFinder client:load regexPattern='ark:\/\d*\/([^/?.#]*)' manifestTemplate='https://openapi.bnf.fr/iiif/presentation/v3/ark:/12148/{id}/manifest.json' testUrl='https://gallica.bnf.fr/ark:/12148/btv1b532238549'/>
+
+## Leventhal Map & Education Center
+
+Browse the collections [here](https://www.leventhalmap.org/collections/).
+
+<p></p>
+
+<UrlFinder client:load regexPattern='(commonwealth:[^?#]*)' manifestTemplate='https://collections.leventhalmap.org/search/{id}/manifest.json' testUrl='https://collections.leventhalmap.org/search/commonwealth:x059cb867'/>
