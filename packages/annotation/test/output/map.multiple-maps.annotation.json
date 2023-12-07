@@ -1,18 +1,17 @@
 {
   "type": "AnnotationPage",
-  "@context": ["http://www.w3.org/ns/anno.jsonld"],
+  "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
   "items": [
     {
       "type": "Annotation",
-      "@context": [
-        "http://iiif.io/api/extension/georef/1/context.json",
-        "http://iiif.io/api/presentation/3/context.json"
-      ],
       "motivation": "georeferencing",
       "target": {
         "type": "SpecificResource",
         "source": {
-          "@id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+          "id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
           "type": "ImageService2",
           "height": 1860,
           "width": 4708
@@ -70,15 +69,11 @@
     },
     {
       "type": "Annotation",
-      "@context": [
-        "http://iiif.io/api/extension/georef/1/context.json",
-        "http://iiif.io/api/presentation/3/context.json"
-      ],
       "motivation": "georeferencing",
       "target": {
         "type": "SpecificResource",
         "source": {
-          "@id": "https://dlc.services/iiif-img/7/4/c835d908-c0c5-4374-a0b3-f1ebd7ad0871",
+          "id": "https://dlc.services/iiif-img/7/4/c835d908-c0c5-4374-a0b3-f1ebd7ad0871",
           "type": "ImageService2",
           "height": 4089,
           "width": 4201

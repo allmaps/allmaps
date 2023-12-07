@@ -48,7 +48,7 @@ function parseResource(annotation: AnnotationAllVersions): Resource {
 
 function parseImageId(annotation: AnnotationAllVersions): string {
   if (isAnnotation1(annotation)) {
-    return annotation.target.source['@id']
+    return annotation.target.source.id
   } else {
     return annotation.target.service[0]['@id']
   }

@@ -40,8 +40,7 @@ export const SvgSelectorSchema = z.object({
 // })
 
 export const SourceSchema = z.object({
-  // TODO: is this always '@id'? or is 'id' also allowed?
-  '@id': z.string().url(),
+  id: z.string().url(),
   type: ImageServiceSchema,
   height: z.number().positive(),
   width: z.number().positive(),
@@ -49,7 +48,6 @@ export const SourceSchema = z.object({
 })
 
 export const TargetSchema = z.object({
-  // TODO: is this always 'id'? or is '@id' also allowed?
   id: z.string().url().optional(),
   type: z.literal('SpecificResource'),
   source: SourceSchema,
