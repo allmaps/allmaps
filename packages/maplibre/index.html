@@ -35,8 +35,12 @@
             'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
         center: [-71.0599, 42.3589],
         zoom: 13,
-        pitchWithRotate: false
+        pitchWithRotate: false,
+        antialias: true
       })
+
+      let nav = new maplibregl.NavigationControl();
+      map.addControl(nav, 'top-left');
 
       const warpedMapLayer = new WarpedMapLayer()
       const annotationUrl = 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
