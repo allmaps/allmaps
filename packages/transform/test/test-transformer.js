@@ -199,7 +199,7 @@ describe('Transform Polygon Forward To Polygon, with maxOffsetRatio very small',
     ]
   ]
 
-  it(`should transform the polygon (without closing) and add midpoints everywhere, including between first and last position`, () => {
+  it(`should transform the polygon (without closing) and add midpoints everywhere, including between first and last point`, () => {
     expectToBeCloseToArrayArrayArray(
       transformer.transformForward(input, transformOptions),
       output
@@ -309,7 +309,7 @@ describe('Transform Polygon Backward To Polygon, with maxOffsetRatio very small'
     ]
   ]
 
-  it(`should transform the polygon (without closing) and add midpoints everywhere, including on between first and last position`, () => {
+  it(`should transform the polygon (without closing) and add midpoints everywhere, including on between first and last point`, () => {
     expectToBeCloseToArrayArrayArray(
       transformer.transformBackward(input, transformOptions),
       output

@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
 
   import Feature from 'ol/Feature.js'
-  import Map from 'ol/Map.js'
+  import OLMap from 'ol/Map.js'
   import Point from 'ol/geom/Point.js'
   import View from 'ol/View.js'
   import CircleStyle from 'ol/style/Circle.js'
@@ -26,9 +26,31 @@
   import { imageInfo } from '$lib/shared/stores/image-info.js'
   import { position } from '$lib/shared/stores/geolocation.js'
 
+  import Controls from '$lib/components/Controls.svelte'
+
+  import type { Map } from '@allmaps/annotation'
+
+  let transformer: GcpTransformer
+
+  let ol: HTMLElement
+  let olMap: OLMap
+  const tileLayer = new TileLayer()
+  const positionFeature: Feature = new Feature()
+
+  let currentMapId: string | undefined
+
   $: {
-    if ($position && transformer) {
-      const feature = positionToGeoJson($position)
+    updatePosition($position)
+  }
+
+  $: {
+    setNewMap($map)
+  }
+
+  // eslint-disable-next-line no-undef
+  function updatePosition(position: GeolocationPosition) {
+    if (position && transformer) {
+      const feature = positionToGeoJson(position)
       if (positionFeature) {
         const imageCoordinates = transformer.transformBackward(feature.geometry)
         positionFeature.setGeometry(
@@ -38,21 +60,40 @@
     }
   }
 
-  let transformer: GcpTransformer
+  function setNewMap(map?: Map) {
+    if (currentMapId === map?.id || !map || !$imageInfo || !olMap) {
+      return
+    }
 
-  let ol: HTMLElement
-  let positionFeature: Feature
+    transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+
+    const options = new IIIFInfo($imageInfo).getTileSourceOptions()
+    if (options) {
+      options.zDirection = -1
+    }
+    const iiifTileSource = new IIIF(options)
+    tileLayer.setSource(iiifTileSource)
+
+    const tileGrid = iiifTileSource.getTileGrid()
+
+    if (tileGrid) {
+      olMap.setView(
+        new View({
+          resolutions: tileGrid.getResolutions(),
+          extent: tileGrid.getExtent(),
+          constrainOnlyCenter: true
+        })
+      )
+      olMap.getView().fit(tileGrid.getExtent())
+    }
+
+    updatePosition($position)
+  }
 
   onMount(async () => {
     if (!$imageInfo || !$map) {
       return
     }
-
-    transformer = new GcpTransformer($map.gcps, $map.transformation?.type)
-
-    const tileLayer = new TileLayer()
-
-    positionFeature = new Feature()
 
     positionFeature.setStyle(
       new Style({
@@ -75,29 +116,17 @@
       })
     })
 
-    const olMap = new Map({
+    olMap = new OLMap({
       layers: [tileLayer, vectorLayer],
       target: ol
     })
 
-    const options = new IIIFInfo($imageInfo).getTileSourceOptions()
-    options.zDirection = -1
-    const iiifTileSource = new IIIF(options)
-    tileLayer.setSource(iiifTileSource)
-
-    const tileGrid = iiifTileSource.getTileGrid()
-
-    if (tileGrid) {
-      olMap.setView(
-        new View({
-          resolutions: tileGrid.getResolutions(),
-          extent: tileGrid.getExtent(),
-          constrainOnlyCenter: true
-        })
-      )
-      olMap.getView().fit(tileGrid.getExtent())
-    }
+    setNewMap($map)
   })
 </script>
 
 <div bind:this={ol} class="w-full h-full" />
+
+<div class="absolute z-50 bottom-0 w-full flex justify-center p-4">
+  <Controls />
+</div>

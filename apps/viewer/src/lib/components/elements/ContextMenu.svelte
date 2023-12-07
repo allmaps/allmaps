@@ -1,10 +1,6 @@
 <script lang="ts">
-
-  import type {
-    ClientRectObject,
-    VirtualElement
-  } from 'svelte-floating-ui/core'
-  import { offset, flip, shift } from "svelte-floating-ui/dom";
+  import type { VirtualElement } from 'svelte-floating-ui/core'
+  import { flip, shift } from 'svelte-floating-ui/dom'
   import { createFloatingActions } from 'svelte-floating-ui'
 
   export let event: MouseEvent
@@ -12,12 +8,12 @@
   const [floatingRef, floatingContent] = createFloatingActions({
     // strategy: 'fixed',
     // strategy: "absolute",
-    placement: "bottom-start",
+    placement: 'bottom-start',
     middleware: [
       // offset(6),
       flip(),
-      shift(),
-    ],
+      shift()
+    ]
   })
 
   const virtualElement: VirtualElement = {

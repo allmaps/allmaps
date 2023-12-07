@@ -10,9 +10,8 @@ import type { Map as Georef } from '@allmaps/annotation'
 
 import Map from 'ol/Map.js'
 import VectorSource from 'ol/source/Vector.js'
-import TileLayer from 'ol/layer/Tile.js'
+import VectorTile from 'ol/layer/VectorTile.js'
 import VectorLayer from 'ol/layer/Vector.js'
-import XYZ from 'ol/source/XYZ.js'
 import View from 'ol/View.js'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import Select from 'ol/interaction/Select.js'
@@ -21,6 +20,9 @@ import {
   DblClickDragZoom,
   defaults as defaultInteractions
 } from 'ol/interaction.js'
+
+import { applyStyle } from 'ol-mapbox-style'
+import { style } from '$lib/shared/protomaps.js'
 
 import IIIFLayer from '$lib/shared/IIIFLayer.js'
 
@@ -37,6 +39,7 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
 import type { MapIDOrError } from '$lib/shared/types.js'
+import type Feature from 'ol/Feature.js'
 import type { FeatureLike } from 'ol/Feature.js'
 import type { OrderFunction } from 'ol/render.js'
 
@@ -84,8 +87,6 @@ export async function createImageInfoCache() {
 // Map view
 
 export let mapOl: Map | undefined
-export let mapTileSource: XYZ | undefined
-export let mapTileLayer: TileLayer<XYZ> | undefined
 export const mapWarpedMapSource = new WarpedMapSource()
 export let mapWarpedMapLayer: WarpedMapLayer | undefined
 export const mapVectorSource = new VectorSource()
@@ -100,8 +101,8 @@ function mapVectorLayerOrderFunction(
   const mapId2 = feature2.getId() as string
 
   if (mapId1 && mapId2) {
-    const zIndex1 = mapWarpedMapSource.getZIndex(mapId1)
-    const zIndex2 = mapWarpedMapSource.getZIndex(mapId2)
+    const zIndex1 = mapWarpedMapSource.getMapZIndex(mapId1)
+    const zIndex2 = mapWarpedMapSource.getMapZIndex(mapId2)
 
     if (zIndex1 !== undefined && zIndex2 !== undefined) {
       return zIndex1 - zIndex2
@@ -119,8 +120,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
+      // TODO: Consider using ...tileCache.getCachedTile(tileUrl)
       const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+        mapWarpedMapLayer?.renderer.tileCache.getCacheableTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {
@@ -140,22 +142,15 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
 }
 
 export function createMapOl() {
-  // TODO: set attribution
-  mapTileSource = new XYZ({
-    url: defaultXYZLayers[0].url,
-    maxZoom: 19
-  })
-
-  mapTileLayer = new TileLayer({
-    source: mapTileSource
-  })
+  const mapBaseLayer = new VectorTile({ declutter: true })
+  applyStyle(mapBaseLayer, style)
 
   mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
 
   if (mapWarpedMapLayer) {
     // TODO: emit this event directly from WarpedMapLayer?
     mapWarpedMapLayer.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTTILELOADED,
+      WarpedMapEventType.FIRSTMAPTILELOADED,
       mapWarpedMapLayerFirstTileLoaded
     )
 
@@ -167,7 +162,7 @@ export function createMapOl() {
 
     mapOl = new Map({
       interactions: defaultInteractions().extend([new DblClickDragZoom()]),
-      layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
+      layers: [mapBaseLayer, mapWarpedMapLayer, mapVectorLayer],
       controls: [],
       view: new View({
         maxZoom: 24,
@@ -231,21 +226,21 @@ export const ol = derived(view, ($view) => {
 // Exported functions
 
 export function showMap(mapId: string) {
-  if (!mapWarpedMapSource.isVisible(mapId)) {
+  if (!mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.showMap(mapId)
     addMapToVectorSource(mapId)
   }
 }
 
 export function hideMap(mapId: string) {
-  if (mapWarpedMapSource.isVisible(mapId)) {
+  if (mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.hideMap(mapId)
     removeMapFromVectorSource(mapId)
   }
 }
 
 export async function addMap(map: Georef): Promise<MapIDOrError> {
-  const mapIdOrError = await mapWarpedMapSource.addMap(map)
+  const mapIdOrError = await mapWarpedMapSource.addGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     addMapToVectorSource(mapId)
@@ -255,7 +250,7 @@ export async function addMap(map: Georef): Promise<MapIDOrError> {
 }
 
 export async function removeMap(map: Georef) {
-  const mapIdOrError = await mapWarpedMapSource.removeMap(map)
+  const mapIdOrError = await mapWarpedMapSource.removeGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     removeMapFromVectorSource(mapId)
@@ -265,10 +260,10 @@ export async function removeMap(map: Georef) {
 }
 
 export function addMapToVectorSource(mapId: string) {
-  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
   if (warpedMap) {
     const geoMask = warpedMap.geoMask
-    const feature = new GeoJSON().readFeature(geoMask)
+    const feature = new GeoJSON().readFeature(geoMask) as Feature
     feature.setId(warpedMap.mapId)
 
     if (!mapVectorSource.hasFeature(feature)) {
@@ -280,6 +275,6 @@ export function addMapToVectorSource(mapId: string) {
 export function removeMapFromVectorSource(mapId: string) {
   const feature = mapVectorSource.getFeatureById(mapId)
   if (feature) {
-    mapVectorSource.removeFeature(feature)
+    mapVectorSource.removeFeature(feature as Feature)
   }
 }

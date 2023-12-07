@@ -1,4 +1,5 @@
-export * from './colors.js'
+export * from './color.js'
 export * from './geometry.js'
 export * from './geojson.js'
 export * from './svg.js'
+export * from './tile.js'

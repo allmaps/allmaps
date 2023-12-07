@@ -1,81 +1,206 @@
 import { Image } from '@allmaps/iiif-parser'
+import {
+  computeBbox,
+  bboxToPolygon,
+  bboxToCenter,
+  distance
+} from '@allmaps/stdlib'
 
+import type {
+  Point,
+  Line,
+  Ring,
+  Bbox,
+  Size,
+  Tile,
+  TileZoomLevel,
+  TileByColumn
+} from '@allmaps/types'
 import type { GcpTransformer } from '@allmaps/transform'
-import type { TileZoomLevel } from '@allmaps/iiif-parser'
 
-import { computeBbox, bboxToPolygon } from '@allmaps/stdlib'
+/**
+ * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
+ */
+const SCALE_FACTOR_SHARPENING = 0.5
 
-import type { Size, BBox, Position, Tile, Line, Ring } from './types.js'
-import type { Polygon } from '@allmaps/types'
+// Functions for preparing to make tiles
 
-type PositionByX = { [key: number]: Position }
+export function geoBboxToResourceRing(
+  transformer: GcpTransformer,
+  geoBbox: Bbox
+): Ring {
+  // TODO: this function could be moved elsewhere because not stricktly about tiles
+  //
+  // 'transformer' is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
+  // 'geoBbox' is a Bbox (e.g. of the viewport) in (projected) geo coordinates
+  // 'geoBboxResourceRing' is a ring of this Bbox, transformed backward to resource coordinates.
+  // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
-function distanceFromPoint(tile: Tile, point: Position) {
-  const center = tileCenter(tile)
+  const geoBboxRing = bboxToPolygon(geoBbox)[0]
+  const geoBboxResourceRing = transformer.transformBackward(geoBboxRing, {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 2
+  }) as Ring
 
-  const dx = center[0] - point[0]
-  const dy = center[1] - point[1]
-
-  return Math.sqrt(dx ** 2 + dy ** 2)
+  return geoBboxResourceRing
 }
 
-export function imageCoordinatesToTileCoordinates(
-  tile: Tile,
-  imageCoordinates: Position,
-  clip = true
-): Position | undefined {
-  const tileXMin = tile.column * tile.zoomLevel.originalWidth
-  const tileYMin = tile.row * tile.zoomLevel.originalHeight
+export function getBestTileZoomLevel(
+  // TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
+  image: Image,
+  canvasSize: Size,
+  resourceRing: Ring
+): TileZoomLevel {
+  const resourceBbox = computeBbox(resourceRing)
 
-  const tileX = (imageCoordinates[0] - tileXMin) / tile.zoomLevel.scaleFactor
-  const tileY = (imageCoordinates[1] - tileYMin) / tile.zoomLevel.scaleFactor
+  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
+  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
 
-  if (
-    !clip ||
-    (imageCoordinates[0] >= tileXMin &&
-      imageCoordinates[0] <= tileXMin + tile.zoomLevel.originalWidth &&
-      imageCoordinates[1] >= tileYMin &&
-      imageCoordinates[1] <= tileYMin + tile.zoomLevel.originalHeight &&
-      imageCoordinates[0] <= tile.imageSize[0] &&
-      imageCoordinates[1] <= tile.imageSize[1])
-  ) {
-    return [tileX, tileY]
+  const resourceToCanvasScaleX = resourceBboxWidth / canvasSize[0]
+  const resourceToCanvasScaleY = resourceBboxHeight / canvasSize[1]
+  const resourceToCanvasScale = Math.min(
+    resourceToCanvasScaleX,
+    resourceToCanvasScaleY
+  )
+
+  return getBestTileZoomLevelForScale(image, resourceToCanvasScale)
+}
+
+/**
+ * Returns the best TileZoomLevel for a given resource-to-canvas scale.
+ *
+ * @export
+ * @param {Image} image - A parsed IIIF Image
+ * @param {number} resourceToCanvasScale - The resource to canvas scale, relating resource pixels to canvas pixels.
+ * @returns {TileZoomLevel}
+ */
+export function getBestTileZoomLevelForScale(
+  image: Image,
+  resourceToCanvasScale: number
+): TileZoomLevel {
+  // Returning the TileZoomLevel with the scaleFactor closest to the current scale.
+  //
+  // Available scaleFactors in tileZoomLevels:
+  // 1---------2---------4---------8---------16
+  // Math.log() of those scaleFactors
+  // 0---------0.69------1.38------2.07------2.77
+  //
+  // Current scale of the map = 3
+  // 1---------2----|----4---------8---------16
+  // Math.log(3) = 1.09
+  // 0------*--0.69---|--1.38------2.07------2.77
+  //
+  // scaleFactor = 1
+  // Math.log(1) = 0
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(0 - (1.09 - 0.69)) = abs(-0.4) = 0.4
+  //
+  // scaleFactor = 2
+  // Math.log(2) = 0.69
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(0.69 - (1.09 - 0.69)) = abs(0.29) = 0.29
+  //
+  // scaleFactor = 4
+  // Math.log(4) = 1.38
+  // Math.log(3) = 1.09 (current)
+  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
+  // diff = abs(1.38 - (1.09 - 0.69)) = abs(0.98) = 0.98
+  //
+  // => Pick scale factor 2, with minimum diff.
+  // Notice how 3 lies in the middle of 2 and 4, but on the log scale log(3) lies closer to log(4) then log(2)
+  // Notice how the SCALE_FACTOR_SHARPENING makes the actual current log scale for which the closest scaleFactor is searched move one factor of two sharper
+  // On the schematic drawing above, this is represented with a '*', left of the '|'.
+  //
+  // Math reminder: log(A)-log(B)=log(A/B)
+
+  let smallestdiffLogScaleFactor = Number.POSITIVE_INFINITY
+  let bestTileZoomLevel = image.tileZoomLevels.at(-1) as TileZoomLevel
+
+  for (const tileZoomLevel of image.tileZoomLevels) {
+    const diffLogScaleFactor = Math.abs(
+      Math.log(tileZoomLevel.scaleFactor) -
+        (Math.log(resourceToCanvasScale) - Math.log(SCALE_FACTOR_SHARPENING))
+    )
+    if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
+      smallestdiffLogScaleFactor = diffLogScaleFactor
+      bestTileZoomLevel = tileZoomLevel
+    }
   }
+
+  return bestTileZoomLevel
 }
 
-export function tileBBox(tile: Tile): BBox {
-  const tileXMin = tile.column * tile.zoomLevel.originalWidth
-  const tileYMin = tile.row * tile.zoomLevel.originalHeight
+// Making tiles
 
-  const tileXMax = Math.min(
-    tileXMin + tile.zoomLevel.originalWidth,
-    tile.imageSize[0]
+export function computeTilesConveringRingAtTileZoomLevel(
+  resourceRing: Ring,
+  tileZoomLevel: TileZoomLevel,
+  image: Image
+): Tile[] {
+  const scaledResourceRing = scaleResourcePoints(resourceRing, tileZoomLevel)
+  const tilesByColumn = ringToTilesByColumn(scaledResourceRing)
+  const tiles = tilesByColumnToTiles(tilesByColumn, image, tileZoomLevel)
+
+  // Sort tiles to load tiles in order of their distance to center
+  const resourceRingCenter = bboxToCenter(computeBbox(resourceRing))
+  tiles.sort(
+    (tileA, tileB) =>
+      distanceTileToPoint(tileA, resourceRingCenter) -
+      distanceTileToPoint(tileB, resourceRingCenter)
   )
-  const tileYMax = Math.min(
-    tileYMin + tile.zoomLevel.originalHeight,
-    tile.imageSize[1]
-  )
 
-  return [tileXMin, tileYMin, tileXMax, tileYMax]
+  return tiles
 }
 
-export function tileCenter(tile: Tile): Position {
-  const bbox = tileBBox(tile)
-
-  return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
+function scaleResourcePoints(
+  resourcePoints: Point[],
+  zoomLevel: TileZoomLevel
+): Point[] {
+  // This scales the incoming resource points to a grid, where there scaled coordinates on the grid pixels (between integer numbers) correspond to the original coordinates on the tiles provided at this zoom level
+  return resourcePoints.map((point) => [
+    point[0] / zoomLevel.originalWidth,
+    point[1] / zoomLevel.originalHeight
+  ])
 }
 
-// From:
-//  https://github.com/vHawk/tiles-intersect
-// See also:
-//  https://www.redblobgames.com/grids/line-drawing.html
-function tilesIntersect([a, b]: Line): Position[] {
+function ringToTilesByColumn(ring: Ring) {
+  const tilesByColumn: TileByColumn = {}
+  for (let i = 0; i < ring.length; i++) {
+    const line: Line = [ring[i], ring[(i + 1) % ring.length]]
+    const points = pointsIntersectingLine(line)
+
+    points.forEach(([x, y]) => {
+      if (!tilesByColumn[x]) {
+        tilesByColumn[x] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]
+      }
+
+      if (y < tilesByColumn[x][0]) {
+        tilesByColumn[x][0] = y
+      }
+
+      if (y > tilesByColumn[x][1]) {
+        tilesByColumn[x][1] = y
+      }
+    })
+  }
+
+  return tilesByColumn
+}
+
+function pointsIntersectingLine([a, b]: Line): Point[] {
+  // From:
+  //  https://github.com/vHawk/tiles-intersect
+  // See also:
+  //  https://www.redblobgames.com/grids/line-drawing.html
+
   let x = Math.floor(a[0])
   let y = Math.floor(a[1])
   const endX = Math.floor(b[0])
   const endY = Math.floor(b[1])
 
-  const points: Position[] = [[x, y]]
+  const points: Point[] = [[x, y]]
 
   if (x === endX && y === endY) {
     return points
@@ -111,168 +236,100 @@ function tilesIntersect([a, b]: Line): Position[] {
   return points
 }
 
-function getBestZoomLevelForMapScale(
+function tilesByColumnToTiles(
+  tilesByColumn: TileByColumn,
   image: Image,
-  mapTileScale: number
-): TileZoomLevel {
-  const tileZoomLevels = image.tileZoomLevels
-
-  let smallestScaleDiff = Number.POSITIVE_INFINITY
-  let bestZoomLevel = tileZoomLevels[tileZoomLevels.length - 1]
-
-  for (const zoomLevel of tileZoomLevels) {
-    const scaleFactor = zoomLevel.scaleFactor
-    const scaleDiff = Math.abs(scaleFactor - mapTileScale)
-
-    // scaleFactors:
-    // 1.......2.......4.......8.......16
-    //
-    // Example mapTileScale = 3
-    // 1.......2..|....4.......8.......16
-    //
-    // scaleFactor 2:
-    //   scaleDiff = 1
-    //   scaleFactor * 1.25 = 2.5 => 2.5 >= 3 === false
-    //
-    // scaleFactor 4:
-    //   scaleDiff = 1
-    //   scaleFactor * 1.25 = 5 => 5 >= 3 === true
-    //
-    // Pick scaleFactor 4!
-
-    // TODO: read 1.25 from config
-    // TODO: maybe use a smaller value when the scaleFactor is low and a higher value when the scaleFactor is high?
-    // TODO: use lgoarithmic scale?
-    if (scaleDiff < smallestScaleDiff && scaleFactor * 1.25 >= mapTileScale) {
-      smallestScaleDiff = scaleDiff
-      bestZoomLevel = zoomLevel
-    }
-  }
-
-  return bestZoomLevel
-}
-
-function scaleToTiles(zoomLevel: TileZoomLevel, points: Ring): Ring {
-  return points.map((point) => [
-    point[0] / zoomLevel.originalWidth,
-    point[1] / zoomLevel.originalHeight
-  ])
-}
-
-function findNeededIiifTilesByX(tilePixelExtent: Ring) {
-  const tiles: PositionByX = {}
-  for (let i = 0; i < tilePixelExtent.length; i++) {
-    const line: Line = [
-      tilePixelExtent[i],
-      tilePixelExtent[(i + 1) % tilePixelExtent.length]
-    ]
-    const lineTiles = tilesIntersect(line)
-
-    lineTiles.forEach(([x, y]) => {
-      if (!tiles[x]) {
-        tiles[x] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]
-      }
-
-      if (y < tiles[x][0]) {
-        tiles[x][0] = y
-      }
-
-      if (y > tiles[x][1]) {
-        tiles[x][1] = y
-      }
-    })
-  }
-
-  return tiles
-}
-
-function iiifTilesByXToArray(
-  zoomLevel: TileZoomLevel,
-  imageSize: Size,
-  iiifTilesByX: PositionByX
+  zoomLevel: TileZoomLevel
 ): Tile[] {
-  const neededIiifTiles: Tile[] = []
-  for (const xKey in iiifTilesByX) {
+  const tiles: Tile[] = []
+  for (const xKey in tilesByColumn) {
     const x = parseInt(xKey)
 
     if (x < 0 || x >= zoomLevel.columns) {
       break
     }
 
-    const fromY = Math.max(iiifTilesByX[x][0], 0)
-    const toY = Math.min(iiifTilesByX[x][1], zoomLevel.rows - 1)
+    const fromY = Math.max(tilesByColumn[x][0], 0)
+    const toY = Math.min(tilesByColumn[x][1], zoomLevel.rows - 1)
 
     for (let y = fromY; y <= toY; y++) {
-      neededIiifTiles.push({
+      tiles.push({
         column: x,
         row: y,
-        zoomLevel,
-        imageSize
+        tileZoomLevel: zoomLevel,
+        imageSize: [image.width, image.height]
       })
     }
   }
 
-  return neededIiifTiles
+  return tiles
 }
 
-export function getResourcePolygon(transformer: GcpTransformer, geoBBox: BBox) {
-  // geoBBox is a BBox of the extent viewport in geospatial coordinates (in the projection that was given)
-  // geoBBoxResourcePolygon is a polygon of this BBox, transformed to resource coordinates.
-  // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
+// Geometric computations
 
-  const geoBBoxPolygon = bboxToPolygon(geoBBox)
-  const geoBBoxResourcePolygon = transformer.transformBackward(geoBBoxPolygon, {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  }) as Polygon
-
-  return geoBBoxResourcePolygon
+function distanceTileToPoint(tile: Tile, point: Point): number {
+  return distance(tileCenter(tile), point)
 }
 
-export function getBestZoomLevel(
-  image: Image,
-  viewportSize: Size,
-  resourcePolygon: Polygon
-): TileZoomLevel {
-  const resourceBBox = computeBbox(resourcePolygon)
+export function tileCenter(tile: Tile): Point {
+  const bbox = computeBboxTile(tile)
 
-  const resourceBBoxWidth = resourceBBox[2] - resourceBBox[0]
-  const resourceBBoxHeight = resourceBBox[3] - resourceBBox[1]
-
-  const mapScaleX = resourceBBoxWidth / viewportSize[0]
-  const mapScaleY = resourceBBoxHeight / viewportSize[1]
-  const mapScale = Math.min(mapScaleX, mapScaleY)
-
-  return getBestZoomLevelForMapScale(image, mapScale)
+  return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
 }
 
-export function computeIiifTilesForPolygonAndZoomLevel(
-  image: Image,
-  resourcePolygon: Polygon,
-  zoomLevel: TileZoomLevel
-): Tile[] {
-  const tilePixelExtent = scaleToTiles(zoomLevel, resourcePolygon[0])
+export function tilePosition(tile: Tile): Point {
+  const resourceTilePositionX = tile.column * tile.tileZoomLevel.originalWidth
+  const resourceTilePositionY = tile.row * tile.tileZoomLevel.originalHeight
 
-  const iiifTilesByX = findNeededIiifTilesByX(tilePixelExtent)
-  const iiifTiles = iiifTilesByXToArray(
-    zoomLevel,
-    [image.width, image.height],
-    iiifTilesByX
+  return [resourceTilePositionX, resourceTilePositionY]
+}
+
+export function computeBboxTile(tile: Tile): Bbox {
+  const resourceTilePosition = tilePosition(tile)
+
+  const resourceTileMaxX = Math.min(
+    resourceTilePosition[0] + tile.tileZoomLevel.originalWidth,
+    tile.imageSize[0]
+  )
+  const resourceTileMaxY = Math.min(
+    resourceTilePosition[1] + tile.tileZoomLevel.originalHeight,
+    tile.imageSize[1]
   )
 
-  // sort tiles to load tiles in order of their distance to center
-  // TODO: move to new SortedFetch class
-  const resourceBBox = computeBbox(resourcePolygon)
-  const resourceCenter: Position = [
-    (resourceBBox[0] + resourceBBox[2]) / 2,
-    (resourceBBox[1] + resourceBBox[3]) / 2
+  return [
+    resourceTilePosition[0],
+    resourceTilePosition[1],
+    resourceTileMaxX,
+    resourceTileMaxY
   ]
+}
 
-  iiifTiles.sort(
-    (tileA, tileB) =>
-      distanceFromPoint(tileA, resourceCenter) -
-      distanceFromPoint(tileB, resourceCenter)
-  )
+// Currently unused
+export function resourcePointToTilePoint(
+  tile: Tile,
+  resourcePoint: Point,
+  clip = true
+): Point | undefined {
+  const resourceTilePosition = tilePosition(tile)
 
-  return iiifTiles
+  const tilePointX =
+    (resourcePoint[0] - resourceTilePosition[0]) /
+    tile.tileZoomLevel.scaleFactor
+  const tilePointY =
+    (resourcePoint[1] - resourceTilePosition[1]) /
+    tile.tileZoomLevel.scaleFactor
+
+  if (
+    !clip ||
+    (resourcePoint[0] >= resourceTilePosition[0] &&
+      resourcePoint[0] <=
+        resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
+      resourcePoint[1] >= resourceTilePosition[1] &&
+      resourcePoint[1] <=
+        resourceTilePosition[1] + tile.tileZoomLevel.originalHeight &&
+      resourcePoint[0] <= tile.imageSize[0] &&
+      resourcePoint[1] <= tile.imageSize[1])
+  ) {
+    return [tilePointX, tilePointY]
+  }
 }

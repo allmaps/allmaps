@@ -3,7 +3,7 @@ import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 import type { Map } from '@allmaps/annotation'
 
 import type {
-  Position,
+  Point,
   GeojsonGeometry,
   SvgAttributes,
   SvgPolygon,
@@ -66,12 +66,12 @@ function getNodeSvgGeometry(node: ElementNode): SvgGeometry {
   } else if (tag === 'polyline') {
     return {
       type: 'polyline',
-      coordinates: getNodePositions(node)
+      coordinates: getNodePoints(node)
     }
   } else if (tag === 'polygon') {
     return {
       type: 'polygon',
-      coordinates: getNodePositions(node)
+      coordinates: getNodePoints(node)
     }
   } else if (tag === 'rect') {
     return {
@@ -107,7 +107,7 @@ function getNodeNumberProperty(node: ElementNode, prop: string): number {
   return Number(value) || 0
 }
 
-function getNodePositions(node: ElementNode): Position[] {
+function getNodePoints(node: ElementNode): Point[] {
   const points = node?.properties?.points
 
   if (points) {
@@ -124,7 +124,7 @@ function getNodePositions(node: ElementNode): Position[] {
   return []
 }
 
-function positionsToString(coordinates: Position[]): string {
+function pointsToString(coordinates: Point[]): string {
   return coordinates.map((coordinate) => coordinate.join(',')).join(' ')
 }
 
@@ -154,12 +154,12 @@ function svgGeometryToString(geometry: SvgGeometry): string {
   } else if (geometry.type === 'polyline') {
     return elementToString('polyline', {
       ...geometry.attributes,
-      points: positionsToString(geometry.coordinates)
+      points: pointsToString(geometry.coordinates)
     })
   } else if (geometry.type === 'polygon') {
     return elementToString('polygon', {
       ...geometry.attributes,
-      points: positionsToString(geometry.coordinates)
+      points: pointsToString(geometry.coordinates)
     })
   } else if (geometry.type === 'rect') {
     return elementToString('rect', {

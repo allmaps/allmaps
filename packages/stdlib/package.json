@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.12",
+  "version": "1.0.0-beta.17",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -44,16 +44,16 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.16",
-    "@allmaps/iiif-parser": "^1.0.0-beta.25",
-    "@allmaps/types": "^1.0.0-beta.3",
+    "@allmaps/annotation": "^1.0.0-beta.19",
+    "@allmaps/iiif-parser": "^1.0.0-beta.28",
+    "@allmaps/types": "^1.0.0-beta.6",
     "@placemarkio/geojson-rewind": "^1.0.2",
     "svg-parser": "^2.0.4"
   },
   "devDependencies": {
+    "@types/svg-parser": "^2.0.3",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "@types/svg-parser": "^2.0.3",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.35.0",

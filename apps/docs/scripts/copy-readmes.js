@@ -12,7 +12,7 @@ const packagesDir = path.join(__dirname, '../../../packages')
 const outputDir = path.join(__dirname, '../src/content/docs/reference/packages')
 
 function isReadmeValid(readme) {
-  return readme.length > 150
+  return readme && readme.length > 150
 }
 
 const getDirectories = async (source) =>
@@ -24,11 +24,28 @@ const removeFirstLine = (lines) => lines.substring(lines.indexOf('\n') + 1)
 
 for (const packageName of await getDirectories(packagesDir)) {
   const readmePath = path.join(packagesDir, packageName, 'README.md')
-  const readme = await readFile(readmePath, { encoding: 'utf8' })
+
+  let readme
+  try {
+    readme = await readFile(readmePath, { encoding: 'utf8' })
+  } catch (err) {
+    // ignore
+  }
 
   if (!isReadmeValid(readme)) {
     console.log('Skipping README.md from', readmePath)
     continue
+  }
+
+  let description
+  try {
+    const packageFilename = path.join(packagesDir, packageName, 'package.json')
+    const packageModule = await import(packageFilename, {
+      assert: { type: 'json' }
+    })
+    description = packageModule.default.description
+  } catch (err) {
+    // ignore
   }
 
   console.log('Copying README.md from', readmePath)
@@ -36,7 +53,7 @@ for (const packageName of await getDirectories(packagesDir)) {
   const newReadme =
     `---
 title: '@allmaps/${packageName}'
-description: lees uit package.json
+description: ${description}
 ---\n` + removeFirstLine(readme)
 
   const outputPath = path.join(outputDir, `${packageName}.md`)

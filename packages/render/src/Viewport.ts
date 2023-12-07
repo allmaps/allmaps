@@ -1,170 +1,181 @@
-import World from './World.js'
-
+import { composeTransform } from './shared/matrix.js'
 import {
-  getResourcePolygon,
-  getBestZoomLevel,
-  computeIiifTilesForPolygonAndZoomLevel
-} from './shared/tiles.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
-import { applyTransform } from './shared/matrix.js'
+  computeBbox,
+  bboxToRectangle,
+  webMercatorToLonLat,
+  bboxToSize
+} from '@allmaps/stdlib'
 
-import type {
-  Position,
-  Size,
-  BBox,
-  Transform,
-  NeededTile,
-  TileZoomLevel
-} from './shared/types.js'
+import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
 
-const MIN_COMBINED_PIXEL_SIZE = 5
-
+/**
+ * The viewport describes the view on the rendered map.
+ * @export
+ * @class Viewport
+ * @typedef {Viewport}
+ * @extends {EventTarget}
+ * @property {Point} geoCenter - Center point of the viewport, in lon lat geo coordinates.
+ * @property {Rectangle} geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in lon lat geo coordinates.
+ * @property {Size} geoSize - Size of the viewport in lon lat geo coordinates, as [width, height]. (This is the size of the bbox of the rectangle, since lon lat only makes sense in in that case).
+ * @property {Bbox} geoBbox - Bbox of the rotated rectangle of the viewport, in lon lat geo coordinates.
+ * @property {Point} projectedGeoCenter - Center point of the viewport, in projected geo coordinates.
+ * @property {Rectangle} projectedGeoRectangle - Rotated rectangle of the viewport point, in projected geo coordinates.
+ * @property {Size} projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bbox of the rotated rectangle, but the width and hight of the rectangle).
+ * @property {Bbox} projectedGeoBbox - Bbox of the rotated rectangle of the viewport, in projected geo coordinates.
+ * @property {number} rotation - Rotation of the viewport with respect to the projected coordinate system.
+ * @property {number} projectedGeoPerViewportScale - Resolution of the viewport, in projected geo coordinates per viewport pixel.
+ * @property {Point} viewportCenter - Center point of the viewport, in viewport pixels.
+ * @property {Rectangle} viewportRectangle - Rectangle of the viewport point, in viewport pixels.
+ * @property {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
+ * @property {Bbox} viewportBbox - Bbox of the viewport, in viewport pixels.
+ * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
+ * @property {Point} canvasCenter - Center point of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property {Rectangle} canvasRectangle - Rectangle of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as [width, height].
+ * @property {Bbox} canvasBbox - Bbox of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
+ * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
+ * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+ */
 export default class Viewport extends EventTarget {
-  world: World
-
-  projectionTransform: Transform = [1, 0, 0, 1, 0, 0]
-  visibleWarpedMapIds: Set<string> = new Set()
-  bestZoomLevelByMapId: Map<string, TileZoomLevel> = new Map()
-
-  constructor(world: World) {
-    super()
-
-    this.world = world
-  }
+  geoCenter: Point
+  geoRectangle: Rectangle
+  geoSize: Size
+  geoBbox: Bbox
+  projectedGeoCenter: Point
+  projectedGeoRectangle: Rectangle
+  projectedGeoSize: Size
+  projectedGeoBbox: Bbox
+  rotation: number
+  projectedGeoPerViewportScale: number
+  viewportCenter: Point
+  viewportRectangle: Rectangle
+  viewportSize: Size
+  viewportBbox: Bbox
+  devicePixelRatio: number
+  canvasCenter: Point
+  canvasRectangle: Rectangle
+  canvasSize: Size
+  canvasBbox: Bbox
+  projectedGeoPerCanvasScale: number
+  projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
+  projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
 
   /**
-   * Returns the mapIds of the warped maps that are visible in the viewport, sorted by z-index
-   * @returns {Iterable<string>}
+   * Creates an instance of Viewport.
+   *
+   * @constructor
+   * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
+   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
+   * @param {number} projectedGeoPerViewportScale - Resolution of the viewport, in projection coordinates per viewport pixel.
+   * @param {number} [devicePixelRatio=1] - The devicePixelRatio of the viewport.
    */
-  getVisibleWarpedMapIds() {
-    const sortedVisibleWarpedMapIds = [...this.visibleWarpedMapIds].sort(
-      (mapIdA, mapIdB) => {
-        const zIndexA = this.world.getZIndex(mapIdA)
-        const zIndexB = this.world.getZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
-
-        return 0
-      }
-    )
-
-    return sortedVisibleWarpedMapIds
-  }
-
-  setProjectionTransform(projectionTransform: Transform) {
-    this.projectionTransform = projectionTransform
-  }
-
-  getProjectionTransform() {
-    return this.projectionTransform
-  }
-
-  // TODO: split function in two?
-  // Find better name?
-  updateViewportAndGetTilesNeeded(
+  constructor(
+    projectedGeoCenter: Point,
     viewportSize: Size,
-    geoBBox: BBox,
-    coordinateToPixelTransform: Transform
-  ): NeededTile[] {
-    let possibleVisibleWarpedMapIds: Iterable<string> = []
-    const possibleInvisibleWarpedMapIds = new Set(this.visibleWarpedMapIds)
+    rotation: number,
+    projectedGeoPerViewportScale: number,
+    devicePixelRatio = 1
+  ) {
+    super()
+    // TODO: should this still extend EventTartget and hence include super()?
 
-    possibleVisibleWarpedMapIds =
-      this.world.getPossibleVisibleWarpedMapIds(geoBBox)
+    this.projectedGeoCenter = projectedGeoCenter
+    this.projectedGeoPerViewportScale = projectedGeoPerViewportScale
+    this.rotation = rotation
+    this.viewportSize = viewportSize
+    this.devicePixelRatio = devicePixelRatio
 
-    const neededTiles: NeededTile[] = []
-    for (const mapId of possibleVisibleWarpedMapIds) {
-      const warpedMap = this.world.getMap(mapId)
+    this.projectedGeoRectangle = this.computeProjectedGeoRectangle(
+      this.projectedGeoCenter,
+      this.projectedGeoPerViewportScale,
+      this.rotation,
+      this.viewportSize
+    )
+    this.projectedGeoBbox = computeBbox(this.projectedGeoRectangle)
+    this.projectedGeoSize = [
+      this.viewportSize[0] * projectedGeoPerViewportScale,
+      this.viewportSize[1] * projectedGeoPerViewportScale
+    ]
 
-      if (!warpedMap) {
-        continue
-      }
+    this.geoCenter = webMercatorToLonLat(this.projectedGeoCenter)
+    // TODO: improve this with an interpolated back-projection, resulting in a ring
+    this.geoRectangle = this.projectedGeoRectangle.map((point) => {
+      return webMercatorToLonLat(point)
+    }) as Rectangle
+    this.geoBbox = computeBbox(this.geoRectangle)
+    this.geoSize = bboxToSize(this.geoBbox)
 
-      // Don't show maps when they're too small
-      const topLeft: Position = [
-        warpedMap.geoMaskBBox[0],
-        warpedMap.geoMaskBBox[1]
-      ]
-      const bottomRight: Position = [
-        warpedMap.geoMaskBBox[2],
-        warpedMap.geoMaskBBox[3]
-      ]
+    this.viewportCenter = [this.viewportSize[0] / 2, this.viewportSize[1] / 2]
+    this.viewportBbox = [0, 0, ...this.viewportSize]
+    this.viewportRectangle = bboxToRectangle(this.viewportBbox)
 
-      const pixelTopLeft = applyTransform(coordinateToPixelTransform, topLeft)
-      const pixelBottomRight = applyTransform(
-        coordinateToPixelTransform,
-        bottomRight
-      )
+    this.canvasCenter = [
+      this.viewportCenter[0] * this.devicePixelRatio,
+      this.viewportSize[1] * this.devicePixelRatio
+    ]
+    this.canvasSize = [
+      this.viewportSize[0] * this.devicePixelRatio,
+      this.viewportSize[1] * this.devicePixelRatio
+    ]
+    this.canvasBbox = [0, 0, ...this.canvasSize]
+    this.canvasRectangle = bboxToRectangle(this.canvasBbox)
 
-      const pixelWidth = Math.abs(pixelBottomRight[0] - pixelTopLeft[0])
-      const pixelHeight = Math.abs(pixelTopLeft[1] - pixelBottomRight[1])
+    this.projectedGeoPerCanvasScale =
+      this.projectedGeoPerViewportScale / this.devicePixelRatio
 
-      // Only draw maps that are larger than MIN_COMBINED_PIXEL_SIZE pixels
-      // in combined width and height
-      if (pixelWidth + pixelHeight < MIN_COMBINED_PIXEL_SIZE) {
-        continue
-      }
+    this.projectedGeoToViewportTransform =
+      this.composeProjectedGeoToViewportTransform()
+    this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
+  }
 
-      const geoBBoxResourcePolygon = getResourcePolygon(
-        warpedMap.transformer,
-        geoBBox
-      )
+  private composeProjectedGeoToViewportTransform(): Transform {
+    return composeTransform(
+      this.viewportSize[0] / 2,
+      this.viewportSize[1] / 2,
+      1 / this.projectedGeoPerViewportScale,
+      -1 / this.projectedGeoPerViewportScale,
+      -this.rotation,
+      -this.projectedGeoCenter[0],
+      -this.projectedGeoCenter[1]
+    )
+  }
 
-      const zoomLevel = getBestZoomLevel(
-        warpedMap.parsedImage,
-        viewportSize,
-        geoBBoxResourcePolygon
-      )
+  private composeProjectedGeoToClipTransform(): Transform {
+    return composeTransform(
+      0,
+      0,
+      2 / (this.projectedGeoPerViewportScale * this.viewportSize[0]),
+      2 / (this.projectedGeoPerViewportScale * this.viewportSize[1]),
+      -this.rotation,
+      -this.projectedGeoCenter[0],
+      -this.projectedGeoCenter[1]
+    )
+  }
 
-      // TODO: remove maps from this list when they're removed from World
-      // or not visible anymore
-      this.bestZoomLevelByMapId.set(mapId, zoomLevel)
-
-      // TODO: rename function
-      const tiles = computeIiifTilesForPolygonAndZoomLevel(
-        warpedMap.parsedImage,
-        geoBBoxResourcePolygon,
-        zoomLevel
-      )
-
-      if (tiles.length) {
-        if (!this.visibleWarpedMapIds.has(mapId)) {
-          this.visibleWarpedMapIds.add(mapId)
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-          )
-        }
-
-        possibleInvisibleWarpedMapIds.delete(mapId)
-
-        for (const tile of tiles) {
-          const imageRequest = warpedMap.parsedImage.getIiifTile(
-            tile.zoomLevel,
-            tile.column,
-            tile.row
-          )
-          const url = warpedMap.parsedImage.getImageUrl(imageRequest)
-
-          neededTiles.push({
-            mapId,
-            tile,
-            imageRequest,
-            url
-          })
-        }
-      }
-    }
-
-    for (const mapId of possibleInvisibleWarpedMapIds) {
-      if (this.visibleWarpedMapIds.has(mapId)) {
-        this.visibleWarpedMapIds.delete(mapId)
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-        )
-      }
-    }
-
-    return neededTiles
+  /** Returns a rotated rectangle in projected geo coordinates */
+  private computeProjectedGeoRectangle(
+    projectedGeoCenter: Point,
+    projectedGeoPerViewportScale: number,
+    rotation: number,
+    viewportSize: Size
+  ): Rectangle {
+    const dx = (projectedGeoPerViewportScale * viewportSize[0]) / 2
+    const dy = (projectedGeoPerViewportScale * viewportSize[1]) / 2
+    const cosRotation = Math.cos(rotation)
+    const sinRotation = Math.sin(rotation)
+    const xCos = dx * cosRotation
+    const xSin = dx * sinRotation
+    const yCos = dy * cosRotation
+    const ySin = dy * sinRotation
+    const x = projectedGeoCenter[0]
+    const y = projectedGeoCenter[1]
+    return [
+      [x - xCos + ySin, y - xSin - yCos],
+      [x - xCos - ySin, y - xSin + yCos],
+      [x + xCos - ySin, y + xSin + yCos],
+      [x + xCos + ySin, y + xSin - yCos]
+    ]
   }
 }

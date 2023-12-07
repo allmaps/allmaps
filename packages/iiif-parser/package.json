@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-beta.25",
+  "version": "1.0.0-beta.28",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc && npm run documentation",
     "preversion": "npm run types && npm run lint && npm test",
     "types": "tsc --noEmit",
     "test": "NODE_ENV=test mocha",
@@ -58,6 +58,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@allmaps/types": "^1.0.0-beta.6",
     "zod": "^3.20.6"
   }
 }

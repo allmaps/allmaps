@@ -62,9 +62,7 @@ function setNextOrPrevMapActive(
 
   let $maps: ViewerMap[]
 
-  // Temporarily turned off list view
-  const hideOthers = false // options?.hideOthers ?? false
-  if (hideOthers) {
+  if (options?.hideOthers) {
     $maps = get(maps)
   } else if ($selectedMapCount > 1) {
     $maps = get(selectedMaps)
@@ -102,7 +100,7 @@ function setNextOrPrevMapActive(
     setSelectedMaps([newActiveMapId], updateView)
   }
 
-  if (hideOthers) {
+  if (options?.hideOthers) {
     const hideMapIds = $maps
       .map((viewerMap) => viewerMap.mapId)
       .filter((mapId) => mapId !== newActiveMapId)
@@ -144,7 +142,7 @@ export const activeMap = derived(
 activeMapId.subscribe(($activeMapId) => {
   if ($activeMapId) {
     if (mapWarpedMapSource && $activeMapId.updateView) {
-      mapWarpedMapSource.bringToFront([$activeMapId.mapId])
+      mapWarpedMapSource.bringMapsToFront([$activeMapId.mapId])
     }
   }
 })

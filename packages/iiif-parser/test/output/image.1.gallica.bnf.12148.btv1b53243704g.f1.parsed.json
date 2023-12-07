@@ -8,58 +8,40 @@
   "height": 11060,
   "tileZoomLevels": [
     {
+      "columns": 11,
+      "height": 768,
+      "originalHeight": 768,
+      "originalWidth": 768,
+      "rows": 15,
       "scaleFactor": 1,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 256,
-      "originalHeight": 256,
-      "columns": 31,
-      "rows": 44
+      "width": 768
     },
     {
+      "columns": 6,
+      "height": 768,
+      "originalHeight": 1536,
+      "originalWidth": 1536,
+      "rows": 8,
       "scaleFactor": 2,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 512,
-      "originalHeight": 512,
-      "columns": 16,
-      "rows": 22
+      "width": 768
     },
     {
+      "columns": 3,
+      "height": 768,
+      "originalHeight": 3072,
+      "originalWidth": 3072,
+      "rows": 4,
       "scaleFactor": 4,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 1024,
-      "originalHeight": 1024,
-      "columns": 8,
-      "rows": 11
+      "width": 768
     },
     {
-      "scaleFactor": 8,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 2048,
-      "originalHeight": 2048,
-      "columns": 4,
-      "rows": 6
-    },
-    {
-      "scaleFactor": 16,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 4096,
-      "originalHeight": 4096,
       "columns": 2,
-      "rows": 3
-    },
-    {
-      "scaleFactor": 32,
-      "width": 256,
-      "height": 256,
-      "originalWidth": 8192,
-      "originalHeight": 8192,
-      "columns": 1,
-      "rows": 2
+      "height": 768,
+      "originalHeight": 6144,
+      "originalWidth": 6144,
+      "rows": 2,
+      "scaleFactor": 8,
+      "width": 768
     }
   ]
 }

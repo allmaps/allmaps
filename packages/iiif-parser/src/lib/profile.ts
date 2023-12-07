@@ -3,10 +3,17 @@ import { z } from 'zod'
 import { ImageSchema } from '../schemas/iiif.js'
 import { ImageServiceSchema } from '../schemas/image-service.js'
 import { Image2ProfileDescriptionSchema } from '../schemas/image.2.js'
-import { ProfileProperties } from '../lib/types.js'
+import { ProfileProperties, MajorVersion } from '../lib/types.js'
 
-import { image1ProfileUriRegex } from '../schemas/image.1.js'
-import { image2ProfileUriRegex } from '../schemas/image.2.js'
+import {
+  image1ProfileUriRegex,
+  Image1ContextString,
+  Image1ContextStringIncorrect
+} from '../schemas/image.1.js'
+import {
+  image2ProfileUriRegex,
+  Image2ContextString
+} from '../schemas/image.2.js'
 
 const anyRegionAndSizeFeatures = ['regionByPx', 'sizeByWh']
 
@@ -46,6 +53,44 @@ function parseImage2ProfileDescription(
         parsedProfileDescription?.supports &&
         parsedProfileDescription?.supports?.includes(feature)
     )
+  }
+}
+
+export function getMajorIiifVersionFromImageService(
+  imageService: ImageServiceType
+): MajorVersion {
+  if ('type' in imageService && imageService.type === 'ImageService3') {
+    return 3
+  } else if (
+    ('type' in imageService && imageService.type === 'ImageService2') ||
+    ('@type' in imageService && imageService['@type'] === 'ImageService2') ||
+    ('@context' in imageService &&
+      imageService['@context'] === Image2ContextString)
+  ) {
+    return 2
+  } else if (
+    '@context' in imageService &&
+    (imageService['@context'] === Image1ContextString ||
+      imageService['@context'] === Image1ContextStringIncorrect)
+  ) {
+    return 1
+  } else if ('profile' in imageService) {
+    let profile: string
+    if (Array.isArray(imageService.profile)) {
+      profile = imageService.profile[0]
+    } else {
+      profile = imageService.profile
+    }
+
+    if (profile.match(image1ProfileUriRegex)) {
+      return 1
+    } else if (profile.match(image2ProfileUriRegex)) {
+      return 2
+    } else {
+      return 3
+    }
+  } else {
+    throw new Error('Unsupported IIIF Image Service')
   }
 }
 

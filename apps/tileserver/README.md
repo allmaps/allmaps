@@ -50,14 +50,9 @@ Publish to Cloudflare Workers:
 
 To generate XYZ map tiles, Allmaps Tile Server needs a Georeference Annotation. You can supply a Georeference Annotation in three ways:
 
-- [Allmaps Tile Server](#allmaps-tile-server)
-  - [Development](#development)
-  - [API](#api)
-    - [Supplying a Georeference Annotation](#supplying-a-georeference-annotation)
-      - [By using the URL of a Georeference Annotation](#by-using-the-url-of-a-georeference-annotation)
-      - [By using the Allmaps ID of a georeferenced map](#by-using-the-allmaps-id-of-a-georeferenced-map)
-      - [By supplying a complete URL-encoded Georeference Annotation](#by-supplying-a-complete-url-encoded-georeference-annotation)
-    - [URL parameters](#url-parameters)
+1. [By using the URL of a Georeference Annotation](#by-using-the-url-of-a-georeference-annotation)
+2. [By using the Allmaps ID of a georeferenced map](#by-using-the-allmaps-id-of-a-georeferenced-map)
+3. [By supplying a complete URL-encoded Georeference Annotation](#by-supplying-a-complete-url-encoded-georeference-annotation)
 
 The different ways of supplying a Georeference Annotation are explained in detail below.
 

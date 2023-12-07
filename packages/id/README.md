@@ -32,7 +32,7 @@ The browser version of @allmaps/id uses the [`SubtleCrypto.digest()`](https://de
 
 ```html
 <script type="module">
-  import { generateId } from 'https://unpkg.com/@allmaps/id?module'
+  import { generateId } from 'https://esm.run/@allmaps/id'
 
   const url =
     'https://orka.bibliothek.uni-kassel.de/viewer/rest/iiif/manifests/1535113582549/manifest/'

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.15",
+  "version": "1.0.0-beta.20",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -41,8 +41,8 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/types": "^1.0.0-beta.3",
-    "@allmaps/stdlib": "^1.0.0-beta.11",
+    "@allmaps/stdlib": "^1.0.0-beta.17",
+    "@allmaps/types": "^1.0.0-beta.6",
     "@turf/distance": "^6.3.0",
     "@turf/midpoint": "^6.3.0",
     "ml-matrix": "^6.10.4"
@@ -50,7 +50,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "bench": "node bench/index.js",
-    "build": "tsc",
+    "build": "tsc && npm run documentation",
     "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "pretest": "npm run build",
@@ -64,9 +64,9 @@
     "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "documentation": "^14.0.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
+    "documentation": "^14.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",

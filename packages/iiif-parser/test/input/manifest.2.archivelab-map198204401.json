@@ -1,0 +1,70 @@
+{
+  "@context": "https://iiif.io/api/presentation/2/context.json",
+  "@id": "https://iiif.archivelab.org/iiif/map198204401/manifest.json",
+  "@type": "sc:Manifest",
+  "attribution": "The Internet Archive",
+  "description": "<div><b>Description</b>: A map of the state of California with a complete delineation of the gold region. The map is compiled from the most recent surveys and explorations and contains an accurate description of the county boundaries. It also shows a complete list of post offices in the state in 1851 and a portion of the Great Basin.\u00a0<br /></div><div><br /></div><div><b>Accession Number</b>: 1982/004/0401</div><div><br /></div><div><b>Collection</b>: Eleanor McClatchy Collection</div><div><br /></div><div><b>Publisher</b>: Butler, B.F.\u00a0</div><div><br /></div><div><b>Date Published</b>: 1851</div><div><br /></div><div><b>Dimensions</b>: 20 x 26 in</div>",
+  "label": "Map of the State of California",
+  "logo": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcReMN4l9cgu_qb1OwflFeyfHcjp8aUfVNSJ9ynk2IfuHwW1I4mDSw",
+  "metadata": [
+    {
+      "label": "title",
+      "value": "Map of the State of California"
+    },
+    {
+      "label": "subject",
+      "value": "California Gold Rush; Gold mines and mining; Great Basin; Eleanor McClatchy Collection; CSH Map Digitization Project"
+    },
+    {
+      "label": "date",
+      "value": "1851"
+    },
+    {
+      "label": "creator",
+      "value": "Brown, Henry B. "
+    }
+  ],
+  "related": "http://archive.org/details/map198204401",
+  "seeAlso": "https://archive.org/metadata/map198204401",
+  "sequences": [
+    {
+      "@context": "https://iiif.io/api/image/2/context.json",
+      "@id": "https://iiif.archivelab.org/iiif/map198204401/canvas/default",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@context": "https://iiif.io/api/presentation/2/context.json",
+          "@id": "https://iiif.archivelab.org/iiif/map198204401/canvas",
+          "@type": "sc:Canvas",
+          "description": "<div><b>Description</b>: A map of the state of California with a complete delineation of the gold region. The map is compiled from the most recent surveys and explorations and contains an accurate description of the county boundaries. It also shows a complete list of post offices in the state in 1851 and a portion of the Great Basin.\u00a0<br /></div><div><br /></div><div><b>Accession Number</b>: 1982/004/0401</div><div><br /></div><div><b>Collection</b>: Eleanor McClatchy Collection</div><div><br /></div><div><b>Publisher</b>: Butler, B.F.\u00a0</div><div><br /></div><div><b>Date Published</b>: 1851</div><div><br /></div><div><b>Dimensions</b>: 20 x 26 in</div>",
+          "height": 7911,
+          "images": [
+            {
+              "@context": "https://iiif.io/api/image/2/context.json",
+              "@id": "https://iiif.archivelab.org/iiif/map198204401/annotation",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://iiif.archivelab.org/iiif/map198204401/annotation",
+              "resource": {
+                "@id": "https://iiif.archivelab.org/iiif/map198204401/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 7911,
+                "service": {
+                  "@context": "https://iiif.io/api/image/2/context.json",
+                  "@id": "https://iiif.archivelab.org/iiif/map198204401",
+                  "profile": "https://iiif.io/api/image/2/profiles/level2.json"
+                },
+                "width": 6061
+              }
+            }
+          ],
+          "label": "Map of the State of California",
+          "width": 6061
+        }
+      ],
+      "label": "default"
+    }
+  ],
+  "viewingHint": "paged"
+}

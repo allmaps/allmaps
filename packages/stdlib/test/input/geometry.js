@@ -1,5 +1,5 @@
-export const positionResource = [518, 991]
-export const positionGeo = [4.9516614, 52.4633102]
+export const pointResource = [518, 991]
+export const pointGeo = [4.9516614, 52.4633102]
 export const geojsonPointGeo = {
   type: 'Point',
   coordinates: [4.9516614, 52.4633102]

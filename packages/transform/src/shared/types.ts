@@ -1,10 +1,10 @@
-import type { Position, GeojsonPoint } from '@allmaps/types'
+import type { Point, GeojsonPoint } from '@allmaps/types'
 
 /**
  * Ground Control Point (GCP).
- * A GCP contains a mapping between a sourcer and destination position.
+ * A GCP contains a mapping between a source and destination point.
  */
-export type TransformGcp = { source: Position; destination: Position }
+export type TransformGcp = { source: Point; destination: Point }
 
 export type Segment = {
   from: TransformGcp
@@ -24,32 +24,32 @@ export type TransformationType =
 export type TransformOptions = {
   maxOffsetRatio: number
   maxDepth: number
-  // Assume destination positions are in lon/lat coordinates and use geographic distances and midpoints there
+  // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there
   destinationIsGeographic: boolean
-  // Assume source positions are in lon/lat coordinates and use geographic distances and midpoints there
+  // Assume source points are in lon/lat coordinates and use geographic distances and midpoints there
   sourceIsGeographic: boolean
 }
 
 export type PartialTransformOptions = Partial<TransformOptions>
 
 export type KernelFunction = (r: number, epsilon?: number) => number
-export type NormFunction = (position1: Position, position2: Position) => number
+export type NormFunction = (point1: Point, point2: Point) => number
 
 export type Transformation = {
-  sourcePositions: Position[]
-  destinationPositions: Position[]
+  sourcePoints: Point[]
+  destinationPoints: Point[]
 
-  positionCount: number
+  pointCount: number
 
-  interpolate(position: Position): Position
+  interpolate(point: Point): Point
 }
 
 export type GcpTransformerInterface = {
   gcps: TransformGcp[]
 
-  transformForward(position: Position | GeojsonPoint): Position
-  transformToGeo(position: Position | GeojsonPoint): Position
+  transformForward(point: Point | GeojsonPoint): Point
+  transformToGeo(point: Point | GeojsonPoint): Point
 
-  transformBackward(position: Position | GeojsonPoint): Position
-  transformToResource(position: Position | GeojsonPoint): Position
+  transformBackward(point: Point | GeojsonPoint): Point
+  transformToResource(point: Point | GeojsonPoint): Point
 }

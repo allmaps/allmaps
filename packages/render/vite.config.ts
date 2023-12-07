@@ -1,5 +1,7 @@
 import { defineConfig, type PluginOption } from 'vite'
 import { exec } from 'child_process'
+import { mkdirp } from 'mkdirp'
+import { copyFile } from 'node:fs/promises'
 
 import ports from '../../ports.json'
 
@@ -15,6 +17,24 @@ const buildTypes: PluginOption = {
   }
 }
 
+const buildShaders: PluginOption = {
+  name: 'build:shaders',
+  buildEnd: async function (error) {
+    if (!error) {
+      const files = [
+        'fragment-shader.glsl',
+        'vertex-shader.glsl',
+        'shaders.d.ts'
+      ]
+
+      await mkdirp('./dist/shaders')
+      for (let file of files) {
+        await copyFile(`./src/shaders/${file}`, `./dist/shaders/${file}`)
+      }
+    }
+  }
+}
+
 export default defineConfig({
   server: {
     port: ports.render
@@ -23,17 +43,11 @@ export default defineConfig({
     target: 'es2020',
     sourcemap: true,
     emptyOutDir: false,
-    // minify: false,
+    minify: true,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) => {
-        if (format === 'umd') {
-          return `index.cjs`
-        }
-
-        return `index.js`
-      },
+      fileName: (format) => `bundled/index.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
@@ -67,5 +81,5 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [buildTypes]
+  plugins: [buildTypes, buildShaders]
 })
