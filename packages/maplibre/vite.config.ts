@@ -1,7 +1,7 @@
 import { defineConfig, type PluginOption } from 'vite'
 import { exec } from 'child_process'
 
-// import ports from '../../ports.json'
+import ports from '../../ports.json'
 
 // TODO: move to @allmaps/stdlib?
 const buildTypes: PluginOption = {
@@ -17,25 +17,25 @@ const buildTypes: PluginOption = {
 
 export default defineConfig({
   server: {
-    // port: ports.maplibre
-    port: 5570
+    port: ports.maplibre
   },
   build: {
     target: 'es2020',
     sourcemap: true,
     emptyOutDir: false,
-    // minify: false,
+    minify: true,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) =>
-        `bundled/allmaps-maplibre.${format}.${format === 'umd' ? 'cjs' : 'js'}`,
+      fileName: (format) => `bundled/allmaps-maplibre-3.3.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
-      external: [],
+      external: ['maplibre-gl'],
       output: {
-        globals: {}
+        globals: {
+          'maplibre-gl': 'maplibre-gl'
+        }
       }
     }
   },

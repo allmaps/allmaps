@@ -48,7 +48,7 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build",
+    "build": "vite build && npm run documentation",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
@@ -56,6 +56,7 @@
     "format": "prettier --write src test",
     "preversion": "npm run types && npm run lint && npm test",
     "test": "NODE_ENV=test mocha",
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "pretest": "npm run build"
   },
   "license": "GPL-3.0-or-later",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "documentation": "^14.0.0",
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",

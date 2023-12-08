@@ -47,12 +47,7 @@
 
       map.on('load', async () => {
         map.addLayer(warpedMapLayer)
-
-        fetch(annotationUrl)
-          .then((response) => response.json())
-          .then((annotation) => {
-            warpedMapLayer.addGeoreferenceAnnotation(annotation)
-          })
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
 
     </script>

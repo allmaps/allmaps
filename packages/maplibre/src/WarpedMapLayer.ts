@@ -29,7 +29,7 @@ const ERROR_MSG_RENDER =
  * @class WarpedMapLayer
  */
 export class WarpedMapLayer implements CustomLayerInterface {
-  id = 'warped-map'
+  id = 'warped-map-layer'
   type = 'custom' as const
   renderingMode = '2d' as const
 
@@ -41,6 +41,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   /**
    * Creates a WarpedMapLayer instance
+   *
+   * @constructor
    * @param {string} [id] - unique id for this layer
    * @param {Cache} imageInfoCache - image info cache
    */
@@ -631,7 +633,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Resets the colorization of a single warped map
+   * Resets the colorization of a single map
    * @param {string} mapId - ID of the map
    */
   resetMapColorize(mapId: string) {
