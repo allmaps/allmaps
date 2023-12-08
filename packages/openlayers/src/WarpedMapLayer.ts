@@ -100,6 +100,15 @@ export class WarpedMapLayer extends Layer {
   // No setOpacity() and getOpacity() here since default for OL Layer class
 
   /**
+   * Gets the opacity of a single map
+   * @param {string} mapId - ID of the map
+   * @return {number | undefined} opacity of the map
+   */
+  getMapOpacity(mapId: string): number | undefined {
+    return this.renderer.getMapOpacity(mapId)
+  }
+
+  /**
    * Sets the opacity of a single map
    * @param {string} mapId - ID of the map
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
@@ -250,7 +259,7 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Resets the colorization of a single warped map
+   * Resets the colorization of a single map
    * @param {string} mapId - ID of the map
    */
   resetMapColorize(mapId: string) {

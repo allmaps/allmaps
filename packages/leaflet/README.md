@@ -31,7 +31,13 @@ And load using:
 import { WarpedMapLayer } from '@allmaps/leaflet'
 ```
 
-Alternatively, ESM and UMD bundled versions of the code are also provided under `/dist/bundled`. You can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading leaflet.
+You can build this package using
+
+```sh
+pnpm run build
+```
+
+As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading leaflet.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js"></script>
@@ -110,7 +116,7 @@ The following events are emitted to inform you of the state of the WarpedMapLaye
 | A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
 | The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
 | The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
-| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` | `{}`                               |
+| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
 
 You can listen to them in the typical Leaflet way. Here's an example:
 
@@ -169,15 +175,17 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
     *   [sendMapsBackward](#sendmapsbackward)
+    *   [bringToFront](#bringtofront)
+    *   [bringToBack](#bringtoback)
     *   [getMapZIndex](#getmapzindex)
     *   [getZIndex](#getzindex)
     *   [setZIndex](#setzindex)
     *   [setImageInfoCache](#setimageinfocache)
-    *   [bringToFront](#bringtofront)
-    *   [bringToBack](#bringtoback)
     *   [getPaneName](#getpanename)
     *   [getOpacity](#getopacity)
     *   [setOpacity](#setopacity)
+    *   [resetOpacity](#resetopacity)
+    *   [getMapOpacity](#getmapopacity)
     *   [setMapOpacity](#setmapopacity)
     *   [resetMapOpacity](#resetmapopacity)
     *   [setSaturation](#setsaturation)
@@ -427,6 +435,14 @@ Send maps backward
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 
+#### bringToFront
+
+Brings the layer in front of other overlays (in the same map pane).
+
+#### bringToBack
+
+Brings the layer to the back of other overlays (in the same map pane).
+
 #### getMapZIndex
 
 Returns the z-index of a single map
@@ -457,14 +473,6 @@ Sets the image info Cache of the warpedMapList, informing it's warped maps about
 
 *   `cache` **Cache** the image info cache
 
-#### bringToFront
-
-Brings the layer in front of other overlays (in the same map pane).
-
-#### bringToBack
-
-Brings the layer to the back of other overlays (in the same map pane).
-
 #### getPaneName
 
 Gets the pane name the layer is attached to. Defaults to 'tilePane'
@@ -484,6 +492,20 @@ Sets the opacity of the layer
 ##### Parameters
 
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Layer opacity
+
+#### resetOpacity
+
+Resets the opacity of the layer to fully opaque
+
+#### getMapOpacity
+
+Gets the opacity of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** opacity of the map
 
 #### setMapOpacity
 

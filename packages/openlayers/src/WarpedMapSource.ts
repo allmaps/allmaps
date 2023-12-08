@@ -14,6 +14,12 @@ import type { Bbox, Ring } from '@allmaps/types'
 export class WarpedMapSource extends Source {
   warpedMapList: WarpedMapList
 
+  /**
+   * Creates a WarpedMapSource instance
+   *
+   * @constructor
+   * @param {Cache} [imageInfoCache] - image info cache
+   */
   constructor(imageInfoCache?: Cache) {
     super({
       interpolate: true,
@@ -33,7 +39,9 @@ export class WarpedMapSource extends Source {
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.warpedMapList.addGeoreferenceAnnotation(annotation)
+    const results = await this.warpedMapList.addGeoreferenceAnnotation(
+      annotation
+    )
     this.changed()
 
     return results
@@ -47,7 +55,9 @@ export class WarpedMapSource extends Source {
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.warpedMapList.removeGeoreferenceAnnotation(annotation)
+    const results = await this.warpedMapList.removeGeoreferenceAnnotation(
+      annotation
+    )
     this.changed()
 
     return results

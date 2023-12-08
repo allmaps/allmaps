@@ -105,8 +105,9 @@ export const WarpedMapLayer = L.Layer.extend({
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results =
-      this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
+    const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
+      annotation
+    )
     this._update()
 
     return results
@@ -122,7 +123,7 @@ export const WarpedMapLayer = L.Layer.extend({
     annotation: unknown
   ): Promise<(string | Error)[]> {
     const results =
-      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+      await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this._update()
 
     return results
@@ -372,6 +373,26 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
+   * Brings the layer in front of other overlays (in the same map pane).
+   */
+  bringToFront() {
+    if (this._map) {
+      L.DomUtil.toFront(this.container)
+    }
+    return this
+  },
+
+  /**
+   * Brings the layer to the back of other overlays (in the same map pane).
+   */
+  bringToBack() {
+    if (this._map) {
+      L.DomUtil.toBack(this.container)
+    }
+    return this
+  },
+
+  /**
    * Returns the z-index of a single map
    * @param {string} mapId - ID of the map
    * @returns {number | undefined} - z-index of the map
@@ -406,26 +427,6 @@ export const WarpedMapLayer = L.Layer.extend({
   },
 
   /**
-   * Brings the layer in front of other overlays (in the same map pane).
-   */
-  bringToFront() {
-    if (this._map) {
-      L.DomUtil.toFront(this.container)
-    }
-    return this
-  },
-
-  /**
-   * Brings the layer to the back of other overlays (in the same map pane).
-   */
-  bringToBack() {
-    if (this._map) {
-      L.DomUtil.toBack(this.container)
-    }
-    return this
-  },
-
-  /**
    * Gets the pane name the layer is attached to. Defaults to 'tilePane'
    * @returns {string} Pane name
    */
@@ -449,6 +450,24 @@ export const WarpedMapLayer = L.Layer.extend({
     this.options.opacity = opacity
     this._update()
     return this
+  },
+
+  /**
+   * Resets the opacity of the layer to fully opaque
+   */
+  resetOpacity() {
+    this.options.opacity = 1
+    this._update()
+    return this
+  },
+
+  /**
+   * Gets the opacity of a single map
+   * @param {string} mapId - ID of the map
+   * @return {number | undefined} opacity of the map
+   */
+  getMapOpacity(mapId: string): number | undefined {
+    return this.renderer.getMapOpacity(mapId)
   },
 
   /**

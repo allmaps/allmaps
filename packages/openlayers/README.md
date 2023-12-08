@@ -4,7 +4,7 @@ Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plug
 
 ## How it works
 
-This plugin creates a new class `WarpedMapLayer` which extends and behaves like a `L.Layer`. You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your OpenLayers map. This will render all Georeferenced Maps contained in the annotation (pages) on your OpenLayers map!
+This plugin creates a new class `WarpedMapLayer` which extends and behaves like a [OpenLayers Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html). You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your OpenLayers map. This will render all Georeferenced Maps contained in the annotation (pages) on your OpenLayers map!
 
 What happens under the hood for each Georeferenced Map, is, in short, the following:
 
@@ -29,13 +29,17 @@ And load using:
 import { WarpedMapLayer } from '@allmaps/openlayers'
 ```
 
-Alternatively, ESM and UMD bundled versions of the code are also provided under `/dist/bundled`. You can load them directly in a HTML script tag using a CDN.
+You can build this package using
+
+```sh
+pnpm run build
+```
+
+As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@allmaps/openlayers/dist/bundled/allmaps-openlayers-8.umd.cjs"></script>
 ```
-
-*Note: Replace the openLayer version number to the appropriate version for your use-case.*
 
 When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
 
@@ -120,7 +124,7 @@ The following events are emitted to inform you of the state of the WarpedMapLaye
 | A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
 | The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
 | The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
-| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` | `{}`                               |
+| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
 
 You can listen to them in the typical OpenLayers way. Here's an example:
 
@@ -156,6 +160,7 @@ All these map phases originating from the same Georeference Annotation have the 
 *   [WarpedMapLayer](#warpedmaplayer)
     *   [getContainer](#getcontainer)
     *   [getCanvas](#getcanvas)
+    *   [getMapOpacity](#getmapopacity)
     *   [setMapOpacity](#setmapopacity)
     *   [resetMapOpacity](#resetmapopacity)
     *   [setSaturation](#setsaturation)
@@ -234,6 +239,16 @@ Returns **[HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element)** H
 Gets the HTML canvas element of the layer
 
 Returns **([HTMLCanvasElement](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) | null)** HTML Canvas Element
+
+#### getMapOpacity
+
+Gets the opacity of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** opacity of the map
 
 #### setMapOpacity
 
@@ -341,7 +356,7 @@ Sets the colorization for a single mapID of the map
 
 #### resetMapColorize
 
-Resets the colorization of a single warped map
+Resets the colorization of a single map
 
 ##### Parameters
 
