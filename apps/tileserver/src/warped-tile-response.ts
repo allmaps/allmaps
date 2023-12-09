@@ -19,6 +19,7 @@ import type { XYZTile, Cache, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 const CHANNELS = 4
+const DEFAULT_SCALE_FACTOR_SHARPENING = 1
 
 export async function createWarpedTileResponse(
   maps: Map[],
@@ -66,7 +67,8 @@ export async function createWarpedTileResponse(
     const zoomLevel = getBestTileZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      resourceRing
+      resourceRing,
+      DEFAULT_SCALE_FACTOR_SHARPENING
     )
 
     const iiifTiles = computeTilesConveringRingAtTileZoomLevel(

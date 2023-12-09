@@ -23,7 +23,7 @@ import type { GcpTransformer } from '@allmaps/transform'
 /**
  * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
  */
-const SCALE_FACTOR_SHARPENING = 0.5
+const DEFAULT_SCALE_FACTOR_SHARPENING = 0.5
 
 // Functions for preparing to make tiles
 
@@ -51,7 +51,8 @@ export function getBestTileZoomLevel(
   // TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
   image: Image,
   canvasSize: Size,
-  resourceRing: Ring
+  resourceRing: Ring,
+  scaleFactorSharpening?: number
 ): TileZoomLevel {
   const resourceBbox = computeBbox(resourceRing)
 
@@ -65,7 +66,11 @@ export function getBestTileZoomLevel(
     resourceToCanvasScaleY
   )
 
-  return getBestTileZoomLevelForScale(image, resourceToCanvasScale)
+  return getBestTileZoomLevelForScale(
+    image,
+    resourceToCanvasScale,
+    scaleFactorSharpening
+  )
 }
 
 /**
@@ -78,7 +83,8 @@ export function getBestTileZoomLevel(
  */
 export function getBestTileZoomLevelForScale(
   image: Image,
-  resourceToCanvasScale: number
+  resourceToCanvasScale: number,
+  scaleFactorSharpening = DEFAULT_SCALE_FACTOR_SHARPENING
 ): TileZoomLevel {
   // Returning the TileZoomLevel with the scaleFactor closest to the current scale.
   //
@@ -123,7 +129,7 @@ export function getBestTileZoomLevelForScale(
   for (const tileZoomLevel of image.tileZoomLevels) {
     const diffLogScaleFactor = Math.abs(
       Math.log(tileZoomLevel.scaleFactor) -
-        (Math.log(resourceToCanvasScale) - Math.log(SCALE_FACTOR_SHARPENING))
+        (Math.log(resourceToCanvasScale) - Math.log(scaleFactorSharpening))
     )
     if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
       smallestdiffLogScaleFactor = diffLogScaleFactor
