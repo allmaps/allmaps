@@ -1,10 +1,10 @@
 import CacheableTile, { CachedTile, isCachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
+import { tileByteSize } from './shared/tiles.js'
 import FetchableMapTile from './FetchableTile.js'
 
-const MAX_HISTORY_SIZE = 20 * 1000 * 1000 // size in bites
-const MAX_HISTORY_LENGTH = 20
+const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
 
 export default class TileCache extends EventTarget {
   protected tilesByTileUrl: Map<string, CacheableTile> = new Map()
@@ -13,7 +13,8 @@ export default class TileCache extends EventTarget {
 
   protected tilesFetchingCount = 0
 
-  protected requestedTilesHistory: FetchableMapTile[] = []
+  protected previousRequestedTiles: FetchableMapTile[] = []
+  protected outgoingTilesHistory: FetchableMapTile[] = []
 
   getCacheableTile(tileUrl: string) {
     return this.tilesByTileUrl.get(tileUrl)
@@ -46,39 +47,49 @@ export default class TileCache extends EventTarget {
   }
 
   requestFetcableMapTiles(requestedTiles: FetchableMapTile[]) {
-    // Currently this function is called with fetchableMapTiles of the same map
-    // so we don't expect doubles of (mapId, tileUrl) cominations, but that could change.
-
-    // Make set of unique (mapId, tileUrl) cominations that are part of this request
+    // Make set of unique (mapId, tileUrl) keys that are part of this request
     const requestedTilesKeys = new Set(
       requestedTiles.map((fetchableMapTile) =>
         this.createKey(fetchableMapTile.mapId, fetchableMapTile.tileUrl)
       )
     )
-    // Make set of unique (mapId, tileUrl) cominations that are part of the historic requests
-    const requestedTilesHistoryKeys = new Set(
-      this.requestedTilesHistory.map((fetchableMapTile) =>
+
+    // Compute outgoing tiles by comparing requested tiles to previous requested tiles
+    const outgoingTiles = []
+    for (const requestedTile of this.previousRequestedTiles) {
+      // If the requested tiles doesn't contain the set previous requested tile's tileUrl and mapId, add the previous requested tile as outgoing tile
+      if (
+        !requestedTilesKeys.has(
+          this.createKey(requestedTile.mapId, requestedTile.tileUrl)
+        )
+      ) {
+        outgoingTiles.push(requestedTile)
+      }
+    }
+
+    // Add outgoing tiles to outgoingTilesHistory
+    this.updateOutgoingTilesHistory(outgoingTiles)
+
+    // Make set of unique (mapId, tileUrl) keys that are part of the outgoing tiles history
+    const outgoingTilesHistoryKeys = new Set(
+      this.outgoingTilesHistory.map((fetchableMapTile) =>
         this.createKey(fetchableMapTile.mapId, fetchableMapTile.tileUrl)
       )
     )
-    // Make set of unique (mapId, tileUrl) cominations that are part of this request but not of the historic requests
-    const requestedTilesAndRequestedTilesHistoryKeys = new Set([
+    // Make set of unique (mapId, tileUrl) keys that are part of one of the above
+    const requestedTilesAndOutgoingTilesHistoryKeys = new Set([
       ...requestedTilesKeys,
-      ...requestedTilesHistoryKeys
+      ...outgoingTilesHistoryKeys
     ]) // TODO: use union() when it becomes official
-    // Make set of unique (mapId, tileUrl) cominations that are new in the request compared to the historic requests
-    const requestedTilesKeysNotInHistory = Array.from(
-      requestedTilesKeys
-    ).filter((key) => !Array.from(requestedTilesHistoryKeys).includes(key))
 
-    // Remove tiles from cache if not in request (or historic request)
+    // Remove tiles from cache if not in request (or outgoing tiles history)
     // Loop over all tileUrl's in cache, and the mapId's they are for
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl) {
       for (const mapId of mapIds) {
-        // If the requests (and historic requests) tiles don't include the (mapId, tileUrl) combination of the loop
-        // remove that (mapId, tileUrl) combination from the cache
+        // If the requested tiles (or outgoing tiles history) keys don't include the (mapId, tileUrl) key of the loop
+        // remove that (mapId, tileUrl) key from the cache
         if (
-          !requestedTilesAndRequestedTilesHistoryKeys.has(
+          !requestedTilesAndOutgoingTilesHistoryKeys.has(
             this.createKey(mapId, tileUrl)
           )
         ) {
@@ -89,58 +100,49 @@ export default class TileCache extends EventTarget {
 
     // Add requested tiles if not in cache
     // Loop over all requested tiles
-    for (const fetchableMapTile of requestedTiles) {
+    for (const requestedTile of requestedTiles) {
       // If the cache doesn't contain the set tile's tileUrl and mapId, add the requested tile
       if (
         !this.mapIdsByTileUrl
-          .get(fetchableMapTile.tileUrl)
-          ?.has(fetchableMapTile.mapId)
+          .get(requestedTile.tileUrl)
+          ?.has(requestedTile.mapId)
       ) {
-        this.addMapTile(fetchableMapTile)
+        this.addMapTile(requestedTile)
       }
     }
 
-    // Update historic requests
-    const requestedTilesNotInHistory = requestedTiles.filter(
-      (fetchableMapTile) =>
-        Array.from(requestedTilesKeysNotInHistory).includes(
-          this.createKey(fetchableMapTile.mapId, fetchableMapTile.tileUrl)
-        )
-    )
-    this.updateRequestedTilesHistory(requestedTilesNotInHistory)
+    // Update previous requested tiles
+    this.previousRequestedTiles = requestedTiles
   }
 
-  updateRequestedTilesHistory(requestedTilesNotInHistory: FetchableMapTile[]) {
-    // Add fetchableMapTiles to history:
-    // adding items to the front and
-    // adding the last requested tiles first
-    // such that the first requested tiles are at the start of the array
-    for (
-      let index = requestedTilesNotInHistory.length - 1;
-      index >= 0;
-      index--
-    ) {
-      const fetchableMapTile = requestedTilesNotInHistory[index]
-      this.requestedTilesHistory.unshift(fetchableMapTile)
+  updateOutgoingTilesHistory(outgoingTiles: FetchableMapTile[]) {
+    // Add outgoing tiles to history:
+    // to keep the most relevant tiles when trimming,
+    // add the outgoing tiles are at the front of the Array
+    // and add the first tiles of this request last
+    // (since these are closest to the viewport center and hence more important)
+    for (let index = outgoingTiles.length - 1; index >= 0; index--) {
+      const fetchableMapTile = outgoingTiles[index]
+      this.outgoingTilesHistory.unshift(fetchableMapTile)
     }
+
+    // Make history unique
+    this.outgoingTilesHistory = Array.from(new Set(this.outgoingTilesHistory))
 
     // Trim history based on maximum amounts
     let count = 0
     let size = 0
-    for (const fetchableMapTile of this.requestedTilesHistory) {
+    for (const fetchableMapTile of this.outgoingTilesHistory) {
       count += 1
-      size +=
-        (fetchableMapTile.imageRequest.size?.height || 0) *
-        (fetchableMapTile.imageRequest.size?.width || 0) *
-        3 // RBG, so 3 values per pixel
-      if (count >= MAX_HISTORY_LENGTH) {
-        break
-      }
+      size += tileByteSize(fetchableMapTile)
+      // if (count >= MAX_HISTORY_LENGTH) {
+      //   break
+      // }
       if (size >= MAX_HISTORY_SIZE) {
         break
       }
     }
-    this.requestedTilesHistory = this.requestedTilesHistory.slice(0, count)
+    this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
   }
 
   clear() {
@@ -148,7 +150,7 @@ export default class TileCache extends EventTarget {
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.tilesFetchingCount = 0
-    this.requestedTilesHistory = []
+    this.outgoingTilesHistory = []
   }
 
   dispose() {

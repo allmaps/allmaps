@@ -5,6 +5,8 @@ import {
   bboxToCenter,
   distance
 } from '@allmaps/stdlib'
+import FetchableMapTile from '../FetchableTile'
+import CacheableTile from '../CacheableTile'
 
 import type {
   Point,
@@ -263,6 +265,16 @@ function tilesByColumnToTiles(
   }
 
   return tiles
+}
+
+// Computations
+
+export function tileByteSize(tile: FetchableMapTile | CacheableTile): number {
+  return (
+    (tile.imageRequest.size?.height || 0) *
+    (tile.imageRequest.size?.width || 0) *
+    3 // RBG, so 3 values per pixel
+  )
 }
 
 // Geometric computations
