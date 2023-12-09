@@ -17,6 +17,12 @@ import {
   getBestTileZoomLevelForScale as getBestTileZoomLevel,
   computeTilesConveringRingAtTileZoomLevel
 } from './shared/tiles.js'
+import {
+  createTransform,
+  multiplyTransform,
+  invertTransform,
+  transformToMatrix4
+} from './shared/matrix.js'
 import { createShader, createProgram } from './shared/webgl2.js'
 
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
@@ -30,6 +36,8 @@ import {
 
 import type { DebouncedFunc } from 'lodash-es'
 
+import type { Transform } from '@allmaps/types'
+
 import type Viewport from './Viewport.js'
 
 import type {
@@ -37,16 +45,6 @@ import type {
   RemoveColorOptions,
   ColorizeOptions
 } from './shared/types.js'
-
-// Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
-//
-// import {
-//   createTransform,
-//   multiplyTransform,
-//   invertTransform,
-//   transformToMatrix4
-// } from './shared/matrix.js'
-// import type { Transform } from '@allmaps/types'
 
 const THROTTLE_WAIT_MS = 50
 const THROTTLE_OPTIONS = {
@@ -86,9 +84,7 @@ export default class WebGL2Renderer extends EventTarget {
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
-  // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
-  //
-  // invertedRenderTransform: Transform
+  invertedRenderTransform: Transform
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
@@ -126,9 +122,7 @@ export default class WebGL2Renderer extends EventTarget {
 
     gl.disable(gl.DEPTH_TEST)
 
-    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
-    //
-    // this.invertedRenderTransform = createTransform()
+    this.invertedRenderTransform = createTransform()
 
     this.addEventListeners()
 
@@ -436,6 +430,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private prepareRenderInternal(): void {
+    this.updateVertexBuffers()
     this.updateRequestedTiles()
   }
 
@@ -444,11 +439,9 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
-    //
-    // this.invertedRenderTransform = invertTransform(
-    //   this.viewport.projectedGeoToClipTransform
-    // )
+    this.invertedRenderTransform = invertTransform(
+      this.viewport.projectedGeoToClipTransform
+    )
 
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
@@ -475,6 +468,8 @@ export default class WebGL2Renderer extends EventTarget {
     const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
+
+    let anyBestScaleFactorUpdate = false
 
     const requestedTiles: FetchableMapTile[] = []
     for (const mapId of possibleMapsInViewport) {
@@ -513,7 +508,11 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
+      const bestScaleFactorUpdate = warpedMap.updateBestScaleFactor(
+        tileZoomLevel.scaleFactor
+      )
+      anyBestScaleFactorUpdate =
+        anyBestScaleFactorUpdate || bestScaleFactorUpdate
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
@@ -534,6 +533,9 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
+    if (anyBestScaleFactorUpdate) {
+      this.updateVertexBuffers()
+    }
     this.tileCache.requestFetcableMapTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
 
@@ -622,20 +624,16 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    this.updateVertexBuffers()
-
-    // Keeping this here to reactivate in case the call to updateVertexBuffers() moves back to prepareRenderInternal()
-    //
     // renderTransform is the product of:
     // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
     // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
     // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
     // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
     // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
-    // const renderTransform = multiplyTransform(
-    //   this.viewport.projectedGeoToClipTransform,
-    //   this.invertedRenderTransform
-    // )
+    const renderTransform = multiplyTransform(
+      this.viewport.projectedGeoToClipTransform,
+      this.invertedRenderTransform
+    )
 
     const gl = this.gl
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
@@ -647,15 +645,15 @@ export default class WebGL2Renderer extends EventTarget {
 
     // Render Transform
 
-    // const renderTransformLocation = gl.getUniformLocation(
-    //   this.program,
-    //   'u_renderTransform'
-    // )
-    // gl.uniformMatrix4fv(
-    //   renderTransformLocation,
-    //   false,
-    //   transformToMatrix4(renderTransform)
-    // )
+    const renderTransformLocation = gl.getUniformLocation(
+      this.program,
+      'u_renderTransform'
+    )
+    gl.uniformMatrix4fv(
+      renderTransformLocation,
+      false,
+      transformToMatrix4(renderTransform)
+    )
 
     // Animation Progress
 

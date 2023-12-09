@@ -153,6 +153,8 @@ export default class WebGL2WarpedMap {
   }
 
   private updateTextures() {
+    this.updateVertexBuffersInternal()
+
     const gl = this.gl
 
     if (this.CachedTilesByTileUrl.size === 0) {

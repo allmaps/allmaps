@@ -116,7 +116,7 @@ export default class WarpedMap {
     // Triangulating before rendering is not strictly necessary
     // But creating the triangulation on the highest zoom level once assures the vertex buffers are long enough
     // TODO: Could this be simplified?
-    this.setBestScaleFactor(1)
+    this.updateBestScaleFactor(1)
   }
 
   getViewportMask(viewport: Viewport): Ring {
@@ -186,10 +186,13 @@ export default class WarpedMap {
     )
   }
 
-  setBestScaleFactor(scaleFactor: number) {
+  updateBestScaleFactor(scaleFactor: number): boolean {
     if (this.bestScaleFactor != scaleFactor) {
       this.bestScaleFactor = scaleFactor
       this.updateTriangulation(true)
+      return true
+    } else {
+      return false
     }
   }
 
