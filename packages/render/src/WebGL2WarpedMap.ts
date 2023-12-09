@@ -5,6 +5,7 @@ import { throttle } from 'lodash-es'
 import { isOverlapping } from '@allmaps/stdlib'
 
 import WarpedMap from './WarpedMap.js'
+import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { computeBboxTile } from './shared/tiles.js'
 import { applyTransform } from './shared/matrix.js'
 import { createBuffer } from './shared/webgl2.js'
@@ -16,9 +17,9 @@ import type { Transform } from '@allmaps/types'
 import type { CachedTile } from './CacheableTile.js'
 import type { RenderOptions } from './shared/types.js'
 
-const THROTTLE_WAIT_MS = 50
+const THROTTLE_WAIT_MS = 250
 const THROTTLE_OPTIONS = {
-  leading: true,
+  leading: false,
   trailing: true
 }
 
@@ -27,7 +28,7 @@ const DEFAULT_SATURATION = 1
 
 // const MAX_SCALE_FACTOR_DIFFERENCE = 2
 
-export default class WebGL2WarpedMap {
+export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
 
   gl: WebGL2RenderingContext
@@ -55,6 +56,8 @@ export default class WebGL2WarpedMap {
     program: WebGLProgram,
     warpedMap: WarpedMap
   ) {
+    super()
+
     this.warpedMap = warpedMap
 
     this.gl = gl
@@ -153,8 +156,6 @@ export default class WebGL2WarpedMap {
   }
 
   private updateTextures() {
-    this.updateVertexBuffersInternal()
-
     const gl = this.gl
 
     if (this.CachedTilesByTileUrl.size === 0) {
@@ -324,5 +325,7 @@ export default class WebGL2WarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
   }
 }

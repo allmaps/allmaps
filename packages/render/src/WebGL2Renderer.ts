@@ -1,4 +1,4 @@
-import { throttle, debounce } from 'lodash-es'
+import { throttle } from 'lodash-es'
 
 import TileCache from './TileCache.js'
 import FetchableMapTile from './FetchableTile.js'
@@ -51,11 +51,6 @@ const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
 }
-const DEBOUNCE_WAIT_MS = 100
-const DEBOUNCE_OPTIONS = {
-  leading: false,
-  trailing: true
-}
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -94,9 +89,6 @@ export default class WebGL2Renderer extends EventTarget {
   private throttledPrepareRenderInternal: DebouncedFunc<
     typeof this.prepareRenderInternal
   >
-  private debouncedRenderInternal: DebouncedFunc<
-    typeof this.prepareRenderInternal
-  >
 
   constructor(gl: WebGL2RenderingContext, warpedMapList: WarpedMapList) {
     super()
@@ -130,12 +122,6 @@ export default class WebGL2Renderer extends EventTarget {
       this.prepareRenderInternal.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
-    )
-
-    this.debouncedRenderInternal = debounce(
-      this.renderInternal.bind(this),
-      DEBOUNCE_WAIT_MS,
-      DEBOUNCE_OPTIONS
     )
   }
 
@@ -290,9 +276,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.viewport = viewport
     this.throttledPrepareRenderInternal()
     this.renderInternal()
-    // The reason why this debounced function is needed is unclear.
-    // Maybe because textures are not ready when the CHANGED event is emitted in mapTileLoaded.
-    this.debouncedRenderInternal()
   }
 
   clear() {
@@ -303,8 +286,9 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   dispose() {
-    for (const warpedMapWebGLRenderer of this.webgl2WarpedMapsById.values()) {
-      warpedMapWebGLRenderer.dispose()
+    for (const webgl2warpedMap of this.webgl2WarpedMapsById.values()) {
+      this.removeEventListenersFromWebGL2WarpedMap(webgl2warpedMap)
+      webgl2warpedMap.dispose()
     }
 
     this.tileCache.clear()
@@ -430,8 +414,8 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   private prepareRenderInternal(): void {
-    this.updateVertexBuffers()
     this.updateRequestedTiles()
+    this.updateVertexBuffers()
   }
 
   private updateVertexBuffers() {
@@ -468,8 +452,6 @@ export default class WebGL2Renderer extends EventTarget {
     const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
       this.viewport.projectedGeoBbox
     )
-
-    let anyBestScaleFactorUpdate = false
 
     const requestedTiles: FetchableMapTile[] = []
     for (const mapId of possibleMapsInViewport) {
@@ -508,11 +490,7 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      const bestScaleFactorUpdate = warpedMap.updateBestScaleFactor(
-        tileZoomLevel.scaleFactor
-      )
-      anyBestScaleFactorUpdate =
-        anyBestScaleFactorUpdate || bestScaleFactorUpdate
+      warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
@@ -533,9 +511,6 @@ export default class WebGL2Renderer extends EventTarget {
       }
     }
 
-    if (anyBestScaleFactorUpdate) {
-      this.updateVertexBuffers()
-    }
     this.tileCache.requestFetcableMapTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
 
@@ -906,6 +881,7 @@ export default class WebGL2Renderer extends EventTarget {
           warpedMap
         )
         this.webgl2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
+        this.addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
       }
     }
   }
@@ -934,5 +910,25 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.updateTriangulation(false)
       }
     }
+  }
+
+  private texturesUpdated() {
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+  }
+
+  private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
+    webgl2WarpedMap.addEventListener(
+      WarpedMapEventType.TEXTURESUPDATED,
+      this.texturesUpdated.bind(this)
+    )
+  }
+
+  private removeEventListenersFromWebGL2WarpedMap(
+    webgl2WarpedMap: WebGL2WarpedMap
+  ) {
+    webgl2WarpedMap.removeEventListener(
+      WarpedMapEventType.TEXTURESUPDATED,
+      this.texturesUpdated.bind(this)
+    )
   }
 }

@@ -18,6 +18,8 @@ export enum WarpedMapEventType {
   FIRSTMAPTILELOADED = 'firstmaptileloaded',
   ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
 
+  TEXTURESUPDATED = 'texturesupdated',
+
   // TODO: Maybe have one OPTIONSCHANGED event?
   ZINDICESCHANGES = 'zindiceschanged',
   RESOURCEMASKUPDATED = 'resourcemaskupdated',
