@@ -47,6 +47,14 @@ export default class TileCache extends EventTarget {
   }
 
   requestFetcableMapTiles(requestedTiles: FetchableMapTile[]) {
+    // If previous requested tiles is the same as current, don't do anything
+    if (
+      JSON.stringify(this.previousRequestedTiles) ===
+      JSON.stringify(requestedTiles)
+    ) {
+      return
+    }
+
     // Make set of unique (mapId, tileUrl) keys that are part of this request
     const requestedTilesKeys = new Set(
       requestedTiles.map((fetchableMapTile) =>
