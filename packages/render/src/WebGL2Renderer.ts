@@ -513,11 +513,6 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.tileCache.requestFetcableMapTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
-
-    // Update textures also when viewport changes, to makes textures lighter if possible.
-    for (const mapId of this.mapsInViewport) {
-      this.webgl2WarpedMapsById.get(mapId)?.throttledUpdateTextures()
-    }
   }
 
   private viewportMovedSignificantly(): boolean {
