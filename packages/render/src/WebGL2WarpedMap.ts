@@ -25,7 +25,7 @@ const THROTTLE_OPTIONS = {
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
-const MAX_SCALE_FACTOR_DIFFERENCE = 1
+// const MAX_SCALE_FACTOR_DIFFERENCE = 2
 
 export default class WebGL2WarpedMap {
   warpedMap: WarpedMap
@@ -171,14 +171,14 @@ export default class WebGL2WarpedMap {
           )
         : true
     })
-    cachedTiles = cachedTiles.filter((cachedTile) => {
-      return (
-        Math.abs(
-          cachedTile.tile.tileZoomLevel.scaleFactor -
-            this.warpedMap.bestScaleFactor
-        ) <= MAX_SCALE_FACTOR_DIFFERENCE
-      )
-    })
+    // cachedTiles = cachedTiles.filter((cachedTile) => {
+    //   return (
+    //     Math.abs(
+    //       cachedTile.tile.tileZoomLevel.scaleFactor -
+    //         this.warpedMap.bestScaleFactor
+    //     ) <= MAX_SCALE_FACTOR_DIFFERENCE
+    //   )
+    // })
 
     const CachedTilesByTileUrlCount = cachedTiles.length
 
