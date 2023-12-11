@@ -50,8 +50,7 @@
         $activeMap.viewerMap.mapId
       )
       if (warpedMap) {
-        const bbox = computeBbox(warpedMap.geoMask.coordinates[0])
-        mapOl.getView().fit(bbox, {
+        mapOl.getView().fit(warpedMap.projectedGeoMaskBbox, {
           duration: 200,
           padding: [25, 25, 25, 25]
         })

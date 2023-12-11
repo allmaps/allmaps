@@ -262,7 +262,7 @@ export async function removeMap(map: Georef) {
 export function addMapToVectorSource(mapId: string) {
   const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
   if (warpedMap) {
-    const geoMask = warpedMap.geoMask
+    const geoMask = warpedMap.projectedGeoMask
     const feature = new GeoJSON().readFeature(geoMask) as Feature
     feature.setId(warpedMap.mapId)
 

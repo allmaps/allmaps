@@ -59,7 +59,6 @@
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.resource.id
   const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
-  const geoMask = warpedMap?.geoMask
 
   const checkboxId = `dropdown-maps-${mapId}`
 
@@ -348,13 +347,13 @@
             href="https://annotations.allmaps.org/maps/{mapId}">new tab</a
           >,
 
-          {#if geoMask}
+          {#if warpedMap?.geoMask}
             <a
               class="underline"
               target="_blank"
               rel="noreferrer"
               href="http://geojson.io/#data=data:application/json,{encodeURIComponent(
-                JSON.stringify(geoMask)
+                JSON.stringify(warpedMap.geoMask)
               )}">geojson.io</a
             >,
           {/if}
