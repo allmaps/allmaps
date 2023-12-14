@@ -1,5 +1,3 @@
-import { applyTransform } from './shared/matrix.js'
-
 import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
@@ -16,7 +14,8 @@ import {
   mixPoints
 } from '@allmaps/stdlib'
 
-import type Viewport from './Viewport.js'
+import { applyTransform } from './shared/matrix.js'
+import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import type { Point, Gcp, Ring, Bbox, GeojsonPolygon } from '@allmaps/types'
 import type {
@@ -24,10 +23,19 @@ import type {
   PartialTransformOptions
 } from '@allmaps/transform'
 
-// TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 80
+import type Viewport from './Viewport.js'
 
-export default class WarpedMap {
+const DIAMETER_FRACTION = 80 // TODO: Consider making this tunable by the user.
+const TRANSFORMER_OPTIONS = {
+  maxOffsetRatio: 0.01,
+  maxDepth: 2
+} as PartialTransformOptions
+const PROJECTED_TRANSFORMER_OPTIONS = {
+  maxOffsetRatio: 0.01, // TODO: make this dependant on projectedGeoPerViewportScale at viewport?
+  maxDepth: 2
+} as PartialTransformOptions
+
+export default class WarpedMap extends EventTarget {
   mapId: string
   georeferencedMap: GeoreferencedMap
 
@@ -48,7 +56,6 @@ export default class WarpedMap {
   transformationType: TransformationType
   transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
-  transformOptions: PartialTransformOptions
 
   geoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
@@ -78,6 +85,8 @@ export default class WarpedMap {
     imageInfoCache?: Cache,
     visible = true
   ) {
+    super()
+
     this.mapId = mapId
     this.georeferencedMap = georeferencedMap
 
@@ -106,17 +115,8 @@ export default class WarpedMap {
 
     this.transformationType =
       this.georeferencedMap.transformation?.type || 'polynomial'
-    this.transformOptions = {
-      maxOffsetRatio: 0.01,
-      maxDepth: 6
-    }
 
     this.updateTransformerProperties()
-
-    // Triangulating before rendering is not strictly necessary
-    // But creating the triangulation on the highest zoom level once assures the vertex buffers are long enough
-    // TODO: Could this be simplified?
-    this.updateBestScaleFactor(1)
   }
 
   getViewportMask(viewport: Viewport): Ring {
@@ -186,6 +186,27 @@ export default class WarpedMap {
     )
   }
 
+  setResourceViewportRing(resourceViewportRing: Ring) {
+    this.resourceViewportRing = resourceViewportRing
+    this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
+  }
+
+  setResourceMask(resourceMask: Ring): void {
+    this.resourceMask = resourceMask
+    this.updateGeoMask()
+    this.updateProjectedGeoMask()
+  }
+
+  setTransformationType(transformationType: TransformationType): void {
+    this.transformationType = transformationType
+    this.updateTransformerProperties()
+  }
+
+  setGcps(gcps: Gcp[]): void {
+    this.gcps = gcps
+    this.updateTransformerProperties()
+  }
+
   updateBestScaleFactor(scaleFactor: number): boolean {
     if (this.bestScaleFactor != scaleFactor) {
       this.bestScaleFactor = scaleFactor
@@ -194,11 +215,6 @@ export default class WarpedMap {
     } else {
       return false
     }
-  }
-
-  setResourceViewportRing(resourceViewportRing: Ring) {
-    this.resourceViewportRing = resourceViewportRing
-    this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
   }
 
   updateTriangulation(currentIsNew = false) {
@@ -225,18 +241,26 @@ export default class WarpedMap {
       )
     }
 
-    this.updateProjectedGeo(currentIsNew)
+    this.updateProjectedGeoTrianglePoints(currentIsNew)
   }
 
-  updateProjectedGeo(currentIsNew = false) {
+  updateProjectedGeoTrianglePoints(currentIsNew = false) {
     this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-      (point) => this.projectedTransformer.transformToGeo(point as Point)
+      (point) => this.projectedTransformer.transformToGeo(point as Point) // Not passing options because not relevant for points
     )
 
     if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
       this.projectedGeoCurrentTrianglePoints =
         this.projectedGeoNewTrianglePoints
     }
+  }
+
+  resetCurrentTrianglePoints() {
+    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
+  }
+
+  clearResourceTrianglePointsByBestScaleFactor() {
+    this.resourceTrianglePointsByBestScaleFactor = new Map()
   }
 
   mixCurrentTrianglePoints(t: number) {
@@ -250,37 +274,15 @@ export default class WarpedMap {
       })
   }
 
-  resetCurrentTrianglePoints() {
-    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
-  }
-
-  setResourceMask(resourceMask: Ring): void {
-    this.resourceMask = resourceMask
-    this.updateGeoMask()
-    this.updateProjectedGeoMask()
-  }
-
-  setTransformationType(transformationType: TransformationType): void {
-    this.transformationType = transformationType
-    this.updateTransformerProperties()
-  }
-
-  setGcps(gcps: Gcp[]): void {
-    this.gcps = gcps
-    this.updateTransformerProperties()
-  }
-
-  clearResourceTrianglePointsByBestScaleFactor() {
-    this.resourceTrianglePointsByBestScaleFactor = new Map()
-  }
-
-  async completeImageInfo(): Promise<void> {
+  async loadImageInfo(): Promise<void> {
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
       cache: this.imageInfoCache
     })
     this.parsedImage = IIIFImage.parse(imageInfoJson)
     this.imageId = await generateId(imageUri)
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
   }
 
   dispose() {
@@ -313,7 +315,7 @@ export default class WarpedMap {
   private updateGeoMask(): void {
     this.geoMask = this.transformer.transformForwardAsGeojson(
       [this.resourceMask],
-      this.transformOptions
+      TRANSFORMER_OPTIONS
     )
     this.geoMaskBbox = computeBbox(this.geoMask)
   }
@@ -321,7 +323,7 @@ export default class WarpedMap {
   private updateFullGeoMask(): void {
     this.geoFullMask = this.transformer.transformForwardAsGeojson(
       [this.resourceFullMask],
-      this.transformOptions
+      TRANSFORMER_OPTIONS
     )
     this.geoFullMaskBbox = computeBbox(this.geoFullMask)
   }
@@ -329,7 +331,7 @@ export default class WarpedMap {
   private updateProjectedGeoMask(): void {
     this.projectedGeoMask = this.projectedTransformer.transformForwardAsGeojson(
       [this.resourceMask],
-      this.transformOptions
+      PROJECTED_TRANSFORMER_OPTIONS
     )
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
   }
@@ -338,7 +340,7 @@ export default class WarpedMap {
     this.projectedGeoFullMask =
       this.projectedTransformer.transformForwardAsGeojson(
         [this.resourceFullMask],
-        this.transformOptions
+        PROJECTED_TRANSFORMER_OPTIONS
       )
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
   }

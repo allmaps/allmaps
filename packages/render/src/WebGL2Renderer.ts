@@ -14,7 +14,7 @@ import {
 } from './shared/events.js'
 import {
   geoBboxToResourceRing,
-  getBestTileZoomLevelForScale as getBestTileZoomLevel,
+  getBestTileZoomLevelForScale,
   computeTilesConveringRingAtTileZoomLevel
 } from './shared/tiles.js'
 import {
@@ -46,8 +46,14 @@ import type {
   ColorizeOptions
 } from './shared/types.js'
 
-const THROTTLE_WAIT_MS = 50
-const THROTTLE_OPTIONS = {
+const THROTTLE_PREPARE_WAIT_MS = 500
+const THROTTLE_PREPARE_OPTIONS = {
+  leading: true,
+  trailing: true
+}
+
+const THROTTLE_CHANGED_WAIT_MS = 50
+const THROTTLE_CHANGED_OPTIONS = {
   leading: true,
   trailing: true
 }
@@ -90,6 +96,8 @@ export default class WebGL2Renderer extends EventTarget {
     typeof this.prepareRenderInternal
   >
 
+  private throttledChanged: DebouncedFunc<typeof this.changed>
+
   constructor(gl: WebGL2RenderingContext, warpedMapList: WarpedMapList) {
     super()
 
@@ -120,8 +128,14 @@ export default class WebGL2Renderer extends EventTarget {
 
     this.throttledPrepareRenderInternal = throttle(
       this.prepareRenderInternal.bind(this),
-      THROTTLE_WAIT_MS,
-      THROTTLE_OPTIONS
+      THROTTLE_PREPARE_WAIT_MS,
+      THROTTLE_PREPARE_OPTIONS
+    )
+
+    this.throttledChanged = throttle(
+      this.changed.bind(this),
+      THROTTLE_CHANGED_WAIT_MS,
+      THROTTLE_CHANGED_OPTIONS
     )
   }
 
@@ -301,80 +315,6 @@ export default class WebGL2Renderer extends EventTarget {
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
-  private addEventListeners() {
-    this.addEventListener(
-      WarpedMapEventType.IMAGEINFONEEDED,
-      this.imageInfoNeeded.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.CLEARED,
-      this.clear.bind(this)
-    )
-  }
-
-  private removeEventListeners() {
-    this.removeEventListener(
-      WarpedMapEventType.IMAGEINFONEEDED,
-      this.imageInfoNeeded.bind(this)
-    )
-
-    this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
-    )
-
-    this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.CLEARED,
-      this.clear.bind(this)
-    )
-  }
-
   private startTransformationTransition() {
     if (this.lastAnimationFrameRequestId !== undefined) {
       cancelAnimationFrame(this.lastAnimationFrameRequestId)
@@ -467,9 +407,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       // Get warped map image info if lacking
       if (!hasImageInfo(warpedMap)) {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.IMAGEINFONEEDED, mapId)
-        )
+        warpedMap.loadImageInfo()
         continue
       }
 
@@ -485,16 +423,24 @@ export default class WebGL2Renderer extends EventTarget {
       // Note the equivalence of the following two:
       // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
       // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
-      const tileZoomLevel = getBestTileZoomLevel(
+      const tileZoomLevel = getBestTileZoomLevelForScale(
         warpedMap.parsedImage,
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
       warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
 
+      // Transforming the viewport back to resource expensive
+      // To lower the effort, reduct the requred precision based on the current viewport scale
+      const projectedTransformerOptions = {
+        maxOffsetRatio: 1 * this.viewport.projectedGeoPerViewportScale,
+        maxDepth: 2
+      }
+
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox
+        this.viewport.projectedGeoBbox,
+        projectedTransformerOptions
       )
 
       warpedMap.setResourceViewportRing(resourceViewportRing)
@@ -551,6 +497,7 @@ export default class WebGL2Renderer extends EventTarget {
 
   private updateMapsInViewport(tiles: FetchableMapTile[]) {
     // TODO: handle everything as Set() once JS supports filter on sets.
+    // And speed up with annonymous functions with the Set.prototype.difference() once broadly supported
     const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
     const newMapsInViewportAsArray = tiles
       .map((tile) => tile.mapId)
@@ -812,16 +759,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private async imageInfoNeeded(event: Event) {
+  private changed() {
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+  }
+
+  private imageInfoLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (!warpedMap) {
-        return
-      }
-
-      await warpedMap.completeImageInfo()
-
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
     }
   }
@@ -845,8 +788,6 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       webgl2WarpedMap.addCachedTileAndUpdateTextures(tile)
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
   }
 
@@ -860,8 +801,6 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       webgl2WarpedMap.removeCachedTileAndUpdateTextures(tileUrl)
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     }
   }
 
@@ -888,7 +827,7 @@ export default class WebGL2Renderer extends EventTarget {
         if (this.animating) {
           warpedMap.mixCurrentTrianglePoints(this.animationProgress)
         }
-        warpedMap.updateProjectedGeo(false)
+        warpedMap.updateProjectedGeoTrianglePoints(false)
       }
 
       this.updateVertexBuffers()
@@ -907,14 +846,10 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private texturesUpdated() {
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
-  }
-
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
-      this.texturesUpdated.bind(this)
+      this.throttledChanged.bind(this)
     )
   }
 
@@ -923,7 +858,81 @@ export default class WebGL2Renderer extends EventTarget {
   ) {
     webgl2WarpedMap.removeEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
-      this.texturesUpdated.bind(this)
+      this.throttledChanged.bind(this)
+    )
+  }
+
+  private addEventListeners() {
+    this.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.mapTileLoaded.bind(this)
+    )
+
+    this.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILEREMOVED,
+      this.mapTileRemoved.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.imageInfoLoaded.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.warpedMapAdded.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.CLEARED,
+      this.clear.bind(this)
+    )
+  }
+
+  private removeEventListeners() {
+    this.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.mapTileLoaded.bind(this)
+    )
+
+    this.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILEREMOVED,
+      this.mapTileRemoved.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.imageInfoLoaded.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.warpedMapAdded.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.TRANSFORMATIONCHANGED,
+      this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.RESOURCEMASKUPDATED,
+      this.resourceMaskUpdated.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.CLEARED,
+      this.clear.bind(this)
     )
   }
 }

@@ -4,6 +4,7 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 import { tileByteSize } from './shared/tiles.js'
 import FetchableMapTile from './FetchableTile.js'
 
+const MAX_HISTORY_TOTAL_COUNT = 0
 const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
 
 export default class TileCache extends EventTarget {
@@ -76,7 +77,7 @@ export default class TileCache extends EventTarget {
     }
 
     // Add outgoing tiles to outgoingTilesHistory
-    this.updateOutgoingTilesHistory(outgoingTiles)
+    this.updateOutgoingTilesHistory(outgoingTiles, requestedTiles.length)
 
     // Make set of unique (mapId, tileUrl) keys that are part of the outgoing tiles history
     const outgoingTilesHistoryKeys = new Set(
@@ -123,7 +124,10 @@ export default class TileCache extends EventTarget {
     this.previousRequestedTiles = requestedTiles
   }
 
-  updateOutgoingTilesHistory(outgoingTiles: FetchableMapTile[]) {
+  updateOutgoingTilesHistory(
+    outgoingTiles: FetchableMapTile[],
+    requestCount: number
+  ) {
     // Add outgoing tiles to history:
     // to keep the most relevant tiles when trimming,
     // add the outgoing tiles are at the front of the Array
@@ -140,16 +144,20 @@ export default class TileCache extends EventTarget {
     // Trim history based on maximum amounts
     let count = 0
     let size = 0
+    let lastSize = 0
     for (const fetchableMapTile of this.outgoingTilesHistory) {
       count += 1
-      size += tileByteSize(fetchableMapTile)
-      // if (count >= MAX_HISTORY_LENGTH) {
-      //   break
-      // }
+      lastSize = tileByteSize(fetchableMapTile)
+      size += lastSize
+      if (count + requestCount >= MAX_HISTORY_TOTAL_COUNT) {
+        break
+      }
       if (size >= MAX_HISTORY_SIZE) {
         break
       }
     }
+    count -= 1
+    size -= lastSize
     this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
   }
 

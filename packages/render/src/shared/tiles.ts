@@ -18,7 +18,10 @@ import type {
   TileZoomLevel,
   TileByColumn
 } from '@allmaps/types'
-import type { GcpTransformer } from '@allmaps/transform'
+import type {
+  GcpTransformer,
+  PartialTransformOptions
+} from '@allmaps/transform'
 
 /**
  * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
@@ -29,7 +32,11 @@ const DEFAULT_SCALE_FACTOR_SHARPENING = 0.5
 
 export function geoBboxToResourceRing(
   transformer: GcpTransformer,
-  geoBbox: Bbox
+  geoBbox: Bbox,
+  transformerOptions = {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 2
+  } as PartialTransformOptions
 ): Ring {
   // TODO: this function could be moved elsewhere because not stricktly about tiles
   //
@@ -38,11 +45,16 @@ export function geoBboxToResourceRing(
   // 'geoBboxResourceRing' is a ring of this Bbox, transformed backward to resource coordinates.
   // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
 
+  // TODO: Consider to specify sourceIsGeographic and destinationIsGeographic options.
+  // The results could be more accurate when we specify {sourceIsGeographic: false, destinationIsGeographic: true)
+  // But then all locations calling this function should do that with a normal transformer (resource as cartesian to geo as lon-lat) and not a projected transformer (resource as cartesian to projectedGeo as cartesian)
+  // Currently this function is used with a normal transformer in @allmaps/tileserver, and with a projected transformer in @allmaps/render
+
   const geoBboxRing = bboxToPolygon(geoBbox)[0]
-  const geoBboxResourceRing = transformer.transformBackward(geoBboxRing, {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  }) as Ring
+  const geoBboxResourceRing = transformer.transformBackward(
+    geoBboxRing,
+    transformerOptions
+  ) as Ring
 
   return geoBboxResourceRing
 }

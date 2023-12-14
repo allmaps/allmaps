@@ -288,6 +288,20 @@ export default class WarpedMapList extends EventTarget {
     return results
   }
 
+  clear(): void {
+    this.warpedMapsById = new Map()
+    this.zIndices = new Map()
+    this.rtree?.clear()
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
+  }
+
+  dispose() {
+    for (const warpedMap of this.getWarpedMaps()) {
+      this.removeEventListenersFromWarpedMap(warpedMap)
+      warpedMap.dispose()
+    }
+  }
+
   private async addGeoreferencedMapInternal(
     georeferencedMap: GeoreferencedMap
   ): Promise<string> {
@@ -300,6 +314,7 @@ export default class WarpedMapList extends EventTarget {
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
     this.addToOrUpdateRtree(warpedMap)
+    this.addEventListenersToWarpedMap(warpedMap)
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
     )
@@ -359,10 +374,21 @@ export default class WarpedMapList extends EventTarget {
     }
   }
 
-  clear(): void {
-    this.warpedMapsById = new Map()
-    this.zIndices = new Map()
-    this.rtree?.clear()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
+  private imageInfoLoaded() {
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+  }
+
+  private addEventListenersToWarpedMap(warpedMap: WarpedMap) {
+    warpedMap.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.imageInfoLoaded.bind(this)
+    )
+  }
+
+  private removeEventListenersFromWarpedMap(warpedMap: WarpedMap) {
+    warpedMap.removeEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.imageInfoLoaded.bind(this)
+    )
   }
 }

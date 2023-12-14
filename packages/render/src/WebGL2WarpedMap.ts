@@ -19,7 +19,7 @@ import type { RenderOptions } from './shared/types.js'
 
 const THROTTLE_WAIT_MS = 250
 const THROTTLE_OPTIONS = {
-  leading: false,
+  leading: true,
   trailing: true
 }
 
@@ -155,7 +155,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangleIndex')
   }
 
-  private updateTextures() {
+  private async updateTextures() {
     const gl = this.gl
 
     if (this.CachedTilesByTileUrl.size === 0) {
