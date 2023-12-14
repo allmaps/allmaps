@@ -63,7 +63,11 @@ A first way to add an annotation to a WarpedMapLayer is to specify the annotatio
 import { WarpedMapLayer } from '@allmaps/leaflet'
 
 // Leaflet map with OSM base layer
-const map = L.map('map').setView([42.35921, -71.05882], 13)
+const map = L.map('map', {
+        center: [42.35921, -71.05882],
+        zoom: 14,
+        zoomAnimationThreshold: 1 // Zoom animations for more then one zoomlevel are not supported
+      });
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

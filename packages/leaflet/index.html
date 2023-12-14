@@ -37,7 +37,11 @@
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
-      const map = L.map('map').setView([42.35921, -71.05882], 14)
+      const map = L.map('map', {
+        center: [42.35921, -71.05882],
+        zoom: 14,
+        zoomAnimationThreshold: 1 // Zoom animations for more then one zoomlevel are not supported
+      });
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
