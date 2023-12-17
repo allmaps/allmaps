@@ -27,11 +27,11 @@ import type Viewport from './Viewport.js'
 
 const DIAMETER_FRACTION = 80 // TODO: Consider making this tunable by the user.
 const TRANSFORMER_OPTIONS = {
-  maxOffsetRatio: 0.01,
+  maxOffsetRatio: 0.05,
   maxDepth: 2
 } as PartialTransformOptions
 const PROJECTED_TRANSFORMER_OPTIONS = {
-  maxOffsetRatio: 0.01, // TODO: make this dependant on projectedGeoPerViewportScale at viewport?
+  maxOffsetRatio: 0.05,
   maxDepth: 2
 } as PartialTransformOptions
 
@@ -69,7 +69,9 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  bestScaleFactor!: number // At current viewport
+  // The properties below are for the current viewport
+
+  bestScaleFactor!: number
   resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
 
   resourceViewportRing: Ring = [] // At current viewport

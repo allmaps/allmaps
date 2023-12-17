@@ -185,6 +185,13 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     const CachedTilesByTileUrlCount = cachedTiles.length
 
+    // console.log(
+    //   'from',
+    //   this.CachedTilesByTileUrl.size,
+    //   'packing',
+    //   CachedTilesByTileUrlCount
+    // )
+
     const packedTiles = cachedTiles.map((cachedTile, index) => ({
       w: cachedTile.imageBitmap.width,
       h: cachedTile.imageBitmap.height,

@@ -1,4 +1,7 @@
-export function equalArray<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
+export function equalArray<T>(
+  arr1: Array<T> | null,
+  arr2: Array<T> | null
+): boolean {
   if (!arr1 || !arr2) {
     return false
   }
@@ -11,6 +14,16 @@ export function equalArray<T>(arr1: Array<T> | null, arr2: Array<T> | null) {
     }
   }
   return true
+}
+
+export function equalSet<T>(set1: Set<T> | null, set2: Set<T> | null): boolean {
+  if (!set1 || !set2) {
+    return false
+  }
+  if (set1.size !== set2.size) {
+    return false
+  }
+  return [...set1].every((x) => set2.has(x))
 }
 
 export function maxOfNumberOrUndefined(

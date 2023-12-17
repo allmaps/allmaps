@@ -1,10 +1,17 @@
+import { equalSet } from '@allmaps/stdlib'
+
 import CacheableTile, { CachedTile, isCachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import { tileByteSize } from './shared/tiles.js'
+import {
+  tileByteSize,
+  createKeyFromTile,
+  createKeyFromMapIdAndTileUrl,
+  fetchableMapTilesToKeys
+} from './shared/tiles.js'
 import FetchableMapTile from './FetchableTile.js'
 
-const MAX_HISTORY_TOTAL_COUNT = 0
+const MAX_HISTORY_TOTAL_COUNT = 50
 const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
 
 export default class TileCache extends EventTarget {
@@ -48,44 +55,30 @@ export default class TileCache extends EventTarget {
   }
 
   requestFetcableMapTiles(requestedTiles: FetchableMapTile[]) {
-    // If previous requested tiles is the same as current, don't do anything
-    if (
-      JSON.stringify(this.previousRequestedTiles) ===
-      JSON.stringify(requestedTiles)
-    ) {
+    const previousRequestedTilesKeys = fetchableMapTilesToKeys(
+      this.previousRequestedTiles
+    )
+    const requestedTilesKeys = fetchableMapTilesToKeys(requestedTiles)
+
+    // If previous requested tiles is the same as current requested tiles, don't do anything
+    if (equalSet(previousRequestedTilesKeys, requestedTilesKeys)) {
       return
     }
 
-    // Make set of unique (mapId, tileUrl) keys that are part of this request
-    const requestedTilesKeys = new Set(
-      requestedTiles.map((fetchableMapTile) =>
-        this.createKey(fetchableMapTile.mapId, fetchableMapTile.tileUrl)
-      )
-    )
-
     // Compute outgoing tiles by comparing requested tiles to previous requested tiles
     const outgoingTiles = []
-    for (const requestedTile of this.previousRequestedTiles) {
-      // If the requested tiles doesn't contain the set previous requested tile's tileUrl and mapId, add the previous requested tile as outgoing tile
-      if (
-        !requestedTilesKeys.has(
-          this.createKey(requestedTile.mapId, requestedTile.tileUrl)
-        )
-      ) {
-        outgoingTiles.push(requestedTile)
+    for (const previousRequestedTile of this.previousRequestedTiles) {
+      if (!requestedTilesKeys.has(createKeyFromTile(previousRequestedTile))) {
+        outgoingTiles.push(previousRequestedTile)
       }
     }
 
     // Add outgoing tiles to outgoingTilesHistory
     this.updateOutgoingTilesHistory(outgoingTiles, requestedTiles.length)
 
-    // Make set of unique (mapId, tileUrl) keys that are part of the outgoing tiles history
-    const outgoingTilesHistoryKeys = new Set(
-      this.outgoingTilesHistory.map((fetchableMapTile) =>
-        this.createKey(fetchableMapTile.mapId, fetchableMapTile.tileUrl)
-      )
+    const outgoingTilesHistoryKeys = fetchableMapTilesToKeys(
+      this.outgoingTilesHistory
     )
-    // Make set of unique (mapId, tileUrl) keys that are part of one of the above
     const requestedTilesAndOutgoingTilesHistoryKeys = new Set([
       ...requestedTilesKeys,
       ...outgoingTilesHistoryKeys
@@ -99,7 +92,7 @@ export default class TileCache extends EventTarget {
         // remove that (mapId, tileUrl) key from the cache
         if (
           !requestedTilesAndOutgoingTilesHistoryKeys.has(
-            this.createKey(mapId, tileUrl)
+            createKeyFromMapIdAndTileUrl(mapId, tileUrl)
           )
         ) {
           this.removeMapTile(mapId, tileUrl)
@@ -119,6 +112,15 @@ export default class TileCache extends EventTarget {
         this.addMapTile(requestedTile)
       }
     }
+
+    // console.log(
+    //   'end of request: requesting',
+    //   requestedTilesKeys.size,
+    //   'history',
+    //   outgoingTilesHistoryKeys.size,
+    //   'cache',
+    //   this.tilesByTileUrl.size
+    // )
 
     // Update previous requested tiles
     this.previousRequestedTiles = requestedTiles
@@ -149,15 +151,17 @@ export default class TileCache extends EventTarget {
       count += 1
       lastSize = tileByteSize(fetchableMapTile)
       size += lastSize
-      if (count + requestCount >= MAX_HISTORY_TOTAL_COUNT) {
+      if (count + requestCount > MAX_HISTORY_TOTAL_COUNT) {
+        count -= 1
+        size -= lastSize
         break
       }
-      if (size >= MAX_HISTORY_SIZE) {
+      if (size > MAX_HISTORY_SIZE) {
+        count -= 1
+        size -= lastSize
         break
       }
     }
-    count -= 1
-    size -= lastSize
     this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
   }
 
@@ -337,13 +341,6 @@ export default class TileCache extends EventTarget {
 
       return tileUrls
     }
-  }
-
-  // TODO: consider a way to make this more elegant:
-  // - many to many datastructures
-  // - a new compact class with just these two properties and an equality function between elements
-  private createKey(mapId: string, tileUrl: string) {
-    return `${mapId}:${tileUrl}`
   }
 
   private updateTilesFetchingCount(delta: number) {

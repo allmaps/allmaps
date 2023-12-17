@@ -30,6 +30,32 @@ const DEFAULT_SCALE_FACTOR_SHARPENING = 0.5
 
 // Functions for preparing to make tiles
 
+// TODO: consider a way to make this more elegant:
+// - many to many datastructures
+// - a new compact class with just these two properties and an equality function between elements
+export function createKeyFromMapIdAndTileUrl(
+  mapId: string,
+  tileUrl: string
+): string {
+  return `${mapId}:${tileUrl}`
+}
+export function createKeyFromTile(fetchableMapTile: FetchableMapTile): string {
+  return createKeyFromMapIdAndTileUrl(
+    fetchableMapTile.mapId,
+    fetchableMapTile.tileUrl
+  )
+}
+
+export function fetchableMapTilesToKeys(
+  fetchableMapTiles: FetchableMapTile[]
+): Set<string> {
+  return new Set(
+    fetchableMapTiles.map((fetchableMapTile) =>
+      createKeyFromTile(fetchableMapTile)
+    )
+  )
+}
+
 export function geoBboxToResourceRing(
   transformer: GcpTransformer,
   geoBbox: Bbox,
