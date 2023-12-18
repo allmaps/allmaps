@@ -1,12 +1,12 @@
 # @allmaps/allmaps
 
-**Curating, georeferencing and exploring for IIIF maps**
+<p align="center">
+  <img src="packages/ui/static/favicon.png" />
+</p>
 
-100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to curate, georeference and explore collections of digitized maps.
+100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to **curate, georeference and explore collections of digitized maps**.
 
-👉 **[allmaps.org](https://allmaps.org/)**
-
-More documentation coming soon!
+👉 [allmaps.org](https://allmaps.org/) - [docs.allmaps.org](https://docs.allmaps.org/)
 
 ## Contents
 
@@ -28,8 +28,11 @@ Packages:
 - [@allmaps/annotation](packages/annotation)
 - [@allmaps/id](packages/id)
 - [@allmaps/iiif-parser](packages/iiif-parser)
+- [@allmaps/leaflet](packages/leaflet)
+- [@allmaps/maplibre](packages/maplibre)
 - [@allmaps/openlayers](packages/openlayers)
 - [@allmaps/render](packages/render)
+- [@allmaps/schemas](packages/schemas)
 - [@allmaps/stdlib](packages/stdlib)
 - [@allmaps/tailwind](packages/tailwind)
 - [@allmaps/transform](packages/transform)
