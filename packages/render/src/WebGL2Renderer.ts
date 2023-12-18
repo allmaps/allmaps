@@ -65,6 +65,16 @@ const MIN_VIEWPORT_DIAMETER = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
+/**
+ * Render Warped Maps to a canvas using WebGL2.
+ *
+ * It's main function is `render()`
+ *
+ * @export
+ * @class WebGL2Renderer
+ * @typedef {WebGL2Renderer}
+ * @extends {EventTarget}
+ */
 export default class WebGL2Renderer extends EventTarget {
   gl: WebGL2RenderingContext
   program: WebGLProgram
@@ -97,6 +107,13 @@ export default class WebGL2Renderer extends EventTarget {
 
   private throttledChanged: DebouncedFunc<typeof this.changed>
 
+  /**
+   * Creates an instance of WebGL2Renderer.
+   *
+   * @constructor
+   * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
+   * @param {WarpedMapList} warpedMapList - the list of warped maps to render
+   */
   constructor(gl: WebGL2RenderingContext, warpedMapList: WarpedMapList) {
     super()
 
@@ -138,18 +155,37 @@ export default class WebGL2Renderer extends EventTarget {
     )
   }
 
+  /**
+   * Get the opacity of the renderer
+   *
+   * @returns {(number | undefined)}
+   */
   getOpacity(): number | undefined {
     return this.opacity
   }
 
+  /**
+   * Set the opacity of the renderer
+   *
+   * @param {number} opacity - opacity to set
+   */
   setOpacity(opacity: number): void {
     this.opacity = opacity
   }
 
+  /**
+   * Reset the opacity of the renderer
+   */
   resetOpacity(): void {
     this.opacity = DEFAULT_OPACITY
   }
 
+  /**
+   * Get the opacity of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {(number | undefined)}
+   */
   getMapOpacity(mapId: string): number | undefined {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
 
@@ -158,6 +194,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Set the opacity of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @param {number} opacity - opacity to set
+   */
   setMapOpacity(mapId: string, opacity: number): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -165,6 +207,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Rreset the opacity of a map
+   *
+   * @param {string} mapId - ID of the map
+   */
   resetMapOpacity(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -172,18 +219,37 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Get the 'remove color options' of the renderer
+   *
+   * @returns {(Partial<RemoveColorOptions> | undefined)}
+   */
   getRemoveColorOptions(): Partial<RemoveColorOptions> | undefined {
     return this.renderOptions.removeColorOptions
   }
 
+  /**
+   * Set the 'remove color options' of the renderer
+   *
+   * @param {RemoveColorOptions} removeColorOptions
+   */
   setRemoveColorOptions(removeColorOptions: RemoveColorOptions) {
     this.renderOptions.removeColorOptions = removeColorOptions
   }
 
+  /**
+   * Reset the 'remove color options' of the renderer
+   */
   resetRemoveColorOptions() {
     this.renderOptions.removeColorOptions = undefined
   }
 
+  /**
+   * Get the 'remove color options' of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {(Partial<RemoveColorOptions> | undefined)}
+   */
   getMapRemoveColorOptions(
     mapId: string
   ): Partial<RemoveColorOptions> | undefined {
@@ -193,6 +259,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Set the 'remove color options' of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @param {RemoveColorOptions} removeColorOptions - the 'remove color options' to set
+   */
   setMapRemoveColorOptions(
     mapId: string,
     removeColorOptions: RemoveColorOptions
@@ -203,6 +275,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Reset the 'remove color options' of a map
+   *
+   * @param {string} mapId - ID of the map
+   */
   resetMapRemoveColorOptions(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -210,18 +287,37 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Get the colorize options of the renderer
+   *
+   * @returns {(Partial<ColorizeOptions> | undefined)}
+   */
   getColorizeOptions(): Partial<ColorizeOptions> | undefined {
     return this.renderOptions.colorizeOptions
   }
 
+  /**
+   * Set the colorize options of the renderer
+   *
+   * @param {ColorizeOptions} colorizeOptions - the colorize options to set
+   */
   setColorizeOptions(colorizeOptions: ColorizeOptions): void {
     this.renderOptions.colorizeOptions = colorizeOptions
   }
 
+  /**
+   * Reset the colorize options of the renderer
+   */
   resetColorizeOptions(): void {
     this.renderOptions.colorizeOptions = undefined
   }
 
+  /**
+   * Get the colorize options of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {(Partial<ColorizeOptions> | undefined)}
+   */
   getMapColorizeOptions(mapId: string): Partial<ColorizeOptions> | undefined {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -229,6 +325,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Set the colorize options of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @param {ColorizeOptions} colorizeOptions - the colorize options to set
+   */
   setMapColorizeOptions(mapId: string, colorizeOptions: ColorizeOptions): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -236,6 +338,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Reset the colorize options of a map
+   *
+   * @param {string} mapId - ID of the map
+   */
   resetMapColorizeOptions(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -243,22 +350,39 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Get the saturation of the renderer
+   *
+   * @returns {number}
+   */
   getSaturation(): number {
     return this.saturation
   }
 
   /**
-   * Set the saturation of the all maps
-   * @param saturation 0 - grayscale, 1 - original colors
+   * Set the saturation of the renderer
+   *
+   * 0 - grayscale, 1 - original colors
+   *
+   * @param saturation - the satuation to set
    */
   setSaturation(saturation: number): void {
     this.saturation = saturation
   }
 
+  /**
+   * Reset the satuation of the renderer
+   */
   resetSaturation(): void {
     this.saturation = DEFAULT_SATURATION
   }
 
+  /**
+   * Get the saturation of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {(number | undefined)}
+   */
   getMapSaturation(mapId: string): number | undefined {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -267,9 +391,12 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Set the saturation of a single map
-   * @param mapId the ID of the map
-   * @param saturation 0 - grayscale, 1 - original colors
+   * Set the saturation of a map
+   *
+   * 0 - grayscale, 1 - original colors
+   *
+   * @param mapId - ID of the map
+   * @param saturation - the saturation to set
    */
   setMapSaturation(mapId: string, saturation: number): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
@@ -278,6 +405,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * reset the saturation of a map
+   *
+   * @param {string} mapId - ID of the map
+   */
   resetMapSaturation(mapId: string): void {
     const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
     if (webGL2WarpedMap) {
@@ -285,6 +417,11 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  /**
+   * Render the map for a given viewport
+   *
+   * @param {Viewport} viewport - the current viewport
+   */
   render(viewport: Viewport): void {
     this.viewport = viewport
     this.throttledPrepareRenderInternal()
