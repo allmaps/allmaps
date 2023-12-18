@@ -6,12 +6,7 @@ Allmaps plugin for [MapLibre](https://maplibre.org/). This plugin allows display
 
 This plugin creates a new class `WarpedMapLayer` which extends and behaves like a [MapLibre Layer](https://maplibre.org/maplibre-style-spec/layers/). You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your MapLibre map. This will render all Georeferenced Maps contained in the annotation (pages) on your MapLibre map!
 
-What happens under the hood for each Georeferenced Map, is, in short, the following:
-
-*   The Ground Control Points are read from the Georeference Annotation, and using those a transformation is computed from IIIF resource pixels to projected geo coordinates.
-*   The Resource Mask is read from the Georeference Annotation, and the area within is divided into small triangles.
-*   The Viewport is transformed from projected geo coordinates backwards to the resource image, and the IIIF tiles covering this viewport are fetched and cached.
-*   The area inside the Resource Mask is rendered in the Viewport, triangle by triangle, using the cached tiles. The location of the triangles is computed using the forward transformation built from the Ground Control Points.
+To understand what happens under the hood for each Georeferenced Map, see the [@allmaps/render](../render/README.md) package.
 
 ## Installation
 

@@ -41,6 +41,7 @@
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "build:types": "tsc --declaration --esModuleInterop"
   },
   "homepage": "https://allmaps.org",

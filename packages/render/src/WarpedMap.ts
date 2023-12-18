@@ -36,7 +36,7 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
 } as PartialTransformOptions
 
 /**
- * Class for warped maps, which describle how a georeferenced map is warped using a specific transformation.
+ * Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
  *
  * @export
  * @class WarpedMap

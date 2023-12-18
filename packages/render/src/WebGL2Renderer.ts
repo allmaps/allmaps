@@ -65,7 +65,7 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 /**
- * Class for renderers that render Warped Maps to a canvas using WebGL2.
+ * Class for renderers that render warped maps to a HTML canvas element using WebGL2
  *
  * It's main function is `render()`
  *
