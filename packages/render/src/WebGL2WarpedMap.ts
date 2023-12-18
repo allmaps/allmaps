@@ -29,7 +29,7 @@ const DEFAULT_SATURATION = 1
 // const MAX_SCALE_FACTOR_DIFFERENCE = 2
 
 /**
- * WebGL2 class to draw WarpedMaps
+ * Class for storing the WebGL2 information necessary to draw WarpedMaps
  *
  * @export
  * @class WebGL2WarpedMap

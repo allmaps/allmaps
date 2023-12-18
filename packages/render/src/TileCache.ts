@@ -1,6 +1,6 @@
 import { equalSet } from '@allmaps/stdlib'
 
-import CacheableTile, { CachedTile, isCachedTile } from './CacheableTile.js'
+import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import {
@@ -14,6 +14,14 @@ import FetchableMapTile from './FetchableTile.js'
 const MAX_HISTORY_TOTAL_COUNT = 50
 const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
 
+/**
+ * A class for caches of tiles.
+ *
+ * @export
+ * @class TileCache
+ * @typedef {TileCache}
+ * @extends {EventTarget}
+ */
 export default class TileCache extends EventTarget {
   protected tilesByTileUrl: Map<string, CacheableTile> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
@@ -24,36 +32,71 @@ export default class TileCache extends EventTarget {
   protected previousRequestedTiles: FetchableMapTile[] = []
   protected outgoingTilesHistory: FetchableMapTile[] = []
 
-  getCacheableTile(tileUrl: string) {
+  /**
+   * Get a specific cacheable tile in this cache
+   * I.e. independent of whether their fetching is completed and image bitmap is created
+   *
+   * @param {string} tileUrl - the url of the requested tile
+   * @returns {(CacheableTile | undefined)}
+   */
+  getCacheableTile(tileUrl: string): CacheableTile | undefined {
     return this.tilesByTileUrl.get(tileUrl)
   }
 
-  getCachedTile(tileUrl: string) {
+  /**
+   * Get a specific cached tile in this cache
+   * I.e. with their fetching completed and image bitmap created
+   *
+   * @param {string} tileUrl - the url of the requested tile
+   * @returns {(CachedTile | undefined)}
+   */
+  getCachedTile(tileUrl: string): CachedTile | undefined {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
-    if (cacheableTile && isCachedTile(cacheableTile)) {
+    if (cacheableTile && cacheableTile.isCachedTile()) {
       return cacheableTile as CachedTile
     }
   }
 
-  getCacheableTiles() {
+  /**
+   * Get the tiles in this cache (independent of whether their caching has completed)
+   *
+   * @returns {IterableIterator<CacheableTile>}
+   */
+  getCacheableTiles(): IterableIterator<CacheableTile> {
     return this.tilesByTileUrl.values()
   }
 
-  getCachedTiles() {
+  /**
+   * Get the tiles in this cache whose caching has completed
+   * I.e. their fetching is completed and image bitmap is created
+   *
+   * @returns {CacheableTile[]}
+   */
+  getCachedTiles(): CacheableTile[] {
     const cacheableTiles = Array.from(this.tilesByTileUrl.values())
     const cachedTiles: CachedTile[] = []
     cacheableTiles.forEach((cacheableTile) => {
-      if (isCachedTile(cacheableTile)) {
+      if (cacheableTile.isCachedTile()) {
         cachedTiles.push(cacheableTile)
       }
     })
     return cachedTiles
   }
 
-  getTileUrls() {
+  /**
+   * Get the urls of all tiles in this cache
+   *
+   * @returns {IterableIterator<string>}
+   */
+  getTileUrls(): IterableIterator<string> {
     return this.tilesByTileUrl.keys()
   }
 
+  /**
+   * Process the request for new tiles to be added to this cache
+   *
+   * @param {FetchableMapTile[]} requestedTiles
+   */
   requestFetcableMapTiles(requestedTiles: FetchableMapTile[]) {
     const previousRequestedTilesKeys = fetchableMapTilesToKeys(
       this.previousRequestedTiles
@@ -126,45 +169,6 @@ export default class TileCache extends EventTarget {
     this.previousRequestedTiles = requestedTiles
   }
 
-  updateOutgoingTilesHistory(
-    outgoingTiles: FetchableMapTile[],
-    requestCount: number
-  ) {
-    // Add outgoing tiles to history:
-    // to keep the most relevant tiles when trimming,
-    // add the outgoing tiles are at the front of the Array
-    // and add the first tiles of this request last
-    // (since these are closest to the viewport center and hence more important)
-    for (let index = outgoingTiles.length - 1; index >= 0; index--) {
-      const fetchableMapTile = outgoingTiles[index]
-      this.outgoingTilesHistory.unshift(fetchableMapTile)
-    }
-
-    // Make history unique
-    this.outgoingTilesHistory = Array.from(new Set(this.outgoingTilesHistory))
-
-    // Trim history based on maximum amounts
-    let count = 0
-    let size = 0
-    let lastSize = 0
-    for (const fetchableMapTile of this.outgoingTilesHistory) {
-      count += 1
-      lastSize = tileByteSize(fetchableMapTile)
-      size += lastSize
-      if (count + requestCount > MAX_HISTORY_TOTAL_COUNT) {
-        count -= 1
-        size -= lastSize
-        break
-      }
-      if (size > MAX_HISTORY_SIZE) {
-        count -= 1
-        size -= lastSize
-        break
-      }
-    }
-    this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
-  }
-
   clear() {
     this.tilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
@@ -221,7 +225,7 @@ export default class TileCache extends EventTarget {
 
     // If there are no other maps for this tile and it's still fetching, abort the fetch and delete the tile from the cache.
     if (!mapIds.size) {
-      if (cacheableTile.fetching) {
+      if (!cacheableTile.isCachedTile()) {
         // Cancel fetch if tile is still being fetched
         cacheableTile.abort()
         this.updateTilesFetchingCount(-1)
@@ -236,6 +240,45 @@ export default class TileCache extends EventTarget {
         tileUrl
       })
     )
+  }
+
+  private updateOutgoingTilesHistory(
+    outgoingTiles: FetchableMapTile[],
+    requestCount: number
+  ) {
+    // Add outgoing tiles to history:
+    // to keep the most relevant tiles when trimming,
+    // add the outgoing tiles are at the front of the Array
+    // and add the first tiles of this request last
+    // (since these are closest to the viewport center and hence more important)
+    for (let index = outgoingTiles.length - 1; index >= 0; index--) {
+      const fetchableMapTile = outgoingTiles[index]
+      this.outgoingTilesHistory.unshift(fetchableMapTile)
+    }
+
+    // Make history unique
+    this.outgoingTilesHistory = Array.from(new Set(this.outgoingTilesHistory))
+
+    // Trim history based on maximum amounts
+    let count = 0
+    let size = 0
+    let lastSize = 0
+    for (const fetchableMapTile of this.outgoingTilesHistory) {
+      count += 1
+      lastSize = tileByteSize(fetchableMapTile)
+      size += lastSize
+      if (count + requestCount > MAX_HISTORY_TOTAL_COUNT) {
+        count -= 1
+        size -= lastSize
+        break
+      }
+      if (size > MAX_HISTORY_SIZE) {
+        count -= 1
+        size -= lastSize
+        break
+      }
+    }
+    this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
   }
 
   private tileFetched(event: Event) {

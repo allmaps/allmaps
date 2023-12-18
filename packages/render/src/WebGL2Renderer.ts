@@ -2,7 +2,6 @@ import { throttle } from 'lodash-es'
 
 import TileCache from './TileCache.js'
 import FetchableMapTile from './FetchableTile.js'
-import { isCachedTile } from './CacheableTile.js'
 import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
@@ -66,7 +65,7 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 /**
- * Render Warped Maps to a canvas using WebGL2.
+ * Class for renderers that render Warped Maps to a canvas using WebGL2.
  *
  * It's main function is `render()`
  *
@@ -914,7 +913,7 @@ export default class WebGL2Renderer extends EventTarget {
         return
       }
 
-      if (!isCachedTile(tile)) {
+      if (!tile.isCachedTile()) {
         return
       }
 

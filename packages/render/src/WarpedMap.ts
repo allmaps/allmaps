@@ -36,7 +36,7 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
 } as PartialTransformOptions
 
 /**
- * A Warped Map describles how a Georeferenced Map is warped using a specific transformation.
+ * Class for warped maps, which describle how a georeferenced map is warped using a specific transformation.
  *
  * @export
  * @class WarpedMap
@@ -532,7 +532,7 @@ export default class WarpedMap extends EventTarget {
 }
 
 /**
- * Warped map with image ID and parsed image.
+ * Class for warped maps with image ID and parsed IIIF image.
  *
  * @export
  * @class WarpedMapWithImageInfo

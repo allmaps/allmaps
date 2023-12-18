@@ -4,6 +4,14 @@ import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 import type { Tile, ImageRequest } from '@allmaps/types'
 
+/**
+ * Class for tiles that can be cached. These are used on the tile cache (and are not associated to a specific map)
+ *
+ * @export
+ * @class CacheableTile
+ * @typedef {CacheableTile}
+ * @extends {EventTarget}
+ */
 export default class CacheableTile extends EventTarget {
   readonly tile: Tile
   readonly imageRequest: ImageRequest
@@ -12,6 +20,12 @@ export default class CacheableTile extends EventTarget {
 
   protected abortController: AbortController
 
+  /**
+   * Creates an instance of CacheableTile.
+   *
+   * @constructor
+   * @param {FetchableMapTile} fetchableMapTile
+   */
   constructor(fetchableMapTile: FetchableMapTile) {
     super()
 
@@ -22,6 +36,14 @@ export default class CacheableTile extends EventTarget {
     this.abortController = new AbortController()
   }
 
+  /**
+   * Fetch the tile and create it's image bitmap.
+   *
+   * Returns and event when completed (or error).
+   *
+   * @async
+   * @returns {Promise<ImageBitmap> | void}
+   */
   async fetch() {
     try {
       const image = await fetchImage(this.tileUrl, this.abortController.signal)
@@ -44,10 +66,19 @@ export default class CacheableTile extends EventTarget {
     }
   }
 
-  get fetching() {
-    return this.imageBitmap ? false : true
+  /**
+   * Whether a tile has completed it's caching
+   * I.e. their fetching is completed and image bitmap is created
+   *
+   * @returns {cacheableTile is CachedTile}
+   */
+  isCachedTile(): this is CachedTile {
+    return this.imageBitmap !== undefined
   }
 
+  /**
+   * Abort the fetch
+   */
   abort() {
     if (!this.abortController.signal.aborted) {
       this.abortController.abort()
@@ -55,15 +86,18 @@ export default class CacheableTile extends EventTarget {
   }
 }
 
+/**
+ * Class for cacheable tiles whose caching has been completed
+ * I.e. their fetching is completed and image bitmap is created
+ *
+ * @export
+ * @class CachedTile
+ * @typedef {CachedTile}
+ * @extends {CacheableTile}
+ */
 export class CachedTile extends CacheableTile {
   imageBitmap!: ImageBitmap
   constructor(fetchableMapTile: FetchableMapTile) {
     super(fetchableMapTile)
   }
-}
-
-export function isCachedTile(
-  cacheableTile: CacheableTile
-): cacheableTile is CachedTile {
-  return cacheableTile.imageBitmap !== undefined
 }
