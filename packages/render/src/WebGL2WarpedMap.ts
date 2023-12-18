@@ -28,6 +28,14 @@ const DEFAULT_SATURATION = 1
 
 // const MAX_SCALE_FACTOR_DIFFERENCE = 2
 
+/**
+ * WebGL2 class to draw WarpedMaps
+ *
+ * @export
+ * @class WebGL2WarpedMap
+ * @typedef {WebGL2WarpedMap}
+ * @extends {EventTarget}
+ */
 export default class WebGL2WarpedMap extends EventTarget {
   warpedMap: WarpedMap
 
@@ -51,6 +59,14 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
 
+  /**
+   * Creates an instance of WebGL2WarpedMap.
+   *
+   * @constructor
+   * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
+   * @param {WebGLProgram} program - the WebGL2 program
+   * @param {WarpedMap} warpedMap - the warped map to render
+   */
   constructor(
     gl: WebGL2RenderingContext,
     program: WebGLProgram,
@@ -77,16 +93,31 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Update the vertex buffers of this warped map
+   *
+   * @param {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+   */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.projectedGeoToClipTransform = projectedGeoToClipTransform
     this.updateVertexBuffersInternal()
   }
 
+  /**
+   * Add cached tile to the textures of this map and update textures
+   *
+   * @param {CachedTile} cachedTile
+   */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile) {
     this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
+  /**
+   * Remove cached tile from the textures of this map and update textes
+   *
+   * @param {string} tileUrl
+   */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     this.CachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
