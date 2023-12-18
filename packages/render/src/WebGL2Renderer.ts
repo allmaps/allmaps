@@ -3,7 +3,6 @@ import { throttle } from 'lodash-es'
 import TileCache from './TileCache.js'
 import FetchableMapTile from './FetchableTile.js'
 import { isCachedTile } from './CacheableTile.js'
-import { hasImageInfo } from './WarpedMap.js'
 import WarpedMapList from './WarpedMapList.js'
 import WebGL2WarpedMap from './WebGL2WarpedMap.js'
 
@@ -406,7 +405,7 @@ export default class WebGL2Renderer extends EventTarget {
       }
 
       // Get warped map image info if lacking
-      if (!hasImageInfo(warpedMap)) {
+      if (!warpedMap.hasImageInfo()) {
         warpedMap.loadImageInfo()
         continue
       }
@@ -825,7 +824,9 @@ export default class WebGL2Renderer extends EventTarget {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixCurrentTrianglePoints(this.animationProgress)
+          warpedMap.mixProjectedGeoCurrentAndNewTrianglePoints(
+            this.animationProgress
+          )
         }
         warpedMap.updateProjectedGeoTrianglePoints(false)
       }

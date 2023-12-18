@@ -35,6 +35,45 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
   maxDepth: 2
 } as PartialTransformOptions
 
+/**
+ * A Warped Map describles how a Georeferenced Map is warped using a specific transformation.
+ *
+ * @export
+ * @class WarpedMap
+ * @typedef {WarpedMap}
+ * @extends {EventTarget}
+ * @param {string} mapId - ID of the map
+ * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
+ * @param {Gcp[]} gcps - Ground Controle Points used for warping this map (source to geo)
+ * @param {Gcp[]} projectedGcps - Projected Ground Controle Points (source to projectedGeo)
+ * @param {Ring} resourceMask - Resource mask
+ * @param {Bbox} resourceMaskBbox - Bbox of the resource mask
+ * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
+ * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
+ * @param {Cache} imageInfoCache - Cache of the image info of this image
+ * @param {string} imageId - ID of the image
+ * @param {IIIFImage} parsedImage - ID of the image
+ * @param {boolean} visible - Whether the map is visible
+ * @param {TransformationType} transformationType - Transformation type used in the transfomer
+ * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
+ * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
+ * @param {Ring} geoMask - Resource mask in geo coordinates
+ * @param {Bbox} geoMaskBbox - Bbox of the geo mask
+ * @param {Ring} geoFullMask - Resource full mask in geo coordinates
+ * @param {Bbox} geoFullMaskBbox - Bbox of the geo full mask
+ * @param {Ring} projectedGeoMask - Resource mask in projected geo coordintas
+ * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeo mask
+ * @param {Ring} projectedGeoFullMask - Resource full mask in projected geo coordintas
+ * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeo full mask
+ * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geo coordinates.
+ * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
+ * @param {Bbox} resourceViewportRingBbox - Bbox of the viewport transformed back to resource coordinates, at the current viewport
+ * @param {Point[]} resourceTrianglePoints - Points of the triangulated resourceMask, at the current best scale factor
+ * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the resource triangle points per bestScaleFactor
+ * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangulated resource mask in projectedGeo coordinates, at the current best scale factor
+ * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangulated resource mask in projectedGeo coordinates, at the current best scale factor
+ */
 export default class WarpedMap extends EventTarget {
   mapId: string
   georeferencedMap: GeoreferencedMap
@@ -72,15 +111,29 @@ export default class WarpedMap extends EventTarget {
   // The properties below are for the current viewport
 
   bestScaleFactor!: number
-  resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> = new Map()
 
   resourceViewportRing: Ring = [] // At current viewport
   resourceViewportRingBbox?: Bbox
 
+  // The properties below are at the current bestScaleFactor
+
   resourceTrianglePoints: Point[] = []
+  private resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> =
+    new Map()
   projectedGeoCurrentTrianglePoints: Point[] = []
   projectedGeoNewTrianglePoints: Point[] = []
+  // TODO: consider to add a similar cache for projectedGeo to speed up computations with a double map:
+  // projectedGeoTrianglePointsByTransformationTypeByBestScaleFactor
 
+  /**
+   * Creates an instance of WarpedMap.
+   *
+   * @constructor
+   * @param {string} mapId - ID of the map
+   * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
+   * @param {?Cache} [imageInfoCache] - Cache of the image info of this image
+   * @param {boolean} [visible=true] - Whether the map is visible
+   */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
@@ -121,19 +174,37 @@ export default class WarpedMap extends EventTarget {
     this.updateTransformerProperties()
   }
 
+  /**
+   * Get resource mask in viewport coordinates
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Ring}
+   */
   getViewportMask(viewport: Viewport): Ring {
     return convertGeojsonPolygonToRing(this.projectedGeoMask).map((point) => {
       return applyTransform(viewport.projectedGeoToViewportTransform, point)
     })
   }
 
+  /**
+   * Get bbox of resource mask in viewport coordinates
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Bbox}
+   */
   getViewportMaskBbox(viewport: Viewport): Bbox {
     return computeBbox(this.getViewportMask(viewport))
   }
 
+  /**
+   * Get approximate resource mask in viewport coordinates
+   *
+   * Approximate since transform of bbox (used here) is not as precise as bbox of transform (which is more expensive to compute)
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Bbox}
+   */
   getApproxViewportMaskBbox(viewport: Viewport): Bbox {
-    // Approx since transform of bbox is not as precise as bbox of transform
-    // (which is more expensive to compute)
     return computeBbox(
       bboxToRectangle(this.projectedGeoMaskBbox).map((point) => {
         return applyTransform(viewport.projectedGeoToViewportTransform, point)
@@ -141,6 +212,12 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Get resource full mask in viewport coordinates
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Ring}
+   */
   getViewportFullMask(viewport: Viewport): Ring {
     return convertGeojsonPolygonToRing(this.projectedGeoFullMask).map(
       (point) => {
@@ -149,13 +226,25 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Get bbox of resource full mask in viewport coordinates
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Bbox}
+   */
   getViewportFullMaskBbox(viewport: Viewport): Bbox {
     return computeBbox(this.getViewportFullMask(viewport))
   }
 
+  /**
+   * Get approximate resource full mask in viewport coordinates
+   *
+   * Approximate since transform of bbox (used here) is not as precise as bbox of transform (which is more expensive to compute)
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {Bbox}
+   */
   getApproxViewportFullMaskBbox(viewport: Viewport): Bbox {
-    // Approx since transform of bbox is not as precise as bbox of transform
-    // (which is more expensive to compute)
     return computeBbox(
       bboxToRectangle(this.projectedGeoFullMaskBbox).map((point) => {
         return applyTransform(viewport.projectedGeoToViewportTransform, point)
@@ -163,6 +252,12 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Get scale of the warped map, in resource pixels per viewport pixels.
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {number}
+   */
   getResourceToViewportScale(viewport: Viewport): number {
     return bboxesToScale(
       this.resourceMaskBbox,
@@ -170,10 +265,24 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Get scale of the warped map, in resource pixels per canvas pixels.
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {number}
+   */
   getResourceToCanvasScale(viewport: Viewport): number {
     return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
   }
 
+  /**
+   * Get approximate scale of the warped map, in resource pixels per viewport pixels.
+   *
+   * Approximate since appoximate resource to viewport scale is used
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {number}
+   */
   getApproxResourceToViewportScale(viewport: Viewport): number {
     return bboxesToScale(
       this.resourceMaskBbox,
@@ -181,6 +290,14 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Get approximate scale of the warped map, in resource pixels per canvas pixels.
+   *
+   * Approximate since appoximate resource to viewport scale is used
+   *
+   * @param {Viewport} viewport - the current viewport
+   * @returns {number}
+   */
   getApproxResourceToCanvasScale(viewport: Viewport): number {
     return (
       this.getApproxResourceToViewportScale(viewport) /
@@ -188,37 +305,65 @@ export default class WarpedMap extends EventTarget {
     )
   }
 
-  setResourceViewportRing(resourceViewportRing: Ring) {
+  /**
+   * Set viewport ring in resource coorinates of current viewport
+   *
+   * @param {Ring} resourceViewportRing
+   */
+  setResourceViewportRing(resourceViewportRing: Ring): void {
     this.resourceViewportRing = resourceViewportRing
     this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
   }
 
+  /**
+   * Update the mask loaded from a georeferenced map to a new mask.
+   *
+   * @param {Ring} resourceMask
+   */
   setResourceMask(resourceMask: Ring): void {
     this.resourceMask = resourceMask
     this.updateGeoMask()
     this.updateProjectedGeoMask()
   }
 
+  /**
+   * Update the transformation type loaded from a georeferenced map to a new transformation type.
+   *
+   * @param {TransformationType} transformationType
+   */
   setTransformationType(transformationType: TransformationType): void {
     this.transformationType = transformationType
     this.updateTransformerProperties()
   }
 
+  /**
+   * Update the ground controle points loaded from a georeferenced map to new ground controle points.
+   *
+   * @param {GCP[]} gcps
+   */
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
     this.updateTransformerProperties()
   }
 
-  updateBestScaleFactor(scaleFactor: number): boolean {
+  /**
+   * Update the best scale factor at the current viewport
+   *
+   * @param {number} scaleFactor
+   * @returns {boolean}
+   */
+  updateBestScaleFactor(scaleFactor: number): void {
     if (this.bestScaleFactor != scaleFactor) {
       this.bestScaleFactor = scaleFactor
       this.updateTriangulation(true)
-      return true
-    } else {
-      return false
     }
   }
 
+  /**
+   * Update the triangulation of the resource mask. Computes the points of the triangulated resourceMask, at the current best scale factor
+   *
+   * @param {boolean} [currentIsNew=false] - whether the new and current triangulation are the same - true by default, false during a transformation transition
+   */
   updateTriangulation(currentIsNew = false) {
     if (
       this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
@@ -246,6 +391,11 @@ export default class WarpedMap extends EventTarget {
     this.updateProjectedGeoTrianglePoints(currentIsNew)
   }
 
+  /**
+   * Update the (current and new) points of the triangulated resource mask in projectedGeo coordinates, at the current best scale factor
+   *
+   * @param {boolean} [currentIsNew=false]
+   */
   updateProjectedGeoTrianglePoints(currentIsNew = false) {
     this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
       (point) => this.projectedTransformer.transformToGeo(point as Point) // Not passing options because not relevant for points
@@ -257,15 +407,26 @@ export default class WarpedMap extends EventTarget {
     }
   }
 
+  /**
+   * Reset the current points of the triangulated resource mask in projectedGeo coordinates.
+   */
   resetCurrentTrianglePoints() {
     this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
   }
 
+  /**
+   * Clear the cache of the resource triangle points per bestScaleFactor
+   */
   clearResourceTrianglePointsByBestScaleFactor() {
     this.resourceTrianglePointsByBestScaleFactor = new Map()
   }
 
-  mixCurrentTrianglePoints(t: number) {
+  /**
+   * Mix the current and new points of the triangulated resource mask in projectedGeo coordinates
+   *
+   * @param {number} t
+   */
+  mixProjectedGeoCurrentAndNewTrianglePoints(t: number) {
     this.projectedGeoCurrentTrianglePoints =
       this.projectedGeoNewTrianglePoints.map((point, index) => {
         return mixPoints(
@@ -276,6 +437,21 @@ export default class WarpedMap extends EventTarget {
       })
   }
 
+  /**
+   * Check if warpedMap has image info
+   *
+   * @returns {this is WarpedMapWithImageInfo}
+   */
+  hasImageInfo(): this is WarpedMapWithImageInfo {
+    return this.imageId !== undefined && this.parsedImage !== undefined
+  }
+
+  /**
+   * Fetch and parse the image info, and generate the image ID
+   *
+   * @async
+   * @returns {Promise<void>}
+   */
   async loadImageInfo(): Promise<void> {
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
@@ -355,6 +531,14 @@ export default class WarpedMap extends EventTarget {
   }
 }
 
+/**
+ * Warped map with image ID and parsed image.
+ *
+ * @export
+ * @class WarpedMapWithImageInfo
+ * @typedef {WarpedMapWithImageInfo}
+ * @extends {WarpedMap}
+ */
 export class WarpedMapWithImageInfo extends WarpedMap {
   imageId!: string
   parsedImage!: IIIFImage
@@ -366,10 +550,4 @@ export class WarpedMapWithImageInfo extends WarpedMap {
   ) {
     super(mapId, georeferencedMap, imageInfoCache, visible)
   }
-}
-
-export function hasImageInfo(
-  warpedMap: WarpedMap
-): warpedMap is WarpedMapWithImageInfo {
-  return warpedMap.imageId !== undefined && warpedMap.parsedImage !== undefined
 }
