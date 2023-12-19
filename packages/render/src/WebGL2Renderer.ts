@@ -29,7 +29,8 @@ import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 import {
   distance,
   maxOfNumberOrUndefined,
-  bboxToDiameter
+  bboxToDiameter,
+  bboxToCenter
 } from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
@@ -524,8 +525,18 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
-    const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
-      this.viewport.geoBbox
+    const possibleMapsInViewport = Array.from(
+      this.warpedMapList.getMapsByBbox(this.viewport.geoBbox)
+    ).sort(
+      (mapId0, mapId1) =>
+        distance(
+          bboxToCenter(this.warpedMapList.getWarpedMap(mapId0)!.geoMaskBbox),
+          this.viewport!.geoCenter
+        ) -
+        distance(
+          bboxToCenter(this.warpedMapList.getWarpedMap(mapId1)!.geoMaskBbox),
+          this.viewport!.geoCenter
+        )
     )
 
     const requestedTiles: FetchableMapTile[] = []
@@ -566,10 +577,9 @@ export default class WebGL2Renderer extends EventTarget {
       warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource expensive
-      // To lower the effort, reduct the requred precision based on the current viewport scale
+      // This can be expensive if many maps and high depth, and seems to work fine with low depth.
       const projectedTransformerOptions = {
-        maxOffsetRatio: 1 * this.viewport.projectedGeoPerViewportScale,
-        maxDepth: 2
+        maxDepth: 0
       }
 
       const resourceViewportRing = geoBboxToResourceRing(
