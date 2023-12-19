@@ -8,7 +8,7 @@
     "types": "lerna run types --parallel",
     "lint": "lerna run lint --parallel",
     "documentation": "lerna run documentation --parallel",
-    "precommit": "npm run documentation && npm run types && npm run lint && npm run test",
+    "precommit": "npm run types && npm run test && npm run lint && npm run documentation",
     "test": "lerna run test --parallel",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
