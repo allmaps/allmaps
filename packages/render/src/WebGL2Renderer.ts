@@ -525,7 +525,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     const possibleMapsInViewport = this.warpedMapList.getMapsByBbox(
-      this.viewport.projectedGeoBbox
+      this.viewport.geoBbox
     )
 
     const requestedTiles: FetchableMapTile[] = []

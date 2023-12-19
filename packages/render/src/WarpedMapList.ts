@@ -352,7 +352,7 @@ export default class WarpedMapList extends EventTarget {
   private addToOrUpdateRtree(warpedMap: WarpedMap): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
-      this.rtree.addItem(warpedMap.mapId, warpedMap.projectedGeoMask)
+      this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
     }
   }
 

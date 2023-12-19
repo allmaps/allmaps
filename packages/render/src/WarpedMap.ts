@@ -8,7 +8,6 @@ import {
   bboxToRectangle,
   bboxesToScale,
   geometryToDiameter,
-  convertGeojsonPolygonToRing,
   fetchImageInfo,
   lonLatToWebMecator,
   mixPoints
@@ -57,9 +56,9 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
- * @param {Ring} geoMask - Resource mask in geo coordinates
+ * @param {GeojsonPolygon} geoMask - Resource mask in geo coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geo mask
- * @param {Ring} geoFullMask - Resource full mask in geo coordinates
+ * @param {GeojsonPolygon} geoFullMask - Resource full mask in geo coordinates
  * @param {Bbox} geoFullMaskBbox - Bbox of the geo full mask
  * @param {Ring} projectedGeoMask - Resource mask in projected geo coordintas
  * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeo mask
@@ -101,9 +100,9 @@ export default class WarpedMap extends EventTarget {
   geoFullMask!: GeojsonPolygon
   geoFullMaskBbox!: Bbox
 
-  projectedGeoMask!: GeojsonPolygon
+  projectedGeoMask!: Ring
   projectedGeoMaskBbox!: Bbox
-  projectedGeoFullMask!: GeojsonPolygon
+  projectedGeoFullMask!: Ring
   projectedGeoFullMaskBbox!: Bbox
 
   resourceToProjectedGeoScale!: number
@@ -181,7 +180,7 @@ export default class WarpedMap extends EventTarget {
    * @returns {Ring}
    */
   getViewportMask(viewport: Viewport): Ring {
-    return convertGeojsonPolygonToRing(this.projectedGeoMask).map((point) => {
+    return this.projectedGeoMask.map((point) => {
       return applyTransform(viewport.projectedGeoToViewportTransform, point)
     })
   }
@@ -219,11 +218,9 @@ export default class WarpedMap extends EventTarget {
    * @returns {Ring}
    */
   getViewportFullMask(viewport: Viewport): Ring {
-    return convertGeojsonPolygonToRing(this.projectedGeoFullMask).map(
-      (point) => {
-        return applyTransform(viewport.projectedGeoToViewportTransform, point)
-      }
-    )
+    return this.projectedGeoFullMask.map((point) => {
+      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+    })
   }
 
   /**
@@ -507,19 +504,18 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateProjectedGeoMask(): void {
-    this.projectedGeoMask = this.projectedTransformer.transformForwardAsGeojson(
+    this.projectedGeoMask = this.projectedTransformer.transformForward(
       [this.resourceMask],
       PROJECTED_TRANSFORMER_OPTIONS
-    )
+    )[0]
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
   }
 
   private updateProjectedFullGeoMask(): void {
-    this.projectedGeoFullMask =
-      this.projectedTransformer.transformForwardAsGeojson(
-        [this.resourceFullMask],
-        PROJECTED_TRANSFORMER_OPTIONS
-      )
+    this.projectedGeoFullMask = this.projectedTransformer.transformForward(
+      [this.resourceFullMask],
+      PROJECTED_TRANSFORMER_OPTIONS
+    )[0]
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
   }
 
