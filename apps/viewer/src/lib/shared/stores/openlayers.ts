@@ -10,8 +10,9 @@ import type { Map as Georef } from '@allmaps/annotation'
 
 import Map from 'ol/Map.js'
 import VectorSource from 'ol/source/Vector.js'
-import VectorTile from 'ol/layer/VectorTile.js'
+import TileLayer from 'ol/layer/Tile.js'
 import VectorLayer from 'ol/layer/Vector.js'
+import XYZ from 'ol/source/XYZ.js'
 import View from 'ol/View.js'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import Select from 'ol/interaction/Select.js'
@@ -20,9 +21,6 @@ import {
   DblClickDragZoom,
   defaults as defaultInteractions
 } from 'ol/interaction.js'
-
-import { applyStyle } from 'ol-mapbox-style'
-import { style } from '$lib/shared/protomaps.js'
 
 import IIIFLayer from '$lib/shared/IIIFLayer.js'
 
@@ -87,6 +85,8 @@ export async function createImageInfoCache() {
 // Map view
 
 export let mapOl: Map | undefined
+export let mapTileSource: XYZ | undefined
+export let mapTileLayer: TileLayer<XYZ> | undefined
 export const mapWarpedMapSource = new WarpedMapSource()
 export let mapWarpedMapLayer: WarpedMapLayer | undefined
 export const mapVectorSource = new VectorSource()
@@ -142,8 +142,15 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
 }
 
 export function createMapOl() {
-  const mapBaseLayer = new VectorTile({ declutter: true })
-  applyStyle(mapBaseLayer, style)
+  // TODO: set attribution
+  mapTileSource = new XYZ({
+    url: defaultXYZLayers[0].url,
+    maxZoom: 19
+  })
+
+  mapTileLayer = new TileLayer({
+    source: mapTileSource
+  })
 
   mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
 
@@ -162,7 +169,7 @@ export function createMapOl() {
 
     mapOl = new Map({
       interactions: defaultInteractions().extend([new DblClickDragZoom()]),
-      layers: [mapBaseLayer, mapWarpedMapLayer, mapVectorLayer],
+      layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
       controls: [],
       view: new View({
         maxZoom: 24,
