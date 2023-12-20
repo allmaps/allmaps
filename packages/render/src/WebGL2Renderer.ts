@@ -526,7 +526,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByBbox(this.viewport.geoBbox)
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
     ).sort(
       (mapId0, mapId1) =>
         distance(
