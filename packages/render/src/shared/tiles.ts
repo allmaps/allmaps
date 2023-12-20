@@ -26,7 +26,8 @@ import type {
 /**
  * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
  */
-const DEFAULT_SCALE_FACTOR_SHARPENING = 0.5
+// TODO: Sharpening is confusing name for this constant
+const DEFAULT_SCALE_FACTOR_SHARPENING = 0.75
 
 // Functions for preparing to make tiles
 
