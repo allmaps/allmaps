@@ -18,8 +18,8 @@ Apps:
 - [Allmaps Tile Server](apps/tileserver)
 - [Allmaps Latest](apps/latest)
 - [Allmaps CLI](apps/cli)
-- [Allmaps Explore](apps/explore)
-- [Allmaps Info](apps/info)
+  <!-- - [Allmaps Explore](apps/explore) -->
+  <!-- - [Allmaps Info](apps/info) -->
 - [Allmaps IIIF Viewer](apps/iiif)
 - [Allmaps Here](apps/here)
 
@@ -40,53 +40,62 @@ Packages:
 - [@allmaps/types](packages/types)
 - [@allmaps/ui](packages/ui)
 
+To see how these apps and packages are related, check out the [dependency graph](https://observablehq.com/@allmaps/javascript-dependencies).
+
 ## Installation
 
-First, clone this repository locally
+Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/installation#using-corepack) installed.
+
+First, clone this repository locally:
 
 ```sh
 git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Then install dependencies and create symlinks
+Then, initialize SvelteKit apps:
+
+```sh
+pnpm run check
+```
+
+Finally, install dependencies and create symlinks:
 
 ```sh
 pnpm install -r
-npx lerna link
 ```
 
 ## Running packages and apps locally
 
-### All apps and packages
+### All packages and apps
 
-To run the `dev` and `build --watch` scripts for all packages and apps, run the following in one terminal window:
+To run the `watch` and `dev` scripts for all packages and apps, run the following in one terminal window:
 
 ```sh
-npx lerna run watch --parallel
+pnpm run watch
 ```
 
 And this in another:
 
 ```sh
-npx lerna run dev --parallel
+pnpm run dev
 ```
 
-### One app or package
+### A single app
 
-To only run a single app in dev mode, you need to run all packages in watch mode:
+To run the `dev` script for a single app, you need to run the `watch` scripts of all packages in one terminal window:
 
 ```sh
-npx lerna run watch --parallel
+pnpm run watch
 ```
 
-And then use lerna with `--scope` to select a single app:
+And then run the `dev` script of the app in another:
 
 ```sh
-npx lerna run --scope "@allmaps/viewer" dev
+pnpm --filter "@allmaps/viewer" run dev
 ```
 
-You can also directly run the `dev` script from a single app:
+You can also run the `dev` script from the app's directory instead:
 
 ```sh
 cd apps/viewer
@@ -95,16 +104,22 @@ pnpm run dev
 
 ## Troubleshooting
 
-If things don't work, it might help to run:
+If things don't work, it might help to reinitialize the SvelteKit apps:
 
 ```sh
-npx lerna run check --parallel
+pnpm run check
 ```
 
-or
+Or, reinstall dependencies and create the monorepo's symlinks:
 
 ```sh
-npx lerna link
+pnpm install -r
+```
+
+As a last resort, you can try to remove some (or all) `node_modules` directories using [npkill](https://npkill.js.org/):
+
+```sh
+pnpm dlx npkill
 ```
 
 ## Commit changes
@@ -122,27 +137,34 @@ git commit --no-verify
 Check TypeScript types for all packages:
 
 ```sh
-npx lerna run types --parallel
+pnpm run types
 ```
 
-Run Prettier and ESLint for all packages:
+Run [Prettier] and [ESLint] for all packages:
 
 ```sh
-npx lerna run lint --parallel
+pnpm run lint
 ```
 
 ## Run tests
 
-Run `test` scripts for all packages and apps:
+Run tests for all packages and apps:
 
 ```sh
-npx lerna run test --parallel
+pnpm run test
 ```
 
-Run tests in single package:
+Run tests for a single package:
 
 ```sh
-npx lerna run --scope @allmaps/id test
+pnpm --filter "@allmaps/transform" test
+```
+
+You can run the tests from the package's directory instead:
+
+```sh
+cd packages/transform
+pnpm test
 ```
 
 # Versioning & publishing

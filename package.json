@@ -3,20 +3,25 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "watch": "lerna run watch --parallel",
-    "dev": "lerna run dev --parallel",
-    "types": "lerna run types --parallel",
-    "lint": "lerna run lint --parallel",
-    "documentation": "lerna run documentation --parallel",
+    "watch": "pnpm --recursive --parallel run watch",
+    "dev": "pnpm --recursive --parallel run dev",
+    "types": "pnpm --recursive run types",
+    "lint": "pnpm --recursive run lint",
+    "test": "pnpm --recursive run test",
+    "check": "pnpm --recursive run check",
+    "documentation": "pnpm --recursive run documentation",
     "precommit": "npm run types && npm run test && npm run lint && npm run documentation",
-    "test": "lerna run test --parallel",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
     "prepare": "husky install"
   },
   "devDependencies": {
     "husky": "^8.0.3",
-    "lerna": "^5.1.0",
+    "lerna": "^7.0.0",
     "nx": "^14.3.6"
-  }
+  },
+  "engines": {
+    "node": ">=20.8.0"
+  },
+  "packageManager": "pnpm@8.10.0"
 }
