@@ -17,12 +17,12 @@ export interface StringSourceOptions {
 export type Source = (UrlSourceOptions | StringSourceOptions) & {
   id: string
   json: unknown
-  parsed: Parsed
+  parsed: ParsedSource
   // error?: Error
   annotations: unknown[]
 }
 
-export type Parsed =
+export type ParsedSource =
   | {
       type: 'annotation'
       maps: Map[]
