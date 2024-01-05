@@ -68,10 +68,8 @@ function generateSource(map: MapAllVersions) {
   if (isMap2(map)) {
     id = map.resource.id
     type = map.resource.type
-
     width = map.resource.width
     height = map.resource.height
-
     partOf = map.resource.partOf
   } else {
     id = map.image.uri
