@@ -1,7 +1,7 @@
 # @allmaps/allmaps
 
 <p align="center">
-  <img src="packages/ui/static/favicon.png" />
+  <img src="/packages/ui/src/lib/shared/images/allmaps-logo.svg" />
 </p>
 
 100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to **curate, georeference and explore collections of digitized maps**.
