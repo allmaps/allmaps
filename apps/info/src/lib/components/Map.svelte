@@ -7,7 +7,7 @@
   export let api = false
 
   const mapId = map.id
-  const imageUri = map.image.uri
+  const imageUri = map.resource.id
 
   let annotationUrl: string
   let viewerUrl: string
