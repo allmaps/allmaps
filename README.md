@@ -140,7 +140,7 @@ Check TypeScript types for all packages:
 pnpm run types
 ```
 
-Run [Prettier] and [ESLint] for all packages:
+Run [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) for all packages:
 
 ```sh
 pnpm run lint
