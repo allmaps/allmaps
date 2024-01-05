@@ -19,8 +19,6 @@
 
   import { idsFromFeatures } from '$lib/shared/openlayers.js'
 
-  import { computeBbox } from '@allmaps/stdlib'
-
   import MapContextMenu from '$lib/components/dropdowns/MapContextMenu.svelte'
   import HiddenWarpedMap from '$lib/components/elements/HiddenWarpedMap.svelte'
 
