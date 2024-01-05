@@ -1,8 +1,8 @@
-# @allmaps/allmaps
-
-<p align="center">
+<p align="center" width="100px">
   <img src="/packages/ui/src/lib/shared/images/allmaps-logo.svg" />
 </p>
+
+# @allmaps/allmaps
 
 100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to **curate, georeference and explore collections of digitized maps**.
 
