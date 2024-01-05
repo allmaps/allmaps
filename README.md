@@ -1,5 +1,5 @@
-<p align="center" width="100px">
-  <img src="/packages/ui/src/lib/shared/images/allmaps-logo.svg" />
+<p align="center">
+  <img src="/packages/ui/src/lib/shared/images/allmaps-logo.svg" width="100px" />
 </p>
 
 # @allmaps/allmaps
