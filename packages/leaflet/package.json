@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/leaflet",
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -59,11 +59,11 @@
     "leaflet"
   ],
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.19",
-    "@allmaps/render": "^1.0.0-beta.42",
-    "@allmaps/stdlib": "^1.0.0-beta.17",
-    "@allmaps/transform": "^1.0.0-beta.20",
-    "@allmaps/types": "^1.0.0-beta.6",
+    "@allmaps/annotation": "^1.0.0-beta.20",
+    "@allmaps/render": "^1.0.0-beta.43",
+    "@allmaps/stdlib": "^1.0.0-beta.18",
+    "@allmaps/transform": "^1.0.0-beta.21",
+    "@allmaps/types": "^1.0.0-beta.7",
     "leaflet": "^1.9.4"
   },
   "license": "GPL-3.0-or-later",

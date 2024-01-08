@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/docs",
   "description": "Allmaps Documentation",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "private": true,
   "contributors": [
     {
@@ -37,9 +37,9 @@
     "copy-readmes": "node ./scripts/copy-readmes.js"
   },
   "dependencies": {
-    "@allmaps/id": "^1.0.0-beta.16",
+    "@allmaps/id": "^1.0.0-beta.21",
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/ui": "^1.0.0-beta.20",
+    "@allmaps/ui": "^1.0.0-beta.21",
     "@astrojs/starlight": "^0.8.0",
     "@astrojs/starlight-tailwind": "^1.0.2",
     "@astrojs/svelte": "^3.1.0",
