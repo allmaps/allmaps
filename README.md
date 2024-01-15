@@ -53,16 +53,16 @@ git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Then, initialize SvelteKit apps:
-
-```sh
-pnpm run check
-```
-
-Finally, install dependencies and create symlinks:
+Then, install dependencies and create symlinks:
 
 ```sh
 pnpm install -r
+```
+
+Finally, initialize SvelteKit apps:
+
+```sh
+pnpm run check
 ```
 
 ## Running packages and apps locally
