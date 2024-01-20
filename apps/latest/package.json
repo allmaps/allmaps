@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.12",
+  "version": "1.0.0-beta.13",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -30,7 +30,7 @@
     "@allmaps/annotation": "^1.0.0-beta.20",
     "@allmaps/id": "^1.0.0-beta.21",
     "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/transform": "^1.0.0-beta.21",
+    "@allmaps/transform": "^1.0.0-beta.22",
     "@allmaps/types": "^1.0.0-beta.7",
     "@allmaps/ui": "^1.0.0-beta.21",
     "@turf/area": "^6.5.0",
