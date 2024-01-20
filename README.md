@@ -44,16 +44,23 @@ To see how these apps and packages are related, check out the [dependency graph]
 
 ## Installation
 
-Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/installation#using-corepack) installed.
+Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/) installed.
 
-First, clone this repository locally:
+You can [install pnpm with Corepack](https://pnpm.io/installation#using-corepack):
+
+```sh
+corepack enable
+corepack prepare pnpm@latest --activate
+```
+
+Then, clone this repository locally:
 
 ```sh
 git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Then, install dependencies and create symlinks:
+Install dependencies and create symlinks:
 
 ```sh
 pnpm install -r
