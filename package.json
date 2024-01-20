@@ -6,6 +6,7 @@
     "watch": "pnpm --recursive --parallel run watch",
     "dev": "pnpm --recursive --parallel run dev",
     "types": "pnpm --recursive run types",
+    "build": "pnpm --recursive run build",
     "lint": "pnpm --recursive run lint",
     "test": "pnpm --recursive run test",
     "check": "pnpm --recursive run check",
