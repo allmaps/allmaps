@@ -45,7 +45,7 @@
     "@allmaps/types": "^1.0.0-beta.7",
     "@turf/distance": "^6.3.0",
     "@turf/midpoint": "^6.3.0",
-    "ml-matrix": "^6.10.4"
+    "ml-matrix": "^6.11.0"
   },
   "scripts": {
     "watch": "tsc --watch",
