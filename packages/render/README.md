@@ -60,6 +60,26 @@ pnpm run build
 #### Table of Contents
 
 *   [WarpedMapWithImageInfo](#warpedmapwithimageinfo)
+*   [WarpedMapList](#warpedmaplist)
+    *   [getMaps](#getmaps)
+    *   [getWarpedMap](#getwarpedmap)
+    *   [getMapZIndex](#getmapzindex)
+    *   [getTotalBbox](#gettotalbbox)
+    *   [getTotalProjectedGeoMaskBbox](#gettotalprojectedgeomaskbbox)
+    *   [getMapsByGeoBbox](#getmapsbygeobbox)
+    *   [setImageInfoCache](#setimageinfocache)
+    *   [setMapResourceMask](#setmapresourcemask)
+    *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [bringMapsToFront](#bringmapstofront)
+    *   [sendMapsToBack](#sendmapstoback)
+    *   [bringMapsForward](#bringmapsforward)
+    *   [sendMapsBackward](#sendmapsbackward)
+    *   [showMaps](#showmaps)
+    *   [hideMaps](#hidemaps)
+    *   [addGeoreferencedMap](#addgeoreferencedmap)
+    *   [removeGeoreferencedMap](#removegeoreferencedmap)
+    *   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+    *   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
 *   [Viewport](#viewport)
     *   [Properties](#properties)
     *   [computeProjectedGeoRectangle](#computeprojectedgeorectangle)
@@ -108,7 +128,7 @@ pnpm run build
     *   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
 *   [DEFAULT\_SCALE\_FACTOR\_SHARPENING](#default_scale_factor_sharpening)
 *   [getBestTileZoomLevelForScale](#getbesttilezoomlevelforscale)
-    *   [Parameters](#parameters-24)
+    *   [Parameters](#parameters-40)
 
 ### WarpedMapWithImageInfo
 
@@ -117,6 +137,177 @@ pnpm run build
 Class for warped maps with image ID and parsed IIIF image.
 
 Type: [WarpedMapWithImageInfo](#warpedmapwithimageinfo)
+
+### WarpedMapList
+
+**Extends EventTarget**
+
+Class for warped map lists, which describe an ordered array of maps to be drawn.
+They contain an imageInfoCash, and and RTree for quickly looking up maps using their Bbox.
+
+Type: [WarpedMapList](#warpedmaplist)
+
+#### getMaps
+
+Returns mapIds for the maps in this list.
+
+Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### getWarpedMap
+
+Returns the WarpedMap object in this list of map specified by a mapId.
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+#### getMapZIndex
+
+Returns the zIndex of a map.
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+#### getTotalBbox
+
+Return the total Bbox of all visible maps in this list, in geo coordinates
+
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+#### getTotalProjectedGeoMaskBbox
+
+Return the total Bbox of all visible maps in this list, in projectedGeo coordinates
+
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+#### getMapsByGeoBbox
+
+Returns mapId's of the maps whose geoBbox overlaps with the specified geoBbox.
+
+##### Parameters
+
+*   `geoBbox` **Bbox**&#x20;
+
+Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### setImageInfoCache
+
+Sets the image info cache
+
+##### Parameters
+
+*   `cache` **Cache** the image info cache
+
+#### setMapResourceMask
+
+Sets the resource mask for a specified map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `resourceMask` **Ring** the new resource mask
+
+#### setMapsTransformationType
+
+Sets the transformation type of specified maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
+*   `transformationType` **TransformationType** the new transformation type
+
+#### bringMapsToFront
+
+Changes the zIndex of the specified maps to bring them to front
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### sendMapsToBack
+
+Changes the zIndex of the specified maps to send them to back
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### bringMapsForward
+
+Changes the zIndex of the specified maps to bring them forward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### sendMapsBackward
+
+Changes the zIndex of the specified maps to send them backward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### showMaps
+
+Changes the visibility of the specified maps to `true`
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### hideMaps
+
+Changes the visibility of the specified maps to `false`
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+#### addGeoreferencedMap
+
+Adds a georeferenced map to this list
+
+##### Parameters
+
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
+#### removeGeoreferencedMap
+
+Removes a georeferenced map from this list
+
+##### Parameters
+
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
+#### addGeoreferenceAnnotation
+
+Parses an annotation and adds its georeferenced map to this list
+
+##### Parameters
+
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+#### removeGeoreferenceAnnotation
+
+Parses an annotation and removes its georeferenced map from this list
+
+##### Parameters
+
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
 
 ### Viewport
 
