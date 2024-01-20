@@ -11,16 +11,40 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 const packagesDir = path.join(__dirname, '../../../packages')
 const outputDir = path.join(__dirname, '../src/content/docs/reference/packages')
 
+/**
+ * Function to check if a README.md file is valid.
+ * @param {string | undefined} readme - Contents of the README.md file
+ * @returns {boolean} - Whether the README.md file is valid
+ */
 function isReadmeValid(readme) {
-  return readme && readme.length > 150
+  return typeof readme === 'string' && readme.length > 150
 }
 
-const getDirectories = async (source) =>
-  (await readdir(source, { withFileTypes: true }))
+/**
+ * Get the directories in a directory.
+ * @param {string} source
+ * @returns {Promise<string[]>} - The directories in the source directory
+ */
+async function getDirectories(source) {
+  const dirent = await readdir(source, { withFileTypes: true })
+
+  return dirent
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name)
+}
 
-const removeFirstLine = (lines) => lines.substring(lines.indexOf('\n') + 1)
+/**
+ * Remove the first line of a string.
+ * @param {string | undefined} lines
+ * @returns {string} - The string without the first line
+ */
+function removeFirstLine(lines) {
+  if (!lines) {
+    return ''
+  }
+
+  return lines.substring(lines.indexOf('\n') + 1)
+}
 
 for (const packageName of await getDirectories(packagesDir)) {
   const readmePath = path.join(packagesDir, packageName, 'README.md')
