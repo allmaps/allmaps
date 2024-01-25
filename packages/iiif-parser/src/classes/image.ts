@@ -247,17 +247,15 @@ export class EmbeddedImage {
       const widthStr = String(width)
       let heightStr = String(height)
 
-      if (this.majorVersion <= 2) {
-        const aspectRatio = regionWidth / regionHeight
-        const aspectRatioWidth = height * aspectRatio
-        const aspectRatioHeight = aspectRatioWidth / aspectRatio
+      const aspectRatio = regionWidth / regionHeight
+      const aspectRatioWidth = height * aspectRatio
+      const aspectRatioHeight = aspectRatioWidth / aspectRatio
 
-        // Is this really the right way to do it?
-        // See also:
-        // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
-        if (height === Math.round(aspectRatioHeight)) {
-          heightStr = ''
-        }
+      // Is this really the right way to do it?
+      // See also:
+      // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
+      if (height === Math.round(aspectRatioHeight)) {
+        heightStr = ''
       }
 
       urlSize = `${widthStr},${heightStr}`
