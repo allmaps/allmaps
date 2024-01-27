@@ -143,17 +143,10 @@ export default class TileCache extends EventTarget {
       }
     }
 
-    // Add requested tiles if not in cache
-    // Loop over all requested tiles
+    // Add requested tiles
+    // Loop over all requested tiles, and add them (also do this if the cache already contains them, so as to trigger the loading events in addMapTile() which will trigger a rerender etc.)
     for (const requestedTile of requestedTiles) {
-      // If the cache doesn't contain the set tile's tileUrl and mapId, add the requested tile
-      if (
-        !this.mapIdsByTileUrl
-          .get(requestedTile.tileUrl)
-          ?.has(requestedTile.mapId)
-      ) {
-        this.addMapTile(requestedTile)
-      }
+      this.addMapTile(requestedTile)
     }
 
     // console.log(
@@ -199,8 +192,6 @@ export default class TileCache extends EventTarget {
       // The results are handled inside the tile using events
       cacheableTile.fetch()
     } else {
-      // This should not happen given the way the tiles are added
-
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
           mapId,
