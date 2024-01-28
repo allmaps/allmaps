@@ -1,4 +1,4 @@
-<img src=",/packages/ui/src/lib/shared/images/allmaps-logo.svg" width="100" align="right" />
+<img src="./packages/ui/src/lib/shared/images/allmaps-logo.svg" width="100" align="right" />
 
 # @allmaps/allmaps
 
