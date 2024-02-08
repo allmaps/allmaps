@@ -18,7 +18,14 @@ export class DetectBackgroundColorWorker {
     // ])
 
     const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height)
-    const context = canvas.getContext('2d')
+
+    // https://github.com/microsoft/TypeScript/issues/53614
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const context = canvas.getContext('2d') as
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D
+      | null
+
     if (context) {
       context.drawImage(
         imageBitmap,

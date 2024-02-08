@@ -5,12 +5,17 @@
   import type Select from 'ol/interaction/Select.js'
   import type { ViewerMap } from '$lib/shared/types.js'
 
+  import type Feature from 'ol/Feature.js'
+  import type Geometry from 'ol/geom/Geometry.js'
+
   export let vectorSource: VectorSource
 
   export let select: Select
   export let viewerMap: ViewerMap
 
-  const feature = vectorSource.getFeatureById(viewerMap.mapId)
+  const feature = vectorSource.getFeatureById(
+    viewerMap.mapId
+  ) as Feature<Geometry>
 
   onMount(() => {
     if (feature) {
