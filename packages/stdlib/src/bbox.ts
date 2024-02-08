@@ -46,6 +46,7 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
     return computeBbox(convertGeojsonGeometryToGeometry(points))
   }
 
+  // TODO: do this without making two new arrays
   const xs = []
   const ys = []
 
