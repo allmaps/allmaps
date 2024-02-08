@@ -52,7 +52,7 @@
           // JSON might be a Georeference Annotation
           const maps = parseAnnotation(json)
           type = 'annotation'
-          maps.forEach((map) => addImageUri(map.image.uri))
+          maps.forEach((map) => addImageUri(map.resource.id))
           loaded = true
         } else {
           // JSON might be IIIF data
