@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@allmaps/maplibre</title>
+    <!-- TODO: load specific version from unpkg or skypack -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
@@ -29,27 +30,65 @@
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
+      import layers from 'https://cdn.skypack.dev/protomaps-themes-base'
+
       const map = new maplibregl.Map({
         container: 'map',
-        style:
-            'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+        style: {
+          version: 8,
+          glyphs:
+            'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+          sources: {
+            protomaps: {
+              type: 'vector',
+              tiles: [
+                'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
+              ],
+              maxzoom: 14,
+              attribution:
+                '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
+            }
+          },
+          layers: layers('protomaps', 'light')
+        },
         center: [-71.0599, 42.3589],
         zoom: 13,
         pitchWithRotate: false,
-        antialias: true
+        // This is needed to fix error that causes base map to disappear
+        // Don't know a better way to fix this currently.
+        // Related GitHub issues:
+        // - https://github.com/mapbox/mapbox-gl-js/issues/9499
+        // - https://github.com/mapbox/mapbox-gl-js/issues/8936
+        preserveDrawingBuffer: true
       })
 
-      let nav = new maplibregl.NavigationControl();
-      map.addControl(nav, 'top-left');
+      let nav = new maplibregl.NavigationControl()
+      map.addControl(nav, 'top-left')
 
       const warpedMapLayer = new WarpedMapLayer()
-      const annotationUrl = 'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
+      const annotationUrl =
+        'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
 
       map.on('load', async () => {
         map.addLayer(warpedMapLayer)
         await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
 
+      map.on('webglcontextlost', () => {
+        console.log('webglcontextlost')
+      })
+
+      document.addEventListener('keydown', (event) => {
+        if (event.code === 'Space') {
+          warpedMapLayer.setOpacity(0)
+        }
+      })
+
+      document.addEventListener('keyup', (event) => {
+        if (event.code === 'Space') {
+          warpedMapLayer.setOpacity(1)
+        }
+      })
     </script>
   </body>
 </html>
