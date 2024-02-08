@@ -27,7 +27,7 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) => `bundled/allmaps-maplibre-3.3.${format}.js`,
+      fileName: (format) => `bundled/allmaps-maplibre-4.0.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {

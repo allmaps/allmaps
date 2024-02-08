@@ -465,7 +465,6 @@ export class WarpedMapLayer implements CustomLayerInterface {
       throw new Error(ERROR_MSG_RENDER)
     }
     this.renderer.resetMapOpacity(mapId)
-
     this.map?.triggerRepaint()
   }
 
