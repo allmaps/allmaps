@@ -64,29 +64,13 @@ Install dependencies and create symlinks:
 pnpm install -r
 ```
 
-Finally, initialize SvelteKit apps:
+Finally, build all packages to ensure all JavaScript exports are created from TypeScript files, and initialize SvelteKit apps:
 
 ```sh
-pnpm run check
+pnpm run init
 ```
 
-## Running packages and apps locally
-
-### All packages and apps
-
-To run the `watch` and `dev` scripts for all packages and apps, run the following in one terminal window:
-
-```sh
-pnpm run watch
-```
-
-And this in another:
-
-```sh
-pnpm run dev
-```
-
-### A single app
+### Running a single app locally
 
 To run the `dev` script for a single app, you need to run the `watch` scripts of all packages in one terminal window:
 
@@ -104,6 +88,20 @@ You can also run the `dev` script from the app's directory instead:
 
 ```sh
 cd apps/viewer
+pnpm run dev
+```
+
+### Running all packages and apps locally
+
+To run the `watch` and `dev` scripts for all packages and apps, run the following in one terminal window:
+
+```sh
+pnpm run watch
+```
+
+And this in another:
+
+```sh
 pnpm run dev
 ```
 
