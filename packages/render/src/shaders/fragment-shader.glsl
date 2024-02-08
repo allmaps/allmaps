@@ -121,7 +121,7 @@ void main() {
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
     // Debugging: uncomment to override color of the treated point with a color made from the point's triangle index
-    vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    // vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
     // color = debugColor;
   }
 }
