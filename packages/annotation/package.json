@@ -60,6 +60,6 @@
     "zod-validation-error": "^1.5.0"
   },
   "dependencies": {
-    "zod": "^3.20.6"
+    "zod": "^3.22.4"
   }
 }
