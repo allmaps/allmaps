@@ -23,7 +23,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "require": "./dist/bundled/index.umd.js",
-      "import": "./dist/index.js"
+      "import": "./dist/bundled/index.es.js"
     }
   },
   "files": [
