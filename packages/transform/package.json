@@ -17,11 +17,13 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
+  "main": "./dist/index.js",
+  "unpkg": "./dist/bundled/index.umd.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "require": "./dist/bundled/index.umd.js",
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -48,16 +50,19 @@
     "ml-matrix": "^6.11.0"
   },
   "scripts": {
-    "watch": "tsc --watch",
-    "bench": "node bench/index.js",
-    "build": "tsc && npm run documentation",
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "vite build && pnpm run documentation",
+    "preview": "vite preview",
+    "pretest": "pnpm run build",
     "test": "NODE_ENV=test mocha",
+    "preversion": "npm run types && npm run lint && npm test",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "pretest": "npm run build",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
     "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
-    "preversion": "npm run types && npm run lint && npm test"
+    "build:types": "tsc --declaration --esModuleInterop",
+    "bench": "node bench/index.js"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
@@ -70,6 +75,7 @@
     "eslint": "^8.35.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^4.3.0"
   }
 }
