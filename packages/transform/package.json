@@ -15,8 +15,9 @@
   ],
   "description": "Coordinate transformation functions",
   "type": "module",
-  "module": "./dist/bundled/index.es.js",
+  "module": "./dist/index.js",
   "main": "./dist/bundled/index.umd.js",
+  "unpkg": "./dist/bundled/index.es.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
