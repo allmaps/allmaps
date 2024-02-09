@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/here",
-  "version": "1.0.0-beta.15",
+  "version": "1.0.0-beta.16",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -31,7 +31,7 @@
     "@allmaps/iiif-parser": "^1.0.0-beta.32",
     "@allmaps/stdlib": "^1.0.0-beta.21",
     "@allmaps/tailwind": "^1.0.0-beta.9",
-    "@allmaps/transform": "^1.0.0-beta.26",
+    "@allmaps/transform": "^1.0.0-beta.27",
     "@allmaps/types": "^1.0.0-beta.8",
     "@allmaps/ui": "^1.0.0-beta.22",
     "ol": "^8.2.0"
