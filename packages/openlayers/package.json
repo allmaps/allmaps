@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.57",
+  "version": "1.0.0-beta.58",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -60,7 +60,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.53",
+    "@allmaps/render": "^1.0.0-beta.54",
     "@allmaps/stdlib": "^1.0.0-beta.21",
     "lodash-es": "^4.17.21",
     "ol": "^8.2.0"
