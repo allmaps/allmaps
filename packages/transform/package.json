@@ -18,7 +18,7 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "unpkg": "./dist/bundled/index.umd.js",
+  "unpkg": "./dist/bundled/index.es.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
