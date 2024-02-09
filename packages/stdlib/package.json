@@ -42,9 +42,9 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "npm run types && npm run lint && npm test",
+    "preversion": "pnpm run types && pnpm run lint && pnpm test",
     "test": "NODE_ENV=test mocha",
-    "pretest": "npm run build",
+    "pretest": "pnpm run build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit"

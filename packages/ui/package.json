@@ -46,7 +46,7 @@
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "npm run types && npm run lint"
+    "preversion": "pnpm run types && pnpm run lint"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^2.0.0",
