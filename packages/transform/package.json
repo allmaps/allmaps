@@ -17,6 +17,7 @@
   "type": "module",
   "main": "./dist/bundled/index.umd.js",
   "module": "./dist/bundled/index.es.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
