@@ -74,10 +74,6 @@
         await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
 
-      map.on('webglcontextlost', () => {
-        console.log('webglcontextlost')
-      })
-
       document.addEventListener('keydown', (event) => {
         if (event.code === 'Space') {
           warpedMapLayer.setOpacity(0)
