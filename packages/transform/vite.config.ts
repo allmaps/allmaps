@@ -24,9 +24,17 @@ export default defineConfig({
       name: 'Allmaps',
       fileName: (format) => `bundled/index.${format}.js`,
       formats: ['es', 'umd']
+    },
+    rollupOptions: {
+      external: ['@allmaps/stdlib', '@turf/distance', '@turf/midpoint'],
+      output: {
+        globals: {
+          '@allmaps/stdlib': '@allmaps/stdlib',
+          '@turf/distance': '@turf/distance',
+          '@turf/midpoint': '@turf/midpoint'
+        }
+      }
     }
-    // Transform module is bundled with vite to fix ESM errors with ml-matrix.
-    // TODO: should some of this module's dependencies be external?
   },
   optimizeDeps: {
     esbuildOptions: {
