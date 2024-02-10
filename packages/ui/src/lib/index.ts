@@ -8,6 +8,7 @@ import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
 import Loading from '$lib/components/Loading.svelte'
 import Dial from '$lib/components/Dial.svelte'
+import Slider from '$lib/components/Slider.svelte'
 import Copy from '$lib/components/Copy.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 
@@ -34,6 +35,7 @@ export {
   URLType,
   Loading,
   Dial,
+  Slider,
   Copy,
   MapMonster,
 
