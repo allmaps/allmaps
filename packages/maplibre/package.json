@@ -15,13 +15,13 @@
   ],
   "description": "MapLibre classes for Allmaps",
   "type": "module",
-  "main": "./dist/bundled/allmaps-maplibre-4.0.umd.cjs",
+  "main": "./dist/bundled/allmaps-maplibre-4.0.umd.js",
   "module": "./dist/bundled/allmaps-maplibre-4.0.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/bundled/allmaps-maplibre-4.0.umd.cjs",
+      "require": "./dist/bundled/allmaps-maplibre-4.0.umd.js",
       "import": "./dist/bundled/allmaps-maplibre-4.0.es.js"
     }
   },
