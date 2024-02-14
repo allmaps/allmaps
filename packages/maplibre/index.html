@@ -4,13 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@allmaps/maplibre</title>
-    <!-- TODO: load specific version from unpkg or skypack -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
+      href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
       type="text/css"
     />
-    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
     <style>
       body {
         margin: 0;
@@ -30,6 +29,7 @@
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
+      // This example loads the basemap using protomaps
       import layers from 'https://cdn.skypack.dev/protomaps-themes-base'
 
       const map = new maplibregl.Map({
@@ -74,12 +74,12 @@
         await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
 
+      // Adding some logic to toggle the opacity using the 'Space' key
       document.addEventListener('keydown', (event) => {
         if (event.code === 'Space') {
           warpedMapLayer.setOpacity(0)
         }
       })
-
       document.addEventListener('keyup', (event) => {
         if (event.code === 'Space') {
           warpedMapLayer.setOpacity(1)

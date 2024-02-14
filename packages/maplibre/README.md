@@ -62,8 +62,8 @@ const map = new maplibregl.Map({
     'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
   center: [-71.0599, 42.3589],
   zoom: 13,
-  pitchWithRotate: false, // Disable pitch on your map
-  preserveDrawingBuffer: true
+  maxPitch: 0, // Disable pitch on your map
+  preserveDrawingBuffer: true // Hack required for a rendering issues
 })
 
 const warpedMapLayer = new WarpedMapLayer()
@@ -109,7 +109,9 @@ map.on('load', async () => {
 
 ### Example
 
-Once this package is published, a CodePen example will be added here.
+<a href="https://codepen.io/mclaeysb/pen/YzgdNNe?editors=1000"><img src="thumbnail.png" height="400" alt="Allmaps MapLibre Thumbnail"></a>
+
+Click the image above to see a live CodePen example of a minimal html file that loads a MapLibre map, creates a Layer and adds a Georeference Annotation to the Layer to display it's Georeferenced Map on the MapLibre map.
 
 ### Events
 
