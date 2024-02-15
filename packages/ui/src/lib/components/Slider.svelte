@@ -15,11 +15,9 @@
   let initialValue = internalValue
   let lastValue = internalValue
 
-  
   $: {
     value = invert ? 1 - internalValue : internalValue
   }
-
 
   function clampValue(value: number): number {
     if (value > 1) {
@@ -52,13 +50,18 @@
     active = false
   }
   const keydown = (event: KeyboardEvent) => {
-    if (!active && keyCode && event.code === keyCode && event.target === document.body) {
+    if (
+      !active &&
+      keyCode &&
+      event.code === keyCode &&
+      event.target === document.body
+    ) {
       pointerdown(event)
     }
   }
   const keyup = (event: KeyboardEvent) => {
     if (keyCode && event.code === keyCode && event.target === document.body) {
-      pointerup() 
+      pointerup()
     }
   }
 
@@ -77,47 +80,56 @@
   }
 </script>
 
-<svelte:window on:keydown={keydown} on:keyup={keyup} on:pointerdown={globalPointerdown}/>
+<svelte:window
+  on:keydown={keydown}
+  on:keyup={keyup}
+  on:pointerdown={globalPointerdown}
+/>
 
-<div class="inline-block flex z-100 select-none container" on:mouseenter={enter} on:mouseleave={exit} on:wheel={wheel}>
+<div
+  class="inline-block flex z-100 select-none container"
+  on:mouseenter={enter}
+  on:mouseleave={exit}
+  on:wheel={wheel}
+>
+  <div
+    class="overflow-hidden transition-all rounded-full border-black border relative border-2 p-1 w-9 bg-white cursor-pointer {hover
+      ? ' h-[150px]'
+      : ' h-9'}"
+  >
     <div
-      class="overflow-hidden transition-all rounded-full border-black border relative border-2 p-1 w-9 bg-white cursor-pointer {hover
-        ? ' h-[150px]'
-        : ' h-9'}"
+      class="absolute bottom-0 left-0 w-full h-8 flex justify-center items-center"
+      on:pointerdown={pointerdown}
+      on:pointerup={pointerup}
     >
-      <div
-        class="absolute bottom-0 left-0 w-full h-8 flex justify-center items-center"
-        on:pointerdown={pointerdown}
-        on:pointerup={pointerup}
-      >
-        <slot />
-      </div>
+      <slot />
+    </div>
 
-      <div
-        class="absolute top-0 left-0 w-full h-[calc(100%-3rem)] z-10 {!hover
-          ? 'hidden'
-          : ''}"
-      >
-        <input
-          type="range"
-          class="slider"
-          bind:value={internalValue}
-          min="0"
-          max="1"
-          alt={label}
-          {step}
-          on:pointerenter={() => active = true}
-          on:pointerleave={() => active = false}
-        />
-      </div>
-
-      <div
-        class="absolute bottom-0 left-0 w-full z-0 background"
-        style="height: calc({internalValue * 100}%{!hover
-          ? ''
-          : ' + ' + (1 - internalValue) * 3 + 'rem'});"
+    <div
+      class="absolute top-0 left-0 w-full h-[calc(100%-3rem)] z-10 {!hover
+        ? 'hidden'
+        : ''}"
+    >
+      <input
+        type="range"
+        class="slider"
+        bind:value={internalValue}
+        min="0"
+        max="1"
+        alt={label}
+        {step}
+        on:pointerenter={() => (active = true)}
+        on:pointerleave={() => (active = false)}
       />
     </div>
+
+    <div
+      class="absolute bottom-0 left-0 w-full z-0 background"
+      style="height: calc({internalValue * 100}%{!hover
+        ? ''
+        : ' + ' + (1 - internalValue) * 3 + 'rem'});"
+    />
+  </div>
 </div>
 
 <style>
@@ -125,9 +137,10 @@
     background-color: rgba(0, 0, 0, 0.388);
   }
   .container {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -webkit-tap-highlight-color: transparent;
   }
+
   .slider {
     -webkit-appearance: none;
     appearance: none;
@@ -146,7 +159,7 @@
     width: 30px;
     height: 10px;
     background: transparent;
-    cursor: ns-resize	;
+    cursor: ns-resize;
     border-radius: 0;
   }
 
@@ -154,7 +167,7 @@
     width: 100%;
     height: 10px;
     background: transparent;
-    cursor: ns-resize	;
+    cursor: ns-resize;
     border-radius: 0;
   }
 </style>
