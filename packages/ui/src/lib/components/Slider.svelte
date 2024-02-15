@@ -15,7 +15,7 @@
   let initialValue = internalValue
   let lastValue = internalValue
 
-
+  
   $: {
     value = invert ? 1 - internalValue : internalValue
   }
@@ -33,15 +33,13 @@
 
   const enter = (event: MouseEvent | TouchEvent) => {
     hover = true
-    console.log('enter')
   }
   const exit = () => {
     hover = false
-    console.log('exit')
   }
   const pointerdown = (event: MouseEvent | TouchEvent | KeyboardEvent) => {
-    console.log('pointerdown')
     active = true
+    hover = true
     lastValue = internalValue
     if (event.shiftKey) {
       internalValue = clampValue(initialValue + toggleValue)
@@ -50,7 +48,6 @@
     }
   }
   const pointerup = () => {
-    console.log('pointerup')
     internalValue = lastValue
     active = false
   }
@@ -71,9 +68,16 @@
     const delta = event.deltaY
     internalValue = clampValue(internalValue + delta / 100)
   }
+
+  const globalPointerdown = (event: PointerEvent) => {
+    if (event.target instanceof HTMLCanvasElement) {
+      active = false
+      hover = false
+    }
+  }
 </script>
 
-<svelte:window on:keydown={keydown} on:keyup={keyup} />
+<svelte:window on:keydown={keydown} on:keyup={keyup} on:pointerdown={globalPointerdown}/>
 
 <div class="inline-block flex z-100 select-none container" on:mouseenter={enter} on:mouseleave={exit} on:wheel={wheel}>
     <div
