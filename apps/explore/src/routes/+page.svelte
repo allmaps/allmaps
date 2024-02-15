@@ -113,8 +113,8 @@
           'line-cap': 'round'
         },
         paint: {
-          'line-color': '#ff69b4',
-          'line-width': 2
+          'line-color': '#ff56ba',
+          'line-width': 3
         }
       })
 
@@ -147,7 +147,9 @@
           {#await fetchImageInfo(feature.properties.resourceId)}
             <p>Loading...</p>
           {:then imageInfo}
-            <Thumbnail {imageInfo} width={300} height={300} mode="contain" />
+            <a href="https://viewer.allmaps.org/?url={feature.properties.id}">
+              <Thumbnail {imageInfo} width={300} height={300} mode="contain" />
+            </a>
             <div>
               <button
                 on:click={() => showOnMap(feature.properties.id)}
@@ -162,8 +164,7 @@
               <a
                 class="underline"
                 href="https://viewer.allmaps.org/?url={feature.properties.id}"
-                target="_blank"
-                rel="noreferrer">Open in Allmaps Viewer</a
+                >Open in Allmaps Viewer</a
               >
             </div>
           {:catch error}
