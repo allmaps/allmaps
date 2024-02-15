@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 import basicSsl from '@vitejs/plugin-basic-ssl'
-// this is needed to serve the app over https 
-// if you are using an ip instead of localhost to make sure
-// crypto has SubtleCrypto which is needed in the id package
+// This is needed to serve the app over https
+// if you are using an IP address instead of localhost to make sure
+// crypto has SubtleCrypto which is needed in the @allmaps/id package
 
 import ports from '../../ports.json'
 
@@ -15,6 +15,6 @@ export default defineConfig({
   plugins: [
     sveltekit(),
     // @ts-ignore: Unreachable code error
-    basicSsl() 
+    basicSsl()
   ]
 })
