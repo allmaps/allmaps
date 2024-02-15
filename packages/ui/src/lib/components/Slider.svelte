@@ -31,14 +31,16 @@
     }
   }
 
-  const enter = () => {
+  const enter = (event: MouseEvent | TouchEvent) => {
     hover = true
+    console.log('enter')
   }
   const exit = () => {
     hover = false
+    console.log('exit')
   }
   const pointerdown = (event: MouseEvent | TouchEvent | KeyboardEvent) => {
-    // console.log('pointerdown')
+    console.log('pointerdown')
     active = true
     lastValue = internalValue
     if (event.shiftKey) {
@@ -48,7 +50,7 @@
     }
   }
   const pointerup = () => {
-    // console.log('pointerup')
+    console.log('pointerup')
     internalValue = lastValue
     active = false
   }
@@ -62,11 +64,18 @@
       pointerup() 
     }
   }
+
+  const wheel = (event: WheelEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const delta = event.deltaY
+    internalValue = clampValue(internalValue + delta / 100)
+  }
 </script>
 
 <svelte:window on:keydown={keydown} on:keyup={keyup} />
 
-<div class="inline-block flex z-100" on:mouseenter={enter} on:mouseleave={exit}>
+<div class="inline-block flex z-100 select-none container" on:mouseenter={enter} on:mouseleave={exit} on:wheel={wheel}>
     <div
       class="overflow-hidden transition-all rounded-full relative border-2 bg-white p-1 w-9 cursor-pointer {hover
         ? 'border-black h-[150px]'
@@ -81,7 +90,7 @@
       </div>
 
       <div
-        class="absolute top-0 left-0 w-full h-[calc(100%-2rem)] z-10 {!hover
+        class="absolute top-0 left-0 w-full h-[calc(100%-3rem)] z-10 {!hover
           ? 'hidden'
           : ''}"
       >
@@ -102,12 +111,16 @@
         class="absolute bottom-0 left-0 w-full bg-black z-0"
         style="height: calc({internalValue * 100}%{!hover
           ? ''
-          : ' + ' + (1 - internalValue) * 2 + 'rem'});"
+          : ' + ' + (1 - internalValue) * 3 + 'rem'});"
       />
     </div>
 </div>
 
 <style>
+  .container {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+  }
   .slider {
     -webkit-appearance: none;
     appearance: none;
