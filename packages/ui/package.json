@@ -75,6 +75,7 @@
   },
   "dependencies": {
     "@allmaps/tailwind": "^1.0.0-beta.9",
+    "@allmaps/iiif-parser": "^1.0.0-beta.32",
     "flowbite": "^1.6.4"
   }
 }

@@ -4,6 +4,7 @@ import paramStore from './shared/stores/param.js'
 
 import Logo from '$lib/components/Logo.svelte'
 import Header from '$lib/components/Header.svelte'
+import Thumbnail from '$lib/components/Thumbnail.svelte'
 import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
 import Loading from '$lib/components/Loading.svelte'
@@ -31,6 +32,7 @@ export { urlStore, dataStore, paramStore }
 export {
   Logo,
   Header,
+  Thumbnail,
   URLInput,
   URLType,
   Loading,
