@@ -148,7 +148,9 @@
           {#await fetchImageInfo(feature.properties.resourceId)}
             <p>Loading...</p>
           {:then imageInfo}
-            <a href="https://viewer.allmaps.org/?url={feature.properties.id}">
+            <a
+              href="https://dev.viewer.allmaps.org/?url={feature.properties.id}"
+            >
               <Thumbnail {imageInfo} width={300} height={300} mode="contain" />
             </a>
             <div>
@@ -164,8 +166,8 @@
               >
               <a
                 class="underline"
-                href="https://viewer.allmaps.org/?url={feature.properties.id}"
-                >Open in Allmaps Viewer</a
+                href="https://dev.viewer.allmaps.org/?url={feature.properties
+                  .id}">Open in Allmaps Viewer</a
               >
             </div>
           {:catch error}
