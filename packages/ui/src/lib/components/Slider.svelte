@@ -77,9 +77,9 @@
 
 <div class="inline-block flex z-100 select-none container" on:mouseenter={enter} on:mouseleave={exit} on:wheel={wheel}>
     <div
-      class="overflow-hidden transition-all rounded-full relative border-2 bg-white p-1 w-9 cursor-pointer {hover
-        ? 'border-black h-[150px]'
-        : 'border-gray-500 h-9'}"
+      class="overflow-hidden transition-all rounded-full border-black border relative border-2 p-1 w-9 bg-white cursor-pointer {hover
+        ? ' h-[150px]'
+        : ' h-9'}"
     >
       <div
         class="absolute bottom-0 left-0 w-full h-8 flex justify-center items-center"
@@ -108,7 +108,7 @@
       </div>
 
       <div
-        class="absolute bottom-0 left-0 w-full bg-black z-0"
+        class="absolute bottom-0 left-0 w-full z-0 background"
         style="height: calc({internalValue * 100}%{!hover
           ? ''
           : ' + ' + (1 - internalValue) * 3 + 'rem'});"
@@ -117,6 +117,9 @@
 </div>
 
 <style>
+  .background {
+    background-color: rgba(0, 0, 0, 0.388);
+  }
   .container {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
