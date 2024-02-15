@@ -90,10 +90,11 @@
         },
         layers: layers('protomaps', 'light')
       },
-      center: [-77.41, 37.5],
-      zoom: 10,
+      center: [14.2437, 40.8384],
+      zoom: 7,
       maxPitch: 0,
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: true,
+      hash: true
     })
 
     map.on('load', () => {
