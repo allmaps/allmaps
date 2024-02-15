@@ -65,8 +65,8 @@
   const wheel = (event: WheelEvent) => {
     event.preventDefault()
     event.stopPropagation()
-    const delta = event.deltaY
-    internalValue = clampValue(internalValue + delta / 100)
+    const delta = event.deltaY / 100
+    internalValue = clampValue(internalValue - delta)
   }
 
   const globalPointerdown = (event: PointerEvent) => {
