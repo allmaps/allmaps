@@ -44,7 +44,12 @@
     "vite": "^4.3.0"
   },
   "dependencies": {
+    "@allmaps/maplibre": "^1.0.0-beta.15",
+    "@allmaps/tailwind": "^1.0.0-beta.9",
     "@allmaps/ui": "^1.0.0-beta.22",
-    "ol": "^8.2.0"
+    "@allmaps/stdlib": "^1.0.0-beta.21",
+    "maplibre-gl": "^4.0.0",
+    "pmtiles": "^3.0.3",
+    "protomaps-themes-base": "2.0.0-alpha.5"
   }
 }

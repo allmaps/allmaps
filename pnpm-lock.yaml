@@ -123,12 +123,27 @@ importers:
 
   apps/explore:
     dependencies:
+      '@allmaps/maplibre':
+        specifier: ^1.0.0-beta.15
+        version: link:../../packages/maplibre
+      '@allmaps/stdlib':
+        specifier: ^1.0.0-beta.21
+        version: link:../../packages/stdlib
+      '@allmaps/tailwind':
+        specifier: ^1.0.0-beta.9
+        version: link:../../packages/tailwind
       '@allmaps/ui':
         specifier: ^1.0.0-beta.22
         version: link:../../packages/ui
-      ol:
-        specifier: ^8.2.0
-        version: 8.2.0
+      maplibre-gl:
+        specifier: ^4.0.0
+        version: 4.0.0
+      pmtiles:
+        specifier: ^3.0.3
+        version: 3.0.3
+      protomaps-themes-base:
+        specifier: 2.0.0-alpha.5
+        version: 2.0.0-alpha.5
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^1.0.0
@@ -1242,6 +1257,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@allmaps/iiif-parser':
+        specifier: ^1.0.0-beta.32
+        version: link:../iiif-parser
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.9
         version: link:../tailwind
@@ -4164,6 +4182,12 @@ packages:
       '@types/geojson': 7946.0.10
     dev: true
 
+  /@types/leaflet@1.9.8:
+    resolution: {integrity: sha512-EXdsL4EhoUtGm2GC2ZYtXn+Fzc6pluVgagvo2VC1RHWToLGlTRwVYoDpqS/7QXa01rmDyBjJk3Catpf60VMkwg==}
+    dependencies:
+      '@types/geojson': 7946.0.13
+    dev: false
+
   /@types/lodash-es@4.17.6:
     resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
     dependencies:
@@ -6698,6 +6722,10 @@ packages:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
     dependencies:
       reusify: 1.0.4
+
+  /fflate@0.8.2:
+    resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
+    dev: false
 
   /figures@3.2.0:
     resolution: {integrity: sha512-yaduQFRKLXYOGgEn6AZau90j3ggSOyiqXU0F9JZfeXYhNa+Jk4X+s45A2zg5jns87GAFa34BBm2kXw4XpNcbdg==}
@@ -10948,6 +10976,13 @@ packages:
       pathe: 1.1.1
     dev: true
 
+  /pmtiles@3.0.3:
+    resolution: {integrity: sha512-tj4l3HHJd6/qf9VefzlPK2eYEQgbf+4uXPzNlrj3k7hHvLtibYSxfp51TF6ALt4YezM8MCdiOminnHvdAyqyGg==}
+    dependencies:
+      '@types/leaflet': 1.9.8
+      fflate: 0.8.2
+    dev: false
+
   /pngjs@6.0.0:
     resolution: {integrity: sha512-TRzzuFRRmEoSW/p1KVAmiOgPco2Irlah+bGFCeNfJXxxYGwSw7YwAOAcd7X28K/m5bjBWKsC29KyoMfHbypayg==}
     engines: {node: '>=12.13.0'}
@@ -11243,6 +11278,10 @@ packages:
   /protocols@2.0.1:
     resolution: {integrity: sha512-/XJ368cyBJ7fzLMwLKv1e4vLxOju2MNAIokcr7meSaNcVbWz/CPcW22cP04mwxOErdA5mwjA8Q6w/cdAQxVn7Q==}
     dev: true
+
+  /protomaps-themes-base@2.0.0-alpha.5:
+    resolution: {integrity: sha512-IQ63JgClmJY89jyk+5qodvoTlpaAshmy8iJIze1UapPCo4Q+gEuErLrIqgsRWN1aXyL7pNm9CrhkKaNEUmWXBg==}
+    dev: false
 
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
