@@ -73,8 +73,8 @@ export default class Helmert implements Transformation {
         this.helmertParametersMatrix.get(2, 0) * newSourcePoint[0] -
         this.helmertParametersMatrix.get(3, 0) * newSourcePoint[1],
       this.helmertParametersMatrix.get(1, 0) +
-        this.helmertParametersMatrix.get(3, 0) * newSourcePoint[0] +
-        this.helmertParametersMatrix.get(2, 0) * newSourcePoint[1]
+        this.helmertParametersMatrix.get(2, 0) * newSourcePoint[1] +
+        this.helmertParametersMatrix.get(3, 0) * newSourcePoint[0]
     ]
 
     return newDestinationPoint

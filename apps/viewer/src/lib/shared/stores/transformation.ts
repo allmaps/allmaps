@@ -6,13 +6,13 @@ import { mapIds } from '$lib/shared/stores/maps.js'
 import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
 
 const transformations: TransformationType[] = [
-  // 'helmert',
   'polynomial',
   // 'polynomial1',
   // 'polynomial2',
   // 'polynomial3',
   // 'projective',
-  'thinPlateSpline'
+  'thinPlateSpline',
+  'helmert'
 ]
 
 const DEFAULT_TRANSFORMATION_INDEX = 0

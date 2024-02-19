@@ -27,7 +27,8 @@ function mergeDefaultOptions(
     maxOffsetRatio: 0,
     maxDepth: 0,
     destinationIsGeographic: false,
-    sourceIsGeographic: false
+    sourceIsGeographic: false,
+    differentHandedness: false
   }
 
   if (options && options.maxDepth !== undefined) {
@@ -44,6 +45,10 @@ function mergeDefaultOptions(
 
   if (options && options.sourceIsGeographic !== undefined) {
     mergedOptions.sourceIsGeographic = options.sourceIsGeographic
+  }
+
+  if (options && options.differentHandedness !== undefined) {
+    mergedOptions.differentHandedness = options.differentHandedness
   }
 
   return mergedOptions

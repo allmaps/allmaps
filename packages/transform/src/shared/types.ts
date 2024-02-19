@@ -24,10 +24,12 @@ export type TransformationType =
 export type TransformOptions = {
   maxOffsetRatio: number
   maxDepth: number
-  // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there
-  destinationIsGeographic: boolean
   // Assume source points are in lon/lat coordinates and use geographic distances and midpoints there
   sourceIsGeographic: boolean
+  // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there
+  destinationIsGeographic: boolean
+  // Whether one of the axes should be flipped while computing the transformation parameters.
+  differentHandedness: boolean
 }
 
 export type PartialTransformOptions = Partial<TransformOptions>
@@ -38,6 +40,7 @@ export type NormFunction = (point1: Point, point2: Point) => number
 export type Transformation = {
   sourcePoints: Point[]
   destinationPoints: Point[]
+  options?: PartialTransformOptions
 
   pointCount: number
 

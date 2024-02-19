@@ -4,7 +4,7 @@
     nextTransformation
   } from '$lib/shared/stores/transformation.js'
 
-  import { Polynomial1, ThinPlateSpline } from '@allmaps/ui'
+  import { Helmert, Polynomial1, ThinPlateSpline } from '@allmaps/ui'
 </script>
 
 <button
@@ -16,5 +16,7 @@
     <Polynomial1 />
   {:else if $transformation === 'thinPlateSpline'}
     <ThinPlateSpline />
+  {:else if $transformation === 'helmert'}
+    <Helmert />
   {/if}
 </button>

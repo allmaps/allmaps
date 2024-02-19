@@ -1,3 +1,19 @@
+import {
+  convertPointToGeojsonPoint,
+  convertLineStringToGeojsonLineString,
+  convertPolygonToGeojsonPolygon,
+  convertGeojsonPointToPoint,
+  convertGeojsonLineStringToLineString,
+  convertGeojsonPolygonToPolygon,
+  isPoint,
+  isLineString,
+  isPolygon,
+  isGeojsonPoint,
+  isGeojsonLineString,
+  isGeojsonPolygon,
+  flipY
+} from '@allmaps/stdlib'
+
 import Helmert from './shared/helmert.js'
 import Polynomial from './shared/polynomial.js'
 import Projective from './shared/projective.js'
@@ -13,29 +29,6 @@ import {
   transformPolygonBackwardToPolygon
 } from './shared/transform-helper-functions.js'
 
-import {
-  convertPointToGeojsonPoint,
-  convertLineStringToGeojsonLineString,
-  convertPolygonToGeojsonPolygon,
-  convertGeojsonPointToPoint,
-  convertGeojsonLineStringToLineString,
-  convertGeojsonPolygonToPolygon,
-  isPoint,
-  isLineString,
-  isPolygon,
-  isGeojsonPoint,
-  isGeojsonLineString,
-  isGeojsonPolygon
-} from '@allmaps/stdlib'
-
-import type {
-  TransformGcp,
-  TransformationType,
-  PartialTransformOptions,
-  GcpTransformerInterface,
-  Transformation
-} from './shared/types.js'
-
 import type {
   Point,
   LineString,
@@ -49,6 +42,14 @@ import type {
   SvgGeometry
 } from '@allmaps/types'
 
+import type {
+  TransformGcp,
+  TransformationType,
+  PartialTransformOptions,
+  GcpTransformerInterface,
+  Transformation
+} from './shared/types.js'
+
 /**
  * A Ground Control Point Transformer, containing a forward and backward transformation and
  * specifying functions to transform geometries using these transformations.
@@ -58,6 +59,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   sourcePoints: Point[]
   destinationPoints: Point[]
   type: TransformationType
+  options?: PartialTransformOptions
 
   forwardTransformation?: Transformation
   backwardTransformation?: Transformation
@@ -68,8 +70,12 @@ export default class GcpTransformer implements GcpTransformerInterface {
    * @param {TransformationType} [type='polynomial'] - The transformation type
    */ constructor(
     gcps: TransformGcp[] | Gcp[],
-    type: TransformationType = 'polynomial'
+    type: TransformationType = 'polynomial',
+    options?: PartialTransformOptions
   ) {
+    if (options) {
+      this.options = options
+    }
     if (gcps.length == 0) {
       throw new Error('No control points.')
     }
@@ -90,12 +96,22 @@ export default class GcpTransformer implements GcpTransformerInterface {
     this.type = type
   }
 
+  assureEqualHandedness(point: Point): Point {
+    return this.options?.differentHandedness ? flipY(point) : point
+  }
+
   #createForwardTransformation(): Transformation {
-    return this.#createTransformation(this.sourcePoints, this.destinationPoints)
+    return this.#createTransformation(
+      this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
+      this.destinationPoints
+    )
   }
 
   #createBackwardTransformation(): Transformation {
-    return this.#createTransformation(this.destinationPoints, this.sourcePoints)
+    return this.#createTransformation(
+      this.destinationPoints,
+      this.sourcePoints.map((point) => this.assureEqualHandedness(point))
+    )
   }
 
   #createTransformation(
@@ -156,7 +172,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
       if (!this.forwardTransformation) {
         this.forwardTransformation = this.#createForwardTransformation()
       }
-      return this.forwardTransformation.interpolate(input)
+      return this.forwardTransformation.interpolate(
+        this.assureEqualHandedness(input)
+      )
     } else if (isGeojsonPoint(input)) {
       return this.transformForward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {
@@ -298,7 +316,9 @@ export default class GcpTransformer implements GcpTransformerInterface {
         this.backwardTransformation = this.#createBackwardTransformation()
       }
 
-      return this.backwardTransformation.interpolate(input)
+      return this.assureEqualHandedness(
+        this.backwardTransformation.interpolate(input)
+      )
     } else if (isGeojsonPoint(input)) {
       return this.transformBackward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {

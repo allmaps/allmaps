@@ -145,9 +145,9 @@ export default class WarpedMap extends EventTarget {
     this.georeferencedMap = georeferencedMap
 
     this.gcps = this.georeferencedMap.gcps
-    this.projectedGcps = this.gcps.map(({ geo, resource }) => ({
-      geo: lonLatToWebMecator(geo),
-      resource
+    this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: lonLatToWebMecator(geo)
     }))
 
     this.resourceMask = this.georeferencedMap.resourceMask
@@ -477,13 +477,18 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateTransformer(): void {
-    this.transformer = new GcpTransformer(this.gcps, this.transformationType)
+    this.transformer = new GcpTransformer(this.gcps, this.transformationType, {
+      differentHandedness: true
+    })
   }
 
   private updateProjectedTransformer(): void {
     this.projectedTransformer = new GcpTransformer(
       this.projectedGcps,
-      this.transformationType
+      this.transformationType,
+      {
+        differentHandedness: true
+      }
     )
   }
 

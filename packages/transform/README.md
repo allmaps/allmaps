@@ -72,9 +72,21 @@ type Polygon = Point[][]
 type Geometry = Point | LineString | Polygon
 ```
 
-### Refined transfromation of LineStrings and Polygons
+### Handedness
+
+For some transformations, it is important that the source and destination planes have the same *handedness*.
+
+There are two types of handedness: a Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the "first" and the y-axis the "second" axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates.
+
+The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For many transformations, it does not matter whether the source and destination have the same handedness, since a separate transformation is computed for both axes. For some transformations, like the Helmert transformation, the transformation of X and Y coordinates are computed jointly (they are said to be 'coupled') and the difference matters.
+
+In case the handedness differs one can set the `differentHandedness` parameter to `true`. This will flip the y-axis of the source in the control points (and new points) so as to align the handedness of both during computation.
+
+### Refined transformation of LineStrings and Polygons
 
 When transforming a line or polygon, it can happen that simply transforming every point is not sufficient. Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines). An algorithm will therefore recursively add midpoints in each segment (i.e. between two points) to make the line more granular. A midpoint is added at the transformed middle point of the original segment on the condition that the ratio of (the distance between the middle point of the transformed segment and the transformed middle point of the original segment) to the length of the transformed segment, is larger then a given ratio. The following options specify if and with what degree of detail such extra points should be added.
+
+### Transformation options
 
 | Option                    | Description                                                              | Default                                      |
 | :------------------------ | :----------------------------------------------------------------------- | :------------------------------------------- |
@@ -82,6 +94,7 @@ When transforming a line or polygon, it can happen that simply transforming ever
 | `maxDepth`                | Maximum recursion depth (higher means more midpoints)                    | `0`                                          |
 | `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` when source is GeoJSON)      |
 | `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` when destination is GeoJSON) |
+| `differentHandedness` | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false` |
 
 ## Installation
 
@@ -297,6 +310,7 @@ specifying functions to transform geometries using these transformations.
 
 *   `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<TransformGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
 *   `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
+*   `options` &#x20;
 
 #### transformForward
 

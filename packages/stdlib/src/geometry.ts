@@ -193,6 +193,14 @@ export function isEqualPointArrayArray(
 
 // Compute
 
+export function flipX(point: Point): Point {
+  return [-point[0], point[1]]
+}
+
+export function flipY(point: Point): Point {
+  return [point[0], -point[1]]
+}
+
 export function midPoint(point0: Point, point1: Point): Point {
   return [
     (point1[0] - point0[0]) / 2 + point0[0],
