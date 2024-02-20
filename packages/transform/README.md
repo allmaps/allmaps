@@ -74,13 +74,13 @@ type Geometry = Point | LineString | Polygon
 
 ### Handedness
 
-For some transformations, it is important that the source and destination planes have the same *handedness*.
+For some transformations, it is important that the source and destination planes have the same _handedness_.
 
-There are two types of handedness: a Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the "first" and the y-axis the "second" axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates.
+There are two types of handedness: a Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the "first" and the y-axis the "second" axis) is said to have _right-handed_ orientation (also called _standard_, _positive_ or _counter-clockwise_). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is _left-handed_ (or _negative_ or _clock-wise_). This is for example the case for typical pixel coordinates.
 
 The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For many transformations, it does not matter whether the source and destination have the same handedness, since a separate transformation is computed for both axes. For some transformations, like the Helmert transformation, the transformation of X and Y coordinates are computed jointly (they are said to be 'coupled') and the difference matters.
 
-In case the handedness differs one can set the `differentHandedness` parameter to `true`. This will flip the y-axis of the source in the control points (and new points) so as to align the handedness of both during computation.
+In case the handedness differs one can set the `differentHandedness` parameter to `true`. This will internally flip the y-axis of the source so as to align the handedness of both during computation.
 
 ### Refined transformation of LineStrings and Polygons
 
@@ -88,13 +88,13 @@ When transforming a line or polygon, it can happen that simply transforming ever
 
 ### Transformation options
 
-| Option                    | Description                                                              | Default                                      |
-| :------------------------ | :----------------------------------------------------------------------- | :------------------------------------------- |
-| `maxOffsetRatio`          | Maximum offset ratio (smaller means more midpoints)                      | `0`                                          |
-| `maxDepth`                | Maximum recursion depth (higher means more midpoints)                    | `0`                                          |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` when source is GeoJSON)      |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` when destination is GeoJSON) |
-| `differentHandedness` | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false` |
+| Option                    | Description                                                                                                                                                           | Default                                      |
+| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| `maxOffsetRatio`          | Maximum offset ratio (smaller means more midpoints)                                                                                                                   | `0`                                          |
+| `maxDepth`                | Maximum recursion depth (higher means more midpoints)                                                                                                                 | `0`                                          |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                      | `false` (`true` when source is GeoJSON)      |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                 | `false` (`true` when destination is GeoJSON) |
+| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false`                                      |
 
 ## Installation
 
@@ -285,19 +285,19 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 
 #### Table of Contents
 
-*   [allmaps/transform](#allmapstransform)
-*   [GcpTransformer](#gcptransformer)
-    *   [Parameters](#parameters)
-    *   [transformForward](#transformforward)
-    *   [transformForwardAsGeojson](#transformforwardasgeojson)
-    *   [transformBackward](#transformbackward)
-    *   [transformBackwardAsGeojson](#transformbackwardasgeojson)
-    *   [transformToGeo](#transformtogeo)
-    *   [transformToGeoAsGeojson](#transformtogeoasgeojson)
-    *   [transformToResource](#transformtoresource)
-    *   [transformToResourceAsGeojson](#transformtoresourceasgeojson)
-    *   [transformSvgToGeojson](#transformsvgtogeojson)
-    *   [transformGeojsonToSvg](#transformgeojsontosvg)
+- [allmaps/transform](#allmapstransform)
+- [GcpTransformer](#gcptransformer)
+  - [Parameters](#parameters)
+  - [transformForward](#transformforward)
+  - [transformForwardAsGeojson](#transformforwardasgeojson)
+  - [transformBackward](#transformbackward)
+  - [transformBackwardAsGeojson](#transformbackwardasgeojson)
+  - [transformToGeo](#transformtogeo)
+  - [transformToGeoAsGeojson](#transformtogeoasgeojson)
+  - [transformToResource](#transformtoresource)
+  - [transformToResourceAsGeojson](#transformtoresourceasgeojson)
+  - [transformSvgToGeojson](#transformsvgtogeojson)
+  - [transformGeojsonToSvg](#transformgeojsontosvg)
 
 ### allmaps/transform
 
@@ -308,9 +308,9 @@ specifying functions to transform geometries using these transformations.
 
 #### Parameters
 
-*   `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<TransformGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
-*   `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
-*   `options` &#x20;
+- `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<TransformGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
+- `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
+- `options` &#x20;
 
 #### transformForward
 
@@ -318,8 +318,8 @@ Transforms a Geometry or a GeoJSON geometry forward to a Geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+- `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+- `options` **PartialTransformOptions?** Transform options
 
 Returns **Geometry** Forward transform of input as Geometry
 
@@ -329,8 +329,8 @@ Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+- `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+- `options` **PartialTransformOptions?** Transform options
 
 Returns **GeojsonGeometry** Forward transform of input, as GeoJSON geometry
 
@@ -340,8 +340,8 @@ Transforms a geometry or a GeoJSON geometry backward to a Geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+- `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+- `options` **PartialTransformOptions?** Transform options
 
 Returns **Geometry** backward transform of input, as geometry
 
@@ -351,8 +351,8 @@ Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+- `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
+- `options` **PartialTransformOptions?** Transform options
 
 Returns **GeojsonGeometry** backward transform of input, as GeoJSON geometry
 
@@ -362,8 +362,8 @@ Transforms Geometry or GeoJSON geometry forward, as Geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` &#x20;
+- `input` **(Geometry | GeojsonGeometry)** Input to transform
+- `options` &#x20;
 
 Returns **Geometry** Forward transform of input, as Geometry
 
@@ -373,8 +373,8 @@ Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` &#x20;
+- `input` **(Geometry | GeojsonGeometry)** Input to transform
+- `options` &#x20;
 
 Returns **Geometry** Forward transform of input, as GeoJSON geometry
 
@@ -384,8 +384,8 @@ Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` &#x20;
+- `input` **(Geometry | GeojsonGeometry)** Input to transform
+- `options` &#x20;
 
 Returns **Geometry** Backward transform of input, as a Geometry
 
@@ -395,8 +395,8 @@ Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
 
 ##### Parameters
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` &#x20;
+- `input` **(Geometry | GeojsonGeometry)** Input to transform
+- `options` &#x20;
 
 Returns **GeojsonGeometry** Backward transform of input, as a GeoJSON geometry
 
@@ -406,8 +406,8 @@ Transforms a SVG geometry forward to a GeoJSON geometry
 
 ##### Parameters
 
-*   `geometry` **SvgGeometry** SVG geometry to transform
-*   `transformOptions` &#x20;
+- `geometry` **SvgGeometry** SVG geometry to transform
+- `transformOptions` &#x20;
 
 Returns **GeojsonGeometry** Forward transform of input, as a GeoJSON geometry
 
@@ -417,25 +417,25 @@ Transforms a GeoJSON geometry backward to a SVG geometry
 
 ##### Parameters
 
-*   `geometry` **GeojsonGeometry** GeoJSON geometry to transform
-*   `transformOptions` &#x20;
+- `geometry` **GeojsonGeometry** GeoJSON geometry to transform
+- `transformOptions` &#x20;
 
 Returns **SvgGeometry** Backward transform of input, as SVG geometry
 
 ## Notes
 
-*   Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-*   The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
+- Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+- The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ## CLI
 
 The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific use cases:
 
-*   Transforming points to points.
-*   Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
-*   Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
-*   Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
-*   Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
+- Transforming points to points.
+- Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
+- Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
+- Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
+- Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
 
 ## Benchmark
 

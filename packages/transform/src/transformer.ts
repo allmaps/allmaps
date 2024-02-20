@@ -46,7 +46,6 @@ import type {
   TransformGcp,
   TransformationType,
   PartialTransformOptions,
-  GcpTransformerInterface,
   Transformation
 } from './shared/types.js'
 
@@ -54,7 +53,7 @@ import type {
  * A Ground Control Point Transformer, containing a forward and backward transformation and
  * specifying functions to transform geometries using these transformations.
  * */
-export default class GcpTransformer implements GcpTransformerInterface {
+export default class GcpTransformer {
   gcps: TransformGcp[]
   sourcePoints: Point[]
   destinationPoints: Point[]
@@ -96,25 +95,25 @@ export default class GcpTransformer implements GcpTransformerInterface {
     this.type = type
   }
 
-  assureEqualHandedness(point: Point): Point {
+  private assureEqualHandedness(point: Point): Point {
     return this.options?.differentHandedness ? flipY(point) : point
   }
 
-  #createForwardTransformation(): Transformation {
-    return this.#createTransformation(
+  private createForwardTransformation(): Transformation {
+    return this.createTransformation(
       this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
       this.destinationPoints
     )
   }
 
-  #createBackwardTransformation(): Transformation {
-    return this.#createTransformation(
+  private createBackwardTransformation(): Transformation {
+    return this.createTransformation(
       this.destinationPoints,
       this.sourcePoints.map((point) => this.assureEqualHandedness(point))
     )
   }
 
-  #createTransformation(
+  private createTransformation(
     sourcePoints: Point[],
     destinationPoints: Point[]
   ): Transformation {
@@ -170,7 +169,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   ): Geometry {
     if (isPoint(input)) {
       if (!this.forwardTransformation) {
-        this.forwardTransformation = this.#createForwardTransformation()
+        this.forwardTransformation = this.createForwardTransformation()
       }
       return this.forwardTransformation.interpolate(
         this.assureEqualHandedness(input)
@@ -313,7 +312,7 @@ export default class GcpTransformer implements GcpTransformerInterface {
   ): Geometry {
     if (isPoint(input)) {
       if (!this.backwardTransformation) {
-        this.backwardTransformation = this.#createBackwardTransformation()
+        this.backwardTransformation = this.createBackwardTransformation()
       }
 
       return this.assureEqualHandedness(
