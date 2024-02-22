@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import maplibregl, { Map } from 'maplibre-gl'
+  import { Map, addProtocol } from 'maplibre-gl'
   import layers from 'protomaps-themes-base'
   import { Protocol } from 'pmtiles'
 
@@ -9,22 +9,32 @@
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
+  import type { MapGeoJSONFeature, FilterSpecification } from 'maplibre-gl'
+
+  import { formatTimeAgo } from '$lib/shared/format.js'
+
   import 'maplibre-gl/dist/maplibre-gl.css'
 
+  // const pmtilesUrl = 'http://127.0.0.1:8080/maps.pmtiles'
+  const pmtilesUrl =
+    'https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
+
   let container: HTMLElement
-  let map: maplibregl.Map
+  let map: Map
   let warpedMapLayer: WarpedMapLayer
 
   let currentAnnotationUrl: string | undefined
 
   let layersAdded = false
 
-  let features: maplibregl.MapGeoJSONFeature[] = []
+  let features: MapGeoJSONFeature[] = []
+
+  let lastModifiedAgo: string | undefined = ''
 
   const maxMaxAea = 50_000_000_000
   let maxArea = 5_000_000_000
 
-  function getFilters(maxAea: number): maplibregl.FilterSpecification {
+  function getFilters(maxAea: number): FilterSpecification {
     return [
       'all',
       ['>=', 'area', 0],
@@ -67,9 +77,13 @@
     }
   }
 
+  function getViewerUrl(feature: MapGeoJSONFeature) {
+    return `https://dev.viewer.allmaps.org/?url=${feature.properties.id}`
+  }
+
   onMount(() => {
     const protocol = new Protocol()
-    maplibregl.addProtocol('pmtiles', protocol.tile)
+    addProtocol('pmtiles', protocol.tile)
 
     map = new Map({
       container,
@@ -100,8 +114,7 @@
     map.on('load', () => {
       map.addSource('masks', {
         type: 'vector',
-        // url: 'pmtiles://http://127.0.0.1:8080/maps.pmtiles'
-        url: 'pmtiles://https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
+        url: `pmtiles://${pmtilesUrl}`
       })
 
       map.addLayer({
@@ -132,50 +145,69 @@
       })
     })
 
+    fetch(pmtilesUrl, {
+      method: 'HEAD'
+    }).then((response) => {
+      const lastModified = response.headers.get('Last-Modified')
+      if (lastModified) {
+        lastModifiedAgo = formatTimeAgo(lastModified)
+      }
+    })
+
     return () => {
       map.remove()
     }
   })
 </script>
 
-<div class="absolute w-full h-full flex flex-col">
-  <Header appName="Explore" />
-  <div class="w-full h-full flex flex-row min-h-0">
-    <div bind:this={container} class="w-full h-full" />
-    <aside class="h-full p-2 flex flex-col w-[300px] flex-shrink-0">
-      <ol class="h-full overflow-auto grid gap-2">
+<div class="absolute w-full h-full grid grid-rows-[min-content_1fr]">
+  <Header appName="Explore">
+    {#if lastModifiedAgo}
+      <div class="w-full flex flex-row justify-end">
+        <div class="text-sm">Data updated {lastModifiedAgo}</div>
+      </div>
+    {/if}
+  </Header>
+  <div
+    class="overflow-auto grid grid-rows-[50%_50%] sm:grid-rows-none sm:grid-cols-[1fr_300px]"
+  >
+    <div bind:this={container} />
+    <aside class="relative p-2 flex flex-col min-h-0">
+      <ol class="w-full h-full overflow-auto grid gap-2">
         {#each features.slice(0, 25) as feature}
-          {#await fetchImageInfo(feature.properties.resourceId)}
-            <p>Loading...</p>
-          {:then imageInfo}
-            <a
-              href="https://dev.viewer.allmaps.org/?url={feature.properties.id}"
-            >
-              <Thumbnail {imageInfo} width={300} height={300} mode="contain" />
-            </a>
-            <div>
-              <button
-                on:click={() => showOnMap(feature.properties.id)}
-                class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
-                >Show on map</button
-              >
-              <button
-                on:click={() => copyToClipboard(feature.properties.id)}
-                class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
-                >Copy URL</button
-              >
-              <a
-                class="underline"
-                href="https://dev.viewer.allmaps.org/?url={feature.properties
-                  .id}">Open in Allmaps Viewer</a
-              >
-            </div>
-          {:catch error}
-            <p style="color: red">{error.message}</p>
-          {/await}
+          <li>
+            {#await fetchImageInfo(feature.properties.resourceId)}
+              <p>Loading...</p>
+            {:then imageInfo}
+              <a href={getViewerUrl(feature)}>
+                <Thumbnail
+                  {imageInfo}
+                  width={300}
+                  height={300}
+                  mode="contain"
+                />
+              </a>
+              <div class="flex-shrink-0">
+                <button
+                  on:click={() => showOnMap(feature.properties.id)}
+                  class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
+                  >Show on map</button
+                >
+                <button
+                  on:click={() => copyToClipboard(feature.properties.id)}
+                  class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
+                  >Copy URL</button
+                >
+                <a class="underline" href={getViewerUrl(feature)}
+                  >Open in Allmaps Viewer</a
+                >
+              </div>
+            {:catch error}
+              <p style="color: red">{error.message}</p>
+            {/await}
+          </li>
         {/each}
       </ol>
-
       <div>
         <label
           >Max. area: <input
