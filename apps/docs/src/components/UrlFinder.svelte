@@ -1,5 +1,6 @@
 <script lang="ts">
   import { generateId } from '@allmaps/id'
+
   export let regexPattern: string
   export let testUrl: string
   export let manifestTemplate: string
@@ -15,7 +16,7 @@
   $: id = url ? url.match(regex) : null
 
   $: if (id) {
-    manifestId = manifestTemplate.replace("{id}", id[1])
+    manifestId = manifestTemplate.replace('{id}', id[1])
     editorUrl = `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(
       manifestId
     )}`
@@ -37,7 +38,7 @@
     }
   }
 
-  function doTest () {
+  function doTest() {
     url = testUrl
   }
 </script>
@@ -62,7 +63,13 @@
       {/if}
     </ul>
   {:else}
-    <p><i>Please enter a valid URL, e.g. <a class="testlink" on:click={doTest}>{testUrl}</a></i></p>
+    <p>
+      <i
+        >Please enter a valid URL, e.g. <a class="testlink" on:click={doTest}
+          >{testUrl}</a
+        ></i
+      >
+    </p>
   {/if}
 </div>
 

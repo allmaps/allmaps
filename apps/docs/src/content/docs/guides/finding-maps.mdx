@@ -16,16 +16,22 @@ Some collections containing maps:
 - [Digital Piranesi](https://archive.org/details/digital-piranesi-v17)
 
 #### Open in Allmaps
+
 Please enter a valid URL below to an object in the Internet Archive. Please note that IIIF Collection Manifests are currently not supported in Allmaps.
 
 <p></p>
 
-<UrlFinder client:load regexPattern='https:\/\/archive.org\/details\/([^/?]*)' manifestTemplate='https://iiif.archive.org/iiif/{id}/manifest.json' testUrl='https://archive.org/details/map2002023007/'/>
+<UrlFinder
+  client:load
+  regexPattern="https:\/\/archive.org\/details\/([^/?]*)"
+  manifestTemplate="https://iiif.archive.org/iiif/{id}/manifest.json"
+  testUrl="https://archive.org/details/map2002023007/"
+/>
 
 #### Links
 
-  - [Making IIIF Official at the Internet Archive](https://blog.archive.org/2023/09/18/making-iiif-official-at-the-internet-archive/)
-  - [Documentation](https://iiif.archive.org/iiif/documentation)
+- [Making IIIF Official at the Internet Archive](https://blog.archive.org/2023/09/18/making-iiif-official-at-the-internet-archive/)
+- [Documentation](https://iiif.archive.org/iiif/documentation)
 
 ## La Bibliothèque nationale de France
 
@@ -38,7 +44,12 @@ Map collections:
 
 <p></p>
 
-<UrlFinder client:load regexPattern='ark:\/\d*\/([^/?.#]*)' manifestTemplate='https://openapi.bnf.fr/iiif/presentation/v3/ark:/12148/{id}/manifest.json' testUrl='https://gallica.bnf.fr/ark:/12148/btv1b532238549'/>
+<UrlFinder
+  client:load
+  regexPattern="ark:\/\d*\/([^/?.#]*)"
+  manifestTemplate="https://openapi.bnf.fr/iiif/presentation/v3/ark:/12148/{id}/manifest.json"
+  testUrl="https://gallica.bnf.fr/ark:/12148/btv1b532238549"
+/>
 
 ## Leventhal Map & Education Center
 
@@ -46,4 +57,9 @@ Browse the collections [here](https://www.leventhalmap.org/collections/).
 
 <p></p>
 
-<UrlFinder client:load regexPattern='(commonwealth:[^?#]*)' manifestTemplate='https://collections.leventhalmap.org/search/{id}/manifest.json' testUrl='https://collections.leventhalmap.org/search/commonwealth:x059cb867'/>
+<UrlFinder
+  client:load
+  regexPattern="(commonwealth:[^?#]*)"
+  manifestTemplate="https://collections.leventhalmap.org/search/{id}/manifest.json"
+  testUrl="https://collections.leventhalmap.org/search/commonwealth:x059cb867"
+/>

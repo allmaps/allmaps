@@ -128,7 +128,7 @@ You can listen to them in the typical OpenLayers way. Here's an example:
 map.on(
   'warpedmapadded',
   (event) => {
-    console.log(event.mapId, warpedMapSource.getTotalBounds())
+    console.log(event.mapId, warpedMapSource.getExtent())
   },
   map
 )
@@ -195,8 +195,13 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+<<<<<<< Updated upstream
     *   [getTotalBbox](#gettotalbbox)
     *   [getTotalProjectedBbox](#gettotalprojectedbbox)
+=======
+    *   [getExtent](#getextent)
+    *   [getProjectedExtent](#getprojectedextent)
+>>>>>>> Stashed changes
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -519,17 +524,17 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **[TransformationType](#transformationtype)** new transformation type
 
-#### getTotalBbox
+#### getExtent
 
-Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in lon lat coordinates.
+Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
 
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounding box of all warped maps
 
-#### getTotalProjectedBbox
+#### getProjectedExtent
 
-Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
 
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bounding box of all warped maps
 
 #### bringMapsToFront
 
@@ -575,7 +580,7 @@ Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### setImageInfoCache
 
-Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+Sets the image info Cache of the WarpedMapList
 
 ##### Parameters
 
