@@ -15,7 +15,6 @@
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
-  // const pmtilesUrl = 'http://127.0.0.1:8080/maps.pmtiles'
   const pmtilesUrl =
     'https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
 
@@ -58,12 +57,8 @@
 
   async function showOnMap(annotationUrl: string) {
     if (warpedMapLayer) {
-      if (currentAnnotationUrl) {
-        // TODO: add .clear() to WarpedMapLayer
-        await warpedMapLayer.removeGeoreferenceAnnotationByUrl(
-          currentAnnotationUrl
-        )
-      }
+      warpedMapLayer.clear()
+
       await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       currentAnnotationUrl = annotationUrl
     }
@@ -173,9 +168,9 @@
   >
     <div bind:this={container} />
     <aside class="relative p-2 flex flex-col min-h-0">
-      <ol class="w-full h-full overflow-auto grid gap-2">
+      <ol class="w-full h-full overflow-auto grid auto-rows-min gap-2">
         {#each features.slice(0, 25) as feature}
-          <li>
+          <li class="grid gap-2">
             {#await fetchImageInfo(feature.properties.resourceId)}
               <p>Loading...</p>
             {:then imageInfo}
@@ -187,7 +182,7 @@
                   mode="contain"
                 />
               </a>
-              <div class="flex-shrink-0">
+              <div class="flex-shrink-0 flex gap-2 flex-wrap">
                 <button
                   on:click={() => showOnMap(feature.properties.id)}
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
