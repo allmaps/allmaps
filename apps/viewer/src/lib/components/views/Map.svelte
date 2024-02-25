@@ -28,7 +28,7 @@
   let featureContextMenu: FeatureContextMenu | undefined
 
   function fitExtent() {
-    const extent = mapWarpedMapSource.getProjectedExtent()
+    const extent = mapWarpedMapSource.getExtent()
     if (extent && mapOl) {
       mapOl.getView().fit(extent, {
         padding: [25, 25, 25, 25]
