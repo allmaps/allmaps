@@ -37,6 +37,7 @@
         preserveDrawingBuffer: true
       })
 
+      let mapLoaded = false
       let nav = new NavigationControl()
       map.addControl(nav, 'top-left')
 
@@ -45,12 +46,23 @@
         'https://annotations.allmaps.org/images/d180902cb93d5bf2'
 
       map.on('load', async () => {
+        mapLoaded = true
         map.addLayer(warpedMapLayer)
         await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
 
+      async function handleAddMapClicked() {
+        if (mapLoaded) {
+          await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+            'https://annotations.allmaps.org/maps/3c72848762664ecd'
+          )
+
+          map.fitBounds(warpedMapLayer.getBounds())
+        }
+      }
+
       if (window.initializeControls) {
-        initializeControls('controls.html', warpedMapLayer)
+        initializeControls('controls.html', warpedMapLayer, handleAddMapClicked)
       }
     </script>
   </body>

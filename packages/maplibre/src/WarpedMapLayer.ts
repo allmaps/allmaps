@@ -136,9 +136,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
-    const results = this.addGeoreferenceAnnotation(annotation)
 
-    return results
+    return this.addGeoreferenceAnnotation(annotation)
   }
 
   /**
