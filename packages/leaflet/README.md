@@ -372,8 +372,6 @@ Sets the transformation type of multiple maps
 
 Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
 
-Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** LatLngBounds of all visible maps
-
 #### bringMapsToFront
 
 Bring maps to front

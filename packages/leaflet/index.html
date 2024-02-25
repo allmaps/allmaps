@@ -43,8 +43,20 @@
       const warpedMapLayer = new WarpedMapLayer(annotationUrl)
       map.addLayer(warpedMapLayer)
 
+      async function handleAddMapClicked() {
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+          'https://annotations.allmaps.org/maps/3aacd6b40f27c1cc'
+        )
+
+        map.fitBounds(warpedMapLayer.getBounds())
+      }
+
       if (window.initializeControls) {
-        initializeControls('examples/controls.html', warpedMapLayer)
+        initializeControls(
+          'examples/controls.html',
+          warpedMapLayer,
+          handleAddMapClicked
+        )
       }
     </script>
   </body>

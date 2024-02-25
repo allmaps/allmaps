@@ -195,9 +195,8 @@ export class WarpedMapLayer extends L.Layer {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
-    const results = this.addGeoreferenceAnnotation(annotation)
 
-    return results
+    return this.addGeoreferenceAnnotation(annotation)
   }
 
   /**
@@ -375,17 +374,17 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
-   * @returns {L.LatLngBounds | undefined} - LatLngBounds of all visible maps
+   * @returns {number[][] | undefined} - L.LatLngBounds in array form of all visible maps
    */
-  getBounds(): L.LatLngBounds | undefined {
+  getBounds(): number[][] | undefined {
     assertRenderer(this.renderer)
 
     const bbox = this.renderer.warpedMapList.getBbox()
     if (bbox) {
-      return L.latLngBounds(
-        L.latLng(bbox[1], bbox[0]),
-        L.latLng(bbox[3], bbox[2])
-      )
+      return [
+        [bbox[1], bbox[0]],
+        [bbox[3], bbox[2]]
+      ]
     }
   }
 
