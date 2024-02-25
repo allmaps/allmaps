@@ -13,8 +13,8 @@ export default defineConfig({
     port: ports.viewer
   },
   plugins: [
-    sveltekit(),
+    sveltekit()
     // @ts-ignore: Unreachable code error
-    basicSsl()
+    // basicSsl()
   ]
 })
