@@ -26,8 +26,6 @@ export default defineConfig({
       sidebar: [
         { label: 'Introduction', link: '/introduction/' },
         { label: 'Get Started', link: '/get-started/' },
-        { label: 'FAQ', link: '/faq/' },
-        { label: 'Glossary', link: '/glossary/' },
         {
           label: 'Guides',
           // items: [{ label: 'Data', link: '/data/' }]
@@ -66,7 +64,9 @@ export default defineConfig({
               }
             }
           ]
-        }
+        },
+        { label: 'FAQ', link: '/faq/' },
+        { label: 'Glossary', link: '/glossary/' }
       ],
       customCss: [
         './src/css/tailwind.css',
