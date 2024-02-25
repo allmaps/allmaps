@@ -18,6 +18,7 @@
   "scripts": {
     "dev": "npx miniflare dist/worker.es.js -w -m --port $(../../port.js tileserver)",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
