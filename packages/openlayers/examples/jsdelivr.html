@@ -41,8 +41,18 @@
         'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
       )
 
+      async function handleAddMapClicked() {
+        await warpedMapSource.addGeoreferenceAnnotationByUrl(
+          'https://annotations.allmaps.org/maps/4d7b3c96d3e89c4f'
+        )
+
+        map.getView().fit(warpedMapSource.getExtent(), {
+          padding: [25, 25, 25, 25]
+        })
+      }
+
       if (window.initializeControls) {
-        initializeControls('controls.html', warpedMapLayer)
+        initializeControls('controls.html', warpedMapLayer, handleAddMapClicked)
       }
     </script>
   </body>

@@ -181,8 +181,8 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [getLonLatExtent](#getlonlatextent)
     *   [getExtent](#getextent)
-    *   [getProjectedExtent](#getprojectedextent)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -505,13 +505,13 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **[TransformationType](#transformationtype)** new transformation type
 
-#### getExtent
+#### getLonLatExtent
 
 Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
 
 Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounding box of all warped maps
 
-#### getProjectedExtent
+#### getExtent
 
 Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
 

@@ -1,4 +1,8 @@
-function initializeControls(controlsHtmlUrl, warpedMapLayer) {
+function initializeControls(
+  controlsHtmlUrl,
+  warpedMapLayer,
+  handleAddMapClicked
+) {
   fetch(controlsHtmlUrl)
     .then((response) => response.text())
     .then((html) => {
@@ -59,6 +63,12 @@ function initializeControls(controlsHtmlUrl, warpedMapLayer) {
     document
       .querySelector('#colorize-color')
       .addEventListener('input', () => setColorize())
+
+    document.querySelector('#add-map').addEventListener('click', () => {
+      if (handleAddMapClicked) {
+        handleAddMapClicked()
+      }
+    })
 
     // Toggle the opacity using the 'Space' key
     document.addEventListener('keydown', (event) => {

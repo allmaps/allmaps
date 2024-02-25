@@ -214,7 +214,7 @@ export class WarpedMapSource extends Source {
    * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
    * @returns {Bbox | undefined} - Bounding box of all warped maps
    */
-  getExtent(): Extent | undefined {
+  getLonLatExtent(): Extent | undefined {
     return this.warpedMapList.getBbox()
   }
 
@@ -222,7 +222,7 @@ export class WarpedMapSource extends Source {
    * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
    * @returns {Bbox | undefined} - bounding box of all warped maps
    */
-  getProjectedExtent(): Extent | undefined {
+  getExtent(): Extent | undefined {
     return this.warpedMapList.getProjectedBbox()
   }
 
