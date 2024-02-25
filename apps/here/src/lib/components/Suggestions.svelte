@@ -3,11 +3,10 @@
 
   import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
   import { parseAnnotation } from '@allmaps/annotation'
+  import { Thumbnail } from '@allmaps/ui'
 
   import { position } from '$lib/shared/stores/geolocation.js'
   import { maps } from '$lib/shared/stores/maps.js'
-
-  import Thumbnail from '$lib/components/Thumbnail.svelte'
 
   // eslint-disable-next-line no-undef
   async function handleGeolocation(position: GeolocationPosition) {

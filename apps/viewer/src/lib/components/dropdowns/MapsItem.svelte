@@ -18,14 +18,14 @@
     mapWarpedMapLayer
   } from '$lib/shared/stores/openlayers.js'
   import { setActiveMapId } from '$lib/shared/stores/active.js'
+  import { imageInfoCache } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
 
-  import Thumbnail from '$lib/components/Thumbnail.svelte'
-
-  import { getFullResourceMask } from '@allmaps/stdlib'
+  import { fetchImageInfo, getFullResourceMask } from '@allmaps/stdlib'
 
   import {
+    Thumbnail,
     Copy,
     Dial,
     BringMapsToFront,
@@ -39,6 +39,8 @@
   export let viewerMap: ViewerMap
 
   let container: HTMLElement
+
+  let imageInfo: unknown | undefined
 
   const selected = writable(viewerMap.state.selected)
   const visible = writable(viewerMap.state.visible)
@@ -164,10 +166,12 @@
     mapWarpedMapSource.sendMapsToBack([mapId])
   }
 
-  onMount(() => {
+  onMount(async () => {
     if ($firstSelectedMapId === mapId) {
       container.scrollIntoView()
     }
+
+    imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
   })
 </script>
 
@@ -191,12 +195,8 @@
         class:opacity-50={!$visible}
       >
         <div class="absolute block object-fill">
-          {#if viewerMap}
-            <Thumbnail
-              imageUri={viewerMap.map.resource.id}
-              width={192}
-              height={192}
-            />
+          {#if viewerMap && imageInfo !== undefined}
+            <Thumbnail {imageInfo} width={192} height={192} mode="contain" />
           {/if}
           <svg class="absolute w-full h-full inset-0" viewBox="0 0 100 100">
             <polygon
