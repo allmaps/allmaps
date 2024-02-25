@@ -3,7 +3,9 @@ import Source from 'ol/source/Source.js'
 import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Bbox, Ring } from '@allmaps/types'
+import type { Ring } from '@allmaps/types'
+
+import type { Extent } from 'ol/extent'
 
 /**
  * WarpedMapSource class. Together with a [WarpedMapLayer](#warpedmaplayer), this class
@@ -209,19 +211,19 @@ export class WarpedMapSource extends Source {
   }
 
   /**
-   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in lon lat coordinates.
-   * @returns {Bbox | undefined} - bbox of all warped maps
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+   * @returns {Bbox | undefined} - Bounding box of all warped maps
    */
-  getTotalBbox(): Bbox | undefined {
-    return this.warpedMapList.getTotalBbox()
+  getExtent(): Extent | undefined {
+    return this.warpedMapList.getBbox()
   }
 
   /**
-   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
-   * @returns {Bbox | undefined} - bbox of all warped maps
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+   * @returns {Bbox | undefined} - bounding box of all warped maps
    */
-  getTotalProjectedBbox(): Bbox | undefined {
-    return this.warpedMapList.getTotalProjectedGeoMaskBbox()
+  getProjectedExtent(): Extent | undefined {
+    return this.warpedMapList.getProjectedBbox()
   }
 
   /**
@@ -269,10 +271,8 @@ export class WarpedMapSource extends Source {
     return this.warpedMapList.getMapZIndex(mapId)
   }
 
-  // not getZIndex() here since default for OL Layer
-
   /**
-   * Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+   * Sets the image info Cache of the WarpedMapList
    * @param {Cache} cache - the image info cache
    */
   setImageInfoCache(cache: Cache) {

@@ -14,28 +14,28 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @class Viewport
  * @typedef {Viewport}
  * @extends {EventTarget}
- * @property {Point} geoCenter - Center point of the viewport, in lon lat geo coordinates.
- * @property {Rectangle} geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in lon lat geo coordinates.
- * @property {Size} geoSize - Size of the viewport in lon lat geo coordinates, as [width, height]. (This is the size of the bbox of the rectangle, since lon lat only makes sense in in that case).
- * @property {Bbox} geoBbox - Bbox of the rotated rectangle of the viewport, in lon lat geo coordinates.
+ * @property {Point} geoCenter - Center point of the viewport, in longitude/latitude coordinates.
+ * @property {Rectangle} geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
+ * @property {Size} geoSize - Size of the viewport in longitude/latitude coordinates, as [width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in in that case).
+ * @property {Bbox} geoBbox - Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
  * @property {Point} projectedGeoCenter - Center point of the viewport, in projected geo coordinates.
  * @property {Rectangle} projectedGeoRectangle - Rotated rectangle of the viewport point, in projected geo coordinates.
- * @property {Size} projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bbox of the rotated rectangle, but the width and hight of the rectangle).
- * @property {Bbox} projectedGeoBbox - Bbox of the rotated rectangle of the viewport, in projected geo coordinates.
+ * @property {Size} projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
+ * @property {Bbox} projectedGeoBbox - Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
  * @property {number} rotation - Rotation of the viewport with respect to the projected coordinate system.
  * @property {number} projectedGeoPerViewportScale - Resolution of the viewport, in projected geo coordinates per viewport pixel.
  * @property {Point} viewportCenter - Center point of the viewport, in viewport pixels.
  * @property {Rectangle} viewportRectangle - Rectangle of the viewport point, in viewport pixels.
  * @property {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
- * @property {Bbox} viewportBbox - Bbox of the viewport, in viewport pixels.
+ * @property {Bbox} viewportBbox - Bounding box of the viewport, in viewport pixels.
  * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
  * @property {Point} canvasCenter - Center point of the HTMLCanvasElement of the viewport, in canvas pixels.
  * @property {Rectangle} canvasRectangle - Rectangle of the HTMLCanvasElement of the viewport, in canvas pixels.
  * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as [width, height].
- * @property {Bbox} canvasBbox - Bbox of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property {Bbox} canvasBbox - Bounding box of the HTMLCanvasElement of the viewport, in canvas pixels.
  * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
- * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
- * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+ * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
+ * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
  */
 export default class Viewport extends EventTarget {
   geoCenter: Point

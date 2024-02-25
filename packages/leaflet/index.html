@@ -16,61 +16,36 @@
       integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
       crossorigin=""
     ></script>
-    <style>
-      html,
-      body {
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-
-      #map {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        height: 100%;
-      }
-    </style>
+    <link rel="stylesheet" href="examples/style.css" type="text/css" />
+    <script src="examples/controls.js"></script>
   </head>
   <body>
     <div id="map"></div>
+    <div id="controls"></div>
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
       const map = L.map('map', {
-        center: [42.35921, -71.05882],
+        center: [51.0518, 3.7278],
         zoom: 14,
-        zoomAnimationThreshold: 1 // Zoom animations for more then one zoomlevel are not supported
-      });
+        // Zoom animations for more than one zoom level are not supported
+        zoomAnimationThreshold: 1
+      })
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map)
 
-      // Georeference Annotations to add to a WarpedMapLayer.
       const annotationUrl =
-        'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
+        'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
 
       const warpedMapLayer = new WarpedMapLayer(annotationUrl)
       map.addLayer(warpedMapLayer)
 
-      // It's also possible to add a Georeference Annotation to an
-      // existing WarpedMapLayer:
-      // function addGeoreferenceAnnotationByUrl1(annotationUrl) {
-      //   fetch(annotationUrl)
-      //     .then((response) => response.json())
-      //     .then((annotation) =>
-      //       warpedMapLayer.addGeoreferenceAnnotation(annotation)
-      //     )
-      // }
-
-      // Or to do the same by just using the URL of a Georeference Annotation:
-      // async function addGeoreferenceAnnotationByUrl2(annotationUrl) {
-      //   return await warpedMapLayer.addGeoreferenceAnnotationByUrl(
-      //     annotationUrl
-      //   )
-      // }
+      if (window.initializeControls) {
+        initializeControls('examples/controls.html', warpedMapLayer)
+      }
     </script>
   </body>
 </html>

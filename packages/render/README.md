@@ -1,57 +1,60 @@
 # @allmaps/render
 
-Plugin that renders georeferenced maps in a warped fashion on an HTML canvas element.
+Allmaps render module. Renders georeferenced [IIIF](https://iiif.io) maps using [Georeference Annotations](https://iiif.io/api/georef/extension/georef/). Currently, only rendering to a WebGL 2 context is implemented. This module is used by:
 
-Currently, only rendering using the WebGL2 API is implemented. In the future, rendering using the Canvas API might be implemented as well.
-
-For practical implementations in webmapping libraries, see the [@allmaps/openlayers](../openlayers/), [@allmaps/leaflet](../leaflet/) anc [@allmaps/maplibre](../maplibre/) packages.
+*   [Allmaps plugin for Leaflet](../leaflet/)
+*   [Allmaps plugin for MapLibre](../maplibre/)
+*   [Allmaps plugin for OpenLayers](../openlayers/)
 
 ## How it works
 
-A renderer accomplishes this task using a set of properties it is assigned at it's creation:
+The render module accomplishes this task with the following classes:
 
-*   A **WebGL2RenderingContext** containing the rendering context for the drawing surface of an HTML element.
-*   A **WebGLProgram** for storing the vertex and fragment shader
-*   A **WarpedMapList** containing the list of WarpedMaps to draw
-*   A list of **WebGL2WarpedMap** elements containing the GL information for each warped map
-*   A **tileCache** for storing the image bitmaps of cached tiles
+*   A **`WebGL2RenderingContext`** containing the rendering context for the drawing surface of an HTML element.
+*   A **`WebGLProgram`** for storing the vertex and fragment shader
+*   A **`WarpedMapList`** containing the list of WarpedMaps to draw
+*   A list of **`WebGL2WarpedMap`** elements containing the GL information for each warped map
+*   A **`TileCache`** for storing the image bitmaps of cached tiles
 
 This package also contains two other important classes:
 
-*   A **Viewport** describes which view of the map should be rendered (extent, zoom level, ...)
-*   A **WarpedMap** describes how a georeferenced map is warped using a specific transformation
+*   A **`Viewport`** describes which view of the map should be rendered (extent, zoom level, ...)
+*   A **`WarpedMap`** describes how a georeferenced map is warped using a specific transformation
 
-The renderer draws in it's WebGL2RenderingContext when it's `render()` function is called and passed a Viewport (e.g. by a JS mapping library). Then, for each WarpedMap is the WarpedMapList, the following happens:
+The renderer draws in its WebGL2RenderingContext when its `render` function is called and passed a Viewport (e.g. by a JavaScript mapping library). Then, for each WarpedMap in the `WarpedMapList`, the following happens:
 
-*   The Ground Control Points are read from the Georeference Annotation, and using those a warping transformation is computed from IIIF resource pixels to projected geo coordinates.
+*   The ground control points (GPCs) are read from the Georeference Annotation. These GCOs are used to compute a transformation from IIIF resource coordinates to projected geospatial coordinates.
 *   The resource mask is read from the Georeference Annotation, and the area within is divided into small triangles.
-*   The best tile zoom level is computed for the current viewport, telling us which IIIF tile level to use.
-*   The Viewport is transformed (warped) backwards from projected geo coordinates to the resource image. The IIIF tiles covering this 'viewport on the resource image' are fetched and cached in the TileCache.
-*   The area inside the Resource Mask is rendered in the viewport, triangle by triangle, using the cached tiles. The location of the triangles is computed using the forward transformation built from the Ground Control Points.
+*   The best tile zoom level is computed for the current viewport, telling us which IIIF tile [`scaleFactor`](https://iiif.io/api/image/3.0/#54-tiles) to use.
+*   The Viewport is transformed backwards from projected geospatial coordinates to resource coordinates of the IIIF image. The IIIF tiles covering this viewport on the resource image are fetched and cached in the TileCache.
+*   The area inside the resource mask is rendered in the viewport, triangle by triangle, using the cached tiles. The location of the triangles is computed using the forward transformation built from the GPCs.
 
 ## Installation
 
 This package works in browsers and in Node.js as an ESM module.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/render
+pnpm install @allmaps/render
 ```
 
-And load using:
-
-```js
-import { Viewport, WebGL2Renderer } from '@allmaps/render'
-```
-
-You can build this package using
+You can build this package locally by running:
 
 ```sh
 pnpm run build
 ```
 
 ## Usage
+
+Import the package and its classes:
+
+```js
+import { Viewport, WebGL2Renderer } from '@allmaps/render'
+```
+
+For a complete example, see the source code of the Allmaps plugins for [Leaflet](../leaflet/),
+[MapLibre](../maplibre/) and [OpenLayers](../openlayers/).
 
 ## API
 
@@ -64,8 +67,8 @@ pnpm run build
     *   [getMaps](#getmaps)
     *   [getWarpedMap](#getwarpedmap)
     *   [getMapZIndex](#getmapzindex)
-    *   [getTotalBbox](#gettotalbbox)
-    *   [getTotalProjectedGeoMaskBbox](#gettotalprojectedgeomaskbbox)
+    *   [getBbox](#getbbox)
+    *   [getProjectedBbox](#getprojectedbbox)
     *   [getMapsByGeoBbox](#getmapsbygeobbox)
     *   [setImageInfoCache](#setimageinfocache)
     *   [setMapResourceMask](#setmapresourcemask)
@@ -173,21 +176,21 @@ Returns the zIndex of a map.
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
-#### getTotalBbox
+#### getBbox
 
-Return the total Bbox of all visible maps in this list, in geo coordinates
+Return the bounding box of all visible maps in this list, in longitude/latitude coordinates
 
 Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
-#### getTotalProjectedGeoMaskBbox
+#### getProjectedBbox
 
-Return the total Bbox of all visible maps in this list, in projectedGeo coordinates
+Return the bounding box of all visible maps in this list, in projected coordinates
 
 Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
 #### getMapsByGeoBbox
 
-Returns mapId's of the maps whose geoBbox overlaps with the specified geoBbox.
+Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 ##### Parameters
 
@@ -319,28 +322,28 @@ Type: [Viewport](#viewport)
 
 #### Properties
 
-*   `geoCenter` **Point** Center point of the viewport, in lon lat geo coordinates.
-*   `geoRectangle` **Rectangle** Rotated rectangle (possibly quadrilateral) of the viewport point, in lon lat geo coordinates.
-*   `geoSize` **Size** Size of the viewport in lon lat geo coordinates, as \[width, height]. (This is the size of the bbox of the rectangle, since lon lat only makes sense in in that case).
-*   `geoBbox` **Bbox** Bbox of the rotated rectangle of the viewport, in lon lat geo coordinates.
+*   `geoCenter` **Point** Center point of the viewport, in longitude/latitude coordinates.
+*   `geoRectangle` **Rectangle** Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
+*   `geoSize` **Size** Size of the viewport in longitude/latitude coordinates, as \[width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in in that case).
+*   `geoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected geo coordinates.
 *   `projectedGeoRectangle` **Rectangle** Rotated rectangle of the viewport point, in projected geo coordinates.
-*   `projectedGeoSize` **Size** Size of the viewport in projected geo coordinates, as \[width, height]. (This is not the size of the bbox of the rotated rectangle, but the width and hight of the rectangle).
-*   `projectedGeoBbox` **Bbox** Bbox of the rotated rectangle of the viewport, in projected geo coordinates.
+*   `projectedGeoSize` **Size** Size of the viewport in projected geo coordinates, as \[width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
+*   `projectedGeoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
 *   `rotation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Rotation of the viewport with respect to the projected coordinate system.
 *   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projected geo coordinates per viewport pixel.
 *   `viewportCenter` **Point** Center point of the viewport, in viewport pixels.
 *   `viewportRectangle` **Rectangle** Rectangle of the viewport point, in viewport pixels.
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
-*   `viewportBbox` **Bbox** Bbox of the viewport, in viewport pixels.
+*   `viewportBbox` **Bbox** Bounding box of the viewport, in viewport pixels.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The devicePixelRatio of the viewport.
 *   `canvasCenter` **Point** Center point of the HTMLCanvasElement of the viewport, in canvas pixels.
 *   `canvasRectangle` **Rectangle** Rectangle of the HTMLCanvasElement of the viewport, in canvas pixels.
 *   `canvasSize` **Size** Size of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize\*devicePixelRatio), as \[width, height].
-*   `canvasBbox` **Bbox** Bbox of the HTMLCanvasElement of the viewport, in canvas pixels.
+*   `canvasBbox` **Bbox** Bounding box of the HTMLCanvasElement of the viewport, in canvas pixels.
 *   `projectedGeoPerCanvasScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
-*   `projectedGeoToViewportTransform` **Transform** Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayer coordinateToPixelTransform.
-*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayer projectionTransform.
+*   `projectedGeoToViewportTransform` **Transform** Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
+*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to WebGL coordinates in the \[-1, 1] range. Equivalent to OpenLayers projectionTransform.
 
 #### computeProjectedGeoRectangle
 

@@ -28,7 +28,7 @@ export type LineString = Point[]
 // - No duplicate points
 // - Unclosed: last element is not a repetition of the first
 // - So far no requirement on self-intersection although that may be useful in future
-// - So far no requirement on winding order. This is only applied when exporting to geojson
+// - So far no requirement on winding order. This is only applied when exporting to GeoJSON
 export type Ring = Point[]
 
 export type Polygon = Point[][]
@@ -47,7 +47,7 @@ export type Bbox = [number, number, number, number]
 
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
- * Alternatively, two numbers indicating the minimum and maximum of, for example, an Array of numbers
+ * Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
  *
  * @export
  * @typedef {Size}

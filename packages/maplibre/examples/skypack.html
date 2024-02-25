@@ -6,20 +6,22 @@
     <title>@allmaps/maplibre</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
+      href="https://cdn.skypack.dev/maplibre-gl@4.0.2/dist/maplibre-gl.css"
       type="text/css"
     />
-    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
-    <link rel="stylesheet" href="examples/style.css" type="text/css" />
-    <script src="examples/controls.js"></script>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <script src="controls.js"></script>
   </head>
   <body>
     <div id="map"></div>
     <div id="controls"></div>
     <script type="module">
-      import { Map, NavigationControl } from 'maplibre-gl'
+      import {
+        Map,
+        NavigationControl
+      } from 'https://cdn.skypack.dev/maplibre-gl@4.0.2'
 
-      import { WarpedMapLayer } from './src/index.ts'
+      import { WarpedMapLayer } from 'https://cdn.skypack.dev/@allmaps/maplibre'
 
       const map = new Map({
         container: 'map',
@@ -48,7 +50,7 @@
       })
 
       if (window.initializeControls) {
-        initializeControls('examples/controls.html', warpedMapLayer)
+        initializeControls('controls.html', warpedMapLayer)
       }
     </script>
   </body>

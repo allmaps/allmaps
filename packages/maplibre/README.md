@@ -1,30 +1,32 @@
 # @allmaps/maplibre
 
-Allmaps plugin for [MapLibre](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+
+[![Example of the Allmaps plugin for MapLibre](example.jpg)](https://observablehq.com/@allmaps/maplibre-plugin)
+
+Examples:
+
+*   [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
+*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/maplibre/leaflet/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/maplibre/leaflet/examples/jsdelivr.html)
 
 ## How it works
 
-This plugin creates a new class `WarpedMapLayer` which extends and behaves like a [MapLibre Layer](https://maplibre.org/maplibre-style-spec/layers/). You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your MapLibre map. This will render all Georeferenced Maps contained in the annotation (pages) on your MapLibre map!
+This plugin creates a new class `WarpedMapLayer` which extends MapLibre's [`CustomLayerInterface`](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). You can add one or multiple Georeference Annotations (or AnnotationPages with multiple Georeference Annotations) to a WarpedMapLayer, and add the WarpedMapLayer to your MapLibre map. This will render all georeferenced maps contained in the Georeference Annotation on your MapLibre map.
 
-To understand what happens under the hood for each Georeferenced Map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
 ## Installation
 
-This package works in browsers and in Node.js as an ESM module.
+This package works in browsers and in Node.js as an ESM or an UMD module.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/maplibre
+pnpm install @allmaps/maplibre
 ```
 
-And load using:
-
-```js
-import { WarpedMapLayer } from '@allmaps/maplibre'
-```
-
-You can build this package using
+You can build this package locally by running:
 
 ```sh
 pnpm run build
@@ -36,21 +38,19 @@ As an alternative to loading using import, ESM and UMD bundled versions of the c
 <script src="https://cdn.jsdelivr.net/npm/@allmaps/maplibre/dist/bundled/allmaps-maplibre-4.0.umd.js"></script>
 ```
 
-When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
+When loading the bundled package, its classes are available under the `Allmaps` global variable:
 
 ```js
-// ... (see 'Usage' below)
 const warpedMapLayer = new Allmaps.WarpedMapLayer()
-// ...
 ```
 
 ## Usage
 
 Built for MapLibre 4.0, but should work with earlier versions as well.
 
-### Loading an annotation
+### Loading a Georeference Annotation
 
-Creating a layer adding it to map looks like this:
+Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
 import { WarpedMapLayer } from '@allmaps/maplibre'
@@ -58,64 +58,52 @@ import { WarpedMapLayer } from '@allmaps/maplibre'
 // MapLibre map with base layer
 const map = new maplibregl.Map({
   container: 'map',
-  style:
-    'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-  center: [-71.0599, 42.3589],
-  zoom: 13,
-  maxPitch: 0, // Disable pitch on your map
-  preserveDrawingBuffer: true // Hack required for a rendering issues
+  style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+  center: [-73.9337, 40.8011],
+  zoom: 11.5,
+  // Pitch is currently not supported by the Allmaps plugin for MapLibre
+  maxPitch: 0,
+  // This is needed to improve rendering
+  // Future versions of the plugin might not need this
+  preserveDrawingBuffer: true
 })
 
+const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'
 const warpedMapLayer = new WarpedMapLayer()
 
-map.on('load', async () => {
+map.on('load', () => {
   map.addLayer(warpedMapLayer)
+  warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 })
 ```
 
-WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/), which allows it to draw directly into the map's WebGL context using the map's camera. Although it can be added to a map (possibly in between other layers) like usual using `map.addLayer()`, there are some differences to a normal layer to take into account:
+WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). It can be added to a map like any other MapLibre layer, but there are some things to take into account:
 
-*   WarpedMapLayer does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers/README.md)).
-*   WarpedMapLayer can't be styles using the [MapLibre Style Spec](https://maplibre.org/maplibre-style-spec/).
-*   Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` value to their constructor: `const warpedMapLayerWithUniqueId = new WarpedMapLayer('my-unique-id')`
-*   WarpedMapLayer does not support pitching, so disable it on your map. Enabling antialiasing on your map will create the WebGL context with MSAA antialiasing, so custom layers like the WarpedMapLayer are antialiased, which may improve the visual result.
-
-A Georeference Annotation can be added to a WarpedMapLayer using the functions `addGeoreferenceAnnotation()` or `addGeoreferenceAnnotationByUrl()`, which will render it as part of the WarpedMapLayer on the OpenLayers map. Here's an example of the first using `fetch()` and `then()`.
+*   `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
+*   `WarpedMapLayer` currently does not support pitch, so disable it on your map.
+*   Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
 
 ```js
-const annotationUrl =
-  'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
-
-map.on('load', async () => {
-  map.addLayer(warpedMapLayer)
-
-  fetch(annotationUrl)
-    .then((response) => response.json())
-    .then((annotation) => {
-      warpedMapLayer.addGeoreferenceAnnotation(annotation)
-    })
-})
+const warpedMapLayerWithUniqueId = new WarpedMapLayer('my-unique-id')
 ```
 
-And here's an example of the later inside the nameless call-back function of the 'load' event.
+A Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
-map.on('load', async () => {
-  map.addLayer(warpedMapLayer)
-
-  await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-})
+fetch(annotationUrl)
+  .then((response) => response.json())
+  .then((annotation) => warpedMapLayer.addGeoreferenceAnnotation(annotation))
 ```
 
-### Example
+Or:
 
-<a href="https://codepen.io/mclaeysb/pen/YzgdNNe?editors=1000"><img src="thumbnail.png" height="400" alt="Allmaps MapLibre Thumbnail"></a>
-
-Click the image above to see a live CodePen example of a minimal html file that loads a MapLibre map, creates a Layer and adds a Georeference Annotation to the Layer to display it's Georeferenced Map on the MapLibre map.
+```js
+await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+```
 
 ### Events
 
-The following events are emitted to inform you of the state of the WarpedMapLayer.
+The following events are emitted to inform you of the state of the `WarpedMapLayer`.
 
 | Description                                                   | Type                      | Data                               |
 | ------------------------------------------------------------- | ------------------------- | ---------------------------------- |
@@ -133,7 +121,7 @@ You can listen to them in the typical MapLibre way. Here's an example:
 map.on(
   'warpedmapadded',
   (event) => {
-    console.log(event.mapId, warpedMapLayer.getTotalBounds())
+    console.log(event.mapId, warpedMapLayer.getBounds())
   },
   map
 )
@@ -141,17 +129,15 @@ map.on(
 
 Some of the functions specified in the API only make sense once a warped map is loaded into the WarpedMapLayer. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
 
-### What is a 'map'?
+### What is a *map*?
 
-Both MapLibre and Allmaps have a concept named a 'map'.
-
-A MapLibre map is an instance of the [MapLibre Map Class](https://maplibre.org/maplibre-gl-js/docs/API/classes/maplibregl.Map/), the central class of the MapLibre API, used to create a map on a page and manipulate it.
+A MapLibre map is an instance of the MapLibre [`Map`](https://maplibre.org/maplibre-gl-js/docs/API/classes/maplibregl.Map/) class, the central class of the MapLibre API, used to create a map on a page and manipulate it.
 
 In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
 
 *   When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
 *   When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-*   (Inside the WebGL2 rendering code, there's also a WebGL2WarpedMap)
+*   Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
 
 All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used though-out Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
 
@@ -179,8 +165,7 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
-    *   [getTotalBbox](#gettotalbbox)
-    *   [getTotalProjectedBbox](#gettotalprojectedbbox)
+    *   [getBounds](#getbounds)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -205,6 +190,7 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [resetColorize](#resetcolorize)
     *   [setMapColorize](#setmapcolorize)
     *   [resetMapColorize](#resetmapcolorize)
+    *   [clear](#clear)
     *   [preparerender](#preparerender)
     *   [render](#render)
 
@@ -364,17 +350,11 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **TransformationType** new transformation type
 
-#### getTotalBbox
+#### getBounds
 
-Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in lon lat coordinates.
+Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
 
-Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
-
-#### getTotalProjectedBbox
-
-Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
-
-Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all warped maps
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bounding box of all warped maps
 
 #### bringMapsToFront
 
@@ -565,6 +545,10 @@ Resets the colorization of a single map
 ##### Parameters
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+#### clear
+
+Removes all warped maps from the layer
 
 #### preparerender
 

@@ -6,22 +6,18 @@
     <title>@allmaps/maplibre</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
-      type="text/css"
+      href="https://unpkg.com/maplibre-gl@4.0.2/dist/maplibre-gl.css"
     />
-    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
-    <link rel="stylesheet" href="examples/style.css" type="text/css" />
-    <script src="examples/controls.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@4.0.2/dist/maplibre-gl.js"></script>
+    <script src="../dist/bundled/allmaps-maplibre-4.0.umd.js"></script>
+    <link rel="stylesheet" href="../examples/style.css" type="text/css" />
+    <script src="../examples/controls.js"></script>
   </head>
   <body>
     <div id="map"></div>
     <div id="controls"></div>
-    <script type="module">
-      import { Map, NavigationControl } from 'maplibre-gl'
-
-      import { WarpedMapLayer } from './src/index.ts'
-
-      const map = new Map({
+    <script>
+      const map = new maplibregl.Map({
         container: 'map',
         style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
         center: [-73.9337, 40.8011],
@@ -35,10 +31,10 @@
         preserveDrawingBuffer: true
       })
 
-      let nav = new NavigationControl()
+      let nav = new maplibregl.NavigationControl()
       map.addControl(nav, 'top-left')
 
-      const warpedMapLayer = new WarpedMapLayer()
+      const warpedMapLayer = new Allmaps.WarpedMapLayer()
       const annotationUrl =
         'https://annotations.allmaps.org/images/d180902cb93d5bf2'
 
@@ -48,7 +44,7 @@
       })
 
       if (window.initializeControls) {
-        initializeControls('examples/controls.html', warpedMapLayer)
+        initializeControls('../examples/controls.html', warpedMapLayer)
       }
     </script>
   </body>

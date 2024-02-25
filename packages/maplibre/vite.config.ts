@@ -3,6 +3,7 @@ import { exec } from 'child_process'
 
 import ports from '../../ports.json'
 
+// Create TypeScript definition files
 // TODO: move to @allmaps/stdlib?
 const buildTypes: PluginOption = {
   name: 'build:types',
@@ -15,6 +16,7 @@ const buildTypes: PluginOption = {
   }
 }
 
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   server: {
     port: ports.maplibre

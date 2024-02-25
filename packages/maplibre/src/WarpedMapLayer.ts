@@ -14,11 +14,21 @@ import {
   sizesToScale
 } from '@allmaps/stdlib'
 
-import type { TransformationType } from '@allmaps/transform'
-import type { Bbox, Ring } from '@allmaps/types'
+import type { LngLatBoundsLike } from 'maplibre-gl'
 
-const ERROR_MSG_RENDER =
-  'Renderer not defined. Add the layer to the map before running this function.'
+import type { TransformationType } from '@allmaps/transform'
+import type { Ring } from '@allmaps/types'
+
+const NO_RENDERER_ERROR_MESSAGE =
+  'Renderer not defined. Add the layer to a map before calling this function.'
+
+function assertRenderer(
+  renderer?: WebGL2Renderer
+): asserts renderer is WebGL2Renderer {
+  if (!renderer) {
+    throw new Error(NO_RENDERER_ERROR_MESSAGE)
+  }
+}
 
 /**
  * WarpedMapLayer class.
@@ -88,9 +98,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
       annotation
     )
@@ -107,9 +116,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const results =
       await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this.map?.triggerRepaint()
@@ -157,9 +165,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   async addGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const result =
       this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this.map?.triggerRepaint()
@@ -175,9 +182,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   async removeGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const result =
       this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
     this.map?.triggerRepaint()
@@ -190,9 +196,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @returns {WarpedMapList} the warped map list
    */
   getWarpedMapList(): WarpedMapList {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList
   }
 
@@ -202,9 +207,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @returns {WarpedMap | undefined} the warped map
    */
   getWarpedMap(mapId: string): WarpedMap | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList.getWarpedMap(mapId)
   }
 
@@ -213,9 +217,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   showMap(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.showMaps([mapId])
     this.map?.triggerRepaint()
   }
@@ -225,9 +228,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   showMaps(mapIds: Iterable<string>) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.showMaps(mapIds)
     this.map?.triggerRepaint()
   }
@@ -237,9 +239,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   hideMap(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.hideMaps([mapId])
     this.map?.triggerRepaint()
   }
@@ -249,9 +250,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   hideMaps(mapIds: Iterable<string>) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.hideMaps(mapIds)
     this.map?.triggerRepaint()
   }
@@ -261,9 +261,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @returns {boolean | undefined} - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
     return warpedMap?.visible
   }
@@ -274,9 +273,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Ring} resourceMask - new resource mask
    */
   setMapResourceMask(mapId: string, resourceMask: Ring) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
     this.map?.triggerRepaint()
   }
@@ -290,9 +288,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setMapsTransformationType(
       mapIds,
       transformation
@@ -301,25 +298,19 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in lon lat coordinates.
-   * @returns {Bbox | undefined} - bbox of all warped maps
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+   * @returns {Bbox | undefined} - bounding box of all warped maps
    */
-  getTotalBbox(): Bbox | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
-    return this.renderer.warpedMapList.getTotalBbox()
-  }
+  getBounds(): LngLatBoundsLike | undefined {
+    assertRenderer(this.renderer)
 
-  /**
-   * Return the Bbox of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
-   * @returns {Bbox | undefined} - bbox of all warped maps
-   */
-  getTotalProjectedBbox(): Bbox | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
+    const bbox = this.renderer.warpedMapList.getBbox()
+    if (bbox) {
+      return [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]]
+      ]
     }
-    return this.renderer.warpedMapList.getTotalProjectedGeoMaskBbox()
   }
 
   /**
@@ -327,9 +318,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   bringMapsToFront(mapIds: Iterable<string>) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.bringMapsToFront(mapIds)
     this.map?.triggerRepaint()
   }
@@ -339,9 +329,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   sendMapsToBack(mapIds: string[]) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.sendMapsToBack(mapIds)
     this.map?.triggerRepaint()
   }
@@ -351,9 +340,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   bringMapsForward(mapIds: Iterable<string>) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.bringMapsForward(mapIds)
     this.map?.triggerRepaint()
   }
@@ -363,9 +351,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   sendMapsBackward(mapIds: Iterable<string>) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.sendMapsBackward(mapIds)
     this.map?.triggerRepaint()
   }
@@ -376,9 +363,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @returns {number | undefined} - z-index of the warped map
    */
   getMapZIndex(mapId: string): number | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList.getMapZIndex(mapId)
   }
 
@@ -389,9 +375,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {Cache} cache - the image info cache
    */
   setImageInfoCache(cache: Cache) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setImageInfoCache(cache)
   }
 
@@ -402,9 +387,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @return {number | undefined} opacity of the map
    */
   getOpacity(): number | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     return this.renderer.getOpacity()
   }
 
@@ -413,9 +397,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
   setOpacity(opacity: number) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.setOpacity(opacity)
     this.map?.triggerRepaint()
   }
@@ -424,9 +407,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Resets the opacity of the layer to fully opaque
    */
   resetOpacity() {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetOpacity()
     this.map?.triggerRepaint()
   }
@@ -437,9 +419,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @return {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     return this.renderer.getMapOpacity(mapId)
   }
 
@@ -449,9 +430,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
   setMapOpacity(mapId: string, opacity: number) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.setMapOpacity(mapId, opacity)
     this.map?.triggerRepaint()
   }
@@ -461,9 +441,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   resetMapOpacity(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapOpacity(mapId)
     this.map?.triggerRepaint()
   }
@@ -473,9 +452,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setSaturation(saturation: number) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.setSaturation(saturation)
     this.map?.triggerRepaint()
   }
@@ -484,9 +462,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Resets the saturation of a single map to the original colors
    */
   resetSaturation() {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetSaturation()
     this.map?.triggerRepaint()
   }
@@ -497,9 +474,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setMapSaturation(mapId: string, saturation: number) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.setMapSaturation(mapId, saturation)
     this.map?.triggerRepaint()
   }
@@ -509,9 +485,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   resetMapSaturation(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapSaturation(mapId)
     this.map?.triggerRepaint()
   }
@@ -526,9 +501,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   setRemoveColor(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
@@ -545,9 +519,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Resets the color removal for all maps
    */
   resetRemoveColor() {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetRemoveColorOptions()
     this.map?.triggerRepaint()
   }
@@ -564,9 +537,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
     mapId: string,
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
@@ -584,9 +556,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   resetMapRemoveColor(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapRemoveColorOptions(mapId)
   }
 
@@ -595,9 +566,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} hexColor - desired hex color
    */
   setColorize(hexColor: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setColorizeOptions({ color })
@@ -609,9 +579,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Resets the colorization for all maps
    */
   resetColorize() {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetColorizeOptions()
     this.map?.triggerRepaint()
   }
@@ -622,9 +591,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} hexColor - desired hex color
    */
   setMapColorize(mapId: string, hexColor: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setMapColorizeOptions(mapId, { color })
@@ -637,10 +605,19 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} mapId - ID of the map
    */
   resetMapColorize(mapId: string) {
-    if (!this.renderer) {
-      throw new Error(ERROR_MSG_RENDER)
-    }
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapColorizeOptions(mapId)
+    this.map?.triggerRepaint()
+  }
+
+  /**
+   * Removes all warped maps from the layer
+   */
+  clear() {
+    assertRenderer(this.renderer)
+
+    this.renderer.clear()
     this.map?.triggerRepaint()
   }
 
@@ -648,7 +625,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Prepare rendering the layer.
    */
   preparerender(): void {
-    // Empty function to make TS happy
+    // Empty function to make TypeScript happy
   }
 
   /**

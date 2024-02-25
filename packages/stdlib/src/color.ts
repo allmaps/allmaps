@@ -20,7 +20,7 @@ export function rgbToHex([r, g, b]: Color): string {
 /**
  * Convert hex to RGB
  * @param {string} hex - hex string, e.g. '#0033ff'
- * @returns {Color} rgb, e.g. [0, 51, 255]
+ * @returns {Color} RGB, e.g. [0, 51, 255]
  */
 export function hexToRgb(hex: string): Color {
   const bigint = parseInt(hex.replace(/^#/, ''), 16)
@@ -33,10 +33,8 @@ export function hexToRgb(hex: string): Color {
 /**
  * Convert hex to fractional RGB
  * @param {string} hex - hex string, e.g. '#0033ff'
- * @returns {Color} rgb, e.g. [0, 0.2, 1]
+ * @returns {Color} Fractional RGB, e.g. [0, 0.2, 1]
  */
 export function hexToFractionalRgb(hex: string): Color {
-  return hexToRgb(hex).map((c) => {
-    return c / 255
-  }) as [number, number, number]
+  return hexToRgb(hex).map((c) => c / 255) as [number, number, number]
 }

@@ -429,6 +429,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   clear() {
+    this.warpedMapList.clear()
     this.webgl2WarpedMapsById = new Map()
     this.mapsInViewport = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
@@ -1039,11 +1040,6 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.RESOURCEMASKUPDATED,
       this.resourceMaskUpdated.bind(this)
     )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.CLEARED,
-      this.clear.bind(this)
-    )
   }
 
   private removeEventListeners() {
@@ -1075,11 +1071,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.RESOURCEMASKUPDATED,
       this.resourceMaskUpdated.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.CLEARED,
-      this.clear.bind(this)
     )
   }
 }

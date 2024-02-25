@@ -47,7 +47,7 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && npm run documentation",
+    "build": "vite build && pnpm run documentation",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",

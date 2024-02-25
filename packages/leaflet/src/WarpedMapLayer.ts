@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as L from 'leaflet'
+
 import {
   WarpedMap,
   WarpedMapList,
@@ -16,53 +16,92 @@ import {
 } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-import type { Point, Bbox } from '@allmaps/types'
+import type { Point } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
-type WarpedMapLayerOptions = {
+export type WarpedMapLayerOptions = {
   opacity: number
   interactive: boolean
   className: string
   pane: string
-  zIndex: string
+  zIndex?: number
+  imageInfoCache?: Cache
+}
+
+const NO_RENDERER_ERROR_MESSAGE =
+  'Renderer not defined. Add the layer to a map before calling this function.'
+
+function assertRenderer(
+  renderer?: WebGL2Renderer
+): asserts renderer is WebGL2Renderer {
+  if (!renderer) {
+    throw new Error(NO_RENDERER_ERROR_MESSAGE)
+  }
 }
 
 /**
  * WarpedMapLayer class.
  *
- * Renders georeferenced maps of a IIIF Georeference Annotation on a Leaflet map.
+ * Renders georeferenced maps of a Georeference Annotation on a Leaflet map.
  * WarpedMapLayer extends Leaflet's [L.Layer](https://leafletjs.com/reference.html#layer).
  *
  * @class WarpedMapLayer
  */
-export const WarpedMapLayer = L.Layer.extend({
-  options: {
+export class WarpedMapLayer extends L.Layer {
+  container: HTMLDivElement | undefined
+
+  canvas: HTMLCanvasElement | undefined
+  gl: WebGL2RenderingContext | null | undefined
+
+  renderer: WebGL2Renderer | undefined
+
+  _annotationOrAnnotationUrl: (unknown | string) | undefined
+
+  resizeObserver: ResizeObserver | undefined
+
+  options: WarpedMapLayerOptions = {
     opacity: 1,
     interactive: false,
     className: '',
     pane: 'tilePane',
-    zIndex: '1'
-  },
+    zIndex: 1
+  }
+
+  constructor(
+    annotationOrAnnotationUrl: unknown,
+    options: WarpedMapLayerOptions
+  ) {
+    super()
+    this.initialize(annotationOrAnnotationUrl, options)
+  }
 
   /**
    * Creates a WarpedMapLayer
-   * @param {unknown} [annotation] - Georeference Annotation or URL pointing to an Annotation
+   * @param {unknown} [annotation] - Georeference Annotation or URL of a Georeference Annotation
    * @param {WarpedMapLayerOptions} options
    */
-  initialize(annotation: unknown, options: WarpedMapLayerOptions) {
-    this._annotation = annotation
+  initialize(
+    annotationOrAnnotationUrl: unknown,
+    options: WarpedMapLayerOptions
+  ) {
+    this._annotationOrAnnotationUrl = annotationOrAnnotationUrl
     L.setOptions(this, options)
 
     this._initGl()
-  },
+  }
 
   /**
    * Contains all code code that creates DOM elements for the layer and adds them to map panes where they belong.
    * @async
    */
-  async onAdd(map: Map) {
+  onAdd(map: Map) {
+    if (!this._map || !this.container) {
+      return this
+    }
+
     const paneName = this.getPaneName()
-    this._map.getPane(paneName).appendChild(this.container)
+    const pane = this._map.getPane(paneName)
+    pane?.appendChild(this.container)
 
     map.on('zoomend viewreset move', this._update, this)
     map.on('zoomanim', this._animateZoom, this)
@@ -75,26 +114,37 @@ export const WarpedMapLayer = L.Layer.extend({
       box: 'content-box'
     })
 
-    if (this._annotation) {
-      if (isValidHttpUrl(this._annotation)) {
-        await this.addGeoreferenceAnnotationByUrl(this._annotation)
+    if (this._annotationOrAnnotationUrl) {
+      if (
+        typeof this._annotationOrAnnotationUrl === 'string' &&
+        isValidHttpUrl(this._annotationOrAnnotationUrl)
+      ) {
+        this.addGeoreferenceAnnotationByUrl(
+          this._annotationOrAnnotationUrl
+        ).then(() => this._update())
       } else {
-        await this.addGeoreferenceAnnotation(this._annotation)
+        this.addGeoreferenceAnnotation(this._annotationOrAnnotationUrl).then(
+          () => this._update()
+        )
       }
     }
 
-    this._update()
     return this
-  },
+  }
 
   /**
    * Contains all cleanup code that removes the layer's elements from the DOM.
    */
   onRemove(map: Map) {
-    this.container.remove()
+    if (this.container) {
+      this.container.remove()
+    }
+
     map.off('zoomend viewreset move', this._update, this)
     map.off('zoomanim', this._animateZoom, this)
-  },
+
+    return this
+  }
 
   /**
    * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
@@ -105,13 +155,15 @@ export const WarpedMapLayer = L.Layer.extend({
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
+    assertRenderer(this.renderer)
+
     const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
       annotation
     )
     this._update()
 
     return results
-  },
+  }
 
   /**
    * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
@@ -122,12 +174,14 @@ export const WarpedMapLayer = L.Layer.extend({
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
+    assertRenderer(this.renderer)
+
     const results =
       await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this._update()
 
     return results
-  },
+  }
 
   /**
    * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
@@ -144,7 +198,7 @@ export const WarpedMapLayer = L.Layer.extend({
     const results = this.addGeoreferenceAnnotation(annotation)
 
     return results
-  },
+  }
 
   /**
    * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
@@ -161,7 +215,7 @@ export const WarpedMapLayer = L.Layer.extend({
     const results = this.removeGeoreferenceAnnotation(annotation)
 
     return results
-  },
+  }
 
   /**
    * Adds a Georeferenced map.
@@ -171,12 +225,14 @@ export const WarpedMapLayer = L.Layer.extend({
   async addGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
+    assertRenderer(this.renderer)
+
     const result =
       this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this._update()
 
     return result
-  },
+  }
 
   /**
    * Removes a Georeferenced map.
@@ -186,35 +242,39 @@ export const WarpedMapLayer = L.Layer.extend({
   async removeGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
+    assertRenderer(this.renderer)
+
     const result =
       this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
     this._update()
 
     return result
-  },
+  }
 
   /**
    * Gets the HTML container element of the layer
    * @return {HTMLElement} HTML Div Element
    */
-  getContainer(): HTMLElement {
+  getContainer(): HTMLDivElement | undefined {
     return this.container
-  },
+  }
 
   /**
    * Gets the HTML canvas element of the layer
    * @return {HTMLCanvasElement | null} HTML Canvas Element
    */
-  getCanvas(): HTMLCanvasElement | null {
+  getCanvas(): HTMLCanvasElement | undefined {
     return this.canvas
-  },
+  }
 
   /**
    * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList {
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList
-  },
+  }
 
   /**
    * Returns a single map's warped map
@@ -222,53 +282,66 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {WarpedMap | undefined} the warped map
    */
   getWarpedMap(mapId: string): WarpedMap | undefined {
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList.getWarpedMap(mapId)
-  },
+  }
 
   /**
    * Make a single map visible
    * @param {string} mapId - ID of the map
    */
   showMap(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.showMaps([mapId])
     this._update()
-  },
+  }
 
   /**
    * Make multiple maps visible
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   showMaps(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.showMaps(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Make a single map invisible
    * @param {string} mapId - ID of the map
    */
   hideMap(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.hideMaps([mapId])
+
     this._update()
-  },
+  }
 
   /**
    * Make multiple maps invisible
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   hideMaps(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.hideMaps(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Returns the visibility of a single map
    * @returns {boolean | undefined} - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
+    assertRenderer(this.renderer)
+
     const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
     return warpedMap?.visible
-  },
+  }
 
   /**
    * Sets the resource mask of a single map
@@ -276,9 +349,11 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {Point[]} resourceMask - new resource mask
    */
   setMapResourceMask(mapId: string, resourceMask: Point[]) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
     this._update()
-  },
+  }
 
   /**
    * Sets the transformation type of multiple maps
@@ -289,108 +364,94 @@ export const WarpedMapLayer = L.Layer.extend({
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setMapsTransformationType(
       mapIds,
       transformation
     )
     this._update()
-  },
+  }
 
   /**
-   * Return the Bbox of all visible maps (inside or outside of the Viewport), in lon lat coordinates.
-   * @returns {Bbox | undefined} - bbox of all visible maps
-   */
-  getTotalBbox(): Bbox | undefined {
-    return this.renderer.warpedMapList.getBbox()
-  },
-
-  /**
-   * Return the Bbox of all visible maps (inside or outside of the Viewport), in projected coordinates.
-   * @returns {Bbox | undefined} - bbox of all visible maps
-   */
-  getTotalProjectedBbox(): Bbox | undefined {
-    return this.renderer.warpedMapList.getProjectedBbox()
-  },
-
-  /**
-   * Returns the bounds of all visible maps (inside or outside of the Viewport), in lon lat coordinates.
+   * Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
    * @returns {L.LatLngBounds | undefined} - LatLngBounds of all visible maps
    */
-  getTotalBounds(): L.LatLngBounds | undefined {
-    const bbox = this.getTotalBbox()
-    return L.latLngBounds(
-      L.latLng(bbox[1], bbox[0]),
-      L.latLng(bbox[3], bbox[2])
-    )
-  },
+  getBounds(): L.LatLngBounds | undefined {
+    assertRenderer(this.renderer)
 
-  /**
-   * Returns the bounds of all visible maps (inside or outside of the Viewport), in projected coordinates.
-   * @returns {L.LatLngBounds | undefined} - LatLngBounds of all visible maps
-   */
-  getTotalProjectedBounds(): L.LatLngBounds | undefined {
-    const bbox = this.getTotalProjectedBbox()
-    return L.latLngBounds(
-      L.latLng(bbox[1], bbox[0]),
-      L.latLng(bbox[3], bbox[2])
-    )
-  },
+    const bbox = this.renderer.warpedMapList.getBbox()
+    if (bbox) {
+      return L.latLngBounds(
+        L.latLng(bbox[1], bbox[0]),
+        L.latLng(bbox[3], bbox[2])
+      )
+    }
+  }
 
   /**
    * Bring maps to front
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   bringMapsToFront(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.bringMapsToFront(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Send maps to back
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   sendMapsToBack(mapIds: string[]) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.sendMapsToBack(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Bring maps forward
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   bringMapsForward(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.bringMapsForward(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Send maps backward
    * @param {Iterable<string>} mapIds - IDs of the maps
    */
   sendMapsBackward(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.sendMapsBackward(mapIds)
     this._update()
-  },
+  }
 
   /**
    * Brings the layer in front of other overlays (in the same map pane).
    */
   bringToFront() {
-    if (this._map) {
+    if (this._map && this.container) {
       L.DomUtil.toFront(this.container)
     }
     return this
-  },
+  }
 
   /**
    * Brings the layer to the back of other overlays (in the same map pane).
    */
   bringToBack() {
-    if (this._map) {
+    if (this._map && this.container) {
       L.DomUtil.toBack(this.container)
     }
     return this
-  },
+  }
 
   /**
    * Returns the z-index of a single map
@@ -398,15 +459,17 @@ export const WarpedMapLayer = L.Layer.extend({
    * @returns {number | undefined} - z-index of the map
    */
   getMapZIndex(mapId: string): number | undefined {
+    assertRenderer(this.renderer)
+
     return this.renderer.warpedMapList.getMapZIndex(mapId)
-  },
+  }
 
   /**
    * Gets the zIndex of the layer.
    */
   getZIndex() {
     return this.options.zIndex
-  },
+  }
 
   /**
    * Changes the zIndex of the layer.
@@ -416,15 +479,17 @@ export const WarpedMapLayer = L.Layer.extend({
     this.options.zIndex = value
     this._updateZIndex()
     return this
-  },
+  }
 
   /**
-   * Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+   * Sets the image info Cache of the warpedMapList
    * @param {Cache} cache - the image info cache
    */
   setImageInfoCache(cache: Cache) {
+    assertRenderer(this.renderer)
+
     this.renderer.warpedMapList.setImageInfoCache(cache)
-  },
+  }
 
   /**
    * Gets the pane name the layer is attached to. Defaults to 'tilePane'
@@ -432,7 +497,7 @@ export const WarpedMapLayer = L.Layer.extend({
    */
   getPaneName(): string {
     return this._map.getPane(this.options.pane) ? this.options.pane : 'tilePane'
-  },
+  }
 
   /**
    * Gets the opacity of the layer
@@ -440,7 +505,7 @@ export const WarpedMapLayer = L.Layer.extend({
    */
   getOpacity(): number {
     return this.options.opacity
-  },
+  }
 
   /**
    * Sets the opacity of the layer
@@ -450,7 +515,7 @@ export const WarpedMapLayer = L.Layer.extend({
     this.options.opacity = opacity
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the opacity of the layer to fully opaque
@@ -459,7 +524,7 @@ export const WarpedMapLayer = L.Layer.extend({
     this.options.opacity = 1
     this._update()
     return this
-  },
+  }
 
   /**
    * Gets the opacity of a single map
@@ -467,8 +532,10 @@ export const WarpedMapLayer = L.Layer.extend({
    * @return {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
+    assertRenderer(this.renderer)
+
     return this.renderer.getMapOpacity(mapId)
-  },
+  }
 
   /**
    * Sets the opacity of a single map
@@ -476,39 +543,47 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
   setMapOpacity(mapId: string, opacity: number) {
+    assertRenderer(this.renderer)
+
     this.renderer.setMapOpacity(mapId, opacity)
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the opacity of a single map to 1
    * @param {string} mapId - ID of the map
    */
   resetMapOpacity(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapOpacity(mapId)
     this._update()
     return this
-  },
+  }
 
   /**
    * Sets the saturation of a single map
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setSaturation(saturation: number) {
+    assertRenderer(this.renderer)
+
     this.renderer.setSaturation(saturation)
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the saturation of a single map to the original colors
    */
   resetSaturation() {
+    assertRenderer(this.renderer)
+
     this.renderer.resetSaturation()
     this._update()
     return this
-  },
+  }
 
   /**
    * Sets the saturation of a single map
@@ -516,20 +591,24 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setMapSaturation(mapId: string, saturation: number) {
+    assertRenderer(this.renderer)
+
     this.renderer.setMapSaturation(mapId, saturation)
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the saturation of a single map to the original colors
    * @param {string} mapId - ID of the map
    */
   resetMapSaturation(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapSaturation(mapId)
     this._update()
     return this
-  },
+  }
 
   /**
    * Removes a color from all maps
@@ -541,6 +620,8 @@ export const WarpedMapLayer = L.Layer.extend({
   setRemoveColor(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
+    assertRenderer(this.renderer)
+
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
@@ -552,16 +633,18 @@ export const WarpedMapLayer = L.Layer.extend({
     })
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the color removal for all maps
    */
   resetRemoveColor() {
+    assertRenderer(this.renderer)
+
     this.renderer.resetRemoveColorOptions()
     this._update()
     return this
-  },
+  }
 
   /**
    * Removes a color from a single map
@@ -575,6 +658,8 @@ export const WarpedMapLayer = L.Layer.extend({
     mapId: string,
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
   ) {
+    assertRenderer(this.renderer)
+
     const color = options.hexColor
       ? hexToFractionalRgb(options.hexColor)
       : undefined
@@ -586,38 +671,45 @@ export const WarpedMapLayer = L.Layer.extend({
     })
     this._update()
     return this
-  },
+  }
 
   /**
    * Resets the color removal for a single map
    * @param {string} mapId - ID of the map
    */
   resetMapRemoveColor(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapRemoveColorOptions(mapId)
     return this
-  },
+  }
 
   /**
    * Sets the colorization for all maps
    * @param {string} hexColor - desired hex color
    */
   setColorize(hexColor: string) {
-    const color = this.hexToRgb(hexColor)
+    assertRenderer(this.renderer)
+
+    const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setColorizeOptions({ color })
       this._update()
     }
     return this
-  },
+  }
 
   /**
    * Resets the colorization for all maps
    */
   resetColorize() {
+    assertRenderer(this.renderer)
+
     this.renderer.resetColorizeOptions()
     this._update()
+
     return this
-  },
+  }
 
   /**
    * Sets the colorization for a single map
@@ -625,23 +717,38 @@ export const WarpedMapLayer = L.Layer.extend({
    * @param {string} hexColor - desired hex color
    */
   setMapColorize(mapId: string, hexColor: string) {
-    const color = this.hexToRgb(hexColor)
+    assertRenderer(this.renderer)
+
+    const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setMapColorizeOptions(mapId, { color })
       this._update()
     }
     return this
-  },
+  }
 
   /**
    * Resets the colorization of a single map
    * @param {string} mapId - ID of the map
    */
   resetMapColorize(mapId: string) {
+    assertRenderer(this.renderer)
+
     this.renderer.resetMapColorizeOptions(mapId)
     this._update()
     return this
-  },
+  }
+
+  /**
+   * Removes all warped maps from the layer
+   */
+  clear() {
+    assertRenderer(this.renderer)
+
+    this.renderer.clear()
+    this._update()
+    return this
+  }
 
   _initGl() {
     this.container = L.DomUtil.create('div')
@@ -676,9 +783,13 @@ export const WarpedMapLayer = L.Layer.extend({
     this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
 
     this._addEventListeners()
-  },
+  }
 
   _resized(entries: ResizeObserverEntry[]) {
+    if (!this.canvas) {
+      return
+    }
+
     // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
     // TODO: read + understand https://web.dev/device-pixel-content-box/
     for (const entry of entries) {
@@ -710,12 +821,19 @@ export const WarpedMapLayer = L.Layer.extend({
       this.canvas.style.height = height + 'px'
     }
     this._update()
-  },
+  }
 
   // Note: borrowed from L.ImageOverlay
   // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
   _animateZoom(e: ZoomAnimEvent) {
+    if (!this.canvas) {
+      return
+    }
+
     const scale = this._map.getZoomScale(e.zoom)
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     const offset = this._map._latLngBoundsToNewLayerBounds(
       this._map.getBounds(),
       e.zoom,
@@ -723,20 +841,21 @@ export const WarpedMapLayer = L.Layer.extend({
     ).min
 
     L.DomUtil.setTransform(this.canvas, offset, scale)
-  },
+  }
 
   _updateZIndex() {
-    if (
-      this.container &&
-      this.options.zIndex !== undefined &&
-      this.options.zIndex !== null
-    ) {
-      this.container.style.zIndex = this.options.zIndex
+    if (this.container && this.options.zIndex !== undefined) {
+      this.container.style.zIndex = String(this.options.zIndex)
     }
-  },
+  }
 
   _update() {
-    if (!this._map) {
+    if (
+      !this._map ||
+      !this.renderer ||
+      !this.canvas ||
+      !this._map.options.crs
+    ) {
       return
     }
 
@@ -788,13 +907,14 @@ export const WarpedMapLayer = L.Layer.extend({
       window.devicePixelRatio
     )
 
-    // Render
     this.renderer.render(viewport)
 
     return this.container
-  },
+  }
 
   _addEventListeners() {
+    assertRenderer(this.renderer)
+
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
       this._update.bind(this)
@@ -844,9 +964,11 @@ export const WarpedMapLayer = L.Layer.extend({
       WarpedMapEventType.CLEARED,
       this._update.bind(this)
     )
-  },
+  }
 
   _removeEventListeners() {
+    assertRenderer(this.renderer)
+
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
       this._update.bind(this)
@@ -896,7 +1018,7 @@ export const WarpedMapLayer = L.Layer.extend({
       WarpedMapEventType.CLEARED,
       this._update.bind(this)
     )
-  },
+  }
 
   _passWarpedMapEvent(event: Event) {
     if (event instanceof WarpedMapEvent) {
@@ -904,9 +1026,15 @@ export const WarpedMapLayer = L.Layer.extend({
         this._map.fire(event.type, event.data)
       }
     }
-  },
+  }
 
   _unload() {
+    assertRenderer(this.renderer)
+
+    if (!this.gl) {
+      return
+    }
+
     this.renderer.dispose()
 
     const extension = this.gl.getExtension('WEBGL_lose_context')
@@ -917,8 +1045,8 @@ export const WarpedMapLayer = L.Layer.extend({
     canvas.width = 1
     canvas.height = 1
 
-    this.resizeObserver.disconnect()
+    this.resizeObserver?.disconnect()
 
     this._removeEventListeners()
   }
-})
+}

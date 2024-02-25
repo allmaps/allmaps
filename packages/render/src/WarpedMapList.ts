@@ -105,11 +105,11 @@ export default class WarpedMapList extends EventTarget {
   }
 
   /**
-   * Return the total Bbox of all visible maps in this list, in geo coordinates
+   * Return the bounding box of all visible maps in this list, in longitude/latitude coordinates
    *
    * @returns {(Bbox | undefined)}
    */
-  getTotalBbox(): Bbox | undefined {
+  getBbox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.getWarpedMaps()) {
@@ -126,11 +126,11 @@ export default class WarpedMapList extends EventTarget {
   }
 
   /**
-   * Return the total Bbox of all visible maps in this list, in projectedGeo coordinates
+   * Return the bounding box of all visible maps in this list, in projected coordinates
    *
    * @returns {(Bbox | undefined)}
    */
-  getTotalProjectedGeoMaskBbox(): Bbox | undefined {
+  getProjectedBbox(): Bbox | undefined {
     let bbox
 
     for (const warpedMap of this.getWarpedMaps()) {
@@ -147,7 +147,7 @@ export default class WarpedMapList extends EventTarget {
   }
 
   /**
-   * Returns mapId's of the maps whose geoBbox overlaps with the specified geoBbox.
+   * Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
    *
    * @param {Bbox} geoBbox
    * @returns {Iterable<string>}

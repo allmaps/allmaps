@@ -57,6 +57,10 @@ export default class GeojsonPolygonRTree {
   }
 
   clear() {
+    this.polygonsById.clear()
+    this.bboxesById.clear()
+    this.itemsById.clear()
+
     this.rbush.clear()
   }
 

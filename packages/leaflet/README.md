@@ -1,143 +1,134 @@
 # @allmaps/leaflet
 
-Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
 
-The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).
+*The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
+
+[![Example of the Allmaps plugin for Leaflet](example.jpg)](https://observablehq.com/@allmaps/leaflet-plugin)
+
+Examples:
+
+*   [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
+*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/leaflet/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/leaflet/examples/jsdelivr.html)
 
 ## How it works
 
-This plugin creates a new class `WarpedMapLayer` which extends and behaves like a `L.Layer`. You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your Leaflet map. This will render all Georeferenced Maps contained in the annotation (pages) on your Leaflet map!
+This plugin exports the class `WarpedMapLayer` that extends [`L.Layer`](https://leafletjs.com/reference.html#layer). You can add one or multiple Georeference Annotations (or AnnotationPages that contain multiple Georeference Annotations) to a WarpedMapLayer, and add the WarpedMapLayer to your Leaflet map. This will render all georeferenced maps defined by the Georeference Annotations.
 
-To understand what happens under the hood for each Georeferenced Map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
 ## Installation
 
-This package works in browsers and in Node.js as an ESM module.
+This package works in browsers and in Node.js as an ESM or an UMD module.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
 npm install @allmaps/leaflet
 ```
 
-And load using:
-
-```js
-import { WarpedMapLayer } from '@allmaps/leaflet'
-```
-
-You can build this package using
+You can build this package locally by running:
 
 ```sh
 pnpm run build
 ```
 
-As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading leaflet.
+As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading Leaflet.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js"></script>
 ```
 
-When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
+When loading the bundled package, its classes are available under the `Allmaps` global variable:
 
 ```js
-// ... (see 'Usage' below)
 const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
-// ...
 ```
 
 ## Usage
 
 Built for Leaflet 1.9, but should work with earlier versions as well.
 
-### Loading an annotation
+### Loading a Georeference Annotation
 
-A first way to add an annotation to a WarpedMapLayer is to specify the annotation or annotationUrl when creating the WarpedMapLayer.
+Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
 import { WarpedMapLayer } from '@allmaps/leaflet'
 
-// Leaflet map with OSM base layer
 const map = L.map('map', {
-        center: [42.35921, -71.05882],
-        zoom: 14,
-        zoomAnimationThreshold: 1 // Zoom animations for more then one zoomlevel are not supported
-      });
+  center: [51.0518, 3.7278],
+  zoom: 14,
+  // Zoom animations for more than one zoom level are
+  // currently not supported by the Allmaps plugin for Leafet
+  zoomAnimationThreshold: 1
+})
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map)
 
 const annotationUrl =
-  'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
-const warpedMapLayer = new WarpedMapLayer(annotationUrl)
-
-map.addLayer(warpedMapLayer)
+  'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+const warpedMapLayer = new WarpedMapLayer(annotationUrl).addTo(map)
 ```
 
-When adding this WarpedMapLayer to the Leaflet map, the Georeferenced Map specified by the Georeference Annotation will be rendered as part of the WarpedMapLayer on the Leaflet map.
+When adding this WarpedMapLayer to the Leaflet map, the georeferenced map specified in the Georeference Annotation will be rendered on the Leaflet map.
 
-Specifying a Georeference Annotation when creating a WarpedMapLayer (as is done above) is optional. A Georeference Annotation can also be added at a later stage using the functions `addGeoreferenceAnnotation()` or `addGeoreferenceAnnotationByUrl()`. Here's an example of the first using `fetch()` and `then()`.
+Specifying a the URL Georeference Annotation when creating a WarpedMapLayer (as is done above) is optional. A Georeference Annotation can also be added at a later stage using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
 fetch(annotationUrl)
   .then((response) => response.json())
-  .then((annotation) => {
-    warpedMapLayer.addGeoreferenceAnnotation(annotation)
-  })
+  .then((annotation) => warpedMapLayer.addGeoreferenceAnnotation(annotation))
 ```
 
-And here's an example of the later using a custom async function
+Or:
 
 ```js
-async function asyncAddGeoreferenceAnnotationByUrl() {
-  // ...
-  return await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-}
-asyncAddGeoreferenceAnnotationByUrl()
+await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
-
-### Example
-
-<a href="https://codepen.io/mclaeysb/pen/vYbXGjo"><img src="thumbnail.png" height="400" alt="Allmaps OpenLayers Thumbnail"></a>
-
-Click the image above to see a live CodePen example of a minimal html file that loads a Leaflet map, creates a Layer and adds a Georeference Annotation to the Layer to display it's Georeferenced Map on the Leaflet map.
 
 ### Events
 
 The following events are emitted to inform you of the state of the WarpedMapLayer.
 
 | Description                                                   | Type                      | Data                               |
-|---------------------------------------------------------------|---------------------------|------------------------------------|
+| ------------------------------------------------------------- | ------------------------- | ---------------------------------- |
 | A warped map has been added to the warped map list            | `warpedmapadded`          | `mapId: string`                    |
 | A warped map has been removed from the warped map list        | `warpedmapremoved`        | `mapId: string`                    |
 | A warped map enters the viewport                              | `warpedmapenter`          | `mapId: string`                    |
 | A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
-| The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
+| The visibility of some warped maps has changed                | `visibilitychanged`       | `mapIds: string[]`                 |
 | The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
 | All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
 
 You can listen to them in the typical Leaflet way. Here's an example:
 
 ```js
-map.on('warpedmapadded', (event) => {console.log(event.mapId, warpedMapSource.getTotalBounds())}, map)
+map.on(
+  'warpedmapadded',
+  (event) => {
+    console.log(event.mapId, warpedMapSource.getBounds())
+  },
+  map
+)
 ```
 
-Some of the functions specified in the API only make sense once a warped map is loaded into the WarpedMapLayer. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
+Some of the functions specified in the API only make sense once a warped map is loaded into the `WarpedMapLayer`. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
 
-### What is a 'map'?
+### What is a *map*?
 
-Both Leaflet and Allmaps have a concept named a 'map'.
-
-A Leaflet map is an instance of the [Leaflet Map Class](https://leafletjs.com/reference.html#map), the central class of the Leaflet API, used to create a map on a page and manipulate it.
+A Leaflet map is an instance of the Leaflet [`Map`](https://leafletjs.com/reference.html#map) class, the central class of the Leaflet API, used to create a map on a page and manipulate it.
 
 In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
 
-*   When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
-*   When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-*   (Inside the WebGL2 rendering code, there's also a WebGL2WarpedMap)
+*   When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
+*   When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
+*   Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
 
-All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used though-out Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
+All these map phases originate from the same Georeference Annotation have the same unique `mapId` property. This string value is used thoughout Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a WarpedMapLayer, so you can use it later to call functions on a specific map.
 
 ## API
 
@@ -166,10 +157,7 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
-    *   [getTotalBbox](#gettotalbbox)
-    *   [getTotalProjectedBbox](#gettotalprojectedbbox)
-    *   [getTotalBounds](#gettotalbounds)
-    *   [getTotalProjectedBounds](#gettotalprojectedbounds)
+    *   [getBounds](#getbounds)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -199,12 +187,13 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [resetColorize](#resetcolorize)
     *   [setMapColorize](#setmapcolorize)
     *   [resetMapColorize](#resetmapcolorize)
+    *   [clear](#clear)
 
 ### WarpedMapLayer
 
 WarpedMapLayer class.
 
-Renders georeferenced maps of a IIIF Georeference Annotation on a Leaflet map.
+Renders georeferenced maps of a Georeference Annotation on a Leaflet map.
 WarpedMapLayer extends Leaflet's [L.Layer](https://leafletjs.com/reference.html#layer).
 
 #### initialize
@@ -213,8 +202,9 @@ Creates a WarpedMapLayer
 
 ##### Parameters
 
-*   `annotation` **unknown?** Georeference Annotation or URL pointing to an Annotation
+*   `annotationOrAnnotationUrl` &#x20;
 *   `options` **WarpedMapLayerOptions**&#x20;
+*   `annotation` **unknown?** Georeference Annotation or URL of a Georeference Annotation
 
 #### onAdd
 
@@ -378,27 +368,9 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **TransformationType** new transformation type
 
-#### getTotalBbox
+#### getBounds
 
-Return the Bbox of all visible maps (inside or outside of the Viewport), in lon lat coordinates.
-
-Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all visible maps
-
-#### getTotalProjectedBbox
-
-Return the Bbox of all visible maps (inside or outside of the Viewport), in projected coordinates.
-
-Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bbox of all visible maps
-
-#### getTotalBounds
-
-Returns the bounds of all visible maps (inside or outside of the Viewport), in lon lat coordinates.
-
-Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** LatLngBounds of all visible maps
-
-#### getTotalProjectedBounds
-
-Returns the bounds of all visible maps (inside or outside of the Viewport), in projected coordinates.
+Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
 
 Returns **(L.LatLngBounds | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** LatLngBounds of all visible maps
 
@@ -466,7 +438,7 @@ Changes the zIndex of the layer.
 
 #### setImageInfoCache
 
-Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+Sets the image info Cache of the warpedMapList
 
 ##### Parameters
 
@@ -617,3 +589,7 @@ Resets the colorization of a single map
 ##### Parameters
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+#### clear
+
+Removes all warped maps from the layer

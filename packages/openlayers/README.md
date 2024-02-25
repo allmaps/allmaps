@@ -1,30 +1,34 @@
 # @allmaps/openlayers
 
-Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/).
+Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/).
+
+Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+
+[![Example of the Allmaps plugin for OpenLayers](example.jpg)](https://observablehq.com/@allmaps/openlayers-plugin)
+
+Examples:
+
+*   [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
+*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/openlayers/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/openlayers/examples/jsdelivr.html)
 
 ## How it works
 
-This plugin creates a new class `WarpedMapLayer` which extends and behaves like a [OpenLayers Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html). You can add one or multiple Georeference Annotations (or Georeference Annotation Pages) to a WarpedMapLayer, and add the WarpedMapLayer to your OpenLayers map. This will render all Georeferenced Maps contained in the annotation (pages) on your OpenLayers map!
+This plugin exports the classes `WarpedMapLayer` and `WarpedMapSource`. You can add one or multiple Georeference Annotations (or AnnotationPages that contain multiple Georeference Annotations) to a WarpedMapSource, add this WarpedMapSource to a WarpedMapLayer and this WarpedMapLayer to your OpenLayers map. This will render all georeferenced maps defined by the Georeference Annotations.
 
-To understand what happens under the hood for each Georeferenced Map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
 ## Installation
 
-This package works in browsers and in Node.js as an ESM module.
+This package works in browsers and in Node.js as an ESM or an UMD module.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/openlayers
+pnpm install @allmaps/openlayers
 ```
 
-And load using:
-
-```js
-import { WarpedMapLayer } from '@allmaps/openlayers'
-```
-
-You can build this package using
+You can build this package locally by running:
 
 ```sh
 pnpm run build
@@ -36,77 +40,61 @@ As an alternative to loading using import, ESM and UMD bundled versions of the c
 <script src="https://cdn.jsdelivr.net/npm/@allmaps/openlayers/dist/bundled/allmaps-openlayers-8.umd.js"></script>
 ```
 
-When loading as bundled code, the package's functions are available under the `Allmaps` global variable:
+When loading the bundled package, its classes are available under the `Allmaps` global variable:
 
 ```js
-// ... (see 'Usage' below)
 const warpedMapSource = new Allmaps.WarpedMapSource()
-// ...
 ```
 
 ## Usage
 
-Built for OpenLayers 8, but should work with OpenLayers 6 and OpenLayers 7 as well. See [the vite config](./vite.config.ts) for more information about globals, and the OpenLayers version for which it has been compiled.
+Built for OpenLayers 8, but should work with OpenLayers 6 and OpenLayers 7 as well.
 
-### Loading an annotation
+### Loading a Georeference Annotation
 
-As is custom in OpenLayers, this package differentiates 'source' and 'layer'. In the Allmaps Leaflet package, this distinction is not made.
-
-Create a source and layer and adding them to map looks like this:
+Creating a `WarpedMapLayer` and `WarpedMapSource` and adding them to a map looks like this:
 
 ```js
 import { WarpedMapLayer, WarpedMapSource } from '@allmaps/openlayers'
 
-// Create warpedMapSource and warpedMapLayer
-const warpedMapSource = new WarpedMapSource()
-const warpedMapLayer = new WarpedMapLayer({
-  source: warpedMapSource
-})
-
-// OpenLayers map with OSM base layer and the warpedMapLayer
 const map = new ol.Map({
   target: 'map',
   layers: [
     new ol.layer.Tile({
       source: new ol.source.OSM()
-    }),
-    warpedMapLayer
+    })
   ],
   view: new ol.View({
-    center: ol.proj.fromLonLat([-71.0599, 42.3589]),
-    zoom: 13
+    center: ol.proj.fromLonLat([-71.00661, 42.37124]),
+    zoom: 14
   })
 })
+
+// Create WarpedMapSource and WarpedMapLayer
+const warpedMapSource = new allmapsOpenLayers.WarpedMapSource()
+const warpedMapLayer = new allmapsOpenLayers.WarpedMapLayer({
+  source: warpedMapSource
+})
+
+// Add layer to map and Georeference Annotation to source
+const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
+map.addLayer(warpedMapLayer)
+warpedMapSource.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-A Georeference Annotation can be added to a WarpedMapSource using the functions `addGeoreferenceAnnotation()` or `addGeoreferenceAnnotationByUrl()`, which will render it as part of the WarpedMapLayer on the OpenLayers map. Here's an example of the first using `fetch()` and `then()`.
+A Georeference Annotation can be added to a WarpedMapSource using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
-const annotationUrl =
-  'https://annotations.allmaps.org/images/813b0579711371e2@2c1d7e89d8c309e8'
-
 fetch(annotationUrl)
   .then((response) => response.json())
-  .then((annotation) => {
-    warpedMapSource.addGeoreferenceAnnotation(annotation)
-  })
+  .then((annotation) => warpedMapSource.addGeoreferenceAnnotation(annotation))
 ```
 
-And here's an example of the later using a custom async function
+Or:
 
 ```js
-async function asyncAddGeoreferenceAnnotationByUrl() {
-  // ...
-  return await warpedMapSource.addGeoreferenceAnnotationByUrl(annotationUrl)
-}
-asyncAddGeoreferenceAnnotationByUrl()
+await warpedMapSource.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
-
-### Example
-
-<a href="https://codepen.io/mclaeysb/pen/RwvqNpe"><img src="thumbnail.png" height="400" alt="Allmaps OpenLayers Thumbnail"></a>
-
-Click the image above to see a live CodePen example of a minimal html file that loads an OpenLayers map, creates a Source and Layer and adds a Georeference Annotation to the Source to display it's Georeferenced Map on the OpenLayers map.
 
 ### Events
 
@@ -136,17 +124,15 @@ map.on(
 
 Some of the functions specified in the API only make sense once a warped map is loaded into the WarpedMapSource. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
 
-### What is a 'map'?
+### What is a *map*?
 
-Both OpenLayers and Allmaps have a concept named a 'map'.
-
-A OpenLayers map is an instance of the [OpenLayers Map Class](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html), the central class of the OpenLayers API, used to create a map on a page and manipulate it.
+An OpenLayers map is an instance of the OpenLayers [`Map`](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html) class, the central class of the OpenLayers API, used to create a map on a page and manipulate it.
 
 In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
 
 *   When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
 *   When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-*   (Inside the WebGL2 rendering code, there's also a WebGL2WarpedMap)
+*   Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
 
 All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used though-out Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
 
@@ -195,13 +181,8 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
-<<<<<<< Updated upstream
-    *   [getTotalBbox](#gettotalbbox)
-    *   [getTotalProjectedBbox](#gettotalprojectedbbox)
-=======
     *   [getExtent](#getextent)
     *   [getProjectedExtent](#getprojectedextent)
->>>>>>> Stashed changes
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)

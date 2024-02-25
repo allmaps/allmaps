@@ -6,33 +6,42 @@
     <title>@allmaps/openlayers</title>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css"
+      href="https://cdn.skypack.dev/ol@8.2.0/ol.css"
       type="text/css"
     />
     <link rel="stylesheet" href="./style.css" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@allmaps/openlayers/dist/bundled/allmaps-openlayers-8.umd.js"></script>
     <script src="./controls.js"></script>
   </head>
   <body>
     <div id="map"></div>
     <div id="controls"></div>
-    <script defer>
-      const warpedMapSource = new Allmaps.WarpedMapSource()
-      const warpedMapLayer = new Allmaps.WarpedMapLayer({
+    <script type="module">
+      import Map from 'https://cdn.skypack.dev/ol@8.2.0/Map.js'
+      import View from 'https://cdn.skypack.dev/ol@8.2.0/View.js'
+      import { fromLonLat } from 'https://cdn.skypack.dev/ol@8.2.0/proj.js'
+      import TileLayer from 'https://cdn.skypack.dev/ol@8.2.0/layer/Tile.js'
+      import OSMSource from 'https://cdn.skypack.dev/ol@8.2.0/source/OSM.js'
+
+      import {
+        WarpedMapLayer,
+        WarpedMapSource
+      } from 'https://cdn.skypack.dev/@allmaps/openlayers'
+
+      const warpedMapSource = new WarpedMapSource()
+      const warpedMapLayer = new WarpedMapLayer({
         source: warpedMapSource
       })
 
-      const map = new ol.Map({
+      const map = new Map({
         target: 'map',
         layers: [
-          new ol.layer.Tile({
-            source: new ol.source.OSM()
+          new TileLayer({
+            source: new OSMSource()
           }),
           warpedMapLayer
         ],
-        view: new ol.View({
-          center: ol.proj.fromLonLat([-71.00661, 42.37124]),
+        view: new View({
+          center: fromLonLat([-71.00661, 42.37124]),
           zoom: 14
         })
       })

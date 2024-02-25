@@ -3,10 +3,10 @@ import { exec } from 'child_process'
 
 import ports from '../../ports.json'
 
-// Create TypeScript defintion files
+// Create TypeScript definition files
 // TODO: move to @allmaps/stdlib?
-const dts: PluginOption = {
-  name: 'dts-generator',
+const buildTypes: PluginOption = {
+  name: 'build:types',
   buildEnd: (error) => {
     if (!error) {
       return new Promise((resolve, reject) => {
@@ -47,7 +47,7 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [dts],
+  plugins: [buildTypes],
   define: {
     // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:
     global: 'globalThis'
