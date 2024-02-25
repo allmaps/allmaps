@@ -644,8 +644,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
       projectedGeoCenterAsLngLat.lat
     ])
 
-    // Gettig the viewportSize should also be possible through getting the bounds
-    // And using project() to go to pixel coordintas
+    // Getting the viewportSize should also be possible through getting the bounds
+    // And using project() to go to resource coordintas
     const canvas = this.map.getCanvas()
     const viewportSize = [
       canvas.width / window.devicePixelRatio,
@@ -662,7 +662,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     const geoUpperRightAsLngLat = this.map.unproject([viewportSize[0], 0])
     const geoUpperLeftAsLngLat = this.map.unproject([0, 0])
     // TODO: project using map projection instead of supposing Mercator
-    // Possible first step could be to use MapLibre's Mercator compuation. Example:
+    // Possible first step could be to use MapLibre's Mercator computation. Example:
     // const projectedGeoLowerLeftAsMercatorCoordinate = MercatorCoordinate.fromLngLat(geoLowerLeftAsLngLat)
     // const projectedGeoLowerLeftAsPoint = [projectedGeoLowerLeftAsMercatorCoordinate.x, projectedGeoLowerLeftAsMercatorCoordinate.y]
     // But this delivers results in Mercator coordinates that are rescaled to fit in a [0, 0] to [1, 1] rectangle.
