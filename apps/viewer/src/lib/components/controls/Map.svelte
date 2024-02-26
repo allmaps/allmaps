@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
 
   import { ol } from '$lib/shared/stores/openlayers.js'
+  import experimentalFeatures from '$lib/shared/experimental-features.js'
 
   import type Map from 'ol/Map.js'
   import Zoom from 'ol/control/Zoom.js'
@@ -139,8 +140,9 @@
     class="inline-flex rounded-md shadow-sm"
     role="group"
   />
-
-  <Transformation />
+  {#if experimentalFeatures}
+    <Transformation />
+  {/if}
 </div>
 <!-- <div class="select-container">
   <div class="select">

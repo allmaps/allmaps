@@ -36,6 +36,7 @@
     mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
   import { nextTransformation } from '$lib/shared/stores/transformation.js'
+  import experimentalFeatures from '$lib/shared/experimental-features.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -106,9 +107,15 @@
     } else if (event.key === '1') {
       $view = 'map'
     } else if (event.key === '2') {
-      $view = 'list'
+      if (experimentalFeatures) {
+        $view = 'list'
+      } else {
+        $view = 'image'
+      }
     } else if (event.key === '3') {
-      $view = 'image'
+      if (experimentalFeatures) {
+        $view = 'image'
+      }
     } else if (event.key === 'm') {
       $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
     } else if (event.key === 't') {
