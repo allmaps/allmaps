@@ -457,7 +457,7 @@ Type: [FetchableMapTile](#fetchablemaptile)
 
 **Extends EventTarget**
 
-Class for renderers that render warped maps to a HTML canvas element using WebGL2
+Class that render warped maps to a HTML canvas element using WebGL 2
 
 Its main function is `render`
 
@@ -510,13 +510,13 @@ Rreset the opacity of a map
 
 #### getRemoveColorOptions
 
-Get the 'remove color options' of the renderer
+Get the remove color options of the renderer
 
 Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
 #### setRemoveColorOptions
 
-Set the 'remove color options' of the renderer
+Set the remove color options of the renderer
 
 ##### Parameters
 
@@ -524,11 +524,11 @@ Set the 'remove color options' of the renderer
 
 #### resetRemoveColorOptions
 
-Reset the 'remove color options' of the renderer
+Reset the remove color options of the renderer
 
 #### getMapRemoveColorOptions
 
-Get the 'remove color options' of a map
+Get the remove color options of a map
 
 ##### Parameters
 
@@ -538,7 +538,7 @@ Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.
 
 #### setMapRemoveColorOptions
 
-Set the 'remove color options' of a map
+Set the remove color options of a map
 
 ##### Parameters
 
@@ -547,7 +547,7 @@ Set the 'remove color options' of a map
 
 #### resetMapRemoveColorOptions
 
-Reset the 'remove color options' of a map
+Reset the remove color options of a map
 
 ##### Parameters
 
@@ -641,7 +641,7 @@ Set the saturation of a map
 
 #### resetMapSaturation
 
-reset the saturation of a map
+Reset the saturation of a map
 
 ##### Parameters
 
