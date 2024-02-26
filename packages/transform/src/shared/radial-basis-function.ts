@@ -64,7 +64,8 @@ export default class RBF implements Transformation {
       }
     }
 
-    // If it's not provided, and if it's an input to the kernelFunction, compute epsilon as the average distance between the control points
+    // If it's not provided, and if it's an input to the kernelFunction,
+    // compute epsilon as the average distance between the control points
     if (epsilon === undefined) {
       epsilon =
         kernelsMatrix.sum() / (Math.pow(this.pointCount, 2) - this.pointCount)

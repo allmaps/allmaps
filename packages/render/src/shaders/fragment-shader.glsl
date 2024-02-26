@@ -95,7 +95,7 @@ void main() {
   }
 
   if(found == true) {
-    // Read color of the treated point at it's packed tiles texture point coordinates in the packed tiles texture
+    // Read color of the treated point at its packed tiles texture point coordinates in the packed tiles texture
     color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
     // Remove background color

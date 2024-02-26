@@ -214,7 +214,8 @@ export default class TileCache extends EventTarget {
     const mapIds = this.removeMapIdForTileUrl(mapId, tileUrl)
     this.removeTileUrlForMapId(mapId, tileUrl)
 
-    // If there are no other maps for this tile and it's still fetching, abort the fetch and delete the tile from the cache.
+    // If there are no other maps for this tile and it's still fetching,
+    // abort the fetch and delete the tile from the cache.
     if (!mapIds.size) {
       if (!cacheableTile.isCachedTile()) {
         // Cancel fetch if tile is still being fetched

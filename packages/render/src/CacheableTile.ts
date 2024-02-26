@@ -37,7 +37,7 @@ export default class CacheableTile extends EventTarget {
   }
 
   /**
-   * Fetch the tile and create it's image bitmap.
+   * Fetch the tile and create its image bitmap.
    *
    * Returns and event when completed (or error).
    *
@@ -67,7 +67,7 @@ export default class CacheableTile extends EventTarget {
   }
 
   /**
-   * Whether a tile has completed it's caching
+   * Whether a tile has completed its caching
    * I.e. their fetching is completed and image bitmap is created
    *
    * @returns {cacheableTile is CachedTile}

@@ -400,7 +400,7 @@ Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### setImageInfoCache
 
-Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+Sets the image info cache of the WarpedMapList
 
 ##### Parameters
 

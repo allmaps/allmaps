@@ -370,7 +370,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
-   * Sets the image info Cache of the warpedMapList, informing it's warped maps about possibly cached imageInfo.
+   * Sets the image info cache of the WarpedMapList
    * @param {Cache} cache - the image info cache
    */
   setImageInfoCache(cache: Cache) {
@@ -379,7 +379,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.warpedMapList.setImageInfoCache(cache)
   }
 
-  // No setOpacity() and getOpacity() here since default for OL Layer class
+  // No setOpacity() and getOpacity() here since these are
+  // already present on the OpenLayers Layer class
 
   /**
    * Gets the opacity of the layer

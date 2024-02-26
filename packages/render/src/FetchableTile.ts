@@ -20,7 +20,7 @@ export default class FetchableMapTile {
    *
    * @constructor
    * @param {Tile} tile - the tile
-   * @param {WarpedMapWithImageInfo} warpedMap - the warpedMap, which must have it's image info so the tileUrl can be assigned
+   * @param {WarpedMapWithImageInfo} warpedMap - the warpedMap, which must have its image info so the tileUrl can be assigned
    */
   constructor(tile: Tile, warpedMap: WarpedMapWithImageInfo) {
     this.mapId = warpedMap.mapId

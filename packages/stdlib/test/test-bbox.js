@@ -8,7 +8,7 @@ describe('computeBbox()', async () => {
   it(`should return a correct Bbox`, () => {
     expectToBeCloseToArray(computeBbox(lineStringGeo), lineStringGeoBbox)
   })
-  it(`should return the same Bbox for a polygon or it's ring`, () => {
+  it(`should return the same Bbox for a polygon or its ring`, () => {
     expectToBeCloseToArray(
       computeBbox(lineStringGeo),
       computeBbox([lineStringGeo])

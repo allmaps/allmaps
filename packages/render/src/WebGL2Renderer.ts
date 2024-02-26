@@ -68,7 +68,7 @@ const ANIMATION_DURATION = 750
 /**
  * Class for renderers that render warped maps to a HTML canvas element using WebGL2
  *
- * It's main function is `render()`
+ * Its main function is `render`
  *
  * @export
  * @class WebGL2Renderer

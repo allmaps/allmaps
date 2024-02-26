@@ -423,7 +423,7 @@ Type: [CacheableTile](#cacheabletile)
 
 #### fetch
 
-Fetch the tile and create it's image bitmap.
+Fetch the tile and create its image bitmap.
 
 Returns and event when completed (or error).
 
@@ -431,7 +431,7 @@ Returns **([Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference
 
 #### isCachedTile
 
-Whether a tile has completed it's caching
+Whether a tile has completed its caching
 I.e. their fetching is completed and image bitmap is created
 
 #### abort
@@ -459,7 +459,7 @@ Type: [FetchableMapTile](#fetchablemaptile)
 
 Class for renderers that render warped maps to a HTML canvas element using WebGL2
 
-It's main function is `render()`
+Its main function is `render`
 
 Type: [WebGL2Renderer](#webgl2renderer)
 
