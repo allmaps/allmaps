@@ -8,6 +8,7 @@
     Loading,
     URLInput,
     URLType,
+    Stats,
     dataStore,
     paramStore
   } from '@allmaps/ui'
@@ -151,6 +152,8 @@
     }
   })
 </script>
+
+<Stats />
 
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">

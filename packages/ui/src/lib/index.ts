@@ -1,17 +1,18 @@
-import urlStore from './shared/stores/url.js'
 import dataStore from './shared/stores/data.js'
 import paramStore from './shared/stores/param.js'
+import urlStore from './shared/stores/url.js'
 
-import Logo from '$lib/components/Logo.svelte'
+import Copy from '$lib/components/Copy.svelte'
+import Dial from '$lib/components/Dial.svelte'
 import Header from '$lib/components/Header.svelte'
+import Loading from '$lib/components/Loading.svelte'
+import Logo from '$lib/components/Logo.svelte'
+import MapMonster from '$lib/components/MapMonster.svelte'
+import Slider from '$lib/components/Slider.svelte'
+import Stats from '$lib/components/Stats.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
 import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
-import Loading from '$lib/components/Loading.svelte'
-import Dial from '$lib/components/Dial.svelte'
-import Slider from '$lib/components/Slider.svelte'
-import Copy from '$lib/components/Copy.svelte'
-import MapMonster from '$lib/components/MapMonster.svelte'
 
 // Arrange icons
 import BringMapsToFront from '$lib/components/icons/BringMapsToFront.svelte'
@@ -30,16 +31,17 @@ import ThinPlateSpline from '$lib/components/icons/transformations/ThinPlateSpli
 export { urlStore, dataStore, paramStore }
 
 export {
-  Logo,
+  Copy,
+  Dial,
   Header,
+  Loading,
+  Logo,
+  MapMonster,
+  Slider,
+  Stats,
   Thumbnail,
   URLInput,
   URLType,
-  Loading,
-  Dial,
-  Slider,
-  Copy,
-  MapMonster,
 
   // Arrange icons
   BringMapsToFront,
