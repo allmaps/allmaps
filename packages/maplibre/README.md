@@ -7,8 +7,8 @@ Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows disp
 Examples:
 
 *   [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
-*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/maplibre/leaflet/examples/skypack.html)
-*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/maplibre/leaflet/examples/jsdelivr.html)
+*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/maplibre/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/maplibre/examples/jsdelivr.html)
 
 ## How it works
 
