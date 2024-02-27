@@ -14,6 +14,7 @@ import {
   flipY
 } from '@allmaps/stdlib'
 
+import Straight from './shared/straight.js'
 import Helmert from './shared/helmert.js'
 import Polynomial from './shared/polynomial.js'
 import Projective from './shared/projective.js'
@@ -117,7 +118,9 @@ export default class GcpTransformer {
     sourcePoints: Point[],
     destinationPoints: Point[]
   ): Transformation {
-    if (this.type === 'helmert') {
+    if (this.type === 'straight') {
+      return new Straight(sourcePoints, destinationPoints)
+    } else if (this.type === 'helmert') {
       return new Helmert(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
       return new Polynomial(sourcePoints, destinationPoints)

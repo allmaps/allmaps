@@ -10,6 +10,10 @@ export default class Helmert implements Transformation {
 
   helmertParametersMatrix: Matrix
 
+  scale?: number
+  rotation?: number
+  translation?: Point
+
   pointCount: number
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
@@ -59,6 +63,20 @@ export default class Helmert implements Transformation {
     this.helmertParametersMatrix = pseudoInverseHelmertCoefsMatrix.mmul(
       destinationPointsMatrix
     )
+
+    // Set the derived parameters
+    this.scale = Math.sqrt(
+      this.helmertParametersMatrix.get(2, 0) ** 2 +
+        this.helmertParametersMatrix.get(3, 0) ** 2
+    )
+    this.rotation = Math.atan2(
+      this.helmertParametersMatrix.get(3, 0),
+      this.helmertParametersMatrix.get(2, 0)
+    )
+    this.translation = [
+      this.helmertParametersMatrix.get(0, 0),
+      this.helmertParametersMatrix.get(1, 0)
+    ]
   }
 
   // The interpolant function will compute the value at any point.
@@ -76,6 +94,13 @@ export default class Helmert implements Transformation {
         this.helmertParametersMatrix.get(2, 0) * newSourcePoint[1] +
         this.helmertParametersMatrix.get(3, 0) * newSourcePoint[0]
     ]
+    // Alternatively, using derived helmert parameters
+    // this.translation[0] +
+    //   this.scale * Math.cos(rotation) * newSourcePoint[0] -
+    //   this.scale * Math.sin(rotation) * newSourcePoint[1],
+    // this.translation[1] +
+    //   this.scale * Math.cos(rotation) * newSourcePoint[1] +
+    //   this.scale * Math.sin(rotation) * newSourcePoint[0]
 
     return newDestinationPoint
   }

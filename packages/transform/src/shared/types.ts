@@ -13,6 +13,7 @@ export type Segment = {
 
 /** Transformation type. */
 export type TransformationType =
+  | 'straight'
   | 'helmert'
   | 'polynomial'
   | 'polynomial1'
