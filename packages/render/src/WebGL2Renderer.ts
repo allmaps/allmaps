@@ -38,6 +38,7 @@ import type { DebouncedFunc } from 'lodash-es'
 import type { Transform } from '@allmaps/types'
 
 import type Viewport from './Viewport.js'
+import type WarpedMap from './WarpedMap.js'
 
 import type {
   RenderOptions,
@@ -424,7 +425,10 @@ export default class WebGL2Renderer extends EventTarget {
    */
   render(viewport: Viewport): void {
     this.viewport = viewport
-    this.throttledPrepareRenderInternal()
+    if (this.checkAndLoadImageInfos()) {
+      // Don't fire throttled function unless it could result in something
+      this.throttledPrepareRenderInternal()
+    }
     this.renderInternal()
   }
 
@@ -489,31 +493,32 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  private checkAndLoadImageInfos(): boolean {
+    if (!this.viewport) {
+      return false
+    }
+
+    const checks = Array.from(
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
+    )
+      .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
+      .map((warpedMap) => {
+        if (!warpedMap.hasImageInfo()) {
+          if (!warpedMap.loadingImageInfo) {
+            // Load if non-existent and not already loading
+            warpedMap.loadImageInfo()
+          }
+          return false
+        } else {
+          return true
+        }
+      })
+    return checks.some((val) => val === true)
+  }
+
   private prepareRenderInternal(): void {
     this.updateRequestedTiles()
     this.updateVertexBuffers()
-  }
-
-  private updateVertexBuffers() {
-    if (!this.viewport) {
-      return
-    }
-
-    this.invertedRenderTransform = invertTransform(
-      this.viewport.projectedGeoToClipTransform
-    )
-
-    for (const mapId of this.mapsInViewport) {
-      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-
-      if (!webgl2WarpedMap) {
-        break
-      }
-
-      webgl2WarpedMap.updateVertexBuffers(
-        this.viewport.projectedGeoToClipTransform
-      )
-    }
   }
 
   private updateRequestedTiles(): void {
@@ -551,14 +556,15 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // Get warped map image info if lacking
       if (!warpedMap.hasImageInfo()) {
-        warpedMap.loadImageInfo()
+        // Note: don't load image info here
+        // this would imply waiting for the first throttling cycle to complete
+        // before acting on a sucessful load
         continue
       }
 
-      // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels
-      // Diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
+      // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
+      // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
       if (
         bboxToDiameter(warpedMap.getApproxViewportMaskBbox(this.viewport)) <
         MIN_VIEWPORT_DIAMETER
@@ -577,8 +583,8 @@ export default class WebGL2Renderer extends EventTarget {
       warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
-      // This can be expensive if many maps and high depth, and seems to work fine with low depth.
       const projectedTransformerOptions = {
+        // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
         maxDepth: 0
       }
 
@@ -606,16 +612,43 @@ export default class WebGL2Renderer extends EventTarget {
     this.updateMapsInViewport(requestedTiles)
   }
 
+  private updateVertexBuffers() {
+    if (!this.viewport) {
+      return
+    }
+
+    this.invertedRenderTransform = invertTransform(
+      this.viewport.projectedGeoToClipTransform
+    )
+
+    for (const mapId of this.mapsInViewport) {
+      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
+
+      if (!webgl2WarpedMap) {
+        break
+      }
+
+      webgl2WarpedMap.updateVertexBuffers(
+        this.viewport.projectedGeoToClipTransform
+      )
+    }
+  }
+
   private viewportMovedSignificantly(): boolean {
+    // Returns whether the viewport moved significantly (or didn't move at all).
+    // This to prevent updating requested tiles on minimal movements.
+    // No move should also return true, e.g. when this function is called multiple times during startup, without changes to the viewport
+
     // TODO: this could be a problem if the viewport is quickly and continously moved
     // within the tolerance during initial loading.
     // Possible solution: adding a 'allrendered' event and listening to it.
+
     if (!this.viewport) {
       return false
     }
     if (!this.previousSignificantViewport) {
       this.previousSignificantViewport = this.viewport
-      return false
+      return true // No move should also return true
     } else {
       const rectangleDistances = []
       for (let i = 0; i < 4; i++) {
@@ -628,8 +661,7 @@ export default class WebGL2Renderer extends EventTarget {
       }
       const dist = Math.max(...rectangleDistances)
       if (dist == 0) {
-        // No move should also pass, e.g. when this function is called multiple times during startup, without changes to the viewport
-        return true
+        return true // No move should also return true
       }
       if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
         this.previousSignificantViewport = this.viewport

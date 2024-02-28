@@ -90,6 +90,7 @@ export default class WarpedMap extends EventTarget {
   imageInfoCache?: Cache
   imageId?: string
   parsedImage?: IIIFImage
+  loadingImageInfo: boolean
 
   visible: boolean
 
@@ -166,6 +167,7 @@ export default class WarpedMap extends EventTarget {
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
 
     this.imageInfoCache = imageInfoCache
+    this.loadingImageInfo = false
 
     this.visible = visible
 
@@ -452,12 +454,14 @@ export default class WarpedMap extends EventTarget {
    * @returns {Promise<void>}
    */
   async loadImageInfo(): Promise<void> {
+    this.loadingImageInfo = true
     const imageUri = this.georeferencedMap.resource.id
     const imageInfoJson = await fetchImageInfo(imageUri, {
       cache: this.imageInfoCache
     })
     this.parsedImage = IIIFImage.parse(imageInfoJson)
     this.imageId = await generateId(imageUri)
+    this.loadingImageInfo = false
 
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
   }
