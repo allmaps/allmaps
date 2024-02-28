@@ -17,7 +17,7 @@ import type { Transform } from '@allmaps/types'
 import type { CachedTile } from './CacheableTile.js'
 import type { RenderOptions } from './shared/types.js'
 
-const THROTTLE_WAIT_MS = 250
+const THROTTLE_WAIT_MS = 100
 const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
