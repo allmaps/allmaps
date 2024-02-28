@@ -20,11 +20,12 @@ import type {
 
 import type { Point, LineString, Ring, Polygon } from '@allmaps/types'
 
-function mergeDefaultOptions(
-  options?: PartialTransformOptions
+export function mergeOptions(
+  optionsFromTransform?: PartialTransformOptions,
+  optionsFromGCPTransformer?: PartialTransformOptions,
+  optionsFromDataFormat?: PartialTransformOptions
 ): TransformOptions {
-  const mergedOptions = {
-    close: false,
+  const optionsDefault: TransformOptions = {
     maxOffsetRatio: 0,
     maxDepth: 0,
     destinationIsGeographic: false,
@@ -32,36 +33,19 @@ function mergeDefaultOptions(
     differentHandedness: false
   }
 
-  if (options && options.maxDepth !== undefined) {
-    mergedOptions.maxDepth = options.maxDepth
+  return {
+    ...optionsDefault,
+    ...optionsFromDataFormat,
+    ...optionsFromGCPTransformer,
+    ...optionsFromTransform
   }
-
-  if (options && options.maxOffsetRatio !== undefined) {
-    mergedOptions.maxOffsetRatio = options.maxOffsetRatio
-  }
-
-  if (options && options.destinationIsGeographic !== undefined) {
-    mergedOptions.destinationIsGeographic = options.destinationIsGeographic
-  }
-
-  if (options && options.sourceIsGeographic !== undefined) {
-    mergedOptions.sourceIsGeographic = options.sourceIsGeographic
-  }
-
-  if (options && options.differentHandedness !== undefined) {
-    mergedOptions.differentHandedness = options.differentHandedness
-  }
-
-  return mergedOptions
 }
 
 export function transformLineStringForwardToLineString(
   transformer: GcpTransformer,
   lineString: LineString,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): LineString {
-  const mergedOptions = mergeDefaultOptions(options)
-
   lineString = conformLineString(lineString)
 
   const points = lineString.map((point) => ({
@@ -74,7 +58,7 @@ export function transformLineStringForwardToLineString(
     recursivelyAddMidpointsWithDestinationMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendedSegments, true).map(
@@ -85,10 +69,8 @@ export function transformLineStringForwardToLineString(
 export function transformLineStringBackwardToLineString(
   transformer: GcpTransformer,
   lineString: LineString,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): LineString {
-  const mergedOptions = mergeDefaultOptions(options)
-
   lineString = conformLineString(lineString)
 
   const points: TransformGcp[] = lineString.map((point) => ({
@@ -101,7 +83,7 @@ export function transformLineStringBackwardToLineString(
     recursivelyAddMidpointsWithSourceMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendendSegements, true).map((point) => point.source)
@@ -110,10 +92,8 @@ export function transformLineStringBackwardToLineString(
 export function transformRingForwardToRing(
   transformer: GcpTransformer,
   ring: Ring,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Ring {
-  const mergedOptions = mergeDefaultOptions(options)
-
   ring = conformRing(ring)
 
   const points = ring.map((point) => ({
@@ -126,7 +106,7 @@ export function transformRingForwardToRing(
     recursivelyAddMidpointsWithDestinationMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendedSegments, false).map(
@@ -137,10 +117,8 @@ export function transformRingForwardToRing(
 export function transformRingBackwardToRing(
   transformer: GcpTransformer,
   ring: Ring,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Ring {
-  const mergedOptions = mergeDefaultOptions(options)
-
   ring = conformRing(ring)
 
   const points: TransformGcp[] = ring.map((point) => ({
@@ -153,7 +131,7 @@ export function transformRingBackwardToRing(
     recursivelyAddMidpointsWithSourceMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendendSegements, false).map(
@@ -164,7 +142,7 @@ export function transformRingBackwardToRing(
 export function transformPolygonForwardToPolygon(
   transformer: GcpTransformer,
   polygon: Polygon,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Polygon {
   return polygon.map((ring) => {
     return transformRingForwardToRing(transformer, ring, options)
@@ -174,7 +152,7 @@ export function transformPolygonForwardToPolygon(
 export function transformPolygonBackwardToPolygon(
   transformer: GcpTransformer,
   polygon: Polygon,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Polygon {
   return polygon.map((ring) => {
     return transformRingBackwardToRing(transformer, ring, options)

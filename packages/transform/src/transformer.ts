@@ -24,6 +24,7 @@ import { thinPlateKernel } from './shared/kernel-functions.js'
 import { euclideanNorm } from './shared/norm-functions.js'
 
 import {
+  mergeOptions,
   transformLineStringForwardToLineString,
   transformLineStringBackwardToLineString,
   transformPolygonForwardToPolygon,
@@ -180,26 +181,30 @@ export default class GcpTransformer {
     } else if (isGeojsonPoint(input)) {
       return this.transformForward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {
-      return transformLineStringForwardToLineString(this, input, options)
+      return transformLineStringForwardToLineString(
+        this,
+        input,
+        mergeOptions(options, this.options)
+      )
     } else if (isGeojsonLineString(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
       return transformLineStringForwardToLineString(
         this,
         convertGeojsonLineStringToLineString(input),
-        options
+        mergeOptions(options, this.options, {
+          sourceIsGeographic: true
+        })
       )
     } else if (isPolygon(input)) {
-      return transformPolygonForwardToPolygon(this, input, options)
+      return transformPolygonForwardToPolygon(
+        this,
+        input,
+        mergeOptions(options, this.options)
+      )
     } else if (isGeojsonPolygon(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
       return transformPolygonForwardToPolygon(
         this,
         convertGeojsonPolygonToPolygon(input),
-        options
+        mergeOptions(options, this.options, { sourceIsGeographic: true })
       )
     } else {
       throw new Error('Input type not supported')
@@ -240,45 +245,45 @@ export default class GcpTransformer {
         this.transformForward(convertGeojsonPointToPoint(input))
       )
     } else if (isLineString(input)) {
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertLineStringToGeojsonLineString(
-        transformLineStringForwardToLineString(this, input, options)
+        transformLineStringForwardToLineString(
+          this,
+          input,
+          mergeOptions(options, this.options, {
+            destinationIsGeographic: true
+          })
+        )
       )
     } else if (isGeojsonLineString(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertLineStringToGeojsonLineString(
         transformLineStringForwardToLineString(
           this,
           convertGeojsonLineStringToLineString(input),
-          options
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true,
+            destinationIsGeographic: true
+          })
         )
       )
     } else if (isPolygon(input)) {
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertPolygonToGeojsonPolygon(
-        transformPolygonForwardToPolygon(this, input, options)
+        transformPolygonForwardToPolygon(
+          this,
+          input,
+          mergeOptions(options, this.options, {
+            destinationIsGeographic: true
+          })
+        )
       )
     } else if (isGeojsonPolygon(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertPolygonToGeojsonPolygon(
         transformPolygonForwardToPolygon(
           this,
           convertGeojsonPolygonToPolygon(input),
-          options
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true,
+            destinationIsGeographic: true
+          })
         )
       )
     } else {
@@ -324,26 +329,32 @@ export default class GcpTransformer {
     } else if (isGeojsonPoint(input)) {
       return this.transformBackward(convertGeojsonPointToPoint(input))
     } else if (isLineString(input)) {
-      return transformLineStringBackwardToLineString(this, input, options)
+      return transformLineStringBackwardToLineString(
+        this,
+        input,
+        mergeOptions(options, this.options)
+      )
     } else if (isGeojsonLineString(input)) {
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return transformLineStringBackwardToLineString(
         this,
         convertGeojsonLineStringToLineString(input),
-        options
+        mergeOptions(options, this.options, {
+          destinationIsGeographic: true
+        })
       )
     } else if (isPolygon(input)) {
-      return transformPolygonBackwardToPolygon(this, input, options)
+      return transformPolygonBackwardToPolygon(
+        this,
+        input,
+        mergeOptions(options, this.options)
+      )
     } else if (isGeojsonPolygon(input)) {
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return transformPolygonBackwardToPolygon(
         this,
         convertGeojsonPolygonToPolygon(input),
-        options
+        mergeOptions(options, this.options, {
+          destinationIsGeographic: true
+        })
       )
     } else {
       throw new Error('Input type not supported')
@@ -384,45 +395,45 @@ export default class GcpTransformer {
         this.transformBackward(convertGeojsonPointToPoint(input))
       )
     } else if (isLineString(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
       return convertLineStringToGeojsonLineString(
-        transformLineStringBackwardToLineString(this, input, options)
+        transformLineStringBackwardToLineString(
+          this,
+          input,
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true
+          })
+        )
       )
     } else if (isGeojsonLineString(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertLineStringToGeojsonLineString(
         transformLineStringBackwardToLineString(
           this,
           convertGeojsonLineStringToLineString(input),
-          options
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true,
+            destinationIsGeographic: true
+          })
         )
       )
     } else if (isPolygon(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
       return convertPolygonToGeojsonPolygon(
-        transformPolygonBackwardToPolygon(this, input, options)
+        transformPolygonBackwardToPolygon(
+          this,
+          input,
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true
+          })
+        )
       )
     } else if (isGeojsonPolygon(input)) {
-      if (options && !('sourceIsGeographic' in options)) {
-        options.sourceIsGeographic = true
-      }
-      if (options && !('destinationIsGeographic' in options)) {
-        options.destinationIsGeographic = true
-      }
       return convertPolygonToGeojsonPolygon(
         transformPolygonBackwardToPolygon(
           this,
           convertGeojsonPolygonToPolygon(input),
-          options
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true,
+            destinationIsGeographic: true
+          })
         )
       )
     } else {

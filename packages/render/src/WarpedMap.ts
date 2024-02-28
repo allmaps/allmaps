@@ -27,11 +27,13 @@ import type Viewport from './Viewport.js'
 const DIAMETER_FRACTION = 80 // TODO: Consider making this tunable by the user.
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
-  maxDepth: 2
+  maxDepth: 2,
+  differentHandedness: true
 } as PartialTransformOptions
 const PROJECTED_TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
-  maxDepth: 2
+  maxDepth: 2,
+  differentHandedness: true
 } as PartialTransformOptions
 
 /**
@@ -395,7 +397,7 @@ export default class WarpedMap extends EventTarget {
    */
   updateProjectedGeoTrianglePoints(currentIsNew = false) {
     this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-      (point) => this.projectedTransformer.transformToGeo(point as Point) // Not passing options because not relevant for points
+      (point) => this.projectedTransformer.transformToGeo(point as Point)
     )
 
     if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
@@ -477,50 +479,46 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateTransformer(): void {
-    this.transformer = new GcpTransformer(this.gcps, this.transformationType, {
-      differentHandedness: true
-    })
+    this.transformer = new GcpTransformer(
+      this.gcps,
+      this.transformationType,
+      TRANSFORMER_OPTIONS
+    )
   }
 
   private updateProjectedTransformer(): void {
     this.projectedTransformer = new GcpTransformer(
       this.projectedGcps,
       this.transformationType,
-      {
-        differentHandedness: true
-      }
+      PROJECTED_TRANSFORMER_OPTIONS
     )
   }
 
   private updateGeoMask(): void {
-    this.geoMask = this.transformer.transformForwardAsGeojson(
-      [this.resourceMask],
-      TRANSFORMER_OPTIONS
-    )
+    this.geoMask = this.transformer.transformForwardAsGeojson([
+      this.resourceMask
+    ])
     this.geoMaskBbox = computeBbox(this.geoMask)
   }
 
   private updateFullGeoMask(): void {
-    this.geoFullMask = this.transformer.transformForwardAsGeojson(
-      [this.resourceFullMask],
-      TRANSFORMER_OPTIONS
-    )
+    this.geoFullMask = this.transformer.transformForwardAsGeojson([
+      this.resourceFullMask
+    ])
     this.geoFullMaskBbox = computeBbox(this.geoFullMask)
   }
 
   private updateProjectedGeoMask(): void {
-    this.projectedGeoMask = this.projectedTransformer.transformForward(
-      [this.resourceMask],
-      PROJECTED_TRANSFORMER_OPTIONS
-    )[0]
+    this.projectedGeoMask = this.projectedTransformer.transformForward([
+      this.resourceMask
+    ])[0]
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
   }
 
   private updateProjectedFullGeoMask(): void {
-    this.projectedGeoFullMask = this.projectedTransformer.transformForward(
-      [this.resourceFullMask],
-      PROJECTED_TRANSFORMER_OPTIONS
-    )[0]
+    this.projectedGeoFullMask = this.projectedTransformer.transformForward([
+      this.resourceFullMask
+    ])[0]
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
   }
 

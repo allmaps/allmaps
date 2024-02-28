@@ -576,7 +576,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
 
-      // Transforming the viewport back to resource expensive
+      // Transforming the viewport back to resource
       // This can be expensive if many maps and high depth, and seems to work fine with low depth.
       const projectedTransformerOptions = {
         maxDepth: 0
