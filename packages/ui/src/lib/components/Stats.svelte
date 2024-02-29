@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { env } from '$env/dynamic/public'
+  // Using import.meta.env in favor of $env/dynamic/public
+  // to ensure @allmaps/ui also works in Astro, for docs.allmaps.org
+  // TODO: are there other ways to do this?
+  // Using import.meta.env makes vite say:
+  //   "Avoid usage of `import.meta.env` in your code. It requires a bundler to work.
+  //   Consider using packages like `esm-env` instead which provide cross-bundler-compatible
+  //   environment variables.
+
+  // import { env } from '$env/dynamic/public'
+  const env = import.meta.env
 </script>
 
 <svelte:head>
