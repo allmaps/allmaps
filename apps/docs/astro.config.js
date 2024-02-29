@@ -64,9 +64,9 @@ export default defineConfig({
               }
             }
           ]
-        },
-        { label: 'FAQ', link: '/faq/' },
-        { label: 'Glossary', link: '/glossary/' }
+        }
+        // { label: 'FAQ', link: '/faq/' },
+        // { label: 'Glossary', link: '/glossary/' }
       ],
       customCss: [
         './src/css/tailwind.css',
