@@ -8,93 +8,7 @@ Care was taken to make this module **usable and useful outside of the Allmaps co
 
 ## How it works
 
-This package exports the `GcpTransformer` class. Its instances (called `transformers`) are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary points in one plane to the corresponding points in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
-
-## Transform vs. GDAL
-
-The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical. See the [tests](./test/test-transform.js) for details.
-
-For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library. This library is used for creating and solving the linear systems of equations that are at the heart of each of each of these transformations.
-
-### Defining Ground Control Points
-
-GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
-
-```ts
-type TransformGcp = {
-  source: [number, number]
-  destination: [number, number]
-}
-```
-
-Or you can supply an array of objects containing `resource` and `geo` coordinates. This is the format used in [Georeference Annotations](https://iiif.io/api/extension/georef/):
-
-```js
-type Gcp = {
-  resource: [number, number],
-  geo: [number, number]
-}
-```
-
-### Supported transformation types
-
-| Type                   | Options    | Description                                                              | Properties                                                                       | Minimum number of GCPs |
-| ---------------------- | ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
-| `helmert`              |            | Helmert transformation or 'similarity transformation'                    | Preserves shape and angle                                                        | 2                      |
-| `polynomial` (default) | `order: 1` | First order polynomial transformation                                    | Preserves lines and parallelism                                                  | 3                      |
-| `polynomial`           | `order: 2` | Second order polynomial transformation                                   | Some bending flexibility                                                         | 6                      |
-| `polynomial`           | `order: 3` | Third order polynomial transformation                                    | More bending flexibility                                                         | 10                     |
-| `thinPlateSpline`      |            | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
-| `projective`           |            | Projective or 'perspective' transformation, used for aerial images       | Preserves lines and cross-ratios                                                 | 4                      |
-
-### Transformation methods
-
-A transformer is build from a set of GCPs and a transformation type. It contains the forward and backward transformation, and has specific methods to apply it to transform geometries forward and backward.
-
-All transformer methods accepts points, line strings as well as polygons, both as simple geometries or GeoJSON geometries. There are, however, separate methods for transforming to simple geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
-
-Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
-
-Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
-
-The simple geometries are:
-
-```js
-type Point = [number, number]
-
-type LineString = Point[]
-
-type Polygon = Point[][]
-// A polygon is an array of rings of at least three points
-// Rings are not closed: the first point is not repeated at the end.
-// There is no requirement on winding order.
-
-type Geometry = Point | LineString | Polygon
-```
-
-### Handedness
-
-For some transformations, it is important that the source and destination planes have the same *handedness*.
-
-There are two types of handedness: a Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the "first" and the y-axis the "second" axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates.
-
-The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For many transformations, it does not matter whether the source and destination have the same handedness, since a separate transformation is computed for both axes. For some transformations, like the Helmert transformation, the transformation of X and Y coordinates are computed jointly (they are said to be 'coupled') and the difference matters.
-
-In case the handedness differs one can set the `differentHandedness` parameter to `true`. This will flip the y-axis of the source in the control points (and new points) so as to align the handedness of both during computation.
-
-### Refined transformation of LineStrings and Polygons
-
-When transforming a line or polygon, it can happen that simply transforming every point is not sufficient. Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines). An algorithm will therefore recursively add midpoints in each segment (i.e. between two points) to make the line more granular. A midpoint is added at the transformed middle point of the original segment on the condition that the ratio of (the distance between the middle point of the transformed segment and the transformed middle point of the original segment) to the length of the transformed segment, is larger then a given ratio. The following options specify if and with what degree of detail such extra points should be added.
-
-### Transformation options
-
-| Option                    | Description                                                              | Default                                      |
-| :------------------------ | :----------------------------------------------------------------------- | :------------------------------------------- |
-| `maxOffsetRatio`          | Maximum offset ratio (smaller means more midpoints)                      | `0`                                          |
-| `maxDepth`                | Maximum recursion depth (higher means more midpoints)                    | `0`                                          |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` when source is GeoJSON)      |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` when destination is GeoJSON) |
-| `differentHandedness` | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false` |
+This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary points in one plane to the corresponding points in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
 
 ## Installation
 
@@ -278,6 +192,115 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 //   ]
 // }
 ```
+
+### Transformation types
+
+A transformer is build from a set of GCPs and a transformation type. The following transformation types are supported.
+
+| Type                                       | Description                                                              | Properties                                                                       | Minimum number of GCPs |
+| ------------------------------------------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
+| `straight`                                 | Straight transformation                                                  | Preserves shapes and angles, no overall rotation                                 | 2                      |
+| `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Preserves shapes and angles                                                      | 2                      |
+| `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Preserves lines and parallelism                                                  | 3                      |
+| `polynomial2`                              | Second order polynomial transformation                                   | Some bending flexibility                                                         | 6                      |
+| `polynomial3`                              | Third order polynomial transformation                                    | More bending flexibility                                                         | 10                     |
+| `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
+| `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Preserves lines and cross-ratios                                                 | 4                      |
+
+### Transformer methods
+
+Once a transformer is built, it can be used to transform geometries forward and backward.
+
+All transformer methods accepts points, line strings as well as polygons, both as simple geometries or GeoJSON geometries. There are, however, separate methods for transforming to simple geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
+
+Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
+
+Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
+
+### Transform options
+
+Some options are available to improve transformations, e.g. to transform LineStrings or Polygons by recursively adding midpoints, or to correctly deal with a possible different handedness of source and destination coordinates.
+
+These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the options derived from the data format (e.g. setting 'true' when source is GeoJSON), which in term override the default options.
+
+As an exception, the `differentHandedness` option is only used when a transformer is built (and is not read during geometry transformation).
+
+Here's an overview of the available options:
+
+| Option                    | Description                                                                                                                                                           | Default                                      |
+| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| `maxOffsetRatio`          | Maximum offset ratio when recursively adding midpoints (smaller means more midpoints)                                                                                 | `0`                                          |
+| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                               | `0` (i.e. no midpoints by default!)          |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                      | `false` (`true` when source is GeoJSON)      |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                 | `false` (`true` when destination is GeoJSON) |
+| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false`                                      |
+
+#### Recursively adding midpoints
+
+When transforming LineStrings and Polygons, it can happen that simply transforming every point is not sufficient.
+
+Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines).
+
+An algorithm will therefore recursively add midpoints in each segment (i.e. between two points) to make the line more granular. A midpoint is added at the transformed middle point of the original segment on the condition that the ratio of (the distance between the middle point of the transformed segment and the transformed middle point of the original segment) to the length of the transformed segment, is larger then the specified `maxOffsetRatio`. This process is repeated until this condition isn't valid anymore, or until `maxDepth` is reached.
+
+The computation of the midpoints and distances in the source and destination domains during this process uses geometric algorithms, unless `sourceIsGeographic` or `destinationIsGeographic` are set to `true`, in which case geographic algorithms (such as 'Great-circle distance') are used.
+
+#### Handedness
+
+For some transformations, it is important that the source and destination planes have the same *handedness*.
+
+When we consider 2D Cartesian planes, there are two types of 'handedness'. A Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the "first" and the y-axis the "second" axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates, which have their origin in the top left corner.
+
+The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For many transformations a separate transformation is computed for both axes and hence it does not matter whether the source and destination have the same handedness. For some transformations, like the Helmert transformation, the transformation of X and Y coordinates are computed jointly (they are said to be 'coupled') and the difference matters. The algorithms won't produce the desired results unless action is taken to align the handedness.
+
+Therefore, in case the handedness differs one can set the `differentHandedness` parameter to `true`. This will internally flip the y-axis of the source so as to align the handedness of both during computation.
+
+## Notes
+
+### Typing
+
+#### GCPs
+
+GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
+
+```ts
+type TransformGcp = {
+  source: [number, number]
+  destination: [number, number]
+}
+```
+
+Or you can supply an array of objects containing `resource` and `geo` coordinates. This is the format used in [Georeference Annotations](https://iiif.io/api/extension/georef/):
+
+```ts
+type Gcp = {
+  resource: [number, number]
+  geo: [number, number]
+}
+```
+
+#### Geometries
+
+This uses the same geometry types as used in other packages. The simple geometries are:
+
+```ts
+type Point = [number, number]
+
+type LineString = Point[]
+
+type Polygon = Point[][]
+// A polygon is an array of rings of at least three points
+// Rings are not closed: the first point is not repeated at the end.
+// There is no requirement on winding order.
+
+type Geometry = Point | LineString | Polygon
+```
+
+### Transform vs. GDAL
+
+The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical. See the [tests](./test/test-transform.js) for details.
+
+For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library. This library is used for creating and solving the linear systems of equations that are at the heart of each of each of these transformations.
 
 ## API
 

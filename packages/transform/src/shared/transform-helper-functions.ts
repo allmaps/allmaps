@@ -9,21 +9,23 @@ import {
   conformRing
 } from '@allmaps/stdlib'
 
+import GcpTransformer from '../transformer'
+
 import type {
   TransformGcp,
   Segment,
   TransformOptions,
-  GcpTransformerInterface,
   PartialTransformOptions
 } from './types.js'
 
 import type { Point, LineString, Ring, Polygon } from '@allmaps/types'
 
-function mergeDefaultOptions(
-  options?: PartialTransformOptions
+export function mergeOptions(
+  optionsFromTransform?: PartialTransformOptions,
+  optionsFromGCPTransformer?: PartialTransformOptions,
+  optionsFromDataFormat?: PartialTransformOptions
 ): TransformOptions {
-  const mergedOptions = {
-    close: false,
+  const optionsDefault: TransformOptions = {
     maxOffsetRatio: 0,
     maxDepth: 0,
     destinationIsGeographic: false,
@@ -31,36 +33,19 @@ function mergeDefaultOptions(
     differentHandedness: false
   }
 
-  if (options && options.maxDepth !== undefined) {
-    mergedOptions.maxDepth = options.maxDepth
+  return {
+    ...optionsDefault,
+    ...optionsFromDataFormat,
+    ...optionsFromGCPTransformer,
+    ...optionsFromTransform
   }
-
-  if (options && options.maxOffsetRatio !== undefined) {
-    mergedOptions.maxOffsetRatio = options.maxOffsetRatio
-  }
-
-  if (options && options.destinationIsGeographic !== undefined) {
-    mergedOptions.destinationIsGeographic = options.destinationIsGeographic
-  }
-
-  if (options && options.sourceIsGeographic !== undefined) {
-    mergedOptions.sourceIsGeographic = options.sourceIsGeographic
-  }
-
-  if (options && options.differentHandedness !== undefined) {
-    mergedOptions.differentHandedness = options.differentHandedness
-  }
-
-  return mergedOptions
 }
 
 export function transformLineStringForwardToLineString(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   lineString: LineString,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): LineString {
-  const mergedOptions = mergeDefaultOptions(options)
-
   lineString = conformLineString(lineString)
 
   const points = lineString.map((point) => ({
@@ -73,7 +58,7 @@ export function transformLineStringForwardToLineString(
     recursivelyAddMidpointsWithDestinationMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendedSegments, true).map(
@@ -82,12 +67,10 @@ export function transformLineStringForwardToLineString(
 }
 
 export function transformLineStringBackwardToLineString(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   lineString: LineString,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): LineString {
-  const mergedOptions = mergeDefaultOptions(options)
-
   lineString = conformLineString(lineString)
 
   const points: TransformGcp[] = lineString.map((point) => ({
@@ -100,19 +83,17 @@ export function transformLineStringBackwardToLineString(
     recursivelyAddMidpointsWithSourceMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendendSegements, true).map((point) => point.source)
 }
 
 export function transformRingForwardToRing(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   ring: Ring,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Ring {
-  const mergedOptions = mergeDefaultOptions(options)
-
   ring = conformRing(ring)
 
   const points = ring.map((point) => ({
@@ -125,7 +106,7 @@ export function transformRingForwardToRing(
     recursivelyAddMidpointsWithDestinationMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendedSegments, false).map(
@@ -134,12 +115,10 @@ export function transformRingForwardToRing(
 }
 
 export function transformRingBackwardToRing(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   ring: Ring,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Ring {
-  const mergedOptions = mergeDefaultOptions(options)
-
   ring = conformRing(ring)
 
   const points: TransformGcp[] = ring.map((point) => ({
@@ -152,7 +131,7 @@ export function transformRingBackwardToRing(
     recursivelyAddMidpointsWithSourceMidPointFromTransform(
       transformer,
       segments,
-      mergedOptions
+      options
     )
 
   return segmentsToPoints(extendendSegements, false).map(
@@ -161,9 +140,9 @@ export function transformRingBackwardToRing(
 }
 
 export function transformPolygonForwardToPolygon(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   polygon: Polygon,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Polygon {
   return polygon.map((ring) => {
     return transformRingForwardToRing(transformer, ring, options)
@@ -171,9 +150,9 @@ export function transformPolygonForwardToPolygon(
 }
 
 export function transformPolygonBackwardToPolygon(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   polygon: Polygon,
-  options?: PartialTransformOptions
+  options: TransformOptions
 ): Polygon {
   return polygon.map((ring) => {
     return transformRingBackwardToRing(transformer, ring, options)
@@ -203,7 +182,7 @@ function segmentsToPoints(segments: Segment[], close = false): TransformGcp[] {
 }
 
 function recursivelyAddMidpointsWithDestinationMidPointFromTransform(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -224,7 +203,7 @@ function recursivelyAddMidpointsWithDestinationMidPointFromTransform(
 }
 
 function recursivelyAddMidpointsWithSourceMidPointFromTransform(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   segments: Segment[],
   options: TransformOptions
 ) {
@@ -245,7 +224,7 @@ function recursivelyAddMidpointsWithSourceMidPointFromTransform(
 }
 
 function addMidpointWithDestinationMidPointFromTransform(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   segment: Segment,
   options: TransformOptions,
   depth: number
@@ -315,7 +294,7 @@ function addMidpointWithDestinationMidPointFromTransform(
 }
 
 function addMidpointWithSourceMidPointFromTransform(
-  transformer: GcpTransformerInterface,
+  transformer: GcpTransformer,
   segment: Segment,
   options: TransformOptions,
   depth: number

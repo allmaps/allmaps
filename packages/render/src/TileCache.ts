@@ -11,7 +11,7 @@ import {
 } from './shared/tiles.js'
 import FetchableMapTile from './FetchableTile.js'
 
-const MAX_HISTORY_TOTAL_COUNT = 50
+const MAX_HISTORY_TOTAL_COUNT = 0
 const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
 
 /**

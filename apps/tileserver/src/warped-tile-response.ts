@@ -58,7 +58,10 @@ export async function createWarpedTileResponse(
     // Create transformer
     const transformer = new GcpTransformer(
       map.gcps,
-      options['transformation.type'] || map.transformation?.type
+      options['transformation.type'] || map.transformation?.type,
+      {
+        differentHandedness: true
+      }
     )
 
     // Compute necessary IIIF tiles

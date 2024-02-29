@@ -1,4 +1,4 @@
-import type { Point, GeojsonPoint } from '@allmaps/types'
+import type { Point } from '@allmaps/types'
 
 /**
  * Ground Control Point (GCP).
@@ -13,6 +13,7 @@ export type Segment = {
 
 /** Transformation type. */
 export type TransformationType =
+  | 'straight'
   | 'helmert'
   | 'polynomial'
   | 'polynomial1'
@@ -45,14 +46,4 @@ export type Transformation = {
   pointCount: number
 
   interpolate(point: Point): Point
-}
-
-export type GcpTransformerInterface = {
-  gcps: TransformGcp[]
-
-  transformForward(point: Point | GeojsonPoint): Point
-  transformToGeo(point: Point | GeojsonPoint): Point
-
-  transformBackward(point: Point | GeojsonPoint): Point
-  transformToResource(point: Point | GeojsonPoint): Point
 }

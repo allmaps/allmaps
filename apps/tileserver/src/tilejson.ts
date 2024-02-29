@@ -17,7 +17,10 @@ export function generateTileJson(
   for (const map of maps) {
     const transformer = new GcpTransformer(
       map.gcps,
-      options['transformation.type'] || map.transformation?.type
+      options['transformation.type'] || map.transformation?.type,
+      {
+        differentHandedness: true
+      }
     )
 
     const geoMask = transformer.transformForwardAsGeojson([map.resourceMask], {
