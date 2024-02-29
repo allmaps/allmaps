@@ -5,7 +5,7 @@
   import layers from 'protomaps-themes-base'
   import { Protocol } from 'pmtiles'
 
-  import { Header, Thumbnail } from '@allmaps/ui'
+  import { Header, Thumbnail, Stats } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
@@ -154,6 +154,8 @@
     }
   })
 </script>
+
+<Stats />
 
 <div class="absolute w-full h-full grid grid-rows-[min-content_1fr]">
   <Header appName="Explore">
