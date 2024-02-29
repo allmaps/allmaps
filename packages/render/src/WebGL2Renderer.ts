@@ -67,7 +67,7 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 /**
- * Class for renderers that render warped maps to a HTML canvas element using WebGL2
+ * Class that render warped maps to a HTML canvas element using WebGL 2
  *
  * Its main function is `render`
  *
@@ -221,7 +221,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Get the 'remove color options' of the renderer
+   * Get the remove color options of the renderer
    *
    * @returns {(Partial<RemoveColorOptions> | undefined)}
    */
@@ -230,7 +230,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Set the 'remove color options' of the renderer
+   * Set the remove color options of the renderer
    *
    * @param {RemoveColorOptions} removeColorOptions
    */
@@ -239,14 +239,14 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Reset the 'remove color options' of the renderer
+   * Reset the remove color options of the renderer
    */
   resetRemoveColorOptions() {
     this.renderOptions.removeColorOptions = undefined
   }
 
   /**
-   * Get the 'remove color options' of a map
+   * Get the remove color options of a map
    *
    * @param {string} mapId - ID of the map
    * @returns {(Partial<RemoveColorOptions> | undefined)}
@@ -261,7 +261,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Set the 'remove color options' of a map
+   * Set the remove color options of a map
    *
    * @param {string} mapId - ID of the map
    * @param {RemoveColorOptions} removeColorOptions - the 'remove color options' to set
@@ -277,7 +277,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * Reset the 'remove color options' of a map
+   * Reset the remove color options of a map
    *
    * @param {string} mapId - ID of the map
    */
@@ -407,7 +407,7 @@ export default class WebGL2Renderer extends EventTarget {
   }
 
   /**
-   * reset the saturation of a map
+   * Reset the saturation of a map
    *
    * @param {string} mapId - ID of the map
    */
@@ -661,8 +661,10 @@ export default class WebGL2Renderer extends EventTarget {
         )
       }
       const dist = Math.max(...rectangleDistances)
-      if (dist == 0) {
-        return true // No move should also return true
+      if (dist === 0) {
+        // No move should also pass, e.g. when this function is called multiple times during startup,
+        // without changes to the viewport
+        return true
       }
       if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
         this.previousSignificantViewport = this.viewport
@@ -736,9 +738,9 @@ export default class WebGL2Renderer extends EventTarget {
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.useProgram(this.program)
 
-    // # Global uniform
+    // Global uniform
 
-    // Render Transform
+    // Render transform
 
     const renderTransformLocation = gl.getUniformLocation(
       this.program,
@@ -750,7 +752,7 @@ export default class WebGL2Renderer extends EventTarget {
       transformToMatrix4(renderTransform)
     )
 
-    // Animation Progress
+    // Animation progress
 
     const animationProgressLocation = gl.getUniformLocation(
       this.program,
@@ -765,7 +767,7 @@ export default class WebGL2Renderer extends EventTarget {
         continue
       }
 
-      // # Map specific uniforms
+      // Map-specific uniforms
 
       this.setRenderOptionsUniforms(
         this.renderOptions,
@@ -777,7 +779,7 @@ export default class WebGL2Renderer extends EventTarget {
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
       gl.uniform1f(opacityLocation, this.opacity * webgl2WarpedMap.opacity)
 
-      // Satuation
+      // Saturation
 
       const saturationLocation = gl.getUniformLocation(
         this.program,
@@ -788,7 +790,7 @@ export default class WebGL2Renderer extends EventTarget {
         this.saturation * webgl2WarpedMap.saturation
       )
 
-      // Best Scale Factor
+      // Best scale factor
 
       const bestScaleFactorLocation = gl.getUniformLocation(
         this.program,
@@ -797,7 +799,7 @@ export default class WebGL2Renderer extends EventTarget {
       const bestScaleFactor = webgl2WarpedMap.warpedMap.bestScaleFactor
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
-      // Packed Tiles Texture
+      // Packed tiles texture
 
       const packedTilesTextureLocation = gl.getUniformLocation(
         this.program,
@@ -807,7 +809,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesTexture)
 
-      // Packed Tiles Positions Texture
+      // Packed tiles positions texture
 
       const packedTilesPositionsTextureLocation = gl.getUniformLocation(
         this.program,
@@ -817,7 +819,7 @@ export default class WebGL2Renderer extends EventTarget {
       gl.activeTexture(gl.TEXTURE1)
       gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesPositionsTexture)
 
-      // Packed Tiles Resource Positions And Dimensions Texture
+      // Packed tiles resource positions and dimensions texture
 
       const packedTilesResourcePositionsAndDimensionsLocation =
         gl.getUniformLocation(
@@ -831,7 +833,7 @@ export default class WebGL2Renderer extends EventTarget {
         webgl2WarpedMap.packedTilesResourcePositionsAndDimensionsTexture
       )
 
-      // Packed Tiles Scale Factors Texture
+      // Packed tiles scale factors texture
 
       const packedTileScaleFactorsTextureLocation = gl.getUniformLocation(
         this.program,
@@ -844,7 +846,7 @@ export default class WebGL2Renderer extends EventTarget {
         webgl2WarpedMap.packedTilesScaleFactorsTexture
       )
 
-      // # Draw each map
+      // Draw each map
 
       const vao = webgl2WarpedMap.vao
       const count = webgl2WarpedMap.warpedMap.resourceTrianglePoints.length
