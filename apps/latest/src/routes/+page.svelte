@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
 
-  import { MapMonster } from '@allmaps/ui'
+  import { MapMonster, Stats } from '@allmaps/ui'
 
   import turfRewind from '@turf/rewind'
   import { GcpTransformer } from '@allmaps/transform'
@@ -132,6 +132,8 @@
     }
   })
 </script>
+
+<Stats />
 
 <ol class="grid text-xs sm:text-sm xl:text-base">
   <li

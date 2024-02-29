@@ -7,16 +7,21 @@
   //   Consider using packages like `esm-env` instead which provide cross-bundler-compatible
   //   environment variables.
 
+  // import.meta.env uses:
+  //   VITE_STATS_WEBSITE_ID
+  // $env/dynamic/public uses:
+  //   PUBLIC_STATS_WEBSITE_ID
+
   // import { env } from '$env/dynamic/public'
   const env = import.meta.env
 </script>
 
 <svelte:head>
-  {#if env.PUBLIC_STATS_WEBSITE_ID}
+  {#if env.VITE_STATS_WEBSITE_ID}
     <script
       async
       src="https://stats.allmaps.org/script.js"
-      data-website-id={env.PUBLIC_STATS_WEBSITE_ID}
+      data-website-id={env.VITE_STATS_WEBSITE_ID}
     ></script>
   {/if}
 </svelte:head>
