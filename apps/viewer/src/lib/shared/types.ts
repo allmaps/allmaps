@@ -1,6 +1,6 @@
 import type { Image, Manifest, Collection } from '@allmaps/iiif-parser'
 import type { Map, Annotation, AnnotationPage } from '@allmaps/annotation'
-import type { Position } from '@allmaps/render'
+import type { Point } from '@allmaps/types'
 
 import type { FeatureLike } from 'ol/Feature.js'
 
@@ -17,12 +17,12 @@ export interface StringSourceOptions {
 export type Source = (UrlSourceOptions | StringSourceOptions) & {
   id: string
   json: unknown
-  parsed: Parsed
+  parsed: ParsedSource
   // error?: Error
   annotations: unknown[]
 }
 
-export type Parsed =
+export type ParsedSource =
   | {
       type: 'annotation'
       maps: Map[]
@@ -54,7 +54,7 @@ export type MapState = {
   visible: boolean
   selected: boolean
   highlighted: boolean
-  customResourceMask?: Position[]
+  customResourceMask?: Point[]
 }
 
 export type RemoveBackgroundOptions = {

@@ -9,7 +9,7 @@
   "target": {
     "type": "SpecificResource",
     "source": {
-      "@id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+      "id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
       "type": "ImageService2",
       "height": 1860,
       "width": 4708

@@ -5,6 +5,7 @@
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -23,6 +24,7 @@
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/openlayers" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/tailwind" }
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/types" }
   ]
 }

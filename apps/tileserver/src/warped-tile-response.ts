@@ -4,29 +4,27 @@ import { encode as encodePng } from 'upng-js'
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
-  getResourcePolygon,
-  getBestZoomLevel,
-  computeIiifTilesForPolygonAndZoomLevel
+  geoBboxToResourceRing,
+  getBestTileZoomLevel,
+  computeTilesConveringRingAtTileZoomLevel
 } from '@allmaps/render'
+import classifyPoint from 'robust-point-in-polygon'
 
 import { cachedFetch } from './fetch.js'
-import {
-  xyzTileToGeoBBox,
-  pointInPolygon,
-  tileToLongitude,
-  tileToLatitude
-} from './geo.js'
+import { xyzTileToGeoBbox, tileToLng, tileToLat } from './geo.js'
 
-import type { Coord, XYZTile, Cache, Tile, Options } from './types.js'
+import type { Point, Tile } from '@allmaps/types'
 import type { Map } from '@allmaps/annotation'
+import type { XYZTile, Cache, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 const CHANNELS = 4
+const DEFAULT_SCALE_FACTOR_SHARPENING = 1
 
 export async function createWarpedTileResponse(
   maps: Map[],
   { x, y, z }: XYZTile,
-  options: Options,
+  options: TilejsonOptions,
   cache: Cache
 ): Promise<Response> {
   // Create resulting warped tile
@@ -55,33 +53,37 @@ export async function createWarpedTileResponse(
     const parsedImage: Image = Image.parse(imageInfo)
 
     // Compute xyz tile extent
-    const geoBBox = xyzTileToGeoBBox({ x, y, z })
+    const geoBbox = xyzTileToGeoBbox({ x, y, z })
 
     // Create transformer
     const transformer = new GcpTransformer(
       map.gcps,
-      options['transformation.type'] || map.transformation?.type
+      options['transformation.type'] || map.transformation?.type,
+      {
+        differentHandedness: true
+      }
     )
 
     // Compute necessary IIIF tiles
-    const geoBBoxResourcePolygon = getResourcePolygon(transformer, geoBBox)
+    const resourceRing = geoBboxToResourceRing(transformer, geoBbox)
 
-    const zoomLevel = getBestZoomLevel(
+    const zoomLevel = getBestTileZoomLevel(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
-      geoBBoxResourcePolygon
+      resourceRing,
+      DEFAULT_SCALE_FACTOR_SHARPENING
     )
 
-    const iiifTiles = computeIiifTilesForPolygonAndZoomLevel(
-      parsedImage,
-      geoBBoxResourcePolygon,
-      zoomLevel
+    const iiifTiles = computeTilesConveringRingAtTileZoomLevel(
+      resourceRing,
+      zoomLevel,
+      parsedImage
     )
 
     // Get IIIF tile urls
     const iiifTileUrls = iiifTiles.map((tile: Tile) => {
       const { region, size } = parsedImage.getIiifTile(
-        tile.zoomLevel,
+        tile.tileZoomLevel,
         tile.column,
         tile.row
       )
@@ -123,9 +125,9 @@ export async function createWarpedTileResponse(
       ) {
         // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles, in two steps
         // 1) Detemine lonlat of warped tile pixel location
-        const warpedTilePixelGeo: Coord = [
-          tileToLongitude({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
-          tileToLatitude({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
+        const warpedTilePixelGeo: Point = [
+          tileToLng({ x: x + warpedTilePixelX / TILE_SIZE, z: z }),
+          tileToLat({ y: y + warpedTilePixelY / TILE_SIZE, z: z })
         ]
         // 2) Determine corresponding pixel location (with decimals) on resource using transformer
         const [pixelX, pixelY] =
@@ -133,10 +135,13 @@ export async function createWarpedTileResponse(
 
         // Check if pixel inside resource mask
         // TODO: improve efficiency
-        // TODO: fix strange repeating error,
-        //    remove pointInPolygon check and fix first
-        const inside = pointInPolygon([pixelX, pixelY], resourceMask)
-        if (!inside) {
+
+        // classifyPoint: Returns An integer which determines the position of point relative to polygon. This has the following interpretation:
+        // -1 if point is contained inside loop
+        // 0 if point is on the boundary of loop
+        // 1 if point is outside loop
+        // TODO: check if =0 is ok to
+        if (classifyPoint(resourceMask, [pixelX, pixelY]) == 1) {
           continue
         }
 
@@ -148,13 +153,13 @@ export async function createWarpedTileResponse(
         let foundTile = false
         for (tileIndex = 0; tileIndex < iiifTiles.length; tileIndex++) {
           tile = iiifTiles[tileIndex]
-          tileXMin = tile.column * tile.zoomLevel.originalWidth
-          tileYMin = tile.row * tile.zoomLevel.originalHeight
+          tileXMin = tile.column * tile.tileZoomLevel.originalWidth
+          tileYMin = tile.row * tile.tileZoomLevel.originalHeight
           if (
             pixelX >= tileXMin &&
-            pixelX <= tileXMin + tile.zoomLevel.originalWidth &&
+            pixelX <= tileXMin + tile.tileZoomLevel.originalWidth &&
             pixelY >= tileYMin &&
-            pixelY <= tileYMin + tile.zoomLevel.originalHeight
+            pixelY <= tileYMin + tile.tileZoomLevel.originalHeight
           ) {
             foundTile = true
             break
@@ -173,7 +178,7 @@ export async function createWarpedTileResponse(
 
           if (decodedJpeg) {
             // Get resource tile size
-            const resourceTileSize = tile.zoomLevel.width
+            const resourceTileSize = tile.tileZoomLevel.width
 
             // Schematic drawing of resource tile and sub-pixel location of (pixelTileX, pixelTileY)
             //
@@ -189,8 +194,10 @@ export async function createWarpedTileResponse(
             // 0 *---------* 1 > X
             //
             // Determine (sub-)pixel coordinates on resource tile
-            const pixelTileX = (pixelX - tileXMin) / tile.zoomLevel.scaleFactor
-            const pixelTileY = (pixelY - tileYMin) / tile.zoomLevel.scaleFactor
+            const pixelTileX =
+              (pixelX - tileXMin) / tile.tileZoomLevel.scaleFactor
+            const pixelTileY =
+              (pixelY - tileYMin) / tile.tileZoomLevel.scaleFactor
             // Determine coordinates of four surrounding pixels 0, 1, 2, 3 on the resource tile
             const pixelTileXFloor = Math.max(Math.floor(pixelTileX), 0)
             const pixelTileXCeil = Math.min(

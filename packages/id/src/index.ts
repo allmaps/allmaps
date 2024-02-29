@@ -1,4 +1,3 @@
-import * as crypto from 'crypto'
 import serialize from './checksum.js'
 
 /**
@@ -7,8 +6,16 @@ import serialize from './checksum.js'
  * @param {string} str - Input string.
  * @returns {string} SHA-1 hash of `str`.
  */
-function generateHash(str: string): string {
-  return crypto.createHash('sha1').update(str, 'utf-8').digest('hex')
+async function generateHash(str: string): Promise<string> {
+  const hashBuffer = await crypto.subtle.digest(
+    'SHA-1',
+    new TextEncoder().encode(str)
+  )
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray
+    .map((byte: number) => byte.toString(16).padStart(2, '0'))
+    .join('')
+  return hashHex
 }
 
 /**

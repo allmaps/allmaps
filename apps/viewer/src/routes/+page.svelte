@@ -8,6 +8,7 @@
     Loading,
     URLInput,
     URLType,
+    Stats,
     dataStore,
     paramStore
   } from '@allmaps/ui'
@@ -35,6 +36,7 @@
     mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
   import { nextTransformation } from '$lib/shared/stores/transformation.js'
+  import experimentalFeatures from '$lib/shared/experimental-features.js'
 
   import Container from '$lib/components/Container.svelte'
   import Examples from '$lib/components/Examples.svelte'
@@ -104,11 +106,16 @@
       setNextMapActive({ updateView, hideOthers })
     } else if (event.key === '1') {
       $view = 'map'
-      // Temporarily turned off list view
-      // } else if (event.key === '2') {
-      //   $view = 'list'
     } else if (event.key === '2') {
-      $view = 'image'
+      if (experimentalFeatures) {
+        $view = 'list'
+      } else {
+        $view = 'image'
+      }
+    } else if (event.key === '3') {
+      if (experimentalFeatures) {
+        $view = 'image'
+      }
     } else if (event.key === 'm') {
       $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
     } else if (event.key === 't') {
@@ -152,6 +159,8 @@
     }
   })
 </script>
+
+<Stats />
 
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">

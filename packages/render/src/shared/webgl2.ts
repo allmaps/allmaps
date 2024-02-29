@@ -8,7 +8,6 @@ export function createShader(
   // TODO: are all unneeded webgl objects properly deleted?
 
   const shader = gl.createShader(type)
-
   if (shader) {
     gl.shaderSource(shader, source)
     gl.compileShader(shader)

@@ -20,9 +20,9 @@ export const Metadata3Schema = MetadataItem3Schema.array()
 
 export const AnnotationBody3Schema = z.object({
   type: z.literal('Image'),
-  width: z.number().int(),
-  height: z.number().int(),
-  service: ImageServiceSchema.array().length(1)
+  width: z.number().int().optional(),
+  height: z.number().int().optional(),
+  service: ImageServiceSchema.array()
 })
 
 const Annotation3Schema = z.object({

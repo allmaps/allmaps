@@ -2,13 +2,13 @@
   import { onMount } from 'svelte'
 
   import { ol } from '$lib/shared/stores/openlayers.js'
+  import experimentalFeatures from '$lib/shared/experimental-features.js'
 
   import type Map from 'ol/Map.js'
   import Zoom from 'ol/control/Zoom.js'
   import Rotate from 'ol/control/Rotate.js'
 
-  // Temporarily turned off list view
-  // import Transformation from '$lib/components/controls/Transformation.svelte'
+  import Transformation from '$lib/components/controls/Transformation.svelte'
 
   let zoom: Zoom
   let rotate: Rotate
@@ -140,9 +140,9 @@
     class="inline-flex rounded-md shadow-sm"
     role="group"
   />
-
-  <!-- Temporarily turned off list view -->
-  <!-- <Transformation /> -->
+  {#if experimentalFeatures}
+    <Transformation />
+  {/if}
 </div>
 <!-- <div class="select-container">
   <div class="select">

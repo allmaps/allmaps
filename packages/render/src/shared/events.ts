@@ -1,30 +1,33 @@
 export enum WarpedMapEventType {
+  GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
+  GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
+
   WARPEDMAPADDED = 'warpedmapadded',
   WARPEDMAPREMOVED = 'warpedmapremoved',
 
-  // TODO: Maybe have one MAPSCHANGED event?
+  WARPEDMAPENTER = 'warpedmapenter',
+  WARPEDMAPLEAVE = 'warpedmapleave',
+
+  IMAGEINFOLOADED = 'imageinfoloaded',
+
+  TILEFETCHED = 'tilefetched',
+  TILEFETCHERROR = 'tilefetcherror',
+  MAPTILELOADED = 'maptileloaded',
+  MAPTILEREMOVED = 'maptileremoved',
+  FIRSTMAPTILELOADED = 'firstmaptileloaded',
+  ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
+
+  TEXTURESUPDATED = 'texturesupdated',
+
+  // TODO: Maybe have one OPTIONSCHANGED event?
   ZINDICESCHANGES = 'zindiceschanged',
   RESOURCEMASKUPDATED = 'resourcemaskupdated',
   VISIBILITYCHANGED = 'visibilitychanged',
   TRANSFORMATIONCHANGED = 'transformationchanged',
 
-  GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
-  GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
+  CHANGED = 'changed',
 
-  WARPEDMAPENTER = 'warpedmapenter',
-  WARPEDMAPLEAVE = 'warpedmapleave',
-
-  TILENEEDED = 'tileneeded',
-  TILEREMOVED = 'tileremoved',
-  TILELOADED = 'tileloaded',
-  TILEFETCHERROR = 'tilefetcherror',
-  ALLTILESLOADED = 'alltilesloaded',
-
-  // Emits when the first tile of a map is added
-  FIRSTTILELOADED = 'firsttileloaded',
-
-  CLEARED = 'cleared',
-  CHANGED = 'changed'
+  CLEARED = 'cleared'
 }
 
 export type WarpedMapTileEventDetail = {

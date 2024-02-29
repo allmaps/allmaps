@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.23",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lerna-build": "lerna run build --scope @allmaps/latest --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -24,15 +25,15 @@
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "npm run types && npm run lint"
+    "preversion": "pnpm run types && pnpm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.16",
-    "@allmaps/id": "^1.0.0-beta.16",
-    "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/transform": "^1.0.0-beta.15",
-    "@allmaps/ui": "^1.0.0-beta.18",
-    "@allmaps/types": "^1.0.0-beta.3",
+    "@allmaps/annotation": "^1.0.0-beta.22",
+    "@allmaps/id": "^1.0.0-beta.23",
+    "@allmaps/tailwind": "^1.0.0-beta.9",
+    "@allmaps/transform": "^1.0.0-beta.32",
+    "@allmaps/types": "^1.0.0-beta.9",
+    "@allmaps/ui": "^1.0.0-beta.23",
     "@turf/area": "^6.5.0",
     "@turf/rewind": "^6.5.0",
     "d3-geo": "^3.0.1"

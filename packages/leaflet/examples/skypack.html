@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/leaflet</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.skypack.dev/leaflet@1.9.2/dist/leaflet.css"
+      integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <script src="controls.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="controls"></div>
+    <script type="module">
+      import L from 'https://cdn.skypack.dev/leaflet@1.9.2'
+
+      import { WarpedMapLayer } from 'https://cdn.skypack.dev/@allmaps/leaflet'
+
+      const map = L.map('map', {
+        center: [51.0518, 3.7278],
+        zoom: 14,
+        // Zoom animations for more than one zoom level are not supported
+        zoomAnimationThreshold: 1
+      })
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map)
+
+      const annotationUrl =
+        'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+
+      const warpedMapLayer = new WarpedMapLayer(annotationUrl)
+      map.addLayer(warpedMapLayer)
+
+      async function handleAddMapClicked() {
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+          'https://annotations.allmaps.org/maps/3aacd6b40f27c1cc'
+        )
+
+        map.fitBounds(warpedMapLayer.getBounds())
+      }
+
+      if (window.initializeControls) {
+        initializeControls('controls.html', warpedMapLayer, handleAddMapClicked)
+      }
+    </script>
+  </body>
+</html>

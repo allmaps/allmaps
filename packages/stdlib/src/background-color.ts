@@ -1,4 +1,4 @@
-import type { Position } from '@allmaps/types'
+import type { Point } from '@allmaps/types'
 
 type Color = [number, number, number]
 
@@ -14,10 +14,7 @@ type Histogram = {
 const DEFAULT_BIN_SIZE = 5
 const DEFAULT_RESOLUTION = 2
 
-export function getImageData(
-  imageElement: HTMLImageElement,
-  mask?: Position[]
-) {
+export function getImageData(imageElement: HTMLImageElement, mask?: Point[]) {
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
 

@@ -60,7 +60,7 @@ const tests = [
     filename: 'image.3.uvacreate-mmph-wae681.json',
     thumbnailSize: { width: 400, height: 400 },
     expectedUrl:
-      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/full/500,372/0/default.jpg'
+      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/full/500,/0/default.jpg'
   }
 ]
 

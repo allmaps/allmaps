@@ -1,7 +1,8 @@
-import { Size, ImageRequest, Tileset, TileZoomLevel } from './types.js'
+import type { SizeObject, ImageRequest, TileZoomLevel } from '@allmaps/types'
+import type { Tileset } from './types.js'
 
 export function getIiifTile(
-  { width: imageWidth, height: imageHeight }: Size,
+  { width: imageWidth, height: imageHeight }: SizeObject,
   zoomLevel: TileZoomLevel,
   column: number,
   row: number
@@ -52,8 +53,8 @@ export function getIiifTile(
 }
 
 function getDefaultTileset(
-  { width: imageWidth, height: imageHeight }: Size,
-  tileWidth = 256
+  { width: imageWidth, height: imageHeight }: SizeObject,
+  tileWidth = 768
 ): Tileset {
   const maxTilesPerSide = Math.max(imageWidth, imageHeight) / tileWidth
   const maxExponent = Math.ceil(Math.log(maxTilesPerSide) / Math.log(2))
@@ -90,7 +91,7 @@ function getDefaultTileset(
 }
 
 function getTileZoomLevelFromScaleFactor(
-  { width: imageWidth, height: imageHeight }: Size,
+  { width: imageWidth, height: imageHeight }: SizeObject,
   tileset: Tileset,
   scaleFactor: number
 ): TileZoomLevel {
@@ -111,7 +112,7 @@ function getTileZoomLevelFromScaleFactor(
 }
 
 function getTileZoomLevelsFromTilesets(
-  imageSize: Size,
+  imageSize: SizeObject,
   tilesets: Tileset[]
 ): TileZoomLevel[] {
   return tilesets
@@ -137,7 +138,7 @@ function hasValidTileset(tilesets: Tileset[]): boolean {
 }
 
 export function getTileZoomLevels(
-  imageSize: Size,
+  imageSize: SizeObject,
   tilesets: Tileset[] | undefined,
   supportsAnyRegionAndSize: boolean
 ): TileZoomLevel[] {

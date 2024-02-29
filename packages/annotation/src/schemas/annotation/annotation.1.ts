@@ -39,8 +39,7 @@ export const SvgSelectorSchema = z.object({
 //   size: z.string().regex(sizeRegex)
 // })
 
-export const SourceSchema = z.object({
-  // TODO: is this always '@id'? or is 'id' also allowed?
+export const SourceSchema1 = z.object({
   '@id': z.string().url(),
   type: ImageServiceSchema,
   height: z.number().positive(),
@@ -48,11 +47,17 @@ export const SourceSchema = z.object({
   partOf: PartOfSchema.array().optional()
 })
 
+export const SourceSchema2 = z.object({
+  id: z.string().url(),
+  type: ImageServiceSchema,
+  height: z.number().positive(),
+  width: z.number().positive(),
+  partOf: PartOfSchema.array().optional()
+})
+
 export const TargetSchema = z.object({
-  // TODO: is this always 'id'? or is '@id' also allowed?
-  id: z.string().url().optional(),
   type: z.literal('SpecificResource'),
-  source: SourceSchema,
+  source: SourceSchema1.or(SourceSchema2),
   // selector: SvgSelectorSchema.or(ImageApiSelectorSchema)
   selector: SvgSelectorSchema
 })

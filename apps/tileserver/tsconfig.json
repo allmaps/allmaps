@@ -8,13 +8,14 @@
     "types": [
       "@cloudflare/workers-types"
       // "vitest-environment-miniflare/globals"
-    ]
+    ],
   },
   "references": [
-    { "path": "../../packages/transform" },
-    { "path": "../../packages/render" },
     { "path": "../../packages/annotation" },
-    { "path": "../../packages/iiif-parser" }
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/render" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/types" }
   ],
   "include": ["./src/**/*"]
 }

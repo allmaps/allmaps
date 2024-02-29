@@ -37,6 +37,7 @@ import { mapsById, setRemoveBackgroundColor } from '$lib/shared/stores/maps.js'
 import { detectBackgroundColor } from '$lib/shared/wrappers/detect-background-color.js'
 
 import type { MapIDOrError } from '$lib/shared/types.js'
+import type Feature from 'ol/Feature.js'
 import type { FeatureLike } from 'ol/Feature.js'
 import type { OrderFunction } from 'ol/render.js'
 
@@ -100,8 +101,8 @@ function mapVectorLayerOrderFunction(
   const mapId2 = feature2.getId() as string
 
   if (mapId1 && mapId2) {
-    const zIndex1 = mapWarpedMapSource.getZIndex(mapId1)
-    const zIndex2 = mapWarpedMapSource.getZIndex(mapId2)
+    const zIndex1 = mapWarpedMapSource.getMapZIndex(mapId1)
+    const zIndex2 = mapWarpedMapSource.getMapZIndex(mapId2)
 
     if (zIndex1 !== undefined && zIndex2 !== undefined) {
       return zIndex1 - zIndex2
@@ -119,8 +120,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
+      // TODO: Consider using ...tileCache.getCachedTile(tileUrl)
       const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+        mapWarpedMapLayer?.renderer.tileCache.getCacheableTile(tileUrl)
       const imageBitmap = cachedTile?.imageBitmap
 
       if (imageBitmap) {
@@ -155,7 +157,7 @@ export function createMapOl() {
   if (mapWarpedMapLayer) {
     // TODO: emit this event directly from WarpedMapLayer?
     mapWarpedMapLayer.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTTILELOADED,
+      WarpedMapEventType.FIRSTMAPTILELOADED,
       mapWarpedMapLayerFirstTileLoaded
     )
 
@@ -231,21 +233,21 @@ export const ol = derived(view, ($view) => {
 // Exported functions
 
 export function showMap(mapId: string) {
-  if (!mapWarpedMapSource.isVisible(mapId)) {
+  if (!mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.showMap(mapId)
     addMapToVectorSource(mapId)
   }
 }
 
 export function hideMap(mapId: string) {
-  if (mapWarpedMapSource.isVisible(mapId)) {
+  if (mapWarpedMapSource.isMapVisible(mapId)) {
     mapWarpedMapSource.hideMap(mapId)
     removeMapFromVectorSource(mapId)
   }
 }
 
 export async function addMap(map: Georef): Promise<MapIDOrError> {
-  const mapIdOrError = await mapWarpedMapSource.addMap(map)
+  const mapIdOrError = await mapWarpedMapSource.addGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     addMapToVectorSource(mapId)
@@ -255,7 +257,7 @@ export async function addMap(map: Georef): Promise<MapIDOrError> {
 }
 
 export async function removeMap(map: Georef) {
-  const mapIdOrError = await mapWarpedMapSource.removeMap(map)
+  const mapIdOrError = await mapWarpedMapSource.removeGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     removeMapFromVectorSource(mapId)
@@ -265,10 +267,13 @@ export async function removeMap(map: Georef) {
 }
 
 export function addMapToVectorSource(mapId: string) {
-  const warpedMap = mapWarpedMapSource.getMap(mapId)
+  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
   if (warpedMap) {
     const geoMask = warpedMap.geoMask
-    const feature = new GeoJSON().readFeature(geoMask)
+    const feature = new GeoJSON().readFeature(geoMask, {
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:3857'
+    }) as Feature
     feature.setId(warpedMap.mapId)
 
     if (!mapVectorSource.hasFeature(feature)) {
@@ -280,6 +285,6 @@ export function addMapToVectorSource(mapId: string) {
 export function removeMapFromVectorSource(mapId: string) {
   const feature = mapVectorSource.getFeatureById(mapId)
   if (feature) {
-    mapVectorSource.removeFeature(feature)
+    mapVectorSource.removeFeature(feature as Feature)
   }
 }

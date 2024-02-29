@@ -10,5 +10,7 @@
   "tiles": 5508,
   "latest": 5509,
   "here": 5510,
-  "docs": 5511
+  "docs": 5511,
+  "leaflet": 5512,
+  "maplibre": 5513
 }

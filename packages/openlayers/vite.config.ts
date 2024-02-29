@@ -3,6 +3,7 @@ import { exec } from 'child_process'
 
 import ports from '../../ports.json'
 
+// Create TypeScript definition files
 // TODO: move to @allmaps/stdlib?
 const buildTypes: PluginOption = {
   name: 'build:types',
@@ -20,17 +21,14 @@ export default defineConfig({
     port: ports.openlayers
   },
   build: {
-    target: 'es2020',
+    target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
-    // minify: false,
+    minify: true,
     lib: {
       entry: './src/index.ts',
       name: 'Allmaps',
-      fileName: (format) =>
-        `bundled/allmaps-openlayers-8.${format}.${
-          format === 'umd' ? 'cjs' : 'js'
-        }`,
+      fileName: (format) => `bundled/allmaps-openlayers-8.${format}.js`,
       formats: ['es', 'umd']
     },
     rollupOptions: {
@@ -62,7 +60,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'es2020'
+      target: 'es2022'
     }
   },
   base: '',

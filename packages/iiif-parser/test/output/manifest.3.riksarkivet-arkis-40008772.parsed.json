@@ -1,0 +1,147 @@
+{
+  "canvases": [
+    {
+      "height": 18194,
+      "image": {
+        "embedded": true,
+        "height": 18194,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://lbiiif.riksarkivet.se/v3/arkis!40008772_00001",
+        "width": 15162
+      },
+      "label": {
+        "en": ["Image 1"],
+        "sv": ["Bild 1"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "en": ["Image ID"],
+            "sv": ["Bildid"]
+          },
+          "value": {
+            "none": ["40008772_00001"]
+          }
+        },
+        {
+          "label": {
+            "en": ["Link"],
+            "sv": ["Länk"]
+          },
+          "value": {
+            "none": ["https://sok.riksarkivet.se/bildvisning/40008772_00001"]
+          }
+        },
+        {
+          "label": {
+            "en": ["Source reference"],
+            "sv": ["Källhänvisning"]
+          },
+          "value": {
+            "en": [
+              "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696), Image ID: 40008772_00001"
+            ],
+            "sv": [
+              "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696), bildid: 40008772_00001"
+            ]
+          }
+        }
+      ],
+      "type": "canvas",
+      "uri": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/canvas",
+      "width": 15162
+    }
+  ],
+  "embedded": false,
+  "label": {
+    "en": [
+      "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+    ],
+    "sv": [
+      "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+    ]
+  },
+  "majorVersion": 3,
+  "metadata": [
+    {
+      "label": {
+        "en": ["Archive"],
+        "sv": ["Arkiv"]
+      },
+      "value": {
+        "none": ["Lantmäteristyrelsen"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Serie"],
+        "sv": ["Serie"]
+      },
+      "value": {
+        "none": ["Lantmäteristyrelsens leverans 1892"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Reference code"],
+        "sv": ["Referenskod"]
+      },
+      "value": {
+        "none": ["SE/RA/420571/02/2/0027:00001"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Title"],
+        "sv": ["Titel"]
+      },
+      "value": {
+        "none": [
+          "[Helsingfors] Geometrisk grundrijtning öfver stapelstaden Hellsingfors i Nyhland,\noch alle des tillhörige åkrar, afmätte anno 1696 af sahl. Lars\nForsell, renoverat och beskrefven anno 1701. [Stadsplan. Papper,\nritad, 155 x 134.] 44, 27. [Beskrivning, se lantmäteristyrelsens\nleverans 1892/61.]"
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": ["Date"],
+        "sv": ["Datering"]
+      },
+      "value": {
+        "none": ["1696"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Source reference"],
+        "sv": ["Källhänvisning"]
+      },
+      "value": {
+        "none": [
+          "Lantmäteristyrelsen, Lantmäteristyrelsens leverans 1892, SE/RA/420571/02/2/0027:00001 (1696)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": ["Rights"],
+        "sv": ["Rättighetsmärkning"]
+      },
+      "value": {
+        "none": ["https://creativecommons.org/publicdomain/mark/1.0/"]
+      }
+    },
+    {
+      "label": {
+        "en": ["IIIF Manifest"],
+        "sv": ["IIIF-manifest"]
+      },
+      "value": {
+        "none": ["https://lbiiif.riksarkivet.se/arkis!40008772/manifest"]
+      }
+    }
+  ],
+  "type": "manifest",
+  "uri": "https://lbiiif.riksarkivet.se/arkis!40008772/manifest"
+}

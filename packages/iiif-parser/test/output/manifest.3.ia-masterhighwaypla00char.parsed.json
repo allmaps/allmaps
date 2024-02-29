@@ -1,0 +1,4047 @@
+{
+  "embedded": false,
+  "type": "manifest",
+  "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char/manifest.json",
+  "majorVersion": 3,
+  "label": {
+    "none": [
+      "The master highway plan for the Boston metropolitan area : submitted to Robert F. Bradford, Governor of the Commonwealth of Massachusetts by the Joint Board for the Metropolitan Master Highway Plan, based upon a traffic survey by the Dept. of Public Works; Public Roads Administration, Federal Works Agency participating"
+    ]
+  },
+  "canvases": [
+    {
+      "type": "canvas",
+      "width": 3228,
+      "height": 2520,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$0/canvas",
+      "label": {
+        "none": ["1"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0001.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3228,
+        "height": 2520
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3406,
+      "height": 2705,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$1/canvas",
+      "label": {
+        "none": ["2"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0002.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3406,
+        "height": 2705
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2555,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$2/canvas",
+      "label": {
+        "none": ["3"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0003.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2555
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$3/canvas",
+      "label": {
+        "none": ["4"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0004.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$4/canvas",
+      "label": {
+        "none": ["5"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0005.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$5/canvas",
+      "label": {
+        "none": ["6"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0006.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2638,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$6/canvas",
+      "label": {
+        "none": ["7"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0007.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2638
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$7/canvas",
+      "label": {
+        "none": ["8"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0008.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$8/canvas",
+      "label": {
+        "none": ["9"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0009.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$9/canvas",
+      "label": {
+        "none": ["10"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0010.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$10/canvas",
+      "label": {
+        "none": ["11"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0011.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$11/canvas",
+      "label": {
+        "none": ["12"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0012.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2625,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$12/canvas",
+      "label": {
+        "none": ["13"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0013.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2625
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$13/canvas",
+      "label": {
+        "none": ["14"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0014.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3458,
+      "height": 2732,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$14/canvas",
+      "label": {
+        "none": ["15"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0015.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3458,
+        "height": 2732
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2644,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$15/canvas",
+      "label": {
+        "none": ["16"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0016.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2644
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2637,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$16/canvas",
+      "label": {
+        "none": ["17"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0017.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2637
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$17/canvas",
+      "label": {
+        "none": ["18"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0018.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2639,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$18/canvas",
+      "label": {
+        "none": ["19"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0019.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2639
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2568,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$19/canvas",
+      "label": {
+        "none": ["20"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0020.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2568
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2568,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$20/canvas",
+      "label": {
+        "none": ["21"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0021.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2568
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$21/canvas",
+      "label": {
+        "none": ["22"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0022.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2637,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$22/canvas",
+      "label": {
+        "none": ["23"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0023.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2637
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$23/canvas",
+      "label": {
+        "none": ["24"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0024.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$24/canvas",
+      "label": {
+        "none": ["25"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0025.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$25/canvas",
+      "label": {
+        "none": ["26"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0026.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$26/canvas",
+      "label": {
+        "none": ["27"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0027.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$27/canvas",
+      "label": {
+        "none": ["28"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0028.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$28/canvas",
+      "label": {
+        "none": ["29"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0029.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$29/canvas",
+      "label": {
+        "none": ["30"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0030.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$30/canvas",
+      "label": {
+        "none": ["31"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0031.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$31/canvas",
+      "label": {
+        "none": ["32"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0032.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2643,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$32/canvas",
+      "label": {
+        "none": ["33"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0033.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2643
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$33/canvas",
+      "label": {
+        "none": ["34"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0034.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$34/canvas",
+      "label": {
+        "none": ["35"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0035.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$35/canvas",
+      "label": {
+        "none": ["36"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0036.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$36/canvas",
+      "label": {
+        "none": ["37"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0037.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$37/canvas",
+      "label": {
+        "none": ["38"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0038.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$38/canvas",
+      "label": {
+        "none": ["39"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0039.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$39/canvas",
+      "label": {
+        "none": ["40"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0040.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$40/canvas",
+      "label": {
+        "none": ["41"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0041.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$41/canvas",
+      "label": {
+        "none": ["42"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0042.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$42/canvas",
+      "label": {
+        "none": ["43"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0043.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$43/canvas",
+      "label": {
+        "none": ["44"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0044.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2640,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$44/canvas",
+      "label": {
+        "none": ["45"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0045.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2640
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$45/canvas",
+      "label": {
+        "none": ["46"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0046.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2635,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$46/canvas",
+      "label": {
+        "none": ["47"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0047.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2635
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$47/canvas",
+      "label": {
+        "none": ["48"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0048.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$48/canvas",
+      "label": {
+        "none": ["49"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0049.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$49/canvas",
+      "label": {
+        "none": ["50"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0050.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2644,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$50/canvas",
+      "label": {
+        "none": ["51"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0051.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2644
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2643,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$51/canvas",
+      "label": {
+        "none": ["52"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0052.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2643
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2618,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$52/canvas",
+      "label": {
+        "none": ["53"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0053.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2618
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$53/canvas",
+      "label": {
+        "none": ["54"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0054.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$54/canvas",
+      "label": {
+        "none": ["55"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0055.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$55/canvas",
+      "label": {
+        "none": ["56"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0056.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$56/canvas",
+      "label": {
+        "none": ["57"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0057.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$57/canvas",
+      "label": {
+        "none": ["58"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0058.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$58/canvas",
+      "label": {
+        "none": ["59"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0059.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$59/canvas",
+      "label": {
+        "none": ["60"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0060.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$60/canvas",
+      "label": {
+        "none": ["61"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0061.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$61/canvas",
+      "label": {
+        "none": ["62"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0062.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2638,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$62/canvas",
+      "label": {
+        "none": ["63"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0063.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2638
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$63/canvas",
+      "label": {
+        "none": ["64"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0064.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$64/canvas",
+      "label": {
+        "none": ["65"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0065.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$65/canvas",
+      "label": {
+        "none": ["66"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0066.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$66/canvas",
+      "label": {
+        "none": ["67"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0067.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$67/canvas",
+      "label": {
+        "none": ["68"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0068.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$68/canvas",
+      "label": {
+        "none": ["69"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0069.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$69/canvas",
+      "label": {
+        "none": ["70"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0070.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$70/canvas",
+      "label": {
+        "none": ["71"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0071.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$71/canvas",
+      "label": {
+        "none": ["72"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0072.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$72/canvas",
+      "label": {
+        "none": ["73"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0073.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$73/canvas",
+      "label": {
+        "none": ["74"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0074.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$74/canvas",
+      "label": {
+        "none": ["75"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0075.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$75/canvas",
+      "label": {
+        "none": ["76"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0076.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$76/canvas",
+      "label": {
+        "none": ["77"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0077.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$77/canvas",
+      "label": {
+        "none": ["78"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0078.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$78/canvas",
+      "label": {
+        "none": ["79"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0079.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$79/canvas",
+      "label": {
+        "none": ["80"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0080.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$80/canvas",
+      "label": {
+        "none": ["81"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0081.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$81/canvas",
+      "label": {
+        "none": ["82"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0082.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2623,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$82/canvas",
+      "label": {
+        "none": ["83"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0083.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2623
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$83/canvas",
+      "label": {
+        "none": ["84"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0084.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$84/canvas",
+      "label": {
+        "none": ["85"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0085.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$85/canvas",
+      "label": {
+        "none": ["86"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0086.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2644,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$86/canvas",
+      "label": {
+        "none": ["87"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0087.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2644
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$87/canvas",
+      "label": {
+        "none": ["88"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0088.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$88/canvas",
+      "label": {
+        "none": ["89"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0089.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$89/canvas",
+      "label": {
+        "none": ["90"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0090.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2643,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$90/canvas",
+      "label": {
+        "none": ["91"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0091.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2643
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$91/canvas",
+      "label": {
+        "none": ["92"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0092.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$92/canvas",
+      "label": {
+        "none": ["93"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0093.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$93/canvas",
+      "label": {
+        "none": ["94"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0094.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$94/canvas",
+      "label": {
+        "none": ["95"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0095.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$95/canvas",
+      "label": {
+        "none": ["96"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0096.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2640,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$96/canvas",
+      "label": {
+        "none": ["97"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0097.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2640
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$97/canvas",
+      "label": {
+        "none": ["98"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0098.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$98/canvas",
+      "label": {
+        "none": ["99"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0099.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$99/canvas",
+      "label": {
+        "none": ["100"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0100.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$100/canvas",
+      "label": {
+        "none": ["101"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0101.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$101/canvas",
+      "label": {
+        "none": ["102"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0102.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$102/canvas",
+      "label": {
+        "none": ["103"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0103.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2638,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$103/canvas",
+      "label": {
+        "none": ["104"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0104.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2638
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2644,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$104/canvas",
+      "label": {
+        "none": ["105"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0105.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2644
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2645,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$105/canvas",
+      "label": {
+        "none": ["106"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0106.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2645
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$106/canvas",
+      "label": {
+        "none": ["107"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0107.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$107/canvas",
+      "label": {
+        "none": ["108"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0108.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$108/canvas",
+      "label": {
+        "none": ["109"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0109.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$109/canvas",
+      "label": {
+        "none": ["110"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0110.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2644,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$110/canvas",
+      "label": {
+        "none": ["111"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0111.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2644
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$111/canvas",
+      "label": {
+        "none": ["112"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0112.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$112/canvas",
+      "label": {
+        "none": ["113"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0113.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3381,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$113/canvas",
+      "label": {
+        "none": ["114"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0114.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3381,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$114/canvas",
+      "label": {
+        "none": ["115"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0115.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$115/canvas",
+      "label": {
+        "none": ["116"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0116.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$116/canvas",
+      "label": {
+        "none": ["117"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0117.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$117/canvas",
+      "label": {
+        "none": ["118"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0118.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2637,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$118/canvas",
+      "label": {
+        "none": ["119"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0119.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2637
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$119/canvas",
+      "label": {
+        "none": ["120"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0120.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$120/canvas",
+      "label": {
+        "none": ["121"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0121.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$121/canvas",
+      "label": {
+        "none": ["122"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0122.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2691,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$122/canvas",
+      "label": {
+        "none": ["123"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0123.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2691
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$123/canvas",
+      "label": {
+        "none": ["124"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0124.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2633,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$124/canvas",
+      "label": {
+        "none": ["125"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0125.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2633
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$125/canvas",
+      "label": {
+        "none": ["126"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0126.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2634,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$126/canvas",
+      "label": {
+        "none": ["127"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0127.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2634
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3325,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$127/canvas",
+      "label": {
+        "none": ["128"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0128.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3325,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2626,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$128/canvas",
+      "label": {
+        "none": ["129"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0129.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2626
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$129/canvas",
+      "label": {
+        "none": ["130"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0130.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$130/canvas",
+      "label": {
+        "none": ["131"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0131.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3261,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$131/canvas",
+      "label": {
+        "none": ["132"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0132.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3261,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2641,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$132/canvas",
+      "label": {
+        "none": ["133"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0133.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2641
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$133/canvas",
+      "label": {
+        "none": ["134"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0134.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2618,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$134/canvas",
+      "label": {
+        "none": ["135"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0135.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2618
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$135/canvas",
+      "label": {
+        "none": ["136"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0136.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$136/canvas",
+      "label": {
+        "none": ["137"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0137.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$137/canvas",
+      "label": {
+        "none": ["138"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0138.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$138/canvas",
+      "label": {
+        "none": ["139"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0139.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$139/canvas",
+      "label": {
+        "none": ["140"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0140.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5130,
+      "height": 1565,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$140/canvas",
+      "label": {
+        "none": ["141"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0141.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5130,
+        "height": 1565
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2942,
+      "height": 2704,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$141/canvas",
+      "label": {
+        "none": ["142"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0142.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 2942,
+        "height": 2704
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5277,
+      "height": 1730,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$142/canvas",
+      "label": {
+        "none": ["143"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0143.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5277,
+        "height": 1730
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 2956,
+      "height": 2694,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$143/canvas",
+      "label": {
+        "none": ["144"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0144.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 2956,
+        "height": 2694
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5195,
+      "height": 1573,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$144/canvas",
+      "label": {
+        "none": ["145"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0145.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5195,
+        "height": 1573
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$145/canvas",
+      "label": {
+        "none": ["146"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0146.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5342,
+      "height": 1472,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$146/canvas",
+      "label": {
+        "none": ["147"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0147.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5342,
+        "height": 1472
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2694,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$147/canvas",
+      "label": {
+        "none": ["148"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0148.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2694
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5545,
+      "height": 2081,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$148/canvas",
+      "label": {
+        "none": ["149"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0149.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5545,
+        "height": 2081
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2692,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$149/canvas",
+      "label": {
+        "none": ["150"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0150.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2692
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5408,
+      "height": 2081,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$150/canvas",
+      "label": {
+        "none": ["151"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0151.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5408,
+        "height": 2081
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$151/canvas",
+      "label": {
+        "none": ["152"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0152.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$152/canvas",
+      "label": {
+        "none": ["153"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0153.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2691,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$153/canvas",
+      "label": {
+        "none": ["154"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0154.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2691
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2642,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$154/canvas",
+      "label": {
+        "none": ["155"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0155.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2642
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$155/canvas",
+      "label": {
+        "none": ["156"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0156.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5057,
+      "height": 1546,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$156/canvas",
+      "label": {
+        "none": ["157"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0157.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5057,
+        "height": 1546
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$157/canvas",
+      "label": {
+        "none": ["158"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0158.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5268,
+      "height": 1610,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$158/canvas",
+      "label": {
+        "none": ["159"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0159.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5268,
+        "height": 1610
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$159/canvas",
+      "label": {
+        "none": ["160"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0160.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5167,
+      "height": 1998,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$160/canvas",
+      "label": {
+        "none": ["161"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0161.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5167,
+        "height": 1998
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$161/canvas",
+      "label": {
+        "none": ["162"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0162.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5323,
+      "height": 1841,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$162/canvas",
+      "label": {
+        "none": ["163"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0163.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5323,
+        "height": 1841
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$163/canvas",
+      "label": {
+        "none": ["164"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0164.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5323,
+      "height": 1823,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$164/canvas",
+      "label": {
+        "none": ["165"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0165.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5323,
+        "height": 1823
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2703,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$165/canvas",
+      "label": {
+        "none": ["166"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0166.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2703
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5268,
+      "height": 2191,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$166/canvas",
+      "label": {
+        "none": ["167"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0167.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5268,
+        "height": 2191
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$167/canvas",
+      "label": {
+        "none": ["168"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0168.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5259,
+      "height": 1481,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$168/canvas",
+      "label": {
+        "none": ["169"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0169.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5259,
+        "height": 1481
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$169/canvas",
+      "label": {
+        "none": ["170"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0170.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5167,
+      "height": 2155,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$170/canvas",
+      "label": {
+        "none": ["171"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0171.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5167,
+        "height": 2155
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$171/canvas",
+      "label": {
+        "none": ["172"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0172.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5185,
+      "height": 2182,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$172/canvas",
+      "label": {
+        "none": ["173"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0173.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5185,
+        "height": 2182
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$173/canvas",
+      "label": {
+        "none": ["174"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0174.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5213,
+      "height": 2136,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$174/canvas",
+      "label": {
+        "none": ["175"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0175.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5213,
+        "height": 2136
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$175/canvas",
+      "label": {
+        "none": ["176"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0176.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5121,
+      "height": 1453,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$176/canvas",
+      "label": {
+        "none": ["177"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0177.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5121,
+        "height": 1453
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$177/canvas",
+      "label": {
+        "none": ["178"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0178.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5351,
+      "height": 2734,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$178/canvas",
+      "label": {
+        "none": ["179"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0179.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5351,
+        "height": 2734
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$179/canvas",
+      "label": {
+        "none": ["180"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0180.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5102,
+      "height": 2127,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$180/canvas",
+      "label": {
+        "none": ["181"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0181.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5102,
+        "height": 2127
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2646,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$181/canvas",
+      "label": {
+        "none": ["182"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0182.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2646
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5075,
+      "height": 2108,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$182/canvas",
+      "label": {
+        "none": ["183"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0183.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5075,
+        "height": 2108
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3369,
+      "height": 2246,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$183/canvas",
+      "label": {
+        "none": ["184"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0184.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3369,
+        "height": 2246
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5102,
+      "height": 2136,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$184/canvas",
+      "label": {
+        "none": ["185"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0185.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5102,
+        "height": 2136
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3369,
+      "height": 2246,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$185/canvas",
+      "label": {
+        "none": ["186"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0186.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3369,
+        "height": 2246
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 5269,
+      "height": 1666,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$186/canvas",
+      "label": {
+        "none": ["187"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0187.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 5269,
+        "height": 1666
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3369,
+      "height": 2246,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$187/canvas",
+      "label": {
+        "none": ["188"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0188.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3369,
+        "height": 2246
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4143,
+      "height": 3472,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$188/canvas",
+      "label": {
+        "none": ["189"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0189.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4143,
+        "height": 3472
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4918,
+      "height": 3232,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$189/canvas",
+      "label": {
+        "none": ["190"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0190.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4918,
+        "height": 3232
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4826,
+      "height": 3186,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$190/canvas",
+      "label": {
+        "none": ["191"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0191.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4826,
+        "height": 3186
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4808,
+      "height": 3186,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$191/canvas",
+      "label": {
+        "none": ["192"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0192.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4808,
+        "height": 3186
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4844,
+      "height": 3186,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$192/canvas",
+      "label": {
+        "none": ["193"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0193.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4844,
+        "height": 3186
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 4807,
+      "height": 3214,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$193/canvas",
+      "label": {
+        "none": ["194"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0194.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 4807,
+        "height": 3214
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3065,
+      "height": 3472,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$194/canvas",
+      "label": {
+        "none": ["195"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0195.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3065,
+        "height": 3472
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3775,
+      "height": 3121,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$195/canvas",
+      "label": {
+        "none": ["196"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0196.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3775,
+        "height": 3121
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3775,
+      "height": 3121,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$196/canvas",
+      "label": {
+        "none": ["197"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0197.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3775,
+        "height": 3121
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3857,
+      "height": 3149,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$197/canvas",
+      "label": {
+        "none": ["198"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0198.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3857,
+        "height": 3149
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3857,
+      "height": 3131,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$198/canvas",
+      "label": {
+        "none": ["199"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0199.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3857,
+        "height": 3131
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3848,
+      "height": 2615,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$199/canvas",
+      "label": {
+        "none": ["200"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0200.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3848,
+        "height": 2615
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3848,
+      "height": 2615,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$200/canvas",
+      "label": {
+        "none": ["201"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0201.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3848,
+        "height": 2615
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3234,
+      "height": 2577,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$201/canvas",
+      "label": {
+        "none": ["202"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0202.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3234,
+        "height": 2577
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3346,
+      "height": 2683,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$202/canvas",
+      "label": {
+        "none": ["203"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0203.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3346,
+        "height": 2683
+      }
+    },
+    {
+      "type": "canvas",
+      "width": 3228,
+      "height": 2520,
+      "uri": "https://iiif.archive.org/iiif/masterhighwaypla00char$203/canvas",
+      "label": {
+        "none": ["204"]
+      },
+      "image": {
+        "embedded": true,
+        "type": "image",
+        "uri": "https://iiif.archive.org/image/iiif/3/masterhighwaypla00char%2Fmasterhighwaypla00char_jp2.zip%2Fmasterhighwaypla00char_jp2%2Fmasterhighwaypla00char_0204.jp2",
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "width": 3228,
+        "height": 2520
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "none": ["title"]
+      },
+      "value": {
+        "none": [
+          "The master highway plan for the Boston metropolitan area : submitted to Robert F. Bradford, Governor of the Commonwealth of Massachusetts by the Joint Board for the Metropolitan Master Highway Plan, based upon a traffic survey by the Dept. of Public Works; Public Roads Administration, Federal Works Agency participating"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["creator"]
+      },
+      "value": {
+        "none": [
+          "Charles A. Maguire and Associates",
+          "Stewart, Pearson H., former owner",
+          "Charles A. Maguire and Associates",
+          "De Leuw, Cather & Company",
+          "J.E. Greiner Company",
+          "Massachusetts. Joint Board for the Metropolitan Master Highway Plan",
+          "United States. Public Roads Administration"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["subject"]
+      },
+      "value": {
+        "none": [
+          "Roads",
+          "Highway planning",
+          "Master Plans",
+          "Traffic surveys",
+          "Traffic flow",
+          "Streets"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["date"]
+      },
+      "value": {
+        "none": ["1948"]
+      }
+    },
+    {
+      "label": {
+        "none": ["language"]
+      },
+      "value": {
+        "none": ["eng"]
+      }
+    },
+    {
+      "label": {
+        "none": ["lccn"]
+      },
+      "value": {
+        "none": ["52063007"]
+      }
+    },
+    {
+      "label": {
+        "none": ["page-progression"]
+      },
+      "value": {
+        "none": ["lr"]
+      }
+    },
+    {
+      "label": {
+        "none": ["sponsor"]
+      },
+      "value": {
+        "none": ["Boston Public Library"]
+      }
+    },
+    {
+      "label": {
+        "none": ["contributor"]
+      },
+      "value": {
+        "none": ["Boston Public Library"]
+      }
+    },
+    {
+      "label": {
+        "none": ["scanningcenter"]
+      },
+      "value": {
+        "none": ["boston"]
+      }
+    },
+    {
+      "label": {
+        "none": ["mediatype"]
+      },
+      "value": {
+        "none": ["texts"]
+      }
+    },
+    {
+      "label": {
+        "none": ["call_number"]
+      },
+      "value": {
+        "none": ["39999063797086"]
+      }
+    },
+    {
+      "label": {
+        "none": ["repub_state"]
+      },
+      "value": {
+        "none": ["4"]
+      }
+    },
+    {
+      "label": {
+        "none": ["updatedate"]
+      },
+      "value": {
+        "none": ["2012-11-01 11:50:22"]
+      }
+    },
+    {
+      "label": {
+        "none": ["updater"]
+      },
+      "value": {
+        "none": ["Associate-Tim-Bigelow"]
+      }
+    },
+    {
+      "label": {
+        "none": ["identifier"]
+      },
+      "value": {
+        "none": ["masterhighwaypla00char"]
+      }
+    },
+    {
+      "label": {
+        "none": ["addeddate"]
+      },
+      "value": {
+        "none": ["2012-11-01 11:50:24"]
+      }
+    },
+    {
+      "label": {
+        "none": ["scanner"]
+      },
+      "value": {
+        "none": ["scribe6.boston.archive.org"]
+      }
+    },
+    {
+      "label": {
+        "none": ["foldout_seconds"]
+      },
+      "value": {
+        "none": ["11389"]
+      }
+    },
+    {
+      "label": {
+        "none": ["ppi"]
+      },
+      "value": {
+        "none": ["300"]
+      }
+    },
+    {
+      "label": {
+        "none": ["camera"]
+      },
+      "value": {
+        "none": ["Canon EOS 5D Mark II"]
+      }
+    },
+    {
+      "label": {
+        "none": ["operator"]
+      },
+      "value": {
+        "none": ["associate-matthew-brown@archive.org"]
+      }
+    },
+    {
+      "label": {
+        "none": ["scandate"]
+      },
+      "value": {
+        "none": ["20121101171107"]
+      }
+    },
+    {
+      "label": {
+        "none": ["foldout-operator"]
+      },
+      "value": {
+        "none": ["associate-nicholas-delancey@archive.org"]
+      }
+    },
+    {
+      "label": {
+        "none": ["republisher"]
+      },
+      "value": {
+        "none": ["Associate-Tim-Bigelow@archive.org"]
+      }
+    },
+    {
+      "label": {
+        "none": ["foldoutcount"]
+      },
+      "value": {
+        "none": ["35"]
+      }
+    },
+    {
+      "label": {
+        "none": ["identifier-access"]
+      },
+      "value": {
+        "none": ["http://archive.org/details/masterhighwaypla00char"]
+      }
+    },
+    {
+      "label": {
+        "none": ["identifier-ark"]
+      },
+      "value": {
+        "none": ["ark:/13960/t77s9003p"]
+      }
+    },
+    {
+      "label": {
+        "none": ["scanfee"]
+      },
+      "value": {
+        "none": ["100"]
+      }
+    },
+    {
+      "label": {
+        "none": ["collection"]
+      },
+      "value": {
+        "none": [
+          "massdotlibrary",
+          "regionaldigitizationmass",
+          "bostonpubliclibrary",
+          "americana"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["sponsordate"]
+      },
+      "value": {
+        "none": ["20121130"]
+      }
+    },
+    {
+      "label": {
+        "none": ["openlibrary_edition"]
+      },
+      "value": {
+        "none": ["OL6128241M"]
+      }
+    },
+    {
+      "label": {
+        "none": ["openlibrary_work"]
+      },
+      "value": {
+        "none": ["OL7191080W"]
+      }
+    },
+    {
+      "label": {
+        "none": ["external-identifier"]
+      },
+      "value": {
+        "none": ["urn:oclc:record:1049659645"]
+      }
+    },
+    {
+      "label": {
+        "none": ["oclc-id"]
+      },
+      "value": {
+        "none": ["2826311"]
+      }
+    },
+    {
+      "label": {
+        "none": ["associated-names"]
+      },
+      "value": {
+        "none": [
+          "Stewart, Pearson H., former owner; Charles A. Maguire and Associates; De Leuw, Cather & Company; J.E. Greiner Company; Massachusetts. Joint Board for the Metropolitan Master Highway Plan; United States. Public Roads Administration"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["republisher_operator"]
+      },
+      "value": {
+        "none": ["Associate-Tim-Bigelow@archive.org"]
+      }
+    },
+    {
+      "label": {
+        "none": ["republisher_date"]
+      },
+      "value": {
+        "none": ["20121103130937"]
+      }
+    },
+    {
+      "label": {
+        "none": ["ocr_module_version"]
+      },
+      "value": {
+        "none": ["0.0.21"]
+      }
+    },
+    {
+      "label": {
+        "none": ["ocr_converted"]
+      },
+      "value": {
+        "none": ["abbyy-to-hocr 1.1.37"]
+      }
+    },
+    {
+      "label": {
+        "none": ["page_number_confidence"]
+      },
+      "value": {
+        "none": ["82"]
+      }
+    },
+    {
+      "label": {
+        "none": ["page_number_module_version"]
+      },
+      "value": {
+        "none": ["1.0.3"]
+      }
+    }
+  ]
+}

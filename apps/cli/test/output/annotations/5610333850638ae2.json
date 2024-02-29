@@ -8,7 +8,7 @@
   "target": {
     "type": "SpecificResource",
     "source": {
-      "@id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:9880z811p",
+      "id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:9880z811p",
       "type": "ImageService2",
       "height": 7393,
       "width": 11550

@@ -1,9 +1,11 @@
 import Source from 'ol/source/Source.js'
 
-import { RTree, World } from '@allmaps/render'
+import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Position, BBox } from '@allmaps/render'
+import type { Ring } from '@allmaps/types'
+
+import type { Extent } from 'ol/extent'
 
 /**
  * WarpedMapSource class. Together with a [WarpedMapLayer](#warpedmaplayer), this class
@@ -12,9 +14,14 @@ import type { Position, BBox } from '@allmaps/render'
  * @extends import("ol/source/Source.js")
  */
 export class WarpedMapSource extends Source {
-  rtree: RTree
-  world: World
+  warpedMapList: WarpedMapList
 
+  /**
+   * Creates a WarpedMapSource instance
+   *
+   * @constructor
+   * @param {Cache} [imageInfoCache] - image info cache
+   */
   constructor(imageInfoCache?: Cache) {
     super({
       interpolate: true,
@@ -23,22 +30,7 @@ export class WarpedMapSource extends Source {
       wrapX: true
     })
 
-    this.rtree = new RTree()
-    this.world = new World(this.rtree, imageInfoCache)
-  }
-
-  async addMap(map: unknown): Promise<string | Error> {
-    const result = this.world.addMap(map)
-    this.changed()
-
-    return result
-  }
-
-  async removeMap(map: unknown): Promise<string | Error> {
-    const result = this.world.removeMap(map)
-    this.changed()
-
-    return result
+    this.warpedMapList = new WarpedMapList(imageInfoCache)
   }
 
   /**
@@ -49,7 +41,9 @@ export class WarpedMapSource extends Source {
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.world.addGeoreferenceAnnotation(annotation)
+    const results = await this.warpedMapList.addGeoreferenceAnnotation(
+      annotation
+    )
     this.changed()
 
     return results
@@ -63,144 +57,208 @@ export class WarpedMapSource extends Source {
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = this.world.removeGeoreferenceAnnotation(annotation)
+    const results = await this.warpedMapList.removeGeoreferenceAnnotation(
+      annotation
+    )
     this.changed()
 
     return results
   }
 
   /**
-   * Clears the source, removes all warped maps
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
    */
-  clear() {
-    this.world.clear()
+  async addGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.addGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.removeGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Adds a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was added, or an error
+   */
+  async addGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result = this.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this.changed()
+
+    return result
   }
 
   /**
-   * Returns the World object that contains a list of all warped maps
+   * Removes a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was remvoed, or an error
    */
-  getWorld() {
-    return this.world
+  async removeGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result = this.warpedMapList.removeGeoreferencedMap(georeferencedMap)
+    this.changed()
+
+    return result
   }
 
   /**
-   * Returns a single warped map
-   * @param {string} mapId - ID of the warped map
+   * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
+   * @returns {WarpedMapList} the warped map list
    */
-  getMap(mapId: string) {
-    return this.world.getMap(mapId)
+  getWarpedMapList(): WarpedMapList {
+    return this.warpedMapList
+  }
+
+  /**
+   * Returns a single map's warped map
+   * @param {string} mapId - ID of the map
+   * @returns {WarpedMap | undefined} the warped map
+   */
+  getWarpedMap(mapId: string): WarpedMap | undefined {
+    return this.warpedMapList.getWarpedMap(mapId)
   }
 
   /**
    * Make a single map visible
-   * @param {string} mapId - ID of the warped map
+   * @param {string} mapId - ID of the map
    */
   showMap(mapId: string) {
-    this.world.showMaps([mapId])
+    this.warpedMapList.showMaps([mapId])
     this.changed()
   }
 
   /**
    * Make multiple maps visible
-   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
   showMaps(mapIds: Iterable<string>) {
-    this.world.showMaps(mapIds)
+    this.warpedMapList.showMaps(mapIds)
     this.changed()
   }
 
   /**
    * Make a single map invisible
-   * @param {string} mapId - ID of the warped map
+   * @param {string} mapId - ID of the map
    */
   hideMap(mapId: string) {
-    this.world.hideMaps([mapId])
+    this.warpedMapList.hideMaps([mapId])
     this.changed()
   }
 
   /**
    * Make multiple maps invisible
-   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
   hideMaps(mapIds: Iterable<string>) {
-    this.world.hideMaps(mapIds)
+    this.warpedMapList.hideMaps(mapIds)
     this.changed()
   }
 
   /**
-   * Returns visibility of a single map
-   * @returns {boolean} - whether the map is visible
+   * Returns the visibility of a single map
+   * @returns {boolean | undefined} - whether the map is visible
    */
-  isVisible(mapId: string) {
-    const warpedMap = this.world.getMap(mapId)
+  isMapVisible(mapId: string): boolean | undefined {
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
     return warpedMap?.visible
   }
 
   /**
    * Sets the resource mask of a single map
-   * @param {string} mapId - ID of the warped map
-   * @param {Position[]} resourceMask - new resource mask
+   * @param {string} mapId - ID of the map
+   * @param {Ring} resourceMask - new resource mask
    */
-  setResourceMask(mapId: string, resourceMask: Position[]) {
-    this.world.setResourceMask(mapId, resourceMask)
+  setMapResourceMask(mapId: string, resourceMask: Ring) {
+    this.warpedMapList.setMapResourceMask(mapId, resourceMask)
     this.changed()
   }
 
   /**
    * Sets the transformation type of multiple maps
-   * @param {Iterable<string>} mapIds - IDs of the warped maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
    * @param {TransformationType} transformation - new transformation type
    */
-  setTransformation(
+  setMapsTransformationType(
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.world.setTransformation(mapIds, transformation)
+    this.warpedMapList.setMapsTransformationType(mapIds, transformation)
     this.changed()
   }
 
   /**
-   * Return the extent of all warped maps in the source
-   * @returns {BBox | undefined} - extent of all warped maps
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+   * @returns {Bbox | undefined} - Bounding box of all warped maps
    */
-  getExtent(): BBox | undefined {
-    return this.world.getBBox()
+  getLonLatExtent(): Extent | undefined {
+    return this.warpedMapList.getBbox()
+  }
+
+  /**
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+   * @returns {Bbox | undefined} - bounding box of all warped maps
+   */
+  getExtent(): Extent | undefined {
+    return this.warpedMapList.getProjectedBbox()
   }
 
   /**
    * Bring maps to front
-   * @param {Iterable<string>} mapIds - IDs of the warped maps to bring to front
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
-  bringToFront(mapIds: Iterable<string>) {
-    this.world.bringToFront(mapIds)
+  bringMapsToFront(mapIds: Iterable<string>) {
+    this.warpedMapList.bringMapsToFront(mapIds)
     this.changed()
   }
 
   /**
    * Send maps to back
-   * @param {Iterable<string>} mapIds - IDs of the warped maps to send to back
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
-  sendToBack(mapIds: string[]) {
-    this.world.sendToBack(mapIds)
+  sendMapsToBack(mapIds: string[]) {
+    this.warpedMapList.sendMapsToBack(mapIds)
     this.changed()
   }
 
   /**
    * Bring maps forward
-   * @param {Iterable<string>} mapIds - IDs of the warped maps to bring forward
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
-  bringForward(mapIds: Iterable<string>) {
-    this.world.bringForward(mapIds)
+  bringMapsForward(mapIds: Iterable<string>) {
+    this.warpedMapList.bringMapsForward(mapIds)
     this.changed()
   }
 
   /**
    * Send maps backward
-   * @param {Iterable<string>} mapIds - IDs of the warped maps to send backward
+   * @param {Iterable<string>} mapIds - IDs of the maps
    */
-  sendBackward(mapIds: Iterable<string>) {
-    this.world.sendBackward(mapIds)
+  sendMapsBackward(mapIds: Iterable<string>) {
+    this.warpedMapList.sendMapsBackward(mapIds)
     this.changed()
   }
 
@@ -209,11 +267,23 @@ export class WarpedMapSource extends Source {
    * @param {string} mapId - ID of the warped map
    * @returns {number | undefined} - z-index of the warped map
    */
-  getZIndex(mapId: string) {
-    return this.world.getZIndex(mapId)
+  getMapZIndex(mapId: string): number | undefined {
+    return this.warpedMapList.getMapZIndex(mapId)
   }
 
+  /**
+   * Sets the image info Cache of the WarpedMapList
+   * @param {Cache} cache - the image info cache
+   */
   setImageInfoCache(cache: Cache) {
-    this.world.setImageInfoCache(cache)
+    this.warpedMapList.setImageInfoCache(cache)
+  }
+
+  /**
+   * Clears the source, removes all maps
+   */
+  clear() {
+    this.warpedMapList.clear()
+    this.changed()
   }
 }

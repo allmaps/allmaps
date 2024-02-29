@@ -43,7 +43,10 @@ export const Image2ProfileSchema = Image2ProfileUri.or(
 )
 
 export const Image2ContextString = 'http://iiif.io/api/image/2/context.json'
-export const Image2Context = z.literal(Image2ContextString)
+export const Image2Context = z
+  .literal(Image2ContextString)
+  // Invalid, bus used by https://iiif.archivelab.org
+  .or(z.literal('https://iiif.io/api/image/2/context.json'))
 
 export const Image2Schema = z.object({
   '@id': z.string().url(),

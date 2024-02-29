@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import { fromZodError } from 'zod-validation-error'
 
 import { IIIF } from '@allmaps/iiif-parser'
 
@@ -23,12 +24,8 @@ export default function parse() {
         } catch (err) {
           if (err instanceof Error && err.name === 'ZodError') {
             const zodError = err as ZodError
-            const formatted = zodError.format()
-            const errors = formatted._errors
-
-            errors.forEach((error) => {
-              console.error(error)
-            })
+            const validationError = fromZodError(zodError)
+            console.error(validationError.toString())
           } else if (err instanceof Error) {
             console.error(err.message)
           }

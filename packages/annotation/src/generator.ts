@@ -68,10 +68,8 @@ function generateSource(map: MapAllVersions) {
   if (isMap2(map)) {
     id = map.resource.id
     type = map.resource.type
-
     width = map.resource.width
     height = map.resource.height
-
     partOf = map.resource.partOf
   } else {
     id = map.image.uri
@@ -81,7 +79,7 @@ function generateSource(map: MapAllVersions) {
   }
 
   return {
-    '@id': id,
+    id,
     type,
     height,
     width,
@@ -120,7 +118,10 @@ function generateFeature(gcp: GCP) {
   }
 }
 
-function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
+function generateGeoreferenceAnnotation(
+  map: MapAllVersions,
+  includeContext = true
+): Annotation1 {
   const target = {
     type: 'SpecificResource' as const,
     source: generateSource(map),
@@ -136,7 +137,7 @@ function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
   return {
     id: map.id,
     type: 'Annotation',
-    '@context': generateContext(),
+    '@context': includeContext ? generateContext() : undefined,
     motivation: 'georeferencing' as const,
     target,
     body
@@ -168,12 +169,12 @@ export function generateAnnotation(
     }
 
     const annotations = parsedMaps.map((parsedMap) =>
-      generateGeoreferenceAnnotation(parsedMap)
+      generateGeoreferenceAnnotation(parsedMap, false)
     )
 
     return {
       type: 'AnnotationPage',
-      '@context': ['http://www.w3.org/ns/anno.jsonld'],
+      '@context': generateContext(),
       items: annotations
     }
   } else {

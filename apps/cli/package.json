@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.14",
+  "version": "1.0.0-beta.33",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -36,8 +36,8 @@
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
     "test": "NODE_ENV=test mocha --slow 200ms",
-    "pretest": "npm run build",
-    "preversion": "npm run types && npm run lint && npm test",
+    "pretest": "pnpm run build",
+    "preversion": "pnpm run types && pnpm run lint && pnpm test",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test"
@@ -51,11 +51,11 @@
   ],
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.16",
-    "@allmaps/iiif-parser": "^1.0.0-beta.25",
-    "@allmaps/transform": "^1.0.0-beta.15",
-    "@allmaps/stdlib": "^1.0.0-beta.12",
-    "@allmaps/id": "^1.0.0-beta.16",
+    "@allmaps/annotation": "^1.0.0-beta.22",
+    "@allmaps/id": "^1.0.0-beta.23",
+    "@allmaps/iiif-parser": "^1.0.0-beta.33",
+    "@allmaps/stdlib": "^1.0.0-beta.22",
+    "@allmaps/transform": "^1.0.0-beta.32",
     "commander": "^10.0.0",
     "stream-json": "^1.7.4",
     "zod-validation-error": "^1.5.0"
@@ -71,6 +71,6 @@
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
     "typescript": "^5.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.22.4"
   }
 }

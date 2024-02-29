@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/maplibre</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.0.0/dist/maplibre-gl.css"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@allmaps/maplibre/dist/bundled/allmaps-maplibre-4.0.umd.js"></script>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <script src="controls.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="controls"></div>
+    <script type="module">
+      const map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        center: [-73.9337, 40.8011],
+        zoom: 11.5,
+        maxPitch: 0,
+        // preserveDrawingBuffer is needed to fix error that causes base map to disappear
+        // Don't know a better way to fix this currently.
+        // Related GitHub issues:
+        // - https://github.com/mapbox/mapbox-gl-js/issues/9499
+        // - https://github.com/mapbox/mapbox-gl-js/issues/8936
+        preserveDrawingBuffer: true
+      })
+
+      let mapLoaded = false
+      let nav = new maplibregl.NavigationControl()
+      map.addControl(nav, 'top-left')
+
+      const warpedMapLayer = new Allmaps.WarpedMapLayer()
+      const annotationUrl =
+        'https://annotations.allmaps.org/images/d180902cb93d5bf2'
+
+      map.on('load', async () => {
+        mapLoaded = true
+        map.addLayer(warpedMapLayer)
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+      })
+
+      async function handleAddMapClicked() {
+        if (mapLoaded) {
+          await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+            'https://annotations.allmaps.org/maps/3c72848762664ecd'
+          )
+
+          map.fitBounds(warpedMapLayer.getBounds())
+        }
+      }
+
+      if (window.initializeControls) {
+        initializeControls('controls.html', warpedMapLayer, handleAddMapClicked)
+      }
+    </script>
+  </body>
+</html>

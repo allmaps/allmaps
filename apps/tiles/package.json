@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tiles",
-  "version": "0.0.2-alpha.4",
+  "version": "0.0.2-alpha.14",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lerna-build": "lerna run build --scope @allmaps/tiles --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -24,13 +25,13 @@
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "npm run types && npm run lint"
+    "preversion": "pnpm run types && pnpm run lint"
   },
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.12",
-    "@allmaps/tailwind": "^1.0.0-beta.8",
-    "@allmaps/ui": "^1.0.0-beta.18",
-    "ol": "^8.1.0"
+    "@allmaps/stdlib": "^1.0.0-beta.22",
+    "@allmaps/tailwind": "^1.0.0-beta.9",
+    "@allmaps/ui": "^1.0.0-beta.23",
+    "ol": "^8.2.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",

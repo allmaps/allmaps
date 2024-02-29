@@ -1,12 +1,12 @@
-# @allmaps/allmaps
+<p align=center><a href="https://allmaps.org"><img width="480" src="static/allmaps.svg" alt="Allmaps"></a></p>
 
-**Curating, georeferencing and exploring for IIIF maps**
+# Allmaps
 
-100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to curate, georeference and explore collections of digitized maps.
+100,000s of maps are available through [IIIF](https://iiif.io/), across libraries, archives and museums worldwide. Allmaps makes it easier and more inspiring to **curate, georeference and explore collections of digitized maps**.
 
-👉 **[allmaps.org](https://allmaps.org/)**
+👉 For more information about the Allmaps project, see [allmaps.org](https://allmaps.org/).
 
-More documentation coming soon!
+[![Allmaps Viewer](static/allmaps-viewer.jpg)](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F9c4e14c0b9d41379)
 
 ## Contents
 
@@ -18,8 +18,8 @@ Apps:
 - [Allmaps Tile Server](apps/tileserver)
 - [Allmaps Latest](apps/latest)
 - [Allmaps CLI](apps/cli)
-- [Allmaps Explore](apps/explore)
-- [Allmaps Info](apps/info)
+  <!-- - [Allmaps Explore](apps/explore) -->
+  <!-- - [Allmaps Info](apps/info) -->
 - [Allmaps IIIF Viewer](apps/iiif)
 - [Allmaps Here](apps/here)
 
@@ -28,8 +28,11 @@ Packages:
 - [@allmaps/annotation](packages/annotation)
 - [@allmaps/id](packages/id)
 - [@allmaps/iiif-parser](packages/iiif-parser)
+- [@allmaps/leaflet](packages/leaflet)
+- [@allmaps/maplibre](packages/maplibre)
 - [@allmaps/openlayers](packages/openlayers)
 - [@allmaps/render](packages/render)
+- [@allmaps/schemas](packages/schemas)
 - [@allmaps/stdlib](packages/stdlib)
 - [@allmaps/tailwind](packages/tailwind)
 - [@allmaps/transform](packages/transform)
@@ -37,71 +40,91 @@ Packages:
 - [@allmaps/types](packages/types)
 - [@allmaps/ui](packages/ui)
 
+To see how these apps and packages are related, check out the [dependency graph](https://observablehq.com/@allmaps/javascript-dependencies).
+
 ## Installation
 
-First, clone this repository locally
+Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/) installed.
+
+You can [install pnpm with Corepack](https://pnpm.io/installation#using-corepack):
+
+```sh
+corepack enable
+corepack prepare pnpm@latest --activate
+```
+
+Then, clone this repository locally:
 
 ```sh
 git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Then install dependencies and create symlinks
+Install dependencies and create symlinks:
 
 ```sh
 pnpm install -r
-npx lerna link
 ```
 
-## Running packages and apps locally
-
-### All apps and packages
-
-To run the `dev` and `build --watch` scripts for all packages and apps, run the following in one terminal window:
+Finally, build all packages to ensure all JavaScript exports are created from TypeScript files, and initialize SvelteKit apps:
 
 ```sh
-npx lerna run watch --parallel
+pnpm run init
 ```
 
-And this in another:
+### Running a single app locally
+
+To run the `dev` script for a single app, you need to run the `watch` scripts of all packages in one terminal window:
 
 ```sh
-npx lerna run dev --parallel
+pnpm run watch
 ```
 
-### One app or package
-
-To only run a single app in dev mode, you need to run all packages in watch mode:
+And then run the `dev` script of the app in another:
 
 ```sh
-npx lerna run watch --parallel
+pnpm --filter "@allmaps/viewer" run dev
 ```
 
-And then use lerna with `--scope` to select a single app:
-
-```sh
-npx lerna run --scope "@allmaps/viewer" dev
-```
-
-You can also directly run the `dev` script from a single app:
+You can also run the `dev` script from the app's directory instead:
 
 ```sh
 cd apps/viewer
 pnpm run dev
 ```
 
-## Troubleshooting
+### Running all packages and apps locally
 
-If things don't work, it might help to run:
+To run the `watch` and `dev` scripts for all packages and apps, run the following in one terminal window:
 
 ```sh
-npx lerna run check --parallel
+pnpm run watch
 ```
 
-or
+And this in another:
 
 ```sh
-npx lerna link
+pnpm run dev
+```
+
+## Troubleshooting
+
+If things don't work, it might help to reinitialize the SvelteKit apps:
+
+```sh
+pnpm run check
+```
+
+Or, reinstall dependencies and create the monorepo's symlinks:
+
+```sh
+pnpm install -r
+```
+
+As a last resort, you can try to remove some (or all) `node_modules` directories using [npkill](https://npkill.js.org/):
+
+```sh
+pnpm dlx npkill
 ```
 
 ## Commit changes
@@ -119,27 +142,34 @@ git commit --no-verify
 Check TypeScript types for all packages:
 
 ```sh
-npx lerna run types --parallel
+pnpm run types
 ```
 
-Run Prettier and ESLint for all packages:
+Run [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) for all packages:
 
 ```sh
-npx lerna run lint --parallel
+pnpm run lint
 ```
 
 ## Run tests
 
-Run `test` scripts for all packages and apps:
+Run tests for all packages and apps:
 
 ```sh
-npx lerna run test --parallel
+pnpm run test
 ```
 
-Run tests in single package:
+Run tests for a single package:
 
 ```sh
-npx lerna run --scope @allmaps/id test
+pnpm --filter "@allmaps/transform" test
+```
+
+You can run the tests from the package's directory instead:
+
+```sh
+cd packages/transform
+pnpm test
 ```
 
 # Versioning & publishing

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/info",
-  "version": "0.0.2-alpha.25",
+  "version": "0.0.2-alpha.36",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lerna-build": "lerna run build --scope @allmaps/info --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -24,14 +25,14 @@
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "npm run types && npm run lint"
+    "preversion": "pnpm run types && pnpm run lint"
   },
   "packageManager": "pnpm@6.32.3",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.16",
-    "@allmaps/id": "^1.0.0-beta.16",
-    "@allmaps/iiif-parser": "^1.0.0-beta.25",
-    "@allmaps/ui": "^1.0.0-beta.18"
+    "@allmaps/annotation": "^1.0.0-beta.22",
+    "@allmaps/id": "^1.0.0-beta.23",
+    "@allmaps/iiif-parser": "^1.0.0-beta.33",
+    "@allmaps/ui": "^1.0.0-beta.23"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",

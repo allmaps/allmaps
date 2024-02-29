@@ -4,14 +4,12 @@ export * from './classes/manifest.js'
 export * from './classes/canvas.js'
 export * from './classes/image.js'
 
+export type { Region, Size, ImageRequest, TileZoomLevel } from '@allmaps/types'
 export type {
   Tileset,
-  Region,
-  Size,
-  ImageRequest,
   MajorVersion,
-  TileZoomLevel,
-  ProfileProperties
+  ProfileProperties,
+  LanguageString
 } from './lib/types.js'
 
 /**

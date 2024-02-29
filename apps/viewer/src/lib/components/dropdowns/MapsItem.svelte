@@ -18,20 +18,20 @@
     mapWarpedMapLayer
   } from '$lib/shared/stores/openlayers.js'
   import { setActiveMapId } from '$lib/shared/stores/active.js'
+  import { imageInfoCache } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
 
-  import Thumbnail from '$lib/components/Thumbnail.svelte'
-
-  import { getFullResourceMask } from '@allmaps/stdlib'
+  import { fetchImageInfo, getFullResourceMask } from '@allmaps/stdlib'
 
   import {
+    Thumbnail,
     Copy,
     Dial,
-    BringToFront,
-    BringForward,
-    SendBackward,
-    SendToBack
+    BringMapsToFront,
+    BringMapsForward,
+    SendMapsBackward,
+    SendMapsToBack
   } from '@allmaps/ui'
 
   import type { ViewerMap } from '$lib/shared/types.js'
@@ -39,6 +39,8 @@
   export let viewerMap: ViewerMap
 
   let container: HTMLElement
+
+  let imageInfo: unknown | undefined
 
   const selected = writable(viewerMap.state.selected)
   const visible = writable(viewerMap.state.visible)
@@ -58,8 +60,7 @@
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.resource.id
-  const warpedMap = mapWarpedMapSource.getMap(mapId)
-  const geoMask = warpedMap?.geoMask
+  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
 
   const checkboxId = `dropdown-maps-${mapId}`
 
@@ -84,6 +85,8 @@
     })
   }
 
+  // TODO: the fullResourceMask is available directly in WarpedMap class!
+  // This also means this function can be removed from stdlib.
   const fullResourceMask = getFullResourceMask(imageWidth, imageHeight)
 
   selected.subscribe(($selected) => {
@@ -147,26 +150,28 @@
     $view = 'image'
   }
 
-  function handleBringToFront() {
-    mapWarpedMapSource.bringToFront([mapId])
+  function handleBringMapsToFront() {
+    mapWarpedMapSource.bringMapsToFront([mapId])
   }
 
-  function handleBringForward() {
-    mapWarpedMapSource.bringForward([mapId])
+  function handleBringMapsForward() {
+    mapWarpedMapSource.bringMapsForward([mapId])
   }
 
-  function handleSendBackward() {
-    mapWarpedMapSource.sendBackward([mapId])
+  function handleSendMapsBackward() {
+    mapWarpedMapSource.sendMapsBackward([mapId])
   }
 
-  function handleSendToBack() {
-    mapWarpedMapSource.sendToBack([mapId])
+  function handleSendMapsToBack() {
+    mapWarpedMapSource.sendMapsToBack([mapId])
   }
 
-  onMount(() => {
+  onMount(async () => {
     if ($firstSelectedMapId === mapId) {
       container.scrollIntoView()
     }
+
+    imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
   })
 </script>
 
@@ -190,12 +195,8 @@
         class:opacity-50={!$visible}
       >
         <div class="absolute block object-fill">
-          {#if viewerMap}
-            <Thumbnail
-              imageUri={viewerMap.map.resource.id}
-              width={192}
-              height={192}
-            />
+          {#if viewerMap && imageInfo !== undefined}
+            <Thumbnail {imageInfo} width={192} height={192} mode="contain" />
           {/if}
           <svg class="absolute w-full h-full inset-0" viewBox="0 0 100 100">
             <polygon
@@ -299,34 +300,34 @@
         <button
           type="button"
           title="Bring To Front"
-          on:click={handleBringToFront}
+          on:click={handleBringMapsToFront}
           class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
-          <BringToFront />
+          <BringMapsToFront />
         </button>
         <button
           type="button"
           title="Bring Forward"
-          on:click={handleBringForward}
+          on:click={handleBringMapsForward}
           class="p-1.5 w-8 h-8 bg-white border-t border-b border-r border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
-          <BringForward />
+          <BringMapsForward />
         </button>
         <button
           type="button"
           title="Send Backward"
-          on:click={handleSendBackward}
+          on:click={handleSendMapsBackward}
           class="p-1.5 w-8 h-8 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
-          <SendBackward />
+          <SendMapsBackward />
         </button>
         <button
           type="button"
           title="Send to Back"
-          on:click={handleSendToBack}
+          on:click={handleSendMapsToBack}
           class="p-1.5 w-8 h-8 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
         >
-          <SendToBack />
+          <SendMapsToBack />
         </button>
       </div>
     </div>
@@ -346,13 +347,13 @@
             href="https://annotations.allmaps.org/maps/{mapId}">new tab</a
           >,
 
-          {#if geoMask}
+          {#if warpedMap?.geoMask}
             <a
               class="underline"
               target="_blank"
               rel="noreferrer"
               href="http://geojson.io/#data=data:application/json,{encodeURIComponent(
-                JSON.stringify(geoMask)
+                JSON.stringify(warpedMap.geoMask)
               )}">geojson.io</a
             >,
           {/if}
