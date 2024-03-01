@@ -15,8 +15,29 @@ export type GeojsonPolygon = {
   coordinates: Point[][]
 }
 
+export type GeojsonMultiPoint = {
+  type: 'MultiPoint'
+  coordinates: Point[]
+}
+
+export type GeojsonMultiLineString = {
+  type: 'MultiLineString'
+  coordinates: Point[][]
+}
+
+export type GeojsonMultiPolygon = {
+  type: 'MultiPolygon'
+  coordinates: Point[][][]
+}
+
 // Consider using @types/geojson!
-export type GeojsonGeometry = GeojsonPoint | GeojsonLineString | GeojsonPolygon
+export type GeojsonGeometry =
+  | GeojsonPoint
+  | GeojsonLineString
+  | GeojsonPolygon
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon
 
 // The (string) values of the 'type' field of the type GeojsonGeometrys
 export type GeojsonGeometryType = GeojsonGeometry['type']
