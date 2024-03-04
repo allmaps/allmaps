@@ -223,7 +223,7 @@ Some options are available to improve transformations, e.g. to transform lineStr
 
 These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the options derived from the data format (e.g. setting 'true' when source is GeoJSON), which in term override the default options.
 
-As an exception, the `differentHandedness` option is only used when a transformer is built (and is not read during geometry transformation).
+The `differentHandedness` option is used both when a transformer and when a geometry is transformed, and should not be altered between these two actions.
 
 Here's an overview of the available options:
 
