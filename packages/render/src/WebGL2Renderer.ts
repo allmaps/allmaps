@@ -531,6 +531,10 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
+    if (this.animating) {
+      return
+    }
+
     const possibleMapsInViewport = Array.from(
       this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
     ).sort(
@@ -581,7 +585,10 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
+      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor, true)
+      // Note: the second option prevents the (expensive) forward transform of points
+      // Which is ok since these are triggered later by setResourceViewportRing as well
+      // TODO: prevent double computations more elegantly?
 
       // Transforming the viewport back to resource
       const projectedTransformerOptions = {
@@ -1022,7 +1029,7 @@ export default class WebGL2Renderer extends EventTarget {
       const mapId = event.data as string
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (warpedMap) {
-        warpedMap.clearResourceTrianglePointsByBestScaleFactor()
+        warpedMap.clearResourceTrianglesByBestScaleFactor()
         warpedMap.updateTriangulation(false)
       }
     }

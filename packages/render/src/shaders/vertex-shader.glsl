@@ -6,9 +6,9 @@ uniform mat4 u_renderTransform;
 
 uniform float u_animationProgress;
 
+in vec2 a_resourceTrianglePoint;
 in vec2 a_clipCurrentTrianglePoint;
 in vec2 a_clipNewTrianglePoint;
-in vec2 a_resourceTrianglePoint;
 in float a_triangleIndex;
 
 out vec2 v_resourceTrianglePoint;
