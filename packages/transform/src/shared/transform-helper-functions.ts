@@ -30,6 +30,7 @@ export function mergeOptions(
     maxDepth: 0,
     destinationIsGeographic: false,
     sourceIsGeographic: false,
+    inputIsMultiGeometry: false,
     differentHandedness: false
   }
 

@@ -204,42 +204,48 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPoint(input)) {
-      if (!this.forwardTransformation) {
-        this.forwardTransformation = this.createForwardTransformation()
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        if (!this.forwardTransformation) {
+          this.forwardTransformation = this.createForwardTransformation()
+        }
+        return this.forwardTransformation.interpolate(
+          this.assureEqualHandedness(input)
+        )
+      } else if (isGeojsonPoint(input)) {
+        return this.transformForward(convertGeojsonPointToPoint(input), options)
+      } else if (isLineString(input)) {
+        return transformLineStringForwardToLineString(
+          this,
+          input,
+          mergeOptions(options, this.options)
+        )
+      } else if (isGeojsonLineString(input)) {
+        return transformLineStringForwardToLineString(
+          this,
+          convertGeojsonLineStringToLineString(input),
+          mergeOptions(options, this.options, {
+            sourceIsGeographic: true
+          })
+        )
+      } else if (isPolygon(input)) {
+        return transformPolygonForwardToPolygon(
+          this,
+          input,
+          mergeOptions(options, this.options)
+        )
+      } else if (isGeojsonPolygon(input)) {
+        return transformPolygonForwardToPolygon(
+          this,
+          convertGeojsonPolygonToPolygon(input),
+          mergeOptions(options, this.options, { sourceIsGeographic: true })
+        )
       }
-      return this.forwardTransformation.interpolate(
-        this.assureEqualHandedness(input)
-      )
-    } else if (isGeojsonPoint(input)) {
-      return this.transformForward(convertGeojsonPointToPoint(input), options)
-    } else if (isLineString(input)) {
-      return transformLineStringForwardToLineString(
-        this,
-        input,
-        mergeOptions(options, this.options)
-      )
-    } else if (isGeojsonLineString(input)) {
-      return transformLineStringForwardToLineString(
-        this,
-        convertGeojsonLineStringToLineString(input),
-        mergeOptions(options, this.options, {
-          sourceIsGeographic: true
-        })
-      )
-    } else if (isPolygon(input)) {
-      return transformPolygonForwardToPolygon(
-        this,
-        input,
-        mergeOptions(options, this.options)
-      )
-    } else if (isGeojsonPolygon(input)) {
-      return transformPolygonForwardToPolygon(
-        this,
-        convertGeojsonPolygonToPolygon(input),
-        mergeOptions(options, this.options, { sourceIsGeographic: true })
-      )
-    } else if (isMultiPoint(input)) {
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return input.map((element) => this.transformForward(element, options))
     } else if (isGeojsonMultiPoint(input)) {
       return expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
@@ -304,55 +310,61 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPoint(input)) {
-      return convertPointToGeojsonPoint(this.transformForward(input))
-    } else if (isGeojsonPoint(input)) {
-      return convertPointToGeojsonPoint(
-        this.transformForward(convertGeojsonPointToPoint(input))
-      )
-    } else if (isLineString(input)) {
-      return convertLineStringToGeojsonLineString(
-        transformLineStringForwardToLineString(
-          this,
-          input,
-          mergeOptions(options, this.options, {
-            destinationIsGeographic: true
-          })
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return convertPointToGeojsonPoint(this.transformForward(input))
+      } else if (isGeojsonPoint(input)) {
+        return convertPointToGeojsonPoint(
+          this.transformForward(convertGeojsonPointToPoint(input))
         )
-      )
-    } else if (isGeojsonLineString(input)) {
-      return convertLineStringToGeojsonLineString(
-        transformLineStringForwardToLineString(
-          this,
-          convertGeojsonLineStringToLineString(input),
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true,
-            destinationIsGeographic: true
-          })
+      } else if (isLineString(input)) {
+        return convertLineStringToGeojsonLineString(
+          transformLineStringForwardToLineString(
+            this,
+            input,
+            mergeOptions(options, this.options, {
+              destinationIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isPolygon(input)) {
-      return convertPolygonToGeojsonPolygon(
-        transformPolygonForwardToPolygon(
-          this,
-          input,
-          mergeOptions(options, this.options, {
-            destinationIsGeographic: true
-          })
+      } else if (isGeojsonLineString(input)) {
+        return convertLineStringToGeojsonLineString(
+          transformLineStringForwardToLineString(
+            this,
+            convertGeojsonLineStringToLineString(input),
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true,
+              destinationIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isGeojsonPolygon(input)) {
-      return convertPolygonToGeojsonPolygon(
-        transformPolygonForwardToPolygon(
-          this,
-          convertGeojsonPolygonToPolygon(input),
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true,
-            destinationIsGeographic: true
-          })
+      } else if (isPolygon(input)) {
+        return convertPolygonToGeojsonPolygon(
+          transformPolygonForwardToPolygon(
+            this,
+            input,
+            mergeOptions(options, this.options, {
+              destinationIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isMultiPoint(input)) {
+      } else if (isGeojsonPolygon(input)) {
+        return convertPolygonToGeojsonPolygon(
+          transformPolygonForwardToPolygon(
+            this,
+            convertGeojsonPolygonToPolygon(input),
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true,
+              destinationIsGeographic: true
+            })
+          )
+        )
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return joinGeojsonPointArrayToGeojsonMultiPoint(
         input.map((element) => this.transformForwardAsGeojson(element, options))
       )
@@ -429,45 +441,50 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPoint(input)) {
-      if (!this.backwardTransformation) {
-        this.backwardTransformation = this.createBackwardTransformation()
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        if (!this.backwardTransformation) {
+          this.backwardTransformation = this.createBackwardTransformation()
+        }
+        return this.assureEqualHandedness(
+          this.backwardTransformation.interpolate(input)
+        )
+      } else if (isGeojsonPoint(input)) {
+        return this.transformBackward(convertGeojsonPointToPoint(input))
+      } else if (isLineString(input)) {
+        return transformLineStringBackwardToLineString(
+          this,
+          input,
+          mergeOptions(options, this.options)
+        )
+      } else if (isGeojsonLineString(input)) {
+        return transformLineStringBackwardToLineString(
+          this,
+          convertGeojsonLineStringToLineString(input),
+          mergeOptions(options, this.options, {
+            destinationIsGeographic: true
+          })
+        )
+      } else if (isPolygon(input)) {
+        return transformPolygonBackwardToPolygon(
+          this,
+          input,
+          mergeOptions(options, this.options)
+        )
+      } else if (isGeojsonPolygon(input)) {
+        return transformPolygonBackwardToPolygon(
+          this,
+          convertGeojsonPolygonToPolygon(input),
+          mergeOptions(options, this.options, {
+            destinationIsGeographic: true
+          })
+        )
       }
-
-      return this.assureEqualHandedness(
-        this.backwardTransformation.interpolate(input)
-      )
-    } else if (isGeojsonPoint(input)) {
-      return this.transformBackward(convertGeojsonPointToPoint(input))
-    } else if (isLineString(input)) {
-      return transformLineStringBackwardToLineString(
-        this,
-        input,
-        mergeOptions(options, this.options)
-      )
-    } else if (isGeojsonLineString(input)) {
-      return transformLineStringBackwardToLineString(
-        this,
-        convertGeojsonLineStringToLineString(input),
-        mergeOptions(options, this.options, {
-          destinationIsGeographic: true
-        })
-      )
-    } else if (isPolygon(input)) {
-      return transformPolygonBackwardToPolygon(
-        this,
-        input,
-        mergeOptions(options, this.options)
-      )
-    } else if (isGeojsonPolygon(input)) {
-      return transformPolygonBackwardToPolygon(
-        this,
-        convertGeojsonPolygonToPolygon(input),
-        mergeOptions(options, this.options, {
-          destinationIsGeographic: true
-        })
-      )
-    } else if (isMultiPoint(input)) {
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return input.map((element) => this.transformBackward(element, options))
     } else if (isGeojsonMultiPoint(input)) {
       return expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
@@ -532,55 +549,61 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPoint(input)) {
-      return convertPointToGeojsonPoint(this.transformBackward(input))
-    } else if (isGeojsonPoint(input)) {
-      return convertPointToGeojsonPoint(
-        this.transformBackward(convertGeojsonPointToPoint(input))
-      )
-    } else if (isLineString(input)) {
-      return convertLineStringToGeojsonLineString(
-        transformLineStringBackwardToLineString(
-          this,
-          input,
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true
-          })
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return convertPointToGeojsonPoint(this.transformBackward(input))
+      } else if (isGeojsonPoint(input)) {
+        return convertPointToGeojsonPoint(
+          this.transformBackward(convertGeojsonPointToPoint(input))
         )
-      )
-    } else if (isGeojsonLineString(input)) {
-      return convertLineStringToGeojsonLineString(
-        transformLineStringBackwardToLineString(
-          this,
-          convertGeojsonLineStringToLineString(input),
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true,
-            destinationIsGeographic: true
-          })
+      } else if (isLineString(input)) {
+        return convertLineStringToGeojsonLineString(
+          transformLineStringBackwardToLineString(
+            this,
+            input,
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isPolygon(input)) {
-      return convertPolygonToGeojsonPolygon(
-        transformPolygonBackwardToPolygon(
-          this,
-          input,
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true
-          })
+      } else if (isGeojsonLineString(input)) {
+        return convertLineStringToGeojsonLineString(
+          transformLineStringBackwardToLineString(
+            this,
+            convertGeojsonLineStringToLineString(input),
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true,
+              destinationIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isGeojsonPolygon(input)) {
-      return convertPolygonToGeojsonPolygon(
-        transformPolygonBackwardToPolygon(
-          this,
-          convertGeojsonPolygonToPolygon(input),
-          mergeOptions(options, this.options, {
-            sourceIsGeographic: true,
-            destinationIsGeographic: true
-          })
+      } else if (isPolygon(input)) {
+        return convertPolygonToGeojsonPolygon(
+          transformPolygonBackwardToPolygon(
+            this,
+            input,
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true
+            })
+          )
         )
-      )
-    } else if (isMultiPoint(input)) {
+      } else if (isGeojsonPolygon(input)) {
+        return convertPolygonToGeojsonPolygon(
+          transformPolygonBackwardToPolygon(
+            this,
+            convertGeojsonPolygonToPolygon(input),
+            mergeOptions(options, this.options, {
+              sourceIsGeographic: true,
+              destinationIsGeographic: true
+            })
+          )
+        )
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return joinGeojsonPointArrayToGeojsonMultiPoint(
         input.map((element) =>
           this.transformBackwardAsGeojson(element, options)
@@ -664,19 +687,25 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPoint(input)) {
-      return this.transformForward(input as Point, options)
-    } else if (isGeojsonPoint(input)) {
-      return this.transformForward(input as GeojsonPoint, options)
-    } else if (isLineString(input)) {
-      return this.transformForward(input as LineString, options)
-    } else if (isGeojsonLineString(input)) {
-      return this.transformForward(input as GeojsonLineString, options)
-    } else if (isPolygon(input)) {
-      return this.transformForward(input as Polygon, options)
-    } else if (isGeojsonPolygon(input)) {
-      return this.transformForward(input as GeojsonPolygon, options)
-    } else if (isMultiPoint(input)) {
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return this.transformForward(input as Point, options)
+      } else if (isGeojsonPoint(input)) {
+        return this.transformForward(input as GeojsonPoint, options)
+      } else if (isLineString(input)) {
+        return this.transformForward(input as LineString, options)
+      } else if (isGeojsonLineString(input)) {
+        return this.transformForward(input as GeojsonLineString, options)
+      } else if (isPolygon(input)) {
+        return this.transformForward(input as Polygon, options)
+      } else if (isGeojsonPolygon(input)) {
+        return this.transformForward(input as GeojsonPolygon, options)
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return this.transformForward(input as MultiPoint, options)
     } else if (isGeojsonMultiPoint(input)) {
       return this.transformForward(input as GeojsonMultiPoint, options)
@@ -734,19 +763,28 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPoint(input)) {
-      return this.transformForwardAsGeojson(input as Point, options)
-    } else if (isGeojsonPoint(input)) {
-      return this.transformForwardAsGeojson(input as GeojsonPoint, options)
-    } else if (isLineString(input)) {
-      return this.transformForwardAsGeojson(input as LineString, options)
-    } else if (isGeojsonLineString(input)) {
-      return this.transformForwardAsGeojson(input as GeojsonLineString, options)
-    } else if (isPolygon(input)) {
-      return this.transformForwardAsGeojson(input as Polygon, options)
-    } else if (isGeojsonPolygon(input)) {
-      return this.transformForwardAsGeojson(input as GeojsonPolygon, options)
-    } else if (isMultiPoint(input)) {
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return this.transformForwardAsGeojson(input as Point, options)
+      } else if (isGeojsonPoint(input)) {
+        return this.transformForwardAsGeojson(input as GeojsonPoint, options)
+      } else if (isLineString(input)) {
+        return this.transformForwardAsGeojson(input as LineString, options)
+      } else if (isGeojsonLineString(input)) {
+        return this.transformForwardAsGeojson(
+          input as GeojsonLineString,
+          options
+        )
+      } else if (isPolygon(input)) {
+        return this.transformForwardAsGeojson(input as Polygon, options)
+      } else if (isGeojsonPolygon(input)) {
+        return this.transformForwardAsGeojson(input as GeojsonPolygon, options)
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return this.transformForwardAsGeojson(input as MultiPoint, options)
     } else if (isGeojsonMultiPoint(input)) {
       return this.transformForwardAsGeojson(input as GeojsonMultiPoint, options)
@@ -810,19 +848,25 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): Geometry {
-    if (isPoint(input)) {
-      return this.transformBackward(input as Point, options)
-    } else if (isGeojsonPoint(input)) {
-      return this.transformBackward(input as GeojsonPoint, options)
-    } else if (isLineString(input)) {
-      return this.transformBackward(input as LineString, options)
-    } else if (isGeojsonLineString(input)) {
-      return this.transformBackward(input as GeojsonLineString, options)
-    } else if (isPolygon(input)) {
-      return this.transformBackward(input as Polygon, options)
-    } else if (isGeojsonPolygon(input)) {
-      return this.transformBackward(input as GeojsonPolygon, options)
-    } else if (isMultiPoint(input)) {
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return this.transformBackward(input as Point, options)
+      } else if (isGeojsonPoint(input)) {
+        return this.transformBackward(input as GeojsonPoint, options)
+      } else if (isLineString(input)) {
+        return this.transformBackward(input as LineString, options)
+      } else if (isGeojsonLineString(input)) {
+        return this.transformBackward(input as GeojsonLineString, options)
+      } else if (isPolygon(input)) {
+        return this.transformBackward(input as Polygon, options)
+      } else if (isGeojsonPolygon(input)) {
+        return this.transformBackward(input as GeojsonPolygon, options)
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return this.transformBackward(input as MultiPoint, options)
     } else if (isGeojsonMultiPoint(input)) {
       return this.transformBackward(input as GeojsonMultiPoint, options)
@@ -880,22 +924,28 @@ export default class GcpTransformer {
     input: Geometry | GeojsonGeometry,
     options?: PartialTransformOptions
   ): GeojsonGeometry {
-    if (isPoint(input)) {
-      return this.transformBackwardAsGeojson(input as Point, options)
-    } else if (isGeojsonPoint(input)) {
-      return this.transformBackwardAsGeojson(input as GeojsonPoint, options)
-    } else if (isLineString(input)) {
-      return this.transformBackwardAsGeojson(input as LineString, options)
-    } else if (isGeojsonLineString(input)) {
-      return this.transformBackwardAsGeojson(
-        input as GeojsonLineString,
-        options
-      )
-    } else if (isPolygon(input)) {
-      return this.transformBackwardAsGeojson(input as Polygon, options)
-    } else if (isGeojsonPolygon(input)) {
-      return this.transformBackwardAsGeojson(input as GeojsonPolygon, options)
-    } else if (isMultiPoint(input)) {
+    if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
+      if (isPoint(input)) {
+        return this.transformBackwardAsGeojson(input as Point, options)
+      } else if (isGeojsonPoint(input)) {
+        return this.transformBackwardAsGeojson(input as GeojsonPoint, options)
+      } else if (isLineString(input)) {
+        return this.transformBackwardAsGeojson(input as LineString, options)
+      } else if (isGeojsonLineString(input)) {
+        return this.transformBackwardAsGeojson(
+          input as GeojsonLineString,
+          options
+        )
+      } else if (isPolygon(input)) {
+        return this.transformBackwardAsGeojson(input as Polygon, options)
+      } else if (isGeojsonPolygon(input)) {
+        return this.transformBackwardAsGeojson(input as GeojsonPolygon, options)
+      }
+    }
+    if (options) {
+      options.inputIsMultiGeometry = false // false for piecewise single geometries
+    }
+    if (isMultiPoint(input)) {
       return this.transformBackwardAsGeojson(input as MultiPoint, options)
     } else if (isGeojsonMultiPoint(input)) {
       return this.transformBackwardAsGeojson(

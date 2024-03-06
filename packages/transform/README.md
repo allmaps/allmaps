@@ -227,13 +227,14 @@ The `differentHandedness` option is used both when a transformer and when a geom
 
 Here's an overview of the available options:
 
-| Option                    | Description                                                                                                                                                           | Default                                      |
-| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
-| `maxOffsetRatio`          | Maximum offset ratio when recursively adding midpoints (smaller means more midpoints)                                                                                 | `0`                                          |
-| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                               | `0` (i.e. no midpoints by default!)          |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                      | `false` (`true` when source is GeoJSON)      |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                 | `false` (`true` when destination is GeoJSON) |
-| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false`                                      |
+| Option                    | Description                                                                                                                                                                                                                                                | Default                                      |
+| :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| `maxOffsetRatio`          | Maximum offset ratio when recursively adding midpoints (smaller means more midpoints)                                                                                                                                                                      | `0`                                          |
+| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                    | `0` (i.e. no midpoints by default!)          |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                                                                                                           | `false` (`true` when source is GeoJSON)      |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                                                                                                      | `false` (`true` when destination is GeoJSON) |
+| `inputIsMultiGeometry`    | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the simple geometry (as opposed to GeoJSON geometries) types are not deterministic: the types of LineString and MultiPoint are identical. | `false`                                      |
+| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination.                                                                                      | `false`                                      |
 
 #### Recursively adding midpoints
 
@@ -294,6 +295,7 @@ type Polygon = Point[][]
 // There is no requirement on winding order.
 
 export type MultiPoint = Point[]
+// Notice that this is equivalent to the LineString type, hence the `inputIsMultiGeometry` option
 
 export type MultiLineString = Point[][]
 
