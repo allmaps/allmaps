@@ -193,6 +193,63 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 // }
 ```
 
+### MultiPoint
+
+In this example we transform a MultiPoint to a MultiPoint.
+
+```js
+export const transformGcps7 = [
+  {
+    source: [0, 0],
+    destination: [0, 0]
+  },
+  {
+    source: [100, 0],
+    destination: [20, 0]
+  },
+  {
+    source: [200, 100],
+    destination: [40, 20]
+  },
+  {
+    source: [200, 200],
+    destination: [40, 40]
+  },
+  {
+    source: [150, 250],
+    destination: [40, 100]
+  },
+  {
+    source: [100, 200],
+    destination: [20, 40]
+  },
+  {
+    source: [0, 100],
+    destination: [0, 20]
+  }
+]
+
+const transformOptions = {
+  inputIsMultiGeometry: true // this assures the transform method recognises the input as a multiPoint, not a LineString
+}
+
+const transformer = new GcpTransformer(transformGcps7, 'polynomial')
+
+const multiPoint = [
+  [10, 50],
+  [50, 50]
+]
+
+const transformedMultiPoint = transformer.transformForward(
+  multiPoint,
+  transformOptions
+)
+// const transformedMultiPoint = [
+//   [31.06060606060611, 155.30303030303048],
+//   [237.12121212121218, 185.60606060606085]
+// ]
+```
+
 ### Transformation types
 
 A transformer is build from a set of GCPs and a transformation type. The following transformation types are supported.
