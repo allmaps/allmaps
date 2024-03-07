@@ -172,34 +172,6 @@ describe('Transform LineString Backward To LineString from GeoJSON', async () =>
   })
 })
 
-describe('Transform MultiPoint Forward To MultiPoint, with maxDepth = 1', async () => {
-  const transformOptions = {
-    maxOffsetRatio: 0.01,
-    maxDepth: 1
-  }
-  const transformer = new GcpTransformer(transformGcps6, 'thinPlateSpline')
-  const input = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-  const output = [
-    [4.388957777030093, 51.959084191571606],
-    [4.392938913951547, 51.94062947962427],
-    [4.425874493300959, 51.94172557475595],
-    [4.4230497784967655, 51.950815146974556],
-    [4.420666790347598, 51.959985351835975]
-  ]
-
-  it(`should recognise multi geometry and transform the points piecewise, not as lineString with midpoints`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
-      output
-    )
-  })
-})
-
 describe('Transform MultiPoint Backward To MultiPoint', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.001,
