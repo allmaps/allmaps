@@ -23,11 +23,6 @@ export default [
     organization: 'Library of Congress',
     url: 'https://annotations.allmaps.org/?url=https://www.loc.gov/item/88695674/manifest.json'
   },
-  // {
-  //   title: 'Atlas of the city of Boston, West Roxbury',
-  //   organization: 'Leventhal Map & Education Center',
-  //   url: 'https://raw.githubusercontent.com/allmaps/webgl2-preview/main/static/west-roxbury.json'
-  // },
   {
     title: 'Atlas of the city of Lynn, Massachusetts',
     organization: 'Leventhal Map & Education Center',
