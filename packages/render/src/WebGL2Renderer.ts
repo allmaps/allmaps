@@ -585,10 +585,7 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor, true)
-      // Note: the second option prevents the (expensive) forward transform of points
-      // Which is ok since these are triggered later by setResourceViewportRing as well
-      // TODO: prevent double computations more elegantly?
+      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
       const projectedTransformerOptions = {
@@ -1024,17 +1021,6 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private resourceMaskUpdated(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (warpedMap) {
-        warpedMap.clearResourceTrianglesByBestScaleFactor()
-        warpedMap.updateTriangulation(false)
-      }
-    }
-  }
-
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
@@ -1076,11 +1062,6 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
   }
 
   private removeEventListeners() {
@@ -1107,11 +1088,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
     )
   }
 }

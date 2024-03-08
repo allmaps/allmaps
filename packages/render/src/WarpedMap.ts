@@ -10,8 +10,7 @@ import {
   geometryToDiameter,
   fetchImageInfo,
   lonLatToWebMecator,
-  mixPoints,
-  isOverlapping
+  mixPoints
 } from '@allmaps/stdlib'
 
 import { applyTransform } from './shared/matrix.js'
@@ -73,11 +72,11 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
  * @param {Bbox} resourceViewportRingBbox - Bbox of the viewport transformed back to resource coordinates, at the current viewport
- * @param {Point[]} resourceTriangles - Triangles of the triangulated resourceMask (at the current bestScaleFactor)
- * @private {Map<number, Point[][]>} resourceTrianglesByBestScaleFactor - Cache of the triangles of the triangulated resourceMask by bestScaleFactor
- * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor and viewport)
- * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resource mask (at the current bestScaleFactor and viewport) in projectedGeo coordinates
- * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resource mask (at the current bestScaleFactor and viewport) in projectedGeo coordinate
+ * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+ * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
+ * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resource mask (at the current bestScaleFactor) in projectedGeo coordinates
+ * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resource mask (at the current bestScaleFactor) in projectedGeo coordinate
+ * @private {Map<number, Map<number, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -131,14 +130,16 @@ export default class WarpedMap extends EventTarget {
 
   // The properties below are at the current bestScaleFactor
 
-  resourceTriangles: Point[][] = []
-  private resourceTrianglesByBestScaleFactor: Map<number, Point[][]> = new Map()
-
-  // The properties below are at the current bestScaleFactor and viewport
-
   resourceTrianglePoints: Point[] = []
+  private resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> =
+    new Map()
+
   projectedGeoCurrentTrianglePoints: Point[] = []
   projectedGeoNewTrianglePoints: Point[] = []
+  private projectedGeoTrianglePointsByBestScaleFactorAndTransformationType: Map<
+    number,
+    Map<TransformationType, Point[]>
+  > = new Map()
 
   /**
    * Creates an instance of WarpedMap.
@@ -327,7 +328,6 @@ export default class WarpedMap extends EventTarget {
   setResourceViewportRing(resourceViewportRing: Ring): void {
     this.resourceViewportRing = resourceViewportRing
     this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
-    this.updateResourceTrianglePoints(true)
   }
 
   /**
@@ -337,8 +337,14 @@ export default class WarpedMap extends EventTarget {
    */
   setResourceMask(resourceMask: Ring): void {
     this.resourceMask = resourceMask
+    this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.updateGeoMask()
     this.updateProjectedGeoMask()
+    this.updateResourceToProjectedGeoScale()
+    this.resourceTrianglePointsByBestScaleFactor = new Map()
+    this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType =
+      new Map()
+    this.updateTriangulation()
   }
 
   /**
@@ -365,76 +371,81 @@ export default class WarpedMap extends EventTarget {
    * Set the best scale factor at the current viewport
    *
    * @param {number} scaleFactor - scale factor
-   * @param {boolean} [holdTransform=false] - hold the transfomation of points, usfull to prevent repeated (expensive) resource to projectedGeo point transformations
    * @returns {boolean}
    */
-  setBestScaleFactor(scaleFactor: number, holdTransform = false): void {
+  setBestScaleFactor(scaleFactor: number): void {
     if (this.bestScaleFactor != scaleFactor) {
       this.bestScaleFactor = scaleFactor
-      this.updateTriangulation(true, holdTransform)
+      this.updateTriangulation(true)
     }
   }
 
   /**
-   * Update the triangulation of the resource mask, at the current bestScaleFactor
+   * Update the triangulation of the resource mask, at the current bestScaleFactor. Use cache if available.
    *
    * @param {boolean} [currentIsNew=false] - whether the new and current triangulation are the same - true by default, false during a transformation transition
-   * @param {boolean} [holdTransform=false] - hold the transfomation of points, usfull to prevent repeated (expensive) resource to projectedGeo point transformations
    */
-  updateTriangulation(currentIsNew = false, holdTransform = false) {
-    if (this.resourceTrianglesByBestScaleFactor.has(this.bestScaleFactor)) {
-      this.resourceTriangles = this.resourceTrianglesByBestScaleFactor.get(
-        this.bestScaleFactor
-      ) as Point[][]
+  updateTriangulation(currentIsNew = false) {
+    if (
+      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
+    ) {
+      this.resourceTrianglePoints =
+        this.resourceTrianglePointsByBestScaleFactor.get(
+          this.bestScaleFactor
+        ) as Point[]
     } else {
       const diameter =
         (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
         DIAMETER_FRACTION
 
-      this.resourceTriangles = triangulate(this.resourceMask, diameter)
+      this.resourceTrianglePoints = triangulate(
+        this.resourceMask,
+        diameter
+      ).flat()
 
-      this.resourceTrianglesByBestScaleFactor.set(
+      this.resourceTrianglePointsByBestScaleFactor.set(
         this.bestScaleFactor,
-        this.resourceTriangles
+        this.resourceTrianglePoints
       )
     }
 
-    this.updateResourceTrianglePoints(currentIsNew, holdTransform)
+    this.updateProjectedGeoTrianglePoints(currentIsNew)
   }
 
   /**
-   * Update the resource triangle points of the triangulation, at the current bestScaleFactor and viewport.
-   * This filters out the resource triangles that don't overlap with the resourceViewportRingBbox.
-   *
-   * @param {boolean} [currentIsNew=false] - whether the new and current triangulation are the same - true by default, false during a transformation transition
-   * @param {boolean} [holdTransform=false] - hold the transfomation of points, usfull to prevent repeated (expensive) resource to projectedGeo point transformations
-   */
-  updateResourceTrianglePoints(
-    currentIsNew = false,
-    holdTransform = false
-  ): void {
-    if (!this.resourceViewportRingBbox) {
-      return
-    }
-    this.resourceTrianglePoints = this.resourceTriangles
-      .filter((triangle) =>
-        isOverlapping(computeBbox(triangle), this.resourceViewportRingBbox!)
-      )
-      .flat()
-    if (!holdTransform) {
-      this.updateProjectedGeoTrianglePoints(currentIsNew)
-    }
-  }
-
-  /**
-   * Update the (current and new) points of the triangulated resource mask in projectedGeo coordinates, at the current best scale factor and viewport
+   * Update the (current and new) points of the triangulated resource mask, at the current best scale factor, in projectedGeo coordinates. Use cache if available.
    *
    * @param {boolean} [currentIsNew=false]
    */
   updateProjectedGeoTrianglePoints(currentIsNew = false) {
-    this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-      (point) => this.projectedTransformer.transformToGeo(point as Point)
-    )
+    if (
+      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
+        .get(this.bestScaleFactor)
+        ?.has(this.transformationType)
+    ) {
+      this.projectedGeoNewTrianglePoints =
+        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
+          .get(this.bestScaleFactor)
+          ?.get(this.transformationType) as Point[]
+    } else {
+      this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
+        (point) => this.projectedTransformer.transformToGeo(point as Point)
+      )
+
+      if (
+        !this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.get(
+          this.bestScaleFactor
+        )
+      ) {
+        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.set(
+          this.bestScaleFactor,
+          new Map()
+        )
+      }
+      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
+        .get(this.bestScaleFactor)
+        ?.set(this.transformationType, this.projectedGeoNewTrianglePoints)
+    }
 
     if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
       this.projectedGeoCurrentTrianglePoints =
@@ -447,13 +458,6 @@ export default class WarpedMap extends EventTarget {
    */
   resetCurrentTrianglePoints() {
     this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
-  }
-
-  /**
-   * Clear the cache of the resource triangle points per bestScaleFactor
-   */
-  clearResourceTrianglesByBestScaleFactor() {
-    this.resourceTrianglesByBestScaleFactor = new Map()
   }
 
   /**
@@ -501,7 +505,6 @@ export default class WarpedMap extends EventTarget {
   }
 
   dispose() {
-    this.resourceTriangles = []
     this.resourceTrianglePoints = []
     this.projectedGeoCurrentTrianglePoints = []
     this.projectedGeoNewTrianglePoints = []
