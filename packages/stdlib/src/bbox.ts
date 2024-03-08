@@ -121,9 +121,9 @@ export function bboxToSize(bbox: Bbox): Size {
 // Scales
 
 export function sizesToScale(size0: Size, size1: Size): number {
-  const scaleX = size0[0] / size1[0]
-  const scaleY = size0[1] / size1[1]
-  return Math.min(scaleX, scaleY)
+  const scaleMin = Math.min(...size0) / Math.min(...size1)
+  const scaleMax = Math.max(...size0) / Math.max(...size1)
+  return Math.min(scaleMin, scaleMax)
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {
