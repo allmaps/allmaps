@@ -87,6 +87,15 @@ function generateSource(map: MapAllVersions) {
   }
 }
 
+function generateDates(map: MapAllVersions) {
+  if (isMap2(map)) {
+    return {
+      created: map.created,
+      modified: map.modified
+    }
+  }
+}
+
 export function generateContext() {
   return [
     'http://iiif.io/api/extension/georef/1/context.json',
@@ -118,10 +127,7 @@ function generateFeature(gcp: GCP) {
   }
 }
 
-function generateGeoreferenceAnnotation(
-  map: MapAllVersions,
-  includeContext = true
-): Annotation1 {
+function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
   const target = {
     type: 'SpecificResource' as const,
     source: generateSource(map),
@@ -137,7 +143,8 @@ function generateGeoreferenceAnnotation(
   return {
     id: map.id,
     type: 'Annotation',
-    '@context': includeContext ? generateContext() : undefined,
+    '@context': generateContext(),
+    ...generateDates(map),
     motivation: 'georeferencing' as const,
     target,
     body
@@ -169,12 +176,12 @@ export function generateAnnotation(
     }
 
     const annotations = parsedMaps.map((parsedMap) =>
-      generateGeoreferenceAnnotation(parsedMap, false)
+      generateGeoreferenceAnnotation(parsedMap)
     )
 
     return {
       type: 'AnnotationPage',
-      '@context': generateContext(),
+      '@context': 'http://www.w3.org/ns/anno.jsonld',
       items: annotations
     }
   } else {

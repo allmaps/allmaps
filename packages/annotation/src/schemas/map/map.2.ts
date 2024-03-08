@@ -27,6 +27,8 @@ export const MapSchema = z.object({
     .optional(),
   type: z.literal('GeoreferencedMap'),
   id: z.string().optional(),
+  created: z.string().datetime().optional(),
+  modified: z.string().datetime().optional(),
   resource: ResourceSchema,
   gcps: GCPSchema.array(),
   resourceMask: ResourceMaskSchema,

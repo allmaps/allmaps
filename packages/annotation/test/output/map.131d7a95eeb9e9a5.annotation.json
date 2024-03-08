@@ -1,0 +1,69 @@
+{
+  "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "body": {
+    "features": [
+      {
+        "geometry": {
+          "coordinates": [70.1367188, 49.0954522],
+          "type": "Point"
+        },
+        "properties": {
+          "resourceCoords": [8320, 804]
+        },
+        "type": "Feature"
+      },
+      {
+        "geometry": {
+          "coordinates": [72.5976563, 0.0878906],
+          "type": "Point"
+        },
+        "properties": {
+          "resourceCoords": [8307, 9312]
+        },
+        "type": "Feature"
+      },
+      {
+        "geometry": {
+          "coordinates": [-11.6015625, -11.7813253],
+          "type": "Point"
+        },
+        "properties": {
+          "resourceCoords": [354, 9325]
+        },
+        "type": "Feature"
+      },
+      {
+        "geometry": {
+          "coordinates": [11.7773438, 48.1660854],
+          "type": "Point"
+        },
+        "properties": {
+          "resourceCoords": [225, 855]
+        },
+        "type": "Feature"
+      }
+    ],
+    "type": "FeatureCollection"
+  },
+  "id": "http://annotations.localhost:9584/maps/131d7a95eeb9e9a5",
+  "modified": "2022-07-10T08:00:45.933Z",
+  "created": "2022-07-10T08:00:45.933Z",
+  "motivation": "georeferencing",
+  "target": {
+    "selector": {
+      "type": "SvgSelector",
+      "value": "<svg width=\"8597\" height=\"9851\"><polygon points=\"297,800 233,9339 8318,9381 8372,894\" /></svg>"
+    },
+    "source": {
+      "height": 9851,
+      "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd382:g3824:g3824g:cw0357200",
+      "type": "ImageService2",
+      "width": 8597
+    },
+    "type": "SpecificResource"
+  },
+  "type": "Annotation"
+}
