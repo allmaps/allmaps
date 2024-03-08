@@ -9,6 +9,7 @@ export default class Polynomial implements Transformation {
   destinationPoints: Point[]
 
   polynomialParametersMatrices: [Matrix, Matrix]
+  polynomialParameters: [number[], number[]]
 
   pointCount: number
   order: number
@@ -121,6 +122,7 @@ export default class Polynomial implements Transformation {
           break
       }
     }
+
     // Compute polynomial parameters by solving the linear system of equations for each target component
     // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
     // This wil result in:
@@ -134,11 +136,14 @@ export default class Polynomial implements Transformation {
       pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[0]),
       pseudoInversePolynomialCoefsMatrix.mmul(destinationPointsMatrices[1])
     ]
+    this.polynomialParameters = this.polynomialParametersMatrices.map(
+      (matrix) => matrix.to1DArray()
+    ) as [number[], number[]]
   }
 
   // The interpolant function will compute the value at any point.
   interpolate(newSourcePoint: Point): Point {
-    if (!this.polynomialParametersMatrices) {
+    if (!this.polynomialParameters) {
       throw new Error('Polynomial parameters not computed')
     }
 
@@ -148,45 +153,39 @@ export default class Polynomial implements Transformation {
       switch (this.order) {
         case 1:
           newDestinationPoint[i] +=
-            this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1]
+            this.polynomialParameters[i][0] +
+            this.polynomialParameters[i][1] * newSourcePoint[0] +
+            this.polynomialParameters[i][2] * newSourcePoint[1]
           break
 
         case 2:
           newDestinationPoint[i] +=
-            this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1] +
-            this.polynomialParametersMatrices[i].get(3, 0) *
-              newSourcePoint[0] ** 2 +
-            this.polynomialParametersMatrices[i].get(4, 0) *
-              newSourcePoint[1] ** 2 +
-            this.polynomialParametersMatrices[i].get(5, 0) *
+            this.polynomialParameters[i][0] +
+            this.polynomialParameters[i][1] * newSourcePoint[0] +
+            this.polynomialParameters[i][2] * newSourcePoint[1] +
+            this.polynomialParameters[i][3] * newSourcePoint[0] ** 2 +
+            this.polynomialParameters[i][4] * newSourcePoint[1] ** 2 +
+            this.polynomialParameters[i][5] *
               newSourcePoint[0] *
               newSourcePoint[1]
           break
 
         case 3:
           newDestinationPoint[i] +=
-            this.polynomialParametersMatrices[i].get(0, 0) +
-            this.polynomialParametersMatrices[i].get(1, 0) * newSourcePoint[0] +
-            this.polynomialParametersMatrices[i].get(2, 0) * newSourcePoint[1] +
-            this.polynomialParametersMatrices[i].get(3, 0) *
-              newSourcePoint[0] ** 2 +
-            this.polynomialParametersMatrices[i].get(4, 0) *
-              newSourcePoint[1] ** 2 +
-            this.polynomialParametersMatrices[i].get(5, 0) *
+            this.polynomialParameters[i][0] +
+            this.polynomialParameters[i][1] * newSourcePoint[0] +
+            this.polynomialParameters[i][2] * newSourcePoint[1] +
+            this.polynomialParameters[i][3] * newSourcePoint[0] ** 2 +
+            this.polynomialParameters[i][4] * newSourcePoint[1] ** 2 +
+            this.polynomialParameters[i][5] *
               newSourcePoint[0] *
               newSourcePoint[1] +
-            this.polynomialParametersMatrices[i].get(6, 0) *
-              newSourcePoint[0] ** 3 +
-            this.polynomialParametersMatrices[i].get(7, 0) *
-              newSourcePoint[1] ** 3 +
-            this.polynomialParametersMatrices[i].get(8, 0) *
+            this.polynomialParameters[i][6] * newSourcePoint[0] ** 3 +
+            this.polynomialParameters[i][7] * newSourcePoint[1] ** 3 +
+            this.polynomialParameters[i][8] *
               newSourcePoint[0] ** 2 *
               newSourcePoint[1] +
-            this.polynomialParametersMatrices[i].get(9, 0) *
+            this.polynomialParameters[i][9] *
               newSourcePoint[0] *
               newSourcePoint[1] ** 2
           break

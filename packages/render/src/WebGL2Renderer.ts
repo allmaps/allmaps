@@ -531,6 +531,10 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
+    if (this.animating) {
+      return
+    }
+
     const possibleMapsInViewport = Array.from(
       this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
     ).sort(
@@ -581,7 +585,7 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.getApproxResourceToCanvasScale(this.viewport)
       )
 
-      warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
+      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
       const projectedTransformerOptions = {
@@ -1017,17 +1021,6 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private resourceMaskUpdated(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (warpedMap) {
-        warpedMap.clearResourceTrianglePointsByBestScaleFactor()
-        warpedMap.updateTriangulation(false)
-      }
-    }
-  }
-
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
@@ -1069,11 +1062,6 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
   }
 
   private removeEventListeners() {
@@ -1100,11 +1088,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
     )
   }
 }

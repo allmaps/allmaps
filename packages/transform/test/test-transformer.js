@@ -172,6 +172,31 @@ describe('Transform LineString Backward To LineString from GeoJSON', async () =>
   })
 })
 
+describe('Transform MultiPoint Backward To MultiPoint', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.001,
+    maxDepth: 2,
+    destinationIsGeographic: true,
+    inputIsMultiGeometry: true
+  }
+  const transformer = new GcpTransformer(transformGcps7, 'polynomial')
+  const input = [
+    [10, 50],
+    [50, 50]
+  ]
+  const output = [
+    [31.06060606060611, 155.30303030303048],
+    [237.12121212121218, 185.60606060606085]
+  ]
+
+  it(`should recognise multi geometry and transform the points piecewise, not considering the input as lineString, and hence not add midpoints and ignore lineString options`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformBackward(input, transformOptions),
+      output
+    )
+  })
+})
+
 describe('Transform Polygon Forward To Polygon, with maxOffsetRatio very small', async () => {
   const transformOptions = {
     maxOffsetRatio: 0.00001,
@@ -348,6 +373,69 @@ describe('Transform Polygon Backward To Polygon, with maxOffsetRatio very small'
     ]
 
     it(`should give the same result as transforming from polygon`, () => {
+      expect(
+        transformer.transformBackward(input, transformOptions)
+      ).to.deep.equal(output)
+    })
+  })
+
+  describe('Transform GeoJSONMultiPolygon Backward To Polygon', async () => {
+    const transformOptions = {
+      maxOffsetRatio: 0.00001,
+      maxDepth: 1
+    }
+    const transformer = new GcpTransformer(transformGcps6, 'thinPlateSpline')
+    const input = {
+      type: 'MultiPolygon',
+      coordinates: [
+        [
+          [
+            [4.388957777030093, 51.959084191571606],
+            [4.392938913951547, 51.94062947962427],
+            [4.425874493300959, 51.94172557475595],
+            [4.420666790347598, 51.959985351835975],
+            [4.388957777030093, 51.959084191571606]
+          ]
+        ],
+        [
+          [
+            [4.388957777030093, 51.959084191571606],
+            [4.392938913951547, 51.94062947962427],
+            [4.425874493300959, 51.94172557475595],
+            [4.420666790347598, 51.959985351835975],
+            [4.388957777030093, 51.959084191571606]
+          ]
+        ]
+      ]
+    }
+    const output = [
+      [
+        [
+          [1032.5263837176526, 992.2883187637146],
+          [1045.038670070595, 1489.2938524267215],
+          [1056.6257766352364, 1986.6566391349374],
+          [1520.5146305339294, 1995.064826625076],
+          [1972.2719445148632, 2006.6657102722945],
+          [1969.4756718048366, 1507.0983522493168],
+          [1957.822599920541, 1009.7982201488556],
+          [1495.7555378955249, 1000.7599463685738]
+        ]
+      ],
+      [
+        [
+          [1032.5263837176526, 992.2883187637146],
+          [1045.038670070595, 1489.2938524267215],
+          [1056.6257766352364, 1986.6566391349374],
+          [1520.5146305339294, 1995.064826625076],
+          [1972.2719445148632, 2006.6657102722945],
+          [1969.4756718048366, 1507.0983522493168],
+          [1957.822599920541, 1009.7982201488556],
+          [1495.7555378955249, 1000.7599463685738]
+        ]
+      ]
+    ]
+
+    it(`should give the same result as transforming from geojson polygon`, () => {
       expect(
         transformer.transformBackward(input, transformOptions)
       ).to.deep.equal(output)

@@ -70,12 +70,15 @@ export function combineBboxes(bbox0: Bbox, bbox1: Bbox): Bbox {
   ]
 }
 
-//[xMin, yMin, xMax, yMax]
 export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
   const isOverlappingInX = bbox0[2] >= bbox1[0] && bbox1[2] >= bbox0[0]
   const isOverlappingInY = bbox0[3] >= bbox1[1] && bbox1[3] >= bbox0[1]
 
   return isOverlappingInX && isOverlappingInY
+}
+
+export function pointInBbox(point: Point, bbox: Bbox): boolean {
+  return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
 }
 
 // Transform
