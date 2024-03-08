@@ -59,6 +59,8 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
+ * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
+ * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - Resource mask in geo coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geo mask
  * @param {GeojsonPolygon} geoFullMask - Resource full mask in geo coordinates
@@ -99,6 +101,14 @@ export default class WarpedMap extends EventTarget {
   transformationType: TransformationType
   transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
+  private transformerByTransformationType: Map<
+    TransformationType,
+    GcpTransformer
+  > = new Map()
+  private projectedTransformerByTransformationType: Map<
+    TransformationType,
+    GcpTransformer
+  > = new Map()
 
   geoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
@@ -348,7 +358,7 @@ export default class WarpedMap extends EventTarget {
    */
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
-    this.updateTransformerProperties()
+    this.updateTransformerProperties(false)
   }
 
   /**
@@ -497,9 +507,9 @@ export default class WarpedMap extends EventTarget {
     this.projectedGeoNewTrianglePoints = []
   }
 
-  private updateTransformerProperties(): void {
-    this.updateTransformer()
-    this.updateProjectedTransformer()
+  private updateTransformerProperties(useCache = true): void {
+    this.updateTransformer(useCache)
+    this.updateProjectedTransformer(useCache)
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
@@ -507,20 +517,49 @@ export default class WarpedMap extends EventTarget {
     this.updateResourceToProjectedGeoScale()
   }
 
-  private updateTransformer(): void {
-    this.transformer = new GcpTransformer(
-      this.gcps,
-      this.transformationType,
-      TRANSFORMER_OPTIONS
-    )
+  private updateTransformer(useCache = true): void {
+    if (
+      this.transformerByTransformationType.has(this.transformationType) &&
+      useCache
+    ) {
+      this.transformer = this.transformerByTransformationType.get(
+        this.transformationType
+      ) as GcpTransformer
+    } else {
+      this.transformer = new GcpTransformer(
+        this.gcps,
+        this.transformationType,
+        TRANSFORMER_OPTIONS
+      )
+      this.transformerByTransformationType.set(
+        this.transformationType,
+        this.transformer
+      )
+    }
   }
 
-  private updateProjectedTransformer(): void {
-    this.projectedTransformer = new GcpTransformer(
-      this.projectedGcps,
-      this.transformationType,
-      PROJECTED_TRANSFORMER_OPTIONS
-    )
+  private updateProjectedTransformer(useCache = true): void {
+    if (
+      this.projectedTransformerByTransformationType.has(
+        this.transformationType
+      ) &&
+      useCache
+    ) {
+      this.projectedTransformer =
+        this.projectedTransformerByTransformationType.get(
+          this.transformationType
+        ) as GcpTransformer
+    } else {
+      this.projectedTransformer = new GcpTransformer(
+        this.projectedGcps,
+        this.transformationType,
+        PROJECTED_TRANSFORMER_OPTIONS
+      )
+      this.projectedTransformerByTransformationType.set(
+        this.transformationType,
+        this.projectedTransformer
+      )
+    }
   }
 
   private updateGeoMask(): void {
