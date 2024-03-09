@@ -24,7 +24,8 @@ import type {
 
 import type Viewport from './Viewport.js'
 
-const DIAMETER_FRACTION = 80 // TODO: Consider making this tunable by the user.
+// TODO: Consider making this tunable by the user.
+const DIAMETER_FRACTION = 80
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
@@ -35,6 +36,8 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
   maxDepth: 2,
   differentHandedness: true
 } as PartialTransformOptions
+
+const MAX_TRIANGULATE_ERROR_COUNT = 10
 
 /**
  * Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
@@ -120,6 +123,8 @@ export default class WarpedMap extends EventTarget {
   projectedGeoFullMaskBbox!: Bbox
 
   resourceToProjectedGeoScale!: number
+
+  triangulateErrorCount = 0
 
   // The properties below are for the current viewport
 
@@ -398,10 +403,14 @@ export default class WarpedMap extends EventTarget {
         (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
         DIAMETER_FRACTION
 
-      this.resourceTrianglePoints = triangulate(
-        this.resourceMask,
-        diameter
-      ).flat()
+      try {
+        this.resourceTrianglePoints = triangulate(
+          this.resourceMask,
+          diameter
+        ).flat()
+      } catch (err) {
+        this.logTriangulateError(err)
+      }
 
       this.resourceTrianglePointsByBestScaleFactor.set(
         this.bestScaleFactor,
@@ -410,6 +419,22 @@ export default class WarpedMap extends EventTarget {
     }
 
     this.updateProjectedGeoTrianglePoints(currentIsNew)
+  }
+
+  private logTriangulateError(err: unknown) {
+    this.triangulateErrorCount++
+
+    if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
+      // TODO: use function to get Allmaps Editor URL
+      console.error(
+        `Error computing triangulation for map ${this.mapId}.`,
+        `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
+      )
+
+      if (this.triangulateErrorCount === 1) {
+        console.error(err)
+      }
+    }
   }
 
   /**
