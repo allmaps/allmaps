@@ -129,7 +129,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [updateVertexBuffers](#updatevertexbuffers)
     *   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
     *   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
-*   [DEFAULT\_SCALE\_FACTOR\_SHARPENING](#default_scale_factor_sharpening)
+*   [DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION](#default_target_scale_factor_correction)
 *   [getBestTileZoomLevelForScale](#getbesttilezoomlevelforscale)
     *   [Parameters](#parameters-40)
 
@@ -687,9 +687,11 @@ Remove cached tile from the textures of this map and update textes
 
 *   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
 
-### DEFAULT\_SCALE\_FACTOR\_SHARPENING
+### DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION
 
-Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
+Target scale factor correction
+Since this is done before comparing *logarithmic* evaluations of the target and available scale factors (to find the best fit), this has more effect on small scale factors.
+0 = no correction, -1 = correct target scale factor with -1 to obain less sharp images (especially at low scale factors), 1 = idem with correction +1, ...
 
 Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
 
@@ -701,6 +703,6 @@ Returns the best TileZoomLevel for a given resource-to-canvas scale.
 
 *   `image` **[Image](https://developer.mozilla.org/docs/Web/API/HTMLImageElement/Image)** A parsed IIIF Image
 *   `resourceToCanvasScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The resource to canvas scale, relating resource pixels to canvas pixels.
-*   `scaleFactorSharpening`   (optional, default `DEFAULT_SCALE_FACTOR_SHARPENING`)
+*   `targetScaleFactorCorrection`   (optional, default `DEFAULT_TARGET_SCALE_FACTOR_CORRECTION`)
 
 Returns **TileZoomLevel**&#x20;

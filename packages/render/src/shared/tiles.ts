@@ -24,10 +24,11 @@ import type {
 } from '@allmaps/transform'
 
 /**
- * Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
+ * Target scale factor correction
+ * Since this is done before comparing *logarithmic* evaluations of the target and available scale factors (to find the best fit), this has more effect on small scale factors.
+ * 0 = no correction, -1 = correct target scale factor with -1 to obain less sharp images (especially at low scale factors), 1 = idem with correction +1, ...
  */
-// TODO: Sharpening is confusing name for this constant
-const DEFAULT_SCALE_FACTOR_SHARPENING = 0.75
+const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 0.5
 
 // Functions for preparing to make tiles
 
@@ -91,7 +92,7 @@ export function getBestTileZoomLevel(
   image: Image,
   canvasSize: Size,
   resourceRing: Ring,
-  scaleFactorSharpening?: number
+  targetScaleFactorCorrection?: number
 ): TileZoomLevel {
   const resourceBbox = computeBbox(resourceRing)
 
@@ -108,7 +109,7 @@ export function getBestTileZoomLevel(
   return getBestTileZoomLevelForScale(
     image,
     resourceToCanvasScale,
-    scaleFactorSharpening
+    targetScaleFactorCorrection
   )
 }
 
@@ -123,7 +124,7 @@ export function getBestTileZoomLevel(
 export function getBestTileZoomLevelForScale(
   image: Image,
   resourceToCanvasScale: number,
-  scaleFactorSharpening = DEFAULT_SCALE_FACTOR_SHARPENING
+  targetScaleFactorCorrection = DEFAULT_TARGET_SCALE_FACTOR_CORRECTION
 ): TileZoomLevel {
   // Returning the TileZoomLevel with the scaleFactor closest to the current scale.
   //
@@ -168,7 +169,7 @@ export function getBestTileZoomLevelForScale(
   for (const tileZoomLevel of image.tileZoomLevels) {
     const diffLogScaleFactor = Math.abs(
       Math.log(tileZoomLevel.scaleFactor) -
-        (Math.log(resourceToCanvasScale) - Math.log(scaleFactorSharpening))
+        Math.log(resourceToCanvasScale + targetScaleFactorCorrection)
     )
     if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
       smallestdiffLogScaleFactor = diffLogScaleFactor
