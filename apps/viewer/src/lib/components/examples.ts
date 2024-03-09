@@ -1,9 +1,15 @@
 export default [
+  // {
+  //   title: 'Nieuwe plattegrond der stad Rotterdam (1800)',
+  //   organization: 'Nationaal Archief',
+  //   url: 'https://annotations.allmaps.org/manifests/a63721386cfbf035'
+  //   // https://sammeltassen.github.io/iiif-manifests/nationaal-archief/NL-HaNA_4.VTHR_4636.json
+  // },
   {
-    title: 'Nieuwe plattegrond der stad Rotterdam (1800)',
-    organization: 'Nationaal Archief',
-    url: 'https://annotations.allmaps.org/manifests/a63721386cfbf035'
-    // https://sammeltassen.github.io/iiif-manifests/nationaal-archief/NL-HaNA_4.VTHR_4636.json
+    title: 'Plattegrond van Rotterdam in 10 bladen (1895 - 1897)',
+    organization: 'Stadsarchief Rotterdam',
+    url: 'https://annotations.allmaps.org/manifests/631b96e4d6d3f421'
+    // https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json
   },
   {
     title:
