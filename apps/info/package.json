@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/info",
-  "version": "0.0.2-alpha.38",
+  "version": "0.0.2-alpha.39",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -30,9 +30,9 @@
   "packageManager": "pnpm@6.32.3",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.23",
-    "@allmaps/id": "^1.0.0-beta.24",
-    "@allmaps/iiif-parser": "^1.0.0-beta.34",
-    "@allmaps/ui": "^1.0.0-beta.25"
+    "@allmaps/id": "^1.0.0-beta.25",
+    "@allmaps/iiif-parser": "^1.0.0-beta.35",
+    "@allmaps/ui": "^1.0.0-beta.26"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0",

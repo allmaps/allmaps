@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.57",
+  "version": "1.0.0-beta.58",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -60,12 +60,12 @@
   ],
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.23",
-    "@allmaps/id": "^1.0.0-beta.24",
-    "@allmaps/iiif-parser": "^1.0.0-beta.34",
-    "@allmaps/stdlib": "^1.0.0-beta.23",
-    "@allmaps/transform": "^1.0.0-beta.33",
-    "@allmaps/triangulate": "^1.0.0-beta.15",
-    "@allmaps/types": "^1.0.0-beta.10",
+    "@allmaps/id": "^1.0.0-beta.25",
+    "@allmaps/iiif-parser": "^1.0.0-beta.35",
+    "@allmaps/stdlib": "^1.0.0-beta.24",
+    "@allmaps/transform": "^1.0.0-beta.34",
+    "@allmaps/triangulate": "^1.0.0-beta.16",
+    "@allmaps/types": "^1.0.0-beta.11",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "lodash-es": "^4.17.21",
     "potpack": "^2.0.0",
