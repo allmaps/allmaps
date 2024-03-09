@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/explore",
-  "version": "0.0.2-alpha.31",
+  "version": "0.0.2-alpha.32",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -45,10 +45,10 @@
     "vite": "^4.3.0"
   },
   "dependencies": {
-    "@allmaps/maplibre": "^1.0.0-beta.21",
-    "@allmaps/stdlib": "^1.0.0-beta.25",
-    "@allmaps/tailwind": "^1.0.0-beta.10",
-    "@allmaps/ui": "^1.0.0-beta.26",
+    "@allmaps/maplibre": "^1.0.0-beta.22",
+    "@allmaps/stdlib": "^1.0.0-beta.26",
+    "@allmaps/tailwind": "^1.0.0-beta.11",
+    "@allmaps/ui": "^1.0.0-beta.27",
     "maplibre-gl": "^4.0.0",
     "pmtiles": "^3.0.3",
     "protomaps-themes-base": "2.0.0-alpha.5"
