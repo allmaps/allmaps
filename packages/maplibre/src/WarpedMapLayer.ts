@@ -8,16 +8,16 @@ import {
   WarpedMapEventType
 } from '@allmaps/render'
 import {
-  distance,
+  rectangleToSize,
+  sizesToScale,
   hexToFractionalRgb,
-  lonLatToWebMecator,
-  sizesToScale
+  lonLatToWebMecator
 } from '@allmaps/stdlib'
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Ring } from '@allmaps/types'
+import type { Rectangle, Ring } from '@allmaps/types'
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
@@ -683,26 +683,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
       geoUpperLeftAsLngLat.lng,
       geoUpperLeftAsLngLat.lat
     ])
-    const upperXSize = distance(
-      projectedGeoUpperLeftAsPoint,
-      projectedGeoUpperRightAsPoint
-    )
-    const lowerXSize = distance(
+    const projectedGeoRectangle = [
       projectedGeoLowerLeftAsPoint,
-      projectedGeoLowerRightAsPoint
-    )
-    const rightYSize = distance(
       projectedGeoLowerRightAsPoint,
-      projectedGeoUpperRightAsPoint
-    )
-    const leftYsize = distance(
-      projectedGeoLowerLeftAsPoint,
+      projectedGeoUpperRightAsPoint,
       projectedGeoUpperLeftAsPoint
-    )
-    const projectedGeoSize = [
-      (upperXSize + lowerXSize) / 2,
-      (rightYSize + leftYsize) / 2
-    ] as [number, number]
+    ] as Rectangle
+    const projectedGeoSize = rectangleToSize(projectedGeoRectangle)
     const projectedGeoPerViewportScale = sizesToScale(
       projectedGeoSize,
       viewportSize

@@ -9,14 +9,14 @@ import {
   WebGL2Renderer
 } from '@allmaps/render'
 import {
-  bboxToSize,
+  rectangleToSize,
   sizesToScale,
   hexToFractionalRgb,
   isValidHttpUrl
 } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-import type { Point } from '@allmaps/types'
+import type { Point, Rectangle } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 export type WarpedMapLayerOptions = {
@@ -883,16 +883,22 @@ export class WarpedMapLayer extends L.Layer {
     const projectedNorthEastAsPoint = this._map.options.crs.project(
       geoBboxAsLatLngBounds.getNorthEast()
     )
+    const projectedNorthWestAsPoint = this._map.options.crs.project(
+      geoBboxAsLatLngBounds.getNorthWest()
+    )
     const projectedSouthWestAsPoint = this._map.options.crs.project(
       geoBboxAsLatLngBounds.getSouthWest()
     )
-    const projectedGeoBbox = [
-      projectedSouthWestAsPoint.x,
-      projectedSouthWestAsPoint.y,
-      projectedNorthEastAsPoint.x,
-      projectedNorthEastAsPoint.y
-    ] as [number, number, number, number]
-    const projectedGeoSize = bboxToSize(projectedGeoBbox)
+    const projectedSouthEastAsPoint = this._map.options.crs.project(
+      geoBboxAsLatLngBounds.getSouthEast()
+    )
+    const projectedGeoRectangle = [
+      [projectedNorthEastAsPoint.x, projectedNorthEastAsPoint.y],
+      [projectedNorthWestAsPoint.x, projectedNorthWestAsPoint.y],
+      [projectedSouthWestAsPoint.x, projectedSouthWestAsPoint.y],
+      [projectedSouthEastAsPoint.x, projectedSouthEastAsPoint.y]
+    ] as Rectangle
+    const projectedGeoSize = rectangleToSize(projectedGeoRectangle)
     const projectedGeoPerViewportScale = sizesToScale(
       projectedGeoSize,
       viewportSize
