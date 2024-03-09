@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-viewer",
-  "version": "0.0.2-alpha.39",
+  "version": "0.0.2-alpha.40",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -28,7 +28,7 @@
     "preversion": "pnpm run types && pnpm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.23",
+    "@allmaps/annotation": "^1.0.0-beta.25",
     "@allmaps/id": "^1.0.0-beta.25",
     "@allmaps/iiif-parser": "^1.0.0-beta.35",
     "@allmaps/ui": "^1.0.0-beta.26"
