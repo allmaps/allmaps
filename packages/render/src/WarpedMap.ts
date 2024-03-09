@@ -6,7 +6,7 @@ import { triangulate } from '@allmaps/triangulate'
 import {
   computeBbox,
   bboxToRectangle,
-  bboxesToScale,
+  rectanglesToScale,
   geometryToDiameter,
   fetchImageInfo,
   lonLatToWebMecator,
@@ -16,7 +16,14 @@ import {
 import { applyTransform } from './shared/matrix.js'
 import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-import type { Point, Gcp, Ring, Bbox, GeojsonPolygon } from '@allmaps/types'
+import type {
+  Point,
+  Gcp,
+  Ring,
+  Rectangle,
+  Bbox,
+  GeojsonPolygon
+} from '@allmaps/types'
 import type {
   TransformationType,
   PartialTransformOptions
@@ -52,8 +59,10 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Gcp[]} projectedGcps - Projected Ground Controle Points (source to projectedGeo)
  * @param {Ring} resourceMask - Resource mask
  * @param {Bbox} resourceMaskBbox - Bbox of the resource mask
+ * @param {Rectangle} resourceMaskRectangle - Rectangle of the resource mask bbox
  * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
+ * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
  * @param {Cache} imageInfoCache - Cache of the image info of this image
  * @param {string} imageId - ID of the image
  * @param {IIIFImage} parsedImage - ID of the image
@@ -64,17 +73,21 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
  * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - Resource mask in geo coordinates
- * @param {Bbox} geoMaskBbox - Bbox of the geo mask
+ * @param {Bbox} geoMaskBbox - Bbox of the geoMask
+ * @param {Rectangle} geoMaskRectangle - Resource mask rectangle in geo coordinates
  * @param {GeojsonPolygon} geoFullMask - Resource full mask in geo coordinates
- * @param {Bbox} geoFullMaskBbox - Bbox of the geo full mask
- * @param {Ring} projectedGeoMask - Resource mask in projected geo coordintas
- * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeo mask
- * @param {Ring} projectedGeoFullMask - Resource full mask in projected geo coordintas
- * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeo full mask
- * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geo coordinates.
+ * @param {Bbox} geoFullMaskBbox - Bbox of the geoFullMask
+ * @param {Rectangle} geoFullMaskRectangle - Resource full mask rectangle in geo coordinates
+ * @param {Ring} projectedGeoMask - Resource mask in projectedGeo coordinates
+ * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeoMask
+ * @param {Rectangle} projectedGeoMaskRectangle - Resource mask rectangle in projectedGeo coordinates
+ * @param {Ring} projectedGeoFullMask - Resource full mask in projectedGeo coordinates
+ * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
+ * @param {Rectangle} projectedGeoFullMaskRectangle - Resource full mask rectangle in projectedGeo coordinates
+ * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates.
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
- * @param {Bbox} resourceViewportRingBbox - Bbox of the viewport transformed back to resource coordinates, at the current viewport
+ * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
  * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resource mask (at the current bestScaleFactor) in projectedGeo coordinates
@@ -89,9 +102,11 @@ export default class WarpedMap extends EventTarget {
   projectedGcps: Gcp[]
 
   resourceMask: Ring
-  resourceMaskBbox: Bbox
+  resourceMaskBbox!: Bbox
+  resourceMaskRectangle!: Rectangle
   resourceFullMask: Ring
   resourceFullMaskBbox: Bbox
+  resourceFullMaskRectangle: Rectangle
 
   imageInfoCache?: Cache
   imageId?: string
@@ -114,13 +129,17 @@ export default class WarpedMap extends EventTarget {
 
   geoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
+  geoMaskRectangle!: Rectangle
   geoFullMask!: GeojsonPolygon
   geoFullMaskBbox!: Bbox
+  geoFullMaskRectangle!: Rectangle
 
   projectedGeoMask!: Ring
   projectedGeoMaskBbox!: Bbox
+  projectedGeoMaskRectangle!: Rectangle
   projectedGeoFullMask!: Ring
   projectedGeoFullMaskBbox!: Bbox
+  projectedGeoFullMaskRectangle!: Rectangle
 
   resourceToProjectedGeoScale!: number
 
@@ -173,7 +192,8 @@ export default class WarpedMap extends EventTarget {
     }))
 
     this.resourceMask = this.georeferencedMap.resourceMask
-    this.resourceMaskBbox = computeBbox(this.resourceMask)
+    this.updateResourceMaskProperties()
+
     this.resourceFullMask = [
       [0, 0],
       [this.georeferencedMap.resource.width, 0],
@@ -184,6 +204,7 @@ export default class WarpedMap extends EventTarget {
       [0, this.georeferencedMap.resource.height]
     ]
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
+    this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
 
     this.imageInfoCache = imageInfoCache
     this.loadingImageInfo = false
@@ -192,7 +213,6 @@ export default class WarpedMap extends EventTarget {
 
     this.transformationType =
       this.georeferencedMap.transformation?.type || 'polynomial'
-
     this.updateTransformerProperties()
   }
 
@@ -219,19 +239,15 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get approximate resource mask in viewport coordinates
-   *
-   * Approximate since transform of bbox (used here) is not as precise as bbox of transform (which is more expensive to compute)
+   * Get rectangle of resourceMaskBbox in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
-   * @returns {Bbox}
+   * @returns {Rectangle}
    */
-  getApproxViewportMaskBbox(viewport: Viewport): Bbox {
-    return computeBbox(
-      bboxToRectangle(this.projectedGeoMaskBbox).map((point) => {
-        return applyTransform(viewport.projectedGeoToViewportTransform, point)
-      })
-    )
+  getViewportMaskRectangle(viewport: Viewport): Rectangle {
+    return this.projectedGeoMaskRectangle.map((point) => {
+      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+    }) as Rectangle
   }
 
   /**
@@ -257,19 +273,15 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get approximate resource full mask in viewport coordinates
-   *
-   * Approximate since transform of bbox (used here) is not as precise as bbox of transform (which is more expensive to compute)
+   * Get rectangle of resourceFullMaskBbox in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
-   * @returns {Bbox}
+   * @returns {Rectangle}
    */
-  getApproxViewportFullMaskBbox(viewport: Viewport): Bbox {
-    return computeBbox(
-      bboxToRectangle(this.projectedGeoFullMaskBbox).map((point) => {
-        return applyTransform(viewport.projectedGeoToViewportTransform, point)
-      })
-    )
+  getViewportFullMaskRectangle(viewport: Viewport): Rectangle {
+    return this.projectedGeoFullMaskRectangle.map((point) => {
+      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+    }) as Rectangle
   }
 
   /**
@@ -279,9 +291,9 @@ export default class WarpedMap extends EventTarget {
    * @returns {number}
    */
   getResourceToViewportScale(viewport: Viewport): number {
-    return bboxesToScale(
-      this.resourceMaskBbox,
-      this.getViewportMaskBbox(viewport)
+    return rectanglesToScale(
+      this.resourceMaskRectangle,
+      this.getViewportMaskRectangle(viewport)
     )
   }
 
@@ -293,36 +305,6 @@ export default class WarpedMap extends EventTarget {
    */
   getResourceToCanvasScale(viewport: Viewport): number {
     return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
-  }
-
-  /**
-   * Get approximate scale of the warped map, in resource pixels per viewport pixels.
-   *
-   * Approximate since appoximate resource to viewport scale is used
-   *
-   * @param {Viewport} viewport - the current viewport
-   * @returns {number}
-   */
-  getApproxResourceToViewportScale(viewport: Viewport): number {
-    return bboxesToScale(
-      this.resourceMaskBbox,
-      this.getApproxViewportMaskBbox(viewport)
-    )
-  }
-
-  /**
-   * Get approximate scale of the warped map, in resource pixels per canvas pixels.
-   *
-   * Approximate since appoximate resource to viewport scale is used
-   *
-   * @param {Viewport} viewport - the current viewport
-   * @returns {number}
-   */
-  getApproxResourceToCanvasScale(viewport: Viewport): number {
-    return (
-      this.getApproxResourceToViewportScale(viewport) /
-      viewport.devicePixelRatio
-    )
   }
 
   /**
@@ -342,7 +324,7 @@ export default class WarpedMap extends EventTarget {
    */
   setResourceMask(resourceMask: Ring): void {
     this.resourceMask = resourceMask
-    this.resourceMaskBbox = computeBbox(this.resourceMask)
+    this.updateResourceMaskProperties()
     this.updateGeoMask()
     this.updateProjectedGeoMask()
     this.updateResourceToProjectedGeoScale()
@@ -535,6 +517,11 @@ export default class WarpedMap extends EventTarget {
     this.projectedGeoNewTrianglePoints = []
   }
 
+  private updateResourceMaskProperties() {
+    this.resourceMaskBbox = computeBbox(this.resourceMask)
+    this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
+  }
+
   private updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
@@ -595,6 +582,10 @@ export default class WarpedMap extends EventTarget {
       this.resourceMask
     ])
     this.geoMaskBbox = computeBbox(this.geoMask)
+    this.geoMaskRectangle = this.transformer.transformForward(
+      [this.resourceMaskRectangle],
+      { maxDepth: 0 }
+    )[0] as Rectangle
   }
 
   private updateFullGeoMask(): void {
@@ -602,6 +593,10 @@ export default class WarpedMap extends EventTarget {
       this.resourceFullMask
     ])
     this.geoFullMaskBbox = computeBbox(this.geoFullMask)
+    this.geoFullMaskRectangle = this.transformer.transformForward(
+      [this.resourceFullMaskRectangle],
+      { maxDepth: 0 }
+    )[0] as Rectangle
   }
 
   private updateProjectedGeoMask(): void {
@@ -609,6 +604,9 @@ export default class WarpedMap extends EventTarget {
       this.resourceMask
     ])[0]
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
+    this.projectedGeoMaskRectangle = this.projectedTransformer.transformForward(
+      [this.resourceMaskRectangle]
+    )[0] as Rectangle
   }
 
   private updateProjectedFullGeoMask(): void {
@@ -616,12 +614,16 @@ export default class WarpedMap extends EventTarget {
       this.resourceFullMask
     ])[0]
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
+    this.projectedGeoFullMaskRectangle =
+      this.projectedTransformer.transformForward([
+        this.resourceFullMaskRectangle
+      ])[0] as Rectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {
-    this.resourceToProjectedGeoScale = bboxesToScale(
-      this.resourceMaskBbox,
-      this.projectedGeoMaskBbox
+    this.resourceToProjectedGeoScale = rectanglesToScale(
+      this.resourceMaskRectangle,
+      this.projectedGeoMaskRectangle
     )
   }
 }

@@ -571,7 +571,7 @@ export default class WebGL2Renderer extends EventTarget {
       // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
       // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
       if (
-        bboxToDiameter(warpedMap.getApproxViewportMaskBbox(this.viewport)) <
+        bboxToDiameter(warpedMap.getViewportMaskBbox(this.viewport)) <
         MIN_VIEWPORT_DIAMETER
       ) {
         continue
@@ -582,7 +582,7 @@ export default class WebGL2Renderer extends EventTarget {
       // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
       const tileZoomLevel = getBestTileZoomLevelForScale(
         warpedMap.parsedImage,
-        warpedMap.getApproxResourceToCanvasScale(this.viewport)
+        warpedMap.getResourceToCanvasScale(this.viewport)
       )
 
       warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
