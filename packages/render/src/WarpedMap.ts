@@ -58,8 +58,8 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Gcp[]} gcps - Ground Controle Points used for warping this map (source to geo)
  * @param {Gcp[]} projectedGcps - Projected Ground Controle Points (source to projectedGeo)
  * @param {Ring} resourceMask - Resource mask
- * @param {Bbox} resourceMaskBbox - Bbox of the resource mask
- * @param {Rectangle} resourceMaskRectangle - Rectangle of the resource mask bbox
+ * @param {Bbox} resourceMaskBbox - Bbox of the resourceMask
+ * @param {Rectangle} resourceMaskRectangle - Rectangle of the resourceMaskBbox
  * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
@@ -72,26 +72,26 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
  * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
  * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
- * @param {GeojsonPolygon} geoMask - Resource mask in geo coordinates
+ * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
- * @param {Rectangle} geoMaskRectangle - Resource mask rectangle in geo coordinates
- * @param {GeojsonPolygon} geoFullMask - Resource full mask in geo coordinates
+ * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geo coordinates
+ * @param {GeojsonPolygon} geoFullMask - resourceFullMask in geo coordinates
  * @param {Bbox} geoFullMaskBbox - Bbox of the geoFullMask
- * @param {Rectangle} geoFullMaskRectangle - Resource full mask rectangle in geo coordinates
- * @param {Ring} projectedGeoMask - Resource mask in projectedGeo coordinates
+ * @param {Rectangle} geoFullMaskRectangle - resourceFullMaskRectangle in geo coordinates
+ * @param {Ring} projectedGeoMask - resourceMask in projectedGeo coordinates
  * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeoMask
- * @param {Rectangle} projectedGeoMaskRectangle - Resource mask rectangle in projectedGeo coordinates
- * @param {Ring} projectedGeoFullMask - Resource full mask in projectedGeo coordinates
+ * @param {Rectangle} projectedGeoMaskRectangle - resourceMaskRectanglee in projectedGeo coordinates
+ * @param {Ring} projectedGeoFullMask - resourceFullMask in projectedGeo coordinates
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
- * @param {Rectangle} projectedGeoFullMaskRectangle - Resource full mask rectangle in projectedGeo coordinates
+ * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates.
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
  * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
- * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resource mask (at the current bestScaleFactor) in projectedGeo coordinates
- * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resource mask (at the current bestScaleFactor) in projectedGeo coordinate
+ * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
+ * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
  * @private {Map<number, Map<number, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
  */
 export default class WarpedMap extends EventTarget {
@@ -217,7 +217,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get resource mask in viewport coordinates
+   * Get resourceMask in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Ring}
@@ -229,7 +229,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get bbox of resource mask in viewport coordinates
+   * Get bbox of resourceMask in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Bbox}
@@ -239,7 +239,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get rectangle of resourceMaskBbox in viewport coordinates
+   * Get resourceMaskRectangle in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Rectangle}
@@ -251,7 +251,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get resource full mask in viewport coordinates
+   * Get resourceFullMask in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Ring}
@@ -263,7 +263,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get bbox of resource full mask in viewport coordinates
+   * Get bbox of rresourceFullMask in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Bbox}
@@ -273,7 +273,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get rectangle of resourceFullMaskBbox in viewport coordinates
+   * Get resourceFullMaskRectangle in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Rectangle}
@@ -308,7 +308,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set viewport ring in resource coorinates of current viewport
+   * Set resourceViewportRing at current viewport
    *
    * @param {Ring} resourceViewportRing
    */
@@ -318,7 +318,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Update the mask loaded from a georeferenced map to a new mask.
+   * Update the resourceMask loaded from a georeferenced map to a new mask.
    *
    * @param {Ring} resourceMask
    */
@@ -335,7 +335,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Update the transformation type loaded from a georeferenced map to a new transformation type.
+   * Update the transformationType loaded from a georeferenced map to a new transformation type.
    *
    * @param {TransformationType} transformationType
    */
@@ -345,7 +345,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Update the ground controle points loaded from a georeferenced map to new ground controle points.
+   * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
    *
    * @param {GCP[]} gcps
    */
@@ -355,7 +355,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set the best scale factor at the current viewport
+   * Set the bestScaleFactor at the current viewport
    *
    * @param {number} scaleFactor - scale factor
    * @returns {boolean}
@@ -368,7 +368,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Update the triangulation of the resource mask, at the current bestScaleFactor. Use cache if available.
+   * Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
    *
    * @param {boolean} [currentIsNew=false] - whether the new and current triangulation are the same - true by default, false during a transformation transition
    */
@@ -420,7 +420,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Update the (current and new) points of the triangulated resource mask, at the current best scale factor, in projectedGeo coordinates. Use cache if available.
+   * Update the (current and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
    *
    * @param {boolean} [currentIsNew=false]
    */
@@ -461,14 +461,14 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Reset the current points of the triangulated resource mask in projectedGeo coordinates.
+   * Reset the current points of the triangulated resourceMask in projectedGeo coordinates.
    */
   resetCurrentTrianglePoints() {
     this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
   }
 
   /**
-   * Mix the current and new points of the triangulated resource mask in projectedGeo coordinates
+   * Mix the current and new points of the triangulated resourceMask in projectedGeo coordinates
    *
    * @param {number} t
    */

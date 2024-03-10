@@ -17,11 +17,11 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Point} geoCenter - Center point of the viewport, in longitude/latitude coordinates.
  * @property {Rectangle} geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
  * @property {Size} geoSize - Size of the viewport in longitude/latitude coordinates, as [width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in in that case).
- * @property {Bbox} geoBbox - Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
+ * @property {Bbox} geoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
  * @property {Point} projectedGeoCenter - Center point of the viewport, in projected geo coordinates.
  * @property {Rectangle} projectedGeoRectangle - Rotated rectangle of the viewport point, in projected geo coordinates.
  * @property {Size} projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
- * @property {Bbox} projectedGeoBbox - Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
+ * @property {Bbox} projectedGeoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
  * @property {number} rotation - Rotation of the viewport with respect to the projected coordinate system.
  * @property {number} projectedGeoPerViewportScale - Resolution of the viewport, in projected geo coordinates per viewport pixel.
  * @property {Point} viewportCenter - Center point of the viewport, in viewport pixels.
@@ -41,11 +41,11 @@ export default class Viewport extends EventTarget {
   geoCenter: Point
   geoRectangle: Rectangle
   geoSize: Size
-  geoBbox: Bbox
+  geoRectangleBbox: Bbox
   projectedGeoCenter: Point
   projectedGeoRectangle: Rectangle
   projectedGeoSize: Size
-  projectedGeoBbox: Bbox
+  projectedGeoRectangleBbox: Bbox
   rotation: number
   projectedGeoPerViewportScale: number
   viewportCenter: Point
@@ -93,7 +93,7 @@ export default class Viewport extends EventTarget {
       this.rotation,
       this.viewportSize
     )
-    this.projectedGeoBbox = computeBbox(this.projectedGeoRectangle)
+    this.projectedGeoRectangleBbox = computeBbox(this.projectedGeoRectangle)
     this.projectedGeoSize = [
       this.viewportSize[0] * projectedGeoPerViewportScale,
       this.viewportSize[1] * projectedGeoPerViewportScale
@@ -104,8 +104,8 @@ export default class Viewport extends EventTarget {
     this.geoRectangle = this.projectedGeoRectangle.map((point) => {
       return webMercatorToLonLat(point)
     }) as Rectangle
-    this.geoBbox = computeBbox(this.geoRectangle)
-    this.geoSize = bboxToSize(this.geoBbox)
+    this.geoRectangleBbox = computeBbox(this.geoRectangle)
+    this.geoSize = bboxToSize(this.geoRectangleBbox)
 
     this.viewportCenter = [this.viewportSize[0] / 2, this.viewportSize[1] / 2]
     this.viewportBbox = [0, 0, ...this.viewportSize]

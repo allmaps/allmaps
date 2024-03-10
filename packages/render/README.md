@@ -325,11 +325,11 @@ Type: [Viewport](#viewport)
 *   `geoCenter` **Point** Center point of the viewport, in longitude/latitude coordinates.
 *   `geoRectangle` **Rectangle** Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
 *   `geoSize` **Size** Size of the viewport in longitude/latitude coordinates, as \[width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in in that case).
-*   `geoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
+*   `geoRectangleBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected geo coordinates.
 *   `projectedGeoRectangle` **Rectangle** Rotated rectangle of the viewport point, in projected geo coordinates.
 *   `projectedGeoSize` **Size** Size of the viewport in projected geo coordinates, as \[width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
-*   `projectedGeoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
+*   `projectedGeoRectangleBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
 *   `rotation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Rotation of the viewport with respect to the projected coordinate system.
 *   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projected geo coordinates per viewport pixel.
 *   `viewportCenter` **Point** Center point of the viewport, in viewport pixels.

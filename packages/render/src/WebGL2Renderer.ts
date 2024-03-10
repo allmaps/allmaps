@@ -500,7 +500,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     const checks = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
       .map((warpedMap) => {
@@ -536,7 +536,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
     ).sort(
       (mapId0, mapId1) =>
         distance(
@@ -595,7 +595,7 @@ export default class WebGL2Renderer extends EventTarget {
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox,
+        this.viewport.projectedGeoRectangleBbox,
         projectedTransformerOptions
       )
 
