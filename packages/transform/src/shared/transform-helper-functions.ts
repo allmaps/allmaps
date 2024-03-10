@@ -187,7 +187,7 @@ function recursivelyAddMidpointsWithDestinationMidPointFromTransform(
   segments: Segment[],
   options: TransformOptions
 ) {
-  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+  if (options.maxDepth <= 0) {
     return segments
   }
 
@@ -208,7 +208,7 @@ function recursivelyAddMidpointsWithSourceMidPointFromTransform(
   segments: Segment[],
   options: TransformOptions
 ) {
-  if (options.maxDepth <= 0 || options.maxOffsetRatio <= 0) {
+  if (options.maxDepth <= 0) {
     return segments
   }
 
@@ -230,6 +230,10 @@ function addMidpointWithDestinationMidPointFromTransform(
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
+  if (depth >= options.maxDepth) {
+    return segment
+  }
+
   const sourceMidPointFunction = options.sourceIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
@@ -263,11 +267,8 @@ function addMidpointWithDestinationMidPointFromTransform(
   )
 
   if (
-    depth < options.maxDepth &&
-    (options.maxOffsetRatio
-      ? destinationMidPointsDistance / segmentDestinationDistance >
-        options.maxOffsetRatio
-      : false) &&
+    destinationMidPointsDistance / segmentDestinationDistance >
+      options.maxOffsetRatio &&
     segmentDestinationDistance > 0
   ) {
     const newSegmentMidpoint: TransformGcp = {
@@ -300,6 +301,10 @@ function addMidpointWithSourceMidPointFromTransform(
   options: TransformOptions,
   depth: number
 ): Segment | Segment[] {
+  if (depth >= options.maxDepth) {
+    return segment
+  }
+
   const destinationMidPointFunction = options.destinationIsGeographic
     ? (point1: Point, point2: Point) =>
         getWorldMidpoint(point1, point2).geometry.coordinates as Point
@@ -334,10 +339,7 @@ function addMidpointWithSourceMidPointFromTransform(
   )
 
   if (
-    depth < options.maxDepth &&
-    (options.maxOffsetRatio
-      ? sourceMidPointsDistance / segmentSourceDistance > options.maxOffsetRatio
-      : false) &&
+    sourceMidPointsDistance / segmentSourceDistance > options.maxOffsetRatio &&
     segmentSourceDistance > 0
   ) {
     const newSegmentMidpoint: TransformGcp = {
