@@ -70,21 +70,21 @@ export function geoBboxToResourceRing(
   //
   // 'transformer' is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
   // 'geoBbox' is a Bbox (e.g. of the viewport) in (projected) geo coordinates
-  // 'geoBboxResourceRing' is a ring of this Bbox, transformed backward to resource coordinates.
-  // Due to transformerOptions this in not necessarilly a 4-point ring, but can have more points.
+  // 'geoBboxResourcePolygon' is a Polygon of this Bbox, transformed backward to resource coordinates.
+  // Due to transformerOptions this in not necessarilly a polygon with a 4-point ring, but can have more points.
 
   // TODO: Consider to specify sourceIsGeographic and destinationIsGeographic options.
   // The results could be more accurate when we specify {sourceIsGeographic: false, destinationIsGeographic: true)
   // But then all locations calling this function should do that with a normal transformer (resource as cartesian to geo as lon-lat) and not a projected transformer (resource as cartesian to projectedGeo as cartesian)
   // Currently this function is used with a normal transformer in @allmaps/tileserver, and with a projected transformer in @allmaps/render
 
-  const geoBboxRing = bboxToPolygon(geoBbox)[0]
-  const geoBboxResourceRing = transformer.transformBackward(
-    geoBboxRing,
+  const geoBboxPolygon = bboxToPolygon(geoBbox)
+  const geoBboxResourcePolygon = transformer.transformBackward(
+    geoBboxPolygon,
     transformerOptions
-  ) as Ring
+  )
 
-  return geoBboxResourceRing
+  return geoBboxResourcePolygon[0]
 }
 
 export function getBestTileZoomLevel(
@@ -127,41 +127,39 @@ export function getBestTileZoomLevelForScale(
   targetScaleFactorCorrection = DEFAULT_TARGET_SCALE_FACTOR_CORRECTION
 ): TileZoomLevel {
   // Returning the TileZoomLevel with the scaleFactor closest to the current scale.
+  // We use logarithms here because for scaleFactors 1 is a 'far' of 2 as 8 is of 16.
+  // Math reminder: log(A)-log(B)=log(A/B)
   //
+  // Example:
   // Available scaleFactors in tileZoomLevels:
   // 1---------2---------4---------8---------16
   // Math.log() of those scaleFactors
   // 0---------0.69------1.38------2.07------2.77
   //
-  // Current scale of the map = 3
-  // 1---------2----|----4---------8---------16
-  // Math.log(3) = 1.09
-  // 0------*--0.69---|--1.38------2.07------2.77
+  // Current scale of the map '|' = 3, corrected scale '*' = 3.5
+  // 1---------2----|-*--4---------8---------16
+  // Math.log(3.5) = 1.09, Math.log(3.5) = 1.25
+  // 0---------0.69--|-*-1.38------2.07------2.77
   //
   // scaleFactor = 1
   // Math.log(1) = 0
-  // Math.log(3) = 1.09 (current)
-  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
-  // diff = abs(0 - (1.09 - 0.69)) = abs(-0.4) = 0.4
+  // Math.log(3 + targetScaleFactorCorrection) = Math.log(3 + 0.5) = 1.25 (current)
+  // diff = abs(0 - 1.25) = abs(-1.25) = 1.25
   //
   // scaleFactor = 2
   // Math.log(2) = 0.69
-  // Math.log(3) = 1.09 (current)
-  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
-  // diff = abs(0.69 - (1.09 - 0.69)) = abs(0.29) = 0.29
+  // Math.log(3 + 0.5) = 1.25 (current)
+  // diff = abs(0.69 - 1.25) = abs(-0.56) = 0.56
   //
   // scaleFactor = 4
   // Math.log(4) = 1.38
-  // Math.log(3) = 1.09 (current)
-  // Math.log(SCALE_FACTOR_SHARPENING) = 0.69
-  // diff = abs(1.38 - (1.09 - 0.69)) = abs(0.98) = 0.98
+  // Math.log(3 + 0.5) = 1.25 (current)
+  // diff = abs(1.38 - 1.25) = abs(0.13) = 0.13
   //
-  // => Pick scale factor 2, with minimum diff.
+  // => Pick scale factor 4, with minimum diff.
   // Notice how 3 lies in the middle of 2 and 4, but on the log scale log(3) lies closer to log(4) then log(2)
-  // Notice how the SCALE_FACTOR_SHARPENING makes the actual current log scale for which the closest scaleFactor is searched move one factor of two sharper
-  // On the schematic drawing above, this is represented with a '*', left of the '|'.
-  //
-  // Math reminder: log(A)-log(B)=log(A/B)
+  // Notice how the targetScaleFactorCorrection corrects the current scale for which the closest scaleFactor is searched.
+  // Notice how this happens before taking a Math.log(), making it have more effect on smaller scales then on bigger.
 
   let smallestdiffLogScaleFactor = Number.POSITIVE_INFINITY
   let bestTileZoomLevel = image.tileZoomLevels.at(-1) as TileZoomLevel
@@ -182,7 +180,7 @@ export function getBestTileZoomLevelForScale(
 
 // Making tiles
 
-export function computeTilesConveringRingAtTileZoomLevel(
+export function computeTilesCoveringRingAtTileZoomLevel(
   resourceRing: Ring,
   tileZoomLevel: TileZoomLevel,
   image: Image

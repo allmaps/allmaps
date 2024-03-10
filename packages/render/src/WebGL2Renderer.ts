@@ -13,7 +13,7 @@ import {
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale,
-  computeTilesConveringRingAtTileZoomLevel
+  computeTilesCoveringRingAtTileZoomLevel
 } from './shared/tiles.js'
 import {
   createTransform,
@@ -602,7 +602,7 @@ export default class WebGL2Renderer extends EventTarget {
       warpedMap.setResourceViewportRing(resourceViewportRing)
 
       // This returns tiles sorted by distance from center of resourceViewportRing
-      const tiles = computeTilesConveringRingAtTileZoomLevel(
+      const tiles = computeTilesCoveringRingAtTileZoomLevel(
         resourceViewportRing,
         tileZoomLevel,
         warpedMap.parsedImage
