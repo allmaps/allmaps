@@ -148,17 +148,18 @@ export default class WebGL2WarpedMap extends EventTarget {
       'a_resourceTrianglePoint'
     )
 
-    const clipCurrentTrianglePoints =
-      this.warpedMap.projectedGeoCurrentTrianglePoints.map((point) => {
+    const clipTrianglePoints = this.warpedMap.projectedGeoTrianglePoints.map(
+      (point) => {
         return applyTransform(
           this.projectedGeoToClipTransform as Transform,
           point
         )
-      })
+      }
+    )
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(clipCurrentTrianglePoints.flat()),
+      new Float32Array(clipTrianglePoints.flat()),
       2,
       'a_clipCurrentTrianglePoint'
     )
@@ -179,13 +180,29 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
 
     // For debugging purposes, a triangle index is passed.
-    let triangleIndex = new Float32Array(
+    let trianglePointsTriangleIndex = new Float32Array(
       this.warpedMap.resourceTrianglePoints.length
     )
-    triangleIndex = triangleIndex.map((v, i) => {
+    trianglePointsTriangleIndex = trianglePointsTriangleIndex.map((v, i) => {
       return Math.round((i - 1) / 3)
     })
-    createBuffer(this.gl, this.program, triangleIndex, 1, 'a_triangleIndex')
+    createBuffer(
+      this.gl,
+      this.program,
+      trianglePointsTriangleIndex,
+      1,
+      'a_triangleIndex'
+    )
+
+    const trianglePointDistortions = this.warpedMap.trianglePointDistortions
+
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(trianglePointDistortions),
+      1,
+      'a_distortion'
+    )
   }
 
   private async updateTextures() {

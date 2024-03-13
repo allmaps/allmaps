@@ -32,6 +32,7 @@ export type TransformOptions = {
   // Whether one of the axes should be flipped while computing the transformation parameters.
   inputIsMultiGeometry: boolean
   differentHandedness: boolean
+  evaluationType: EvaluationType
 }
 
 export type PartialTransformOptions = Partial<TransformOptions>

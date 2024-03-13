@@ -10,9 +10,11 @@ in vec2 a_resourceTrianglePoint;
 in vec2 a_clipCurrentTrianglePoint;
 in vec2 a_clipNewTrianglePoint;
 in float a_triangleIndex;
+in float a_distortion;
 
 out vec2 v_resourceTrianglePoint;
 out float v_triangleIndex;
+out float v_distortion;
 
 float cubicInOut(float t) {
   return t < 0.5f ? 4.0f * t * t * t : 0.5f * pow(2.0f * t - 2.0f, 3.0f) + 1.0f;
@@ -22,6 +24,7 @@ void main() {
   // Pass attributes as varyings to fragment shader
   v_resourceTrianglePoint = a_resourceTrianglePoint;
   v_triangleIndex = a_triangleIndex;
+  v_distortion = a_distortion;
 
   // Compute triangle vertex coordinates by mixing current and new
   vec2 clipTrianglePoint = mix(a_clipCurrentTrianglePoint, a_clipNewTrianglePoint, cubicInOut(u_animationProgress));

@@ -484,7 +484,7 @@ export default class WebGL2Renderer extends EventTarget {
       )
     } else {
       for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetCurrentTrianglePoints()
+        warpedMap.resetTrianglePoints()
       }
       this.updateVertexBuffers()
 
@@ -1009,9 +1009,7 @@ export default class WebGL2Renderer extends EventTarget {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixProjectedGeoCurrentAndNewTrianglePoints(
-            this.animationProgress
-          )
+          warpedMap.mixProjectedGeoTrianglePoints(this.animationProgress)
         }
         warpedMap.updateProjectedGeoTrianglePoints(false)
       }

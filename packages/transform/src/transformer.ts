@@ -211,7 +211,8 @@ export default class GcpTransformer {
           this.forwardTransformation = this.createForwardTransformation()
         }
         return this.forwardTransformation.evaluate(
-          this.assureEqualHandedness(input)
+          this.assureEqualHandedness(input),
+          mergeOptions(options, this.options).evaluationType
         )
       } else if (isGeojsonPoint(input)) {
         return this.transformForward(convertGeojsonPointToPoint(input), options)

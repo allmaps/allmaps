@@ -23,10 +23,18 @@ uniform isampler2D u_packedTilesScaleFactorsTexture;
 
 in vec2 v_resourceTrianglePoint;
 in float v_triangleIndex;
+in float v_distortion;
 
 out vec4 color;
 
+vec4 rgbToVec4(int r, int g, int b) {
+    return vec4(float(r) / 255.0, float(g) / 255.0, float(b) / 255.0, 1.0);
+}
+
 void main() {
+  // Colors
+  vec4 green = rgbToVec4(134,239,172);
+
   // The treated triangle point
   int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
   int resourceTrianglePointY = int(round(v_resourceTrianglePoint.y));
@@ -123,5 +131,10 @@ void main() {
     // Debugging: uncomment to override color of the treated point with a color made from the point's triangle index
     // vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
     // color = debugColor;
+
+    // Distortion test
+    // vec4 distortionColor = mix(vec4(green.rgb, 0), green, v_distortion);
+    vec4 distortionColor = mix(green, green, v_distortion);
+    color = distortionColor;
   }
 }

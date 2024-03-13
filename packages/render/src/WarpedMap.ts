@@ -90,7 +90,7 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
- * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
+ * @param {Point[]} projectedGeoTrianglePoints - Current points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
  * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
  * @private {Map<number, Map<number, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
  */
@@ -158,12 +158,14 @@ export default class WarpedMap extends EventTarget {
   private resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> =
     new Map()
 
-  projectedGeoCurrentTrianglePoints: Point[] = []
+  projectedGeoTrianglePoints: Point[] = []
   projectedGeoNewTrianglePoints: Point[] = []
   private projectedGeoTrianglePointsByBestScaleFactorAndTransformationType: Map<
     number,
     Map<TransformationType, Point[]>
   > = new Map()
+
+  trianglePointDistortions: number[] = []
 
   /**
    * Creates an instance of WarpedMap.
@@ -436,7 +438,7 @@ export default class WarpedMap extends EventTarget {
           ?.get(this.transformationType) as Point[]
     } else {
       this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-        (point) => this.projectedTransformer.transformToGeo(point as Point)
+        (point) => this.projectedTransformer.transformToGeo(point)
       )
 
       if (
@@ -454,17 +456,25 @@ export default class WarpedMap extends EventTarget {
         ?.set(this.transformationType, this.projectedGeoNewTrianglePoints)
     }
 
-    if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
-      this.projectedGeoCurrentTrianglePoints =
-        this.projectedGeoNewTrianglePoints
+    if (currentIsNew || !this.projectedGeoTrianglePoints.length) {
+      this.projectedGeoTrianglePoints = this.projectedGeoNewTrianglePoints
     }
+
+    this.trianglePointDistortions = this.resourceTrianglePoints.map(
+      (point) =>
+        this.projectedTransformer.transformToGeo(point, {
+          evaluationType: 'twoOmega'
+        })[0]
+    )
+
+    console.log(this.trianglePointDistortions)
   }
 
   /**
    * Reset the current points of the triangulated resourceMask in projectedGeo coordinates.
    */
-  resetCurrentTrianglePoints() {
-    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
+  resetTrianglePoints() {
+    this.projectedGeoTrianglePoints = this.projectedGeoNewTrianglePoints
   }
 
   /**
@@ -472,15 +482,12 @@ export default class WarpedMap extends EventTarget {
    *
    * @param {number} t
    */
-  mixProjectedGeoCurrentAndNewTrianglePoints(t: number) {
-    this.projectedGeoCurrentTrianglePoints =
-      this.projectedGeoNewTrianglePoints.map((point, index) => {
-        return mixPoints(
-          point,
-          this.projectedGeoCurrentTrianglePoints[index],
-          t
-        )
-      })
+  mixProjectedGeoTrianglePoints(t: number) {
+    this.projectedGeoTrianglePoints = this.projectedGeoNewTrianglePoints.map(
+      (point, index) => {
+        return mixPoints(point, this.projectedGeoTrianglePoints[index], t)
+      }
+    )
   }
 
   /**
@@ -513,7 +520,7 @@ export default class WarpedMap extends EventTarget {
 
   dispose() {
     this.resourceTrianglePoints = []
-    this.projectedGeoCurrentTrianglePoints = []
+    this.projectedGeoTrianglePoints = []
     this.projectedGeoNewTrianglePoints = []
   }
 
