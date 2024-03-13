@@ -192,7 +192,7 @@ export default class Polynomial extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to x at a new point
-  evaluatePartDerX(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeX(newSourcePoint: Point): Point {
     if (!this.polynomialParameters) {
       throw new Error('Polynomial parameters not computed')
     }
@@ -234,7 +234,7 @@ export default class Polynomial extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to x at a new point
-  evaluatePartDerY(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeY(newSourcePoint: Point): Point {
     if (!this.polynomialParameters) {
       throw new Error('Polynomial parameters not computed')
     }

@@ -94,7 +94,7 @@ export default class Projective extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to x at a new point
-  evaluatePartDerX(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeX(newSourcePoint: Point): Point {
     if (!this.projectiveParameters) {
       throw new Error('projective parameters not computed')
     }
@@ -125,7 +125,7 @@ export default class Projective extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to y at a new point
-  evaluatePartDerY(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeY(newSourcePoint: Point): Point {
     if (!this.projectiveParameters) {
       throw new Error('projective parameters not computed')
     }

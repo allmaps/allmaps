@@ -40,14 +40,15 @@ export type KernelFunction = (
   r: number,
   options: KernelFunctionOptions
 ) => number
-export type KernelFunctionOptions = { der?: number; epsilon?: number }
+export type KernelFunctionOptions = { derivative?: number; epsilon?: number }
 export type NormFunction = (point0: Point, point1: Point) => number
 
 export type EvaluationType =
   | 'function'
-  | 'parDerX'
-  | 'parDerY'
+  | 'partialDerivativeX'
+  | 'partialDerivativeY'
   | 'log2sigma'
   | 'twoOmega'
   | 'airyKavr'
   | 'signDetJ'
+  | 'thetaa'

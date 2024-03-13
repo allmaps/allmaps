@@ -54,7 +54,7 @@ export default class Straight extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to x at a new point
-  evaluatePartDerX(_newSourcePoint: Point): Point {
+  evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
     if (!this.scale || !this.translation) {
       throw new Error('Straight parameters not computed')
     }
@@ -65,7 +65,7 @@ export default class Straight extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to y at a new point
-  evaluatePartDerY(_newSourcePoint: Point): Point {
+  evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
     if (!this.scale || !this.translation) {
       throw new Error('Straight parameters not computed')
     }

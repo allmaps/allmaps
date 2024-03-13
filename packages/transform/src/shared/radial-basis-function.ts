@@ -175,7 +175,7 @@ export default class RBF extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to x at a new point
-  evaluatePartDerX(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeX(newSourcePoint: Point): Point {
     if (!this.rbfWeights || !this.affineWeights) {
       throw new Error('Weights not computed')
     }
@@ -193,7 +193,7 @@ export default class RBF extends Transformation {
         (sum, dist, index) =>
           sum +
           this.kernelFunction(dist, {
-            der: 1,
+            derivative: 1,
             epsilon: this.epsilon
           }) *
             ((newSourcePoint[0] - this.sourcePoints[index][0]) / dist) *
@@ -207,7 +207,7 @@ export default class RBF extends Transformation {
   }
 
   // Evaluate the transformation function's partial derivative to y at a new point
-  evaluatePartDerY(newSourcePoint: Point): Point {
+  evaluatePartialDerivativeY(newSourcePoint: Point): Point {
     if (!this.rbfWeights || !this.affineWeights) {
       throw new Error('Weights not computed')
     }
@@ -225,7 +225,7 @@ export default class RBF extends Transformation {
         (sum, dist, index) =>
           sum +
           this.kernelFunction(dist, {
-            der: 1,
+            derivative: 1,
             epsilon: this.epsilon
           }) *
             ((newSourcePoint[1] - this.sourcePoints[index][1]) / dist) *
