@@ -1,7 +1,7 @@
 import type { Command } from 'commander'
 
 const DEFAULT_MAX_OFFSET_RATIO = 0
-const DEFAULT_MAX_DEPTH = 6
+const DEFAULT_MAX_DEPTH = 0
 
 export function addAnnotationOptions(command: Command): Command {
   // Note: annotation is not required since transformer can be built using only GCPs, which could be specified individually.

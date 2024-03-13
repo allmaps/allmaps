@@ -9,6 +9,7 @@ export default class Helmert implements Transformation {
   destinationPoints: Point[]
 
   helmertParametersMatrix: Matrix
+  helmertParameters: number[]
 
   scale?: number
   rotation?: number
@@ -57,42 +58,40 @@ export default class Helmert implements Transformation {
       helmertCoefsMatrix.set(2 * i + 1, 2, sourcePoints[i][1])
       helmertCoefsMatrix.set(2 * i + 1, 3, sourcePoints[i][0])
     }
+
     // Compute helmert parameters by solving the linear system of equations for each target component
     // Will result in a Matrix([[t_x], [t_y], [m], [n]])
     const pseudoInverseHelmertCoefsMatrix = pseudoInverse(helmertCoefsMatrix)
     this.helmertParametersMatrix = pseudoInverseHelmertCoefsMatrix.mmul(
       destinationPointsMatrix
     )
+    this.helmertParameters = this.helmertParametersMatrix.to1DArray()
 
     // Set the derived parameters
     this.scale = Math.sqrt(
-      this.helmertParametersMatrix.get(2, 0) ** 2 +
-        this.helmertParametersMatrix.get(3, 0) ** 2
+      this.helmertParameters[2] ** 2 + this.helmertParameters[3] ** 2
     )
     this.rotation = Math.atan2(
-      this.helmertParametersMatrix.get(3, 0),
-      this.helmertParametersMatrix.get(2, 0)
+      this.helmertParameters[3],
+      this.helmertParameters[2]
     )
-    this.translation = [
-      this.helmertParametersMatrix.get(0, 0),
-      this.helmertParametersMatrix.get(1, 0)
-    ]
+    this.translation = [this.helmertParameters[0], this.helmertParameters[1]]
   }
 
   // The interpolant function will compute the value at any point.
   interpolate(newSourcePoint: Point): Point {
-    if (!this.helmertParametersMatrix) {
+    if (!this.helmertParameters) {
       throw new Error('Helmert parameters not computed')
     }
 
     // Compute the interpolated value by applying the helmert coefficients to the input point
     const newDestinationPoint: Point = [
-      this.helmertParametersMatrix.get(0, 0) +
-        this.helmertParametersMatrix.get(2, 0) * newSourcePoint[0] -
-        this.helmertParametersMatrix.get(3, 0) * newSourcePoint[1],
-      this.helmertParametersMatrix.get(1, 0) +
-        this.helmertParametersMatrix.get(2, 0) * newSourcePoint[1] +
-        this.helmertParametersMatrix.get(3, 0) * newSourcePoint[0]
+      this.helmertParameters[0] +
+        this.helmertParameters[2] * newSourcePoint[0] -
+        this.helmertParameters[3] * newSourcePoint[1],
+      this.helmertParameters[1] +
+        this.helmertParameters[2] * newSourcePoint[1] +
+        this.helmertParameters[3] * newSourcePoint[0]
     ]
     // Alternatively, using derived helmert parameters
     // this.translation[0] +

@@ -9,6 +9,7 @@ export default class Projective implements Transformation {
   destinationPoints: Point[]
 
   projectiveParametersMatrix: Matrix
+  projectiveParameters: number[][]
 
   pointCount: number
 
@@ -73,6 +74,7 @@ export default class Projective implements Transformation {
       )
       projectiveCoefsMatrix.set(2 * i + 1, 8, destinationPoints[i][1])
     }
+
     // Compute the last (i.e. 9th) 'right singular vector', i.e. the one with the smallest singular value. (For a set of gcps that exactly follow a projective transformations, the singular value is null and this vector spans the null-space)
     const svd = new SingularValueDecomposition(projectiveCoefsMatrix)
     this.projectiveParametersMatrix = Matrix.from1DArray(
@@ -80,27 +82,28 @@ export default class Projective implements Transformation {
       3,
       svd.rightSingularVectors.getColumn(8)
     ).transpose()
+    this.projectiveParameters = this.projectiveParametersMatrix.to2DArray()
   }
 
   // The interpolant function will compute the value at any point.
   interpolate(newSourcePoint: Point): Point {
-    if (!this.projectiveParametersMatrix) {
+    if (!this.projectiveParameters) {
       throw new Error('projective parameters not computed')
     }
 
     // Compute the interpolated value by applying the coefficients to the input point
     const c =
-      this.projectiveParametersMatrix.get(0, 2) * newSourcePoint[0] +
-      this.projectiveParametersMatrix.get(1, 2) * newSourcePoint[1] +
-      this.projectiveParametersMatrix.get(2, 2)
+      this.projectiveParameters[0][2] * newSourcePoint[0] +
+      this.projectiveParameters[1][2] * newSourcePoint[1] +
+      this.projectiveParameters[2][2]
     const newDestinationPoint: Point = [
-      (this.projectiveParametersMatrix.get(0, 0) * newSourcePoint[0] +
-        this.projectiveParametersMatrix.get(1, 0) * newSourcePoint[1] +
-        this.projectiveParametersMatrix.get(2, 0)) /
+      (this.projectiveParameters[0][0] * newSourcePoint[0] +
+        this.projectiveParameters[1][0] * newSourcePoint[1] +
+        this.projectiveParameters[2][0]) /
         c,
-      (this.projectiveParametersMatrix.get(0, 1) * newSourcePoint[0] +
-        this.projectiveParametersMatrix.get(1, 1) * newSourcePoint[1] +
-        this.projectiveParametersMatrix.get(2, 1)) /
+      (this.projectiveParameters[0][1] * newSourcePoint[0] +
+        this.projectiveParameters[1][1] * newSourcePoint[1] +
+        this.projectiveParameters[2][1]) /
         c
     ]
 

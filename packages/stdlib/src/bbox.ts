@@ -70,7 +70,6 @@ export function combineBboxes(bbox0: Bbox, bbox1: Bbox): Bbox {
   ]
 }
 
-//[xMin, yMin, xMax, yMax]
 export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
   const isOverlappingInX = bbox0[2] >= bbox1[0] && bbox1[2] >= bbox0[0]
   const isOverlappingInY = bbox0[3] >= bbox1[1] && bbox1[3] >= bbox0[1]
@@ -78,8 +77,13 @@ export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
   return isOverlappingInX && isOverlappingInY
 }
 
+export function pointInBbox(point: Point, bbox: Bbox): boolean {
+  return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
+}
+
 // Transform
 
+// Returns a rectangle with four points, starting from lower left and going anti-clockwise.
 export function bboxToRectangle(bbox: Bbox): Rectangle {
   return [
     [bbox[0], bbox[1]],
@@ -118,14 +122,31 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
+// Approximate results, for rectangles coming from bboxes. A more precise result would require a minimal-covering-rectangle algorithm
+export function rectangleToSize(rectangle: Rectangle): Size {
+  return [
+    0.5 *
+      (distance(rectangle[0], rectangle[1]) +
+        distance(rectangle[2], rectangle[3])),
+    0.5 *
+      (distance(rectangle[1], rectangle[2]) +
+        distance(rectangle[3], rectangle[0]))
+  ]
+}
+
 // Scales
 
 export function sizesToScale(size0: Size, size1: Size): number {
-  const scaleX = size0[0] / size1[0]
-  const scaleY = size0[1] / size1[1]
-  return Math.min(scaleX, scaleY)
+  return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {
   return sizesToScale(bboxToSize(bbox0), bboxToSize(bbox1))
+}
+
+export function rectanglesToScale(
+  rectangle0: Rectangle,
+  rectangle1: Rectangle
+): number {
+  return sizesToScale(rectangleToSize(rectangle0), rectangleToSize(rectangle1))
 }

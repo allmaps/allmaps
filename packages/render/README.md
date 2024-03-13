@@ -129,7 +129,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [updateVertexBuffers](#updatevertexbuffers)
     *   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
     *   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
-*   [DEFAULT\_SCALE\_FACTOR\_SHARPENING](#default_scale_factor_sharpening)
+*   [DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION](#default_target_scale_factor_correction)
 *   [getBestTileZoomLevelForScale](#getbesttilezoomlevelforscale)
     *   [Parameters](#parameters-40)
 
@@ -325,11 +325,11 @@ Type: [Viewport](#viewport)
 *   `geoCenter` **Point** Center point of the viewport, in longitude/latitude coordinates.
 *   `geoRectangle` **Rectangle** Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
 *   `geoSize` **Size** Size of the viewport in longitude/latitude coordinates, as \[width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in in that case).
-*   `geoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
+*   `geoRectangleBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected geo coordinates.
 *   `projectedGeoRectangle` **Rectangle** Rotated rectangle of the viewport point, in projected geo coordinates.
 *   `projectedGeoSize` **Size** Size of the viewport in projected geo coordinates, as \[width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
-*   `projectedGeoBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
+*   `projectedGeoRectangleBbox` **Bbox** Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
 *   `rotation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Rotation of the viewport with respect to the projected coordinate system.
 *   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projected geo coordinates per viewport pixel.
 *   `viewportCenter` **Point** Center point of the viewport, in viewport pixels.
@@ -687,9 +687,11 @@ Remove cached tile from the textures of this map and update textes
 
 *   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
 
-### DEFAULT\_SCALE\_FACTOR\_SHARPENING
+### DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION
 
-Scale factor sharpening: 1 = no sharpening, 2 = one level extra sharper, 4 = two levels extra sharper, 1/2 = one level less sharp ...
+Target scale factor correction
+Since this is done before comparing *logarithmic* evaluations of the target and available scale factors (to find the best fit), this has more effect on small scale factors.
+0 = no correction, -1 = correct target scale factor with -1 to obain less sharp images (especially at low scale factors), 1 = idem with correction +1, ...
 
 Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
 
@@ -701,6 +703,6 @@ Returns the best TileZoomLevel for a given resource-to-canvas scale.
 
 *   `image` **[Image](https://developer.mozilla.org/docs/Web/API/HTMLImageElement/Image)** A parsed IIIF Image
 *   `resourceToCanvasScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The resource to canvas scale, relating resource pixels to canvas pixels.
-*   `scaleFactorSharpening`   (optional, default `DEFAULT_SCALE_FACTOR_SHARPENING`)
+*   `targetScaleFactorCorrection`   (optional, default `DEFAULT_TARGET_SCALE_FACTOR_CORRECTION`)
 
 Returns **TileZoomLevel**&#x20;

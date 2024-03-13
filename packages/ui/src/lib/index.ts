@@ -27,6 +27,7 @@ import Polynomial2 from '$lib/components/icons/transformations/Polynomial2.svelt
 import Polynomial3 from '$lib/components/icons/transformations/Polynomial3.svelte'
 import Projective from '$lib/components/icons/transformations/Projective.svelte'
 import ThinPlateSpline from '$lib/components/icons/transformations/ThinPlateSpline.svelte'
+import Straight from './components/icons/transformations/Straight.svelte'
 
 export { urlStore, dataStore, paramStore }
 
@@ -55,7 +56,8 @@ export {
   Polynomial2,
   Polynomial3,
   Projective,
-  ThinPlateSpline
+  ThinPlateSpline,
+  Straight
 }
 
 export * from './shared/types.js'

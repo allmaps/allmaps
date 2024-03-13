@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/annotation",
-  "version": "1.0.0-beta.22",
+  "version": "1.0.0-beta.26",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -36,9 +36,9 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && npm run documentation",
+    "build": "tsc && pnpm run documentation",
     "preversion": "pnpm run types && pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test mocha && npm run examples",
+    "test": "NODE_ENV=test mocha && pnpm run examples",
     "pretest": "pnpm run build",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",

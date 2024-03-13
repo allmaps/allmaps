@@ -6,7 +6,7 @@ import { GcpTransformer } from '@allmaps/transform'
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevel,
-  computeTilesConveringRingAtTileZoomLevel
+  computeTilesCoveringRingAtTileZoomLevel
 } from '@allmaps/render'
 import classifyPoint from 'robust-point-in-polygon'
 
@@ -19,7 +19,7 @@ import type { XYZTile, Cache, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 const CHANNELS = 4
-const DEFAULT_SCALE_FACTOR_SHARPENING = 1
+const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 0 // TODO: Consider to change to 0.5 like @allmaps/render
 
 export async function createWarpedTileResponse(
   maps: Map[],
@@ -71,10 +71,10 @@ export async function createWarpedTileResponse(
       parsedImage,
       [TILE_SIZE, TILE_SIZE],
       resourceRing,
-      DEFAULT_SCALE_FACTOR_SHARPENING
+      DEFAULT_TARGET_SCALE_FACTOR_CORRECTION
     )
 
-    const iiifTiles = computeTilesConveringRingAtTileZoomLevel(
+    const iiifTiles = computeTilesCoveringRingAtTileZoomLevel(
       resourceRing,
       zoomLevel,
       parsedImage

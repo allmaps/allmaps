@@ -4,7 +4,8 @@ import {
   PointSchema,
   ImageServiceSchema,
   PointGeometrySchema,
-  TransformationSchema
+  TransformationSchema,
+  ContextSchema
 } from '../shared.js'
 
 const svg =
@@ -47,7 +48,7 @@ export const BodySchema = z.object({
 export const AnnotationSchema = z.object({
   id: z.string().optional(),
   type: z.literal('Annotation'),
-  '@context': z.string().url().array().optional(),
+  '@context': ContextSchema.optional(),
   motivation: z.string().default('georeferencing').optional(),
   target: TargetSchema,
   body: BodySchema
@@ -56,6 +57,6 @@ export const AnnotationSchema = z.object({
 export const AnnotationPageSchema = z.object({
   id: z.string().optional(),
   type: z.literal('AnnotationPage'),
-  '@context': z.string().url().array().optional(),
+  '@context': ContextSchema.optional(),
   items: z.array(AnnotationSchema)
 })

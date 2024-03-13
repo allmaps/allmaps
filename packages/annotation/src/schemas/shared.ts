@@ -38,20 +38,21 @@ export const PartOfSchema: z.ZodType<PartOf> = basePartOfSchema.extend({
   partOf: z.lazy(() => PartOfSchema.array()).optional()
 })
 
-const PolynomialTransformationSchema = z.object({
-  type: z.literal('polynomial'),
-  options: z
-    .object({
-      order: z.number().min(1).max(3)
+export const TransformationSchema = z
+  .union([
+    z.any(),
+    z.object({
+      type: z.string(),
+      options: z.object({}).optional()
     })
-    .optional()
-})
+  ])
+  .transform((val) => {
+    if (val && typeof val === 'object' && 'type' in val) {
+      return val
+    }
+  })
 
-const ThinPlateSplineTransformationSchema = z.object({
-  type: z.literal('thinPlateSpline')
-})
-
-// TODO: add more transformation types, and also allow invalid types
-export const TransformationSchema = PolynomialTransformationSchema.or(
-  ThinPlateSplineTransformationSchema
-)
+export const ContextSchema = z.union([
+  z.string().url().array(),
+  z.string().url()
+])

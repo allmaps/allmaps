@@ -1,14 +1,14 @@
 # @allmaps/transform
 
-This module serves to **transform points, lines, polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of control points**, who's coordinates are known in both planes, and a specific transformation algorithm.
+This module serves to **transform Points, LineStrings, Polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of Control Points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
-It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from control points in the annotation and transforms points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
+It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from Control Points in the annotation and transforms Points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
 
 Care was taken to make this module **usable and useful outside of the Allmaps context** as well! Feel free to incorporate it in your project.
 
 ## How it works
 
-This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary points in one plane to the corresponding points in the other plane. The transformer has dedicated functions that use this transformation to transform points and more complex geometries like line strings and polygons.
+This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary Points in one plane to the corresponding Points in the other plane. The transformer has dedicated functions that use this transformation to transform Points and more complex geometries like LineStrings and Polygons.
 
 ## Installation
 
@@ -119,7 +119,7 @@ const transformedLineString = transformer.transformBackward(
 // ]
 
 // Notice how the result has two layers of midpoints!
-// In a first step the point [133.16, 174.55] is added between the start and end point
+// In a first step the Point [133.16, 174.55] is added between the start and end Point
 // Then [80.91, 165.79] and [185.89, 181.22] are added in between.
 ```
 
@@ -193,25 +193,82 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 // }
 ```
 
+### MultiPoint
+
+In this example we transform a MultiPoint to a MultiPoint.
+
+```js
+export const transformGcps7 = [
+  {
+    source: [0, 0],
+    destination: [0, 0]
+  },
+  {
+    source: [100, 0],
+    destination: [20, 0]
+  },
+  {
+    source: [200, 100],
+    destination: [40, 20]
+  },
+  {
+    source: [200, 200],
+    destination: [40, 40]
+  },
+  {
+    source: [150, 250],
+    destination: [40, 100]
+  },
+  {
+    source: [100, 200],
+    destination: [20, 40]
+  },
+  {
+    source: [0, 100],
+    destination: [0, 20]
+  }
+]
+
+const transformOptions = {
+  inputIsMultiGeometry: true // this assures the transform method recognises the input as a multiPoint, not a LineString
+}
+
+const transformer = new GcpTransformer(transformGcps7, 'polynomial')
+
+const multiPoint = [
+  [10, 50],
+  [50, 50]
+]
+
+const transformedMultiPoint = transformer.transformForward(
+  multiPoint,
+  transformOptions
+)
+// const transformedMultiPoint = [
+//   [31.06060606060611, 155.30303030303048],
+//   [237.12121212121218, 185.60606060606085]
+// ]
+```
+
 ### Transformation types
 
 A transformer is build from a set of GCPs and a transformation type. The following transformation types are supported.
 
-| Type                                       | Description                                                              | Properties                                                                       | Minimum number of GCPs |
-| ------------------------------------------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
-| `straight`                                 | Straight transformation                                                  | Preserves shapes and angles, no overall rotation                                 | 2                      |
-| `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Preserves shapes and angles                                                      | 2                      |
-| `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Preserves lines and parallelism                                                  | 3                      |
-| `polynomial2`                              | Second order polynomial transformation                                   | Some bending flexibility                                                         | 6                      |
-| `polynomial3`                              | Third order polynomial transformation                                    | More bending flexibility                                                         | 10                     |
-| `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Exact, smooth (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
-| `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Preserves lines and cross-ratios                                                 | 4                      |
+|                                                                                                                 | Type                                       | Description                                                              | Properties                                                                                                                           | Minimum number of GCPs |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/straight.svg" alt="straight">                 | `straight`                                 | Straight transformation                                                  | Applies translation and scaling. Preserves shapes and angles.                                                                        | 2                      |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/helmert.svg" alt="helmert">                   | `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Applies translation, scaling and rotation. Preserves shapes and angles.                                                              | 2                      |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-1.svg" alt="polynomial">           | `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Applies translation, scaling, rotation and shearing. Preserves lines and parallelism.                                                | 3                      |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-2.svg" alt="polynomial2">          | `polynomial2`                              | Second order polynomial transformation.                                  | Applies second order effects. Adds some bending flexibility.                                                                         | 6                      |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-3.svg" alt="polynomial3">          | `polynomial3`                              | Third order polynomial transformation                                    | Applies third order effects. Adds more bending flexibility.                                                                          | 10                     |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/thin-plate-spline.svg" alt="thinPlateSpline"> | `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Applies smooth transformation. Transformation is 'exact' at GPCs. (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
+| <img width="100" src="../ui/src/lib/shared/images/transformations/projective.svg" alt="projective">             | `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Follow perspective rules. Preserves lines and cross-ratios.                                                                          | 4                      |
 
 ### Transformer methods
 
 Once a transformer is built, it can be used to transform geometries forward and backward.
 
-All transformer methods accepts points, line strings as well as polygons, both as simple geometries or GeoJSON geometries. There are, however, separate methods for transforming to simple geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
+All transformer methods accepts Points, LineStrings as well as Polygons (and MultiPoints, MultiLineStrings and MultiPolygons), both as simple geometries or GeoJSON geometries. There are, however, separate methods for transforming to simple geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
 
 Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
 
@@ -223,25 +280,26 @@ Some options are available to improve transformations, e.g. to transform LineStr
 
 These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the options derived from the data format (e.g. setting 'true' when source is GeoJSON), which in term override the default options.
 
-As an exception, the `differentHandedness` option is only used when a transformer is built (and is not read during geometry transformation).
+The `differentHandedness` option is used both when a transformer and when a geometry is transformed, and should not be altered between these two actions.
 
 Here's an overview of the available options:
 
-| Option                    | Description                                                                                                                                                           | Default                                      |
-| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
-| `maxOffsetRatio`          | Maximum offset ratio when recursively adding midpoints (smaller means more midpoints)                                                                                 | `0`                                          |
-| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                               | `0` (i.e. no midpoints by default!)          |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                      | `false` (`true` when source is GeoJSON)      |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                 | `false` (`true` when destination is GeoJSON) |
-| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination. | `false`                                      |
+| Option                    | Description                                                                                                                                                                                                                                                | Default                                      |
+| :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| `maxOffsetRatio`          | Maximum offset ratio when recursively adding midpoints (smaller means more midpoints)                                                                                                                                                                      | `0`                                          |
+| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                    | `0` (i.e. no midpoints by default!)          |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                                                                                                           | `false` (`true` when source is GeoJSON)      |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                                                                                                      | `false` (`true` when destination is GeoJSON) |
+| `inputIsMultiGeometry`    | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the simple geometry (as opposed to GeoJSON geometries) types are not deterministic: the types of LineString and MultiPoint are identical. | `false`                                      |
+| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination.                                                                                      | `false`                                      |
 
 #### Recursively adding midpoints
 
-When transforming LineStrings and Polygons, it can happen that simply transforming every point is not sufficient.
+When transforming LineStrings and Polygons, it can happen that simply transforming every Point is not sufficient.
 
 Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines).
 
-An algorithm will therefore recursively add midpoints in each segment (i.e. between two points) to make the line more granular. A midpoint is added at the transformed middle point of the original segment on the condition that the ratio of (the distance between the middle point of the transformed segment and the transformed middle point of the original segment) to the length of the transformed segment, is larger then the specified `maxOffsetRatio`. This process is repeated until this condition isn't valid anymore, or until `maxDepth` is reached.
+An algorithm will therefore recursively add midpoints in each segment (i.e. between two Points) to make the line more granular. A midpoint is added at the transformed middle Point of the original segment on the condition that the ratio of (the distance between the middle Point of the transformed segment and the transformed middle Point of the original segment) to the length of the transformed segment, is larger then the specified `maxOffsetRatio`. This process is repeated until this condition isn't valid anymore, or until `maxDepth` is reached.
 
 The computation of the midpoints and distances in the source and destination domains during this process uses geometric algorithms, unless `sourceIsGeographic` or `destinationIsGeographic` are set to `true`, in which case geographic algorithms (such as 'Great-circle distance') are used.
 
@@ -289,12 +347,27 @@ type Point = [number, number]
 type LineString = Point[]
 
 type Polygon = Point[][]
-// A polygon is an array of rings of at least three points
+// A Polygon is an array of rings of at least three points
 // Rings are not closed: the first point is not repeated at the end.
 // There is no requirement on winding order.
 
-type Geometry = Point | LineString | Polygon
+export type MultiPoint = Point[]
+// Notice that this is equivalent to the LineString type, hence the `inputIsMultiGeometry` option
+
+export type MultiLineString = Point[][]
+
+export type MultiPolygon = Point[][][]
+
+export type Geometry =
+  | Point
+  | LineString
+  | Polygon
+  | MultiPoint
+  | MultiLineString
+  | MultiPolygon
 ```
+
+GeoJSON geometries follow the [GeoJSON specification](https://geojson.org/).
 
 ### Transform vs. GDAL
 
@@ -427,6 +500,8 @@ Returns **GeojsonGeometry** Backward transform of input, as a GeoJSON geometry
 
 Transforms a SVG geometry forward to a GeoJSON geometry
 
+Note: Multi-geometries are not supported
+
 ##### Parameters
 
 *   `geometry` **SvgGeometry** SVG geometry to transform
@@ -437,6 +512,8 @@ Returns **GeojsonGeometry** Forward transform of input, as a GeoJSON geometry
 #### transformGeojsonToSvg
 
 Transforms a GeoJSON geometry backward to a SVG geometry
+
+Note: Multi-geometries are not supported
 
 ##### Parameters
 

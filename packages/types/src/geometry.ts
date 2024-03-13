@@ -33,7 +33,19 @@ export type Ring = Point[]
 
 export type Polygon = Point[][]
 
-export type Geometry = Point | LineString | Polygon
+export type MultiPoint = Point[]
+
+export type MultiLineString = Point[][]
+
+export type MultiPolygon = Point[][][]
+
+export type Geometry =
+  | Point
+  | LineString
+  | Polygon
+  | MultiPoint
+  | MultiLineString
+  | MultiPolygon
 
 export type Gcp = { resource: Point; geo: Point }
 

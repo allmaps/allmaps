@@ -1,5 +1,4 @@
 import { Matrix, inverse } from 'ml-matrix'
-import { multiplyMatricesElementwise } from './matrix.js'
 
 import type { Transformation } from './types'
 
@@ -15,6 +14,8 @@ export default class RBF implements Transformation {
   normFunction: NormFunction
 
   weightsMatrices: [Matrix, Matrix]
+  rbfWeights: [number[], number[]]
+  affineWeights: [number[], number[]]
 
   pointCount: number
   epsilon?: number
@@ -132,45 +133,48 @@ export default class RBF implements Transformation {
       inverseKernelsAndAffineCoefsMatrix.mmul(destinationPointsMatrices[0]),
       inverseKernelsAndAffineCoefsMatrix.mmul(destinationPointsMatrices[1])
     ]
+
+    // Store rbf and affine parts of the weights more as arrays for more efficient access on interpolation
+    this.rbfWeights = this.weightsMatrices.map((matrix) =>
+      matrix.selection([...Array(this.pointCount).keys()], [0]).to1DArray()
+    ) as [number[], number[]]
+    this.affineWeights = this.weightsMatrices.map((matrix) =>
+      matrix
+        .selection(
+          [0, 1, 2].map((n) => n + this.pointCount),
+          [0]
+        )
+        .to1DArray()
+    ) as [number[], number[]]
   }
 
   // The interpolant function will compute the value at any point.
   interpolate(newSourcePoint: Point): Point {
-    if (!this.weightsMatrices) {
+    if (!this.rbfWeights || !this.affineWeights) {
       throw new Error('Weights not computed')
     }
 
     // Make a column matrix with the distances of that point to all control points
-    const newDistancesMatrix = Matrix.zeros(this.pointCount, 1)
-    for (let i = 0; i < this.pointCount; i++) {
-      newDistancesMatrix.set(
-        i,
-        0,
-        this.kernelFunction(
-          this.normFunction(newSourcePoint, this.sourcePoints[i]),
-          this.epsilon
-        )
+    const newDistances = this.sourcePoints.map((sourcePoint) =>
+      this.kernelFunction(
+        this.normFunction(newSourcePoint, sourcePoint),
+        this.epsilon
       )
-    }
+    )
 
     // Compute the interpolated value by summing the weighted contributions of the input point
     const newDestinationPoint: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       // Apply the weights to the new distances
-      // Note: don't consider the last three weights who are there for the affine part
-      newDestinationPoint[i] = multiplyMatricesElementwise(
-        newDistancesMatrix,
-        this.weightsMatrices[i].selection(
-          [...Array(this.pointCount).keys()],
-          [0]
-        )
-      ).sum()
+      newDestinationPoint[i] = newDistances.reduce(
+        (r0, e0, i0) => r0 + e0 * this.rbfWeights[i][i0],
+        0
+      )
       // Add the affine part
-      const a0 = this.weightsMatrices[i].get(this.pointCount, 0)
-      const ax = this.weightsMatrices[i].get(this.pointCount + 1, 0)
-      const ay = this.weightsMatrices[i].get(this.pointCount + 2, 0)
       newDestinationPoint[i] +=
-        a0 + ax * newSourcePoint[0] + ay * newSourcePoint[1]
+        this.affineWeights[i][0] +
+        this.affineWeights[i][1] * newSourcePoint[0] +
+        this.affineWeights[i][2] * newSourcePoint[1]
     }
     return newDestinationPoint
   }

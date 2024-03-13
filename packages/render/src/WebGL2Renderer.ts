@@ -13,7 +13,7 @@ import {
 import {
   geoBboxToResourceRing,
   getBestTileZoomLevelForScale,
-  computeTilesConveringRingAtTileZoomLevel
+  computeTilesCoveringRingAtTileZoomLevel
 } from './shared/tiles.js'
 import {
   createTransform,
@@ -500,7 +500,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
 
     const checks = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
       .map((warpedMap) => {
@@ -531,8 +531,12 @@ export default class WebGL2Renderer extends EventTarget {
       return
     }
 
+    if (this.animating) {
+      return
+    }
+
     const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoBbox)
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
     ).sort(
       (mapId0, mapId1) =>
         distance(
@@ -567,7 +571,7 @@ export default class WebGL2Renderer extends EventTarget {
       // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
       // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
       if (
-        bboxToDiameter(warpedMap.getApproxViewportMaskBbox(this.viewport)) <
+        bboxToDiameter(warpedMap.getViewportMaskBbox(this.viewport)) <
         MIN_VIEWPORT_DIAMETER
       ) {
         continue
@@ -578,10 +582,10 @@ export default class WebGL2Renderer extends EventTarget {
       // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
       const tileZoomLevel = getBestTileZoomLevelForScale(
         warpedMap.parsedImage,
-        warpedMap.getApproxResourceToCanvasScale(this.viewport)
+        warpedMap.getResourceToCanvasScale(this.viewport)
       )
 
-      warpedMap.updateBestScaleFactor(tileZoomLevel.scaleFactor)
+      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
       const projectedTransformerOptions = {
@@ -591,14 +595,14 @@ export default class WebGL2Renderer extends EventTarget {
 
       const resourceViewportRing = geoBboxToResourceRing(
         warpedMap.projectedTransformer,
-        this.viewport.projectedGeoBbox,
+        this.viewport.projectedGeoRectangleBbox,
         projectedTransformerOptions
       )
 
       warpedMap.setResourceViewportRing(resourceViewportRing)
 
       // This returns tiles sorted by distance from center of resourceViewportRing
-      const tiles = computeTilesConveringRingAtTileZoomLevel(
+      const tiles = computeTilesCoveringRingAtTileZoomLevel(
         resourceViewportRing,
         tileZoomLevel,
         warpedMap.parsedImage
@@ -1017,17 +1021,6 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private resourceMaskUpdated(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (warpedMap) {
-        warpedMap.clearResourceTrianglePointsByBestScaleFactor()
-        warpedMap.updateTriangulation(false)
-      }
-    }
-  }
-
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
@@ -1069,11 +1062,6 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
-    )
   }
 
   private removeEventListeners() {
@@ -1100,11 +1088,6 @@ export default class WebGL2Renderer extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKUPDATED,
-      this.resourceMaskUpdated.bind(this)
     )
   }
 }

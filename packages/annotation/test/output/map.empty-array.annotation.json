@@ -1,8 +1,5 @@
 {
   "type": "AnnotationPage",
-  "@context": [
-    "http://iiif.io/api/extension/georef/1/context.json",
-    "http://iiif.io/api/presentation/3/context.json"
-  ],
+  "@context": "http://www.w3.org/ns/anno.jsonld",
   "items": []
 }

@@ -205,10 +205,10 @@ All the commands above accept the following options for specifying the transform
 
 All the commands above (except `point`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
-| Option                            | Description                                                              | Default                                                 |
-| :-------------------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------ |
-| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints          | `0`                                                     |
-| `-d, --max-depth <number>`        | Maximum recursion depth                                                  | `6`                                                     |
+| Option                            | Description                                                           | Default                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------ |
+| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints       | `0`                                                     |
+| `-d, --max-depth <number>`        | Maximum recursion depth                                               | `0`                                                     |
 | `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` for `geojson` command)                  |
 | `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` for `svg` and `resource-mask` commands) |
 

@@ -88,6 +88,15 @@ function parseGcps(annotation: AnnotationAllVersions): GCP[] {
   }))
 }
 
+function parseDates(annotation: AnnotationAllVersions) {
+  if (isAnnotation1(annotation)) {
+    return {
+      created: annotation.created,
+      modified: annotation.modified
+    }
+  }
+}
+
 function parseImageDimensions(annotation: AnnotationAllVersions): {
   width: number
   height: number
@@ -159,6 +168,7 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
     id: annotation.id,
+    ...parseDates(annotation),
     resource: parseResource(annotation),
     gcps: parseGcps(annotation),
     resourceMask: parseResourceMask(annotation),
