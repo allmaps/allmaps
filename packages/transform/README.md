@@ -394,6 +394,8 @@ For a little history: this library started out as a JavaScript port of [gdaltran
     *   [transformToResourceAsGeojson](#transformtoresourceasgeojson)
     *   [transformSvgToGeojson](#transformsvgtogeojson)
     *   [transformGeojsonToSvg](#transformgeojsontosvg)
+*   [Transformation](#transformation)
+    *   [Parameters](#parameters-11)
 
 ### allmaps/transform
 
@@ -521,6 +523,18 @@ Note: Multi-geometries are not supported
 *   `transformOptions` &#x20;
 
 Returns **SvgGeometry** Backward transform of input, as SVG geometry
+
+### Transformation
+
+Transformation class. Extended by the various transformations.
+
+#### Parameters
+
+*   `sourcePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The source points
+*   `destinationPoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The destination points
+*   `type` **TransformationType** The transformation type
+*   `pointCountMinimum` &#x20;
+*   `null-null` **pointCountMinimum** The minimum number of points for the transformation type
 
 ## Notes
 
