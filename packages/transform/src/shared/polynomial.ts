@@ -1,45 +1,35 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import type { Transformation } from './types'
+import Transformation from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
+import type { TransformationType } from './types.js'
 
-export default class Polynomial implements Transformation {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-
+export default class Polynomial extends Transformation {
   polynomialParametersMatrices: [Matrix, Matrix]
   polynomialParameters: [number[], number[]]
 
-  pointCount: number
   order: number
-  nCoefs: number
+  pointCountMinimum: number
 
   constructor(
     sourcePoints: Point[],
     destinationPoints: Point[],
     order?: number
   ) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
+    order = order || 1
+    const pointsCountMinimum = ((order + 1) * (order + 2)) / 2
+    // If there are less control points then there are coefficients to be determined (for each dimension), the system can not be solved
 
-    this.pointCount = this.sourcePoints.length
+    super(
+      sourcePoints,
+      destinationPoints,
+      ('polynomial' + order) as TransformationType,
+      pointsCountMinimum
+    )
 
-    this.order = order || 1
-    this.nCoefs = ((this.order + 1) * (this.order + 2)) / 2
-
-    // if there are less control points then there are coefficients to be determined (for each dimension), the system can not be solved
-    if (this.pointCount < this.nCoefs) {
-      throw new Error(
-        'Not enough control points. A polynomial transformation of order ' +
-          this.order +
-          ' requires a minimum of ' +
-          this.nCoefs +
-          ' points, but ' +
-          this.pointCount +
-          ' are given.'
-      )
-    }
+    this.order = order
+    this.pointCountMinimum = pointsCountMinimum
 
     if (this.order < 1 || this.order > 3) {
       throw new Error(
@@ -55,8 +45,8 @@ export default class Polynomial implements Transformation {
     // Since they both use the same coefficients, there is only one polynomialCoefsMatrix
 
     const destinationPointsMatrices: [Matrix, Matrix] = [
-      Matrix.columnVector(destinationPoints.map((value) => value[0])),
-      Matrix.columnVector(destinationPoints.map((value) => value[1]))
+      Matrix.columnVector(this.destinationPoints.map((value) => value[0])),
+      Matrix.columnVector(this.destinationPoints.map((value) => value[1]))
     ]
 
     // Construct Nx3 Matrix polynomialCoefsMatrix
@@ -71,50 +61,53 @@ export default class Polynomial implements Transformation {
     // for order = 3
     // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
     // ...
-    const polynomialCoefsMatrix = Matrix.zeros(this.pointCount, this.nCoefs)
+    const polynomialCoefsMatrix = Matrix.zeros(
+      this.pointCount,
+      this.pointCountMinimum
+    )
     for (let i = 0; i < this.pointCount; i++) {
       switch (this.order) {
         case 1:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
+          polynomialCoefsMatrix.set(i, 1, this.sourcePoints[i][0])
+          polynomialCoefsMatrix.set(i, 2, this.sourcePoints[i][1])
           break
 
         case 2:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
-          polynomialCoefsMatrix.set(i, 3, sourcePoints[i][0] ** 2)
-          polynomialCoefsMatrix.set(i, 4, sourcePoints[i][1] ** 2)
+          polynomialCoefsMatrix.set(i, 1, this.sourcePoints[i][0])
+          polynomialCoefsMatrix.set(i, 2, this.sourcePoints[i][1])
+          polynomialCoefsMatrix.set(i, 3, this.sourcePoints[i][0] ** 2)
+          polynomialCoefsMatrix.set(i, 4, this.sourcePoints[i][1] ** 2)
           polynomialCoefsMatrix.set(
             i,
             5,
-            sourcePoints[i][0] * sourcePoints[i][1]
+            this.sourcePoints[i][0] * this.sourcePoints[i][1]
           )
           break
 
         case 3:
           polynomialCoefsMatrix.set(i, 0, 1)
-          polynomialCoefsMatrix.set(i, 1, sourcePoints[i][0])
-          polynomialCoefsMatrix.set(i, 2, sourcePoints[i][1])
-          polynomialCoefsMatrix.set(i, 3, sourcePoints[i][0] ** 2)
-          polynomialCoefsMatrix.set(i, 4, sourcePoints[i][1] ** 2)
+          polynomialCoefsMatrix.set(i, 1, this.sourcePoints[i][0])
+          polynomialCoefsMatrix.set(i, 2, this.sourcePoints[i][1])
+          polynomialCoefsMatrix.set(i, 3, this.sourcePoints[i][0] ** 2)
+          polynomialCoefsMatrix.set(i, 4, this.sourcePoints[i][1] ** 2)
           polynomialCoefsMatrix.set(
             i,
             5,
-            sourcePoints[i][0] * sourcePoints[i][1]
+            this.sourcePoints[i][0] * this.sourcePoints[i][1]
           )
-          polynomialCoefsMatrix.set(i, 6, sourcePoints[i][0] ** 3)
-          polynomialCoefsMatrix.set(i, 7, sourcePoints[i][1] ** 3)
+          polynomialCoefsMatrix.set(i, 6, this.sourcePoints[i][0] ** 3)
+          polynomialCoefsMatrix.set(i, 7, this.sourcePoints[i][1] ** 3)
           polynomialCoefsMatrix.set(
             i,
             8,
-            sourcePoints[i][0] ** 2 * sourcePoints[i][1]
+            this.sourcePoints[i][0] ** 2 * this.sourcePoints[i][1]
           )
           polynomialCoefsMatrix.set(
             i,
             9,
-            sourcePoints[i][0] * sourcePoints[i][1] ** 2
+            this.sourcePoints[i][0] * this.sourcePoints[i][1] ** 2
           )
           break
 
@@ -141,13 +134,13 @@ export default class Polynomial implements Transformation {
     ) as [number[], number[]]
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolate(newSourcePoint: Point): Point {
+  // Evaluate the transformation function at a new point
+  evaluateFunction(newSourcePoint: Point): Point {
     if (!this.polynomialParameters) {
       throw new Error('Polynomial parameters not computed')
     }
 
-    // Compute the interpolated value by applying the polynomial coefficients to the input point
+    // Apply the helmert coefficients to the input point
     const newDestinationPoint: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       switch (this.order) {
@@ -196,5 +189,89 @@ export default class Polynomial implements Transformation {
     }
 
     return newDestinationPoint
+  }
+
+  // Evaluate the transformation function's partial derivative to x at a new point
+  evaluatePartDerX(newSourcePoint: Point): Point {
+    if (!this.polynomialParameters) {
+      throw new Error('Polynomial parameters not computed')
+    }
+
+    // Apply the helmert coefficients to the input point
+    const newDestinationPointPartDerX: Point = [0, 0]
+    for (let i = 0; i < 2; i++) {
+      switch (this.order) {
+        case 1:
+          newDestinationPointPartDerX[i] += this.polynomialParameters[i][1]
+          break
+
+        case 2:
+          newDestinationPointPartDerX[i] +=
+            this.polynomialParameters[i][1] +
+            2 * this.polynomialParameters[i][3] * newSourcePoint[0] +
+            this.polynomialParameters[i][5] * newSourcePoint[1]
+          break
+
+        case 3:
+          newDestinationPointPartDerX[i] +=
+            this.polynomialParameters[i][1] +
+            2 * this.polynomialParameters[i][3] * newSourcePoint[0] +
+            this.polynomialParameters[i][5] * newSourcePoint[1] +
+            3 * this.polynomialParameters[i][6] * newSourcePoint[0] ** 2 +
+            2 *
+              this.polynomialParameters[i][8] *
+              newSourcePoint[0] *
+              newSourcePoint[1] +
+            this.polynomialParameters[i][9] * newSourcePoint[1] ** 2
+          break
+
+        default:
+          break
+      }
+    }
+
+    return newDestinationPointPartDerX
+  }
+
+  // Evaluate the transformation function's partial derivative to x at a new point
+  evaluatePartDerY(newSourcePoint: Point): Point {
+    if (!this.polynomialParameters) {
+      throw new Error('Polynomial parameters not computed')
+    }
+
+    // Apply the helmert coefficients to the input point
+    const newDestinationPointPartDerY: Point = [0, 0]
+    for (let i = 0; i < 2; i++) {
+      switch (this.order) {
+        case 1:
+          newDestinationPointPartDerY[i] += this.polynomialParameters[i][2]
+          break
+
+        case 2:
+          newDestinationPointPartDerY[i] +=
+            this.polynomialParameters[i][2] +
+            2 * this.polynomialParameters[i][4] * newSourcePoint[1] +
+            this.polynomialParameters[i][5] * newSourcePoint[0]
+          break
+
+        case 3:
+          newDestinationPointPartDerY[i] +=
+            this.polynomialParameters[i][2] +
+            2 * this.polynomialParameters[i][4] * newSourcePoint[1] +
+            this.polynomialParameters[i][5] * newSourcePoint[0] +
+            3 * this.polynomialParameters[i][7] * newSourcePoint[1] ** 2 +
+            this.polynomialParameters[i][8] * newSourcePoint[0] ** 2 +
+            2 *
+              this.polynomialParameters[i][9] *
+              newSourcePoint[0] *
+              newSourcePoint[1]
+          break
+
+        default:
+          break
+      }
+    }
+
+    return newDestinationPointPartDerY
   }
 }

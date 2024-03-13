@@ -26,6 +26,8 @@ import {
   flipY
 } from '@allmaps/stdlib'
 
+import Transformation from './transformation.js'
+
 import Straight from './shared/straight.js'
 import Helmert from './shared/helmert.js'
 import Polynomial from './shared/polynomial.js'
@@ -65,8 +67,7 @@ import type {
 import type {
   TransformGcp,
   TransformationType,
-  PartialTransformOptions,
-  Transformation
+  PartialTransformOptions
 } from './shared/types.js'
 
 /**
@@ -209,7 +210,7 @@ export default class GcpTransformer {
         if (!this.forwardTransformation) {
           this.forwardTransformation = this.createForwardTransformation()
         }
-        return this.forwardTransformation.interpolate(
+        return this.forwardTransformation.evaluate(
           this.assureEqualHandedness(input)
         )
       } else if (isGeojsonPoint(input)) {
@@ -447,7 +448,7 @@ export default class GcpTransformer {
           this.backwardTransformation = this.createBackwardTransformation()
         }
         return this.assureEqualHandedness(
-          this.backwardTransformation.interpolate(input)
+          this.backwardTransformation.evaluate(input)
         )
       } else if (isGeojsonPoint(input)) {
         return this.transformBackward(convertGeojsonPointToPoint(input))

@@ -1,31 +1,15 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import type { Transformation } from './types'
+import Transformation from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class Projective implements Transformation {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-
+export default class Projective extends Transformation {
   projectiveParametersMatrix: Matrix
   projectiveParameters: number[][]
 
-  pointCount: number
-
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
-
-    this.pointCount = this.sourcePoints.length
-
-    if (this.pointCount < 4) {
-      throw new Error(
-        'Not enough control points. A projective transformation requires a minimum of 4 points, but ' +
-          this.pointCount +
-          ' are given.'
-      )
-    }
+    super(sourcePoints, destinationPoints, 'projective', 4)
 
     // 2D projective (= perspective) transformation
     // See https://citeseerx.ist.psu.edu/doc/10.1.1.186.4411 for more information
@@ -85,28 +69,89 @@ export default class Projective implements Transformation {
     this.projectiveParameters = this.projectiveParametersMatrix.to2DArray()
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolate(newSourcePoint: Point): Point {
+  // Evaluate the transformation function at a new point
+  evaluateFunction(newSourcePoint: Point): Point {
     if (!this.projectiveParameters) {
       throw new Error('projective parameters not computed')
     }
 
-    // Compute the interpolated value by applying the coefficients to the input point
+    // Apply the coefficients to the input point
     const c =
       this.projectiveParameters[0][2] * newSourcePoint[0] +
       this.projectiveParameters[1][2] * newSourcePoint[1] +
       this.projectiveParameters[2][2]
-    const newDestinationPoint: Point = [
-      (this.projectiveParameters[0][0] * newSourcePoint[0] +
-        this.projectiveParameters[1][0] * newSourcePoint[1] +
-        this.projectiveParameters[2][0]) /
-        c,
-      (this.projectiveParameters[0][1] * newSourcePoint[0] +
-        this.projectiveParameters[1][1] * newSourcePoint[1] +
-        this.projectiveParameters[2][1]) /
-        c
-    ]
+    const num1 =
+      this.projectiveParameters[0][0] * newSourcePoint[0] +
+      this.projectiveParameters[1][0] * newSourcePoint[1] +
+      this.projectiveParameters[2][0]
+    const num2 =
+      this.projectiveParameters[0][1] * newSourcePoint[0] +
+      this.projectiveParameters[1][1] * newSourcePoint[1] +
+      this.projectiveParameters[2][1]
+    const newDestinationPoint: Point = [num1 / c, num2 / c]
 
     return newDestinationPoint
+  }
+
+  // Evaluate the transformation function's partial derivative to x at a new point
+  evaluatePartDerX(newSourcePoint: Point): Point {
+    if (!this.projectiveParameters) {
+      throw new Error('projective parameters not computed')
+    }
+
+    // Apply the coefficients to the input point
+    const c =
+      this.projectiveParameters[0][2] * newSourcePoint[0] +
+      this.projectiveParameters[1][2] * newSourcePoint[1] +
+      this.projectiveParameters[2][2]
+    const num1 =
+      this.projectiveParameters[0][0] * newSourcePoint[0] +
+      this.projectiveParameters[1][0] * newSourcePoint[1] +
+      this.projectiveParameters[2][0]
+    const num2 =
+      this.projectiveParameters[0][1] * newSourcePoint[0] +
+      this.projectiveParameters[1][1] * newSourcePoint[1] +
+      this.projectiveParameters[2][1]
+    const newDestinationPointPartDerX: Point = [
+      (c * this.projectiveParameters[0][0] -
+        this.projectiveParameters[0][2] * num1) /
+        c ** 2,
+      (c * this.projectiveParameters[0][1] -
+        this.projectiveParameters[0][2] * num2) /
+        c ** 2
+    ]
+
+    return newDestinationPointPartDerX
+  }
+
+  // Evaluate the transformation function's partial derivative to y at a new point
+  evaluatePartDerY(newSourcePoint: Point): Point {
+    if (!this.projectiveParameters) {
+      throw new Error('projective parameters not computed')
+    }
+
+    // Apply the coefficients to the input point
+    const c =
+      this.projectiveParameters[0][2] * newSourcePoint[0] +
+      this.projectiveParameters[1][2] * newSourcePoint[1] +
+      this.projectiveParameters[2][2]
+    const num1 =
+      this.projectiveParameters[0][0] * newSourcePoint[0] +
+      this.projectiveParameters[1][0] * newSourcePoint[1] +
+      this.projectiveParameters[2][0]
+    const num2 =
+      this.projectiveParameters[0][1] * newSourcePoint[0] +
+      this.projectiveParameters[1][1] * newSourcePoint[1] +
+      this.projectiveParameters[2][1]
+    const newDestinationPointPartDerY: Point = [
+      (c * this.projectiveParameters[1][0] -
+        this.projectiveParameters[1][2] * num1) /
+        c ** 2,
+      (c * this.projectiveParameters[1][1] -
+        this.projectiveParameters[1][2] * num2) /
+        c ** 2
+    ]
+
+    return newDestinationPointPartDerY
   }
 }

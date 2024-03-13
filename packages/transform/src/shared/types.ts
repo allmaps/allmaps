@@ -36,15 +36,15 @@ export type TransformOptions = {
 
 export type PartialTransformOptions = Partial<TransformOptions>
 
-export type KernelFunction = (r: number, epsilon?: number) => number
-export type NormFunction = (point1: Point, point2: Point) => number
+export type KernelFunction = (
+  r: number,
+  options: KernelFunctionOptions
+) => number
+export type KernelFunctionOptions = { der?: number; epsilon?: number }
+export type NormFunction = (point0: Point, point1: Point) => number
 
-export type Transformation = {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-  options?: PartialTransformOptions
-
-  pointCount: number
-
-  interpolate(point: Point): Point
+// Specifying a partial derivative of a 2D function: how many times are the first or second argument derived?
+export type PartDer2D = {
+  x: number
+  y: number
 }
