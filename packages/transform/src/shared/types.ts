@@ -43,8 +43,11 @@ export type KernelFunction = (
 export type KernelFunctionOptions = { der?: number; epsilon?: number }
 export type NormFunction = (point0: Point, point1: Point) => number
 
-// Specifying a partial derivative of a 2D function: how many times are the first or second argument derived?
-export type PartDer2D = {
-  x: number
-  y: number
-}
+export type EvaluationType =
+  | 'function'
+  | 'parDerX'
+  | 'parDerY'
+  | 'log2sigma'
+  | 'twoOmega'
+  | 'airyKavr'
+  | 'signDetJ'
