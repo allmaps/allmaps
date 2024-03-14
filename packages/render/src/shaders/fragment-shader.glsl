@@ -33,7 +33,25 @@ vec4 rgbToVec4(int r, int g, int b) {
 
 void main() {
   // Colors
-  vec4 green = rgbToVec4(134,239,172);
+  vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);
+
+  vec4 colorGreen300 = vec4(0.5254, 0.9372, 0.6745, 1.0);
+  vec4 colorPurple300 = vec4(0.8470, 0.7058, 0.9960, 1.0);
+  vec4 colorRed300 = vec4(0.9882, 0.6470, 0.6470, 1.0);
+  vec4 colorYellow300 = vec4(0.9921, 0.8784, 0.2784, 1.0);
+  vec4 colorOrange300 = vec4(0.9921, 0.7294, 0.4549, 1.0);
+  vec4 colorPink300 = vec4(0.9764, 0.6588, 0.8313, 1.0);
+  vec4 colorBlue300 = vec4(0.5764, 0.7725, 0.9921, 1.0);
+  vec4 colorGrey300 = vec4(0.8196, 0.8352, 0.8588, 1.0);
+
+  vec4 colorGreen500 = vec4(0.1333, 0.7725, 0.3686, 1.0);
+  vec4 colorPurple500 = vec4(0.6588, 0.3333, 0.9686, 1.0);
+  vec4 colorRed500 = vec4(0.9372, 0.2666, 0.2666, 1.0);
+  vec4 colorYellow500 = vec4(0.9176, 0.7019, 0.0313, 1.0);
+  vec4 colorOrange500 = vec4(0.9764, 0.4509, 0.0862, 1.0);
+  vec4 colorPink500 = vec4(0.9254, 0.2823, 0.6, 1.0);
+  vec4 colorBlue500 = vec4(0.2313, 0.5098, 0.9647, 1.0);
+  vec4 colorGrey500 = vec4(0.4196, 0.4470, 0.5019, 1.0);
 
   // The treated triangle point
   int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
@@ -128,13 +146,16 @@ void main() {
     // Opacity
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
-    // Debugging: uncomment to override color of the treated point with a color made from the point's triangle index
-    // vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
-    // color = debugColor;
+    // Triangles
+    // TODO: make this a rendering option
+    if(false) {
+      color = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    }
 
-    // Distortion test
-    // vec4 distortionColor = mix(vec4(green.rgb, 0), green, v_distortion);
-    vec4 distortionColor = mix(green, green, v_distortion);
-    color = distortionColor;
+    // Distortion
+    // TODO: make this a rendering option
+    if (false) {
+      color = mix(vec4(colorGreen300.rgb, 0.0), colorGreen300, v_distortion-floor(v_distortion));
+    }
   }
 }
