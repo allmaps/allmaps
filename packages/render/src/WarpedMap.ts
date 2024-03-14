@@ -165,7 +165,7 @@ export default class WarpedMap extends EventTarget {
     Map<TransformationType, Point[]>
   > = new Map()
 
-  trianglePointDistortions: number[] = []
+  trianglePointsDistortion: number[] = []
 
   /**
    * Creates an instance of WarpedMap.
@@ -460,14 +460,14 @@ export default class WarpedMap extends EventTarget {
       this.projectedGeoTrianglePoints = this.projectedGeoNewTrianglePoints
     }
 
-    this.trianglePointDistortions = this.resourceTrianglePoints.map(
+    this.trianglePointsDistortion = this.resourceTrianglePoints.map(
       (point) =>
         this.projectedTransformer.transformToGeo(point, {
           evaluationType: 'twoOmega'
         })[0]
     )
 
-    console.log(this.trianglePointDistortions)
+    // console.log(this.trianglePointsDistortion)
   }
 
   /**

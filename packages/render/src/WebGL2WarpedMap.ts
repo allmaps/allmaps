@@ -139,7 +139,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.gl.bindVertexArray(this.vao)
 
     const resourceTrianglePoints = this.warpedMap.resourceTrianglePoints
-
+    console.log(resourceTrianglePoints)
     createBuffer(
       this.gl,
       this.program,
@@ -179,11 +179,10 @@ export default class WebGL2WarpedMap extends EventTarget {
       'a_clipNewTrianglePoint'
     )
 
-    // For debugging purposes, a triangle index is passed.
     let trianglePointsTriangleIndex = new Float32Array(
       this.warpedMap.resourceTrianglePoints.length
     )
-    trianglePointsTriangleIndex = trianglePointsTriangleIndex.map((v, i) => {
+    trianglePointsTriangleIndex = trianglePointsTriangleIndex.map((_v, i) => {
       return Math.round((i - 1) / 3)
     })
     createBuffer(
@@ -194,12 +193,11 @@ export default class WebGL2WarpedMap extends EventTarget {
       'a_triangleIndex'
     )
 
-    const trianglePointDistortions = this.warpedMap.trianglePointDistortions
-
+    const trianglePointsDistortion = this.warpedMap.trianglePointsDistortion
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(trianglePointDistortions),
+      new Float32Array(trianglePointsDistortion),
       1,
       'a_distortion'
     )

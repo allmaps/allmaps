@@ -34,6 +34,7 @@ vec4 rgbToVec4(int r, int g, int b) {
 void main() {
   // Colors
   vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 colorBlack = vec4(0.0, 0.0, 0.0, 1.0);
 
   vec4 colorGreen300 = vec4(0.5254, 0.9372, 0.6745, 1.0);
   vec4 colorPurple300 = vec4(0.8470, 0.7058, 0.9960, 1.0);
@@ -150,6 +151,16 @@ void main() {
     // TODO: make this a rendering option
     if(false) {
       color = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    }
+
+    // Grid
+    // TODO: make this a rendering option
+    if(true) {
+      float gridSize = 20.0 * float(u_bestScaleFactor);
+      float gridWidth = 2.0 * float(u_bestScaleFactor);
+      if(mod(float(resourceTrianglePointX)+gridWidth/2.0, gridSize) < gridWidth ||  mod(float(resourceTrianglePointY)+gridWidth/2.0, gridSize) < gridWidth) {
+        color = colorBlack;
+      }
     }
 
     // Distortion
