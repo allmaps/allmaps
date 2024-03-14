@@ -25,6 +25,7 @@ import type {
   GeojsonPolygon
 } from '@allmaps/types'
 import type {
+  Helmert,
   TransformationType,
   PartialTransformOptions
 } from '@allmaps/transform'
@@ -34,11 +35,6 @@ import type Viewport from './Viewport.js'
 // TODO: Consider making this tunable by the user.
 const DIAMETER_FRACTION = 80
 const TRANSFORMER_OPTIONS = {
-  maxOffsetRatio: 0.05,
-  maxDepth: 2,
-  differentHandedness: true
-} as PartialTransformOptions
-const PROJECTED_TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
   differentHandedness: true
@@ -70,6 +66,8 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
+ * @param {GcpTransformer} helmertTransformer - Helmert Transformer used for reference scaling (resource to geo)
+ * @param {GcpTransformer} projectedHelmertTransformer - Projected Helmert Transformer used reference scaling (resource to projectedGeo)
  * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
  * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
@@ -118,6 +116,8 @@ export default class WarpedMap extends EventTarget {
   transformationType: TransformationType
   transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
+  helmertTransformer!: GcpTransformer
+  projectedHelmertTransformer!: GcpTransformer
   private transformerByTransformationType: Map<
     TransformationType,
     GcpTransformer
@@ -467,7 +467,7 @@ export default class WarpedMap extends EventTarget {
         })[0]
     )
 
-    // console.log(this.trianglePointsDistortion)
+    console.log(this.trianglePointsDistortion)
   }
 
   /**
@@ -532,6 +532,8 @@ export default class WarpedMap extends EventTarget {
   private updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
+    this.updateHelmertTransformer(useCache)
+    this.updateProjectedHelmertTransformer(useCache)
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
@@ -540,47 +542,67 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateTransformer(useCache = true): void {
-    if (
-      this.transformerByTransformationType.has(this.transformationType) &&
+    this.transformer = this.updateTransformerInternal(
+      this.gcps,
+      this.transformationType,
+      this.transformerByTransformationType,
       useCache
-    ) {
-      this.transformer = this.transformerByTransformationType.get(
-        this.transformationType
-      ) as GcpTransformer
-    } else {
-      this.transformer = new GcpTransformer(
-        this.gcps,
-        this.transformationType,
-        TRANSFORMER_OPTIONS
-      )
-      this.transformerByTransformationType.set(
-        this.transformationType,
-        this.transformer
-      )
-    }
+    )
   }
 
   private updateProjectedTransformer(useCache = true): void {
-    if (
-      this.projectedTransformerByTransformationType.has(
-        this.transformationType
-      ) &&
+    this.projectedTransformer = this.updateTransformerInternal(
+      this.projectedGcps,
+      this.transformationType,
+      this.projectedTransformerByTransformationType,
       useCache
-    ) {
-      this.projectedTransformer =
-        this.projectedTransformerByTransformationType.get(
-          this.transformationType
-        ) as GcpTransformer
+    )
+  }
+
+  private updateHelmertTransformer(useCache = true): void {
+    this.helmertTransformer = this.updateTransformerInternal(
+      this.gcps,
+      'helmert',
+      this.transformerByTransformationType,
+      useCache
+    )
+    this.helmertTransformer.createForwardTransformation()
+    this.helmertTransformer.createBackwardTransformation()
+  }
+
+  private updateProjectedHelmertTransformer(useCache = true): void {
+    this.projectedHelmertTransformer = this.updateTransformerInternal(
+      this.projectedGcps,
+      'helmert',
+      this.projectedTransformerByTransformationType,
+      useCache
+    )
+    this.projectedHelmertTransformer.createForwardTransformation()
+    this.projectedHelmertTransformer.createBackwardTransformation()
+    // console.log(
+    //   'scale of forward Helmert transform',
+    //   (this.projectedHelmertTransformer.forwardTransformation as Helmert)?.scale
+    // )
+  }
+
+  private updateTransformerInternal(
+    gcps: Gcp[],
+    transformationType: TransformationType,
+    transformerByTransformationType: Map<TransformationType, GcpTransformer>,
+    useCache = true
+  ): GcpTransformer {
+    if (transformerByTransformationType.has(transformationType) && useCache) {
+      return transformerByTransformationType.get(
+        transformationType
+      ) as GcpTransformer
     } else {
-      this.projectedTransformer = new GcpTransformer(
-        this.projectedGcps,
-        this.transformationType,
-        PROJECTED_TRANSFORMER_OPTIONS
+      const transformer = new GcpTransformer(
+        gcps,
+        transformationType,
+        TRANSFORMER_OPTIONS
       )
-      this.projectedTransformerByTransformationType.set(
-        this.transformationType,
-        this.projectedTransformer
-      )
+      transformerByTransformationType.set(transformationType, transformer)
+      return transformer
     }
   }
 

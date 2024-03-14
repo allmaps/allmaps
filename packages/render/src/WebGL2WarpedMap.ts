@@ -139,7 +139,6 @@ export default class WebGL2WarpedMap extends EventTarget {
     this.gl.bindVertexArray(this.vao)
 
     const resourceTrianglePoints = this.warpedMap.resourceTrianglePoints
-    console.log(resourceTrianglePoints)
     createBuffer(
       this.gl,
       this.program,

@@ -56,7 +56,7 @@ export default abstract class Transformation {
     } else if (type == 'partialDerivativeY') {
       return this.evaluatePartialDerivativeY(newSourcePoint)
     } else if (
-      ['log2sigma', '2Omega', 'AiryKavr', 'signDetJ', 'thetaa'].includes(type)
+      ['log2sigma', 'twoOmega', 'AiryKavr', 'signDetJ', 'thetaa'].includes(type)
     ) {
       const partialDerivativeX = this.evaluatePartialDerivativeX(newSourcePoint)
       const partialDerivativeY = this.evaluatePartialDerivativeY(newSourcePoint)

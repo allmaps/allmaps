@@ -33,6 +33,7 @@ vec4 rgbToVec4(int r, int g, int b) {
 
 void main() {
   // Colors
+  vec4 colorTransparent = vec4(0.0, 0.0, 0.0, 0.0);
   vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);
   vec4 colorBlack = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -69,7 +70,7 @@ void main() {
   // Prepare storage for the resulting packed tiles texture point that corresponds to the treated triangle point
   vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
 
-  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  color = colorTransparent;
 
   bool found = false;
 
@@ -147,6 +148,14 @@ void main() {
     // Opacity
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
+    // Distortion
+    // TODO: make this a rendering option
+    if (true) {
+      // color = mix(vec4(colorGreen300.rgb, 0.0), colorGreen300, mod(v_distortion, 1.0));
+      float distortion = mod(v_distortion, 1.0);
+      color = color + distortion * vec4(colorGreen300.rgb, distortion);
+    }
+
     // Triangles
     // TODO: make this a rendering option
     if(false) {
@@ -161,12 +170,6 @@ void main() {
       if(mod(float(resourceTrianglePointX)+gridWidth/2.0, gridSize) < gridWidth ||  mod(float(resourceTrianglePointY)+gridWidth/2.0, gridSize) < gridWidth) {
         color = colorBlack;
       }
-    }
-
-    // Distortion
-    // TODO: make this a rendering option
-    if (false) {
-      color = mix(vec4(colorGreen300.rgb, 0.0), colorGreen300, v_distortion-floor(v_distortion));
     }
   }
 }

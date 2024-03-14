@@ -116,50 +116,24 @@ export default class GcpTransformer {
     this.type = type
   }
 
-  private assureEqualHandedness(point: Point): Point {
-    return this.options?.differentHandedness ? flipY(point) : point
-  }
-
-  private createForwardTransformation(): Transformation {
-    return this.createTransformation(
+  /**
+   * Create forward transformation
+   */
+  createForwardTransformation(): void {
+    this.forwardTransformation = this.computeTransformation(
       this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
       this.destinationPoints
     )
   }
 
-  private createBackwardTransformation(): Transformation {
-    return this.createTransformation(
+  /**
+   * Create backward transformation
+   */
+  createBackwardTransformation(): void {
+    this.backwardTransformation = this.computeTransformation(
       this.destinationPoints,
       this.sourcePoints.map((point) => this.assureEqualHandedness(point))
     )
-  }
-
-  private createTransformation(
-    sourcePoints: Point[],
-    destinationPoints: Point[]
-  ): Transformation {
-    if (this.type === 'straight') {
-      return new Straight(sourcePoints, destinationPoints)
-    } else if (this.type === 'helmert') {
-      return new Helmert(sourcePoints, destinationPoints)
-    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(sourcePoints, destinationPoints)
-    } else if (this.type === 'polynomial2') {
-      return new Polynomial(sourcePoints, destinationPoints, 2)
-    } else if (this.type === 'polynomial3') {
-      return new Polynomial(sourcePoints, destinationPoints, 3)
-    } else if (this.type === 'projective') {
-      return new Projective(sourcePoints, destinationPoints)
-    } else if (this.type === 'thinPlateSpline') {
-      return new RBF(
-        sourcePoints,
-        destinationPoints,
-        thinPlateKernel,
-        euclideanNorm
-      )
-    } else {
-      throw new Error(`Unsupported transformation type: ${this.type}`)
-    }
   }
 
   // Base functions
@@ -208,9 +182,9 @@ export default class GcpTransformer {
     if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
       if (isPoint(input)) {
         if (!this.forwardTransformation) {
-          this.forwardTransformation = this.createForwardTransformation()
+          this.createForwardTransformation()
         }
-        return this.forwardTransformation.evaluate(
+        return this.forwardTransformation!.evaluate(
           this.assureEqualHandedness(input),
           mergeOptions(options, this.options).evaluationType
         )
@@ -446,10 +420,10 @@ export default class GcpTransformer {
     if (!mergeOptions(options, this.options).inputIsMultiGeometry) {
       if (isPoint(input)) {
         if (!this.backwardTransformation) {
-          this.backwardTransformation = this.createBackwardTransformation()
+          this.createBackwardTransformation()
         }
         return this.assureEqualHandedness(
-          this.backwardTransformation.evaluate(input)
+          this.backwardTransformation!.evaluate(input)
         )
       } else if (isGeojsonPoint(input)) {
         return this.transformBackward(convertGeojsonPointToPoint(input))
@@ -1041,6 +1015,38 @@ export default class GcpTransformer {
       }
     } else {
       throw new Error(`Unsupported GeoJSON geometry`)
+    }
+  }
+
+  private assureEqualHandedness(point: Point): Point {
+    return this.options?.differentHandedness ? flipY(point) : point
+  }
+
+  private computeTransformation(
+    sourcePoints: Point[],
+    destinationPoints: Point[]
+  ): Transformation {
+    if (this.type === 'straight') {
+      return new Straight(sourcePoints, destinationPoints)
+    } else if (this.type === 'helmert') {
+      return new Helmert(sourcePoints, destinationPoints)
+    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
+      return new Polynomial(sourcePoints, destinationPoints)
+    } else if (this.type === 'polynomial2') {
+      return new Polynomial(sourcePoints, destinationPoints, 2)
+    } else if (this.type === 'polynomial3') {
+      return new Polynomial(sourcePoints, destinationPoints, 3)
+    } else if (this.type === 'projective') {
+      return new Projective(sourcePoints, destinationPoints)
+    } else if (this.type === 'thinPlateSpline') {
+      return new RBF(
+        sourcePoints,
+        destinationPoints,
+        thinPlateKernel,
+        euclideanNorm
+      )
+    } else {
+      throw new Error(`Unsupported transformation type: ${this.type}`)
     }
   }
 }

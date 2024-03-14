@@ -31,7 +31,8 @@ export function mergeOptions(
     destinationIsGeographic: false,
     sourceIsGeographic: false,
     inputIsMultiGeometry: false,
-    differentHandedness: false
+    differentHandedness: false,
+    evaluationType: 'function'
   }
 
   return {
