@@ -1,5 +1,13 @@
 import { throttle } from 'lodash-es'
 
+import {
+  distance,
+  maxOfNumberOrUndefined,
+  bboxToDiameter,
+  bboxToCenter
+} from '@allmaps/stdlib'
+import { supportedDistortionMeasures } from '@allmaps/transform'
+
 import TileCache from './TileCache.js'
 import FetchableMapTile from './FetchableTile.js'
 import WarpedMapList from './WarpedMapList.js'
@@ -26,13 +34,6 @@ import { createShader, createProgram } from './shared/webgl2.js'
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
 import spectral from './shaders/spectral.glsl?raw'
-
-import {
-  distance,
-  maxOfNumberOrUndefined,
-  bboxToDiameter,
-  bboxToCenter
-} from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -793,6 +794,38 @@ export default class WebGL2Renderer extends EventTarget {
       gl.uniform1f(
         saturationLocation,
         this.saturation * webgl2WarpedMap.saturation
+      )
+
+      // Distortion
+
+      const distortionLocation = gl.getUniformLocation(
+        this.program,
+        'u_distortion'
+      )
+      gl.uniform1f(
+        distortionLocation,
+        webgl2WarpedMap.warpedMap.distortionMeasure ? 1 : 0
+      )
+
+      console.log(
+        webgl2WarpedMap.warpedMap.distortionMeasure
+          ? supportedDistortionMeasures.indexOf(
+              webgl2WarpedMap.warpedMap.distortionMeasure
+            )
+          : 0
+      )
+
+      const distortionOptionsDistortionMeasureLocation = gl.getUniformLocation(
+        this.program,
+        'u_distortionOptionsdistortionMeasure'
+      )
+      gl.uniform1i(
+        distortionOptionsDistortionMeasureLocation,
+        webgl2WarpedMap.warpedMap.distortionMeasure
+          ? supportedDistortionMeasures.indexOf(
+              webgl2WarpedMap.warpedMap.distortionMeasure
+            )
+          : 0
       )
 
       // Best scale factor

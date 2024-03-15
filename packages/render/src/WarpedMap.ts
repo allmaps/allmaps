@@ -3,6 +3,7 @@ import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import { triangulate } from '@allmaps/triangulate'
+import { computeDistortionFromPartialDerivatives } from '@allmaps/transform'
 import {
   computeBbox,
   bboxToRectangle,
@@ -10,7 +11,9 @@ import {
   geometryToDiameter,
   fetchImageInfo,
   lonLatToWebMecator,
-  mixPoints
+  mixPoints,
+  getPropertyFromCacheOrComputation,
+  getPropertyFromDoubleCacheOrComputation
 } from '@allmaps/stdlib'
 
 import { applyTransform } from './shared/matrix.js'
@@ -27,7 +30,8 @@ import type {
 import type {
   Helmert,
   TransformationType,
-  PartialTransformOptions
+  PartialTransformOptions,
+  DistortionMeasure
 } from '@allmaps/transform'
 
 import type Viewport from './Viewport.js'
@@ -82,15 +86,17 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Ring} projectedGeoFullMask - resourceFullMask in projectedGeo coordinates
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
- * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates.
+ * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates
+ * @param {DistortionMeasure | undefined} distortionMeasure - Distortion measure displayed for this map
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
  * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
+ * @param {number} triangulateErrorCount - Number of time the triangulation has resulted in an error
  * @param {Point[]} projectedGeoTrianglePoints - Current points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
  * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
- * @private {Map<number, Map<number, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
+ * @private {Map<number, Map<TransformationType, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -143,7 +149,7 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  triangulateErrorCount = 0
+  distortionMeasure: DistortionMeasure | undefined = undefined
 
   // The properties below are for the current viewport
 
@@ -157,10 +163,24 @@ export default class WarpedMap extends EventTarget {
   resourceTrianglePoints: Point[] = []
   private resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> =
     new Map()
+  triangulateErrorCount = 0
 
   projectedGeoTrianglePoints: Point[] = []
   projectedGeoNewTrianglePoints: Point[] = []
   private projectedGeoTrianglePointsByBestScaleFactorAndTransformationType: Map<
+    number,
+    Map<TransformationType, Point[]>
+  > = new Map()
+
+  projectedGeoTrianglePointsPartialDerivativeX: Point[] = []
+  projectedGeoTrianglePointsPartialDerivativeY: Point[] = []
+  projectedGeoNewTrianglePointsPartialDerivativeX: Point[] = []
+  projectedGeoNewTrianglePointsPartialDerivativeY: Point[] = []
+  private projectedGeoTrianglePointsPartialDerivativeXByBestScaleFactorAndTransformationType: Map<
+    number,
+    Map<TransformationType, Point[]>
+  > = new Map()
+  private projectedGeoTrianglePointsPartialDerivativeYByBestScaleFactorAndTransformationType: Map<
     number,
     Map<TransformationType, Point[]>
   > = new Map()
@@ -423,51 +443,80 @@ export default class WarpedMap extends EventTarget {
 
   /**
    * Update the (current and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
+   * Also updates the partial derivatives and distortion at every point
    *
    * @param {boolean} [currentIsNew=false]
    */
   updateProjectedGeoTrianglePoints(currentIsNew = false) {
-    if (
-      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-        .get(this.bestScaleFactor)
-        ?.has(this.transformationType)
-    ) {
-      this.projectedGeoNewTrianglePoints =
-        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-          .get(this.bestScaleFactor)
-          ?.get(this.transformationType) as Point[]
-    } else {
-      this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-        (point) => this.projectedTransformer.transformToGeo(point)
+    // projectedGeoTrianglePoints
+
+    this.projectedGeoNewTrianglePoints =
+      getPropertyFromDoubleCacheOrComputation(
+        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType,
+        this.bestScaleFactor,
+        this.transformationType,
+        () =>
+          this.resourceTrianglePoints.map((point) =>
+            this.projectedTransformer.transformToGeo(point)
+          )
       )
-
-      if (
-        !this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.get(
-          this.bestScaleFactor
-        )
-      ) {
-        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.set(
-          this.bestScaleFactor,
-          new Map()
-        )
-      }
-      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-        .get(this.bestScaleFactor)
-        ?.set(this.transformationType, this.projectedGeoNewTrianglePoints)
-    }
-
     if (currentIsNew || !this.projectedGeoTrianglePoints.length) {
       this.projectedGeoTrianglePoints = this.projectedGeoNewTrianglePoints
     }
 
-    this.trianglePointsDistortion = this.resourceTrianglePoints.map(
-      (point) =>
-        this.projectedTransformer.transformToGeo(point, {
-          evaluationType: 'twoOmega'
-        })[0]
-    )
+    // Partial Derivatives
+    this.projectedGeoNewTrianglePointsPartialDerivativeX =
+      getPropertyFromDoubleCacheOrComputation(
+        this
+          .projectedGeoTrianglePointsPartialDerivativeXByBestScaleFactorAndTransformationType,
+        this.bestScaleFactor,
+        this.transformationType,
+        () =>
+          this.resourceTrianglePoints.map((point) =>
+            this.projectedTransformer.transformToGeo(point, {
+              evaluationType: 'partialDerivativeX'
+            })
+          )
+      )
+    if (
+      currentIsNew ||
+      !this.projectedGeoTrianglePointsPartialDerivativeX.length
+    ) {
+      this.projectedGeoTrianglePointsPartialDerivativeX =
+        this.projectedGeoNewTrianglePointsPartialDerivativeX
+    }
 
-    console.log(this.trianglePointsDistortion)
+    this.projectedGeoNewTrianglePointsPartialDerivativeY =
+      getPropertyFromDoubleCacheOrComputation(
+        this
+          .projectedGeoTrianglePointsPartialDerivativeYByBestScaleFactorAndTransformationType,
+        this.bestScaleFactor,
+        this.transformationType,
+        () =>
+          this.resourceTrianglePoints.map((point) =>
+            this.projectedTransformer.transformToGeo(point, {
+              evaluationType: 'partialDerivativeY'
+            })
+          )
+      )
+
+    if (
+      currentIsNew ||
+      !this.projectedGeoTrianglePointsPartialDerivativeY.length
+    ) {
+      this.projectedGeoTrianglePointsPartialDerivativeY =
+        this.projectedGeoNewTrianglePointsPartialDerivativeY
+    }
+
+    // Distortion
+    this.trianglePointsDistortion = this.projectedGeoTrianglePoints.map(
+      (_point, index) =>
+        computeDistortionFromPartialDerivatives(
+          this.projectedGeoTrianglePointsPartialDerivativeX[index],
+          this.projectedGeoTrianglePointsPartialDerivativeY[index],
+          this.distortionMeasure
+        )
+    )
   }
 
   /**
@@ -542,38 +591,49 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateTransformer(useCache = true): void {
-    this.transformer = this.updateTransformerInternal(
-      this.gcps,
-      this.transformationType,
+    this.transformer = getPropertyFromCacheOrComputation(
       this.transformerByTransformationType,
+      this.transformationType,
+      () =>
+        new GcpTransformer(
+          this.gcps,
+          this.transformationType,
+          TRANSFORMER_OPTIONS
+        ),
       useCache
     )
   }
 
   private updateProjectedTransformer(useCache = true): void {
-    this.projectedTransformer = this.updateTransformerInternal(
-      this.projectedGcps,
-      this.transformationType,
+    this.projectedTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
+      this.transformationType,
+      () =>
+        new GcpTransformer(
+          this.projectedGcps,
+          this.transformationType,
+          TRANSFORMER_OPTIONS
+        ),
       useCache
     )
   }
 
   private updateHelmertTransformer(useCache = true): void {
-    this.helmertTransformer = this.updateTransformerInternal(
-      this.gcps,
-      'helmert',
+    this.helmertTransformer = getPropertyFromCacheOrComputation(
       this.transformerByTransformationType,
+      'helmert',
+      () => new GcpTransformer(this.gcps, 'helmert', TRANSFORMER_OPTIONS),
       useCache
     )
     this.helmertTransformer.createForwardTransformation()
   }
 
   private updateProjectedHelmertTransformer(useCache = true): void {
-    this.projectedHelmertTransformer = this.updateTransformerInternal(
-      this.projectedGcps,
-      'helmert',
+    this.projectedHelmertTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
+      'helmert',
+      () =>
+        new GcpTransformer(this.projectedGcps, 'helmert', TRANSFORMER_OPTIONS),
       useCache
     )
     this.projectedHelmertTransformer.createForwardTransformation()
@@ -581,27 +641,6 @@ export default class WarpedMap extends EventTarget {
       'scale of forward Helmert transform',
       (this.projectedHelmertTransformer.forwardTransformation as Helmert)?.scale
     )
-  }
-
-  private updateTransformerInternal(
-    gcps: Gcp[],
-    transformationType: TransformationType,
-    transformerByTransformationType: Map<TransformationType, GcpTransformer>,
-    useCache = true
-  ): GcpTransformer {
-    if (transformerByTransformationType.has(transformationType) && useCache) {
-      return transformerByTransformationType.get(
-        transformationType
-      ) as GcpTransformer
-    } else {
-      const transformer = new GcpTransformer(
-        gcps,
-        transformationType,
-        TRANSFORMER_OPTIONS
-      )
-      transformerByTransformationType.set(transformationType, transformer)
-      return transformer
-    }
   }
 
   private updateGeoMask(): void {

@@ -48,7 +48,6 @@ export type EvaluationType =
   | 'function'
   | 'partialDerivativeX'
   | 'partialDerivativeY'
-  | DistortionMeasure
 
 export type DistortionMeasure =
   | 'log2sigma'

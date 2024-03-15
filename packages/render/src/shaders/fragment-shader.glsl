@@ -18,6 +18,9 @@ uniform vec3 u_colorizeOptionsColor;
 uniform float u_opacity;
 uniform float u_saturation;
 
+uniform bool u_distortion;
+uniform int u_distortionOptionsdistortionMeasure;
+
 uniform int u_bestScaleFactor;
 
 uniform sampler2D u_packedTilesTexture;
@@ -154,9 +157,7 @@ void main() {
 
     // Distortion
     // TODO: make this a rendering option
-    if (true) {
-      // color = mix(vec4(colorGreen300.rgb, 0.0), colorGreen300, mod(v_distortion, 1.0));
-      // color = color + vec4(colorGreen300.rgb, v_distortion);
+    if (u_distortion) {
       color = spectral_mix(color, colorGreen300, v_distortion);
     }
 
