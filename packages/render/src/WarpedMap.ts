@@ -567,7 +567,6 @@ export default class WarpedMap extends EventTarget {
       useCache
     )
     this.helmertTransformer.createForwardTransformation()
-    this.helmertTransformer.createBackwardTransformation()
   }
 
   private updateProjectedHelmertTransformer(useCache = true): void {
@@ -578,11 +577,10 @@ export default class WarpedMap extends EventTarget {
       useCache
     )
     this.projectedHelmertTransformer.createForwardTransformation()
-    this.projectedHelmertTransformer.createBackwardTransformation()
-    // console.log(
-    //   'scale of forward Helmert transform',
-    //   (this.projectedHelmertTransformer.forwardTransformation as Helmert)?.scale
-    // )
+    console.log(
+      'scale of forward Helmert transform',
+      (this.projectedHelmertTransformer.forwardTransformation as Helmert)?.scale
+    )
   }
 
   private updateTransformerInternal(

@@ -25,6 +25,7 @@ import { createShader, createProgram } from './shared/webgl2.js'
 
 import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
+import spectral from './shaders/spectral.glsl?raw'
 
 import {
   distance,
@@ -126,7 +127,7 @@ export default class WebGL2Renderer extends EventTarget {
     const fragmentShader = createShader(
       gl,
       gl.FRAGMENT_SHADER,
-      fragmentShaderSource
+      fragmentShaderSource.replace('#include "spectral.glsl"', spectral)
     )
 
     this.program = createProgram(gl, vertexShader, fragmentShader)

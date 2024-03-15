@@ -3,6 +3,10 @@
 precision highp float;
 precision highp isampler2D;
 
+// Color mixing from Spectral.js
+#include "spectral.glsl"
+// End of color mixing from Spectral.js
+
 uniform bool u_removeColor;
 uniform vec3 u_removeColorOptionsColor;
 uniform float u_removeColorOptionsThreshold;
@@ -70,8 +74,8 @@ void main() {
   // Prepare storage for the resulting packed tiles texture point that corresponds to the treated triangle point
   vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
 
+  // Set the initial values
   color = colorTransparent;
-
   bool found = false;
 
   // Loop through all packed tiles
@@ -152,8 +156,8 @@ void main() {
     // TODO: make this a rendering option
     if (true) {
       // color = mix(vec4(colorGreen300.rgb, 0.0), colorGreen300, mod(v_distortion, 1.0));
-      float distortion = mod(v_distortion, 1.0);
-      color = color + distortion * vec4(colorGreen300.rgb, distortion);
+      // color = color + vec4(colorGreen300.rgb, v_distortion);
+      color = spectral_mix(color, colorGreen300, v_distortion);
     }
 
     // Triangles
