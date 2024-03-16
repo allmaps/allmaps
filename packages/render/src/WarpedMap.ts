@@ -445,13 +445,10 @@ export default class WarpedMap extends EventTarget {
 
   /**
    * Update the (previous and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
-   * Also updates the partial derivatives and distortion at every point
    *
    * @param {boolean} [previousIsNew=false]
    */
   updateProjectedGeoTrianglePoints(previousIsNew = false) {
-    // projectedGeoTrianglePoints
-
     this.projectedGeoTrianglePoints = getPropertyFromDoubleCacheOrComputation(
       this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType,
       this.bestScaleFactor,
@@ -465,7 +462,18 @@ export default class WarpedMap extends EventTarget {
       this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
     }
 
-    // Partial Derivatives
+    this.updateTrianglePointsDistortion(previousIsNew)
+  }
+
+  /**
+   * Update the (previous and new) distortion at the points of the triangulated resourceMask. Use cache if available.
+   *
+   * @param {boolean} [previousIsNew=false]
+   */
+  updateTrianglePointsDistortion(previousIsNew = false) {
+    if (!this.distortionMeasure) {
+      return
+    }
 
     this.projectedGeoTrianglePointsPartialDerivativeX =
       getPropertyFromDoubleCacheOrComputation(
@@ -510,9 +518,7 @@ export default class WarpedMap extends EventTarget {
         this.projectedGeoTrianglePointsPartialDerivativeY
     }
 
-    // Distortion
-
-    this.trianglePointsDistortion = this.projectedGeoPreviousTrianglePoints.map(
+    this.trianglePointsDistortion = this.projectedGeoTrianglePoints.map(
       (_point, index) =>
         computeDistortionFromPartialDerivatives(
           this.projectedGeoTrianglePointsPartialDerivativeX[index],
@@ -523,11 +529,6 @@ export default class WarpedMap extends EventTarget {
     if (previousIsNew || !this.previousTrianglePointsDistortion.length) {
       this.previousTrianglePointsDistortion = this.trianglePointsDistortion
     }
-
-    console.log(
-      this.previousTrianglePointsDistortion.slice(0, 5),
-      this.trianglePointsDistortion.slice(0, 5)
-    )
   }
 
   /**

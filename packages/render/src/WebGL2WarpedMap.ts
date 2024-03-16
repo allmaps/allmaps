@@ -184,24 +184,26 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     // Previous and New Distortion
 
-    const previousTrianglePointsDistortion =
-      this.warpedMap.previousTrianglePointsDistortion
-    createBuffer(
-      this.gl,
-      this.program,
-      new Float32Array(previousTrianglePointsDistortion),
-      1,
-      'a_previousTrianglePointDistortion'
-    )
+    if (this.warpedMap.distortionMeasure) {
+      const previousTrianglePointsDistortion =
+        this.warpedMap.previousTrianglePointsDistortion
+      createBuffer(
+        this.gl,
+        this.program,
+        new Float32Array(previousTrianglePointsDistortion),
+        1,
+        'a_previousTrianglePointDistortion'
+      )
 
-    const trianglePointsDistortion = this.warpedMap.trianglePointsDistortion
-    createBuffer(
-      this.gl,
-      this.program,
-      new Float32Array(trianglePointsDistortion),
-      1,
-      'a_trianglePointDistortion'
-    )
+      const trianglePointsDistortion = this.warpedMap.trianglePointsDistortion
+      createBuffer(
+        this.gl,
+        this.program,
+        new Float32Array(trianglePointsDistortion),
+        1,
+        'a_trianglePointDistortion'
+      )
+    }
 
     // Triangle index
 
