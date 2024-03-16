@@ -283,6 +283,14 @@ export function midPoint(point0: Point, point1: Point): Point {
   ]
 }
 
+export function mixNumbers(
+  number0: number,
+  number1: number,
+  t: number
+): number {
+  return number0 * t + number1 * (1 - t)
+}
+
 export function mixPoints(point0: Point, point1: Point, t: number): Point {
   return [
     point0[0] * t + point1[0] * (1 - t),

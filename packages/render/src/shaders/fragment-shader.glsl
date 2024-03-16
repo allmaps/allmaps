@@ -30,7 +30,7 @@ uniform isampler2D u_packedTilesScaleFactorsTexture;
 
 in vec2 v_resourceTrianglePoint;
 in float v_triangleIndex;
-in float v_distortion;
+in float v_trianglePointDistortion;
 
 out vec4 color;
 
@@ -158,7 +158,7 @@ void main() {
     // Distortion
     // TODO: make this a rendering option
     if (u_distortion) {
-      color = spectral_mix(color, colorGreen300, v_distortion);
+      color = spectral_mix(color, colorGreen300, v_trianglePointDistortion);
     }
 
     // Triangles

@@ -1043,7 +1043,7 @@ export default class WebGL2Renderer extends EventTarget {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixProjectedGeoTrianglePoints(this.animationProgress)
+          warpedMap.mixTrianglePoints(this.animationProgress)
         }
         warpedMap.updateProjectedGeoTrianglePoints(false)
       }
