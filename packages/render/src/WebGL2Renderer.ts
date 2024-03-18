@@ -804,15 +804,7 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1f(
         distortionLocation,
-        webgl2WarpedMap.warpedMap.distortionMeasure ? 1 : 0
-      )
-
-      console.log(
-        webgl2WarpedMap.warpedMap.distortionMeasure
-          ? supportedDistortionMeasures.indexOf(
-              webgl2WarpedMap.warpedMap.distortionMeasure
-            )
-          : 0
+        webgl2WarpedMap.warpedMap.distortion ? 1 : 0
       )
 
       const distortionOptionsDistortionMeasureLocation = gl.getUniformLocation(
@@ -821,11 +813,9 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1i(
         distortionOptionsDistortionMeasureLocation,
-        webgl2WarpedMap.warpedMap.distortionMeasure
-          ? supportedDistortionMeasures.indexOf(
-              webgl2WarpedMap.warpedMap.distortionMeasure
-            )
-          : 0
+        supportedDistortionMeasures.indexOf(
+          webgl2WarpedMap.warpedMap.distortionMeasure
+        )
       )
 
       // Best scale factor

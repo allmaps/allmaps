@@ -156,9 +156,32 @@ void main() {
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
     // Distortion
-    // TODO: make this a rendering option
+    // color = colorWhite; // Set option to not display image
+
+    float trianglePointDistortion = v_trianglePointDistortion;
+    // float trianglePointDistortion = floor(trianglePointDistortion*20.0)/20.0; // Set options to do stepwise
+
     if (u_distortion) {
-      color = spectral_mix(color, colorGreen300, v_trianglePointDistortion);
+      switch (u_distortionOptionsdistortionMeasure) {
+        case 0:
+          if (trianglePointDistortion > 0.0) {
+            color = spectral_mix(color, colorRed500, trianglePointDistortion);
+          } else {
+            color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
+          }
+          break;
+        case 1:
+          color = spectral_mix(color, colorGreen500, trianglePointDistortion);
+          break;
+        case 2:
+          color = spectral_mix(color, colorYellow500, trianglePointDistortion*4.0);
+          break;
+        case 3:
+          color = trianglePointDistortion == -1.0 ? colorRed300 : color;
+          break;
+        default:
+          color = color;
+      }
     }
 
     // Triangles

@@ -111,7 +111,7 @@ export default class Helmert extends Transformation {
 
     // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerY: Point = [
-      this.helmertParameters[3],
+      -this.helmertParameters[3],
       this.helmertParameters[2]
     ]
 

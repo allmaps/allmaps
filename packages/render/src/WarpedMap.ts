@@ -38,7 +38,7 @@ import type {
 import type Viewport from './Viewport.js'
 
 // TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 80
+const DIAMETER_FRACTION = 300
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
@@ -150,7 +150,8 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  distortionMeasure: DistortionMeasure | undefined = 'twoOmega'
+  distortion: boolean = true // set to false
+  distortionMeasure: DistortionMeasure = 'log2sigma'
 
   // The properties below are for the current viewport
 
@@ -471,7 +472,7 @@ export default class WarpedMap extends EventTarget {
    * @param {boolean} [previousIsNew=false]
    */
   updateTrianglePointsDistortion(previousIsNew = false) {
-    if (!this.distortionMeasure) {
+    if (!this.distortion) {
       return
     }
 
@@ -523,12 +524,20 @@ export default class WarpedMap extends EventTarget {
         computeDistortionFromPartialDerivatives(
           this.projectedGeoTrianglePointsPartialDerivativeX[index],
           this.projectedGeoTrianglePointsPartialDerivativeY[index],
-          this.distortionMeasure
+          this.distortionMeasure,
+          (this.projectedHelmertTransformer.forwardTransformation as Helmert)
+            .scale
         )
     )
     if (previousIsNew || !this.previousTrianglePointsDistortion.length) {
       this.previousTrianglePointsDistortion = this.trianglePointsDistortion
     }
+
+    console.log(
+      'Helmert scale',
+      (this.projectedHelmertTransformer.forwardTransformation as Helmert).scale
+    )
+    console.log(this.trianglePointsDistortion)
   }
 
   /**
@@ -662,10 +671,6 @@ export default class WarpedMap extends EventTarget {
       useCache
     )
     this.projectedHelmertTransformer.createForwardTransformation()
-    console.log(
-      'scale of forward Helmert transform',
-      (this.projectedHelmertTransformer.forwardTransformation as Helmert)?.scale
-    )
   }
 
   private updateGeoMask(): void {
