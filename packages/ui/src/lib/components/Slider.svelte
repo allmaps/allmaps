@@ -68,10 +68,9 @@
   const wheel = (event: WheelEvent) => {
     event.preventDefault()
     event.stopPropagation()
-    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
     let delta = event.deltaY / 100
-    if (isFirefox) {
-      delta = event.deltaY > 0 ? 0.05 : -0.05
+    if (Math.abs(step*3) < 1) {
+      delta = event.deltaY > 0 ? step : -1 * step
     }
     internalValue = clampValue(internalValue - delta)
   }
