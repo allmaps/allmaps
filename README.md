@@ -207,13 +207,13 @@ To use the devcontainer, you need to have Docker and Visual Studio Code installe
 
 The first time you open the devcontainer, it will take a while to build the Docker image. After that, the devcontainer will start automatically. Per default, the container will install the packages and run the init script by itself.
 
-# Exposing the container to the local network
+## Exposing the container to the local network
 If you want to expose the container to the local network (e.g. to test the Allmaps Viewer on a mobile device), you need to run the "dev" script with the `--host` option:
 ```sh
 pnpm --filter "@allmaps/viewer" run dev --host
 ``` 
 Also you need to change the Remote: Local Port Host in you VSCode settings to "allInterfaces" to expose the ports to the local network.
-```json
+```
 remote.localPortHost: "allInterfaces"
 ```
 Make sure that the basic Ssl plugin is enabled in `apps/viewer/vite.config.ts` so the crypto module is available in the browser.
