@@ -197,3 +197,23 @@ Promoting unchanged pre-release versions:
 ```sh
 lerna version --conventional-commits --conventional-graduate
 ```
+
+
+# Running Allmaps in a devcontainer
+
+You can use the devcontainer (`.devcontainer/devcontainer.json`) in this repository to run Allmaps in a Docker container. This is useful if you want to develop Allmaps on a Windows machine, or if you want to use a consistent development environment across different machines. Extensive Documentation on how to use devcontainers can be found [here](https://code.visualstudio.com/docs/devcontainers/containers). We recommend using the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension for Visual Studio Code.
+
+To use the devcontainer, you need to have Docker and Visual Studio Code installed. Then, open this repository in Visual Studio Code and click on the "Reopen in Container" button in the bottom right corner of the window. You can also directly clone the repository into a new devcontainer by selecting on the "Clone Repository in Container Volume" from the command palette. This will create a new devcontainer with the repository already cloned into it whithout the need to clone the repository first on your local machine.
+
+The first time you open the devcontainer, it will take a while to build the Docker image. After that, the devcontainer will start automatically. Per default, the container will install the packages and run the init script by itself.
+
+# Exposing the container to the local network
+If you want to expose the container to the local network (e.g. to test the Allmaps Viewer on a mobile device), you need to run the "dev" script with the `--host` option:
+```sh
+pnpm --filter "@allmaps/viewer" run dev --host
+``` 
+Also you need to change the Remote: Local Port Host in you VSCode settings to "allInterfaces" to expose the ports to the local network.
+```json
+remote.localPortHost: "allInterfaces"
+```
+Make sure that the basic Ssl plugin is enabled in `apps/viewer/vite.config.ts` so the crypto module is available in the browser.
