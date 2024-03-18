@@ -159,7 +159,7 @@ void main() {
     // color = colorWhite; // Set option to not display image
 
     float trianglePointDistortion = v_trianglePointDistortion;
-    // float trianglePointDistortion = floor(trianglePointDistortion*20.0)/20.0; // Set options to do stepwise
+    // trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // Set options to do stepwise
 
     if (u_distortion) {
       switch (u_distortionOptionsdistortionMeasure) {

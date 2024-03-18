@@ -486,7 +486,7 @@ export default class WebGL2Renderer extends EventTarget {
       )
     } else {
       for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetTrianglePoints()
+        warpedMap.resetUniquePoints()
       }
       this.updateVertexBuffers()
 
@@ -877,7 +877,8 @@ export default class WebGL2Renderer extends EventTarget {
       // Draw each map
 
       const vao = webgl2WarpedMap.vao
-      const count = webgl2WarpedMap.warpedMap.resourceTrianglePoints.length
+      const count =
+        webgl2WarpedMap.warpedMap.trianglePointsUniquePointsIndex.length
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
@@ -1033,9 +1034,9 @@ export default class WebGL2Renderer extends EventTarget {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixTrianglePoints(this.animationProgress)
+          warpedMap.mixUniquePoints(this.animationProgress)
         }
-        warpedMap.updateProjectedGeoTrianglePoints(false)
+        warpedMap.updateProjectedGeoUniquePoints(false)
       }
 
       this.updateVertexBuffers()
