@@ -71,8 +71,6 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
- * @param {GcpTransformer} helmertTransformer - Helmert Transformer used for reference scaling (resource to geo)
- * @param {GcpTransformer} projectedHelmertTransformer - Projected Helmert Transformer used reference scaling (resource to projectedGeo)
  * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
  * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
@@ -98,6 +96,7 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Point[]} projectedGeoPreviousTrianglePoints - Previous points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
  * @param {Point[]} projectedGeoTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
  * @private {Map<number, Map<TransformationType, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
+ * // TODO: add partial derivatives and distortions
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -123,8 +122,6 @@ export default class WarpedMap extends EventTarget {
   transformationType: TransformationType
   transformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
-  helmertTransformer!: GcpTransformer
-  projectedHelmertTransformer!: GcpTransformer
   private transformerByTransformationType: Map<
     TransformationType,
     GcpTransformer
@@ -333,6 +330,25 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Get the reference scaling from the forward transformation of the projected Helmert transformer
+   *
+   * @returns {number}
+   */
+  getReferenceScaling(): number {
+    const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
+      this.projectedTransformerByTransformationType,
+      'helmert',
+      () =>
+        new GcpTransformer(this.projectedGcps, 'helmert', TRANSFORMER_OPTIONS)
+    )
+    if (!projectedHelmertTransformer.forwardTransformation) {
+      projectedHelmertTransformer.createForwardTransformation()
+    }
+    return (projectedHelmertTransformer.forwardTransformation as Helmert)
+      .scale as number
+  }
+
+  /**
    * Set resourceViewportRing at current viewport
    *
    * @param {Ring} resourceViewportRing
@@ -525,18 +541,14 @@ export default class WarpedMap extends EventTarget {
           this.projectedGeoTrianglePointsPartialDerivativeX[index],
           this.projectedGeoTrianglePointsPartialDerivativeY[index],
           this.distortionMeasure,
-          (this.projectedHelmertTransformer.forwardTransformation as Helmert)
-            .scale
+          this.getReferenceScaling()
         )
     )
     if (previousIsNew || !this.previousTrianglePointsDistortion.length) {
       this.previousTrianglePointsDistortion = this.trianglePointsDistortion
     }
 
-    console.log(
-      'Helmert scale',
-      (this.projectedHelmertTransformer.forwardTransformation as Helmert).scale
-    )
+    console.log('Helmert scale', this.getReferenceScaling())
     console.log(this.trianglePointsDistortion)
   }
 
@@ -615,8 +627,6 @@ export default class WarpedMap extends EventTarget {
   private updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
-    this.updateHelmertTransformer(useCache)
-    this.updateProjectedHelmertTransformer(useCache)
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
@@ -650,27 +660,6 @@ export default class WarpedMap extends EventTarget {
         ),
       useCache
     )
-  }
-
-  private updateHelmertTransformer(useCache = true): void {
-    this.helmertTransformer = getPropertyFromCacheOrComputation(
-      this.transformerByTransformationType,
-      'helmert',
-      () => new GcpTransformer(this.gcps, 'helmert', TRANSFORMER_OPTIONS),
-      useCache
-    )
-    this.helmertTransformer.createForwardTransformation()
-  }
-
-  private updateProjectedHelmertTransformer(useCache = true): void {
-    this.projectedHelmertTransformer = getPropertyFromCacheOrComputation(
-      this.projectedTransformerByTransformationType,
-      'helmert',
-      () =>
-        new GcpTransformer(this.projectedGcps, 'helmert', TRANSFORMER_OPTIONS),
-      useCache
-    )
-    this.projectedHelmertTransformer.createForwardTransformation()
   }
 
   private updateGeoMask(): void {
