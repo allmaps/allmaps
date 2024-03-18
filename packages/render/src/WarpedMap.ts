@@ -414,50 +414,37 @@ export default class WarpedMap extends EventTarget {
    * @param {boolean} [previousIsNew=false] - whether the previous and new triangulation are the same - true by default, false during a transformation transition
    */
   updateTriangulation(previousIsNew = false) {
-    if (
-      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
-    ) {
-      this.resourceTrianglePoints =
-        this.resourceTrianglePointsByBestScaleFactor.get(
-          this.bestScaleFactor
-        ) as Point[]
-    } else {
-      const diameter =
-        (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
-        DIAMETER_FRACTION
+    this.resourceTrianglePoints = getPropertyFromCacheOrComputation(
+      this.resourceTrianglePointsByBestScaleFactor,
+      this.bestScaleFactor,
+      () => {
+        const diameter =
+          (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
+          DIAMETER_FRACTION
 
-      try {
-        this.resourceTrianglePoints = triangulate(
-          this.resourceMask,
-          diameter
-        ).flat()
-      } catch (err) {
-        this.logTriangulateError(err)
+        // TODO: make this obsolete by cleaning mask using conformPolygon() in @allmaps/annotation or in WarpedMap constructor
+        try {
+          return triangulate(this.resourceMask, diameter).flat()
+        } catch (err) {
+          this.triangulateErrorCount++
+
+          if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
+            // TODO: use function to get Allmaps Editor URL
+            console.error(
+              `Error computing triangulation for map ${this.mapId}.`,
+              `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
+            )
+
+            if (this.triangulateErrorCount === 1) {
+              console.error(err)
+            }
+          }
+          return this.resourceTrianglePoints
+        }
       }
-
-      this.resourceTrianglePointsByBestScaleFactor.set(
-        this.bestScaleFactor,
-        this.resourceTrianglePoints
-      )
-    }
+    )
 
     this.updateProjectedGeoTrianglePoints(previousIsNew)
-  }
-
-  private logTriangulateError(err: unknown) {
-    this.triangulateErrorCount++
-
-    if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
-      // TODO: use function to get Allmaps Editor URL
-      console.error(
-        `Error computing triangulation for map ${this.mapId}.`,
-        `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
-      )
-
-      if (this.triangulateErrorCount === 1) {
-        console.error(err)
-      }
-    }
   }
 
   /**
