@@ -56,6 +56,7 @@
 
   const limit = Math.max(1, Math.min(1000, urlLimit))
 
+  let apiMaps: unknown[] = []
   let maps: Map[] = []
   let displayMaps: DisplayMap[] = []
 
@@ -78,9 +79,21 @@
 
   onMount(async () => {
     const response = await fetch(mapsUrl)
-    const apiMaps = await response.json()
-    const mapOrMaps = validateMap(apiMaps)
-    maps = Array.isArray(mapOrMaps) ? mapOrMaps : [mapOrMaps]
+    const results = await response.json()
+
+    if (Array.isArray(results)) {
+      for (const apiMap of results) {
+        try {
+          const mapOrMaps = validateMap(apiMap)
+          const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
+
+          apiMaps.push(apiMap)
+          maps.push(map)
+        } catch (err) {
+          console.error(apiMap, err)
+        }
+      }
+    }
 
     clearInterval(loadingInterval)
     loadingSteps = []
