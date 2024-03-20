@@ -34,7 +34,6 @@
     "@allmaps/transform": "^1.0.0-beta.37",
     "@allmaps/types": "^1.0.0-beta.12",
     "@allmaps/ui": "^1.0.0-beta.27",
-    "@turf/area": "^6.5.0",
     "@turf/rewind": "^6.5.0",
     "d3-geo": "^3.0.1"
   },

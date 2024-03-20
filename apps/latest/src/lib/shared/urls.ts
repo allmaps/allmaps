@@ -10,9 +10,10 @@ export async function getUrls(map: Map) {
   const annotationUrl = `https://annotations.allmaps.org/images/${imageId}`
 
   return {
+    annotation: annotationUrl,
     viewer: `https://viewer.allmaps.org/?url=${encodeURIComponent(
       annotationUrl
     )}&map=${mapId}`,
-    editor: `https://editor.allmaps.org/#/mask?url=${imageUri}/info.json&image=${imageId}&map=${mapId}`
+    editor: `https://editor.allmaps.org/#/mask?url=${imageUri}/info.json`
   }
 }

@@ -30,10 +30,10 @@ importers:
         specifier: ^1.0.0-beta.36
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../../packages/stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/transform
       commander:
         specifier: ^10.0.0
@@ -124,10 +124,10 @@ importers:
   apps/explore:
     dependencies:
       '@allmaps/maplibre':
-        specifier: ^1.0.0-beta.22
+        specifier: ^1.0.0-beta.23
         version: link:../../packages/maplibre
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.11
@@ -200,13 +200,13 @@ importers:
         specifier: ^1.0.0-beta.36
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.11
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/transform
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -413,7 +413,7 @@ importers:
         specifier: ^1.0.0-beta.11
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/transform
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -421,9 +421,6 @@ importers:
       '@allmaps/ui':
         specifier: ^1.0.0-beta.27
         version: link:../../packages/ui
-      '@turf/area':
-        specifier: ^6.5.0
-        version: 6.5.0
       '@turf/rewind':
         specifier: ^6.5.0
         version: 6.5.0
@@ -489,7 +486,7 @@ importers:
   apps/tiles:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.11
@@ -562,10 +559,10 @@ importers:
         specifier: ^1.0.0-beta.36
         version: link:../../packages/iiif-parser
       '@allmaps/render':
-        specifier: ^1.0.0-beta.60
+        specifier: ^1.0.0-beta.61
         version: link:../../packages/render
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/transform
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -637,19 +634,19 @@ importers:
         specifier: ^1.0.0-beta.36
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.65
+        specifier: ^1.0.0-beta.66
         version: link:../../packages/openlayers
       '@allmaps/render':
-        specifier: ^1.0.0-beta.60
+        specifier: ^1.0.0-beta.61
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.11
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../../packages/transform
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -848,13 +845,13 @@ importers:
         specifier: ^1.0.0-beta.26
         version: link:../annotation
       '@allmaps/render':
-        specifier: ^1.0.0-beta.60
+        specifier: ^1.0.0-beta.61
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../transform
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -888,10 +885,10 @@ importers:
   packages/maplibre:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.60
+        specifier: ^1.0.0-beta.61
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       maplibre-gl:
         specifier: ^4.0.0
@@ -925,10 +922,10 @@ importers:
   packages/openlayers:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.60
+        specifier: ^1.0.0-beta.61
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       lodash-es:
         specifier: ^4.17.21
@@ -974,13 +971,13 @@ importers:
         specifier: ^1.0.0-beta.36
         version: link:../iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.37
         version: link:../transform
       '@allmaps/triangulate':
-        specifier: ^1.0.0-beta.18
+        specifier: ^1.0.0-beta.19
         version: link:../triangulate
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -1142,7 +1139,7 @@ importers:
   packages/transform:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       '@turf/distance':
         specifier: ^6.3.0
@@ -1194,7 +1191,7 @@ importers:
   packages/triangulate:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.26
+        specifier: ^1.0.0-beta.27
         version: link:../stdlib
       '@allmaps/types':
         specifier: ^1.0.0-beta.12
@@ -3987,13 +3984,6 @@ packages:
       '@tufjs/canonical-json': 1.0.0
       minimatch: 9.0.3
     dev: true
-
-  /@turf/area@6.5.0:
-    resolution: {integrity: sha512-xCZdiuojokLbQ+29qR6qoMD89hv+JAgWjLrwSEWL+3JV8IXKeNFl6XkEJz9HGkVpnXvQKJoRz4/liT+8ZZ5Jyg==}
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/meta': 6.5.0
-    dev: false
 
   /@turf/bbox@6.5.0:
     resolution: {integrity: sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==}

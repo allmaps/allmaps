@@ -20,6 +20,7 @@
     error?: string
     polygon?: Polygon
     urls?: {
+      annotation?: string
       viewer?: string
       editor?: string
     }
@@ -198,7 +199,9 @@
           <div>updated {properties?.timeAgo}</div>
           <div>
             <a class="underline" href={urls?.editor}>editor</a> /
-            <a class="underline" href={urls?.viewer}>viewer</a>
+            <a class="underline" href={urls?.viewer}>viewer</a> /
+            <a class="underline" href={urls?.annotation}>annotation</a>
+            <span></span>
           </div>
         </div>
 

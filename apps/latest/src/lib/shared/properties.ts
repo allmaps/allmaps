@@ -1,5 +1,3 @@
-import turfArea from '@turf/area'
-
 import type { Map } from '@allmaps/annotation'
 import type { Polygon } from 'geojson'
 
@@ -44,27 +42,31 @@ export function getProperties(map: Map, apiMap: unknown, polygon?: Polygon) {
   // TODO: create new type for API output
   // maybe with https://github.com/trpc/trpc
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updatedAt = (apiMap as any).updatedAt as string
 
   const { hostname } = new URL(map.resource.id)
-  const timeAgo = formatTimeAgo(updatedAt)
+  const timeAgo = formatTimeAgo(map.modified)
+
+  type _Allmaps = {
+    area: number
+  }
 
   let areaStr
-  if (polygon) {
-    const area = turfArea(polygon) / (1000 * 1000)
+  if (apiMap && typeof apiMap === 'object' && '_allmaps' in apiMap) {
+    const _allmaps = apiMap._allmaps as _Allmaps
+    const areaSqKm = _allmaps.area / (1000 * 1000)
 
     let maximumFractionDigits = 0
-    if (area < 1) {
+    if (areaSqKm < 1) {
       maximumFractionDigits = 3
-    } else if (area < 10) {
+    } else if (areaSqKm < 10) {
       maximumFractionDigits = 2
-    } else if (area < 20) {
+    } else if (areaSqKm < 20) {
       maximumFractionDigits = 1
     }
 
     areaStr = `${new Intl.NumberFormat('en-US', {
       maximumFractionDigits
-    }).format(area)} km²`
+    }).format(areaSqKm)} km²`
   }
 
   return {
