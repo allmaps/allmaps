@@ -50,32 +50,3 @@ export function isValidHttpUrl(string: string) {
 
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
-
-export function arrayToUniqueObjectsArrayAndIndicesArray<T>(
-  arr: T[],
-  equalsFunction: (obj0: T, obj1: T) => boolean
-) {
-  const uniqueObjects = []
-  const indices = []
-
-  for (let i = 0; i < arr.length; i++) {
-    let isDuplicate = false
-
-    // Check if current object is a duplicate of any existing unique object
-    for (let j = 0; j < uniqueObjects.length; j++) {
-      if (equalsFunction(arr[i], uniqueObjects[j])) {
-        isDuplicate = true
-        indices.push(j)
-        break
-      }
-    }
-
-    // If not a duplicate, add it to unique objects array
-    if (!isDuplicate) {
-      uniqueObjects.push(arr[i])
-      indices.push(uniqueObjects.length - 1)
-    }
-  }
-
-  return { uniqueObjects, indices }
-}

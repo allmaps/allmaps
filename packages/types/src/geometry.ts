@@ -3,12 +3,25 @@ export type Point = [number, number]
 export type Line = [Point, Point]
 
 /**
- * Triangle. Winding order of points is free.
+ * Triangle
+ * As `[[x0, y0], [x1, y1], [x2, y2]]`
+ *
+ * Winding order of points is free.
  *
  * @export
  * @typedef {Trianle}
  */
 export type Triangle = [Point, Point, Point]
+
+/**
+ * Unique Index Triangle
+ * As `[index0, index1, index2]` with each index pointing to a unique point
+ *
+ * Winding order of points is free.
+ *
+ * @typedef {Object} UniquePointsIndexTriangle
+ */
+export type UniquePointsIndexTriangle = [number, number, number]
 
 /**
  * Rectangle (or possibly quadrilateral). Winding order of points is free.
@@ -23,12 +36,17 @@ export type Rectangle = [Point, Point, Point, Point]
 // - No duplicate points
 export type LineString = Point[]
 
-// Note:
-// - At least 3 points
-// - No duplicate points
-// - Unclosed: last element is not a repetition of the first
-// - So far no requirement on self-intersection although that may be useful in future
-// - So far no requirement on winding order. This is only applied when exporting to GeoJSON
+/**
+ * Ring as `[[number, number], ...]`
+ *
+ * Must contain at least 3 points
+ * May not contain duplicate points
+ * Must be unclosed: last element is not a repetition of the first
+ * May not be self-intersecting
+ * So far no requirement on self-intersection although that may be useful in future
+ * So far no requirement on winding order. This is only applied when exporting to GeoJSON
+ * @typedef {Object} Ring
+ */
 export type Ring = Point[]
 
 export type Polygon = Point[][]

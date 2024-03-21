@@ -41,22 +41,20 @@ function makePointsOnLine(line: Line, distance: number): Point[] {
   return result
 }
 
-export function makePointsOnPolygon(polygon: Ring, distance: number) {
-  // close polygon
-  polygon = [...polygon, polygon[0]]
+export function makePointsOnRing(ring: Ring, distance: number) {
+  // close ring
+  ring = [...ring, ring[0]]
 
   let result: Ring = []
-  for (let i = 0; i < polygon.length - 1; i++) {
-    result = result.concat(
-      makePointsOnLine([polygon[i], polygon[i + 1]], distance)
-    )
+  for (let i = 0; i < ring.length - 1; i++) {
+    result = result.concat(makePointsOnLine([ring[i], ring[i + 1]], distance))
   }
   return result
 }
 
-export function createGrid(polygon: Ring, gridSize: number): Point[] {
+export function createGrid(ring: Ring, gridSize: number): Point[] {
   const grid = []
-  const bbox: Bbox = computeBbox(polygon)
+  const bbox: Bbox = computeBbox(ring)
   for (let x = bbox[0] + gridSize, i = 0; x <= bbox[2]; i++, x += gridSize) {
     for (let y = bbox[1] + gridSize, j = 0; y <= bbox[3]; j++, y += gridSize) {
       grid.push([x, y] as Point)

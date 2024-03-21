@@ -140,10 +140,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     // Resource Triangle Points
 
-    const resourceTrianglePoints =
-      this.warpedMap.trianglePointsUniquePointsIndex.map(
-        (i) => this.warpedMap.resourceUniquePoints[i]
-      )
+    const resourceTrianglePoints = this.warpedMap.resourceTrianglePoints
     createBuffer(
       this.gl,
       this.program,
@@ -155,14 +152,12 @@ export default class WebGL2WarpedMap extends EventTarget {
     // Clip Previous and New Triangle Points
 
     const clipPreviousTrianglePoints =
-      this.warpedMap.trianglePointsUniquePointsIndex
-        .map((i) => this.warpedMap.projectedGeoPreviousUniquePoints[i])
-        .map((point) => {
-          return applyTransform(
-            this.projectedGeoToClipTransform as Transform,
-            point
-          )
-        })
+      this.warpedMap.projectedGeoPreviousTrianglePoints.map((point) => {
+        return applyTransform(
+          this.projectedGeoToClipTransform as Transform,
+          point
+        )
+      })
     createBuffer(
       this.gl,
       this.program,
@@ -171,14 +166,14 @@ export default class WebGL2WarpedMap extends EventTarget {
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.warpedMap.trianglePointsUniquePointsIndex
-      .map((i) => this.warpedMap.projectedGeoUniquePoints[i])
-      .map((point) => {
+    const clipTrianglePoints = this.warpedMap.projectedGeoTrianglePoints.map(
+      (point) => {
         return applyTransform(
           this.projectedGeoToClipTransform as Transform,
           point
         )
-      })
+      }
+    )
     createBuffer(
       this.gl,
       this.program,
@@ -191,9 +186,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     if (this.warpedMap.distortion) {
       const previousTrianglePointsDistortion =
-        this.warpedMap.trianglePointsUniquePointsIndex.map(
-          (i) => this.warpedMap.previousUniquePointsDistortion[i]
-        )
+        this.warpedMap.previousTrianglePointsDistortion
       createBuffer(
         this.gl,
         this.program,
@@ -202,10 +195,7 @@ export default class WebGL2WarpedMap extends EventTarget {
         'a_previousTrianglePointDistortion'
       )
 
-      const trianglePointsDistortion =
-        this.warpedMap.trianglePointsUniquePointsIndex.map(
-          (i) => this.warpedMap.uniquePointsDistortion[i]
-        )
+      const trianglePointsDistortion = this.warpedMap.trianglePointsDistortion
       createBuffer(
         this.gl,
         this.program,
@@ -218,7 +208,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     // Triangle index
 
     const trianglePointsTriangleIndex = new Float32Array(
-      this.warpedMap.trianglePointsUniquePointsIndex.length
+      this.warpedMap.resourceTrianglePoints.length
     ).map((_v, i) => {
       return Math.round((i - 1) / 3)
     })

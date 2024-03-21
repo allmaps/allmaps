@@ -159,7 +159,7 @@ void main() {
     // color = colorWhite; // Set option to not display image
 
     float trianglePointDistortion = v_trianglePointDistortion;
-    // trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // Set options to do stepwise
+    trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // Set options to do stepwise
 
     if (u_distortion) {
       switch (u_distortionOptionsdistortionMeasure) {
@@ -192,7 +192,7 @@ void main() {
 
     // Grid
     // TODO: make this a rendering option
-    if(true) {
+    if(false) {
       float gridSize = 20.0 * float(u_bestScaleFactor);
       float gridWidth = 2.0 * float(u_bestScaleFactor);
       if(mod(float(resourceTrianglePointX)+gridWidth/2.0, gridSize) < gridWidth ||  mod(float(resourceTrianglePointY)+gridWidth/2.0, gridSize) < gridWidth) {

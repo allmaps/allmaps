@@ -23,6 +23,9 @@ export function computeDistortionFromPartialDerivatives(
     partialDerivativeX[1] * partialDerivativeY[1]
   const a = Math.sqrt(0.5 * (E + G + Math.sqrt((E - G) ** 2 + 4 * F ** 2)))
   const b = Math.sqrt(0.5 * (E + G - Math.sqrt((E - G) ** 2 + 4 * F ** 2)))
+  const thetaxp = Math.atan(partialDerivativeX[1] / partialDerivativeX[0])
+  const alphap =
+    Math.sign(-F) * Math.asin(Math.sqrt((1 - a ** 2 / E) / (1 - (a / b) ** 2)))
   switch (supportedDistortionMeasures.indexOf(distortionMeasure)) {
     case 0:
       return (Math.log(a * b) - 2 * Math.log(referenceScaling)) / Math.log(2)
@@ -40,10 +43,6 @@ export function computeDistortionFromPartialDerivatives(
           partialDerivativeX[1] * partialDerivativeY[0]
       )
     case 4:
-      const thetaxp = Math.atan(partialDerivativeX[1] / partialDerivativeX[0])
-      const alphap =
-        Math.sign(-F) *
-        Math.asin(Math.sqrt((1 - a ** 2 / E) / (1 - (a / b) ** 2)))
       return thetaxp - alphap
     default:
       throw new Error('Distortion ' + distortionMeasure + ' not supported')
