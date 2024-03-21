@@ -30,8 +30,10 @@
 
   let lastModifiedAgo: string | undefined = ''
 
-  const maxMaxAea = 50_000_000_000
-  let maxArea = 5_000_000_000
+  const minMaxArea = 100_000
+  const maxMaxAea = 500_000_000_000
+
+  let maxAreaSqrt = Math.sqrt(5_000_000_000)
 
   function getFilters(maxAea: number): FilterSpecification {
     return [
@@ -44,7 +46,7 @@
 
   $: {
     if (layersAdded) {
-      map.setFilter('masks', getFilters(maxArea))
+      map.setFilter('masks', getFilters(maxAreaSqrt ** 2))
       updateFeatures()
     }
   }
@@ -73,7 +75,11 @@
   }
 
   function getViewerUrl(feature: MapGeoJSONFeature) {
-    return `https://dev.viewer.allmaps.org/?url=${feature.properties.id}`
+    return `https://viewer.allmaps.org/?url=${feature.properties.id}`
+  }
+
+  function getEditorUrl(feature: MapGeoJSONFeature) {
+    return `https://editor.allmaps.org/?#/collection?url=${feature.properties.resourceId}/info.json`
   }
 
   onMount(() => {
@@ -174,7 +180,7 @@
         {#each features.slice(0, 25) as feature}
           <li class="grid gap-2">
             {#await fetchImageInfo(feature.properties.resourceId)}
-              <p>Loading...</p>
+              <p class="h-[300px]">Loading...</p>
             {:then imageInfo}
               <a href={getViewerUrl(feature)}>
                 <Thumbnail
@@ -195,9 +201,10 @@
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
                   >Copy URL</button
                 >
-                <a class="underline" href={getViewerUrl(feature)}
-                  >Open in Allmaps Viewer</a
-                >
+                <div>
+                  <a class="underline" href={getViewerUrl(feature)}>viewer</a> /
+                  <a class="underline" href={getEditorUrl(feature)}>editor</a>
+                </div>
               </div>
             {:catch error}
               <p style="color: red">{error.message}</p>
@@ -209,10 +216,10 @@
         <label
           >Max. area: <input
             class="w-full"
-            bind:value={maxArea}
-            min="10000"
-            max={maxMaxAea}
-            step={maxMaxAea / 100}
+            bind:value={maxAreaSqrt}
+            min={Math.sqrt(minMaxArea)}
+            max={Math.sqrt(maxMaxAea)}
+            step={(Math.sqrt(maxMaxAea) - Math.sqrt(minMaxArea)) / 100}
             type="range"
           /></label
         >
