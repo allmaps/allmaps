@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
-We don't track Features Requests in Issues but in are welcomed in Discussions!
+⚠️ THIS IS NOT THE PAGE YOU'RE LOOKING FOR ⚠️
 
-👉 Head over to https://github.com/allmaps/allmaps/discussions and add your idea's there!
+We don't track Features Requests in Issues but gather ideas using Discussions.
+
+👉 Head over to https://github.com/allmaps/allmaps/discussions and add your cool idea's there!
