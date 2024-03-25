@@ -4,6 +4,7 @@
   import { Map, addProtocol } from 'maplibre-gl'
   import layers from 'protomaps-themes-base'
   import { Protocol } from 'pmtiles'
+  import { uniqWith } from 'lodash-es'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
@@ -52,9 +53,18 @@
   }
 
   function updateFeatures() {
-    features = map.queryRenderedFeatures({
+    const newFeatures = map.queryRenderedFeatures({
       layers: ['masks']
     })
+
+    features = uniqWith(
+      newFeatures,
+      (a: MapGeoJSONFeature, b: MapGeoJSONFeature) =>
+        a.properties.id === b.properties.id
+    ).toSorted(
+      (a: MapGeoJSONFeature, b: MapGeoJSONFeature) =>
+        a.properties.area - b.properties.area
+    )
   }
 
   async function showOnMap(annotationUrl: string) {

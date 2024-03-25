@@ -135,6 +135,9 @@ importers:
       '@allmaps/ui':
         specifier: ^1.0.0-beta.27
         version: link:../../packages/ui
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       maplibre-gl:
         specifier: ^4.0.0
         version: 4.0.0
