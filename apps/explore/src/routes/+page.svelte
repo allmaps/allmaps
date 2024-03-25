@@ -177,7 +177,7 @@
     <div bind:this={container} />
     <aside class="relative p-2 flex flex-col min-h-0">
       <ol class="w-full h-full overflow-auto grid auto-rows-min gap-2">
-        {#each features.slice(0, 25) as feature}
+        {#each features.slice(0, 25) as feature (feature.properties.id)}
           <li class="grid gap-2">
             {#await fetchImageInfo(feature.properties.resourceId)}
               <p class="h-[300px]">Loading...</p>
