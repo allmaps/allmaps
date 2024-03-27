@@ -114,7 +114,7 @@ You can listen to them in the typical Leaflet way. Here's an example:
 map.on(
   'warpedmapadded',
   (event) => {
-    console.log(event.mapId, warpedMapLayer.getBounds())
+    console.log(event.mapId, warpedMapSource.getBounds())
   },
   map
 )
