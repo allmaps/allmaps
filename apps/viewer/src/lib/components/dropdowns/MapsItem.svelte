@@ -340,11 +340,8 @@
 
         <div>
           Open in:
-          <a
-            class="underline"
-            target="_blank"
-            rel="noreferrer"
-            href="https://annotations.allmaps.org/maps/{mapId}">new tab</a
+          <a class="underline" target="_blank" rel="noreferrer" href={mapId}
+            >new tab</a
           >,
 
           {#if warpedMap?.geoMask}
@@ -368,7 +365,10 @@
         </div>
       </div>
       <div class="py-1">XYZ tile URL:</div>
-      <Copy string={`https://allmaps.xyz/maps/${mapId}/{z}/{x}/{y}.png`} />
+      <!-- TODO: create functions for IDs/URNs in stdlib -->
+      <Copy
+        string={`https://allmaps.xyz/maps/${mapId.split('/').at(-1)}/{z}/{x}/{y}.png`}
+      />
     </div>
   </div>
 
