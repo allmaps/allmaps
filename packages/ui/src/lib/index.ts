@@ -14,6 +14,7 @@ import Stats from '$lib/components/Stats.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
 import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
+import Hamburger from './components/icons/Hamburger.svelte'
 
 // Arrange icons
 import BringMapsToFront from '$lib/components/icons/BringMapsToFront.svelte'
@@ -45,6 +46,7 @@ export {
   Thumbnail,
   URLInput,
   URLType,
+  Hamburger,
 
   // Arrange icons
   BringMapsToFront,

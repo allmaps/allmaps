@@ -169,7 +169,7 @@
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
   <div class="z-10">
-    <Header appName="Viewer" transparent={$view == "map"}>
+    <Header appName="Viewer" transparent={true}>
     </Header>
   </div>
   <main class="relative h-full overflow-hidden">
