@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, createEventDispatcher } from 'svelte'
 
   import { Tooltip } from 'flowbite'
   import type { TooltipOptions, TooltipInterface } from 'flowbite'
@@ -33,6 +33,8 @@
 
   export let toggleValue = maxValue
 
+  const dispatch = createEventDispatcher();
+
   let container: HTMLElement
 
   const distanceThreshold = 15
@@ -45,6 +47,7 @@
   let initialValue = maxValue
 
   let threshold = 0.1
+  let lastInteractionTime = 0
 
   $: {
     if (tooltip) {
@@ -136,6 +139,7 @@
     endEventType: string
   ) {
     active = true
+    lastInteractionTime = Date.now()
 
     if (toggle) {
       if (initialValue < threshold) {
@@ -151,6 +155,7 @@
 
     window.addEventListener(moveEventType, handleMove)
     window.addEventListener(endEventType, () => {
+      // this is not clean, it will be triggered a lot of times
       if (hasMoved) {
         initialValue = internalValue
       } else {
@@ -160,6 +165,9 @@
       window.removeEventListener(moveEventType, handleMove)
       active = false
       hasMoved = false
+      if (Date.now() - lastInteractionTime < 300) {
+        dispatch('click', { value: internalValue })
+      }
     })
 
     event.preventDefault()
