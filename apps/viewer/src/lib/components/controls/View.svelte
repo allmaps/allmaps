@@ -1,16 +1,19 @@
 <script lang="ts">
   import { view } from '$lib/shared/stores/view.js'
   import experimentalFeatures from '$lib/shared/experimental-features.js'
-  import { Hamburger } from '@allmaps/ui'
+  import { Hamburger, Close } from '@allmaps/ui'
 </script>
 
 <div class="inline-flex rounded-md shadow-sm">
   <button
-    on:click={() => ($view = 'map')}
-    class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
-  
+    on:click={() => ($view == 'map' ? ($view = 'list') : ($view = 'map'))}
+    class="px-3 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
   >
-  <Hamburger />
+    {#if $view === 'map'}
+      <Hamburger />
+    {:else}
+      <Close />
+    {/if}
   </button>
 
   <!-- <button

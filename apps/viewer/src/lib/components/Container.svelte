@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { view } from '$lib/shared/stores/view.js'
+  import { SplitPane } from '@rich_harris/svelte-split-pane'
+
+  import { view, mobile } from '$lib/shared/stores/view.js'
   import { error } from '$lib/shared/stores/error.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
 
-  import MapView from '$lib/components/views/Map.svelte'
+  import MapContainer from '$lib/components/MapContainer.svelte'
   import ListView from '$lib/components/views/List.svelte'
-  import ImageView from '$lib/components/views/Image.svelte'
-
-  import MapControl from '$lib/components/controls/Map.svelte'
-  import ViewControl from '$lib/components/controls/View.svelte'
-  import PathControl from '$lib/components/controls/Path.svelte'
-  import DialsControl from '$lib/components/controls/Dials.svelte'
-  import SelectionControl from '$lib/components/controls/Selection.svelte'
 
   import Error from '$lib/components/elements/Error.svelte'
+
+  let width = 0
+  $: {
+    mobile.set(width < 540)
+  }
 </script>
 
 {#if $error}
@@ -24,52 +24,30 @@
   <!-- TODO: -->
   <!-- <div>EMPTY!</div> -->
 {:else}
-  <div class="w-full h-full relative flex flex-col">
-    {#if $view === 'map'}
-      <MapView />
-    {:else if $view === 'list'}
-      <ListView />
+  <div class="w-full h-full relative flex flex-row" bind:clientWidth={width}>
+    {#if $view !== 'map'}
+      <SplitPane
+        type={$mobile ? 'vertical' : 'horizontal'}
+        id="main"
+        min="100px"
+        max="-4.1rem"
+        pos="50%"
+        priority="min"
+        --color={'#dbdbdb'}
+        --thickness={'20px'}
+      >
+        <section slot="a"><MapContainer /></section>
+        <section slot="b"><ListView /></section>
+      </SplitPane>
     {:else}
-      <ImageView />
+      <MapContainer />
     {/if}
-    <div
-      class="pointer-events-none absolute top-0 w-full h-full p-2 grid grid-cols-3 grid-rows-2"
-    >
-      <div>
-        <!-- {#if $view !== 'list'}
-          <div class="pointer-events-auto inline">
-            <MapControl />
-          </div>
-        {/if} -->
-      </div>
-      <div />
-      <div class="justify-self-end">
-        <div class="pointer-events-auto inline">
-          <ViewControl />
-        </div>
-      </div>
-      <div class="self-end">
-        {#if $view !== 'list'}
-          <div class="pointer-events-auto inline">
-            <!-- <PathControl /> -->
-            <MapControl />
-          </div>
-        {/if}
-      </div>
-      <div class="justify-self-center self-end">
-        {#if $view === 'map'}
-          <div class="pointer-events-auto inline">
-            <DialsControl />
-          </div>
-        {/if}
-      </div>
-      <div class="justify-self-end self-end">
-        {#if $view !== 'list' && $mapCount > 1}
-          <div class="pointer-events-auto inline">
-            <SelectionControl />
-          </div>
-        {/if}
-      </div>
-    </div>
   </div>
 {/if}
+
+<style>
+  /* this is a hack to make the split pane full width since tailwind doesn't support 100% width for .container */
+  :global(.container) {
+    max-width: 100%;
+  }
+</style>
