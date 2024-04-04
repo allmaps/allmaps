@@ -3,6 +3,8 @@
   import type { TooltipOptions, TooltipInterface } from 'flowbite'
 
   export let string: string
+  export let compact: boolean = false
+  export let big: boolean = false
 
   // let textarea: HTMLTextAreaElement
   let input: HTMLInputElement
@@ -45,11 +47,11 @@
   }
 </script>
 
-<div class="relative w-full h-8 flex flex-row">
+<div class="relative w-full flex flex-row">
   <div
     role="tooltip"
     bind:this={tooltipTarget}
-    class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip"
+    class="absolute z-10 invisible inline-block px-2 py-1 text-sm text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip"
   >
     Copied!
     <div class="tooltip-arrow" data-popper-arrow />
@@ -61,13 +63,21 @@
     on:focus={handleFocus}
     on:mouseup={handleMouseup}
     on:touchend={handleMouseup}
-    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-sm text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis"
+    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden  text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis text-sm"
+    class:text-base={big}
+    class:h-12={big}
+    class:p-4={big}
+    class:hidden={compact}
     readonly
     value={string}
   />
 
   <button
-    class="top-0 right-0 p-1 w-8 h-8 text-sm font-medium text-white rounded-r-lg border-gray-100 border-2 focus:ring-4 focus:outline-none focus:ring-blue-300"
+    class="top-0 right-0 p-1 w-8 h-8 font-medium text-white rounded-r-lg border-gray-100 border-2 focus:ring-4 focus:outline-none focus:ring-blue-300 text-sm"
+    class:border-none={compact}
+    class:focus-none={compact}
+    class:text-base={big}
+    class:h-12={big}
     bind:this={tooltipTrigger}
     on:click={copy}
     ><svg
