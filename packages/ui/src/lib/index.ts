@@ -14,7 +14,6 @@ import Stats from '$lib/components/Stats.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
 import URLInput from '$lib/components/URLInput.svelte'
 import URLType from '$lib/components/URLType.svelte'
-import Hamburger from './components/icons/Hamburger.svelte'
 
 // Arrange icons
 import BringMapsToFront from '$lib/components/icons/BringMapsToFront.svelte'
@@ -30,6 +29,13 @@ import Polynomial3 from '$lib/components/icons/transformations/Polynomial3.svelt
 import Projective from '$lib/components/icons/transformations/Projective.svelte'
 import ThinPlateSpline from '$lib/components/icons/transformations/ThinPlateSpline.svelte'
 import Straight from './components/icons/transformations/Straight.svelte'
+
+// Misc
+import Hamburger from './components/icons/Hamburger.svelte'
+import Close from './components/icons/Close.svelte'
+import Mask from './components/icons/Mask.svelte'
+import Opacity from './components/icons/Opacity.svelte'
+import Crop from './components/icons/Crop.svelte'
 
 export { urlStore, dataStore, paramStore }
 
@@ -47,6 +53,10 @@ export {
   URLInput,
   URLType,
   Hamburger,
+  Close,
+  Mask,
+  Opacity,
+  Crop,
 
   // Arrange icons
   BringMapsToFront,
