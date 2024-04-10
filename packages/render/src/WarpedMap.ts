@@ -86,15 +86,23 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates
- * @param {DistortionMeasure | undefined} distortionMeasure - Distortion measure displayed for this map
+ * @param {boolean} distortion - Wether to compute and render distortions
+ * @param {DistortionMeasure} distortionMeasure - Distortion measure displayed for this map
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
  * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
+ * @param {Point[]} resourceTrianglepoints - Triangle points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @param {Point[]} resourceUniquepoints - Unique points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+ * @param {number[]} trianglePointsUniquePointsIndex - Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
  * @param {number} triangulateErrorCount - Number of time the triangulation has resulted in an error
- * @param {Point[]} projectedGeoPreviousUniquePoints - Previous unique points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
- * @param {Point[]} projectedGeoUniquePoints - New (during transformation transition) unique points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
- * // TODO: add partial derivatives and distortions
+ * @param {Point[]} projectedGeoPreviousTrianglePoints - The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
+ * @param {Point[]} projectedGeoTrianglePoints - The resourceTrianglePoints in geo coordinates
+ * @param {Point[]} projectedGeoUniquePoints - The resourceUniquePoints in geo coordinates
+ * @param {Point[]} projectedGeoUniquePointsPartialDerivativeX - Partial Derivative to X at the projectedGeoUniquePoints
+ * @param {Point[]} projectedGeoUniquePointsPartialDerivativeY - Partial Derivative to Y at the projectedGeoUniquePoints
+ * @param {number[]} previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
+ * @param {number[]} trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
+ * @param {number[]} uniquePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoUniquePoints
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -174,10 +182,6 @@ export default class WarpedMap extends EventTarget {
     Map<TransformationType, Point[]>
   > = new Map()
 
-  projectedGeoPreviousTrianglePointsPartialDerivativeX: Point[] = []
-  projectedGeoPreviousTrianglePointsPartialDerivativeY: Point[] = []
-  projectedGeoTrianglePointsPartialDerivativeX: Point[] = []
-  projectedGeoTrianglePointsPartialDerivativeY: Point[] = []
   projectedGeoUniquePointsPartialDerivativeX: Point[] = []
   projectedGeoUniquePointsPartialDerivativeY: Point[] = []
   private projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType: Map<
@@ -521,17 +525,6 @@ export default class WarpedMap extends EventTarget {
             })
           )
       )
-    this.projectedGeoTrianglePointsPartialDerivativeX =
-      this.trianglePointsUniquePointsIndex.map(
-        (i) => this.projectedGeoUniquePointsPartialDerivativeX[i]
-      )
-    if (
-      previousIsNew ||
-      !this.projectedGeoPreviousTrianglePointsPartialDerivativeX.length
-    ) {
-      this.projectedGeoPreviousTrianglePointsPartialDerivativeX =
-        this.projectedGeoTrianglePointsPartialDerivativeX
-    }
 
     this.projectedGeoUniquePointsPartialDerivativeY =
       getPropertyFromDoubleCacheOrComputation(
@@ -546,17 +539,6 @@ export default class WarpedMap extends EventTarget {
             })
           )
       )
-    this.projectedGeoTrianglePointsPartialDerivativeY =
-      this.trianglePointsUniquePointsIndex.map(
-        (i) => this.projectedGeoUniquePointsPartialDerivativeY[i]
-      )
-    if (
-      previousIsNew ||
-      !this.projectedGeoPreviousTrianglePointsPartialDerivativeY.length
-    ) {
-      this.projectedGeoPreviousTrianglePointsPartialDerivativeY =
-        this.projectedGeoUniquePointsPartialDerivativeY
-    }
 
     this.uniquePointsDistortion = this.projectedGeoUniquePoints.map(
       (_point, index) =>
@@ -637,9 +619,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   dispose() {
-    this.resourceTrianglePoints = []
-    this.projectedGeoPreviousTrianglePoints = []
-    this.projectedGeoTrianglePoints = []
+    // TODO: consider adding all heavy properties in here
   }
 
   private updateResourceMaskProperties() {
