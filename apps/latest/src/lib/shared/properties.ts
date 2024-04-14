@@ -1,5 +1,4 @@
 import type { Map } from '@allmaps/annotation'
-import type { Polygon } from 'geojson'
 
 const formatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto'
@@ -38,7 +37,7 @@ function formatTimeAgo(dateStr?: string) {
   }
 }
 
-export function getProperties(map: Map, apiMap: unknown, polygon?: Polygon) {
+export function getProperties(map: Map, apiMap: unknown) {
   // TODO: create new type for API output
   // maybe with https://github.com/trpc/trpc
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
