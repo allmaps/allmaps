@@ -3,10 +3,12 @@
 
   import { Image, type ImageRequest } from '@allmaps/iiif-parser'
 
+  import type { Fit } from '@allmaps/types'
+
   export let imageInfo: unknown
   export let width: number
   export let height = width
-  export let mode: 'cover' | 'contain' = 'cover'
+  export let mode: Fit = 'cover'
 
   let imageRequest: ImageRequest | ImageRequest[][] | undefined = undefined
 
