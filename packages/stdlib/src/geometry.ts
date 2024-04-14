@@ -41,7 +41,7 @@ export function isLineString(input: any): input is LineString {
 function isRing(input: any): input is Ring {
   return (
     Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) == closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
+    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
   )
 }
 
@@ -232,9 +232,9 @@ export function isClosed(input: Point[]): boolean {
 
 export function isEqualPoint(point1: Point, point: Point): boolean {
   if (point1 === point) return true
-  if (point1 == null || point == null) return false
+  if (point1 === null || point === null) return false
 
-  return point1[0] == point[0] && point1[1] == point[1]
+  return point1[0] === point[0] && point1[1] === point[1]
 }
 
 export function isEqualPointArray(
@@ -242,7 +242,7 @@ export function isEqualPointArray(
   pointArray2: Point[]
 ): boolean {
   if (pointArray1 === pointArray2) return true
-  if (pointArray1 == null || pointArray2 == null) return false
+  if (!pointArray1 || !pointArray2) return false
   if (pointArray1.length !== pointArray2.length) return false
 
   for (let i = 0; i < pointArray1.length; ++i) {
@@ -256,7 +256,7 @@ export function isEqualPointArrayArray(
   pointArrayArray2: Point[][]
 ): boolean {
   if (pointArrayArray1 === pointArrayArray2) return true
-  if (pointArrayArray1 == null || pointArrayArray2 == null) return false
+  if (!pointArrayArray1 || !pointArrayArray2) return false
   if (pointArrayArray1.length !== pointArrayArray2.length) return false
 
   for (let i = 0; i < pointArrayArray1.length; ++i) {
@@ -293,7 +293,7 @@ export function mixPoints(point0: Point, point1: Point, t: number): Point {
 export function distance(line: Line): number
 export function distance(from: Point, to: Point): number
 export function distance(from: Point | Line, to?: Point): number {
-  if (isLineString(from) && from.length == 2) {
+  if (isLineString(from) && from.length === 2) {
     return distance(from[0], from[1])
   } else if (isPoint(from) && isPoint(to)) {
     return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)

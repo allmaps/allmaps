@@ -95,8 +95,8 @@ export default class GcpTransformer {
     if (options) {
       this.options = options
     }
-    if (gcps.length == 0) {
-      throw new Error('No control points.')
+    if (gcps.length === 0) {
+      throw new Error('No control points')
     }
     this.gcps = gcps.map((gcp) => {
       if ('resource' in gcp && 'geo' in gcp) {

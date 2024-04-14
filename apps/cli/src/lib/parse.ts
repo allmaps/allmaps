@@ -79,18 +79,18 @@ export function parseTransformationType(
 ): TransformationType {
   let transformationType
   if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '1'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '1'
   ) {
-    transformationType == 'polynomial1'
+    transformationType = 'polynomial1'
   } else if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '2'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '2'
   ) {
     transformationType = 'polynomial2'
   } else if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '3'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '3'
   ) {
     transformationType = 'polynomial3'
   } else if (options.transformationType) {
