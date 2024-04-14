@@ -1,0 +1,276 @@
+{
+  "canvases": [
+    {
+      "height": 10080,
+      "image": {
+        "embedded": true,
+        "height": 10080,
+        "majorVersion": 2,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://iiif.lib.utexas.edu/iiif/2/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2",
+        "width": 8504
+      },
+      "label": {
+        "none": [
+          "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]"
+        ]
+      },
+      "type": "canvas",
+      "uri": "https://curio.lib.utexas.edu/canvas/Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518].json",
+      "width": 8504
+    }
+  ],
+  "description": {
+    "en": [
+      "Originally published by Sanborn Map Co., New York; name of publisher and place of publication varies.| Fire insurance map, hand-colored to show building construction, locations of windows and doors, elevators, and available water facilities.| Shows factories, commercial occupancy of buildings, property boundaries and house and block numbers.| Includes notes on population, fire departments, and prevailing winds.| Includes location map and key to building colors and other features."
+    ]
+  },
+  "embedded": false,
+  "label": {
+    "en": ["Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]"]
+  },
+  "majorVersion": 2,
+  "metadata": [
+    {
+      "label": {
+        "none": ["Creator/Contributor"]
+      },
+      "value": {
+        "en": ["Sanborn Map Company (cartographer)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date Created/Date Issued"]
+      },
+      "value": {
+        "en": ["1924-01-01"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Owning Repository"]
+      },
+      "value": {
+        "en": [
+          "Perry-Castañeda Library Maps, University of Texas Libraries, The University of Texas at Austin"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Source Collection Name"]
+      },
+      "value": {
+        "en": ["Sanborn Fire Insurance Maps [San Antonio, Texas, 1924]"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Type"]
+      },
+      "value": {
+        "en": ["maps| cartographic| Fire insurance maps| Digital maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Form/Medium"]
+      },
+      "value": {
+        "en": ["maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Genre"]
+      },
+      "value": {
+        "en": ["Fire insurance maps| Digital maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Extent"]
+      },
+      "value": {
+        "en": ["64 x 54 cm"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Language"]
+      },
+      "value": {
+        "en": ["English"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Publisher"]
+      },
+      "value": {
+        "en": ["Sanborn Map Company"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Topic"]
+      },
+      "value": {
+        "en": ["Fire risk assessment maps"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Geographic Coverage"]
+      },
+      "value": {
+        "en": [
+          "United States (country)| West (U.S.) (region)| Texas (state)| Bexar County (county)| San Antonio (city)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Place Name"]
+      },
+      "value": {
+        "en": ["San Antonio (Tex)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Cartographic Information"]
+      },
+      "value": {
+        "en": [
+          "29.4167, -98.4833 (WGS84)| Scale 1:600 ; drawn to a scale of 50 feet to an inch."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Origin Note"]
+      },
+      "value": {
+        "en": [
+          "Original located at the Dolph Briscoe Center for American History."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Identifier - UTL DAMS PID"]
+      },
+      "value": {
+        "en": ["utlmaps:0217cef0-3269-438f-8d3a-e90c790e3e51"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Related Resource - Host"]
+      },
+      "value": {
+        "en": [
+          "Sanborn Fire Insurance Maps, 1877-1951. [Digital Texas Sanborn Fire Insurance Maps] (title)"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Primary Title"]
+      },
+      "value": {
+        "en": [
+          "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Description"]
+      },
+      "value": {
+        "en": [
+          "Originally published by Sanborn Map Co., New York; name of publisher and place of publication varies.| Fire insurance map, hand-colored to show building construction, locations of windows and doors, elevators, and available water facilities.| Shows factories, commercial occupancy of buildings, property boundaries and house and block numbers.| Includes notes on population, fire departments, and prevailing winds.| Includes location map and key to building colors and other features."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["License"]
+      },
+      "value": {
+        "en": ["https://creativecommons.org/publicdomain/mark/1.0/"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Identifier - PID"]
+      },
+      "value": {
+        "none": ["utlmaps:0217cef0-3269-438f-8d3a-e90c790e3e51"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Thumbnail URI"]
+      },
+      "value": {
+        "none": [
+          "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/TN/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jpg"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["IIIF Image"]
+      },
+      "value": {
+        "none": [
+          "https://curio.lib.utexas.edu/assets/images/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["IIIF Resource"]
+      },
+      "value": {
+        "none": [
+          "https://curio.lib.utexas.edu/assets/images/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Date Added"]
+      },
+      "value": {
+        "none": ["2022-02-15"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Manifest URI"]
+      },
+      "value": {
+        "none": [
+          "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/manifests/2/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.json"
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["extra"]
+      },
+      "value": {
+        "none": ["undefined"]
+      }
+    }
+  ],
+  "type": "manifest",
+  "uri": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/manifests/2/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.json"
+}

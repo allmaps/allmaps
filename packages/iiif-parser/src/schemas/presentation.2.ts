@@ -17,10 +17,19 @@ export const PossibleLanguageValue2Schema = Value2Schema.or(
   LanguageValue2Schema
 ).or(LanguageValue2Schema.array())
 
-export const MetadataItem2Schema = z.object({
-  label: PossibleLanguageValue2Schema.optional(),
-  value: PossibleLanguageValue2Schema.optional()
-})
+export const MetadataItem2Schema = z
+  .union([
+    z.any(),
+    z.object({
+      label: PossibleLanguageValue2Schema.optional(),
+      value: PossibleLanguageValue2Schema.optional()
+    })
+  ])
+  .transform((val) => {
+    if (val && typeof val === 'object' && 'label' in val && 'value' in val) {
+      return val
+    }
+  })
 
 export const Metadata2Schema = MetadataItem2Schema.array()
 
