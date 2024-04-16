@@ -2,7 +2,7 @@ import Source from 'ol/source/Source.js'
 
 import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
-import type { TransformationType } from '@allmaps/transform'
+import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { Ring } from '@allmaps/types'
 
 import type { Extent } from 'ol/extent'
@@ -207,6 +207,19 @@ export class WarpedMapSource extends Source {
     transformation: TransformationType
   ) {
     this.warpedMapList.setMapsTransformationType(mapIds, transformation)
+    this.changed()
+  }
+
+  /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    this.warpedMapList.setMapsDistortionMeasure(mapIds, distortionMeasure)
     this.changed()
   }
 

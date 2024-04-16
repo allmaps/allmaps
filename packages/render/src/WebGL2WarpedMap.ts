@@ -184,7 +184,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     // Previous and New Distortion
 
-    if (this.warpedMap.distortion) {
+    if (this.warpedMap.distortionMeasure) {
       const previousTrianglePointsDistortion =
         this.warpedMap.previousTrianglePointsDistortion
       createBuffer(

@@ -64,9 +64,9 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param {Cache} imageInfoCache - Cache of the image info of this image
- * @param {string} imageId - ID of the image
- * @param {IIIFImage} parsedImage - ID of the image
+ * @param {Cache} [imageInfoCache] - Cache of the image info of this image
+ * @param {string} [imageId] - ID of the image
+ * @param {IIIFImage} [parsedImage] - ID of the image
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
@@ -86,11 +86,10 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates
- * @param {boolean} distortion - Wether to compute and render distortions
- * @param {DistortionMeasure} distortionMeasure - Distortion measure displayed for this map
+ * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
- * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
+ * @param {Bbox} [resourceViewportRingBbox] - Bbox of the resourceViewportRing
  * @param {Point[]} resourceTrianglepoints - Triangle points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @param {Point[]} resourceUniquepoints - Unique points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @param {number[]} trianglePointsUniquePointsIndex - Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
@@ -153,14 +152,13 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  distortion = true // set to false
-  distortionMeasure: DistortionMeasure = 'log2sigma'
+  distortionMeasure?: DistortionMeasure = 'log2sigma'
 
   // The properties below are for the current viewport
 
   bestScaleFactor!: number
 
-  resourceViewportRing: Ring = [] // At current viewport
+  resourceViewportRing: Ring = []
   resourceViewportRingBbox?: Bbox
 
   // The properties below are at the current bestScaleFactor
@@ -396,6 +394,16 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Set the distortionMeasure
+   *
+   * @param {DistortionMeasure} [distortionMeasure] - the disortion measure
+   */
+  setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
+    this.distortionMeasure = distortionMeasure
+    this.updateTrianglePointsDistortion()
+  }
+
+  /**
    * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
    *
    * @param {GCP[]} gcps
@@ -508,7 +516,7 @@ export default class WarpedMap extends EventTarget {
    * @param {boolean} [previousIsNew=false]
    */
   updateTrianglePointsDistortion(previousIsNew = false) {
-    if (!this.distortion) {
+    if (!this.distortionMeasure) {
       return
     }
 
@@ -545,7 +553,7 @@ export default class WarpedMap extends EventTarget {
         computeDistortionFromPartialDerivatives(
           this.projectedGeoUniquePointsPartialDerivativeX[index],
           this.projectedGeoUniquePointsPartialDerivativeY[index],
-          this.distortionMeasure,
+          this.distortionMeasure!,
           this.getReferenceScaling()
         )
     )

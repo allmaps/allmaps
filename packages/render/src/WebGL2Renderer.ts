@@ -804,19 +804,22 @@ export default class WebGL2Renderer extends EventTarget {
       )
       gl.uniform1f(
         distortionLocation,
-        webgl2WarpedMap.warpedMap.distortion ? 1 : 0
+        webgl2WarpedMap.warpedMap.distortionMeasure ? 1 : 0
       )
 
-      const distortionOptionsDistortionMeasureLocation = gl.getUniformLocation(
-        this.program,
-        'u_distortionOptionsdistortionMeasure'
-      )
-      gl.uniform1i(
-        distortionOptionsDistortionMeasureLocation,
-        supportedDistortionMeasures.indexOf(
-          webgl2WarpedMap.warpedMap.distortionMeasure
+      if (webgl2WarpedMap.warpedMap.distortionMeasure) {
+        const distortionOptionsDistortionMeasureLocation =
+          gl.getUniformLocation(
+            this.program,
+            'u_distortionOptionsdistortionMeasure'
+          )
+        gl.uniform1i(
+          distortionOptionsDistortionMeasureLocation,
+          supportedDistortionMeasures.indexOf(
+            webgl2WarpedMap.warpedMap.distortionMeasure
+          )
         )
-      )
+      }
 
       // Best scale factor
 
@@ -1043,6 +1046,12 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  private distortionChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      this.updateVertexBuffers()
+    }
+  }
+
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
@@ -1084,6 +1093,11 @@ export default class WebGL2Renderer extends EventTarget {
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
+    )
   }
 
   private removeEventListeners() {
@@ -1110,6 +1124,11 @@ export default class WebGL2Renderer extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
     )
   }
 }

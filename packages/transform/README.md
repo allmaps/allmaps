@@ -384,6 +384,8 @@ For a little history: this library started out as a JavaScript port of [gdaltran
 *   [allmaps/transform](#allmapstransform)
 *   [GcpTransformer](#gcptransformer)
     *   [Parameters](#parameters)
+    *   [createForwardTransformation](#createforwardtransformation)
+    *   [createBackwardTransformation](#createbackwardtransformation)
     *   [transformForward](#transformforward)
     *   [transformForwardAsGeojson](#transformforwardasgeojson)
     *   [transformBackward](#transformbackward)
@@ -409,6 +411,14 @@ specifying functions to transform geometries using these transformations.
 *   `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<TransformGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
 *   `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
 *   `options` &#x20;
+
+#### createForwardTransformation
+
+Create forward transformation
+
+#### createBackwardTransformation
+
+Create backward transformation
 
 #### transformForward
 
@@ -526,15 +536,14 @@ Returns **SvgGeometry** Backward transform of input, as SVG geometry
 
 ### Transformation
 
-Transformation class. Extended by the various transformations.
+Transformation class. Abstract class, extended by the various transformations.
 
 #### Parameters
 
 *   `sourcePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The source points
 *   `destinationPoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The destination points
 *   `type` **TransformationType** The transformation type
-*   `pointCountMinimum` &#x20;
-*   `null-null` **pointCountMinimum** The minimum number of points for the transformation type
+*   `pointCountMinimum` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The minimum number of points for the transformation type
 
 ## Notes
 
