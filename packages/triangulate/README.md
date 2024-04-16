@@ -60,9 +60,9 @@ const triangles = triangulate(polygon, distance)
     *   [triangulatePoly2tri](#triangulatepoly2tri)
         *   [Parameters](#parameters-1)
 *   [Types](#types)
-    *   [Triangle](#triangle)
     *   [poly2tri.Triangle](#poly2tritriangle)
-    *   [Ring](#ring)
+*   [triangulateToUnique](#triangulatetounique)
+    *   [Parameters](#parameters-2)
 
 ### Triangulation
 
@@ -74,10 +74,10 @@ Triangulates a polygon
 
 ##### Parameters
 
-*   `polygon` **[Ring](#ring)** Polygon
+*   `polygon` **Ring** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Triangle](#triangle)>** Array of triangles partitioning the polygon
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Triangle>** Array of triangles partitioning the polygon
 
 #### triangulatePoly2tri
 
@@ -85,7 +85,7 @@ Triangulates a polygon (and returns the full Poly2tri output)
 
 ##### Parameters
 
-*   `polygon` **[Ring](#ring)** Polygon
+*   `polygon` **Ring** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[poly2tri.Triangle](#poly2tritriangle)>** Array of triangles partitioning the polygon
@@ -94,23 +94,24 @@ Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Gl
 
 The types used in this module are described below.
 
-#### Triangle
-
-Triangle as `[[x0, y0], [x1, y1], [x2, y2]]`
-
-Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
-
 #### poly2tri.Triangle
 
 Triangle object from [poly2tri](https://github.com/r3mi/poly2tri.js/) package
 
 Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
-#### Ring
+### triangulateToUnique
 
-Polygon object, as an outer Ring only `[[number, number], ...]`
+Triangulates a polygon and return unique points.
+Grid points typically occure in 6 triangles
+This function reutrns the list of unique points, and returns the triangles as uniquePointsIndexTriangles with indices refering to the unique points
 
-Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
+#### Parameters
+
+*   `polygon` **Ring** Polygon
+*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
+
+Returns **{uniquePointsIndexTriangles: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<UniquePointsIndexTriangle>, uniquePoints: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>}** Object with uniquePointsIndexTriangles and uniquePoints
 
 ## Notes
 

@@ -73,6 +73,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [setImageInfoCache](#setimageinfocache)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -131,7 +132,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
 *   [DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION](#default_target_scale_factor_correction)
 *   [getBestTileZoomLevelForScale](#getbesttilezoomlevelforscale)
-    *   [Parameters](#parameters-40)
+    *   [Parameters](#parameters-41)
 
 ### WarpedMapWithImageInfo
 
@@ -223,6 +224,15 @@ Sets the transformation type of specified maps
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
 *   `transformationType` **TransformationType** the new transformation type
+
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of specified maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
+*   `distortionMeasure` **DistortionMeasure?** the distortion measure
 
 #### bringMapsToFront
 
