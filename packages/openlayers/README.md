@@ -513,7 +513,7 @@ Sets the distortion measure of multiple maps
 ##### Parameters
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-*   `distortionMeasure` **DistortionMeasure** new transformation type
+*   `distortionMeasure` **DistortionMeasure** new distortion measure
 
 #### getLonLatExtent
 

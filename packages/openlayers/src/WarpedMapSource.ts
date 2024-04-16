@@ -213,7 +213,7 @@ export class WarpedMapSource extends Source {
   /**
    * Sets the distortion measure of multiple maps
    * @param {Iterable<string>} mapIds - IDs of the maps
-   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   * @param {DistortionMeasure} distortionMeasure - new distortion measure
    */
   setMapsDistortionMeasure(
     mapIds: Iterable<string>,
