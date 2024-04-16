@@ -156,10 +156,11 @@ void main() {
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
     // Distortion
-    // color = colorWhite; // Set option to not display image
+    // color = colorWhite; // TODO: Add option to not display image
+    // color = colorTransparant; // TODO: Add option to not display image
 
     float trianglePointDistortion = v_trianglePointDistortion;
-    trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // Set options to do stepwise
+    trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // TODO: Add component to toggle stepwise vs continuous
 
     if (u_distortion) {
       switch (u_distortionOptionsdistortionMeasure) {
@@ -174,7 +175,7 @@ void main() {
           color = spectral_mix(color, colorGreen500, trianglePointDistortion);
           break;
         case 2:
-          color = spectral_mix(color, colorYellow500, trianglePointDistortion*4.0);
+          color = spectral_mix(color, colorYellow500, trianglePointDistortion);
           break;
         case 3:
           color = trianglePointDistortion == -1.0 ? colorRed300 : color;

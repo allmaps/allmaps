@@ -8,8 +8,7 @@ import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
 const distortionMeasures: (DistortionMeasure | undefined)[] = [
   undefined,
   'log2sigma',
-  'twoOmega',
-  'airyKavr'
+  'twoOmega'
 ]
 
 const DEFAULT_DISTORTIONMEASURE_INDEX = 0
