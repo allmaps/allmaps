@@ -71,8 +71,6 @@ const MAX_TRIANGULATE_ERROR_COUNT = 10
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
- * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
- * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
  * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geo coordinates
@@ -152,7 +150,7 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  distortionMeasure?: DistortionMeasure = 'log2sigma'
+  distortionMeasure?: DistortionMeasure
 
   // The properties below are for the current viewport
 
@@ -380,6 +378,10 @@ export default class WarpedMap extends EventTarget {
     this.triangulationByBestScaleFactor = new Map()
     this.projectedGeoUniquePointsByBestScaleFactorAndTransformationType =
       new Map()
+    this.projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType =
+      new Map()
+    this.projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType =
+      new Map()
     this.updateTriangulation()
   }
 
@@ -400,7 +402,6 @@ export default class WarpedMap extends EventTarget {
    */
   setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     this.distortionMeasure = distortionMeasure
-    this.updateTrianglePointsDistortion()
   }
 
   /**

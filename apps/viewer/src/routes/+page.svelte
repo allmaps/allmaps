@@ -36,6 +36,7 @@
     mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
   import { nextTransformation } from '$lib/shared/stores/transformation.js'
+  import { nextDistortionMeasure } from '$lib/shared/stores/distortion.js'
   import experimentalFeatures from '$lib/shared/experimental-features.js'
 
   import Container from '$lib/components/Container.svelte'
@@ -120,6 +121,8 @@
       $mapVectorLayerOutlinesVisible = !$mapVectorLayerOutlinesVisible
     } else if (event.key === 't') {
       nextTransformation()
+    } else if (event.key === 'd') {
+      nextDistortionMeasure()
     }
   }
 

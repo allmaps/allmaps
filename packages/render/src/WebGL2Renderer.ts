@@ -1041,14 +1041,22 @@ export default class WebGL2Renderer extends EventTarget {
         warpedMap.updateProjectedGeoTrianglePoints(false)
       }
 
-      this.updateVertexBuffers()
-      this.startTransformationTransition()
+      this.updateVertexBuffers() // TODO: can this be removed?
+      this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
     }
   }
 
   private distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      this.updateVertexBuffers()
+      const mapIds = event.data as string[]
+      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        warpedMap.updateTrianglePointsDistortion(false)
+      }
+
+      this.updateVertexBuffers() // TODO: can this be removed?
+      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+        warpedMap.resetTrianglePoints()
+      }
     }
   }
 
