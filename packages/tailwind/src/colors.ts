@@ -33,6 +33,9 @@ const darkblueShades: Shades = [
   '#0b0d22'
 ]
 
+// TODO: add dark blue background color
+// '#101655'
+
 const purpleShades: Shades = [
   '#f3dcf0',
   '#e7b9e1',
