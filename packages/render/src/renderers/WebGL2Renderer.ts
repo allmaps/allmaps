@@ -4,6 +4,8 @@ import BaseRenderer from '../classes/BaseRenderer.js'
 import WarpedMapList from '../classes/WarpedMapList.js'
 import WebGL2WarpedMap from '../classes/WebGL2WarpedMap.js'
 import CacheableImageBitmapTile from '../classes/CacheableImageBitmapTile.js'
+import { distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
+import { supportedDistortionMeasures } from '@allmaps/transform'
 
 import {
   WarpedMapEvent,
@@ -20,8 +22,7 @@ import { createShader, createProgram } from '../shared/webgl2.js'
 
 import vertexShaderSource from '../shaders/vertex-shader.glsl?raw'
 import fragmentShaderSource from '../shaders/fragment-shader.glsl?raw'
-
-import { distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
+import spectral from '../shaders/spectral.glsl?raw'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -118,7 +119,7 @@ export default class WebGL2Renderer
     const fragmentShader = createShader(
       gl,
       gl.FRAGMENT_SHADER,
-      fragmentShaderSource
+      fragmentShaderSource.replace('#include "spectral.glsl"', spectral)
     )
 
     this.program = createProgram(gl, vertexShader, fragmentShader)
@@ -489,7 +490,7 @@ export default class WebGL2Renderer
       )
     } else {
       for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetCurrentTrianglePoints()
+        warpedMap.resetTrianglePoints()
       }
       this.updateVertexBuffers()
 
@@ -526,101 +527,6 @@ export default class WebGL2Renderer
     this.updateRequestedTiles()
     this.updateVertexBuffers()
   }
-
-  // private updateRequestedTiles(): void {
-  //   if (!this.viewport) {
-  //     return
-  //   }
-
-  //   if (!this.viewportMovedSignificantly()) {
-  //     return
-  //   }
-
-  //   if (this.animating) {
-  //     return
-  //   }
-
-  //   const possibleMapsInViewport = Array.from(
-  //     this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
-  //   ).sort(
-  //     (mapId0, mapId1) =>
-  //       distance(
-  //         bboxToCenter(this.warpedMapList.getWarpedMap(mapId0)!.geoMaskBbox),
-  //         this.viewport!.geoCenter
-  //       ) -
-  //       distance(
-  //         bboxToCenter(this.warpedMapList.getWarpedMap(mapId1)!.geoMaskBbox),
-  //         this.viewport!.geoCenter
-  //       )
-  //   )
-
-  //   const requestedTiles: FetchableMapTile[] = []
-  //   for (const mapId of possibleMapsInViewport) {
-  //     const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-  //     if (!warpedMap) {
-  //       continue
-  //     }
-
-  //     if (!warpedMap.visible) {
-  //       continue
-  //     }
-
-  //     if (!warpedMap.hasImageInfo()) {
-  //       // Note: don't load image info here
-  //       // this would imply waiting for the first throttling cycle to complete
-  //       // before acting on a sucessful load
-  //       continue
-  //     }
-
-  //     // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
-  //     // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
-  //     if (
-  //       bboxToDiameter(warpedMap.getViewportMaskBbox(this.viewport)) <
-  //       MIN_VIEWPORT_DIAMETER
-  //     ) {
-  //       continue
-  //     }
-
-  //     // Note the equivalence of the following two:
-  //     // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
-  //     // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
-  //     const tileZoomLevel = getBestTileZoomLevelForScale(
-  //       warpedMap.parsedImage,
-  //       warpedMap.getResourceToCanvasScale(this.viewport)
-  //     )
-
-  //     warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
-
-  //     // Transforming the viewport back to resource
-  //     const projectedTransformerOptions = {
-  //       // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-  //       maxDepth: 0
-  //     }
-
-  //     const resourceViewportRing = geoBboxToResourceRing(
-  //       warpedMap.projectedTransformer,
-  //       this.viewport.projectedGeoRectangleBbox,
-  //       projectedTransformerOptions
-  //     )
-
-  //     warpedMap.setResourceViewportRing(resourceViewportRing)
-
-  //     // This returns tiles sorted by distance from center of resourceViewportRing
-  //     const tiles = computeTilesCoveringRingAtTileZoomLevel(
-  //       resourceViewportRing,
-  //       tileZoomLevel,
-  //       warpedMap.parsedImage
-  //     )
-
-  //     for (const tile of tiles) {
-  //       requestedTiles.push(new FetchableMapTile(tile, warpedMap))
-  //     }
-  //   }
-
-  //   this.tileCache.requestFetcableMapTiles(requestedTiles)
-  //   this.updateMapsInViewport(requestedTiles)
-  // }
 
   private updateVertexBuffers() {
     if (!this.viewport) {
@@ -683,47 +589,6 @@ export default class WebGL2Renderer
       }
     }
   }
-
-  // private updateMapsInViewport(tiles: FetchableMapTile[]) {
-  //   // TODO: handle everything as Set() once JS supports filter on sets.
-  //   // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
-  //   const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
-  //   const newMapsInViewportAsArray = tiles
-  //     .map((tile) => tile.mapId)
-  //     .filter((v, i, a) => {
-  //       // filter out duplicate mapIds
-  //       return a.indexOf(v) === i
-  //     })
-
-  //   this.mapsInViewport = new Set(
-  //     newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
-  //       const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-  //       const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-  //       if (zIndexA !== undefined && zIndexB !== undefined) {
-  //         return zIndexA - zIndexB
-  //       }
-  //       return 0
-  //     })
-  //   )
-
-  //   const enteringMapsInViewport = newMapsInViewportAsArray.filter(
-  //     (mapId) => !oldMapsInViewportAsArray.includes(mapId)
-  //   )
-  //   const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
-  //     (mapId) => !newMapsInViewportAsArray.includes(mapId)
-  //   )
-
-  //   for (const mapId in enteringMapsInViewport) {
-  //     this.dispatchEvent(
-  //       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-  //     )
-  //   }
-  //   for (const mapId in leavingMapsInViewport) {
-  //     this.dispatchEvent(
-  //       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-  //     )
-  //   }
-  // }
 
   private renderInternal(): void {
     if (!this.viewport) {
@@ -798,6 +663,31 @@ export default class WebGL2Renderer
         saturationLocation,
         this.saturation * webgl2WarpedMap.saturation
       )
+
+      // Distortion
+
+      const distortionLocation = gl.getUniformLocation(
+        this.program,
+        'u_distortion'
+      )
+      gl.uniform1f(
+        distortionLocation,
+        webgl2WarpedMap.warpedMap.distortionMeasure ? 1 : 0
+      )
+
+      if (webgl2WarpedMap.warpedMap.distortionMeasure) {
+        const distortionOptionsDistortionMeasureLocation =
+          gl.getUniformLocation(
+            this.program,
+            'u_distortionOptionsdistortionMeasure'
+          )
+        gl.uniform1i(
+          distortionOptionsDistortionMeasureLocation,
+          supportedDistortionMeasures.indexOf(
+            webgl2WarpedMap.warpedMap.distortionMeasure
+          )
+        )
+      }
 
       // Best scale factor
 
@@ -1014,15 +904,27 @@ export default class WebGL2Renderer
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixProjectedGeoCurrentAndNewTrianglePoints(
-            this.animationProgress
-          )
+          warpedMap.mixTrianglePoints(this.animationProgress)
         }
         warpedMap.updateProjectedGeoTrianglePoints(false)
       }
 
-      this.updateVertexBuffers()
-      this.startTransformationTransition()
+      this.updateVertexBuffers() // TODO: can this be removed?
+      this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
+    }
+  }
+
+  private distortionChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        warpedMap.updateTrianglePointsDistortion(false)
+      }
+
+      this.updateVertexBuffers() // TODO: can this be removed?
+      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+        warpedMap.resetTrianglePoints()
+      }
     }
   }
 
@@ -1039,6 +941,24 @@ export default class WebGL2Renderer
     webgl2WarpedMap.removeEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
       this.throttledChanged.bind(this)
+    )
+  }
+
+  protected addEventListeners() {
+    super.addEventListeners()
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
+    )
+  }
+
+  protected removeEventListeners() {
+    super.removeEventListeners()
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
     )
   }
 }

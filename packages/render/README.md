@@ -62,6 +62,30 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 
 #### Table of Contents
 
+*   [WarpedMap](#warpedmap)
+    *   [Parameters](#parameters)
+    *   [getViewportMask](#getviewportmask)
+    *   [getViewportMaskBbox](#getviewportmaskbbox)
+    *   [getViewportMaskRectangle](#getviewportmaskrectangle)
+    *   [getViewportFullMask](#getviewportfullmask)
+    *   [getViewportFullMaskBbox](#getviewportfullmaskbbox)
+    *   [getViewportFullMaskRectangle](#getviewportfullmaskrectangle)
+    *   [getResourceToViewportScale](#getresourcetoviewportscale)
+    *   [getResourceToCanvasScale](#getresourcetocanvasscale)
+    *   [getReferenceScaling](#getreferencescaling)
+    *   [setResourceViewportRing](#setresourceviewportring)
+    *   [setResourceMask](#setresourcemask)
+    *   [setTransformationType](#settransformationtype)
+    *   [setDistortionMeasure](#setdistortionmeasure)
+    *   [setGcps](#setgcps)
+    *   [setBestScaleFactor](#setbestscalefactor)
+    *   [updateTriangulation](#updatetriangulation)
+    *   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
+    *   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
+    *   [resetTrianglePoints](#resettrianglepoints)
+    *   [mixTrianglePoints](#mixtrianglepoints)
+    *   [hasImageInfo](#hasimageinfo)
+    *   [loadImageInfo](#loadimageinfo)
 *   [WarpedMapWithImageInfo](#warpedmapwithimageinfo)
 *   [WarpedMapList](#warpedmaplist)
     *   [getMaps](#getmaps)
@@ -73,6 +97,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [setImageInfoCache](#setimageinfocache)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
@@ -131,7 +156,246 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
 *   [DEFAULT\_TARGET\_SCALE\_FACTOR\_CORRECTION](#default_target_scale_factor_correction)
 *   [getBestTileZoomLevelForScale](#getbesttilezoomlevelforscale)
-    *   [Parameters](#parameters-40)
+    *   [Parameters](#parameters-60)
+
+### WarpedMap
+
+**Extends EventTarget**
+
+Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
+
+Type: [WarpedMap](#warpedmap)
+
+#### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
+*   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>** Ground Controle Points used for warping this map (source to geo)
+*   `projectedGcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>** Projected Ground Controle Points (source to projectedGeo)
+*   `resourceMask` **Ring** Resource mask
+*   `resourceMaskBbox` **Bbox** Bbox of the resourceMask
+*   `resourceMaskRectangle` **Rectangle** Rectangle of the resourceMaskBbox
+*   `resourceFullMask` **Ring** Resource full mask (describing the entire extent of the image)
+*   `resourceFullMaskBbox` **Bbox** Bbox of the resource full mask
+*   `resourceFullMaskRectangle` **Rectangle** Rectangle of the resource full mask bbox
+*   `imageInfoCache` **Cache?** Cache of the image info of this image
+*   `imageId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** ID of the image
+*   `parsedImage` **IIIFImage?** ID of the image
+*   `visible` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether the map is visible
+*   `transformationType` **TransformationType** Transformation type used in the transfomer
+*   `transformer` **GcpTransformer** Transformer used for warping this map (resource to geo)
+*   `projectedTransformer` **GcpTransformer** Projected Transformer used for warping this map (resource to projectedGeo)
+*   `geoMask` **GeojsonPolygon** resourceMask in geo coordinates
+*   `geoMaskBbox` **Bbox** Bbox of the geoMask
+*   `geoMaskRectangle` **Rectangle** resourceMaskRectangle in geo coordinates
+*   `geoFullMask` **GeojsonPolygon** resourceFullMask in geo coordinates
+*   `geoFullMaskBbox` **Bbox** Bbox of the geoFullMask
+*   `geoFullMaskRectangle` **Rectangle** resourceFullMaskRectangle in geo coordinates
+*   `projectedGeoMask` **Ring** resourceMask in projectedGeo coordinates
+*   `projectedGeoMaskBbox` **Bbox** Bbox of the projectedGeoMask
+*   `projectedGeoMaskRectangle` **Rectangle** resourceMaskRectanglee in projectedGeo coordinates
+*   `projectedGeoFullMask` **Ring** resourceFullMask in projectedGeo coordinates
+*   `projectedGeoFullMaskBbox` **Bbox** Bbox of the projectedGeoFullMask
+*   `projectedGeoFullMaskRectangle` **Rectangle** resourceFullMaskRectangle in projectedGeo coordinates
+*   `resourceToProjectedGeoScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Scale of the warped map, in resource pixels per projectedGeo coordinates
+*   `distortionMeasure` **DistortionMeasure?** Distortion measure displayed for this map
+*   `bestScaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The best tile scale factor for displaying this map, at the current viewport
+*   `resourceViewportRing` **Ring** The viewport transformed back to resource coordinates, at the current viewport
+*   `resourceViewportRingBbox` **Bbox?** Bbox of the resourceViewportRing
+*   `resourceTrianglepoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** Triangle points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+*   `resourceUniquepoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** Unique points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+*   `trianglePointsUniquePointsIndex` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
+*   `triangulateErrorCount` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Number of time the triangulation has resulted in an error
+*   `projectedGeoPreviousTrianglePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
+*   `projectedGeoTrianglePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The resourceTrianglePoints in geo coordinates
+*   `projectedGeoUniquePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The resourceUniquePoints in geo coordinates
+*   `projectedGeoUniquePointsPartialDerivativeX` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** Partial Derivative to X at the projectedGeoUniquePoints
+*   `projectedGeoUniquePointsPartialDerivativeY` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** Partial Derivative to Y at the projectedGeoUniquePoints
+*   `previousTrianglePointsDistortion` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** The trianglePointsDistortion of the previous transformation type, used during transformation transitions
+*   `trianglePointsDistortion` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
+*   `uniquePointsDistortion` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** Distortion amount of the distortionMeasure at the projectedGeoUniquePoints
+
+#### getViewportMask
+
+Get resourceMask in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Ring**&#x20;
+
+#### getViewportMaskBbox
+
+Get bbox of resourceMask in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Bbox**&#x20;
+
+#### getViewportMaskRectangle
+
+Get resourceMaskRectangle in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Rectangle**&#x20;
+
+#### getViewportFullMask
+
+Get resourceFullMask in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Ring**&#x20;
+
+#### getViewportFullMaskBbox
+
+Get bbox of rresourceFullMask in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Bbox**&#x20;
+
+#### getViewportFullMaskRectangle
+
+Get resourceFullMaskRectangle in viewport coordinates
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **Rectangle**&#x20;
+
+#### getResourceToViewportScale
+
+Get scale of the warped map, in resource pixels per viewport pixels.
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+#### getResourceToCanvasScale
+
+Get scale of the warped map, in resource pixels per canvas pixels.
+
+##### Parameters
+
+*   `viewport` **[Viewport](#viewport)** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+#### getReferenceScaling
+
+Get the reference scaling from the forward transformation of the projected Helmert transformer
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+#### setResourceViewportRing
+
+Set resourceViewportRing at current viewport
+
+##### Parameters
+
+*   `resourceViewportRing` **Ring**&#x20;
+
+#### setResourceMask
+
+Update the resourceMask loaded from a georeferenced map to a new mask.
+
+##### Parameters
+
+*   `resourceMask` **Ring**&#x20;
+
+#### setTransformationType
+
+Update the transformationType loaded from a georeferenced map to a new transformation type.
+
+##### Parameters
+
+*   `transformationType` **TransformationType**&#x20;
+
+#### setDistortionMeasure
+
+Set the distortionMeasure
+
+##### Parameters
+
+*   `distortionMeasure` **DistortionMeasure?** the disortion measure
+
+#### setGcps
+
+Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+
+##### Parameters
+
+*   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GCP>**&#x20;
+
+#### setBestScaleFactor
+
+Set the bestScaleFactor at the current viewport
+
+##### Parameters
+
+*   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+#### updateTriangulation
+
+Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
+
+##### Parameters
+
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether the previous and new triangulation are the same - true by default, false during a transformation transition (optional, default `false`)
+
+#### updateProjectedGeoTrianglePoints
+
+Update the (previous and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
+
+##### Parameters
+
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+#### updateTrianglePointsDistortion
+
+Update the (previous and new) distortion at the points of the triangulated resourceMask. Use cache if available.
+
+##### Parameters
+
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+#### resetTrianglePoints
+
+Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
+
+#### mixTrianglePoints
+
+Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
+
+##### Parameters
+
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+#### hasImageInfo
+
+Check if warpedMap has image info
+
+#### loadImageInfo
+
+Fetch and parse the image info, and generate the image ID
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
 ### WarpedMapWithImageInfo
 
@@ -164,7 +428,7 @@ Returns the WarpedMap object in this list of map specified by a mapId.
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
 
-Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+Returns **([WarpedMap](#warpedmap) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
 #### getMapZIndex
 
@@ -223,6 +487,15 @@ Sets the transformation type of specified maps
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
 *   `transformationType` **TransformationType** the new transformation type
+
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of specified maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
+*   `distortionMeasure` **DistortionMeasure?** the distortion measure
 
 #### bringMapsToFront
 

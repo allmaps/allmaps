@@ -230,37 +230,37 @@ export function isClosed(input: Point[]): boolean {
   )
 }
 
-export function isEqualPoint(point1: Point, point: Point): boolean {
-  if (point1 === point) return true
-  if (point1 === null || point === null) return false
+export function isEqualPoint(point0: Point, point1: Point): boolean {
+  if (point0 === point1) return true
+  if (point0 === null || point1 === null) return false
 
-  return point1[0] === point[0] && point1[1] === point[1]
+  return point0[0] === point1[0] && point0[1] === point1[1]
 }
 
 export function isEqualPointArray(
-  pointArray1: Point[],
-  pointArray2: Point[]
+  pointArray0: Point[],
+  pointArray1: Point[]
 ): boolean {
-  if (pointArray1 === pointArray2) return true
-  if (!pointArray1 || !pointArray2) return false
-  if (pointArray1.length !== pointArray2.length) return false
+  if (pointArray0 === pointArray1) return true
+  if (!pointArray0 || !pointArray1) return false
+  if (pointArray0.length !== pointArray1.length) return false
 
-  for (let i = 0; i < pointArray1.length; ++i) {
-    if (isEqualPoint(pointArray1[i], pointArray2[i])) return false
+  for (let i = 0; i < pointArray0.length; ++i) {
+    if (isEqualPoint(pointArray0[i], pointArray1[i])) return false
   }
   return true
 }
 
 export function isEqualPointArrayArray(
-  pointArrayArray1: Point[][],
-  pointArrayArray2: Point[][]
+  pointArrayArray0: Point[][],
+  pointArrayArray1: Point[][]
 ): boolean {
-  if (pointArrayArray1 === pointArrayArray2) return true
-  if (!pointArrayArray1 || !pointArrayArray2) return false
-  if (pointArrayArray1.length !== pointArrayArray2.length) return false
+  if (pointArrayArray0 === pointArrayArray1) return true
+  if (!pointArrayArray0 || !pointArrayArray1) return false
+  if (pointArrayArray0.length !== pointArrayArray1.length) return false
 
-  for (let i = 0; i < pointArrayArray1.length; ++i) {
-    if (isEqualPointArray(pointArrayArray1[i], pointArrayArray2[i]))
+  for (let i = 0; i < pointArrayArray0.length; ++i) {
+    if (isEqualPointArray(pointArrayArray0[i], pointArrayArray1[i]))
       return false
   }
   return true
@@ -281,6 +281,14 @@ export function midPoint(point0: Point, point1: Point): Point {
     (point1[0] - point0[0]) / 2 + point0[0],
     (point1[1] - point0[1]) / 2 + point0[1]
   ]
+}
+
+export function mixNumbers(
+  number0: number,
+  number1: number,
+  t: number
+): number {
+  return number0 * t + number1 * (1 - t)
 }
 
 export function mixPoints(point0: Point, point1: Point, t: number): Point {

@@ -11,7 +11,7 @@ import WarpedMap from './WarpedMap.js'
 import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import type { TransformationType } from '@allmaps/transform'
+import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type {
   Ring,
   Bbox,
@@ -261,6 +261,27 @@ export default class WarpedMapList extends EventTarget {
     }
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.TRANSFORMATIONCHANGED, mapIds)
+    )
+  }
+
+  /**
+   * Sets the distortion measure of specified maps
+   *
+   * @param {Iterable<string>} mapIds - the IDs of the maps
+   * @param {DistortionMeasure} [distortionMeasure] - the distortion measure
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ): void {
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap) {
+        warpedMap.setDistortionMeasure(distortionMeasure)
+      }
+    }
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIds)
     )
   }
 

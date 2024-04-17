@@ -17,7 +17,7 @@ import {
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
 import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
-import type { TransformationType } from '@allmaps/transform'
+import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 
 export type WarpedMapLayerOptions = {
   opacity: number
@@ -368,6 +368,24 @@ export class WarpedMapLayer extends L.Layer {
     this.renderer.warpedMapList.setMapsTransformationType(
       mapIds,
       transformation
+    )
+    this._update()
+  }
+
+  /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapsDistortionMeasure(
+      mapIds,
+      distortionMeasure
     )
     this._update()
   }

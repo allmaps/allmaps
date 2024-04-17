@@ -24,6 +24,7 @@ const buildShaders: PluginOption = {
       const files = [
         'fragment-shader.glsl',
         'vertex-shader.glsl',
+        'spectral.glsl',
         'shaders.d.ts'
       ]
 

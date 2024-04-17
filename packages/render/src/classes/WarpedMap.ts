@@ -2,7 +2,8 @@ import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
-import { triangulate } from '@allmaps/triangulate'
+import { triangulateToUnique } from '@allmaps/triangulate'
+import { computeDistortionFromPartialDerivatives } from '@allmaps/transform'
 import {
   computeBbox,
   bboxToRectangle,
@@ -10,7 +11,10 @@ import {
   geometryToDiameter,
   fetchImageInfo,
   lonLatToWebMecator,
-  mixPoints
+  mixNumbers,
+  mixPoints,
+  getPropertyFromCacheOrComputation,
+  getPropertyFromDoubleCacheOrComputation
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -27,20 +31,17 @@ import type {
   ImageInformations
 } from '@allmaps/types'
 import type {
+  Helmert,
   TransformationType,
-  PartialTransformOptions
+  PartialTransformOptions,
+  DistortionMeasure
 } from '@allmaps/transform'
 
 import type Viewport from './Viewport.js'
 
 // TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 80
+const DIAMETER_FRACTION = 300
 const TRANSFORMER_OPTIONS = {
-  maxOffsetRatio: 0.05,
-  maxDepth: 2,
-  differentHandedness: true
-} as PartialTransformOptions
-const PROJECTED_TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
   differentHandedness: true
@@ -80,15 +81,13 @@ function createDefaultWarpedMapOptions(): Partial<WarpedMapOptions> {
  * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param {Cache} imageInfoCache - Cache of the image info of this image
- * @param {string} imageId - ID of the image
- * @param {IIIFImage} parsedImage - ID of the image
+ * @param {Cache} [imageInfoCache] - Cache of the image info of this image
+ * @param {string} [imageId] - ID of the image
+ * @param {IIIFImage} [parsedImage] - ID of the image
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
  * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
- * @private {Map<TransformationType, GcpTransformer>} transformerByTransformationType - Cache of transformer by transformation type
- * @private {Map<TransformationType, GcpTransformer>} projecteTransformerByTransformationType - Cache of projected transformer by transformation type
  * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
  * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geo coordinates
@@ -101,15 +100,23 @@ function createDefaultWarpedMapOptions(): Partial<WarpedMapOptions> {
  * @param {Ring} projectedGeoFullMask - resourceFullMask in projectedGeo coordinates
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
- * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates.
+ * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates
+ * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
  * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
- * @param {Bbox} resourceViewportRingBbox - Bbox of the resourceViewportRing
- * @param {Point[]} resourceTrianglePoints - Points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
- * @private {Map<number, Point[]>} resourceTrianglePointsByBestScaleFactor - Cache of the pointes of the triangles of the triangulated resourceMask by bestScaleFactor
- * @param {Point[]} projectedGeoCurrentTrianglePoints - Current points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinates
- * @param {Point[]} projectedGeoNewTrianglePoints - New (during transformation transition) points of the triangles of the triangulated resourceMask (at the current bestScaleFactor) in projectedGeo coordinate
- * @private {Map<number, Map<number, Point[]>>} projectedGeoTrianglePointsByBestScaleFactorAndTransformationType - Cache of the pointes of the triangles of the triangulated resourceMask in projectedGeo coordinates by bestScaleFactor and transformationType
+ * @param {Bbox} [resourceViewportRingBbox] - Bbox of the resourceViewportRing
+ * @param {Point[]} resourceTrianglepoints - Triangle points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+ * @param {Point[]} resourceUniquepoints - Unique points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
+ * @param {number[]} trianglePointsUniquePointsIndex - Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
+ * @param {number} triangulateErrorCount - Number of time the triangulation has resulted in an error
+ * @param {Point[]} projectedGeoPreviousTrianglePoints - The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
+ * @param {Point[]} projectedGeoTrianglePoints - The resourceTrianglePoints in geo coordinates
+ * @param {Point[]} projectedGeoUniquePoints - The resourceUniquePoints in geo coordinates
+ * @param {Point[]} projectedGeoUniquePointsPartialDerivativeX - Partial Derivative to X at the projectedGeoUniquePoints
+ * @param {Point[]} projectedGeoUniquePointsPartialDerivativeY - Partial Derivative to Y at the projectedGeoUniquePoints
+ * @param {number[]} previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
+ * @param {number[]} trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
+ * @param {number[]} uniquePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoUniquePoints
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -162,27 +169,48 @@ export default class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  triangulateErrorCount = 0
+  distortionMeasure?: DistortionMeasure
 
   // The properties below are for the current viewport
 
   bestScaleFactor!: number
 
-  resourceViewportRing: Ring = [] // At current viewport
+  resourceViewportRing: Ring = []
   resourceViewportRingBbox?: Bbox
 
   // The properties below are at the current bestScaleFactor
 
   resourceTrianglePoints: Point[] = []
-  private resourceTrianglePointsByBestScaleFactor: Map<number, Point[]> =
-    new Map()
+  resourceUniquePoints: Point[] = []
+  trianglePointsUniquePointsIndex: number[] = []
+  private triangulationByBestScaleFactor: Map<
+    number,
+    { trianglePointsUniquePointsIndex: number[]; resourceUniquePoints: Point[] }
+  > = new Map()
+  triangulateErrorCount = 0
 
-  projectedGeoCurrentTrianglePoints: Point[] = []
-  projectedGeoNewTrianglePoints: Point[] = []
-  private projectedGeoTrianglePointsByBestScaleFactorAndTransformationType: Map<
+  projectedGeoPreviousTrianglePoints: Point[] = []
+  projectedGeoTrianglePoints: Point[] = []
+  projectedGeoUniquePoints: Point[] = []
+  private projectedGeoUniquePointsByBestScaleFactorAndTransformationType: Map<
     number,
     Map<TransformationType, Point[]>
   > = new Map()
+
+  projectedGeoUniquePointsPartialDerivativeX: Point[] = []
+  projectedGeoUniquePointsPartialDerivativeY: Point[] = []
+  private projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType: Map<
+    number,
+    Map<TransformationType, Point[]>
+  > = new Map()
+  private projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType: Map<
+    number,
+    Map<TransformationType, Point[]>
+  > = new Map()
+
+  previousTrianglePointsDistortion: number[] = []
+  trianglePointsDistortion: number[] = []
+  uniquePointsDistortion: number[] = []
 
   /**
    * Creates an instance of WarpedMap.
@@ -333,6 +361,25 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Get the reference scaling from the forward transformation of the projected Helmert transformer
+   *
+   * @returns {number}
+   */
+  getReferenceScaling(): number {
+    const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
+      this.projectedTransformerByTransformationType,
+      'helmert',
+      () =>
+        new GcpTransformer(this.projectedGcps, 'helmert', TRANSFORMER_OPTIONS)
+    )
+    if (!projectedHelmertTransformer.forwardTransformation) {
+      projectedHelmertTransformer.createForwardTransformation()
+    }
+    return (projectedHelmertTransformer.forwardTransformation as Helmert)
+      .scale as number
+  }
+
+  /**
    * Set resourceViewportRing at current viewport
    *
    * @param {Ring} resourceViewportRing
@@ -353,8 +400,12 @@ export default class WarpedMap extends EventTarget {
     this.updateGeoMask()
     this.updateProjectedGeoMask()
     this.updateResourceToProjectedGeoScale()
-    this.resourceTrianglePointsByBestScaleFactor = new Map()
-    this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType =
+    this.triangulationByBestScaleFactor = new Map()
+    this.projectedGeoUniquePointsByBestScaleFactorAndTransformationType =
+      new Map()
+    this.projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType =
+      new Map()
+    this.projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType =
       new Map()
     this.updateTriangulation()
   }
@@ -367,6 +418,15 @@ export default class WarpedMap extends EventTarget {
   setTransformationType(transformationType: TransformationType): void {
     this.transformationType = transformationType
     this.updateTransformerProperties()
+  }
+
+  /**
+   * Set the distortionMeasure
+   *
+   * @param {DistortionMeasure} [distortionMeasure] - the disortion measure
+   */
+  setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
+    this.distortionMeasure = distortionMeasure
   }
 
   /**
@@ -395,117 +455,173 @@ export default class WarpedMap extends EventTarget {
   /**
    * Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
    *
-   * @param {boolean} [currentIsNew=false] - whether the new and current triangulation are the same - true by default, false during a transformation transition
+   * @param {boolean} [previousIsNew=false] - whether the previous and new triangulation are the same - true by default, false during a transformation transition
    */
-  updateTriangulation(currentIsNew = false) {
-    if (
-      this.resourceTrianglePointsByBestScaleFactor.has(this.bestScaleFactor)
-    ) {
-      this.resourceTrianglePoints =
-        this.resourceTrianglePointsByBestScaleFactor.get(
-          this.bestScaleFactor
-        ) as Point[]
-    } else {
-      const diameter =
-        (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
-        DIAMETER_FRACTION
-
-      try {
-        this.resourceTrianglePoints = triangulate(
-          this.resourceMask,
-          diameter
-        ).flat()
-      } catch (err) {
-        this.logTriangulateError(err)
-      }
-
-      this.resourceTrianglePointsByBestScaleFactor.set(
+  updateTriangulation(previousIsNew = false) {
+    const { trianglePointsUniquePointsIndex, resourceUniquePoints } =
+      getPropertyFromCacheOrComputation(
+        this.triangulationByBestScaleFactor,
         this.bestScaleFactor,
-        this.resourceTrianglePoints
+        () => {
+          const diameter =
+            (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
+            DIAMETER_FRACTION
+
+          // TODO: make this obsolete by cleaning mask using conformPolygon() in @allmaps/annotation or in WarpedMap constructor
+          try {
+            const { uniquePointsIndexTriangles, uniquePoints } =
+              triangulateToUnique(this.resourceMask, diameter)
+
+            return {
+              trianglePointsUniquePointsIndex:
+                uniquePointsIndexTriangles.flat(),
+              resourceUniquePoints: uniquePoints
+            }
+          } catch (err) {
+            this.triangulateErrorCount++
+
+            if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
+              // TODO: use function to get Allmaps Editor URL
+              console.error(
+                `Error computing triangulation for map ${this.mapId}.`,
+                `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
+              )
+
+              if (this.triangulateErrorCount === 1) {
+                console.error(err)
+              }
+            }
+            return {
+              trianglePointsUniquePointsIndex:
+                this.trianglePointsUniquePointsIndex,
+              resourceUniquePoints: this.resourceUniquePoints
+            }
+          }
+        }
       )
-    }
 
-    this.updateProjectedGeoTrianglePoints(currentIsNew)
-  }
+    this.resourceTrianglePoints = trianglePointsUniquePointsIndex.map(
+      (i) => resourceUniquePoints[i]
+    )
+    this.resourceUniquePoints = resourceUniquePoints as Point[]
+    this.trianglePointsUniquePointsIndex =
+      trianglePointsUniquePointsIndex as number[]
 
-  private logTriangulateError(err: unknown) {
-    this.triangulateErrorCount++
-
-    if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
-      // TODO: use function to get Allmaps Editor URL
-      console.error(
-        `Error computing triangulation for map ${this.mapId}.`,
-        `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
-      )
-
-      if (this.triangulateErrorCount === 1) {
-        console.error(err)
-      }
-    }
+    this.updateProjectedGeoTrianglePoints(previousIsNew)
   }
 
   /**
-   * Update the (current and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
+   * Update the (previous and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
    *
-   * @param {boolean} [currentIsNew=false]
+   * @param {boolean} [previousIsNew=false]
    */
-  updateProjectedGeoTrianglePoints(currentIsNew = false) {
-    if (
-      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-        .get(this.bestScaleFactor)
-        ?.has(this.transformationType)
-    ) {
-      this.projectedGeoNewTrianglePoints =
-        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-          .get(this.bestScaleFactor)
-          ?.get(this.transformationType) as Point[]
-    } else {
-      this.projectedGeoNewTrianglePoints = this.resourceTrianglePoints.map(
-        (point) => this.projectedTransformer.transformToGeo(point as Point)
+  updateProjectedGeoTrianglePoints(previousIsNew = false) {
+    this.projectedGeoUniquePoints = getPropertyFromDoubleCacheOrComputation(
+      this.projectedGeoUniquePointsByBestScaleFactorAndTransformationType,
+      this.bestScaleFactor,
+      this.transformationType,
+      () =>
+        this.resourceUniquePoints.map((point) =>
+          this.projectedTransformer.transformToGeo(point)
+        )
+    )
+    this.projectedGeoTrianglePoints = this.trianglePointsUniquePointsIndex.map(
+      (i) => this.projectedGeoUniquePoints[i]
+    )
+
+    if (previousIsNew || !this.projectedGeoPreviousTrianglePoints.length) {
+      this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
+    }
+
+    this.updateTrianglePointsDistortion(previousIsNew)
+  }
+
+  /**
+   * Update the (previous and new) distortion at the points of the triangulated resourceMask. Use cache if available.
+   *
+   * @param {boolean} [previousIsNew=false]
+   */
+  updateTrianglePointsDistortion(previousIsNew = false) {
+    if (!this.distortionMeasure) {
+      return
+    }
+
+    this.projectedGeoUniquePointsPartialDerivativeX =
+      getPropertyFromDoubleCacheOrComputation(
+        this
+          .projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType,
+        this.bestScaleFactor,
+        this.transformationType,
+        () =>
+          this.resourceUniquePoints.map((point) =>
+            this.projectedTransformer.transformToGeo(point, {
+              evaluationType: 'partialDerivativeX'
+            })
+          )
       )
 
-      if (
-        !this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.get(
-          this.bestScaleFactor
-        )
-      ) {
-        this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType.set(
-          this.bestScaleFactor,
-          new Map()
-        )
-      }
-      this.projectedGeoTrianglePointsByBestScaleFactorAndTransformationType
-        .get(this.bestScaleFactor)
-        ?.set(this.transformationType, this.projectedGeoNewTrianglePoints)
-    }
+    this.projectedGeoUniquePointsPartialDerivativeY =
+      getPropertyFromDoubleCacheOrComputation(
+        this
+          .projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType,
+        this.bestScaleFactor,
+        this.transformationType,
+        () =>
+          this.resourceUniquePoints.map((point) =>
+            this.projectedTransformer.transformToGeo(point, {
+              evaluationType: 'partialDerivativeY'
+            })
+          )
+      )
 
-    if (currentIsNew || !this.projectedGeoCurrentTrianglePoints.length) {
-      this.projectedGeoCurrentTrianglePoints =
-        this.projectedGeoNewTrianglePoints
+    this.uniquePointsDistortion = this.projectedGeoUniquePoints.map(
+      (_point, index) =>
+        computeDistortionFromPartialDerivatives(
+          this.projectedGeoUniquePointsPartialDerivativeX[index],
+          this.projectedGeoUniquePointsPartialDerivativeY[index],
+          this.distortionMeasure!,
+          this.getReferenceScaling()
+        )
+    )
+    this.trianglePointsDistortion = this.trianglePointsUniquePointsIndex.map(
+      (i) => this.uniquePointsDistortion[i]
+    )
+    if (previousIsNew || !this.previousTrianglePointsDistortion.length) {
+      this.previousTrianglePointsDistortion = this.trianglePointsDistortion
     }
   }
 
   /**
-   * Reset the current points of the triangulated resourceMask in projectedGeo coordinates.
+   * Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
    */
-  resetCurrentTrianglePoints() {
-    this.projectedGeoCurrentTrianglePoints = this.projectedGeoNewTrianglePoints
+  resetTrianglePoints() {
+    this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
+    this.previousTrianglePointsDistortion = this.trianglePointsDistortion
   }
 
   /**
-   * Mix the current and new points of the triangulated resourceMask in projectedGeo coordinates
+   * Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
    *
    * @param {number} t
    */
-  mixProjectedGeoCurrentAndNewTrianglePoints(t: number) {
-    this.projectedGeoCurrentTrianglePoints =
-      this.projectedGeoNewTrianglePoints.map((point, index) => {
+  mixTrianglePoints(t: number) {
+    this.projectedGeoPreviousTrianglePoints =
+      this.projectedGeoTrianglePoints.map((point, index) => {
         return mixPoints(
           point,
-          this.projectedGeoCurrentTrianglePoints[index],
+          this.projectedGeoPreviousTrianglePoints[index],
           t
         )
       })
+    this.previousTrianglePointsDistortion = this.trianglePointsDistortion.map(
+      (distortion, index) => {
+        return mixNumbers(
+          distortion,
+          this.previousTrianglePointsDistortion[index],
+          t
+        )
+      }
+    )
   }
 
   /**
@@ -555,9 +671,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   dispose() {
-    this.resourceTrianglePoints = []
-    this.projectedGeoCurrentTrianglePoints = []
-    this.projectedGeoNewTrianglePoints = []
+    // TODO: consider adding all heavy properties in here
   }
 
   private updateResourceMaskProperties() {
@@ -576,48 +690,31 @@ export default class WarpedMap extends EventTarget {
   }
 
   private updateTransformer(useCache = true): void {
-    if (
-      this.transformerByTransformationType.has(this.transformationType) &&
+    this.transformer = getPropertyFromCacheOrComputation(
+      this.transformerByTransformationType,
+      this.transformationType,
+      () =>
+        new GcpTransformer(
+          this.gcps,
+          this.transformationType,
+          TRANSFORMER_OPTIONS
+        ),
       useCache
-    ) {
-      this.transformer = this.transformerByTransformationType.get(
-        this.transformationType
-      ) as GcpTransformer
-    } else {
-      this.transformer = new GcpTransformer(
-        this.gcps,
-        this.transformationType,
-        TRANSFORMER_OPTIONS
-      )
-      this.transformerByTransformationType.set(
-        this.transformationType,
-        this.transformer
-      )
-    }
+    )
   }
 
   private updateProjectedTransformer(useCache = true): void {
-    if (
-      this.projectedTransformerByTransformationType.has(
-        this.transformationType
-      ) &&
+    this.projectedTransformer = getPropertyFromCacheOrComputation(
+      this.projectedTransformerByTransformationType,
+      this.transformationType,
+      () =>
+        new GcpTransformer(
+          this.projectedGcps,
+          this.transformationType,
+          TRANSFORMER_OPTIONS
+        ),
       useCache
-    ) {
-      this.projectedTransformer =
-        this.projectedTransformerByTransformationType.get(
-          this.transformationType
-        ) as GcpTransformer
-    } else {
-      this.projectedTransformer = new GcpTransformer(
-        this.projectedGcps,
-        this.transformationType,
-        PROJECTED_TRANSFORMER_OPTIONS
-      )
-      this.projectedTransformerByTransformationType.set(
-        this.transformationType,
-        this.projectedTransformer
-      )
-    }
+    )
   }
 
   private updateGeoMask(): void {

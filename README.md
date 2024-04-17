@@ -42,6 +42,10 @@ Packages:
 
 To see how these apps and packages are related, check out the [dependency graph](https://observablehq.com/@allmaps/javascript-dependencies).
 
+## Contributing
+
+We're welcoming contributions! You can read more about the many ways you can contribute [here](./CONTRIBUTING.md).
+
 ## Installation
 
 Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/) installed.

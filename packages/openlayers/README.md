@@ -181,6 +181,7 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [getLonLatExtent](#getlonlatextent)
     *   [getExtent](#getextent)
     *   [bringMapsToFront](#bringmapstofront)
@@ -504,6 +505,15 @@ Sets the transformation type of multiple maps
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **[TransformationType](#transformationtype)** new transformation type
+
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `distortionMeasure` **DistortionMeasure** new distortion measure
 
 #### getLonLatExtent
 

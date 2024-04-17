@@ -16,7 +16,7 @@ import {
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
-import type { TransformationType } from '@allmaps/transform'
+import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 import type { Rectangle, Ring, ImageInformations } from '@allmaps/types'
 
 const NO_RENDERER_ERROR_MESSAGE =
@@ -294,6 +294,24 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.warpedMapList.setMapsTransformationType(
       mapIds,
       transformation
+    )
+    this.map?.triggerRepaint()
+  }
+
+  /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapsDistortionMeasure(
+      mapIds,
+      distortionMeasure
     )
     this.map?.triggerRepaint()
   }

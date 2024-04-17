@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import { expectToBeCloseToArrayArrayArray } from '../../stdlib/test/helper-functions.js'
 
-import { triangulate } from '../dist/index.js'
+import { triangulate, triangulateToUnique } from '../dist/index.js'
 
 const rectangle = [
   [0.592, 0.953],
@@ -149,4 +149,12 @@ describe('Rectangle', async () => {
   //     rectangleOnGridDistanceResult
   //   )
   // })
+  it(`should work provide the same result when using unique points`, () => {
+    const { uniquePointsIndexTriangles, uniquePoints } =
+      triangulateToUnique(rectangle)
+    const triangles = uniquePointsIndexTriangles.map((t) =>
+      t.map((indexPoint) => uniquePoints[indexPoint])
+    )
+    expectToBeCloseToArrayArrayArray(triangles, rectangleNoDistanceResult)
+  })
 })
