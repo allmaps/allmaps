@@ -3,8 +3,9 @@ import potpack from 'potpack'
 import { throttle } from 'lodash-es'
 
 import { isOverlapping } from '@allmaps/stdlib'
+import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
-import WarpedMap from './WarpedMap.js'
+import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import { computeBboxTile } from '../shared/tiles.js'
 import { applyTransform } from '../shared/matrix.js'
@@ -14,7 +15,8 @@ import type { DebouncedFunc } from 'lodash-es'
 
 import type { Transform } from '@allmaps/types'
 
-import type { CachedTile } from './CacheableTile.js'
+import type { WarpedMapOptions } from '../shared/types.js'
+import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
 
 const THROTTLE_WAIT_MS = 100
@@ -26,7 +28,16 @@ const THROTTLE_OPTIONS = {
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
-// const MAX_SCALE_FACTOR_DIFFERENCE = 2
+export function createWebGL2WarpedMapFactory(
+  gl: WebGL2RenderingContext,
+  program: WebGLProgram
+) {
+  return (
+    mapId: string,
+    georeferencedMap: GeoreferencedMap,
+    options?: Partial<WarpedMapOptions>
+  ) => new WebGL2WarpedMap(mapId, georeferencedMap, gl, program, options)
+}
 
 /**
  * Class for storing the WebGL 2 information necessary to draw WarpedMaps
@@ -36,9 +47,7 @@ const DEFAULT_SATURATION = 1
  * @typedef {WebGL2WarpedMap}
  * @extends {EventTarget}
  */
-export default class WebGL2WarpedMap extends EventTarget {
-  warpedMap: WarpedMap
-
+export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
@@ -63,18 +72,20 @@ export default class WebGL2WarpedMap extends EventTarget {
    * Creates an instance of WebGL2WarpedMap.
    *
    * @constructor
+   * @param {string} mapId - ID of the map
+   * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
+   * @param {?Cache} [imageInfoCache] - Cache of the image info of this image
    * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
    * @param {WebGLProgram} program - the WebGL2 program
-   * @param {WarpedMap} warpedMap - the warped map to render
    */
   constructor(
+    mapId: string,
+    georeferencedMap: GeoreferencedMap,
     gl: WebGL2RenderingContext,
     program: WebGLProgram,
-    warpedMap: WarpedMap
+    options?: Partial<WarpedMapOptions>
   ) {
-    super()
-
-    this.warpedMap = warpedMap
+    super(mapId, georeferencedMap, options)
 
     this.gl = gl
     this.program = program
@@ -140,7 +151,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     // Resource Triangle Points
 
-    const resourceTrianglePoints = this.warpedMap.resourceTrianglePoints
+    const resourceTrianglePoints = this.resourceTrianglePoints
     createBuffer(
       this.gl,
       this.program,
@@ -152,7 +163,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     // Clip Previous and New Triangle Points
 
     const clipPreviousTrianglePoints =
-      this.warpedMap.projectedGeoPreviousTrianglePoints.map((point) => {
+      this.projectedGeoPreviousTrianglePoints.map((point) => {
         return applyTransform(
           this.projectedGeoToClipTransform as Transform,
           point
@@ -166,14 +177,12 @@ export default class WebGL2WarpedMap extends EventTarget {
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.warpedMap.projectedGeoTrianglePoints.map(
-      (point) => {
-        return applyTransform(
-          this.projectedGeoToClipTransform as Transform,
-          point
-        )
-      }
-    )
+    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) => {
+      return applyTransform(
+        this.projectedGeoToClipTransform as Transform,
+        point
+      )
+    })
     createBuffer(
       this.gl,
       this.program,
@@ -184,9 +193,9 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     // Previous and New Distortion
 
-    if (this.warpedMap.distortionMeasure) {
+    if (this.distortionMeasure) {
       const previousTrianglePointsDistortion =
-        this.warpedMap.previousTrianglePointsDistortion
+        this.previousTrianglePointsDistortion
       createBuffer(
         this.gl,
         this.program,
@@ -195,7 +204,7 @@ export default class WebGL2WarpedMap extends EventTarget {
         'a_previousTrianglePointDistortion'
       )
 
-      const trianglePointsDistortion = this.warpedMap.trianglePointsDistortion
+      const trianglePointsDistortion = this.trianglePointsDistortion
       createBuffer(
         this.gl,
         this.program,
@@ -208,7 +217,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     // Triangle index
 
     const trianglePointsTriangleIndex = new Float32Array(
-      this.warpedMap.resourceTrianglePoints.length
+      this.resourceTrianglePoints.length
     ).map((_v, i) => {
       return Math.round((i - 1) / 3)
     })
@@ -233,21 +242,13 @@ export default class WebGL2WarpedMap extends EventTarget {
     // Only pack tiles that are inside the viewport (as drawn on the resource)
     // And don't differ too much in scale level from the optimal one at this viewport
     cachedTiles = cachedTiles.filter((cachedTile) => {
-      return this.warpedMap.resourceViewportRingBbox
+      return this.resourceViewportRingBbox
         ? isOverlapping(
             computeBboxTile(cachedTile.tile),
-            this.warpedMap.resourceViewportRingBbox
+            this.resourceViewportRingBbox
           )
         : true
     })
-    // cachedTiles = cachedTiles.filter((cachedTile) => {
-    //   return (
-    //     Math.abs(
-    //       cachedTile.tile.tileZoomLevel.scaleFactor -
-    //         this.warpedMap.bestScaleFactor
-    //     ) <= MAX_SCALE_FACTOR_DIFFERENCE
-    //   )
-    // })
 
     const CachedTilesByTileUrlCount = cachedTiles.length
 

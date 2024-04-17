@@ -1,22 +1,23 @@
 import classifyPoint from 'robust-point-in-polygon'
 
-import type WarpedMapList from '../classes/WarpedMapList.js'
-import type Viewport from '../classes/Viewport.js'
-import type TileCache from '../classes/TileCache.js'
-import type { CachedTile } from '../classes/CacheableTile.js'
+import type WarpedMapList from '../maps/WarpedMapList.js'
+import type Viewport from '../Viewport.js'
+import type TileCache from '../tilecache/TileCache.js'
+import type { CachedTile } from '../tilecache/CacheableTile.js'
 
+import type WarpedMap from '../maps/WarpedMap.js'
 import type { Point } from '@allmaps/types'
 
 import { GetImageDataValue, GetImageDataSize } from './types.js'
 
 const CHANNELS = 4
 
-export async function renderToIntArray<T>(
-  warpedMapList: WarpedMapList,
-  tileCache: TileCache<T>,
+export async function renderToIntArray<W extends WarpedMap, D>(
+  warpedMapList: WarpedMapList<W>,
+  tileCache: TileCache<D>,
   viewport: Viewport,
-  getImageDataValue: GetImageDataValue<T>,
-  getImageDataSize: GetImageDataSize<T>,
+  getImageDataValue: GetImageDataValue<D>,
+  getImageDataSize: GetImageDataSize<D>,
   intArray: Uint8ClampedArray
 ): Promise<void> {
   const [width, height] = viewport.viewportSize
@@ -63,7 +64,7 @@ export async function renderToIntArray<T>(
         }
 
         // Determine tile index of resource tile on which this pixel location (with decimals) is
-        let cachedTile: CachedTile<T> | undefined
+        let cachedTile: CachedTile<D> | undefined
         let tileXMin: number | undefined
         let tileYMin: number | undefined
         let foundCachedTile = false

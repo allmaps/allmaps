@@ -7,7 +7,7 @@ import {
   setSelectedMaps
 } from '$lib/shared/stores/selected.js'
 import { showMap, hideMaps } from '$lib/shared/stores/visible.js'
-import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
+import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
@@ -141,8 +141,8 @@ export const activeMap = derived(
 
 activeMapId.subscribe(($activeMapId) => {
   if ($activeMapId) {
-    if (mapWarpedMapSource && $activeMapId.updateView) {
-      mapWarpedMapSource.bringMapsToFront([$activeMapId.mapId])
+    if (mapWarpedMapLayer && $activeMapId.updateView) {
+      mapWarpedMapLayer.bringMapsToFront([$activeMapId.mapId])
     }
   }
 })

@@ -9,8 +9,8 @@ import {
   resetMaps
 } from '$lib/shared/stores/maps.js'
 import {
-  mapWarpedMapSource,
-  mapVectorSource
+  mapVectorSource,
+  mapWarpedMapLayer
 } from '$lib/shared/stores/openlayers.js'
 import { resetTransformation } from '$lib/shared/stores/transformation.js'
 
@@ -109,7 +109,7 @@ export function removeSource(id: string) {
 }
 
 export function resetSources() {
-  mapWarpedMapSource.clear()
+  mapWarpedMapLayer.clear()
   mapVectorSource.clear()
 
   resetTransformation()

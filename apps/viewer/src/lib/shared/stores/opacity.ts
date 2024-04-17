@@ -6,7 +6,7 @@ import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
 export const opacity = {
   ...writable(1),
   set: ($opacity: number) => {
-    mapWarpedMapLayer?.setOpacity($opacity)
+    mapWarpedMapLayer.setOpacity($opacity)
   }
 }
 

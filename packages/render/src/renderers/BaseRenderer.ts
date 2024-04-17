@@ -1,6 +1,6 @@
-import TileCache from './TileCache.js'
-import WarpedMapList from './WarpedMapList.js'
-import FetchableMapTile from './FetchableTile.js'
+import TileCache from '../tilecache/TileCache.js'
+import WarpedMapList from '../maps/WarpedMapList.js'
+import FetchableMapTile from '../tilecache/FetchableTile.js'
 
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -12,30 +12,46 @@ import {
 
 import { distance, bboxToDiameter, bboxToCenter } from '@allmaps/stdlib'
 
-import type { FetchFn } from '@allmaps/types'
-
-import type Viewport from './Viewport.js'
-import type { CachableTileFactory } from '../shared/types.js'
+import type Viewport from '../Viewport.js'
+import type WarpedMap from '../maps/WarpedMap.js'
+import type {
+  CachableTileFactory,
+  WarpedMapFactory,
+  RendererOptions
+} from '../shared/types.js'
 
 const MIN_VIEWPORT_DIAMETER = 5
 
-export default abstract class BaseRenderer<T> extends EventTarget {
-  tileCache: TileCache<T>
-  warpedMapList: WarpedMapList
+export default abstract class BaseRenderer<
+  W extends WarpedMap,
+  D
+> extends EventTarget {
+  warpedMapList: WarpedMapList<W>
+  tileCache: TileCache<D>
 
   mapsInViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
   constructor(
-    warpedMapList: WarpedMapList,
-    cachableTileFactory: CachableTileFactory<T>,
-    fetchFn?: FetchFn
+    cachableTileFactory: CachableTileFactory<D>,
+    warpedMapFactory: WarpedMapFactory<W>,
+    options?: Partial<RendererOptions>
   ) {
     super()
 
-    this.tileCache = new TileCache(cachableTileFactory, fetchFn)
-    this.warpedMapList = warpedMapList
+    this.tileCache = new TileCache(cachableTileFactory, options)
+    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
   }
+
+  async addGeoreferenceAnnotation(annotation: unknown) {
+    return this.warpedMapList.addGeoreferenceAnnotation(annotation)
+  }
+
+  async addGeoreferencedMap(georeferencedMap: unknown) {
+    return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
+  }
+
+  // addMap
 
   protected shouldUpdateRequestedTiles() {
     return true

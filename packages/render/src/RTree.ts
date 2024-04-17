@@ -19,7 +19,7 @@ type RTreeItem = {
   id: string
 }
 
-export default class GeojsonPolygonRTree {
+export default class RTree {
   rbush: RBush<RTreeItem> = new RBush()
 
   polygonsById: Map<string, GeojsonPolygon> = new Map()

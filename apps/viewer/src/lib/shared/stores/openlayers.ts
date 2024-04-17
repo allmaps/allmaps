@@ -1,7 +1,6 @@
 import { writable, derived, get } from 'svelte/store'
 
 import {
-  WarpedMapSource,
   WarpedMapLayer,
   WarpedMapEvent,
   WarpedMapEventType
@@ -81,15 +80,13 @@ export const imageInformations: ImageInformations = new Map()
 
 // Map view
 
-export let mapOl: OLMap | undefined
-export let mapTileSource: XYZ | undefined
-export let mapTileLayer: TileLayer<XYZ> | undefined
-export const mapWarpedMapSource = new WarpedMapSource()
-mapWarpedMapSource.setImageInformations(imageInformations)
-export let mapWarpedMapLayer: WarpedMapLayer | undefined
+export let mapOl: OLMap
+export let mapTileSource: XYZ
+export let mapTileLayer: TileLayer<XYZ>
+export const mapWarpedMapLayer = new WarpedMapLayer()
 export const mapVectorSource = new VectorSource()
-export let mapVectorLayer: VectorLayer<VectorSource> | undefined
-export let mapSelect: Select | undefined
+export let mapVectorLayer: VectorLayer<VectorSource>
+export let mapSelect: Select
 
 function mapVectorLayerOrderFunction(
   feature1: FeatureLike,
@@ -99,8 +96,8 @@ function mapVectorLayerOrderFunction(
   const mapId2 = feature2.getId() as string
 
   if (mapId1 && mapId2) {
-    const zIndex1 = mapWarpedMapSource.getMapZIndex(mapId1)
-    const zIndex2 = mapWarpedMapSource.getMapZIndex(mapId2)
+    const zIndex1 = mapWarpedMapLayer.getMapZIndex(mapId1)
+    const zIndex2 = mapWarpedMapLayer.getMapZIndex(mapId2)
 
     if (zIndex1 !== undefined && zIndex2 !== undefined) {
       return zIndex1 - zIndex2
@@ -119,7 +116,7 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
       const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
+        mapWarpedMapLayer.renderer.tileCache.getCachedTile(tileUrl)
 
       if (cachedTile) {
         const imageBitmap = cachedTile.data
@@ -149,39 +146,35 @@ export function createMapOl() {
     source: mapTileSource
   })
 
-  mapWarpedMapLayer = new WarpedMapLayer({ source: mapWarpedMapSource })
+  // TODO: emit this event directly from WarpedMapLayer?
+  mapWarpedMapLayer.renderer.tileCache.addEventListener(
+    WarpedMapEventType.FIRSTMAPTILELOADED,
+    mapWarpedMapLayerFirstTileLoaded
+  )
 
-  if (mapWarpedMapLayer) {
-    // TODO: emit this event directly from WarpedMapLayer?
-    mapWarpedMapLayer.renderer.tileCache.addEventListener(
-      WarpedMapEventType.FIRSTMAPTILELOADED,
-      mapWarpedMapLayerFirstTileLoaded
-    )
+  mapVectorLayer = new VectorLayer({
+    source: mapVectorSource,
+    style: invisiblePolygonStyle,
+    renderOrder: mapVectorLayerOrderFunction as OrderFunction
+  })
 
-    mapVectorLayer = new VectorLayer({
-      source: mapVectorSource,
-      style: invisiblePolygonStyle,
-      renderOrder: mapVectorLayerOrderFunction as OrderFunction
-    })
+  mapOl = new OLMap({
+    interactions: defaultInteractions().extend([new DblClickDragZoom()]),
+    layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
+    controls: [],
+    view: new View({
+      maxZoom: 24,
+      zoom: 12
+    }),
+    keyboardEventTarget: document
+  })
 
-    mapOl = new OLMap({
-      interactions: defaultInteractions().extend([new DblClickDragZoom()]),
-      layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
-      controls: [],
-      view: new View({
-        maxZoom: 24,
-        zoom: 12
-      }),
-      keyboardEventTarget: document
-    })
+  mapSelect = new Select({
+    condition: click,
+    style: selectedPolygonStyle
+  })
 
-    mapSelect = new Select({
-      condition: click,
-      style: selectedPolygonStyle
-    })
-
-    mapOl.addInteraction(mapSelect)
-  }
+  mapOl.addInteraction(mapSelect)
 }
 
 export const mapVectorLayerOutlinesVisible = writable(false)
@@ -230,21 +223,21 @@ export const ol = derived(view, ($view) => {
 // Exported functions
 
 export function showMap(mapId: string) {
-  if (!mapWarpedMapSource.isMapVisible(mapId)) {
-    mapWarpedMapSource.showMap(mapId)
+  if (!mapWarpedMapLayer.isMapVisible(mapId)) {
+    mapWarpedMapLayer.showMap(mapId)
     addMapToVectorSource(mapId)
   }
 }
 
 export function hideMap(mapId: string) {
-  if (mapWarpedMapSource.isMapVisible(mapId)) {
-    mapWarpedMapSource.hideMap(mapId)
+  if (mapWarpedMapLayer.isMapVisible(mapId)) {
+    mapWarpedMapLayer.hideMap(mapId)
     removeMapFromVectorSource(mapId)
   }
 }
 
 export async function addMap(map: Georef): Promise<MapIDOrError> {
-  const mapIdOrError = await mapWarpedMapSource.addGeoreferencedMap(map)
+  const mapIdOrError = await mapWarpedMapLayer.addGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     addMapToVectorSource(mapId)
@@ -254,7 +247,7 @@ export async function addMap(map: Georef): Promise<MapIDOrError> {
 }
 
 export async function removeMap(map: Georef) {
-  const mapIdOrError = await mapWarpedMapSource.removeGeoreferencedMap(map)
+  const mapIdOrError = await mapWarpedMapLayer.removeGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
     removeMapFromVectorSource(mapId)
@@ -264,7 +257,7 @@ export async function removeMap(map: Georef) {
 }
 
 export function addMapToVectorSource(mapId: string) {
-  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
+  const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
   if (warpedMap) {
     const geoMask = warpedMap.geoMask
     const feature = new GeoJSON().readFeature(geoMask, {

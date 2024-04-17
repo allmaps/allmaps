@@ -10,7 +10,6 @@ import {
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { fromHue } from '$lib/shared/color.js'
 import {
-  mapWarpedMapSource,
   mapWarpedMapLayer,
   addMap,
   removeMap
@@ -109,7 +108,7 @@ export function resetCustomResourceMask(mapId: string) {
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = undefined
-      mapWarpedMapSource.setMapResourceMask(mapId, viewerMap.map.resourceMask)
+      mapWarpedMapLayer.setMapResourceMask(mapId, viewerMap.map.resourceMask)
     }
 
     return $mapsById
@@ -125,7 +124,7 @@ export function setCustomResourceMask(
 
     if (viewerMap) {
       viewerMap.state.customResourceMask = customResourceMask
-      mapWarpedMapSource.setMapResourceMask(mapId, customResourceMask)
+      mapWarpedMapLayer.setMapResourceMask(mapId, customResourceMask)
     }
 
     return $mapsById
@@ -141,7 +140,7 @@ export function setRemoveBackgroundColor(
 
     if (viewerMap) {
       viewerMap.renderOptions.removeBackground.color = removeBackgroundColor
-      mapWarpedMapLayer?.setMapRemoveColor(mapId, {
+      mapWarpedMapLayer.setMapRemoveColor(mapId, {
         hexColor: removeBackgroundColor,
         threshold: viewerMap.renderOptions.removeBackground.threshold,
         hardness: viewerMap.renderOptions.removeBackground.hardness

@@ -10,7 +10,7 @@ import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
  * @typedef {CacheableTile}
  * @extends {EventTarget}
  */
-export default abstract class CacheableTile<T> extends EventTarget {
+export default abstract class CacheableTile<D> extends EventTarget {
   readonly tile: Tile
   readonly imageRequest: ImageRequest
   readonly tileUrl: string
@@ -18,7 +18,7 @@ export default abstract class CacheableTile<T> extends EventTarget {
 
   protected abortController: AbortController
 
-  protected data?: T
+  protected data?: D
 
   /**
    * Creates an instance of CacheableTile.
@@ -37,7 +37,7 @@ export default abstract class CacheableTile<T> extends EventTarget {
     this.abortController = new AbortController()
   }
 
-  abstract fetch(): Promise<T | undefined>
+  abstract fetch(): Promise<D | undefined>
 
   /**
    * Whether a tile has completed its caching
@@ -45,7 +45,7 @@ export default abstract class CacheableTile<T> extends EventTarget {
    *
    * @returns {boolean}
    */
-  isCachedTile(): this is CachedTile<T> {
+  isCachedTile(): this is CachedTile<D> {
     return this.data !== undefined
   }
 
@@ -68,6 +68,6 @@ export default abstract class CacheableTile<T> extends EventTarget {
  * @typedef {CachedTile}
  * @extends {CacheableTile}
  */
-export abstract class CachedTile<T> extends CacheableTile<T> {
-  data!: T
+export abstract class CachedTile<D> extends CacheableTile<D> {
+  data!: D
 }

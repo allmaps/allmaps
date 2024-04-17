@@ -1,20 +1,58 @@
+import { Map as GeoreferencedMap } from '@allmaps/annotation'
+
+import type FetchableMapTile from '../tilecache/FetchableTile.js'
+import type CacheableTile from '../tilecache/CacheableTile.js'
+
 import type { Color } from '@allmaps/types'
+import type { Size, FetchFn, ImageInformations } from '@allmaps/types'
 
-import type FetchableMapTile from '../classes/FetchableTile.js'
-import type CacheableTile from '../classes/CacheableTile.js'
+// TODO: export this from @allmaps/transform
+export type TransformationOptions = {
+  type: string
+  options?: any
+}
 
-import type { Size } from '@allmaps/types'
+export type WarpedMapOptions = {
+  fetchFn: FetchFn
+  // TODO: this option needs a better name:
+  imageInformations: ImageInformations
+  visible: boolean
+  transformation: TransformationOptions
+}
+
+export type WarpedMapListOptions = {
+  fetchFn: FetchFn
+  createRTree: boolean
+  imageInformations: ImageInformations
+}
+
+// TODO: consider to pass these options separately (since most WarpedMapOptions are optional)
+export type RendererOptions = WarpedMapListOptions &
+  WarpedMapOptions & {
+    imageInformations: ImageInformations
+    fetchFn: FetchFn
+  }
+
+export type WebGL2RendererOptions = RendererOptions
+export type CanvasRendererOptions = RendererOptions
+export type IntArrayRendererOptions = RendererOptions
+
+export type WarpedMapLayerOptions = WebGL2RendererOptions
+
+export type TileCacheOptions = {
+  fetchFn: FetchFn
+}
 
 export type Renderer = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render: (...params: any[]) => any
 }
 
-export type GetImageData<T> = (data: Uint8ClampedArray) => T
+export type GetImageData<D> = (data: Uint8ClampedArray) => D
 
-export type GetImageDataValue<T> = (data: T, index: number) => number
+export type GetImageDataValue<D> = (data: D, index: number) => number
 
-export type GetImageDataSize<T> = (data: T) => Size
+export type GetImageDataSize<D> = (data: D) => Size
 
 export type RemoveColorOptions = Partial<{
   color: Color
@@ -26,11 +64,18 @@ export type ColorizeOptions = Partial<{
   color: Color
 }>
 
+// TODO: don't make partial, extend with other rendering options
 export type RenderOptions = Partial<{
   removeColorOptions?: RemoveColorOptions
   colorizeOptions?: ColorizeOptions
 }>
 
-export type CachableTileFactory<T> = (
+export type WarpedMapFactory<W> = (
+  mapId: string,
+  georeferencedMap: GeoreferencedMap,
+  options?: Partial<WarpedMapOptions>
+) => W
+
+export type CachableTileFactory<D> = (
   fetchableMapTile: FetchableMapTile
-) => CacheableTile<T>
+) => CacheableTile<D>

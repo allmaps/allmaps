@@ -1,12 +1,13 @@
 import * as L from 'leaflet'
 
 import {
-  WarpedMap,
+  WebGL2WarpedMap,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2Renderer
+  WebGL2Renderer,
+  WarpedMapLayerOptions
 } from '@allmaps/render'
 import {
   rectangleToSize,
@@ -19,7 +20,7 @@ import type { Map, ZoomAnimEvent } from 'leaflet'
 import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 
-export type WarpedMapLayerOptions = {
+export type LeafletWarpedMapLayerOptions = WarpedMapLayerOptions & {
   opacity: number
   interactive: boolean
   className: string
@@ -30,6 +31,9 @@ export type WarpedMapLayerOptions = {
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
+
+const DEFAULT_PANE = 'tilePane'
+const DEFAULT_OPACITY = 1
 
 function assertRenderer(
   renderer?: WebGL2Renderer
@@ -59,17 +63,17 @@ export class WarpedMapLayer extends L.Layer {
 
   resizeObserver: ResizeObserver | undefined
 
-  options: WarpedMapLayerOptions = {
-    opacity: 1,
+  options: Partial<LeafletWarpedMapLayerOptions> = {
+    opacity: DEFAULT_OPACITY,
     interactive: false,
     className: '',
-    pane: 'tilePane',
+    pane: DEFAULT_PANE,
     zIndex: 1
   }
 
   constructor(
     annotationOrAnnotationUrl: unknown,
-    options: WarpedMapLayerOptions
+    options: Partial<LeafletWarpedMapLayerOptions>
   ) {
     super()
     this.initialize(annotationOrAnnotationUrl, options)
@@ -82,7 +86,7 @@ export class WarpedMapLayer extends L.Layer {
    */
   initialize(
     annotationOrAnnotationUrl: unknown,
-    options: WarpedMapLayerOptions
+    options: Partial<LeafletWarpedMapLayerOptions>
   ) {
     this._annotationOrAnnotationUrl = annotationOrAnnotationUrl
     L.setOptions(this, options)
@@ -269,7 +273,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
-  getWarpedMapList(): WarpedMapList {
+  getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList
@@ -278,9 +282,9 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Returns a single map's warped map
    * @param {string} mapId - ID of the map
-   * @returns {WarpedMap | undefined} the warped map
+   * @returns {WebGL2WarpedMap | undefined} the warped map
    */
-  getWarpedMap(mapId: string): WarpedMap | undefined {
+  getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMap(mapId)
@@ -513,7 +517,8 @@ export class WarpedMapLayer extends L.Layer {
    * @returns {string} Pane name
    */
   getPaneName(): string {
-    return this._map.getPane(this.options.pane) ? this.options.pane : 'tilePane'
+    // this._map.getPane(this.options.pane) ? this.options.pane : DEFAULT_PANE
+    return this.options.pane || DEFAULT_PANE
   }
 
   /**
@@ -521,7 +526,7 @@ export class WarpedMapLayer extends L.Layer {
    * @returns {number} Layer opacity
    */
   getOpacity(): number {
-    return this.options.opacity
+    return this.options.opacity || DEFAULT_OPACITY
   }
 
   /**
@@ -795,11 +800,7 @@ export class WarpedMapLayer extends L.Layer {
       throw new Error('WebGL 2 not available')
     }
 
-    const warpedMapList = new WarpedMapList({
-      imageInformations: this.options.imageInformations
-    })
-
-    this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
+    this.renderer = new WebGL2Renderer(this.gl)
 
     this._addEventListeners()
   }

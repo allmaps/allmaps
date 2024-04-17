@@ -1,15 +1,16 @@
-import BaseRenderer from '../classes/BaseRenderer.js'
-import CacheableImageDataTile from '../classes/CacheableImageDataTile.js'
-import WarpedMapList from '../classes/WarpedMapList.js'
-import Viewport from '../classes/Viewport.js'
+import BaseRenderer from './BaseRenderer.js'
+import CacheableImageDataTile from '../tilecache/CacheableImageDataTile.js'
+import { createWarpedMapFactory } from '../maps/WarpedMap.js'
+import Viewport from '../Viewport.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
-import type { Renderer } from '../shared/types.js'
+import type { Renderer, CanvasRendererOptions } from '../shared/types.js'
+import type WarpedMap from '../maps/WarpedMap.js'
 
-import type { Size, FetchFn } from '@allmaps/types'
+import type { Size } from '@allmaps/types'
 
 export default class CanvasRenderer
-  extends BaseRenderer<ImageData>
+  extends BaseRenderer<WarpedMap, ImageData>
   implements Renderer
 {
   canvas: HTMLCanvasElement
@@ -17,10 +18,13 @@ export default class CanvasRenderer
 
   constructor(
     canvas: HTMLCanvasElement,
-    warpedMapList: WarpedMapList,
-    fetchFn?: FetchFn
+    options?: Partial<CanvasRendererOptions>
   ) {
-    super(warpedMapList, CacheableImageDataTile.createFactory(), fetchFn)
+    super(
+      CacheableImageDataTile.createFactory(),
+      createWarpedMapFactory(),
+      options
+    )
 
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D

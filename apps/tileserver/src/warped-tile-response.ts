@@ -1,7 +1,7 @@
 import { decode as decodeJpeg, type UintArrRet } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
-import { IntArrayRenderer, WarpedMapList, Viewport } from '@allmaps/render'
+import { IntArrayRenderer, Viewport } from '@allmaps/render'
 
 import { tileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'
@@ -41,22 +41,20 @@ export async function createWarpedTileResponse(
     }
   }
 
-  const warpedMapList = new WarpedMapList({
-    fetchFn: cachedFetch as FetchFn,
-    transformation: transformationOptions,
-    createRTree: false
-  })
-
-  for (const map of maps) {
-    await warpedMapList.addGeoreferencedMap(map)
-  }
-
   const renderer = new IntArrayRenderer<UintArrRet>(
-    warpedMapList,
     getImageData,
     getImageDataValue,
-    getImageDataSize
+    getImageDataSize,
+    {
+      fetchFn: cachedFetch as FetchFn,
+      transformation: transformationOptions,
+      createRTree: false
+    }
   )
+
+  for (const map of maps) {
+    await renderer.addGeoreferencedMap(map)
+  }
 
   const projectedGeoBbox: Bbox = tileToProjectedGeoBbox({ x, y, z })
 

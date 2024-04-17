@@ -5,7 +5,7 @@ import {
   bboxToCenter,
   distance
 } from '@allmaps/stdlib'
-import FetchableMapTile from '../classes/FetchableTile'
+import FetchableMapTile from '../tilecache/FetchableTile'
 
 import type {
   Point,

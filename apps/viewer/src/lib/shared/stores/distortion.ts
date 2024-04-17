@@ -3,7 +3,7 @@ import { writable, derived, get } from 'svelte/store'
 import type { DistortionMeasure } from '@allmaps/transform'
 
 import { mapIds } from '$lib/shared/stores/maps.js'
-import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
+import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
 
 const distortionMeasures: (DistortionMeasure | undefined)[] = [
   undefined,
@@ -35,5 +35,5 @@ export function nextDistortionMeasure() {
 
 distortionMeasure.subscribe(($distortionMeasure) => {
   const $mapIds = get(mapIds)
-  mapWarpedMapSource.setMapsDistortionMeasure($mapIds, $distortionMeasure)
+  mapWarpedMapLayer?.setMapsDistortionMeasure($mapIds, $distortionMeasure)
 })

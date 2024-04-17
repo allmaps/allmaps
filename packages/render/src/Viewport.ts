@@ -1,5 +1,5 @@
-import WarpedMapList from './WarpedMapList.js'
-import { composeTransform } from '../shared/matrix.js'
+import WarpedMapList from './maps/WarpedMapList.js'
+import { composeTransform } from './shared/matrix.js'
 
 import {
   computeBbox,
@@ -10,6 +10,8 @@ import {
   bboxToCenter,
   computeProjectedGeoPerViewportScale
 } from '@allmaps/stdlib'
+
+import type WarpedMap from './maps/WarpedMap.js'
 
 import type {
   Point,
@@ -143,8 +145,8 @@ export default class Viewport {
   }
 
   // TODO: maybe integrate this in a constructor overload later
-  static fitWarpedMapList(
-    warpedMapList: WarpedMapList,
+  static fitWarpedMapList<W extends WarpedMap>(
+    warpedMapList: WarpedMapList<W>,
     viewportSize: Size,
     fit: Fit = 'contain'
   ): Viewport {

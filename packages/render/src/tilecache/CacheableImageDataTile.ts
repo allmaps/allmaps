@@ -71,10 +71,10 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
  * I.e. their fetching is completed and image bitmap is created
  *
  * @export
- * @class CachedImageBitmapTile
+ * @class CachedImageDataTile
  * @typedef {CachedImageDataTile}
  * @extends {CacheableImageDataTile}
  */
-export class CachedImageBitmapTile extends CacheableImageDataTile {
+export class CachedImageDataTile extends CacheableImageDataTile {
   data!: ImageData
 }

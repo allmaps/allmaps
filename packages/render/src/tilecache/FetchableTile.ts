@@ -1,4 +1,4 @@
-import { WarpedMapWithImageInfo } from './WarpedMap.js'
+import { WarpedMapWithImageInfo } from '../maps/WarpedMap.js'
 
 import type { Tile, ImageRequest } from '@allmaps/types'
 

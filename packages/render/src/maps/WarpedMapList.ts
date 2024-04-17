@@ -5,11 +5,13 @@ import {
   type Map as GeoreferencedMap
 } from '@allmaps/annotation'
 
-import GeojsonPolygonRTree from './RTree.js'
+import RTree from '../RTree.js'
 import WarpedMap from './WarpedMap.js'
 
 import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+
+import type { WarpedMapFactory, WarpedMapListOptions } from '../shared/types.js'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type {
@@ -19,14 +21,6 @@ import type {
   FetchFn,
   ImageInformations
 } from '@allmaps/types'
-
-type WarpedMapListOptions = {
-  fetchFn: FetchFn
-  transformation: unknown
-  createRTree: boolean
-  // TODO: this option needs a better name:
-  imageInformations: ImageInformations
-}
 
 function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
   return {
@@ -41,14 +35,15 @@ function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
  *
  * @export
  * @class WarpedMapList
- * @typedef {WarpedMapList}
+ * @typedef {WarpedMapList<W>}
  * @extends {EventTarget}
  */
-export default class WarpedMapList extends EventTarget {
-  warpedMapsById: Map<string, WarpedMap> = new Map()
+export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
+  warpedMapFactory: WarpedMapFactory<W>
+  warpedMapsById: Map<string, W> = new Map()
 
   zIndices: Map<string, number> = new Map()
-  rtree?: GeojsonPolygonRTree
+  rtree?: RTree
   imageInformations?: ImageInformations
 
   fetchFn?: FetchFn
@@ -60,23 +55,25 @@ export default class WarpedMapList extends EventTarget {
    * @param {?Cache} [imageInfoCache] - An image info cache
    * @param {?WarpedMapListOptions} [options] - Options
    */
-  constructor(options?: Partial<WarpedMapListOptions>) {
+  constructor(
+    warpedMapFactory: WarpedMapFactory<W>,
+    options?: Partial<WarpedMapListOptions>
+  ) {
     super()
+
+    this.warpedMapFactory = warpedMapFactory
 
     options = {
       ...createDefaultWarpedMapListOptions(),
       ...options
     }
 
-    // maps: GeoreferencedMap[]
-    this.fetchFn = options.fetchFn
-    // transformation: unknown
-    // maaak o0ok transform
+    this.fetchFn = options?.fetchFn
 
     this.imageInformations = options.imageInformations
 
     if (options.createRTree) {
-      this.rtree = new GeojsonPolygonRTree()
+      this.rtree = new RTree()
     }
   }
 
@@ -93,15 +90,15 @@ export default class WarpedMapList extends EventTarget {
    * Returns WarpedMap objects of the maps in this list.
    * Optionally specify mapIds whose WarpedMap objects are requested.
    *
-   * @returns {Iterable<WarpedMap>}
+   * @returns {Iterable<W>}
    */
-  getWarpedMaps(): Iterable<WarpedMap>
-  getWarpedMaps(mapIds: string[]): Iterable<WarpedMap>
-  getWarpedMaps(mapIds?: string[]): Iterable<WarpedMap> {
+  getWarpedMaps(): Iterable<W>
+  getWarpedMaps(mapIds: string[]): Iterable<W>
+  getWarpedMaps(mapIds?: string[]): Iterable<W> {
     if (mapIds === undefined) {
       return this.warpedMapsById.values()
     } else {
-      const warpedMaps: WarpedMap[] = []
+      const warpedMaps: W[] = []
       for (const mapId of mapIds) {
         const warpedMap = this.warpedMapsById.get(mapId)
         if (warpedMap) {
@@ -116,9 +113,9 @@ export default class WarpedMapList extends EventTarget {
    * Returns the WarpedMap object in this list of map specified by a mapId.
    *
    * @param {string} mapId
-   * @returns {(WarpedMap | undefined)}
+   * @returns {(W | undefined)}
    */
-  getWarpedMap(mapId: string): WarpedMap | undefined {
+  getWarpedMap(mapId: string): W | undefined {
     return this.warpedMapsById.get(mapId)
   }
 
@@ -436,9 +433,7 @@ export default class WarpedMapList extends EventTarget {
    * @param {unknown} annotation
    * @returns {Promise<(string | Error)[]>}
    */
-  async addGeoreferenceAnnotation(
-    annotation: unknown
-  ): Promise<(string | Error)[]> {
+  async addGeoreferenceAnnotation(annotation: unknown) {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const settledResults = await Promise.allSettled(
@@ -500,8 +495,7 @@ export default class WarpedMapList extends EventTarget {
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
 
-    // hier
-    const warpedMap = new WarpedMap(mapId, georeferencedMap, {
+    const warpedMap = this.warpedMapFactory(mapId, georeferencedMap, {
       imageInformations: this.imageInformations,
       fetchFn: this.fetchFn
     })
@@ -543,14 +537,14 @@ export default class WarpedMapList extends EventTarget {
     return mapId
   }
 
-  private addToOrUpdateRtree(warpedMap: WarpedMap): void {
+  private addToOrUpdateRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
       this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
     }
   }
 
-  private removeFromRtree(warpedMap: WarpedMap): void {
+  private removeFromRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
     }
@@ -578,14 +572,14 @@ export default class WarpedMapList extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
   }
 
-  private addEventListenersToWarpedMap(warpedMap: WarpedMap) {
+  private addEventListenersToWarpedMap(warpedMap: W) {
     warpedMap.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
       this.imageInfoLoaded.bind(this)
     )
   }
 
-  private removeEventListenersFromWarpedMap(warpedMap: WarpedMap) {
+  private removeEventListenersFromWarpedMap(warpedMap: W) {
     warpedMap.removeEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
       this.imageInfoLoaded.bind(this)

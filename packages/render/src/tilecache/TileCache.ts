@@ -13,7 +13,7 @@ import FetchableMapTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
 
-import type { CachableTileFactory } from '../shared/types.js'
+import type { CachableTileFactory, TileCacheOptions } from '../shared/types.js'
 
 const MAX_HISTORY_TOTAL_COUNT = 0
 const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bytes
@@ -26,11 +26,11 @@ const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bytes
  * @typedef {TileCache}
  * @extends {EventTarget}
  */
-export default class TileCache<T> extends EventTarget {
-  cachableTileFactory: CachableTileFactory<T>
+export default class TileCache<D> extends EventTarget {
+  cachableTileFactory: CachableTileFactory<D>
   fetchFn?: FetchFn
 
-  protected tilesByTileUrl: Map<string, CacheableTile<T>> = new Map()
+  protected tilesByTileUrl: Map<string, CacheableTile<D>> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
@@ -39,11 +39,14 @@ export default class TileCache<T> extends EventTarget {
   protected previousRequestedTiles: FetchableMapTile[] = []
   protected outgoingTilesHistory: FetchableMapTile[] = []
 
-  constructor(cachableTileFactory: CachableTileFactory<T>, fetchFn?: FetchFn) {
+  constructor(
+    cachableTileFactory: CachableTileFactory<D>,
+    options?: Partial<TileCacheOptions>
+  ) {
     super()
 
     this.cachableTileFactory = cachableTileFactory
-    this.fetchFn = fetchFn
+    this.fetchFn = options?.fetchFn
   }
 
   /**
@@ -53,7 +56,7 @@ export default class TileCache<T> extends EventTarget {
    * @param {string} tileUrl - the url of the requested tile
    * @returns {(CacheableTile | undefined)}
    */
-  getCacheableTile(tileUrl: string): CacheableTile<T> | undefined {
+  getCacheableTile(tileUrl: string): CacheableTile<D> | undefined {
     return this.tilesByTileUrl.get(tileUrl)
   }
 
@@ -64,10 +67,10 @@ export default class TileCache<T> extends EventTarget {
    * @param {string} tileUrl - the url of the requested tile
    * @returns {(CachedTile | undefined)}
    */
-  getCachedTile(tileUrl: string): CachedTile<T> | undefined {
+  getCachedTile(tileUrl: string): CachedTile<D> | undefined {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
     if (cacheableTile && cacheableTile.isCachedTile()) {
-      return cacheableTile as CachedTile<T>
+      return cacheableTile as CachedTile<D>
     }
   }
 
@@ -76,7 +79,7 @@ export default class TileCache<T> extends EventTarget {
    *
    * @returns {IterableIterator<CacheableTile>}
    */
-  getCacheableTiles(): IterableIterator<CacheableTile<T>> {
+  getCacheableTiles(): IterableIterator<CacheableTile<D>> {
     return this.tilesByTileUrl.values()
   }
 
@@ -85,8 +88,8 @@ export default class TileCache<T> extends EventTarget {
    *
    * @returns {CacheableTile[]}
    */
-  getCachedTiles(): CachedTile<T>[] {
-    const cachedTiles: CachedTile<T>[] = []
+  getCachedTiles(): CachedTile<D>[] {
+    const cachedTiles: CachedTile<D>[] = []
 
     for (const cacheableTile of this.tilesByTileUrl.values()) {
       if (cacheableTile.isCachedTile()) {
@@ -97,8 +100,8 @@ export default class TileCache<T> extends EventTarget {
     return cachedTiles
   }
 
-  getCachedTilesForMapId(mapId: string): CachedTile<T>[] {
-    const cachedTiles: CachedTile<T>[] = []
+  getCachedTilesForMapId(mapId: string): CachedTile<D>[] {
+    const cachedTiles: CachedTile<D>[] = []
 
     for (const cacheableTile of this.tilesByTileUrl.values()) {
       if (
@@ -436,7 +439,7 @@ export default class TileCache<T> extends EventTarget {
     }
   }
 
-  private addEventListenersToTile(cacheableTile: CacheableTile<T>) {
+  private addEventListenersToTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)
@@ -447,7 +450,7 @@ export default class TileCache<T> extends EventTarget {
     )
   }
 
-  private removeEventListenersFromTile(cacheableTile: CacheableTile<T>) {
+  private removeEventListenersFromTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)

@@ -1,39 +1,39 @@
-import BaseRenderer from '../classes/BaseRenderer.js'
-import WarpedMapList from '../classes/WarpedMapList.js'
-import Viewport from '../classes/Viewport.js'
-import CacheableIntArrayTile from '../classes/CacheableIntArrayTile.js'
+import BaseRenderer from './BaseRenderer.js'
+import Viewport from '../Viewport.js'
+import { createWarpedMapFactory } from '../maps/WarpedMap.js'
+import CacheableIntArrayTile from '../tilecache/CacheableIntArrayTile.js'
 
 import type {
   Renderer,
   GetImageData,
   GetImageDataValue,
-  GetImageDataSize
+  GetImageDataSize,
+  IntArrayRendererOptions
 } from '../shared/types.js'
+
+import type WarpedMap from '../maps/WarpedMap.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 
-import type { FetchFn } from '@allmaps/types'
-
 const CHANNELS = 4
 
-export default class IntArrayRenderer<T>
-  extends BaseRenderer<T>
+export default class IntArrayRenderer<D>
+  extends BaseRenderer<WarpedMap, D>
   implements Renderer
 {
-  getImageDataValue: GetImageDataValue<T>
-  getImageDataSize: GetImageDataSize<T>
+  getImageDataValue: GetImageDataValue<D>
+  getImageDataSize: GetImageDataSize<D>
 
   constructor(
-    warpedMapList: WarpedMapList,
-    getImageData: GetImageData<T>,
-    getImageDataValue: GetImageDataValue<T>,
-    getImageDataSize: GetImageDataSize<T>,
-    fetchFn?: FetchFn
+    getImageData: GetImageData<D>,
+    getImageDataValue: GetImageDataValue<D>,
+    getImageDataSize: GetImageDataSize<D>,
+    options?: Partial<IntArrayRendererOptions>
   ) {
     super(
-      warpedMapList,
       CacheableIntArrayTile.createFactory(getImageData),
-      fetchFn
+      createWarpedMapFactory(),
+      options
     )
     this.getImageDataValue = getImageDataValue
     this.getImageDataSize = getImageDataSize

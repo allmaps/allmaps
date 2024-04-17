@@ -14,12 +14,12 @@ import type { GetImageData } from '../shared/types.js'
  * @typedef {CacheableArrayBufferTile}
  * @extends {EventTarget}
  */
-export default class CacheableIntArrayTile<T> extends CacheableTile<T> {
-  getImageData: GetImageData<T>
+export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
+  getImageData: GetImageData<D>
 
   constructor(
     fetchableMapTile: FetchableMapTile,
-    getImageData: GetImageData<T>
+    getImageData: GetImageData<D>
   ) {
     super(fetchableMapTile)
 
@@ -64,7 +64,7 @@ export default class CacheableIntArrayTile<T> extends CacheableTile<T> {
     return this.data
   }
 
-  static createFactory<T>(getImageData: GetImageData<T>) {
+  static createFactory<D>(getImageData: GetImageData<D>) {
     return (fetchableMapTile: FetchableMapTile) =>
       new CacheableIntArrayTile(fetchableMapTile, getImageData)
   }
@@ -79,6 +79,6 @@ export default class CacheableIntArrayTile<T> extends CacheableTile<T> {
  * @typedef {CachedIntArrayTile}
  * @extends {CacheableIntArrayTile}
  */
-export class CachedIntArrayTile<T> extends CacheableIntArrayTile<T> {
-  data!: T
+export class CachedIntArrayTile<D> extends CacheableIntArrayTile<D> {
+  data!: D
 }

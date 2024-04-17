@@ -1,28 +1,48 @@
-import WarpedMap from './classes/WarpedMap.js'
-import WarpedMapList from './classes/WarpedMapList.js'
-import Viewport from './classes/Viewport.js'
-import GeojsonPolygonRTree from './classes/RTree.js'
-import TileCache from './classes/TileCache.js'
-import CacheableTile from './classes/CacheableTile.js'
-import FetchableTile from './classes/FetchableTile.js'
+import Viewport from './Viewport.js'
+import RTree from './RTree.js'
 
-import CacheableImageBitmapTile, {
-  CachedImageBitmapTile
-} from './classes/CacheableImageBitmapTile.js'
-import CacheableIntArrayTile, {
-  CachedIntArrayTile
-} from './classes/CacheableIntArrayTile.js'
+export { Viewport, RTree }
+
+import WarpedMap, { createWarpedMapFactory } from './maps/WarpedMap.js'
+import TriangulatedWarpedMap, {
+  createTriangulatedWarpedMapFactory
+} from './maps/TriangulatedWarpedMap.js'
+import WebGL2WarpedMap, {
+  createWebGL2WarpedMapFactory
+} from './maps/WebGL2WarpedMap.js'
+import WarpedMapList from './maps/WarpedMapList.js'
 
 export {
   WarpedMap,
-  WarpedMapList,
-  Viewport,
-  GeojsonPolygonRTree,
+  TriangulatedWarpedMap,
+  WebGL2WarpedMap,
+  createWarpedMapFactory,
+  createTriangulatedWarpedMapFactory,
+  createWebGL2WarpedMapFactory,
+  WarpedMapList
+}
+
+import CacheableTile from './tilecache/CacheableTile.js'
+import FetchableTile from './tilecache/FetchableTile.js'
+import CacheableImageBitmapTile, {
+  CachedImageBitmapTile
+} from './tilecache/CacheableImageBitmapTile.js'
+import CacheableImageDataTile, {
+  CachedImageDataTile
+} from './tilecache/CacheableImageDataTile.js'
+import CacheableIntArrayTile, {
+  CachedIntArrayTile
+} from './tilecache/CacheableIntArrayTile.js'
+import TileCache from './tilecache/TileCache.js'
+
+export {
   TileCache,
   CacheableTile,
   FetchableTile,
   CacheableImageBitmapTile,
   CachedImageBitmapTile,
+  CacheableImageDataTile,
+  CachedImageDataTile,
   CacheableIntArrayTile,
   CachedIntArrayTile
 }

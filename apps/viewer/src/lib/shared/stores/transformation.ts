@@ -3,7 +3,7 @@ import { writable, derived, get } from 'svelte/store'
 import type { TransformationType } from '@allmaps/transform'
 
 import { mapIds } from '$lib/shared/stores/maps.js'
-import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
+import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
 
 const transformations: TransformationType[] = [
   'polynomial',
@@ -39,5 +39,5 @@ export function nextTransformation() {
 
 transformation.subscribe(($transformation) => {
   const $mapIds = get(mapIds)
-  mapWarpedMapSource.setMapsTransformationType($mapIds, $transformation)
+  mapWarpedMapLayer.setMapsTransformationType($mapIds, $transformation)
 })

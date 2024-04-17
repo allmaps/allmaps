@@ -2,7 +2,7 @@ import { Map, CustomLayerInterface } from 'maplibre-gl'
 import {
   Viewport,
   WebGL2Renderer,
-  WarpedMap,
+  WebGL2WarpedMap,
   WarpedMapList,
   WarpedMapEvent,
   WarpedMapEventType
@@ -17,7 +17,10 @@ import {
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
+import type { WarpedMapLayerOptions } from '@allmaps/render'
 import type { Rectangle, Ring, ImageInformations } from '@allmaps/types'
+
+export type MapLibreWarpedMapLayerOptions = WarpedMapLayerOptions
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
@@ -44,10 +47,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   renderingMode = '2d' as const
 
   map?: Map
-
   renderer?: WebGL2Renderer
-
-  private imageInformations?: ImageInformations
+  options?: Partial<MapLibreWarpedMapLayerOptions>
 
   /**
    * Creates a WarpedMapLayer instance
@@ -56,11 +57,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param {string} [id] - unique id for this layer
    * @param {Cache} imageInformations - image info cache
    */
-  constructor(id?: string, imageInformations?: ImageInformations) {
+  constructor(id?: string, options?: Partial<MapLibreWarpedMapLayerOptions>) {
     if (id) {
       this.id = id
     }
-    this.imageInformations = imageInformations
+    this.options = options
   }
 
   /**
@@ -71,12 +72,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map
 
-    const warpedMapList = new WarpedMapList({
-      imageInformations: this.imageInformations
-    })
-
-    this.renderer = new WebGL2Renderer(gl, warpedMapList)
-
+    this.renderer = new WebGL2Renderer(gl, this.options)
     this.addEventListeners()
   }
 
@@ -196,7 +192,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
    * @returns {WarpedMapList} the warped map list
    */
-  getWarpedMapList(): WarpedMapList {
+  getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList
@@ -205,9 +201,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Returns a single map's warped map
    * @param {string} mapId - ID of the map
-   * @returns {WarpedMap | undefined} the warped map
+   * @returns {WebGL2WarpedMap | undefined} the warped map
    */
-  getWarpedMap(mapId: string): WarpedMap | undefined {
+  getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMap(mapId)

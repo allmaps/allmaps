@@ -1,9 +1,10 @@
 import { throttle } from 'lodash-es'
 
-import BaseRenderer from '../classes/BaseRenderer.js'
-import WarpedMapList from '../classes/WarpedMapList.js'
-import WebGL2WarpedMap from '../classes/WebGL2WarpedMap.js'
-import CacheableImageBitmapTile from '../classes/CacheableImageBitmapTile.js'
+import BaseRenderer from './BaseRenderer.js'
+import WebGL2WarpedMap, {
+  createWebGL2WarpedMapFactory
+} from '../maps/WebGL2WarpedMap.js'
+import CacheableImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
 import { distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
 
@@ -26,16 +27,17 @@ import spectral from '../shaders/spectral.glsl?raw'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Transform, FetchFn } from '@allmaps/types'
+import type { Transform } from '@allmaps/types'
 
-import type Viewport from '../classes/Viewport.js'
-import type WarpedMap from '../classes/WarpedMap.js'
+import type Viewport from '../Viewport.js'
+import type WarpedMap from '../maps/WarpedMap.js'
 
 import type {
   Renderer,
   RenderOptions,
   RemoveColorOptions,
-  ColorizeOptions
+  ColorizeOptions,
+  WebGL2RendererOptions
 } from '../shared/types.js'
 
 const THROTTLE_PREPARE_WAIT_MS = 500
@@ -69,18 +71,13 @@ const ANIMATION_DURATION = 750
  */
 // export default class WebGL2Renderer extends EventTarget {
 export default class WebGL2Renderer
-  extends BaseRenderer<ImageBitmap>
+  extends BaseRenderer<WebGL2WarpedMap, ImageBitmap>
   implements Renderer
 {
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
-  webgl2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
-
-  // viewport: Viewport | undefined
   previousSignificantViewport: Viewport | undefined
-
-  // mapsInViewport: Set<string> = new Set()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -104,17 +101,12 @@ export default class WebGL2Renderer
    *
    * @constructor
    * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
-   * @param {WarpedMapList} warpedMapList - the list of warped maps to render
+   * @param {WebGL2RendererOptions} options - the WebGL2 rendering options
    */
   constructor(
     gl: WebGL2RenderingContext,
-    warpedMapList: WarpedMapList,
-    fetchFn?: FetchFn
+    options?: Partial<WebGL2RendererOptions>
   ) {
-    super(warpedMapList, CacheableImageBitmapTile.createFactory(), fetchFn)
-
-    this.gl = gl
-
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
     const fragmentShader = createShader(
       gl,
@@ -122,7 +114,16 @@ export default class WebGL2Renderer
       fragmentShaderSource.replace('#include "spectral.glsl"', spectral)
     )
 
-    this.program = createProgram(gl, vertexShader, fragmentShader)
+    const program = createProgram(gl, vertexShader, fragmentShader)
+
+    super(
+      CacheableImageBitmapTile.createFactory(),
+      createWebGL2WarpedMapFactory(gl, program),
+      options
+    )
+
+    this.gl = gl
+    this.program = program
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -181,10 +182,10 @@ export default class WebGL2Renderer
    * @returns {(number | undefined)}
    */
   getMapOpacity(mapId: string): number | undefined {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-    if (webGL2WarpedMap) {
-      return webGL2WarpedMap.opacity
+    if (warpedMap) {
+      return warpedMap.opacity
     }
   }
 
@@ -195,9 +196,9 @@ export default class WebGL2Renderer
    * @param {number} opacity - opacity to set
    */
   setMapOpacity(mapId: string, opacity: number): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.opacity = Math.min(Math.max(opacity, 0), 1)
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.opacity = Math.min(Math.max(opacity, 0), 1)
     }
   }
 
@@ -207,9 +208,9 @@ export default class WebGL2Renderer
    * @param {string} mapId - ID of the map
    */
   resetMapOpacity(mapId: string): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.opacity = DEFAULT_OPACITY
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.opacity = DEFAULT_OPACITY
     }
   }
 
@@ -247,9 +248,9 @@ export default class WebGL2Renderer
   getMapRemoveColorOptions(
     mapId: string
   ): Partial<RemoveColorOptions> | undefined {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      return webGL2WarpedMap.renderOptions.removeColorOptions
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      return warpedMap.renderOptions.removeColorOptions
     }
   }
 
@@ -263,9 +264,9 @@ export default class WebGL2Renderer
     mapId: string,
     removeColorOptions: RemoveColorOptions
   ): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.removeColorOptions = removeColorOptions
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.removeColorOptions = removeColorOptions
     }
   }
 
@@ -275,9 +276,9 @@ export default class WebGL2Renderer
    * @param {string} mapId - ID of the map
    */
   resetMapRemoveColorOptions(mapId: string): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.removeColorOptions = undefined
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.removeColorOptions = undefined
     }
   }
 
@@ -313,9 +314,9 @@ export default class WebGL2Renderer
    * @returns {(Partial<ColorizeOptions> | undefined)}
    */
   getMapColorizeOptions(mapId: string): Partial<ColorizeOptions> | undefined {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      return webGL2WarpedMap.renderOptions.colorizeOptions
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      return warpedMap.renderOptions.colorizeOptions
     }
   }
 
@@ -326,9 +327,9 @@ export default class WebGL2Renderer
    * @param {ColorizeOptions} colorizeOptions - the colorize options to set
    */
   setMapColorizeOptions(mapId: string, colorizeOptions: ColorizeOptions): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.colorizeOptions = colorizeOptions
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.colorizeOptions = colorizeOptions
     }
   }
 
@@ -338,9 +339,9 @@ export default class WebGL2Renderer
    * @param {string} mapId - ID of the map
    */
   resetMapColorizeOptions(mapId: string): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.renderOptions.colorizeOptions = undefined
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.colorizeOptions = undefined
     }
   }
 
@@ -378,9 +379,9 @@ export default class WebGL2Renderer
    * @returns {(number | undefined)}
    */
   getMapSaturation(mapId: string): number | undefined {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      return webGL2WarpedMap.saturation
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      return warpedMap.saturation
     }
   }
 
@@ -393,9 +394,9 @@ export default class WebGL2Renderer
    * @param saturation - the saturation to set
    */
   setMapSaturation(mapId: string, saturation: number): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.saturation = saturation
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.saturation = saturation
     }
   }
 
@@ -405,9 +406,9 @@ export default class WebGL2Renderer
    * @param {string} mapId - ID of the map
    */
   resetMapSaturation(mapId: string): void {
-    const webGL2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-    if (webGL2WarpedMap) {
-      webGL2WarpedMap.saturation = DEFAULT_SATURATION
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.saturation = DEFAULT_SATURATION
     }
   }
 
@@ -440,16 +441,15 @@ export default class WebGL2Renderer
 
   clear() {
     this.warpedMapList.clear()
-    this.webgl2WarpedMapsById = new Map()
     this.mapsInViewport = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
 
   dispose() {
-    for (const webgl2warpedMap of this.webgl2WarpedMapsById.values()) {
-      this.removeEventListenersFromWebGL2WarpedMap(webgl2warpedMap)
-      webgl2warpedMap.dispose()
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      this.removeEventListenersFromWebGL2WarpedMap(warpedMap)
+      warpedMap.dispose()
     }
 
     this.tileCache.clear()
@@ -538,15 +538,12 @@ export default class WebGL2Renderer
     )
 
     for (const mapId of this.mapsInViewport) {
-      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-
-      if (!webgl2WarpedMap) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (!warpedMap) {
         break
       }
 
-      webgl2WarpedMap.updateVertexBuffers(
-        this.viewport.projectedGeoToClipTransform
-      )
+      warpedMap.updateVertexBuffers(this.viewport.projectedGeoToClipTransform)
     }
   }
 
@@ -635,23 +632,20 @@ export default class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
     for (const mapId of this.mapsInViewport) {
-      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap) {
+      if (!warpedMap) {
         continue
       }
 
       // Map-specific uniforms
 
-      this.setRenderOptionsUniforms(
-        this.renderOptions,
-        webgl2WarpedMap.renderOptions
-      )
+      this.setRenderOptionsUniforms(this.renderOptions, warpedMap.renderOptions)
 
       // Opacity
 
       const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
-      gl.uniform1f(opacityLocation, this.opacity * webgl2WarpedMap.opacity)
+      gl.uniform1f(opacityLocation, this.opacity * warpedMap.opacity)
 
       // Saturation
 
@@ -659,10 +653,7 @@ export default class WebGL2Renderer
         this.program,
         'u_saturation'
       )
-      gl.uniform1f(
-        saturationLocation,
-        this.saturation * webgl2WarpedMap.saturation
-      )
+      gl.uniform1f(saturationLocation, this.saturation * warpedMap.saturation)
 
       // Distortion
 
@@ -670,12 +661,9 @@ export default class WebGL2Renderer
         this.program,
         'u_distortion'
       )
-      gl.uniform1f(
-        distortionLocation,
-        webgl2WarpedMap.warpedMap.distortionMeasure ? 1 : 0
-      )
+      gl.uniform1f(distortionLocation, warpedMap.distortionMeasure ? 1 : 0)
 
-      if (webgl2WarpedMap.warpedMap.distortionMeasure) {
+      if (warpedMap.distortionMeasure) {
         const distortionOptionsDistortionMeasureLocation =
           gl.getUniformLocation(
             this.program,
@@ -683,9 +671,7 @@ export default class WebGL2Renderer
           )
         gl.uniform1i(
           distortionOptionsDistortionMeasureLocation,
-          supportedDistortionMeasures.indexOf(
-            webgl2WarpedMap.warpedMap.distortionMeasure
-          )
+          supportedDistortionMeasures.indexOf(warpedMap.distortionMeasure)
         )
       }
 
@@ -695,7 +681,7 @@ export default class WebGL2Renderer
         this.program,
         'u_bestScaleFactor'
       )
-      const bestScaleFactor = webgl2WarpedMap.warpedMap.bestScaleFactor
+      const bestScaleFactor = warpedMap.bestScaleFactor
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
       // Packed tiles texture
@@ -706,7 +692,7 @@ export default class WebGL2Renderer
       )
       gl.uniform1i(packedTilesTextureLocation, 0)
       gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesTexture)
+      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesTexture)
 
       // Packed tiles positions texture
 
@@ -716,7 +702,7 @@ export default class WebGL2Renderer
       )
       gl.uniform1i(packedTilesPositionsTextureLocation, 1)
       gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, webgl2WarpedMap.packedTilesPositionsTexture)
+      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesPositionsTexture)
 
       // Packed tiles resource positions and dimensions texture
 
@@ -729,7 +715,7 @@ export default class WebGL2Renderer
       gl.activeTexture(gl.TEXTURE2)
       gl.bindTexture(
         gl.TEXTURE_2D,
-        webgl2WarpedMap.packedTilesResourcePositionsAndDimensionsTexture
+        warpedMap.packedTilesResourcePositionsAndDimensionsTexture
       )
 
       // Packed tiles scale factors texture
@@ -740,15 +726,12 @@ export default class WebGL2Renderer
       )
       gl.uniform1i(packedTileScaleFactorsTextureLocation, 3)
       gl.activeTexture(gl.TEXTURE3)
-      gl.bindTexture(
-        gl.TEXTURE_2D,
-        webgl2WarpedMap.packedTilesScaleFactorsTexture
-      )
+      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesScaleFactorsTexture)
 
       // Draw each map
 
-      const vao = webgl2WarpedMap.vao
-      const count = webgl2WarpedMap.warpedMap.resourceTrianglePoints.length
+      const vao = warpedMap.vao
+      const count = warpedMap.resourceTrianglePoints.length
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
@@ -861,25 +844,25 @@ export default class WebGL2Renderer
         return
       }
 
-      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
-      if (!webgl2WarpedMap) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (!warpedMap) {
         return
       }
 
-      webgl2WarpedMap.addCachedTileAndUpdateTextures(tile)
+      warpedMap.addCachedTileAndUpdateTextures(tile)
     }
   }
 
   protected mapTileRemoved(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
-      const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap) {
+      if (!warpedMap) {
         return
       }
 
-      webgl2WarpedMap.removeCachedTileAndUpdateTextures(tileUrl)
+      warpedMap.removeCachedTileAndUpdateTextures(tileUrl)
     }
   }
 
@@ -888,13 +871,7 @@ export default class WebGL2Renderer
       const mapId = event.data as string
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (warpedMap) {
-        const webgl2WarpedMap = new WebGL2WarpedMap(
-          this.gl,
-          this.program,
-          warpedMap
-        )
-        this.webgl2WarpedMapsById.set(warpedMap.mapId, webgl2WarpedMap)
-        this.addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
+        this.addEventListenersToWebGL2WarpedMap(warpedMap)
       }
     }
   }
