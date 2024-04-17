@@ -32,7 +32,6 @@
   import {
     createMapOl,
     createImageOl,
-    createImageInfoCache,
     mapVectorLayerOutlinesVisible
   } from '$lib/shared/stores/openlayers.js'
   import { nextTransformation } from '$lib/shared/stores/transformation.js'
@@ -126,7 +125,6 @@
   onMount(() => {
     createMapOl()
     createImageOl()
-    createImageInfoCache()
 
     paramStore.subscribe(async (value) => {
       resetRenderOptionsLayer()

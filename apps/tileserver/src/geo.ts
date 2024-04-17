@@ -1,5 +1,7 @@
+import { lonLatToWebMecator } from '@allmaps/stdlib'
+
 import type { Point, Bbox, GeojsonPolygon } from '@allmaps/types'
-import type { XYZTile } from './types'
+import type { XYZTile } from './types.js'
 
 export function xyzTileToGeojson({ z, x, y }: XYZTile): GeojsonPolygon {
   const topLeft = xyzTileTopLeft({ z, x, y })
@@ -32,6 +34,13 @@ export function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
 
 export function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
   return [tileToLng({ x: x + 1, z }), tileToLat({ y: y + 1, z })]
+}
+
+export function tileToProjectedGeoBbox({ x, y, z }: XYZTile): Bbox {
+  return [
+    ...lonLatToWebMecator(xyzTileTopLeft({ x, y, z })),
+    ...lonLatToWebMecator(xyzTileBottomRight({ x, y, z }))
+  ]
 }
 
 // From:

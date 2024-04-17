@@ -17,7 +17,7 @@ import {
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Rectangle, Ring } from '@allmaps/types'
+import type { Rectangle, Ring, ImageInformations } from '@allmaps/types'
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
@@ -47,20 +47,20 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   renderer?: WebGL2Renderer
 
-  private imageInfoCache?: Cache
+  private imageInformations?: ImageInformations
 
   /**
    * Creates a WarpedMapLayer instance
    *
    * @constructor
    * @param {string} [id] - unique id for this layer
-   * @param {Cache} imageInfoCache - image info cache
+   * @param {Cache} imageInformations - image info cache
    */
-  constructor(id?: string, imageInfoCache?: Cache) {
+  constructor(id?: string, imageInformations?: ImageInformations) {
     if (id) {
       this.id = id
     }
-    this.imageInfoCache = imageInfoCache
+    this.imageInformations = imageInformations
   }
 
   /**
@@ -71,7 +71,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map
 
-    const warpedMapList = new WarpedMapList(this.imageInfoCache)
+    const warpedMapList = new WarpedMapList({
+      imageInformations: this.imageInformations
+    })
 
     this.renderer = new WebGL2Renderer(gl, warpedMapList)
 
@@ -373,10 +375,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Sets the image info cache of the WarpedMapList
    * @param {Cache} cache - the image info cache
    */
-  setImageInfoCache(cache: Cache) {
+  setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setImageInfoCache(cache)
+    this.renderer.warpedMapList.setImageInformations(imageInformations)
   }
 
   // No setOpacity() and getOpacity() here since these are

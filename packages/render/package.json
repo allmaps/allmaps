@@ -24,6 +24,22 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/bundled/index.umd.js",
       "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./intarray": {
+      "types": "./dist/renderers/IntArrayRenderer.d.ts",
+      "import": "./dist/renderers/IntArrayRenderer.js"
+    },
+    "./canvas": {
+      "types": "./dist/renderers/CanvasRenderer.d.ts",
+      "import": "./dist/renderers/CanvasRenderer.js"
+    },
+    "./webgl2": {
+      "types": "./dist/renderers/WebGL2Renderer.d.ts",
+      "import": "./dist/renderers/WebGL2Renderer.js"
     }
   },
   "files": [
@@ -69,13 +85,15 @@
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "lodash-es": "^4.17.21",
     "potpack": "^2.0.0",
-    "rbush": "^3.0.1"
+    "rbush": "^3.0.1",
+    "robust-point-in-polygon": "^1.0.3"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.14.2",
     "@types/rbush": "^3.0.0",
+    "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "chai": "^4.3.6",

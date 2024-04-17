@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/render</title>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script type="module">
+      import { CanvasRenderer, WarpedMapList, Viewport } from './src/index.ts'
+
+      async function render() {
+        const warpedMapList = new WarpedMapList({
+          createRTree: false
+        })
+
+        const width = 600
+        const height = 600
+        const canvas = document.getElementById('canvas')
+        const context = canvas.getContext('2d')
+        const ratio = window.devicePixelRatio || 1
+        canvas.width = width * ratio
+        canvas.height = height * ratio
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+        context.scale(ratio, ratio)
+
+        const renderer = new CanvasRenderer(canvas, warpedMapList)
+
+        const annotation = await fetch(
+          'https://annotations.allmaps.org/images/4af0fa9c8207b36c'
+        ).then((response) => response.json())
+
+        await warpedMapList.addGeoreferenceAnnotation(annotation)
+        await renderer.render()
+      }
+
+      render()
+    </script>
+  </body>
+</html>

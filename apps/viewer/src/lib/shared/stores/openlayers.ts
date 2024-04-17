@@ -8,7 +8,7 @@ import {
 } from '@allmaps/openlayers'
 import type { Map as Georef } from '@allmaps/annotation'
 
-import Map from 'ol/Map.js'
+import OLMap from 'ol/Map.js'
 import VectorSource from 'ol/source/Vector.js'
 import TileLayer from 'ol/layer/Tile.js'
 import VectorLayer from 'ol/layer/Vector.js'
@@ -40,6 +40,8 @@ import type { MapIDOrError } from '$lib/shared/types.js'
 import type Feature from 'ol/Feature.js'
 import type { FeatureLike } from 'ol/Feature.js'
 import type { OrderFunction } from 'ol/render.js'
+
+import type { ImageInformations } from '@allmaps/types'
 
 type XYZLayer = {
   url: string
@@ -75,19 +77,15 @@ export const xyzLayer = derived(
 
 // Image Information Cache
 
-export let imageInfoCache: Cache | undefined
-
-export async function createImageInfoCache() {
-  imageInfoCache = await caches.open('new-cache')
-  mapWarpedMapSource.setImageInfoCache(imageInfoCache)
-}
+export const imageInformations: ImageInformations = new Map()
 
 // Map view
 
-export let mapOl: Map | undefined
+export let mapOl: OLMap | undefined
 export let mapTileSource: XYZ | undefined
 export let mapTileLayer: TileLayer<XYZ> | undefined
 export const mapWarpedMapSource = new WarpedMapSource()
+mapWarpedMapSource.setImageInformations(imageInformations)
 export let mapWarpedMapLayer: WarpedMapLayer | undefined
 export const mapVectorSource = new VectorSource()
 export let mapVectorLayer: VectorLayer<VectorSource> | undefined
@@ -120,12 +118,11 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
     const sourceMap = $mapsById.get(mapId)
 
     if (sourceMap && !sourceMap.renderOptions.removeBackground.color) {
-      // TODO: Consider using ...tileCache.getCachedTile(tileUrl)
       const cachedTile =
-        mapWarpedMapLayer?.renderer.tileCache.getCacheableTile(tileUrl)
-      const imageBitmap = cachedTile?.imageBitmap
+        mapWarpedMapLayer?.renderer.tileCache.getCachedTile(tileUrl)
 
-      if (imageBitmap) {
+      if (cachedTile) {
+        const imageBitmap = cachedTile.data
         const backgroundColor = await detectBackgroundColor(
           sourceMap.map,
           imageBitmap
@@ -167,7 +164,7 @@ export function createMapOl() {
       renderOrder: mapVectorLayerOrderFunction as OrderFunction
     })
 
-    mapOl = new Map({
+    mapOl = new OLMap({
       interactions: defaultInteractions().extend([new DblClickDragZoom()]),
       layers: [mapTileLayer, mapWarpedMapLayer, mapVectorLayer],
       controls: [],
@@ -201,7 +198,7 @@ mapVectorLayerOutlinesVisible.subscribe(($mapVectorLayerOutlinesVisible) => {
 
 // Image view
 
-export let imageOl: Map | undefined
+export let imageOl: OLMap | undefined
 export const imageVectorSource = new VectorSource()
 export let imageVectorLayer: VectorLayer<VectorSource> | undefined
 export let imageIiifLayer: IIIFLayer | undefined
@@ -214,7 +211,7 @@ export function createImageOl() {
 
   imageIiifLayer = new IIIFLayer()
 
-  imageOl = new Map({
+  imageOl = new OLMap({
     interactions: defaultInteractions().extend([new DblClickDragZoom()]),
     controls: [],
     layers: [imageIiifLayer, imageVectorLayer],

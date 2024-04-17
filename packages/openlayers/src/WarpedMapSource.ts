@@ -3,7 +3,7 @@ import Source from 'ol/source/Source.js'
 import { WarpedMap, WarpedMapList } from '@allmaps/render'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Ring } from '@allmaps/types'
+import type { Ring, ImageInformations } from '@allmaps/types'
 
 import type { Extent } from 'ol/extent'
 
@@ -22,7 +22,7 @@ export class WarpedMapSource extends Source {
    * @constructor
    * @param {Cache} [imageInfoCache] - image info cache
    */
-  constructor(imageInfoCache?: Cache) {
+  constructor(imageInformations?: ImageInformations) {
     super({
       interpolate: true,
       projection: undefined,
@@ -30,7 +30,7 @@ export class WarpedMapSource extends Source {
       wrapX: true
     })
 
-    this.warpedMapList = new WarpedMapList(imageInfoCache)
+    this.warpedMapList = new WarpedMapList({ imageInformations })
   }
 
   /**
@@ -275,8 +275,8 @@ export class WarpedMapSource extends Source {
    * Sets the image info Cache of the WarpedMapList
    * @param {Cache} cache - the image info cache
    */
-  setImageInfoCache(cache: Cache) {
-    this.warpedMapList.setImageInfoCache(cache)
+  setImageInformations(imageInformations: ImageInformations) {
+    this.warpedMapList.setImageInformations(imageInformations)
   }
 
   /**

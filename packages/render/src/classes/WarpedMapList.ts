@@ -8,19 +8,36 @@ import {
 import GeojsonPolygonRTree from './RTree.js'
 import WarpedMap from './WarpedMap.js'
 
-import { combineBboxes } from '@allmaps/stdlib'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
+import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { TransformationType } from '@allmaps/transform'
-import type { Ring, Bbox } from '@allmaps/types'
+import type {
+  Ring,
+  Bbox,
+  Point,
+  FetchFn,
+  ImageInformations
+} from '@allmaps/types'
 
 type WarpedMapListOptions = {
+  fetchFn: FetchFn
+  transformation: unknown
   createRTree: boolean
+  // TODO: this option needs a better name:
+  imageInformations: ImageInformations
+}
+
+function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
+  return {
+    createRTree: true,
+    imageInformations: new Map()
+  }
 }
 
 /**
  * Class for warped map lists, which describe an ordered array of maps to be drawn.
- * They contain an imageInfoCash, and and RTree for quickly looking up maps using their Bbox.
+ * This class contains an imageInfoCache and an RTree for quickly looking up maps using their Bbox.
  *
  * @export
  * @class WarpedMapList
@@ -32,7 +49,9 @@ export default class WarpedMapList extends EventTarget {
 
   zIndices: Map<string, number> = new Map()
   rtree?: GeojsonPolygonRTree
-  imageInfoCache?: Cache
+  imageInformations?: ImageInformations
+
+  fetchFn?: FetchFn
 
   /**
    * Creates an instance of WarpedMapList.
@@ -41,11 +60,20 @@ export default class WarpedMapList extends EventTarget {
    * @param {?Cache} [imageInfoCache] - An image info cache
    * @param {?WarpedMapListOptions} [options] - Options
    */
-  constructor(imageInfoCache?: Cache, options?: WarpedMapListOptions) {
+  constructor(options?: Partial<WarpedMapListOptions>) {
     super()
-    options = Object.assign({ createRTree: true }, options)
 
-    this.imageInfoCache = imageInfoCache
+    options = {
+      ...createDefaultWarpedMapListOptions(),
+      ...options
+    }
+
+    // maps: GeoreferencedMap[]
+    this.fetchFn = options.fetchFn
+    // transformation: unknown
+    // maaak o0ok transform
+
+    this.imageInformations = options.imageInformations
 
     if (options.createRTree) {
       this.rtree = new GeojsonPolygonRTree()
@@ -57,13 +85,13 @@ export default class WarpedMapList extends EventTarget {
    *
    * @returns {Iterable<string>}
    */
-  getMaps(): Iterable<string> {
+  getMapIds(): Iterable<string> {
     return this.warpedMapsById.keys()
   }
 
   /**
    * Returns WarpedMap objects of the maps in this list.
-   * Optionally specify mapId's whose WarpedMap objects are requested.
+   * Optionally specify mapIds whose WarpedMap objects are requested.
    *
    * @returns {Iterable<WarpedMap>}
    */
@@ -102,6 +130,20 @@ export default class WarpedMapList extends EventTarget {
    */
   getMapZIndex(mapId: string): number | undefined {
     return this.zIndices.get(mapId)
+  }
+
+  getCenter(): Point | undefined {
+    const bbox = this.getBbox()
+    if (bbox) {
+      return bboxToCenter(bbox)
+    }
+  }
+
+  getProjectedCenter(): Point | undefined {
+    const bbox = this.getProjectedBbox()
+    if (bbox) {
+      return bboxToCenter(bbox)
+    }
   }
 
   /**
@@ -179,8 +221,8 @@ export default class WarpedMapList extends EventTarget {
    *
    * @param {Cache} cache - the image info cache
    */
-  setImageInfoCache(cache: Cache): void {
-    this.imageInfoCache = cache
+  setImageInformations(imageInformations: ImageInformations): void {
+    this.imageInformations = imageInformations
   }
 
   /**
@@ -436,11 +478,12 @@ export default class WarpedMapList extends EventTarget {
     georeferencedMap: GeoreferencedMap
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
-    const warpedMap = new WarpedMap(
-      mapId,
-      georeferencedMap,
-      this.imageInfoCache
-    )
+
+    // hier
+    const warpedMap = new WarpedMap(mapId, georeferencedMap, {
+      imageInformations: this.imageInformations,
+      fetchFn: this.fetchFn
+    })
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
     this.addToOrUpdateRtree(warpedMap)
@@ -502,6 +545,12 @@ export default class WarpedMapList extends EventTarget {
       this.zIndices.set(mapId, zIndex)
       zIndex++
     }
+  }
+
+  loadAllImageInfo() {
+    return [...this.warpedMapsById.values()].map((warpedMap) =>
+      warpedMap.loadImageInfo()
+    )
   }
 
   private imageInfoLoaded() {

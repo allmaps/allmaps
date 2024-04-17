@@ -38,7 +38,7 @@ export async function mapsFromParams(
     return []
   }
 
-  const mapsResponse = await cachedFetch(cache, url)
+  const mapsResponse = await cachedFetch(url)
 
   if (!mapsResponse) {
     throw new Error(`Error fetching maps from URL: ${url}`)
@@ -68,7 +68,7 @@ export async function mapsFromQuery(
     const maps = parseAnnotation(annotation)
     return maps
   } else if (query?.url) {
-    const annotationResponse = await cachedFetch(cache, query.url)
+    const annotationResponse = await cachedFetch(query.url)
 
     if (!annotationResponse) {
       throw new Error(`Error fetching annotation from URL: ${query.url}`)

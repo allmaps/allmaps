@@ -1,50 +1,41 @@
 import { throttle } from 'lodash-es'
 
-import TileCache from './TileCache.js'
-import FetchableMapTile from './FetchableTile.js'
-import WarpedMapList from './WarpedMapList.js'
-import WebGL2WarpedMap from './WebGL2WarpedMap.js'
+import BaseRenderer from '../classes/BaseRenderer.js'
+import WarpedMapList from '../classes/WarpedMapList.js'
+import WebGL2WarpedMap from '../classes/WebGL2WarpedMap.js'
+import CacheableImageBitmapTile from '../classes/CacheableImageBitmapTile.js'
 
 import {
   WarpedMapEvent,
   WarpedMapEventType,
   WarpedMapTileEventDetail
-} from './shared/events.js'
-import {
-  geoBboxToResourceRing,
-  getBestTileZoomLevelForScale,
-  computeTilesCoveringRingAtTileZoomLevel
-} from './shared/tiles.js'
+} from '../shared/events.js'
 import {
   createTransform,
   multiplyTransform,
   invertTransform,
   transformToMatrix4
-} from './shared/matrix.js'
-import { createShader, createProgram } from './shared/webgl2.js'
+} from '../shared/matrix.js'
+import { createShader, createProgram } from '../shared/webgl2.js'
 
-import vertexShaderSource from './shaders/vertex-shader.glsl?raw'
-import fragmentShaderSource from './shaders/fragment-shader.glsl?raw'
+import vertexShaderSource from '../shaders/vertex-shader.glsl?raw'
+import fragmentShaderSource from '../shaders/fragment-shader.glsl?raw'
 
-import {
-  distance,
-  maxOfNumberOrUndefined,
-  bboxToDiameter,
-  bboxToCenter
-} from '@allmaps/stdlib'
+import { distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Transform } from '@allmaps/types'
+import type { Transform, FetchFn } from '@allmaps/types'
 
-import type Viewport from './Viewport.js'
-import type WarpedMap from './WarpedMap.js'
+import type Viewport from '../classes/Viewport.js'
+import type WarpedMap from '../classes/WarpedMap.js'
 
 import type {
+  Renderer,
   RenderOptions,
   RemoveColorOptions,
   ColorizeOptions
-} from './shared/types.js'
+} from '../shared/types.js'
 
 const THROTTLE_PREPARE_WAIT_MS = 500
 const THROTTLE_PREPARE_OPTIONS = {
@@ -62,12 +53,11 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_COLOR_THRESHOLD = 0
 const DEFAULT_REMOVE_COLOR_HARDNESS = 0.7
-const MIN_VIEWPORT_DIAMETER = 5
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 /**
- * Class that render warped maps to a HTML canvas element using WebGL 2
+ * Class that render warped maps to a WebGL 2 context
  *
  * Its main function is `render`
  *
@@ -76,20 +66,20 @@ const ANIMATION_DURATION = 750
  * @typedef {WebGL2Renderer}
  * @extends {EventTarget}
  */
-export default class WebGL2Renderer extends EventTarget {
+// export default class WebGL2Renderer extends EventTarget {
+export default class WebGL2Renderer
+  extends BaseRenderer<ImageBitmap>
+  implements Renderer
+{
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
-  warpedMapList: WarpedMapList
-
   webgl2WarpedMapsById: Map<string, WebGL2WarpedMap> = new Map()
 
-  tileCache: TileCache = new TileCache()
-
-  viewport: Viewport | undefined
+  // viewport: Viewport | undefined
   previousSignificantViewport: Viewport | undefined
 
-  mapsInViewport: Set<string> = new Set()
+  // mapsInViewport: Set<string> = new Set()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -115,10 +105,12 @@ export default class WebGL2Renderer extends EventTarget {
    * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
    * @param {WarpedMapList} warpedMapList - the list of warped maps to render
    */
-  constructor(gl: WebGL2RenderingContext, warpedMapList: WarpedMapList) {
-    super()
-
-    this.warpedMapList = warpedMapList
+  constructor(
+    gl: WebGL2RenderingContext,
+    warpedMapList: WarpedMapList,
+    fetchFn?: FetchFn
+  ) {
+    super(warpedMapList, CacheableImageBitmapTile.createFactory(), fetchFn)
 
     this.gl = gl
 
@@ -418,6 +410,19 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
+  shouldUpdateRequestedTiles() {
+    if (!this.viewportMovedSignificantly()) {
+      return false
+    }
+
+    if (this.animating) {
+      // TODO: check if this makes sense
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Render the map for a given viewport
    *
@@ -522,100 +527,100 @@ export default class WebGL2Renderer extends EventTarget {
     this.updateVertexBuffers()
   }
 
-  private updateRequestedTiles(): void {
-    if (!this.viewport) {
-      return
-    }
+  // private updateRequestedTiles(): void {
+  //   if (!this.viewport) {
+  //     return
+  //   }
 
-    if (!this.viewportMovedSignificantly()) {
-      return
-    }
+  //   if (!this.viewportMovedSignificantly()) {
+  //     return
+  //   }
 
-    if (this.animating) {
-      return
-    }
+  //   if (this.animating) {
+  //     return
+  //   }
 
-    const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
-    ).sort(
-      (mapId0, mapId1) =>
-        distance(
-          bboxToCenter(this.warpedMapList.getWarpedMap(mapId0)!.geoMaskBbox),
-          this.viewport!.geoCenter
-        ) -
-        distance(
-          bboxToCenter(this.warpedMapList.getWarpedMap(mapId1)!.geoMaskBbox),
-          this.viewport!.geoCenter
-        )
-    )
+  //   const possibleMapsInViewport = Array.from(
+  //     this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
+  //   ).sort(
+  //     (mapId0, mapId1) =>
+  //       distance(
+  //         bboxToCenter(this.warpedMapList.getWarpedMap(mapId0)!.geoMaskBbox),
+  //         this.viewport!.geoCenter
+  //       ) -
+  //       distance(
+  //         bboxToCenter(this.warpedMapList.getWarpedMap(mapId1)!.geoMaskBbox),
+  //         this.viewport!.geoCenter
+  //       )
+  //   )
 
-    const requestedTiles: FetchableMapTile[] = []
-    for (const mapId of possibleMapsInViewport) {
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+  //   const requestedTiles: FetchableMapTile[] = []
+  //   for (const mapId of possibleMapsInViewport) {
+  //     const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!warpedMap) {
-        continue
-      }
+  //     if (!warpedMap) {
+  //       continue
+  //     }
 
-      if (!warpedMap.visible) {
-        continue
-      }
+  //     if (!warpedMap.visible) {
+  //       continue
+  //     }
 
-      if (!warpedMap.hasImageInfo()) {
-        // Note: don't load image info here
-        // this would imply waiting for the first throttling cycle to complete
-        // before acting on a sucessful load
-        continue
-      }
+  //     if (!warpedMap.hasImageInfo()) {
+  //       // Note: don't load image info here
+  //       // this would imply waiting for the first throttling cycle to complete
+  //       // before acting on a sucessful load
+  //       continue
+  //     }
 
-      // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
-      // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
-      if (
-        bboxToDiameter(warpedMap.getViewportMaskBbox(this.viewport)) <
-        MIN_VIEWPORT_DIAMETER
-      ) {
-        continue
-      }
+  //     // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
+  //     // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
+  //     if (
+  //       bboxToDiameter(warpedMap.getViewportMaskBbox(this.viewport)) <
+  //       MIN_VIEWPORT_DIAMETER
+  //     ) {
+  //       continue
+  //     }
 
-      // Note the equivalence of the following two:
-      // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
-      // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
-      const tileZoomLevel = getBestTileZoomLevelForScale(
-        warpedMap.parsedImage,
-        warpedMap.getResourceToCanvasScale(this.viewport)
-      )
+  //     // Note the equivalence of the following two:
+  //     // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
+  //     // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
+  //     const tileZoomLevel = getBestTileZoomLevelForScale(
+  //       warpedMap.parsedImage,
+  //       warpedMap.getResourceToCanvasScale(this.viewport)
+  //     )
 
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
+  //     warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
-      // Transforming the viewport back to resource
-      const projectedTransformerOptions = {
-        // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-        maxDepth: 0
-      }
+  //     // Transforming the viewport back to resource
+  //     const projectedTransformerOptions = {
+  //       // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
+  //       maxDepth: 0
+  //     }
 
-      const resourceViewportRing = geoBboxToResourceRing(
-        warpedMap.projectedTransformer,
-        this.viewport.projectedGeoRectangleBbox,
-        projectedTransformerOptions
-      )
+  //     const resourceViewportRing = geoBboxToResourceRing(
+  //       warpedMap.projectedTransformer,
+  //       this.viewport.projectedGeoRectangleBbox,
+  //       projectedTransformerOptions
+  //     )
 
-      warpedMap.setResourceViewportRing(resourceViewportRing)
+  //     warpedMap.setResourceViewportRing(resourceViewportRing)
 
-      // This returns tiles sorted by distance from center of resourceViewportRing
-      const tiles = computeTilesCoveringRingAtTileZoomLevel(
-        resourceViewportRing,
-        tileZoomLevel,
-        warpedMap.parsedImage
-      )
+  //     // This returns tiles sorted by distance from center of resourceViewportRing
+  //     const tiles = computeTilesCoveringRingAtTileZoomLevel(
+  //       resourceViewportRing,
+  //       tileZoomLevel,
+  //       warpedMap.parsedImage
+  //     )
 
-      for (const tile of tiles) {
-        requestedTiles.push(new FetchableMapTile(tile, warpedMap))
-      }
-    }
+  //     for (const tile of tiles) {
+  //       requestedTiles.push(new FetchableMapTile(tile, warpedMap))
+  //     }
+  //   }
 
-    this.tileCache.requestFetcableMapTiles(requestedTiles)
-    this.updateMapsInViewport(requestedTiles)
-  }
+  //   this.tileCache.requestFetcableMapTiles(requestedTiles)
+  //   this.updateMapsInViewport(requestedTiles)
+  // }
 
   private updateVertexBuffers() {
     if (!this.viewport) {
@@ -679,46 +684,46 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private updateMapsInViewport(tiles: FetchableMapTile[]) {
-    // TODO: handle everything as Set() once JS supports filter on sets.
-    // And speed up with annonymous functions with the Set.prototype.difference() once broadly supported
-    const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
-    const newMapsInViewportAsArray = tiles
-      .map((tile) => tile.mapId)
-      .filter((v, i, a) => {
-        // filter out duplicate mapIds
-        return a.indexOf(v) === i
-      })
+  // private updateMapsInViewport(tiles: FetchableMapTile[]) {
+  //   // TODO: handle everything as Set() once JS supports filter on sets.
+  //   // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
+  //   const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
+  //   const newMapsInViewportAsArray = tiles
+  //     .map((tile) => tile.mapId)
+  //     .filter((v, i, a) => {
+  //       // filter out duplicate mapIds
+  //       return a.indexOf(v) === i
+  //     })
 
-    this.mapsInViewport = new Set(
-      newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
-        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
-        return 0
-      })
-    )
+  //   this.mapsInViewport = new Set(
+  //     newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
+  //       const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+  //       const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
+  //       if (zIndexA !== undefined && zIndexB !== undefined) {
+  //         return zIndexA - zIndexB
+  //       }
+  //       return 0
+  //     })
+  //   )
 
-    const enteringMapsInViewport = newMapsInViewportAsArray.filter(
-      (mapId) => !oldMapsInViewportAsArray.includes(mapId)
-    )
-    const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
-      (mapId) => !newMapsInViewportAsArray.includes(mapId)
-    )
+  //   const enteringMapsInViewport = newMapsInViewportAsArray.filter(
+  //     (mapId) => !oldMapsInViewportAsArray.includes(mapId)
+  //   )
+  //   const leavingMapsInViewport = oldMapsInViewportAsArray.filter(
+  //     (mapId) => !newMapsInViewportAsArray.includes(mapId)
+  //   )
 
-    for (const mapId in enteringMapsInViewport) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
-      )
-    }
-    for (const mapId in leavingMapsInViewport) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
-      )
-    }
-  }
+  //   for (const mapId in enteringMapsInViewport) {
+  //     this.dispatchEvent(
+  //       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+  //     )
+  //   }
+  //   for (const mapId in leavingMapsInViewport) {
+  //     this.dispatchEvent(
+  //       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+  //     )
+  //   }
+  // }
 
   private renderInternal(): void {
     if (!this.viewport) {
@@ -947,13 +952,13 @@ export default class WebGL2Renderer extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
-  private imageInfoLoaded(event: Event) {
+  protected imageInfoLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
     }
   }
 
-  private mapTileLoaded(event: Event) {
+  protected mapTileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
       const tile = this.tileCache.getCacheableTile(tileUrl)
@@ -975,7 +980,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private mapTileRemoved(event: Event) {
+  protected mapTileRemoved(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
       const webgl2WarpedMap = this.webgl2WarpedMapsById.get(mapId)
@@ -988,7 +993,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private warpedMapAdded(event: Event) {
+  protected warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapId = event.data as string
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -1004,7 +1009,7 @@ export default class WebGL2Renderer extends EventTarget {
     }
   }
 
-  private transformationChanged(event: Event) {
+  protected transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
@@ -1034,60 +1039,6 @@ export default class WebGL2Renderer extends EventTarget {
     webgl2WarpedMap.removeEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
       this.throttledChanged.bind(this)
-    )
-  }
-
-  private addEventListeners() {
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
-    )
-
-    this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-  }
-
-  private removeEventListeners() {
-    this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
-    )
-
-    this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
     )
   }
 }

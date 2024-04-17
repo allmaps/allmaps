@@ -1,10 +1,17 @@
-import WarpedMap from './WarpedMap.js'
-import WarpedMapList from './WarpedMapList.js'
-import Viewport from './Viewport.js'
-import GeojsonPolygonRTree from './RTree.js'
-import TileCache from './TileCache.js'
-import CacheableTile from './CacheableTile.js'
-import FetchableTile from './FetchableTile.js'
+import WarpedMap from './classes/WarpedMap.js'
+import WarpedMapList from './classes/WarpedMapList.js'
+import Viewport from './classes/Viewport.js'
+import GeojsonPolygonRTree from './classes/RTree.js'
+import TileCache from './classes/TileCache.js'
+import CacheableTile from './classes/CacheableTile.js'
+import FetchableTile from './classes/FetchableTile.js'
+
+import CacheableImageBitmapTile, {
+  CachedImageBitmapTile
+} from './classes/CacheableImageBitmapTile.js'
+import CacheableIntArrayTile, {
+  CachedIntArrayTile
+} from './classes/CacheableIntArrayTile.js'
 
 export {
   WarpedMap,
@@ -13,13 +20,18 @@ export {
   GeojsonPolygonRTree,
   TileCache,
   CacheableTile,
-  FetchableTile
+  FetchableTile,
+  CacheableImageBitmapTile,
+  CachedImageBitmapTile,
+  CacheableIntArrayTile,
+  CachedIntArrayTile
 }
 
-import WebGL2Renderer from './WebGL2Renderer.js'
-// import CanvasRenderer from './CanvasRenderer.js'
+import WebGL2Renderer from './renderers/WebGL2Renderer.js'
+import CanvasRenderer from './renderers/CanvasRenderer.js'
+import IntArrayRenderer from './renderers/IntArrayRenderer.js'
 
-export { WebGL2Renderer }
+export { WebGL2Renderer, CanvasRenderer, IntArrayRenderer }
 
 export * from './shared/types.js'
 export * from './shared/events.js'

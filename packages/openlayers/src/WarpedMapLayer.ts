@@ -307,6 +307,7 @@ export class WarpedMapLayer extends Layer {
       frameState.viewState.resolution,
       window.devicePixelRatio
     )
+
     this.renderer.render(viewport)
 
     return this.container

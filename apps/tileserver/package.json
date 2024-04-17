@@ -35,6 +35,7 @@
     "@allmaps/render": "^1.0.0-beta.61",
     "@allmaps/transform": "^1.0.0-beta.37",
     "@allmaps/types": "^1.0.0-beta.12",
+    "@allmaps/stdlib": "^1.0.0-beta.27",
     "@cloudflare/workers-types": "^3.14.0",
     "@turf/bbox": "^6.5.0",
     "@turf/center": "^6.5.0",

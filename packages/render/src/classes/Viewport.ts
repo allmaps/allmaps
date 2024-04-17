@@ -1,12 +1,24 @@
-import { composeTransform } from './shared/matrix.js'
+import WarpedMapList from './WarpedMapList.js'
+import { composeTransform } from '../shared/matrix.js'
+
 import {
   computeBbox,
   bboxToRectangle,
   webMercatorToLonLat,
-  bboxToSize
+  bboxToSize,
+  rectangleToSize,
+  bboxToCenter,
+  computeProjectedGeoPerViewportScale
 } from '@allmaps/stdlib'
 
-import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
+import type {
+  Point,
+  Rectangle,
+  Size,
+  Bbox,
+  Transform,
+  Fit
+} from '@allmaps/types'
 
 /**
  * The viewport describes the view on the rendered map.
@@ -37,7 +49,7 @@ import type { Point, Rectangle, Size, Bbox, Transform } from '@allmaps/types'
  * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
  * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
  */
-export default class Viewport extends EventTarget {
+export default class Viewport {
   geoCenter: Point
   geoRectangle: Rectangle
   geoSize: Size
@@ -48,15 +60,18 @@ export default class Viewport extends EventTarget {
   projectedGeoRectangleBbox: Bbox
   rotation: number
   projectedGeoPerViewportScale: number
+
   viewportCenter: Point
   viewportRectangle: Rectangle
   viewportSize: Size
   viewportBbox: Bbox
+
   devicePixelRatio: number
   canvasCenter: Point
   canvasRectangle: Rectangle
   canvasSize: Size
   canvasBbox: Bbox
+
   projectedGeoPerCanvasScale: number
   projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
@@ -78,9 +93,6 @@ export default class Viewport extends EventTarget {
     projectedGeoPerViewportScale: number,
     devicePixelRatio = 1
   ) {
-    super()
-    // TODO: should this still extend EventTartget and hence include super()?
-
     this.projectedGeoCenter = projectedGeoCenter
     this.projectedGeoPerViewportScale = projectedGeoPerViewportScale
     this.rotation = rotation
@@ -128,6 +140,65 @@ export default class Viewport extends EventTarget {
     this.projectedGeoToViewportTransform =
       this.composeProjectedGeoToViewportTransform()
     this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
+  }
+
+  // TODO: maybe integrate this in a constructor overload later
+  static fitWarpedMapList(
+    warpedMapList: WarpedMapList,
+    viewportSize: Size,
+    fit: Fit = 'contain'
+  ): Viewport {
+    const projectedGeoCenter = warpedMapList.getProjectedCenter()
+    const projectedGeoBbox = warpedMapList.getProjectedBbox()
+
+    if (!projectedGeoCenter || !projectedGeoBbox) {
+      throw new Error('WarpedMapList has no projected center or bbox')
+    }
+
+    const rotation = 0
+    const projectedGeoSize = rectangleToSize(bboxToRectangle(projectedGeoBbox))
+
+    const projectedGeoPerViewportScale = computeProjectedGeoPerViewportScale(
+      projectedGeoSize,
+      viewportSize,
+      fit
+    )
+
+    return new Viewport(
+      projectedGeoCenter,
+      viewportSize,
+      rotation,
+      projectedGeoPerViewportScale
+    )
+  }
+
+  // TODO: maybe integrate this in a constructor overload later
+  static fitBbox(
+    projectedGeoBbox: Bbox,
+    viewportSize: Size,
+    fit: Fit = 'contain'
+  ) {
+    const projectedGeoCenter = bboxToCenter(projectedGeoBbox)
+
+    if (!projectedGeoCenter || !projectedGeoBbox) {
+      throw new Error('WarpedMapList has no projected center or bbox')
+    }
+
+    const rotation = 0
+    const projectedGeoSize = rectangleToSize(bboxToRectangle(projectedGeoBbox))
+
+    const projectedGeoPerViewportScale = computeProjectedGeoPerViewportScale(
+      projectedGeoSize,
+      viewportSize,
+      fit
+    )
+
+    return new Viewport(
+      projectedGeoCenter,
+      [viewportSize[0], viewportSize[1]],
+      rotation,
+      projectedGeoPerViewportScale
+    )
   }
 
   private composeProjectedGeoToViewportTransform(): Transform {

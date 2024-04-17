@@ -1,29 +1,36 @@
 import { equalSet } from '@allmaps/stdlib'
 
 import CacheableTile, { CachedTile } from './CacheableTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import {
   tileByteSize,
   createKeyFromTile,
   createKeyFromMapIdAndTileUrl,
   fetchableMapTilesToKeys
-} from './shared/tiles.js'
+} from '../shared/tiles.js'
 import FetchableMapTile from './FetchableTile.js'
 
+import type { FetchFn } from '@allmaps/types'
+
+import type { CachableTileFactory } from '../shared/types.js'
+
 const MAX_HISTORY_TOTAL_COUNT = 0
-const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bites
+const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bytes
 
 /**
- * A class for caches of tiles.
+ * Class that caches IIIF tiles.
  *
  * @export
  * @class TileCache
  * @typedef {TileCache}
  * @extends {EventTarget}
  */
-export default class TileCache extends EventTarget {
-  protected tilesByTileUrl: Map<string, CacheableTile> = new Map()
+export default class TileCache<T> extends EventTarget {
+  cachableTileFactory: CachableTileFactory<T>
+  fetchFn?: FetchFn
+
+  protected tilesByTileUrl: Map<string, CacheableTile<T>> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
@@ -32,6 +39,13 @@ export default class TileCache extends EventTarget {
   protected previousRequestedTiles: FetchableMapTile[] = []
   protected outgoingTilesHistory: FetchableMapTile[] = []
 
+  constructor(cachableTileFactory: CachableTileFactory<T>, fetchFn?: FetchFn) {
+    super()
+
+    this.cachableTileFactory = cachableTileFactory
+    this.fetchFn = fetchFn
+  }
+
   /**
    * Get a specific cacheable tile in this cache
    * I.e. independent of whether their fetching is completed and image bitmap is created
@@ -39,7 +53,7 @@ export default class TileCache extends EventTarget {
    * @param {string} tileUrl - the url of the requested tile
    * @returns {(CacheableTile | undefined)}
    */
-  getCacheableTile(tileUrl: string): CacheableTile | undefined {
+  getCacheableTile(tileUrl: string): CacheableTile<T> | undefined {
     return this.tilesByTileUrl.get(tileUrl)
   }
 
@@ -50,10 +64,10 @@ export default class TileCache extends EventTarget {
    * @param {string} tileUrl - the url of the requested tile
    * @returns {(CachedTile | undefined)}
    */
-  getCachedTile(tileUrl: string): CachedTile | undefined {
+  getCachedTile(tileUrl: string): CachedTile<T> | undefined {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
     if (cacheableTile && cacheableTile.isCachedTile()) {
-      return cacheableTile as CachedTile
+      return cacheableTile as CachedTile<T>
     }
   }
 
@@ -62,29 +76,44 @@ export default class TileCache extends EventTarget {
    *
    * @returns {IterableIterator<CacheableTile>}
    */
-  getCacheableTiles(): IterableIterator<CacheableTile> {
+  getCacheableTiles(): IterableIterator<CacheableTile<T>> {
     return this.tilesByTileUrl.values()
   }
 
   /**
    * Get the tiles in this cache whose caching has completed
-   * I.e. their fetching is completed and image bitmap is created
    *
    * @returns {CacheableTile[]}
    */
-  getCachedTiles(): CacheableTile[] {
-    const cacheableTiles = Array.from(this.tilesByTileUrl.values())
-    const cachedTiles: CachedTile[] = []
-    cacheableTiles.forEach((cacheableTile) => {
+  getCachedTiles(): CachedTile<T>[] {
+    const cachedTiles: CachedTile<T>[] = []
+
+    for (const cacheableTile of this.tilesByTileUrl.values()) {
       if (cacheableTile.isCachedTile()) {
         cachedTiles.push(cacheableTile)
       }
-    })
+    }
+
+    return cachedTiles
+  }
+
+  getCachedTilesForMapId(mapId: string): CachedTile<T>[] {
+    const cachedTiles: CachedTile<T>[] = []
+
+    for (const cacheableTile of this.tilesByTileUrl.values()) {
+      if (
+        cacheableTile.isCachedTile() &&
+        this.tileUrlsByMapId.get(mapId)?.has(cacheableTile.tileUrl)
+      ) {
+        cachedTiles.push(cacheableTile)
+      }
+    }
+
     return cachedTiles
   }
 
   /**
-   * Get the urls of all tiles in this cache
+   * Get the URLs of all tiles in this cache
    *
    * @returns {IterableIterator<string>}
    */
@@ -97,7 +126,7 @@ export default class TileCache extends EventTarget {
    *
    * @param {FetchableMapTile[]} requestedTiles
    */
-  requestFetcableMapTiles(requestedTiles: FetchableMapTile[]) {
+  requestFetchableMapTiles(requestedTiles: FetchableMapTile[]) {
     const previousRequestedTilesKeys = fetchableMapTilesToKeys(
       this.previousRequestedTiles
     )
@@ -122,10 +151,12 @@ export default class TileCache extends EventTarget {
     const outgoingTilesHistoryKeys = fetchableMapTilesToKeys(
       this.outgoingTilesHistory
     )
+
+    // TODO: use union() when it becomes official
     const requestedTilesAndOutgoingTilesHistoryKeys = new Set([
       ...requestedTilesKeys,
       ...outgoingTilesHistoryKeys
-    ]) // TODO: use union() when it becomes official
+    ])
 
     // Remove tiles from cache if not in request (or outgoing tiles history)
     // Loop over all tileUrl's in cache, and the mapId's they are for
@@ -149,17 +180,32 @@ export default class TileCache extends EventTarget {
       this.addMapTile(requestedTile)
     }
 
-    // console.log(
-    //   'end of request: requesting',
-    //   requestedTilesKeys.size,
-    //   'history',
-    //   outgoingTilesHistoryKeys.size,
-    //   'cache',
-    //   this.tilesByTileUrl.size
-    // )
-
     // Update previous requested tiles
     this.previousRequestedTiles = requestedTiles
+  }
+
+  waitUntilAllTilesLoaded(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.finished) {
+        resolve()
+      } else {
+        const listener = () => {
+          this.removeEventListener(
+            WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+            listener
+          )
+          resolve()
+        }
+        this.addEventListener(
+          WarpedMapEventType.ALLREQUESTEDTILESLOADED,
+          listener
+        )
+      }
+    })
+  }
+
+  getTileUrlsForMapId(mapId: string) {
+    return this.tileUrlsByMapId.get(mapId) || new Set()
   }
 
   clear() {
@@ -181,7 +227,7 @@ export default class TileCache extends EventTarget {
     const tileUrl = fetchableMapTile.tileUrl
 
     if (!this.tilesByTileUrl.has(tileUrl)) {
-      const cacheableTile = new CacheableTile(fetchableMapTile)
+      const cacheableTile = this.cachableTileFactory(fetchableMapTile)
 
       this.addEventListenersToTile(cacheableTile)
 
@@ -308,8 +354,6 @@ export default class TileCache extends EventTarget {
 
       if (!this.tilesByTileUrl.has(tileUrl)) {
         this.updateTilesFetchingCount(-1)
-        // TODO: why delete it if it's not there?
-        this.tilesByTileUrl.delete(tileUrl)
       }
     }
   }
@@ -378,6 +422,10 @@ export default class TileCache extends EventTarget {
     }
   }
 
+  get finished() {
+    return this.tilesFetchingCount === 0
+  }
+
   private updateTilesFetchingCount(delta: number) {
     this.tilesFetchingCount += delta
 
@@ -388,7 +436,7 @@ export default class TileCache extends EventTarget {
     }
   }
 
-  private addEventListenersToTile(cacheableTile: CacheableTile) {
+  private addEventListenersToTile(cacheableTile: CacheableTile<T>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)
@@ -399,7 +447,7 @@ export default class TileCache extends EventTarget {
     )
   }
 
-  private removeEventListenersFromTile(cacheableTile: CacheableTile) {
+  private removeEventListenersFromTile(cacheableTile: CacheableTile<T>) {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)

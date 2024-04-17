@@ -16,7 +16,7 @@ import {
 } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-import type { Point, Rectangle } from '@allmaps/types'
+import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 export type WarpedMapLayerOptions = {
@@ -25,7 +25,7 @@ export type WarpedMapLayerOptions = {
   className: string
   pane: string
   zIndex?: number
-  imageInfoCache?: Cache
+  imageInformations?: ImageInformations
 }
 
 const NO_RENDERER_ERROR_MESSAGE =
@@ -484,10 +484,10 @@ export class WarpedMapLayer extends L.Layer {
    * Sets the image info Cache of the warpedMapList
    * @param {Cache} cache - the image info cache
    */
-  setImageInfoCache(cache: Cache) {
+  setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setImageInfoCache(cache)
+    this.renderer.warpedMapList.setImageInformations(imageInformations)
   }
 
   /**
@@ -777,7 +777,9 @@ export class WarpedMapLayer extends L.Layer {
       throw new Error('WebGL 2 not available')
     }
 
-    const warpedMapList = new WarpedMapList(this.options.imageInfoCache)
+    const warpedMapList = new WarpedMapList({
+      imageInformations: this.options.imageInformations
+    })
 
     this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
 

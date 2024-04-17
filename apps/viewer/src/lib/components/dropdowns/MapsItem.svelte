@@ -18,7 +18,7 @@
     mapWarpedMapLayer
   } from '$lib/shared/stores/openlayers.js'
   import { setActiveMapId } from '$lib/shared/stores/active.js'
-  import { imageInfoCache } from '$lib/shared/stores/openlayers.js'
+  import { imageInformations } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
 
@@ -171,7 +171,13 @@
       container.scrollIntoView()
     }
 
-    imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
+    // TODO: move to function
+    if (imageInformations.has(imageUri)) {
+      imageInfo = imageInformations.get(imageUri)
+    } else {
+      imageInfo = await fetchImageInfo(imageUri, { cache: 'force-cache' })
+      imageInformations.set(imageUri, imageInfo)
+    }
   })
 </script>
 

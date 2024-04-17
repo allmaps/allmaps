@@ -113,7 +113,7 @@ router.get('/:z/:x/:y.png', async (req) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
@@ -121,7 +121,7 @@ router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
@@ -129,7 +129,7 @@ router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
@@ -137,7 +137,7 @@ router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req.query)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options, cache)
+  return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 // -------------------------------------------------------------------------------------------

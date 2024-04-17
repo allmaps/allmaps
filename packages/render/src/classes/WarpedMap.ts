@@ -13,8 +13,8 @@ import {
   mixPoints
 } from '@allmaps/stdlib'
 
-import { applyTransform } from './shared/matrix.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
+import { applyTransform } from '../shared/matrix.js'
+import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type {
   Point,
@@ -22,7 +22,9 @@ import type {
   Ring,
   Rectangle,
   Bbox,
-  GeojsonPolygon
+  GeojsonPolygon,
+  FetchFn,
+  ImageInformations
 } from '@allmaps/types'
 import type {
   TransformationType,
@@ -45,6 +47,21 @@ const PROJECTED_TRANSFORMER_OPTIONS = {
 } as PartialTransformOptions
 
 const MAX_TRIANGULATE_ERROR_COUNT = 10
+
+type WarpedMapOptions = {
+  fetchFn: FetchFn
+  // TODO: this option needs a better name:
+  imageInformations: ImageInformations
+  visible: boolean
+}
+
+const DEFAULT_VISIBLE = true
+
+function createDefaultWarpedMapOptions(): Partial<WarpedMapOptions> {
+  return {
+    visible: DEFAULT_VISIBLE
+  }
+}
 
 /**
  * Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
@@ -108,10 +125,12 @@ export default class WarpedMap extends EventTarget {
   resourceFullMaskBbox: Bbox
   resourceFullMaskRectangle: Rectangle
 
-  imageInfoCache?: Cache
+  imageInformations?: ImageInformations
   imageId?: string
   parsedImage?: IIIFImage
   loadingImageInfo: boolean
+
+  fetchFn?: FetchFn
 
   visible: boolean
 
@@ -177,10 +196,14 @@ export default class WarpedMap extends EventTarget {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    imageInfoCache?: Cache,
-    visible = true
+    options: Partial<WarpedMapOptions>
   ) {
     super()
+
+    options = {
+      ...createDefaultWarpedMapOptions(),
+      ...options
+    }
 
     this.mapId = mapId
     this.georeferencedMap = georeferencedMap
@@ -206,10 +229,12 @@ export default class WarpedMap extends EventTarget {
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
 
-    this.imageInfoCache = imageInfoCache
+    this.imageInformations = options.imageInformations
     this.loadingImageInfo = false
 
-    this.visible = visible
+    this.visible = options.visible || DEFAULT_VISIBLE
+
+    this.fetchFn = options.fetchFn
 
     this.transformationType =
       this.georeferencedMap.transformation?.type || 'polynomial'
@@ -499,16 +524,34 @@ export default class WarpedMap extends EventTarget {
    * @returns {Promise<void>}
    */
   async loadImageInfo(): Promise<void> {
-    this.loadingImageInfo = true
-    const imageUri = this.georeferencedMap.resource.id
-    const imageInfoJson = await fetchImageInfo(imageUri, {
-      cache: this.imageInfoCache
-    })
-    this.parsedImage = IIIFImage.parse(imageInfoJson)
-    this.imageId = await generateId(imageUri)
-    this.loadingImageInfo = false
+    try {
+      this.loadingImageInfo = true
+      const imageUri = this.georeferencedMap.resource.id
 
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+      let imageInfo
+
+      if (this.imageInformations?.get(imageUri)) {
+        imageInfo = this.imageInformations.get(imageUri)
+      } else {
+        // TODO: don't force-cache here?
+        imageInfo = await fetchImageInfo(
+          imageUri,
+          { cache: 'force-cache' },
+          this.fetchFn
+        )
+        this.imageInformations?.set(imageUri, imageInfo)
+      }
+
+      this.parsedImage = IIIFImage.parse(imageInfo)
+      this.imageId = await generateId(imageUri)
+
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+    } catch (err) {
+      this.loadingImageInfo = false
+      throw err
+    } finally {
+      this.loadingImageInfo = false
+    }
   }
 
   dispose() {
@@ -642,9 +685,8 @@ export class WarpedMapWithImageInfo extends WarpedMap {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    imageInfoCache?: Cache,
-    visible = true
+    options: Partial<WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, imageInfoCache, visible)
+    super(mapId, georeferencedMap, options)
   }
 }

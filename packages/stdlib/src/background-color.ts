@@ -14,30 +14,27 @@ type Histogram = {
 const DEFAULT_BIN_SIZE = 5
 const DEFAULT_RESOLUTION = 2
 
-export function getImageData(imageElement: HTMLImageElement, mask?: Point[]) {
-  const canvas = document.createElement('canvas')
+export function getImageData(imageBitmap: ImageBitmap, mask?: Point[]) {
+  const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height)
   const context = canvas.getContext('2d')
 
-  if (context) {
-    canvas.width = imageElement.width
-    canvas.height = imageElement.height
-
-    if (mask) {
-      context.fillStyle = 'rgba(0, 0, 0, 0)'
-      context.fillRect(0, 0, imageElement.width, imageElement.height)
-
-      context.beginPath()
-      context.moveTo(mask[0][0], mask[0][1])
-      mask.slice(1).forEach((point) => context.lineTo(point[0], point[1]))
-      context.closePath()
-      context.clip()
-    }
-
-    context.drawImage(imageElement, 0, 0)
-    return context.getImageData(0, 0, imageElement.width, imageElement.height)
-  } else {
-    throw new Error('Unable to get canvas context')
+  if (!context) {
+    throw new Error('Could not create OffscreenCanvas context')
   }
+
+  if (mask) {
+    context.fillStyle = 'rgba(0, 0, 0, 0)'
+    context.fillRect(0, 0, imageBitmap.width, imageBitmap.height)
+
+    context.beginPath()
+    context.moveTo(mask[0][0], mask[0][1])
+    mask.slice(1).forEach((point) => context.lineTo(point[0], point[1]))
+    context.closePath()
+    context.clip()
+  }
+
+  context.drawImage(imageBitmap, 0, 0)
+  return context.getImageData(0, 0, imageBitmap.width, imageBitmap.height)
 }
 
 export function getColorsArray(

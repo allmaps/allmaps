@@ -5,17 +5,17 @@ import { throttle } from 'lodash-es'
 import { isOverlapping } from '@allmaps/stdlib'
 
 import WarpedMap from './WarpedMap.js'
-import { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
-import { computeBboxTile } from './shared/tiles.js'
-import { applyTransform } from './shared/matrix.js'
-import { createBuffer } from './shared/webgl2.js'
+import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import { computeBboxTile } from '../shared/tiles.js'
+import { applyTransform } from '../shared/matrix.js'
+import { createBuffer } from '../shared/webgl2.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { Transform } from '@allmaps/types'
 
 import type { CachedTile } from './CacheableTile.js'
-import type { RenderOptions } from './shared/types.js'
+import type { RenderOptions } from '../shared/types.js'
 
 const THROTTLE_WAIT_MS = 100
 const THROTTLE_OPTIONS = {
@@ -29,7 +29,7 @@ const DEFAULT_SATURATION = 1
 // const MAX_SCALE_FACTOR_DIFFERENCE = 2
 
 /**
- * Class for storing the WebGL2 information necessary to draw WarpedMaps
+ * Class for storing the WebGL 2 information necessary to draw WarpedMaps
  *
  * @export
  * @class WebGL2WarpedMap
@@ -44,7 +44,7 @@ export default class WebGL2WarpedMap extends EventTarget {
 
   vao: WebGLVertexArrayObject | null
 
-  CachedTilesByTileUrl: Map<string, CachedTile> = new Map()
+  CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -108,7 +108,7 @@ export default class WebGL2WarpedMap extends EventTarget {
    *
    * @param {CachedTile} cachedTile
    */
-  addCachedTileAndUpdateTextures(cachedTile: CachedTile) {
+  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
     this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
@@ -218,16 +218,9 @@ export default class WebGL2WarpedMap extends EventTarget {
 
     const CachedTilesByTileUrlCount = cachedTiles.length
 
-    // console.log(
-    //   'from',
-    //   this.CachedTilesByTileUrl.size,
-    //   'packing',
-    //   CachedTilesByTileUrlCount
-    // )
-
     const packedTiles = cachedTiles.map((cachedTile, index) => ({
-      w: cachedTile.imageBitmap.width,
-      h: cachedTile.imageBitmap.height,
+      w: cachedTile.data.width,
+      h: cachedTile.data.height,
       // Calling potpack will add x and y properties
       // with the position of the tile's origin in the pack
       // By adding them here already, we'll make TypeScript happy!
@@ -261,7 +254,7 @@ export default class WebGL2WarpedMap extends EventTarget {
     )
     for (const packedTile of packedTiles) {
       // Fill with the TileImageBitmap of each packed tile
-      const imageBitmap = cachedTiles[packedTile.index].imageBitmap
+      const imageBitmap = cachedTiles[packedTile.index].data
       gl.texSubImage2D(
         gl.TEXTURE_2D,
         0,

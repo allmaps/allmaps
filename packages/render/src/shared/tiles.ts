@@ -5,8 +5,7 @@ import {
   bboxToCenter,
   distance
 } from '@allmaps/stdlib'
-import FetchableMapTile from '../FetchableTile'
-import CacheableTile from '../CacheableTile'
+import FetchableMapTile from '../classes/FetchableTile'
 
 import type {
   Point,
@@ -33,8 +32,9 @@ const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 0.5
 // Functions for preparing to make tiles
 
 // TODO: consider a way to make this more elegant:
-// - many to many datastructures
+// - many-to-many data structure
 // - a new compact class with just these two properties and an equality function between elements
+// - new JS tuple - https://github.com/tc39/proposal-record-tuple
 export function createKeyFromMapIdAndTileUrl(
   mapId: string,
   tileUrl: string
@@ -66,9 +66,9 @@ export function geoBboxToResourceRing(
     maxDepth: 2
   } as PartialTransformOptions
 ): Ring {
-  // TODO: this function could be moved elsewhere because not stricktly about tiles
+  // TODO: this function could be moved elsewhere because not strictly about tiles
   //
-  // 'transformer' is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
+  // 'transformer' is the transformer built from the (projected) GCPs. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
   // 'geoBbox' is a Bbox (e.g. of the viewport) in (projected) geo coordinates
   // 'geoBboxResourcePolygon' is a Polygon of this Bbox, transformed backward to resource coordinates.
   // Due to transformerOptions this in not necessarilly a polygon with a 4-point ring, but can have more points.
@@ -313,7 +313,7 @@ function tilesByColumnToTiles(
 
 // Computations
 
-export function tileByteSize(tile: FetchableMapTile | CacheableTile): number {
+export function tileByteSize(tile: FetchableMapTile): number {
   return (
     (tile.imageRequest.size?.height || 0) *
     (tile.imageRequest.size?.width || 0) *

@@ -1,6 +1,8 @@
 // TODO: consider using
 // https://github.com/mourner/flatbush
 import RBush from 'rbush'
+
+// TODO: use robust-point-in-polygon
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 
 import { computeBbox } from '@allmaps/stdlib'

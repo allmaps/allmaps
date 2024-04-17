@@ -13,6 +13,7 @@ import type {
   Rectangle,
   Bbox,
   Size,
+  Fit,
   GeojsonGeometry
 } from '@allmaps/types'
 
@@ -132,6 +133,22 @@ export function rectangleToSize(rectangle: Rectangle): Size {
       (distance(rectangle[1], rectangle[2]) +
         distance(rectangle[3], rectangle[0]))
   ]
+}
+
+export function computeProjectedGeoPerViewportScale(
+  projectedGeoSize: Size,
+  viewportSize: Size,
+  fit: Fit
+) {
+  if (viewportSize[0] >= viewportSize[1]) {
+    return fit === 'contain'
+      ? projectedGeoSize[0] / viewportSize[0]
+      : projectedGeoSize[1] / viewportSize[1]
+  } else {
+    return fit === 'contain'
+      ? projectedGeoSize[1] / viewportSize[1]
+      : projectedGeoSize[0] / viewportSize[0]
+  }
 }
 
 // Scales

@@ -32,8 +32,6 @@ export default class FetchableMapTile {
       tile.row
     )
     this.imageRequest = imageRequest
-
-    const url = warpedMap.parsedImage.getImageUrl(imageRequest)
-    this.tileUrl = url
+    this.tileUrl = warpedMap.parsedImage.getImageUrl(imageRequest)
   }
 }
