@@ -13,9 +13,12 @@ export const supportedDistortionMeasures = [
 export function computeDistortionFromPartialDerivatives(
   partialDerivativeX: Point,
   partialDerivativeY: Point,
-  distortionMeasure: DistortionMeasure,
+  distortionMeasure?: DistortionMeasure,
   referenceScaling = 1
 ): number {
+  if (!distortionMeasure) {
+    return 0
+  }
   const E = partialDerivativeX[0] ** 2 + partialDerivativeX[1] ** 2
   const G = partialDerivativeY[0] ** 2 + partialDerivativeY[1] ** 2
   const F =

@@ -57,7 +57,8 @@ export function createWarpedMapFactory() {
 }
 
 /**
- * Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
+ * Class for warped maps
+ * This class describes how a georeferenced map is warped using a specific transformation.
  *
  * @export
  * @class WarpedMap

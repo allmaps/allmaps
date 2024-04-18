@@ -656,12 +656,6 @@ export default class WebGL2Renderer
 
       // Distortion
 
-      const distortionLocation = gl.getUniformLocation(
-        this.program,
-        'u_distortion'
-      )
-      gl.uniform1f(distortionLocation, warpedMap.distortionMeasure ? 1 : 0)
-
       if (warpedMap.distortionMeasure) {
         const distortionOptionsDistortionMeasureLocation =
           gl.getUniformLocation(
@@ -894,13 +888,14 @@ export default class WebGL2Renderer
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        if (this.animating) {
+          warpedMap.mixTrianglePoints(this.animationProgress)
+        }
         warpedMap.updateTrianglePointsDistortion(false)
       }
 
       this.updateVertexBuffers() // TODO: can this be removed?
-      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetTrianglePoints()
-      }
+      this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
     }
   }
 

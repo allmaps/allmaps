@@ -226,12 +226,6 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    * @param {boolean} [previousIsNew=false]
    */
   updateTrianglePointsDistortion(previousIsNew = false) {
-    if (!this.distortionMeasure) {
-      return
-    }
-
-    const distortionMeasure = this.distortionMeasure
-
     this.projectedGeoUniquePointsPartialDerivativeX =
       getPropertyFromDoubleCacheOrComputation(
         this
