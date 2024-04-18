@@ -512,7 +512,8 @@ export default class WarpedMap extends EventTarget {
     ])[0]
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
     this.projectedGeoMaskRectangle = this.projectedTransformer.transformForward(
-      [this.resourceMaskRectangle]
+      [this.resourceMaskRectangle],
+      { maxDepth: 0 }
     )[0] as Rectangle
   }
 
@@ -522,9 +523,10 @@ export default class WarpedMap extends EventTarget {
     ])[0]
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
     this.projectedGeoFullMaskRectangle =
-      this.projectedTransformer.transformForward([
-        this.resourceFullMaskRectangle
-      ])[0] as Rectangle
+      this.projectedTransformer.transformForward(
+        [this.resourceFullMaskRectangle],
+        { maxDepth: 0 }
+      )[0] as Rectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {
