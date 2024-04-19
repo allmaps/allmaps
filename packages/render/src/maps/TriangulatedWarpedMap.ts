@@ -259,8 +259,8 @@ export default class TriangulatedWarpedMap extends WarpedMap {
         computeDistortionFromPartialDerivatives(
           this.projectedGeoUniquePointsPartialDerivativeX[index],
           this.projectedGeoUniquePointsPartialDerivativeY[index],
-          distortionMeasure,
-          this.getReferenceScaling()
+          this.distortionMeasure!,
+          this.getReferenceScale()
         )
     )
     this.trianglePointsDistortion = this.trianglePointsUniquePointsIndex.map(

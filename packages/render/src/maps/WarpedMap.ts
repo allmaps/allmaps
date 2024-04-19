@@ -312,7 +312,7 @@ export default class WarpedMap extends EventTarget {
    *
    * @returns {number}
    */
-  getReferenceScaling(): number {
+  getReferenceScale(): number {
     const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
       'helmert',

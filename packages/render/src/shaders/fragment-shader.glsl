@@ -190,7 +190,6 @@ void main() {
     }
 
     // Grid
-    // TODO: make this a rendering option
     if(u_grid) {
       float gridSize = 20.0f * float(u_bestScaleFactor);
       float gridWidth = 2.0f * float(u_bestScaleFactor);
