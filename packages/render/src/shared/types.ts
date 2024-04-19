@@ -64,10 +64,15 @@ export type ColorizeOptions = Partial<{
   color: Color
 }>
 
+export type GridOptions = Partial<{
+  enabled: boolean
+}>
+
 // TODO: don't make partial, extend with other rendering options
 export type RenderOptions = Partial<{
   removeColorOptions?: RemoveColorOptions
   colorizeOptions?: ColorizeOptions
+  gridOptions?: GridOptions
 }>
 
 export type WarpedMapFactory<W> = (

@@ -51,6 +51,15 @@ export function setRenderOptionsForMap(
         } else {
           mapWarpedMapLayer.resetMapColorize(mapId)
         }
+
+        if (viewerMap.renderOptions.grid.enabled) {
+          mapWarpedMapLayer.setMapGrid(
+            mapId,
+            viewerMap.renderOptions.grid.enabled
+          )
+        } else {
+          mapWarpedMapLayer.resetMapGrid(mapId)
+        }
       }
 
       $mapsById.set(mapId, viewerMap)
@@ -93,6 +102,12 @@ export const renderOptions = {
           mapWarpedMapLayer.setColorize($renderOptionsLayer.colorize.color)
         } else {
           mapWarpedMapLayer.resetColorize()
+        }
+
+        if ($renderOptionsLayer.grid.enabled) {
+          mapWarpedMapLayer.setGrid($renderOptionsLayer.grid.enabled)
+        } else {
+          mapWarpedMapLayer.resetGrid()
         }
       }
 

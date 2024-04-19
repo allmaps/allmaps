@@ -14,6 +14,8 @@ uniform float u_removeColorOptionsHardness;
 uniform bool u_colorize;
 uniform vec3 u_colorizeOptionsColor;
 
+uniform bool u_grid;
+
 uniform float u_opacity;
 uniform float u_saturation;
 
@@ -189,7 +191,7 @@ void main() {
 
     // Grid
     // TODO: make this a rendering option
-    if(false) {
+    if(u_grid) {
       float gridSize = 20.0f * float(u_bestScaleFactor);
       float gridWidth = 2.0f * float(u_bestScaleFactor);
       if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
