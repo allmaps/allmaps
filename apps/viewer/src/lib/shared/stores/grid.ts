@@ -11,7 +11,7 @@ export function toggleGrid() {
   grid.update(($grid) => {
     $grid = !$grid
     const $mapIds = get(mapIds)
-    for (let mapId of $mapIds) {
+    for (const mapId of $mapIds) {
       setRenderOptionsForMap(mapId, {
         grid: {
           enabled: $grid
