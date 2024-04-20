@@ -4,6 +4,8 @@ import FetchableMapTile from './FetchableTile.js'
 import CacheableTile from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
+import type { FetchFn } from '@allmaps/types'
+
 import type { GetImageData } from '../shared/types.js'
 
 /**
@@ -19,9 +21,10 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
 
   constructor(
     fetchableMapTile: FetchableMapTile,
-    getImageData: GetImageData<D>
+    getImageData: GetImageData<D>,
+    fetchFn?: FetchFn
   ) {
-    super(fetchableMapTile)
+    super(fetchableMapTile, fetchFn)
 
     this.getImageData = getImageData
   }
@@ -65,8 +68,8 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
   }
 
   static createFactory<D>(getImageData: GetImageData<D>) {
-    return (fetchableMapTile: FetchableMapTile) =>
-      new CacheableIntArrayTile(fetchableMapTile, getImageData)
+    return (fetchableMapTile: FetchableMapTile, fetchFn?: FetchFn) =>
+      new CacheableIntArrayTile(fetchableMapTile, getImageData, fetchFn)
   }
 }
 

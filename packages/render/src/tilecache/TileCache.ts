@@ -230,7 +230,10 @@ export default class TileCache<D> extends EventTarget {
     const tileUrl = fetchableMapTile.tileUrl
 
     if (!this.tilesByTileUrl.has(tileUrl)) {
-      const cacheableTile = this.cachableTileFactory(fetchableMapTile)
+      const cacheableTile = this.cachableTileFactory(
+        fetchableMapTile,
+        this.fetchFn
+      )
 
       this.addEventListenersToTile(cacheableTile)
 

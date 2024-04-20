@@ -417,12 +417,7 @@ export default class WarpedMap extends EventTarget {
       if (this.imageInformations?.get(imageUri)) {
         imageInfo = this.imageInformations.get(imageUri)
       } else {
-        // TODO: don't force-cache here?
-        imageInfo = await fetchImageInfo(
-          imageUri,
-          { cache: 'force-cache' },
-          this.fetchFn
-        )
+        imageInfo = await fetchImageInfo(imageUri, undefined, this.fetchFn)
         this.imageInformations?.set(imageUri, imageInfo)
       }
 
