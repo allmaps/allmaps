@@ -1,7 +1,7 @@
 import { decode as decodeJpeg, type UintArrRet } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
-import { IntArrayRenderer, Viewport } from '@allmaps/render'
+import { IntArrayRenderer, Viewport } from '@allmaps/render/int-array'
 
 import { tileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'

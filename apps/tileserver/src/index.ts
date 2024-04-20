@@ -6,6 +6,7 @@ import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
 import { optionsFromQuery } from './options.js'
 import { generateTileJson } from './tilejson.js'
 import { generateTilesHtml } from './html.js'
+import { ONE_HOUR } from './fetch.js'
 
 import type { XYZTile, Caches } from './types.js'
 
@@ -61,8 +62,8 @@ router.get('/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
 // -------------------------------------------------------------------------------------------
 
 router.get('/tiles.json', async (req, env) => {
-  const maps = await mapsFromQuery(cache, req.query)
-  const options = optionsFromQuery(req.query)
+  const maps = await mapsFromQuery(req)
+  const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
   const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
@@ -72,8 +73,8 @@ router.get('/tiles.json', async (req, env) => {
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const mapId = req.params?.mapId
-  const maps = await mapsFromParams(cache, env, req.params)
-  const options = optionsFromQuery(req.query)
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`
@@ -83,8 +84,8 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
 
 router.get('/images/:imageId/tiles.json', async (req, env) => {
   const imageId = req.params?.imageId
-  const maps = await mapsFromParams(cache, env, req.params)
-  const options = optionsFromQuery(req.query)
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`
@@ -94,8 +95,8 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
 
 router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
   const manifestId = req.params?.manifestId
-  const maps = await mapsFromParams(cache, env, req.params)
-  const options = optionsFromQuery(req.query)
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`
@@ -109,33 +110,33 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
 
 // TODO: support retina tiles @2x
 router.get('/:z/:x/:y.png', async (req) => {
-  const maps = await mapsFromQuery(cache, req.query)
+  const maps = await mapsFromQuery(req)
   const { x, y, z } = xyzFromParams(req.params)
-  const options = optionsFromQuery(req.query)
+  const options = optionsFromQuery(req)
 
   return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
-  const maps = await mapsFromParams(cache, env, req.params)
+  const maps = await mapsFromParams(env, req)
   const { x, y, z } = xyzFromParams(req.params)
-  const options = optionsFromQuery(req.query)
+  const options = optionsFromQuery(req)
 
   return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
-  const maps = await mapsFromParams(cache, env, req.params)
+  const maps = await mapsFromParams(env, req)
   const { x, y, z } = xyzFromParams(req.params)
-  const options = optionsFromQuery(req.query)
+  const options = optionsFromQuery(req)
 
   return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
-  const maps = await mapsFromParams(cache, env, req.params)
+  const maps = await mapsFromParams(env, req)
   const { x, y, z } = xyzFromParams(req.params)
-  const options = optionsFromQuery(req.query)
+  const options = optionsFromQuery(req)
 
   return await createWarpedTileResponse(maps, { x, y, z }, options)
 })
@@ -151,29 +152,28 @@ router.all('*', () =>
 )
 
 export default {
-  fetch: async (req: Request, ...extra: []) => {
-    const url = req.url
+  fetch: async (request: Request, ...extra: []) => {
+    const url = request.url
 
-    const cacheResponse = await cache.match(req.url)
+    const cacheResponse = await cache.match(request.url)
 
     if (cacheResponse) {
-      console.log('Found in cache:', req.url)
       return cacheResponse
     } else {
-      console.log('Not found in cache:', req.url)
-
       return router
-        .handle(req, ...extra)
-        .then((res) => {
-          if (res.status !== 200) {
+        .handle(request, ...extra)
+        .then((response) => {
+          if (response.status !== 200) {
             throw new Error(`Failed to fetch ${url}`)
           }
 
-          // Set CORS headers
-          res.headers.set('Access-Control-Allow-Origin', '*')
+          // Set CORS and Cache headers
+          response.headers.set('Access-Control-Allow-Origin', '*')
+          response.headers.append('Cache-Control', `s-maxage=${ONE_HOUR}`)
 
-          cache.put(url, res.clone())
-          return res
+          cache.put(url, response.clone())
+
+          return response
         })
         .catch((err) => {
           return createErrorResponse(err)

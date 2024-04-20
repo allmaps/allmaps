@@ -1,11 +1,14 @@
-import type { Obj } from 'itty-router'
+// import type { Obj } from 'itty-router'
 
 import type { TilejsonOptions } from './types.js'
 import type { TransformationType } from '@allmaps/transform'
 
-export function optionsFromQuery(query: Obj | undefined): TilejsonOptions {
-  let transformationType: TransformationType = 'polynomial'
+import type { IRequest } from 'itty-router'
 
+export function optionsFromQuery(req: IRequest): TilejsonOptions {
+  const query = req.query
+
+  let transformationType: TransformationType = 'polynomial'
   const queryTransformationType = query?.['transformation.type']
 
   if (
