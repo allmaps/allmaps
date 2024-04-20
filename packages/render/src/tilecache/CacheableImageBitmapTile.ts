@@ -66,5 +66,5 @@ export default class CacheableImageBitmapTile extends CacheableTile<ImageBitmap>
  * @extends {CacheableImageBitmapTile}
  */
 export class CachedImageBitmapTile extends CacheableImageBitmapTile {
-  data!: ImageBitmap
+  declare data: ImageBitmap
 }

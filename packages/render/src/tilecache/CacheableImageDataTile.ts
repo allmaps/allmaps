@@ -76,5 +76,5 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
  * @extends {CacheableImageDataTile}
  */
 export class CachedImageDataTile extends CacheableImageDataTile {
-  data!: ImageData
+  declare data: ImageData
 }

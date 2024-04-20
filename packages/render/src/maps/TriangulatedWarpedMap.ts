@@ -230,6 +230,8 @@ export default class TriangulatedWarpedMap extends WarpedMap {
       return
     }
 
+    const distortionMeasure = this.distortionMeasure
+
     this.projectedGeoUniquePointsPartialDerivativeX =
       getPropertyFromDoubleCacheOrComputation(
         this
@@ -263,7 +265,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
         computeDistortionFromPartialDerivatives(
           this.projectedGeoUniquePointsPartialDerivativeX[index],
           this.projectedGeoUniquePointsPartialDerivativeY[index],
-          this.distortionMeasure!,
+          distortionMeasure,
           this.getReferenceScaling()
         )
     )

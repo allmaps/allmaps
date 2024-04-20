@@ -80,5 +80,5 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
  * @extends {CacheableIntArrayTile}
  */
 export class CachedIntArrayTile<D> extends CacheableIntArrayTile<D> {
-  data!: D
+  declare data: D
 }

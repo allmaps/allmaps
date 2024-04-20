@@ -41,7 +41,7 @@ export default defineConfig({
     port: ports.render
   },
   build: {
-    target: 'es2020',
+    target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
     minify: true,
@@ -78,7 +78,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'es2020'
+      target: 'es2022'
     }
   },
   base: '',

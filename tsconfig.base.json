@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "strict": true,
     "allowJs": true,
-    "target": "es2021",
+    "target": "es2022",
     "composite": true,
     "declaration": true,
     "moduleResolution": "node",

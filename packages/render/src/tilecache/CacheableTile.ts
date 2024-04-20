@@ -69,5 +69,5 @@ export default abstract class CacheableTile<D> extends EventTarget {
  * @extends {CacheableTile}
  */
 export abstract class CachedTile<D> extends CacheableTile<D> {
-  data!: D
+  declare data: D
 }

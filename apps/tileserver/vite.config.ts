@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
-    target: 'es2020',
+    target: 'es2022',
     lib: {
       formats: ['es'],
       entry: './src/worker.ts',
@@ -12,7 +12,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'es2020'
+      target: 'es2022'
     }
   },
   base: ''

@@ -544,8 +544,9 @@ export default class WarpedMap extends EventTarget {
  * @extends {WarpedMap}
  */
 export class WarpedMapWithImageInfo extends WarpedMap {
-  imageId!: string
-  parsedImage!: IIIFImage
+  declare imageId: string
+  declare parsedImage: IIIFImage
+
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
