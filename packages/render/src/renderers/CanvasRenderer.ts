@@ -1,7 +1,7 @@
 import BaseRenderer from './BaseRenderer.js'
 import CacheableImageDataTile from '../tilecache/CacheableImageDataTile.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
-import Viewport from '../Viewport.js'
+import Viewport from '../viewport/Viewport.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 import type { Renderer, CanvasRendererOptions } from '../shared/types.js'
@@ -34,10 +34,10 @@ export default class CanvasRenderer
     const width = this.canvas.width
     const height = this.canvas.height
 
-    this.viewport = Viewport.fitWarpedMapList(this.warpedMapList, [
-      width,
-      height
-    ])
+    this.viewport = Viewport.fromWarpedMapList(
+      [width, height],
+      this.warpedMapList
+    )
 
     // TODO: this function loads too many info.jsons?? Some maps are outside of viewport.
     // Align with checkAndLoadImageInfos() (for WebGL2Renderer, where the renderer doesn't

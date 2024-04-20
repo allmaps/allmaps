@@ -40,7 +40,7 @@ export function createWebGL2WarpedMapFactory(
 }
 
 /**
- * Class for storing the WebGL 2 information necessary to draw WarpedMaps
+ * Class for WebGL2 rendered warped maps
  *
  * @export
  * @class WebGL2WarpedMap
@@ -193,26 +193,24 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Previous and New Distortion
 
-    if (this.distortionMeasure) {
-      const previousTrianglePointsDistortion =
-        this.previousTrianglePointsDistortion
-      createBuffer(
-        this.gl,
-        this.program,
-        new Float32Array(previousTrianglePointsDistortion),
-        1,
-        'a_previousTrianglePointDistortion'
-      )
+    const previousTrianglePointsDistortion =
+      this.previousTrianglePointsDistortion
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(previousTrianglePointsDistortion),
+      1,
+      'a_previousTrianglePointDistortion'
+    )
 
-      const trianglePointsDistortion = this.trianglePointsDistortion
-      createBuffer(
-        this.gl,
-        this.program,
-        new Float32Array(trianglePointsDistortion),
-        1,
-        'a_trianglePointDistortion'
-      )
-    }
+    const trianglePointsDistortion = this.trianglePointsDistortion
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(trianglePointsDistortion),
+      1,
+      'a_trianglePointDistortion'
+    )
 
     // Triangle index
 

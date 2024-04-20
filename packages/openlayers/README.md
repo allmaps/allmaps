@@ -146,26 +146,7 @@ All these map phases originating from the same Georeference Annotation have the 
 *   [Bbox](#bbox)
 *   [TransformationType](#transformationtype)
 *   [WarpedMapLayer](#warpedmaplayer)
-    *   [getContainer](#getcontainer)
-    *   [getCanvas](#getcanvas)
-    *   [getMapOpacity](#getmapopacity)
-    *   [setMapOpacity](#setmapopacity)
-    *   [resetMapOpacity](#resetmapopacity)
-    *   [setSaturation](#setsaturation)
-    *   [resetSaturation](#resetsaturation)
-    *   [setMapSaturation](#setmapsaturation)
-    *   [resetMapSaturation](#resetmapsaturation)
-    *   [setRemoveColor](#setremovecolor)
-    *   [resetRemoveColor](#resetremovecolor)
-    *   [setMapRemoveColor](#setmapremovecolor)
-    *   [resetMapRemoveColor](#resetmapremovecolor)
-    *   [setColorize](#setcolorize)
-    *   [resetColorize](#resetcolorize)
-    *   [setMapColorize](#setmapcolorize)
-    *   [resetMapColorize](#resetmapcolorize)
-    *   [dispose](#dispose)
-    *   [render](#render)
-*   [WarpedMapSource](#warpedmapsource)
+    *   [Parameters](#parameters)
     *   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
     *   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
     *   [addGeoreferenceAnnotationByUrl](#addgeoreferenceannotationbyurl)
@@ -189,8 +170,31 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [bringMapsForward](#bringmapsforward)
     *   [sendMapsBackward](#sendmapsbackward)
     *   [getMapZIndex](#getmapzindex)
-    *   [setImageInfoCache](#setimageinfocache)
+    *   [setImageInformations](#setimageinformations)
+    *   [getContainer](#getcontainer)
+    *   [getCanvas](#getcanvas)
+    *   [getMapOpacity](#getmapopacity)
+    *   [setMapOpacity](#setmapopacity)
+    *   [resetMapOpacity](#resetmapopacity)
+    *   [setSaturation](#setsaturation)
+    *   [resetSaturation](#resetsaturation)
+    *   [setMapSaturation](#setmapsaturation)
+    *   [resetMapSaturation](#resetmapsaturation)
+    *   [setRemoveColor](#setremovecolor)
+    *   [resetRemoveColor](#resetremovecolor)
+    *   [setMapRemoveColor](#setmapremovecolor)
+    *   [resetMapRemoveColor](#resetmapremovecolor)
+    *   [setColorize](#setcolorize)
+    *   [resetColorize](#resetcolorize)
+    *   [setMapColorize](#setmapcolorize)
+    *   [resetMapColorize](#resetmapcolorize)
+    *   [setGrid](#setgrid)
+    *   [resetGrid](#resetgrid)
+    *   [setMapGrid](#setmapgrid)
+    *   [resetMapGrid](#resetmapgrid)
+    *   [dispose](#dispose)
     *   [clear](#clear)
+    *   [render](#render)
 
 ### Point
 
@@ -214,8 +218,220 @@ Type: (`"helmert"` | `"polynomial"` | `"polynomial1"` | `"polynomial2"` | `"poly
 
 WarpedMapLayer class.
 
-Together with a WarpedMapSource, this class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
+This class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
 WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+
+#### Parameters
+
+*   `options` **WebGL2RendererOptions?** the WebGL2 renderer options
+
+#### addGeoreferenceAnnotation
+
+Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+
+##### Parameters
+
+*   `annotation` **any** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
+
+#### removeGeoreferenceAnnotation
+
+Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+
+##### Parameters
+
+*   `annotation` **any** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
+
+#### addGeoreferenceAnnotationByUrl
+
+Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+
+##### Parameters
+
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
+
+#### removeGeoreferenceAnnotationByUrl
+
+Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+
+##### Parameters
+
+*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
+
+#### addGeoreferencedMap
+
+Adds a Georeferenced map.
+
+##### Parameters
+
+*   `georeferencedMap` **unknown** Georeferenced map
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>** the map ID of the map that was added, or an error
+
+#### removeGeoreferencedMap
+
+Removes a Georeferenced map.
+
+##### Parameters
+
+*   `georeferencedMap` **unknown** Georeferenced map
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>** the map ID of the map that was remvoed, or an error
+
+#### getWarpedMapList
+
+Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
+
+Returns **WarpedMapList** the warped map list
+
+#### getWarpedMap
+
+Returns a single map's warped map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **(WebGL2WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
+
+#### showMap
+
+Make a single map visible
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+#### showMaps
+
+Make multiple maps visible
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### hideMap
+
+Make a single map invisible
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+#### hideMaps
+
+Make multiple maps invisible
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### isMapVisible
+
+Returns the visibility of a single map
+
+##### Parameters
+
+*   `mapId` &#x20;
+
+Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
+
+#### setMapResourceMask
+
+Sets the resource mask of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `resourceMask` **Ring** new resource mask
+
+#### setMapsTransformationType
+
+Sets the transformation type of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `transformation` **[TransformationType](#transformationtype)** new transformation type
+
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `distortionMeasure` **DistortionMeasure** new distortion measure
+
+#### getLonLatExtent
+
+Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounding box of all warped maps
+
+#### getExtent
+
+Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+
+Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bounding box of all warped maps
+
+#### bringMapsToFront
+
+Bring maps to front
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### sendMapsToBack
+
+Send maps to back
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### bringMapsForward
+
+Bring maps forward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### sendMapsBackward
+
+Send maps backward
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+
+#### getMapZIndex
+
+Returns the z-index of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
+
+#### setImageInformations
+
+Sets the image info Cache of the WarpedMapList
+
+##### Parameters
+
+*   `imageInformations` &#x20;
+*   `cache` **Cache** the image info cache
 
 #### getContainer
 
@@ -351,9 +567,42 @@ Resets the colorization of a single map
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
+#### setGrid
+
+Sets the grid for all maps
+
+##### Parameters
+
+*   `enabled` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether to show the grid
+
+#### resetGrid
+
+Resets the grid for all maps
+
+#### setMapGrid
+
+Sets the grid for a single mapID of the map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `enabled` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether to show the grid
+
+#### resetMapGrid
+
+Resets the grid of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
 #### dispose
 
 Disposes all WebGL resources and cached tiles
+
+#### clear
+
+Clears: removes all maps
 
 #### render
 
@@ -364,219 +613,3 @@ Render the layer.
 *   `frameState` &#x20;
 
 Returns **[HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element)** The rendered element
-
-### WarpedMapSource
-
-WarpedMapSource class. Together with a [WarpedMapLayer](#warpedmaplayer), this class
-renders a warped map on an OpenLayers map.
-
-#### addGeoreferenceAnnotation
-
-Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
-
-##### Parameters
-
-*   `annotation` **any** Georeference Annotation
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
-
-#### removeGeoreferenceAnnotation
-
-Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
-
-##### Parameters
-
-*   `annotation` **any** Georeference Annotation
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
-
-#### addGeoreferenceAnnotationByUrl
-
-Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-
-##### Parameters
-
-*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were added, or an error per map
-
-#### removeGeoreferenceAnnotationByUrl
-
-Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-
-##### Parameters
-
-*   `annotationUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Georeference Annotation
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>** the map IDs of the maps that were removed, or an error per map
-
-#### addGeoreferencedMap
-
-Adds a Georeferenced map.
-
-##### Parameters
-
-*   `georeferencedMap` **unknown** Georeferenced map
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>** the map ID of the map that was added, or an error
-
-#### removeGeoreferencedMap
-
-Removes a Georeferenced map.
-
-##### Parameters
-
-*   `georeferencedMap` **unknown** Georeferenced map
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>** the map ID of the map that was remvoed, or an error
-
-#### getWarpedMapList
-
-Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
-
-Returns **WarpedMapList** the warped map list
-
-#### getWarpedMap
-
-Returns a single map's warped map
-
-##### Parameters
-
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-
-Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
-
-#### showMap
-
-Make a single map visible
-
-##### Parameters
-
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-
-#### showMaps
-
-Make multiple maps visible
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### hideMap
-
-Make a single map invisible
-
-##### Parameters
-
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-
-#### hideMaps
-
-Make multiple maps invisible
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### isMapVisible
-
-Returns the visibility of a single map
-
-##### Parameters
-
-*   `mapId` &#x20;
-
-Returns **([boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** whether the map is visible
-
-#### setMapResourceMask
-
-Sets the resource mask of a single map
-
-##### Parameters
-
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-*   `resourceMask` **Ring** new resource mask
-
-#### setMapsTransformationType
-
-Sets the transformation type of multiple maps
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-*   `transformation` **[TransformationType](#transformationtype)** new transformation type
-
-#### setMapsDistortionMeasure
-
-Sets the distortion measure of multiple maps
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-*   `distortionMeasure` **DistortionMeasure** new distortion measure
-
-#### getLonLatExtent
-
-Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
-
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** Bounding box of all warped maps
-
-#### getExtent
-
-Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
-
-Returns **([Bbox](#bbox) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** bounding box of all warped maps
-
-#### bringMapsToFront
-
-Bring maps to front
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### sendMapsToBack
-
-Send maps to back
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### bringMapsForward
-
-Bring maps forward
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### sendMapsBackward
-
-Send maps backward
-
-##### Parameters
-
-*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
-
-#### getMapZIndex
-
-Returns the z-index of a single map
-
-##### Parameters
-
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the warped map
-
-Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
-
-#### setImageInfoCache
-
-Sets the image info Cache of the WarpedMapList
-
-##### Parameters
-
-*   `cache` **Cache** the image info cache
-
-#### clear
-
-Clears the source, removes all maps

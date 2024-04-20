@@ -172,7 +172,7 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [bringMapsForward](#bringmapsforward)
     *   [sendMapsBackward](#sendmapsbackward)
     *   [getMapZIndex](#getmapzindex)
-    *   [setImageInfoCache](#setimageinfocache)
+    *   [setImageInformations](#setimageinformations)
     *   [getOpacity](#getopacity)
     *   [setOpacity](#setopacity)
     *   [resetOpacity](#resetopacity)
@@ -289,7 +289,7 @@ Returns a single map's warped map
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
-Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
+Returns **(WebGL2WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
 
 #### showMap
 
@@ -408,12 +408,13 @@ Returns the z-index of a single map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
 
-#### setImageInfoCache
+#### setImageInformations
 
 Sets the image info cache of the WarpedMapList
 
 ##### Parameters
 
+*   `imageInformations` &#x20;
 *   `cache` **Cache** the image info cache
 
 #### getOpacity

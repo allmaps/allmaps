@@ -14,10 +14,11 @@ uniform float u_removeColorOptionsHardness;
 uniform bool u_colorize;
 uniform vec3 u_colorizeOptionsColor;
 
+uniform bool u_grid;
+
 uniform float u_opacity;
 uniform float u_saturation;
 
-uniform bool u_distortion;
 uniform int u_distortionOptionsdistortionMeasure;
 
 uniform int u_bestScaleFactor;
@@ -161,27 +162,25 @@ void main() {
     float trianglePointDistortion = v_trianglePointDistortion;
     trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f; // TODO: Add component to toggle stepwise vs continuous
 
-    if(u_distortion) {
-      switch(u_distortionOptionsdistortionMeasure) {
-        case 0:
-          if(trianglePointDistortion > 0.0f) {
-            color = spectral_mix(color, colorRed500, trianglePointDistortion);
-          } else {
-            color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
-          }
-          break;
-        case 1:
-          color = spectral_mix(color, colorGreen500, trianglePointDistortion);
-          break;
-        case 2:
-          color = spectral_mix(color, colorYellow500, trianglePointDistortion);
-          break;
-        case 3:
-          color = trianglePointDistortion == -1.0f ? colorRed300 : color;
-          break;
-        default:
-          color = color;
-      }
+    switch (u_distortionOptionsdistortionMeasure) {
+      case 0:
+        if (trianglePointDistortion > 0.0f) {
+          color = spectral_mix(color, colorRed500, trianglePointDistortion);
+        } else {
+          color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
+        }
+        break;
+      case 1:
+        color = spectral_mix(color, colorGreen500, trianglePointDistortion);
+        break;
+      case 2:
+        color = spectral_mix(color, colorYellow500, trianglePointDistortion);
+        break;
+      case 3:
+        color = trianglePointDistortion == -1.0f ? colorRed300 : color;
+        break;
+      default:
+        color = color;
     }
 
     // Triangles
@@ -191,8 +190,7 @@ void main() {
     }
 
     // Grid
-    // TODO: make this a rendering option
-    if(false) {
+    if(u_grid) {
       float gridSize = 20.0f * float(u_bestScaleFactor);
       float gridWidth = 2.0f * float(u_bestScaleFactor);
       if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {

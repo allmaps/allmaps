@@ -28,17 +28,17 @@ import type {
 import type {
   Helmert,
   TransformationType,
-  PartialTransformOptions,
+  TransformOptions,
   DistortionMeasure
 } from '@allmaps/transform'
 
-import type Viewport from '../Viewport.js'
+import type Viewport from '../viewport/Viewport.js'
 
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
   differentHandedness: true
-} as PartialTransformOptions
+} as Partial<TransformOptions>
 
 const DEFAULT_VISIBLE = true
 
@@ -57,7 +57,8 @@ export function createWarpedMapFactory() {
 }
 
 /**
- * Class for warped maps, which describe how a georeferenced map is warped using a specific transformation.
+ * Class for warped maps
+ * This class describes how a georeferenced map is warped using a specific transformation.
  *
  * @export
  * @class WarpedMap
@@ -311,7 +312,7 @@ export default class WarpedMap extends EventTarget {
    *
    * @returns {number}
    */
-  getReferenceScaling(): number {
+  getReferenceScale(): number {
     const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
       'helmert',
@@ -507,7 +508,8 @@ export default class WarpedMap extends EventTarget {
     ])[0]
     this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
     this.projectedGeoMaskRectangle = this.projectedTransformer.transformForward(
-      [this.resourceMaskRectangle]
+      [this.resourceMaskRectangle],
+      { maxDepth: 0 }
     )[0] as Rectangle
   }
 
@@ -517,9 +519,10 @@ export default class WarpedMap extends EventTarget {
     ])[0]
     this.projectedGeoFullMaskBbox = computeBbox(this.projectedGeoFullMask)
     this.projectedGeoFullMaskRectangle =
-      this.projectedTransformer.transformForward([
-        this.resourceFullMaskRectangle
-      ])[0] as Rectangle
+      this.projectedTransformer.transformForward(
+        [this.resourceFullMaskRectangle],
+        { maxDepth: 0 }
+      )[0] as Rectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {

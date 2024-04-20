@@ -40,9 +40,10 @@ export async function generateImage(mapId: string, size: Size) {
 
   await renderer.addGeoreferenceAnnotation(annotation)
 
-  const viewport = Viewport.fitWarpedMapList(
-    renderer.warpedMapList,
+  const viewport = Viewport.fromWarpedMapList(
     size,
+    renderer.warpedMapList,
+    1,
     'contain',
     1.25
   )

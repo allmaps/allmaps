@@ -28,7 +28,7 @@ import type { DebouncedFunc } from 'lodash-es'
 
 import type { Transform } from '@allmaps/types'
 
-import type Viewport from '../Viewport.js'
+import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
 
 import type {
@@ -36,6 +36,7 @@ import type {
   RenderOptions,
   RemoveColorOptions,
   ColorizeOptions,
+  GridOptions,
   WebGL2RendererOptions
 } from '../shared/types.js'
 
@@ -341,6 +342,69 @@ export default class WebGL2Renderer
     const warpedMap = this.warpedMapList.getWarpedMap(mapId)
     if (warpedMap) {
       warpedMap.renderOptions.colorizeOptions = undefined
+    }
+  }
+
+  /**
+   * Get the grid options of the renderer
+   *
+   * @returns {(Partial<GridOptions> | undefined)}
+   */
+  getGridOptions(): Partial<GridOptions> | undefined {
+    return this.renderOptions.gridOptions
+  }
+
+  /**
+   * Set the grid options of the renderer
+   *
+   * @param {GridOptions} gridOptions - the grid options to set
+   */
+  setGridOptions(gridOptions: GridOptions): void {
+    this.renderOptions.gridOptions = gridOptions
+  }
+
+  /**
+   * Reset the grid options of the renderer
+   */
+  resetGridOptions(): void {
+    this.renderOptions.gridOptions = undefined
+  }
+
+  /**
+   * Get the grid options of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {(Partial<GridOptions> | undefined)}
+   */
+  getMapGridOptions(mapId: string): Partial<GridOptions> | undefined {
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      return warpedMap.renderOptions.gridOptions
+    }
+  }
+
+  /**
+   * Set the grid options of a map
+   *
+   * @param {string} mapId - ID of the map
+   * @param {GridOptions} gridOptions - the grid options to set
+   */
+  setMapGridOptions(mapId: string, gridOptions: GridOptions): void {
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.gridOptions = gridOptions
+    }
+  }
+
+  /**
+   * Reset the grid options of a map
+   *
+   * @param {string} mapId - ID of the map
+   */
+  resetMapGridOptions(mapId: string): void {
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (warpedMap) {
+      warpedMap.renderOptions.gridOptions = undefined
     }
   }
 
@@ -656,12 +720,6 @@ export default class WebGL2Renderer
 
       // Distortion
 
-      const distortionLocation = gl.getUniformLocation(
-        this.program,
-        'u_distortion'
-      )
-      gl.uniform1f(distortionLocation, warpedMap.distortionMeasure ? 1 : 0)
-
       if (warpedMap.distortionMeasure) {
         const distortionOptionsDistortionMeasureLocation =
           gl.getUniformLocation(
@@ -763,6 +821,10 @@ export default class WebGL2Renderer
       colorizeOptions: {
         ...layerRenderOptions.colorizeOptions,
         ...mapRenderOptions.colorizeOptions
+      },
+      gridOptions: {
+        ...layerRenderOptions.gridOptions,
+        ...mapRenderOptions.gridOptions
       }
     }
 
@@ -818,6 +880,13 @@ export default class WebGL2Renderer
       )
       gl.uniform3fv(colorizeOptionsColorLocation, colorizeOptionsColor)
     }
+
+    // Grid uniforms
+
+    const gridOptionsGrid = renderOptions.gridOptions?.enabled
+
+    const gridLocation = gl.getUniformLocation(this.program, 'u_grid')
+    gl.uniform1f(gridLocation, gridOptionsGrid ? 1 : 0)
   }
 
   private changed() {
@@ -894,13 +963,14 @@ export default class WebGL2Renderer
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+        if (this.animating) {
+          warpedMap.mixTrianglePoints(this.animationProgress)
+        }
         warpedMap.updateTrianglePointsDistortion(false)
       }
 
       this.updateVertexBuffers() // TODO: can this be removed?
-      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetTrianglePoints()
-      }
+      this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
     }
   }
 

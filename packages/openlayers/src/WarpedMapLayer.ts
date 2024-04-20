@@ -535,6 +535,42 @@ export default class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Sets the grid for all maps
+   * @param {boolean} enabled - whether to show the grid
+   */
+  setGrid(enabled: boolean) {
+    this.renderer.setGridOptions({ enabled })
+    this.changed()
+  }
+
+  /**
+   * Resets the grid for all maps
+   */
+  resetGrid() {
+    this.renderer.resetGridOptions()
+    this.changed()
+  }
+
+  /**
+   * Sets the grid for a single mapID of the map
+   * @param {string} mapId - ID of the map
+   * @param {boolean} enabled - whether to show the grid
+   */
+  setMapGrid(mapId: string, enabled: boolean) {
+    this.renderer.setMapGridOptions(mapId, { enabled })
+    this.changed()
+  }
+
+  /**
+   * Resets the grid of a single map
+   * @param {string} mapId - ID of the map
+   */
+  resetMapGrid(mapId: string) {
+    this.renderer.resetMapGridOptions(mapId)
+    this.changed()
+  }
+
+  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
@@ -576,10 +612,10 @@ export default class WarpedMapLayer extends Layer {
     this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
     const viewport = new Viewport(
-      frameState.viewState.center as [number, number],
       frameState.size as [number, number],
-      frameState.viewState.rotation,
+      frameState.viewState.center as [number, number],
       frameState.viewState.resolution,
+      frameState.viewState.rotation,
       window.devicePixelRatio
     )
 

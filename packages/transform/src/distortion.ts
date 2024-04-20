@@ -10,12 +10,25 @@ export const supportedDistortionMeasures = [
   'thetaa'
 ]
 
+/**
+ * Compute distortion from partial derivatives
+ *
+ * @export
+ * @param {Point} partialDerivativeX - the partial derivative to 'x' of the transformation, evaluated at a set point
+ * @param {Point} partialDerivativeY - the partial derivative to 'x' of the transformation, evaluated at a set point
+ * @param {?DistortionMeasure} [distortionMeasure] - the requested distortion measure, or undefined to return 0
+ * @param {number} [referenceScale=1] - the reference area scaling (sigma) to take into account, e.g. computed via a helmert transform
+ * @returns {number} - the distortion measure at the set point
+ */
 export function computeDistortionFromPartialDerivatives(
   partialDerivativeX: Point,
   partialDerivativeY: Point,
-  distortionMeasure: DistortionMeasure,
-  referenceScaling = 1
+  distortionMeasure?: DistortionMeasure,
+  referenceScale = 1
 ): number {
+  if (!distortionMeasure) {
+    return 0
+  }
   const E = partialDerivativeX[0] ** 2 + partialDerivativeX[1] ** 2
   const G = partialDerivativeY[0] ** 2 + partialDerivativeY[1] ** 2
   const F =
@@ -28,14 +41,13 @@ export function computeDistortionFromPartialDerivatives(
     Math.sign(-F) * Math.asin(Math.sqrt((1 - a ** 2 / E) / (1 - (a / b) ** 2)))
   switch (supportedDistortionMeasures.indexOf(distortionMeasure)) {
     case 0:
-      return (Math.log(a * b) - 2 * Math.log(referenceScaling)) / Math.log(2)
+      return (Math.log(a * b) - 2 * Math.log(referenceScale)) / Math.log(2)
     case 1:
       return 2 * Math.asin((a - b) / (a + b))
     case 2:
       return (
         0.5 *
-        (Math.log(a / referenceScaling) ** 2 +
-          Math.log(b / referenceScaling) ** 2)
+        (Math.log(a / referenceScale) ** 2 + Math.log(b / referenceScale) ** 2)
       )
     case 3:
       return Math.sign(

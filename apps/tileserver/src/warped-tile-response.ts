@@ -4,11 +4,11 @@ import { encode as encodePng } from 'upng-js'
 
 import { IntArrayRenderer, Viewport } from '@allmaps/render/int-array'
 
-import { tileToProjectedGeoBbox } from './geo.js'
+import { xyzTileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'
 
 import type { Size, Bbox, FetchFn } from '@allmaps/types'
-import type { Map } from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 import type { XYZTile, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
@@ -26,7 +26,7 @@ function getImageDataSize(decodedJpeg: UintArrRet): Size {
 }
 
 export async function createWarpedTileResponse(
-  maps: Map[],
+  georeferencedMaps: GeoreferencedMap[],
   { x, y, z }: XYZTile,
   options: TilejsonOptions
 ): Promise<Response> {
@@ -34,8 +34,8 @@ export async function createWarpedTileResponse(
     throw new Error('x, y and z must be positive integers')
   }
 
+  // TODO: simplify thin when TilejsonOptions will be alligned with TransformationOptions from @allmaps/render
   let transformationOptions
-
   if (options['transformation.type']) {
     transformationOptions = {
       type: options['transformation.type']
@@ -53,13 +53,17 @@ export async function createWarpedTileResponse(
     }
   )
 
-  for (const map of maps) {
-    await renderer.addGeoreferencedMap(map)
+  for (const georeferencedMap of georeferencedMaps) {
+    await renderer.addGeoreferencedMap(georeferencedMap)
   }
 
-  const projectedGeoBbox: Bbox = tileToProjectedGeoBbox({ x, y, z })
+  const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
 
-  const viewport = Viewport.fitBbox(projectedGeoBbox, [TILE_SIZE, TILE_SIZE])
+  const viewport = Viewport.fromProjectedGeoBbox(
+    [TILE_SIZE, TILE_SIZE],
+    projectedGeoBbox
+  )
+
   const warpedTile = await renderer.render(viewport)
 
   const pngBuffer = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 0)

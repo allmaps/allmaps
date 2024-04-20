@@ -3,12 +3,11 @@ import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import type FetchableMapTile from '../tilecache/FetchableTile.js'
 import type CacheableTile from '../tilecache/CacheableTile.js'
 
-import type { Color } from '@allmaps/types'
-import type { Size, FetchFn, ImageInformations } from '@allmaps/types'
+import type { Size, FetchFn, ImageInformations, Color } from '@allmaps/types'
+import type { TransformationType } from '@allmaps/transform'
 
-// TODO: export this from @allmaps/transform
 export type TransformationOptions = {
-  type: string
+  type: TransformationType
   options?: any
 }
 
@@ -64,10 +63,15 @@ export type ColorizeOptions = Partial<{
   color: Color
 }>
 
+export type GridOptions = Partial<{
+  enabled: boolean
+}>
+
 // TODO: don't make partial, extend with other rendering options
 export type RenderOptions = Partial<{
   removeColorOptions?: RemoveColorOptions
   colorizeOptions?: ColorizeOptions
+  gridOptions?: GridOptions
 }>
 
 export type WarpedMapFactory<W> = (

@@ -35,8 +35,6 @@ export type TransformOptions = {
   evaluationType: EvaluationType
 }
 
-export type PartialTransformOptions = Partial<TransformOptions>
-
 export type KernelFunction = (
   r: number,
   options: KernelFunctionOptions

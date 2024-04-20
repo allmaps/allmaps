@@ -1,10 +1,5 @@
 import { Image } from '@allmaps/iiif-parser'
-import {
-  computeBbox,
-  bboxToPolygon,
-  bboxToCenter,
-  distance
-} from '@allmaps/stdlib'
+import { computeBbox, bboxToCenter, distance } from '@allmaps/stdlib'
 import FetchableMapTile from '../tilecache/FetchableTile'
 
 import type {
@@ -17,10 +12,6 @@ import type {
   TileZoomLevel,
   TileByColumn
 } from '@allmaps/types'
-import type {
-  GcpTransformer,
-  PartialTransformOptions
-} from '@allmaps/transform'
 
 /**
  * Target scale factor correction
@@ -55,61 +46,6 @@ export function fetchableMapTilesToKeys(
     fetchableMapTiles.map((fetchableMapTile) =>
       createKeyFromTile(fetchableMapTile)
     )
-  )
-}
-
-export function geoBboxToResourceRing(
-  transformer: GcpTransformer,
-  geoBbox: Bbox,
-  transformerOptions = {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  } as PartialTransformOptions
-): Ring {
-  // TODO: this function could be moved elsewhere because not strictly about tiles
-  //
-  // 'transformer' is the transformer built from the (projected) GCPs. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
-  // 'geoBbox' is a Bbox (e.g. of the viewport) in (projected) geo coordinates
-  // 'geoBboxResourcePolygon' is a Polygon of this Bbox, transformed backward to resource coordinates.
-  // Due to transformerOptions this in not necessarilly a polygon with a 4-point ring, but can have more points.
-
-  // TODO: Consider to specify sourceIsGeographic and destinationIsGeographic options.
-  // The results could be more accurate when we specify {sourceIsGeographic: false, destinationIsGeographic: true)
-  // But then all locations calling this function should do that with a normal transformer (resource as cartesian to geo as lon-lat) and not a projected transformer (resource as cartesian to projectedGeo as cartesian)
-  // Currently this function is used with a normal transformer in @allmaps/tileserver, and with a projected transformer in @allmaps/render
-
-  const geoBboxPolygon = bboxToPolygon(geoBbox)
-  const geoBboxResourcePolygon = transformer.transformBackward(
-    geoBboxPolygon,
-    transformerOptions
-  )
-
-  return geoBboxResourcePolygon[0]
-}
-
-export function getBestTileZoomLevel(
-  // TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
-  image: Image,
-  canvasSize: Size,
-  resourceRing: Ring,
-  targetScaleFactorCorrection?: number
-): TileZoomLevel {
-  const resourceBbox = computeBbox(resourceRing)
-
-  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
-  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
-
-  const resourceToCanvasScaleX = resourceBboxWidth / canvasSize[0]
-  const resourceToCanvasScaleY = resourceBboxHeight / canvasSize[1]
-  const resourceToCanvasScale = Math.min(
-    resourceToCanvasScaleX,
-    resourceToCanvasScaleY
-  )
-
-  return getBestTileZoomLevelForScale(
-    image,
-    resourceToCanvasScale,
-    targetScaleFactorCorrection
   )
 }
 

@@ -68,9 +68,14 @@ export type ColorizeOptions = {
   color: string | null
 }
 
+export type GridOptions = {
+  enabled: boolean
+}
+
 export type RenderOptions = {
   removeBackground: RemoveBackgroundOptions
   colorize: ColorizeOptions
+  grid: GridOptions
 }
 
 export type FeatureContextMenu = {
