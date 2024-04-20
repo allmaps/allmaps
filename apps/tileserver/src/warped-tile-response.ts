@@ -58,7 +58,10 @@ export async function createWarpedTileResponse(
 
   const projectedGeoBbox: Bbox = tileToProjectedGeoBbox({ x, y, z })
 
-  const viewport = Viewport.fitBbox(projectedGeoBbox, [TILE_SIZE, TILE_SIZE])
+  const viewport = Viewport.newViewportFromProjectedGeoBbox(
+    [TILE_SIZE, TILE_SIZE],
+    projectedGeoBbox
+  )
   const warpedTile = await renderer.render(viewport)
 
   const png = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 256)

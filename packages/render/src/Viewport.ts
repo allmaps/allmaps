@@ -3,12 +3,11 @@ import { composeTransform } from './shared/matrix.js'
 
 import {
   computeBbox,
-  bboxToRectangle,
-  webMercatorToLonLat,
-  bboxToSize,
-  rectangleToSize,
   bboxToCenter,
-  computeProjectedGeoPerViewportScale
+  bboxToRectangle,
+  bboxToSize,
+  sizesToScale,
+  webMercatorToLonLat
 } from '@allmaps/stdlib'
 
 import type WarpedMap from './maps/WarpedMap.js'
@@ -82,17 +81,17 @@ export default class Viewport {
    * Creates an instance of Viewport.
    *
    * @constructor
-   * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
-   * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
+   * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
    * @param {number} projectedGeoPerViewportScale - Resolution of the viewport, in projection coordinates per viewport pixel.
+   * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
    * @param {number} [devicePixelRatio=1] - The devicePixelRatio of the viewport.
    */
   constructor(
-    projectedGeoCenter: Point,
     viewportSize: Size,
-    rotation: number,
+    projectedGeoCenter: Point,
     projectedGeoPerViewportScale: number,
+    rotation: number,
     devicePixelRatio = 1
   ) {
     this.projectedGeoCenter = projectedGeoCenter
@@ -144,10 +143,21 @@ export default class Viewport {
     this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
   }
 
-  // TODO: maybe integrate this in a constructor overload later
-  static fitWarpedMapList<W extends WarpedMap>(
-    warpedMapList: WarpedMapList<W>,
+  /**
+   * Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
+   *
+   * @static
+   * @template {WarpedMap} W
+   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param {WarpedMapList<W>} warpedMapList - A WarpedMapList.
+   * @param {?number} [devicePixelRatio] - The devicePixelRatio of the viewport.
+   * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
+   * @returns {Viewport} - A new Viewport object
+   */
+  static newViewportFromWarpedMapList<W extends WarpedMap>(
     viewportSize: Size,
+    warpedMapList: WarpedMapList<W>,
+    devicePixelRatio?: number,
     fit: Fit = 'contain'
   ): Viewport {
     const projectedGeoCenter = warpedMapList.getProjectedCenter()
@@ -157,49 +167,54 @@ export default class Viewport {
       throw new Error('WarpedMapList has no projected center or bbox')
     }
 
-    const rotation = 0
-    const projectedGeoSize = rectangleToSize(bboxToRectangle(projectedGeoBbox))
-
-    const projectedGeoPerViewportScale = computeProjectedGeoPerViewportScale(
+    const projectedGeoSize = bboxToSize(projectedGeoBbox)
+    const projectedGeoPerViewportScale = sizesToScale(
       projectedGeoSize,
       viewportSize,
       fit
     )
 
     return new Viewport(
-      projectedGeoCenter,
       viewportSize,
-      rotation,
-      projectedGeoPerViewportScale
+      projectedGeoCenter,
+      projectedGeoPerViewportScale,
+      0,
+      devicePixelRatio
     )
   }
 
-  // TODO: maybe integrate this in a constructor overload later
-  static fitBbox(
-    projectedGeoBbox: Bbox,
+  /**
+   * Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBbox
+   *
+   * @static
+   * @template {WarpedMap} W
+   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param {WarpedMapList<W>} projectedGeoBbox - A projectedGeoBbox.
+   * @param {?number} [devicePixelRatio] - The devicePixelRatio of the viewport.
+   * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
+   * @returns {Viewport} - A new Viewport object
+   */
+  static newViewportFromProjectedGeoBbox(
     viewportSize: Size,
+    projectedGeoBbox: Bbox,
+    devicePixelRatio?: number,
     fit: Fit = 'contain'
   ) {
     const projectedGeoCenter = bboxToCenter(projectedGeoBbox)
 
-    if (!projectedGeoCenter || !projectedGeoBbox) {
-      throw new Error('WarpedMapList has no projected center or bbox')
-    }
-
-    const rotation = 0
-    const projectedGeoSize = rectangleToSize(bboxToRectangle(projectedGeoBbox))
-
-    const projectedGeoPerViewportScale = computeProjectedGeoPerViewportScale(
+    const projectedGeoSize = bboxToSize(projectedGeoBbox)
+    const projectedGeoPerViewportScale = sizesToScale(
       projectedGeoSize,
       viewportSize,
       fit
     )
 
     return new Viewport(
+      viewportSize,
       projectedGeoCenter,
-      [viewportSize[0], viewportSize[1]],
-      rotation,
-      projectedGeoPerViewportScale
+      projectedGeoPerViewportScale,
+      0,
+      devicePixelRatio
     )
   }
 

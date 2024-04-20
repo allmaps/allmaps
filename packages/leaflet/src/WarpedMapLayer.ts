@@ -886,6 +886,12 @@ export class WarpedMapLayer extends L.Layer {
     this.renderer.setOpacity(this.getOpacity())
 
     // Prepare Viewport input
+    const viewportSizeAsPoint = this._map.getSize()
+    const viewportSize = [viewportSizeAsPoint.x, viewportSizeAsPoint.y] as [
+      number,
+      number
+    ]
+
     const geoCenterAsPoint = this._map.getCenter()
     const projectedGeoCenterAsPoint =
       this._map.options.crs.project(geoCenterAsPoint)
@@ -893,12 +899,6 @@ export class WarpedMapLayer extends L.Layer {
       projectedGeoCenterAsPoint.x,
       projectedGeoCenterAsPoint.y
     ] as [number, number]
-
-    const viewportSizeAsPoint = this._map.getSize()
-    const viewportSize = [viewportSizeAsPoint.x, viewportSizeAsPoint.y] as [
-      number,
-      number
-    ]
 
     const geoBboxAsLatLngBounds = this._map.getBounds()
     const projectedNorthEastAsPoint = this._map.options.crs.project(
@@ -926,10 +926,10 @@ export class WarpedMapLayer extends L.Layer {
     )
 
     const viewport = new Viewport(
-      projectedGeoCenter,
       viewportSize,
-      0,
+      projectedGeoCenter,
       projectedGeoPerViewportScale,
+      0,
       window.devicePixelRatio
     )
 

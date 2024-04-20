@@ -34,10 +34,10 @@ export default class CanvasRenderer
     const width = this.canvas.width
     const height = this.canvas.height
 
-    this.viewport = Viewport.fitWarpedMapList(this.warpedMapList, [
-      width,
-      height
-    ])
+    this.viewport = Viewport.newViewportFromWarpedMapList(
+      [width, height],
+      this.warpedMapList
+    )
 
     // TODO: this function loads too many info.jsons?? Some maps are outside of viewport.
     // Align with checkAndLoadImageInfos() (for WebGL2Renderer, where the renderer doesn't

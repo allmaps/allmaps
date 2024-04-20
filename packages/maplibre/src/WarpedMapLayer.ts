@@ -655,12 +655,6 @@ export class WarpedMapLayer implements CustomLayerInterface {
       return
     }
 
-    const projectedGeoCenterAsLngLat = this.map.getCenter()
-    const projectedGeoCenter = lonLatToWebMecator([
-      projectedGeoCenterAsLngLat.lng,
-      projectedGeoCenterAsLngLat.lat
-    ])
-
     // Getting the viewportSize should also be possible through getting the bounds
     // And using project() to go to resource coordintas
     const canvas = this.map.getCanvas()
@@ -669,7 +663,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
       canvas.height / window.devicePixelRatio
     ] as [number, number]
 
-    const rotation = -(this.map.getBearing() / 180) * Math.PI
+    const projectedGeoCenterAsLngLat = this.map.getCenter()
+    const projectedGeoCenter = lonLatToWebMecator([
+      projectedGeoCenterAsLngLat.lng,
+      projectedGeoCenterAsLngLat.lat
+    ])
 
     const geoLowerLeftAsLngLat = this.map.unproject([0, viewportSize[1]])
     const geoLowerRightAsLngLat = this.map.unproject([
@@ -711,11 +709,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
       viewportSize
     )
 
+    const rotation = -(this.map.getBearing() / 180) * Math.PI
+
     const viewport = new Viewport(
-      projectedGeoCenter,
       viewportSize,
-      rotation,
+      projectedGeoCenter,
       projectedGeoPerViewportScale,
+      rotation,
       window.devicePixelRatio
     )
 
