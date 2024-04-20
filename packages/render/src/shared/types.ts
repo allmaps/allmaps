@@ -77,5 +77,6 @@ export type WarpedMapFactory<W> = (
 ) => W
 
 export type CachableTileFactory<D> = (
-  fetchableMapTile: FetchableMapTile
+  fetchableMapTile: FetchableMapTile,
+  fetchFn?: FetchFn
 ) => CacheableTile<D>

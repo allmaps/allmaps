@@ -4,6 +4,8 @@ import FetchableMapTile from './FetchableTile.js'
 import CacheableTile from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
+import type { FetchFn } from '@allmaps/types'
+
 /**
  * Class for tiles that can be cached. These are used on the tile cache (and are not associated to a specific map)
  *
@@ -61,8 +63,8 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
   }
 
   static createFactory() {
-    return (fetchableMapTile: FetchableMapTile) =>
-      new CacheableImageDataTile(fetchableMapTile)
+    return (fetchableMapTile: FetchableMapTile, fetchFn?: FetchFn) =>
+      new CacheableImageDataTile(fetchableMapTile, fetchFn)
   }
 }
 
