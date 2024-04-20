@@ -61,8 +61,7 @@
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
-    "build:types": "tsc --declaration --esModuleInterop"
+    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
@@ -95,11 +94,13 @@
     "chai": "^4.3.6",
     "documentation": "^14.0.0",
     "eslint": "^8.35.0",
-    "mkdirp": "^3.0.1",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.3",
+    "vite-plugin-dts": "^3.8.3",
+    "vite-plugin-glsl": "^1.3.0",
+    "vite-plugin-no-bundle": "^4.0.0"
   },
   "gitHead": "f372db912469ba4415c94f79ea2806c3866ff987"
 }

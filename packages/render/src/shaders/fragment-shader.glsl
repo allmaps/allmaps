@@ -4,8 +4,7 @@ precision highp float;
 precision highp isampler2D;
 
 // Color mixing from Spectral.js
-#include "spectral.glsl"
-// End of color mixing from Spectral.js
+#include spectral.frag;
 
 uniform bool u_removeColor;
 uniform vec3 u_removeColorOptionsColor;
@@ -35,32 +34,32 @@ in float v_trianglePointDistortion;
 out vec4 color;
 
 vec4 rgbToVec4(int r, int g, int b) {
-    return vec4(float(r) / 255.0, float(g) / 255.0, float(b) / 255.0, 1.0);
+  return vec4(float(r) / 255.0f, float(g) / 255.0f, float(b) / 255.0f, 1.0f);
 }
 
 void main() {
   // Colors
-  vec4 colorTransparent = vec4(0.0, 0.0, 0.0, 0.0);
-  vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);
-  vec4 colorBlack = vec4(0.0, 0.0, 0.0, 1.0);
+  vec4 colorTransparent = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  vec4 colorWhite = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+  vec4 colorBlack = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-  vec4 colorGreen300 = vec4(0.5254, 0.9372, 0.6745, 1.0);
-  vec4 colorPurple300 = vec4(0.8470, 0.7058, 0.9960, 1.0);
-  vec4 colorRed300 = vec4(0.9882, 0.6470, 0.6470, 1.0);
-  vec4 colorYellow300 = vec4(0.9921, 0.8784, 0.2784, 1.0);
-  vec4 colorOrange300 = vec4(0.9921, 0.7294, 0.4549, 1.0);
-  vec4 colorPink300 = vec4(0.9764, 0.6588, 0.8313, 1.0);
-  vec4 colorBlue300 = vec4(0.5764, 0.7725, 0.9921, 1.0);
-  vec4 colorGrey300 = vec4(0.8196, 0.8352, 0.8588, 1.0);
+  vec4 colorGreen300 = vec4(0.5254f, 0.9372f, 0.6745f, 1.0f);
+  vec4 colorPurple300 = vec4(0.8470f, 0.7058f, 0.9960f, 1.0f);
+  vec4 colorRed300 = vec4(0.9882f, 0.6470f, 0.6470f, 1.0f);
+  vec4 colorYellow300 = vec4(0.9921f, 0.8784f, 0.2784f, 1.0f);
+  vec4 colorOrange300 = vec4(0.9921f, 0.7294f, 0.4549f, 1.0f);
+  vec4 colorPink300 = vec4(0.9764f, 0.6588f, 0.8313f, 1.0f);
+  vec4 colorBlue300 = vec4(0.5764f, 0.7725f, 0.9921f, 1.0f);
+  vec4 colorGrey300 = vec4(0.8196f, 0.8352f, 0.8588f, 1.0f);
 
-  vec4 colorGreen500 = vec4(0.1333, 0.7725, 0.3686, 1.0);
-  vec4 colorPurple500 = vec4(0.6588, 0.3333, 0.9686, 1.0);
-  vec4 colorRed500 = vec4(0.9372, 0.2666, 0.2666, 1.0);
-  vec4 colorYellow500 = vec4(0.9176, 0.7019, 0.0313, 1.0);
-  vec4 colorOrange500 = vec4(0.9764, 0.4509, 0.0862, 1.0);
-  vec4 colorPink500 = vec4(0.9254, 0.2823, 0.6, 1.0);
-  vec4 colorBlue500 = vec4(0.2313, 0.5098, 0.9647, 1.0);
-  vec4 colorGrey500 = vec4(0.4196, 0.4470, 0.5019, 1.0);
+  vec4 colorGreen500 = vec4(0.1333f, 0.7725f, 0.3686f, 1.0f);
+  vec4 colorPurple500 = vec4(0.6588f, 0.3333f, 0.9686f, 1.0f);
+  vec4 colorRed500 = vec4(0.9372f, 0.2666f, 0.2666f, 1.0f);
+  vec4 colorYellow500 = vec4(0.9176f, 0.7019f, 0.0313f, 1.0f);
+  vec4 colorOrange500 = vec4(0.9764f, 0.4509f, 0.0862f, 1.0f);
+  vec4 colorPink500 = vec4(0.9254f, 0.2823f, 0.6f, 1.0f);
+  vec4 colorBlue500 = vec4(0.2313f, 0.5098f, 0.9647f, 1.0f);
+  vec4 colorGrey500 = vec4(0.4196f, 0.4470f, 0.5019f, 1.0f);
 
   // The treated triangle point
   int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
@@ -160,12 +159,12 @@ void main() {
     // color = colorTransparant; // TODO: Add option to not display image
 
     float trianglePointDistortion = v_trianglePointDistortion;
-    trianglePointDistortion = floor(trianglePointDistortion*10.0)/10.0; // TODO: Add component to toggle stepwise vs continuous
+    trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f; // TODO: Add component to toggle stepwise vs continuous
 
-    if (u_distortion) {
-      switch (u_distortionOptionsdistortionMeasure) {
+    if(u_distortion) {
+      switch(u_distortionOptionsdistortionMeasure) {
         case 0:
-          if (trianglePointDistortion > 0.0) {
+          if(trianglePointDistortion > 0.0f) {
             color = spectral_mix(color, colorRed500, trianglePointDistortion);
           } else {
             color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
@@ -178,7 +177,7 @@ void main() {
           color = spectral_mix(color, colorYellow500, trianglePointDistortion);
           break;
         case 3:
-          color = trianglePointDistortion == -1.0 ? colorRed300 : color;
+          color = trianglePointDistortion == -1.0f ? colorRed300 : color;
           break;
         default:
           color = color;
@@ -194,9 +193,9 @@ void main() {
     // Grid
     // TODO: make this a rendering option
     if(false) {
-      float gridSize = 20.0 * float(u_bestScaleFactor);
-      float gridWidth = 2.0 * float(u_bestScaleFactor);
-      if(mod(float(resourceTrianglePointX)+gridWidth/2.0, gridSize) < gridWidth ||  mod(float(resourceTrianglePointY)+gridWidth/2.0, gridSize) < gridWidth) {
+      float gridSize = 20.0f * float(u_bestScaleFactor);
+      float gridWidth = 2.0f * float(u_bestScaleFactor);
+      if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
         color = colorBlack;
       }
     }

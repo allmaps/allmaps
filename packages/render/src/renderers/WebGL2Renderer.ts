@@ -21,9 +21,8 @@ import {
 } from '../shared/matrix.js'
 import { createShader, createProgram } from '../shared/webgl2.js'
 
-import vertexShaderSource from '../shaders/vertex-shader.glsl?raw'
-import fragmentShaderSource from '../shaders/fragment-shader.glsl?raw'
-import spectral from '../shaders/spectral.glsl?raw'
+import vertexShaderSource from '../shaders/vertex-shader.glsl'
+import fragmentShaderSource from '../shaders/fragment-shader.glsl'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -111,7 +110,7 @@ export default class WebGL2Renderer
     const fragmentShader = createShader(
       gl,
       gl.FRAGMENT_SHADER,
-      fragmentShaderSource.replace('#include "spectral.glsl"', spectral)
+      fragmentShaderSource
     )
 
     const program = createProgram(gl, vertexShader, fragmentShader)
