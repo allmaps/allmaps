@@ -5,7 +5,6 @@ import FetchableMapTile from '../tilecache/FetchableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import {
-  geoBboxToResourceRing,
   getBestTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel
 } from '../shared/tiles.js'
@@ -122,16 +121,21 @@ export default abstract class BaseRenderer<
       warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
-      const projectedTransformerOptions = {
-        // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-        maxDepth: 0
+      const transformerOptions = {
+        maxDepth: 0,
+        // maxDepth: 2,
+        // maxOffsetRatio: 0.00001,
+        sourceIsGeographic: false,
+        destinationIsGeographic: true
       }
+      // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
+      // TODO: Consider recusive refinement via options like {maxOffsetRatio: 0.00001, maxDepth: 2}
+      // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
 
-      const resourceViewportRing = geoBboxToResourceRing(
-        warpedMap.projectedTransformer,
-        viewport.projectedGeoRectangleBbox,
-        projectedTransformerOptions
-      )
+      const resourceViewportRing = warpedMap.transformer.transformBackward(
+        [viewport.geoRectangle],
+        transformerOptions
+      )[0]
 
       warpedMap.setResourceViewportRing(resourceViewportRing)
 
