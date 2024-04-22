@@ -477,7 +477,7 @@ Transforms a Geometry or a GeoJSON geometry forward to a Geometry
 ##### Parameters
 
 *   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+*   `options` **Partial\<TransformOptions>?** Transform options
 
 Returns **Geometry** Forward transform of input as Geometry
 
@@ -488,7 +488,7 @@ Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
 ##### Parameters
 
 *   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+*   `options` **Partial\<TransformOptions>?** Transform options
 
 Returns **GeojsonGeometry** Forward transform of input, as GeoJSON geometry
 
@@ -499,7 +499,7 @@ Transforms a geometry or a GeoJSON geometry backward to a Geometry
 ##### Parameters
 
 *   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+*   `options` **Partial\<TransformOptions>?** Transform options
 
 Returns **Geometry** backward transform of input, as geometry
 
@@ -510,7 +510,7 @@ Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
 ##### Parameters
 
 *   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **PartialTransformOptions?** Transform options
+*   `options` **Partial\<TransformOptions>?** Transform options
 
 Returns **GeojsonGeometry** backward transform of input, as GeoJSON geometry
 

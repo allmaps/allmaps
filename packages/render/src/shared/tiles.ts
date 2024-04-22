@@ -49,32 +49,6 @@ export function fetchableMapTilesToKeys(
   )
 }
 
-export function getBestTileZoomLevel(
-  // TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
-  image: Image,
-  canvasSize: Size,
-  resourceRing: Ring,
-  targetScaleFactorCorrection?: number
-): TileZoomLevel {
-  const resourceBbox = computeBbox(resourceRing)
-
-  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
-  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
-
-  const resourceToCanvasScaleX = resourceBboxWidth / canvasSize[0]
-  const resourceToCanvasScaleY = resourceBboxHeight / canvasSize[1]
-  const resourceToCanvasScale = Math.min(
-    resourceToCanvasScaleX,
-    resourceToCanvasScaleY
-  )
-
-  return getBestTileZoomLevelForScale(
-    image,
-    resourceToCanvasScale,
-    targetScaleFactorCorrection
-  )
-}
-
 /**
  * Returns the best TileZoomLevel for a given resource-to-canvas scale.
  *
