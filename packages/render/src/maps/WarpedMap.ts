@@ -28,7 +28,7 @@ import type {
 import type {
   Helmert,
   TransformationType,
-  PartialTransformOptions,
+  TransformOptions,
   DistortionMeasure
 } from '@allmaps/transform'
 
@@ -38,7 +38,7 @@ const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
   differentHandedness: true
-} as PartialTransformOptions
+} as Partial<TransformOptions>
 
 const DEFAULT_VISIBLE = true
 
