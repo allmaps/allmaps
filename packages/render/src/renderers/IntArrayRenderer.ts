@@ -1,5 +1,5 @@
 import BaseRenderer from './BaseRenderer.js'
-import Viewport from '../Viewport.js'
+import Viewport from '../viewport/Viewport.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import CacheableIntArrayTile from '../tilecache/CacheableIntArrayTile.js'
 

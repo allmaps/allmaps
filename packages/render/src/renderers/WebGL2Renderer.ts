@@ -28,7 +28,7 @@ import type { DebouncedFunc } from 'lodash-es'
 
 import type { Transform } from '@allmaps/types'
 
-import type Viewport from '../Viewport.js'
+import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
 
 import type {

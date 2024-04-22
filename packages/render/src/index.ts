@@ -1,7 +1,6 @@
-import Viewport from './Viewport.js'
-import RTree from './RTree.js'
+import Viewport from './viewport/Viewport.js'
 
-export { Viewport, RTree }
+export { Viewport }
 
 import WarpedMap, { createWarpedMapFactory } from './maps/WarpedMap.js'
 import TriangulatedWarpedMap, {
@@ -11,6 +10,7 @@ import WebGL2WarpedMap, {
   createWebGL2WarpedMapFactory
 } from './maps/WebGL2WarpedMap.js'
 import WarpedMapList from './maps/WarpedMapList.js'
+import RTree from './maps/RTree.js'
 
 export {
   WarpedMap,
@@ -19,7 +19,8 @@ export {
   createWarpedMapFactory,
   createTriangulatedWarpedMapFactory,
   createWebGL2WarpedMapFactory,
-  WarpedMapList
+  WarpedMapList,
+  RTree
 }
 
 import CacheableTile from './tilecache/CacheableTile.js'

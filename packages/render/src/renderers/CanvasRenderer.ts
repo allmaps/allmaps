@@ -1,7 +1,7 @@
 import BaseRenderer from './BaseRenderer.js'
 import CacheableImageDataTile from '../tilecache/CacheableImageDataTile.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
-import Viewport from '../Viewport.js'
+import Viewport from '../viewport/Viewport.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 import type { Renderer, CanvasRendererOptions } from '../shared/types.js'

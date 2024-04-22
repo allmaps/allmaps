@@ -32,7 +32,7 @@ import type {
   DistortionMeasure
 } from '@allmaps/transform'
 
-import type Viewport from '../Viewport.js'
+import type Viewport from '../viewport/Viewport.js'
 
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,

@@ -12,7 +12,7 @@ import {
 
 import { distance, bboxToDiameter, bboxToCenter } from '@allmaps/stdlib'
 
-import type Viewport from '../Viewport.js'
+import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,

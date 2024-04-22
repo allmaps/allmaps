@@ -5,7 +5,7 @@ import {
   type Map as GeoreferencedMap
 } from '@allmaps/annotation'
 
-import RTree from '../RTree.js'
+import RTree from './RTree.js'
 import WarpedMap from './WarpedMap.js'
 
 import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'

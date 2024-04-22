@@ -1,5 +1,5 @@
-import WarpedMapList from './maps/WarpedMapList.js'
-import { composeTransform } from './shared/matrix.js'
+import WarpedMapList from '../maps/WarpedMapList.js'
+import { composeTransform } from '../shared/matrix.js'
 
 import {
   computeBbox,
@@ -10,7 +10,7 @@ import {
   webMercatorToLonLat
 } from '@allmaps/stdlib'
 
-import type WarpedMap from './maps/WarpedMap.js'
+import type WarpedMap from '../maps/WarpedMap.js'
 
 import type {
   Point,
