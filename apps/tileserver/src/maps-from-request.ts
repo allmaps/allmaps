@@ -2,15 +2,19 @@ import { validateMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type { Cache } from './types.js'
 import type { Map, Maps } from '@allmaps/annotation'
-import type { Obj } from 'itty-router'
+import type { IRequest } from 'itty-router'
+
+function parseQueryString(query: string | string[] | undefined) {
+  return query ? (Array.isArray(query) ? query[0] : query) : undefined
+}
 
 export async function mapsFromParams(
-  cache: Cache,
   env: unknown,
-  params: Obj | undefined
+  req: IRequest
 ): Promise<Map[]> {
+  const params = req.params
+
   const mapId = params?.mapId
   const imageId = params?.imageId
   const manifestId = params?.manifestId
@@ -58,20 +62,20 @@ export async function mapsFromParams(
   return maps.filter((map) => map.gcps.length >= 3)
 }
 
-export async function mapsFromQuery(
-  cache: Cache,
-  query: Obj | undefined
-): Promise<Maps> {
-  if (query?.annotation) {
-    const annotation = JSON.parse(query.annotation)
+export async function mapsFromQuery(req: IRequest): Promise<Maps> {
+  const query = req.query
 
-    const maps = parseAnnotation(annotation)
+  const url = parseQueryString(query.url)
+  const annotation = parseQueryString(query.annotation)
+
+  if (annotation) {
+    const maps = parseAnnotation(JSON.parse(annotation))
     return maps
-  } else if (query?.url) {
-    const annotationResponse = await cachedFetch(query.url)
+  } else if (url) {
+    const annotationResponse = await cachedFetch(url)
 
     if (!annotationResponse) {
-      throw new Error(`Error fetching annotation from URL: ${query.url}`)
+      throw new Error(`Error fetching annotation from URL: ${url}`)
     }
 
     const fetchedAnnotation = await annotationResponse.json()

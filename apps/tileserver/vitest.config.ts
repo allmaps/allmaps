@@ -1,15 +1,11 @@
-import { defineConfig } from 'vitest/config'
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
 
-export default defineConfig({
+export default defineWorkersConfig({
   test: {
-    environment: 'miniflare',
-    testTimeout: 30000,
-    // Configuration is automatically loaded from `.env`, `package.json` and
-    // `wrangler.toml` files by default, but you can pass any additional Miniflare
-    // API options here:
-    environmentOptions: {
-      bindings: {},
-      kvNamespaces: ['TEST_NAMESPACE']
+    poolOptions: {
+      workers: {
+        wrangler: { configPath: './wrangler.toml' }
+      }
     }
   }
 })

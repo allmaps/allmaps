@@ -1,5 +1,3 @@
-import type { Request } from 'itty-router'
-
 const generateIframeHtml = (
   tileViewerBaseUrl: string,
   tileJsonUrl: string
