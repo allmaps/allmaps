@@ -6,13 +6,6 @@ export type XYZTile = {
   y: number
 }
 
-// Keeping this here to note that the original version of Tile in this package didn't have imageSize as compared to @allmaps/types
-// export type Tile = {
-//   column: number
-//   row: number
-//   zoomLevel: TileZoomLevel
-// }
-
 export type Cache = {
   put(request: Request | string, response: Response): Promise<undefined>
   match(request: Request | string): Promise<Response | undefined>
@@ -33,6 +26,7 @@ export type Tilejson = {
   // minzoom
 }
 
+// TODO: align this with TransformationOptions from @allmaps/render
 export type TilejsonOptions = {
   'transformation.type': TransformationType
 }
