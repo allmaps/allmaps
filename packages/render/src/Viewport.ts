@@ -148,7 +148,8 @@ export default class Viewport {
   static fitWarpedMapList<W extends WarpedMap>(
     warpedMapList: WarpedMapList<W>,
     viewportSize: Size,
-    fit: Fit = 'contain'
+    fit: Fit = 'contain',
+    zoom: number = 1
   ): Viewport {
     const projectedGeoCenter = warpedMapList.getProjectedCenter()
     const projectedGeoBbox = warpedMapList.getProjectedBbox()
@@ -160,11 +161,9 @@ export default class Viewport {
     const rotation = 0
     const projectedGeoSize = rectangleToSize(bboxToRectangle(projectedGeoBbox))
 
-    const projectedGeoPerViewportScale = computeProjectedGeoPerViewportScale(
-      projectedGeoSize,
-      viewportSize,
-      fit
-    )
+    const projectedGeoPerViewportScale =
+      computeProjectedGeoPerViewportScale(projectedGeoSize, viewportSize, fit) *
+      (1 / zoom)
 
     return new Viewport(
       projectedGeoCenter,
