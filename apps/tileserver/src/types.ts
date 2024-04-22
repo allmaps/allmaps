@@ -13,15 +13,6 @@ export type XYZTile = {
 //   zoomLevel: TileZoomLevel
 // }
 
-export type Cache = {
-  put(request: Request | string, response: Response): Promise<undefined>
-  match(request: Request | string): Promise<Response | undefined>
-}
-
-export type Caches = {
-  default: Cache
-}
-
 export type Tilejson = {
   tilejson: '3.0.0'
   id: string | undefined

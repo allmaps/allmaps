@@ -1,19 +1,20 @@
-import { Router } from 'itty-router'
+import { AutoRouter, error, cors, json } from 'itty-router'
 
 import { createWarpedTileResponse } from './warped-tile-response.js'
-import { createJsonResponse, createErrorResponse } from './json-response.js'
 import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
 import { optionsFromQuery } from './options.js'
 import { generateTileJson } from './tilejson.js'
 import { generateTilesHtml } from './html.js'
-import { ONE_HOUR } from './fetch.js'
+import { match, put, headers } from './cache.js'
 
-import type { XYZTile, Caches } from './types.js'
+import type { XYZTile } from './types.js'
 
-const router = Router()
+const { preflight, corsify } = cors()
 
-declare let caches: Caches
-const cache = caches.default
+const router = AutoRouter({
+  before: [preflight],
+  finally: [corsify, headers, put]
+})
 
 function xyzFromParams(params: unknown): XYZTile {
   if (
@@ -68,7 +69,7 @@ router.get('/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const templateUrl = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(templateUrl, maps, options))
+  return json(generateTileJson(templateUrl, maps, options))
 })
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
@@ -79,7 +80,7 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
+  return json(generateTileJson(urlTemplate, maps, options))
 })
 
 router.get('/images/:imageId/tiles.json', async (req, env) => {
@@ -90,7 +91,7 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
+  return json(generateTileJson(urlTemplate, maps, options))
 })
 
 router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
@@ -101,7 +102,7 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`
 
-  return createJsonResponse(generateTileJson(urlTemplate, maps, options))
+  return json(generateTileJson(urlTemplate, maps, options))
 })
 
 // -------------------------------------------------------------------------------------------
@@ -114,7 +115,7 @@ router.get('/:z/:x/:y.png', async (req) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options)
+  return createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
@@ -122,7 +123,7 @@ router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options)
+  return createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
@@ -130,7 +131,7 @@ router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options)
+  return createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
@@ -138,46 +139,22 @@ router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
-  return await createWarpedTileResponse(maps, { x, y, z }, options)
+  return createWarpedTileResponse(maps, { x, y, z }, options)
 })
 
 // -------------------------------------------------------------------------------------------
-// Root and wildcard routes
+// Router configuration
 // -------------------------------------------------------------------------------------------
 
-router.get('/', () => createJsonResponse({ name: 'Allmaps Tile Server' }))
-
-router.all('*', () =>
-  createJsonResponse({ error: 'Not found' }, 404, 'Not found')
-)
+router.get('/', () => ({ name: 'Allmaps Tile Server' }))
 
 export default {
-  fetch: async (request: Request, ...extra: []) => {
-    const url = request.url
-
-    const cacheResponse = await cache.match(request.url)
-
-    if (cacheResponse) {
-      return cacheResponse
+  fetch: async (request: Request, ...args: unknown[]) => {
+    const cachedResponse = await match(request.url)
+    if (cachedResponse) {
+      return cachedResponse
     } else {
-      return router
-        .handle(request, ...extra)
-        .then((response) => {
-          if (response.status !== 200) {
-            throw new Error(`Failed to fetch ${url}`)
-          }
-
-          // Set CORS and Cache headers
-          response.headers.set('Access-Control-Allow-Origin', '*')
-          response.headers.append('Cache-Control', `s-maxage=${ONE_HOUR}`)
-
-          cache.put(url, response.clone())
-
-          return response
-        })
-        .catch((err) => {
-          return createErrorResponse(err)
-        })
+      return router.fetch(request, ...args).catch(error)
     }
   }
 }

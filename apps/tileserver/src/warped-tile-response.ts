@@ -1,3 +1,4 @@
+import { png } from 'itty-router'
 import { decode as decodeJpeg, type UintArrRet } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
@@ -61,11 +62,6 @@ export async function createWarpedTileResponse(
   const viewport = Viewport.fitBbox(projectedGeoBbox, [TILE_SIZE, TILE_SIZE])
   const warpedTile = await renderer.render(viewport)
 
-  const png = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 256)
-  const tileResponse = new Response(png, {
-    status: 200,
-    headers: { 'content-type': 'image/png' }
-  })
-
-  return tileResponse
+  const pngBuffer = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 0)
+  return png(pngBuffer)
 }
