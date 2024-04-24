@@ -7,7 +7,6 @@ import type {
   Line,
   Ring,
   Bbox,
-  Size,
   Tile,
   TileZoomLevel,
   TileByColumn

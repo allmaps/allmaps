@@ -19,7 +19,7 @@ const height = 600
 //   return generateImage(mapId, [width, height])
 // })
 
-router.get('/maps/:mapId.png', (req, env) => {
+router.get('/maps/:mapId.png', (req) => {
   const mapId = req.params?.mapId
   return generateCard(mapId, [width, height])
 })

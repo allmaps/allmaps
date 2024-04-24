@@ -8,7 +8,7 @@ import type { TransformationType } from '@allmaps/transform'
 
 export type TransformationOptions = {
   type: TransformationType
-  options?: any
+  options?: unknown
 }
 
 export type WarpedMapOptions = {
