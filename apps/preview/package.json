@@ -18,7 +18,6 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js preview)",
-    "test": "vitest",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
