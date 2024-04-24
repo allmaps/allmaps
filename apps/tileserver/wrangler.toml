@@ -1,9 +1,10 @@
 name = "tileserver"
 main = "src/index.ts"
 compatibility_date = "2024-03-20"
-compatibility_flags = []
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 API_BASE_URL="https://api.allmaps.org"
-TILE_SERVER_BASE_URL="https://allmaps.xyz"
+# TILE_SERVER_BASE_URL="https://allmaps.xyz"
+TILE_SERVER_BASE_URL="http://localhost:5504"
 TILE_VIEWER_BASE_URL="https://tiles.allmaps.org"
