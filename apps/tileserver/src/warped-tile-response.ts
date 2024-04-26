@@ -13,22 +13,10 @@ import type { XYZTile, TilejsonOptions } from './types.js'
 
 const TILE_SIZE = 256
 
-function getImageData(input: Uint8ClampedArray) {
-  return decodeJpeg(input, { useTArray: true })
-}
-
-function getImageDataValue(decodedJpeg: UintArrRet, index: number) {
-  return decodedJpeg.data[index]
-}
-
-function getImageDataSize(decodedJpeg: UintArrRet): Size {
-  return [decodedJpeg.width, decodedJpeg.height]
-}
-
 export async function createWarpedTileResponse(
   georeferencedMaps: GeoreferencedMap[],
-  { x, y, z }: XYZTile,
-  options: TilejsonOptions
+  options: TilejsonOptions,
+  { x, y, z }: XYZTile
 ): Promise<Response> {
   if (!(x >= 0 && y >= 0 && z >= 0)) {
     throw new Error('x, y and z must be positive integers')
@@ -68,4 +56,16 @@ export async function createWarpedTileResponse(
 
   const pngBuffer = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 0)
   return png(pngBuffer)
+}
+
+function getImageData(input: Uint8ClampedArray) {
+  return decodeJpeg(input, { useTArray: true })
+}
+
+function getImageDataValue(decodedJpeg: UintArrRet, index: number) {
+  return decodedJpeg.data[index]
+}
+
+function getImageDataSize(decodedJpeg: UintArrRet): Size {
+  return [decodedJpeg.width, decodedJpeg.height]
 }

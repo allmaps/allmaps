@@ -2,7 +2,10 @@ import { validateMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type { Map, Maps } from '@allmaps/annotation'
+import type {
+  Map as GeoreferencedMap,
+  Maps as GeoreferencedMaps
+} from '@allmaps/annotation'
 import type { IRequest } from 'itty-router'
 
 function parseQueryString(query: string | string[] | undefined) {
@@ -12,7 +15,7 @@ function parseQueryString(query: string | string[] | undefined) {
 export async function mapsFromParams(
   env: unknown,
   req: IRequest
-): Promise<Map[]> {
+): Promise<GeoreferencedMap[]> {
   const params = req.params
 
   const mapId = params?.mapId
@@ -49,28 +52,31 @@ export async function mapsFromParams(
   }
 
   const fetchedMaps = await mapsResponse.json()
-  const mapOrMaps = validateMap(fetchedMaps)
+  const georeferencedMapOrMaps = validateMap(fetchedMaps)
 
-  let maps: Map[]
-  if (Array.isArray(mapOrMaps)) {
-    maps = mapOrMaps
+  let georeferencedMaps: GeoreferencedMap[]
+  if (Array.isArray(georeferencedMapOrMaps)) {
+    georeferencedMaps = georeferencedMapOrMaps
   } else {
-    maps = [mapOrMaps]
+    georeferencedMaps = [georeferencedMapOrMaps]
   }
 
   // Only return maps with at least 3 GCPs
-  return maps.filter((map) => map.gcps.length >= 3)
+  // TODO: move this check to schema parser
+  return georeferencedMaps.filter(
+    (georeferencedMap) => georeferencedMap.gcps.length >= 3
+  )
 }
 
-export async function mapsFromQuery(req: IRequest): Promise<Maps> {
+export async function mapsFromQuery(req: IRequest): Promise<GeoreferencedMaps> {
   const query = req.query
 
   const url = parseQueryString(query.url)
   const annotation = parseQueryString(query.annotation)
 
   if (annotation) {
-    const maps = parseAnnotation(JSON.parse(annotation))
-    return maps
+    const georeferencedMaps = parseAnnotation(JSON.parse(annotation))
+    return georeferencedMaps
   } else if (url) {
     const annotationResponse = await cachedFetch(url)
 
@@ -80,10 +86,13 @@ export async function mapsFromQuery(req: IRequest): Promise<Maps> {
 
     const fetchedAnnotation = await annotationResponse.json()
 
-    const maps = parseAnnotation(fetchedAnnotation)
+    const georeferencedMaps = parseAnnotation(fetchedAnnotation)
 
     // Only return maps with at least 3 GCPs
-    return maps.filter((map) => map.gcps.length >= 3)
+    // TODO: move this check to schema parser
+    return georeferencedMaps.filter(
+      (georeferecendeMap) => georeferecendeMap.gcps.length >= 3
+    )
   } else {
     throw new Error('No annotation query parameter supplied')
   }

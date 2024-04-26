@@ -4,17 +4,17 @@ import bbox from '@turf/bbox'
 
 import type { Tilejson, TilejsonOptions } from './types.js'
 
-import type { Map } from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
 export function generateTileJson(
-  urlTemplate: string,
-  maps: Map[],
-  options: TilejsonOptions
+  georeferencedMaps: GeoreferencedMap[],
+  options: TilejsonOptions,
+  urlTemplate: string
 ): Tilejson {
   const geoMasks = []
 
-  for (const map of maps) {
+  for (const map of georeferencedMaps) {
     const transformer = new GcpTransformer(
       map.gcps,
       options['transformation.type'] || map.transformation?.type,
