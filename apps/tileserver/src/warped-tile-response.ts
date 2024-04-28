@@ -22,7 +22,7 @@ export async function createWarpedTileResponse(
     throw new Error('x, y and z must be positive integers')
   }
 
-  // TODO: simplify thin when TilejsonOptions will be alligned with TransformationOptions from @allmaps/render
+  // TODO: simplify this when TilejsonOptions will be aligned with TransformationOptions from @allmaps/render
   let transformationOptions
   if (options['transformation.type']) {
     transformationOptions = {
