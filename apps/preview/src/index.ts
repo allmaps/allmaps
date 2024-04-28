@@ -11,6 +11,11 @@ const router = AutoRouter({
   finally: [corsify, headers, put]
 })
 
+type Env = {
+  USE_CACHE: boolean
+  API_BASE_URL: string
+}
+
 const width = 1200
 const height = 600
 
@@ -27,12 +32,10 @@ router.get('/maps/:mapId.png', (req) => {
 router.get('/', () => json({ name: 'Allmaps Preview' }))
 
 export default {
-  fetch: async (request: Request, ...args: unknown[]) => {
-    const cachedResponse = await match(request.url)
-    if (cachedResponse) {
-      return cachedResponse
-    } else {
-      return router.fetch(request, ...args).catch(error)
-    }
+  fetch: async (request: Request, env, ctx) => {
+    return (
+      (env.USE_CACHE && (await match(request.url))) ||
+      router.fetch(request, env, ctx).catch(error)
+    )
   }
-}
+} satisfies ExportedHandler<Env>

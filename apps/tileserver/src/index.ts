@@ -9,6 +9,13 @@ import { match, put, headers } from './cache.js'
 
 import type { XYZTile } from './types.js'
 
+type Env = {
+  USE_CACHE: boolean
+  API_BASE_URL: string
+  TILE_SERVER_BASE_URL: string
+  TILE_VIEWER_BASE_URL: string
+}
+
 const { preflight, corsify } = cors()
 
 const router = AutoRouter({
@@ -149,12 +156,10 @@ router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {
 router.get('/', () => ({ name: 'Allmaps Tile Server' }))
 
 export default {
-  fetch: async (request: Request, ...args: unknown[]) => {
-    const cachedResponse = await match(request.url)
-    if (cachedResponse) {
-      return cachedResponse
-    } else {
-      return router.fetch(request, ...args).catch(error)
-    }
+  fetch: async (request: Request, env, ctx) => {
+    return (
+      (env.USE_CACHE && (await match(request.url))) ||
+      router.fetch(request, env, ctx).catch(error)
+    )
   }
-}
+} satisfies ExportedHandler<Env>

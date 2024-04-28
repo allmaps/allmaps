@@ -17,7 +17,7 @@
   },
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev --port $(../../port.js preview)",
+    "dev": "wrangler dev --port $(../../port.js preview) --env dev",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
