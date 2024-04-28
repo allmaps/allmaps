@@ -7,14 +7,6 @@
 
   let opacityActive = false
   let removeBackgroundActive = false
-
-  let opacityDisableTooltip = false
-  let removeBackgroundDisableTooltip = false
-
-  $: {
-    opacityDisableTooltip = removeBackgroundActive
-    removeBackgroundDisableTooltip = opacityActive
-  }
 </script>
 
 <div class="inline-flex items-end space-x-1 md:space-x-3">
