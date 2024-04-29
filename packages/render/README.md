@@ -558,12 +558,12 @@ Creates an instance of WebGL2WarpedMap.
 *   `i` &#x20;
 *   `r` &#x20;
 *   `s` &#x20;
-*   `n` &#x20;
+*   `a` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
-*   `imageInfoCache` **Cache??** Cache of the image info of this image
 *   `gl` **WebGL2RenderingContext** the WebGL2 rendering context
 *   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** the WebGL2 program
+*   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
 
 ### updateVertexBuffers
 
