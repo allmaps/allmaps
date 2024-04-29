@@ -64,8 +64,8 @@ void main() {
   vec4 colorGrey500 = vec4(0.4196f, 0.4470f, 0.5019f, 1.0f);
 
   // The treated triangle point
-  int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
-  int resourceTrianglePointY = int(round(v_resourceTrianglePoint.y));
+  float resourceTrianglePointX = v_resourceTrianglePoint.x;
+  float resourceTrianglePointY = v_resourceTrianglePoint.y;
 
   // Reading information on packed tiles from textures
   int packedTilesCount = textureSize(u_packedTilesPositionsTexture, 0).y;
@@ -93,11 +93,11 @@ void main() {
     float packedTilePositionX = float(packedTilePosition.r);
     float packedTilePositionY = float(packedTilePosition.g);
 
-    int packedTileResourcePositionX = packedTileResourcePositionAndDimension.r;
-    int packedTileResourcePositionY = packedTileResourcePositionAndDimension.g;
+    float packedTileResourcePositionX = float(packedTileResourcePositionAndDimension.r);
+    float packedTileResourcePositionY = float(packedTileResourcePositionAndDimension.g);
 
-    int packedTileDimensionWidth = packedTileResourcePositionAndDimension.b;
-    int packedTileDimensionHeight = packedTileResourcePositionAndDimension.a;
+    float packedTileDimensionWidth = float(packedTileResourcePositionAndDimension.b);
+    float packedTileDimensionHeight = float(packedTileResourcePositionAndDimension.a);
 
     // If the treated triangle point is inside the tile, consider to use the tile:
     // if the scale factor is closer to the best scale factor for this map then currently known one
@@ -116,14 +116,14 @@ void main() {
         smallestScaleFactorDiff = scaleFactorDiff;
         bestScaleFactor = packedTileScaleFactor;
 
-        float packedTilePointX = float(resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
-        float packedTilePointY = float(resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
+        float packedTilePointX = (resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
+        float packedTilePointY = (resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
 
         float packedTilesPointX = packedTilePositionX + packedTilePointX;
         float packedTilesPointY = packedTilePositionY + packedTilePointY;
 
-        float packedTilesTexturePointX = round(packedTilesPointX) / float(packedTilesTextureSize.x);
-        float packedTilesTexturePointY = round(packedTilesPointY) / float(packedTilesTextureSize.y);
+        float packedTilesTexturePointX = packedTilesPointX / float(packedTilesTextureSize.x);
+        float packedTilesTexturePointY = packedTilesPointY / float(packedTilesTextureSize.y);
 
         packedTilesTexturePoint = vec2(packedTilesTexturePointX, packedTilesTexturePointY);
       }
