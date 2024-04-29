@@ -720,6 +720,12 @@ export default class WebGL2Renderer
 
       // Distortion
 
+      const distortionLocation = gl.getUniformLocation(
+        this.program,
+        'u_distortion'
+      )
+      gl.uniform1f(distortionLocation, warpedMap.distortionMeasure ? 1 : 0)
+
       if (warpedMap.distortionMeasure) {
         const distortionOptionsDistortionMeasureLocation =
           gl.getUniformLocation(

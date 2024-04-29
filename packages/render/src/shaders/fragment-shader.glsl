@@ -19,6 +19,7 @@ uniform bool u_grid;
 uniform float u_opacity;
 uniform float u_saturation;
 
+uniform bool u_distortion;
 uniform int u_distortionOptionsdistortionMeasure;
 
 uniform int u_bestScaleFactor;
@@ -156,31 +157,34 @@ void main() {
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
     // Distortion
-    // color = colorWhite; // TODO: Add option to not display image
-    // color = colorTransparant; // TODO: Add option to not display image
 
-    float trianglePointDistortion = v_trianglePointDistortion;
-    trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f; // TODO: Add component to toggle stepwise vs continuous
+    if(u_distortion) {
+      // color = colorWhite; // TODO: Add option to not display image
+      // color = colorTransparant; // TODO: Add option to not display image
 
-    switch (u_distortionOptionsdistortionMeasure) {
-      case 0:
-        if (trianglePointDistortion > 0.0f) {
-          color = spectral_mix(color, colorRed500, trianglePointDistortion);
-        } else {
-          color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
-        }
-        break;
-      case 1:
-        color = spectral_mix(color, colorGreen500, trianglePointDistortion);
-        break;
-      case 2:
-        color = spectral_mix(color, colorYellow500, trianglePointDistortion);
-        break;
-      case 3:
-        color = trianglePointDistortion == -1.0f ? colorRed300 : color;
-        break;
-      default:
-        color = color;
+      float trianglePointDistortion = v_trianglePointDistortion;
+      trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f; // TODO: Add component to toggle stepwise vs continuous
+
+      switch (u_distortionOptionsdistortionMeasure) {
+        case 0:
+          if (trianglePointDistortion > 0.0f) {
+            color = spectral_mix(color, colorRed500, trianglePointDistortion);
+          } else {
+            color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
+          }
+          break;
+        case 1:
+          color = spectral_mix(color, colorGreen500, trianglePointDistortion);
+          break;
+        case 2:
+          color = spectral_mix(color, colorYellow500, trianglePointDistortion);
+          break;
+        case 3:
+          color = trianglePointDistortion == -1.0f ? colorRed300 : color;
+          break;
+        default:
+          color = color;
+      }
     }
 
     // Triangles
