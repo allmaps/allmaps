@@ -1,5 +1,11 @@
 import classifyPoint from 'robust-point-in-polygon'
 
+import { pixelToIntArrayIndex, pointToPixel } from '@allmaps/stdlib'
+
+import { GetImageDataValue, GetImageDataSize } from './types.js'
+import { pointInTile, tilePosition } from './tiles.js'
+import { applyTransform, invertTransform } from './matrix.js'
+
 import type WarpedMapList from '../maps/WarpedMapList.js'
 import type Viewport from '../viewport/Viewport.js'
 import type TileCache from '../tilecache/TileCache.js'
@@ -8,10 +14,23 @@ import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type WarpedMap from '../maps/WarpedMap.js'
 import type { Point } from '@allmaps/types'
 
-import { GetImageDataValue, GetImageDataSize } from './types.js'
-
 const CHANNELS = 4
 
+/**
+ * Render to IntArray
+ *
+ * @export
+ * @async
+ * @template {WarpedMap} W
+ * @template D
+ * @param {WarpedMapList<W>} warpedMapList - WarpedMapList who's WarpedMaps will be rendered
+ * @param {TileCache<D>} tileCache - TileCache who's tiles will be used
+ * @param {Viewport} viewport - Viewport to render to. This can be the entire image, or a single XYZ tile
+ * @param {GetImageDataValue<D>} getImageDataValue - Function to access the data of the image, at a specific index
+ * @param {GetImageDataSize<D>} getImageDataSize - Function to access the size of the image
+ * @param {Uint8ClampedArray} intArray - IntArray to render to
+ * @returns {Promise<void>}
+ */
 export async function renderToIntArray<W extends WarpedMap, D>(
   warpedMapList: WarpedMapList<W>,
   tileCache: TileCache<D>,
@@ -20,155 +39,111 @@ export async function renderToIntArray<W extends WarpedMap, D>(
   getImageDataSize: GetImageDataSize<D>,
   intArray: Uint8ClampedArray
 ): Promise<void> {
-  const [width, height] = viewport.viewportSize
-
   for (const warpedMap of warpedMapList.getWarpedMaps()) {
+    // TODO: viewport.projectedGeoRectangleBbox not in warpedMap.projectedGeoBbox, continue
+
     const cachedTiles = tileCache.getCachedTilesForMapId(warpedMap.mapId)
 
-    // Step through all warped tile pixels and set their color
-    // TODO: if there's nothing to render, maybe send static empty PNG?
+    // Step through all viewport pixels and set their color
+    // Note: naming variables 'Pixel' instead of 'Point' when we are sure they are integer coordinate values
     for (
-      let renderedImagePixelX = 0;
-      renderedImagePixelX < width;
-      renderedImagePixelX++
+      let viewportPixelX = 0;
+      viewportPixelX < viewport.viewportSize[0];
+      viewportPixelX++
     ) {
       for (
-        let renderedImagePixelY = 0;
-        renderedImagePixelY < height;
-        renderedImagePixelY++
+        let viewportPixelY = 0;
+        viewportPixelY < viewport.viewportSize[1];
+        viewportPixelY++
       ) {
-        // Go from warped tile pixel location to corresponding pixel location (with decimals) on resource tiles,
-        // in two steps:
-        //
-        // 1) Detemine the projected geospatial coordinates of the warped image's pixel location
-        const renderedImagePixelProjectedGeo: Point = [
-          viewport.projectedGeoRectangleBbox[0] +
-            viewport.projectedGeoSize[0] * (renderedImagePixelX / width),
-          viewport.projectedGeoRectangleBbox[1] +
-            viewport.projectedGeoSize[1] * (renderedImagePixelY / height)
-        ]
+        const viewportPixel = [viewportPixelX, viewportPixelY] as Point
 
-        // 2) Determine corresponding resource coordinates (with decimals) on resource using transformer
-        const resourceCoordinates =
-          warpedMap.projectedTransformer.transformToResource(
-            renderedImagePixelProjectedGeo
-          )
+        // Get resourcePoint corresponding to this viewportPixel
+        const projectedGeoPoint = applyTransform(
+          invertTransform(viewport.projectedGeoToViewportTransform),
+          viewportPixel
+        )
+        const resourcePoint =
+          warpedMap.projectedTransformer.transformToResource(projectedGeoPoint)
 
-        // Check if pixel is inside resource mask
+        // Apply mask: Check if resourcePoint is inside resource mask
         // classifyPoint returns an integer which determines the position of point relative to polygon:
         //   -1 if point lies inside polygon
         //    0 if point lies on the polygon's edge
         //    1 if point lies outside polygon
-        if (classifyPoint(warpedMap.resourceMask, resourceCoordinates) === 1) {
+        if (classifyPoint(warpedMap.resourceMask, resourcePoint) === 1) {
           continue
         }
 
-        // Determine tile index of resource tile on which this pixel location (with decimals) is
+        // Find the tile on which resourcePoint is located
+        // Note: we are currently waiting for all tiles to be cashed
+        // If not, consider to use the tile with minimum scaleFactorDiff, as in fragmentShader
         let cachedTile: CachedTile<D> | undefined
-        let tileXMin: number | undefined
-        let tileYMin: number | undefined
         let foundCachedTile = false
         for (cachedTile of cachedTiles) {
-          const tile = cachedTile.tile
-
-          tileXMin = tile.column * tile.tileZoomLevel.originalWidth
-          tileYMin = tile.row * tile.tileZoomLevel.originalHeight
-          if (
-            resourceCoordinates[0] >= tileXMin &&
-            resourceCoordinates[0] <=
-              tileXMin + tile.tileZoomLevel.originalWidth &&
-            resourceCoordinates[1] >= tileYMin &&
-            resourceCoordinates[1] <=
-              tileYMin + tile.tileZoomLevel.originalHeight
-          ) {
+          if (pointInTile(resourcePoint, cachedTile.tile)) {
             foundCachedTile = true
-
             break
           }
         }
 
-        // If tile is found, set color of this warped tile pixel
-        if (
-          foundCachedTile &&
-          cachedTile &&
-          tileXMin !== undefined &&
-          tileYMin !== undefined
-        ) {
+        // If tile is found, set color of this resourcePoint, i.e. viewportPixel
+        if (foundCachedTile && cachedTile) {
           const tile = cachedTile.tile
+          const tileSize = getImageDataSize(cachedTile.data)
 
-          // Schematic drawing of resource tile and sub-pixel location of (pixelTileX, pixelTileY)
+          // Determine sub-pixel coordinates of the resourcePoint on the (scaled) tile: 'tilePoint'
           //
-          // PixelTile: +
-          // Surrounding pixels: *
+          // Schematic drawing of tilePoint inside a pixel of the (scaled) resource tile
+          // tilePoint: +
+          // Surrounding pixels of the (scaled) resource tile: *
           //
-          //   Y
-          //   ^
-          // 2 *---------* 3
-          //   |         |
-          //   |         |
-          //   |   +     |
-          // 0 *---------* 1 > X
+          //        Y
+          //        ^
+          // [0, 1] *---------* [1, 1]
+          //        |         |
+          //        |         |
+          //        |   +     |
+          // [0, 0] *---------* [1, 0] > X
           //
-          // Determine (sub-)pixel coordinates on resource tile
+          const resourceTilePosition = tilePosition(tile)
+          const tilePoint = resourcePoint.map(
+            (coordinate, index) =>
+              (coordinate - resourceTilePosition[index]) /
+              tile.tileZoomLevel.scaleFactor
+          ) as Point
 
-          const pixelTileX =
-            (resourceCoordinates[0] - tileXMin) / tile.tileZoomLevel.scaleFactor
-          const pixelTileY =
-            (resourceCoordinates[1] - tileYMin) / tile.tileZoomLevel.scaleFactor
-
-          const [tileWidth, tileHeight] = getImageDataSize(cachedTile.data)
-
-          // Determine coordinates of four surrounding pixels
-          const pixelTileXFloor = Math.max(Math.floor(pixelTileX), 0)
-          const pixelTileXCeil = Math.min(Math.ceil(pixelTileX), tileWidth - 1)
-          const pixelTileYFloor = Math.max(Math.floor(pixelTileY), 0)
-          const pixelTileYCeil = Math.min(Math.ceil(pixelTileY), tileHeight - 1)
-
-          // Determine indices of four surrounding pixels
-          const tileIntArrayIndices = [
-            pixelToIndex(pixelTileXFloor, pixelTileYFloor, tileWidth, CHANNELS),
-            pixelToIndex(pixelTileXCeil, pixelTileYFloor, tileWidth, CHANNELS),
-            pixelToIndex(pixelTileXFloor, pixelTileYCeil, tileWidth, CHANNELS),
-            pixelToIndex(pixelTileXCeil, pixelTileYCeil, tileWidth, CHANNELS)
+          // Determine the tilePoint's four surrounding pixels: bottom-left, bottom-right, top-left, top-right
+          const tilePointPixels = [
+            pointToPixel(tilePoint, [0, 0], tileSize),
+            pointToPixel(tilePoint, [1, 0], tileSize),
+            pointToPixel(tilePoint, [0, 1], tileSize),
+            pointToPixel(tilePoint, [1, 1], tileSize)
           ]
 
-          // Determine remaining (sub-)pixel decimals on resource tile
-          const pixelTileXDecimals = pixelTileX - Math.floor(pixelTileX)
-          const pixelTileYDecimals = pixelTileY - Math.floor(pixelTileY)
-
-          // Define index in result intArray
-          const intArrayIndex =
-            ((height - renderedImagePixelY) * width + renderedImagePixelX) *
+          // Determine the index where to write this pixel's information in the IntArray
+          const viewportPixelIntArrayIndex = pixelToIntArrayIndex(
+            viewportPixel,
+            viewport.viewportSize,
             CHANNELS
+          )
 
-          // For each color, compute and set the RGBA colors in the intArray
-          // by interpolating the color of the four surrounding pixels on the resource tile
+          // Apply bilinear resampling:
+          // for each color, set the color value in the intArray in the following way:
+          // for the current tile point (derived earlier from resourcePoint and hence from viewportPoint)
+          // go over all tile pixels surrounding it
+          // multiply their color value and pixel weight, and add all of these together
           for (let color = 0; color < CHANNELS; color++) {
-            intArray[intArrayIndex + color] =
-              getImageDataValue(
-                cachedTile.data,
-                tileIntArrayIndices[0] + color
-              ) *
-                (1 - pixelTileXDecimals) *
-                (1 - pixelTileYDecimals) +
-              getImageDataValue(
-                cachedTile.data,
-                tileIntArrayIndices[1] + color
-              ) *
-                pixelTileXDecimals *
-                (1 - pixelTileYDecimals) +
-              getImageDataValue(
-                cachedTile.data,
-                tileIntArrayIndices[2] + color
-              ) *
-                (1 - pixelTileXDecimals) *
-                pixelTileYDecimals +
-              getImageDataValue(
-                cachedTile.data,
-                tileIntArrayIndices[3] + color
-              ) *
-                pixelTileXDecimals *
-                pixelTileYDecimals
+            intArray[viewportPixelIntArrayIndex + color] = tilePointPixels
+              .map(
+                (tilePointPixel) =>
+                  getImageDataValue(
+                    cachedTile!.data,
+                    pixelToIntArrayIndex(tilePointPixel, tileSize, CHANNELS) +
+                      color
+                  ) * bilinearPixelWeight(tilePointPixel, tilePoint)
+              )
+              .reduce((a, c) => a + c, 0)
           }
         }
       }
@@ -176,11 +151,8 @@ export async function renderToIntArray<W extends WarpedMap, D>(
   }
 }
 
-function pixelToIndex(
-  pixelX: number,
-  pixelY: number,
-  width: number,
-  channels: number
-): number {
-  return (pixelY * width + pixelX) * channels
+function bilinearPixelWeight(pixel: Point, point: Point): number {
+  return (
+    (1 - Math.abs(point[0] - pixel[0])) * (1 - Math.abs(point[1] - pixel[1]))
+  )
 }

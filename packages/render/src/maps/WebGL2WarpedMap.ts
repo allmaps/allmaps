@@ -74,9 +74,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @constructor
    * @param {string} mapId - ID of the map
    * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
-   * @param {?Cache} [imageInfoCache] - Cache of the image info of this image
    * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
    * @param {WebGLProgram} program - the WebGL2 program
+   * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
    */
   constructor(
     mapId: string,
@@ -193,24 +193,26 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Previous and New Distortion
 
-    const previousTrianglePointsDistortion =
-      this.previousTrianglePointsDistortion
-    createBuffer(
-      this.gl,
-      this.program,
-      new Float32Array(previousTrianglePointsDistortion),
-      1,
-      'a_previousTrianglePointDistortion'
-    )
+    if (this.distortionMeasure) {
+      const previousTrianglePointsDistortion =
+        this.previousTrianglePointsDistortion
+      createBuffer(
+        this.gl,
+        this.program,
+        new Float32Array(previousTrianglePointsDistortion),
+        1,
+        'a_previousTrianglePointDistortion'
+      )
 
-    const trianglePointsDistortion = this.trianglePointsDistortion
-    createBuffer(
-      this.gl,
-      this.program,
-      new Float32Array(trianglePointsDistortion),
-      1,
-      'a_trianglePointDistortion'
-    )
+      const trianglePointsDistortion = this.trianglePointsDistortion
+      createBuffer(
+        this.gl,
+        this.program,
+        new Float32Array(trianglePointsDistortion),
+        1,
+        'a_trianglePointDistortion'
+      )
+    }
 
     // Triangle index
 

@@ -17,7 +17,8 @@ import type {
   GeojsonMultiPoint,
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
-  GeojsonGeometry
+  GeojsonGeometry,
+  Size
 } from '@allmaps/types'
 
 // Assert
@@ -267,6 +268,32 @@ export function isEqualPointArrayArray(
 }
 
 // Compute
+
+export function pointToPixel(
+  point: Point,
+  translate: Point = [0, 0],
+  size?: Size
+): Point {
+  return point.map((coordinate, index) => {
+    let result = Math.floor(coordinate + translate[index])
+    if (size) {
+      result = Math.max(result, 0)
+      result = Math.min(result, size[index] - 1)
+    }
+    return result
+  }) as Point
+}
+
+export function pixelToIntArrayIndex(
+  pixel: Point,
+  size: Size,
+  channels: number,
+  flipY = false
+): number {
+  const column = pixel[0]
+  const row = flipY ? size[1] - 1 - pixel[1] : pixel[1]
+  return (row * size[0] + column) * channels
+}
 
 export function flipX(point: Point): Point {
   return [-point[0], point[1]]

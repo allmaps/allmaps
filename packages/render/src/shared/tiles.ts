@@ -268,11 +268,61 @@ export function tileCenter(tile: Tile): Point {
   return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
 }
 
+/**
+ *
+ * @export
+ * @param {Tile} tile
+ * @returns {Point}
+ */
 export function tilePosition(tile: Tile): Point {
   const resourceTilePositionX = tile.column * tile.tileZoomLevel.originalWidth
   const resourceTilePositionY = tile.row * tile.tileZoomLevel.originalHeight
 
   return [resourceTilePositionX, resourceTilePositionY]
+}
+
+export function pointToTilePoint(
+  resourcePoint: Point,
+  tile: Tile,
+  clip = true
+): Point | undefined {
+  const resourceTilePosition = tilePosition(tile)
+  const tilePoint = [
+    (resourcePoint[0] - resourceTilePosition[0]) /
+      tile.tileZoomLevel.scaleFactor,
+    (resourcePoint[1] - resourceTilePosition[1]) /
+      tile.tileZoomLevel.scaleFactor
+  ] as Point
+
+  if (
+    !clip ||
+    pointInTile(resourcePoint, tile)
+    // && pointInImage(resourcePoint, tile)
+  ) {
+    return tilePoint
+  }
+}
+
+export function pointInTile(resourcePoint: Point, tile: Tile): boolean {
+  const resourceTilePosition = tilePosition(tile)
+
+  return (
+    resourcePoint[0] >= resourceTilePosition[0] &&
+    resourcePoint[0] <=
+      resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
+    resourcePoint[1] >= resourceTilePosition[1] &&
+    resourcePoint[1] <=
+      resourceTilePosition[1] + tile.tileZoomLevel.originalHeight
+  )
+}
+
+export function pointInImage(resourcePoint: Point, tile: Tile): boolean {
+  return (
+    resourcePoint[0] > 0 &&
+    resourcePoint[0] <= tile.imageSize[0] &&
+    resourcePoint[1] > 0 &&
+    resourcePoint[1] <= tile.imageSize[1]
+  )
 }
 
 export function computeBboxTile(tile: Tile): Bbox {
@@ -293,34 +343,4 @@ export function computeBboxTile(tile: Tile): Bbox {
     resourceTileMaxX,
     resourceTileMaxY
   ]
-}
-
-// Currently unused
-export function resourcePointToTilePoint(
-  tile: Tile,
-  resourcePoint: Point,
-  clip = true
-): Point | undefined {
-  const resourceTilePosition = tilePosition(tile)
-
-  const tilePointX =
-    (resourcePoint[0] - resourceTilePosition[0]) /
-    tile.tileZoomLevel.scaleFactor
-  const tilePointY =
-    (resourcePoint[1] - resourceTilePosition[1]) /
-    tile.tileZoomLevel.scaleFactor
-
-  if (
-    !clip ||
-    (resourcePoint[0] >= resourceTilePosition[0] &&
-      resourcePoint[0] <=
-        resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
-      resourcePoint[1] >= resourceTilePosition[1] &&
-      resourcePoint[1] <=
-        resourceTilePosition[1] + tile.tileZoomLevel.originalHeight &&
-      resourcePoint[0] <= tile.imageSize[0] &&
-      resourcePoint[1] <= tile.imageSize[1])
-  ) {
-    return [tilePointX, tilePointY]
-  }
 }

@@ -66,9 +66,9 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [Parameters](#parameters)
 *   [computeProjectedGeoRectangle](#computeprojectedgeorectangle)
     *   [Parameters](#parameters-1)
-*   [newViewportFromWarpedMapList](#newviewportfromwarpedmaplist)
+*   [fromWarpedMapList](#fromwarpedmaplist)
     *   [Parameters](#parameters-2)
-*   [newViewportFromProjectedGeoBbox](#newviewportfromprojectedgeobbox)
+*   [fromProjectedGeoBbox](#fromprojectedgeobbox)
     *   [Parameters](#parameters-3)
 *   [constructor](#constructor-1)
     *   [Parameters](#parameters-4)
@@ -247,8 +247,8 @@ Creates an instance of Viewport.
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `s` &#x20;
-*   `i`   (optional, default `1`)
+*   `r` &#x20;
+*   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected coordinates.
 *   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projection coordinates per viewport pixel.
@@ -264,9 +264,9 @@ Returns a rotated rectangle in projected geo coordinates
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `s` &#x20;
+*   `r` &#x20;
 
-### newViewportFromWarpedMapList
+### fromWarpedMapList
 
 Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
 
@@ -275,7 +275,8 @@ Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `s`   (optional, default `"contain"`)
+*   `r`   (optional, default `"contain"`)
+*   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)??** The devicePixelRatio of the viewport.
@@ -283,7 +284,7 @@ Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
 
 Returns **Viewport** A new Viewport object
 
-### newViewportFromProjectedGeoBbox
+### fromProjectedGeoBbox
 
 Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBbox
 
@@ -292,7 +293,7 @@ Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBb
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `s`   (optional, default `"contain"`)
+*   `r`   (optional, default `"contain"`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)??** The devicePixelRatio of the viewport.
@@ -557,12 +558,12 @@ Creates an instance of WebGL2WarpedMap.
 *   `i` &#x20;
 *   `r` &#x20;
 *   `s` &#x20;
-*   `n` &#x20;
+*   `a` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
-*   `imageInfoCache` **Cache??** Cache of the image info of this image
 *   `gl` **WebGL2RenderingContext** the WebGL2 rendering context
 *   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** the WebGL2 program
+*   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
 
 ### updateVertexBuffers
 
