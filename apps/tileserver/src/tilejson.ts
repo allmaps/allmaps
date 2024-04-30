@@ -1,53 +1,39 @@
-import { GcpTransformer } from '@allmaps/transform'
-
-import bbox from '@turf/bbox'
+import { json } from 'itty-router'
+import {
+  WarpedMapList,
+  createWarpedMapFactory
+} from '@allmaps/render/int-array'
 
 import type { Tilejson, TilejsonOptions } from './types.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(
+export async function generateTileJson(
   georeferencedMaps: GeoreferencedMap[],
   options: TilejsonOptions,
   urlTemplate: string
-): Tilejson {
-  const geoMasks = []
+): Promise<Tilejson> {
+  const warpedMapList = new WarpedMapList(createWarpedMapFactory())
 
-  for (const map of georeferencedMaps) {
-    const transformer = new GcpTransformer(
-      map.gcps,
-      options['transformation.type'] || map.transformation?.type,
-      {
-        differentHandedness: true
-      }
-    )
-
-    const geoMask = transformer.transformForwardAsGeojson([map.resourceMask], {
-      maxOffsetRatio: 0.01
-    })
-    geoMasks.push(geoMask)
+  for (const georeferencedMap of georeferencedMaps) {
+    await warpedMapList.addGeoreferencedMap(georeferencedMap)
   }
 
-  const bounds = bbox({
-    type: 'FeatureCollection',
-    features: geoMasks.map((geoMask) => ({
-      type: 'Feature',
-      properties: {},
-      geometry: geoMask
-    }))
-  })
+  const bounds = warpedMapList.getBbox()
+  const center = warpedMapList.getCenter()
 
-  return {
+  if (!bounds || !center) {
+    throw new Error('Could not compute bounding box and center of maps')
+  }
+
+  return json({
     tilejson: '3.0.0',
     id: urlTemplate,
     tiles: [urlTemplate],
     fields: {},
     bounds,
-    center: [
-      (bounds[2] - bounds[0]) / 2 + bounds[0],
-      (bounds[3] - bounds[1]) / 2 + bounds[1]
-    ]
+    center
     // TODO: add minzoom and maxzoom
-  }
+  })
 }

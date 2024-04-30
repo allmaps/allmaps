@@ -663,12 +663,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240320.1
         version: 4.20240405.0
-      '@turf/bbox':
-        specifier: ^6.5.0
-        version: 6.5.0
-      '@turf/center':
-        specifier: ^6.5.0
-        version: 6.5.0
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.10
@@ -4181,13 +4175,6 @@ packages:
       minimatch: 9.0.4
     dev: true
 
-  /@turf/bbox@6.5.0:
-    resolution: {integrity: sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==}
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/meta': 6.5.0
-    dev: true
-
   /@turf/bearing@6.5.0:
     resolution: {integrity: sha512-dxINYhIEMzgDOztyMZc20I7ssYVNEpSv04VbMo5YPQsqa80KO3TFvbuCahMsCAW5z8Tncc8dwBlEFrmRjJG33A==}
     dependencies:
@@ -4208,13 +4195,6 @@ packages:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
     dev: false
-
-  /@turf/center@6.5.0:
-    resolution: {integrity: sha512-T8KtMTfSATWcAX088rEDKjyvQCBkUsLnK/Txb6/8WUXIeOZyHu42G7MkdkHRoHtwieLdduDdmPLFyTdG5/e7ZQ==}
-    dependencies:
-      '@turf/bbox': 6.5.0
-      '@turf/helpers': 6.5.0
-    dev: true
 
   /@turf/clone@6.5.0:
     resolution: {integrity: sha512-mzVtTFj/QycXOn6ig+annKrM6ZlimreKYz6f/GSERytOpgzodbQyOgkfwru100O1KQhhjSudKK4DsQ0oyi9cTw==}
@@ -4238,6 +4218,7 @@ packages:
 
   /@turf/helpers@6.5.0:
     resolution: {integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==}
+    dev: false
 
   /@turf/invariant@6.5.0:
     resolution: {integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==}
@@ -4249,6 +4230,7 @@ packages:
     resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
     dependencies:
       '@turf/helpers': 6.5.0
+    dev: false
 
   /@turf/midpoint@6.3.0:
     resolution: {integrity: sha512-ImiYK5l/QZh5aCynxCyHoaJYn4j1VhorVyw2XihHuwAtebTc+KRaBJpWSD2eJxo3Q3J+QepWMiiMvQFJgQ5uCQ==}

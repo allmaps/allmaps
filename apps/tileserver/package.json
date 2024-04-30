@@ -41,8 +41,6 @@
     "upng-js": "^2.1.0",
     "vitest": "1.3.0",
     "wrangler": "^3.0.0",
-    "@turf/bbox": "^6.5.0",
-    "@turf/center": "^6.5.0",
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
