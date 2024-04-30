@@ -50,7 +50,13 @@ export default [
       'A pictorial map of that portion of New York City known as Manhattan, also showing parts of the Bronx',
     organization: 'Harvard Map Collection',
     url: 'https://annotations.allmaps.org/manifests/02c7b8df6fac1378'
+  },
+  {
+    title: "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae",
+    organization: 'David Rumsey Map Collection',
+    url: 'https://annotations.allmaps.org/maps/135dfd2d58dc26ec'
   }
+
   // Consider adding:
   // - https://annotations.allmaps.org/manifests/012e1c2c1db0ebf7
   // - https://annotations.allmaps.org/images/ac6cb364d8cab22d
