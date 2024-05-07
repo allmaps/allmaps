@@ -16,6 +16,10 @@ export async function headers(response: Response) {
 }
 
 export async function put(response: Response, request: Request) {
-  await cache.put(request.url, response.clone())
+  // Only cache HTTP 200 responses
+  if (response.status === 200) {
+    await cache.put(request.url, response.clone())
+  }
+
   return response
 }
