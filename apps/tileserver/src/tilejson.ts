@@ -4,17 +4,33 @@ import {
   createWarpedMapFactory
 } from '@allmaps/render/int-array'
 
-import type { Tilejson, TilejsonOptions } from './types.js'
+import { cachedFetch } from './fetch.js'
+
+import type { Tilejson, TransformationOptions } from './types.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
+import type { FetchFn } from '@allmaps/types'
+
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export async function generateTileJson(
+export async function generateTileJsonResponse(
   georeferencedMaps: GeoreferencedMap[],
-  options: TilejsonOptions,
+  options: TransformationOptions,
   urlTemplate: string
 ): Promise<Tilejson> {
-  const warpedMapList = new WarpedMapList(createWarpedMapFactory())
+  // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
+  let transformationOptions
+  if (options['transformation.type']) {
+    transformationOptions = {
+      type: options['transformation.type']
+    }
+  }
+
+  const warpedMapList = new WarpedMapList(createWarpedMapFactory(), {
+    fetchFn: cachedFetch as FetchFn,
+    transformation: transformationOptions,
+    createRTree: false
+  })
 
   for (const georeferencedMap of georeferencedMaps) {
     await warpedMapList.addGeoreferencedMap(georeferencedMap)

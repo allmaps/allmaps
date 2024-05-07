@@ -3,7 +3,7 @@ import { AutoRouter, error, cors } from 'itty-router'
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
 import { optionsFromQuery } from './options.js'
-import { generateTileJson } from './tilejson.js'
+import { generateTileJsonResponse as generateTileJsonResponse } from './tilejson.js'
 import { generateTilesHtml } from './html.js'
 import { match, put, headers } from './cache.js'
 
@@ -76,7 +76,7 @@ router.get('/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
 
-  return generateTileJson(maps, options, urlTemplate)
+  return generateTileJsonResponse(maps, options, urlTemplate)
 })
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
@@ -87,7 +87,7 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`
 
-  return generateTileJson(maps, options, urlTemplate)
+  return generateTileJsonResponse(maps, options, urlTemplate)
 })
 
 router.get('/images/:imageId/tiles.json', async (req, env) => {
@@ -98,7 +98,7 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`
 
-  return generateTileJson(maps, options, urlTemplate)
+  return generateTileJsonResponse(maps, options, urlTemplate)
 })
 
 router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
@@ -109,7 +109,7 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`
 
-  return generateTileJson(maps, options, urlTemplate)
+  return generateTileJsonResponse(maps, options, urlTemplate)
 })
 
 // -------------------------------------------------------------------------------------------

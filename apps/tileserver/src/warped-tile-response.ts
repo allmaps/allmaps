@@ -9,7 +9,7 @@ import { cachedFetch } from './fetch.js'
 
 import type { Size, Bbox, FetchFn } from '@allmaps/types'
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
-import type { XYZTile, TilejsonOptions } from './types.js'
+import type { XYZTile, TransformationOptions } from './types.js'
 
 const TILE_SIZE = 256
 
@@ -27,7 +27,7 @@ function getImageDataSize(decodedJpeg: UintArrRet): Size {
 
 export async function createWarpedTileResponse(
   georeferencedMaps: GeoreferencedMap[],
-  options: TilejsonOptions,
+  options: TransformationOptions,
   { x, y, z }: XYZTile
 ): Promise<Response> {
   if (!(x >= 0 && y >= 0 && z >= 0)) {

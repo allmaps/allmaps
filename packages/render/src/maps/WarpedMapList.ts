@@ -11,7 +11,11 @@ import WarpedMap from './WarpedMap.js'
 import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import type { WarpedMapFactory, WarpedMapListOptions } from '../shared/types.js'
+import type {
+  TransformationOptions,
+  WarpedMapFactory,
+  WarpedMapListOptions
+} from '../shared/types.js'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type {
@@ -45,6 +49,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   zIndices: Map<string, number> = new Map()
   rtree?: RTree
   imageInformations?: ImageInformations
+  transformation?: TransformationOptions
 
   fetchFn?: FetchFn
 
@@ -71,6 +76,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.fetchFn = options?.fetchFn
 
     this.imageInformations = options.imageInformations
+    this.transformation = options.transformation
 
     if (options.createRTree) {
       this.rtree = new RTree()
@@ -497,7 +503,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     const warpedMap = this.warpedMapFactory(mapId, georeferencedMap, {
       imageInformations: this.imageInformations,
-      fetchFn: this.fetchFn
+      fetchFn: this.fetchFn,
+      transformation: this.transformation
     })
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)

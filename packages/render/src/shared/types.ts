@@ -23,6 +23,7 @@ export type WarpedMapListOptions = {
   fetchFn: FetchFn
   createRTree: boolean
   imageInformations: ImageInformations
+  transformation: TransformationOptions
 }
 
 // TODO: consider to pass these options separately (since most WarpedMapOptions are optional)

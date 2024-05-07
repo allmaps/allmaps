@@ -4,9 +4,15 @@ import { cachedFetch } from './fetch.js'
 import { generateImage } from './image.js'
 import { arrayBufferToBase64 } from './base64.js'
 
+import type { TransformationOptions } from './types.js'
+
 import type { Size } from '@allmaps/types'
 
-export async function generateCard(mapId: string, size: Size) {
+export async function generateCard(
+  mapId: string,
+  size: Size,
+  options: TransformationOptions
+) {
   // TODO: move font and logo to static dir or to static.allmaps.org
   const font = await cachedFetch(
     'https://fonts.allmaps.org/geograph/woff/geograph-bold.woff'
@@ -14,7 +20,7 @@ export async function generateCard(mapId: string, size: Size) {
   const logoUrl =
     'https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo-inverted.svg'
 
-  const imageResponse = await generateImage(mapId, size)
+  const imageResponse = await generateImage(mapId, size, options)
   const image = await imageResponse.arrayBuffer()
 
   const base64Image = arrayBufferToBase64(image)

@@ -212,7 +212,10 @@ export default class WarpedMap extends EventTarget {
     this.fetchFn = options.fetchFn
 
     this.transformationType =
-      this.georeferencedMap.transformation?.type || 'polynomial'
+      options.transformation?.type ||
+      this.georeferencedMap.transformation?.type ||
+      'polynomial'
+
     this.updateTransformerProperties()
   }
 

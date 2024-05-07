@@ -1,5 +1,6 @@
 import { AutoRouter, error, cors, json } from 'itty-router'
 
+import { optionsFromQuery } from './options.js'
 // import { generateImage } from './image.js'
 import { generateCard } from './card.js'
 import { match, put, headers } from './cache.js'
@@ -26,7 +27,9 @@ const height = 600
 
 router.get('/maps/:mapId.png', (req) => {
   const mapId = req.params?.mapId
-  return generateCard(mapId, [width, height])
+  const options = optionsFromQuery(req)
+
+  return generateCard(mapId, [width, height], options)
 })
 
 router.get('/', () => json({ name: 'Allmaps Preview' }))

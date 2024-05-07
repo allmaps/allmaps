@@ -18,6 +18,6 @@ export type Tilejson = {
 }
 
 // TODO: align this with TransformationOptions from @allmaps/render
-export type TilejsonOptions = {
+export type TransformationOptions = {
   'transformation.type': TransformationType
 }
