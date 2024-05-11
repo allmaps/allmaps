@@ -2,6 +2,7 @@ import dataStore from './shared/stores/data.js'
 import paramStore from './shared/stores/param.js'
 import urlStore from './shared/stores/url.js'
 
+import Collection from '$lib/components/Collection.svelte'
 import Copy from '$lib/components/Copy.svelte'
 import Dial from '$lib/components/Dial.svelte'
 import Header from '$lib/components/Header.svelte'
@@ -32,6 +33,7 @@ import Straight from './components/icons/transformations/Straight.svelte'
 export { urlStore, dataStore, paramStore }
 
 export {
+  Collection,
   Copy,
   Dial,
   Header,
