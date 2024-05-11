@@ -1,0 +1,193 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/manifests/2/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.json",
+  "@type": "sc:Manifest",
+  "label": {
+    "@value": "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]",
+    "@language": "en"
+  },
+  "metadata": [
+    {
+      "label": "Creator/Contributor",
+      "value": {
+        "@value": "Sanborn Map Company (cartographer)",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Date Created/Date Issued",
+      "value": { "@value": "1924-01-01", "@language": "en" }
+    },
+    {
+      "label": "Owning Repository",
+      "value": {
+        "@value": "Perry-Casta\u00f1eda Library Maps, University of Texas Libraries, The University of Texas at Austin",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Source Collection Name",
+      "value": {
+        "@value": "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924]",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Type",
+      "value": {
+        "@value": "maps| cartographic| Fire insurance maps| Digital maps",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Form/Medium",
+      "value": { "@value": "maps", "@language": "en" }
+    },
+    {
+      "label": "Genre",
+      "value": {
+        "@value": "Fire insurance maps| Digital maps",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Extent",
+      "value": { "@value": "64 x 54 cm", "@language": "en" }
+    },
+    {
+      "label": "Language",
+      "value": { "@value": "English", "@language": "en" }
+    },
+    {
+      "label": "Publisher",
+      "value": { "@value": "Sanborn Map Company", "@language": "en" }
+    },
+    {
+      "label": "Topic",
+      "value": { "@value": "Fire risk assessment maps", "@language": "en" }
+    },
+    {
+      "label": "Geographic Coverage",
+      "value": {
+        "@value": "United States (country)| West (U.S.) (region)| Texas (state)| Bexar County (county)| San Antonio (city)",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Place Name",
+      "value": { "@value": "San Antonio (Tex)", "@language": "en" }
+    },
+    {
+      "label": "Cartographic Information",
+      "value": {
+        "@value": "29.4167, -98.4833 (WGS84)| Scale 1:600 ; drawn to a scale of 50 feet to an inch.",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Origin Note",
+      "value": {
+        "@value": "Original located at the Dolph Briscoe Center for American History.",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Identifier - UTL DAMS PID",
+      "value": {
+        "@value": "utlmaps:0217cef0-3269-438f-8d3a-e90c790e3e51",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Related Resource - Host",
+      "value": {
+        "@value": "Sanborn Fire Insurance Maps, 1877-1951. [Digital Texas Sanborn Fire Insurance Maps] (title)",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Primary Title",
+      "value": {
+        "@value": "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Description",
+      "value": {
+        "@value": "Originally published by Sanborn Map Co., New York; name of publisher and place of publication varies.| Fire insurance map, hand-colored to show building construction, locations of windows and doors, elevators, and available water facilities.| Shows factories, commercial occupancy of buildings, property boundaries and house and block numbers.| Includes notes on population, fire departments, and prevailing winds.| Includes location map and key to building colors and other features.",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "License",
+      "value": {
+        "@value": "https://creativecommons.org/publicdomain/mark/1.0/",
+        "@language": "en"
+      }
+    },
+    {
+      "label": "Identifier - PID",
+      "value": "utlmaps:0217cef0-3269-438f-8d3a-e90c790e3e51"
+    },
+    {
+      "label": "Thumbnail URI",
+      "value": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/TN/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jpg"
+    },
+    {
+      "label": "IIIF Image",
+      "value": "https://curio.lib.utexas.edu/assets/images/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2"
+    },
+    {
+      "label": "IIIF Resource",
+      "value": "https://curio.lib.utexas.edu/assets/images/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2"
+    },
+    { "label": "Date Added", "value": "2022-02-15" },
+    {
+      "label": "Manifest URI",
+      "value": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/manifests/2/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.json"
+    },
+    { "label": "extra", "value": [{}] }
+  ],
+  "description": {
+    "@value": "Originally published by Sanborn Map Co., New York; name of publisher and place of publication varies.| Fire insurance map, hand-colored to show building construction, locations of windows and doors, elevators, and available water facilities.| Shows factories, commercial occupancy of buildings, property boundaries and house and block numbers.| Includes notes on population, fire departments, and prevailing winds.| Includes location map and key to building colors and other features.",
+    "@language": "en"
+  },
+  "thumbnail": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/TN/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jpg",
+  "license": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "viewingDirection": "left-to-right",
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://curio.lib.utexas.edu/canvas/Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518].json",
+          "@type": "sc:Canvas",
+          "label": "Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518]",
+          "height": 10080,
+          "width": 8504,
+          "images": [
+            {
+              "@id": "https://curio.lib.utexas.edu/annotation/Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518].json",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://iiif.lib.utexas.edu/iiif/2/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 10080,
+                "width": 8504,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://iiif.lib.utexas.edu/iiif/2/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://curio.lib.utexas.edu/canvas/Sanborn Fire Insurance Maps [San Antonio, Texas, 1924, Sheet 518].json"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

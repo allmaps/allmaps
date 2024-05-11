@@ -7,7 +7,7 @@
   import { fetchImageInfo } from '@allmaps/stdlib'
 
   import {
-    imageInfoCache,
+    imageInformations,
     imageOl,
     imageIiifLayer,
     imageVectorSource
@@ -49,9 +49,16 @@
       const map = viewerMap.map
 
       const imageUri = map.resource.id
-      const imageInfo = await fetchImageInfo(imageUri, {
-        cache: imageInfoCache
-      })
+
+      let imageInfo
+
+      // TODO: move to function
+      if (imageInformations.has(imageUri)) {
+        imageInfo = imageInformations.get(imageUri)
+      } else {
+        imageInfo = await fetchImageInfo(imageUri, { cache: 'force-cache' })
+        imageInformations.set(imageUri, imageInfo)
+      }
 
       imageIiifLayer.setImageInfo(imageInfo as ImageInformationResponse)
 

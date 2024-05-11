@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { TilesetSchema } from '../schemas/shared.js'
 
-export type Tileset = z.infer<typeof TilesetSchema>
+export type { Fit } from '@allmaps/types'
 
-export type Fit = 'cover' | 'contain'
+export type Tileset = z.infer<typeof TilesetSchema>
 
 export type MajorVersion = 1 | 2 | 3
 

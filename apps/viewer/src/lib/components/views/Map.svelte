@@ -6,7 +6,7 @@
 
   import {
     mapOl,
-    mapWarpedMapSource,
+    mapWarpedMapLayer,
     mapVectorSource,
     mapSelect
   } from '$lib/shared/stores/openlayers.js'
@@ -28,7 +28,7 @@
   let featureContextMenu: FeatureContextMenu | undefined
 
   function fitExtent() {
-    const extent = mapWarpedMapSource.getExtent()
+    const extent = mapWarpedMapLayer.getExtent()
     if (extent && mapOl) {
       mapOl.getView().fit(extent, {
         padding: [25, 25, 25, 25]
@@ -44,7 +44,7 @@
 
   $: {
     if (mapOl && $activeMap && $activeMap.updateView) {
-      const warpedMap = mapWarpedMapSource?.getWarpedMap(
+      const warpedMap = mapWarpedMapLayer.getWarpedMap(
         $activeMap.viewerMap.mapId
       )
       if (warpedMap) {

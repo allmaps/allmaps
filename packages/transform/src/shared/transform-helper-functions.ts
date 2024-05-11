@@ -11,19 +11,14 @@ import {
 
 import GcpTransformer from '../transformer'
 
-import type {
-  TransformGcp,
-  Segment,
-  TransformOptions,
-  PartialTransformOptions
-} from './types.js'
+import type { TransformGcp, Segment, TransformOptions } from './types.js'
 
 import type { Point, LineString, Ring, Polygon } from '@allmaps/types'
 
 export function mergeOptions(
-  optionsFromTransform?: PartialTransformOptions,
-  optionsFromGCPTransformer?: PartialTransformOptions,
-  optionsFromDataFormat?: PartialTransformOptions
+  optionsFromTransform?: Partial<TransformOptions>,
+  optionsFromGCPTransformer?: Partial<TransformOptions>,
+  optionsFromDataFormat?: Partial<TransformOptions>
 ): TransformOptions {
   const optionsDefault: TransformOptions = {
     maxOffsetRatio: 0,
@@ -31,7 +26,8 @@ export function mergeOptions(
     destinationIsGeographic: false,
     sourceIsGeographic: false,
     inputIsMultiGeometry: false,
-    differentHandedness: false
+    differentHandedness: false,
+    evaluationType: 'function'
   }
 
   return {

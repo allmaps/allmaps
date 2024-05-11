@@ -6,11 +6,13 @@ import { TilesetSchema, SizeSchema } from './shared.js'
 
 export const image3Profiles = ['level0', 'level1', 'level2'] as const
 
+export const Image3ProfileSchema = z.enum(image3Profiles)
+
 export const Image3Schema = z.object({
   id: z.string().url(),
   type: z.literal('ImageService3'),
   protocol: z.literal('http://iiif.io/api/image'),
-  profile: z.enum(image3Profiles),
+  profile: Image3ProfileSchema,
   width: z.number().int(),
   height: z.number().int(),
   maxWidth: z.number().int().optional(),

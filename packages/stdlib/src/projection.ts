@@ -2,8 +2,7 @@ import { degreesToRadians } from './geometry.js'
 
 import type { Point } from '@allmaps/types'
 
-// From:
-//   https://gis.stackexchange.com/questions/156035/calculating-mercator-coordinates-from-lat-lon
+// From: https://gis.stackexchange.com/questions/156035/calculating-mercator-coordinates-from-lat-lon
 export function lonLatToWebMecator([lon, lat]: Point): Point {
   const rMajor = 6378137.0
   const x = rMajor * degreesToRadians(lon)

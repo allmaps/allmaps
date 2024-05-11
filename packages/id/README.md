@@ -83,7 +83,7 @@ Generates an ID from a string using the SHA-1 algorithm. Given the same input, t
 #### Parameters
 
 *   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Input string.
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash.  The maximum length of the hash is 40 characters. (optional, default `16`)
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16. (optional, default `16`)
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of `str`.
 
@@ -93,7 +93,7 @@ Generates a random ID.
 
 #### Parameters
 
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Length of returned hash. The maximum length of the hash is 40 characters.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of a random UUID.
 
@@ -104,6 +104,6 @@ Generates a checksum of a JSON object.
 #### Parameters
 
 *   `obj` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** JSON object.
-*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Length of returned hash. The maximum length of the hash is 40 characters. (optional, default `16`)
+*   `length` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Length of returned hash. The maximum length of the hash is 40 characters.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.

@@ -1,27 +1,16 @@
 import { Image } from '@allmaps/iiif-parser'
-import {
-  computeBbox,
-  bboxToPolygon,
-  bboxToCenter,
-  distance
-} from '@allmaps/stdlib'
-import FetchableMapTile from '../FetchableTile'
-import CacheableTile from '../CacheableTile'
+import { computeBbox, bboxToCenter, distance } from '@allmaps/stdlib'
+import FetchableTile from '../tilecache/FetchableTile'
 
 import type {
   Point,
   Line,
   Ring,
   Bbox,
-  Size,
   Tile,
   TileZoomLevel,
   TileByColumn
 } from '@allmaps/types'
-import type {
-  GcpTransformer,
-  PartialTransformOptions
-} from '@allmaps/transform'
 
 /**
  * Target scale factor correction
@@ -33,83 +22,27 @@ const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 0.5
 // Functions for preparing to make tiles
 
 // TODO: consider a way to make this more elegant:
-// - many to many datastructures
+// - many-to-many data structure
 // - a new compact class with just these two properties and an equality function between elements
+// - new JS tuple - https://github.com/tc39/proposal-record-tuple
 export function createKeyFromMapIdAndTileUrl(
   mapId: string,
   tileUrl: string
 ): string {
   return `${mapId}:${tileUrl}`
 }
-export function createKeyFromTile(fetchableMapTile: FetchableMapTile): string {
+export function createKeyFromTile(fetchableTile: FetchableTile): string {
   return createKeyFromMapIdAndTileUrl(
-    fetchableMapTile.mapId,
-    fetchableMapTile.tileUrl
+    fetchableTile.mapId,
+    fetchableTile.tileUrl
   )
 }
 
-export function fetchableMapTilesToKeys(
-  fetchableMapTiles: FetchableMapTile[]
+export function fetchableTilesToKeys(
+  fetchableTiles: FetchableTile[]
 ): Set<string> {
   return new Set(
-    fetchableMapTiles.map((fetchableMapTile) =>
-      createKeyFromTile(fetchableMapTile)
-    )
-  )
-}
-
-export function geoBboxToResourceRing(
-  transformer: GcpTransformer,
-  geoBbox: Bbox,
-  transformerOptions = {
-    maxOffsetRatio: 0.00001,
-    maxDepth: 2
-  } as PartialTransformOptions
-): Ring {
-  // TODO: this function could be moved elsewhere because not stricktly about tiles
-  //
-  // 'transformer' is the transformer built from the (projected) Gcps. It transforms forward from resource coordinates to projected geo coordinates, and backward from (projected) geo coordinates to resource coordinates.
-  // 'geoBbox' is a Bbox (e.g. of the viewport) in (projected) geo coordinates
-  // 'geoBboxResourcePolygon' is a Polygon of this Bbox, transformed backward to resource coordinates.
-  // Due to transformerOptions this in not necessarilly a polygon with a 4-point ring, but can have more points.
-
-  // TODO: Consider to specify sourceIsGeographic and destinationIsGeographic options.
-  // The results could be more accurate when we specify {sourceIsGeographic: false, destinationIsGeographic: true)
-  // But then all locations calling this function should do that with a normal transformer (resource as cartesian to geo as lon-lat) and not a projected transformer (resource as cartesian to projectedGeo as cartesian)
-  // Currently this function is used with a normal transformer in @allmaps/tileserver, and with a projected transformer in @allmaps/render
-
-  const geoBboxPolygon = bboxToPolygon(geoBbox)
-  const geoBboxResourcePolygon = transformer.transformBackward(
-    geoBboxPolygon,
-    transformerOptions
-  )
-
-  return geoBboxResourcePolygon[0]
-}
-
-export function getBestTileZoomLevel(
-  // TODO: once tileserver can import from stdlib, it can point to getBestTileZoomLevelForScale directly just like WebGL2Render, and this function can be removed.
-  image: Image,
-  canvasSize: Size,
-  resourceRing: Ring,
-  targetScaleFactorCorrection?: number
-): TileZoomLevel {
-  const resourceBbox = computeBbox(resourceRing)
-
-  const resourceBboxWidth = resourceBbox[2] - resourceBbox[0]
-  const resourceBboxHeight = resourceBbox[3] - resourceBbox[1]
-
-  const resourceToCanvasScaleX = resourceBboxWidth / canvasSize[0]
-  const resourceToCanvasScaleY = resourceBboxHeight / canvasSize[1]
-  const resourceToCanvasScale = Math.min(
-    resourceToCanvasScaleX,
-    resourceToCanvasScaleY
-  )
-
-  return getBestTileZoomLevelForScale(
-    image,
-    resourceToCanvasScale,
-    targetScaleFactorCorrection
+    fetchableTiles.map((fetchableTile) => createKeyFromTile(fetchableTile))
   )
 }
 
@@ -313,7 +246,7 @@ function tilesByColumnToTiles(
 
 // Computations
 
-export function tileByteSize(tile: FetchableMapTile | CacheableTile): number {
+export function tileByteSize(tile: FetchableTile): number {
   return (
     (tile.imageRequest.size?.height || 0) *
     (tile.imageRequest.size?.width || 0) *
@@ -333,11 +266,61 @@ export function tileCenter(tile: Tile): Point {
   return [(bbox[2] - bbox[0]) / 2 + bbox[0], (bbox[3] - bbox[1]) / 2 + bbox[1]]
 }
 
+/**
+ *
+ * @export
+ * @param {Tile} tile
+ * @returns {Point}
+ */
 export function tilePosition(tile: Tile): Point {
   const resourceTilePositionX = tile.column * tile.tileZoomLevel.originalWidth
   const resourceTilePositionY = tile.row * tile.tileZoomLevel.originalHeight
 
   return [resourceTilePositionX, resourceTilePositionY]
+}
+
+export function pointToTilePoint(
+  resourcePoint: Point,
+  tile: Tile,
+  clip = true
+): Point | undefined {
+  const resourceTilePosition = tilePosition(tile)
+  const tilePoint = [
+    (resourcePoint[0] - resourceTilePosition[0]) /
+      tile.tileZoomLevel.scaleFactor,
+    (resourcePoint[1] - resourceTilePosition[1]) /
+      tile.tileZoomLevel.scaleFactor
+  ] as Point
+
+  if (
+    !clip ||
+    pointInTile(resourcePoint, tile)
+    // && pointInImage(resourcePoint, tile)
+  ) {
+    return tilePoint
+  }
+}
+
+export function pointInTile(resourcePoint: Point, tile: Tile): boolean {
+  const resourceTilePosition = tilePosition(tile)
+
+  return (
+    resourcePoint[0] >= resourceTilePosition[0] &&
+    resourcePoint[0] <=
+      resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
+    resourcePoint[1] >= resourceTilePosition[1] &&
+    resourcePoint[1] <=
+      resourceTilePosition[1] + tile.tileZoomLevel.originalHeight
+  )
+}
+
+export function pointInImage(resourcePoint: Point, tile: Tile): boolean {
+  return (
+    resourcePoint[0] > 0 &&
+    resourcePoint[0] <= tile.imageSize[0] &&
+    resourcePoint[1] > 0 &&
+    resourcePoint[1] <= tile.imageSize[1]
+  )
 }
 
 export function computeBboxTile(tile: Tile): Bbox {
@@ -358,34 +341,4 @@ export function computeBboxTile(tile: Tile): Bbox {
     resourceTileMaxX,
     resourceTileMaxY
   ]
-}
-
-// Currently unused
-export function resourcePointToTilePoint(
-  tile: Tile,
-  resourcePoint: Point,
-  clip = true
-): Point | undefined {
-  const resourceTilePosition = tilePosition(tile)
-
-  const tilePointX =
-    (resourcePoint[0] - resourceTilePosition[0]) /
-    tile.tileZoomLevel.scaleFactor
-  const tilePointY =
-    (resourcePoint[1] - resourceTilePosition[1]) /
-    tile.tileZoomLevel.scaleFactor
-
-  if (
-    !clip ||
-    (resourcePoint[0] >= resourceTilePosition[0] &&
-      resourcePoint[0] <=
-        resourceTilePosition[0] + tile.tileZoomLevel.originalWidth &&
-      resourcePoint[1] >= resourceTilePosition[1] &&
-      resourcePoint[1] <=
-        resourceTilePosition[1] + tile.tileZoomLevel.originalHeight &&
-      resourcePoint[0] <= tile.imageSize[0] &&
-      resourcePoint[1] <= tile.imageSize[1])
-  ) {
-    return [tilePointX, tilePointY]
-  }
 }

@@ -24,6 +24,7 @@ export enum WarpedMapEventType {
   RESOURCEMASKUPDATED = 'resourcemaskupdated',
   VISIBILITYCHANGED = 'visibilitychanged',
   TRANSFORMATIONCHANGED = 'transformationchanged',
+  DISTORTIONCHANGED = 'distortionchanged',
 
   CHANGED = 'changed',
 

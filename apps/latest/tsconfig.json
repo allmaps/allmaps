@@ -5,6 +5,8 @@
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -18,6 +20,7 @@
     { "path": "../../packages/transform" },
     { "path": "../../packages/annotation" },
     { "path": "../../packages/tailwind" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/id" }
   ]
 }

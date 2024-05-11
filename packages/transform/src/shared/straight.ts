@@ -1,43 +1,23 @@
 import Helmert from './helmert.js'
 
-import type { PartialTransformOptions, Transformation } from './types'
+import Transformation from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class Straight implements Transformation {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-
-  options?: PartialTransformOptions
-
+export default class Straight extends Transformation {
   scale?: number
   sourcePointsCenter: Point
   destinationPointsCenter: Point
   translation?: Point
 
-  pointCount: number
-
-  constructor(
-    sourcePoints: Point[],
-    destinationPoints: Point[],
-    options?: PartialTransformOptions
-  ) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
-    this.options = options
-
-    this.pointCount = this.sourcePoints.length
-
-    if (this.pointCount < 2) {
-      throw new Error(
-        'Not enough control points. A straight transformation requires a minimum of 2 points, but ' +
-          this.pointCount +
-          ' are given.'
-      )
-    }
+  constructor(sourcePoints: Point[], destinationPoints: Point[]) {
+    super(sourcePoints, destinationPoints, 'straight', 2)
 
     // Compute the corrensponing Helmert transform and get the scale from it
-    const helmertTransformation = new Helmert(sourcePoints, destinationPoints)
+    const helmertTransformation = new Helmert(
+      this.sourcePoints,
+      this.destinationPoints
+    )
     this.scale = helmertTransformation.scale
 
     if (!this.scale) {
@@ -59,8 +39,8 @@ export default class Straight implements Transformation {
     ) as Point
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolate(newSourcePoint: Point): Point {
+  // Evaluate the transformation function at a new point
+  evaluateFunction(newSourcePoint: Point): Point {
     if (!this.scale || !this.translation) {
       throw new Error('Straight parameters not computed')
     }
@@ -71,5 +51,27 @@ export default class Straight implements Transformation {
     ]
 
     return newDestinationPoint
+  }
+
+  // Evaluate the transformation function's partial derivative to x at a new point
+  evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
+    if (!this.scale || !this.translation) {
+      throw new Error('Straight parameters not computed')
+    }
+
+    const newDestinationPointPartDerX: Point = [this.scale, 0]
+
+    return newDestinationPointPartDerX
+  }
+
+  // Evaluate the transformation function's partial derivative to y at a new point
+  evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
+    if (!this.scale || !this.translation) {
+      throw new Error('Straight parameters not computed')
+    }
+
+    const newDestinationPointPartDerY: Point = [0, this.scale]
+
+    return newDestinationPointPartDerY
   }
 }

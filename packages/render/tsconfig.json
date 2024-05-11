@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["vite-plugin-glsl/ext"],
+    "paths": {}
   },
   "references": [
     { "path": "../../packages/annotation" },

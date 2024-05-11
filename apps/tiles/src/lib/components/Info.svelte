@@ -29,7 +29,7 @@
   const speechBalloonTextColor = 'white'
 </script>
 
-<div class="p-4">
+<div class="p-4 drop-shadow-md">
   <MapMonster
     color="green"
     mood="happy"

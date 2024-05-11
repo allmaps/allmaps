@@ -100,7 +100,7 @@ export function getProfileProperties(
   // TODO: this function is very messy and needs cleaning up.
   // Probably also needs a better way to keep ImageService and ImageInfo apart.
 
-  if ('type' in parsedImage) {
+  if ('type' in parsedImage || '@type' in parsedImage) {
     const profile = parsedImage.profile
 
     let supportsAnyRegionAndSize = false

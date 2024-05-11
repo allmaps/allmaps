@@ -17,7 +17,8 @@ import type {
   GeojsonMultiPoint,
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
-  GeojsonGeometry
+  GeojsonGeometry,
+  Size
 } from '@allmaps/types'
 
 // Assert
@@ -41,7 +42,7 @@ export function isLineString(input: any): input is LineString {
 function isRing(input: any): input is Ring {
   return (
     Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) == closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
+    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
   )
 }
 
@@ -230,43 +231,69 @@ export function isClosed(input: Point[]): boolean {
   )
 }
 
-export function isEqualPoint(point1: Point, point: Point): boolean {
-  if (point1 === point) return true
-  if (point1 == null || point == null) return false
+export function isEqualPoint(point0: Point, point1: Point): boolean {
+  if (point0 === point1) return true
+  if (point0 === null || point1 === null) return false
 
-  return point1[0] == point[0] && point1[1] == point[1]
+  return point0[0] === point1[0] && point0[1] === point1[1]
 }
 
 export function isEqualPointArray(
-  pointArray1: Point[],
-  pointArray2: Point[]
+  pointArray0: Point[],
+  pointArray1: Point[]
 ): boolean {
-  if (pointArray1 === pointArray2) return true
-  if (pointArray1 == null || pointArray2 == null) return false
-  if (pointArray1.length !== pointArray2.length) return false
+  if (pointArray0 === pointArray1) return true
+  if (!pointArray0 || !pointArray1) return false
+  if (pointArray0.length !== pointArray1.length) return false
 
-  for (let i = 0; i < pointArray1.length; ++i) {
-    if (isEqualPoint(pointArray1[i], pointArray2[i])) return false
+  for (let i = 0; i < pointArray0.length; ++i) {
+    if (isEqualPoint(pointArray0[i], pointArray1[i])) return false
   }
   return true
 }
 
 export function isEqualPointArrayArray(
-  pointArrayArray1: Point[][],
-  pointArrayArray2: Point[][]
+  pointArrayArray0: Point[][],
+  pointArrayArray1: Point[][]
 ): boolean {
-  if (pointArrayArray1 === pointArrayArray2) return true
-  if (pointArrayArray1 == null || pointArrayArray2 == null) return false
-  if (pointArrayArray1.length !== pointArrayArray2.length) return false
+  if (pointArrayArray0 === pointArrayArray1) return true
+  if (!pointArrayArray0 || !pointArrayArray1) return false
+  if (pointArrayArray0.length !== pointArrayArray1.length) return false
 
-  for (let i = 0; i < pointArrayArray1.length; ++i) {
-    if (isEqualPointArray(pointArrayArray1[i], pointArrayArray2[i]))
+  for (let i = 0; i < pointArrayArray0.length; ++i) {
+    if (isEqualPointArray(pointArrayArray0[i], pointArrayArray1[i]))
       return false
   }
   return true
 }
 
 // Compute
+
+export function pointToPixel(
+  point: Point,
+  translate: Point = [0, 0],
+  size?: Size
+): Point {
+  return point.map((coordinate, index) => {
+    let result = Math.floor(coordinate + translate[index])
+    if (size) {
+      result = Math.max(result, 0)
+      result = Math.min(result, size[index] - 1)
+    }
+    return result
+  }) as Point
+}
+
+export function pixelToIntArrayIndex(
+  pixel: Point,
+  size: Size,
+  channels: number,
+  flipY = false
+): number {
+  const column = pixel[0]
+  const row = flipY ? size[1] - 1 - pixel[1] : pixel[1]
+  return (row * size[0] + column) * channels
+}
 
 export function flipX(point: Point): Point {
   return [-point[0], point[1]]
@@ -283,6 +310,14 @@ export function midPoint(point0: Point, point1: Point): Point {
   ]
 }
 
+export function mixNumbers(
+  number0: number,
+  number1: number,
+  t: number
+): number {
+  return number0 * t + number1 * (1 - t)
+}
+
 export function mixPoints(point0: Point, point1: Point, t: number): Point {
   return [
     point0[0] * t + point1[0] * (1 - t),
@@ -293,7 +328,7 @@ export function mixPoints(point0: Point, point1: Point, t: number): Point {
 export function distance(line: Line): number
 export function distance(from: Point, to: Point): number
 export function distance(from: Point | Line, to?: Point): number {
-  if (isLineString(from) && from.length == 2) {
+  if (isLineString(from) && from.length === 2) {
     return distance(from[0], from[1])
   } else if (isPoint(from) && isPoint(to)) {
     return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)

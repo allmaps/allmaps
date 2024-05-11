@@ -1,13 +1,10 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import type { Transformation } from './types'
+import Transformation from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class Helmert implements Transformation {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-
+export default class Helmert extends Transformation {
   helmertParametersMatrix: Matrix
   helmertParameters: number[]
 
@@ -15,21 +12,8 @@ export default class Helmert implements Transformation {
   rotation?: number
   translation?: Point
 
-  pointCount: number
-
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
-    this.sourcePoints = sourcePoints
-    this.destinationPoints = destinationPoints
-
-    this.pointCount = this.sourcePoints.length
-
-    if (this.pointCount < 2) {
-      throw new Error(
-        'Not enough control points. A helmert transformation requires a minimum of 2 points, but ' +
-          this.pointCount +
-          ' are given.'
-      )
-    }
+    super(sourcePoints, destinationPoints, 'helmert', 2)
 
     // 2D Helmert transformation (= similarity transformation)
     // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
@@ -51,12 +35,12 @@ export default class Helmert implements Transformation {
     for (let i = 0; i < this.pointCount; i++) {
       helmertCoefsMatrix.set(2 * i, 0, 1)
       helmertCoefsMatrix.set(2 * i, 1, 0)
-      helmertCoefsMatrix.set(2 * i, 2, sourcePoints[i][0])
-      helmertCoefsMatrix.set(2 * i, 3, -sourcePoints[i][1])
+      helmertCoefsMatrix.set(2 * i, 2, this.sourcePoints[i][0])
+      helmertCoefsMatrix.set(2 * i, 3, -this.sourcePoints[i][1])
       helmertCoefsMatrix.set(2 * i + 1, 0, 0)
       helmertCoefsMatrix.set(2 * i + 1, 1, 1)
-      helmertCoefsMatrix.set(2 * i + 1, 2, sourcePoints[i][1])
-      helmertCoefsMatrix.set(2 * i + 1, 3, sourcePoints[i][0])
+      helmertCoefsMatrix.set(2 * i + 1, 2, this.sourcePoints[i][1])
+      helmertCoefsMatrix.set(2 * i + 1, 3, this.sourcePoints[i][0])
     }
 
     // Compute helmert parameters by solving the linear system of equations for each target component
@@ -78,13 +62,13 @@ export default class Helmert implements Transformation {
     this.translation = [this.helmertParameters[0], this.helmertParameters[1]]
   }
 
-  // The interpolant function will compute the value at any point.
-  interpolate(newSourcePoint: Point): Point {
+  // Evaluate the transformation function at a new point
+  evaluateFunction(newSourcePoint: Point): Point {
     if (!this.helmertParameters) {
       throw new Error('Helmert parameters not computed')
     }
 
-    // Compute the interpolated value by applying the helmert coefficients to the input point
+    // Apply the helmert coefficients to the input point
     const newDestinationPoint: Point = [
       this.helmertParameters[0] +
         this.helmertParameters[2] * newSourcePoint[0] -
@@ -102,5 +86,35 @@ export default class Helmert implements Transformation {
     //   this.scale * Math.sin(rotation) * newSourcePoint[0]
 
     return newDestinationPoint
+  }
+
+  // Evaluate the transformation function's partial derivative to x at a new point
+  evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
+    if (!this.helmertParameters) {
+      throw new Error('Helmert parameters not computed')
+    }
+
+    // Apply the helmert coefficients to the input point
+    const newDestinationPointPartDerX: Point = [
+      this.helmertParameters[2],
+      this.helmertParameters[3]
+    ]
+
+    return newDestinationPointPartDerX
+  }
+
+  // Evaluate the transformation function's partial derivative to y at a new point
+  evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
+    if (!this.helmertParameters) {
+      throw new Error('Helmert parameters not computed')
+    }
+
+    // Apply the helmert coefficients to the input point
+    const newDestinationPointPartDerY: Point = [
+      -this.helmertParameters[3],
+      this.helmertParameters[2]
+    ]
+
+    return newDestinationPointPartDerY
   }
 }

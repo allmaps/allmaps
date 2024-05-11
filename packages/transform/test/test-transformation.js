@@ -1,6 +1,10 @@
+import { expect } from 'chai'
 import { describe, it } from 'mocha'
 import { expectToBeCloseToArray } from '../../stdlib/test/helper-functions.js'
-import { GcpTransformer } from '../dist/index.js'
+import {
+  GcpTransformer,
+  computeDistortionFromPartialDerivatives
+} from '../dist/index.js'
 
 import {
   transformGcps3,
@@ -85,5 +89,31 @@ describe('Thin plate spline transformation', async () => {
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
     expectToBeCloseToArray(transformer.transformForward(input), output)
+  })
+})
+
+describe('Thin plate spline transformation distortion', async () => {
+  const helmertTransformer = new GcpTransformer(transformGcps6, 'helmert')
+  helmertTransformer.createForwardTransformation()
+  const referenceScale = helmertTransformer.forwardTransformation.scale
+
+  const transformer = new GcpTransformer(transformGcps6, 'thinPlateSpline')
+  const input = [1000, 1000]
+  const partialDerivativeX = transformer.transformForward(input, {
+    evaluationType: 'partialDerivativeX'
+  })
+  const partialDerivativeY = transformer.transformForward(input, {
+    evaluationType: 'partialDerivativeY'
+  })
+  const distortion = computeDistortionFromPartialDerivatives(
+    partialDerivativeX,
+    partialDerivativeY,
+    'log2sigma',
+    referenceScale
+  )
+  const output = 1.7800137112938559
+
+  it(`should be able to compute distortion`, () => {
+    expect(distortion).to.equal(output)
   })
 })

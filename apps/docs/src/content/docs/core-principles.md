@@ -3,6 +3,10 @@ title: Core Principles
 description: ''
 ---
 
+<!-- Use CSS counter to style principle headings? -->
+<!-- https://2ality.com/2012/01/numbering-headingshtml.html -->
+<!-- https://www.smashingmagazine.com/2019/07/css-lists-markers-counters/ -->
+
 ## Principle I: Open data in, open data out
 
 ## Principle II: Light-weight, modular and interoperable

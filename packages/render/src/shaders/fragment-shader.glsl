@@ -3,6 +3,9 @@
 precision highp float;
 precision highp isampler2D;
 
+// Color mixing from Spectral.js
+#include spectral.frag;
+
 uniform bool u_removeColor;
 uniform vec3 u_removeColorOptionsColor;
 uniform float u_removeColorOptionsThreshold;
@@ -11,8 +14,13 @@ uniform float u_removeColorOptionsHardness;
 uniform bool u_colorize;
 uniform vec3 u_colorizeOptionsColor;
 
+uniform bool u_grid;
+
 uniform float u_opacity;
 uniform float u_saturation;
+
+uniform bool u_distortion;
+uniform int u_distortionOptionsdistortionMeasure;
 
 uniform int u_bestScaleFactor;
 
@@ -23,13 +31,42 @@ uniform isampler2D u_packedTilesScaleFactorsTexture;
 
 in vec2 v_resourceTrianglePoint;
 in float v_triangleIndex;
+in float v_trianglePointDistortion;
 
 out vec4 color;
 
+vec4 rgbToVec4(int r, int g, int b) {
+  return vec4(float(r) / 255.0f, float(g) / 255.0f, float(b) / 255.0f, 1.0f);
+}
+
 void main() {
-  // The treated triangle point
-  int resourceTrianglePointX = int(round(v_resourceTrianglePoint.x));
-  int resourceTrianglePointY = int(round(v_resourceTrianglePoint.y));
+  // Colors
+  // TODO: supply colors from JavaScript
+  // TODO: move to distortion.frag
+  vec4 colorTransparent = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  vec4 colorWhite = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+  vec4 colorBlack = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+  vec4 colorGreen300 = vec4(0.5254f, 0.9372f, 0.6745f, 1.0f);
+  vec4 colorPurple300 = vec4(0.8470f, 0.7058f, 0.9960f, 1.0f);
+  vec4 colorRed300 = vec4(0.9882f, 0.6470f, 0.6470f, 1.0f);
+  vec4 colorYellow300 = vec4(0.9921f, 0.8784f, 0.2784f, 1.0f);
+  vec4 colorOrange300 = vec4(0.9921f, 0.7294f, 0.4549f, 1.0f);
+  vec4 colorPink300 = vec4(0.9764f, 0.6588f, 0.8313f, 1.0f);
+  vec4 colorBlue300 = vec4(0.5764f, 0.7725f, 0.9921f, 1.0f);
+  vec4 colorGrey300 = vec4(0.8196f, 0.8352f, 0.8588f, 1.0f);
+
+  vec4 colorGreen500 = vec4(0.1333f, 0.7725f, 0.3686f, 1.0f);
+  vec4 colorPurple500 = vec4(0.6588f, 0.3333f, 0.9686f, 1.0f);
+  vec4 colorRed500 = vec4(0.9372f, 0.2666f, 0.2666f, 1.0f);
+  vec4 colorYellow500 = vec4(0.9176f, 0.7019f, 0.0313f, 1.0f);
+  vec4 colorOrange500 = vec4(0.9764f, 0.4509f, 0.0862f, 1.0f);
+  vec4 colorPink500 = vec4(0.9254f, 0.2823f, 0.6f, 1.0f);
+  vec4 colorBlue500 = vec4(0.2313f, 0.5098f, 0.9647f, 1.0f);
+  vec4 colorGrey500 = vec4(0.4196f, 0.4470f, 0.5019f, 1.0f);
+
+  float resourceTrianglePointX = v_resourceTrianglePoint.x;
+  float resourceTrianglePointY = v_resourceTrianglePoint.y;
 
   // Reading information on packed tiles from textures
   int packedTilesCount = textureSize(u_packedTilesPositionsTexture, 0).y;
@@ -39,11 +76,11 @@ void main() {
   int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
   int bestScaleFactor = 0;
 
-  // Prepare storage for the resulting packed tiles texture point that corresponds to the treated triangle point
+  // Prepare storage for the resulting packed tiles texture point that corresponds to the triangle point
   vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
 
-  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
+  // Set the initial values
+  color = colorTransparent;
   bool found = false;
 
   // Loop through all packed tiles
@@ -57,16 +94,16 @@ void main() {
     float packedTilePositionX = float(packedTilePosition.r);
     float packedTilePositionY = float(packedTilePosition.g);
 
-    int packedTileResourcePositionX = packedTileResourcePositionAndDimension.r;
-    int packedTileResourcePositionY = packedTileResourcePositionAndDimension.g;
+    float packedTileResourcePositionX = float(packedTileResourcePositionAndDimension.r);
+    float packedTileResourcePositionY = float(packedTileResourcePositionAndDimension.g);
 
-    int packedTileDimensionWidth = packedTileResourcePositionAndDimension.b;
-    int packedTileDimensionHeight = packedTileResourcePositionAndDimension.a;
+    float packedTileDimensionWidth = float(packedTileResourcePositionAndDimension.b);
+    float packedTileDimensionHeight = float(packedTileResourcePositionAndDimension.a);
 
-    // If the treated triangle point is inside the tile, consider to use the tile:
+    // If the triangle point is inside the tile, consider to use the tile:
     // if the scale factor is closer to the best scale factor for this map then currently known one
     // update the smallest scale factor diff
-    // and compute the packed tiles texture point that corresponds to the treated triangle point
+    // and compute the packed tiles texture point that corresponds to the triangle point
     if(resourceTrianglePointX >= packedTileResourcePositionX &&
       resourceTrianglePointX < packedTileResourcePositionX + packedTileDimensionWidth &&
       resourceTrianglePointY >= packedTileResourcePositionY &&
@@ -80,14 +117,14 @@ void main() {
         smallestScaleFactorDiff = scaleFactorDiff;
         bestScaleFactor = packedTileScaleFactor;
 
-        float packedTilePointX = float(resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
-        float packedTilePointY = float(resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
+        float packedTilePointX = (resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
+        float packedTilePointY = (resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
 
         float packedTilesPointX = packedTilePositionX + packedTilePointX;
         float packedTilesPointY = packedTilePositionY + packedTilePointY;
 
-        float packedTilesTexturePointX = round(packedTilesPointX) / float(packedTilesTextureSize.x);
-        float packedTilesTexturePointY = round(packedTilesPointY) / float(packedTilesTextureSize.y);
+        float packedTilesTexturePointX = packedTilesPointX / float(packedTilesTextureSize.x);
+        float packedTilesTexturePointY = packedTilesPointY / float(packedTilesTextureSize.y);
 
         packedTilesTexturePoint = vec2(packedTilesTexturePointX, packedTilesTexturePointY);
       }
@@ -95,7 +132,7 @@ void main() {
   }
 
   if(found == true) {
-    // Read color of the treated point at its packed tiles texture point coordinates in the packed tiles texture
+    // Read color of the point at its packed tiles texture point coordinates in the packed tiles texture
     color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
     // Remove background color
@@ -120,8 +157,52 @@ void main() {
     // Opacity
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
-    // Debugging: uncomment to override color of the treated point with a color made from the point's triangle index
-    // vec4 debugColor = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
-    // color = debugColor;
+    // Distortion
+    // TODO: move to distortion.frag
+    if(u_distortion) {
+      // color = colorWhite; // TODO: Add option to not display image
+      // color = colorTransparant; // TODO: Add option to not display image
+
+      float trianglePointDistortion = v_trianglePointDistortion;
+
+      // TODO: Add component to toggle stepwise vs continuous
+      trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f;
+
+      switch(u_distortionOptionsdistortionMeasure) {
+        case 0:
+          if(trianglePointDistortion > 0.0f) {
+            color = spectral_mix(color, colorRed500, trianglePointDistortion);
+          } else {
+            color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));
+          }
+          break;
+        case 1:
+          color = spectral_mix(color, colorGreen500, trianglePointDistortion);
+          break;
+        case 2:
+          color = spectral_mix(color, colorYellow500, trianglePointDistortion);
+          break;
+        case 3:
+          color = trianglePointDistortion == -1.0f ? colorRed300 : color;
+          break;
+        default:
+          color = color;
+      }
+    }
+
+    // Triangles
+    // TODO: make this a rendering option
+    if(false) {
+      color = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    }
+
+    // Grid
+    if(u_grid) {
+      float gridSize = 20.0f * float(u_bestScaleFactor);
+      float gridWidth = 2.0f * float(u_bestScaleFactor);
+      if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
+        color = colorBlack;
+      }
+    }
   }
 }

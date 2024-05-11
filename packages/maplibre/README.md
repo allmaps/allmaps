@@ -7,8 +7,8 @@ Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows disp
 Examples:
 
 *   [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
-*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/maplibre/examples/skypack.html)
-*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/maplibre/examples/jsdelivr.html)
+*   [HTML example using ESM and Skypack](https://allmaps.org/allmaps/packages/maplibre/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://allmaps.org/allmaps/packages/maplibre/examples/jsdelivr.html)
 
 ## How it works
 
@@ -118,13 +118,9 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 You can listen to them in the typical MapLibre way. Here's an example:
 
 ```js
-map.on(
-  'warpedmapadded',
-  (event) => {
-    console.log(event.mapId, warpedMapLayer.getBounds())
-  },
-  map
-)
+warpedMapLayer.on('warpedmapadded', (event) => {
+  console.log(event.mapId, warpedMapLayer.getBounds())
+})
 ```
 
 Some of the functions specified in the API only make sense once a warped map is loaded into the WarpedMapLayer. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
@@ -165,13 +161,14 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [getBounds](#getbounds)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
     *   [bringMapsForward](#bringmapsforward)
     *   [sendMapsBackward](#sendmapsbackward)
     *   [getMapZIndex](#getmapzindex)
-    *   [setImageInfoCache](#setimageinfocache)
+    *   [setImageInformations](#setimageinformations)
     *   [getOpacity](#getopacity)
     *   [setOpacity](#setopacity)
     *   [resetOpacity](#resetopacity)
@@ -198,7 +195,7 @@ All these map phases originating from the same Georeference Annotation have the 
 
 WarpedMapLayer class.
 
-This class renders georeferenced maps of a IIIF Georeference Annotation on a MapLibre map.
+This class renders maps from a IIIF Georeference Annotation on a MapLibre map.
 WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/).
 
 #### onAdd
@@ -208,7 +205,7 @@ Method called when the layer has been added to the Map.
 ##### Parameters
 
 *   `map` **[Map](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map)** The Map this custom layer was just added to.
-*   `gl` **WebGL2RenderingContext** The gl context for the map.
+*   `gl` **WebGL2RenderingContext** The WebGL 2 context for the map.
 
 #### onRemove
 
@@ -288,7 +285,7 @@ Returns a single map's warped map
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
-Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
+Returns **(WebGL2WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
 
 #### showMap
 
@@ -350,6 +347,15 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **TransformationType** new transformation type
 
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `distortionMeasure` **DistortionMeasure** new transformation type
+
 #### getBounds
 
 Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
@@ -398,13 +404,13 @@ Returns the z-index of a single map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** z-index of the warped map
 
-#### setImageInfoCache
+#### setImageInformations
 
-Sets the image info cache of the WarpedMapList
+Sets the object that caches image information
 
 ##### Parameters
 
-*   `cache` **Cache** the image info cache
+*   `imageInformations` **ImageInformations** Object that caches image information
 
 #### getOpacity
 

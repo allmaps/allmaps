@@ -1,5 +1,7 @@
+import { lonLatToWebMecator } from '@allmaps/stdlib'
+
 import type { Point, Bbox, GeojsonPolygon } from '@allmaps/types'
-import type { XYZTile } from './types'
+import type { XYZTile } from './types.js'
 
 export function xyzTileToGeojson({ z, x, y }: XYZTile): GeojsonPolygon {
   const topLeft = xyzTileTopLeft({ z, x, y })
@@ -26,37 +28,27 @@ export function xyzTileToGeoBbox({ z, x, y }: XYZTile): Bbox {
   return [...topLeft, ...bottomRight]
 }
 
+export function xyzTileToProjectedGeoBbox({ x, y, z }: XYZTile): Bbox {
+  return [
+    ...lonLatToWebMecator(xyzTileTopLeft({ x, y, z })),
+    ...lonLatToWebMecator(xyzTileBottomRight({ x, y, z }))
+  ]
+}
+
 export function xyzTileTopLeft({ z, x, y }: XYZTile): Point {
-  return [tileToLng({ x, z }), tileToLat({ y, z })]
+  return [xyzTileToLng({ x, z }), xyzTileToLat({ y, z })]
 }
 
 export function xyzTileBottomRight({ z, x, y }: XYZTile): Point {
-  return [tileToLng({ x: x + 1, z }), tileToLat({ y: y + 1, z })]
+  return [xyzTileToLng({ x: x + 1, z }), xyzTileToLat({ y: y + 1, z })]
 }
 
-// From:
-//   https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-export function tileToLng({ x, z }: { x: number; z: number }): number {
+// From: https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+export function xyzTileToLng({ x, z }: { x: number; z: number }): number {
   return (x / Math.pow(2, z)) * 360 - 180
 }
 
-export function tileToLat({ y, z }: { y: number; z: number }): number {
+export function xyzTileToLat({ y, z }: { y: number; z: number }): number {
   const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
   return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
-}
-
-export function lonToTile(lon: number, zoom: number): number {
-  return Math.floor(((lon + 180) / 360) * Math.pow(2, zoom))
-}
-
-export function latToTile(lat: number, zoom: number): number {
-  return Math.floor(
-    ((1 -
-      Math.log(
-        Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)
-      ) /
-        Math.PI) /
-      2) *
-      Math.pow(2, zoom)
-  )
 }

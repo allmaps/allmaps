@@ -2,15 +2,19 @@ import { validateMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type { Cache } from './types.js'
-import type { Map, Maps } from '@allmaps/annotation'
-import type { Obj } from 'itty-router'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { IRequest } from 'itty-router'
+
+function parseQueryString(query: string | string[] | undefined) {
+  return query ? (Array.isArray(query) ? query[0] : query) : undefined
+}
 
 export async function mapsFromParams(
-  cache: Cache,
   env: unknown,
-  params: Obj | undefined
-): Promise<Map[]> {
+  req: IRequest
+): Promise<GeoreferencedMap[]> {
+  const params = req.params
+
   const mapId = params?.mapId
   const imageId = params?.imageId
   const manifestId = params?.manifestId
@@ -38,48 +42,56 @@ export async function mapsFromParams(
     return []
   }
 
-  const mapsResponse = await cachedFetch(cache, url)
+  const mapsResponse = await cachedFetch(url)
 
   if (!mapsResponse) {
     throw new Error(`Error fetching maps from URL: ${url}`)
   }
 
   const fetchedMaps = await mapsResponse.json()
-  const mapOrMaps = validateMap(fetchedMaps)
+  const georeferencedMapOrMaps = validateMap(fetchedMaps)
 
-  let maps: Map[]
-  if (Array.isArray(mapOrMaps)) {
-    maps = mapOrMaps
+  let georeferencedMaps: GeoreferencedMap[]
+  if (Array.isArray(georeferencedMapOrMaps)) {
+    georeferencedMaps = georeferencedMapOrMaps
   } else {
-    maps = [mapOrMaps]
+    georeferencedMaps = [georeferencedMapOrMaps]
   }
 
   // Only return maps with at least 3 GCPs
-  return maps.filter((map) => map.gcps.length >= 3)
+  // TODO: move this check to schema parser
+  return georeferencedMaps.filter(
+    (georeferencedMap) => georeferencedMap.gcps.length >= 3
+  )
 }
 
 export async function mapsFromQuery(
-  cache: Cache,
-  query: Obj | undefined
-): Promise<Maps> {
-  if (query?.annotation) {
-    const annotation = JSON.parse(query.annotation)
+  req: IRequest
+): Promise<GeoreferencedMap[]> {
+  const query = req.query
 
-    const maps = parseAnnotation(annotation)
-    return maps
-  } else if (query?.url) {
-    const annotationResponse = await cachedFetch(cache, query.url)
+  const url = parseQueryString(query.url)
+  const annotation = parseQueryString(query.annotation)
+
+  if (annotation) {
+    const georeferencedMaps = parseAnnotation(JSON.parse(annotation))
+    return georeferencedMaps
+  } else if (url) {
+    const annotationResponse = await cachedFetch(url)
 
     if (!annotationResponse) {
-      throw new Error(`Error fetching annotation from URL: ${query.url}`)
+      throw new Error(`Error fetching annotation from URL: ${url}`)
     }
 
     const fetchedAnnotation = await annotationResponse.json()
 
-    const maps = parseAnnotation(fetchedAnnotation)
+    const georeferencedMaps = parseAnnotation(fetchedAnnotation)
 
     // Only return maps with at least 3 GCPs
-    return maps.filter((map) => map.gcps.length >= 3)
+    // TODO: move this check to schema parser
+    return georeferencedMaps.filter(
+      (georeferecendeMap) => georeferecendeMap.gcps.length >= 3
+    )
   } else {
     throw new Error('No annotation query parameter supplied')
   }

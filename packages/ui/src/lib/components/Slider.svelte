@@ -29,7 +29,7 @@
     }
   }
 
-  const enter = (event: MouseEvent | TouchEvent) => {
+  const enter = () => {
     hover = true
   }
   const exit = () => {
@@ -88,6 +88,9 @@
 
 <div
   class="inline-block flex z-100 select-none container"
+  role="slider"
+  aria-valuenow={value}
+  tabindex="0"
   on:mouseenter={enter}
   on:mouseleave={exit}
   on:wheel={wheel}

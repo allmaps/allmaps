@@ -13,12 +13,9 @@
   } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
   import { view } from '$lib/shared/stores/view.js'
-  import {
-    mapWarpedMapSource,
-    mapWarpedMapLayer
-  } from '$lib/shared/stores/openlayers.js'
+  import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
   import { setActiveMapId } from '$lib/shared/stores/active.js'
-  import { imageInfoCache } from '$lib/shared/stores/openlayers.js'
+  import { imageInformations } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
 
@@ -60,7 +57,7 @@
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.resource.id
-  const warpedMap = mapWarpedMapSource.getWarpedMap(mapId)
+  const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
 
   const checkboxId = `dropdown-maps-${mapId}`
 
@@ -114,7 +111,7 @@
   })
 
   opacity.subscribe(($opacity) => {
-    mapWarpedMapLayer?.setMapOpacity(mapId, $opacity)
+    mapWarpedMapLayer.setMapOpacity(mapId, $opacity)
   })
 
   function resourceMaskToPoints(
@@ -151,19 +148,19 @@
   }
 
   function handleBringMapsToFront() {
-    mapWarpedMapSource.bringMapsToFront([mapId])
+    mapWarpedMapLayer.bringMapsToFront([mapId])
   }
 
   function handleBringMapsForward() {
-    mapWarpedMapSource.bringMapsForward([mapId])
+    mapWarpedMapLayer.bringMapsForward([mapId])
   }
 
   function handleSendMapsBackward() {
-    mapWarpedMapSource.sendMapsBackward([mapId])
+    mapWarpedMapLayer.sendMapsBackward([mapId])
   }
 
   function handleSendMapsToBack() {
-    mapWarpedMapSource.sendMapsToBack([mapId])
+    mapWarpedMapLayer.sendMapsToBack([mapId])
   }
 
   onMount(async () => {
@@ -171,7 +168,13 @@
       container.scrollIntoView()
     }
 
-    imageInfo = await fetchImageInfo(imageUri, { cache: imageInfoCache })
+    // TODO: move to function
+    if (imageInformations.has(imageUri)) {
+      imageInfo = imageInformations.get(imageUri)
+    } else {
+      imageInfo = await fetchImageInfo(imageUri, { cache: 'force-cache' })
+      imageInformations.set(imageUri, imageInfo)
+    }
   })
 </script>
 

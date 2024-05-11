@@ -14,6 +14,10 @@ export function getDefaultRenderOptions(
       enabled: false,
       color: null,
       ...renderOptions?.colorize
+    },
+    grid: {
+      enabled: false,
+      ...renderOptions?.grid
     }
   }
 }

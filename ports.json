@@ -1,4 +1,5 @@
 {
+  "api": 5499,
   "viewer": 5500,
   "info": 5501,
   "explore": 5502,
@@ -12,5 +13,6 @@
   "here": 5510,
   "docs": 5511,
   "leaflet": 5512,
-  "maplibre": 5513
+  "maplibre": 5513,
+  "preview": 5514
 }

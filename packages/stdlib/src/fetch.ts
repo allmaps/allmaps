@@ -1,23 +1,16 @@
-type FetchOptions = {
-  abortSignal?: AbortSignal
-  cache?: Cache
-}
+import type { FetchFn } from '@allmaps/types'
 
-export async function fetchUrl(url: string, options: FetchOptions = {}) {
-  let response: Response | undefined
+export async function fetchUrl(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  fetchFn?: FetchFn
+): Promise<Response> {
+  let response: Response
 
-  if (options.cache) {
-    response = await options.cache.match(url)
-  }
-
-  if (!response) {
-    response = await fetch(url, {
-      signal: options.abortSignal
-    })
-
-    if (options.cache) {
-      options.cache.put(url, response.clone())
-    }
+  if (typeof fetchFn === 'function') {
+    response = await fetchFn(input, init)
+  } else {
+    response = await fetch(input, init)
   }
 
   if (!response.ok) {
@@ -28,58 +21,28 @@ export async function fetchUrl(url: string, options: FetchOptions = {}) {
 }
 
 export async function fetchJson(
-  url: string,
-  options: FetchOptions = {}
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  fetchFn?: FetchFn
 ): Promise<unknown> {
-  const response = await fetchUrl(url, options)
+  const response = await fetchUrl(input, init, fetchFn)
   return await response.json()
 }
 
 export async function fetchImageInfo(
   imageUri: string,
-  options: FetchOptions = {}
+  init?: RequestInit,
+  fetchFn?: FetchFn
 ) {
-  const json = await fetchJson(`${imageUri}/info.json`, options)
-  return json
+  return await fetchJson(`${imageUri}/info.json`, init, fetchFn)
 }
 
-export function fetchImage(
-  url: string,
-  abortSignal?: AbortSignal
-): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image()
-    let aborted = false
-
-    image.addEventListener('load', () => resolve(image))
-    image.addEventListener('error', async () => {
-      if (!aborted) {
-        // image.src errors are not at all descriptive
-        // load image again using fetch
-        try {
-          await fetchUrl(url, { abortSignal })
-          throw new Error(
-            'Image failed to load by setting Image src but downloaded successfully using fetch'
-          )
-        } catch (err) {
-          reject(err)
-        }
-      } else {
-        reject(new DOMException('Loading image aborted by user', 'AbortError'))
-      }
-    })
-
-    image.crossOrigin = 'anonymous'
-    image.src = url
-
-    if (abortSignal) {
-      abortSignal.addEventListener('abort', () => {
-        // abort event received from AbortController
-        // Set image.src to '' to cancel the fetch
-        // https://stackoverflow.com/questions/5278304/how-to-cancel-an-image-from-loading
-        aborted = true
-        image.src = ''
-      })
-    }
-  })
+export async function fetchImageBitmap(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  fetchFn?: FetchFn
+) {
+  const response = await fetchUrl(input, init, fetchFn)
+  const blob = await response.blob()
+  return await createImageBitmap(blob)
 }

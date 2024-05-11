@@ -1,53 +1,55 @@
-import { GcpTransformer } from '@allmaps/transform'
+import { json } from 'itty-router'
+import {
+  WarpedMapList,
+  createWarpedMapFactory
+} from '@allmaps/render/int-array'
 
-import bbox from '@turf/bbox'
+import { cachedFetch } from './fetch.js'
 
-import type { Tilejson, TilejsonOptions } from './types.js'
+import type { Tilejson, TransformationOptions } from './types.js'
 
-import type { Map } from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+
+import type { FetchFn } from '@allmaps/types'
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
-export function generateTileJson(
-  urlTemplate: string,
-  maps: Map[],
-  options: TilejsonOptions
-): Tilejson {
-  const geoMasks = []
-
-  for (const map of maps) {
-    const transformer = new GcpTransformer(
-      map.gcps,
-      options['transformation.type'] || map.transformation?.type,
-      {
-        differentHandedness: true
-      }
-    )
-
-    const geoMask = transformer.transformForwardAsGeojson([map.resourceMask], {
-      maxOffsetRatio: 0.01
-    })
-    geoMasks.push(geoMask)
+export async function generateTileJsonResponse(
+  georeferencedMaps: GeoreferencedMap[],
+  options: TransformationOptions,
+  urlTemplate: string
+): Promise<Tilejson> {
+  // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
+  let transformationOptions
+  if (options['transformation.type']) {
+    transformationOptions = {
+      type: options['transformation.type']
+    }
   }
 
-  const bounds = bbox({
-    type: 'FeatureCollection',
-    features: geoMasks.map((geoMask) => ({
-      type: 'Feature',
-      properties: {},
-      geometry: geoMask
-    }))
+  const warpedMapList = new WarpedMapList(createWarpedMapFactory(), {
+    fetchFn: cachedFetch as FetchFn,
+    transformation: transformationOptions,
+    createRTree: false
   })
 
-  return {
+  for (const georeferencedMap of georeferencedMaps) {
+    await warpedMapList.addGeoreferencedMap(georeferencedMap)
+  }
+
+  const bounds = warpedMapList.getBbox()
+  const center = warpedMapList.getCenter()
+
+  if (!bounds || !center) {
+    throw new Error('Could not compute bounding box and center of maps')
+  }
+
+  return json({
     tilejson: '3.0.0',
     id: urlTemplate,
     tiles: [urlTemplate],
     fields: {},
     bounds,
-    center: [
-      (bounds[2] - bounds[0]) / 2 + bounds[0],
-      (bounds[3] - bounds[1]) / 2 + bounds[1]
-    ]
+    center
     // TODO: add minzoom and maxzoom
-  }
+  })
 }

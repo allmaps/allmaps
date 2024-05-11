@@ -1,4 +1,4 @@
-import type { Request } from 'itty-router'
+import { html } from 'itty-router'
 
 const generateIframeHtml = (
   tileViewerBaseUrl: string,
@@ -42,9 +42,5 @@ export function generateTilesHtml(
     'tiles.json'
   )
 
-  return new Response(generateIframeHtml(tileViewerBaseUrl, tileJsonUrl), {
-    headers: {
-      'content-type': 'text/html;charset=UTF-8'
-    }
-  })
+  return html(generateIframeHtml(tileViewerBaseUrl, tileJsonUrl))
 }

@@ -13,6 +13,7 @@ import type {
   Rectangle,
   Bbox,
   Size,
+  Fit,
   GeojsonGeometry
 } from '@allmaps/types'
 
@@ -104,6 +105,10 @@ export function bboxToLine(bbox: Bbox): Line {
   ]
 }
 
+export function bboxToPoint(bbox: Bbox): Point {
+  return [bbox[0], bbox[1]]
+}
+
 export function bboxToDiameter(bbox: Bbox): number {
   return distance(bboxToLine(bbox))
 }
@@ -122,7 +127,9 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
-// Approximate results, for rectangles coming from bboxes. A more precise result would require a minimal-covering-rectangle algorithm
+// Approximate results, for rectangles coming from bboxes.
+// A more precise result would require a minimal-covering-rectangle algorithm
+// Or computing and comparing rectangle surfaces
 export function rectangleToSize(rectangle: Rectangle): Size {
   return [
     0.5 *
@@ -136,8 +143,14 @@ export function rectangleToSize(rectangle: Rectangle): Size {
 
 // Scales
 
-export function sizesToScale(size0: Size, size1: Size): number {
-  return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
+export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
+  if (!fit) {
+    return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
+  } else if (fit === 'contain') {
+    return size1[0] >= size1[1] ? size0[0] / size1[0] : size0[1] / size1[1]
+  } else {
+    return size1[0] >= size1[1] ? size0[1] / size1[1] : size0[0] / size1[0]
+  }
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {

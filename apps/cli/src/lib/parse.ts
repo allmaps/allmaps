@@ -1,10 +1,7 @@
 import { parseAnnotation, validateMap } from '@allmaps/annotation'
 
 import type { Map } from '@allmaps/annotation'
-import type {
-  PartialTransformOptions,
-  TransformationType
-} from '@allmaps/transform'
+import type { TransformOptions, TransformationType } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
 import { readFromFile, parseJsonFromFile } from './io.js'
 
@@ -79,18 +76,18 @@ export function parseTransformationType(
 ): TransformationType {
   let transformationType
   if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '1'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '1'
   ) {
-    transformationType == 'polynomial1'
+    transformationType = 'polynomial1'
   } else if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '2'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '2'
   ) {
     transformationType = 'polynomial2'
   } else if (
-    options.transformationType == 'polynomial' &&
-    options.transformationOrder == '3'
+    options.transformationType === 'polynomial' &&
+    options.transformationOrder === '3'
   ) {
     transformationType = 'polynomial3'
   } else if (options.transformationType) {
@@ -124,8 +121,8 @@ export function parseAnnotationsValidateMaps(jsonValues: unknown[]): Map[] {
 
 export function parseTransformOptions(
   options: unknown
-): PartialTransformOptions {
-  const transformOptions: PartialTransformOptions = {}
+): Partial<TransformOptions> {
+  const transformOptions: Partial<TransformOptions> = {}
 
   if (options && typeof options === 'object') {
     if ('maxOffsetRatio' in options && options.maxOffsetRatio) {

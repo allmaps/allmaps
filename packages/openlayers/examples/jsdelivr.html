@@ -18,10 +18,7 @@
     <div id="map"></div>
     <div id="controls"></div>
     <script defer>
-      const warpedMapSource = new Allmaps.WarpedMapSource()
-      const warpedMapLayer = new Allmaps.WarpedMapLayer({
-        source: warpedMapSource
-      })
+      const warpedMapLayer = new Allmaps.WarpedMapLayer()
 
       const map = new ol.Map({
         target: 'map',
@@ -37,16 +34,16 @@
         })
       })
 
-      warpedMapSource.addGeoreferenceAnnotationByUrl(
+      warpedMapLayer.addGeoreferenceAnnotationByUrl(
         'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
       )
 
       async function handleAddMapClicked() {
-        await warpedMapSource.addGeoreferenceAnnotationByUrl(
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(
           'https://annotations.allmaps.org/maps/4d7b3c96d3e89c4f'
         )
 
-        map.getView().fit(warpedMapSource.getExtent(), {
+        map.getView().fit(warpedMapLayer.getExtent(), {
           padding: [25, 25, 25, 25]
         })
       }

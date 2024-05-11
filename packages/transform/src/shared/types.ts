@@ -32,19 +32,24 @@ export type TransformOptions = {
   // Whether one of the axes should be flipped while computing the transformation parameters.
   inputIsMultiGeometry: boolean
   differentHandedness: boolean
+  evaluationType: EvaluationType
 }
 
-export type PartialTransformOptions = Partial<TransformOptions>
+export type KernelFunction = (
+  r: number,
+  options: KernelFunctionOptions
+) => number
+export type KernelFunctionOptions = { derivative?: number; epsilon?: number }
+export type NormFunction = (point0: Point, point1: Point) => number
 
-export type KernelFunction = (r: number, epsilon?: number) => number
-export type NormFunction = (point1: Point, point2: Point) => number
+export type EvaluationType =
+  | 'function'
+  | 'partialDerivativeX'
+  | 'partialDerivativeY'
 
-export type Transformation = {
-  sourcePoints: Point[]
-  destinationPoints: Point[]
-  options?: PartialTransformOptions
-
-  pointCount: number
-
-  interpolate(point: Point): Point
-}
+export type DistortionMeasure =
+  | 'log2sigma'
+  | 'twoOmega'
+  | 'airyKavr'
+  | 'signDetJ'
+  | 'thetaa'
