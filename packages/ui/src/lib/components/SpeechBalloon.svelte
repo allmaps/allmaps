@@ -15,7 +15,6 @@
     w-[30rem]
     max-w-[90%]
     rounded-md
-    shadow-md
     after:content-['']
     after:absolute
     after:bottom-0
