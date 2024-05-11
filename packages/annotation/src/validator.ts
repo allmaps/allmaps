@@ -33,7 +33,6 @@ type AnnotationPageAllVersions = z.infer<typeof AnnotationPageAllVersionsSchema>
 
 type Map2 = z.infer<typeof Map2Schema>
 type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-type Maps2 = z.infer<typeof Maps2Schema>
 type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
 
 export function validateAnnotation(
@@ -66,7 +65,7 @@ export function validateAnnotation(
   }
 }
 
-export function validateMap(mapOrMaps: unknown): Map2 | Maps2 {
+export function validateMap(mapOrMaps: unknown): Map2 | Map2[] {
   if (isMapsBeforeParse(mapOrMaps)) {
     // Seperate .parse for different versions for better Zod errors
     let parsedMaps: MapsAllVersions

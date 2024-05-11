@@ -96,7 +96,7 @@ function generateDates(map: MapAllVersions) {
   }
 }
 
-export function generateContext() {
+function generateContext() {
   return [
     'http://iiif.io/api/extension/georef/1/context.json',
     'http://iiif.io/api/presentation/3/context.json'

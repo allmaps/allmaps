@@ -2,10 +2,7 @@ import { validateMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type {
-  Map as GeoreferencedMap,
-  Maps as GeoreferencedMaps
-} from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 import type { IRequest } from 'itty-router'
 
 function parseQueryString(query: string | string[] | undefined) {
@@ -68,7 +65,9 @@ export async function mapsFromParams(
   )
 }
 
-export async function mapsFromQuery(req: IRequest): Promise<GeoreferencedMaps> {
+export async function mapsFromQuery(
+  req: IRequest
+): Promise<GeoreferencedMap[]> {
   const query = req.query
 
   const url = parseQueryString(query.url)
