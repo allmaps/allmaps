@@ -1,4 +1,6 @@
-import type { Map } from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+
+import type { Properties } from '$lib/shared/types.js'
 
 const formatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto'
@@ -37,13 +39,22 @@ function formatTimeAgo(dateStr?: string) {
   }
 }
 
-export function getProperties(map: Map, apiMap: unknown) {
+export function getHostname(map: GeoreferencedMap) {
+  const { hostname } = new URL(map.resource.id)
+  return hostname
+}
+
+export function getTimeAgo(map: GeoreferencedMap) {
+  return formatTimeAgo(map.modified)
+}
+
+export function getProperties(
+  map: GeoreferencedMap,
+  apiMap: unknown
+): Properties {
   // TODO: create new type for API output
   // maybe with https://github.com/trpc/trpc
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-  const { hostname } = new URL(map.resource.id)
-  const timeAgo = formatTimeAgo(map.modified)
 
   type _Allmaps = {
     area: number
@@ -69,8 +80,8 @@ export function getProperties(map: Map, apiMap: unknown) {
   }
 
   return {
-    hostname,
-    timeAgo,
+    gcpCount: map.gcps.length,
+    resourceMaskPointCount: map.resourceMask.length,
     areaStr
   }
 }

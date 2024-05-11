@@ -1,8 +1,8 @@
 import { generateId } from '@allmaps/id'
 
-import type { Map } from '@allmaps/annotation'
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
-export async function getUrls(map: Map) {
+export async function getUrls(map: GeoreferencedMap) {
   const mapId = map.id
   const imageUri = map.resource.id
   const imageId = await generateId(imageUri)
