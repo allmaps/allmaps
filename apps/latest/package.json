@@ -14,10 +14,19 @@
   },
   "license": "GPL-3.0-or-later",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    }
+  },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "watch": "svelte-package --watch",
+    "build": "vite build && pnpm run package",
     "build:dev": "vite build --mode development",
+    "package": "svelte-kit sync && svelte-package && publint",
+    "prepublishOnly": "pnpm run package",
     "lerna-build": "lerna run build --scope @allmaps/latest --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -26,6 +35,14 @@
     "format": "prettier --write src",
     "types": "tsc --noEmit",
     "preversion": "pnpm run types && pnpm run lint"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "peerDependencies": {
+    "svelte": "^4.0.0"
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.26",
@@ -40,23 +57,25 @@
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/package": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@types/d3-geo": "^3.0.2",
     "@types/eslint": "^8.56.0",
+    "@types/geojson": "^7946.0.10",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.35.1",
+    "postcss": "^8.4.18",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.1.2",
+    "publint": "^0.1.9",
     "svelte": "^4.2.7",
     "svelte-check": "^3.6.0",
+    "tailwindcss": "^3.3.3",
     "typescript": "^5.0.0",
-    "vite": "^5.0.3",
-    "@types/d3-geo": "^3.0.2",
-    "@types/geojson": "^7946.0.10",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "postcss": "^8.4.18",
-    "tailwindcss": "^3.3.3"
+    "vite": "^5.0.3"
   }
 }
