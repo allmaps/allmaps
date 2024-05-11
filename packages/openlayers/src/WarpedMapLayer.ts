@@ -22,7 +22,7 @@ export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
 /**
  * WarpedMapLayer class.
  *
- * This class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
+ * This class renders georeferenced maps from a Georeference Annotation on an OpenLayers map.
  * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
  *
  * @class WarpedMapLayer
@@ -341,8 +341,8 @@ export default class WarpedMapLayer extends Layer {
   }
 
   /**
-   * Sets the image info Cache of the WarpedMapList
-   * @param {Cache} cache - the image info cache
+   * Sets the object that caches image information
+   * @param {ImageInformations} imageInformations - Object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations) {
     this.renderer.warpedMapList.setImageInformations(imageInformations)
@@ -350,7 +350,7 @@ export default class WarpedMapLayer extends Layer {
 
   /**
    * Gets the HTML container element of the layer
-   * @return {HTMLElement} HTML Div Element
+   * @returns {HTMLElement} HTML element
    */
   getContainer(): HTMLElement {
     return this.container
@@ -358,7 +358,7 @@ export default class WarpedMapLayer extends Layer {
 
   /**
    * Gets the HTML canvas element of the layer
-   * @return {HTMLCanvasElement | null} HTML Canvas Element
+   * @returns {HTMLCanvasElement | null} HTML Canvas element
    */
   getCanvas(): HTMLCanvasElement | null {
     return this.canvas
@@ -369,7 +369,7 @@ export default class WarpedMapLayer extends Layer {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} Opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     return this.renderer.getMapOpacity(mapId)
@@ -602,7 +602,7 @@ export default class WarpedMapLayer extends Layer {
   /**
    * Render the layer.
    * @param {import("ol/Map.js").FrameState} frameState - OpenLayers frame state
-   * @return {HTMLElement} The rendered element
+   * @returns {HTMLElement} The rendered element
    */
   render(frameState: FrameState): HTMLElement {
     if (this.canvas) {

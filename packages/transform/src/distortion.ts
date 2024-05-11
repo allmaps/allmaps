@@ -16,8 +16,8 @@ export const supportedDistortionMeasures = [
  * @export
  * @param {Point} partialDerivativeX - the partial derivative to 'x' of the transformation, evaluated at a set point
  * @param {Point} partialDerivativeY - the partial derivative to 'x' of the transformation, evaluated at a set point
- * @param {?DistortionMeasure} [distortionMeasure] - the requested distortion measure, or undefined to return 0
- * @param {number} [referenceScale=1] - the reference area scaling (sigma) to take into account, e.g. computed via a helmert transform
+ * @param {DistortionMeasure} [distortionMeasure] - the requested distortion measure, or undefined to return 0
+ * @param {number} [referenceScale] - the reference area scaling (sigma) to take into account, e.g. computed via a helmert transform
  * @returns {number} - the distortion measure at the set point
  */
 export function computeDistortionFromPartialDerivatives(

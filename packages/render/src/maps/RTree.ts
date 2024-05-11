@@ -18,7 +18,9 @@ type RTreeItem = {
   maxY: number
   id: string
 }
-
+/**
+ * 2D spatial index for polygons
+ */
 export default class RTree {
   rbush: RBush<RTreeItem> = new RBush()
 

@@ -1,11 +1,12 @@
-import FetchableMapTile from './FetchableTile.js'
+import FetchableTile from './FetchableTile.js'
 
 import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
 
 /**
- * Class for tiles that can be cached. These are used on the tile cache (and are not associated to a specific map)
+ * Class for map tiles that can be cached.
  *
  * @export
+ * @tamplate D
  * @class CacheableTile
  * @typedef {CacheableTile}
  * @extends {EventTarget}
@@ -24,14 +25,15 @@ export default abstract class CacheableTile<D> extends EventTarget {
    * Creates an instance of CacheableTile.
    *
    * @constructor
-   * @param {FetchableMapTile} fetchableMapTile
+   * @param {FetchableTile} fetchableTile
+   * @param {FetchFn} [fetchFn] Optional fetch function to use
    */
-  constructor(fetchableMapTile: FetchableMapTile, fetchFn?: FetchFn) {
+  constructor(fetchableTile: FetchableTile, fetchFn?: FetchFn) {
     super()
 
-    this.tile = fetchableMapTile.tile
-    this.imageRequest = fetchableMapTile.imageRequest
-    this.tileUrl = fetchableMapTile.tileUrl
+    this.tile = fetchableTile.tile
+    this.imageRequest = fetchableTile.imageRequest
+    this.tileUrl = fetchableTile.tileUrl
     this.fetchFn = fetchFn
 
     this.abortController = new AbortController()
@@ -40,8 +42,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
   abstract fetch(): Promise<D | undefined>
 
   /**
-   * Whether a tile has completed its caching
-   * I.e. their fetching is completed and tile data is created
+   * Whether a tile has fetched its data
    *
    * @returns {boolean}
    */
@@ -60,8 +61,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
 }
 
 /**
- * Class for cacheable tiles whose caching has been completed
- * I.e. their fetching is completed and image bitmap is created
+ * Class for tiles of which the data has been fetched
  *
  * @export
  * @class CachedTile

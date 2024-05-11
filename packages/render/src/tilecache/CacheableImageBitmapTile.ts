@@ -1,13 +1,13 @@
 import { fetchUrl } from '@allmaps/stdlib'
 
-import FetchableMapTile from './FetchableTile.js'
+import FetchableTile from './FetchableTile.js'
 import CacheableTile from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 
 /**
- * Class for tiles that can be cached. These are used on the tile cache (and are not associated to a specific map)
+ * Class for tiles that are cached using an ImageBitMap.
  *
  * @export
  * @class CacheableImageBitmapTile
@@ -16,10 +16,7 @@ import type { FetchFn } from '@allmaps/types'
  */
 export default class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
   /**
-   * Fetch the tile and create its image bitmap.
-   *
-   * Returns and event when completed (or error).
-   *
+   * Fetch the tile and create its ImageBitMap.
    * @async
    * @returns {Promise<void>}
    */
@@ -53,14 +50,13 @@ export default class CacheableImageBitmapTile extends CacheableTile<ImageBitmap>
   }
 
   static createFactory() {
-    return (fetchableMapTile: FetchableMapTile, fetchFn?: FetchFn) =>
-      new CacheableImageBitmapTile(fetchableMapTile, fetchFn)
+    return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
+      new CacheableImageBitmapTile(fetchableTile, fetchFn)
   }
 }
 
 /**
- * Class for cacheable tiles whose caching has been completed
- * I.e. their fetching is completed and image bitmap is created
+ * Class for cacheable tiles that have been fetched.
  *
  * @export
  * @class CachedImageBitmapTile

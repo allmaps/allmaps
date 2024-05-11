@@ -60,16 +60,13 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
 /**
- * Class that render warped maps to a WebGL 2 context
- *
- * Its main function is `render`
+ * Class that renders WarpedMaps to a WebGL 2 context
  *
  * @export
  * @class WebGL2Renderer
  * @typedef {WebGL2Renderer}
- * @extends {EventTarget}
+ * @extends {BaseRenderer}
  */
-// export default class WebGL2Renderer extends EventTarget {
 export default class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageBitmap>
   implements Renderer
@@ -100,8 +97,8 @@ export default class WebGL2Renderer
    * Creates an instance of WebGL2Renderer.
    *
    * @constructor
-   * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
-   * @param {WebGL2RendererOptions} options - the WebGL2 rendering options
+   * @param {WebGL2RenderingContext} gl - WebGL 2 rendering context
+   * @param {WebGL2RendererOptions} options - options
    */
   constructor(
     gl: WebGL2RenderingContext,

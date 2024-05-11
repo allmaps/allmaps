@@ -1,6 +1,6 @@
 import TileCache from '../tilecache/TileCache.js'
 import WarpedMapList from '../maps/WarpedMapList.js'
-import FetchableMapTile from '../tilecache/FetchableTile.js'
+import FetchableTile from '../tilecache/FetchableTile.js'
 
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -21,6 +21,17 @@ import type {
 
 const MIN_VIEWPORT_DIAMETER = 5
 
+/**
+ * Abstract base class for renderers.
+ *
+ * @export
+ * @abstract
+ * @template {WarpedMap} W
+ * @template D
+ * @class BaseRenderer
+ * @typedef {BaseRenderer}
+ * @extends {EventTarget}
+ */
 export default abstract class BaseRenderer<
   W extends WarpedMap,
   D
@@ -49,8 +60,6 @@ export default abstract class BaseRenderer<
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
   }
-
-  // addMap
 
   protected shouldUpdateRequestedTiles() {
     return true
@@ -82,7 +91,7 @@ export default abstract class BaseRenderer<
       }
     })
 
-    const requestedTiles: FetchableMapTile[] = []
+    const requestedTiles: FetchableTile[] = []
     for (const mapId of possibleMapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
@@ -95,7 +104,7 @@ export default abstract class BaseRenderer<
       }
 
       if (!warpedMap.hasImageInfo()) {
-        // Note: don't load image info here
+        // Note: don't load image information here
         // this would imply waiting for the first throttling cycle to complete
         // before acting on a sucessful load
         continue
@@ -147,15 +156,15 @@ export default abstract class BaseRenderer<
       )
 
       for (const tile of tiles) {
-        requestedTiles.push(new FetchableMapTile(tile, warpedMap))
+        requestedTiles.push(new FetchableTile(tile, warpedMap))
       }
     }
 
-    this.tileCache.requestFetchableMapTiles(requestedTiles)
+    this.tileCache.requestFetchableTiles(requestedTiles)
     this.updateMapsInViewport(requestedTiles)
   }
 
-  protected updateMapsInViewport(tiles: FetchableMapTile[]) {
+  protected updateMapsInViewport(tiles: FetchableTile[]) {
     // TODO: handle everything as Set() once JS supports filter on sets.
     // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
     const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)

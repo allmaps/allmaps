@@ -78,7 +78,7 @@ export default class Viewport {
   projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
 
   /**
-   * Creates an instance of Viewport.
+   * Creates a new Viewport
    *
    * @constructor
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
@@ -144,13 +144,13 @@ export default class Viewport {
   }
 
   /**
-   * Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
+   * Static method creates that creates a Viewport from a WarpedMapList
    *
    * @static
    * @template {WarpedMap} W
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
    * @param {WarpedMapList<W>} warpedMapList - A WarpedMapList.
-   * @param {?number} [devicePixelRatio] - The devicePixelRatio of the viewport.
+   * @param {number} [devicePixelRatio] - The devicePixelRatio of the viewport.
    * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
    * @returns {Viewport} - A new Viewport object
    */
@@ -184,13 +184,13 @@ export default class Viewport {
   }
 
   /**
-   * Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBbox
+   * Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
    *
    * @static
    * @template {WarpedMap} W
    * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
    * @param {WarpedMapList<W>} projectedGeoBbox - A projectedGeoBbox.
-   * @param {?number} [devicePixelRatio] - The devicePixelRatio of the viewport.
+   * @param {number} [devicePixelRatio] - The devicePixelRatio of the viewport.
    * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
    * @returns {Viewport} - A new Viewport object
    */

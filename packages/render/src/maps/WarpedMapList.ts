@@ -34,11 +34,12 @@ function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
 }
 
 /**
- * Class for warped map lists, which describe an ordered array of maps to be drawn.
- * This class contains an imageInfoCache and an RTree for quickly looking up maps using their Bbox.
+ * An ordered list of WarpedMaps. This class contains an optional RTree
+ * for quickly looking up maps using their Bbox.
  *
  * @export
  * @class WarpedMapList
+ * @template {WarpedMap} W
  * @typedef {WarpedMapList<W>}
  * @extends {EventTarget}
  */
@@ -54,11 +55,11 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   fetchFn?: FetchFn
 
   /**
-   * Creates an instance of WarpedMapList.
+   * Creates an instance of a WarpedMapList.
    *
    * @constructor
-   * @param {?Cache} [imageInfoCache] - An image info cache
-   * @param {?WarpedMapListOptions} [options] - Options
+   * @param {WarpedMapFactory<W>} [warpedMapFactory] - Factory function for creating WarpedMap objects
+   * @param {WarpedMapListOptions} [options] - Options
    */
   constructor(
     warpedMapFactory: WarpedMapFactory<W>,
@@ -116,7 +117,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Returns the WarpedMap object in this list of map specified by a mapId.
+   * Returns the WarpedMap object in this list of map specified by its ID.
    *
    * @param {string} mapId
    * @returns {(W | undefined)}
@@ -126,7 +127,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Returns the zIndex of a map.
+   * Returns the z-index of a map.
    *
    * @param {string} mapId
    * @returns {number | undefined}
@@ -220,9 +221,9 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the image info cache
+   * Sets the object that caches image information
    *
-   * @param {Cache} cache - the image info cache
+   * @param {ImageInformations} imageInformations - object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations): void {
     this.imageInformations = imageInformations
@@ -289,7 +290,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the zIndex of the specified maps to bring them to front
+   * Changes the z-index of the specified maps to bring them to front
    *
    * @param {Iterable<string>} mapIds
    */
@@ -306,7 +307,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the zIndex of the specified maps to send them to back
+   * Changes the z-index of the specified maps to send them to back
    *
    * @param {Iterable<string>} mapIds
    */
@@ -323,7 +324,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the zIndex of the specified maps to bring them forward
+   * Changes the z-index of the specified maps to bring them forward
    *
    * @param {Iterable<string>} mapIds
    */

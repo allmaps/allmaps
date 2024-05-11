@@ -40,12 +40,12 @@ export function createWebGL2WarpedMapFactory(
 }
 
 /**
- * Class for WebGL2 rendered warped maps
+ * Class for WarpedMaps that are rendered with WebGL 2
  *
  * @export
  * @class WebGL2WarpedMap
  * @typedef {WebGL2WarpedMap}
- * @extends {EventTarget}
+ * @extends {TriangulatedWarpedMap}
  */
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
@@ -73,9 +73,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    *
    * @constructor
    * @param {string} mapId - ID of the map
-   * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
-   * @param {WebGL2RenderingContext} gl - the WebGL2 rendering context
-   * @param {WebGLProgram} program - the WebGL2 program
+   * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
+   * @param {WebGL2RenderingContext} gl - WebGL rendering context
+   * @param {WebGLProgram} program - WebGL program
    * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
    */
   constructor(
@@ -107,7 +107,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Update the vertex buffers of this warped map
    *
-   * @param {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayer projectionTransform.
+   * @param {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.projectedGeoToClipTransform = projectedGeoToClipTransform
@@ -125,7 +125,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Remove cached tile from the textures of this map and update textes
+   * Remove cached tile from the textures of this map and update textures
    *
    * @param {string} tileUrl
    */
@@ -149,7 +149,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.gl.bindVertexArray(this.vao)
 
-    // Resource Triangle Points
+    // Resource triangle points
 
     const resourceTrianglePoints = this.resourceTrianglePoints
     createBuffer(
@@ -160,7 +160,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_resourceTrianglePoint'
     )
 
-    // Clip Previous and New Triangle Points
+    // Clip previous and new triangle points
 
     const clipPreviousTrianglePoints =
       this.projectedGeoPreviousTrianglePoints.map((point) => {
@@ -191,7 +191,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipTrianglePoint'
     )
 
-    // Previous and New Distortion
+    // Previous and new distortion
 
     if (this.distortionMeasure) {
       const previousTrianglePointsDistortion =
@@ -240,7 +240,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     let cachedTiles = [...this.CachedTilesByTileUrl.values()]
 
     // Only pack tiles that are inside the viewport (as drawn on the resource)
-    // And don't differ too much in scale level from the optimal one at this viewport
+    // and don't differ too much in scale level from the optimal one at this viewport
     cachedTiles = cachedTiles.filter((cachedTile) => {
       return this.resourceViewportRingBbox
         ? isOverlapping(
@@ -268,7 +268,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
-    // Packed Tiles Texture
+    // Packed tiles texture
 
     // if (Math.max(textureWidth, textureHeight) > MAX_TEXTURE_SIZE) {
     //   throw new Error('tile texture too large')
@@ -330,7 +330,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed Tiles Resource Positions And Dimensions Texture
+    // Packed tiles resource positions and dimensions texture
 
     const packedTilesResourcePositionsAndDimensions = packedTiles.map(
       (packedTile) => {
@@ -370,7 +370,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed Tiles Scale Factors Texture
+    // Packed tiles scale factors texture
 
     const packedTilesScaleFactors = packedTiles.map(
       ({ index }) => cachedTiles[index].tile.tileZoomLevel.scaleFactor

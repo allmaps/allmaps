@@ -3,24 +3,24 @@ import { WarpedMapWithImageInfo } from '../maps/WarpedMap.js'
 import type { Tile, ImageRequest } from '@allmaps/types'
 
 /**
- * Class for tiles associated to a warped map. These are used to describe the tiles requested by the renderer.
+ * Class for tiles that can be fetched.
  *
  * @export
- * @class FetchableMapTile
- * @typedef {FetchableMapTile}
+ * @class FetchableTile
+ * @typedef {FetchableTile}
  */
-export default class FetchableMapTile {
+export default class FetchableTile {
   readonly mapId: string
   readonly tile: Tile
   readonly imageRequest: ImageRequest
   readonly tileUrl: string
 
   /**
-   * Creates an instance of FetchableMapTile.
+   * Creates an instance of FetchableTile.
    *
    * @constructor
    * @param {Tile} tile - the tile
-   * @param {WarpedMapWithImageInfo} warpedMap - the warpedMap, which must have its image info so the tileUrl can be assigned
+   * @param {WarpedMapWithImageInfo} warpedMap - A WarpedMap with fetched image information
    */
   constructor(tile: Tile, warpedMap: WarpedMapWithImageInfo) {
     this.mapId = warpedMap.mapId

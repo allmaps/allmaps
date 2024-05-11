@@ -71,22 +71,22 @@ export class WarpedMapLayer extends L.Layer {
     zIndex: 1
   }
 
+  /**
+   * Creates a WarpedMapLayer
+   * @param {unknown} annotationOrAnnotationUrl - Georeference Annotation or URL of a Georeference Annotation
+   * @param {WarpedMapLayerOptions} [options] - Options for the layer
+   */
   constructor(
     annotationOrAnnotationUrl: unknown,
-    options: Partial<LeafletWarpedMapLayerOptions>
+    options?: Partial<LeafletWarpedMapLayerOptions>
   ) {
     super()
     this.initialize(annotationOrAnnotationUrl, options)
   }
 
-  /**
-   * Creates a WarpedMapLayer
-   * @param {unknown} [annotation] - Georeference Annotation or URL of a Georeference Annotation
-   * @param {WarpedMapLayerOptions} options
-   */
   initialize(
     annotationOrAnnotationUrl: unknown,
-    options: Partial<LeafletWarpedMapLayerOptions>
+    options?: Partial<LeafletWarpedMapLayerOptions>
   ) {
     this._annotationOrAnnotationUrl = annotationOrAnnotationUrl
     L.setOptions(this, options)
@@ -96,7 +96,6 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Contains all code code that creates DOM elements for the layer and adds them to map panes where they belong.
-   * @async
    */
   onAdd(map: Map) {
     if (!this._map || !this.container) {
@@ -256,7 +255,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML container element of the layer
-   * @return {HTMLElement} HTML Div Element
+   * @returns {HTMLElement} HTML Div Element
    */
   getContainer(): HTMLDivElement | undefined {
     return this.container
@@ -264,7 +263,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML canvas element of the layer
-   * @return {HTMLCanvasElement | null} HTML Canvas Element
+   * @returns {HTMLCanvasElement | null} HTML Canvas Element
    */
   getCanvas(): HTMLCanvasElement | undefined {
     return this.canvas
@@ -486,15 +485,15 @@ export class WarpedMapLayer extends L.Layer {
   }
 
   /**
-   * Gets the zIndex of the layer.
+   * Gets the z-index of the layer.
    */
   getZIndex() {
     return this.options.zIndex
   }
 
   /**
-   * Changes the zIndex of the layer.
-   * @param {number} value - zIndex
+   * Changes the z-index of the layer.
+   * @param {number} value - z-index
    */
   setZIndex(value: number) {
     this.options.zIndex = value
@@ -503,8 +502,9 @@ export class WarpedMapLayer extends L.Layer {
   }
 
   /**
-   * Sets the image info Cache of the warpedMapList
-   * @param {Cache} cache - the image info cache
+   * Sets the object that caches image information
+   *
+   * @param {ImageInformations} imageInformations - Object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
@@ -551,7 +551,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     assertRenderer(this.renderer)

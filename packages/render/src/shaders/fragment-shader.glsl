@@ -41,6 +41,8 @@ vec4 rgbToVec4(int r, int g, int b) {
 
 void main() {
   // Colors
+  // TODO: supply colors from JavaScript
+  // TODO: move to distortion.frag
   vec4 colorTransparent = vec4(0.0f, 0.0f, 0.0f, 0.0f);
   vec4 colorWhite = vec4(1.0f, 1.0f, 1.0f, 1.0f);
   vec4 colorBlack = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -63,7 +65,6 @@ void main() {
   vec4 colorBlue500 = vec4(0.2313f, 0.5098f, 0.9647f, 1.0f);
   vec4 colorGrey500 = vec4(0.4196f, 0.4470f, 0.5019f, 1.0f);
 
-  // The treated triangle point
   float resourceTrianglePointX = v_resourceTrianglePoint.x;
   float resourceTrianglePointY = v_resourceTrianglePoint.y;
 
@@ -75,7 +76,7 @@ void main() {
   int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
   int bestScaleFactor = 0;
 
-  // Prepare storage for the resulting packed tiles texture point that corresponds to the treated triangle point
+  // Prepare storage for the resulting packed tiles texture point that corresponds to the triangle point
   vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
 
   // Set the initial values
@@ -99,10 +100,10 @@ void main() {
     float packedTileDimensionWidth = float(packedTileResourcePositionAndDimension.b);
     float packedTileDimensionHeight = float(packedTileResourcePositionAndDimension.a);
 
-    // If the treated triangle point is inside the tile, consider to use the tile:
+    // If the triangle point is inside the tile, consider to use the tile:
     // if the scale factor is closer to the best scale factor for this map then currently known one
     // update the smallest scale factor diff
-    // and compute the packed tiles texture point that corresponds to the treated triangle point
+    // and compute the packed tiles texture point that corresponds to the triangle point
     if(resourceTrianglePointX >= packedTileResourcePositionX &&
       resourceTrianglePointX < packedTileResourcePositionX + packedTileDimensionWidth &&
       resourceTrianglePointY >= packedTileResourcePositionY &&
@@ -131,7 +132,7 @@ void main() {
   }
 
   if(found == true) {
-    // Read color of the treated point at its packed tiles texture point coordinates in the packed tiles texture
+    // Read color of the point at its packed tiles texture point coordinates in the packed tiles texture
     color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
     // Remove background color
@@ -157,17 +158,19 @@ void main() {
     color = vec4(color.rgb * u_opacity, color.a * u_opacity);
 
     // Distortion
-
+    // TODO: move to distortion.frag
     if(u_distortion) {
       // color = colorWhite; // TODO: Add option to not display image
       // color = colorTransparant; // TODO: Add option to not display image
 
       float trianglePointDistortion = v_trianglePointDistortion;
-      trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f; // TODO: Add component to toggle stepwise vs continuous
 
-      switch (u_distortionOptionsdistortionMeasure) {
+      // TODO: Add component to toggle stepwise vs continuous
+      trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f;
+
+      switch(u_distortionOptionsdistortionMeasure) {
         case 0:
-          if (trianglePointDistortion > 0.0f) {
+          if(trianglePointDistortion > 0.0f) {
             color = spectral_mix(color, colorRed500, trianglePointDistortion);
           } else {
             color = spectral_mix(color, colorBlue500, abs(trianglePointDistortion));

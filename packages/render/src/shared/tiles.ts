@@ -1,6 +1,6 @@
 import { Image } from '@allmaps/iiif-parser'
 import { computeBbox, bboxToCenter, distance } from '@allmaps/stdlib'
-import FetchableMapTile from '../tilecache/FetchableTile'
+import FetchableTile from '../tilecache/FetchableTile'
 
 import type {
   Point,
@@ -31,20 +31,18 @@ export function createKeyFromMapIdAndTileUrl(
 ): string {
   return `${mapId}:${tileUrl}`
 }
-export function createKeyFromTile(fetchableMapTile: FetchableMapTile): string {
+export function createKeyFromTile(fetchableTile: FetchableTile): string {
   return createKeyFromMapIdAndTileUrl(
-    fetchableMapTile.mapId,
-    fetchableMapTile.tileUrl
+    fetchableTile.mapId,
+    fetchableTile.tileUrl
   )
 }
 
-export function fetchableMapTilesToKeys(
-  fetchableMapTiles: FetchableMapTile[]
+export function fetchableTilesToKeys(
+  fetchableTiles: FetchableTile[]
 ): Set<string> {
   return new Set(
-    fetchableMapTiles.map((fetchableMapTile) =>
-      createKeyFromTile(fetchableMapTile)
-    )
+    fetchableTiles.map((fetchableTile) => createKeyFromTile(fetchableTile))
   )
 }
 
@@ -248,7 +246,7 @@ function tilesByColumnToTiles(
 
 // Computations
 
-export function tileByteSize(tile: FetchableMapTile): number {
+export function tileByteSize(tile: FetchableTile): number {
   return (
     (tile.imageRequest.size?.height || 0) *
     (tile.imageRequest.size?.width || 0) *

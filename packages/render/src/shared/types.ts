@@ -1,6 +1,6 @@
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
-import type FetchableMapTile from '../tilecache/FetchableTile.js'
+import type FetchableTile from '../tilecache/FetchableTile.js'
 import type CacheableTile from '../tilecache/CacheableTile.js'
 
 import type { Size, FetchFn, ImageInformations, Color } from '@allmaps/types'
@@ -82,6 +82,6 @@ export type WarpedMapFactory<W> = (
 ) => W
 
 export type CachableTileFactory<D> = (
-  fetchableMapTile: FetchableMapTile,
+  fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>

@@ -34,7 +34,7 @@ export function createTriangulatedWarpedMapFactory() {
 }
 
 /**
- * Class for triangulated warped maps.
+ * Class for triangulated WarpedMaps.
  *
  * @export
  * @class TriangulatedWarpedMap
@@ -43,8 +43,8 @@ export function createTriangulatedWarpedMapFactory() {
  * @param {number[]} trianglePointsUniquePointsIndex - Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
  * @param {number} triangulateErrorCount - Number of time the triangulation has resulted in an error
  * @param {Point[]} projectedGeoPreviousTrianglePoints - The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
- * @param {Point[]} projectedGeoTrianglePoints - The resourceTrianglePoints in geo coordinates
- * @param {Point[]} projectedGeoUniquePoints - The resourceUniquePoints in geo coordinates
+ * @param {Point[]} projectedGeoTrianglePoints - The resourceTrianglePoints in geospatial coordinates
+ * @param {Point[]} projectedGeoUniquePoints - The resourceUniquePoints in geospatial coordinates
  * @param {Point[]} projectedGeoUniquePointsPartialDerivativeX - Partial Derivative to X at the projectedGeoUniquePoints
  * @param {Point[]} projectedGeoUniquePointsPartialDerivativeY - Partial Derivative to Y at the projectedGeoUniquePoints
  * @param {number[]} previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
@@ -85,12 +85,12 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   uniquePointsDistortion: number[] = []
 
   /**
-   * Creates an instance of WarpedMap.
+   * Creates an instance of a TriangulatedWarpedMap.
    *
    * @constructor
    * @param {string} mapId - ID of the map
-   * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
-   * @param {?Cache} [imageInfoCache] - Cache of the image info of this image
+   * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
+   * @param {WarpedMapOptions} [options] - Options
    */
   constructor(
     mapId: string,
@@ -106,7 +106,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Update the resourceMask loaded from a georeferenced map to a new mask.
+   * Update the resourceMask.
    *
    * @param {Ring} resourceMask
    */
@@ -123,7 +123,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Set the bestScaleFactor at the current viewport
+   * Set the bestScaleFactor for the current viewport
    *
    * @param {number} scaleFactor - scale factor
    * @returns {boolean}
@@ -139,7 +139,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
    *
-   * @param {boolean} [previousIsNew=false] - whether the previous and new triangulation are the same - true by default, false during a transformation transition
+   * @param {boolean} [previousIsNew] - whether the previous and new triangulation are the same - true by default, false during a transformation transition
    */
   updateTriangulation(previousIsNew = false) {
     const { trianglePointsUniquePointsIndex, resourceUniquePoints } =

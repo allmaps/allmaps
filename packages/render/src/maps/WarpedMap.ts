@@ -57,7 +57,7 @@ export function createWarpedMapFactory() {
 }
 
 /**
- * Class for warped maps
+ * Class for warped maps.
  * This class describes how a georeferenced map is warped using a specific transformation.
  *
  * @export
@@ -65,38 +65,37 @@ export function createWarpedMapFactory() {
  * @typedef {WarpedMap}
  * @extends {EventTarget}
  * @param {string} mapId - ID of the map
- * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
- * @param {Gcp[]} gcps - Ground Controle Points used for warping this map (source to geo)
- * @param {Gcp[]} projectedGcps - Projected Ground Controle Points (source to projectedGeo)
+ * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
+ * @param {Gcp[]} gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
+ * @param {Gcp[]} projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
  * @param {Ring} resourceMask - Resource mask
  * @param {Bbox} resourceMaskBbox - Bbox of the resourceMask
  * @param {Rectangle} resourceMaskRectangle - Rectangle of the resourceMaskBbox
  * @param {Ring} resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param {Cache} [imageInfoCache] - Cache of the image info of this image
  * @param {string} [imageId] - ID of the image
  * @param {IIIFImage} [parsedImage] - ID of the image
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
- * @param {GcpTransformer} transformer - Transformer used for warping this map (resource to geo)
- * @param {GcpTransformer} projectedTransformer - Projected Transformer used for warping this map (resource to projectedGeo)
- * @param {GeojsonPolygon} geoMask - resourceMask in geo coordinates
+ * @param {GcpTransformer} transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
+ * @param {GcpTransformer} projectedTransformer - Ttransformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param {GeojsonPolygon} geoMask - resourceMask in geospatial coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
- * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geo coordinates
- * @param {GeojsonPolygon} geoFullMask - resourceFullMask in geo coordinates
+ * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
+ * @param {GeojsonPolygon} geoFullMask - resourceFullMask in geospatial coordinates
  * @param {Bbox} geoFullMaskBbox - Bbox of the geoFullMask
- * @param {Rectangle} geoFullMaskRectangle - resourceFullMaskRectangle in geo coordinates
- * @param {Ring} projectedGeoMask - resourceMask in projectedGeo coordinates
+ * @param {Rectangle} geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
+ * @param {Ring} projectedGeoMask - resourceMask in projected geospatial coordinates
  * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeoMask
- * @param {Rectangle} projectedGeoMaskRectangle - resourceMaskRectanglee in projectedGeo coordinates
- * @param {Ring} projectedGeoFullMask - resourceFullMask in projectedGeo coordinates
+ * @param {Rectangle} projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
+ * @param {Ring} projectedGeoFullMask - resourceFullMask in projected geospatial coordinates
  * @param {Bbox} projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
- * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projectedGeo coordinates
- * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projectedGeo coordinates
+ * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
+ * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
- * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
- * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, at the current viewport
+ * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, in the current viewport
+ * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, in the current viewport
  * @param {Bbox} [resourceViewportRingBbox] - Bbox of the resourceViewportRing
  */
 export default class WarpedMap extends EventTarget {
@@ -164,9 +163,8 @@ export default class WarpedMap extends EventTarget {
    *
    * @constructor
    * @param {string} mapId - ID of the map
-   * @param {GeoreferencedMap} georeferencedMap - Georeferende map this warped map is build on
-   * @param {?Cache} [imageInfoCache] - Cache of the image info of this image
-   * @param {boolean} [visible=true] - Whether the map is visible
+   * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
+   * @param {WarpedMapOptions} [options] - options
    */
   constructor(
     mapId: string,
@@ -232,7 +230,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Get bbox of resourceMask in viewport coordinates
+   * Get Bbox of resourceMask in viewport coordinates
    *
    * @param {Viewport} viewport - the current viewport
    * @returns {Bbox}
@@ -382,7 +380,7 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set the bestScaleFactor at the current viewport
+   * Set the bestScaleFactor for the current viewport
    *
    * @param {number} scaleFactor - scale factor
    * @returns {boolean}

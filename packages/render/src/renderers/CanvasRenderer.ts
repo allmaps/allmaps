@@ -9,6 +9,14 @@ import type WarpedMap from '../maps/WarpedMap.js'
 
 import type { Size } from '@allmaps/types'
 
+/**
+ * Class that renders WarpedMaps to a HTML Canvas element with the Canvas 2D API
+ *
+ * @export
+ * @class CanvasRenderer
+ * @typedef {CanvasRenderer}
+ * @extends {BaseRenderer}
+ */
 export default class CanvasRenderer
   extends BaseRenderer<WarpedMap, ImageData>
   implements Renderer

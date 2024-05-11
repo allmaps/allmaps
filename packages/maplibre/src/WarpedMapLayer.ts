@@ -36,7 +36,7 @@ function assertRenderer(
 /**
  * WarpedMapLayer class.
  *
- * This class renders georeferenced maps of a IIIF Georeference Annotation on a MapLibre map.
+ * This class renders maps from a IIIF Georeference Annotation on a MapLibre map.
  * WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/).
  *
  * @class WarpedMapLayer
@@ -54,8 +54,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Creates a WarpedMapLayer instance
    *
    * @constructor
-   * @param {string} [id] - unique id for this layer
-   * @param {Cache} imageInformations - image info cache
+   * @param {string} [id] - Unique ID for this layer
+   * @param {MapLibreWarpedMapLayerOptions} [options] - options
    */
   constructor(id?: string, options?: Partial<MapLibreWarpedMapLayerOptions>) {
     if (id) {
@@ -67,7 +67,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Method called when the layer has been added to the Map.
    * @param {Map} map - The Map this custom layer was just added to.
-   * @param {WebGL2RenderingContext} gl - The gl context for the map.
+   * @param {WebGL2RenderingContext} gl - The WebGL 2 context for the map.
    */
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map
@@ -386,8 +386,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
-   * Sets the image info cache of the WarpedMapList
-   * @param {Cache} cache - the image info cache
+   * Sets the object that caches image information
+   * @param {ImageInformations} imageInformations - Object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
@@ -400,7 +400,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   /**
    * Gets the opacity of the layer
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getOpacity(): number | undefined {
     assertRenderer(this.renderer)
@@ -432,7 +432,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     assertRenderer(this.renderer)

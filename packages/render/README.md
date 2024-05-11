@@ -181,7 +181,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [getCacheableTiles](#getcacheabletiles)
 *   [getCachedTiles](#getcachedtiles)
 *   [getTileUrls](#gettileurls)
-*   [requestFetchableMapTiles](#requestfetchablemaptiles)
+*   [requestFetchableTiles](#requestfetchabletiles)
     *   [Parameters](#parameters-52)
 *   [constructor](#constructor-7)
     *   [Parameters](#parameters-53)
@@ -240,7 +240,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 
 ### constructor
 
-Creates an instance of Viewport.
+Creates a new Viewport
 
 #### Parameters
 
@@ -268,7 +268,7 @@ Returns a rotated rectangle in projected geo coordinates
 
 ### fromWarpedMapList
 
-Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
+Static method creates that creates a Viewport from a WarpedMapList
 
 #### Parameters
 
@@ -279,14 +279,14 @@ Alternative Viewport constructor, specifying projectedGeo using a WarpedMapList
 *   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
-*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)??** The devicePixelRatio of the viewport.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
 *   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
 
 Returns **Viewport** A new Viewport object
 
 ### fromProjectedGeoBbox
 
-Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBbox
+Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
 
 #### Parameters
 
@@ -296,7 +296,7 @@ Alternative Viewport constructor, specifying projectedGeo using a projectedGeoBb
 *   `r`   (optional, default `"contain"`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
-*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)??** The devicePixelRatio of the viewport.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
 *   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
 
 Returns **Viewport** A new Viewport object
@@ -311,9 +311,8 @@ Creates an instance of WarpedMap.
 *   `r` &#x20;
 *   `s` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-*   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
-*   `imageInfoCache` **Cache??** Cache of the image info of this image
-*   `visible` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether the map is visible (optional, default `true`)
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** options
 
 ### getViewportMask
 
@@ -328,7 +327,7 @@ Returns **Ring**&#x20;
 
 ### getViewportMaskBbox
 
-Get bbox of resourceMask in viewport coordinates
+Get Bbox of resourceMask in viewport coordinates
 
 #### Parameters
 
@@ -456,7 +455,7 @@ Update the Ground Controle Points loaded from a georeferenced map to new Ground 
 
 ### setBestScaleFactor
 
-Set the bestScaleFactor at the current viewport
+Set the bestScaleFactor for the current viewport
 
 #### Parameters
 
@@ -477,7 +476,7 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 ### constructor
 
-Creates an instance of WarpedMap.
+Creates an instance of a TriangulatedWarpedMap.
 
 #### Parameters
 
@@ -485,12 +484,12 @@ Creates an instance of WarpedMap.
 *   `t` &#x20;
 *   `i` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-*   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
-*   `imageInfoCache` **Cache??** Cache of the image info of this image
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** Options
 
 ### setResourceMask
 
-Update the resourceMask loaded from a georeferenced map to a new mask.
+Update the resourceMask.
 
 #### Parameters
 
@@ -499,7 +498,7 @@ Update the resourceMask loaded from a georeferenced map to a new mask.
 
 ### setBestScaleFactor
 
-Set the bestScaleFactor at the current viewport
+Set the bestScaleFactor for the current viewport
 
 #### Parameters
 
@@ -515,7 +514,7 @@ Update the triangulation of the resourceMask, at the current bestScaleFactor. Us
 #### Parameters
 
 *   `e`   (optional, default `!1`)
-*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether the previous and new triangulation are the same - true by default, false during a transformation transition (optional, default `false`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether the previous and new triangulation are the same - true by default, false during a transformation transition
 
 ### updateProjectedGeoTrianglePoints
 
@@ -560,9 +559,9 @@ Creates an instance of WebGL2WarpedMap.
 *   `s` &#x20;
 *   `a` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-*   `georeferencedMap` **GeoreferencedMap** Georeferende map this warped map is build on
-*   `gl` **WebGL2RenderingContext** the WebGL2 rendering context
-*   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** the WebGL2 program
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `gl` **WebGL2RenderingContext** WebGL rendering context
+*   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
 *   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
 
 ### updateVertexBuffers
@@ -572,7 +571,7 @@ Update the vertex buffers of this warped map
 #### Parameters
 
 *   `e` &#x20;
-*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayer projectionTransform.
+*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
 
 ### addCachedTileAndUpdateTextures
 
@@ -585,7 +584,7 @@ Add cached tile to the textures of this map and update textures
 
 ### removeCachedTileAndUpdateTextures
 
-Remove cached tile from the textures of this map and update textes
+Remove cached tile from the textures of this map and update textures
 
 #### Parameters
 
@@ -594,14 +593,14 @@ Remove cached tile from the textures of this map and update textes
 
 ### constructor
 
-Creates an instance of WarpedMapList.
+Creates an instance of a WarpedMapList.
 
 #### Parameters
 
 *   `e` &#x20;
 *   `t` &#x20;
-*   `imageInfoCache` **Cache??** An image info cache
-*   `options` **WarpedMapListOptions??** Options
+*   `warpedMapFactory` **WarpedMapFactory\<W>?** Factory function for creating WarpedMap objects
+*   `options` **WarpedMapListOptions?** Options
 
 ### getMapIds
 
@@ -611,7 +610,7 @@ Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Re
 
 ### getWarpedMap
 
-Returns the WarpedMap object in this list of map specified by a mapId.
+Returns the WarpedMap object in this list of map specified by its ID.
 
 #### Parameters
 
@@ -622,7 +621,7 @@ Returns **(W | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Ref
 
 ### getMapZIndex
 
-Returns the zIndex of a map.
+Returns the z-index of a map.
 
 #### Parameters
 
@@ -656,12 +655,12 @@ Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Re
 
 ### setImageInformations
 
-Sets the image info cache
+Sets the object that caches image information
 
 #### Parameters
 
 *   `e` &#x20;
-*   `cache` **Cache** the image info cache
+*   `imageInformations` **ImageInformations** object that caches image information
 
 ### setMapResourceMask
 
@@ -698,7 +697,7 @@ Sets the distortion measure of specified maps
 
 ### bringMapsToFront
 
-Changes the zIndex of the specified maps to bring them to front
+Changes the z-index of the specified maps to bring them to front
 
 #### Parameters
 
@@ -707,7 +706,7 @@ Changes the zIndex of the specified maps to bring them to front
 
 ### sendMapsToBack
 
-Changes the zIndex of the specified maps to send them to back
+Changes the z-index of the specified maps to send them to back
 
 #### Parameters
 
@@ -716,7 +715,7 @@ Changes the zIndex of the specified maps to send them to back
 
 ### bringMapsForward
 
-Changes the zIndex of the specified maps to bring them forward
+Changes the z-index of the specified maps to bring them forward
 
 #### Parameters
 
@@ -802,12 +801,12 @@ Creates an instance of CacheableTile.
 
 *   `t` &#x20;
 *   `e` &#x20;
-*   `fetchableMapTile` **FetchableMapTile**&#x20;
+*   `fetchableTile` **FetchableTile**&#x20;
+*   `fetchFn` **FetchFn?** Optional fetch function to use
 
 ### isCachedTile
 
-Whether a tile has completed its caching
-I.e. their fetching is completed and tile data is created
+Whether a tile has fetched its data
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
@@ -817,72 +816,64 @@ Abort the fetch
 
 ### constructor
 
-Creates an instance of FetchableMapTile.
+Creates an instance of FetchableTile.
 
 #### Parameters
 
 *   `e` &#x20;
 *   `t` &#x20;
 *   `tile` **Tile** the tile
-*   `warpedMap` **WarpedMapWithImageInfo** the warpedMap, which must have its image info so the tileUrl can be assigned
+*   `warpedMap` **WarpedMapWithImageInfo** A WarpedMap with fetched image information
 
 ### fetch
 
-Fetch the tile and create its image bitmap.
-
-Returns and event when completed (or error).
+Fetch the tile and create its ImageBitMap.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
 ### fetch
 
-Fetch the tile and create its image bitmap.
-
-Returns and event when completed (or error).
+Fetch the tile and create its ImageData object.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
 ### fetch
 
-Fetch the tile and create its image bitmap.
-
-Returns and event when completed (or error).
+Fetch the tile and create its IntArray data using the supplied getImageData function.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
 ### getCacheableTile
 
-Get a specific cacheable tile in this cache
-I.e. independent of whether their fetching is completed and image bitmap is created
+Get a specific tile in this cache
 
 #### Parameters
 
 *   `e` &#x20;
-*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the url of the requested tile
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the URL of the requested tile
 
 Returns **(CacheableTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
 ### getCachedTile
 
-Get a specific cached tile in this cache
-I.e. with their fetching completed and image bitmap created
+Get a specific cached tile in this cache that has been fetched
 
 #### Parameters
 
 *   `e` &#x20;
-*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the url of the requested tile
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the URL of the requested tile
 
 Returns **(CachedTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
 ### getCacheableTiles
 
-Get the tiles in this cache (independent of whether their caching has completed)
+Get the tiles in this cache
 
 Returns **IterableIterator\<CacheableTile>**&#x20;
 
 ### getCachedTiles
 
-Get the tiles in this cache whose caching has completed
+Get the tiles in this cache that have been fetched
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
 
@@ -892,14 +883,14 @@ Get the URLs of all tiles in this cache
 
 Returns **IterableIterator<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
 
-### requestFetchableMapTiles
+### requestFetchableTiles
 
 Process the request for new tiles to be added to this cache
 
 #### Parameters
 
 *   `e` &#x20;
-*   `requestedTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableMapTile>**&#x20;
+*   `tiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
 
 ### constructor
 
@@ -909,8 +900,8 @@ Creates an instance of WebGL2Renderer.
 
 *   `e` &#x20;
 *   `t` &#x20;
-*   `gl` **WebGL2RenderingContext** the WebGL2 rendering context
-*   `options` **WebGL2RendererOptions** the WebGL2 rendering options
+*   `gl` **WebGL2RenderingContext** WebGL 2 rendering context
+*   `options` **WebGL2RendererOptions** options
 
 ### getOpacity
 

@@ -1,6 +1,6 @@
 import { fetchUrl } from '@allmaps/stdlib'
 
-import FetchableMapTile from './FetchableTile.js'
+import FetchableTile from './FetchableTile.js'
 import CacheableTile from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -9,30 +9,28 @@ import type { FetchFn } from '@allmaps/types'
 import type { GetImageData } from '../shared/types.js'
 
 /**
- * Class for tiles that can be cached. These are used on the tile cache (and are not associated to a specific map)
+ * Class for tiles that are cached using an IntArray
  *
  * @export
- * @class CacheableArrayBufferTile
- * @typedef {CacheableArrayBufferTile}
- * @extends {EventTarget}
+ * @class CacheableIntArrayTile
+ * @typedef {CacheableIntArrayTile}
+ * @extends {CacheableTile}
  */
 export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
   getImageData: GetImageData<D>
 
   constructor(
-    fetchableMapTile: FetchableMapTile,
+    fetchableTile: FetchableTile,
     getImageData: GetImageData<D>,
     fetchFn?: FetchFn
   ) {
-    super(fetchableMapTile, fetchFn)
+    super(fetchableTile, fetchFn)
 
     this.getImageData = getImageData
   }
 
   /**
-   * Fetch the tile and create its image bitmap.
-   *
-   * Returns and event when completed (or error).
+   * Fetch the tile and create its IntArray data using the supplied getImageData function.
    *
    * @async
    * @returns {Promise<void>}
@@ -68,14 +66,13 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
   }
 
   static createFactory<D>(getImageData: GetImageData<D>) {
-    return (fetchableMapTile: FetchableMapTile, fetchFn?: FetchFn) =>
-      new CacheableIntArrayTile(fetchableMapTile, getImageData, fetchFn)
+    return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
+      new CacheableIntArrayTile(fetchableTile, getImageData, fetchFn)
   }
 }
 
 /**
- * Class for cacheable tiles whose caching has been completed
- * I.e. their fetching is completed and image bitmap is created
+ * Class for cacheable tiles that have been fetched.
  *
  * @export
  * @class CachedIntArrayTile

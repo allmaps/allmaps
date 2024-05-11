@@ -603,8 +603,8 @@ Compute distortion from partial derivatives
 
 *   `partialDerivativeX` **Point** the partial derivative to 'x' of the transformation, evaluated at a set point
 *   `partialDerivativeY` **Point** the partial derivative to 'x' of the transformation, evaluated at a set point
-*   `distortionMeasure` **DistortionMeasure??** the requested distortion measure, or undefined to return 0
-*   `referenceScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the reference area scaling (sigma) to take into account, e.g. computed via a helmert transform (optional, default `1`)
+*   `distortionMeasure` **DistortionMeasure?** the requested distortion measure, or undefined to return 0
+*   `referenceScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** the reference area scaling (sigma) to take into account, e.g. computed via a helmert transform (optional, default `1`)
 
 Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the distortion measure at the set point
 
