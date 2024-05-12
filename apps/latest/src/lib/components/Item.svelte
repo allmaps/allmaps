@@ -43,7 +43,7 @@
   data-error={error}
   class={`${
     error ? 'bg-gray/20' : backgroundColor
-  } rounded-lg aspect-square p-1.5 relative overflow-hidden`}
+  } rounded-lg aspect-square p-1.5 relative overflow-hidden text-xs @lg:text-sm @2xl:text-base`}
 >
   <div
     class="flex flex-col justify-between pointer-events-none [&>*]:pointer-events-auto h-full relative z-10"
