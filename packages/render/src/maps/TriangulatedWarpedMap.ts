@@ -217,9 +217,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
       this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
     }
 
-    if (this.distortionMeasure) {
-      this.updateTrianglePointsDistortion(previousIsNew)
-    }
+    this.updateTrianglePointsDistortion(previousIsNew)
   }
 
   /**
@@ -228,33 +226,35 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    * @param {boolean} [previousIsNew=false]
    */
   updateTrianglePointsDistortion(previousIsNew = false) {
-    this.projectedGeoUniquePointsPartialDerivativeX =
-      getPropertyFromDoubleCacheOrComputation(
-        this
-          .projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType,
-        this.bestScaleFactor,
-        this.transformationType,
-        () =>
-          this.resourceUniquePoints.map((point) =>
-            this.projectedTransformer.transformToGeo(point, {
-              evaluationType: 'partialDerivativeX'
-            })
-          )
-      )
+    if (this.distortionMeasure) {
+      this.projectedGeoUniquePointsPartialDerivativeX =
+        getPropertyFromDoubleCacheOrComputation(
+          this
+            .projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType,
+          this.bestScaleFactor,
+          this.transformationType,
+          () =>
+            this.resourceUniquePoints.map((point) =>
+              this.projectedTransformer.transformToGeo(point, {
+                evaluationType: 'partialDerivativeX'
+              })
+            )
+        )
 
-    this.projectedGeoUniquePointsPartialDerivativeY =
-      getPropertyFromDoubleCacheOrComputation(
-        this
-          .projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType,
-        this.bestScaleFactor,
-        this.transformationType,
-        () =>
-          this.resourceUniquePoints.map((point) =>
-            this.projectedTransformer.transformToGeo(point, {
-              evaluationType: 'partialDerivativeY'
-            })
-          )
-      )
+      this.projectedGeoUniquePointsPartialDerivativeY =
+        getPropertyFromDoubleCacheOrComputation(
+          this
+            .projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType,
+          this.bestScaleFactor,
+          this.transformationType,
+          () =>
+            this.resourceUniquePoints.map((point) =>
+              this.projectedTransformer.transformToGeo(point, {
+                evaluationType: 'partialDerivativeY'
+              })
+            )
+        )
+    }
 
     this.uniquePointsDistortion = this.projectedGeoUniquePoints.map(
       (_point, index) =>

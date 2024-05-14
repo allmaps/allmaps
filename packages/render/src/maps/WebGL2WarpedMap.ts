@@ -192,27 +192,27 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     // Previous and new distortion
+    // Note: we must update the distortion data even when we don't render distortions
+    // to ensure this array buffer is of the correct length, for example when triangulation changes
 
-    if (this.distortionMeasure) {
-      const previousTrianglePointsDistortion =
-        this.previousTrianglePointsDistortion
-      createBuffer(
-        this.gl,
-        this.program,
-        new Float32Array(previousTrianglePointsDistortion),
-        1,
-        'a_previousTrianglePointDistortion'
-      )
+    const previousTrianglePointsDistortion =
+      this.previousTrianglePointsDistortion
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(previousTrianglePointsDistortion),
+      1,
+      'a_previousTrianglePointDistortion'
+    )
 
-      const trianglePointsDistortion = this.trianglePointsDistortion
-      createBuffer(
-        this.gl,
-        this.program,
-        new Float32Array(trianglePointsDistortion),
-        1,
-        'a_trianglePointDistortion'
-      )
-    }
+    const trianglePointsDistortion = this.trianglePointsDistortion
+    createBuffer(
+      this.gl,
+      this.program,
+      new Float32Array(trianglePointsDistortion),
+      1,
+      'a_trianglePointDistortion'
+    )
 
     // Triangle index
 
