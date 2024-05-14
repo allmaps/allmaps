@@ -17,7 +17,7 @@ import type { Point, Ring } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 // TODO: Consider making this tunable by the user.
-const DIAMETER_FRACTION = 300
+const DIAMETER_FRACTION = 80
 
 const MAX_TRIANGULATE_ERROR_COUNT = 10
 
@@ -217,7 +217,9 @@ export default class TriangulatedWarpedMap extends WarpedMap {
       this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
     }
 
-    this.updateTrianglePointsDistortion(previousIsNew)
+    if (this.distortionMeasure) {
+      this.updateTrianglePointsDistortion(previousIsNew)
+    }
   }
 
   /**
@@ -266,6 +268,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
     this.trianglePointsDistortion = this.trianglePointsUniquePointsIndex.map(
       (i) => this.uniquePointsDistortion[i]
     )
+
     if (previousIsNew || !this.previousTrianglePointsDistortion.length) {
       this.previousTrianglePointsDistortion = this.trianglePointsDistortion
     }
