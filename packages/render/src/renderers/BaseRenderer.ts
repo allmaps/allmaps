@@ -2,8 +2,8 @@ import TileCache from '../tilecache/TileCache.js'
 import WarpedMapList from '../maps/WarpedMapList.js'
 import FetchableTile from '../tilecache/FetchableTile.js'
 
+import TriangulatedWarpedMap from '../maps/TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
-
 import {
   getBestTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel
@@ -127,7 +127,9 @@ export default abstract class BaseRenderer<
         warpedMap.getResourceToCanvasScale(viewport)
       )
 
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
+      if (warpedMap instanceof TriangulatedWarpedMap) {
+        warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
+      }
 
       // Transforming the viewport back to resource
       const transformerOptions = {

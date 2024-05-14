@@ -94,7 +94,6 @@ export function createWarpedMapFactory() {
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
- * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, in the current viewport
  * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, in the current viewport
  * @param {Bbox} [resourceViewportRingBbox] - Bbox of the resourceViewportRing
  */
@@ -152,8 +151,6 @@ export default class WarpedMap extends EventTarget {
   distortionMeasure?: DistortionMeasure
 
   // The properties below are for the current viewport
-
-  bestScaleFactor!: number
 
   resourceViewportRing: Ring = []
   resourceViewportRingBbox?: Bbox
@@ -377,20 +374,6 @@ export default class WarpedMap extends EventTarget {
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
     this.updateTransformerProperties(false)
-  }
-
-  /**
-   * Set the bestScaleFactor for the current viewport
-   *
-   * @param {number} scaleFactor - scale factor
-   * @returns {boolean}
-   */
-  setBestScaleFactor(scaleFactor: number): boolean {
-    const updating = this.bestScaleFactor != scaleFactor
-    if (updating) {
-      this.bestScaleFactor = scaleFactor
-    }
-    return updating
   }
 
   /**
