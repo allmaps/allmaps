@@ -343,7 +343,7 @@ export function featuresToFeatureCollection(
 export function geometriesToFeatureCollection(
   geometries: GeojsonGeometry[],
   properties?: unknown[]
-) {
+): GeojsonFeatureCollection {
   return {
     type: 'FeatureCollection',
     features: geometries.map((geometry, i) =>
@@ -352,4 +352,14 @@ export function geometriesToFeatureCollection(
         : geometryToFeature(geometry)
     )
   }
+}
+
+export function featureToGeometry(feature: GeojsonFeature): GeojsonGeometry {
+  return feature.geometry
+}
+
+export function featureCollectionToGeometries(
+  featureCollection: GeojsonFeatureCollection
+): GeojsonGeometry[] {
+  return featureCollection.features.map(featureToGeometry)
 }

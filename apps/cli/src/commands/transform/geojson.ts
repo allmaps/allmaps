@@ -35,13 +35,14 @@ export default function geojson() {
       throw new Error('Inverse transformation not supported for this command')
     }
 
-    const geoJsonGeometries = await parseJsonInput(files as string[])
+    const geojsonGeometries = await parseJsonInput(files as string[])
 
+    // TODO: consider to use transformGeojsonFeatureCollectionToSvgString()
     const svgGeometries = []
-    for (const geoJsonGeometry of geoJsonGeometries) {
-      if (isGeojsonGeometry(geoJsonGeometry)) {
+    for (const geojsonGeometry of geojsonGeometries) {
+      if (isGeojsonGeometry(geojsonGeometry)) {
         const svgGeometry = transformer.transformGeojsonToSvg(
-          geoJsonGeometry,
+          geojsonGeometry,
           transformOptions
         )
         svgGeometries.push(svgGeometry)

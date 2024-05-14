@@ -40,6 +40,7 @@ export default function svg() {
 
     const svgs = await readInput(files as string[])
 
+    // TODO: consider to use transformSvgStringToGeojsonFeatureCollection()
     const geojsonGeometries = []
     for (const svg of svgs) {
       for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {

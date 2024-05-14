@@ -50,5 +50,5 @@ export type GeojsonFeature = {
 
 export type GeojsonFeatureCollection = {
   type: 'FeatureCollection'
-  features: unknown[]
+  features: GeojsonFeature[]
 }

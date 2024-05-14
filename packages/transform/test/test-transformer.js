@@ -1,9 +1,15 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
+
 import {
   expectToBeCloseToArrayArray,
   expectToBeCloseToArrayArrayArray
 } from '../../stdlib/test/helper-functions.js'
+
+import {
+  geometriesToFeatureCollection,
+  convertGeometryToGeojsonGeometry
+} from '@allmaps/stdlib'
 import { GcpTransformer } from '../dist/index.js'
 
 import { transformGcps6, gcps6, transformGcps7 } from './input/gcps-test.js'
@@ -440,5 +446,39 @@ describe('Transform Polygon Backward To Polygon, with maxOffsetRatio very small'
         transformer.transformBackward(input, transformOptions)
       ).to.deep.equal(output)
     })
+  })
+})
+
+describe('Transform SVG string Backward To Polygon', async () => {
+  const transformOptions = {
+    maxOffsetRatio: 0.00001,
+    maxDepth: 1
+  }
+  const transformer = new GcpTransformer(transformGcps6, 'thinPlateSpline')
+  const input =
+    '<svg><polygon points="4.388957777030093,51.959084191571606 4.392938913951547,51.94062947962427 4.425874493300959,51.94172557475595 4.420666790347598,51.959985351835975" /></svg>'
+  let output = [
+    [
+      [1032.5263837176526, 992.2883187637146],
+      [1045.038670070595, 1489.2938524267215],
+      [1056.6257766352364, 1986.6566391349374],
+      [1520.5146305339294, 1995.064826625076],
+      [1972.2719445148632, 2006.6657102722945],
+      [1969.4756718048366, 1507.0983522493168],
+      [1957.822599920541, 1009.7982201488556],
+      [1495.7555378955249, 1000.7599463685738]
+    ]
+  ]
+  output = geometriesToFeatureCollection(
+    convertGeometryToGeojsonGeometry(output)
+  )
+
+  it(`should give the same result as transforming from geojson polygon`, () => {
+    expect(
+      transformer.transformSvgStringToGeojsonFeatureCollection(
+        input,
+        transformOptions
+      )
+    ).to.deep.equal(output)
   })
 })
