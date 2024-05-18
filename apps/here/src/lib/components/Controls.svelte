@@ -2,9 +2,10 @@
   import { onMount } from 'svelte'
   import { goto } from '$app/navigation'
 
-  import { maps, previousMapId, nextMapId } from '$lib/shared/stores/maps.js'
+  import { mapsWithImageInfo } from '$lib/shared/stores/maps-with-image-info.js'
+  import { previousMapId, nextMapId } from '$lib/shared/stores/selected-map.js'
 
-  const hasMaps = $maps.length > 0
+  const hasMaps = $mapsWithImageInfo.length > 0
 
   function handleKeyup(event: KeyboardEvent) {
     if (event.code === 'BracketLeft' && $previousMapId !== undefined) {

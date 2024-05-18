@@ -22,13 +22,16 @@
 
   import { positionToGeoJson } from '$lib/shared/position.js'
 
-  import { map } from '$lib/shared/stores/maps.js'
-  import { imageInfo } from '$lib/shared/stores/image-info.js'
   import { position } from '$lib/shared/stores/geolocation.js'
+  import { selectedMapWithImageInfo } from '$lib/shared/stores/selected-map.js'
 
   import Controls from '$lib/components/Controls.svelte'
 
   import type { Map } from '@allmaps/annotation'
+  import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
+
+  let mounted = false
+  let lastSelectedMapId: string | undefined = undefined
 
   let transformer: GcpTransformer
 
@@ -37,14 +40,17 @@
   const tileLayer = new TileLayer()
   const positionFeature: Feature = new Feature()
 
-  let currentMapId: string | undefined
-
   $: {
     updatePosition($position)
   }
 
   $: {
-    setNewMap($map)
+    if (
+      $selectedMapWithImageInfo &&
+      $selectedMapWithImageInfo.map.id !== lastSelectedMapId
+    ) {
+      update($selectedMapWithImageInfo)
+    }
   }
 
   // eslint-disable-next-line no-undef
@@ -60,14 +66,20 @@
     }
   }
 
-  function setNewMap(map?: Map) {
-    if (currentMapId === map?.id || !map || !$imageInfo || !olMap) {
+  function update(mapWithImageInfo: {
+    map: Map
+    imageInfo: ImageInformationResponse
+  }) {
+    if (!mounted) {
       return
     }
 
+    const map = mapWithImageInfo.map
+    const imageInfo = mapWithImageInfo.imageInfo
+
     transformer = new GcpTransformer(map.gcps, map.transformation?.type)
 
-    const options = new IIIFInfo($imageInfo).getTileSourceOptions()
+    const options = new IIIFInfo(imageInfo).getTileSourceOptions()
     if (options) {
       options.zDirection = -1
     }
@@ -88,13 +100,11 @@
     }
 
     updatePosition($position)
+
+    lastSelectedMapId = map.id
   }
 
   onMount(async () => {
-    if (!$imageInfo || !$map) {
-      return
-    }
-
     positionFeature.setStyle(
       new Style({
         image: new CircleStyle({
@@ -121,7 +131,11 @@
       target: ol
     })
 
-    setNewMap($map)
+    mounted = true
+
+    if ($selectedMapWithImageInfo) {
+      update($selectedMapWithImageInfo)
+    }
   })
 </script>
 

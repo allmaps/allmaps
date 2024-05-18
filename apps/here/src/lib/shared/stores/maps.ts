@@ -1,46 +1,61 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
-import type { Map } from '@allmaps/annotation'
+import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
 
-export const map = writable<Map | undefined>()
+import { fetchJson } from '@allmaps/stdlib'
+import { parseAnnotation } from '@allmaps/annotation'
 
-export const maps = writable<Map[]>([])
+import { addImageInfo } from '$lib/shared/stores/image-infos.js'
 
-export const mapIndex = derived([map, maps], ([$map, $maps]) => {
-  if ($maps.length) {
-    return $maps.findIndex((map) => map.id === $map?.id)
-  }
-})
+import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
-export const previousMapIndex = derived(
-  [mapIndex, maps],
-  ([$mapIndex, $maps]) => {
-    if ($mapIndex !== undefined) {
-      return ($mapIndex - 1 + $maps.length) % $maps.length
-    }
-  }
+function getMapId(map: GeoreferencedMap) {
+  return map.id || '-'
+}
+
+export const mapsFromCoordinates = writable<Map<string, GeoreferencedMap>>(
+  new Map()
+)
+export const mapsFromUrl = writable<Map<string, GeoreferencedMap>>(new Map())
+
+export const maps = derived(
+  [mapsFromCoordinates, mapsFromUrl],
+  ([$mapsFromCoordinates, $mapsFromUrl]) =>
+    new Map([...$mapsFromCoordinates, ...$mapsFromUrl])
 )
 
-export const previousMapId = derived(
-  [previousMapIndex, maps],
-  ([$previousMapIndex, $maps]) => {
-    if ($previousMapIndex !== undefined && $maps[$previousMapIndex]) {
-      return $maps[$previousMapIndex].id
-    }
-  }
-)
+export async function loadMapsFromCoordinates(
+  latitude: number,
+  longitude: number
+) {
+  const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=25&intersects=${[
+    latitude,
+    longitude
+  ].join(',')}`
 
-export const nextMapIndex = derived([mapIndex, maps], ([$mapIndex, $maps]) => {
-  if ($mapIndex !== undefined) {
-    return ($mapIndex + 1) % $maps.length
-  }
-})
+  const annotations = await fetchJson(url)
+  const maps = parseAnnotation(annotations)
+  maps.forEach((map) => addImageInfo(map.resource.id))
+  mapsFromCoordinates.set(new Map(maps.map((map) => [getMapId(map), map])))
+}
 
-export const nextMapId = derived(
-  [nextMapIndex, maps],
-  ([$nextMapIndex, $maps]) => {
-    if ($nextMapIndex !== undefined && $maps[$nextMapIndex]) {
-      return $maps[$nextMapIndex].id
-    }
+export async function loadMapsFromUrl(url: string) {
+  if (!url) {
+    return
   }
-)
+
+  // If the URL is a map ID, and the map is already loaded, do nothing
+  if (mapExists(url)) {
+    return
+  }
+
+  const annotations = await fetchJson(url)
+  const maps = parseAnnotation(annotations)
+  maps.forEach((map) => addImageInfo(map.resource.id))
+
+  mapsFromUrl.set(new Map(maps.map((map) => [getMapId(map), map])))
+}
+
+export function mapExists(mapId: string) {
+  return get(maps).has(mapId)
+}
