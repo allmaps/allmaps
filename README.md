@@ -54,7 +54,7 @@ You can [install pnpm with Corepack](https://pnpm.io/installation#using-corepack
 
 ```sh
 corepack enable
-corepack prepare pnpm@latest --activate
+corepack use pnpm@8.10.0
 ```
 
 Then, clone this repository locally:
