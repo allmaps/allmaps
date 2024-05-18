@@ -46,13 +46,8 @@
     return `${(100 - (tilesHeight / tilesWidth) * 100) / 2}%`
   }
 
-  // "{(100 - (tilesWidth / tilesHeight) * 100) / 2}%"
-  // style:top="{(100 - (tilesHeight / tilesWidth) * 100) / 2}%"
-
-  onMount(() => {
-    parsedImage = Image.parse(imageInfo)
-    imageRequest = parsedImage.getThumbnail({ width, height }, mode)
-  })
+  $: parsedImage = Image.parse(imageInfo)
+  $: imageRequest = parsedImage.getThumbnail({ width, height }, mode)
 </script>
 
 <div style:aspect-ratio="{width} / {height}" class="overflow-hidden">
