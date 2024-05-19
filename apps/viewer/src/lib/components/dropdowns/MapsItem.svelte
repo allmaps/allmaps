@@ -299,15 +299,16 @@
     <div
       class="text-sm grid gap-2 grid-cols-[auto_1fr] grid-rows-[auto_auto] w-full"
     >
-      <div class="py-1">XYZ tile URL</div>
+      <div class="py-1">Tile URL</div>
       <!-- TODO: create functions for IDs/URNs in stdlib -->
       <Copy
         string={`https://allmaps.xyz/maps/${mapId.split('/').at(-1)}/{z}/{x}/{y}.png`}
+        compact={true}
       />
 
-      <div class="py-1">Georef. Annotation</div>
+      <div class="py-1">Annotation JSON</div>
       <div class="flex flex-col items-end gap-2">
-        <Copy string={JSON.stringify(viewerMap.annotation, null, 2)} />
+        <Copy string={JSON.stringify(viewerMap.annotation, null, 2)} compact={true} />
       </div>
       <!-- <div class="py-1">Export</div>
       <div class="flex flex-row gap-2">
