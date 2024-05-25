@@ -225,6 +225,9 @@ export default abstract class BaseRenderer<
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected transformationChanged(event: Event): void {}
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected distortionChanged(event: Event): void {}
+
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
@@ -254,6 +257,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.addEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
     )
   }
 
@@ -286,6 +294,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.DISTORTIONCHANGED,
+      this.distortionChanged.bind(this)
     )
   }
 }

@@ -962,7 +962,7 @@ export default class WebGL2Renderer
     }
   }
 
-  private distortionChanged(event: Event) {
+  protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
@@ -990,24 +990,6 @@ export default class WebGL2Renderer
     webgl2WarpedMap.removeEventListener(
       WarpedMapEventType.TEXTURESUPDATED,
       this.throttledChanged.bind(this)
-    )
-  }
-
-  protected addEventListeners() {
-    super.addEventListeners()
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
-    )
-  }
-
-  protected removeEventListeners() {
-    super.removeEventListeners()
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
     )
   }
 }
