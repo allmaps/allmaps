@@ -119,7 +119,7 @@ export default class RBF extends Transformation {
       }
     }
 
-    // Compute basis functions weights and the affine parameters by solving the linear system of equations for each target component
+    // Compute basis functions weights and the affine parameters by solving the linear system of equations for each component
     // Note: the same kernelsAndAffineCoefsMatrix is used for both solutions
     const inverseKernelsAndAffineCoefsMatrix = inverse(
       kernelsAndAffineCoefsMatrix
@@ -192,12 +192,14 @@ export default class RBF extends Transformation {
       newDestinationPointPartDerX[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          this.kernelFunction(dist, {
-            derivative: 1,
-            epsilon: this.epsilon
-          }) *
-            ((newSourcePoint[0] - this.sourcePoints[index][0]) / dist) *
-            this.rbfWeights[i][index],
+          (dist == 0
+            ? 0
+            : this.kernelFunction(dist, {
+                derivative: 1,
+                epsilon: this.epsilon
+              }) *
+              ((newSourcePoint[0] - this.sourcePoints[index][0]) / dist) *
+              this.rbfWeights[i][index]),
         0
       )
       // Add the affine part
@@ -224,12 +226,14 @@ export default class RBF extends Transformation {
       newDestinationPointPartDerY[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          this.kernelFunction(dist, {
-            derivative: 1,
-            epsilon: this.epsilon
-          }) *
-            ((newSourcePoint[1] - this.sourcePoints[index][1]) / dist) *
-            this.rbfWeights[i][index],
+          (dist == 0
+            ? 0
+            : this.kernelFunction(dist, {
+                derivative: 1,
+                epsilon: this.epsilon
+              }) *
+              ((newSourcePoint[1] - this.sourcePoints[index][1]) / dist) *
+              this.rbfWeights[i][index]),
         0
       )
       // Add the affine part

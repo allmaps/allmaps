@@ -43,7 +43,7 @@ export default class Helmert extends Transformation {
       helmertCoefsMatrix.set(2 * i + 1, 3, this.sourcePoints[i][0])
     }
 
-    // Compute helmert parameters by solving the linear system of equations for each target component
+    // Compute helmert parameters by solving the linear system of equations for each component
     // Will result in a Matrix([[t_x], [t_y], [m], [n]])
     const pseudoInverseHelmertCoefsMatrix = pseudoInverse(helmertCoefsMatrix)
     this.helmertParametersMatrix = pseudoInverseHelmertCoefsMatrix.mmul(

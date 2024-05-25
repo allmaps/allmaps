@@ -116,7 +116,7 @@ export default class Polynomial extends Transformation {
       }
     }
 
-    // Compute polynomial parameters by solving the linear system of equations for each target component
+    // Compute polynomial parameters by solving the linear system of equations for each component
     // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
     // This wil result in:
     // For order = 1: polynomialParametersMatrices = [Matrix([[a0_x], [ax_x], [ay_x]]), Matrix([[a0_y], [ax_y], [ay_y]])]
