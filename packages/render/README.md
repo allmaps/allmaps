@@ -181,6 +181,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [getTileUrls](#gettileurls)
 *   [requestFetchableTiles](#requestfetchabletiles)
     *   [Parameters](#parameters-51)
+*   [allRequestedTilesLoaded](#allrequestedtilesloaded)
 *   [constructor](#constructor-7)
     *   [Parameters](#parameters-52)
 *   [getOpacity](#getopacity)
@@ -235,6 +236,10 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
     *   [Parameters](#parameters-72)
 *   [render](#render)
     *   [Parameters](#parameters-73)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
+    *   [Parameters](#parameters-74)
+*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+    *   [Parameters](#parameters-75)
 
 ### constructor
 
@@ -877,6 +882,14 @@ Process the request for new tiles to be added to this cache
 *   `e` &#x20;
 *   `tiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
 
+### allRequestedTilesLoaded
+
+Returns a promise that resolves when all requested tiles are loaded.
+This could happen immidiately, in case there are no current requests and the tilesFetchingCount is zero,
+or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
 ### constructor
 
 Creates an instance of WebGL2Renderer.
@@ -1150,3 +1163,25 @@ Render the map for a given viewport
 
 *   `e` &#x20;
 *   `viewport` **Viewport** the current viewport
+
+### addGeoreferenceAnnotation
+
+Parses an annotation and adds its georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+### addGeoreferencedMap
+
+Adds a georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;

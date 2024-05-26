@@ -29,7 +29,6 @@ import type { DebouncedFunc } from 'lodash-es'
 import type { Transform } from '@allmaps/types'
 
 import type Viewport from '../viewport/Viewport.js'
-import type WarpedMap from '../maps/WarpedMap.js'
 
 import type {
   Renderer,
@@ -472,19 +471,6 @@ export default class WebGL2Renderer
     }
   }
 
-  shouldUpdateRequestedTiles() {
-    if (!this.viewportMovedSignificantly()) {
-      return false
-    }
-
-    if (this.animating) {
-      // TODO: check if this makes sense
-      return false
-    }
-
-    return true
-  }
-
   /**
    * Render the map for a given viewport
    *
@@ -492,10 +478,16 @@ export default class WebGL2Renderer
    */
   render(viewport: Viewport): void {
     this.viewport = viewport
-    if (this.checkAndLoadImageInfos()) {
-      // Don't fire throttled function unless it could result in something
+
+    // Not awaiting this, using events to trigger new render calls
+    this.loadMissingImageInfosInViewport()
+
+    // Don't fire throttled function unless it could result in something
+    // Otherwise we have to wait for that cycle to finish before useful cycle can be started
+    if (this.someImageInfosInViewport()) {
       this.throttledPrepareRenderInternal()
     }
+
     this.renderInternal()
   }
 
@@ -522,70 +514,54 @@ export default class WebGL2Renderer
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
-  private startTransformationTransition() {
-    if (this.lastAnimationFrameRequestId !== undefined) {
-      cancelAnimationFrame(this.lastAnimationFrameRequestId)
-    }
-
-    this.animating = true
-    this.transformationTransitionStart = undefined
-    this.lastAnimationFrameRequestId = requestAnimationFrame(
-      this.transformationTransitionFrame.bind(this)
-    )
-  }
-
-  private transformationTransitionFrame(now: number) {
-    if (!this.transformationTransitionStart) {
-      this.transformationTransitionStart = now
-    }
-
-    if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
-      this.animationProgress =
-        (now - this.transformationTransitionStart) / ANIMATION_DURATION
-
-      this.renderInternal()
-
-      this.lastAnimationFrameRequestId = requestAnimationFrame(
-        this.transformationTransitionFrame.bind(this)
-      )
-    } else {
-      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetTrianglePoints()
-      }
-      this.updateVertexBuffers()
-
-      this.animating = false
-      this.animationProgress = 0
-      this.transformationTransitionStart = undefined
-    }
-  }
-
-  private checkAndLoadImageInfos(): boolean {
-    if (!this.viewport) {
-      return false
-    }
-
-    const checks = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
-    )
-      .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
-      .map((warpedMap) => {
-        if (!warpedMap.hasImageInfo()) {
-          if (!warpedMap.loadingImageInfo) {
-            // Load if non-existent and not already loading
-            warpedMap.loadImageInfo()
-          }
-          return false
-        } else {
-          return true
-        }
-      })
-    return checks.some((val) => val === true)
-  }
-
   private prepareRenderInternal(): void {
     this.updateRequestedTiles()
     this.updateVertexBuffers()
+  }
+
+  protected shouldUpdateRequestedTiles(): boolean {
+    // Returns whether requested tiles should be updated
+
+    // Returns true wehn the viewport moved significantly
+    // > to prevent updating requested tiles on minimal movements/
+    // Returns true when the viewport didn't move at all
+    // > since this function is called (possibly multiple times) during startup, without changes to the viewport
+    // Returns false in other cases
+
+    // TODO: this could be a problem if the viewport is quickly and continously moved
+    // within the tolerance during initial loading.
+    // Possible solution: adding a 'allrendered' event and listening to it.
+
+    if (!this.viewport) {
+      return false
+    }
+    if (this.animating) {
+      return false
+    }
+    if (!this.previousSignificantViewport) {
+      this.previousSignificantViewport = this.viewport
+      return true
+    } else {
+      const rectangleDistances = []
+      for (let i = 0; i < 4; i++) {
+        rectangleDistances.push(
+          distance(
+            this.previousSignificantViewport.projectedGeoRectangle[i],
+            this.viewport.projectedGeoRectangle[i]
+          ) / this.viewport.projectedGeoPerViewportScale
+        )
+      }
+      const dist = Math.max(...rectangleDistances)
+      if (dist === 0) {
+        return true
+      }
+      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
+        this.previousSignificantViewport = this.viewport
+        return true
+      } else {
+        return false
+      }
+    }
   }
 
   private updateVertexBuffers() {
@@ -604,46 +580,6 @@ export default class WebGL2Renderer
       }
 
       warpedMap.updateVertexBuffers(this.viewport.projectedGeoToClipTransform)
-    }
-  }
-
-  private viewportMovedSignificantly(): boolean {
-    // Returns whether the viewport moved significantly (or didn't move at all).
-    // This to prevent updating requested tiles on minimal movements.
-    // No move should also return true, e.g. when this function is called multiple times during startup, without changes to the viewport
-
-    // TODO: this could be a problem if the viewport is quickly and continously moved
-    // within the tolerance during initial loading.
-    // Possible solution: adding a 'allrendered' event and listening to it.
-
-    if (!this.viewport) {
-      return false
-    }
-    if (!this.previousSignificantViewport) {
-      this.previousSignificantViewport = this.viewport
-      return true // No move should also return true
-    } else {
-      const rectangleDistances = []
-      for (let i = 0; i < 4; i++) {
-        rectangleDistances.push(
-          distance(
-            this.previousSignificantViewport.projectedGeoRectangle[i],
-            this.viewport.projectedGeoRectangle[i]
-          ) / this.viewport.projectedGeoPerViewportScale
-        )
-      }
-      const dist = Math.max(...rectangleDistances)
-      if (dist === 0) {
-        // No move should also pass, e.g. when this function is called multiple times during startup,
-        // without changes to the viewport
-        return true
-      }
-      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
-        this.previousSignificantViewport = this.viewport
-        return true
-      } else {
-        return false
-      }
     }
   }
 
@@ -890,6 +826,44 @@ export default class WebGL2Renderer
 
     const gridLocation = gl.getUniformLocation(this.program, 'u_grid')
     gl.uniform1f(gridLocation, gridOptionsGrid ? 1 : 0)
+  }
+
+  private startTransformationTransition() {
+    if (this.lastAnimationFrameRequestId !== undefined) {
+      cancelAnimationFrame(this.lastAnimationFrameRequestId)
+    }
+
+    this.animating = true
+    this.transformationTransitionStart = undefined
+    this.lastAnimationFrameRequestId = requestAnimationFrame(
+      this.transformationTransitionFrame.bind(this)
+    )
+  }
+
+  private transformationTransitionFrame(now: number) {
+    if (!this.transformationTransitionStart) {
+      this.transformationTransitionStart = now
+    }
+
+    if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
+      this.animationProgress =
+        (now - this.transformationTransitionStart) / ANIMATION_DURATION
+
+      this.renderInternal()
+
+      this.lastAnimationFrameRequestId = requestAnimationFrame(
+        this.transformationTransitionFrame.bind(this)
+      )
+    } else {
+      for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+        warpedMap.resetTrianglePoints()
+      }
+      this.updateVertexBuffers()
+
+      this.animating = false
+      this.animationProgress = 0
+      this.transformationTransitionStart = undefined
+    }
   }
 
   private changed() {

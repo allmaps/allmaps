@@ -256,16 +256,23 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     mapIds: Iterable<string>,
     transformationType: TransformationType
   ): void {
+    const mapIdsChanged = []
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
+      if (warpedMap && warpedMap.transformationType != transformationType) {
         warpedMap.setTransformationType(transformationType)
         this.addToOrUpdateRtree(warpedMap)
+        mapIdsChanged.push(mapId)
       }
     }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.TRANSFORMATIONCHANGED, mapIds)
-    )
+    if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(
+          WarpedMapEventType.TRANSFORMATIONCHANGED,
+          mapIdsChanged
+        )
+      )
+    }
   }
 
   /**
@@ -278,15 +285,19 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     mapIds: Iterable<string>,
     distortionMeasure?: DistortionMeasure
   ): void {
+    const mapIdsChanged = []
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
+      if (warpedMap && warpedMap.distortionMeasure != distortionMeasure) {
         warpedMap.setDistortionMeasure(distortionMeasure)
+        mapIdsChanged.push(mapId)
       }
     }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIds)
-    )
+    if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIdsChanged)
+      )
+    }
   }
 
   /**
@@ -570,12 +581,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
   }
 
-  loadAllImageInfo() {
-    return [...this.warpedMapsById.values()].map((warpedMap) =>
-      warpedMap.loadImageInfo()
-    )
-  }
-
+  // This function and the listeners below transform an IMAGEINFOLOADED event by a WarpedMap
+  // to an IMAGEINFOLOADED of the WarpedMapList, which is listened to in the Renderer
   private imageInfoLoaded() {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
   }

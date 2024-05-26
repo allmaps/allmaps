@@ -53,12 +53,54 @@ export default abstract class BaseRenderer<
     this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
   }
 
+  /**
+   * Parses an annotation and adds its georeferenced map to this renderer's warped map list
+   *
+   * @async
+   * @param {unknown} annotation
+   * @returns {Promise<(string | Error)[]>}
+   */
   async addGeoreferenceAnnotation(annotation: unknown) {
     return this.warpedMapList.addGeoreferenceAnnotation(annotation)
   }
 
+  /**
+   * Adds a georeferenced map to this renderer's warped map list
+   *
+   * @async
+   * @param {unknown} georeferencedMap
+   * @returns {Promise<string | Error>}
+   */
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
+  }
+
+  protected loadMissingImageInfosInViewport(): Promise<void>[] {
+    if (!this.viewport) {
+      return []
+    }
+
+    return Array.from(
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
+    )
+      .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
+      .filter(
+        (warpedMap) => !warpedMap.hasImageInfo() && !warpedMap.loadingImageInfo
+      )
+      .map((warpedMap) => warpedMap.loadImageInfo())
+  }
+
+  protected someImageInfosInViewport(): boolean {
+    if (!this.viewport) {
+      return false
+    }
+
+    return Array.from(
+      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
+    )
+      .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
+      .map((warpedMap) => warpedMap.hasImageInfo())
+      .some((val) => val === true)
   }
 
   protected shouldUpdateRequestedTiles() {

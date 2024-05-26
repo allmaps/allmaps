@@ -47,14 +47,10 @@ export default class CanvasRenderer
       this.warpedMapList
     )
 
-    // TODO: this function loads too many info.jsons?? Some maps are outside of viewport.
-    // Align with checkAndLoadImageInfos() (for WebGL2Renderer, where the renderer doesn't
-    // have to wait untill all loaded).
-    await Promise.allSettled(this.warpedMapList.loadAllImageInfo())
+    await Promise.allSettled(this.loadMissingImageInfosInViewport())
 
     this.updateRequestedTiles()
-
-    await this.tileCache.waitUntilAllTilesLoaded()
+    await this.tileCache.allRequestedTilesLoaded()
 
     const imageData = new ImageData(width, height)
 

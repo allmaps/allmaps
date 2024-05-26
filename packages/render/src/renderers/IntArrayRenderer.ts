@@ -49,11 +49,11 @@ export default class IntArrayRenderer<D>
 
   async render(viewport: Viewport): Promise<Uint8ClampedArray> {
     this.viewport = viewport
-    await Promise.allSettled(this.warpedMapList.loadAllImageInfo())
+
+    await Promise.allSettled(this.loadMissingImageInfosInViewport())
 
     this.updateRequestedTiles()
-
-    await this.tileCache.waitUntilAllTilesLoaded()
+    await this.tileCache.allRequestedTilesLoaded()
 
     const intArray = new Uint8ClampedArray(
       viewport.viewportSize[0] * viewport.viewportSize[1] * CHANNELS

@@ -186,7 +186,15 @@ export default class TileCache<D> extends EventTarget {
     this.previousRequestedTiles = tiles
   }
 
-  waitUntilAllTilesLoaded(): Promise<void> {
+  /**
+   * Returns a promise that resolves when all requested tiles are loaded.
+   * This could happen immidiately, in case there are no current requests and the tilesFetchingCount is zero,
+   * or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
+   *
+   * @async
+   * @returns {Promise<void>}
+   */
+  async allRequestedTilesLoaded(): Promise<void> {
     return new Promise((resolve) => {
       if (this.finished) {
         resolve()
