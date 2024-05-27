@@ -13,8 +13,8 @@ export default defineConfig({
     port: ports.viewer
   },
   plugins: [
-    sveltekit()
-    // @ts-ignore: Unreachable code error
-    // basicSsl()
+    sveltekit(),
+    // @ts-expect-error: Vite types are not up to date
+    process.env.SSL && basicSsl()
   ]
 })

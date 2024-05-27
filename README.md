@@ -210,10 +210,10 @@ The first time you open the devcontainer, it will take a while to build the Dock
 ## Exposing the container to the local network
 If you want to expose the container to the local network (e.g. to test the Allmaps Viewer on a mobile device), you need to run the "dev" script with the `--host` option:
 ```sh
-pnpm --filter "@allmaps/viewer" run dev --host
+SSL=true pnpm --filter "@allmaps/viewer" run dev --host
 ``` 
 Also you need to change the Remote: Local Port Host in you VSCode settings to "allInterfaces" to expose the ports to the local network.
 ```
 remote.localPortHost: "allInterfaces"
 ```
-Make sure that the basic Ssl plugin is enabled in `apps/viewer/vite.config.ts` so the crypto module is available in the browser.
+Make sure running the server with basicSSL by adding `SSL=true` in front of the pnpm run dev command. SSL is needed for the crypto module to work when accessing the project over the network (other then localhost).
