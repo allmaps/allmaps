@@ -8,5 +8,8 @@ export default defineConfig({
   server: {
     port: ports.explore
   },
-  plugins: [sveltekit()]
+  plugins: [sveltekit()],
+  ssr: {
+    noExternal: 'maplibre-gl'
+  }
 })
