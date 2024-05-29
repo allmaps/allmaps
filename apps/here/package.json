@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/here",
-  "version": "1.0.0-beta.27",
+  "version": "1.0.0-beta.28",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -28,13 +28,13 @@
     "preversion": "pnpm run types && pnpm run lint"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.26",
-    "@allmaps/iiif-parser": "^1.0.0-beta.36",
-    "@allmaps/stdlib": "^1.0.0-beta.27",
-    "@allmaps/tailwind": "^1.0.0-beta.11",
-    "@allmaps/transform": "^1.0.0-beta.37",
-    "@allmaps/types": "^1.0.0-beta.12",
-    "@allmaps/ui": "^1.0.0-beta.27",
+    "@allmaps/annotation": "^1.0.0-beta.27",
+    "@allmaps/iiif-parser": "^1.0.0-beta.37",
+    "@allmaps/stdlib": "^1.0.0-beta.28",
+    "@allmaps/tailwind": "^1.0.0-beta.12",
+    "@allmaps/transform": "^1.0.0-beta.38",
+    "@allmaps/types": "^1.0.0-beta.13",
+    "@allmaps/ui": "^1.0.0-beta.28",
     "@tailwindcss/container-queries": "^0.1.1",
     "ol": "^8.2.0"
   },

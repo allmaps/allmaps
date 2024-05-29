@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/preview",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "Allmaps Preview",
   "private": true,
   "author": {
@@ -26,16 +26,16 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@allmaps/render": "^1.0.0-beta.61",
-    "@allmaps/stdlib": "^1.0.0-beta.27",
-    "@allmaps/types": "^1.0.0-beta.12",
+    "@allmaps/render": "^1.0.0-beta.62",
+    "@allmaps/stdlib": "^1.0.0-beta.28",
+    "@allmaps/types": "^1.0.0-beta.13",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/vitest-pool-workers": "^0.1.0",
     "@cloudflare/workers-types": "^4.20240320.1",
+    "@types/eslint": "^8.56.0",
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@types/eslint": "^8.56.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "itty-router": "^5.0.16",

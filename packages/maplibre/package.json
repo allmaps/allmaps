@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.23",
+  "version": "1.0.0-beta.24",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -60,17 +60,17 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.61",
-    "@allmaps/stdlib": "^1.0.0-beta.27",
+    "@allmaps/render": "^1.0.0-beta.62",
+    "@allmaps/stdlib": "^1.0.0-beta.28",
     "maplibre-gl": "^4.0.0"
   },
   "devDependencies": {
+    "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@types/eslint": "^8.56.0",
+    "documentation": "^14.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "documentation": "^14.0.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
     "typescript": "^5.0.0",
