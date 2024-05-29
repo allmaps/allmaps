@@ -53,8 +53,6 @@ export function createTriangulatedWarpedMapFactory() {
  * @param {number[]} uniquePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoUniquePoints
  */
 export default class TriangulatedWarpedMap extends WarpedMap {
-  bestScaleFactor!: number
-
   resourceTrianglePoints: Point[] = []
   resourceUniquePoints: Point[] = []
   trianglePointsUniquePointsIndex: number[] = []
@@ -186,7 +184,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
       )
 
     this.resourceTrianglePoints = trianglePointsUniquePointsIndex.map(
-      (i) => resourceUniquePoints[i]
+      (index) => resourceUniquePoints[index]
     )
     this.resourceUniquePoints = resourceUniquePoints as Point[]
     this.trianglePointsUniquePointsIndex =

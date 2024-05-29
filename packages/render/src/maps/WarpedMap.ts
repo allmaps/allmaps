@@ -116,6 +116,8 @@ export default class WarpedMap extends EventTarget {
   parsedImage?: IIIFImage
   loadingImageInfo: boolean
 
+  bestScaleFactor = 0
+
   fetchFn?: FetchFn
 
   visible: boolean
@@ -303,6 +305,17 @@ export default class WarpedMap extends EventTarget {
    */
   getResourceToCanvasScale(viewport: Viewport): number {
     return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
+  }
+
+  /**
+   * Set the bestScaleFactor for the current viewport
+   *
+   * @param {number} scaleFactor - scale factor
+   */
+  setBestScaleFactor(scaleFactor: number) {
+    if (this.bestScaleFactor != scaleFactor) {
+      this.bestScaleFactor = scaleFactor
+    }
   }
 
   /**
