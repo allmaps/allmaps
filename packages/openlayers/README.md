@@ -71,7 +71,7 @@ const map = new ol.Map({
 })
 
 // Create WarpedMapLayer
-const warpedMapLayer = new allmapsOpenLayers.WarpedMapLayer()
+const warpedMapLayer = new WarpedMapLayer()
 
 // Add the WarpedMapLayer to the map and load a Georeference Annotation
 const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
