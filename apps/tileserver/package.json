@@ -19,6 +19,7 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "test": "vitest run --passWithNoTests",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
     "preversion": "pnpm run types && pnpm run lint && pnpm test"
@@ -40,7 +41,7 @@
     "typescript": "^5.0.4",
     "upng-js": "^2.1.0",
     "vitest": "1.3.0",
-    "wrangler": "^3.0.0",
+    "wrangler": "^3.57.2",
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

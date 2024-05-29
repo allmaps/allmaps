@@ -7,15 +7,13 @@
     "lib": ["ES2022"],
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": [
-      "@cloudflare/workers-types"
-      // "vitest-environment-miniflare/globals"
-    ]
+    "types": ["@cloudflare/workers-types"]
   },
   "references": [
     { "path": "../../packages/render" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/types" }
   ],
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["test"]
 }
