@@ -6,6 +6,8 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
+  "description": "The latest maps georeferenced with Allmaps Editor",
+  "svelte": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
@@ -13,6 +15,9 @@
   },
   "license": "GPL-3.0-or-later",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
