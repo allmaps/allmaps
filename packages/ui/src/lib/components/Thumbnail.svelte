@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-
   import { Image, type ImageRequest } from '@allmaps/iiif-parser'
 
   import type { Fit } from '@allmaps/types'
