@@ -38,7 +38,6 @@ export function createTriangulatedWarpedMapFactory() {
  *
  * @export
  * @class TriangulatedWarpedMap
- * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {Point[]} resourceTrianglepoints - Triangle points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @param {Point[]} resourceUniquepoints - Unique points of the triangles the triangulated resourceMask (at the current bestScaleFactor)
  * @param {number[]} trianglePointsUniquePointsIndex - Index in resourceUniquepoints where a specific resourceTrianglepoint can be found
@@ -127,12 +126,14 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    * Set the bestScaleFactor for the current viewport
    *
    * @param {number} scaleFactor - scale factor
+   * @returns {boolean}
    */
-  setBestScaleFactor(scaleFactor: number) {
-    if (this.bestScaleFactor != scaleFactor) {
-      this.bestScaleFactor = scaleFactor
+  setBestScaleFactor(scaleFactor: number): boolean {
+    const updating = super.setBestScaleFactor(scaleFactor)
+    if (updating) {
       this.updateTriangulation(true)
     }
+    return updating
   }
 
   /**
