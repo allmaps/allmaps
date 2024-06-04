@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/preview",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Allmaps Preview",
   "private": true,
   "author": {
@@ -26,7 +26,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@allmaps/render": "^1.0.0-beta.62",
+    "@allmaps/render": "^1.0.0-beta.63",
     "@allmaps/stdlib": "^1.0.0-beta.28",
     "@allmaps/types": "^1.0.0-beta.13",
     "@cloudflare/kv-asset-handler": "^0.3.1",
