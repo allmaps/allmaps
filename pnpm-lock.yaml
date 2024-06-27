@@ -1585,17 +1585,20 @@ importers:
   packages/ui:
     dependencies:
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: 1.0.0-beta.40
         version: link:../iiif-parser
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: 1.0.0-beta.14
         version: link:../tailwind
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: 1.0.0-beta.15
         version: link:../types
       flowbite:
         specifier: ^1.6.4
         version: 1.8.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -1618,6 +1621,9 @@ importers:
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.10
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.57.0)(typescript@5.5.4)
