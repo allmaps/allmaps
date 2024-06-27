@@ -7,6 +7,8 @@
 
   import MapMonster from '$lib/components/MapMonster.svelte'
 
+  import Geocoder from '$lib/components/Geocoder.svelte'
+
   import { shades, originalColorIndex } from '@allmaps/tailwind'
 
   import { mapMonsterColors, mapMonsterMoods } from '$lib/shared/constants.js'
@@ -19,6 +21,9 @@
 </Header>
 
 <main class="container mx-auto p-4 space-y-8">
+  <section>
+    <Geocoder on:select={(event) => console.log(event.detail)} />
+  </section>
   <section>
     <h1 class="text-xl font-bold mb-4">Colors:</h1>
     <ul class="flex flex-row basis-full gap-2">
