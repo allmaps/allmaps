@@ -4,6 +4,8 @@
 
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
+  import searchIcon from '$lib/shared/images/search.svg'
+
   import type { GeojsonPoint } from '@allmaps/types'
 
   type GeoJsonFeatureGE = GeojsonPoint & { properties: { label: string } }
@@ -89,13 +91,20 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="search">
+<button popovertarget="geocoder-popover" class={$$restProps.class || ''}>
+  <img alt="Search Icon" src={searchIcon} />
+</button>
+
+<div popover="auto" id="geocoder-popover">
+  <img alt="Search Icon" src={searchIcon} />
+  <!-- svelte-ignore a11y-autofocus -->
   <input
     bind:value={searchTerm}
     placeholder="Search Location"
     autocomplete="off"
     spellcheck="false"
     type="search"
+    autofocus
   />
 
   <div class="results">
@@ -105,7 +114,7 @@
           <!-- Only the most recent promise is considered, meaning we don't need to worry about race conditions. -->
           <li>...searching</li>
         {:then}
-          {#each features as feature}
+          {#each features.slice(0, 5) as feature}
             <li>
               <button
                 on:click={() => {
@@ -126,20 +135,32 @@
 </div>
 
 <style>
-  .search {
-    width: 90vw;
-    max-width: 600px;
+  :popover-open {
     position: fixed;
     left: 50%;
     top: 20%;
+    width: 90vw;
+    max-width: 600px;
+    margin: 0px;
     translate: -50% -0%;
     border-radius: 0.5rem;
     box-shadow: 0px 0px 20px hsl(0 0% 0% / 40%);
     overflow: hidden;
+    box-sizing: border-box;
+
+    & img {
+      position: absolute;
+      color: grey;
+      left: 1.4rem;
+      top: 1.7rem;
+      width: 1.4rem;
+      height: 1.4rem;
+    }
 
     & input {
       width: 100%;
       padding: 1.5rem;
+      padding-left: 3.5rem;
       font: inherit;
       border: none;
       outline: none;
@@ -149,25 +170,19 @@
   .results {
     max-height: 48vh;
     padding: 1.5rem;
-    color: rgb(20, 20, 20);
     background-color: white;
     overflow-y: auto;
     scrollbar-width: thin;
 
     & ul {
-      display: grid;
-      gap: 0.5rem;
-      padding: 0px;
-      margin: 0px;
-      list-style: none;
-
       & li {
         padding: 1rem;
       }
 
       & li.softFocus {
         border-radius: 0.5rem;
-        background-color: #f6f6f6;
+        outline: 1px solid black;
+        /* background-color: #f6f6f6; */
       }
     }
   }
