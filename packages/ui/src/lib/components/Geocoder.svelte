@@ -14,30 +14,33 @@
   }
   type GeoJsonFeatureWHG = {
     geometry?: GeojsonGeometry
-    properties: { title: string }
+    properties: { title: string; variants?: string[]; ccodes?: string[] }
   }
   // WHG return 'GeoJSON features', but not necessarilly points, and sometimes without geometry.
-  type GeoJsonFeature = GeoJsonFeatureGE
-
-  export const focusPointLon: number | undefined = undefined
-  export const focusPointLat: number | undefined = undefined
-
-  let searchTerm = ''
-  let featuresGE: GeoJsonFeatureGE[] = []
-  let featuresWHG: GeoJsonFeatureWHG[] = []
-  let features: GeoJsonFeature[] = []
-  // Usage: this returns a GeoJSON of with the following info
+  type GeoJsonFeatureGeocoder = {
+    geometry: GeojsonPoint
+    properties: { label: string; alt?: string }
+  }
+  // Usage:
   // - properties.name => short location description
   // - properties.label => long location description
   // - geometry.coordinates => coordinates
-  let selectedFeature: GeoJsonFeature | undefined
-  let softFocusIndex = -1
-  let softFocusedElement: HTMLButtonElement | undefined
+
+  export const focusPointLon: number | undefined = undefined
+  export const focusPointLat: number | undefined = undefined
 
   let geocoderPopover: any
   onMount(() => {
     geocoderPopover = document.getElementById('geocoder-popover')
   })
+
+  let searchTerm = ''
+  let featuresGE: GeoJsonFeatureGE[] = []
+  let featuresWHG: GeoJsonFeatureWHG[] = []
+  let features: GeoJsonFeatureGeocoder[] = []
+  let selectedFeature: GeoJsonFeatureGeocoder | undefined
+  let softFocusIndex = -1
+  let softFocusedElement: HTMLButtonElement | undefined
 
   const THROTTLE_WAIT_MS = 200
   const THROTTLE_OPTIONS = {
@@ -97,16 +100,20 @@
   $: throttledGetFeatures(searchTerm)
 
   $: features = [
-    ...featuresGE.map(({ geometry, properties }) => ({ geometry, properties })),
+    ...featuresGE,
     ...featuresWHG
       .filter((feature) => feature.geometry?.type == 'Point')
       .map(({ geometry, properties }) => ({
         geometry: geometry as GeojsonPoint,
-        properties: { label: properties.title }
+        properties: {
+          label: properties.title + ', ' + properties.ccodes?.join(', '),
+          alt: properties.variants?.join(', '),
+          ...properties
+        }
       }))
   ].slice(0, 5)
 
-  function handleClick(feature: GeoJsonFeature): void {
+  function handleClick(feature: GeoJsonFeatureGeocoder): void {
     selectedFeature = feature
     geocoderPopover.hidePopover()
     // This doesn't seem to work when the click comes from an 'Enter'
@@ -175,6 +182,9 @@
             tabindex="0"
           >
             {feature.properties.label}
+            {#if feature.properties.alt}
+              <span class="alt">{feature.properties.alt}</span>
+            {/if}
           </button>
         </li>
       {/each}
@@ -224,6 +234,17 @@
       & ul {
         & li {
           padding: 1rem;
+
+          & .alt {
+            color: grey;
+            font-style: italic;
+          }
+
+          & .alt::before {
+            content: '〜';
+            margin-left: 0.2rem;
+            margin-right: 0.5rem;
+          }
         }
 
         & li.softFocus {
