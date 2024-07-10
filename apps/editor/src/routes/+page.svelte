@@ -87,7 +87,7 @@
     // draw.setMode('')
     draw.setMode('point')
 
-    draw.on('finish', (event) => {
+    draw.on('finish', () => {
       if (draw.getMode() === 'polygon') {
         draw.setMode('select')
       }
