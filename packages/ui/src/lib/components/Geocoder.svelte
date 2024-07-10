@@ -29,7 +29,7 @@
   export const focusPointLon: number | undefined = undefined
   export const focusPointLat: number | undefined = undefined
 
-  let geocoderPopover: any
+  let geocoderPopover: HTMLElement | null
   onMount(() => {
     geocoderPopover = document.getElementById('geocoder-popover')
   })
@@ -41,6 +41,8 @@
   let selectedFeature: GeoJsonFeatureGeocoder | undefined
   let softFocusIndex = -1
   let softFocusedElement: HTMLButtonElement | undefined
+  let controllerGE: AbortController
+  let controllerWHG: AbortController
 
   const THROTTLE_WAIT_MS = 200
   const THROTTLE_OPTIONS = {
@@ -66,6 +68,11 @@
   }
 
   async function getFeaturesGE(text: string): Promise<void> {
+    if (controllerGE) {
+      controllerGE.abort()
+    }
+    controllerGE = new AbortController()
+    const signal = controllerGE.signal
     try {
       let query =
         `https://api.geocode.earth/v1/autocomplete` +
@@ -74,25 +81,40 @@
       if (focusPointLon && focusPointLat) {
         query += `&focus.point.lon=${focusPointLon}&focus.point.lat=${focusPointLat}`
       }
-      featuresGE = await fetch(query)
+      featuresGE = await fetch(query, { signal: signal })
         .then((response) => response.json())
         .then((response) => response.features)
     } catch (error) {
-      console.error('Error fetching geocode.earth:', error)
+      if (!signal.aborted) {
+        console.error('Error fetching geocode.earth:', error)
+      } else {
+        console.warn('Previous fetch to geocode.earth aborted: ' + text)
+      }
       return
     }
   }
 
   async function getFeaturesWHG(text: string): Promise<void> {
+    if (controllerWHG) {
+      controllerWHG.abort()
+    }
+    controllerWHG = new AbortController()
+    const signal = controllerWHG.signal
     try {
       let query = `https://whgazetteer.org/api/index/?name=${text}`
-      featuresWHG = await fetch(query)
+      featuresWHG = await fetch(query, { signal })
         .then((response) => response.json())
         .then((response) => response.features)
     } catch (error) {
-      console.error('Error fetching World Historical Gazetteer:', error)
-      // Strangly WHG seems to crash for some common search terms
-      // Example: https://whgazetteer.org/api/index/?name=London
+      if (!signal.aborted) {
+        console.error('Error fetching World Historical Gazetteer:', error)
+        // Strangly WHG seems to crash for some common search terms
+        // Example: https://whgazetteer.org/api/index/?name=London
+      } else {
+        console.warn(
+          'Previous fetch to World Historical Gazetteer aborted: ' + text
+        )
+      }
       return
     }
   }
@@ -115,7 +137,7 @@
 
   function handleClick(feature: GeoJsonFeatureGeocoder): void {
     selectedFeature = feature
-    geocoderPopover.hidePopover()
+    geocoderPopover?.hidePopover()
     // This doesn't seem to work when the click comes from an 'Enter'
   }
 
