@@ -5,9 +5,7 @@ export function makeFakeStraightAnnotation(
   width: number,
   height: number
 ) {
-  const offsetLng = 0.01
-  const offsetLat = 0
-
+  const scale = 10_000
   const georeferencedMap = [
     {
       '@context': 'https://schemas.allmaps.org/map/2/context.json',
@@ -27,15 +25,15 @@ export function makeFakeStraightAnnotation(
       gcps: [
         {
           resource: [0, 0],
-          geo: [offsetLng, offsetLat + height / 10_000]
+          geo: [0, height / scale]
         },
         {
           resource: [width, 0],
-          geo: [offsetLng + width / 10_000, offsetLat + height / 10_000]
+          geo: [width / scale, height / scale]
         },
         {
           resource: [width, height],
-          geo: [offsetLng + width / 10_000, offsetLat]
+          geo: [width / scale, 0]
         }
       ]
     }
