@@ -2,8 +2,6 @@
   import { throttle } from 'lodash-es'
   import { onMount, createEventDispatcher } from 'svelte'
 
-  import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
-
   import searchIcon from '$lib/shared/images/search.svg'
 
   import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
@@ -26,8 +24,9 @@
   // - properties.label => long location description
   // - geometry.coordinates => coordinates
 
-  export const focusPointLon: number | undefined = undefined
-  export const focusPointLat: number | undefined = undefined
+  export let apiKeyGE: string
+  export let focusPointLon: number | undefined = undefined
+  export let focusPointLat: number | undefined = undefined
 
   let geocoderPopover: HTMLElement | null
   onMount(() => {
@@ -74,9 +73,10 @@
     controllerGE = new AbortController()
     const signal = controllerGE.signal
     try {
+      console.log(apiKeyGE)
       let query =
         `https://api.geocode.earth/v1/autocomplete` +
-        `?api_key=${PUBLIC_GEOCODE_EARTH_API_KEY}` +
+        `?api_key=${apiKeyGE}` +
         `&text=${text}`
       if (focusPointLon && focusPointLat) {
         query += `&focus.point.lon=${focusPointLon}&focus.point.lat=${focusPointLat}`

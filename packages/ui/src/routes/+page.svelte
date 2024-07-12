@@ -13,6 +13,8 @@
 
   import { mapMonsterColors, mapMonsterMoods } from '$lib/shared/constants.js'
 
+  import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
+
   let opacity = 1
 </script>
 
@@ -24,6 +26,7 @@
   <section>
     <h1 class="text-xl font-bold mb-4">Icons:</h1>
     <Geocoder
+      apiKeyGE={PUBLIC_GEOCODE_EARTH_API_KEY}
       class="w-9 h-9 p-1.5 rounded-lg text-sm bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
       on:select={(event) => console.log(event.detail)}
     />
