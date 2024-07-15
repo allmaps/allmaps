@@ -1,32 +1,12 @@
 <script lang="ts">
   import { throttle } from 'lodash-es'
   import { onMount, createEventDispatcher } from 'svelte'
-
   import searchIcon from '$lib/shared/images/search.svg'
 
-  import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
+  import type { GeoJsonFeatureGeocoder } from '$lib/shared/types'
+  import type GeocoderProvider from '$lib/shared/geocoder/provider'
 
-  type GeoJsonFeatureGE = {
-    geometry: GeojsonPoint
-    properties: { label: string }
-  }
-  type GeoJsonFeatureWHG = {
-    geometry?: GeojsonGeometry
-    properties: { title: string; variants?: string[]; ccodes?: string[] }
-  }
-  // WHG return 'GeoJSON features', but not necessarilly points, and sometimes without geometry.
-  type GeoJsonFeatureGeocoder = {
-    geometry: GeojsonPoint
-    properties: { label: string; alt?: string }
-  }
-  // Usage:
-  // - properties.name => short location description
-  // - properties.label => long location description
-  // - geometry.coordinates => coordinates
-
-  export let apiKeyGE: string
-  export let focusPointLon: number | undefined = undefined
-  export let focusPointLat: number | undefined = undefined
+  export let providers: GeocoderProvider[]
 
   let geocoderPopover: HTMLElement | null
   onMount(() => {
@@ -34,14 +14,11 @@
   })
 
   let searchTerm = ''
-  let featuresGE: GeoJsonFeatureGE[] = []
-  let featuresWHG: GeoJsonFeatureWHG[] = []
+  let providerFeatures: GeoJsonFeatureGeocoder[][] = [[]]
   let features: GeoJsonFeatureGeocoder[] = []
   let selectedFeature: GeoJsonFeatureGeocoder | undefined
   let softFocusIndex = -1
   let softFocusedElement: HTMLButtonElement | undefined
-  let controllerGE: AbortController
-  let controllerWHG: AbortController
 
   const THROTTLE_WAIT_MS = 200
   const THROTTLE_OPTIONS = {
@@ -55,85 +32,17 @@
     THROTTLE_OPTIONS
   )
 
-  function getFeatures(text: string): void {
-    if (text == '') {
-      // Using if to avoid calling `fetch` eagerly during server side rendering
-      featuresGE = []
-      featuresWHG = []
-      return
-    }
-    getFeaturesGE(text)
-    getFeaturesWHG(text)
-  }
-
-  async function getFeaturesGE(text: string): Promise<void> {
-    if (controllerGE) {
-      controllerGE.abort()
-    }
-    controllerGE = new AbortController()
-    const signal = controllerGE.signal
-    try {
-      console.log(apiKeyGE)
-      let query =
-        `https://api.geocode.earth/v1/autocomplete` +
-        `?api_key=${apiKeyGE}` +
-        `&text=${text}`
-      if (focusPointLon && focusPointLat) {
-        query += `&focus.point.lon=${focusPointLon}&focus.point.lat=${focusPointLat}`
-      }
-      featuresGE = await fetch(query, { signal: signal })
-        .then((response) => response.json())
-        .then((response) => response.features)
-    } catch (error) {
-      if (!signal.aborted) {
-        console.error('Error fetching geocode.earth:', error)
-      } else {
-        console.warn('Previous fetch to geocode.earth aborted: ' + text)
-      }
-      return
-    }
-  }
-
-  async function getFeaturesWHG(text: string): Promise<void> {
-    if (controllerWHG) {
-      controllerWHG.abort()
-    }
-    controllerWHG = new AbortController()
-    const signal = controllerWHG.signal
-    try {
-      let query = `https://whgazetteer.org/api/index/?name=${text}`
-      featuresWHG = await fetch(query, { signal })
-        .then((response) => response.json())
-        .then((response) => response.features)
-    } catch (error) {
-      if (!signal.aborted) {
-        console.error('Error fetching World Historical Gazetteer:', error)
-        // Strangly WHG seems to crash for some common search terms
-        // Example: https://whgazetteer.org/api/index/?name=London
-      } else {
-        console.warn(
-          'Previous fetch to World Historical Gazetteer aborted: ' + text
-        )
-      }
-      return
-    }
-  }
-
   $: throttledGetFeatures(searchTerm)
 
-  $: features = [
-    ...featuresGE,
-    ...featuresWHG
-      .filter((feature) => feature.geometry?.type == 'Point')
-      .map(({ geometry, properties }) => ({
-        geometry: geometry as GeojsonPoint,
-        properties: {
-          label: properties.title + ', ' + properties.ccodes?.join(', '),
-          alt: properties.variants?.join(', '),
-          ...properties
-        }
-      }))
-  ].slice(0, 5)
+  function getFeatures(text: string): void {
+    for (let [index, provider] of providers.entries()) {
+      provider.getFeatures(text).then((features) => {
+        providerFeatures[index] = features
+      })
+    }
+  }
+
+  $: features = providerFeatures.flat(1).slice(0, 5)
 
   function handleClick(feature: GeoJsonFeatureGeocoder): void {
     selectedFeature = feature
@@ -176,7 +85,10 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<button popovertarget="geocoder-popover" class={$$restProps.class || ''}>
+<button
+  popovertarget="geocoder-popover"
+  class="w-9 h-9 p-1.5 rounded-lg text-sm bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+>
   <img alt="Search Icon" src={searchIcon} />
 </button>
 
