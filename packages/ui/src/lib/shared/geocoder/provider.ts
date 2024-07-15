@@ -1,4 +1,4 @@
-import type { GeoJsonFeatureGeocoder } from '$lib/shared/types'
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
 
 export default abstract class GeocoderProvider {
   name: string
@@ -7,21 +7,21 @@ export default abstract class GeocoderProvider {
   controller?: AbortController
 
   abstract queryFunction(text: string): string
-  abstract featuresFunction(features: unknown[]): GeoJsonFeatureGeocoder[]
+  abstract featuresFunction(features: unknown[]): GeocoderGeoJsonFeature[]
 
   constructor(name: string, apiKey?: string) {
     this.name = name
     this.apiKey = apiKey
   }
 
-  async getFeatures(text: string): Promise<GeoJsonFeatureGeocoder[]> {
+  async getFeatures(text: string): Promise<GeocoderGeoJsonFeature[]> {
     if (this.controller) {
       this.controller.abort()
     }
     this.controller = new AbortController()
     const signal = this.controller.signal
 
-    let result: GeoJsonFeatureGeocoder[] = []
+    let result: GeocoderGeoJsonFeature[] = []
     if (text == '') {
       // Using if to avoid calling `fetch` eagerly during server side rendering
       return result

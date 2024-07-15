@@ -1,5 +1,5 @@
 import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
-import type { GeoJsonFeatureGeocoder } from '$lib/shared/types'
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
 import GeocoderProvider from '../provider'
 
 type GeoJsonFeatureWHG = {
@@ -28,5 +28,5 @@ export default class WorldHistoricalGazetteer extends GeocoderProvider {
           alt: properties.variants?.join(', '),
           ...properties
         }
-      })) as GeoJsonFeatureGeocoder[]
+      })) as GeocoderGeoJsonFeature[]
 }

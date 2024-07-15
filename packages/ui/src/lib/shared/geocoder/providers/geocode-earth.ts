@@ -1,5 +1,5 @@
 import type { GeojsonPoint } from '@allmaps/types'
-import type { GeoJsonFeatureGeocoder } from '$lib/shared/types'
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
 import GeocoderProvider from '../provider'
 
 type GeoJsonFeatureGE = {
@@ -20,5 +20,5 @@ export default class GeocodeEarth extends GeocoderProvider {
     `&text=${text}`
 
   featuresFunction = (features: unknown[]) =>
-    features as GeoJsonFeatureGE[] as GeoJsonFeatureGeocoder[]
+    features as GeoJsonFeatureGE[] as GeocoderGeoJsonFeature[]
 }
