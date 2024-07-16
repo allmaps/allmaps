@@ -23,6 +23,9 @@ export default defineConfig({
         // Pick main or develop branch
         baseUrl: 'https://github.com/allmaps/allmaps/tree/develop/apps/docs/'
       },
+      expressiveCode: {
+        themes: ['material-theme']
+      },
       sidebar: [
         { label: 'Introduction', link: '/introduction/' },
         { label: 'Get Started', link: '/get-started/' },
@@ -39,7 +42,12 @@ export default defineConfig({
             { label: 'For Historians', link: '/tutorials/for-historians/' },
             { label: 'For Students', link: '/tutorials/for-students/' },
             { label: 'For Developers', link: '/tutorials/for-developers/' },
-            { label: 'For Curators', link: '/tutorials/for-curators/' }
+            { label: 'For Curators', link: '/tutorials/for-curators/' },
+            { label: 'Component Playground', link: '/tutorials/allmaps-ids/' },
+            {
+              label: 'Annotated Code',
+              link: '/tutorials/annotated-code/'
+            }
           ]
         },
         {

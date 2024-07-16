@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@allmaps/id": "^1.0.0-beta.27",
+    "@allmaps/iiif-parser": "workspace:^1.0.0-beta.37",
     "@allmaps/tailwind": "^1.0.0-beta.12",
     "@allmaps/ui": "^1.0.0-beta.29",
     "@astrojs/check": "^0.4.1",
@@ -46,6 +47,7 @@
     "@astrojs/svelte": "^5.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "astro": "^4.0.1",
+    "expressive-code": "^0.35.3",
     "sharp": "^0.32.3",
     "svelte": "^4.1.1",
     "tailwindcss": "^3.3.3",

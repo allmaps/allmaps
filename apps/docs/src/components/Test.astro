@@ -1,0 +1,13 @@
+---
+import { Code } from '@astrojs/starlight/components';
+import UrlExplorer from './UrlExplorer.svelte'
+---
+
+<div>
+    <Code
+      code="console.log('This could come from a file or CMS!');"
+      lang="js"
+      title="VVN.js"
+    />
+    <UrlExplorer client:load/>
+</div>

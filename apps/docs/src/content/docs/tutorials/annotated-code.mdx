@@ -1,0 +1,42 @@
+---
+title: Allmaps IDs
+description: ''
+---
+
+import Annotation from '../../../components/Annotation.svelte'
+import AnnotationCodeBlock from '../../../components/AnnotationCodeBlock.svelte'
+import UrlExplorer from '../../../components/UrlExplorer.svelte'
+import Test from '../../../components/Test.astro'
+import { Code } from '@astrojs/starlight/components'
+
+# Annotated Code Block test
+
+This is the annotated code block.
+
+<AnnotationCodeBlock
+  client:load
+  code="console.log('vivianhelloworld')"
+  key="test"
+>
+  <Code code="console.log()" slot="code" lang="js">
+    
+  </Code>
+  <Annotation highlight={[1]}>Notes can be written in the MDX</Annotation>
+  <Annotation highlight={[3]}>
+    They will highlight as they're scrolled
+  </Annotation>
+  <Annotation>And these are being injected with a Svelte slot</Annotation>
+  <Annotation>
+    Things that need to be done still: making this render as markdown, finding a
+    styling library for the code block, and the highlighting code feature
+  </Annotation>
+  <Annotation>
+    When an annotation gets highlighted, it needs to communicate with the code
+    block which lines get highlighted. Maybe a context can be used to
+    communicate this information?
+  </Annotation>
+  <Annotation>
+    Or can it be done with class manipulation? How will the code component know
+    that lines are highlighted?
+  </Annotation>
+</AnnotationCodeBlock>
