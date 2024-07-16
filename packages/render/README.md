@@ -911,7 +911,7 @@ Creates an instance of WebGL2Renderer.
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `gl` **WebGL2RenderingContext** WebGL 2 rendering context
 *   `options` **WebGL2RendererOptions** options
@@ -928,7 +928,7 @@ Set the opacity of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
 
 ### resetOpacity
@@ -941,7 +941,7 @@ Get the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -952,7 +952,7 @@ Set the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
@@ -963,7 +963,7 @@ Rreset the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getRemoveColorOptions
@@ -978,7 +978,7 @@ Set the remove color options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `removeColorOptions` **RemoveColorOptions**&#x20;
 
 ### resetRemoveColorOptions
@@ -991,7 +991,7 @@ Get the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1002,7 +1002,7 @@ Set the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `removeColorOptions` **RemoveColorOptions** the 'remove color options' to set
@@ -1013,7 +1013,7 @@ Reset the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getColorizeOptions
@@ -1028,7 +1028,7 @@ Set the colorize options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
 
 ### resetColorizeOptions
@@ -1041,7 +1041,7 @@ Get the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<ColorizeOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1052,7 +1052,7 @@ Set the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
@@ -1063,7 +1063,7 @@ Reset the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getGridOptions
@@ -1078,7 +1078,7 @@ Set the grid options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `gridOptions` **GridOptions** the grid options to set
 
 ### resetGridOptions
@@ -1091,7 +1091,7 @@ Get the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<GridOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1102,7 +1102,7 @@ Set the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `gridOptions` **GridOptions** the grid options to set
@@ -1113,7 +1113,7 @@ Reset the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getSaturation
@@ -1130,7 +1130,7 @@ Set the saturation of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `saturation`  the satuation to set
 
 ### resetSaturation
@@ -1143,7 +1143,7 @@ Get the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1156,7 +1156,7 @@ Set the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `t` &#x20;
 *   `mapId`  ID of the map
 *   `saturation`  the saturation to set
@@ -1167,7 +1167,7 @@ Reset the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### render
@@ -1176,7 +1176,7 @@ Render the map for a given viewport
 
 #### Parameters
 
-*   `e` &#x20;
+*   `o` &#x20;
 *   `viewport` **Viewport** the current viewport
 
 ### addGeoreferenceAnnotation

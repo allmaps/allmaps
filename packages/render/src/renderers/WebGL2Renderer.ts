@@ -5,8 +5,13 @@ import WebGL2WarpedMap, {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
 import CacheableImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
-import { distance, maxOfNumberOrUndefined } from '@allmaps/stdlib'
+import {
+  distance,
+  hexToFractionalRgb,
+  maxOfNumberOrUndefined
+} from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
+import { red, green, darkblue, yellow, black } from '@allmaps/tailwind'
 
 import {
   WarpedMapEvent,
@@ -626,6 +631,42 @@ export default class WebGL2Renderer
       'u_animationProgress'
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
+
+    // Distortion colors
+    // TODO: make these colors pickable
+
+    const colorDistortion00 = gl.getUniformLocation(
+      this.program,
+      'u_colorDistortion00'
+    )
+    gl.uniform4f(colorDistortion00, ...hexToFractionalRgb(red), 1)
+
+    const colorDistortion01 = gl.getUniformLocation(
+      this.program,
+      'u_colorDistortion01'
+    )
+    gl.uniform4f(colorDistortion01, ...hexToFractionalRgb(darkblue), 1)
+
+    const colorDistortion1 = gl.getUniformLocation(
+      this.program,
+      'u_colorDistortion1'
+    )
+    gl.uniform4f(colorDistortion1, ...hexToFractionalRgb(green), 1)
+
+    const colorDistortion2 = gl.getUniformLocation(
+      this.program,
+      'u_colorDistortion2'
+    )
+    gl.uniform4f(colorDistortion2, ...hexToFractionalRgb(yellow), 1)
+
+    const colorDistortion3 = gl.getUniformLocation(
+      this.program,
+      'u_colorDistortion3'
+    )
+    gl.uniform4f(colorDistortion3, ...hexToFractionalRgb(red), 1)
+
+    const colorGrid = gl.getUniformLocation(this.program, 'u_colorGrid')
+    gl.uniform4f(colorGrid, ...hexToFractionalRgb(black), 1)
 
     for (const mapId of this.mapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
