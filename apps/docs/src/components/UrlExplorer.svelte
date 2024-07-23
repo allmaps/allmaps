@@ -1,6 +1,7 @@
 <script lang="ts">
   import { generateId } from '@allmaps/id'
 
+  import { codeToHtml } from 'shiki'
   let userUrl: string | null = null
   let hash: string | null = null
   let type: string | null = 'images'
@@ -11,9 +12,9 @@
     Manifest as IIIFManifest,
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
-  import CodeBlock from './CodeBlock.svelte'
-  import IiifPreviewBlock from './IiifPreviewBlock.svelte'
+  import StyledCodeBlock from './StyledCodeBlock.svelte'
   let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
+  let code: ''
   let editorHover: boolean = false
   let viewerHover: boolean = false
   let hashHover: boolean = false
@@ -58,7 +59,11 @@
   const loadId = async () => {
     let json = await fetch(userUrl).then((response) => response.json())
     parsedIiif = IIIF.parse(json)
-    fileJson = JSON.stringify(json)
+    fileJson = JSON.stringify(json, null, 2)
+    code = await codeToHtml(fileJson, {
+      lang: 'json',
+      theme: 'nord'
+    })
 
     if (parsedIiif instanceof IIIFImage) {
       path = `/images/`
@@ -93,9 +98,10 @@
   <div class="text-sm italic font-thin text-gray-600">
     IIIF manifests can be loaded into Allmaps to georeference maps.
   </div>
-  <div class="w-full mt-4 h-64">
-    <slot code={"console.log('on first load')"} />
-    <!-- <CodeBlock code={fileJson} /> -->
+  <div class="w-full mt-4 h-64 overflow-y-auto bg-[#2e3440ff]">
+    {#if fileJson}
+      <StyledCodeBlock code={fileJson} lang="json" />
+    {/if}
   </div>
   <div class="flex flex-row gap-4 mt-4">
     <div class="flex flex-col basis-1/3 shrink-0">

@@ -123,6 +123,9 @@ importers:
       sharp:
         specifier: ^0.32.3
         version: 0.32.6
+      shiki:
+        specifier: ^1.10.3
+        version: 1.10.3
       svelte:
         specifier: ^4.1.1
         version: 4.2.17
@@ -1608,7 +1611,7 @@ packages:
       remark-parse: 11.0.0
       remark-rehype: 11.1.0
       remark-smartypants: 2.1.0
-      shiki: 1.6.1
+      shiki: 1.10.3
       unified: 11.0.4
       unist-util-remove-position: 5.0.0
       unist-util-visit: 5.0.0
@@ -2835,7 +2838,7 @@ packages:
     resolution: {integrity: sha512-aFQBPepv0zhVXqJFAvfQ4vXYv/meJKiqmEEKSxdjAfwXllIV49PDlnGEXmbGYjR4hUQQjbfDgzAbrbfePc3YVQ==}
     dependencies:
       '@expressive-code/core': 0.35.3
-      shiki: 1.6.1
+      shiki: 1.10.3
     dev: false
 
   /@expressive-code/plugin-text-markers@0.32.4:
@@ -3983,8 +3986,10 @@ packages:
       - '@types/node'
     dev: true
 
-  /@shikijs/core@1.6.1:
-    resolution: {integrity: sha512-CqYyepN4SnBopaoXYwng4NO8riB5ask/LTCkhOFq+GNGtr2X+aKeD767eYdqYukeixEUvv4bXdyTYVaogj7KBw==}
+  /@shikijs/core@1.10.3:
+    resolution: {integrity: sha512-D45PMaBaeDHxww+EkcDQtDAtzv00Gcsp72ukBtaLSmqRvh0WgGMq3Al0rl1QQBZfuneO75NXMIzEZGFitThWbg==}
+    dependencies:
+      '@types/hast': 3.0.4
     dev: false
 
   /@shuding/opentype.js@1.4.0-beta.0:
@@ -4096,7 +4101,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 3.1.0(svelte@4.2.17)(vite@5.2.12)
       debug: 4.3.4
       svelte: 4.2.17
-      vite: 5.2.12(@types/node@18.19.33)
+      vite: 5.2.12
     transitivePeerDependencies:
       - supports-color
 
@@ -4114,7 +4119,7 @@ packages:
       magic-string: 0.30.10
       svelte: 4.2.17
       svelte-hmr: 0.16.0(svelte@4.2.17)
-      vite: 5.2.12(@types/node@18.19.33)
+      vite: 5.2.12
       vitefu: 0.2.5(vite@5.2.12)
     transitivePeerDependencies:
       - supports-color
@@ -5279,13 +5284,13 @@ packages:
       rehype: 13.0.1
       resolve: 1.22.8
       semver: 7.6.2
-      shiki: 1.6.1
+      shiki: 1.10.3
       string-width: 7.1.0
       strip-ansi: 7.1.0
       tsconfck: 3.0.3(typescript@5.4.5)
       unist-util-visit: 5.0.0
       vfile: 6.0.1
-      vite: 5.2.12(@types/node@18.19.33)
+      vite: 5.2.12
       vitefu: 0.2.5(vite@5.2.12)
       which-pm: 2.2.0
       yargs-parser: 21.1.1
@@ -12317,10 +12322,11 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  /shiki@1.6.1:
-    resolution: {integrity: sha512-1Pu/A1rtsG6HZvQm4W0NExQ45e02og+rPog7PDaFDiMumZgOYnZIu4JtGQeAIfMwdbKSjJQoCUr79vDLKUUxWA==}
+  /shiki@1.10.3:
+    resolution: {integrity: sha512-eneCLncGuvPdTutJuLyUGS8QNPAVFO5Trvld2wgEq1e002mwctAhJKeMGWtWVXOIEzmlcLRqcgPSorR6AVzOmQ==}
     dependencies:
-      '@shikijs/core': 1.6.1
+      '@shikijs/core': 1.10.3
+      '@types/hast': 3.0.4
     dev: false
 
   /shikiji@0.8.7:
@@ -13757,6 +13763,40 @@ packages:
       micromatch: 4.0.7
     dev: true
 
+  /vite@5.2.12:
+    resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^18.0.0 || >=20.0.0
+      less: '*'
+      lightningcss: ^1.21.0
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.20.2
+      postcss: 8.4.38
+      rollup: 4.18.0
+    optionalDependencies:
+      fsevents: 2.3.3
+
   /vite@5.2.12(@types/node@18.19.33):
     resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -13791,6 +13831,7 @@ packages:
       rollup: 4.18.0
     optionalDependencies:
       fsevents: 2.3.3
+    dev: true
 
   /vitefu@0.2.5(vite@5.2.12):
     resolution: {integrity: sha512-SgHtMLoqaeeGnd2evZ849ZbACbnwQCIwRH57t18FxcXoZop0uQu0uzlIhJBlF/eWVzuce0sHeqPcDo+evVcg8Q==}
@@ -13800,7 +13841,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 5.2.12(@types/node@18.19.33)
+      vite: 5.2.12
 
   /vitest@1.3.0:
     resolution: {integrity: sha512-V9qb276J1jjSx9xb75T2VoYXdO1UKi+qfflY7V7w93jzX7oA/+RtYE6TcifxksxsZvygSSMwu2Uw6di7yqDMwg==}

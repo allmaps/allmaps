@@ -82,7 +82,6 @@ export default defineConfig({
         './src/css/starlight.css'
       ]
     }),
-
     svelte()
   ]
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp

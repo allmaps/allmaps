@@ -49,6 +49,7 @@
     "astro": "^4.0.1",
     "expressive-code": "^0.35.3",
     "sharp": "^0.32.3",
+    "shiki": "^1.10.3",
     "svelte": "^4.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.3.3"
