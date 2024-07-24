@@ -17,6 +17,7 @@ export default class GeocodeEarth extends GeocoderProvider {
   queryFunction = (text: string) =>
     `https://api.geocode.earth/v1/autocomplete` +
     `?api_key=${this.apiKey}` +
+    `&layers=-venue` +
     `&text=${text}`
 
   featuresFunction = (features: unknown[]) =>
