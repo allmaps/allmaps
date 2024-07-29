@@ -11,7 +11,7 @@ import {
   maxOfNumberOrUndefined
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
-import { red, green, darkblue, yellow, black } from '@allmaps/tailwind'
+import { red, green, darkblue, yellow, white, black } from '@allmaps/tailwind'
 
 import {
   WarpedMapEvent,
@@ -28,6 +28,8 @@ import { createShader, createProgram } from '../shared/webgl2.js'
 
 import vertexShaderSource from '../shaders/vertex-shader.glsl'
 import fragmentShaderSource from '../shaders/fragment-shader.glsl'
+import vertexPointsShaderSource from '../shaders/vertex-points-shader.glsl'
+import fragmentPointsShaderSource from '../shaders/fragment-points-shader.glsl'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -77,6 +79,7 @@ export default class WebGL2Renderer
 {
   gl: WebGL2RenderingContext
   program: WebGLProgram
+  pointsProgram: WebGLProgram
 
   previousSignificantViewport: Viewport | undefined
 
@@ -115,16 +118,33 @@ export default class WebGL2Renderer
       fragmentShaderSource
     )
 
+    const vertexPointsShader = createShader(
+      gl,
+      gl.VERTEX_SHADER,
+      vertexPointsShaderSource
+    )
+    const fragmentPointsShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      fragmentPointsShaderSource
+    )
+
     const program = createProgram(gl, vertexShader, fragmentShader)
+    const pointsProgram = createProgram(
+      gl,
+      vertexPointsShader,
+      fragmentPointsShader
+    )
 
     super(
       CacheableImageBitmapTile.createFactory(),
-      createWebGL2WarpedMapFactory(gl, program),
+      createWebGL2WarpedMapFactory(gl, program, pointsProgram),
       options
     )
 
     this.gl = gl
     this.program = program
+    this.pointsProgram = pointsProgram
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -608,6 +628,9 @@ export default class WebGL2Renderer
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+
+    // Render Maps
+
     gl.useProgram(this.program)
 
     // Global uniform
@@ -767,13 +790,84 @@ export default class WebGL2Renderer
 
       // Draw each map
 
-      const vao = warpedMap.vao
       const count = warpedMap.resourceTrianglePoints.length
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
 
-      gl.bindVertexArray(vao)
+      gl.bindVertexArray(warpedMap.vao)
+      gl.drawArrays(primitiveType, offset, count)
+    }
+
+    // Render Points
+    // TODO: place in separate function
+    // So 'pointsProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
+
+    gl.useProgram(this.pointsProgram)
+
+    // Global uniform
+
+    // Render transform
+
+    const pointsProgramRenderTransformLocation = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_renderTransform'
+    )
+    gl.uniformMatrix4fv(
+      pointsProgramRenderTransformLocation,
+      false,
+      transformToMatrix4(renderTransform)
+    )
+
+    // Size
+
+    const pointsProgramSize = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_size'
+    )
+    gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
+
+    // Color
+
+    const pointsProgramColor = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_color'
+    )
+    gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
+
+    // Border size
+
+    const pointsProgramBorderSize = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_borderSize'
+    )
+    gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
+
+    // Border Color
+
+    const pointsProgramBorderColor = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_borderColor'
+    )
+    gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
+
+    for (const mapId of this.mapsInViewport) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (!warpedMap) {
+        continue
+      }
+
+      // (none)
+
+      // Draw points for each map
+
+      const count = warpedMap.gcps.length
+
+      const primitiveType = this.gl.POINTS
+      const offset = 0
+
+      gl.bindVertexArray(warpedMap.pointsVao)
       gl.drawArrays(primitiveType, offset, count)
     }
   }

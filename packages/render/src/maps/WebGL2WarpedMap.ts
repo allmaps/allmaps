@@ -30,13 +30,22 @@ const DEFAULT_SATURATION = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
-  program: WebGLProgram
+  program: WebGLProgram,
+  pointsProgram: WebGLProgram
 ) {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
     options?: Partial<WarpedMapOptions>
-  ) => new WebGL2WarpedMap(mapId, georeferencedMap, gl, program, options)
+  ) =>
+    new WebGL2WarpedMap(
+      mapId,
+      georeferencedMap,
+      gl,
+      program,
+      pointsProgram,
+      options
+    )
 }
 
 /**
@@ -50,8 +59,10 @@ export function createWebGL2WarpedMapFactory(
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
   program: WebGLProgram
+  pointsProgram: WebGLProgram
 
   vao: WebGLVertexArrayObject | null
+  pointsVao: WebGLVertexArrayObject | null
 
   CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
 
@@ -83,14 +94,17 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     georeferencedMap: GeoreferencedMap,
     gl: WebGL2RenderingContext,
     program: WebGLProgram,
+    pointsProgram: WebGLProgram,
     options?: Partial<WarpedMapOptions>
   ) {
     super(mapId, georeferencedMap, options)
 
     this.gl = gl
     this.program = program
+    this.pointsProgram = pointsProgram
 
     this.vao = gl.createVertexArray()
+    this.pointsVao = gl.createVertexArray()
 
     this.packedTilesTexture = gl.createTexture()
     this.packedTilesScaleFactorsTexture = gl.createTexture()
@@ -136,6 +150,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   dispose() {
     this.gl.deleteVertexArray(this.vao)
+    this.gl.deleteVertexArray(this.pointsVao)
     this.gl.deleteTexture(this.packedTilesTexture)
     this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.packedTilesPositionsTexture)
@@ -143,9 +158,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   private updateVertexBuffersInternal() {
-    if (!this.vao || !this.projectedGeoToClipTransform) {
+    if (!this.vao || !this.pointsVao || !this.projectedGeoToClipTransform) {
       return
     }
+
+    // Attributes for Maps
 
     this.gl.bindVertexArray(this.vao)
 
@@ -227,6 +244,27 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       trianglePointsTriangleIndex,
       1,
       'a_triangleIndex'
+    )
+
+    // Attributes for points
+    // TODO: place in separate function
+
+    this.gl.bindVertexArray(this.pointsVao)
+
+    // Ground controle points
+
+    const clipPoints = this.projectedGcps.map((projectedGcp) => {
+      return applyTransform(
+        this.projectedGeoToClipTransform as Transform,
+        projectedGcp.geo
+      )
+    })
+    createBuffer(
+      this.gl,
+      this.pointsProgram,
+      new Float32Array(clipPoints.flat()),
+      2,
+      'a_clipPoint'
     )
   }
 
