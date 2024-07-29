@@ -30,6 +30,8 @@ import vertexShaderSource from '../shaders/vertex-shader.glsl'
 import fragmentShaderSource from '../shaders/fragment-shader.glsl'
 import vertexPointsShaderSource from '../shaders/vertex-points-shader.glsl'
 import fragmentPointsShaderSource from '../shaders/fragment-points-shader.glsl'
+import vertexLinesShaderSource from '../shaders/vertex-lines-shader.glsl'
+import fragmentLinesShaderSource from '../shaders/fragment-lines-shader.glsl'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -80,6 +82,7 @@ export default class WebGL2Renderer
   gl: WebGL2RenderingContext
   program: WebGLProgram
   pointsProgram: WebGLProgram
+  linesProgram: WebGLProgram
 
   previousSignificantViewport: Viewport | undefined
 
@@ -129,22 +132,39 @@ export default class WebGL2Renderer
       fragmentPointsShaderSource
     )
 
+    const vertexLinesShader = createShader(
+      gl,
+      gl.VERTEX_SHADER,
+      vertexLinesShaderSource
+    )
+    const fragmentLinesShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      fragmentLinesShaderSource
+    )
+
     const program = createProgram(gl, vertexShader, fragmentShader)
     const pointsProgram = createProgram(
       gl,
       vertexPointsShader,
       fragmentPointsShader
     )
+    const linesProgram = createProgram(
+      gl,
+      vertexLinesShader,
+      fragmentLinesShader
+    )
 
     super(
       CacheableImageBitmapTile.createFactory(),
-      createWebGL2WarpedMapFactory(gl, program, pointsProgram),
+      createWebGL2WarpedMapFactory(gl, program, pointsProgram, linesProgram),
       options
     )
 
     this.gl = gl
     this.program = program
     this.pointsProgram = pointsProgram
+    this.linesProgram = linesProgram
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -868,6 +888,78 @@ export default class WebGL2Renderer
       const offset = 0
 
       gl.bindVertexArray(warpedMap.pointsVao)
+      gl.drawArrays(primitiveType, offset, count)
+    }
+
+    // Render Lines
+    // TODO: place in separate function
+    // So 'linesProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
+
+    gl.useProgram(this.linesProgram)
+
+    // Global uniform
+
+    // Render transform
+
+    const linesProgramRenderTransformLocation = gl.getUniformLocation(
+      this.linesProgram,
+      'u_renderTransform'
+    )
+    gl.uniformMatrix4fv(
+      linesProgramRenderTransformLocation,
+      false,
+      transformToMatrix4(renderTransform)
+    )
+
+    // // Size
+
+    // const pointsProgramSize = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_size'
+    // )
+    // gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
+
+    // // Color
+
+    // const pointsProgramColor = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_color'
+    // )
+    // gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
+
+    // // Border size
+
+    // const pointsProgramBorderSize = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_borderSize'
+    // )
+    // gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
+
+    // // Border Color
+
+    // const pointsProgramBorderColor = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_borderColor'
+    // )
+    // gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
+
+    for (const mapId of this.mapsInViewport) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (!warpedMap) {
+        continue
+      }
+
+      // (none)
+
+      // Draw lines for each map
+
+      const count = warpedMap.gcps.length * 3 * 2
+
+      const primitiveType = this.gl.TRIANGLES
+      const offset = 0
+
+      gl.bindVertexArray(warpedMap.linesVao)
       gl.drawArrays(primitiveType, offset, count)
     }
   }

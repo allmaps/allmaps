@@ -325,11 +325,14 @@ export function mixPoints(point0: Point, point1: Point, t: number): Point {
   ]
 }
 
-export function distance(line: Line): number
+export function distance(from: Line): number
+export function distance(from: Point): number
 export function distance(from: Point, to: Point): number
 export function distance(from: Point | Line, to?: Point): number {
   if (isLineString(from) && from.length === 2) {
     return distance(from[0], from[1])
+  } else if (isPoint(from) && to === undefined) {
+    return distance(from, [0, 0])
   } else if (isPoint(from) && isPoint(to)) {
     return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
   } else {

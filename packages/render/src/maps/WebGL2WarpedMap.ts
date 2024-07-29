@@ -2,7 +2,13 @@ import potpack from 'potpack'
 
 import { throttle } from 'lodash-es'
 
-import { isOverlapping } from '@allmaps/stdlib'
+import {
+  convertLineStringToGeojsonLineString,
+  convertPointToGeojsonPoint,
+  distance,
+  geometryToFeature,
+  isOverlapping
+} from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
@@ -13,7 +19,7 @@ import { createBuffer } from '../shared/webgl2.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Transform } from '@allmaps/types'
+import type { Line, Point, Transform } from '@allmaps/types'
 
 import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
@@ -31,7 +37,8 @@ const DEFAULT_SATURATION = 1
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
   program: WebGLProgram,
-  pointsProgram: WebGLProgram
+  pointsProgram: WebGLProgram,
+  linesProgram: WebGLProgram
 ) {
   return (
     mapId: string,
@@ -44,6 +51,7 @@ export function createWebGL2WarpedMapFactory(
       gl,
       program,
       pointsProgram,
+      linesProgram,
       options
     )
 }
@@ -60,9 +68,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
   program: WebGLProgram
   pointsProgram: WebGLProgram
+  linesProgram: WebGLProgram
 
   vao: WebGLVertexArrayObject | null
   pointsVao: WebGLVertexArrayObject | null
+  linesVao: WebGLVertexArrayObject | null
 
   CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
 
@@ -95,6 +105,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl: WebGL2RenderingContext,
     program: WebGLProgram,
     pointsProgram: WebGLProgram,
+    linesProgram: WebGLProgram,
     options?: Partial<WarpedMapOptions>
   ) {
     super(mapId, georeferencedMap, options)
@@ -102,9 +113,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl = gl
     this.program = program
     this.pointsProgram = pointsProgram
+    this.linesProgram = linesProgram
 
     this.vao = gl.createVertexArray()
     this.pointsVao = gl.createVertexArray()
+    this.linesVao = gl.createVertexArray()
 
     this.packedTilesTexture = gl.createTexture()
     this.packedTilesScaleFactorsTexture = gl.createTexture()
@@ -151,6 +164,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   dispose() {
     this.gl.deleteVertexArray(this.vao)
     this.gl.deleteVertexArray(this.pointsVao)
+    this.gl.deleteVertexArray(this.linesVao)
     this.gl.deleteTexture(this.packedTilesTexture)
     this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.packedTilesPositionsTexture)
@@ -158,7 +172,12 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   private updateVertexBuffersInternal() {
-    if (!this.vao || !this.pointsVao || !this.projectedGeoToClipTransform) {
+    if (
+      !this.vao ||
+      !this.pointsVao ||
+      !this.linesVao ||
+      !this.projectedGeoToClipTransform
+    ) {
       return
     }
 
@@ -265,6 +284,133 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       new Float32Array(clipPoints.flat()),
       2,
       'a_clipPoint'
+    )
+
+    // Attributes for lines
+    // TODO: place in separate function
+
+    this.gl.bindVertexArray(this.linesVao)
+
+    // GCP lines
+
+    const clipLines = this.projectedGcps
+      .map(
+        (projectedGcp) =>
+          [
+            projectedGcp.geo,
+            this.projectedTransformer.transformForward(projectedGcp.resource)
+          ] as Line
+      )
+      .map(
+        (projectedGeoLine) =>
+          projectedGeoLine.map((projectedGeoPoint) => {
+            return applyTransform(
+              this.projectedGeoToClipTransform as Transform,
+              projectedGeoPoint
+            )
+          }) as Line
+      )
+
+    const clipBothNormals = clipLines
+      .map((clipLine) => {
+        const normal = [
+          clipLine[1][1] - clipLine[0][1],
+          -(clipLine[1][0] - clipLine[0][0])
+        ] as Point
+        const length = distance(normal)
+        return normal.map((c) => c / length)
+      })
+      .map((p) => [p, [p[1], -p[0]]] as [Point, Point])
+
+    const sixClipPoints = clipLines
+      .map((clipLine) => [
+        clipLine[0],
+        clipLine[0],
+        clipLine[1],
+        clipLine[0],
+        clipLine[1],
+        clipLine[1]
+      ])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixClipPoints.flat()),
+      2,
+      'a_sixClipPoint'
+    )
+
+    const sixNormals = clipBothNormals
+      .map((clipBothNormal) => [
+        clipBothNormal[0],
+        clipBothNormal[1],
+        clipBothNormal[0],
+        clipBothNormal[1],
+        clipBothNormal[0],
+        clipBothNormal[1]
+      ])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixNormals.flat()),
+      2,
+      'a_sixNormal'
+    )
+
+    const testPoints: Point[] = sixClipPoints.map((point, index) => {
+      const delta = sixNormals[index].map((c) => c * 0.0005)
+      return point.map((c, i) => c + delta[i]) as Point
+    })
+
+    console.log(
+      'clipLines',
+      'http://geojson.io/#data=data:application/json,' +
+        encodeURIComponent(
+          JSON.stringify({
+            type: 'FeatureCollection',
+            features: clipLines.map((line, index) =>
+              geometryToFeature(convertLineStringToGeojsonLineString(line), {
+                index: index
+              })
+            )
+          })
+        )
+    )
+
+    console.log(
+      'clipBothNormals',
+      'http://geojson.io/#data=data:application/json,' +
+        encodeURIComponent(
+          JSON.stringify({
+            type: 'FeatureCollection',
+            features: clipBothNormals.map((bothNormals, index) =>
+              geometryToFeature(
+                convertLineStringToGeojsonLineString(bothNormals),
+                {
+                  index: index
+                }
+              )
+            )
+          })
+        )
+    )
+
+    console.log(
+      'testPoints',
+      'http://geojson.io/#data=data:application/json,' +
+        encodeURIComponent(
+          JSON.stringify({
+            type: 'FeatureCollection',
+            features: testPoints.map((point, index) =>
+              geometryToFeature(convertPointToGeojsonPoint(point), {
+                index: index
+              })
+            )
+          })
+        )
     )
   }
 
