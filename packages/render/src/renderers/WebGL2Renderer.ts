@@ -819,6 +819,99 @@ export default class WebGL2Renderer
       gl.drawArrays(primitiveType, offset, count)
     }
 
+    // Render Lines
+    // TODO: place in separate function
+    // So 'linesProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
+
+    gl.useProgram(this.linesProgram)
+
+    // Global uniform
+
+    // Render transform
+
+    const linesProgramRenderTransformLocation = gl.getUniformLocation(
+      this.linesProgram,
+      'u_renderTransform'
+    )
+    gl.uniformMatrix4fv(
+      linesProgramRenderTransformLocation,
+      false,
+      transformToMatrix4(renderTransform)
+    )
+
+    const linesProgramProjectedGeoToViewportTransformLocation =
+      gl.getUniformLocation(
+        this.linesProgram,
+        'u_projectedGeoToViewportTransform'
+      )
+    gl.uniformMatrix4fv(
+      linesProgramProjectedGeoToViewportTransformLocation,
+      false,
+      transformToMatrix4(this.viewport.projectedGeoToViewportTransform)
+    )
+
+    const linesProgramViewportToClipTransformLocation = gl.getUniformLocation(
+      this.linesProgram,
+      'u_viewportToClipTransform'
+    )
+    gl.uniformMatrix4fv(
+      linesProgramViewportToClipTransformLocation,
+      false,
+      transformToMatrix4(this.viewport.viewportToClipTransform)
+    )
+
+    // // Size
+
+    // const pointsProgramSize = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_size'
+    // )
+    // gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
+
+    // // Color
+
+    // const pointsProgramColor = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_color'
+    // )
+    // gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
+
+    // // Border size
+
+    // const pointsProgramBorderSize = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_borderSize'
+    // )
+    // gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
+
+    // // Border Color
+
+    // const pointsProgramBorderColor = gl.getUniformLocation(
+    //   this.pointsProgram,
+    //   'u_borderColor'
+    // )
+    // gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
+
+    for (const mapId of this.mapsInViewport) {
+      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+      if (!warpedMap) {
+        continue
+      }
+
+      // (none)
+
+      // Draw lines for each map
+
+      const count = warpedMap.gcps.length * 3 * 2
+
+      const primitiveType = this.gl.TRIANGLES
+      const offset = 0
+
+      gl.bindVertexArray(warpedMap.linesVao)
+      gl.drawArrays(primitiveType, offset, count)
+    }
+
     // Render Points
     // TODO: place in separate function
     // So 'pointsProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
@@ -888,78 +981,6 @@ export default class WebGL2Renderer
       const offset = 0
 
       gl.bindVertexArray(warpedMap.pointsVao)
-      gl.drawArrays(primitiveType, offset, count)
-    }
-
-    // Render Lines
-    // TODO: place in separate function
-    // So 'linesProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
-
-    gl.useProgram(this.linesProgram)
-
-    // Global uniform
-
-    // Render transform
-
-    const linesProgramRenderTransformLocation = gl.getUniformLocation(
-      this.linesProgram,
-      'u_renderTransform'
-    )
-    gl.uniformMatrix4fv(
-      linesProgramRenderTransformLocation,
-      false,
-      transformToMatrix4(renderTransform)
-    )
-
-    // // Size
-
-    // const pointsProgramSize = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_size'
-    // )
-    // gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
-
-    // // Color
-
-    // const pointsProgramColor = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_color'
-    // )
-    // gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
-
-    // // Border size
-
-    // const pointsProgramBorderSize = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_borderSize'
-    // )
-    // gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
-
-    // // Border Color
-
-    // const pointsProgramBorderColor = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_borderColor'
-    // )
-    // gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
-
-    for (const mapId of this.mapsInViewport) {
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (!warpedMap) {
-        continue
-      }
-
-      // (none)
-
-      // Draw lines for each map
-
-      const count = warpedMap.gcps.length * 3 * 2
-
-      const primitiveType = this.gl.TRIANGLES
-      const offset = 0
-
-      gl.bindVertexArray(warpedMap.linesVao)
       gl.drawArrays(primitiveType, offset, count)
     }
   }

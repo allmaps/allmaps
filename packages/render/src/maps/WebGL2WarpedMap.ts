@@ -2,13 +2,7 @@ import potpack from 'potpack'
 
 import { throttle } from 'lodash-es'
 
-import {
-  convertLineStringToGeojsonLineString,
-  convertPointToGeojsonPoint,
-  distance,
-  geometryToFeature,
-  isOverlapping
-} from '@allmaps/stdlib'
+import { isOverlapping } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
@@ -265,6 +259,71 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_triangleIndex'
     )
 
+    // Attributes for lines
+    // TODO: place in separate function
+
+    this.gl.bindVertexArray(this.linesVao)
+
+    // GCP lines
+
+    const projectedGeoLines = this.projectedGcps.map(
+      (projectedGcp) =>
+        [
+          projectedGcp.geo,
+          this.projectedTransformer.transformForward(projectedGcp.resource)
+        ] as Line
+    )
+
+    const sixProjectedGeoPoints = projectedGeoLines
+      .map((projectedGeoLine) => [
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[1]
+      ])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixProjectedGeoPoints.flat()),
+      2,
+      'a_projectedGeoPoint'
+    )
+
+    const sixProjectedGeoOtherPoints = projectedGeoLines
+      .map((projectedGeoLine) => [
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[0]
+      ])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixProjectedGeoOtherPoints.flat()),
+      2,
+      'a_projectedGeoOtherPoint'
+    )
+
+    const sixNormalSigns = projectedGeoLines
+      .map((_projectedGeoLine) => [+1, -1, +1, +1, -1, +1])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixNormalSigns.flat()),
+      1,
+      'a_normalSign'
+    )
+
     // Attributes for points
     // TODO: place in separate function
 
@@ -284,133 +343,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       new Float32Array(clipPoints.flat()),
       2,
       'a_clipPoint'
-    )
-
-    // Attributes for lines
-    // TODO: place in separate function
-
-    this.gl.bindVertexArray(this.linesVao)
-
-    // GCP lines
-
-    const clipLines = this.projectedGcps
-      .map(
-        (projectedGcp) =>
-          [
-            projectedGcp.geo,
-            this.projectedTransformer.transformForward(projectedGcp.resource)
-          ] as Line
-      )
-      .map(
-        (projectedGeoLine) =>
-          projectedGeoLine.map((projectedGeoPoint) => {
-            return applyTransform(
-              this.projectedGeoToClipTransform as Transform,
-              projectedGeoPoint
-            )
-          }) as Line
-      )
-
-    const clipBothNormals = clipLines
-      .map((clipLine) => {
-        const normal = [
-          clipLine[1][1] - clipLine[0][1],
-          -(clipLine[1][0] - clipLine[0][0])
-        ] as Point
-        const length = distance(normal)
-        return normal.map((c) => c / length)
-      })
-      .map((p) => [p, [p[1], -p[0]]] as [Point, Point])
-
-    const sixClipPoints = clipLines
-      .map((clipLine) => [
-        clipLine[0],
-        clipLine[0],
-        clipLine[1],
-        clipLine[0],
-        clipLine[1],
-        clipLine[1]
-      ])
-      .flat()
-
-    createBuffer(
-      this.gl,
-      this.linesProgram,
-      new Float32Array(sixClipPoints.flat()),
-      2,
-      'a_sixClipPoint'
-    )
-
-    const sixNormals = clipBothNormals
-      .map((clipBothNormal) => [
-        clipBothNormal[0],
-        clipBothNormal[1],
-        clipBothNormal[0],
-        clipBothNormal[1],
-        clipBothNormal[0],
-        clipBothNormal[1]
-      ])
-      .flat()
-
-    createBuffer(
-      this.gl,
-      this.linesProgram,
-      new Float32Array(sixNormals.flat()),
-      2,
-      'a_sixNormal'
-    )
-
-    const testPoints: Point[] = sixClipPoints.map((point, index) => {
-      const delta = sixNormals[index].map((c) => c * 0.0005)
-      return point.map((c, i) => c + delta[i]) as Point
-    })
-
-    console.log(
-      'clipLines',
-      'http://geojson.io/#data=data:application/json,' +
-        encodeURIComponent(
-          JSON.stringify({
-            type: 'FeatureCollection',
-            features: clipLines.map((line, index) =>
-              geometryToFeature(convertLineStringToGeojsonLineString(line), {
-                index: index
-              })
-            )
-          })
-        )
-    )
-
-    console.log(
-      'clipBothNormals',
-      'http://geojson.io/#data=data:application/json,' +
-        encodeURIComponent(
-          JSON.stringify({
-            type: 'FeatureCollection',
-            features: clipBothNormals.map((bothNormals, index) =>
-              geometryToFeature(
-                convertLineStringToGeojsonLineString(bothNormals),
-                {
-                  index: index
-                }
-              )
-            )
-          })
-        )
-    )
-
-    console.log(
-      'testPoints',
-      'http://geojson.io/#data=data:application/json,' +
-        encodeURIComponent(
-          JSON.stringify({
-            type: 'FeatureCollection',
-            features: testPoints.map((point, index) =>
-              geometryToFeature(convertPointToGeojsonPoint(point), {
-                index: index
-              })
-            )
-          })
-        )
     )
   }
 
