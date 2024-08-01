@@ -265,18 +265,19 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // GCP lines
 
     const projectedGeoLines = this.projectedGeoPoints.map(
-      (projectedGeoPoint, index) => [
-        projectedGeoPoint,
-        this.projectedGeoTransformedResourcePoints[index]
-      ]
+      (projectedGeoPoint, index) =>
+        [
+          projectedGeoPoint,
+          this.projectedGeoTransformedResourcePoints[index]
+        ] as Line
     )
 
     const sixProjectedGeoPoints = projectedGeoLines
       .map((projectedGeoLine) => [
         projectedGeoLine[0],
         projectedGeoLine[0],
-        projectedGeoLine[1],
         projectedGeoLine[0],
+        projectedGeoLine[1],
         projectedGeoLine[1],
         projectedGeoLine[1]
       ])
@@ -294,8 +295,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       .map((projectedGeoLine) => [
         projectedGeoLine[1],
         projectedGeoLine[1],
-        projectedGeoLine[0],
         projectedGeoLine[1],
+        projectedGeoLine[0],
         projectedGeoLine[0],
         projectedGeoLine[0]
       ])
@@ -310,7 +311,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const sixIsOtherPoints = projectedGeoLines
-      .map((_projectedGeoLine) => [0, 0, 1, 1, 0, 0])
+      .map((_projectedGeoLine) => [0, 0, 1, 0, 0, 1])
       .flat()
 
     createBuffer(

@@ -10,11 +10,13 @@ in vec2 v_linePoint;
 out vec4 color;
 
 void main() {
-  float distance = 2.0 * abs(v_linePoint.y) / v_viewportLineWidth;
+  float distance;
   if (v_linePoint.x < 0.0) {
     distance = 2.0 * length(v_linePoint - vec2(0.0,0.0)) / v_viewportLineWidth;
   } else if (v_linePoint.x > v_viewportLineLength) {
     distance = 2.0 * length(v_linePoint - vec2(v_viewportLineLength,0.0)) / v_viewportLineWidth;
+  } else {
+    distance = 2.0 * abs(v_linePoint.y) / v_viewportLineWidth;
   }
   if (distance > 1.0) {
     discard;

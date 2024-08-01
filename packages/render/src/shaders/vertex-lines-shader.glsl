@@ -20,16 +20,16 @@ void main() {
   vec2 viewportPoint = (u_projectedGeoToViewportTransform * vec4(a_projectedGeoPoint, 0.0f, 1.0f)).xy;
   vec2 viewportOtherPoint = (u_projectedGeoToViewportTransform * vec4(a_projectedGeoOtherPoint, 0.0f, 1.0f)).xy;
 
-  float otherPointFlip = -2.0 * a_isOtherPoint + 1.0; // -1 for other point, 1 for point
-  vec2 viewportLine = otherPointFlip * vec2(viewportOtherPoint.x-viewportPoint.x, viewportOtherPoint.y-viewportPoint.y);
+  vec2 viewportLine = vec2(viewportOtherPoint.x-viewportPoint.x, viewportOtherPoint.y-viewportPoint.y);
   vec2 viewportNormalizedLine = normalize(viewportLine);
-  vec2 viewportNormalizedLineNormal = otherPointFlip * normalize(vec2(viewportLine.y, -viewportLine.x));
-  vec2 viewportDeltaX = viewportNormalizedLine * (-1.0 * viewportLineWidth / 2.0 + a_isOtherPoint * viewportLineWidth);
-  vec2 viewportDeltaY = a_normalSign * viewportNormalizedLineNormal * viewportLineWidth / 2.0;
-
+  vec2 viewportNormalizedLineNormal = vec2(viewportNormalizedLine.y, -viewportNormalizedLine.x);
   v_viewportLineLength = length(viewportLine);
-  v_viewportLineWidth = viewportLineWidth;
-  v_linePoint = vec2(-1.0 * viewportLineWidth / 2.0 + a_isOtherPoint * (v_viewportLineLength + viewportLineWidth), a_normalSign * otherPointFlip * viewportLineWidth / 2.0);
 
-  gl_Position = u_viewportToClipTransform * vec4(viewportPoint + viewportDeltaX + viewportDeltaY, 0, 1);
+  float lineX = -1.0 * viewportLineWidth / 2.0 + a_isOtherPoint * (v_viewportLineLength + viewportLineWidth);
+  float lineY = a_normalSign * viewportLineWidth / 2.0;
+  v_linePoint = vec2(lineX, lineY);
+
+  v_viewportLineWidth = viewportLineWidth;
+
+  gl_Position = u_viewportToClipTransform * vec4(viewportPoint + lineX * viewportNormalizedLine + lineY * viewportNormalizedLineNormal, 0, 1);
 }
