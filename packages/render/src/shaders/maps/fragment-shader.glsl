@@ -4,7 +4,7 @@ precision highp float;
 precision highp isampler2D;
 
 // Color mixing from Spectral.js
-#include spectral.frag;
+#include ../spectral.frag;
 
 uniform bool u_removeColor;
 uniform vec3 u_removeColorOptionsColor;

@@ -26,12 +26,12 @@ import {
 } from '../shared/matrix.js'
 import { createShader, createProgram } from '../shared/webgl2.js'
 
-import vertexShaderSource from '../shaders/vertex-shader.glsl'
-import fragmentShaderSource from '../shaders/fragment-shader.glsl'
-import vertexPointsShaderSource from '../shaders/vertex-points-shader.glsl'
-import fragmentPointsShaderSource from '../shaders/fragment-points-shader.glsl'
-import vertexLinesShaderSource from '../shaders/vertex-lines-shader.glsl'
-import fragmentLinesShaderSource from '../shaders/fragment-lines-shader.glsl'
+import mapsVertexShaderSource from '../shaders/maps/vertex-shader.glsl'
+import mapsFragmentShaderSource from '../shaders/maps/fragment-shader.glsl'
+import linesVertexShaderSource from '../shaders/lines/vertex-shader.glsl'
+import linesFragmentShaderSource from '../shaders/lines/fragment-shader.glsl'
+import pointsVertexShaderSource from '../shaders/points/vertex-shader.glsl'
+import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -114,63 +114,76 @@ export default class WebGL2Renderer
     gl: WebGL2RenderingContext,
     options?: Partial<WebGL2RendererOptions>
   ) {
-    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
-    const fragmentShader = createShader(
-      gl,
-      gl.FRAGMENT_SHADER,
-      fragmentShaderSource
-    )
-
-    const vertexPointsShader = createShader(
+    const mapsVertexShader = createShader(
       gl,
       gl.VERTEX_SHADER,
-      vertexPointsShaderSource
+      mapsVertexShaderSource
     )
-    const fragmentPointsShader = createShader(
+    const mapsFragmentShader = createShader(
       gl,
       gl.FRAGMENT_SHADER,
-      fragmentPointsShaderSource
+      mapsFragmentShaderSource
     )
 
-    const vertexLinesShader = createShader(
+    const pointsVertexShader = createShader(
       gl,
       gl.VERTEX_SHADER,
-      vertexLinesShaderSource
+      pointsVertexShaderSource
     )
-    const fragmentLinesShader = createShader(
+    const pointsFragmentShader = createShader(
       gl,
       gl.FRAGMENT_SHADER,
-      fragmentLinesShaderSource
+      pointsFragmentShaderSource
     )
 
-    const program = createProgram(gl, vertexShader, fragmentShader)
+    const linesVertexShader = createShader(
+      gl,
+      gl.VERTEX_SHADER,
+      linesVertexShaderSource
+    )
+    const linesFragmentShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      linesFragmentShaderSource
+    )
+
+    const mapsProgram = createProgram(gl, mapsVertexShader, mapsFragmentShader)
     const pointsProgram = createProgram(
       gl,
-      vertexPointsShader,
-      fragmentPointsShader
+      pointsVertexShader,
+      pointsFragmentShader
     )
     const linesProgram = createProgram(
       gl,
-      vertexLinesShader,
-      fragmentLinesShader
+      linesVertexShader,
+      linesFragmentShader
     )
 
     super(
       CacheableImageBitmapTile.createFactory(),
-      createWebGL2WarpedMapFactory(gl, program, pointsProgram, linesProgram),
+      createWebGL2WarpedMapFactory(
+        gl,
+        mapsProgram,
+        pointsProgram,
+        linesProgram
+      ),
       options
     )
 
     this.gl = gl
-    this.mapsProgram = program
+    this.mapsProgram = mapsProgram
     this.pointsProgram = pointsProgram
     this.linesProgram = linesProgram
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
     // https://stackoverflow.com/questions/27237696/webgl-detach-and-delete-shaders-after-linking
-    gl.deleteShader(vertexShader)
-    gl.deleteShader(fragmentShader)
+    gl.deleteShader(mapsVertexShader)
+    gl.deleteShader(mapsFragmentShader)
+    gl.deleteShader(mapsVertexShader)
+    gl.deleteShader(mapsFragmentShader)
+    gl.deleteShader(mapsVertexShader)
+    gl.deleteShader(mapsFragmentShader)
 
     gl.disable(gl.DEPTH_TEST)
 

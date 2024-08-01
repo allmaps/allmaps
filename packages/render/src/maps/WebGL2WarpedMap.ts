@@ -30,7 +30,7 @@ const DEFAULT_SATURATION = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
-  program: WebGLProgram,
+  mapsProgram: WebGLProgram,
   pointsProgram: WebGLProgram,
   linesProgram: WebGLProgram
 ) {
@@ -43,7 +43,7 @@ export function createWebGL2WarpedMapFactory(
       mapId,
       georeferencedMap,
       gl,
-      program,
+      mapsProgram,
       pointsProgram,
       linesProgram,
       options
@@ -60,7 +60,7 @@ export function createWebGL2WarpedMapFactory(
  */
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
-  program: WebGLProgram
+  mapsProgram: WebGLProgram
   pointsProgram: WebGLProgram
   linesProgram: WebGLProgram
 
@@ -90,14 +90,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {string} mapId - ID of the map
    * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
    * @param {WebGL2RenderingContext} gl - WebGL rendering context
-   * @param {WebGLProgram} program - WebGL program
+   * @param {WebGLProgram} mapsProgram - WebGL program
    * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
    */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
     gl: WebGL2RenderingContext,
-    program: WebGLProgram,
+    mapsProgram: WebGLProgram,
     pointsProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     options?: Partial<WarpedMapOptions>
@@ -105,7 +105,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super(mapId, georeferencedMap, options)
 
     this.gl = gl
-    this.program = program
+    this.mapsProgram = mapsProgram
     this.pointsProgram = pointsProgram
     this.linesProgram = linesProgram
 
@@ -172,14 +172,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    this.gl.bindVertexArray(this.mapsVao)
+    const gl = this.gl
+    const program = this.mapsProgram
+    gl.bindVertexArray(this.mapsVao)
 
     // Resource triangle points
 
     const resourceTrianglePoints = this.resourceTrianglePoints
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(resourceTrianglePoints.flat()),
       2,
       'a_resourceTrianglePoint'
@@ -195,8 +197,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         )
       })
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(clipPreviousTrianglePoints.flat()),
       2,
       'a_clipPreviousTrianglePoint'
@@ -209,8 +211,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       )
     })
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(clipTrianglePoints.flat()),
       2,
       'a_clipTrianglePoint'
@@ -223,8 +225,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const previousTrianglePointsDistortion =
       this.previousTrianglePointsDistortion
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(previousTrianglePointsDistortion),
       1,
       'a_previousTrianglePointDistortion'
@@ -232,8 +234,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const trianglePointsDistortion = this.trianglePointsDistortion
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(trianglePointsDistortion),
       1,
       'a_trianglePointDistortion'
@@ -246,13 +248,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     ).map((_v, i) => {
       return Math.round((i - 1) / 3)
     })
-    createBuffer(
-      this.gl,
-      this.program,
-      trianglePointsTriangleIndex,
-      1,
-      'a_triangleIndex'
-    )
+    createBuffer(gl, program, trianglePointsTriangleIndex, 1, 'a_triangleIndex')
   }
 
   private updateVertexBuffersLines() {
@@ -260,7 +256,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    this.gl.bindVertexArray(this.linesVao)
+    const gl = this.gl
+    const program = this.linesProgram
+    gl.bindVertexArray(this.linesVao)
 
     // GCP lines
 
@@ -284,8 +282,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       .flat()
 
     createBuffer(
-      this.gl,
-      this.linesProgram,
+      gl,
+      program,
       new Float32Array(sixProjectedGeoPoints.flat()),
       2,
       'a_projectedGeoPoint'
@@ -303,8 +301,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       .flat()
 
     createBuffer(
-      this.gl,
-      this.linesProgram,
+      gl,
+      program,
       new Float32Array(sixProjectedGeoOtherPoints.flat()),
       2,
       'a_projectedGeoOtherPoint'
@@ -315,8 +313,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       .flat()
 
     createBuffer(
-      this.gl,
-      this.linesProgram,
+      gl,
+      program,
       new Float32Array(sixIsOtherPoints.flat()),
       1,
       'a_isOtherPoint'
@@ -327,8 +325,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       .flat()
 
     createBuffer(
-      this.gl,
-      this.linesProgram,
+      gl,
+      program,
       new Float32Array(sixNormalSigns.flat()),
       1,
       'a_normalSign'
@@ -340,7 +338,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    this.gl.bindVertexArray(this.pointsVao)
+    const gl = this.gl
+    const program = this.pointsProgram
+    gl.bindVertexArray(this.pointsVao)
 
     // Ground controle points
 
@@ -348,8 +348,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (projectedGcp) => projectedGcp.geo
     )
     createBuffer(
-      this.gl,
-      this.pointsProgram,
+      gl,
+      program,
       new Float32Array(projectedGeoPoints.flat()),
       2,
       'a_projectedGeoPoint'
