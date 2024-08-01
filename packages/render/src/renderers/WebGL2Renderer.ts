@@ -80,7 +80,7 @@ export default class WebGL2Renderer
   implements Renderer
 {
   gl: WebGL2RenderingContext
-  program: WebGLProgram
+  mapsProgram: WebGLProgram
   pointsProgram: WebGLProgram
   linesProgram: WebGLProgram
 
@@ -162,7 +162,7 @@ export default class WebGL2Renderer
     )
 
     this.gl = gl
-    this.program = program
+    this.mapsProgram = program
     this.pointsProgram = pointsProgram
     this.linesProgram = linesProgram
 
@@ -554,7 +554,7 @@ export default class WebGL2Renderer
 
     this.removeEventListeners()
 
-    this.gl.deleteProgram(this.program)
+    this.gl.deleteProgram(this.mapsProgram)
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
@@ -633,6 +633,21 @@ export default class WebGL2Renderer
       return
     }
 
+    const gl = this.gl
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+
+    this.renderMaps()
+    this.renderLines()
+    this.renderPoints()
+  }
+
+  private renderMaps(): void {
+    if (!this.viewport) {
+      return
+    }
+
     // renderTransform is the product of:
     // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
     // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
@@ -645,20 +660,15 @@ export default class WebGL2Renderer
     )
 
     const gl = this.gl
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-    gl.enable(gl.BLEND)
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    // Render Maps
-
-    gl.useProgram(this.program)
+    gl.useProgram(this.mapsProgram)
 
     // Global uniform
 
     // Render transform
 
     const renderTransformLocation = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_renderTransform'
     )
     gl.uniformMatrix4fv(
@@ -670,7 +680,7 @@ export default class WebGL2Renderer
     // Animation progress
 
     const animationProgressLocation = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_animationProgress'
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
@@ -679,36 +689,36 @@ export default class WebGL2Renderer
     // TODO: make these colors pickable
 
     const colorDistortion00 = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_colorDistortion00'
     )
     gl.uniform4f(colorDistortion00, ...hexToFractionalRgb(red), 1)
 
     const colorDistortion01 = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_colorDistortion01'
     )
     gl.uniform4f(colorDistortion01, ...hexToFractionalRgb(darkblue), 1)
 
     const colorDistortion1 = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_colorDistortion1'
     )
     gl.uniform4f(colorDistortion1, ...hexToFractionalRgb(green), 1)
 
     const colorDistortion2 = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_colorDistortion2'
     )
     gl.uniform4f(colorDistortion2, ...hexToFractionalRgb(yellow), 1)
 
     const colorDistortion3 = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_colorDistortion3'
     )
     gl.uniform4f(colorDistortion3, ...hexToFractionalRgb(red), 1)
 
-    const colorGrid = gl.getUniformLocation(this.program, 'u_colorGrid')
+    const colorGrid = gl.getUniformLocation(this.mapsProgram, 'u_colorGrid')
     gl.uniform4f(colorGrid, ...hexToFractionalRgb(black), 1)
 
     for (const mapId of this.mapsInViewport) {
@@ -724,13 +734,16 @@ export default class WebGL2Renderer
 
       // Opacity
 
-      const opacityLocation = gl.getUniformLocation(this.program, 'u_opacity')
+      const opacityLocation = gl.getUniformLocation(
+        this.mapsProgram,
+        'u_opacity'
+      )
       gl.uniform1f(opacityLocation, this.opacity * warpedMap.opacity)
 
       // Saturation
 
       const saturationLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_saturation'
       )
       gl.uniform1f(saturationLocation, this.saturation * warpedMap.saturation)
@@ -738,7 +751,7 @@ export default class WebGL2Renderer
       // Distortion
 
       const distortionLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_distortion'
       )
       gl.uniform1f(distortionLocation, warpedMap.distortionMeasure ? 1 : 0)
@@ -746,7 +759,7 @@ export default class WebGL2Renderer
       if (warpedMap.distortionMeasure) {
         const distortionOptionsDistortionMeasureLocation =
           gl.getUniformLocation(
-            this.program,
+            this.mapsProgram,
             'u_distortionOptionsdistortionMeasure'
           )
         gl.uniform1i(
@@ -758,7 +771,7 @@ export default class WebGL2Renderer
       // Best scale factor
 
       const bestScaleFactorLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_bestScaleFactor'
       )
       const bestScaleFactor = warpedMap.bestScaleFactor
@@ -767,7 +780,7 @@ export default class WebGL2Renderer
       // Packed tiles texture
 
       const packedTilesTextureLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_packedTilesTexture'
       )
       gl.uniform1i(packedTilesTextureLocation, 0)
@@ -777,7 +790,7 @@ export default class WebGL2Renderer
       // Packed tiles positions texture
 
       const packedTilesPositionsTextureLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_packedTilesPositionsTexture'
       )
       gl.uniform1i(packedTilesPositionsTextureLocation, 1)
@@ -788,7 +801,7 @@ export default class WebGL2Renderer
 
       const packedTilesResourcePositionsAndDimensionsLocation =
         gl.getUniformLocation(
-          this.program,
+          this.mapsProgram,
           'u_packedTilesResourcePositionsAndDimensionsTexture'
         )
       gl.uniform1i(packedTilesResourcePositionsAndDimensionsLocation, 2)
@@ -801,7 +814,7 @@ export default class WebGL2Renderer
       // Packed tiles scale factors texture
 
       const packedTileScaleFactorsTextureLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_packedTilesScaleFactorsTexture'
       )
       gl.uniform1i(packedTileScaleFactorsTextureLocation, 3)
@@ -815,82 +828,49 @@ export default class WebGL2Renderer
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
 
-      gl.bindVertexArray(warpedMap.vao)
+      gl.bindVertexArray(warpedMap.mapsVao)
       gl.drawArrays(primitiveType, offset, count)
     }
+  }
 
-    // Render Lines
-    // TODO: place in separate function
-    // So 'linesProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
+  private renderLines(): void {
+    if (!this.viewport) {
+      return
+    }
+
+    const gl = this.gl
 
     gl.useProgram(this.linesProgram)
 
     // Global uniform
 
-    // Render transform
-
-    const linesProgramRenderTransformLocation = gl.getUniformLocation(
+    const projectedGeoToViewportTransformLocation = gl.getUniformLocation(
       this.linesProgram,
-      'u_renderTransform'
+      'u_projectedGeoToViewportTransform'
     )
     gl.uniformMatrix4fv(
-      linesProgramRenderTransformLocation,
-      false,
-      transformToMatrix4(renderTransform)
-    )
-
-    const linesProgramProjectedGeoToViewportTransformLocation =
-      gl.getUniformLocation(
-        this.linesProgram,
-        'u_projectedGeoToViewportTransform'
-      )
-    gl.uniformMatrix4fv(
-      linesProgramProjectedGeoToViewportTransformLocation,
+      projectedGeoToViewportTransformLocation,
       false,
       transformToMatrix4(this.viewport.projectedGeoToViewportTransform)
     )
 
-    const linesProgramViewportToClipTransformLocation = gl.getUniformLocation(
+    const viewportToClipTransformLocation = gl.getUniformLocation(
       this.linesProgram,
       'u_viewportToClipTransform'
     )
     gl.uniformMatrix4fv(
-      linesProgramViewportToClipTransformLocation,
+      viewportToClipTransformLocation,
       false,
       transformToMatrix4(this.viewport.viewportToClipTransform)
     )
 
-    // // Size
+    // Animation progress
 
-    // const pointsProgramSize = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_size'
-    // )
-    // gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
-
-    // // Color
-
-    // const pointsProgramColor = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_color'
-    // )
-    // gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
-
-    // // Border size
-
-    // const pointsProgramBorderSize = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_borderSize'
-    // )
-    // gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
-
-    // // Border Color
-
-    // const pointsProgramBorderColor = gl.getUniformLocation(
-    //   this.pointsProgram,
-    //   'u_borderColor'
-    // )
-    // gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
+    const animationProgressLocation = gl.getUniformLocation(
+      this.mapsProgram,
+      'u_animationProgress'
+    )
+    gl.uniform1f(animationProgressLocation, this.animationProgress)
 
     for (const mapId of this.mapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -911,6 +891,14 @@ export default class WebGL2Renderer
       gl.bindVertexArray(warpedMap.linesVao)
       gl.drawArrays(primitiveType, offset, count)
     }
+  }
+
+  private renderPoints(): void {
+    if (!this.viewport) {
+      return
+    }
+
+    const gl = this.gl
 
     // Render Points
     // TODO: place in separate function
@@ -920,16 +908,24 @@ export default class WebGL2Renderer
 
     // Global uniform
 
-    // Render transform
-
-    const pointsProgramRenderTransformLocation = gl.getUniformLocation(
+    const projectedGeoToViewportTransformLocation = gl.getUniformLocation(
       this.pointsProgram,
-      'u_renderTransform'
+      'u_projectedGeoToViewportTransform'
     )
     gl.uniformMatrix4fv(
-      pointsProgramRenderTransformLocation,
+      projectedGeoToViewportTransformLocation,
       false,
-      transformToMatrix4(renderTransform)
+      transformToMatrix4(this.viewport.projectedGeoToViewportTransform)
+    )
+
+    const viewportToClipTransformLocation = gl.getUniformLocation(
+      this.pointsProgram,
+      'u_viewportToClipTransform'
+    )
+    gl.uniformMatrix4fv(
+      viewportToClipTransformLocation,
+      false,
+      transformToMatrix4(this.viewport.viewportToClipTransform)
     )
 
     // Size
@@ -1020,20 +1016,20 @@ export default class WebGL2Renderer
     const removeColorOptionsColor = renderOptions.removeColorOptions?.color
 
     const removeColorLocation = gl.getUniformLocation(
-      this.program,
+      this.mapsProgram,
       'u_removeColor'
     )
     gl.uniform1f(removeColorLocation, removeColorOptionsColor ? 1 : 0)
 
     if (removeColorOptionsColor) {
       const removeColorOptionsColorLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_removeColorOptionsColor'
       )
       gl.uniform3fv(removeColorOptionsColorLocation, removeColorOptionsColor)
 
       const removeColorOptionsThresholdLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_removeColorOptionsThreshold'
       )
       gl.uniform1f(
@@ -1043,7 +1039,7 @@ export default class WebGL2Renderer
       )
 
       const removeColorOptionsHardnessLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_removeColorOptionsHardness'
       )
       gl.uniform1f(
@@ -1057,12 +1053,15 @@ export default class WebGL2Renderer
 
     const colorizeOptionsColor = renderOptions.colorizeOptions?.color
 
-    const colorizeLocation = gl.getUniformLocation(this.program, 'u_colorize')
+    const colorizeLocation = gl.getUniformLocation(
+      this.mapsProgram,
+      'u_colorize'
+    )
     gl.uniform1f(colorizeLocation, colorizeOptionsColor ? 1 : 0)
 
     if (colorizeOptionsColor) {
       const colorizeOptionsColorLocation = gl.getUniformLocation(
-        this.program,
+        this.mapsProgram,
         'u_colorizeOptionsColor'
       )
       gl.uniform3fv(colorizeOptionsColorLocation, colorizeOptionsColor)
@@ -1072,7 +1071,7 @@ export default class WebGL2Renderer
 
     const gridOptionsGrid = renderOptions.gridOptions?.enabled
 
-    const gridLocation = gl.getUniformLocation(this.program, 'u_grid')
+    const gridLocation = gl.getUniformLocation(this.mapsProgram, 'u_grid')
     gl.uniform1f(gridLocation, gridOptionsGrid ? 1 : 0)
   }
 

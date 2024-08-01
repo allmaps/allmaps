@@ -13,7 +13,7 @@ import { createBuffer } from '../shared/webgl2.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Line, Point, Transform } from '@allmaps/types'
+import type { Line, Transform } from '@allmaps/types'
 
 import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
@@ -64,7 +64,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   pointsProgram: WebGLProgram
   linesProgram: WebGLProgram
 
-  vao: WebGLVertexArrayObject | null
+  mapsVao: WebGLVertexArrayObject | null
   pointsVao: WebGLVertexArrayObject | null
   linesVao: WebGLVertexArrayObject | null
 
@@ -109,7 +109,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.pointsProgram = pointsProgram
     this.linesProgram = linesProgram
 
-    this.vao = gl.createVertexArray()
+    this.mapsVao = gl.createVertexArray()
     this.pointsVao = gl.createVertexArray()
     this.linesVao = gl.createVertexArray()
 
@@ -132,7 +132,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.projectedGeoToClipTransform = projectedGeoToClipTransform
-    this.updateVertexBuffersInternal()
+    this.updateVertexBuffersMaps()
+    this.updateVertexBuffersLines()
+    this.updateVertexBuffersPoints()
   }
 
   /**
@@ -156,7 +158,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   dispose() {
-    this.gl.deleteVertexArray(this.vao)
+    this.gl.deleteVertexArray(this.mapsVao)
     this.gl.deleteVertexArray(this.pointsVao)
     this.gl.deleteVertexArray(this.linesVao)
     this.gl.deleteTexture(this.packedTilesTexture)
@@ -165,19 +167,12 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.deleteTexture(this.packedTilesResourcePositionsAndDimensionsTexture)
   }
 
-  private updateVertexBuffersInternal() {
-    if (
-      !this.vao ||
-      !this.pointsVao ||
-      !this.linesVao ||
-      !this.projectedGeoToClipTransform
-    ) {
+  private updateVertexBuffersMaps() {
+    if (!this.mapsVao || !this.projectedGeoToClipTransform) {
       return
     }
 
-    // Attributes for Maps
-
-    this.gl.bindVertexArray(this.vao)
+    this.gl.bindVertexArray(this.mapsVao)
 
     // Resource triangle points
 
@@ -258,20 +253,22 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       1,
       'a_triangleIndex'
     )
+  }
 
-    // Attributes for lines
-    // TODO: place in separate function
+  private updateVertexBuffersLines() {
+    if (!this.linesVao) {
+      return
+    }
 
     this.gl.bindVertexArray(this.linesVao)
 
     // GCP lines
 
-    const projectedGeoLines = this.projectedGcps.map(
-      (projectedGcp) =>
-        [
-          projectedGcp.geo,
-          this.projectedTransformer.transformForward(projectedGcp.resource)
-        ] as Line
+    const projectedGeoLines = this.projectedGeoPoints.map(
+      (projectedGeoPoint, index) => [
+        projectedGeoPoint,
+        this.projectedGeoTransformedResourcePoints[index]
+      ]
     )
 
     const sixProjectedGeoPoints = projectedGeoLines
@@ -312,6 +309,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoOtherPoint'
     )
 
+    const sixIsOtherPoints = projectedGeoLines
+      .map((_projectedGeoLine) => [0, 0, 1, 1, 0, 0])
+      .flat()
+
+    createBuffer(
+      this.gl,
+      this.linesProgram,
+      new Float32Array(sixIsOtherPoints.flat()),
+      1,
+      'a_isOtherPoint'
+    )
+
     const sixNormalSigns = projectedGeoLines
       .map((_projectedGeoLine) => [+1, -1, +1, +1, -1, +1])
       .flat()
@@ -323,26 +332,26 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       1,
       'a_normalSign'
     )
+  }
 
-    // Attributes for points
-    // TODO: place in separate function
+  private updateVertexBuffersPoints() {
+    if (!this.pointsVao) {
+      return
+    }
 
     this.gl.bindVertexArray(this.pointsVao)
 
     // Ground controle points
 
-    const clipPoints = this.projectedGcps.map((projectedGcp) => {
-      return applyTransform(
-        this.projectedGeoToClipTransform as Transform,
-        projectedGcp.geo
-      )
-    })
+    const projectedGeoPoints = this.projectedGcps.map(
+      (projectedGcp) => projectedGcp.geo
+    )
     createBuffer(
       this.gl,
       this.pointsProgram,
-      new Float32Array(clipPoints.flat()),
+      new Float32Array(projectedGeoPoints.flat()),
       2,
-      'a_clipPoint'
+      'a_projectedGeoPoint'
     )
   }
 

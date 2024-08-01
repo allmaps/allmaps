@@ -18,6 +18,7 @@ import type { WarpedMapOptions } from '../shared/types.js'
 
 import type {
   Gcp,
+  Point,
   Ring,
   Rectangle,
   Bbox,
@@ -104,6 +105,8 @@ export default class WarpedMap extends EventTarget {
 
   gcps: Gcp[]
   projectedGcps: Gcp[]
+  projectedGeoPoints: Point[]
+  projectedGeoTransformedResourcePoints!: Point[]
 
   resourceMask: Ring
   resourceMaskBbox!: Bbox
@@ -186,6 +189,9 @@ export default class WarpedMap extends EventTarget {
       resource,
       geo: lonLatToWebMecator(geo)
     }))
+    this.projectedGeoPoints = this.projectedGcps.map(
+      (projectedGcp) => projectedGcp.geo
+    )
 
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
@@ -446,6 +452,7 @@ export default class WarpedMap extends EventTarget {
   private updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
+    this.updateProjectedGeoTransformedResourcePoints()
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
@@ -478,6 +485,12 @@ export default class WarpedMap extends EventTarget {
           TRANSFORMER_OPTIONS
         ),
       useCache
+    )
+  }
+
+  private updateProjectedGeoTransformedResourcePoints(): void {
+    this.projectedGeoTransformedResourcePoints = this.gcps.map((projectedGcp) =>
+      this.projectedTransformer.transformForward(projectedGcp.resource)
     )
   }
 
