@@ -8,7 +8,7 @@
   import { uniqWith } from 'lodash-es'
 
   // @ts-ignore
-  import { default as mlcontour } from 'maplibre-contour'
+  import mlcontour from 'maplibre-contour'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
