@@ -6,6 +6,8 @@
   import layers from 'protomaps-themes-base'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
+
+  // @ts-ignore
   import { default as mlcontour } from 'maplibre-contour'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
