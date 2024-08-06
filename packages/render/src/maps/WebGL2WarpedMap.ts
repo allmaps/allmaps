@@ -394,31 +394,41 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoPoint'
     )
 
-    // const size = this.projectedGcps.map((_projectedGcp) => 16.0)
-    // createBuffer(gl, program, new Float32Array(size), 1, 'a_size')
-    // // TODO: take devicePixelRation into account for this and borderSize
-    // // TODO: put all these in style
+    const projectedGeoPreviousPoints =
+      this.projectedGeoPreviousTransformedResourcePoints
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(projectedGeoPreviousPoints.flat()),
+      2,
+      'a_projectedGeoPreviousPoint'
+    )
 
-    // const color = this.projectedGcps.map((_projectedGcp) => [
-    //   ...hexToFractionalRgb(red),
-    //   1
-    // ])
-    // createBuffer(gl, program, new Float32Array(color.flat()), 4, 'a_color')
+    const size = this.projectedGcps.map((_projectedGcp) => 16.0)
+    createBuffer(gl, program, new Float32Array(size), 1, 'a_size')
+    // TODO: take devicePixelRation into account for this and borderSize
+    // TODO: put all these in style
 
-    // const borderSize = this.projectedGcps.map((_projectedGcp) => 2.0)
-    // createBuffer(gl, program, new Float32Array(borderSize), 1, 'a_borderSize')
+    const color = this.projectedGcps.map((_projectedGcp) => [
+      ...hexToFractionalRgb(red),
+      1
+    ])
+    createBuffer(gl, program, new Float32Array(color.flat()), 4, 'a_color')
 
-    // const borderColor = this.projectedGcps.map((_projectedGcp) => [
-    //   ...hexToFractionalRgb(white),
-    //   1
-    // ])
-    // createBuffer(
-    //   gl,
-    //   program,
-    //   new Float32Array(borderColor.flat()),
-    //   4,
-    //   'a_borderColor'
-    // )
+    const borderSize = this.projectedGcps.map((_projectedGcp) => 2.0)
+    createBuffer(gl, program, new Float32Array(borderSize), 1, 'a_borderSize')
+
+    const borderColor = this.projectedGcps.map((_projectedGcp) => [
+      ...hexToFractionalRgb(white),
+      1
+    ])
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(borderColor.flat()),
+      4,
+      'a_borderColor'
+    )
   }
 
   private async updateTextures() {

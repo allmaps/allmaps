@@ -932,31 +932,13 @@ export default class WebGL2Renderer
       transformToMatrix4(this.viewport.viewportToClipTransform)
     )
 
-    // Size
+    // Animation progress
 
-    const pointsProgramSize = gl.getUniformLocation(program, 'u_size')
-    gl.uniform1f(pointsProgramSize, 16.0) // TODO: take devicePixelRation into account
-
-    // Color
-
-    const pointsProgramColor = gl.getUniformLocation(program, 'u_color')
-    gl.uniform4f(pointsProgramColor, ...hexToFractionalRgb(red), 1)
-
-    // Border size
-
-    const pointsProgramBorderSize = gl.getUniformLocation(
+    const animationProgressLocation = gl.getUniformLocation(
       program,
-      'u_borderSize'
+      'u_animationProgress'
     )
-    gl.uniform1f(pointsProgramBorderSize, 2.0) // TODO: take devicePixelRation into account
-
-    // Border Color
-
-    const pointsProgramBorderColor = gl.getUniformLocation(
-      program,
-      'u_borderColor'
-    )
-    gl.uniform4f(pointsProgramBorderColor, ...hexToFractionalRgb(white), 1)
+    gl.uniform1f(animationProgressLocation, this.animationProgress)
 
     for (const mapId of this.mapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
