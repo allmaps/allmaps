@@ -4,7 +4,8 @@ precision highp float;
 precision highp isampler2D;
 
 // Color mixing from Spectral.js
-#include ../spectral.frag;
+#include ../spectral.glsl;
+#include ../helpers.glsl;
 
 uniform bool u_removeColor;
 uniform vec3 u_removeColorOptionsColor;
@@ -41,10 +42,6 @@ in float v_triangleIndex;
 in float v_trianglePointDistortion;
 
 out vec4 color;
-
-vec4 rgbToVec4(int r, int g, int b) {
-  return vec4(float(r) / 255.0f, float(g) / 255.0f, float(b) / 255.0f, 1.0f);
-}
 
 void main() {
   float resourceTrianglePointX = v_resourceTrianglePoint.x;
@@ -117,8 +114,8 @@ void main() {
     // Read color of the point at its packed tiles texture point coordinates in the packed tiles texture
     color = texture(u_packedTilesTexture, packedTilesTexturePoint);
 
-    #include post.frag;
-    #include distortion.frag;
-    #include debug.frag;
+    #include post.glsl;
+    #include distortion.glsl;
+    #include debug.glsl;
   }
 }

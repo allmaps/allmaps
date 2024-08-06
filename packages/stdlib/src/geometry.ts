@@ -320,8 +320,8 @@ export function mixNumbers(
 
 export function mixPoints(point0: Point, point1: Point, t: number): Point {
   return [
-    point0[0] * t + point1[0] * (1 - t),
-    point0[1] * t + point1[1] * (1 - t)
+    mixNumbers(point0[0], point1[0], t),
+    mixNumbers(point0[1], point1[1], t)
   ]
 }
 

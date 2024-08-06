@@ -2,8 +2,9 @@ import potpack from 'potpack'
 
 import { throttle } from 'lodash-es'
 
-import { isOverlapping } from '@allmaps/stdlib'
+import { hexToFractionalRgb, isOverlapping } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
+import { red, white } from '@allmaps/tailwind'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -270,6 +271,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         ] as Line
     )
 
+    const projectedGeoPreviousLines = this.projectedGeoPoints.map(
+      (projectedGeoPoint, index) =>
+        [
+          projectedGeoPoint,
+          this.projectedGeoPreviousTransformedResourcePoints[index]
+        ] as Line
+    )
+
     const sixProjectedGeoPoints = projectedGeoLines
       .map((projectedGeoLine) => [
         projectedGeoLine[0],
@@ -280,7 +289,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[1]
       ])
       .flat()
-
     createBuffer(
       gl,
       program,
@@ -299,7 +307,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[0]
       ])
       .flat()
-
     createBuffer(
       gl,
       program,
@@ -308,14 +315,49 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoOtherPoint'
     )
 
-    const sixIsOtherPoints = projectedGeoLines
-      .map((_projectedGeoLine) => [0, 0, 1, 0, 0, 1])
+    const sixProjectedGeoPreviousPoints = projectedGeoPreviousLines
+      .map((projectedGeoLine) => [
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1]
+      ])
       .flat()
-
     createBuffer(
       gl,
       program,
-      new Float32Array(sixIsOtherPoints.flat()),
+      new Float32Array(sixProjectedGeoPreviousPoints.flat()),
+      2,
+      'a_projectedGeoPreviousPoint'
+    )
+
+    const sixProjectedGeoPreviousOtherPoints = projectedGeoPreviousLines
+      .map((projectedGeoLine) => [
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0]
+      ])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixProjectedGeoPreviousOtherPoints.flat()),
+      2,
+      'a_projectedGeoPreviousOtherPoint'
+    )
+
+    const sixIsOtherPoints = projectedGeoLines
+      .map((_projectedGeoLine) => [0, 0, 1, 0, 0, 1])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixIsOtherPoints),
       1,
       'a_isOtherPoint'
     )
@@ -323,11 +365,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const sixNormalSigns = projectedGeoLines
       .map((_projectedGeoLine) => [+1, -1, +1, +1, -1, +1])
       .flat()
-
     createBuffer(
       gl,
       program,
-      new Float32Array(sixNormalSigns.flat()),
+      new Float32Array(sixNormalSigns),
       1,
       'a_normalSign'
     )
@@ -342,11 +383,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.pointsProgram
     gl.bindVertexArray(this.pointsVao)
 
-    // Ground controle points
+    // GCP Points
 
-    const projectedGeoPoints = this.projectedGcps.map(
-      (projectedGcp) => projectedGcp.geo
-    )
+    const projectedGeoPoints = this.projectedGeoTransformedResourcePoints
     createBuffer(
       gl,
       program,
@@ -354,6 +393,32 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       2,
       'a_projectedGeoPoint'
     )
+
+    // const size = this.projectedGcps.map((_projectedGcp) => 16.0)
+    // createBuffer(gl, program, new Float32Array(size), 1, 'a_size')
+    // // TODO: take devicePixelRation into account for this and borderSize
+    // // TODO: put all these in style
+
+    // const color = this.projectedGcps.map((_projectedGcp) => [
+    //   ...hexToFractionalRgb(red),
+    //   1
+    // ])
+    // createBuffer(gl, program, new Float32Array(color.flat()), 4, 'a_color')
+
+    // const borderSize = this.projectedGcps.map((_projectedGcp) => 2.0)
+    // createBuffer(gl, program, new Float32Array(borderSize), 1, 'a_borderSize')
+
+    // const borderColor = this.projectedGcps.map((_projectedGcp) => [
+    //   ...hexToFractionalRgb(white),
+    //   1
+    // ])
+    // createBuffer(
+    //   gl,
+    //   program,
+    //   new Float32Array(borderColor.flat()),
+    //   4,
+    //   'a_borderColor'
+    // )
   }
 
   private async updateTextures() {

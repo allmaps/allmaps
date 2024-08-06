@@ -3,7 +3,6 @@
 precision highp float;
 
 uniform mat4 u_renderTransform;
-
 uniform float u_animationProgress;
 
 in vec2 a_resourceTrianglePoint;

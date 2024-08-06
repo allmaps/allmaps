@@ -275,19 +275,21 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
+   * Reset the previous points.
    */
-  resetTrianglePoints() {
+  resetPoints() {
+    super.resetPoints()
     this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
     this.previousTrianglePointsDistortion = this.trianglePointsDistortion
   }
 
   /**
-   * Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
+   * Mix the previous and new points.
    *
    * @param {number} t
    */
-  mixTrianglePoints(t: number) {
+  mixPoints(t: number) {
+    super.mixPoints(t)
     this.projectedGeoPreviousTrianglePoints =
       this.projectedGeoTrianglePoints.map((point, index) => {
         return mixPoints(

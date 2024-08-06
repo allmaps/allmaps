@@ -6,6 +6,10 @@ precision highp isampler2D;
 in float v_viewportLineLength;
 in float v_viewportLineWidth;
 in vec2 v_linePoint;
+in float v_size;
+in vec3 v_color;
+in float v_borderSize;
+in vec3 v_borderColor;
 
 out vec4 color;
 
