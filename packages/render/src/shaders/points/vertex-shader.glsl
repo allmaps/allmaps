@@ -13,7 +13,7 @@ in vec4 a_color;
 in float a_borderSize;
 in vec4 a_borderColor;
 
-out float v_size;
+out float v_size; // TODO: take devicePixelRation into account for this and borderSize
 out vec4 v_color;
 out float v_borderSize;
 out vec4 v_borderColor;

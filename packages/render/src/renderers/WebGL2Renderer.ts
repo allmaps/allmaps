@@ -951,7 +951,7 @@ export default class WebGL2Renderer
 
       // Draw points for each map
 
-      const count = warpedMap.gcps.length
+      const count = warpedMap.gcps.length * warpedMap.pointLayers.length
 
       const primitiveType = this.gl.POINTS
       const offset = 0

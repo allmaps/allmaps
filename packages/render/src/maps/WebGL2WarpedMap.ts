@@ -4,7 +4,7 @@ import { throttle } from 'lodash-es'
 
 import { hexToFractionalRgb, isOverlapping } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
-import { red, white } from '@allmaps/tailwind'
+import { blue, pink, white } from '@allmaps/tailwind'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -14,9 +14,9 @@ import { createBuffer } from '../shared/webgl2.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Line, Transform } from '@allmaps/types'
+import type { Line, Point, Transform } from '@allmaps/types'
 
-import type { WarpedMapOptions } from '../shared/types.js'
+import type { PointLayer, WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
 
@@ -28,6 +28,11 @@ const THROTTLE_OPTIONS = {
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
+
+const DEFAULT_STYLE_POINT_SIZE = 16
+const DEFAULT_STYLE_POINT_COLOR = [...hexToFractionalRgb(pink), 1]
+const DEFAULT_STYLE_POINT_BORDER_SIZE = 2
+const DEFAULT_STYLE_POINT_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -68,6 +73,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   mapsVao: WebGLVertexArrayObject | null
   pointsVao: WebGLVertexArrayObject | null
   linesVao: WebGLVertexArrayObject | null
+
+  pointLayers: PointLayer[] = []
 
   CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
 
@@ -113,6 +120,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.mapsVao = gl.createVertexArray()
     this.pointsVao = gl.createVertexArray()
     this.linesVao = gl.createVertexArray()
+
+    this.preparePointLayers()
 
     this.packedTilesTexture = gl.createTexture()
     this.packedTilesScaleFactorsTexture = gl.createTexture()
@@ -166,6 +175,21 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.packedTilesPositionsTexture)
     this.gl.deleteTexture(this.packedTilesResourcePositionsAndDimensionsTexture)
+  }
+
+  private preparePointLayers() {
+    this.pointLayers = [
+      {
+        projectedGeoPoints: this.projectedGeoPoints,
+        color: [...hexToFractionalRgb(blue), 1]
+      },
+      {
+        projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
+        projectedGeoPreviousPoints:
+          this.projectedGeoPreviousTransformedResourcePoints,
+        color: [...hexToFractionalRgb(pink), 1]
+      }
+    ]
   }
 
   private updateVertexBuffersMaps() {
@@ -383,9 +407,58 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.pointsProgram
     gl.bindVertexArray(this.pointsVao)
 
-    // GCP Points
+    this.preparePointLayers()
 
-    const projectedGeoPoints = this.projectedGeoTransformedResourcePoints
+    const projectedGeoPoints = this.pointLayers.reduce(
+      (accumulator: Point[], pointLayer) =>
+        accumulator.concat(pointLayer.projectedGeoPoints),
+      []
+    )
+    const projectedGeoPreviousPoints = this.pointLayers.reduce(
+      (accumulator: Point[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPreviousPoints || pointLayer.projectedGeoPoints
+        ),
+      []
+    )
+    const sizes = this.pointLayers.reduce(
+      (accumulator: number[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map(
+            (_point) => pointLayer.size || DEFAULT_STYLE_POINT_SIZE
+          )
+        ),
+      []
+    )
+    const colors = this.pointLayers.reduce(
+      (accumulator: number[][], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map(
+            (_point) => pointLayer.color || DEFAULT_STYLE_POINT_COLOR
+          )
+        ),
+      []
+    )
+    const borderSizes = this.pointLayers.reduce(
+      (accumulator: number[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map(
+            (_point) => pointLayer.borderSize || DEFAULT_STYLE_POINT_BORDER_SIZE
+          )
+        ),
+      []
+    )
+    const borderColors = this.pointLayers.reduce(
+      (accumulator: number[][], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map(
+            (_point) =>
+              pointLayer.borderColor || DEFAULT_STYLE_POINT_BORDER_COLOR
+          )
+        ),
+      []
+    )
+
     createBuffer(
       gl,
       program,
@@ -394,8 +467,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoPoint'
     )
 
-    const projectedGeoPreviousPoints =
-      this.projectedGeoPreviousTransformedResourcePoints
     createBuffer(
       gl,
       program,
@@ -404,28 +475,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoPreviousPoint'
     )
 
-    const size = this.projectedGcps.map((_projectedGcp) => 16.0)
-    createBuffer(gl, program, new Float32Array(size), 1, 'a_size')
-    // TODO: take devicePixelRation into account for this and borderSize
-    // TODO: put all these in style
+    createBuffer(gl, program, new Float32Array(sizes), 1, 'a_size')
 
-    const color = this.projectedGcps.map((_projectedGcp) => [
-      ...hexToFractionalRgb(red),
-      1
-    ])
-    createBuffer(gl, program, new Float32Array(color.flat()), 4, 'a_color')
+    createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
 
-    const borderSize = this.projectedGcps.map((_projectedGcp) => 2.0)
-    createBuffer(gl, program, new Float32Array(borderSize), 1, 'a_borderSize')
+    createBuffer(gl, program, new Float32Array(borderSizes), 1, 'a_borderSize')
 
-    const borderColor = this.projectedGcps.map((_projectedGcp) => [
-      ...hexToFractionalRgb(white),
-      1
-    ])
     createBuffer(
       gl,
       program,
-      new Float32Array(borderColor.flat()),
+      new Float32Array(borderColors.flat()),
       4,
       'a_borderColor'
     )
