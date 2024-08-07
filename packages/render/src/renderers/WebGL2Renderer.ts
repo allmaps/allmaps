@@ -95,7 +95,7 @@ export default class WebGL2Renderer
   lastAnimationFrameRequestId: number | undefined
   animating = false
   transformationTransitionStart: number | undefined
-  animationProgress = 1
+  animationProgress = 0
 
   private throttledPrepareRenderInternal: DebouncedFunc<
     typeof this.prepareRenderInternal
@@ -1068,6 +1068,7 @@ export default class WebGL2Renderer
     }
 
     if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
+      // animationProgress goes from 0 to 1 throughout animation
       this.animationProgress =
         (now - this.transformationTransitionStart) / ANIMATION_DURATION
 

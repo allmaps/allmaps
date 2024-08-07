@@ -315,7 +315,7 @@ export function mixNumbers(
   number1: number,
   t: number
 ): number {
-  return number0 * t + number1 * (1 - t)
+  return number0 * (1 - t) + number1 * t
 }
 
 export function mixPoints(point0: Point, point1: Point, t: number): Point {

@@ -369,6 +369,7 @@ export default class WarpedMap extends EventTarget {
    * @param {TransformationType} transformationType
    */
   setTransformationType(transformationType: TransformationType): void {
+    console.log('setTransformationType')
     this.transformationType = transformationType
     this.updateTransformerProperties()
   }
@@ -419,6 +420,7 @@ export default class WarpedMap extends EventTarget {
    * Reset the previous points.
    */
   resetPoints() {
+    console.log('reset')
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
     this.projectedGeoPreviousMask = this.projectedGeoMask
@@ -533,7 +535,10 @@ export default class WarpedMap extends EventTarget {
       this.projectedTransformer.transformForward(projectedGcp.resource)
     )
 
+    console.log('updateProjectedGeoTransformedResourcePoints')
+
     if (!this.projectedGeoPreviousTransformedResourcePoints) {
+      console.log('setting previous')
       this.projectedGeoPreviousTransformedResourcePoints =
         this.projectedGeoTransformedResourcePoints
     }
