@@ -22,7 +22,7 @@ in vec2 a_projectedGeoPoint;
 in vec2 a_projectedGeoPreviousPoint;
 
 void main() {
-  vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, cubicInOut(u_animationProgress));
+  vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
 
   gl_Position = u_viewportToClipTransform * u_projectedGeoToViewportTransform * vec4(projectedGeoPoint, 0.0f, 1.0f);
 

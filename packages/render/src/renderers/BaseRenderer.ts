@@ -262,6 +262,9 @@ export default abstract class BaseRenderer<
   protected warpedMapRemoved(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected handlePreChange(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected transformationChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
@@ -291,6 +294,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.handlePreChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -328,6 +336,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.handlePreChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(

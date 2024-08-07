@@ -30,8 +30,8 @@ out vec3 v_borderColor;
 void main() {
   float viewportLineWidth = 8.0;
 
-  vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, cubicInOut(u_animationProgress));
-  vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, cubicInOut(u_animationProgress));
+  vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
+  vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, easing(u_animationProgress));
 
   vec2 viewportPoint = (u_projectedGeoToViewportTransform * vec4(projectedGeoPoint, 0.0f, 1.0f)).xy;
   vec2 viewportOtherPoint = (u_projectedGeoToViewportTransform * vec4(projectedGeoOtherPoint, 0.0f, 1.0f)).xy;

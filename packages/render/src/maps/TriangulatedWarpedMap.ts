@@ -137,11 +137,48 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
+   * Reset the previous points and values.
+   */
+  resetPrevious() {
+    super.resetPrevious()
+    this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
+    this.previousTrianglePointsDistortion = this.trianglePointsDistortion
+  }
+
+  /**
+   * Mix the previous and new points and values.
+   *
+   * @param {number} t
+   */
+  mixPreviousAndNew(t: number) {
+    super.mixPreviousAndNew(t)
+    this.projectedGeoPreviousTrianglePoints =
+      this.projectedGeoTrianglePoints.map((point, index) => {
+        return mixPoints(
+          point,
+          this.projectedGeoPreviousTrianglePoints[index],
+          t
+        )
+      })
+    this.previousTrianglePointsDistortion = this.trianglePointsDistortion.map(
+      (distortion, index) => {
+        return mixNumbers(
+          distortion,
+          this.previousTrianglePointsDistortion[index],
+          t
+        )
+      }
+    )
+  }
+
+  /**
    * Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
    *
    * @param {boolean} [previousIsNew] - whether the previous and new triangulation are the same - true by default, false during a transformation transition
    */
-  updateTriangulation(previousIsNew = false) {
+  private updateTriangulation(previousIsNew = false) {
+    if (!this.bestScaleFactor) return
+
     const { trianglePointsUniquePointsIndex, resourceUniquePoints } =
       getPropertyFromCacheOrComputation(
         this.triangulationByBestScaleFactor,
@@ -199,7 +236,9 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param {boolean} [previousIsNew=false]
    */
-  updateProjectedGeoTrianglePoints(previousIsNew = false) {
+  private updateProjectedGeoTrianglePoints(previousIsNew = false) {
+    if (!this.bestScaleFactor) return
+
     this.projectedGeoUniquePoints = getPropertyFromDoubleCacheOrComputation(
       this.projectedGeoUniquePointsByBestScaleFactorAndTransformationType,
       this.bestScaleFactor,
@@ -225,7 +264,9 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param {boolean} [previousIsNew=false]
    */
-  updateTrianglePointsDistortion(previousIsNew = false) {
+  private updateTrianglePointsDistortion(previousIsNew = false) {
+    if (!this.bestScaleFactor) return
+
     if (this.distortionMeasure) {
       this.projectedGeoUniquePointsPartialDerivativeX =
         getPropertyFromDoubleCacheOrComputation(
@@ -274,38 +315,13 @@ export default class TriangulatedWarpedMap extends WarpedMap {
     }
   }
 
-  /**
-   * Reset the previous points.
-   */
-  resetPoints() {
-    super.resetPoints()
-    this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
-    this.previousTrianglePointsDistortion = this.trianglePointsDistortion
+  protected updateTransformerProperties(useCache = true): void {
+    super.updateTransformerProperties(useCache)
+    this.updateProjectedGeoTrianglePoints(false)
   }
 
-  /**
-   * Mix the previous and new points.
-   *
-   * @param {number} t
-   */
-  mixPoints(t: number) {
-    super.mixPoints(t)
-    this.projectedGeoPreviousTrianglePoints =
-      this.projectedGeoTrianglePoints.map((point, index) => {
-        return mixPoints(
-          point,
-          this.projectedGeoPreviousTrianglePoints[index],
-          t
-        )
-      })
-    this.previousTrianglePointsDistortion = this.trianglePointsDistortion.map(
-      (distortion, index) => {
-        return mixNumbers(
-          distortion,
-          this.previousTrianglePointsDistortion[index],
-          t
-        )
-      }
-    )
+  protected updateDistortionProperties(): void {
+    super.updateDistortionProperties()
+    this.updateTrianglePointsDistortion(false)
   }
 }

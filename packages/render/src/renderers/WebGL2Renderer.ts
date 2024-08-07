@@ -1079,7 +1079,7 @@ export default class WebGL2Renderer
       )
     } else {
       for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
-        warpedMap.resetPoints()
+        warpedMap.resetPrevious()
       }
       this.updateVertexBuffers()
 
@@ -1144,32 +1144,27 @@ export default class WebGL2Renderer
     }
   }
 
-  protected transformationChanged(event: Event) {
+  protected handlePreChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
         if (this.animating) {
-          warpedMap.mixPoints(this.animationProgress)
+          warpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
-        warpedMap.updateProjectedGeoTrianglePoints(false)
       }
+    }
+  }
 
-      this.updateVertexBuffers() // TODO: can this be removed?
+  protected transformationChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      this.updateVertexBuffers()
       this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
     }
   }
 
   protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
-      for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
-        if (this.animating) {
-          warpedMap.mixPoints(this.animationProgress)
-        }
-        warpedMap.updateTrianglePointsDistortion(false)
-      }
-
-      this.updateVertexBuffers() // TODO: can this be removed?
+      this.updateVertexBuffers()
       this.startTransformationTransition() // TODO: pass mapIds here reset only those mapIds
     }
   }

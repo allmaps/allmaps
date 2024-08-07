@@ -369,7 +369,6 @@ export default class WarpedMap extends EventTarget {
    * @param {TransformationType} transformationType
    */
   setTransformationType(transformationType: TransformationType): void {
-    console.log('setTransformationType')
     this.transformationType = transformationType
     this.updateTransformerProperties()
   }
@@ -381,6 +380,7 @@ export default class WarpedMap extends EventTarget {
    */
   setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     this.distortionMeasure = distortionMeasure
+    this.updateDistortionProperties()
   }
 
   /**
@@ -417,21 +417,20 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Reset the previous points.
+   * Reset the previous points and values.
    */
-  resetPoints() {
-    console.log('reset')
+  resetPrevious() {
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
     this.projectedGeoPreviousMask = this.projectedGeoMask
   }
 
   /**
-   * Mix the previous and new points.
+   * Mix the previous and new points and values.
    *
    * @param {number} t
    */
-  mixPoints(t: number) {
+  mixPreviousAndNew(t: number) {
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints.map((point, index) => {
         return mixPoints(
@@ -491,7 +490,7 @@ export default class WarpedMap extends EventTarget {
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
   }
 
-  private updateTransformerProperties(useCache = true): void {
+  protected updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
     this.updateProjectedGeoTransformedResourcePoints()
@@ -535,10 +534,7 @@ export default class WarpedMap extends EventTarget {
       this.projectedTransformer.transformForward(projectedGcp.resource)
     )
 
-    console.log('updateProjectedGeoTransformedResourcePoints')
-
     if (!this.projectedGeoPreviousTransformedResourcePoints) {
-      console.log('setting previous')
       this.projectedGeoPreviousTransformedResourcePoints =
         this.projectedGeoTransformedResourcePoints
     }
@@ -599,6 +595,8 @@ export default class WarpedMap extends EventTarget {
       this.projectedGeoMaskRectangle
     )
   }
+
+  protected updateDistortionProperties(): void {}
 }
 
 /**
