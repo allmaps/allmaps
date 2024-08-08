@@ -269,7 +269,10 @@ export function isEqualPointArrayArray(
 
 // Compute
 
-export function pointsToLines(points0: Point[], points1: Point[]): Line[] {
+export function pointsAndPointsToLines(
+  points0: Point[],
+  points1: Point[]
+): Line[] {
   if (points0.length != points1.length)
     throw new Error('Point arrays should be of same lenght')
 

@@ -6,10 +6,10 @@ import {
   hexToFractionalRgb,
   isOverlapping,
   lineStringToLines,
-  pointsToLines
+  pointsAndPointsToLines
 } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
-import { black, blue, pink, white } from '@allmaps/tailwind'
+import { black, blue, green, pink, white } from '@allmaps/tailwind'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -34,6 +34,8 @@ const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
 }
+
+const DEBUG = false // TODO: set using options
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -191,11 +193,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineLayers() {
     this.lineLayers = [
       {
-        projectedGeoLines: pointsToLines(
+        projectedGeoLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
           this.projectedGeoTransformedResourcePoints
         ),
-        projectedGeoPreviousLines: pointsToLines(
+        projectedGeoPreviousLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
           this.projectedGeoPreviousTransformedResourcePoints
         ),
@@ -218,6 +220,15 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: [...hexToFractionalRgb(pink), 1]
       }
     ]
+
+    if (DEBUG) {
+      this.lineLayers = this.lineLayers.concat([
+        {
+          projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
+          color: [...hexToFractionalRgb(green), 1]
+        }
+      ])
+    }
   }
 
   private setPointLayers() {

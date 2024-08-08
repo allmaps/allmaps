@@ -186,6 +186,7 @@ export default abstract class BaseRenderer<
         [viewport.geoRectangle],
         transformerOptions
       )[0]
+      // TODO: consider to transform viewport.projectedGeoRectable backward using projectedTransform
 
       warpedMap.setResourceViewportRing(resourceViewportRing)
 

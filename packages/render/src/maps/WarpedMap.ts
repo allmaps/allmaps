@@ -37,6 +37,7 @@ import type {
 
 import type Viewport from '../viewport/Viewport.js'
 
+// TODO: consider to make the default options more precise
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,

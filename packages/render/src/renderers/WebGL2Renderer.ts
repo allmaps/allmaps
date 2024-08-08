@@ -11,7 +11,7 @@ import {
   maxOfNumberOrUndefined
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
-import { red, green, darkblue, yellow, white, black } from '@allmaps/tailwind'
+import { red, green, darkblue, yellow, black } from '@allmaps/tailwind'
 
 import {
   WarpedMapEvent,
@@ -59,6 +59,8 @@ const THROTTLE_CHANGED_OPTIONS = {
   leading: true,
   trailing: true
 }
+
+const DEBUG = false // TODO: set using options
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -682,7 +684,7 @@ export default class WebGL2Renderer
     // Debug
 
     const debugLocation = gl.getUniformLocation(program, 'u_debug')
-    gl.uniform1f(debugLocation, 1) // TODO: set using options
+    gl.uniform1f(debugLocation, DEBUG ? 1 : 0)
 
     // Render transform
 
