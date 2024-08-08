@@ -28,7 +28,7 @@ out float v_borderSize;
 out vec3 v_borderColor;
 
 void main() {
-  float viewportLineWidth = 8.0;
+  float viewportLineWidth = 6.0;
 
   vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
   vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, easing(u_animationProgress));

@@ -269,6 +269,23 @@ export function isEqualPointArrayArray(
 
 // Compute
 
+export function pointsToLines(points0: Point[], points1: Point[]): Line[] {
+  if (points0.length != points1.length)
+    throw new Error('Point arrays should be of same lenght')
+
+  return points0.map((point0, index) => [point0, points1[index]])
+}
+
+export function lineStringToLines(lineString: LineString): Line[] {
+  return lineString.reduce(
+    (accumulator: Line[], point, index) => [
+      ...accumulator,
+      [point, lineString[(index + 1) % lineString.length]]
+    ],
+    []
+  )
+}
+
 export function pointToPixel(
   point: Point,
   translate: Point = [0, 0],

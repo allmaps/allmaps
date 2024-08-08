@@ -5,6 +5,7 @@ import type CacheableTile from '../tilecache/CacheableTile.js'
 
 import type {
   Point,
+  Line,
   Size,
   FetchFn,
   ImageInformations,
@@ -92,6 +93,15 @@ export type CachableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
+
+export type LineLayer = {
+  projectedGeoLines: Line[]
+  projectedGeoPreviousLines?: Line[]
+  size?: number
+  color?: ColorWithTransparancy
+  borderSize?: number
+  borderColor?: ColorWithTransparancy
+}
 
 export type PointLayer = {
   projectedGeoPoints: Point[]

@@ -886,7 +886,12 @@ export default class WebGL2Renderer
 
       // Draw lines for each map
 
-      const count = warpedMap.gcps.length * 3 * 2
+      const count =
+        warpedMap.lineLayers.reduce(
+          (accumulator: number, lineLayer) =>
+            accumulator + lineLayer.projectedGeoLines.length,
+          0
+        ) * 6
 
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
@@ -951,7 +956,11 @@ export default class WebGL2Renderer
 
       // Draw points for each map
 
-      const count = warpedMap.gcps.length * warpedMap.pointLayers.length
+      const count = warpedMap.pointLayers.reduce(
+        (accumulator: number, pointLayer) =>
+          accumulator + pointLayer.projectedGeoPoints.length,
+        0
+      )
 
       const primitiveType = this.gl.POINTS
       const offset = 0
@@ -1086,6 +1095,8 @@ export default class WebGL2Renderer
       this.animating = false
       this.animationProgress = 0
       this.transformationTransitionStart = undefined
+
+      this.changed()
     }
   }
 
@@ -1144,7 +1155,7 @@ export default class WebGL2Renderer
     }
   }
 
-  protected handlePreChange(event: Event) {
+  protected preChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       for (const warpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
