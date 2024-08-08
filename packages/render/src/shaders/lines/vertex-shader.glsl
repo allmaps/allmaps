@@ -14,21 +14,23 @@ in vec2 a_projectedGeoPreviousPoint;
 in vec2 a_projectedGeoPreviousOtherPoint;
 in float a_isOtherPoint;
 in float a_normalSign;
-in float a_size;
-in vec3 a_color;
-in float a_borderSize;
-in vec3 a_borderColor;
+in float a_viewportSize;
+in vec4 a_color;
+in float a_viewportBorderSize;
+in vec4 a_borderColor;
 
 out float v_viewportLineLength;
-out float v_viewportLineWidth;
 out vec2 v_linePoint;
-out float v_size;
-out vec3 v_color;
-out float v_borderSize;
-out vec3 v_borderColor;
+out float v_viewportSize;
+out vec4 v_color;
+out float v_viewportBorderSize;
+out vec4 v_borderColor;
 
 void main() {
-  float viewportLineWidth = 6.0;
+
+  // TODO: line sizes appear to count twice as much as point sizes
+  float viewportSize = a_viewportSize/2.0;
+  float viewportBorderSize = a_viewportBorderSize/2.0;
 
   vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
   vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, easing(u_animationProgress));
@@ -41,15 +43,13 @@ void main() {
   vec2 viewportNormalizedLineNormal = vec2(viewportNormalizedLine.y, -viewportNormalizedLine.x);
   v_viewportLineLength = length(viewportLine);
 
-  float lineX = -1.0 * viewportLineWidth / 2.0 + a_isOtherPoint * (v_viewportLineLength + viewportLineWidth);
-  float lineY = a_normalSign * viewportLineWidth / 2.0;
+  float lineX = -1.0 * a_viewportSize / 2.0 + a_isOtherPoint * (v_viewportLineLength + a_viewportSize);
+  float lineY = a_normalSign * a_viewportSize / 2.0;
   v_linePoint = vec2(lineX, lineY);
 
-  v_viewportLineWidth = viewportLineWidth;
-
-  v_size = a_size;
+  v_viewportSize = viewportSize;
   v_color = a_color;
-  v_borderSize = a_borderSize;
+  v_viewportBorderSize = viewportBorderSize;
   v_borderColor = a_borderColor;
 
   gl_Position = u_viewportToClipTransform * vec4(viewportPoint + lineX * viewportNormalizedLine + lineY * viewportNormalizedLineNormal, 0, 1);

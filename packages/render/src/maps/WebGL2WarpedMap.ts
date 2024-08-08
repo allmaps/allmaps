@@ -38,10 +38,13 @@ const THROTTLE_OPTIONS = {
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
-const DEFAULT_POINT_LAYER_SIZE = 16
+const DEFAULT_LINE_LAYER_VIEWPORT_SIZE = 6
+const DEFAULT_LINE_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
+const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 2
+
+const DEFAULT_POINT_LAYER_VIEWPORT_SIZE = 16
 const DEFAULT_POINT_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
-const DEFAULT_POINT_LAYER_BORDER_SIZE = 2
-const DEFAULT_POINT_LAYER_BORDER_COLOR = DEFAULT_POINT_LAYER_COLOR
+const DEFAULT_POINT_LAYER_VIEWPORT_BORDER_SIZE = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -196,13 +199,12 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
           this.projectedGeoPoints,
           this.projectedGeoPreviousTransformedResourcePoints
         ),
-        color: [...hexToFractionalRgb(blue), 1],
+        color: [...hexToFractionalRgb(black), 1],
         borderColor: [...hexToFractionalRgb(white), 1]
       },
       {
         projectedGeoLines: lineStringToLines(this.projectedGeoMask),
-        color: [...hexToFractionalRgb(blue), 1],
-        borderColor: [...hexToFractionalRgb(white), 1]
+        color: [...hexToFractionalRgb(pink), 1]
       }
     ]
   }
@@ -415,15 +417,15 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoPreviousOtherPoint'
     )
 
-    const sixIsOtherPoints = this.lineLayers
-      .reduce(
-        (accumulator: Line[], lineLayer) =>
-          accumulator.concat(lineLayer.projectedGeoLines),
-        []
-      )
-
-      .map((_projectedGeoLine) => [0, 0, 1, 0, 0, 1])
-      .flat()
+    const sixIsOtherPoints = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+            0, 0, 1, 0, 0, 1
+          ])
+        ),
+      []
+    )
     createBuffer(
       gl,
       program,
@@ -432,21 +434,92 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_isOtherPoint'
     )
 
-    const sixNormalSigns = this.lineLayers
-      .reduce(
-        (accumulator: Line[], lineLayer) =>
-          accumulator.concat(lineLayer.projectedGeoLines),
-        []
-      )
-
-      .map((_projectedGeoLine) => [+1, -1, +1, +1, -1, +1])
-      .flat()
+    const sixNormalSigns = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+            +1, -1, +1, +1, -1, +1
+          ])
+        ),
+      []
+    )
     createBuffer(
       gl,
       program,
       new Float32Array(sixNormalSigns),
       1,
       'a_normalSign'
+    )
+
+    const viewportSizes = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              lineLayer.viewportSize || DEFAULT_LINE_LAYER_VIEWPORT_SIZE
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportSizes),
+      1,
+      'a_viewportSize'
+    )
+
+    const colors = this.lineLayers.reduce(
+      (accumulator: number[][], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(lineLayer.color || DEFAULT_LINE_LAYER_COLOR)
+          )
+        ),
+      []
+    )
+    createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
+
+    const biewportBorderSizes = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              lineLayer.viewportBorderSize ||
+                DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(biewportBorderSizes),
+      1,
+      'a_viewportBorderSize'
+    )
+
+    const borderColors = this.lineLayers.reduce(
+      (accumulator: number[][], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              lineLayer.borderColor ||
+                lineLayer.color ||
+                DEFAULT_LINE_LAYER_COLOR
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(borderColors.flat()),
+      4,
+      'a_borderColor'
     )
   }
 
@@ -489,45 +562,63 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_projectedGeoPreviousPoint'
     )
 
-    const sizes = this.pointLayers.reduce(
+    const viewportSizes = this.pointLayers.reduce(
       (accumulator: number[], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map(
-            (_point) => pointLayer.size || DEFAULT_POINT_LAYER_SIZE
+            (_projectedGeoPoint) =>
+              pointLayer.viewportSize || DEFAULT_POINT_LAYER_VIEWPORT_SIZE
           )
         ),
       []
     )
-    createBuffer(gl, program, new Float32Array(sizes), 1, 'a_size')
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportSizes),
+      1,
+      'a_viewportSize'
+    )
 
     const colors = this.pointLayers.reduce(
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map(
-            (_point) => pointLayer.color || DEFAULT_POINT_LAYER_COLOR
+            (_projectedGeoPoint) =>
+              pointLayer.color || DEFAULT_POINT_LAYER_COLOR
           )
         ),
       []
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
 
-    const borderSizes = this.pointLayers.reduce(
+    const viewportBorderSizes = this.pointLayers.reduce(
       (accumulator: number[], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map(
-            (_point) => pointLayer.borderSize || DEFAULT_POINT_LAYER_BORDER_SIZE
+            (_projectedGeoPoint) =>
+              pointLayer.viewportBorderSize ||
+              DEFAULT_POINT_LAYER_VIEWPORT_BORDER_SIZE
           )
         ),
       []
     )
-    createBuffer(gl, program, new Float32Array(borderSizes), 1, 'a_borderSize')
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportBorderSizes),
+      1,
+      'a_viewportBorderSize'
+    )
 
     const borderColors = this.pointLayers.reduce(
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map(
-            (_point) =>
-              pointLayer.borderColor || DEFAULT_POINT_LAYER_BORDER_COLOR
+            (_projectedGeoPoint) =>
+              pointLayer.borderColor ||
+              pointLayer.color ||
+              DEFAULT_POINT_LAYER_COLOR
           )
         ),
       []

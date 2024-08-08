@@ -3,9 +3,9 @@
 precision highp float;
 precision highp isampler2D;
 
-in float v_size;
+in float v_viewportSize;
 in vec4 v_color;
-in float v_borderSize;
+in float v_viewportBorderSize;
 in vec4 v_borderColor;
 
 out vec4 color;
@@ -22,9 +22,9 @@ void main() {
 
   // Apply border
   float borderSmoothStep = smoothstep(
-      v_size - v_borderSize - 2.0,
-      v_size - v_borderSize,
-      distance * (v_size + v_borderSize)
+      v_viewportSize - v_viewportBorderSize - 2.0,
+      v_viewportSize - v_viewportBorderSize,
+      distance * (v_viewportSize + v_viewportBorderSize)
   );
   color = (v_borderColor * borderSmoothStep) + ((1.0 - borderSmoothStep) * color);
 }

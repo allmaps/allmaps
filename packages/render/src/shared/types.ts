@@ -97,17 +97,17 @@ export type CachableTileFactory<D> = (
 export type LineLayer = {
   projectedGeoLines: Line[]
   projectedGeoPreviousLines?: Line[]
-  size?: number
+  viewportSize?: number
   color?: ColorWithTransparancy
-  borderSize?: number
+  viewportBorderSize?: number
   borderColor?: ColorWithTransparancy
 }
 
 export type PointLayer = {
   projectedGeoPoints: Point[]
   projectedGeoPreviousPoints?: Point[]
-  size?: number
+  viewportSize?: number
   color?: ColorWithTransparancy
-  borderSize?: number
+  viewportBorderSize?: number
   borderColor?: ColorWithTransparancy
 }
