@@ -25,7 +25,8 @@ import type {
   Bbox,
   GeojsonPolygon,
   FetchFn,
-  ImageInformations
+  ImageInformations,
+  LineString
 } from '@allmaps/types'
 import type {
   Helmert,
@@ -84,7 +85,8 @@ export function createWarpedMapFactory() {
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
- * @param {GcpTransformer} projectedTransformer - Ttransformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param {GcpTransformer} projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param {GcpTransformer} projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param {GeojsonPolygon} geoMask - resourceMask in geospatial coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
  * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
@@ -132,6 +134,7 @@ export default class WarpedMap extends EventTarget {
 
   transformationType: TransformationType
   transformer!: GcpTransformer
+  projectedPreviousTransformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
   private transformerByTransformationType: Map<
     TransformationType,
@@ -322,6 +325,71 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Improve a lineString (e.g. a mask) given a previous lineString.
+   *
+   * Example: when calling this function on projecteGeoMask and projecteGeoPreviousMask
+   * and if the latter has more points (as a result of refinement)
+   * then this will return a different version of the projecteGeoMask with the same amount of points as the projecteGeoPreviousMask
+   *
+   * @param {LineString} projectedGeoLineString - the lineString to improve
+   * @param {LineString} projectedGeoPreviousLineString - the previous lineString
+   * @returns {number}
+   */
+  improveProjectedGeoLineString(
+    projectedGeoLineString: LineString,
+    projectedGeoPreviousLineString: LineString
+  ): LineString {
+    if (
+      projectedGeoLineString.length >= projectedGeoPreviousLineString.length
+    ) {
+      return projectedGeoLineString
+    } else {
+      // Note: it seems like for thin-plate-spline
+      // the backward and forward transform are not exactly inverse outside of the GPCs
+      return this.projectedTransformer.transformForward(
+        this.projectedPreviousTransformer.transformBackward(
+          projectedGeoPreviousLineString,
+          {
+            inputIsMultiGeometry: true
+          }
+        ),
+        {
+          inputIsMultiGeometry: true
+        }
+      )
+    }
+  }
+
+  /**
+   * Improve a previous lineString (e.g. a mask) given a lineString.
+   *
+   * @param {LineString} projectedGeoPreviousLineString - the previous lineString
+   * @param {LineString} projectedGeoLineString - the lineString to improve
+   * @returns {number}
+   */
+  improveProjectedGeoPreviousLineString(
+    projectedGeoPreviousLineString: LineString,
+    projectedGeoLineString: LineString
+  ): LineString {
+    if (
+      projectedGeoPreviousLineString.length >= projectedGeoLineString.length
+    ) {
+      return projectedGeoPreviousLineString
+    } else {
+      // Note: it seems like for thin-plate-spline
+      // the backward and forward transform are not exactly inverse outside of the GPCs
+      return this.projectedPreviousTransformer.transformForward(
+        this.projectedTransformer.transformBackward(projectedGeoLineString, {
+          inputIsMultiGeometry: true
+        }),
+        {
+          inputIsMultiGeometry: true
+        }
+      )
+    }
+  }
+
+  /**
    * Get the reference scaling from the forward transformation of the projected Helmert transformer
    *
    * @returns {number}
@@ -420,6 +488,7 @@ export default class WarpedMap extends EventTarget {
    * Reset the previous points and values.
    */
   resetPrevious() {
+    this.projectedPreviousTransformer = this.projectedTransformer
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
     this.projectedGeoPreviousMask = this.projectedGeoMask
@@ -439,14 +508,17 @@ export default class WarpedMap extends EventTarget {
           t
         )
       })
-    // TODO: improve mixing
-    this.projectedGeoPreviousMask = this.projectedGeoMask
-    // TODO implement mixing for masks, which can be of different lenght
-    // this.projectedGeoPreviousMask = this.projectedGeoMask.map(
-    // (point, index) => {
-    //   return mixPoints(point, this.projectedGeoPreviousMask[index], t)
-    // }
-    // )
+    const projectedGeoMask = this.improveProjectedGeoLineString(
+      this.projectedGeoMask,
+      this.projectedGeoPreviousMask
+    )
+    const projectedGeoPreviousMask = this.improveProjectedGeoPreviousLineString(
+      this.projectedGeoPreviousMask,
+      this.projectedGeoMask
+    )
+    this.projectedGeoPreviousMask = projectedGeoMask.map((point, index) => {
+      return mixPoints(point, projectedGeoPreviousMask[index], t)
+    })
   }
 
   /**
@@ -527,6 +599,9 @@ export default class WarpedMap extends EventTarget {
         ),
       useCache
     )
+    if (!this.projectedPreviousTransformer) {
+      this.projectedPreviousTransformer = this.projectedTransformer
+    }
   }
 
   private updateProjectedGeoTransformedResourcePoints(): void {
