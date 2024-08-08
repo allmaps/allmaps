@@ -40,7 +40,7 @@ const DEFAULT_SATURATION = 1
 
 const DEFAULT_LINE_LAYER_VIEWPORT_SIZE = 6
 const DEFAULT_LINE_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
-const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 2
+const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 1
 
 const DEFAULT_POINT_LAYER_VIEWPORT_SIZE = 16
 const DEFAULT_POINT_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
@@ -311,14 +311,20 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_trianglePointDistortion'
     )
 
-    // Triangle index
+    // Triangle Point index
 
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
     ).map((_v, i) => {
-      return Math.round((i - 1) / 3)
+      return i
     })
-    createBuffer(gl, program, trianglePointsTriangleIndex, 1, 'a_triangleIndex')
+    createBuffer(
+      gl,
+      program,
+      trianglePointsTriangleIndex,
+      1,
+      'a_trianglePointIndex'
+    )
   }
 
   private updateVertexBuffersLines() {

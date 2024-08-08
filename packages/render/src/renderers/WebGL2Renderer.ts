@@ -679,6 +679,11 @@ export default class WebGL2Renderer
 
     // Global uniform
 
+    // Debug
+
+    const debugLocation = gl.getUniformLocation(program, 'u_debug')
+    gl.uniform1f(debugLocation, 1) // TODO: set using options
+
     // Render transform
 
     const renderTransformLocation = gl.getUniformLocation(

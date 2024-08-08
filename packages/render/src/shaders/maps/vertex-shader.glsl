@@ -12,11 +12,12 @@ in vec2 a_clipPreviousTrianglePoint;
 in vec2 a_clipTrianglePoint;
 in float a_previousTrianglePointDistortion;
 in float a_trianglePointDistortion;
-in float a_triangleIndex;
+in float a_trianglePointIndex;
 
 out vec2 v_resourceTrianglePoint;
 out float v_trianglePointDistortion;
-out float v_triangleIndex;
+out float v_trianglePointIndex;
+out vec4 v_trianglePointBarycentric;
 
 void main() {
   // Mixing previous and new triangle points
@@ -32,5 +33,10 @@ void main() {
   // Pass attributes as varyings to fragment shader
   v_resourceTrianglePoint = a_resourceTrianglePoint;
   v_trianglePointDistortion = trianglePointDistortion;
-  v_triangleIndex = a_triangleIndex;
+  v_trianglePointIndex = a_trianglePointIndex;
+
+  float trianglePointLocalIndex = mod(a_trianglePointIndex, 3.0);
+  if(trianglePointLocalIndex == 0.0) v_trianglePointBarycentric = vec4(1.0, 0, 0, 1.0);
+  if(trianglePointLocalIndex == 1.0) v_trianglePointBarycentric = vec4(0.0, 1.0, 0, 1.0);
+  if(trianglePointLocalIndex == 2.0) v_trianglePointBarycentric = vec4(0.0, 0, 1.0, 1.0);
 }
