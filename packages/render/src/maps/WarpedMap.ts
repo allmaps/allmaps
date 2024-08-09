@@ -25,8 +25,7 @@ import type {
   Bbox,
   GeojsonPolygon,
   FetchFn,
-  ImageInformations,
-  LineString
+  ImageInformations
 } from '@allmaps/types'
 import type {
   Helmert,
@@ -75,6 +74,9 @@ export function createWarpedMapFactory() {
  * @param {Point[]} projectedGeoControlPoints - The projected geospatial coordinates of the projected ground control points
  * @param {Point[]} projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
  * @param {Point[]} projectedGeoTransformedResourcePoints - The resource coordinates of the ground control points, transformed to projected geospatial coordinates using the projected transformer
+ * @param {Ring} resourcePreviousLongerMask - Previous resourceLongerMask
+ * @param {Ring} resourcePreviousMask - Resource mask of the previous transformation type
+ * @param {Ring} resourceLongerMask - Resource mask, possibly longer so it's the same length as the longest of projectedGeoMask and projectedGeoPreviousMask
  * @param {Ring} resourceMask - Resource mask
  * @param {Bbox} resourceMaskBbox - Bbox of the resourceMask
  * @param {Rectangle} resourceMaskRectangle - Rectangle of the resourceMaskBbox
@@ -94,7 +96,9 @@ export function createWarpedMapFactory() {
  * @param {GeojsonPolygon} geoFullMask - resourceFullMask in geospatial coordinates
  * @param {Bbox} geoFullMaskBbox - Bbox of the geoFullMask
  * @param {Rectangle} geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
+ * @param {Ring} projectedGeoPreviousLongerMask - The projectedGeoMask of the previous transformation type, possibly longer so it's the same length as the longest of projectedGeoPreviousMask and projectedGeoMask, used during transformation transitions
  * @param {Ring} projectedGeoPreviousMask - The projectedGeoMask of the previous transformation type, used during transformation transitions
+ * @param {Ring} projectedGeoLongerMask - The projectedGeoMask of the previous transformation type, possibly longer so it's the same length as the longest of projectedGeoPreviousMask and projectedGeoMask, used during transformation transitions
  * @param {Ring} projectedGeoMask - resourceMask in projected geospatial coordinates
  * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeoMask
  * @param {Rectangle} projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
@@ -117,6 +121,9 @@ export default class WarpedMap extends EventTarget {
   projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
 
+  resourcePreviousLongerMask!: Ring
+  resourcePreviousMask!: Ring
+  resourceLongerMask!: Ring
   resourceMask: Ring
   resourceMaskBbox!: Bbox
   resourceMaskRectangle!: Rectangle
@@ -153,7 +160,8 @@ export default class WarpedMap extends EventTarget {
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
 
-  projectedGeoPreviousMask!: Ring
+  projectedGeoPreviousLongerMask!: Ring
+  projectedGeoLongerMask!: Ring
   projectedGeoMask!: Ring
   projectedGeoMaskBbox!: Bbox
   projectedGeoMaskRectangle!: Rectangle
@@ -326,71 +334,6 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Improve a lineString (e.g. a mask) given a previous lineString.
-   *
-   * Example: when calling this function on projecteGeoMask and projecteGeoPreviousMask
-   * and if the latter has more points (as a result of refinement)
-   * then this will return a different version of the projecteGeoMask with the same amount of points as the projecteGeoPreviousMask
-   *
-   * @param {LineString} projectedGeoLineString - the lineString to improve
-   * @param {LineString} projectedGeoPreviousLineString - the previous lineString
-   * @returns {number}
-   */
-  improveProjectedGeoLineString(
-    projectedGeoLineString: LineString,
-    projectedGeoPreviousLineString: LineString
-  ): LineString {
-    if (
-      projectedGeoLineString.length >= projectedGeoPreviousLineString.length
-    ) {
-      return projectedGeoLineString
-    } else {
-      // Note: it seems like for thin-plate-spline
-      // the backward and forward transform are not exactly inverse outside of the GPCs
-      return this.projectedTransformer.transformForward(
-        this.projectedPreviousTransformer.transformBackward(
-          projectedGeoPreviousLineString,
-          {
-            inputIsMultiGeometry: true
-          }
-        ),
-        {
-          inputIsMultiGeometry: true
-        }
-      )
-    }
-  }
-
-  /**
-   * Improve a previous lineString (e.g. a mask) given a lineString.
-   *
-   * @param {LineString} projectedGeoPreviousLineString - the previous lineString
-   * @param {LineString} projectedGeoLineString - the lineString to improve
-   * @returns {number}
-   */
-  improveProjectedGeoPreviousLineString(
-    projectedGeoPreviousLineString: LineString,
-    projectedGeoLineString: LineString
-  ): LineString {
-    if (
-      projectedGeoPreviousLineString.length >= projectedGeoLineString.length
-    ) {
-      return projectedGeoPreviousLineString
-    } else {
-      // Note: it seems like for thin-plate-spline
-      // the backward and forward transform are not exactly inverse outside of the GPCs
-      return this.projectedPreviousTransformer.transformForward(
-        this.projectedTransformer.transformBackward(projectedGeoLineString, {
-          inputIsMultiGeometry: true
-        }),
-        {
-          inputIsMultiGeometry: true
-        }
-      )
-    }
-  }
-
-  /**
    * Get the reference scaling from the forward transformation of the projected Helmert transformer
    *
    * @returns {number}
@@ -492,7 +435,9 @@ export default class WarpedMap extends EventTarget {
     this.projectedPreviousTransformer = this.projectedTransformer
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
-    this.projectedGeoPreviousMask = this.projectedGeoMask
+    this.resourcePreviousMask = this.resourceMask
+    this.resourcePreviousLongerMask = this.resourceLongerMask
+    this.projectedGeoPreviousLongerMask = this.projectedGeoLongerMask
   }
 
   /**
@@ -509,17 +454,11 @@ export default class WarpedMap extends EventTarget {
           t
         )
       })
-    const projectedGeoMask = this.improveProjectedGeoLineString(
-      this.projectedGeoMask,
-      this.projectedGeoPreviousMask
+    this.projectedGeoPreviousLongerMask = this.projectedGeoLongerMask.map(
+      (point, index) => {
+        return mixPoints(point, this.projectedGeoPreviousLongerMask[index], t)
+      }
     )
-    const projectedGeoPreviousMask = this.improveProjectedGeoPreviousLineString(
-      this.projectedGeoPreviousMask,
-      this.projectedGeoMask
-    )
-    this.projectedGeoPreviousMask = projectedGeoMask.map((point, index) => {
-      return mixPoints(point, projectedGeoPreviousMask[index], t)
-    })
   }
 
   /**
@@ -561,6 +500,10 @@ export default class WarpedMap extends EventTarget {
   private updateResourceMaskProperties() {
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
+
+    if (!this.resourcePreviousMask) {
+      this.resourcePreviousMask = this.resourceMask
+    }
   }
 
   protected updateTransformerProperties(useCache = true): void {
@@ -648,8 +591,36 @@ export default class WarpedMap extends EventTarget {
       { maxDepth: 0 }
     )[0] as Rectangle
 
-    if (!this.projectedGeoPreviousMask) {
-      this.projectedGeoPreviousMask = this.projectedGeoMask
+    // Computing the resourceLongerMask as the longest resource
+    // coordinates corresponding to projectedGeoMask and projectedGeoPreviousMask
+    // such that projectedGeoPreviousLongerMask and projectedGeoLongerMask
+    // can be computed from this equal length starting point to be equally long as well
+    this.resourceLongerMask = this.projectedTransformer.transformForward(
+      [this.resourceMask],
+      { returnDomain: 'inverse' } // refine this lineString but return resource coordinates
+    )[0]
+    if (!this.resourcePreviousLongerMask) {
+      this.resourcePreviousLongerMask = this.resourceLongerMask
+    }
+    const previousWasLonger =
+      this.resourceLongerMask.length < this.resourcePreviousLongerMask.length
+    const newIsLonger =
+      this.resourceLongerMask.length > this.resourcePreviousLongerMask.length
+    if (previousWasLonger) {
+      this.resourceLongerMask = this.resourcePreviousLongerMask
+    }
+    this.projectedGeoLongerMask = this.projectedTransformer.transformForward(
+      this.resourceLongerMask,
+      { inputIsMultiGeometry: true } // treat the input as an array of points instead of a lineString to refine
+    )
+    if (!this.projectedGeoPreviousLongerMask || newIsLonger) {
+      this.projectedGeoPreviousLongerMask =
+        this.projectedPreviousTransformer.transformForward(
+          this.resourceLongerMask,
+          {
+            inputIsMultiGeometry: true
+          }
+        )
     }
   }
 

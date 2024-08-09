@@ -205,17 +205,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         borderColor: [...hexToFractionalRgb(white), 1]
       },
       {
-        projectedGeoLines: lineStringToLines(
-          this.improveProjectedGeoLineString(
-            this.projectedGeoMask,
-            this.projectedGeoPreviousMask
-          )
-        ),
+        projectedGeoLines: lineStringToLines(this.projectedGeoLongerMask),
         projectedGeoPreviousLines: lineStringToLines(
-          this.improveProjectedGeoPreviousLineString(
-            this.projectedGeoPreviousMask,
-            this.projectedGeoMask
-          )
+          this.projectedGeoPreviousLongerMask
         ),
         color: [...hexToFractionalRgb(pink), 1]
       }
