@@ -63,17 +63,20 @@ git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Install dependencies and create symlinks:
-
-```sh
-pnpm install -r
-```
-
-Finally, build all packages to ensure all JavaScript exports are created from TypeScript files, and initialize SvelteKit apps:
+Finally, initialize the repository:
 
 ```sh
 pnpm run init
 ```
+
+The `init` script is a shorthand for the following commands:
+
+1. `pnpm install --recursive`: install all dependencies for all packages and apps.
+2. `pnpm run build:packages`: build all packages to ensure all JavaScript exports are created from TypeScript files.
+3. `pnpm run check`: initialize SvelteKit apps.
+4. `pnpm run build:apps`: build SvelteKit apps.
+
+If things stop working later on, you can always run the `init` script again.
 
 ### Running a single app locally
 
