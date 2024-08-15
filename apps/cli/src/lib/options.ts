@@ -46,3 +46,27 @@ export function addTransformOptions(command: Command) {
     .option('--destination-is-geographic', 'Destination is geographic')
     .option('--source-is-geographic', 'Source is geographic')
 }
+
+export function addParseIiifOptions(command: Command) {
+  return command
+    .option(
+      '-c, --fetch-collections',
+      'Recursively fetches and parses embedded IIIF Collections',
+      false
+    )
+    .option(
+      '-m, --fetch-manifests',
+      'Recursively fetches and parses embedded IIIF Manifests',
+      false
+    )
+    .option(
+      '-i, --fetch-images',
+      'Recursively fetches and parses embedded IIIF Images',
+      false
+    )
+    .option(
+      '-a, --fetch-all',
+      'Recursively fetches and parses embedded IIIF Collections, Manifests and Images',
+      false
+    )
+}

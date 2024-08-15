@@ -6,7 +6,7 @@ Command-line interface for [Allmaps](https://allmaps.org/).
 
 Use npm to install Allmaps CLI globally:
 
-```sh
+```bash
 npm install -g @allmaps/cli
 ```
 
@@ -14,17 +14,17 @@ npm install -g @allmaps/cli
 
 Run Allmaps CLI in your terminal:
 
-```sh
+```bash
 allmaps
 ```
 
 Without arguments this command displays the help page. Help is always accessible in the following way:
 
-```sh
+```bash
 allmaps --help
 ```
 
-```sh
+```bash
 allmaps <command> --help
 ```
 
@@ -45,32 +45,32 @@ If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/ma
 
 Show help:
 
-```sh
+```bash
 allmaps annotation --help
 ```
 
 Generate Georeference Annotations from input files:
 
-```sh
+```bash
 allmaps annotation generate [files...]
 ```
 
 Parse input files and output them in parsed Georeference Annotations (the format used internally by Allmaps):
 
-```sh
+```bash
 allmaps annotation parse [files...]
 ```
 
 Convert the resource mask from the input files to SVG polygons:
 
-```sh
+```bash
 allmaps annotation svg [files...]
 ```
 
-Output the IDs of the IIIF images in the input files:
+Output the IDs of the IIIF Images in the input files:
 
-```sh
-allmaps annotation image-id [files...]
+```bash
+allmaps annotation image-ids [files...]
 ```
 
 For all the commands above, the input files can be either Georeference Annotations or parsed Georeference Annotations
@@ -79,7 +79,7 @@ For all the commands above, the input files can be either Georeference Annotatio
 
 Show help:
 
-```sh
+```bash
 allmaps transform --help
 ```
 
@@ -99,7 +99,7 @@ This command was inspired by [gdaltransform](https://gdal.org/programs/gdaltrans
 
 **Examples:**
 
-```sh
+```bash
 allmaps transform svg -a <filename> [files...]
 ```
 
@@ -112,7 +112,7 @@ For example, with a file `/path/to/coordinates.txt` that contains two coordinate
 
 You can use the command as follows:
 
-```sh
+```bash
 allmaps transform coordinates -a /path/to/annotation.json /path/to/coordinates.txt
 ```
 
@@ -125,7 +125,7 @@ This will output:
 
 You can also pipe the input and store the output:
 
-```sh
+```bash
 cat /path/to/coordinates.txt | allmaps transform coordinates -a /path/to/annotation.json \
   > /path/to/transformed-coordinates.txt
 ```
@@ -144,7 +144,7 @@ With a file `/path/to/gcps.txt` that contains four GCPs:
 
 This is done with the following command:
 
-```sh
+```bash
 allmaps transform coordinates -g /path/to/gcps.txt -t thinPlateSpline /path/to/coordinates.txt
 ```
 
@@ -154,15 +154,15 @@ Transform SVG forward to GeoJSON Geometry using a transformation built from the 
 
 **Examples:**
 
-```sh
+```bash
 allmaps transform svg -a <filename> [files...]
 ```
 
-```sh
+```bash
 allmaps transform svg -a /path/to/annotation.json /path/to/svg.svg
 ```
 
-```sh
+```bash
 allmaps transform svg -g /path/to/gcps.txt -t thinPlateSpline /path/to/svg.svg
 ```
 
@@ -172,15 +172,15 @@ Transform GeoJSON Geometry backwards to SVG using a transformation built from th
 
 **Examples:**
 
-```sh
+```bash
 allmaps transform geojson -a <filename> [files...]
 ```
 
-```sh
+```bash
 allmaps transform geojson -a /path/to/annotation.json path/to/myGeoJSON.geosjon
 ```
 
-```sh
+```bash
 allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline /path/to/myGeoJSON.geosjon
 ```
 
@@ -192,11 +192,11 @@ This is a faster alternative for 'transform svg' where the resource mask from th
 
 **Examples:**
 
-```sh
+```bash
 allmaps transform resource-mask [files...]
 ```
 
-```sh
+```bash
 allmaps transform resource-mask path/to/myAnnotation.json path/to/myAnnotation2.json
 ```
 
@@ -222,23 +222,29 @@ All the commands above (except `point`) accept the following options for transfo
 
 Show help:
 
-```sh
+```bash
 allmaps iiif --help
 ```
 
 Parse IIIF resources and output them in the format used internally by Allmaps:
 
-```sh
+```bash
 allmaps iiif parse [files...]
 ```
 
 Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
 
-```sh
+```bash
 allmaps manifest -d <id> [files...]
 ```
 
 The ID of the IIIF Manifest can be supplied with the `-i` or `--id` option.
+
+Output the IDs of the IIIF Images in the input files:
+
+```bash
+allmaps iiif image-ids [files...]
+```
 
 ### Generate Allmaps IDs
 
@@ -246,19 +252,19 @@ Allmaps CLI can generate Allmaps IDs for input strings.
 
 Show help:
 
-```sh
+```bash
 allmaps id --help
 ```
 
 Generate the Allmaps ID for a IIIF Manifest URL:
 
-```sh
+```bash
 allmaps id https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/
 ```
 
 Using the same URL, but using standard input:
 
-```sh
+```bash
 echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
 ```
 
@@ -266,24 +272,55 @@ echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps i
 
 Fetches the full-size image using a given IIIF Image ID:
 
-```sh
-allmaps fetch full-image "https://images.uba.uva.nl/iiif/2/default!1!3!1!990009413700205131!HB-KZL-25-02-04.jpg"
+```bash
+allmaps fetch full-image "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:7h14cx32p"
 ```
 
 > [!NOTE]
 > Not all IIIF image servers allow downloading full-sized images. This command does not yet take the image's `maxWidth`, `maxHeight` and `maxArea` properties into account.
 
-### Generate GeoTIFFs
+### Generate Bash scripts
 
-Generate a Bash script that uses GDAL to convert one or more downloaded full-size IIIF images to a GeoTIFF using a given Georeference Annotation:
+#### Dezoomify
 
-```sh
+Generate a Bash script that uses [dezoomify-rs](https://dezoomify-rs.ophir.dev/) to download full-size IIIF images from their IIIF Image IDs:
+
+```bash
+allmaps script dezoomify "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~344467~90112435"
+```
+
+You can use dezoomify-rs when the IIIF server does not allow downloading full-size images directly.
+
+#### Create GeoTIFFs using GDAL
+
+Generate a Bash script that uses [GDAL](https://gdal.org/index.html) to convert one or more downloaded full-size IIIF images to [Cloud Optimized GeoTIFFs](https://www.cogeo.org/) using a given Georeference Annotation:
+
+```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
   allmaps script geotiff
 ```
 
 > [!NOTE]
 > The generated Bash script expects the full-size images to be available on the local file system. You can download these images manually or use the [`allmaps fetch full-image`](#fetch-iiif-images) command.
+
+You can run the generated scripts by saving them to a file:
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps annotation image-ids | \
+  allmaps script dezoomify > dezoomify.sh
+
+bash dezoomify.sh
+```
+
+Or by piping them to Bash:
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps annotation image-ids | \
+  allmaps script dezoomify | \
+  bash
+```
 
 #### Specifying image filenames
 
@@ -297,9 +334,9 @@ For example, the Georeference Annotation https://annotations.allmaps.org/images/
 
 You can use Allmaps CLI to extract all IIIF Image IDs from a Georeference Annotation:
 
-```sh
+```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps annotation image-id
+  allmaps annotation image-ids
 ```
 
 This will output:
@@ -310,9 +347,9 @@ https://iiif-server.lib.uchicago.edu/ark:61001/b2mx3j80nk1f/00000001
 
 The `allmaps id` command generated the Allmaps ID from this IIIF Image ID:
 
-```sh
+```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps annotation image-id | \
+  allmaps annotation image-ids | \
   allmaps id
 ```
 
@@ -324,7 +361,7 @@ Output:
 
 You can override the default behavior by supplying a JSON file that maps IIIF Image IDs to local image filenames:
 
-```sh
+```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
   allmaps script geotiff --image-filenames-file /path/to/image-filenames.json
 ```
@@ -398,7 +435,7 @@ cat *.json | allmaps annotation generate
 
 ```bash
 curl "https://annotations.allmaps.org/maps/096f57b5ff35b3eb" | \
-  allmaps annotation image-id | \
+  allmaps annotation image-ids | \
   allmaps fetch full-image
 
 curl "https://annotations.allmaps.org/maps/096f57b5ff35b3eb" | \
