@@ -6,29 +6,47 @@ type ParseOptions = {
   fetchCollections: boolean
   fetchManifests: boolean
   fetchImages: boolean
+  fetchAll: boolean
 }
 
 const defaultParseOptions = {
   fetchCollections: false,
   fetchManifests: false,
-  fetchImages: false
+  fetchImages: false,
+  fetchAll: false
+}
+
+function fetchFn(
+  input: string | URL | Request,
+  init?: RequestInit
+): Promise<Response> {
+  console.warn('Fetching', input)
+  return fetch(input, init)
 }
 
 export async function parseIiif(
   sourceIiif: unknown,
   options?: Partial<ParseOptions>
 ) {
-  options = {
-    ...defaultParseOptions,
-    ...options
+  if (options && options.fetchAll) {
+    options = {
+      fetchCollections: true,
+      fetchManifests: true,
+      fetchImages: true
+    }
+  } else {
+    options = {
+      ...defaultParseOptions,
+      ...options
+    }
   }
 
   const parsedIiif = IIIF.parse(sourceIiif)
 
   if (parsedIiif.type === 'collection') {
-    await parsedIiif.fetchAll(options)
+    await parsedIiif.fetchAll({ ...options, fetchFn })
   } else if (parsedIiif.type === 'manifest' && options && options.fetchImages) {
-    await parsedIiif.fetchAll()
+    await parsedIiif.fetchAll(fetchFn)
   }
 
   return parsedIiif
