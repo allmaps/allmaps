@@ -42,7 +42,9 @@ export const TransformationSchema = z
   .union([
     z.any(),
     z.object({
-      type: z.string(),
+      type: z
+        .enum(['helmert', 'polynomial', 'thinPlateSpline', 'projective'])
+        .or(z.string()),
       options: z.object({}).optional()
     })
   ])
