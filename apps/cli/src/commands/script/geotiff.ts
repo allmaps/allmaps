@@ -55,7 +55,10 @@ export default function generate() {
     }
 
     for (const map of maps) {
-      const basename = await getMapId(map)
+      const mapId = await getMapId(map)
+      const imageId = await generateId(map.resource.id)
+
+      const basename = `${imageId}_${mapId}`
 
       let imageFilename: string
       if (
@@ -64,7 +67,6 @@ export default function generate() {
       ) {
         imageFilename = imageFilenames[map.resource.id]
       } else {
-        const imageId = await generateId(map.resource.id)
         imageFilename = path.join(options.sourceDir, `${imageId}.jpg`)
       }
 

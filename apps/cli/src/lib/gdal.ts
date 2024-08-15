@@ -1,3 +1,7 @@
+import path from 'path'
+
+import { checkCommand } from './bash.js'
+
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 import type { GeojsonPolygon } from '@allmaps/types'
 
@@ -25,15 +29,6 @@ ${checkCommand('gdalbuildvrt', gdalNotFoundMessage)}
 ${checkCommand('gdal_translate', gdalNotFoundMessage)}
 ${checkCommand('gdalwarp', gdalNotFoundMessage)}
 ${checkCommand('jq', jqNotFoundMessage)}`.trim()
-}
-
-export function checkCommand(command: string, message: string) {
-  return `
-if ! command -v ${command} &> /dev/null
-then
-    echo "Error: ${command} could not be found. ${message}"
-    exit 1
-fi`.trim()
 }
 
 export function checkImageExistsAndCorrectSize(
@@ -66,8 +61,6 @@ else
 fi`.trim()
 }
 
-// https://blog.cleverelephant.ca/2015/02/geotiff-compression-for-dummies.html
-
 export function gdalwarp(
   imageFilename: string,
   basename: string,
@@ -76,30 +69,53 @@ export function gdalwarp(
   geoMask: GeojsonPolygon,
   options?: Partial<GdalOptions>
 ) {
+  // See also: https://blog.cleverelephant.ca/2015/02/geotiff-compression-for-dummies.html
+
   options = { ...defaultOptions, ...options }
 
-  // TODO: read transformation from map
-  // See https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-tps
+  // TODO: parseTransformationType(options, map)
 
-  return `
+  // Read transformation from georeferenced map
+  // See https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-tps
+  let transformationArguments = '-order 1'
+  let transformationMessage = ''
+
+  if (map.transformation) {
+    if (map.transformation.type === 'polynomial') {
+      if (map.transformation.order) {
+        transformationArguments = `-order ${map.transformation.order}`
+      }
+    } else if (map.transformation.type === 'thinPlateSpline') {
+      transformationArguments = '-tps'
+    } else if (map.transformation.type) {
+      transformationMessage = `Transformation type "${map.transformation.type}" is not supported. Using default transformation.`
+    }
+  }
+
+  const vrtFilename = path.join(outputDir, `${basename}.vrt`)
+  const geojsonFilename = path.join(outputDir, `${basename}.geojson`)
+  const geotiffFilename = path.join(outputDir, `${basename}-warped.tif`)
+
+  return `${transformationMessage ? `echo "${transformationMessage}"` : ''}
+
 gdal_translate -of vrt \\
   -a_srs EPSG:4326 \\
   ${map.gcps
     .map((gcp) => `-gcp ${gcp.resource.join(' ')} ${gcp.geo.join(' ')}`)
     .join(' \\\n')} \\
   ${imageFilename} \\
-  ${outputDir}/${basename}.vrt
+  ${vrtFilename}
 
-echo '${JSON.stringify(geoMask)}' > ${outputDir}/${basename}.geojson
+echo '${JSON.stringify(geoMask)}' > ${geojsonFilename}
 
 gdalwarp \\
   -of COG -co COMPRESS=JPEG -co QUALITY=${options.quality} \\
   -dstalpha -overwrite \\
-  -cutline ${outputDir}/${basename}.geojson -crop_to_cutline \\
+  -cutline ${geojsonFilename} -crop_to_cutline \\
   -t_srs "${options.srs}" \\
-  -order 1 \\
-  ${outputDir}/${basename}.vrt \\
-  ${outputDir}/${basename}-warped.tif`.trim()
+  ${transformationArguments} \\
+  ${vrtFilename} \\
+  ${geotiffFilename}`.trim()
 }
 
 export function gdalbuildvrt(
@@ -107,19 +123,15 @@ export function gdalbuildvrt(
   inputTiffs: string[],
   outputVrt: string
 ) {
+  const vrtFilename = path.join(outputDir, outputVrt)
+
   return `
-gdalbuildvrt ${outputDir}/${outputVrt} \\
-  ${inputTiffs.map((tiff) => `${outputDir}/${tiff}`).join(' ')}`.trim()
+gdalbuildvrt ${vrtFilename} \\
+  ${inputTiffs.map((tiff) => path.join(outputDir, tiff)).join(' ')}`.trim()
 }
 
-export function gdal2tiles(
-  outputDir: string,
-  outputTiff: string,
-  layerId: string
-) {
-  return `
-gdal2tiles.py --xyz ${outputDir}/${outputTiff} ${outputDir}/${layerId}`.trim()
-}
+// TODO: consider adding gdal2tiles export:
+//   gdal2tiles.py --xyz merged.vrt merged
 
 // TODO: consider adding pmtiles export:
 //    gdal_translate -of MBTILES merged.vrt merged.mbtiles

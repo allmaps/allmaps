@@ -3,7 +3,7 @@ import { Command } from 'commander'
 import parse from './annotation/parse.js'
 import generate from './annotation/generate.js'
 import svg from './annotation/svg.js'
-import imageId from './annotation/image-id.js'
+import imageIds from './annotation/image-ids.js'
 
 export default function annotation() {
   return new Command('annotation')
@@ -12,5 +12,5 @@ export default function annotation() {
     .addCommand(parse())
     .addCommand(generate())
     .addCommand(svg())
-    .addCommand(imageId())
+    .addCommand(imageIds())
 }
