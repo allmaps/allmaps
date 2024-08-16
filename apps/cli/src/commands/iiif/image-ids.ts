@@ -47,8 +47,8 @@ function collectImageIds(
 export default function parse() {
   let command = new Command('image-ids')
     .argument('[files...]')
-    .summary('read all IIIF Image IDs from a IIIF resource')
-    .description('Reads all IIIF Image IDs from a IIIF resource')
+    .summary('read all IIIF Image IDs from IIIF resources')
+    .description('Reads all IIIF Image IDs from IIIF resources')
 
   command = addParseIiifOptions(command)
 
