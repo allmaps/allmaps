@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tiles",
-  "version": "0.0.2-alpha.22",
+  "version": "0.0.2-alpha.23",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -27,9 +27,9 @@
     "preversion": "pnpm run types && pnpm run lint"
   },
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.28",
+    "@allmaps/stdlib": "^1.0.0-beta.29",
     "@allmaps/tailwind": "^1.0.0-beta.12",
-    "@allmaps/ui": "^1.0.0-beta.29",
+    "@allmaps/ui": "^1.0.0-beta.30",
     "ol": "^8.2.0"
   },
   "devDependencies": {
