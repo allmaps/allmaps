@@ -5,11 +5,12 @@ Usage: allmaps iiif [options] [command]
 Parses and generates IIIF resources
 
 Options:
-  -h, --help                     display help for command
+  -h, --help                      display help for command
 
 Commands:
-  parse [options] [files...]     parse IIIF resources
-  manifest [options] [files...]  generate IIIF Manifest
-  help [command]                 display help for command
+  parse [options] [files...]      parse IIIF resources
+  manifest [options] [files...]   generate IIIF Manifest
+  image-ids [options] [files...]  read all IIIF Image IDs from IIIF resources
+  help [command]                  display help for command
 
 For more details about Allmaps, see https://allmaps.org
