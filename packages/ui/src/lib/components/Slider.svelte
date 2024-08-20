@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
+
   export let value: number
   export let keyCode: string | undefined = undefined
   export let label: string
@@ -14,6 +16,9 @@
   let internalValue = invert ? 1 - value : value
   let initialValue = internalValue
   let lastValue = internalValue
+  let isOsx = browser
+    ? window?.navigator.userAgent.indexOf('Mac OS X') !== -1
+    : false
 
   $: {
     value = invert ? 1 - internalValue : internalValue
@@ -73,6 +78,7 @@
     if (Math.abs(step * 3) < 1) {
       delta = event.deltaY > 0 ? step : -1 * step
     }
+    delta = isOsx ? delta * -1 : delta
     internalValue = clampValue(internalValue - delta)
   }
 
