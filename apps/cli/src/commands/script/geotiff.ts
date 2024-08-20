@@ -6,11 +6,16 @@ import path from 'path'
 import { GcpTransformer } from '@allmaps/transform'
 import { generateId } from '@allmaps/id'
 
-import { addTransformOptions } from '../../lib/options.js'
+import {
+  addTransformationOptions,
+  addTransformOptions
+} from '../../lib/options.js'
 import { parseJsonInput, printString } from '../../lib/io.js'
 import {
   parseAnnotationsValidateMaps,
-  parseTransformOptions
+  parseTransformOptions,
+  parseTransformationType,
+  parseGcps
 } from '../../lib/parse.js'
 import { getMapId } from '../../lib/map.js'
 import {
@@ -25,18 +30,21 @@ export default function generate() {
     .argument('[files...]')
     .summary('generate a Bash script to create a Cloud Optimized GeoTIFF')
     .description(
-      'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one of more Georeference Annotations'
+      'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one or more Georeference Annotations'
     )
     .option('-s, --source-dir <dir>', 'Directory containing source images', '.')
     .option('-d, --output-dir <dir>', 'Output directory', '.')
     .option('-c, --crs <string>', 'Coordinate reference system', 'EPSG:3857')
+    .option('-q, --jpg-quality <number>', 'JPG compression quality', '75')
     .addOption(
       new Option(
         '-i, --image-filenames-file <filename>',
         'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
       ).conflicts('source-dir')
     )
+
   command = addTransformOptions(command)
+  command = addTransformationOptions(command)
 
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files as string[])
@@ -58,6 +66,9 @@ export default function generate() {
       const mapId = await getMapId(map)
       const imageId = await generateId(map.resource.id)
 
+      const gcps = parseGcps(options, map)
+      const transformationType = parseTransformationType(options, map)
+
       const basename = `${imageId}_${mapId}`
 
       let imageFilename: string
@@ -70,7 +81,7 @@ export default function generate() {
         imageFilename = path.join(options.sourceDir, `${imageId}.jpg`)
       }
 
-      const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+      const transformer = new GcpTransformer(gcps, transformationType)
       const polygon = transformer.transformForwardAsGeojson(
         [map.resourceMask],
         transformOptions
@@ -81,7 +92,11 @@ export default function generate() {
         basename,
         options.outputDir,
         map,
-        polygon
+        gcps,
+        polygon,
+        transformationType,
+        options.crs,
+        Number(options.jpgQuality)
       )
 
       gdalwarpScripts.push(

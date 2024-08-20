@@ -7,12 +7,16 @@ export function addAnnotationOptions(command: Command): Command {
   // Note: annotation is not required since transformer can be built using only GCPs, which could be specified individually.
   // This is especially useful when transforming coordinates, outside of the Allmaps context.
   // An error message is still displayed when neither an annotation or GCPs are specified
-  return command
+  return addTransformationOptions(command)
     .option(
       '-a, --annotation <filename>',
       'Filename of Georeference Annotation'
     )
     .option('-i, --inverse', 'Computes the inverse/backward transformation')
+}
+
+export function addTransformationOptions(command: Command) {
+  return command
     .option(
       '-g, --gcps <filename>',
       'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
@@ -43,6 +47,10 @@ export function addTransformOptions(command: Command) {
       'Maximum recursion depth',
       `${DEFAULT_MAX_DEPTH}`
     )
+}
+
+export function addCoordinateTransformOptions(command: Command) {
+  return addTransformOptions(command)
     .option('--destination-is-geographic', 'Destination is geographic')
     .option('--source-is-geographic', 'Source is geographic')
 }
