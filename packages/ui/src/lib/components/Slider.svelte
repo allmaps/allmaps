@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { browser } from '$app/environment'
+  // import { browser } from '$app/environment';
+  // can not use browser from sveltekit or else docs astro are breaking
+
+  import { onMount } from "svelte";
 
   export let value: number
   export let keyCode: string | undefined = undefined
@@ -16,9 +19,11 @@
   let internalValue = invert ? 1 - value : value
   let initialValue = internalValue
   let lastValue = internalValue
-  let isOsx = browser
-    ? window?.navigator.userAgent.indexOf('Mac OS X') !== -1
-    : false
+  let isOsx = false
+
+  onMount(() => {
+    isOsx = window?.navigator.userAgent.indexOf("Mac OS X") !== -1
+  })
 
   $: {
     value = invert ? 1 - internalValue : internalValue
