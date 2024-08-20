@@ -9,7 +9,10 @@ import {
   parseTransformOptions,
   parseTransformationType
 } from '../../lib/parse.js'
-import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+import {
+  addAnnotationOptions,
+  addCoordinateTransformOptions
+} from '../../lib/options.js'
 import {
   stringToSvgGeometriesGenerator,
   geometriesToFeatureCollection
@@ -24,7 +27,7 @@ export default function svg() {
     )
 
   command = addAnnotationOptions(command)
-  command = addTransformOptions(command)
+  command = addCoordinateTransformOptions(command)
 
   return command.action(async (files, options) => {
     const map = parseMap(options)

@@ -3,18 +3,8 @@ import path from 'path'
 import { checkCommand } from './bash.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
-import type { GeojsonPolygon } from '@allmaps/types'
-
-type GdalOptions = {
-  srs: string
-  tr: number
-  quality: number
-}
-
-const defaultOptions: Partial<GdalOptions> = {
-  srs: 'EPSG:3857',
-  quality: 75
-}
+import type { GeojsonPolygon, Gcp } from '@allmaps/types'
+import type { TransformationType } from '@allmaps/transform'
 
 const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
 const gdalNotFoundMessage = 'Please install GDAL.'
@@ -66,30 +56,34 @@ export function gdalwarp(
   basename: string,
   outputDir: string,
   map: GeoreferencedMap,
+  gcps: Gcp[],
   geoMask: GeojsonPolygon,
-  options?: Partial<GdalOptions>
+  transformationType: TransformationType,
+  crs: string,
+  jpgQuality: number
 ) {
   // See also: https://blog.cleverelephant.ca/2015/02/geotiff-compression-for-dummies.html
 
-  options = { ...defaultOptions, ...options }
-
-  // TODO: parseTransformationType(options, map)
-
-  // Read transformation from georeferenced map
+  // Set transformation options
   // See https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-tps
   let transformationArguments = '-order 1'
   let transformationMessage = ''
 
-  if (map.transformation) {
-    if (map.transformation.type === 'polynomial') {
-      if (map.transformation.order) {
-        transformationArguments = `-order ${map.transformation.order}`
-      }
-    } else if (map.transformation.type === 'thinPlateSpline') {
-      transformationArguments = '-tps'
-    } else if (map.transformation.type) {
-      transformationMessage = `Transformation type "${map.transformation.type}" is not supported. Using default transformation.`
+  if (
+    transformationType === 'polynomial' ||
+    transformationType === 'polynomial1' ||
+    transformationType === 'polynomial2' ||
+    transformationType === 'polynomial3'
+  ) {
+    if (transformationType === 'polynomial2') {
+      transformationArguments = `-order 2`
+    } else if (transformationType === 'polynomial3') {
+      transformationArguments = `-order 3`
     }
+  } else if (map.transformation.type === 'thinPlateSpline') {
+    transformationArguments = '-tps'
+  } else if (map.transformation.type) {
+    transformationMessage = `Transformation type "${transformationType}" is not supported. Using default transformation.`
   }
 
   const vrtFilename = path.join(outputDir, `${basename}.vrt`)
@@ -100,7 +94,7 @@ export function gdalwarp(
 
 gdal_translate -of vrt \\
   -a_srs EPSG:4326 \\
-  ${map.gcps
+  ${gcps
     .map((gcp) => `-gcp ${gcp.resource.join(' ')} ${gcp.geo.join(' ')}`)
     .join(' \\\n')} \\
   ${imageFilename} \\
@@ -109,10 +103,10 @@ gdal_translate -of vrt \\
 echo '${JSON.stringify(geoMask)}' > ${geojsonFilename}
 
 gdalwarp \\
-  -of COG -co COMPRESS=JPEG -co QUALITY=${options.quality} \\
+  -of COG -co COMPRESS=JPEG -co QUALITY=${jpgQuality} \\
   -dstalpha -overwrite \\
   -cutline ${geojsonFilename} -crop_to_cutline \\
-  -t_srs "${options.srs}" \\
+  -t_srs "${crs}" \\
   ${transformationArguments} \\
   ${vrtFilename} \\
   ${geotiffFilename}`.trim()

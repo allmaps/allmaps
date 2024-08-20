@@ -26,7 +26,7 @@ export function parseGcps(
   let gcps
   if (options.gcps) {
     gcps = parseGcpsFromFile(options.gcps)
-  } else if (options.annotation && map) {
+  } else if (map) {
     gcps = map.gcps
   } else {
     throw new Error(
