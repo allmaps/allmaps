@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.30",
+  "version": "1.0.0-beta.31",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -76,9 +76,9 @@
     "svelte": "^4.2.7"
   },
   "dependencies": {
-    "@allmaps/iiif-parser": "^1.0.0-beta.38",
-    "@allmaps/tailwind": "^1.0.0-beta.12",
-    "@allmaps/types": "^1.0.0-beta.13",
+    "@allmaps/iiif-parser": "^1.0.0-beta.39",
+    "@allmaps/tailwind": "^1.0.0-beta.13",
+    "@allmaps/types": "^1.0.0-beta.14",
     "flowbite": "^1.6.4"
   }
 }
