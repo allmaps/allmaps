@@ -6,8 +6,8 @@
   export let step = 0.05
   export let invert = false
 
-  export let active = true
-  export let hover = true
+  export let active = false
+  export let hover = false
   export let toggleValue = 1
 
   // internalValue always has minValue 0 and maxValue 1
