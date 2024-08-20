@@ -13,10 +13,7 @@
   } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
   import { view, mobile } from '$lib/shared/stores/view.js'
-  import {
-    mapWarpedMapSource,
-    mapWarpedMapLayer
-  } from '$lib/shared/stores/openlayers.js'
+  import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
   import { setActiveMapId } from '$lib/shared/stores/active.js'
   import { imageInformations } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
@@ -273,6 +270,9 @@
             on:click={() => {
               $colorize = !$colorize
             }}
+            role="button"
+            aria-label="Toggle Colorize"
+            tabindex="0"
           >
             <Dial
               bind:value={$hue}
@@ -308,7 +308,10 @@
 
       <div class="py-1">Annotation JSON</div>
       <div class="flex flex-col items-end gap-2">
-        <Copy string={JSON.stringify(viewerMap.annotation, null, 2)} compact={true} />
+        <Copy
+          string={JSON.stringify(viewerMap.annotation, null, 2)}
+          compact={true}
+        />
       </div>
       <!-- <div class="py-1">Export</div>
       <div class="flex flex-row gap-2">
