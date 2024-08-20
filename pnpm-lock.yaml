@@ -139,7 +139,7 @@ importers:
         specifier: ^1.0.0-beta.12
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/ui
       lodash-es:
         specifier: ^4.17.21
