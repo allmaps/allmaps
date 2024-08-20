@@ -78,7 +78,8 @@ export default function parse() {
       }
     }
 
-    const imageIds = collectImageIds(parsedIiifs)
-    printString(imageIds.join('\n'))
+    const imageIds = new Set(collectImageIds(parsedIiifs))
+
+    printString([...imageIds].join('\n'))
   })
 }
