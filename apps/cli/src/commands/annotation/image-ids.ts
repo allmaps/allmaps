@@ -12,6 +12,8 @@ export default function imageId() {
       const jsonValues = await parseJsonInput(files as string[])
 
       const maps = parseAnnotationsValidateMaps(jsonValues)
-      printString(maps.map((map) => map.resource.id).join('\n'))
+      const imageIds = new Set(maps.map((map) => map.resource.id))
+
+      printString([...imageIds].join('\n'))
     })
 }
