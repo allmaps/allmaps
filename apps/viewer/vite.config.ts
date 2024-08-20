@@ -6,7 +6,8 @@ import ports from '../../ports.json'
 
 export default defineConfig({
   server: {
-    port: ports.viewer
+    port: ports.viewer,
+    proxy: {}
   },
   plugins: [
     sveltekit(),
