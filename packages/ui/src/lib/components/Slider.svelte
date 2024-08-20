@@ -6,8 +6,8 @@
   export let step = 0.05
   export let invert = false
 
-  export let active = false
-  export let hover = false
+  export let active = true
+  export let hover = true
   export let toggleValue = 1
 
   // internalValue always has minValue 0 and maxValue 1
@@ -17,6 +17,7 @@
 
   $: {
     value = invert ? 1 - internalValue : internalValue
+    console.log('value', value)
   }
 
   function clampValue(value: number): number {
@@ -69,7 +70,7 @@
     event.preventDefault()
     event.stopPropagation()
     let delta = event.deltaY / 100
-    if (Math.abs(step*3) < 1) {
+    if (Math.abs(step * 3) < 1) {
       delta = event.deltaY > 0 ? step : -1 * step
     }
     internalValue = clampValue(internalValue - delta)
@@ -99,7 +100,7 @@
   on:wheel={wheel}
 >
   <div
-    class="overflow-hidden transition-all rounded-full border-black border relative border-2 p-1 w-9 bg-white cursor-pointer {hover
+    class="overflow-hidden transition-all rounded-full border-gray-900 border relative border-1 p-1 w-9 bg-white cursor-pointer {hover
       ? ' h-[150px]'
       : ' h-9'}"
   >
@@ -112,7 +113,7 @@
     </div>
 
     <div
-      class="absolute top-0 left-0 w-full h-[calc(100%-3rem)] z-10 {!hover
+      class="absolute top-0 left-0 w-full h-[calc(100%-2.2rem)] z-10 {!hover
         ? 'hidden'
         : ''}"
     >
@@ -133,14 +134,14 @@
       class="absolute bottom-0 left-0 w-full z-0 background"
       style="height: calc({internalValue * 100}%{!hover
         ? ''
-        : ' + ' + (1 - internalValue) * 3 + 'rem'});"
+        : ' + ' + (1 - internalValue) * 2.2 + 'rem'});"
     />
   </div>
 </div>
 
 <style>
   .background {
-    background-color: rgba(0, 0, 0, 0.388);
+    background-color: rgb(215 215 215);
   }
   .container {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -156,14 +157,15 @@
     outline: none;
     opacity: 0.7;
     transition: opacity 0.2s;
+    transform: rotate(180deg);
     writing-mode: vertical-lr;
   }
 
-  @supports (-moz-appearance:none) {
+  /* @supports (-moz-appearance: none) {
     .slider {
       transform: rotate(180deg);
     }
-  }
+  } */
 
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
