@@ -36,11 +36,11 @@
       class="pointer-events-none absolute top-0 w-full h-full p-2 grid grid-cols-3 grid-rows-2"
     >
       <div>
-        {#if $view !== 'list'}
+        <!-- {#if $view !== 'list'}
           <div class="pointer-events-auto inline">
             <MapControl />
           </div>
-        {/if}
+        {/if} -->
       </div>
       <div />
       <div class="justify-self-end">
@@ -51,7 +51,8 @@
       <div class="self-end">
         {#if $view !== 'list'}
           <div class="pointer-events-auto inline">
-            <PathControl />
+            <!-- <PathControl /> -->
+            <MapControl />
           </div>
         {/if}
       </div>

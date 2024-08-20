@@ -169,12 +169,7 @@
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
   <div class="z-10">
-    <Header appName="Viewer">
-      {#if !showForm && initialized}
-        <URLInput>
-          <URLType {type} />
-        </URLInput>
-      {/if}
+    <Header appName="Viewer" transparent={$view == "map"}>
     </Header>
   </div>
   <main class="relative h-full overflow-hidden">
