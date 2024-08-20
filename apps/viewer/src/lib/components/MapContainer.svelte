@@ -3,7 +3,7 @@
 
   import MapControl from '$lib/components/controls/Map.svelte'
   import ViewControl from '$lib/components/controls/View.svelte'
-  import PathControl from '$lib/components/controls/Path.svelte'
+  // import PathControl from '$lib/components/controls/Path.svelte'
   import DialsControl from '$lib/components/controls/Dials.svelte'
   import SelectionControl from '$lib/components/controls/Selection.svelte'
 </script>

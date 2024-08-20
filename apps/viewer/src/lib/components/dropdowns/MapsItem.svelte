@@ -12,9 +12,9 @@
     firstSelectedMapId
   } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
-  import { view, mobile } from '$lib/shared/stores/view.js'
+  // import { view } from '$lib/shared/stores/view.js'
   import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
-  import { setActiveMapId } from '$lib/shared/stores/active.js'
+  // import { setActiveMapId } from '$lib/shared/stores/active.js'
   import { imageInformations } from '$lib/shared/stores/openlayers.js'
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
@@ -25,12 +25,12 @@
     Thumbnail,
     Copy,
     Dial,
-    BringMapsToFront,
-    BringMapsForward,
-    SendMapsBackward,
-    SendMapsToBack,
+    // BringMapsToFront,
+    // BringMapsForward,
+    // SendMapsBackward,
+    // SendMapsToBack,
     Opacity,
-    Mask,
+    // Mask,
     Crop
   } from '@allmaps/ui'
 
@@ -60,7 +60,7 @@
 
   const mapId = viewerMap.mapId
   const imageUri = viewerMap.map.resource.id
-  const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
+  // const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
 
   const checkboxId = `dropdown-maps-${mapId}`
 
@@ -140,31 +140,31 @@
       .join(' ')
   }
 
-  function handleShowOnMap() {
-    setActiveMapId(viewerMap.mapId, true)
-    $view = 'map'
-  }
+  // function handleShowOnMap() {
+  //   setActiveMapId(viewerMap.mapId, true)
+  //   $view = 'map'
+  // }
 
-  function handleShowImage() {
-    setActiveMapId(viewerMap.mapId, true)
-    $view = 'image'
-  }
+  // function handleShowImage() {
+  //   setActiveMapId(viewerMap.mapId, true)
+  //   $view = 'image'
+  // }
 
-  function handleBringMapsToFront() {
-    mapWarpedMapLayer.bringMapsToFront([mapId])
-  }
+  // function handleBringMapsToFront() {
+  //   mapWarpedMapLayer.bringMapsToFront([mapId])
+  // }
 
-  function handleBringMapsForward() {
-    mapWarpedMapLayer.bringMapsForward([mapId])
-  }
+  // function handleBringMapsForward() {
+  //   mapWarpedMapLayer.bringMapsForward([mapId])
+  // }
 
-  function handleSendMapsBackward() {
-    mapWarpedMapLayer.sendMapsBackward([mapId])
-  }
+  // function handleSendMapsBackward() {
+  //   mapWarpedMapLayer.sendMapsBackward([mapId])
+  // }
 
-  function handleSendMapsToBack() {
-    mapWarpedMapLayer.sendMapsToBack([mapId])
-  }
+  // function handleSendMapsToBack() {
+  //   mapWarpedMapLayer.sendMapsToBack([mapId])
+  // }
 
   onMount(async () => {
     if ($firstSelectedMapId === mapId) {

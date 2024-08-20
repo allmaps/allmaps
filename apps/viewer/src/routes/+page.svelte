@@ -7,7 +7,7 @@
     Header,
     Loading,
     URLInput,
-    URLType,
+    // URLType,
     Stats,
     dataStore,
     paramStore
@@ -47,7 +47,7 @@
 
   import 'ol/ol.css'
 
-  let type: 'annotation'
+  // let type: 'annotation'
 
   let initialized = false
   let showForm = false

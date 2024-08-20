@@ -1,6 +1,6 @@
 <script lang="ts">
   import { view } from '$lib/shared/stores/view.js'
-  import experimentalFeatures from '$lib/shared/experimental-features.js'
+  // import experimentalFeatures from '$lib/shared/experimental-features.js'
   import { Hamburger, Close } from '@allmaps/ui'
 </script>
 
