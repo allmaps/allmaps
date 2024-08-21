@@ -2,7 +2,7 @@
   // import { browser } from '$app/environment';
   // can not use browser from sveltekit or else docs astro are breaking
 
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte'
 
   export let value: number
   export let keyCode: string | undefined = undefined
@@ -22,7 +22,7 @@
   let isOsx = false
 
   onMount(() => {
-    isOsx = window?.navigator.userAgent.indexOf("Mac OS X") !== -1
+    isOsx = window?.navigator.userAgent.indexOf('Mac OS X') !== -1
   })
 
   $: {
@@ -150,9 +150,6 @@
 </div>
 
 <style>
-  .background {
-    background-color: rgb(215 215 215);
-  }
   .container {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -webkit-tap-highlight-color: transparent;
