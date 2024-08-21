@@ -27,7 +27,6 @@
 
   $: {
     value = invert ? 1 - internalValue : internalValue
-    console.log('value', value)
   }
 
   function clampValue(value: number): number {
@@ -111,12 +110,12 @@
   on:wheel={wheel}
 >
   <div
-    class="overflow-hidden transition-all rounded-full border-gray-900 border relative border-1 p-1 w-9 bg-white cursor-pointer {hover
+    class="overflow-hidden transition-all rounded-full border-pink-500 border relative border-2 p-1 w-9 bg-white cursor-pointer {hover
       ? ' h-[150px]'
       : ' h-9'}"
   >
     <div
-      class="absolute bottom-0 left-0 w-full h-8 flex justify-center items-center"
+      class="absolute bottom-0 left-0 w-full h-8 flex justify-center items-center stroke-pink-500"
       on:pointerdown={pointerdown}
       on:pointerup={pointerup}
     >
@@ -142,7 +141,7 @@
     </div>
 
     <div
-      class="absolute bottom-0 left-0 w-full z-0 background"
+      class="absolute bottom-0 left-0 w-full z-0 bg-pink-100"
       style="height: calc({internalValue * 100}%{!hover
         ? ''
         : ' + ' + (1 - internalValue) * 2.2 + 'rem'});"

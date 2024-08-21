@@ -18,7 +18,7 @@
     label="Opacity"
   >
     {#if experimentalFeatures}
-      <Opacity />
+      <Opacity class="stroke-pink-500" />
     {/if}
   </svelte:component>
   <svelte:component
@@ -31,7 +31,7 @@
     toggleValue={0.2}
   >
     {#if experimentalFeatures}
-      <Mask />
+      <Mask class="stroke-pink-500" />
     {/if}
   </svelte:component>
 </div>
