@@ -1,8 +1,24 @@
 <script lang="ts">
-  import { maps } from '$lib/shared/stores/maps.js'
+  import { mapsBySourceId } from '$lib/shared/stores/maps.js'
   import MapsItem from '$lib/components/dropdowns/MapsItem.svelte'
-  import { urlStore, Copy } from '@allmaps/ui'
+  import { Copy } from '@allmaps/ui'
   // import { selectedMaps } from '$lib/shared/stores/selected.js'
+  import { sourcesById } from '$lib/shared/stores/sources.js'
+  import { addUrlSource } from '$lib/shared/stores/sources.js'
+
+  const getUrlbyId = (id: string) => {
+    return $sourcesById?.get(id)?.url || ''
+  }
+
+  const addAnnotation = async () => {
+    // check if newAnnotation is an URL
+    if (!newAnnotation.startsWith('http')) return
+    // add annotation to the map
+    await addUrlSource(newAnnotation)
+    // clear newAnnotation
+    newAnnotation = ''
+  }
+  let newAnnotation = ''
 </script>
 
 <section class="w-full h-full overflow-y-auto">
@@ -11,13 +27,14 @@
       <h2 class="text-xl font-medium">Annotations</h2>
     </div>
     <div class="relative w-full flex flex-row mb-4">
-      <div
+      <input
         class="p-4 grow text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis"
-      >
-        Add a Annotation
-      </div>
+        placeholder="Add a Annotation"
+        bind:value={newAnnotation}
+      />
       <button
         class="top-0 right-0 p-1 w-8 text-sm font-medium text-white rounded-r-lg border-gray-100 border-2 focus:ring-4 focus:outline-none focus:ring-blue-300"
+        on:click={addAnnotation}
       >
         <svg
           class="w-full h-full"
@@ -38,14 +55,19 @@
       </button>
     </div>
 
-    <Copy string={$urlStore} big />
-    <ol class="flex flex-col">
-      {#each $maps as viewerMap}
-        <li class="flex flex-row">
-          <MapsItem {viewerMap} />
-        </li>
-      {/each}
-    </ol>
+    {#each Object.entries($mapsBySourceId) as [sourceId, maps]}
+      <div class="mb-5">
+        <Copy string={getUrlbyId(sourceId)} big />
+
+        <ol class="grid grid-cols-2 gap-4 m-2">
+          {#each maps as viewerMap}
+            <li class="flex">
+              <MapsItem {viewerMap} />
+            </li>
+          {/each}
+        </ol>
+      </div>
+    {/each}
 
     <div class="flex flex-row items-center justify-between mb-5">
       <h2 class="text-xl font-medium">Export</h2>
@@ -77,6 +99,7 @@
         </svg>
       </button>
     </div>
+
     <!-- selected maps list selectedMaps -->
     <!-- <ol class="flex flex-col">
       {#each $selectedMaps as viewerMap}
