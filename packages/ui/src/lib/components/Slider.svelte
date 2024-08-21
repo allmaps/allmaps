@@ -2,7 +2,7 @@
   // import { browser } from '$app/environment';
   // can not use browser from sveltekit or else docs astro are breaking
 
-  import { onMount } from 'svelte'
+  import { onMount, createEventDispatcher } from 'svelte'
 
   export let value: number
   export let keyCode: string | undefined = undefined
@@ -14,6 +14,8 @@
   export let active = false
   export let hover = false
   export let toggleValue = 1
+
+  const dispatch = createEventDispatcher()
 
   // internalValue always has minValue 0 and maxValue 1
   let internalValue = invert ? 1 - value : value
@@ -27,6 +29,7 @@
 
   $: {
     value = invert ? 1 - internalValue : internalValue
+    dispatch('change', value)
   }
 
   function clampValue(value: number): number {
