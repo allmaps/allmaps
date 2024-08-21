@@ -6,6 +6,7 @@ import {
   WarpedMapEventType
 } from '@allmaps/openlayers'
 import type { Map as Georef } from '@allmaps/annotation'
+import experimentalFeatures from '$lib/shared/experimental-features.js'
 
 import OLMap from 'ol/Map.js'
 import VectorSource from 'ol/source/Vector.js'
@@ -213,7 +214,7 @@ export function createImageOl() {
 }
 
 export const ol = derived(view, ($view) => {
-  if ($view === 'map') {
+  if ($view === 'map' || ($view === 'list' && experimentalFeatures)) {
     return mapOl
   } else if ($view === 'image') {
     return imageOl
