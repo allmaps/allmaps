@@ -7,6 +7,8 @@
 
   let opacityActive = false
   let removeBackgroundActive = false
+
+  let opacityDispatched = $opacity
 </script>
 
 <div class="inline-flex items-end space-x-1 md:space-x-3">
@@ -16,9 +18,10 @@
     bind:active={opacityActive}
     keyCode="Space"
     label="Opacity"
+    on:change={(event) => (opacityDispatched = Number(event.detail))}
   >
     {#if experimentalFeatures}
-      <Opacity class="stroke-pink-500" />
+      <Opacity class="stroke-pink-500" closed={opacityDispatched === 0} />
     {/if}
   </svelte:component>
   <svelte:component
