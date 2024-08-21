@@ -20,6 +20,7 @@ export type Source = (UrlSourceOptions | StringSourceOptions) & {
   parsed: ParsedSource
   // error?: Error
   annotations: unknown[]
+  url?: string
 }
 
 export type ParsedSource =

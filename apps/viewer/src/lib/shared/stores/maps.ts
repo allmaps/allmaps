@@ -182,3 +182,15 @@ export const visibleMapCount = derived(
   visibleMaps,
   ($visibleMaps) => $visibleMaps.length
 )
+
+export const mapsBySourceId = derived(mapsById, ($mapsById) => {
+  const mapsBySourceId: Record<string, ViewerMap[]> = {}
+  for (const [, map] of $mapsById.entries()) {
+    if (mapsBySourceId[map.sourceId]) {
+      mapsBySourceId[map.sourceId].push(map)
+    } else {
+      mapsBySourceId[map.sourceId] = [map]
+    }
+  }
+  return mapsBySourceId
+})
