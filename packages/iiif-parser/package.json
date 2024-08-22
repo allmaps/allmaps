@@ -35,11 +35,10 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc",
-    "preversion": "pnpm run types && pnpm run lint && pnpm test",
+    "build": "tsc && pnpm run documentation",
+    "preversion": "pnpm run lint && pnpm test",
     "types": "tsc --noEmit",
-    "test": "NODE_ENV=test mocha",
-    "pretest": "pnpm run build",
+    "test": "NODE_ENV=test pnpm run build && mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "format": "prettier --write src test"
