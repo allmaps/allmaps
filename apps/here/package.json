@@ -24,7 +24,7 @@
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "pnpm run types && pnpm run lint"
+    "preversion": "pnpm run types && pnpm run lint && pnpm run build"
   },
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.29",
