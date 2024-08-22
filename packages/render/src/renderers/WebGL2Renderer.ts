@@ -605,7 +605,7 @@ export default class WebGL2Renderer
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.useProgram(this.program)
 
-    // Global uniform
+    // Global uniforms
 
     // Render transform
 
