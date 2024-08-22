@@ -218,9 +218,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
-    ).map((_v, i) => {
-      return Math.round((i - 1) / 3)
-    })
+    ).map((_v, i) => Math.round((i - 1) / 3))
+
     createBuffer(
       this.gl,
       this.program,
