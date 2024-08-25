@@ -19,12 +19,37 @@
     newAnnotation = ''
   }
   let newAnnotation = ''
+
+  let gridCols = 2
+
+  const toggleGridCols = () => {
+    gridCols = gridCols === 1 ? 2 : 1
+  }
 </script>
 
 <section class="w-full h-full overflow-y-auto">
   <div class="container p-4 mx-auto">
     <div class="flex flex-row items-center justify-between mb-5">
       <h2 class="text-xl font-medium">Annotations</h2>
+      <button
+        class="p-2 text-sm w-8 font-medium text-gray-900 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300"
+        on:click={toggleGridCols}
+        aria-label={gridCols === 1
+          ? 'Switch to 2 columns'
+          : 'Switch to 1 column'}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="icon icon-tabler icons-tabler-filled icon-tabler-layout-list w-full h-full"
+          ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
+            d="M18 3a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-2a3 3 0 0 1 3 -3z"
+          /><path
+            d="M18 13a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-2a3 3 0 0 1 3 -3z"
+          /></svg
+        >
+      </button>
     </div>
     <div class="relative w-full flex flex-row mb-4">
       <input
@@ -59,7 +84,7 @@
       <div class="mb-5">
         <Copy string={getUrlbyId(sourceId)} big />
 
-        <ol class="grid grid-cols-2 gap-4 m-2">
+        <ol class="grid grid-cols-{gridCols} gap-4 m-2">
           {#each maps as viewerMap}
             <li class="flex">
               <MapsItem {viewerMap} />
