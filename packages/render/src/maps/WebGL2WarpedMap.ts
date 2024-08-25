@@ -19,7 +19,12 @@ import { createBuffer } from '../shared/webgl2.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Line, Point, Transform } from '@allmaps/types'
+import type {
+  ColorWithTransparancy,
+  Line,
+  Point,
+  Transform
+} from '@allmaps/types'
 
 import type {
   LineLayer,
@@ -42,11 +47,13 @@ const DEFAULT_SATURATION = 1
 
 const DEFAULT_LINE_LAYER_VIEWPORT_SIZE = 6
 const DEFAULT_LINE_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
-const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 1
+const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 0
+const DEFAULT_LINE_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 
 const DEFAULT_POINT_LAYER_VIEWPORT_SIZE = 16
 const DEFAULT_POINT_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
 const DEFAULT_POINT_LAYER_VIEWPORT_BORDER_SIZE = 1
+const DEFAULT_POINT_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -193,6 +200,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineLayers() {
     this.lineLayers = [
       {
+        projectedGeoLines: lineStringToLines(this.projectedGeoLongerMask),
+        projectedGeoPreviousLines: lineStringToLines(
+          this.projectedGeoPreviousLongerMask
+        ),
+        viewportSize: 8,
+        color: [...hexToFractionalRgb(pink), 1]
+      },
+      {
         projectedGeoLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
           this.projectedGeoTransformedResourcePoints
@@ -203,13 +218,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         ),
         color: [...hexToFractionalRgb(black), 1],
         borderColor: [...hexToFractionalRgb(white), 1]
-      },
-      {
-        projectedGeoLines: lineStringToLines(this.projectedGeoLongerMask),
-        projectedGeoPreviousLines: lineStringToLines(
-          this.projectedGeoPreviousLongerMask
-        ),
-        color: [...hexToFractionalRgb(pink), 1]
       }
     ]
 
@@ -227,15 +235,13 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.pointLayers = [
       {
         projectedGeoPoints: this.projectedGeoPoints,
-        color: [...hexToFractionalRgb(blue), 1],
-        borderColor: [...hexToFractionalRgb(white), 1]
+        color: [...hexToFractionalRgb(blue), 1]
       },
       {
         projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
         projectedGeoPreviousPoints:
           this.projectedGeoPreviousTransformedResourcePoints,
-        color: [...hexToFractionalRgb(pink), 1],
-        borderColor: [...hexToFractionalRgb(white), 1]
+        color: [...hexToFractionalRgb(pink), 1]
       }
     ]
   }
@@ -476,7 +482,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.viewportSize || DEFAULT_LINE_LAYER_VIEWPORT_SIZE
+              lineLayer.hasOwnProperty('viewportSize')
+                ? lineLayer.viewportSize
+                : DEFAULT_LINE_LAYER_VIEWPORT_SIZE
             )
           )
         ),
@@ -494,14 +502,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (accumulator: number[][], lineLayer) =>
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
-            Array(6).fill(lineLayer.color || DEFAULT_LINE_LAYER_COLOR)
+            Array(6).fill(
+              lineLayer.hasOwnProperty('color')
+                ? lineLayer.color
+                : DEFAULT_LINE_LAYER_COLOR
+            )
           )
         ),
       []
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
 
-    const biewportBorderSizes = this.lineLayers.reduce(
+    const viewportBorderSizes = this.lineLayers.reduce(
       (accumulator: number[], lineLayer) =>
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
@@ -516,7 +528,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     createBuffer(
       gl,
       program,
-      new Float32Array(biewportBorderSizes),
+      new Float32Array(viewportBorderSizes),
       1,
       'a_viewportBorderSize'
     )
@@ -526,9 +538,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.borderColor ||
-                lineLayer.color ||
-                DEFAULT_LINE_LAYER_COLOR
+              lineLayer.hasOwnProperty('borderColor')
+                ? lineLayer.borderColor
+                : DEFAULT_LINE_LAYER_BORDER_COLOR
             )
           )
         ),
@@ -585,9 +597,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const viewportSizes = this.pointLayers.reduce(
       (accumulator: number[], pointLayer) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map(
-            (_projectedGeoPoint) =>
-              pointLayer.viewportSize || DEFAULT_POINT_LAYER_VIEWPORT_SIZE
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            pointLayer.hasOwnProperty('viewportSize')
+              ? (pointLayer.viewportSize as number)
+              : DEFAULT_POINT_LAYER_VIEWPORT_SIZE
           )
         ),
       []
@@ -603,9 +616,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const colors = this.pointLayers.reduce(
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map(
-            (_projectedGeoPoint) =>
-              pointLayer.color || DEFAULT_POINT_LAYER_COLOR
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            pointLayer.hasOwnProperty('color')
+              ? (pointLayer.color as ColorWithTransparancy)
+              : DEFAULT_POINT_LAYER_COLOR
           )
         ),
       []
@@ -634,11 +648,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const borderColors = this.pointLayers.reduce(
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map(
-            (_projectedGeoPoint) =>
-              pointLayer.borderColor ||
-              pointLayer.color ||
-              DEFAULT_POINT_LAYER_COLOR
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            pointLayer.hasOwnProperty('borderColor')
+              ? (pointLayer.borderColor as ColorWithTransparancy)
+              : DEFAULT_POINT_LAYER_BORDER_COLOR
           )
         ),
       []

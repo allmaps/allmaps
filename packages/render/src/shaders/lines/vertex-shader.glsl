@@ -25,13 +25,10 @@ out float v_viewportSize;
 out vec4 v_color;
 out float v_viewportBorderSize;
 out vec4 v_borderColor;
+out float v_viewportFeatherSize;
+out float v_viewportTotalSize;
 
 void main() {
-
-  // TODO: line sizes appear to count twice as much as point sizes
-  float viewportSize = a_viewportSize/2.0;
-  float viewportBorderSize = a_viewportBorderSize/2.0;
-
   vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
   vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, easing(u_animationProgress));
 
@@ -43,9 +40,25 @@ void main() {
   vec2 viewportNormalizedLineNormal = vec2(viewportNormalizedLine.y, -viewportNormalizedLine.x);
   v_viewportLineLength = length(viewportLine);
 
-  float lineX = -1.0 * a_viewportSize / 2.0 + a_isOtherPoint * (v_viewportLineLength + a_viewportSize);
-  float lineY = a_normalSign * a_viewportSize / 2.0;
+  v_viewportFeatherSize = 1.0;
+
+  // TODO: figure out why size lines need to be devided by two
+  // to have the same effect as point sizes
+  // this could be related to dpr (but then one would expert multiplication by two?)
+  float viewportSize = a_viewportSize / 2.0;
+  float viewportBorderSize = a_viewportBorderSize / 2.0;
+  v_viewportFeatherSize = v_viewportFeatherSize / 2.0;
+
+  v_viewportTotalSize = viewportSize + viewportBorderSize + v_viewportFeatherSize;
+  float lineX = -1.0 * v_viewportTotalSize / 2.0 + a_isOtherPoint * (v_viewportLineLength + 2.0 * (v_viewportTotalSize / 2.0));
+  float lineY = a_normalSign * v_viewportTotalSize / 2.0;
   v_linePoint = vec2(lineX, lineY);
+  // The border is centered on the edge of a line with diameter = size
+  // so adding half a border left and half a border right
+  // results in adding a full border to the total size.
+  // Also adding half an outside feather left and half an outside feather right,
+  // which also serves as minimal size.
+  // Note: there seems to be a maximum size of 512? Could be due to graphics card (or Float32Array)?
 
   v_viewportSize = viewportSize;
   v_color = a_color;
