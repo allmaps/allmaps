@@ -45,9 +45,9 @@
       if (!value) {
         $selectedMapId = undefined
       } else {
-        if (value.type === 'url' && value.url) {
-          loadMapsFromUrl(value.url)
-          $selectedMapId = value.url
+        if (value.type === 'url' && value.urls && value.urls.length > 0) {
+          loadMapsFromUrl(value.urls[0])
+          $selectedMapId = value.urls[0]
         }
       }
     })

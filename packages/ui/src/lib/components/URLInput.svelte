@@ -5,29 +5,30 @@
 
   const dispatch = createEventDispatcher()
 
-  let urlValue: string
+  let urlValues: string[] = []
   let input: HTMLInputElement
 
   export let autofocus: boolean | undefined = undefined
 
-  $: urlValue = $urlStore
+  $: urlValues = $urlStore
 
   $: {
     dispatch('value', {
-      value: urlValue
+      value: urlValues
     })
   }
+  $: console.log('urlStore', $urlStore)
 
   if (autofocus === undefined) {
-    autofocus = $urlStore === ''
+    autofocus = $urlStore.length === 0
   }
 
   export let placeholder =
-    'Type the URL of a IIIF Image, Manifest, Collection or Georeference Annotation'
+    'Type URLs of IIIF Images, Manifests, Collections or Georeference Annotations (separated by commas)'
 
   function selectInputText() {
     input.focus()
-    input.setSelectionRange(0, urlValue.length)
+    input.setSelectionRange(0, input.value.length)
   }
 
   function handleFocus() {
@@ -36,26 +37,31 @@
 
   function handleInputKeyup(event: KeyboardEvent) {
     if (event.key === 'Escape') {
-      urlValue = $urlStore
+      input.value = $urlStore.join(', ')
     }
+    console.log('input', input.value)
+    //submit()
   }
 
   function handleMouseup(event: Event) {
     event.preventDefault()
   }
 
-  export function getValue() {
-    return urlValue
+  export function getValue(): string[] {
+    return input.value.split(',').map(url => url.trim()).filter(url => url !== '')
   }
 
   export function submit() {
-    if (urlValue) {
-      setStoreValue(urlValue)
+    console.log('submit')
+    const urls = getValue()
+    console.log('urls', urls)
+    if (urls.length > 0) {
+      setStoreValue(urls)
     }
   }
 
-  function setStoreValue(urlValue: string) {
-    $urlStore = urlValue
+  function setStoreValue(urls: string[]) {
+    urlStore.set(urls)
   }
 
   function handleDocumentKeyup(event: KeyboardEvent) {
@@ -85,10 +91,10 @@
     on:focus|preventDefault={handleFocus}
     on:keyup={handleInputKeyup}
     on:mouseup={handleMouseup}
-    bind:value={urlValue}
     bind:this={input}
     class="bg-transparent w-full rounded-lg px-2 py-1 focus:outline-none truncate"
     {placeholder}
+    value={$urlStore.join(', ')}
   />
   <div class="shrink-0">
     <slot />

@@ -6,6 +6,12 @@ export default [
   //   // https://sammeltassen.github.io/iiif-manifests/nationaal-archief/NL-HaNA_4.VTHR_4636.json
   // },
   {
+    title: 'Test',
+    organization: 'Test',
+    url: 'https://annotations.allmaps.org/maps/d594d099405b952e,https://annotations.allmaps.org/maps/52a2ec2c4a96ee20'
+    // https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json
+  },
+  {
     title: 'Plattegrond van Rotterdam in 10 bladen (1895 - 1897)',
     organization: 'Stadsarchief Rotterdam',
     url: 'https://annotations.allmaps.org/manifests/631b96e4d6d3f421'

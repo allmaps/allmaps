@@ -18,21 +18,24 @@
   const MAX_URL_PARAM_LENGTH = 2000 - 100
 
   afterNavigate(() => {
-    const newUrl = urlFromUrl()
+    const newUrls = urlFromUrl()
     const newData = dataFromUrl()
 
-    if (newUrl) {
-      $param = {
+    console.log('newUrls', newUrls)
+    console.log('newData', newData)
+
+    if (newUrls.length > 0) {
+      param.set({
         type: 'url',
-        url: newUrl
-      }
+        urls: newUrls
+      })
     } else if (newData) {
-      $param = {
+      param.set({
         type: 'data',
         data: newData
-      }
+      })
     } else {
-      $param = null
+      param.set(undefined)
     }
   })
 
@@ -46,11 +49,18 @@
   param.subscribe(($param) => {
     if (browser && $param) {
       const $page = get(page)
+      console.log('param store', $param)
 
-      if ($param.type === 'url' && $param.url) {
+      if ($param.type === 'url' && $param.urls && $param.urls.length > 0) {
         const searchParams = $page.url.searchParams
         searchParams.delete('data')
-        searchParams.set('url', $param.url)
+        $param.urls.forEach((url, index) => {
+          if (index === 0) {
+            searchParams.set('url', url)
+          } else {
+            searchParams.append('url', url)
+          }
+        })
         gotoSearchParams(searchParams)
       } else if ($param.type === 'data' && $param.data) {
         if ($param.data.length > MAX_URL_PARAM_LENGTH) {

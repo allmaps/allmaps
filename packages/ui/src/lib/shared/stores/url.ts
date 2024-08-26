@@ -1,16 +1,15 @@
 import { writable } from 'svelte/store'
 
-function getUrlFromQueryString(location: Location): string | null {
+function getUrlsFromQueryString(location: Location): string[] {
   const searchParams = new URLSearchParams(location.search)
-  const url = searchParams.get('url')
-  return url
+  return searchParams.getAll('url')
 }
 
-function getUrlFromHash(location: Location): string | null {
+function getUrlsFromHash(location: Location): string[] {
   const hashQueryString = location.hash.slice(1)
 
   if (!hashQueryString) {
-    return null
+    return []
   }
 
   const searchParams = new URLSearchParams(hashQueryString)
@@ -18,29 +17,27 @@ function getUrlFromHash(location: Location): string | null {
 
   const dataUrlPrefix = 'data:text/x-url,'
 
-  if (data) {
-    if (data.startsWith(dataUrlPrefix)) {
-      const url = data.slice(dataUrlPrefix.length)
-      return url
-    }
+  if (data && data.startsWith(dataUrlPrefix)) {
+    const url = data.slice(dataUrlPrefix.length)
+    return [url]
   }
 
-  return null
+  return []
 }
 
-export function fromUrl() {
+export function fromUrl(): string[] {
   if (typeof window !== 'undefined') {
-    const queryStringUrl = getUrlFromQueryString(window.location)
-    const hashUrl = getUrlFromHash(window.location)
+    const queryStringUrls = getUrlsFromQueryString(window.location)
+    const hashUrls = getUrlsFromHash(window.location)
 
-    if (queryStringUrl !== null && queryStringUrl.length) {
-      return queryStringUrl
-    } else if (hashUrl !== null && hashUrl.length) {
-      return hashUrl
+    if (queryStringUrls.length > 0) {
+      return queryStringUrls
+    } else if (hashUrls.length > 0) {
+      return hashUrls
     }
   }
 
-  return ''
+  return []
 }
 
-export default writable<string>(fromUrl())
+export default writable<string[]>(fromUrl())

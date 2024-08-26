@@ -23,34 +23,36 @@
   let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection | undefined
   let maps: MapType[]
 
-  urlStore.subscribe((value) => {
-    loadUrl(value)
+  urlStore.subscribe((values) => {
+    loadUrls(values)
   })
 
-  async function loadUrl(url: string) {
-    try {
-      const json = await fetch(url).then((response) => response.json())
+  async function loadUrls(urls: string[]) {
+    for (const url of urls) {
+      try {
+        const json = await fetch(url).then((response) => response.json())
 
-      if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
-        // The JSON data might be a Georeference Annotation
-        maps = parseAnnotation(json)
-        parsedIiif = undefined
+        if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
+          // The JSON data might be a Georeference Annotation
+          maps = parseAnnotation(json)
+          parsedIiif = undefined
 
-        type = 'annotation'
-      } else {
-        // Try to parse IIIF data
-        parsedIiif = IIIF.parse(json)
-        maps = []
+          type = 'annotation'
+        } else {
+          // Try to parse IIIF data
+          parsedIiif = IIIF.parse(json)
+          maps = []
 
-        type = parsedIiif.type
-      }
+          type = parsedIiif.type
+        }
 
-      loaded = true
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        error = err.message
-      } else {
-        error = 'Unknown error'
+        loaded = true
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          error = err.message
+        } else {
+          error = 'Unknown error'
+        }
       }
     }
   }
