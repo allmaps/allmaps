@@ -69,7 +69,6 @@
 
   function handleUrlInputValue() {
     urlInputValue = urlInput.getValue()
-    console.log('urlInputValue', urlInputValue)
   }
 
   async function handleSubmit() {

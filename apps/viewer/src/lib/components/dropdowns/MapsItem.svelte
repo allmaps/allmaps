@@ -198,7 +198,7 @@
   />
   <label
     for={checkboxId}
-    class="relative inline-block w-full p-2 text-gray-600 bg-gray-100 border-2 border-gray-200 rounded cursor-pointer peer-checked:border-[#FF56BA] select-none z-10"
+    class="relative inline-block w-full p-2 text-gray-600 border-2 border-gray-200 rounded cursor-pointer peer-checked:border-[#FF56BA] select-none z-10"
   >
     <div
       class="relative inline-flex items-center justify-between w-full h-full transition-opacity"

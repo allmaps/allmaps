@@ -17,7 +17,6 @@
       value: urlValues
     })
   }
-  $: console.log('urlValues', urlValues)
 
   if (autofocus === undefined) {
     autofocus = $urlStore.length === 0
