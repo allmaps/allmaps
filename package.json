@@ -12,6 +12,7 @@
     "build": "pnpm --recursive run build",
     "check": "pnpm --recursive run check",
     "lint": "pnpm --recursive run lint",
+    "format": "pnpm --recursive run format",
     "test": "pnpm --recursive run test",
     "documentation": "pnpm --recursive run documentation",
     "precommit": "pnpm run types && pnpm run test && pnpm run lint && pnpm run documentation",
