@@ -67,8 +67,6 @@
     showForm = true
   }
 
-  $: console.log('urlInput', urlInput)
-
   function handleUrlInputValue() {
     urlInputValue = urlInput.getValue()
     console.log('urlInputValue', urlInputValue)
@@ -136,7 +134,7 @@
     createImageOl()
 
     paramStore.subscribe(async (value) => {
-      console.log('paramStore', value)
+      // console.log('paramStore', value)
       resetRenderOptionsLayer()
       resetSources()
 
@@ -149,7 +147,7 @@
         try {
           if (value.type === 'url' && value.urls && value.urls.length > 0) {
             for (const url of value.urls) {
-              console.log('addUrlSource', url)
+              // console.log('addUrlSource', url)
               await addUrlSource(url)
             }
           } else if (value.data) {

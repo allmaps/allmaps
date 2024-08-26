@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
 import { generateId } from '@allmaps/id'
 import { fetchJson, fetchAnnotationsFromApi } from '@allmaps/stdlib'
@@ -52,6 +52,14 @@ async function addSource(
   }
 
   const mapIds = []
+
+  // check if source is already added
+  for (const source of get(sourcesStore).values()) {
+    if (source.id === id) {
+      console.log('source already added', id)
+      return
+    }
+  }
 
   for (const annotation of annotations) {
     mapIds.push(...(await addAnnotation(id, annotation)))

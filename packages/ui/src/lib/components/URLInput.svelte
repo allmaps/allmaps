@@ -17,7 +17,7 @@
       value: urlValues
     })
   }
-  $: console.log('urlStore', $urlStore)
+  $: console.log('urlValues', urlValues)
 
   if (autofocus === undefined) {
     autofocus = $urlStore.length === 0
@@ -39,8 +39,9 @@
     if (event.key === 'Escape') {
       input.value = $urlStore.join(', ')
     }
-    console.log('input', input.value)
-    //submit()
+    dispatch('value', {
+      value: getValue()
+    })
   }
 
   function handleMouseup(event: Event) {
@@ -48,7 +49,10 @@
   }
 
   export function getValue(): string[] {
-    return input.value.split(',').map(url => url.trim()).filter(url => url !== '')
+    return input.value
+      .split(',')
+      .map((url) => url.trim())
+      .filter((url) => url !== '')
   }
 
   export function submit() {

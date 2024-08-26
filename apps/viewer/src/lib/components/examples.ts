@@ -6,9 +6,12 @@ export default [
   //   // https://sammeltassen.github.io/iiif-manifests/nationaal-archief/NL-HaNA_4.VTHR_4636.json
   // },
   {
-    title: 'Test',
+    title: 'Multiple URL',
     organization: 'Test',
-    url: 'https://annotations.allmaps.org/maps/d594d099405b952e,https://annotations.allmaps.org/maps/52a2ec2c4a96ee20'
+    url: [
+      'https://annotations.allmaps.org/maps/d594d099405b952e',
+      'https://annotations.allmaps.org/maps/52a2ec2c4a96ee20'
+    ]
     // https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json
   },
   {
