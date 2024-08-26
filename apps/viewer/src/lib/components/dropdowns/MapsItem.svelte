@@ -198,7 +198,7 @@
   />
   <label
     for={checkboxId}
-    class="relative inline-block w-full p-2 text-gray-500 bg-white border-2 border-gray-200 rounded cursor-pointer peer-checked:border-[#FF56BA] hover:text-gray-600 peer-checked:text-gray-600 select-none z-10"
+    class="relative inline-block w-full p-2 text-gray-600 bg-gray-100 border-2 border-gray-200 rounded cursor-pointer peer-checked:border-[#FF56BA] select-none z-10"
   >
     <div
       class="relative inline-flex items-center justify-between w-full h-full transition-opacity"
@@ -228,16 +228,18 @@
         <div class="flex flex-row items-center w-full">
           <div class="flex flex-row grow gap-1 items-center">
             <div class="text-sm font-medium text-gray-900">
-              Tile {viewerMap.index + 1}
+              Map {viewerMap.index + 1}
             </div>
           </div>
 
           <div class="inline-flex flex-row gap-2 justify-self-end">
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 border-gray-200 hover:bg-gray-50 select-none cursor-pointer w-10 h-10 bg-white/80"
-                class:border-gray-600={$visible}
-                class:text-gray-500={!$visible}
+                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-10 h-10 bg-gray-100"
+                class:border-pink-500={!$visible}
+                class:border-gray-500={$visible}
+                class:bg-pink-100={!$visible}
+                class:text-pink-500={!$visible}
               >
                 <input
                   type="checkbox"
@@ -245,15 +247,17 @@
                   bind:checked={$visible}
                   class="sr-only peer"
                 />
-                <Opacity />
+                <Opacity closed={!$visible} />
               </label>
             </div>
 
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:bg-gray-50 select-none cursor-pointer w-10 h-10 bg-white/80"
-                class:border-gray-600={$useMask}
-                class:text-gray-500={!$useMask}
+                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-10 h-10 bg-gray-100"
+                class:border-pink-500={!$useMask}
+                class:border-gray-500={$useMask}
+                class:bg-pink-100={!$useMask}
+                class:text-pink-500={!$useMask}
               >
                 <input
                   type="checkbox"
