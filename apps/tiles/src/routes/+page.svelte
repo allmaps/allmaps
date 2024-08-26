@@ -19,9 +19,11 @@
 
   onMount(async () => {
     mounted = true
-    urlStore.subscribe(async ($url) => {
-      tileJson = (await fetchJson($url)) as TileJSONType
-      tileUrl = tileJson.tiles[0]
+    urlStore.subscribe(async ($urls) => {
+      if ($urls.length > 0) {
+        tileJson = (await fetchJson($urls[0])) as TileJSONType
+        tileUrl = tileJson.tiles[0]
+      }
     })
   })
 </script>

@@ -57,22 +57,23 @@
 
   let urlInput: URLInput
 
-  let urlInputValue = ''
+  let urlInputValue: string[] = []
 
   function resetForm() {
     error = null
     annotationString = ''
-    urlInputValue = ''
+    urlInputValue = []
 
     showForm = true
   }
 
   function handleUrlInputValue() {
     urlInputValue = urlInput.getValue()
+    console.log('urlInputValue', urlInputValue)
   }
 
   async function handleSubmit() {
-    if (urlInputValue.trim()) {
+    if (urlInputValue.length > 0) {
       urlInput.submit()
     } else {
       dataStore.set(annotationString)
@@ -133,6 +134,7 @@
     createImageOl()
 
     paramStore.subscribe(async (value) => {
+      // console.log('paramStore', value)
       resetRenderOptionsLayer()
       resetSources()
 
@@ -143,8 +145,11 @@
         showForm = false
 
         try {
-          if (value.type === 'url' && value.url) {
-            await addUrlSource(value.url)
+          if (value.type === 'url' && value.urls && value.urls.length > 0) {
+            for (const url of value.urls) {
+              // console.log('addUrlSource', url)
+              await addUrlSource(url)
+            }
           } else if (value.data) {
             await addStringSource(value.data)
           }

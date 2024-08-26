@@ -16,7 +16,7 @@
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
 
-  let url: string | undefined = get(urlStore)
+  let urls: string[] = get(urlStore)
 
   let loaded = false
   let mounted = false
@@ -28,8 +28,8 @@
 
   onMount(async () => {
     mounted = true
-    urlStore.subscribe((value) => {
-      loadUrl(value)
+    urlStore.subscribe((values) => {
+      loadUrls(values)
     })
   })
 
@@ -37,30 +37,33 @@
     return fetch(url).then((response) => response.json())
   }
 
-  async function loadUrl(newUrl: string) {
-    if (newUrl) {
-      url = newUrl
+  async function loadUrls(newUrls: string[]) {
+    if (newUrls.length > 0) {
+      urls = newUrls
 
       imageUris = new Set()
       loaded = false
       error = undefined
 
       try {
-        const json = await fetchJson(url)
+        for (const url of urls) {
+          const json = await fetchJson(url)
 
-        if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
-          // JSON might be a Georeference Annotation
-          const maps = parseAnnotation(json)
-          type = 'annotation'
-          maps.forEach((map) => addImageUri(map.resource.id))
-          loaded = true
-        } else {
-          // JSON might be IIIF data
-          const parsedIiif = IIIF.parse(json)
-          type = parsedIiif.type
+          if (json.type === 'Annotation' || json.type === 'AnnotationPage') {
+            // JSON might be a Georeference Annotation
+            const maps = parseAnnotation(json)
+            type = 'annotation'
+            maps.forEach((map) => addImageUri(map.resource.id))
+            loaded = true
+          } else {
+            // JSON might be IIIF data
+            const parsedIiif = IIIF.parse(json)
+            type = parsedIiif.type
 
-          addImages(parsedIiif)
+            addImages(parsedIiif)
+          }
         }
+        loaded = true
       } catch (err: unknown) {
         if (err instanceof Error) {
           error = err.message
@@ -69,7 +72,7 @@
         }
       }
     } else {
-      url = undefined
+      urls = []
     }
   }
 
@@ -113,23 +116,23 @@
 
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="IIIF">
-    {#if url}
+    {#if urls.length > 0}
       <URLInput>
         <URLType {type} />
       </URLInput>
     {/if}
   </Header>
-  {#if !url || !loaded || error}
+  {#if !urls.length || !loaded || error}
     <main class="container m-auto p-1 md:p-2">
-      {#if !url && mounted}
+      {#if !urls.length && mounted}
         <URLInput />
       {:else if error}
         <div class="flex flex-col items-center">
           <p>Error: {error}</p>
-          {#if url && !url.endsWith('info.json')}
+          {#if urls.length > 0 && !urls[0].endsWith('info.json')}
             <p>
               If you're loading a IIIF Image, try again by <a
-                href={locationUrlWithInfoJson(url)}
+                href={locationUrlWithInfoJson(urls[0])}
                 >adding <code>info.json</code> to the URL</a
               >.
             </p>

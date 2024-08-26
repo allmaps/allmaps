@@ -18,27 +18,32 @@
   const MAX_URL_PARAM_LENGTH = 2000 - 100
 
   afterNavigate(() => {
-    const newUrl = urlFromUrl()
+    const newUrls = urlFromUrl()
     const newData = dataFromUrl()
 
-    if (newUrl) {
-      $param = {
+    // console.log('newUrls', newUrls)
+    // console.log('newData', newData)
+
+    if (newUrls.length > 0) {
+      param.set({
         type: 'url',
-        url: newUrl
-      }
+        urls: newUrls
+      })
     } else if (newData) {
-      $param = {
+      param.set({
         type: 'data',
         data: newData
-      }
+      })
     } else {
-      $param = null
+      param.set(undefined)
     }
   })
 
   function gotoSearchParams(searchParams: URLSearchParams) {
+    // console.log('gotoSearchParams', searchParams.toString())
+    //return
     goto(`?${searchParams.toString()}`, {
-      replaceState: true,
+      replaceState: false,
       keepFocus: true
     })
   }
@@ -46,12 +51,25 @@
   param.subscribe(($param) => {
     if (browser && $param) {
       const $page = get(page)
+      // console.log('param store', $param)
 
-      if ($param.type === 'url' && $param.url) {
+      if ($param.type === 'url' && $param.urls && $param.urls.length > 0) {
         const searchParams = $page.url.searchParams
+        const searchParamsString = searchParams.toString()
         searchParams.delete('data')
-        searchParams.set('url', $param.url)
-        gotoSearchParams(searchParams)
+        $param.urls.forEach((url, index) => {
+          if (index === 0) {
+            searchParams.set('url', url)
+          } else {
+            searchParams.append('url', url)
+          }
+        })
+        // console.log('searchParams', searchParams.toString())
+        // console.log('searchParamsString', searchParamsString)
+
+        if (searchParamsString !== searchParams.toString()) {
+          gotoSearchParams(searchParams)
+        }
       } else if ($param.type === 'data' && $param.data) {
         if ($param.data.length > MAX_URL_PARAM_LENGTH) {
           // If length of URL + URL parameters is too long, use hash-based parameters
