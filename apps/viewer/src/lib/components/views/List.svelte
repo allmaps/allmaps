@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { mapsBySourceId } from '$lib/shared/stores/maps.js'
+  import { mapsBySourceId, removeAnnotation } from '$lib/shared/stores/maps.js'
   import MapsItem from '$lib/components/dropdowns/MapsItem.svelte'
   import { Copy } from '@allmaps/ui'
   import { selectedMaps } from '$lib/shared/stores/selected.js'
   import { sourcesById } from '$lib/shared/stores/sources.js'
   import { addUrlSource } from '$lib/shared/stores/sources.js'
-  import { IconListDetails } from '@tabler/icons-svelte'
+  import { IconListDetails, IconTrash } from '@tabler/icons-svelte'
 
   const getUrlbyId = (id: string) => {
     return $sourcesById?.get(id)?.url || ''
@@ -25,6 +25,10 @@
 
   const toggleGridCols = () => {
     gridCols = gridCols === 1 ? 2 : 1
+  }
+
+  const deleteMap = (sourceId: string) => {
+    removeAnnotation(sourceId)
   }
 </script>
 
@@ -75,7 +79,15 @@
     <div class="flex flex-col mb-5">
       {#each Object.entries($mapsBySourceId) as [sourceId, maps]}
         <div class="mb-5 p-3 border border-gray-300 rounded-lg bg-gray-50">
-          <Copy string={getUrlbyId(sourceId)} big />
+          <div class="flex flex-row items-center justify-between gap-1">
+            <Copy string={getUrlbyId(sourceId)} big />
+            <button
+              class="p-2 text-sm w-8 font-medium text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-200"
+              on:click={() => deleteMap(sourceId)}
+            >
+              <IconTrash class="w-full h-full" />
+            </button>
+          </div>
 
           <ol class="grid grid-cols-{gridCols} gap-4 mt-3">
             {#each maps as viewerMap}
