@@ -12,7 +12,7 @@
     firstSelectedMapId
   } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
-  // import { view } from '$lib/shared/stores/view.js'
+  import { view } from '$lib/shared/stores/view.js'
   import {
     // mapWarpedMapSource,
     mapWarpedMapLayer
@@ -23,7 +23,7 @@
   import { getHue, fromHue } from '$lib/shared/color.js'
 
   import { fetchImageInfo, getFullResourceMask } from '@allmaps/stdlib'
-
+  import { IconPhoto } from '@tabler/icons-svelte'
   import {
     Thumbnail,
     // Copy,
@@ -227,15 +227,37 @@
       <div>
         <div class="flex flex-row items-center w-full">
           <div class="flex flex-row grow gap-1 items-center">
-            <div class="text-sm font-medium text-gray-900">
+            <!-- <div class="text-sm font-medium text-gray-900">
               Map {viewerMap.index + 1}
-            </div>
+            </div> -->
           </div>
 
           <div class="inline-flex flex-row gap-2 justify-self-end">
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-10 h-10 bg-gray-100"
+                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
+                class:border-pink-500={$selected && $view === 'image'}
+                class:border-gray-500={!$selected || $view === 'list'}
+                class:bg-pink-100={$selected && $view === 'image'}
+                class:text-pink-500={$selected && $view === 'image'}
+              >
+                <input
+                  type="checkbox"
+                  id="image"
+                  checked={$selected && $view === 'image'}
+                  on:click={() => {
+                    $selected = true
+                    $view = $view === 'image' ? 'list' : 'image'
+                  }}
+                  class="sr-only peer"
+                />
+                <IconPhoto />
+              </label>
+            </div>
+
+            <div>
+              <label
+                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
                 class:border-pink-500={!$visible}
                 class:border-gray-500={$visible}
                 class:bg-pink-100={!$visible}
@@ -253,7 +275,7 @@
 
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-10 h-10 bg-gray-100"
+                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
                 class:border-pink-500={!$useMask}
                 class:border-gray-500={$useMask}
                 class:bg-pink-100={!$useMask}
@@ -261,7 +283,7 @@
               >
                 <input
                   type="checkbox"
-                  id="opacity"
+                  id="crop"
                   bind:checked={$useMask}
                   class="sr-only peer"
                 />
@@ -272,7 +294,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
-              class="rounded-full p-1 inline-flex items-center border-2 hover:bg-gray-50 bg-white/80"
+              class="rounded-full p-1 inline-flex items-center border-2 w-9 h-9 bg-gray-100"
               class:border-gray-600={$colorize}
               on:click={() => {
                 $colorize = !$colorize

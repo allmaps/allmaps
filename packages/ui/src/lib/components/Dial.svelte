@@ -33,7 +33,7 @@
 
   export let toggleValue = maxValue
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher()
 
   let container: HTMLElement
 
@@ -230,70 +230,61 @@
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
-<div class="inline-block">
-  <div bind:this={container} class="flex">
-    <div
-      id="tooltip-animation"
-      role="tooltip"
-      bind:this={tooltipTarget}
-      class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip"
+<div bind:this={container} class="flex w-full h-full">
+  <div
+    id="tooltip-animation"
+    role="tooltip"
+    bind:this={tooltipTarget}
+    class="absolute z-10 invisible inline-block px-2 py-1 text-xs text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip"
+  >
+    {label}:
+    <span class="relative inline-block w-8 text-right"
+      >{Math.round(value * 100)}%</span
     >
-      {label}:
-      <span class="relative inline-block w-8 text-right"
-        >{Math.round(value * 100)}%</span
+    <div class="tooltip-arrow" data-popper-arrow />
+  </div>
+
+  <input
+    type="range"
+    class="sr-only peer"
+    bind:value={internalValue}
+    min="0"
+    max="1"
+    {step}
+  />
+
+  <div
+    data-tooltip-target="tooltip-animation"
+    role="slider"
+    aria-valuenow={value}
+    tabindex="0"
+    bind:this={tooltipTrigger}
+    class="select-none relative bg-white w-full h-full peer-focus:outline-none peer-focus:ring peer-focus:ring-pink-500 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
+    on:mousedown={handleMousedown}
+    on:touchstart|passive={handleTouchstart}
+    on:mouseenter={handleMouseenter}
+    on:mouseleave={handleMouseleave}
+  >
+    {#if showDial}
+      <svg
+        aria-hidden="true"
+        style:transform={`rotate(${valueToAngle(internalValue)}deg)`}
+        class="absolute inset-0 transition-transform ease-linear w-full h-full"
+        class:duration-75={!hasMoved}
+        class:duration-0={hasMoved}
+        viewBox="0 0 100 100"
       >
-      <div class="tooltip-arrow" data-popper-arrow />
-    </div>
-
-    <input
-      type="range"
-      class="sr-only peer"
-      bind:value={internalValue}
-      min="0"
-      max="1"
-      {step}
-    />
-
-    <div
-      data-tooltip-target="tooltip-animation"
-      role="slider"
-      aria-valuenow={value}
-      tabindex="0"
-      bind:this={tooltipTrigger}
-      class="select-none relative bg-white w-7 h-7 peer-focus:outline-none peer-focus:ring peer-focus:ring-pink-500 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
-      on:mousedown={handleMousedown}
-      on:touchstart|passive={handleTouchstart}
-      on:mouseenter={handleMouseenter}
-      on:mouseleave={handleMouseleave}
-    >
-      {#if showDial}
-        <svg
-          aria-hidden="true"
-          style:transform={`rotate(${valueToAngle(internalValue)}deg)`}
-          class="absolute inset-0 transition-transform ease-linear w-full h-full"
-          class:duration-75={!hasMoved}
-          class:duration-0={hasMoved}
-          viewBox="0 0 100 100"
-        >
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            fill="none"
-            stroke="black"
-            stroke-width="7"
-          />
-          <line
-            x1="50"
-            y1="40"
-            x2="50"
-            y2="5"
-            stroke="black"
-            stroke-width="7"
-          />
-        </svg>
-      {/if}
-      <slot />
-    </div>
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="black"
+          stroke-width="7"
+        />
+        <line x1="50" y1="40" x2="50" y2="5" stroke="black" stroke-width="7" />
+      </svg>
+    {/if}
+    <slot />
   </div>
 </div>
