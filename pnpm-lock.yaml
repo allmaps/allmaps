@@ -22,19 +22,19 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../../packages/transform
+        version: 1.0.0-beta.40
       commander:
         specifier: ^10.0.0
         version: 10.0.1
@@ -89,13 +89,13 @@ importers:
     dependencies:
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@astrojs/check':
         specifier: ^0.4.1
         version: 0.4.1(typescript@5.4.5)
@@ -129,33 +129,30 @@ importers:
 
   apps/explore:
     dependencies:
+      '@allmaps/basemap':
+        specifier: ^0.0.1
+        version: link:../../packages/basemap
       '@allmaps/maplibre':
         specifier: ^1.0.0-beta.25
-        version: link:../../packages/maplibre
+        version: 1.0.0-beta.29
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
-      maplibre-contour:
-        specifier: ^0.0.7
-        version: 0.0.7
       maplibre-gl:
         specifier: ^4.5.0
         version: 4.5.1
       pmtiles:
         specifier: ^3.0.6
         version: 3.0.7
-      protomaps-themes-base:
-        specifier: ^3.0.1
-        version: 3.0.1
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -213,25 +210,25 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../../packages/transform
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/types
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.3)
@@ -295,16 +292,16 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -365,16 +362,16 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -426,22 +423,22 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../../packages/transform
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/types
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@turf/rewind':
         specifier: ^6.5.0
         version: 6.5.0
@@ -520,13 +517,13 @@ importers:
     devDependencies:
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../../packages/render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/types
+        version: 1.0.0-beta.14
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
         version: 0.3.2
@@ -583,13 +580,13 @@ importers:
     dependencies:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       ol:
         specifier: ^8.2.0
         version: 8.2.0
@@ -650,25 +647,25 @@ importers:
     devDependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../../packages/render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../../packages/transform
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/types
+        version: 1.0.0-beta.14
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
         version: 0.3.2
@@ -725,34 +722,34 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../../packages/id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/openlayers':
         specifier: ^1.0.0-beta.68
-        version: link:../../packages/openlayers
+        version: 1.0.0-beta.72
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../../packages/render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../../packages/stdlib
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.13
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../../packages/transform
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/types
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/ui
+        version: 1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       comlink:
         specifier: ^4.4.1
         version: 4.4.1
@@ -867,11 +864,51 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(zod@3.23.8)
 
+  packages/basemap:
+    dependencies:
+      maplibre-contour:
+        specifier: ^0.0.7
+        version: 0.0.7
+      maplibre-gl:
+        specifier: ^4.5.0
+        version: 4.5.1
+      protomaps-themes-base:
+        specifier: ^3.0.1
+        version: 3.0.1
+    devDependencies:
+      '@maplibre/maplibre-gl-style-spec':
+        specifier: ^19.3.1
+        version: 19.3.3
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.10
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.11.0(@typescript-eslint/parser@7.11.0)(eslint@8.57.0)(typescript@5.4.5)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.11.0(eslint@8.57.0)(typescript@5.4.5)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.0
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.0)
+      mocha:
+        specifier: ^8.4.0
+        version: 8.4.0
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.8
+      typescript:
+        specifier: ^5.0.0
+        version: 5.4.5
+
   packages/id:
     dependencies:
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
     devDependencies:
       '@types/eslint':
         specifier: ^8.56.0
@@ -908,7 +945,7 @@ importers:
     dependencies:
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       zod:
         specifier: ^3.22.4
         version: 3.23.8
@@ -951,19 +988,19 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../annotation
+        version: 1.0.0-beta.29
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../transform
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -1006,10 +1043,10 @@ importers:
     dependencies:
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       maplibre-gl:
         specifier: ^4.5.0
         version: 4.5.1
@@ -1049,10 +1086,10 @@ importers:
     dependencies:
       '@allmaps/render':
         specifier: ^1.0.0-beta.63
-        version: link:../render
+        version: 1.0.0-beta.67
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1095,25 +1132,25 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../annotation
+        version: 1.0.0-beta.29
       '@allmaps/id':
         specifier: ^1.0.0-beta.27
-        version: link:../id
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       '@allmaps/transform':
         specifier: ^1.0.0-beta.38
-        version: link:../transform
+        version: 1.0.0-beta.40
       '@allmaps/triangulate':
         specifier: ^1.0.0-beta.20
-        version: link:../triangulate
+        version: 1.0.0-beta.22
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       '@turf/boolean-point-in-polygon':
         specifier: ^6.5.0
         version: 6.5.0
@@ -1189,7 +1226,7 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../annotation
+        version: 1.0.0-beta.29
       zod:
         specifier: ^3.22.4
         version: 3.23.8
@@ -1226,13 +1263,13 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.27
-        version: link:../annotation
+        version: 1.0.0-beta.29
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       '@placemarkio/geojson-rewind':
         specifier: ^1.0.2
         version: 1.0.2
@@ -1308,7 +1345,7 @@ importers:
     dependencies:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       '@turf/distance':
         specifier: ^6.3.0
         version: 6.5.0
@@ -1321,7 +1358,7 @@ importers:
     devDependencies:
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.10
@@ -1366,10 +1403,10 @@ importers:
     dependencies:
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.28
-        version: link:../stdlib
+        version: 1.0.0-beta.30
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       poly2tri:
         specifier: ^1.5.0
         version: 1.5.0
@@ -1445,13 +1482,13 @@ importers:
     dependencies:
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.37
-        version: link:../iiif-parser
+        version: 1.0.0-beta.39
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../tailwind
+        version: 1.0.0-beta.13
       '@allmaps/types':
         specifier: ^1.0.0-beta.13
-        version: link:../types
+        version: 1.0.0-beta.14
       flowbite:
         specifier: ^1.6.4
         version: 1.8.1
@@ -1521,6 +1558,102 @@ importers:
         version: 5.2.12(@types/node@18.19.33)
 
 packages:
+
+  /@allmaps/annotation@1.0.0-beta.29:
+    resolution: {integrity: sha512-dVihINgL7pAALCnPupIBqUiwykPVPV7I6SRZUT/A20saH+/G4TTuCUC0xsDxncvn0TH1tQQtIfjV9c3WSt8pog==}
+    dependencies:
+      zod: 3.23.8
+
+  /@allmaps/id@1.0.0-beta.29:
+    resolution: {integrity: sha512-V0cL0V0sk9Eqb7VlBj/1KufHiJebPTzF2/1YOklCsWJvU8TokJ3s17WWMQO+2srj0mdIRRXqIYVDWlzv9K3AoA==}
+    engines: {node: '>=v19.0.0'}
+    dependencies:
+      '@allmaps/types': 1.0.0-beta.14
+
+  /@allmaps/iiif-parser@1.0.0-beta.39:
+    resolution: {integrity: sha512-u6s9IXm61YbDqVkHYOL2IcOYVb0of8GPIRFOkZnOqzc6sgB67IbpdPwFIp5gQA8Cvvy9qv4oKHOv8c4L37tIXA==}
+    dependencies:
+      '@allmaps/types': 1.0.0-beta.14
+      zod: 3.23.8
+
+  /@allmaps/maplibre@1.0.0-beta.29:
+    resolution: {integrity: sha512-K0AuF7YTmNWiJm8Os3HM1pf0/NRIYJTQg/6T7P4LamKFCieXTxx2MvnSHzaK6dpmsVmmEIC6T193Y2rKibuYNg==}
+    dependencies:
+      '@allmaps/render': 1.0.0-beta.67
+      '@allmaps/stdlib': 1.0.0-beta.30
+      maplibre-gl: 4.5.1
+    dev: false
+
+  /@allmaps/openlayers@1.0.0-beta.72:
+    resolution: {integrity: sha512-5aZvBTnICdCLgMOM1baS3MGKoeJriFRMoTB2dAjlDDatsTwrgnHOE64TQoRPFR6+Nbs/6cilfeb4Wg67BOWSvg==}
+    dependencies:
+      '@allmaps/render': 1.0.0-beta.67
+      '@allmaps/stdlib': 1.0.0-beta.30
+      lodash-es: 4.17.21
+      ol: 8.2.0
+    dev: false
+
+  /@allmaps/render@1.0.0-beta.67:
+    resolution: {integrity: sha512-rUj/gpkAKX3xrCSXRNGifYmpP5sihTD2pTSikTHdvszjYkGTfXd85OTpJ5tP6Qx+uIKs5A/Jg5UP7vkAd9j7SA==}
+    dependencies:
+      '@allmaps/annotation': 1.0.0-beta.29
+      '@allmaps/id': 1.0.0-beta.29
+      '@allmaps/iiif-parser': 1.0.0-beta.39
+      '@allmaps/stdlib': 1.0.0-beta.30
+      '@allmaps/transform': 1.0.0-beta.40
+      '@allmaps/triangulate': 1.0.0-beta.22
+      '@allmaps/types': 1.0.0-beta.14
+      '@turf/boolean-point-in-polygon': 6.5.0
+      lodash-es: 4.17.21
+      potpack: 2.0.0
+      rbush: 3.0.1
+      robust-point-in-polygon: 1.0.3
+
+  /@allmaps/stdlib@1.0.0-beta.30:
+    resolution: {integrity: sha512-14iabVCISajdlMAV8iihGOEvIEZaI7yp8wxpFWzejeAQKcAGaFRWhVMeZBp8/ujYWNdggv5YzioCPhnQwDpciQ==}
+    dependencies:
+      '@allmaps/annotation': 1.0.0-beta.29
+      '@allmaps/iiif-parser': 1.0.0-beta.39
+      '@allmaps/types': 1.0.0-beta.14
+      '@placemarkio/geojson-rewind': 1.0.2
+      svg-parser: 2.0.4
+
+  /@allmaps/tailwind@1.0.0-beta.13:
+    resolution: {integrity: sha512-XCwAWfrUyHAUN1NdiX9QpzppAjWl4bc94T3Bt+TUMDD+zd579JBcD3fL1EUazA5I0oON4FI4IEQJDDtT4OrB4w==}
+    dev: false
+
+  /@allmaps/transform@1.0.0-beta.40:
+    resolution: {integrity: sha512-FZcKvHQ3h//aWhOSBcQvCuuXTRwn9GIab0sT3wbq74dl2t6OoLXreKSjJfqox/GmOQXSfxj3dRYXjcSNZczZpg==}
+    dependencies:
+      '@allmaps/stdlib': 1.0.0-beta.30
+      '@turf/distance': 6.5.0
+      '@turf/midpoint': 6.5.0
+      ml-matrix: 6.11.0
+
+  /@allmaps/triangulate@1.0.0-beta.22:
+    resolution: {integrity: sha512-dyqKTSNEXB7DGIH2XTNRHHgQjH2epgVmmrlRdcu0Qx3TIEo7TwneCC27NWuT/NPVVn2m5tO4wTAz+UlMSoPL5w==}
+    dependencies:
+      '@allmaps/stdlib': 1.0.0-beta.30
+      '@allmaps/types': 1.0.0-beta.14
+      poly2tri: 1.5.0
+      robust-point-in-polygon: 1.0.3
+
+  /@allmaps/types@1.0.0-beta.14:
+    resolution: {integrity: sha512-5HQfCesCv3PnYGzM+a05IWY3+3S5xqkil3BXK1bHtidfxgNgT0kL1y06waoqQagXTbYISy2o0ap0EF0pTNVRjQ==}
+
+  /@allmaps/ui@1.0.0-beta.31(@sveltejs/kit@2.5.10)(svelte@4.2.17):
+    resolution: {integrity: sha512-DLvllgGKRl9iB2aTAjoZWo37gKul+XKRW82iHbycV9y8VVsJe37TGgXKbCHHWaWBiPPdufLcww/i910sTtKwYA==}
+    peerDependencies:
+      '@sveltejs/kit': ^2.0.0
+      svelte: ^4.2.7
+    dependencies:
+      '@allmaps/iiif-parser': 1.0.0-beta.39
+      '@allmaps/tailwind': 1.0.0-beta.13
+      '@allmaps/types': 1.0.0-beta.14
+      '@sveltejs/kit': 2.5.10(@sveltejs/vite-plugin-svelte@3.1.0)(svelte@4.2.17)(vite@5.2.12)
+      flowbite: 1.8.1
+      svelte: 4.2.17
+    dev: false
 
   /@alloc/quick-lru@5.2.0:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -3208,7 +3341,6 @@ packages:
   /@mapbox/jsonlint-lines-primitives@2.0.2:
     resolution: {integrity: sha512-rY0o9A5ECsTQRVhv7tL/OyDpGAoUB4tTvLiW1DSzQGq4bvTPhNw1VpSNjDJc5GFZ2XuyOtSWSVN05qOtcD71qQ==}
     engines: {node: '>= 0.6'}
-    dev: false
 
   /@mapbox/point-geometry@0.1.0:
     resolution: {integrity: sha512-6j56HdLTwWGO0fJPlrZtdU/B13q8Uwmo18Ck2GnGgN9PCFyKTZ3UbXeEdRFh18i9XQ92eH2VdtpJHpBD3aripQ==}
@@ -3220,7 +3352,6 @@ packages:
 
   /@mapbox/unitbezier@0.0.1:
     resolution: {integrity: sha512-nMkuDXFv60aBr9soUG5q+GvZYL+2KZHVvsqFCzqnkGEf46U2fvmytHaEVc1/YZbiLn8X+eR3QzX1+dwDO1lxlw==}
-    dev: false
 
   /@mapbox/vector-tile@1.3.1:
     resolution: {integrity: sha512-MCEddb8u44/xfQ3oD+Srl/tNcQoqTw3goGk2oLsrFxOTc3dUp+kAnby3PvAeeBYSMSjSPD1nd1AJA6W49WnoUw==}
@@ -3232,6 +3363,18 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
     dev: false
+
+  /@maplibre/maplibre-gl-style-spec@19.3.3:
+    resolution: {integrity: sha512-cOZZOVhDSulgK0meTsTkmNXb1ahVvmTmWmfx9gRBwc6hq98wS9JP35ESIoNq3xqEan+UN+gn8187Z6E4NKhLsw==}
+    hasBin: true
+    dependencies:
+      '@mapbox/jsonlint-lines-primitives': 2.0.2
+      '@mapbox/unitbezier': 0.0.1
+      json-stringify-pretty-compact: 3.0.0
+      minimist: 1.2.8
+      rw: 1.3.3
+      sort-object: 3.0.3
+    dev: true
 
   /@maplibre/maplibre-gl-style-spec@20.3.0:
     resolution: {integrity: sha512-eSiQ3E5LUSxAOY9ABXGyfNhout2iEa6mUxKeaQ9nJ8NL1NuaQYU7zKqzx/LEYcXe1neT4uYAgM1wYZj3fTSXtA==}
@@ -3753,11 +3896,9 @@ packages:
 
   /@placemarkio/geojson-rewind@1.0.2:
     resolution: {integrity: sha512-ulBdZOCvKlUIe9v+/PDVfe4wDvfkJRzRXstGEHbAJGiUN8IDYw3wD3156DcN/rO9DiHfjcF8KUQlQ7iiMd+rrA==}
-    dev: false
 
   /@polka/url@1.0.0-next.25:
     resolution: {integrity: sha512-j7P6Rgr3mmtdkeDGTe0E/aYyWEWVtc5yFXtHCRHs28/jptDEWfaVOc5T7cblqy1XKPPfCxJc/8DwQ5YgLOZOVQ==}
-    dev: true
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -4025,7 +4166,6 @@ packages:
       svelte: 4.2.17
       tiny-glob: 0.2.9
       vite: 5.2.12(@types/node@18.19.33)
-    dev: true
 
   /@sveltejs/package@2.3.1(svelte@4.2.17)(typescript@5.4.5):
     resolution: {integrity: sha512-JvR2J4ost1oCn1CSdqenYRwGX/1RX+7LN+VZ71aPnz3JAlIFaEKQd1pBxlb+OSQTfeugJO0W39gB9voAbBO5ow==}
@@ -4120,7 +4260,6 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/boolean-clockwise@6.5.0:
     resolution: {integrity: sha512-45+C7LC5RMbRWrxh3Z0Eihsc8db1VGBO5d9BLTOAwU4jR6SgsunTfRWR16X7JUwIDYlCVEmnjcXJNi/kIU3VIw==}
@@ -4134,7 +4273,6 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/clone@6.5.0:
     resolution: {integrity: sha512-mzVtTFj/QycXOn6ig+annKrM6ZlimreKYz6f/GSERytOpgzodbQyOgkfwru100O1KQhhjSudKK4DsQ0oyi9cTw==}
@@ -4147,24 +4285,20 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/distance@6.5.0:
     resolution: {integrity: sha512-xzykSLfoURec5qvQJcfifw/1mJa+5UwByZZ5TZ8iaqjGYN0vomhV9aiSLeYdUGtYRESZ+DYC/OzY+4RclZYgMg==}
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/helpers@6.5.0:
     resolution: {integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==}
-    dev: false
 
   /@turf/invariant@6.5.0:
     resolution: {integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==}
     dependencies:
       '@turf/helpers': 6.5.0
-    dev: false
 
   /@turf/meta@6.5.0:
     resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
@@ -4179,7 +4313,6 @@ packages:
       '@turf/destination': 6.5.0
       '@turf/distance': 6.5.0
       '@turf/helpers': 6.5.0
-    dev: false
 
   /@turf/rewind@6.5.0:
     resolution: {integrity: sha512-IoUAMcHWotBWYwSYuYypw/LlqZmO+wcBpn8ysrBNbazkFNkLf3btSDZMkKJO/bvOzl55imr/Xj4fi3DdsLsbzQ==}
@@ -5118,7 +5251,6 @@ packages:
   /arr-union@3.1.0:
     resolution: {integrity: sha512-sKpyeERZ02v1FeCZT8lrfJq5u6goHCtpTAzPwJYe7c8SPFOboNjNg1vz2L4VTn9T4PQxEx13TbXLmYUcS6Ug7Q==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /array-differ@3.0.0:
     resolution: {integrity: sha512-THtfYS6KtME/yIAhKjZ2ul7XI96lQGHRputJQHO80LAWQnuGP4iCIN8vdMRboGbIEYBwU33q8Tch1os2+X0kMg==}
@@ -5161,7 +5293,6 @@ packages:
   /assign-symbols@1.0.0:
     resolution: {integrity: sha512-Q+JC7Whu8HhmTdBph/Tq59IoRtoy6KAm5zzPv00WdujX82lbAL8K7WVjne7vdCsAmbF4AYaDOPyO3k0kl8qIrw==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /astring@1.8.6:
     resolution: {integrity: sha512-ISvCdHdlTDlH5IpxQJIex7BWBywFWgjJSVdwst+/iQCoEYnyOaQ95+X1JGshuBjGp6nxKUy1jMgE3zPqN7fQdg==}
@@ -5477,14 +5608,12 @@ packages:
     resolution: {integrity: sha512-nZD//kc78OOxeYtRlVk8/zXqTB4gf/nlguL1ggWA8FuchMyOxcyHR4QPQZMUmA7czC+YnaBrPUCubqAWe50DaA==}
     dependencies:
       typewise-core: 1.2.0
-    dev: false
 
   /bytewise@1.1.0:
     resolution: {integrity: sha512-rHuuseJ9iQ0na6UDhnrRVDh8YnWVlU6xM3VH6q/+yHDeUH2zIhUzP+2/h3LIrhLDBtTqzWpE3p3tP/boefskKQ==}
     dependencies:
       bytewise-core: 1.2.3
       typewise: 1.0.3
-    dev: false
 
   /cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
@@ -6724,7 +6853,6 @@ packages:
 
   /esm-env@1.0.0:
     resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
-    dev: true
 
   /espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
@@ -6881,7 +7009,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       is-extendable: 0.1.1
-    dev: false
 
   /extend-shallow@3.0.2:
     resolution: {integrity: sha512-BwY5b5Ql4+qZoefgMj2NUmx+tehVTH/Kf4k1ZEtOHNFcm2wSxMRo992l6X3TIgni2eZVTZ85xMOjF31fwZAj6Q==}
@@ -6889,7 +7016,6 @@ packages:
     dependencies:
       assign-symbols: 1.0.0
       is-extendable: 1.0.1
-    dev: false
 
   /extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
@@ -7223,7 +7349,6 @@ packages:
   /get-value@2.0.6:
     resolution: {integrity: sha512-Ln0UQDlxH1BapMu3GPtf7CuYNwRZf2gwCuPqbyG6pB8WfmFpzqcy4xtAaAMUhnNqjMKTiCPZG2oMT3YSx8U2NA==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /git-raw-commits@3.0.0:
     resolution: {integrity: sha512-b5OHmZ3vAgGrDn/X0kS+9qCfNKWe4K/jFnhwzVWWg0/k5eLa3060tZShrRg8Dja5kPc+YjS0Gc6y7cRr44Lpjw==}
@@ -7403,7 +7528,6 @@ packages:
 
   /globalyzer@0.1.0:
     resolution: {integrity: sha512-40oNTM9UfG6aBmuKxk/giHn5nQ8RVz/SS4Ir6zgzOv9/qC3kKZ9v4etGTcJbEl/NyVQH7FGU7d+X1egr57Md2Q==}
-    dev: true
 
   /globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
@@ -7419,7 +7543,6 @@ packages:
 
   /globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
-    dev: true
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
@@ -8008,7 +8131,6 @@ packages:
 
   /is-any-array@2.0.1:
     resolution: {integrity: sha512-UtilS7hLRu++wb/WBAw9bNuP1Eg04Ivn1vERJck8zJthEvXCBEBpGR/33u/xLKWEQf95803oalHrVDptcAvFdQ==}
-    dev: false
 
   /is-arrayish@0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
@@ -8059,14 +8181,12 @@ packages:
   /is-extendable@0.1.1:
     resolution: {integrity: sha512-5BMULNob1vgFX6EjQw5izWDxrecWK9AM72rugNr0TFldMOi0fj6Jk+zeKIt0xGj4cEfQIJth4w3OKWOJ4f+AFw==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /is-extendable@1.0.1:
     resolution: {integrity: sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA==}
     engines: {node: '>=0.10.0'}
     dependencies:
       is-plain-object: 2.0.4
-    dev: false
 
   /is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -8347,6 +8467,10 @@ packages:
 
   /json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+    dev: true
+
+  /json-stringify-pretty-compact@3.0.0:
+    resolution: {integrity: sha512-Rc2suX5meI0S3bfdZuA7JMFBGkJ875ApfVyq2WHELjBiiG22My/l7/8zPpH/CfFVQHuVLd8NLR0nv6vi0BYYKA==}
     dev: true
 
   /json-stringify-pretty-compact@4.0.0:
@@ -8664,7 +8788,6 @@ packages:
 
   /lodash-es@4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
 
   /lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
@@ -10133,13 +10256,11 @@ packages:
     resolution: {integrity: sha512-BlEeg80jI0tW6WaPyGxf5Sa4sqvcyY6lbSn5Vcv44lp1I2GR6AWojfUvLnGTNsIXrZ8uqWmo8VcG1WpkI2ONMQ==}
     dependencies:
       is-any-array: 2.0.1
-    dev: false
 
   /ml-array-min@1.2.3:
     resolution: {integrity: sha512-VcZ5f3VZ1iihtrGvgfh/q0XlMobG6GQ8FsNyQXD3T+IlstDv85g8kfV0xUG1QPRO/t21aukaJowDzMTc7j5V6Q==}
     dependencies:
       is-any-array: 2.0.1
-    dev: false
 
   /ml-array-rescale@1.3.7:
     resolution: {integrity: sha512-48NGChTouvEo9KBctDfHC3udWnQKNKEWN0ziELvY3KG25GR5cA8K8wNVzracsqSW1QEkAXjTNx+ycgAv06/1mQ==}
@@ -10147,14 +10268,12 @@ packages:
       is-any-array: 2.0.1
       ml-array-max: 1.2.4
       ml-array-min: 1.2.3
-    dev: false
 
   /ml-matrix@6.11.0:
     resolution: {integrity: sha512-7jr9NmFRkaUxbKslfRu3aZOjJd2LkSitCGv+QH9PF0eJoEG7jIpjXra1Vw8/kgao8+kHCSsJONG6vfWmXQ+/Eg==}
     dependencies:
       is-any-array: 2.0.1
       ml-array-rescale: 1.3.7
-    dev: false
 
   /mlly@1.7.0:
     resolution: {integrity: sha512-U9SDaXGEREBYQgfejV97coK0UL1r+qnF2SyO9A3qcI8MzKnsIFKHNVEkrDyNncQTKQQumsasmeq84eNMdBfsNQ==}
@@ -10205,7 +10324,6 @@ packages:
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
-    dev: true
 
   /mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
@@ -11213,7 +11331,6 @@ packages:
 
   /poly2tri@1.5.0:
     resolution: {integrity: sha512-5yACqznqRrlFA9RhdWyD2blNPVhlB3qK+iRYJCfHtJGINb+XNBgKTw+pJOsJZ+oaGxFsIyFmOVapuREHnRhXPg==}
-    dev: false
 
   /postcss-import@15.1.0(postcss@8.4.38):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
@@ -11323,7 +11440,6 @@ packages:
 
   /potpack@2.0.0:
     resolution: {integrity: sha512-Q+/tYsFU9r7xoOJ+y/ZTtdVQwTWfzjbiXBDMM/JKUux3+QPP02iUuIoeBQ+Ot6oEDlC+/PGjB/5A3K7KKb7hcw==}
-    dev: false
 
   /prebuild-install@7.1.2:
     resolution: {integrity: sha512-UnNke3IQb6sgarcZIDU3gbMeTp/9SSU1DAIkil7PrqG1vZlBtY5msYccSKSHDqa3hNg436IXK+SNImReuA1wEQ==}
@@ -11500,7 +11616,6 @@ packages:
 
   /quickselect@2.0.0:
     resolution: {integrity: sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==}
-    dev: false
 
   /quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
@@ -11516,7 +11631,6 @@ packages:
     resolution: {integrity: sha512-XRaVO0YecOpEuIvbhbpTrZgoiI6xBlz6hnlr6EHhd+0x9ase6EmeN+hdwwUaJvLcsFFQ8iWVF1GAK1yB0BWi0w==}
     dependencies:
       quickselect: 2.0.0
-    dev: false
 
   /rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -11990,28 +12104,23 @@ packages:
       robust-subtract: 1.0.0
       robust-sum: 1.0.0
       two-product: 1.0.2
-    dev: false
 
   /robust-point-in-polygon@1.0.3:
     resolution: {integrity: sha512-pPzz7AevOOcPYnFv4Vs5L0C7BKOq6C/TfAw5EUE58CylbjGiPyMjAnPLzzSuPZ2zftUGwWbmLWPOjPOz61tAcA==}
     dependencies:
       robust-orientation: 1.2.1
-    dev: false
 
   /robust-scale@1.0.2:
     resolution: {integrity: sha512-jBR91a/vomMAzazwpsPTPeuTPPmWBacwA+WYGNKcRGSh6xweuQ2ZbjRZ4v792/bZOhRKXRiQH0F48AvuajY0tQ==}
     dependencies:
       two-product: 1.0.2
       two-sum: 1.0.0
-    dev: false
 
   /robust-subtract@1.0.0:
     resolution: {integrity: sha512-xhKUno+Rl+trmxAIVwjQMiVdpF5llxytozXJOdoT4eTIqmqsndQqFb1A0oiW3sZGlhMRhOi6pAD4MF1YYW6o/A==}
-    dev: false
 
   /robust-sum@1.0.0:
     resolution: {integrity: sha512-AvLExwpaqUqD1uwLU6MwzzfRdaI6VEZsyvQ3IAQ0ZJ08v1H+DTyqskrf2ZJyh0BDduFVLN7H04Zmc+qTiahhAw==}
-    dev: false
 
   /rollup-plugin-inject@3.0.2:
     resolution: {integrity: sha512-ptg9PQwzs3orn4jkgXJ74bfs5vYz1NCZlSQMBUA0wKcGp5i5pA1AO3fOUEte8enhGUC+iapTCzEWw2jEFFUO/w==}
@@ -12071,7 +12180,6 @@ packages:
 
   /rw@1.3.3:
     resolution: {integrity: sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==}
-    dev: false
 
   /rxjs@7.8.1:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
@@ -12084,7 +12192,6 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       mri: 1.2.0
-    dev: true
 
   /safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -12197,7 +12304,6 @@ packages:
 
   /set-cookie-parser@2.6.0:
     resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
-    dev: true
 
   /set-value@2.0.1:
     resolution: {integrity: sha512-JxHc1weCN68wRY0fhCoXpyK55m/XPHafOmK4UWD7m2CI14GMcFypt4w/0+NV5f/ZMby2F6S2wwA7fgynh9gWSw==}
@@ -12207,7 +12313,6 @@ packages:
       is-extendable: 0.1.1
       is-plain-object: 2.0.4
       split-string: 3.1.0
-    dev: false
 
   /shallow-clone@3.0.1:
     resolution: {integrity: sha512-/6KqX+GVUdqPuPPd2LxDDxzX6CAbjJehAAOKlNpqqUpAqPM6HeL8f+o3a+JsyGjn2lv0WY8UsTgUJjU9Ok55NA==}
@@ -12334,7 +12439,6 @@ packages:
       '@polka/url': 1.0.0-next.25
       mrmime: 2.0.0
       totalist: 3.0.1
-    dev: true
 
   /sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
@@ -12393,12 +12497,10 @@ packages:
   /sort-asc@0.2.0:
     resolution: {integrity: sha512-umMGhjPeHAI6YjABoSTrFp2zaBtXBej1a0yKkuMUyjjqu6FJsTF+JYwCswWDg+zJfk/5npWUUbd33HH/WLzpaA==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /sort-desc@0.2.0:
     resolution: {integrity: sha512-NqZqyvL4VPW+RAxxXnB8gvE1kyikh8+pR+T+CXLksVRN9eiQqkQlPwqWYU0mF9Jm7UnctShlxLyAt1CaBOTL1w==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /sort-keys@2.0.0:
     resolution: {integrity: sha512-/dPCrG1s3ePpWm6yBbxZq5Be1dXGLyLn9Z791chDC3NFrpkVbWGzkBwPN1knaciexFXgRJ7hzdnwZ4stHSDmjg==}
@@ -12417,7 +12519,6 @@ packages:
       sort-asc: 0.2.0
       sort-desc: 0.2.0
       union-value: 1.0.1
-    dev: false
 
   /source-map-js@1.2.0:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
@@ -12468,7 +12569,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       extend-shallow: 3.0.2
-    dev: false
 
   /split2@3.2.2:
     resolution: {integrity: sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==}
@@ -12902,7 +13002,6 @@ packages:
 
   /svg-parser@2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
-    dev: false
 
   /tailwindcss@3.4.3:
     resolution: {integrity: sha512-U7sxQk/n397Bmx4JHbJx/iSOOv5G+II3f1kpLpY2QeUv5DcPdcTsYLlusZfq1NthHS1c1cZoyFmmkex1rzke0A==}
@@ -13024,7 +13123,6 @@ packages:
     dependencies:
       globalyzer: 0.1.0
       globrex: 0.1.2
-    dev: true
 
   /tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -13081,7 +13179,6 @@ packages:
   /totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
     engines: {node: '>=6'}
-    dev: true
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
@@ -13191,11 +13288,9 @@ packages:
 
   /two-product@1.0.2:
     resolution: {integrity: sha512-vOyrqmeYvzjToVM08iU52OFocWT6eB/I5LUWYnxeAPGXAhAxXYU/Yr/R2uY5/5n4bvJQL9AQulIuxpIsMoT8XQ==}
-    dev: false
 
   /two-sum@1.0.0:
     resolution: {integrity: sha512-phP48e8AawgsNUjEY2WvoIWqdie8PoiDZGxTDv70LDr01uX5wLEQbOgSP7Z/B6+SW5oLtbe8qaYX2fKJs3CGTw==}
-    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -13274,13 +13369,11 @@ packages:
 
   /typewise-core@1.2.0:
     resolution: {integrity: sha512-2SCC/WLzj2SbUwzFOzqMCkz5amXLlxtJqDKTICqg30x+2DZxcfZN2MvQZmGfXWKNWaKK9pBPsvkcwv8bF/gxKg==}
-    dev: false
 
   /typewise@1.0.3:
     resolution: {integrity: sha512-aXofE06xGhaQSPzt8hlTY+/YWQhm9P0jYUp1f2XtmW/3Bk0qzXcyFWAtPoo2uTGQj1ZwbDuSyuxicq+aDo8lCQ==}
     dependencies:
       typewise-core: 1.2.0
-    dev: false
 
   /ufo@1.5.3:
     resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
@@ -13351,7 +13444,6 @@ packages:
       get-value: 2.0.6
       is-extendable: 0.1.1
       set-value: 2.0.1
-    dev: false
 
   /unique-filename@2.0.1:
     resolution: {integrity: sha512-ODWHtkkdx3IAR+veKxFV+VBkUMcN+FaqzUUd7IZzt+0zhDZFPFxhlqwPF3YQvMHx1TD0tdgYl+kuPnJ8E6ql7A==}
