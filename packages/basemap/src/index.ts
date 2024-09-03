@@ -1,7 +1,8 @@
-import layers from 'protomaps-themes-base'
+import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
 import maplibregl from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
+import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
 
 export function basemapStyle():StyleSpecification {
   return {
@@ -20,7 +21,7 @@ export function basemapStyle():StyleSpecification {
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layers('protomaps', 'light')
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME)
   }
 }
 
@@ -69,9 +70,9 @@ export function addTerrain(map: maplibregl.Map) {
         source: 'terrain',
         paint: {
           'hillshade-exaggeration': 0.6,
-          'hillshade-shadow-color': '#bbb',
-          'hillshade-highlight-color': 'white',
-          'hillshade-accent-color': 'green'
+          'hillshade-shadow-color': TERRAIN_THEME.hillshade_shadow_color,
+          'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
+          'hillshade-accent-color': TERRAIN_THEME.hillshade_accent_color
         }
       },
       'water'
@@ -85,7 +86,8 @@ export function addTerrain(map: maplibregl.Map) {
         'source-layer': 'contours',
         paint: {
           // level = highest index in thresholds array the elevation is a multiple of
-          'line-width': ['match', ['get', 'level'], 1, 1, 0.5]
+          'line-width': ['match', ['get', 'level'], 1, 1, 0.5],
+          'line-color': TERRAIN_THEME.contour_line_color
         }
       },
       'water'
