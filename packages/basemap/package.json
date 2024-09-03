@@ -1,0 +1,62 @@
+{
+  "name": "@allmaps/basemap",
+  "version": "0.0.1",
+  "author": {
+    "name": "Brandon Liu",
+    "email": "brandon@protomaps.com",
+    "url": "https://protomaps.com"
+  },
+  "description": "Allmaps Basemap style for MapLibre",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/basemap"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "protomaps"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "preversion": "pnpm run types && pnpm run lint && pnpm test",
+    "test": "NODE_ENV=test mocha",
+    "pretest": "pnpm run build"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "mocha": "^8.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0",
+    "@maplibre/maplibre-gl-style-spec": "^19.3.1"
+  },
+  "dependencies": {
+    "maplibre-contour": "^0.0.7",
+    "protomaps-themes-base": "^3.0.1",
+    "maplibre-gl": "^4.5.0"
+  }
+}
