@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.64",
+  "version": "1.0.0-beta.65",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -29,7 +29,7 @@
     "@allmaps/annotation": "^1.0.0-beta.29",
     "@allmaps/id": "^1.0.0-beta.29",
     "@allmaps/iiif-parser": "^1.0.0-beta.39",
-    "@allmaps/render": "^1.0.0-beta.65",
+    "@allmaps/render": "^1.0.0-beta.66",
     "@allmaps/stdlib": "^1.0.0-beta.30",
     "@allmaps/transform": "^1.0.0-beta.40",
     "@allmaps/types": "^1.0.0-beta.14",
