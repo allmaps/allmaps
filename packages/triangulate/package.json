@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/triangulate",
-  "version": "1.0.0-beta.20",
+  "version": "1.0.0-beta.22",
   "author": {
     "name": "Manuel Claeys Bouuaert",
     "email": "manuel.claeys.b@gmail.com",
@@ -37,7 +37,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "bench": "node bench/index.js",
-    "build": "tsc && npm run documentation",
+    "build": "tsc",
     "preversion": "pnpm run types && pnpm run lint && pnpm test",
     "test": "NODE_ENV=test mocha",
     "pretest": "pnpm run build",
@@ -48,8 +48,8 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.28",
-    "@allmaps/types": "^1.0.0-beta.13",
+    "@allmaps/stdlib": "^1.0.0-beta.30",
+    "@allmaps/types": "^1.0.0-beta.14",
     "poly2tri": "^1.5.0",
     "robust-point-in-polygon": "^1.0.3"
   },
@@ -65,6 +65,6 @@
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.5.4"
   }
 }

@@ -1,4 +1,4 @@
-import { AutoRouter, error, cors } from 'itty-router'
+import { AutoRouter, error, cors, IRequestStrict } from 'itty-router'
 
 import { createWarpedTileResponse } from './warped-tile-response.js'
 import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
@@ -16,9 +16,11 @@ type Env = {
   TILE_VIEWER_BASE_URL: string
 }
 
+type CFArgs = [Env, ExecutionContext]
+
 const { preflight, corsify } = cors()
 
-const router = AutoRouter({
+const router = AutoRouter<IRequestStrict, CFArgs>({
   before: [preflight],
   finally: [corsify, headers, put]
 })
