@@ -91,7 +91,6 @@ export default function generate() {
         imageFilename,
         basename,
         options.outputDir,
-        map,
         gcps,
         polygon,
         transformationType,
