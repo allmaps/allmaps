@@ -58,7 +58,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   renderOptions: RenderOptions = {}
 
   cachedTilesTextureArray: WebGLTexture | null
-  cachedTilesPositionsTexture: WebGLTexture | null
   cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
   cachedTilesScaleFactorsTexture: WebGLTexture | null
 
@@ -92,7 +91,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.cachedTilesTextureArray = gl.createTexture()
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
-    this.cachedTilesPositionsTexture = gl.createTexture()
     this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
     this.throttledUpdateTextures = throttle(
@@ -136,7 +134,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.deleteVertexArray(this.vao)
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
-    this.gl.deleteTexture(this.cachedTilesPositionsTexture)
     this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
   }
 
@@ -230,6 +227,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private async updateTextures() {
     const gl = this.gl
 
+    if (!this.hasImageInfo()) {
+      return
+    }
+
     if (this.CachedTilesByTileUrl.size === 0) {
       return
     }
@@ -251,11 +252,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Cached tiles texture array
 
-    // TODO: do this earlier
-    if (!this.hasImageInfo()) {
-      return
-    }
-    // TODO: do this earlier, in WarpedMapWithImageInfo for example
     const maxTileWidth = Math.max(
       ...this.parsedImage.tileZoomLevels.map((size) => size.width)
     )
@@ -278,7 +274,24 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       null
     )
     for (let i = 0; i < cachedTiles.length; i++) {
-      const imageBitmap = cachedTiles[i].data
+      let imageBitmap = cachedTiles[i].data
+
+      // Tiles are not guaranteed to respect the width and height
+      // But the texture array requires the bitmaps to be of the specified size
+      // So crop if needed
+      if (
+        imageBitmap.height > maxTileHeight ||
+        imageBitmap.width > maxTileWidth
+      ) {
+        imageBitmap = await createImageBitmap(
+          imageBitmap,
+          0,
+          0,
+          maxTileHeight,
+          maxTileHeight
+        )
+      }
+
       gl.texSubImage3D(
         gl.TEXTURE_2D_ARRAY,
         0,
