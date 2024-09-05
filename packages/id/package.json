@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.28",
+  "version": "1.0.0-beta.29",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -51,7 +51,7 @@
   },
   "homepage": "https://allmaps.org",
   "dependencies": {
-    "@allmaps/types": "^1.0.0-beta.13"
+    "@allmaps/types": "^1.0.0-beta.14"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",

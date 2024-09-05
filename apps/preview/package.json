@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/preview",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Allmaps Preview",
   "private": true,
   "author": {
@@ -26,9 +26,9 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@allmaps/render": "^1.0.0-beta.64",
-    "@allmaps/stdlib": "^1.0.0-beta.29",
-    "@allmaps/types": "^1.0.0-beta.13",
+    "@allmaps/render": "^1.0.0-beta.65",
+    "@allmaps/stdlib": "^1.0.0-beta.30",
+    "@allmaps/types": "^1.0.0-beta.14",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/vitest-pool-workers": "^0.1.0",
     "@cloudflare/workers-types": "^4.20240320.1",
