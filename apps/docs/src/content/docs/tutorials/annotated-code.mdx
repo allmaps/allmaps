@@ -13,7 +13,10 @@ This is the annotated code block.
 
 <AnnotationCodeBlock
   client:only="svelte"
-  codeFile="hello"
+  code="const hi = 'yo'
+  for (int i = 0 ; i < 20; i++) {
+     console.log()
+     }"
   includePlaceholder={true}
 >
   <Annotation highlight={[1]}>Notes can be written in the MDX</Annotation>
@@ -27,7 +30,6 @@ This is the annotated code block.
     But custom icons if we want them still need to be added :)
 
     Also maybe styling should change to accomodate the smaller surface size. (and :::note doesn't work!)
-
     
   </Annotation>
   <Annotation highlight={[4, 5]}>
@@ -47,7 +49,11 @@ This is the annotated code block.
 
 <AnnotationCodeBlock
   client:only="svelte"
-  codeFile="hello"
+  includePlaceholder={true}
+  code="const hi = 'yo'
+  for (int i = 0 ; i < 20; i++) {
+     console.log()
+     }"
   includePlaceholder={true}
 >
 <Annotation>

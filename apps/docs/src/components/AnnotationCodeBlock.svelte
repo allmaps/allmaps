@@ -3,32 +3,25 @@
   import Annotation from './Annotation.svelte'
   import StyledCodeBlock from './StyledCodeBlock.svelte'
 
-  export let codeFile: string
   export let includePlaceholder = false
-  let code: string | null = null
+  export let code: string
   let codeBlock: HTMLElement | null = null
 
   let annotationParent: Element | null = null
+
   // This might not be 0 depending on if the page loaded in pre-scrolled
   let currentAnnotationIdx: number = 0
   let inCodeBlock = false
   let annotations: Element[] = []
   let hasHighlightedFirstTime = false
 
+  // Height for an invisible annotation that gets added to the end
   let placeholderHeight = 100
+
   // This buffer value needs to change if the width is smaller (because another toolbar gets added.)
   const bufferTop = 100
   let originalPosition = 0
   let screenHeight = 0
-
-  // This Astro Endpoint is returning a fixed string, but it should be updated to return the contents of the file
-  const fetchCodeFile = async () => {
-    const c = await fetch(`/hello.json`)
-    const json = await c.json()
-    code = json.code
-  }
-
-  fetchCodeFile()
 
   // Remove the highlight-line class off all lines
   const clearHighlightedLines = () => {
@@ -136,7 +129,6 @@
     }
 
     // This highlights the first annotation's lines after making sure everything has been loaded.
-    // Not the best solution, should be fixed!
     if (
       currentAnnotationIdx == 0 &&
       codeBlock &&
@@ -168,7 +160,6 @@
         0,
         -1
       )
-      // VVN TODO make this less of a headache
       // Highlight the first annotation
       annotations[0].style.filter =
         'saturate(1) brightness(1) drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1))'
