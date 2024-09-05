@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.73",
+  "version": "1.0.0-beta.74",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -30,8 +30,8 @@
     "@allmaps/annotation": "^1.0.0-beta.29",
     "@allmaps/id": "^1.0.0-beta.29",
     "@allmaps/iiif-parser": "^1.0.0-beta.39",
-    "@allmaps/openlayers": "^1.0.0-beta.71",
-    "@allmaps/render": "^1.0.0-beta.66",
+    "@allmaps/openlayers": "^1.0.0-beta.72",
+    "@allmaps/render": "^1.0.0-beta.67",
     "@allmaps/stdlib": "^1.0.0-beta.30",
     "@allmaps/tailwind": "^1.0.0-beta.13",
     "@allmaps/transform": "^1.0.0-beta.40",
