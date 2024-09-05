@@ -1,20 +1,20 @@
 <script lang="ts">
   import { generateId } from '@allmaps/id'
 
-  import { codeToHtml } from 'shiki'
   let userUrl: string | null = null
   let hash: string | null = null
   let type: string | null = 'images'
-  import { onMount } from 'svelte'
+
+  let stylizedCode: string = ''
   import {
     IIIF,
     Image as IIIFImage,
     Manifest as IIIFManifest,
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
+  import { codeToHtml } from 'shiki'
   import StyledCodeBlock from './StyledCodeBlock.svelte'
   let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
-  let code: ''
   let editorHover: boolean = false
   let viewerHover: boolean = false
   let hashHover: boolean = false
@@ -22,9 +22,9 @@
   let fileJson: string | null = null
   let updatedCode: string = 'console.log("first load")'
   const loadUrl = () => {
-    //VVN TODO do i need to sanitize userUrl
+    // TODO perhaps the userUrl should be sanitized?
+
     // Figure out what kind of URL it is
-    console.log('load url clicked')
     if (isIIIFResourceUrl(userUrl)) {
       loadId()
       // Get URI
@@ -34,15 +34,7 @@
     } else {
       // Not a valid URL
     }
-
-    // Populate fields based on that
-
-    hash = '5dece1679edba0dd'
   }
-
-  onMount(() => {
-    updatedCode = 'console.log("hello")'
-  })
 
   const isIIIFResourceUrl = (u) => {
     return true
@@ -57,10 +49,13 @@
   }
 
   const loadId = async () => {
+    if (!userUrl) return
     let json = await fetch(userUrl).then((response) => response.json())
+    console.log('in load id')
     parsedIiif = IIIF.parse(json)
     fileJson = JSON.stringify(json, null, 2)
-    code = await codeToHtml(fileJson, {
+
+    stylizedCode = await codeToHtml(fileJson, {
       lang: 'json',
       theme: 'nord'
     })
@@ -99,8 +94,8 @@
     IIIF manifests can be loaded into Allmaps to georeference maps.
   </div>
   <div class="w-full mt-4 h-64 overflow-y-auto bg-[#2e3440ff]">
-    {#if fileJson}
-      <StyledCodeBlock code={fileJson} lang="json" />
+    {#if hash}
+      {@html stylizedCode}
     {/if}
   </div>
   <div class="flex flex-row gap-4 mt-4">
@@ -118,7 +113,7 @@
         {parsedIiif ? hash : 'no url'}
       </div>
       <div class="italic text-sm font-thin text-gray-600">
-        <!-- This needs to be a localized string VVN TODO -->
+        <!-- TODO This needs to be a localized string -->
         This hash is used to load the manifest in the Allmaps Editor and viewer
       </div>
     </div>

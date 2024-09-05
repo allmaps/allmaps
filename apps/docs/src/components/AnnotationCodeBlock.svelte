@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import Annotation from './Annotation.svelte'
-  import StyledCodeBlock from './StyledCodeBlock.svelte'
+  import { codeToHtml } from 'shiki'
 
   export let includePlaceholder = false
   export let code: string
   let codeBlock: HTMLElement | null = null
+  let stylizedCode: string = ''
 
   let annotationParent: Element | null = null
 
@@ -18,7 +19,7 @@
   // Height for an invisible annotation that gets added to the end
   let placeholderHeight = 100
 
-  // This buffer value needs to change if the width is smaller (because another toolbar gets added.)
+  // TODO: This buffer value needs to change if the width is smaller (because another toolbar gets added.)
   const bufferTop = 100
   let originalPosition = 0
   let screenHeight = 0
@@ -145,6 +146,17 @@
     }
   }
 
+  const updateCodeStyle = async () => {
+    stylizedCode = await codeToHtml(code, {
+      lang: 'json',
+      theme: 'nord'
+    })
+  }
+
+  $: {
+    updateCodeStyle()
+  }
+
   $: {
     // If the last annotation is shorter than a page height, we need to add a placeholder block thats the screenheight - lastannotation height
     if (annotations && screenHeight)
@@ -183,9 +195,7 @@
     class={` bg-[#2e3440ff] text-white font-mono h-[calc(90vh-var(--sl-nav-height))] z-10  ${inCodeBlock ? 'sticky w-8/12 pl-1 top-4' : 'absolute w-9/12 pl-16 top-4'}  p-2 right-0 `}
     bind:this={codeBlock}
   >
-    {#if code}
-      <StyledCodeBlock {code} />
-    {/if}
+    {@html stylizedCode}
   </div>
 </div>
 

@@ -6,7 +6,7 @@
 
   // Logic needs to be added to include the color of the annotation
   // The color can be piped to the code highlighter in the same way the
-  // line numbers are
+  // line numbers are in AnnotationCodeBlock
 
   $: {
     if (annotation && placeholder > 0)

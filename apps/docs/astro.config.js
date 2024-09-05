@@ -42,12 +42,7 @@ export default defineConfig({
             { label: 'For Historians', link: '/tutorials/for-historians/' },
             { label: 'For Students', link: '/tutorials/for-students/' },
             { label: 'For Developers', link: '/tutorials/for-developers/' },
-            { label: 'For Curators', link: '/tutorials/for-curators/' },
-            { label: 'Component Playground', link: '/tutorials/allmaps-ids/' },
-            {
-              label: 'Annotated Code',
-              link: '/tutorials/annotated-code/'
-            }
+            { label: 'For Curators', link: '/tutorials/for-curators/' }
           ]
         },
         {
@@ -82,6 +77,7 @@ export default defineConfig({
         './src/css/starlight.css'
       ]
     }),
+
     svelte()
   ]
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
