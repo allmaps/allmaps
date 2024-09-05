@@ -1,5 +1,3 @@
-import potpack from 'potpack'
-
 import { throttle } from 'lodash-es'
 
 import { isOverlapping } from '@allmaps/stdlib'
@@ -59,10 +57,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
-  packedTilesTexture: WebGLTexture | null
-  packedTilesPositionsTexture: WebGLTexture | null
-  packedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
-  packedTilesScaleFactorsTexture: WebGLTexture | null
+  cachedTilesTextureArray: WebGLTexture | null
+  cachedTilesPositionsTexture: WebGLTexture | null
+  cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
+  cachedTilesScaleFactorsTexture: WebGLTexture | null
 
   projectedGeoToClipTransform: Transform | undefined
 
@@ -92,10 +90,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.vao = gl.createVertexArray()
 
-    this.packedTilesTexture = gl.createTexture()
-    this.packedTilesScaleFactorsTexture = gl.createTexture()
-    this.packedTilesPositionsTexture = gl.createTexture()
-    this.packedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
+    this.cachedTilesTextureArray = gl.createTexture()
+    this.cachedTilesScaleFactorsTexture = gl.createTexture()
+    this.cachedTilesPositionsTexture = gl.createTexture()
+    this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -136,10 +134,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   dispose() {
     this.gl.deleteVertexArray(this.vao)
-    this.gl.deleteTexture(this.packedTilesTexture)
-    this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
-    this.gl.deleteTexture(this.packedTilesPositionsTexture)
-    this.gl.deleteTexture(this.packedTilesResourcePositionsAndDimensionsTexture)
+    this.gl.deleteTexture(this.cachedTilesTextureArray)
+    this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
+    this.gl.deleteTexture(this.cachedTilesPositionsTexture)
+    this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
   }
 
   private updateVertexBuffersInternal() {
@@ -249,91 +247,61 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         : true
     })
 
-    const CachedTilesByTileUrlCount = cachedTiles.length
-
-    const packedTiles = cachedTiles.map((cachedTile, index) => ({
-      w: cachedTile.data.width,
-      h: cachedTile.data.height,
-      // Calling potpack will add x and y properties
-      // with the position of the tile's origin in the pack
-      // By adding them here already, we'll make TypeScript happy!
-      x: 0,
-      y: 0,
-      index
-    }))
-
-    const { w: packedTilesTextureWidth, h: packedTilesTextureHeight } =
-      potpack(packedTiles)
-
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
-    // Packed tiles texture
+    // Cached tiles texture array
 
-    // if (Math.max(textureWidth, textureHeight) > MAX_TEXTURE_SIZE) {
-    //   throw new Error('tile texture too large')
-    // }
+    // TODO: do this earlier
+    if (!this.hasImageInfo()) {
+      return
+    }
+    // TODO: do this earlier, in WarpedMapWithImageInfo for example
+    const maxTileWidth = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.width)
+    )
+    const maxTileHeight = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.height)
+    )
 
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesTexture)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
+
+    gl.texImage3D(
+      gl.TEXTURE_2D_ARRAY,
       0,
       gl.RGBA,
-      packedTilesTextureWidth,
-      packedTilesTextureHeight,
+      maxTileWidth,
+      maxTileHeight,
+      cachedTiles.length,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
       null
     )
-    for (const packedTile of packedTiles) {
-      // Fill with the TileImageBitmap of each packed tile
-      const imageBitmap = cachedTiles[packedTile.index].data
-      gl.texSubImage2D(
-        gl.TEXTURE_2D,
+    for (let i = 0; i < cachedTiles.length; i++) {
+      const imageBitmap = cachedTiles[i].data
+      gl.texSubImage3D(
+        gl.TEXTURE_2D_ARRAY,
         0,
-        packedTile.x,
-        packedTile.y,
+        0,
+        0,
+        i,
         imageBitmap.width,
         imageBitmap.height,
+        1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
         imageBitmap
       )
     }
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed Tiles Positions Texture
+    // Cached tiles resource positions and dimensions texture
 
-    const packedTilesPositions = packedTiles.map((packedTile) => [
-      packedTile.x,
-      packedTile.y
-    ])
-
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesPositionsTexture)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RG32I,
-      1,
-      CachedTilesByTileUrlCount,
-      0,
-      gl.RG_INTEGER,
-      gl.INT,
-      new Int32Array(packedTilesPositions.flat())
-    )
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-    // Packed tiles resource positions and dimensions texture
-
-    const packedTilesResourcePositionsAndDimensions = packedTiles.map(
-      (packedTile) => {
-        const cachedTile = cachedTiles[packedTile.index]
+    const cachedTilesResourcePositionsAndDimensions = cachedTiles.map(
+      (cachedTile) => {
         if (
           cachedTile &&
           cachedTile.imageRequest &&
@@ -351,41 +319,41 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.bindTexture(
       gl.TEXTURE_2D,
-      this.packedTilesResourcePositionsAndDimensionsTexture
+      this.cachedTilesResourcePositionsAndDimensionsTexture
     )
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.RGBA32I,
       1,
-      CachedTilesByTileUrlCount,
+      cachedTiles.length,
       0,
       gl.RGBA_INTEGER,
       gl.INT,
-      new Int32Array(packedTilesResourcePositionsAndDimensions.flat())
+      new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed tiles scale factors texture
+    // Cached tiles scale factors texture
 
-    const packedTilesScaleFactors = packedTiles.map(
-      ({ index }) => cachedTiles[index].tile.tileZoomLevel.scaleFactor
+    const cachedTilesScaleFactors = cachedTiles.map(
+      (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
     )
 
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesScaleFactorsTexture)
+    gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.R32I,
       1,
-      CachedTilesByTileUrlCount,
+      cachedTiles.length,
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(packedTilesScaleFactors)
+      new Int32Array(cachedTilesScaleFactors)
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)

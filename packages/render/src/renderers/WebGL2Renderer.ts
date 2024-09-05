@@ -680,49 +680,39 @@ export default class WebGL2Renderer
       const bestScaleFactor = warpedMap.bestScaleFactor
       gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
 
-      // Packed tiles texture
+      // Cached tiles texture array
 
-      const packedTilesTextureLocation = gl.getUniformLocation(
+      const cachedTilesTextureArrayLocation = gl.getUniformLocation(
         this.program,
-        'u_packedTilesTexture'
+        'u_cachedTilesTextureArray'
       )
-      gl.uniform1i(packedTilesTextureLocation, 0)
+      gl.uniform1i(cachedTilesTextureArrayLocation, 0)
       gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesTexture)
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY, warpedMap.cachedTilesTextureArray)
 
-      // Packed tiles positions texture
+      // Cached tiles resource positions and dimensions texture
 
-      const packedTilesPositionsTextureLocation = gl.getUniformLocation(
-        this.program,
-        'u_packedTilesPositionsTexture'
-      )
-      gl.uniform1i(packedTilesPositionsTextureLocation, 1)
-      gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesPositionsTexture)
-
-      // Packed tiles resource positions and dimensions texture
-
-      const packedTilesResourcePositionsAndDimensionsLocation =
+      const cachedTilesResourcePositionsAndDimensionsLocation =
         gl.getUniformLocation(
           this.program,
-          'u_packedTilesResourcePositionsAndDimensionsTexture'
+          'u_cachedTilesResourcePositionsAndDimensionsTexture'
         )
-      gl.uniform1i(packedTilesResourcePositionsAndDimensionsLocation, 2)
+      gl.uniform1i(cachedTilesResourcePositionsAndDimensionsLocation, 2)
       gl.activeTexture(gl.TEXTURE2)
       gl.bindTexture(
         gl.TEXTURE_2D,
-        warpedMap.packedTilesResourcePositionsAndDimensionsTexture
+        warpedMap.cachedTilesResourcePositionsAndDimensionsTexture
       )
 
-      // Packed tiles scale factors texture
+      // Cached tiles scale factors texture
 
-      const packedTileScaleFactorsTextureLocation = gl.getUniformLocation(
+      const cachedTileScaleFactorsTextureLocation = gl.getUniformLocation(
         this.program,
-        'u_packedTilesScaleFactorsTexture'
+        'u_cachedTilesScaleFactorsTexture'
       )
-      gl.uniform1i(packedTileScaleFactorsTextureLocation, 3)
+      gl.uniform1i(cachedTileScaleFactorsTextureLocation, 3)
       gl.activeTexture(gl.TEXTURE3)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesScaleFactorsTexture)
+      gl.bindTexture(gl.TEXTURE_2D, warpedMap.cachedTilesScaleFactorsTexture)
 
       // Draw each map
 

@@ -24,10 +24,9 @@ uniform int u_distortionOptionsdistortionMeasure;
 
 uniform int u_bestScaleFactor;
 
-uniform sampler2D u_packedTilesTexture;
-uniform isampler2D u_packedTilesPositionsTexture;
-uniform isampler2D u_packedTilesResourcePositionsAndDimensionsTexture;
-uniform isampler2D u_packedTilesScaleFactorsTexture;
+uniform lowp sampler2DArray u_cachedTilesTextureArray;
+uniform isampler2D u_cachedTilesResourcePositionsAndDimensionsTexture;
+uniform isampler2D u_cachedTilesScaleFactorsTexture;
 
 in vec2 v_resourceTrianglePoint;
 in float v_triangleIndex;
@@ -68,72 +67,65 @@ void main() {
   float resourceTrianglePointX = v_resourceTrianglePoint.x;
   float resourceTrianglePointY = v_resourceTrianglePoint.y;
 
-  // Reading information on packed tiles from textures
-  int packedTilesCount = textureSize(u_packedTilesPositionsTexture, 0).y;
-  ivec2 packedTilesTextureSize = textureSize(u_packedTilesTexture, 0);
+  // Reading information on cached tiles from textures
+  ivec3 cachedTilesTextureSize = textureSize(u_cachedTilesTextureArray, 0);
+  int cachedTilesCount = cachedTilesTextureSize.z;
 
   // Setting references for the for loop
   int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
   int bestScaleFactor = 0;
 
-  // Prepare storage for the resulting packed tiles texture point that corresponds to the triangle point
-  vec2 packedTilesTexturePoint = vec2(0.0f, 0.0f);
+  // Prepare storage for the resulting cached tiles texture point that corresponds to the triangle point
+  vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
 
   // Set the initial values
   color = colorTransparent;
   bool found = false;
 
-  // Loop through all packed tiles
-  for(int index = 0; index < packedTilesCount; index += 1) {
+  // Loop through all cached tiles
+  for(int index = 0; index < cachedTilesCount; index += 1) {
 
     // Read the information of the tile
-    ivec2 packedTilePosition = texelFetch(u_packedTilesPositionsTexture, ivec2(0, index), 0).rg;
-    ivec4 packedTileResourcePositionAndDimension = texelFetch(u_packedTilesResourcePositionsAndDimensionsTexture, ivec2(0, index), 0);
-    int packedTileScaleFactor = texelFetch(u_packedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
+    ivec4 cachedTileResourcePositionAndDimension = texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, index), 0);
+    int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
 
-    float packedTilePositionX = float(packedTilePosition.r);
-    float packedTilePositionY = float(packedTilePosition.g);
+    float cachedTileResourcePositionX = float(cachedTileResourcePositionAndDimension.r);
+    float cachedTileResourcePositionY = float(cachedTileResourcePositionAndDimension.g);
 
-    float packedTileResourcePositionX = float(packedTileResourcePositionAndDimension.r);
-    float packedTileResourcePositionY = float(packedTileResourcePositionAndDimension.g);
-
-    float packedTileDimensionWidth = float(packedTileResourcePositionAndDimension.b);
-    float packedTileDimensionHeight = float(packedTileResourcePositionAndDimension.a);
+    float cachedTileDimensionWidth = float(cachedTileResourcePositionAndDimension.b);
+    float cachedTileDimensionHeight = float(cachedTileResourcePositionAndDimension.a);
 
     // If the triangle point is inside the tile, consider to use the tile:
     // if the scale factor is closer to the best scale factor for this map then currently known one
     // update the smallest scale factor diff
-    // and compute the packed tiles texture point that corresponds to the triangle point
-    if(resourceTrianglePointX >= packedTileResourcePositionX &&
-      resourceTrianglePointX < packedTileResourcePositionX + packedTileDimensionWidth &&
-      resourceTrianglePointY >= packedTileResourcePositionY &&
-      resourceTrianglePointY < packedTileResourcePositionY + packedTileDimensionHeight) {
+    // and compute the cached tiles texture point that corresponds to the triangle point
+    if(resourceTrianglePointX >= cachedTileResourcePositionX &&
+      resourceTrianglePointX < cachedTileResourcePositionX + cachedTileDimensionWidth &&
+      resourceTrianglePointY >= cachedTileResourcePositionY &&
+      resourceTrianglePointY < cachedTileResourcePositionY + cachedTileDimensionHeight) {
       found = true;
 
-      int scaleFactorDiff = abs(u_bestScaleFactor - packedTileScaleFactor);
+      int scaleFactorDiff = abs(u_bestScaleFactor - cachedTileScaleFactor);
 
       if(scaleFactorDiff < smallestScaleFactorDiff || bestScaleFactor == 0) {
 
         smallestScaleFactorDiff = scaleFactorDiff;
-        bestScaleFactor = packedTileScaleFactor;
+        bestScaleFactor = cachedTileScaleFactor;
 
-        float packedTilePointX = (resourceTrianglePointX - packedTileResourcePositionX) / float(bestScaleFactor);
-        float packedTilePointY = (resourceTrianglePointY - packedTileResourcePositionY) / float(bestScaleFactor);
+        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(bestScaleFactor);
+        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(bestScaleFactor);
 
-        float packedTilesPointX = packedTilePositionX + packedTilePointX;
-        float packedTilesPointY = packedTilePositionY + packedTilePointY;
+        float cachedTilesTexturePointX = cachedTilePointX / float(cachedTilesTextureSize.x);
+        float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);
 
-        float packedTilesTexturePointX = packedTilesPointX / float(packedTilesTextureSize.x);
-        float packedTilesTexturePointY = packedTilesPointY / float(packedTilesTextureSize.y);
-
-        packedTilesTexturePoint = vec2(packedTilesTexturePointX, packedTilesTexturePointY);
+        cachedTilesTexturePoint = vec3(cachedTilesTexturePointX, cachedTilesTexturePointY, index);
       }
     }
   }
 
   if(found == true) {
-    // Read color of the point at its packed tiles texture point coordinates in the packed tiles texture
-    color = texture(u_packedTilesTexture, packedTilesTexturePoint);
+    // Read color of the point at its chached tiles texture point coordinates in the cached tiles texture array
+    color = texture(u_cachedTilesTextureArray, cachedTilesTexturePoint);
 
     // Remove background color
     if(u_removeColorOptionsThreshold > 0.0f) {
