@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.25",
+  "version": "1.0.0-beta.26",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -60,9 +60,9 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.63",
-    "@allmaps/stdlib": "^1.0.0-beta.28",
-    "maplibre-gl": "^4.5.0"
+    "maplibre-gl": "^4.5.0",
+    "@allmaps/render": "^1.0.0-beta.64",
+    "@allmaps/stdlib": "^1.0.0-beta.29"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.29",
+  "version": "1.0.0-beta.30",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -76,7 +76,7 @@
     "svelte": "^4.2.7"
   },
   "dependencies": {
-    "@allmaps/iiif-parser": "^1.0.0-beta.37",
+    "@allmaps/iiif-parser": "^1.0.0-beta.38",
     "@allmaps/tailwind": "^1.0.0-beta.12",
     "@allmaps/types": "^1.0.0-beta.13",
     "flowbite": "^1.6.4"

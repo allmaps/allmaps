@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.28",
+  "version": "1.0.0-beta.29",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -51,8 +51,8 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.27",
-    "@allmaps/iiif-parser": "^1.0.0-beta.37",
+    "@allmaps/annotation": "^1.0.0-beta.28",
+    "@allmaps/iiif-parser": "^1.0.0-beta.38",
     "@allmaps/types": "^1.0.0-beta.13",
     "@placemarkio/geojson-rewind": "^1.0.2",
     "svg-parser": "^2.0.4"
