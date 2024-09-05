@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/info",
-  "version": "0.0.2-alpha.43",
+  "version": "0.0.2-alpha.45",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -17,7 +17,6 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "build:dev": "vite build --mode development",
     "lerna-build": "lerna run build --scope @allmaps/info --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -29,10 +28,10 @@
   },
   "packageManager": "pnpm@6.32.3",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.27",
-    "@allmaps/id": "^1.0.0-beta.27",
-    "@allmaps/iiif-parser": "^1.0.0-beta.37",
-    "@allmaps/ui": "^1.0.0-beta.29"
+    "@allmaps/annotation": "^1.0.0-beta.29",
+    "@allmaps/id": "^1.0.0-beta.29",
+    "@allmaps/iiif-parser": "^1.0.0-beta.39",
+    "@allmaps/ui": "^1.0.0-beta.31"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
@@ -48,7 +47,7 @@
     "svelte": "^4.2.7",
     "svelte-check": "^3.6.0",
     "tailwindcss": "^3.3.3",
-    "typescript": "^5.0.0",
+    "typescript": "^5.5.4",
     "vite": "^5.0.3"
   }
 }

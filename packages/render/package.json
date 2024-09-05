@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.63",
+  "version": "1.0.0-beta.67",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -52,7 +52,6 @@
     "dev": "vite",
     "watch": "vite build --watch",
     "build": "vite build",
-    "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "pretest": "pnpm run build",
     "test": "NODE_ENV=test mocha",
@@ -69,13 +68,13 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.27",
-    "@allmaps/id": "^1.0.0-beta.27",
-    "@allmaps/iiif-parser": "^1.0.0-beta.37",
-    "@allmaps/stdlib": "^1.0.0-beta.28",
-    "@allmaps/transform": "^1.0.0-beta.38",
-    "@allmaps/triangulate": "^1.0.0-beta.20",
-    "@allmaps/types": "^1.0.0-beta.13",
+    "@allmaps/annotation": "^1.0.0-beta.29",
+    "@allmaps/id": "^1.0.0-beta.29",
+    "@allmaps/iiif-parser": "^1.0.0-beta.39",
+    "@allmaps/stdlib": "^1.0.0-beta.30",
+    "@allmaps/transform": "^1.0.0-beta.40",
+    "@allmaps/triangulate": "^1.0.0-beta.22",
+    "@allmaps/types": "^1.0.0-beta.14",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "lodash-es": "^4.17.21",
     "potpack": "^2.0.0",
@@ -97,7 +96,7 @@
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.5.4",
     "vite": "^5.0.3",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-glsl": "^1.3.0",

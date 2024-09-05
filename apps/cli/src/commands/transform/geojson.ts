@@ -9,7 +9,10 @@ import {
   parseTransformOptions,
   parseTransformationType
 } from '../../lib/parse.js'
-import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+import {
+  addAnnotationOptions,
+  addCoordinateTransformOptions
+} from '../../lib/options.js'
 import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
 
 export default function geojson() {
@@ -21,7 +24,7 @@ export default function geojson() {
     )
 
   command = addAnnotationOptions(command)
-  command = addTransformOptions(command)
+  command = addCoordinateTransformOptions(command)
 
   return command.action(async (files, options) => {
     const map = parseMap(options)
