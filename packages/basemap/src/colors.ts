@@ -87,8 +87,8 @@ export const ALLMAPS_THEME = {
 }
 
 export const TERRAIN_THEME = {
-  hillshade_shadow_color: "#bbb",
-  hillshade_accent_color: "blue",
-  hillshade_highlight_color: "white",
-  contour_line_color: "purple"
+  hillshade_shadow_color: '#bbb',
+  hillshade_accent_color: 'blue',
+  hillshade_highlight_color: 'white',
+  contour_line_color: 'purple'
 }

@@ -1,12 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Map, addProtocol } from 'maplibre-gl'
+  import maplibregl, { Map, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
 
   // @ts-ignore
-  import { default as mlcontour } from 'maplibre-contour'
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
@@ -96,13 +95,10 @@
   onMount(() => {
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
-    var demSource = new mlcontour.DemSource({
-      url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
-    })
-    demSource.setupMaplibre(maplibregl)
 
     map = new Map({
       container,
+      // @ts-ignore
       style: basemapStyle(),
       center: [14.2437, 40.8384],
       zoom: 7,

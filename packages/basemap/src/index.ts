@@ -26,7 +26,7 @@ export function basemapStyle(): StyleSpecification {
 }
 
 export function addTerrain(map: maplibregl.Map) {
-  var demSource = new mlcontour.DemSource({
+  const demSource = new mlcontour.DemSource({
     url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
