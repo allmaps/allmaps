@@ -154,6 +154,7 @@
   }
 
   $: {
+    // Stylizes the code that's passed in
     updateCodeStyle()
   }
 
