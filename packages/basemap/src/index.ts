@@ -4,7 +4,7 @@ import maplibregl from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
 import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
 
-export function basemapStyle():StyleSpecification {
+export function basemapStyle(): StyleSpecification {
   return {
     version: 8,
     glyphs:

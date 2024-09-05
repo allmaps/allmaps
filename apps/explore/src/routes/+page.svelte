@@ -8,7 +8,6 @@
 
   // @ts-ignore
   import { default as mlcontour } from 'maplibre-contour'
-
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
