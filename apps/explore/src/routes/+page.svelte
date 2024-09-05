@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import maplibregl from 'maplibre-gl'
   import { Map, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
