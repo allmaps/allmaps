@@ -13,7 +13,6 @@
     Collection as IIIFCollection
   } from '@allmaps/iiif-parser'
   import { codeToHtml } from 'shiki'
-  import StyledCodeBlock from './StyledCodeBlock.svelte'
   let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
   let editorHover: boolean = false
   let viewerHover: boolean = false
