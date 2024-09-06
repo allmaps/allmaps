@@ -1,5 +1,7 @@
 import { html } from 'itty-router'
 
+import type { TileResolution } from './types.js'
+
 const generateIframeHtml = (
   tileViewerBaseUrl: string,
   tileJsonUrl: string
@@ -35,12 +37,14 @@ const generateIframeHtml = (
 
 export function generateTilesHtml(
   req: Request,
-  tileViewerBaseUrl: string
+  tileViewerBaseUrl: string,
+  resolution: TileResolution = 'normal'
 ): Response {
-  const tileJsonUrl = req.url.replace(
-    '%7Bz%7D/%7Bx%7D/%7By%7D.png',
-    'tiles.json'
-  )
+  const searchValue = `%7Bz%7D/%7Bx%7D/%7By%7D${
+    resolution === 'retina' ? '@2x' : ''
+  }.png`
+  const replaceValue = `tiles${resolution === 'retina' ? '@2x' : ''}.json`
+  const tileJsonUrl = req.url.replace(searchValue, replaceValue)
 
   return html(generateIframeHtml(tileViewerBaseUrl, tileJsonUrl))
 }
