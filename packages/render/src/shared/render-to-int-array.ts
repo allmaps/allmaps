@@ -3,7 +3,11 @@ import classifyPoint from 'robust-point-in-polygon'
 import { pixelToIntArrayIndex, pointToPixel } from '@allmaps/stdlib'
 
 import { GetImageDataValue, GetImageDataSize } from './types.js'
-import { pointInTile, tilePosition } from './tiles.js'
+import {
+  resourcePointInTile,
+  tilePosition,
+  clipTilePointToTile
+} from './tiles.js'
 import { applyTransform, invertTransform } from './matrix.js'
 
 import type WarpedMapList from '../maps/WarpedMapList.js'
@@ -81,7 +85,7 @@ export async function renderToIntArray<W extends WarpedMap, D>(
         let cachedTile: CachedTile<D> | undefined
         let foundCachedTile = false
         for (cachedTile of cachedTiles) {
-          if (pointInTile(resourcePoint, cachedTile.tile)) {
+          if (resourcePointInTile(resourcePoint, cachedTile.tile)) {
             foundCachedTile = true
             break
           }
@@ -115,10 +119,10 @@ export async function renderToIntArray<W extends WarpedMap, D>(
 
           // Determine the tilePoint's four surrounding pixels: bottom-left, bottom-right, top-left, top-right
           const tilePointPixels = [
-            pointToPixel(tilePoint, [0, 0], tileSize),
-            pointToPixel(tilePoint, [1, 0], tileSize),
-            pointToPixel(tilePoint, [0, 1], tileSize),
-            pointToPixel(tilePoint, [1, 1], tileSize)
+            pointToPixel(tilePoint, [0, 0]),
+            pointToPixel(tilePoint, [1, 0]),
+            pointToPixel(tilePoint, [0, 1]),
+            pointToPixel(tilePoint, [1, 1])
           ]
 
           // Determine the index where to write this pixel's information in the IntArray
@@ -139,8 +143,11 @@ export async function renderToIntArray<W extends WarpedMap, D>(
                 (tilePointPixel) =>
                   getImageDataValue(
                     cachedTile!.data,
-                    pixelToIntArrayIndex(tilePointPixel, tileSize, CHANNELS) +
-                      color
+                    pixelToIntArrayIndex(
+                      clipTilePointToTile(tilePointPixel, tile),
+                      tileSize,
+                      CHANNELS
+                    ) + color
                   ) * bilinearPixelWeight(tilePointPixel, tilePoint)
               )
               .reduce((a, c) => a + c, 0)

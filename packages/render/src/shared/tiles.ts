@@ -267,6 +267,7 @@ export function tileCenter(tile: Tile): Point {
 }
 
 /**
+ * Returns the resource position of the tile's origin
  *
  * @export
  * @param {Tile} tile
@@ -279,7 +280,16 @@ export function tilePosition(tile: Tile): Point {
   return [resourceTilePositionX, resourceTilePositionY]
 }
 
-export function pointToTilePoint(
+export function clipTilePointToTile(tilePoint: Point, tile: Tile): Point {
+  const tileSize = [tile.tileZoomLevel.width, tile.tileZoomLevel.height]
+  return tilePoint.map((coordinate, index) => {
+    coordinate = Math.max(coordinate, 0)
+    coordinate = Math.min(coordinate, tileSize[index] - 1)
+    return coordinate
+  }) as Point
+}
+
+export function resourcePointToTilePoint(
   resourcePoint: Point,
   tile: Tile,
   clip = true
@@ -294,14 +304,14 @@ export function pointToTilePoint(
 
   if (
     !clip ||
-    pointInTile(resourcePoint, tile)
+    resourcePointInTile(resourcePoint, tile)
     // && pointInImage(resourcePoint, tile)
   ) {
     return tilePoint
   }
 }
 
-export function pointInTile(resourcePoint: Point, tile: Tile): boolean {
+export function resourcePointInTile(resourcePoint: Point, tile: Tile): boolean {
   const resourceTilePosition = tilePosition(tile)
 
   return (
@@ -314,7 +324,10 @@ export function pointInTile(resourcePoint: Point, tile: Tile): boolean {
   )
 }
 
-export function pointInImage(resourcePoint: Point, tile: Tile): boolean {
+export function resourcePointInImage(
+  resourcePoint: Point,
+  tile: Tile
+): boolean {
   return (
     resourcePoint[0] > 0 &&
     resourcePoint[0] <= tile.imageSize[0] &&

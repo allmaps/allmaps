@@ -269,18 +269,9 @@ export function isEqualPointArrayArray(
 
 // Compute
 
-export function pointToPixel(
-  point: Point,
-  translate: Point = [0, 0],
-  size?: Size
-): Point {
+export function pointToPixel(point: Point, translate: Point = [0, 0]): Point {
   return point.map((coordinate, index) => {
-    let result = Math.floor(coordinate + translate[index])
-    if (size) {
-      result = Math.max(result, 0)
-      result = Math.min(result, size[index] - 1)
-    }
-    return result
+    return Math.floor(coordinate + translate[index])
   }) as Point
 }
 
