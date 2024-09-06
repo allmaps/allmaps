@@ -55,7 +55,6 @@ export function gdalwarp(
   imageFilename: string,
   basename: string,
   outputDir: string,
-  map: GeoreferencedMap,
   gcps: Gcp[],
   geoMask: GeojsonPolygon,
   transformationType: TransformationType,
@@ -80,9 +79,9 @@ export function gdalwarp(
     } else if (transformationType === 'polynomial3') {
       transformationArguments = `-order 3`
     }
-  } else if (map.transformation.type === 'thinPlateSpline') {
+  } else if (transformationType === 'thinPlateSpline') {
     transformationArguments = '-tps'
-  } else if (map.transformation.type) {
+  } else if (transformationType) {
     transformationMessage = `Transformation type "${transformationType}" is not supported. Using default transformation.`
   }
 

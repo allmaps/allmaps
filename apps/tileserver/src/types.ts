@@ -21,3 +21,5 @@ export type Tilejson = {
 export type TransformationOptions = {
   'transformation.type': TransformationType
 }
+
+export type TileResolution = 'normal' | 'retina'
