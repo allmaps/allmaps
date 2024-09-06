@@ -19,6 +19,7 @@ import type {
   MapsPruneInfo
 } from '../shared/types.js'
 
+const REQUEST_VIEWPORT_BUFFER_RATIO = 0.1
 const MIN_VIEWPORT_DIAMETER = 5
 
 /**
@@ -185,7 +186,11 @@ export default abstract class BaseRenderer<
 
       const resourceViewportRing =
         warpedMap.projectedTransformer.transformBackward(
-          [viewport.projectedGeoBufferedRectangle],
+          [
+            viewport.getProjectedGeoBufferedRectangle(
+              REQUEST_VIEWPORT_BUFFER_RATIO
+            )
+          ],
           transformerOptions
         )[0]
 
@@ -201,11 +206,10 @@ export default abstract class BaseRenderer<
       const fetchableTiles = tiles.map(
         (tile) => new FetchableTile(tile, warpedMap)
       )
+
       warpedMap.setCurrentFetchableTiles(fetchableTiles)
 
-      for (const tile of tiles) {
-        requestedTiles.push(new FetchableTile(tile, warpedMap))
-      }
+      requestedTiles.push(...fetchableTiles)
     }
 
     this.tileCache.requestFetchableTiles(requestedTiles)

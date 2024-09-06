@@ -81,9 +81,10 @@ void main() {
   // Set the initial values
   color = colorTransparent;
   bool found = false;
+  int foundIndex = 0;
 
   // Loop through all cached tiles
-  for(int index = 0; index < cachedTilesCount; index += 1) {
+  for(int index= 0 ; index < cachedTilesCount; index += 1) {
 
     // Read the information of the tile
     ivec4 cachedTileResourcePositionAndDimension = texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, index), 0);
@@ -108,7 +109,6 @@ void main() {
       int scaleFactorDiff = abs(u_currentBestScaleFactor - cachedTileScaleFactor);
 
       if(scaleFactorDiff < smallestScaleFactorDiff || currentBestScaleFactor == 0) {
-
         smallestScaleFactorDiff = scaleFactorDiff;
         currentBestScaleFactor = cachedTileScaleFactor;
 
@@ -118,6 +118,7 @@ void main() {
         float cachedTilesTexturePointX = cachedTilePointX / float(cachedTilesTextureSize.x);
         float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);
 
+        foundIndex = index;
         cachedTilesTexturePoint = vec3(cachedTilesTexturePointX, cachedTilesTexturePointY, index);
       }
     }
@@ -186,6 +187,12 @@ void main() {
     // TODO: make this a rendering option
     if(false) {
       color = vec4(abs(sin(v_triangleIndex)), abs(sin(v_triangleIndex + 1.0f)), abs(sin(v_triangleIndex + 2.0f)), 1);
+    }
+
+    // Tiles
+    // TODO: make this a rendering option
+    if(false) {
+      color = vec4(abs(sin(float(foundIndex))), abs(sin(float(foundIndex) + 1.0f)), abs(sin(float(foundIndex) + 2.0f)), 1);
     }
 
     // Grid

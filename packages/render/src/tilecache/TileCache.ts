@@ -173,6 +173,7 @@ export default class TileCache<D> extends EventTarget {
   }
 
   prune(mapsPruneInfo: MapsPruneInfo) {
+    // const oldSize = this.tilesByTileUrl.size
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
         const pruneInfo = mapsPruneInfo.get(mapId)
@@ -195,6 +196,7 @@ export default class TileCache<D> extends EventTarget {
         }
       }
     }
+    // console.log('pruned', oldSize, this.tilesByTileUrl.size)
   }
 
   getTileUrlsForMapId(mapId: string) {

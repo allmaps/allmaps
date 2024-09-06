@@ -26,8 +26,6 @@ import type {
   Fit
 } from '@allmaps/types'
 
-const VIEWPORT_BUFFER_FRATION = 0.5
-
 /**
  * The viewport describes the view on the rendered map.
  * @export
@@ -68,14 +66,11 @@ export default class Viewport {
   projectedGeoRectangleBbox: Bbox
   rotation: number
   projectedGeoPerViewportScale: number
-  projectedGeoBufferedRectangle: Rectangle
 
   viewportCenter: Point
   viewportRectangle: Rectangle
   viewportSize: Size
   viewportBbox: Bbox
-  viewportBufferedRectangle: Rectangle
-  viewportBufferedBbox: Bbox
 
   devicePixelRatio: number
   canvasCenter: Point
@@ -151,19 +146,6 @@ export default class Viewport {
     this.projectedGeoToViewportTransform =
       this.composeProjectedGeoToViewportTransform()
     this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
-
-    this.viewportBufferedBbox = bufferBboxByFraction(
-      this.viewportBbox,
-      VIEWPORT_BUFFER_FRATION
-    )
-    this.viewportBufferedRectangle = bboxToRectangle(this.viewportBufferedBbox)
-    this.projectedGeoBufferedRectangle = this.viewportBufferedRectangle.map(
-      (point) =>
-        applyTransform(
-          invertTransform(this.projectedGeoToViewportTransform),
-          point
-        )
-    ) as Rectangle
   }
 
   /**
@@ -239,6 +221,20 @@ export default class Viewport {
       0,
       devicePixelRatio
     )
+  }
+
+  getProjectedGeoBufferedRectangle(bufferFraction: number): Rectangle {
+    const viewportBufferedBbox = bufferBboxByFraction(
+      this.viewportBbox,
+      bufferFraction
+    )
+    const viewportBufferedRectangle = bboxToRectangle(viewportBufferedBbox)
+    return viewportBufferedRectangle.map((point) =>
+      applyTransform(
+        invertTransform(this.projectedGeoToViewportTransform),
+        point
+      )
+    ) as Rectangle
   }
 
   private composeProjectedGeoToViewportTransform(): Transform {

@@ -25,6 +25,9 @@ const THROTTLE_OPTIONS = {
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 
+const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
+const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
+
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
   program: WebGLProgram
@@ -229,7 +232,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const cachedTiles: Map<string, CachedTile<ImageBitmap>> = new Map()
 
     const cachedTileAtHigherScaleFactor =
-      this.recursivelyGetCachedTileAtHigherScaleFactor(tile, 4)
+      this.recursivelyGetCachedTileAtHigherScaleFactor(
+        tile,
+        TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+      )
 
     let higherTilesFound = false
     for (const cachedTile of cachedTileAtHigherScaleFactor) {
@@ -241,13 +247,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (higherTilesFound) {
       return cachedTiles
     } else {
-      // const cachedTilesAtLowerScaleFactor =
-      //   this.recursivelyGetCachedTileAtLowerScaleFactor(tile, 1)
-      // for (const cachedTile of cachedTilesAtLowerScaleFactor) {
-      //   if (cachedTile) {
-      //     cachedTiles.set(cachedTile.tileUrl, cachedTile)
-      //   }
-      // }
+      const cachedTilesAtLowerScaleFactor =
+        this.recursivelyGetCachedTileAtLowerScaleFactor(
+          tile,
+          TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+        )
+      for (const cachedTile of cachedTilesAtLowerScaleFactor) {
+        if (cachedTile) {
+          cachedTiles.set(cachedTile.tileUrl, cachedTile)
+        }
+      }
     }
 
     return cachedTiles
@@ -385,12 +394,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       CachedTile<ImageBitmap>
     > = new Map()
 
+    // let cachedTileFromCache = 0
     // Select tiles for tileCache that make sense for this map
     // Either because they are requested, or because they are it's parents or children
     for (const fetchableTile of this.currentFetchableTiles) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
         textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+        // cachedTileFromCache++
       } else {
         for (const [
           tileUrl,
@@ -402,6 +413,17 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     const textureTiles = [...textureTilesByTileUrl.values()]
+
+    // console.log(
+    //   'request',
+    //   this.currentFetchableTiles.length,
+    //   'found',
+    //   cachedTileFromCache,
+    //   'texture',
+    //   textureTiles.length,
+    //   'cache',
+    //   this.cachedTilesByTileUrl.size
+    // )
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 

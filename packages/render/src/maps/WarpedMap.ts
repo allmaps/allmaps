@@ -95,10 +95,10 @@ export function createWarpedMapFactory() {
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
- * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, in the current viewport
- * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates, in the current viewport
- * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing, in the current viewport
- * @param {Tile[]} currentTiles - The tiles for displaying this map, in the current viewport
+ * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
+ * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
+ * @param {Tile[]} currentFetchableTiles - The fetchable tiles for displaying this map, at the current viewport
  */
 export default class WarpedMap extends EventTarget {
   mapId: string

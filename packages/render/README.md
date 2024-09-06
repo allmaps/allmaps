@@ -251,11 +251,11 @@ Creates a new Viewport
 
 #### Parameters
 
+*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `i` &#x20;
 *   `r` &#x20;
-*   `s`   (optional, default `1`)
+*   `c`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected coordinates.
 *   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projection coordinates per viewport pixel.
@@ -268,9 +268,9 @@ Returns a rotated rectangle in projected geo coordinates
 
 #### Parameters
 
+*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `i` &#x20;
 *   `r` &#x20;
 
 ### fromWarpedMapList
@@ -279,11 +279,11 @@ Static method creates that creates a Viewport from a WarpedMapList
 
 #### Parameters
 
+*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `i` &#x20;
 *   `r`   (optional, default `"contain"`)
-*   `s`   (optional, default `1`)
+*   `c`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
@@ -297,9 +297,9 @@ Static method creates that creates a Viewport from Bbox in projected geospatial 
 
 #### Parameters
 
+*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `i` &#x20;
 *   `r`   (optional, default `"contain"`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
@@ -572,8 +572,8 @@ Creates an instance of WebGL2WarpedMap.
 *   `e` &#x20;
 *   `t` &#x20;
 *   `r` &#x20;
-*   `a` &#x20;
 *   `s` &#x20;
+*   `a` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `gl` **WebGL2RenderingContext** WebGL rendering context

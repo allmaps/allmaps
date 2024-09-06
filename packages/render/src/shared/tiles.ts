@@ -21,12 +21,12 @@ import type {
 /**
  * Target scale factor correction
  * Since this is done before comparing *logarithmic* evaluations of the target and available scale factors (to find the best fit), this has more effect on small scale factors.
- * 0 = no correction, -1 = correct target scale factor with -1 to obain less sharp images (especially at low scale factors), 1 = idem with correction +1, ...
+ * 0 = no correction, -1 = correct target scale factor with -1 to obain sharper images (especially at low scale factors), 1 = idem with correction +1, ...
  */
-const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 0.5
+const DEFAULT_TARGET_SCALE_FACTOR_CORRECTION = 1
 
-const MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 4
-const MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
+const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
+const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 3
 
 // Functions for preparing to make tiles
 
@@ -108,8 +108,8 @@ export function getBestTileZoomLevelForScale(
 
   for (const tileZoomLevel of image.tileZoomLevels) {
     const diffLogScaleFactor = Math.abs(
-      Math.log(tileZoomLevel.scaleFactor) -
-        Math.log(resourceToCanvasScale + targetScaleFactorCorrection)
+      Math.log2(tileZoomLevel.scaleFactor) -
+        Math.log2(resourceToCanvasScale + targetScaleFactorCorrection)
     )
     if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
       smallestdiffLogScaleFactor = diffLogScaleFactor
@@ -274,25 +274,12 @@ export function pruneTile(
     Math.log2(tile.tileZoomLevel.scaleFactor) - Math.log2(bestScaleFactor)
   // Check if scale factor not too high, i.e. tile resolution too low
   const tileScaleFactorTooHigh =
-    log2ScaleFactorDiff > MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+    log2ScaleFactorDiff > PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
   // Check if scale factor not too low, i.e. tile resolution too high
   const tileScaleFactorTooLow =
-    -log2ScaleFactorDiff > MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+    -log2ScaleFactorDiff > PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
 
-  if (tileScaleFactorTooHigh) {
-    console.log(
-      'pruning tile of scale factor',
-      tile.tileZoomLevel.scaleFactor,
-      'because tile resolution too low'
-    )
-    return true
-  }
-  if (tileScaleFactorTooLow) {
-    console.log(
-      'pruning tile of scale factor',
-      tile.tileZoomLevel.scaleFactor,
-      'because tile resolution too high'
-    )
+  if (tileScaleFactorTooHigh || tileScaleFactorTooLow) {
     return true
   }
 
