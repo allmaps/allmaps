@@ -22,7 +22,7 @@ uniform float u_saturation;
 uniform bool u_distortion;
 uniform int u_distortionOptionsdistortionMeasure;
 
-uniform int u_bestScaleFactor;
+uniform int u_currentBestScaleFactor;
 
 uniform lowp sampler2DArray u_cachedTilesTextureArray;
 uniform isampler2D u_cachedTilesResourcePositionsAndDimensionsTexture;
@@ -73,7 +73,7 @@ void main() {
 
   // Setting references for the for loop
   int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
-  int bestScaleFactor = 0;
+  int currentBestScaleFactor = 0;
 
   // Prepare storage for the resulting cached tiles texture point that corresponds to the triangle point
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
@@ -105,15 +105,15 @@ void main() {
       resourceTrianglePointY < cachedTileResourcePositionY + cachedTileDimensionHeight) {
       found = true;
 
-      int scaleFactorDiff = abs(u_bestScaleFactor - cachedTileScaleFactor);
+      int scaleFactorDiff = abs(u_currentBestScaleFactor - cachedTileScaleFactor);
 
-      if(scaleFactorDiff < smallestScaleFactorDiff || bestScaleFactor == 0) {
+      if(scaleFactorDiff < smallestScaleFactorDiff || currentBestScaleFactor == 0) {
 
         smallestScaleFactorDiff = scaleFactorDiff;
-        bestScaleFactor = cachedTileScaleFactor;
+        currentBestScaleFactor = cachedTileScaleFactor;
 
-        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(bestScaleFactor);
-        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(bestScaleFactor);
+        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(currentBestScaleFactor);
+        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(currentBestScaleFactor);
 
         float cachedTilesTexturePointX = cachedTilePointX / float(cachedTilesTextureSize.x);
         float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);
@@ -190,8 +190,8 @@ void main() {
 
     // Grid
     if(u_grid) {
-      float gridSize = 20.0f * float(u_bestScaleFactor);
-      float gridWidth = 2.0f * float(u_bestScaleFactor);
+      float gridSize = 20.0f * float(u_currentBestScaleFactor);
+      float gridWidth = 2.0f * float(u_currentBestScaleFactor);
       if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
         color = colorBlack;
       }

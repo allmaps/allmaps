@@ -1,5 +1,9 @@
 import WarpedMapList from '../maps/WarpedMapList.js'
-import { composeTransform } from '../shared/matrix.js'
+import {
+  composeTransform,
+  applyTransform,
+  invertTransform
+} from '../shared/matrix.js'
 
 import {
   computeBbox,
@@ -7,6 +11,7 @@ import {
   bboxToRectangle,
   bboxToSize,
   sizesToScale,
+  bufferBboxByFraction,
   webMercatorToLonLat
 } from '@allmaps/stdlib'
 
@@ -20,6 +25,8 @@ import type {
   Transform,
   Fit
 } from '@allmaps/types'
+
+const VIEWPORT_BUFFER_FRATION = 0.5
 
 /**
  * The viewport describes the view on the rendered map.
@@ -61,11 +68,14 @@ export default class Viewport {
   projectedGeoRectangleBbox: Bbox
   rotation: number
   projectedGeoPerViewportScale: number
+  projectedGeoBufferedRectangle: Rectangle
 
   viewportCenter: Point
   viewportRectangle: Rectangle
   viewportSize: Size
   viewportBbox: Bbox
+  viewportBufferedRectangle: Rectangle
+  viewportBufferedBbox: Bbox
 
   devicePixelRatio: number
   canvasCenter: Point
@@ -141,6 +151,19 @@ export default class Viewport {
     this.projectedGeoToViewportTransform =
       this.composeProjectedGeoToViewportTransform()
     this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
+
+    this.viewportBufferedBbox = bufferBboxByFraction(
+      this.viewportBbox,
+      VIEWPORT_BUFFER_FRATION
+    )
+    this.viewportBufferedRectangle = bboxToRectangle(this.viewportBufferedBbox)
+    this.projectedGeoBufferedRectangle = this.viewportBufferedRectangle.map(
+      (point) =>
+        applyTransform(
+          invertTransform(this.projectedGeoToViewportTransform),
+          point
+        )
+    ) as Rectangle
   }
 
   /**

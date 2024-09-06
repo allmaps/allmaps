@@ -29,8 +29,15 @@ export default class CacheableImageBitmapTile extends CacheableTile<ImageBitmap>
         },
         this.fetchFn
       )
+
       const blob = await response.blob()
-      this.data = await createImageBitmap(blob)
+      this.data = await createImageBitmap(
+        blob,
+        0,
+        0,
+        this.tile.tileZoomLevel.width,
+        this.tile.tileZoomLevel.height
+      )
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)

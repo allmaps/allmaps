@@ -82,6 +82,24 @@ export function pointInBbox(point: Point, bbox: Bbox): boolean {
   return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
 }
 
+export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
+  if (dist1 === undefined) {
+    dist1 = dist0
+  }
+  return [bbox[0] - dist0, bbox[1] - dist1, bbox[2] + dist0, bbox[3] + dist1]
+}
+
+export function bufferBboxByFraction(bbox: Bbox, fraction: number): Bbox {
+  const size = bboxToSize(bbox)
+  return bufferBbox(
+    bbox,
+    ...(size.map((widthOrHeigth) => widthOrHeigth * fraction) as [
+      number,
+      number
+    ])
+  )
+}
+
 // Transform
 
 // Returns a rectangle with four points, starting from lower left and going anti-clockwise.

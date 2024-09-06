@@ -15,7 +15,8 @@ import type WarpedMap from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
-  RendererOptions
+  RendererOptions,
+  MapsPruneInfo
 } from '../shared/types.js'
 
 const MIN_VIEWPORT_DIAMETER = 5
@@ -168,7 +169,7 @@ export default abstract class BaseRenderer<
         warpedMap.getResourceToCanvasScale(viewport)
       )
 
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
+      warpedMap.setCurrentBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
       const transformerOptions = {
@@ -182,12 +183,13 @@ export default abstract class BaseRenderer<
       // TODO: Consider recusive refinement via options like {maxOffsetRatio: 0.00001, maxDepth: 2}
       // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
 
-      const resourceViewportRing = warpedMap.transformer.transformBackward(
-        [viewport.geoRectangle],
-        transformerOptions
-      )[0]
+      const resourceViewportRing =
+        warpedMap.projectedTransformer.transformBackward(
+          [viewport.projectedGeoBufferedRectangle],
+          transformerOptions
+        )[0]
 
-      warpedMap.setResourceViewportRing(resourceViewportRing)
+      warpedMap.setCurrentResourceViewportRing(resourceViewportRing)
 
       // This returns tiles sorted by distance from center of resourceViewportRing
       const tiles = computeTilesCoveringRingAtTileZoomLevel(
@@ -196,12 +198,18 @@ export default abstract class BaseRenderer<
         warpedMap.parsedImage
       )
 
+      const fetchableTiles = tiles.map(
+        (tile) => new FetchableTile(tile, warpedMap)
+      )
+      warpedMap.setCurrentFetchableTiles(fetchableTiles)
+
       for (const tile of tiles) {
         requestedTiles.push(new FetchableTile(tile, warpedMap))
       }
     }
 
     this.tileCache.requestFetchableTiles(requestedTiles)
+
     this.updateMapsInViewport(requestedTiles)
   }
 
@@ -216,6 +224,7 @@ export default abstract class BaseRenderer<
         return a.indexOf(v) === i
       })
 
+    // Sort to process by zIndex later
     this.mapsInViewport = new Set(
       newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
         const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
@@ -244,6 +253,20 @@ export default abstract class BaseRenderer<
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
     }
+
+    const mapsPruneInfo: MapsPruneInfo = new Map()
+    for (const {
+      mapId,
+      currentBestScaleFactor,
+      currentResourceViewportRingBbox
+    } of this.warpedMapList.getWarpedMaps(this.mapsInViewport)) {
+      mapsPruneInfo.set(mapId, {
+        currentBestScaleFactor,
+        currentResourceViewportRingBbox
+      })
+    }
+
+    this.tileCache.prune(mapsPruneInfo)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars

@@ -89,159 +89,161 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [getResourceToCanvasScale](#getresourcetocanvasscale)
     *   [Parameters](#parameters-12)
 *   [getReferenceScale](#getreferencescale)
-*   [setResourceViewportRing](#setresourceviewportring)
+*   [setCurrentResourceViewportRing](#setcurrentresourceviewportring)
     *   [Parameters](#parameters-13)
-*   [setResourceMask](#setresourcemask)
+*   [setCurrentFetchableTiles](#setcurrentfetchabletiles)
     *   [Parameters](#parameters-14)
-*   [setTransformationType](#settransformationtype)
+*   [setResourceMask](#setresourcemask)
     *   [Parameters](#parameters-15)
-*   [setDistortionMeasure](#setdistortionmeasure)
+*   [setTransformationType](#settransformationtype)
     *   [Parameters](#parameters-16)
-*   [setGcps](#setgcps)
+*   [setDistortionMeasure](#setdistortionmeasure)
     *   [Parameters](#parameters-17)
-*   [setBestScaleFactor](#setbestscalefactor)
+*   [setGcps](#setgcps)
     *   [Parameters](#parameters-18)
+*   [setCurrentBestScaleFactor](#setcurrentbestscalefactor)
+    *   [Parameters](#parameters-19)
 *   [hasImageInfo](#hasimageinfo)
 *   [loadImageInfo](#loadimageinfo)
 *   [constructor](#constructor-2)
-    *   [Parameters](#parameters-19)
-*   [setResourceMask](#setresourcemask-1)
     *   [Parameters](#parameters-20)
-*   [setBestScaleFactor](#setbestscalefactor-1)
+*   [setResourceMask](#setresourcemask-1)
     *   [Parameters](#parameters-21)
-*   [updateTriangulation](#updatetriangulation)
+*   [setCurrentBestScaleFactor](#setcurrentbestscalefactor-1)
     *   [Parameters](#parameters-22)
-*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
+*   [updateTriangulation](#updatetriangulation)
     *   [Parameters](#parameters-23)
-*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
+*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
     *   [Parameters](#parameters-24)
+*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
+    *   [Parameters](#parameters-25)
 *   [resetTrianglePoints](#resettrianglepoints)
 *   [mixTrianglePoints](#mixtrianglepoints)
-    *   [Parameters](#parameters-25)
-*   [constructor](#constructor-3)
     *   [Parameters](#parameters-26)
-*   [updateVertexBuffers](#updatevertexbuffers)
+*   [constructor](#constructor-3)
     *   [Parameters](#parameters-27)
-*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
+*   [updateVertexBuffers](#updatevertexbuffers)
     *   [Parameters](#parameters-28)
-*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
+*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
     *   [Parameters](#parameters-29)
-*   [constructor](#constructor-4)
+*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
     *   [Parameters](#parameters-30)
+*   [constructor](#constructor-4)
+    *   [Parameters](#parameters-31)
 *   [getMapIds](#getmapids)
 *   [getWarpedMap](#getwarpedmap)
-    *   [Parameters](#parameters-31)
-*   [getMapZIndex](#getmapzindex)
     *   [Parameters](#parameters-32)
+*   [getMapZIndex](#getmapzindex)
+    *   [Parameters](#parameters-33)
 *   [getBbox](#getbbox)
 *   [getProjectedBbox](#getprojectedbbox)
 *   [getMapsByGeoBbox](#getmapsbygeobbox)
-    *   [Parameters](#parameters-33)
-*   [setImageInformations](#setimageinformations)
     *   [Parameters](#parameters-34)
-*   [setMapResourceMask](#setmapresourcemask)
+*   [setImageInformations](#setimageinformations)
     *   [Parameters](#parameters-35)
-*   [setMapsTransformationType](#setmapstransformationtype)
+*   [setMapResourceMask](#setmapresourcemask)
     *   [Parameters](#parameters-36)
-*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
+*   [setMapsTransformationType](#setmapstransformationtype)
     *   [Parameters](#parameters-37)
-*   [bringMapsToFront](#bringmapstofront)
+*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [Parameters](#parameters-38)
-*   [sendMapsToBack](#sendmapstoback)
+*   [bringMapsToFront](#bringmapstofront)
     *   [Parameters](#parameters-39)
-*   [bringMapsForward](#bringmapsforward)
+*   [sendMapsToBack](#sendmapstoback)
     *   [Parameters](#parameters-40)
-*   [sendMapsBackward](#sendmapsbackward)
+*   [bringMapsForward](#bringmapsforward)
     *   [Parameters](#parameters-41)
-*   [showMaps](#showmaps)
+*   [sendMapsBackward](#sendmapsbackward)
     *   [Parameters](#parameters-42)
-*   [hideMaps](#hidemaps)
+*   [showMaps](#showmaps)
     *   [Parameters](#parameters-43)
-*   [addGeoreferencedMap](#addgeoreferencedmap)
+*   [hideMaps](#hidemaps)
     *   [Parameters](#parameters-44)
-*   [removeGeoreferencedMap](#removegeoreferencedmap)
+*   [addGeoreferencedMap](#addgeoreferencedmap)
     *   [Parameters](#parameters-45)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+*   [removeGeoreferencedMap](#removegeoreferencedmap)
     *   [Parameters](#parameters-46)
-*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
     *   [Parameters](#parameters-47)
-*   [constructor](#constructor-5)
+*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
     *   [Parameters](#parameters-48)
+*   [constructor](#constructor-5)
+    *   [Parameters](#parameters-49)
 *   [isCachedTile](#iscachedtile)
 *   [abort](#abort)
 *   [constructor](#constructor-6)
-    *   [Parameters](#parameters-49)
+    *   [Parameters](#parameters-50)
 *   [fetch](#fetch)
 *   [fetch](#fetch-1)
 *   [fetch](#fetch-2)
 *   [getCacheableTile](#getcacheabletile)
-    *   [Parameters](#parameters-50)
-*   [getCachedTile](#getcachedtile)
     *   [Parameters](#parameters-51)
+*   [getCachedTile](#getcachedtile)
+    *   [Parameters](#parameters-52)
 *   [getCacheableTiles](#getcacheabletiles)
 *   [getCachedTiles](#getcachedtiles)
 *   [getTileUrls](#gettileurls)
 *   [requestFetchableTiles](#requestfetchabletiles)
-    *   [Parameters](#parameters-52)
+    *   [Parameters](#parameters-53)
 *   [allRequestedTilesLoaded](#allrequestedtilesloaded)
 *   [constructor](#constructor-7)
-    *   [Parameters](#parameters-53)
+    *   [Parameters](#parameters-54)
 *   [getOpacity](#getopacity)
 *   [setOpacity](#setopacity)
-    *   [Parameters](#parameters-54)
+    *   [Parameters](#parameters-55)
 *   [resetOpacity](#resetopacity)
 *   [getMapOpacity](#getmapopacity)
-    *   [Parameters](#parameters-55)
-*   [setMapOpacity](#setmapopacity)
     *   [Parameters](#parameters-56)
-*   [resetMapOpacity](#resetmapopacity)
+*   [setMapOpacity](#setmapopacity)
     *   [Parameters](#parameters-57)
+*   [resetMapOpacity](#resetmapopacity)
+    *   [Parameters](#parameters-58)
 *   [getRemoveColorOptions](#getremovecoloroptions)
 *   [setRemoveColorOptions](#setremovecoloroptions)
-    *   [Parameters](#parameters-58)
+    *   [Parameters](#parameters-59)
 *   [resetRemoveColorOptions](#resetremovecoloroptions)
 *   [getMapRemoveColorOptions](#getmapremovecoloroptions)
-    *   [Parameters](#parameters-59)
-*   [setMapRemoveColorOptions](#setmapremovecoloroptions)
     *   [Parameters](#parameters-60)
-*   [resetMapRemoveColorOptions](#resetmapremovecoloroptions)
+*   [setMapRemoveColorOptions](#setmapremovecoloroptions)
     *   [Parameters](#parameters-61)
+*   [resetMapRemoveColorOptions](#resetmapremovecoloroptions)
+    *   [Parameters](#parameters-62)
 *   [getColorizeOptions](#getcolorizeoptions)
 *   [setColorizeOptions](#setcolorizeoptions)
-    *   [Parameters](#parameters-62)
+    *   [Parameters](#parameters-63)
 *   [resetColorizeOptions](#resetcolorizeoptions)
 *   [getMapColorizeOptions](#getmapcolorizeoptions)
-    *   [Parameters](#parameters-63)
-*   [setMapColorizeOptions](#setmapcolorizeoptions)
     *   [Parameters](#parameters-64)
-*   [resetMapColorizeOptions](#resetmapcolorizeoptions)
+*   [setMapColorizeOptions](#setmapcolorizeoptions)
     *   [Parameters](#parameters-65)
+*   [resetMapColorizeOptions](#resetmapcolorizeoptions)
+    *   [Parameters](#parameters-66)
 *   [getGridOptions](#getgridoptions)
 *   [setGridOptions](#setgridoptions)
-    *   [Parameters](#parameters-66)
+    *   [Parameters](#parameters-67)
 *   [resetGridOptions](#resetgridoptions)
 *   [getMapGridOptions](#getmapgridoptions)
-    *   [Parameters](#parameters-67)
-*   [setMapGridOptions](#setmapgridoptions)
     *   [Parameters](#parameters-68)
-*   [resetMapGridOptions](#resetmapgridoptions)
+*   [setMapGridOptions](#setmapgridoptions)
     *   [Parameters](#parameters-69)
+*   [resetMapGridOptions](#resetmapgridoptions)
+    *   [Parameters](#parameters-70)
 *   [getSaturation](#getsaturation)
 *   [setSaturation](#setsaturation)
-    *   [Parameters](#parameters-70)
+    *   [Parameters](#parameters-71)
 *   [resetSaturation](#resetsaturation)
 *   [getMapSaturation](#getmapsaturation)
-    *   [Parameters](#parameters-71)
-*   [setMapSaturation](#setmapsaturation)
     *   [Parameters](#parameters-72)
-*   [resetMapSaturation](#resetmapsaturation)
+*   [setMapSaturation](#setmapsaturation)
     *   [Parameters](#parameters-73)
-*   [render](#render)
+*   [resetMapSaturation](#resetmapsaturation)
     *   [Parameters](#parameters-74)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
+*   [render](#render)
     *   [Parameters](#parameters-75)
-*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
     *   [Parameters](#parameters-76)
+*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+    *   [Parameters](#parameters-77)
 
 ### constructor
 
@@ -249,9 +251,9 @@ Creates a new Viewport
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
+*   `i` &#x20;
 *   `r` &#x20;
 *   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
@@ -266,9 +268,9 @@ Returns a rotated rectangle in projected geo coordinates
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
+*   `i` &#x20;
 *   `r` &#x20;
 
 ### fromWarpedMapList
@@ -277,9 +279,9 @@ Static method creates that creates a Viewport from a WarpedMapList
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
+*   `i` &#x20;
 *   `r`   (optional, default `"contain"`)
 *   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
@@ -295,9 +297,9 @@ Static method creates that creates a Viewport from Bbox in projected geospatial 
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
+*   `i` &#x20;
 *   `r`   (optional, default `"contain"`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
@@ -413,7 +415,7 @@ Get the reference scaling from the forward transformation of the projected Helme
 
 Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
-### setResourceViewportRing
+### setCurrentResourceViewportRing
 
 Set resourceViewportRing at current viewport
 
@@ -421,6 +423,15 @@ Set resourceViewportRing at current viewport
 
 *   `e` &#x20;
 *   `resourceViewportRing` **Ring**&#x20;
+
+### setCurrentFetchableTiles
+
+Set tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
 
 ### setResourceMask
 
@@ -458,7 +469,7 @@ Update the Ground Controle Points loaded from a georeferenced map to new Ground 
 *   `e` &#x20;
 *   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GCP>**&#x20;
 
-### setBestScaleFactor
+### setCurrentBestScaleFactor
 
 Set the bestScaleFactor for the current viewport
 
@@ -501,7 +512,7 @@ Update the resourceMask.
 *   `e` &#x20;
 *   `resourceMask` **Ring**&#x20;
 
-### setBestScaleFactor
+### setCurrentBestScaleFactor
 
 Set the bestScaleFactor for the current viewport
 
@@ -559,10 +570,10 @@ Creates an instance of WebGL2WarpedMap.
 #### Parameters
 
 *   `e` &#x20;
+*   `t` &#x20;
 *   `r` &#x20;
-*   `i` &#x20;
+*   `a` &#x20;
 *   `s` &#x20;
-*   `T` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `gl` **WebGL2RenderingContext** WebGL rendering context

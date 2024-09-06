@@ -522,7 +522,7 @@ export default class WebGL2Renderer
   protected shouldUpdateRequestedTiles(): boolean {
     // Returns whether requested tiles should be updated
 
-    // Returns true wehn the viewport moved significantly
+    // Returns true when the viewport moved significantly
     // > to prevent updating requested tiles on minimal movements/
     // Returns true when the viewport didn't move at all
     // > since this function is called (possibly multiple times) during startup, without changes to the viewport
@@ -673,12 +673,12 @@ export default class WebGL2Renderer
 
       // Best scale factor
 
-      const bestScaleFactorLocation = gl.getUniformLocation(
+      const currentBestScaleFactorLocation = gl.getUniformLocation(
         this.program,
-        'u_bestScaleFactor'
+        'u_currentBestScaleFactor'
       )
-      const bestScaleFactor = warpedMap.bestScaleFactor
-      gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
+      const currentBestScaleFactor = warpedMap.currentBestScaleFactor
+      gl.uniform1i(currentBestScaleFactorLocation, currentBestScaleFactor)
 
       // Cached tiles texture array
 
@@ -699,6 +699,7 @@ export default class WebGL2Renderer
         )
       gl.uniform1i(cachedTilesResourcePositionsAndDimensionsLocation, 2)
       gl.activeTexture(gl.TEXTURE2)
+
       gl.bindTexture(
         gl.TEXTURE_2D,
         warpedMap.cachedTilesResourcePositionsAndDimensionsTexture
@@ -723,6 +724,7 @@ export default class WebGL2Renderer
       const offset = 0
 
       gl.bindVertexArray(vao)
+
       gl.drawArrays(primitiveType, offset, count)
     }
   }

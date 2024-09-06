@@ -1,17 +1,16 @@
 import { throttle } from 'lodash-es'
 
-import { isOverlapping } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
-import { computeBboxTile } from '../shared/tiles.js'
 import { applyTransform } from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
+import { tilesCoveringTileForScaleFactor } from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Transform } from '@allmaps/types'
+import type { Tile, Transform } from '@allmaps/types'
 
 import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
@@ -51,7 +50,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   vao: WebGLVertexArrayObject | null
 
-  CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -116,7 +115,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {CachedTile} cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
-    this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
@@ -126,7 +125,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {string} tileUrl
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
-    this.CachedTilesByTileUrl.delete(tileUrl)
+    this.cachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
   }
 
@@ -145,12 +144,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.bindVertexArray(this.vao)
 
     // Resource triangle points
-
-    const resourceTrianglePoints = this.resourceTrianglePoints
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(resourceTrianglePoints.flat()),
+      new Float32Array(this.resourceTrianglePoints.flat()),
       2,
       'a_resourceTrianglePoint'
     )
@@ -158,12 +155,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Clip previous and new triangle points
 
     const clipPreviousTrianglePoints =
-      this.projectedGeoPreviousTrianglePoints.map((point) => {
-        return applyTransform(
-          this.projectedGeoToClipTransform as Transform,
-          point
-        )
-      })
+      this.projectedGeoPreviousTrianglePoints.map((point) =>
+        applyTransform(this.projectedGeoToClipTransform as Transform, point)
+      )
+
     createBuffer(
       this.gl,
       this.program,
@@ -172,12 +167,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) => {
-      return applyTransform(
-        this.projectedGeoToClipTransform as Transform,
-        point
-      )
-    })
+    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
+      applyTransform(this.projectedGeoToClipTransform as Transform, point)
+    )
+
     createBuffer(
       this.gl,
       this.program,
@@ -190,21 +183,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Note: we must update the distortion data even when we don't render distortions
     // to ensure this array buffer is of the correct length, for example when triangulation changes
 
-    const previousTrianglePointsDistortion =
-      this.previousTrianglePointsDistortion
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(previousTrianglePointsDistortion),
+      new Float32Array(this.previousTrianglePointsDistortion),
       1,
       'a_previousTrianglePointDistortion'
     )
 
-    const trianglePointsDistortion = this.trianglePointsDistortion
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(trianglePointsDistortion),
+      new Float32Array(this.trianglePointsDistortion),
       1,
       'a_trianglePointDistortion'
     )
@@ -224,6 +214,160 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
+  private getCachedTilesFromOtherScaleFactors(
+    tile: Tile
+  ): Map<string, CachedTile<ImageBitmap>> {
+    // TODO: improve
+    if (!this.hasImageInfo()) {
+      return new Map()
+    }
+
+    if (this.cachedTilesByTileUrl.size == 0) {
+      return new Map()
+    }
+
+    const cachedTiles: Map<string, CachedTile<ImageBitmap>> = new Map()
+
+    const cachedTileAtHigherScaleFactor =
+      this.recursivelyGetCachedTileAtHigherScaleFactor(tile, 4)
+
+    let higherTilesFound = false
+    for (const cachedTile of cachedTileAtHigherScaleFactor) {
+      if (cachedTile) {
+        higherTilesFound = true
+        cachedTiles.set(cachedTile.tileUrl, cachedTile)
+      }
+    }
+    if (higherTilesFound) {
+      return cachedTiles
+    } else {
+      // const cachedTilesAtLowerScaleFactor =
+      //   this.recursivelyGetCachedTileAtLowerScaleFactor(tile, 1)
+      // for (const cachedTile of cachedTilesAtLowerScaleFactor) {
+      //   if (cachedTile) {
+      //     cachedTiles.set(cachedTile.tileUrl, cachedTile)
+      //   }
+      // }
+    }
+
+    return cachedTiles
+  }
+
+  private recursivelyGetCachedTileAtHigherScaleFactor(
+    tile: Tile,
+    log2ScaleFactorDiff: number
+  ): (CachedTile<ImageBitmap> | undefined)[] {
+    if (log2ScaleFactorDiff <= 0) {
+      return []
+    }
+    const cachedTiles = this.getCachedTileAtHigherScaleFactor(
+      tile,
+      log2ScaleFactorDiff
+    )
+    log2ScaleFactorDiff--
+    if (log2ScaleFactorDiff <= 0) {
+      return [cachedTiles]
+    } else {
+      return [
+        cachedTiles,
+        ...this.recursivelyGetCachedTileAtHigherScaleFactor(
+          tile,
+          log2ScaleFactorDiff
+        )
+      ]
+    }
+  }
+
+  private recursivelyGetCachedTileAtLowerScaleFactor(
+    tile: Tile,
+    log2ScaleFactorDiff: number
+  ): (CachedTile<ImageBitmap> | undefined)[] {
+    if (log2ScaleFactorDiff <= 0) {
+      return []
+    }
+    const cachedTiles = this.getCachedTilesAtLowerScaleFactor(
+      tile,
+      log2ScaleFactorDiff
+    )
+    log2ScaleFactorDiff--
+    if (log2ScaleFactorDiff <= 0) {
+      return cachedTiles
+    } else {
+      return [
+        ...cachedTiles,
+        ...this.recursivelyGetCachedTileAtLowerScaleFactor(
+          tile,
+          log2ScaleFactorDiff
+        )
+      ]
+    }
+  }
+
+  private getCachedTileAtHigherScaleFactor(
+    tile: Tile,
+    log2ScaleFactorDiff: number
+  ): CachedTile<ImageBitmap> | undefined {
+    // TODO: improve
+    if (!this.hasImageInfo()) {
+      throw new Error()
+    }
+
+    // TODO: simplify comparison, because this is also done in tilesCoveringTileForScaleFactor
+    const higherScaleFactor =
+      2 ** (Math.log2(this.currentBestScaleFactor) + log2ScaleFactorDiff)
+
+    const higherScaleFactorTiles = tilesCoveringTileForScaleFactor(
+      tile,
+      higherScaleFactor
+    )
+
+    const higherScaleFactorTile = higherScaleFactorTiles[0]
+
+    const higherScaleFactorTileUrl = this.parsedImage.getImageUrl(
+      this.parsedImage.getIiifTile(
+        higherScaleFactorTile.tileZoomLevel,
+        higherScaleFactorTile.column,
+        higherScaleFactorTile.row
+      )
+    )
+    const higherScaleFactorCachedTile = this.cachedTilesByTileUrl.get(
+      higherScaleFactorTileUrl
+    )
+    return higherScaleFactorCachedTile
+  }
+
+  // TODO: this returns a map so it's unique. Check that that property is used
+  private getCachedTilesAtLowerScaleFactor(
+    tile: Tile,
+    log2ScaleFactorDiff: number
+  ): (CachedTile<ImageBitmap> | undefined)[] {
+    // TODO: improve
+    if (!this.hasImageInfo()) {
+      throw new Error()
+    }
+
+    // TODO: simplify comparison, because this is also done in tilesCoveringTileForScaleFactor
+    const lowerScaleFactor =
+      2 ** (Math.log2(this.currentBestScaleFactor) - log2ScaleFactorDiff)
+
+    const lowerScaleFactorTiles = tilesCoveringTileForScaleFactor(
+      tile,
+      lowerScaleFactor
+    )
+
+    const higherScaleFactorTileUrls = lowerScaleFactorTiles.map((tile) =>
+      this.parsedImage.getImageUrl(
+        this.parsedImage.getIiifTile(tile.tileZoomLevel, tile.column, tile.row)
+      )
+    )
+
+    const higherScaleFactorCachedTiles = higherScaleFactorTileUrls.map(
+      (tileUrl) => this.cachedTilesByTileUrl.get(tileUrl)
+    )
+
+    return higherScaleFactorCachedTiles
+  }
+
   private async updateTextures() {
     const gl = this.gl
 
@@ -231,22 +375,33 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    if (this.CachedTilesByTileUrl.size === 0) {
+    if (this.cachedTilesByTileUrl.size === 0) {
       return
     }
 
-    let cachedTiles = [...this.CachedTilesByTileUrl.values()]
+    // Using a Map() so assure uniqueness
+    const textureTilesByTileUrl: Map<
+      string,
+      CachedTile<ImageBitmap>
+    > = new Map()
 
-    // Only pack tiles that are inside the viewport (as drawn on the resource)
-    // and don't differ too much in scale level from the optimal one at this viewport
-    cachedTiles = cachedTiles.filter((cachedTile) => {
-      return this.resourceViewportRingBbox
-        ? isOverlapping(
-            computeBboxTile(cachedTile.tile),
-            this.resourceViewportRingBbox
-          )
-        : true
-    })
+    // Select tiles for tileCache that make sense for this map
+    // Either because they are requested, or because they are it's parents or children
+    for (const fetchableTile of this.currentFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+      } else {
+        for (const [
+          tileUrl,
+          cachedTile
+        ] of this.getCachedTilesFromOtherScaleFactors(fetchableTile.tile)) {
+          textureTilesByTileUrl.set(tileUrl, cachedTile)
+        }
+      }
+    }
+
+    const textureTiles = [...textureTilesByTileUrl.values()]
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
@@ -267,30 +422,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       gl.RGBA,
       maxTileWidth,
       maxTileHeight,
-      cachedTiles.length,
+      textureTilesByTileUrl.size,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
       null
     )
-    for (let i = 0; i < cachedTiles.length; i++) {
-      let imageBitmap = cachedTiles[i].data
-
-      // Tiles are not guaranteed to respect the width and height
-      // But the texture array requires the bitmaps to be of the specified size
-      // So crop if needed
-      if (
-        imageBitmap.height > maxTileHeight ||
-        imageBitmap.width > maxTileWidth
-      ) {
-        imageBitmap = await createImageBitmap(
-          imageBitmap,
-          0,
-          0,
-          maxTileHeight,
-          maxTileHeight
-        )
-      }
+    for (let i = 0; i < textureTiles.length; i++) {
+      const imageBitmap = textureTiles[i].data
 
       gl.texSubImage3D(
         gl.TEXTURE_2D_ARRAY,
@@ -313,18 +452,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Cached tiles resource positions and dimensions texture
 
-    const cachedTilesResourcePositionsAndDimensions = cachedTiles.map(
-      (cachedTile) => {
+    const cachedTilesResourcePositionsAndDimensions = textureTiles.map(
+      (textureTile) => {
         if (
-          cachedTile &&
-          cachedTile.imageRequest &&
-          cachedTile.imageRequest.region
+          textureTile &&
+          textureTile.imageRequest &&
+          textureTile.imageRequest.region
         ) {
           return [
-            cachedTile.imageRequest.region.x,
-            cachedTile.imageRequest.region.y,
-            cachedTile.imageRequest.region.width,
-            cachedTile.imageRequest.region.height
+            textureTile.imageRequest.region.x,
+            textureTile.imageRequest.region.y,
+            textureTile.imageRequest.region.width,
+            textureTile.imageRequest.region.height
           ]
         }
       }
@@ -339,7 +478,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       0,
       gl.RGBA32I,
       1,
-      cachedTiles.length,
+      textureTiles.length,
       0,
       gl.RGBA_INTEGER,
       gl.INT,
@@ -352,8 +491,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Cached tiles scale factors texture
 
-    const cachedTilesScaleFactors = cachedTiles.map(
-      (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
+    const cachedTilesScaleFactors = textureTiles.map(
+      (textureTile) => textureTile.tile.tileZoomLevel.scaleFactor
     )
 
     gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
@@ -362,7 +501,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       0,
       gl.R32I,
       1,
-      cachedTiles.length,
+      textureTiles.length,
       0,
       gl.RED_INTEGER,
       gl.INT,
