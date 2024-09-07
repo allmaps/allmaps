@@ -89,14 +89,11 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
   return [bbox[0] - dist0, bbox[1] - dist1, bbox[2] + dist0, bbox[3] + dist1]
 }
 
-export function bufferBboxByFraction(bbox: Bbox, fraction: number): Bbox {
+export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
   const size = bboxToSize(bbox)
   return bufferBbox(
     bbox,
-    ...(size.map((widthOrHeigth) => widthOrHeigth * fraction) as [
-      number,
-      number
-    ])
+    ...(size.map((widthOrHeigth) => widthOrHeigth * ratio) as [number, number])
   )
 }
 

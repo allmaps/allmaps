@@ -23,7 +23,8 @@ import type {
   Bbox,
   GeojsonPolygon,
   FetchFn,
-  ImageInformations
+  ImageInformations,
+  TileZoomLevel
 } from '@allmaps/types'
 import type {
   Helmert,
@@ -96,9 +97,11 @@ export function createWarpedMapFactory() {
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
  * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {TileZoomLevel} [currentOverviewTileZoomLevel] - The overview tile zoom level, at the current viewport
  * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
  * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Tile[]} currentFetchableTiles - The fetchable tiles for displaying this map, at the current viewport
+ * @param {Tile[]} currentOverviewFetchableTiles - The overview fetchable tiles, at the current viewport
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -156,11 +159,13 @@ export default class WarpedMap extends EventTarget {
   // The properties below are for the current viewport
 
   currentBestScaleFactor!: number
+  currentOverviewTileZoomLevel?: TileZoomLevel
 
   currentResourceViewportRing: Ring = []
   currentResourceViewportRingBbox!: Bbox
 
   currentFetchableTiles: FetchableTile[] = []
+  currentOverviewFetchableTiles: FetchableTile[] = []
 
   /**
    * Creates an instance of WarpedMap.
@@ -351,6 +356,17 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Set overview tiles at current viewport
+   *
+   * @param {FetchableTile[]} overviewFetchableTiles
+   */
+  setCurrentOverviewFetchableTiles(
+    overviewFetchableTiles: FetchableTile[]
+  ): void {
+    this.currentOverviewFetchableTiles = overviewFetchableTiles
+  }
+
+  /**
    * Update the resourceMask loaded from a georeferenced map to a new mask.
    *
    * @param {Ring} resourceMask
@@ -404,6 +420,16 @@ export default class WarpedMap extends EventTarget {
       this.currentBestScaleFactor = scaleFactor
     }
     return updating
+  }
+
+  /**
+   * Set the overview tile zoom level for the current viewport
+   *
+   * @param {TileZoomLevel} tileZoomLevel - tile zoom level
+   * @returns {boolean}
+   */
+  setCurrentOverviewTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
+    this.currentOverviewTileZoomLevel = tileZoomLevel
   }
 
   /**

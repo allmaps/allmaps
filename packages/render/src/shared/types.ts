@@ -93,8 +93,9 @@ export type CachableTileFactory<D> = (
 ) => CacheableTile<D>
 
 export type MapPruneInfo = {
-  currentBestScaleFactor: number
-  currentResourceViewportRingBbox: Bbox
+  bestScaleFactor: number
+  overviewScaleFactor: number | undefined
+  resourceViewportRingBbox: Bbox
 }
 
 export type MapsPruneInfo = Map<string, MapPruneInfo>

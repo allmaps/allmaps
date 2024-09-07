@@ -5,10 +5,19 @@ import FetchableTile from '../tilecache/FetchableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   getBestTileZoomLevelForScale,
-  computeTilesCoveringRingAtTileZoomLevel
+  computeTilesCoveringRingAtTileZoomLevel,
+  getOverviewZoomLevel,
+  getTilesAtZoomLevel,
+  getTileResolution
 } from '../shared/tiles.js'
 
-import { distance, bboxToDiameter, bboxToCenter } from '@allmaps/stdlib'
+import {
+  distance,
+  bboxToDiameter,
+  bboxToCenter,
+  computeBbox,
+  webMercatorToLonLat
+} from '@allmaps/stdlib'
 
 import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
@@ -19,8 +28,22 @@ import type {
   MapsPruneInfo
 } from '../shared/types.js'
 
-const REQUEST_VIEWPORT_BUFFER_RATIO = 0.1
+const MANY_POSSIBLE_MAPS = 10 // For this amount of maps, request tiles
+
+const POSSIBLE_MAPS_VIEWPORT_BUFFER_RATIO = 1
+const REQUEST_VIEWPORT_BUFFER_RATIO = 0
+
 const MIN_VIEWPORT_DIAMETER = 5
+
+/**
+ * 0 = no correction, -1 = shaper, +1 = less sharp
+ * Normal has more effect on smaller scale factors
+ * Log2 (i.e. per zoomlevel) has equal effect all scale factors
+ */
+const SCALE_FACTOR_CORRECTION = 1
+const LOG2_SCALE_FACTOR_CORRECTION = 0
+
+const OVERVIEW_MAX_RESOLUTION = 1024 * 1024 // Support 1024 tiles, e.g. for Rotterdam map.
 
 /**
  * Abstract base class for renderers.
@@ -41,6 +64,7 @@ export default abstract class BaseRenderer<
   tileCache: TileCache<D>
 
   mapsInViewport: Set<string> = new Set()
+  possibleMapsInViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
   constructor(
@@ -119,23 +143,17 @@ export default abstract class BaseRenderer<
       return
     }
 
-    const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
-    ).sort((mapIdA, mapIdB) => {
-      const warpedMapA = this.warpedMapList.getWarpedMap(mapIdA)
-      const warpedMapB = this.warpedMapList.getWarpedMap(mapIdB)
-      if (warpedMapA && warpedMapB) {
-        return (
-          distance(bboxToCenter(warpedMapA.geoMaskBbox), viewport.geoCenter) -
-          distance(bboxToCenter(warpedMapB.geoMaskBbox), viewport.geoCenter)
-        )
-      } else {
-        return 0
-      }
-    })
+    this.possibleMapsInViewport = this.getPossibleMapsInViewport(
+      POSSIBLE_MAPS_VIEWPORT_BUFFER_RATIO
+    )
+    if (this.possibleMapsInViewport.size > MANY_POSSIBLE_MAPS) {
+      this.possibleMapsInViewport = this.getPossibleMapsInViewport(0)
+    }
 
     const requestedTiles: FetchableTile[] = []
-    for (const mapId of possibleMapsInViewport) {
+    const requestedOverviewTiles: FetchableTile[] = []
+
+    for (const mapId of this.possibleMapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
@@ -162,15 +180,17 @@ export default abstract class BaseRenderer<
         continue
       }
 
+      // Find bestTileZoomLevel for current viewport
+      const bestTileZoomLevel = getBestTileZoomLevelForScale(
+        warpedMap.parsedImage.tileZoomLevels,
+        warpedMap.getResourceToCanvasScale(viewport),
+        SCALE_FACTOR_CORRECTION,
+        LOG2_SCALE_FACTOR_CORRECTION
+      )
+      warpedMap.setCurrentBestScaleFactor(bestTileZoomLevel.scaleFactor)
       // Note the equivalence of the following two:
       // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
       // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
-      const tileZoomLevel = getBestTileZoomLevelForScale(
-        warpedMap.parsedImage,
-        warpedMap.getResourceToCanvasScale(viewport)
-      )
-
-      warpedMap.setCurrentBestScaleFactor(tileZoomLevel.scaleFactor)
 
       // Transforming the viewport back to resource
       const transformerOptions = {
@@ -183,38 +203,108 @@ export default abstract class BaseRenderer<
       // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
       // TODO: Consider recusive refinement via options like {maxOffsetRatio: 0.00001, maxDepth: 2}
       // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
-
       const resourceViewportRing =
         warpedMap.projectedTransformer.transformBackward(
           [
             viewport.getProjectedGeoBufferedRectangle(
-              REQUEST_VIEWPORT_BUFFER_RATIO
+              this.possibleMapsInViewport.size < MANY_POSSIBLE_MAPS
+                ? REQUEST_VIEWPORT_BUFFER_RATIO
+                : 0
             )
           ],
           transformerOptions
         )[0]
-
       warpedMap.setCurrentResourceViewportRing(resourceViewportRing)
 
-      // This returns tiles sorted by distance from center of resourceViewportRing
+      // Find tiles covering this back-transformed viewport
       const tiles = computeTilesCoveringRingAtTileZoomLevel(
         resourceViewportRing,
-        tileZoomLevel,
-        warpedMap.parsedImage
+        bestTileZoomLevel,
+        [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
       )
+      // This returns tiles sorted by distance from center of resourceViewportRing
 
+      // Make fetchable tiles and add to requested
       const fetchableTiles = tiles.map(
         (tile) => new FetchableTile(tile, warpedMap)
       )
-
       warpedMap.setCurrentFetchableTiles(fetchableTiles)
-
       requestedTiles.push(...fetchableTiles)
+
+      // If there's a fit overview level
+      // and we have not reached our maximum
+      // request overview tiles too
+      const overviewTileZoomLevel = getOverviewZoomLevel(
+        warpedMap.parsedImage.tileZoomLevels,
+        OVERVIEW_MAX_RESOLUTION
+      )
+      warpedMap.setCurrentOverviewTileZoomLevel(overviewTileZoomLevel)
+      const overviewTileZoomLevelTotalResolution = requestedOverviewTiles
+        .map((overviewFetchableTile) =>
+          getTileResolution(overviewFetchableTile.tile)
+        )
+        .reduce((a, c) => a + c, 0)
+
+      if (
+        this.possibleMapsInViewport.size <= MANY_POSSIBLE_MAPS &&
+        overviewTileZoomLevel &&
+        overviewTileZoomLevelTotalResolution <=
+          MANY_POSSIBLE_MAPS * OVERVIEW_MAX_RESOLUTION
+      ) {
+        const overviewTiles = getTilesAtZoomLevel(overviewTileZoomLevel, [
+          warpedMap.parsedImage.width,
+          warpedMap.parsedImage.height
+        ])
+
+        const overviewFetchableTiles = overviewTiles.map(
+          (tile) => new FetchableTile(tile, warpedMap)
+        )
+        warpedMap.setCurrentOverviewFetchableTiles(overviewFetchableTiles)
+        requestedOverviewTiles.push(...overviewFetchableTiles)
+      }
     }
 
-    this.tileCache.requestFetchableTiles(requestedTiles)
+    this.tileCache.requestFetchableTiles([
+      ...requestedTiles,
+      ...requestedOverviewTiles
+    ])
 
     this.updateMapsInViewport(requestedTiles)
+    this.pruneTileCache()
+  }
+
+  protected getPossibleMapsInViewport(
+    viewportBufferRatio: number
+  ): Set<string> {
+    if (!this.viewport) {
+      return new Set()
+    }
+
+    const viewport = this.viewport
+
+    const projectedGeoBufferedRectangle =
+      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
+    const geoBufferedRectangleBbox = computeBbox(
+      projectedGeoBufferedRectangle.map((point) => webMercatorToLonLat(point))
+    )
+
+    // Note: simplify this if RTree would ever by in projectedGeo instead of Geo coordinates
+    return new Set(
+      Array.from(
+        this.warpedMapList.getMapsByGeoBbox(geoBufferedRectangleBbox)
+      ).sort((mapIdA, mapIdB) => {
+        const warpedMapA = this.warpedMapList.getWarpedMap(mapIdA)
+        const warpedMapB = this.warpedMapList.getWarpedMap(mapIdB)
+        if (warpedMapA && warpedMapB) {
+          return (
+            distance(bboxToCenter(warpedMapA.geoMaskBbox), viewport.geoCenter) -
+            distance(bboxToCenter(warpedMapB.geoMaskBbox), viewport.geoCenter)
+          )
+        } else {
+          return 0
+        }
+      })
+    )
   }
 
   protected updateMapsInViewport(tiles: FetchableTile[]) {
@@ -257,19 +347,20 @@ export default abstract class BaseRenderer<
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
     }
+  }
 
+  protected pruneTileCache() {
     const mapsPruneInfo: MapsPruneInfo = new Map()
-    for (const {
-      mapId,
-      currentBestScaleFactor,
-      currentResourceViewportRingBbox
-    } of this.warpedMapList.getWarpedMaps(this.mapsInViewport)) {
-      mapsPruneInfo.set(mapId, {
-        currentBestScaleFactor,
-        currentResourceViewportRingBbox
+    for (const warpedMap of this.warpedMapList.getWarpedMaps(
+      this.possibleMapsInViewport
+    )) {
+      mapsPruneInfo.set(warpedMap.mapId, {
+        bestScaleFactor: warpedMap.currentBestScaleFactor,
+        overviewScaleFactor:
+          warpedMap.currentOverviewTileZoomLevel?.scaleFactor,
+        resourceViewportRingBbox: warpedMap.currentResourceViewportRingBbox
       })
     }
-
     this.tileCache.prune(mapsPruneInfo)
   }
 

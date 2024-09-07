@@ -203,5 +203,10 @@ void main() {
         color = colorBlack;
       }
     }
+  } else {
+    // Unfound tiles
+    if(false) {
+      color = vec4(0.0, 0.0, 0.0, 1.0);
+    }
   }
 }

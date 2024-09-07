@@ -11,7 +11,7 @@ import {
   bboxToRectangle,
   bboxToSize,
   sizesToScale,
-  bufferBboxByFraction,
+  bufferBboxByRatio,
   webMercatorToLonLat
 } from '@allmaps/stdlib'
 
@@ -224,7 +224,7 @@ export default class Viewport {
   }
 
   getProjectedGeoBufferedRectangle(bufferFraction: number): Rectangle {
-    const viewportBufferedBbox = bufferBboxByFraction(
+    const viewportBufferedBbox = bufferBboxByRatio(
       this.viewportBbox,
       bufferFraction
     )

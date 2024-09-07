@@ -39,7 +39,7 @@ import type {
   WebGL2RendererOptions
 } from '../shared/types.js'
 
-const THROTTLE_PREPARE_WAIT_MS = 500
+const THROTTLE_PREPARE_WAIT_MS = 200
 const THROTTLE_PREPARE_OPTIONS = {
   leading: true,
   trailing: true
@@ -573,7 +573,7 @@ export default class WebGL2Renderer
       this.viewport.projectedGeoToClipTransform
     )
 
-    for (const mapId of this.mapsInViewport) {
+    for (const mapId of this.possibleMapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (!warpedMap) {
         break
@@ -855,6 +855,7 @@ export default class WebGL2Renderer
       this.animating = false
       this.animationProgress = 0
       this.transformationTransitionStart = undefined
+      this.changed()
     }
   }
 

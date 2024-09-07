@@ -6,7 +6,7 @@ import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import { applyTransform } from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
-import { tilesCoveringTileForScaleFactor } from '../shared/tiles.js'
+import { getTilesCoveringTileAtScaleFactor } from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -16,7 +16,7 @@ import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
 
-const THROTTLE_WAIT_MS = 100
+const THROTTLE_WAIT_MS = 200
 const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
@@ -54,6 +54,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   vao: WebGLVertexArrayObject | null
 
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
+  previousTextureTileUrls: string[] = []
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -217,6 +218,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
+  // TODO: this returns a map so it's unique. Check that that property is used
   private getCachedTilesFromOtherScaleFactors(
     tile: Tile
   ): Map<string, CachedTile<ImageBitmap>> {
@@ -325,7 +327,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const higherScaleFactor =
       2 ** (Math.log2(this.currentBestScaleFactor) + log2ScaleFactorDiff)
 
-    const higherScaleFactorTiles = tilesCoveringTileForScaleFactor(
+    const higherScaleFactorTiles = getTilesCoveringTileAtScaleFactor(
       tile,
       higherScaleFactor
     )
@@ -345,7 +347,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return higherScaleFactorCachedTile
   }
 
-  // TODO: this returns a map so it's unique. Check that that property is used
   private getCachedTilesAtLowerScaleFactor(
     tile: Tile,
     log2ScaleFactorDiff: number
@@ -359,7 +360,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const lowerScaleFactor =
       2 ** (Math.log2(this.currentBestScaleFactor) - log2ScaleFactorDiff)
 
-    const lowerScaleFactorTiles = tilesCoveringTileForScaleFactor(
+    const lowerScaleFactorTiles = getTilesCoveringTileAtScaleFactor(
       tile,
       lowerScaleFactor
     )
@@ -388,40 +389,77 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    // Using a Map() so assure uniqueness
-    const textureTilesByTileUrl: Map<
-      string,
-      CachedTile<ImageBitmap>
-    > = new Map()
-
-    // let cachedTileFromCache = 0
     // Select tiles for tileCache that make sense for this map
     // Either because they are requested, or because they are it's parents or children
+    const requestedCachedTiles = []
+    const otherTileZoomLevelsCachedTiles = []
+
     for (const fetchableTile of this.currentFetchableTiles) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
-        textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
-        // cachedTileFromCache++
+        requestedCachedTiles.push(cachedTile)
       } else {
-        for (const [
-          tileUrl,
-          cachedTile
-        ] of this.getCachedTilesFromOtherScaleFactors(fetchableTile.tile)) {
-          textureTilesByTileUrl.set(tileUrl, cachedTile)
+        for (const cachedTile of this.getCachedTilesFromOtherScaleFactors(
+          fetchableTile.tile
+        ).values()) {
+          otherTileZoomLevelsCachedTiles.push(cachedTile)
         }
       }
     }
 
-    const textureTiles = [...textureTilesByTileUrl.values()]
+    // Select tiles for tileCache that are at overview zoomlevel
+    const overviewCachedTiles = []
+
+    for (const fetchableTile of this.currentOverviewFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        overviewCachedTiles.push(cachedTile)
+      }
+    }
+    // TODO: Keeping this for now because maybe selection of overview is different at texture making
+    // const overviewCachedTiles = Array.from(
+    //   this.cachedTilesByTileUrl.values()
+    // ).filter(
+    //   (cachedTile) =>
+    //     this.currentOverviewTileZoomLevel &&
+    //     cachedTile.tile.tileZoomLevel.scaleFactor ==
+    //       this.currentOverviewTileZoomLevel.scaleFactor
+    // )
+
+    let textureTiles = [
+      ...requestedCachedTiles,
+      ...otherTileZoomLevelsCachedTiles,
+      ...overviewCachedTiles
+    ]
+
+    // Making textureTiles unique by tileUrl
+    const textureTilesByTileUrl: Map<
+      string,
+      CachedTile<ImageBitmap>
+    > = new Map()
+    textureTiles.forEach((cachedTile) =>
+      textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    )
+    textureTiles = [...textureTilesByTileUrl.values()]
+
+    if (textureTiles.length == 0) {
+      return
+    }
 
     // console.log(
-    //   'request',
+    //   'request:',
     //   this.currentFetchableTiles.length,
-    //   'found',
-    //   cachedTileFromCache,
-    //   'texture',
+    //   '+',
+    //   this.currentOverviewFetchableTiles.length,
+    //   ', texture:',
+    //   requestedCachedTiles.length,
+    //   '+',
+    //   otherTileZoomLevelsCachedTiles.length,
+    //   '+',
+    //   overviewCachedTiles.length,
+    //   '=',
     //   textureTiles.length,
-    //   'cache',
+    //   ', cache:',
     //   this.cachedTilesByTileUrl.size
     // )
 
@@ -533,6 +571,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    this.previousTextureTileUrls = textureTiles.map(
+      (textureTile) => textureTile.tileUrl
+    )
 
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
   }

@@ -1,9 +1,9 @@
-import { equalSet, bufferBboxByFraction } from '@allmaps/stdlib'
+import { equalSet } from '@allmaps/stdlib'
 
 import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import { fetchableTilesToKeys, pruneTile } from '../shared/tiles.js'
+import { shouldPruneTile } from '../shared/tiles.js'
 import FetchableTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -14,7 +14,11 @@ import type {
   MapsPruneInfo
 } from '../shared/types.js'
 
-const RESOURCE_VIEWPORT_BUFFER_FRATION = 0.5
+const PRUNE_MANY_MAPS = 20 // For this amount of maps, prune more tiles
+
+const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
+const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
+const PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO = 1
 
 /**
  * Class that fetches and caches IIIF tiles.
@@ -126,8 +130,8 @@ export default class TileCache<D> extends EventTarget {
    * @param {FetchableTile[]} tiles
    */
   requestFetchableTiles(tiles: FetchableTile[]) {
-    const previousTilesKeys = fetchableTilesToKeys(this.previousRequestedTiles)
-    const requestedTilesKeys = fetchableTilesToKeys(tiles)
+    const previousTilesKeys = FetchableTile.toKeys(this.previousRequestedTiles)
+    const requestedTilesKeys = FetchableTile.toKeys(tiles)
 
     // If previous requested tiles is the same as current requested tiles, don't do anything
     if (equalSet(previousTilesKeys, requestedTilesKeys)) {
@@ -173,22 +177,21 @@ export default class TileCache<D> extends EventTarget {
   }
 
   prune(mapsPruneInfo: MapsPruneInfo) {
-    // const oldSize = this.tilesByTileUrl.size
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
-        const pruneInfo = mapsPruneInfo.get(mapId)
+        const mapPruneInfo = mapsPruneInfo.get(mapId)
         const tile = this.tilesByTileUrl.get(tileUrl)?.tile
 
         if (tile) {
           if (
-            !pruneInfo ||
-            pruneTile(
+            !mapPruneInfo ||
+            shouldPruneTile(
               tile,
-              pruneInfo.currentBestScaleFactor,
-              bufferBboxByFraction(
-                pruneInfo.currentResourceViewportRingBbox,
-                RESOURCE_VIEWPORT_BUFFER_FRATION
-              )
+              mapPruneInfo,
+              mapsPruneInfo.size >= PRUNE_MANY_MAPS,
+              PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+              PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
+              PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
             )
           ) {
             this.removeMapTile(mapId, tileUrl)
@@ -196,7 +199,12 @@ export default class TileCache<D> extends EventTarget {
         }
       }
     }
-    // console.log('pruned', oldSize, this.tilesByTileUrl.size)
+    // console.log(
+    //   'possibleMaps',
+    //   mapsPruneInfo.size,
+    //   'tileCache',
+    //   this.tileUrlsByMapId.values()
+    // )
   }
 
   getTileUrlsForMapId(mapId: string) {
