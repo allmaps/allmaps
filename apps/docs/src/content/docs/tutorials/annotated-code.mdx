@@ -1,0 +1,57 @@
+---
+title: Allmaps IDs
+description: ''
+---
+
+import Annotation from '../../../components/Annotation.svelte'
+import AnnotationCodeBlock from '../../../components/AnnotationCodeBlock.svelte'
+import UrlExplorer from '../../../components/UrlExplorer.svelte'
+
+# Annotated Code Block test
+
+This is the annotated code block.
+
+<AnnotationCodeBlock
+  client:only="svelte"
+  code="const hi = 'yo'
+  for (int i = 0 ; i < 20; i++) {
+     console.log()
+     }"
+  includePlaceholder={true}
+>
+  <Annotation highlight={[1]}>
+    # Notes can be written in the MDX
+  </Annotation>
+  <Annotation highlight={[2]}>
+    They will highlight as they're scrolled. Line 3 should be highlighted here.
+    <br/>
+    `highlight={[3]}`
+  </Annotation>
+  <Annotation highlight={[3]}>
+    Code is authored in the overall `<AnnotationCodeBlock>` component, and individual annotations are indicated with `<Annotation>`
+  </Annotation>
+ 
+  <Annotation highlight= {[1, 3, 5]}>
+    In the AnnotationCodeBlock, the `includePlaceholder` property inserts an invisible annotation at the bottom of the list. Without it, it would be impossible to scroll to the bottom few annotations if it was at the end of a page.
+  </Annotation>
+
+  <Annotation>
+    It is important to include `client:only="svelte"` in the `AnnotationCodeBlock` definition because all of these interactions are done on the client side.
+  </Annotation>
+</AnnotationCodeBlock>
+
+# This is the second annotation code block
+
+<AnnotationCodeBlock
+  client:only="svelte"
+  includePlaceholder={true}
+  code="const hi = 'yo'
+  for (int i = 0 ; i < 20; i++) {
+     console.log()
+     }"
+  includePlaceholder={true}
+>
+<Annotation>
+Testing to see what happens if there are two annotation code blocks
+</Annotation>
+</AnnotationCodeBlock>

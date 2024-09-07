@@ -23,6 +23,9 @@ export default defineConfig({
         // Pick main or develop branch
         baseUrl: 'https://github.com/allmaps/allmaps/tree/develop/apps/docs/'
       },
+      expressiveCode: {
+        themes: ['material-theme']
+      },
       sidebar: [
         { label: 'Introduction', link: '/introduction/' },
         { label: 'Get Started', link: '/get-started/' },
