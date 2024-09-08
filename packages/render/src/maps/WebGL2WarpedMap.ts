@@ -15,8 +15,9 @@ import type { Tile, Transform } from '@allmaps/types'
 import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
+import { equalArray } from '@allmaps/stdlib'
 
-const THROTTLE_WAIT_MS = 200
+const THROTTLE_WAIT_MS = 100
 const THROTTLE_OPTIONS = {
   leading: true,
   trailing: true
@@ -66,7 +67,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   projectedGeoToClipTransform: Transform | undefined
 
-  throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
+  clearTextures: DebouncedFunc<typeof this.updateTextures>
 
   /**
    * Creates an instance of WebGL2WarpedMap.
@@ -96,7 +97,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
     this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
-    this.throttledUpdateTextures = throttle(
+    this.clearTextures = throttle(
       this.updateTextures.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
@@ -120,7 +121,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
-    this.throttledUpdateTextures()
+    this.clearTextures()
   }
 
   /**
@@ -130,8 +131,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     this.cachedTilesByTileUrl.delete(tileUrl)
-    this.throttledUpdateTextures()
+    this.clearTextures()
   }
+
+  // TODO: implement clearing, e.g. drawing transparent 1x1 pixel
+  clearTexture() {}
 
   dispose() {
     this.gl.deleteVertexArray(this.vao)
@@ -222,11 +226,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private getCachedTilesFromOtherScaleFactors(
     tile: Tile
   ): Map<string, CachedTile<ImageBitmap>> {
-    // TODO: improve
-    if (!this.hasImageInfo()) {
-      return new Map()
-    }
-
     if (this.cachedTilesByTileUrl.size == 0) {
       return new Map()
     }
@@ -332,6 +331,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       higherScaleFactor
     )
 
+    if (higherScaleFactorTiles.length == 0) {
+      return undefined
+    }
+
     const higherScaleFactorTile = higherScaleFactorTiles[0]
 
     const higherScaleFactorTileUrl = this.parsedImage.getImageUrl(
@@ -385,83 +388,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    if (this.cachedTilesByTileUrl.size === 0) {
+    const textureTiles = this.getTextureTiles()
+
+    if (
+      equalArray(
+        textureTiles.map((textureTile) => textureTile.tileUrl),
+        this.previousTextureTileUrls
+      )
+    ) {
       return
     }
-
-    // Select tiles for tileCache that make sense for this map
-    // Either because they are requested, or because they are it's parents or children
-    const requestedCachedTiles = []
-    const otherTileZoomLevelsCachedTiles = []
-
-    for (const fetchableTile of this.currentFetchableTiles) {
-      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
-      if (cachedTile) {
-        requestedCachedTiles.push(cachedTile)
-      } else {
-        for (const cachedTile of this.getCachedTilesFromOtherScaleFactors(
-          fetchableTile.tile
-        ).values()) {
-          otherTileZoomLevelsCachedTiles.push(cachedTile)
-        }
-      }
-    }
-
-    // Select tiles for tileCache that are at overview zoomlevel
-    const overviewCachedTiles = []
-
-    for (const fetchableTile of this.currentOverviewFetchableTiles) {
-      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
-      if (cachedTile) {
-        overviewCachedTiles.push(cachedTile)
-      }
-    }
-    // TODO: Keeping this for now because maybe selection of overview is different at texture making
-    // const overviewCachedTiles = Array.from(
-    //   this.cachedTilesByTileUrl.values()
-    // ).filter(
-    //   (cachedTile) =>
-    //     this.currentOverviewTileZoomLevel &&
-    //     cachedTile.tile.tileZoomLevel.scaleFactor ==
-    //       this.currentOverviewTileZoomLevel.scaleFactor
-    // )
-
-    let textureTiles = [
-      ...requestedCachedTiles,
-      ...otherTileZoomLevelsCachedTiles,
-      ...overviewCachedTiles
-    ]
-
-    // Making textureTiles unique by tileUrl
-    const textureTilesByTileUrl: Map<
-      string,
-      CachedTile<ImageBitmap>
-    > = new Map()
-    textureTiles.forEach((cachedTile) =>
-      textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
-    )
-    textureTiles = [...textureTilesByTileUrl.values()]
-
-    if (textureTiles.length == 0) {
-      return
-    }
-
-    // console.log(
-    //   'request:',
-    //   this.currentFetchableTiles.length,
-    //   '+',
-    //   this.currentOverviewFetchableTiles.length,
-    //   ', texture:',
-    //   requestedCachedTiles.length,
-    //   '+',
-    //   otherTileZoomLevelsCachedTiles.length,
-    //   '+',
-    //   overviewCachedTiles.length,
-    //   '=',
-    //   textureTiles.length,
-    //   ', cache:',
-    //   this.cachedTilesByTileUrl.size
-    // )
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
@@ -482,7 +418,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       gl.RGBA,
       maxTileWidth,
       maxTileHeight,
-      textureTilesByTileUrl.size,
+      textureTiles.length,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
@@ -577,5 +513,70 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+  }
+
+  getTextureTiles() {
+    // Select tiles for tileCache that make sense for this map
+    // Either because they are requested, or because they are it's parents or children
+    const requestedCachedTiles = []
+    const otherTileZoomLevelsCachedTiles = []
+
+    for (const fetchableTile of this.currentFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        requestedCachedTiles.push(cachedTile)
+      } else {
+        for (const cachedTile of this.getCachedTilesFromOtherScaleFactors(
+          fetchableTile.tile
+        ).values()) {
+          otherTileZoomLevelsCachedTiles.push(cachedTile)
+        }
+      }
+    }
+
+    // Select tiles for tileCache that are at overview zoomlevel
+    const overviewCachedTiles = []
+
+    for (const fetchableTile of this.currentOverviewFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        overviewCachedTiles.push(cachedTile)
+      }
+    }
+
+    let textureTiles = [
+      ...requestedCachedTiles,
+      ...otherTileZoomLevelsCachedTiles,
+      ...overviewCachedTiles
+    ]
+
+    // Making textureTiles unique by tileUrl
+    const textureTilesByTileUrl: Map<
+      string,
+      CachedTile<ImageBitmap>
+    > = new Map()
+    textureTiles.forEach((cachedTile) =>
+      textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    )
+    textureTiles = [...textureTilesByTileUrl.values()]
+
+    // console.log(
+    //   'request:',
+    //   this.currentFetchableTiles.length,
+    //   '+',
+    //   this.currentOverviewFetchableTiles.length,
+    //   ', texture:',
+    //   requestedCachedTiles.length,
+    //   '+',
+    //   otherTileZoomLevelsCachedTiles.length,
+    //   '+',
+    //   overviewCachedTiles.length,
+    //   '=',
+    //   textureTiles.length,
+    //   ', cache:',
+    //   this.cachedTilesByTileUrl.size
+    // )
+
+    return textureTiles
   }
 }

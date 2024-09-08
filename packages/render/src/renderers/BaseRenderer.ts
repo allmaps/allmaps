@@ -6,9 +6,9 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   getBestTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel,
-  getOverviewZoomLevel,
   getTilesAtZoomLevel,
-  getTileResolution
+  getTileResolution,
+  getOverviewTileZoomLevel
 } from '../shared/tiles.js'
 
 import {
@@ -28,7 +28,7 @@ import type {
   MapsPruneInfo
 } from '../shared/types.js'
 
-const MANY_POSSIBLE_MAPS = 10 // For this amount of maps, request tiles
+const MANY_POSSIBLE_MAPS = 20 // For this amount of maps, request tiles
 
 const POSSIBLE_MAPS_VIEWPORT_BUFFER_RATIO = 1
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -146,6 +146,8 @@ export default abstract class BaseRenderer<
     this.possibleMapsInViewport = this.getPossibleMapsInViewport(
       POSSIBLE_MAPS_VIEWPORT_BUFFER_RATIO
     )
+    // If you find more then many maps, look again without buffering
+    // Note: don't just take the first MANY_POSSIBLE_MAPS, since there might be more needed
     if (this.possibleMapsInViewport.size > MANY_POSSIBLE_MAPS) {
       this.possibleMapsInViewport = this.getPossibleMapsInViewport(0)
     }
@@ -234,10 +236,13 @@ export default abstract class BaseRenderer<
       // If there's a fit overview level
       // and we have not reached our maximum
       // request overview tiles too
-      const overviewTileZoomLevel = getOverviewZoomLevel(
+      const overviewTileZoomLevel = getOverviewTileZoomLevel(
         warpedMap.parsedImage.tileZoomLevels,
-        OVERVIEW_MAX_RESOLUTION
+        bestTileZoomLevel.scaleFactor,
+        OVERVIEW_MAX_RESOLUTION,
+        this.warpedMapList.warpedMapsById.size > MANY_POSSIBLE_MAPS
       )
+
       warpedMap.setCurrentOverviewTileZoomLevel(overviewTileZoomLevel)
       const overviewTileZoomLevelTotalResolution = requestedOverviewTiles
         .map((overviewFetchableTile) =>
@@ -246,7 +251,6 @@ export default abstract class BaseRenderer<
         .reduce((a, c) => a + c, 0)
 
       if (
-        this.possibleMapsInViewport.size <= MANY_POSSIBLE_MAPS &&
         overviewTileZoomLevel &&
         overviewTileZoomLevelTotalResolution <=
           MANY_POSSIBLE_MAPS * OVERVIEW_MAX_RESOLUTION
@@ -337,12 +341,13 @@ export default abstract class BaseRenderer<
       (mapId) => !newMapsInViewportAsArray.includes(mapId)
     )
 
-    for (const mapId in enteringMapsInViewport) {
+    for (const mapId of enteringMapsInViewport) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
       )
     }
-    for (const mapId in leavingMapsInViewport) {
+    for (const mapId of leavingMapsInViewport) {
+      this.clearMapTextures(mapId)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
@@ -364,6 +369,10 @@ export default abstract class BaseRenderer<
     this.tileCache.prune(mapsPruneInfo)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected clearMapTextures(mapId: string): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected mapTileLoaded(event: Event): void {}
 

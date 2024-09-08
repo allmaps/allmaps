@@ -869,6 +869,13 @@ export default class WebGL2Renderer
     }
   }
 
+  protected clearMapTextures(mapId: string) {
+    const webGL2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (webGL2WarpedMap) {
+      webGL2WarpedMap.clearTextures()
+    }
+  }
+
   protected mapTileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail

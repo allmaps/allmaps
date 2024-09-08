@@ -3,7 +3,7 @@ import { equalSet } from '@allmaps/stdlib'
 import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import { shouldPruneTile } from '../shared/tiles.js'
+import { isOverviewTile, shouldPruneTile } from '../shared/tiles.js'
 import FetchableTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -14,7 +14,7 @@ import type {
   MapsPruneInfo
 } from '../shared/types.js'
 
-const PRUNE_MANY_MAPS = 20 // For this amount of maps, prune more tiles
+const PRUNE_MANY_MAPS = 50 // For this amount of maps, prune more tiles
 
 const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
 const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
@@ -177,34 +177,49 @@ export default class TileCache<D> extends EventTarget {
   }
 
   prune(mapsPruneInfo: MapsPruneInfo) {
+    const mapIdsWithOverviewKept = new Set()
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
         const mapPruneInfo = mapsPruneInfo.get(mapId)
         const tile = this.tilesByTileUrl.get(tileUrl)?.tile
 
         if (tile) {
+          const keepMapOverview = mapIdsWithOverviewKept.size < PRUNE_MANY_MAPS
           if (
             !mapPruneInfo ||
             shouldPruneTile(
               tile,
               mapPruneInfo,
-              mapsPruneInfo.size >= PRUNE_MANY_MAPS,
-              PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
-              PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
-              PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
+              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+                ? PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+                : 0,
+              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+                ? PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+                : 0,
+              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+                ? PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
+                : 0,
+              keepMapOverview
             )
           ) {
             this.removeMapTile(mapId, tileUrl)
+          } else {
+            if (keepMapOverview && isOverviewTile(tile, mapPruneInfo)) {
+              mapIdsWithOverviewKept.add(mapId)
+            }
           }
         }
       }
     }
-    // console.log(
-    //   'possibleMaps',
-    //   mapsPruneInfo.size,
-    //   'tileCache',
-    //   this.tileUrlsByMapId.values()
-    // )
+
+    console.log(
+      'prune info for',
+      mapsPruneInfo.size,
+      'cache by mapId',
+      Array.from(this.tileUrlsByMapId.values()).map((set) => set.size),
+      'maps with overview kept',
+      mapIdsWithOverviewKept.size
+    )
   }
 
   getTileUrlsForMapId(mapId: string) {

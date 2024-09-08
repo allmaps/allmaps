@@ -88,11 +88,14 @@ export function getBestTileZoomLevelForScale(
   return bestTileZoomLevel
 }
 
-export function getOverviewZoomLevel(
+export function getOverviewTileZoomLevel(
   tileZoomLevels: TileZoomLevel[],
-  maxResolution: number
+  bestScaleFactor: number,
+  maxResolution: number,
+  manyMap: boolean
 ): TileZoomLevel | undefined {
-  return tileZoomLevels
+  const overviewTileZoomLevels = tileZoomLevels
+    .filter((tileZoomLevel) => tileZoomLevel.scaleFactor > bestScaleFactor)
     .filter(
       (tileZoomLevel) =>
         getTileZoomLevelResolution(tileZoomLevel) <= maxResolution
@@ -101,7 +104,7 @@ export function getOverviewZoomLevel(
       (tileZoomLevel0, tileZoomLevel1) =>
         tileZoomLevel1.scaleFactor - tileZoomLevel0.scaleFactor
     )
-    .at(-1)
+  return manyMap ? overviewTileZoomLevels.at(1) : overviewTileZoomLevels.at(-1)
 }
 
 // Making tiles
@@ -248,14 +251,14 @@ export function getTilesCoveringTileAtScaleFactor(
   )
   columnStart = columnStart >= 0 ? columnStart : 0
   const columnEnd = Math.ceil(
-    ((tile.column + 1) * tile.tileZoomLevel.scaleFactor) / scaleFactor - 1
+    ((tile.column + 1) * tile.tileZoomLevel.scaleFactor) / scaleFactor
   )
   let rowStart = Math.floor(
     (tile.row * tile.tileZoomLevel.scaleFactor) / scaleFactor
   )
   rowStart = rowStart >= 0 ? rowStart : 0
   const rowEnd = Math.ceil(
-    ((tile.row + 1) * tile.tileZoomLevel.scaleFactor) / scaleFactor - 1
+    ((tile.row + 1) * tile.tileZoomLevel.scaleFactor) / scaleFactor
   )
   return getTilesAtZoomLevel(
     tile.tileZoomLevel,
@@ -440,13 +443,20 @@ export function createKeyFromTile(fetchableTile: FetchableTile): string {
   )
 }
 
+export function isOverviewTile(tile: Tile, pruneInfo: MapPruneInfo) {
+  return (
+    pruneInfo.overviewScaleFactor &&
+    tile.tileZoomLevel.scaleFactor >= pruneInfo.overviewScaleFactor
+  )
+}
+
 export function shouldPruneTile(
   tile: Tile,
-  pruneInfo: MapPruneInfo,
-  manyMaps: boolean,
+  mapPruneInfo: MapPruneInfo,
   maxHigherLog2ScaleFactorDiff: number,
   maxLowerLog2ScaleFactorDiff: number,
-  viewportBufferRatio: number
+  viewportBufferRatio: number,
+  keepOverview = true
 ) {
   // Example:
   // Available scaleFactors in tileZoomLevels:
@@ -460,22 +470,17 @@ export function shouldPruneTile(
   // Since there are less lower resolution tiles,
   // MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF can be higher then MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
 
-  maxHigherLog2ScaleFactorDiff = !manyMaps ? maxHigherLog2ScaleFactorDiff : 0
-  maxLowerLog2ScaleFactorDiff = !manyMaps ? maxLowerLog2ScaleFactorDiff : 0
-  viewportBufferRatio = !manyMaps ? viewportBufferRatio : 0
-
-  if (
-    !manyMaps &&
-    pruneInfo.overviewScaleFactor &&
-    tile.tileZoomLevel.scaleFactor >= pruneInfo.overviewScaleFactor
-  ) {
+  if (keepOverview && isOverviewTile(tile, mapPruneInfo)) {
     return false
   }
 
   if (
     !isOverlapping(
       computeBboxTile(tile),
-      bufferBboxByRatio(pruneInfo.resourceViewportRingBbox, viewportBufferRatio)
+      bufferBboxByRatio(
+        mapPruneInfo.resourceViewportRingBbox,
+        viewportBufferRatio
+      )
     )
   ) {
     return true
@@ -483,7 +488,7 @@ export function shouldPruneTile(
 
   const log2ScaleFactorDiff =
     Math.log2(tile.tileZoomLevel.scaleFactor) -
-    Math.log2(pruneInfo.bestScaleFactor)
+    Math.log2(mapPruneInfo.bestScaleFactor)
   // Check if scale factor not too high, i.e. tile resolution too low
   const tileScaleFactorTooHigh =
     log2ScaleFactorDiff > maxHigherLog2ScaleFactorDiff
