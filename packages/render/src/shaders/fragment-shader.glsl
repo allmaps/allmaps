@@ -72,8 +72,7 @@ void main() {
   int cachedTilesCount = cachedTilesTextureSize.z;
 
   // Setting references for the for loop
-  int smallestScaleFactorDiff = 256 * 256; // Starting with very high number
-  int currentBestScaleFactor = 0;
+  int smallestBestScaleFactorDiff = int(pow(2.0, 20.0)); // Starting with very high number
 
   // Prepare storage for the resulting cached tiles texture point that corresponds to the triangle point
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
@@ -81,7 +80,7 @@ void main() {
   // Set the initial values
   color = colorTransparent;
   bool found = false;
-  int foundIndex = 0;
+  int foundIndex;
 
   // Loop through all cached tiles
   for(int index= 0 ; index < cachedTilesCount; index += 1) {
@@ -97,28 +96,27 @@ void main() {
     float cachedTileDimensionHeight = float(cachedTileResourcePositionAndDimension.a);
 
     // If the triangle point is inside the tile, consider to use the tile:
-    // if the scale factor is closer to the best scale factor for this map then currently known one
-    // update the smallest scale factor diff
-    // and compute the cached tiles texture point that corresponds to the triangle point
     if(resourceTrianglePointX >= cachedTileResourcePositionX &&
       resourceTrianglePointX < cachedTileResourcePositionX + cachedTileDimensionWidth &&
       resourceTrianglePointY >= cachedTileResourcePositionY &&
       resourceTrianglePointY < cachedTileResourcePositionY + cachedTileDimensionHeight) {
-      found = true;
 
+      // If the scale factor is smaller (more detailed) then the best scale factor for this map then currently known
+      // update the current best scale factor
+      // and compute the cached tiles texture point that corresponds to the triangle point
       int scaleFactorDiff = abs(u_currentBestScaleFactor - cachedTileScaleFactor);
 
-      if(scaleFactorDiff < smallestScaleFactorDiff || currentBestScaleFactor == 0) {
-        smallestScaleFactorDiff = scaleFactorDiff;
-        currentBestScaleFactor = cachedTileScaleFactor;
+      if(scaleFactorDiff < smallestBestScaleFactorDiff) {
+        smallestBestScaleFactorDiff = scaleFactorDiff;
+        found = true;
+        foundIndex = index;
 
-        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(currentBestScaleFactor);
-        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(currentBestScaleFactor);
+        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(cachedTileScaleFactor);
+        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(cachedTileScaleFactor);
 
         float cachedTilesTexturePointX = cachedTilePointX / float(cachedTilesTextureSize.x);
         float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);
 
-        foundIndex = index;
         cachedTilesTexturePoint = vec3(cachedTilesTexturePointX, cachedTilesTexturePointY, index);
       }
     }

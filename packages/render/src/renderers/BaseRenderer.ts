@@ -6,9 +6,9 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   getBestTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel,
-  getTilesAtZoomLevel,
   getTileResolution,
-  getOverviewTileZoomLevel
+  getOverviewTileZoomLevel,
+  getTilesAtScaleFactor
 } from '../shared/tiles.js'
 
 import {
@@ -25,7 +25,7 @@ import type {
   CachableTileFactory,
   WarpedMapFactory,
   RendererOptions,
-  MapsPruneInfo
+  PruneInfoByMapId
 } from '../shared/types.js'
 
 const MANY_POSSIBLE_MAPS = 20 // For this amount of maps, request tiles
@@ -255,10 +255,10 @@ export default abstract class BaseRenderer<
         overviewTileZoomLevelTotalResolution <=
           MANY_POSSIBLE_MAPS * OVERVIEW_MAX_RESOLUTION
       ) {
-        const overviewTiles = getTilesAtZoomLevel(overviewTileZoomLevel, [
-          warpedMap.parsedImage.width,
-          warpedMap.parsedImage.height
-        ])
+        const overviewTiles = getTilesAtScaleFactor(
+          overviewTileZoomLevel.scaleFactor,
+          warpedMap.parsedImage
+        )
 
         const overviewFetchableTiles = overviewTiles.map(
           (tile) => new FetchableTile(tile, warpedMap)
@@ -355,18 +355,18 @@ export default abstract class BaseRenderer<
   }
 
   protected pruneTileCache() {
-    const mapsPruneInfo: MapsPruneInfo = new Map()
+    const pruneInfoByMapId: PruneInfoByMapId = new Map()
     for (const warpedMap of this.warpedMapList.getWarpedMaps(
       this.possibleMapsInViewport
     )) {
-      mapsPruneInfo.set(warpedMap.mapId, {
+      pruneInfoByMapId.set(warpedMap.mapId, {
         bestScaleFactor: warpedMap.currentBestScaleFactor,
         overviewScaleFactor:
           warpedMap.currentOverviewTileZoomLevel?.scaleFactor,
         resourceViewportRingBbox: warpedMap.currentResourceViewportRingBbox
       })
     }
-    this.tileCache.prune(mapsPruneInfo)
+    this.tileCache.prune(pruneInfoByMapId)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars

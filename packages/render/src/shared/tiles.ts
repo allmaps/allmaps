@@ -5,8 +5,10 @@ import {
   isOverlapping,
   bufferBboxByRatio
 } from '@allmaps/stdlib'
+import { pruneInfo } from './types'
 import FetchableTile from '../tilecache/FetchableTile'
 
+import type { Image } from '@allmaps/iiif-parser'
 import type {
   Point,
   Line,
@@ -17,7 +19,6 @@ import type {
   TileZoomLevel,
   TileByColumn
 } from '@allmaps/types'
-import { MapPruneInfo } from './types'
 
 // Preparing to make tiles
 
@@ -244,7 +245,9 @@ function tilesByColumnToTiles(
 
 export function getTilesCoveringTileAtScaleFactor(
   tile: Tile,
-  scaleFactor: number
+  parsedImage: Image,
+  scaleFactor: number,
+  validTile?: (tile: Tile) => boolean
 ) {
   let columnStart = Math.floor(
     (tile.column * tile.tileZoomLevel.scaleFactor) / scaleFactor
@@ -260,47 +263,76 @@ export function getTilesCoveringTileAtScaleFactor(
   const rowEnd = Math.ceil(
     ((tile.row + 1) * tile.tileZoomLevel.scaleFactor) / scaleFactor
   )
-  return getTilesAtZoomLevel(
-    tile.tileZoomLevel,
-    tile.imageSize,
+  return getTilesAtScaleFactor(
+    scaleFactor,
+    parsedImage,
     columnStart,
     columnEnd,
     rowStart,
-    rowEnd
+    rowEnd,
+    validTile
   )
 }
 
-export function getTilesAtZoomLevel(
-  tileSoomLevel: TileZoomLevel,
-  imageSize: Size,
+export function getTilesAtScaleFactor(
+  scaleFactor: number,
+  parsedImage: Image,
   columnStart?: number,
   columnEnd?: number,
   rowStart?: number,
-  rowEnd?: number
+  rowEnd?: number,
+  validTile?: (tile: Tile) => boolean
 ) {
+  validTile = validTile ? validTile : (_tile: Tile) => true
+
+  const tileZoomLevel = parsedImage.tileZoomLevels.find(
+    (tileZoomLevel) => tileZoomLevel.scaleFactor == scaleFactor
+  )
+  const imageSize = [parsedImage.width, parsedImage.height] as Size
+
+  if (!tileZoomLevel) {
+    return []
+  }
+
   columnStart = columnStart ? columnStart : 0
-  columnEnd = columnEnd ? columnEnd : tileSoomLevel.columns
+  columnEnd = columnEnd ? columnEnd : tileZoomLevel.columns
   rowStart = rowStart ? rowStart : 0
-  rowEnd = rowEnd ? rowEnd : tileSoomLevel.rows
+  rowEnd = rowEnd ? rowEnd : tileZoomLevel.rows
 
   const tiles: Tile[] = []
   for (let column = columnStart; column < columnEnd; column++) {
     for (let row = rowStart; row < rowEnd; row++) {
-      tiles.push({
+      const tile = {
         column,
         row,
-        tileZoomLevel: tileSoomLevel,
+        tileZoomLevel,
         imageSize
-      })
+      }
+      if (validTile(tile)) {
+        tiles.push(tile)
+      }
     }
   }
 
   return tiles
 }
 
+// Identity
+
+export function equalTileByRowColumnScaleFactor(
+  tile0: Tile,
+  tile1: Tile
+): boolean {
+  return (
+    tile0.column == tile1.column &&
+    tile0.row == tile1.row &&
+    tile0.tileZoomLevel.scaleFactor == tile1.tileZoomLevel.scaleFactor
+  )
+}
+
 // Geometric computations
 
-function distanceTileToPoint(tile: Tile, point: Point): number {
+export function distanceTileToPoint(tile: Tile, point: Point): number {
   return distance(tileCenter(tile), point)
 }
 
@@ -424,6 +456,208 @@ export function getTileZoomLevelResolution(
   )
 }
 
+//
+
+export function getTilesAtOtherScaleFactors(
+  tile: Tile,
+  parsedImage: Image,
+  currentBestScaleFactor: number,
+  TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF: number,
+  TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF: number,
+  validTile?: (tile: Tile) => boolean
+): Tile[] {
+  const tilesAtOtherScaleFactors = []
+
+  const tilesAtLowerScaleFactor = recursivelyGetTilesAtLowerScaleFactor(
+    tile,
+    parsedImage,
+    currentBestScaleFactor,
+    TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
+    validTile
+  )
+  for (const tileAtLowerScaleFactor of tilesAtLowerScaleFactor) {
+    if (tileAtLowerScaleFactor) {
+      tilesAtOtherScaleFactors.push(tileAtLowerScaleFactor)
+    }
+  }
+  if (tilesAtOtherScaleFactors.length == 0) {
+    const tileAtHigherScaleFactor = recursivelyGetTilesAtHigherScaleFactor(
+      tile,
+      parsedImage,
+      currentBestScaleFactor,
+      TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+      validTile
+    )
+    if (tileAtHigherScaleFactor) {
+      tilesAtOtherScaleFactors.push(tileAtHigherScaleFactor)
+    }
+  }
+
+  return tilesAtOtherScaleFactors
+}
+
+export function recursivelyGetTilesAtHigherScaleFactor(
+  tile: Tile,
+  parsedImage: Image,
+  currentBestScaleFactor: number,
+  log2ScaleFactorDiff: number,
+  validTile?: (tile: Tile) => boolean
+): Tile | undefined {
+  if (log2ScaleFactorDiff <= 0) {
+    return undefined
+  }
+  const tileAtHigherScaleFactor = getTileAtHigherScaleFactor(
+    tile,
+    parsedImage,
+    currentBestScaleFactor,
+    log2ScaleFactorDiff,
+    validTile
+  )
+  log2ScaleFactorDiff--
+  if (log2ScaleFactorDiff <= 0 || tileAtHigherScaleFactor != undefined) {
+    return tileAtHigherScaleFactor
+  } else {
+    return recursivelyGetTilesAtHigherScaleFactor(
+      tile,
+      parsedImage,
+      currentBestScaleFactor,
+      log2ScaleFactorDiff,
+      validTile
+    )
+  }
+}
+
+export function recursivelyGetTilesAtLowerScaleFactor(
+  tile: Tile,
+  parsedImage: Image,
+  currentBestScaleFactor: number,
+  log2ScaleFactorDiff: number,
+  validTile?: (tile: Tile) => boolean
+): (Tile | undefined)[] {
+  if (log2ScaleFactorDiff <= 0) {
+    return []
+  }
+  const tilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
+    tile,
+    parsedImage,
+    currentBestScaleFactor,
+    log2ScaleFactorDiff,
+    validTile
+  )
+  const allTilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
+    tile,
+    parsedImage,
+    currentBestScaleFactor,
+    log2ScaleFactorDiff,
+    (_tile) => true
+  )
+  log2ScaleFactorDiff--
+  if (
+    log2ScaleFactorDiff <= 0 ||
+    tilesAtLowerScaleFactor.length == allTilesAtLowerScaleFactor.length
+  ) {
+    return tilesAtLowerScaleFactor
+  } else {
+    return [
+      ...tilesAtLowerScaleFactor,
+      ...recursivelyGetTilesAtLowerScaleFactor(
+        tile,
+        parsedImage,
+        currentBestScaleFactor,
+        log2ScaleFactorDiff,
+        validTile
+      )
+    ]
+  }
+}
+
+export function getTileAtHigherScaleFactor(
+  tile: Tile,
+  parsedImage: Image,
+  currentBestScaleFactor: number,
+  log2ScaleFactorDiff: number,
+  validTile?: (tile: Tile) => boolean
+): Tile | undefined {
+  const higherScaleFactor =
+    2 ** (Math.log2(currentBestScaleFactor) + log2ScaleFactorDiff)
+
+  const tilesCoveringTileAtHigherScaleFactor =
+    getTilesCoveringTileAtScaleFactor(
+      tile,
+      parsedImage,
+      higherScaleFactor,
+      validTile
+    )
+
+  // console.log(
+  //   'at',
+  //   currentBestScaleFactor,
+  //   'heigher',
+  //   log2ScaleFactorDiff,
+  //   'thus',
+  //   higherScaleFactor,
+  //   'found',
+  //   tilesCoveringTileAtHigherScaleFactor.map((tile) => [
+  //     tile.column,
+  //     tile.row,
+  //     tile.tileZoomLevel.scaleFactor
+  //   ]),
+  //   'in',
+  //   Array.from(cachedTilesByTileUrl.values()).map((cachedTile) => [
+  //     cachedTile.tile.column,
+  //     cachedTile.tile.row,
+  //     cachedTile.tile.tileZoomLevel.scaleFactor
+  //   ])
+  // )
+
+  if (tilesCoveringTileAtHigherScaleFactor.length == 0) {
+    return undefined
+  }
+
+  return tilesCoveringTileAtHigherScaleFactor[0]
+}
+
+export function getTilesAtLowerScaleFactor(
+  tile: Tile,
+  parsedImage: Image,
+  currentBestScaleFactor: number,
+  log2ScaleFactorDiff: number,
+  validTile?: (tile: Tile) => boolean
+): (Tile | undefined)[] {
+  const lowerScaleFactor =
+    2 ** (Math.log2(currentBestScaleFactor) - log2ScaleFactorDiff)
+
+  const tilesCoveringTileAtLowerScaleFactor = getTilesCoveringTileAtScaleFactor(
+    tile,
+    parsedImage,
+    lowerScaleFactor,
+    validTile
+  )
+
+  // console.log(
+  //   'at',
+  //   currentBestScaleFactor,
+  //   'lower',
+  //   log2ScaleFactorDiff,
+  //   'thus',
+  //   lowerScaleFactor,
+  //   'found',
+  //   tilesCoveringTileAtLowerScaleFactor.map((tile) => [
+  //     tile.column,
+  //     tile.row,
+  //     tile.tileZoomLevel.scaleFactor
+  //   ]),
+  //   'in',
+  //   Array.from(cachedTilesByTileUrl.values()).map((cachedTile) => [
+  //     cachedTile.tile.column,
+  //     cachedTile.tile.row,
+  //     cachedTile.tile.tileZoomLevel.scaleFactor
+  //   ])
+  // )
+
+  return tilesCoveringTileAtLowerScaleFactor
+}
+
 // TileCache
 
 // TODO: consider a way to make this more elegant:
@@ -443,7 +677,7 @@ export function createKeyFromTile(fetchableTile: FetchableTile): string {
   )
 }
 
-export function isOverviewTile(tile: Tile, pruneInfo: MapPruneInfo) {
+export function isOverviewTile(tile: Tile, pruneInfo: pruneInfo) {
   return (
     pruneInfo.overviewScaleFactor &&
     tile.tileZoomLevel.scaleFactor >= pruneInfo.overviewScaleFactor
@@ -452,7 +686,7 @@ export function isOverviewTile(tile: Tile, pruneInfo: MapPruneInfo) {
 
 export function shouldPruneTile(
   tile: Tile,
-  mapPruneInfo: MapPruneInfo,
+  mapPruneInfo: pruneInfo,
   maxHigherLog2ScaleFactorDiff: number,
   maxLowerLog2ScaleFactorDiff: number,
   viewportBufferRatio: number,

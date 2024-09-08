@@ -6,7 +6,10 @@ import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import { applyTransform } from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
-import { getTilesCoveringTileAtScaleFactor } from '../shared/tiles.js'
+import {
+  equalTileByRowColumnScaleFactor,
+  getTilesAtOtherScaleFactors
+} from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -221,164 +224,49 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_triangleIndex'
     )
   }
+  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
+    return Array.from(this.cachedTilesByTileUrl.values()).find((cachedTile) =>
+      equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
+    )
+  }
 
-  // TODO: this returns a map so it's unique. Check that that property is used
-  private getCachedTilesFromOtherScaleFactors(
-    tile: Tile
-  ): Map<string, CachedTile<ImageBitmap>> {
-    if (this.cachedTilesByTileUrl.size == 0) {
-      return new Map()
-    }
-
-    const cachedTiles: Map<string, CachedTile<ImageBitmap>> = new Map()
-
-    const cachedTileAtHigherScaleFactor =
-      this.recursivelyGetCachedTileAtHigherScaleFactor(
-        tile,
-        TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+  private tileInCachedTiles(tile: Tile): boolean {
+    return Array.from(this.cachedTilesByTileUrl.values())
+      .map((cachedTile) =>
+        equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
       )
+      .some((b) => b)
+  }
 
-    let higherTilesFound = false
-    for (const cachedTile of cachedTileAtHigherScaleFactor) {
-      if (cachedTile) {
-        higherTilesFound = true
-        cachedTiles.set(cachedTile.tileUrl, cachedTile)
-      }
+  private getCachedTilesAtOtherScaleFactors(
+    tile: Tile
+  ): CachedTile<ImageBitmap>[] {
+    if (this.cachedTilesByTileUrl.size == 0) {
+      return []
     }
-    if (higherTilesFound) {
-      return cachedTiles
-    } else {
-      const cachedTilesAtLowerScaleFactor =
-        this.recursivelyGetCachedTileAtLowerScaleFactor(
-          tile,
-          TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-        )
-      for (const cachedTile of cachedTilesAtLowerScaleFactor) {
-        if (cachedTile) {
-          cachedTiles.set(cachedTile.tileUrl, cachedTile)
-        }
+
+    if (!this.hasImageInfo()) {
+      return []
+    }
+
+    const cachedTiles = []
+    for (tile of getTilesAtOtherScaleFactors(
+      tile,
+      this.parsedImage,
+      this.currentBestScaleFactor,
+      TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
+      TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+      this.tileInCachedTiles.bind(this) // Only consider tiles in cache,
+    )) {
+      const cachedTile = this.tileToCachedTile(tile)
+      if (cachedTile) {
+        cachedTiles.push(cachedTile)
+      } else {
+        throw new Error("Tile supposed to be in cache isn't.")
       }
     }
 
     return cachedTiles
-  }
-
-  private recursivelyGetCachedTileAtHigherScaleFactor(
-    tile: Tile,
-    log2ScaleFactorDiff: number
-  ): (CachedTile<ImageBitmap> | undefined)[] {
-    if (log2ScaleFactorDiff <= 0) {
-      return []
-    }
-    const cachedTiles = this.getCachedTileAtHigherScaleFactor(
-      tile,
-      log2ScaleFactorDiff
-    )
-    log2ScaleFactorDiff--
-    if (log2ScaleFactorDiff <= 0) {
-      return [cachedTiles]
-    } else {
-      return [
-        cachedTiles,
-        ...this.recursivelyGetCachedTileAtHigherScaleFactor(
-          tile,
-          log2ScaleFactorDiff
-        )
-      ]
-    }
-  }
-
-  private recursivelyGetCachedTileAtLowerScaleFactor(
-    tile: Tile,
-    log2ScaleFactorDiff: number
-  ): (CachedTile<ImageBitmap> | undefined)[] {
-    if (log2ScaleFactorDiff <= 0) {
-      return []
-    }
-    const cachedTiles = this.getCachedTilesAtLowerScaleFactor(
-      tile,
-      log2ScaleFactorDiff
-    )
-    log2ScaleFactorDiff--
-    if (log2ScaleFactorDiff <= 0) {
-      return cachedTiles
-    } else {
-      return [
-        ...cachedTiles,
-        ...this.recursivelyGetCachedTileAtLowerScaleFactor(
-          tile,
-          log2ScaleFactorDiff
-        )
-      ]
-    }
-  }
-
-  private getCachedTileAtHigherScaleFactor(
-    tile: Tile,
-    log2ScaleFactorDiff: number
-  ): CachedTile<ImageBitmap> | undefined {
-    // TODO: improve
-    if (!this.hasImageInfo()) {
-      throw new Error()
-    }
-
-    // TODO: simplify comparison, because this is also done in tilesCoveringTileForScaleFactor
-    const higherScaleFactor =
-      2 ** (Math.log2(this.currentBestScaleFactor) + log2ScaleFactorDiff)
-
-    const higherScaleFactorTiles = getTilesCoveringTileAtScaleFactor(
-      tile,
-      higherScaleFactor
-    )
-
-    if (higherScaleFactorTiles.length == 0) {
-      return undefined
-    }
-
-    const higherScaleFactorTile = higherScaleFactorTiles[0]
-
-    const higherScaleFactorTileUrl = this.parsedImage.getImageUrl(
-      this.parsedImage.getIiifTile(
-        higherScaleFactorTile.tileZoomLevel,
-        higherScaleFactorTile.column,
-        higherScaleFactorTile.row
-      )
-    )
-    const higherScaleFactorCachedTile = this.cachedTilesByTileUrl.get(
-      higherScaleFactorTileUrl
-    )
-    return higherScaleFactorCachedTile
-  }
-
-  private getCachedTilesAtLowerScaleFactor(
-    tile: Tile,
-    log2ScaleFactorDiff: number
-  ): (CachedTile<ImageBitmap> | undefined)[] {
-    // TODO: improve
-    if (!this.hasImageInfo()) {
-      throw new Error()
-    }
-
-    // TODO: simplify comparison, because this is also done in tilesCoveringTileForScaleFactor
-    const lowerScaleFactor =
-      2 ** (Math.log2(this.currentBestScaleFactor) - log2ScaleFactorDiff)
-
-    const lowerScaleFactorTiles = getTilesCoveringTileAtScaleFactor(
-      tile,
-      lowerScaleFactor
-    )
-
-    const higherScaleFactorTileUrls = lowerScaleFactorTiles.map((tile) =>
-      this.parsedImage.getImageUrl(
-        this.parsedImage.getIiifTile(tile.tileZoomLevel, tile.column, tile.row)
-      )
-    )
-
-    const higherScaleFactorCachedTiles = higherScaleFactorTileUrls.map(
-      (tileUrl) => this.cachedTilesByTileUrl.get(tileUrl)
-    )
-
-    return higherScaleFactorCachedTiles
   }
 
   private async updateTextures() {
@@ -526,9 +414,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       if (cachedTile) {
         requestedCachedTiles.push(cachedTile)
       } else {
-        for (const cachedTile of this.getCachedTilesFromOtherScaleFactors(
+        for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
           fetchableTile.tile
-        ).values()) {
+        )) {
           otherTileZoomLevelsCachedTiles.push(cachedTile)
         }
       }
@@ -575,6 +463,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     //   textureTiles.length,
     //   ', cache:',
     //   this.cachedTilesByTileUrl.size
+    // )
+
+    // console.log(
+    //   requestedCachedTiles.map(
+    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
+    //   ),
+    //   otherTileZoomLevelsCachedTiles.map(
+    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
+    //   ),
+    //   overviewCachedTiles.map(
+    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
+    //   )
     // )
 
     return textureTiles

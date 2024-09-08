@@ -92,10 +92,10 @@ export type CachableTileFactory<D> = (
   fetchFn?: FetchFn
 ) => CacheableTile<D>
 
-export type MapPruneInfo = {
+export type pruneInfo = {
   bestScaleFactor: number
   overviewScaleFactor: number | undefined
   resourceViewportRingBbox: Bbox
 }
 
-export type MapsPruneInfo = Map<string, MapPruneInfo>
+export type PruneInfoByMapId = Map<string, pruneInfo>

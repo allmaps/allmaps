@@ -11,7 +11,7 @@ import type { FetchFn } from '@allmaps/types'
 import type {
   CachableTileFactory,
   TileCacheOptions,
-  MapsPruneInfo
+  PruneInfoByMapId
 } from '../shared/types.js'
 
 const PRUNE_MANY_MAPS = 50 // For this amount of maps, prune more tiles
@@ -176,27 +176,27 @@ export default class TileCache<D> extends EventTarget {
     })
   }
 
-  prune(mapsPruneInfo: MapsPruneInfo) {
+  prune(pruneInfoByMapId: PruneInfoByMapId) {
     const mapIdsWithOverviewKept = new Set()
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
-        const mapPruneInfo = mapsPruneInfo.get(mapId)
+        const pruneInfo = pruneInfoByMapId.get(mapId)
         const tile = this.tilesByTileUrl.get(tileUrl)?.tile
 
         if (tile) {
           const keepMapOverview = mapIdsWithOverviewKept.size < PRUNE_MANY_MAPS
           if (
-            !mapPruneInfo ||
+            !pruneInfo ||
             shouldPruneTile(
               tile,
-              mapPruneInfo,
-              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+              pruneInfo,
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
                 ? PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
                 : 0,
-              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
                 ? PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
                 : 0,
-              mapsPruneInfo.size >= PRUNE_MANY_MAPS
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
                 ? PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
                 : 0,
               keepMapOverview
@@ -204,7 +204,7 @@ export default class TileCache<D> extends EventTarget {
           ) {
             this.removeMapTile(mapId, tileUrl)
           } else {
-            if (keepMapOverview && isOverviewTile(tile, mapPruneInfo)) {
+            if (keepMapOverview && isOverviewTile(tile, pruneInfo)) {
               mapIdsWithOverviewKept.add(mapId)
             }
           }
@@ -212,14 +212,14 @@ export default class TileCache<D> extends EventTarget {
       }
     }
 
-    console.log(
-      'prune info for',
-      mapsPruneInfo.size,
-      'cache by mapId',
-      Array.from(this.tileUrlsByMapId.values()).map((set) => set.size),
-      'maps with overview kept',
-      mapIdsWithOverviewKept.size
-    )
+    // console.log(
+    //   'prune info for',
+    //   mapsPruneInfo.size,
+    //   'cache by mapId',
+    //   Array.from(this.tileUrlsByMapId.values()).map((set) => set.size),
+    //   'maps with overview kept',
+    //   mapIdsWithOverviewKept.size
+    // )
   }
 
   getTileUrlsForMapId(mapId: string) {
