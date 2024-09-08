@@ -503,25 +503,31 @@ export function recursivelyGetTilesAtHigherScaleFactor(
   log2ScaleFactorDiff: number,
   validTile?: (tile: Tile) => boolean
 ): Tile | undefined {
-  if (log2ScaleFactorDiff <= 0) {
+  const higherScaleFactor = 2 ** (Math.log2(currentBestScaleFactor) + 1)
+  if (
+    higherScaleFactor >
+      parsedImage.tileZoomLevels
+        .map((tileZoomLevel) => tileZoomLevel.scaleFactor)
+        .reduce((a, c) => a + c, 0) -
+        currentBestScaleFactor ||
+    log2ScaleFactorDiff == 0
+  ) {
     return undefined
   }
   const tileAtHigherScaleFactor = getTileAtHigherScaleFactor(
     tile,
     parsedImage,
-    currentBestScaleFactor,
-    log2ScaleFactorDiff,
+    higherScaleFactor,
     validTile
   )
-  log2ScaleFactorDiff--
-  if (log2ScaleFactorDiff <= 0 || tileAtHigherScaleFactor != undefined) {
+  if (tileAtHigherScaleFactor != undefined) {
     return tileAtHigherScaleFactor
   } else {
     return recursivelyGetTilesAtHigherScaleFactor(
       tile,
       parsedImage,
-      currentBestScaleFactor,
-      log2ScaleFactorDiff,
+      higherScaleFactor,
+      log2ScaleFactorDiff--,
       validTile
     )
   }
@@ -534,28 +540,23 @@ export function recursivelyGetTilesAtLowerScaleFactor(
   log2ScaleFactorDiff: number,
   validTile?: (tile: Tile) => boolean
 ): (Tile | undefined)[] {
-  if (log2ScaleFactorDiff <= 0) {
+  const lowerScaleFactor = 2 ** (Math.log2(currentBestScaleFactor) - 1)
+  if (lowerScaleFactor <= 0 || log2ScaleFactorDiff == 0) {
     return []
   }
   const tilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
     tile,
     parsedImage,
-    currentBestScaleFactor,
-    log2ScaleFactorDiff,
+    lowerScaleFactor,
     validTile
   )
   const allTilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
     tile,
     parsedImage,
-    currentBestScaleFactor,
-    log2ScaleFactorDiff,
+    lowerScaleFactor,
     (_tile) => true
   )
-  log2ScaleFactorDiff--
-  if (
-    log2ScaleFactorDiff <= 0 ||
-    tilesAtLowerScaleFactor.length == allTilesAtLowerScaleFactor.length
-  ) {
+  if (tilesAtLowerScaleFactor.length == allTilesAtLowerScaleFactor.length) {
     return tilesAtLowerScaleFactor
   } else {
     return [
@@ -563,8 +564,8 @@ export function recursivelyGetTilesAtLowerScaleFactor(
       ...recursivelyGetTilesAtLowerScaleFactor(
         tile,
         parsedImage,
-        currentBestScaleFactor,
-        log2ScaleFactorDiff,
+        lowerScaleFactor,
+        log2ScaleFactorDiff--,
         validTile
       )
     ]
@@ -574,13 +575,9 @@ export function recursivelyGetTilesAtLowerScaleFactor(
 export function getTileAtHigherScaleFactor(
   tile: Tile,
   parsedImage: Image,
-  currentBestScaleFactor: number,
-  log2ScaleFactorDiff: number,
+  higherScaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ): Tile | undefined {
-  const higherScaleFactor =
-    2 ** (Math.log2(currentBestScaleFactor) + log2ScaleFactorDiff)
-
   const tilesCoveringTileAtHigherScaleFactor =
     getTilesCoveringTileAtScaleFactor(
       tile,
@@ -591,22 +588,12 @@ export function getTileAtHigherScaleFactor(
 
   // console.log(
   //   'at',
-  //   currentBestScaleFactor,
-  //   'heigher',
-  //   log2ScaleFactorDiff,
-  //   'thus',
   //   higherScaleFactor,
   //   'found',
   //   tilesCoveringTileAtHigherScaleFactor.map((tile) => [
   //     tile.column,
   //     tile.row,
   //     tile.tileZoomLevel.scaleFactor
-  //   ]),
-  //   'in',
-  //   Array.from(cachedTilesByTileUrl.values()).map((cachedTile) => [
-  //     cachedTile.tile.column,
-  //     cachedTile.tile.row,
-  //     cachedTile.tile.tileZoomLevel.scaleFactor
   //   ])
   // )
 
@@ -620,13 +607,9 @@ export function getTileAtHigherScaleFactor(
 export function getTilesAtLowerScaleFactor(
   tile: Tile,
   parsedImage: Image,
-  currentBestScaleFactor: number,
-  log2ScaleFactorDiff: number,
+  lowerScaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ): (Tile | undefined)[] {
-  const lowerScaleFactor =
-    2 ** (Math.log2(currentBestScaleFactor) - log2ScaleFactorDiff)
-
   const tilesCoveringTileAtLowerScaleFactor = getTilesCoveringTileAtScaleFactor(
     tile,
     parsedImage,
@@ -636,22 +619,12 @@ export function getTilesAtLowerScaleFactor(
 
   // console.log(
   //   'at',
-  //   currentBestScaleFactor,
-  //   'lower',
-  //   log2ScaleFactorDiff,
-  //   'thus',
   //   lowerScaleFactor,
   //   'found',
   //   tilesCoveringTileAtLowerScaleFactor.map((tile) => [
   //     tile.column,
   //     tile.row,
   //     tile.tileZoomLevel.scaleFactor
-  //   ]),
-  //   'in',
-  //   Array.from(cachedTilesByTileUrl.values()).map((cachedTile) => [
-  //     cachedTile.tile.column,
-  //     cachedTile.tile.row,
-  //     cachedTile.tile.tileZoomLevel.scaleFactor
   //   ])
   // )
 

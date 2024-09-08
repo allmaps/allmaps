@@ -31,7 +31,7 @@ import type {
 const MANY_POSSIBLE_MAPS = 20 // For this amount of maps, request tiles
 
 const POSSIBLE_MAPS_VIEWPORT_BUFFER_RATIO = 1
-const REQUEST_VIEWPORT_BUFFER_RATIO = 0
+const TILE_REQUEST_VIEWPORT_BUFFER_RATIO = 0
 
 const MIN_VIEWPORT_DIAMETER = 5
 
@@ -43,7 +43,9 @@ const MIN_VIEWPORT_DIAMETER = 5
 const SCALE_FACTOR_CORRECTION = 1
 const LOG2_SCALE_FACTOR_CORRECTION = 0
 
-const OVERVIEW_MAX_RESOLUTION = 1024 * 1024 // Support 1024 tiles, e.g. for Rotterdam map.
+const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support 1024 tiles, e.g. for Rotterdam map.
+const MAX_TOTAL_RESOLUTION =
+  MANY_POSSIBLE_MAPS * MAX_MAP_OVERVIEW_RESOLUTION * 50
 
 /**
  * Abstract base class for renderers.
@@ -210,7 +212,7 @@ export default abstract class BaseRenderer<
           [
             viewport.getProjectedGeoBufferedRectangle(
               this.possibleMapsInViewport.size < MANY_POSSIBLE_MAPS
-                ? REQUEST_VIEWPORT_BUFFER_RATIO
+                ? TILE_REQUEST_VIEWPORT_BUFFER_RATIO
                 : 0
             )
           ],
@@ -239,21 +241,21 @@ export default abstract class BaseRenderer<
       const overviewTileZoomLevel = getOverviewTileZoomLevel(
         warpedMap.parsedImage.tileZoomLevels,
         bestTileZoomLevel.scaleFactor,
-        OVERVIEW_MAX_RESOLUTION,
+        MAX_MAP_OVERVIEW_RESOLUTION,
         this.warpedMapList.warpedMapsById.size > MANY_POSSIBLE_MAPS
       )
 
       warpedMap.setCurrentOverviewTileZoomLevel(overviewTileZoomLevel)
-      const overviewTileZoomLevelTotalResolution = requestedOverviewTiles
-        .map((overviewFetchableTile) =>
-          getTileResolution(overviewFetchableTile.tile)
-        )
+      const totallTotalResolution = [
+        ...requestedTiles,
+        ...requestedOverviewTiles
+      ]
+        .map((fetchableTile) => getTileResolution(fetchableTile.tile))
         .reduce((a, c) => a + c, 0)
 
       if (
         overviewTileZoomLevel &&
-        overviewTileZoomLevelTotalResolution <=
-          MANY_POSSIBLE_MAPS * OVERVIEW_MAX_RESOLUTION
+        totallTotalResolution <= MAX_TOTAL_RESOLUTION
       ) {
         const overviewTiles = getTilesAtScaleFactor(
           overviewTileZoomLevel.scaleFactor,
@@ -272,6 +274,8 @@ export default abstract class BaseRenderer<
       ...requestedTiles,
       ...requestedOverviewTiles
     ])
+
+    // console.log('requesting', [...requestedTiles, ...requestedOverviewTiles])
 
     this.updateMapsInViewport(requestedTiles)
     this.pruneTileCache()

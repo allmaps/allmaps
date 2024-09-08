@@ -278,6 +278,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const textureTiles = this.getTextureTiles()
 
+    // Don't update if same request as before
+    // This prevents the event TEXTURESUPDATED from being fired
+    // Which would otherwise trigger an infinite loop
     if (
       equalArray(
         textureTiles.map((textureTile) => textureTile.tileUrl),
@@ -473,6 +476,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
     //   ),
     //   overviewCachedTiles.map(
+    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
+    //   ),
+    //   Array.from(this.cachedTilesByTileUrl.values()).map(
     //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
     //   )
     // )

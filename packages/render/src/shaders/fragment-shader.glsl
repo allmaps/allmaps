@@ -72,15 +72,15 @@ void main() {
   int cachedTilesCount = cachedTilesTextureSize.z;
 
   // Setting references for the for loop
-  int smallestBestScaleFactorDiff = int(pow(2.0, 20.0)); // Starting with very high number
+  int smallestScaleFactor = int(pow(2.0, 20.0)); // Starting with very high number
+  bool found = false;
+  int foundIndex;
 
   // Prepare storage for the resulting cached tiles texture point that corresponds to the triangle point
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
 
   // Set the initial values
   color = colorTransparent;
-  bool found = false;
-  int foundIndex;
 
   // Loop through all cached tiles
   for(int index= 0 ; index < cachedTilesCount; index += 1) {
@@ -104,10 +104,9 @@ void main() {
       // If the scale factor is smaller (more detailed) then the best scale factor for this map then currently known
       // update the current best scale factor
       // and compute the cached tiles texture point that corresponds to the triangle point
-      int scaleFactorDiff = abs(u_currentBestScaleFactor - cachedTileScaleFactor);
-
-      if(scaleFactorDiff < smallestBestScaleFactorDiff) {
-        smallestBestScaleFactorDiff = scaleFactorDiff;
+      // Note: we can safely take the deepest one, since the depth is limited when we gather texture tiles
+      if(cachedTileScaleFactor < smallestScaleFactor) {
+        smallestScaleFactor = cachedTileScaleFactor;
         found = true;
         foundIndex = index;
 
