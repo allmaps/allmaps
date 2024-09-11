@@ -246,17 +246,11 @@ export default abstract class BaseRenderer<
       )
 
       warpedMap.setCurrentOverviewTileZoomLevel(overviewTileZoomLevel)
-      const totallTotalResolution = [
-        ...requestedTiles,
-        ...requestedOverviewTiles
-      ]
+      const totalResolution = [...requestedTiles, ...requestedOverviewTiles]
         .map((fetchableTile) => getTileResolution(fetchableTile.tile))
         .reduce((a, c) => a + c, 0)
 
-      if (
-        overviewTileZoomLevel &&
-        totallTotalResolution <= MAX_TOTAL_RESOLUTION
-      ) {
+      if (overviewTileZoomLevel && totalResolution <= MAX_TOTAL_RESOLUTION) {
         const overviewTiles = getTilesAtScaleFactor(
           overviewTileZoomLevel.scaleFactor,
           warpedMap.parsedImage
