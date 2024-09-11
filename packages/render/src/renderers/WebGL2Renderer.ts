@@ -86,6 +86,8 @@ export default class WebGL2Renderer
   transformationTransitionStart: number | undefined
   animationProgress = 1
 
+  disableRender = false
+
   private throttledPrepareRenderInternal: DebouncedFunc<
     typeof this.prepareRenderInternal
   >
@@ -121,12 +123,6 @@ export default class WebGL2Renderer
     this.gl = gl
     this.program = program
 
-    // Unclear how to remove shaders, possibly already after linking to program, see:
-    // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
-    // https://stackoverflow.com/questions/27237696/webgl-detach-and-delete-shaders-after-linking
-    gl.deleteShader(vertexShader)
-    gl.deleteShader(fragmentShader)
-
     gl.disable(gl.DEPTH_TEST)
 
     this.invertedRenderTransform = createTransform()
@@ -144,6 +140,28 @@ export default class WebGL2Renderer
       THROTTLE_CHANGED_WAIT_MS,
       THROTTLE_CHANGED_OPTIONS
     )
+  }
+
+  initializeWebGL(gl: WebGL2RenderingContext) {
+    // This code is duplicated from the constructor to allow for context loss and restoration
+    // Can't call this function in the constructor, because 'super' must be called before accessing 'this'
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
+    const fragmentShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      fragmentShaderSource
+    )
+
+    const program = createProgram(gl, vertexShader, fragmentShader)
+
+    this.gl = gl
+    this.program = program
+
+    gl.disable(gl.DEPTH_TEST)
+
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      warpedMap.initializeWebGL(program)
+    }
   }
 
   /**
@@ -477,6 +495,10 @@ export default class WebGL2Renderer
    * @param {Viewport} viewport - the current viewport
    */
   render(viewport: Viewport): void {
+    if (this.disableRender) {
+      return
+    }
+
     this.viewport = viewport
 
     // Not awaiting this, using events to trigger new render calls
@@ -498,20 +520,23 @@ export default class WebGL2Renderer
     this.tileCache.clear()
   }
 
-  dispose() {
+  cancelThrottledFunctions() {
+    this.throttledPrepareRenderInternal.cancel()
+    this.throttledChanged.cancel()
+  }
+
+  destroy() {
+    this.cancelThrottledFunctions()
+
     for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
       this.removeEventListenersFromWebGL2WarpedMap(warpedMap)
-      warpedMap.dispose()
     }
-
-    this.tileCache.clear()
-    this.tileCache.dispose()
 
     this.removeEventListeners()
 
+    super.destroy()
+
     this.gl.deleteProgram(this.program)
-    // Can't delete context, see:
-    // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
   private prepareRenderInternal(): void {
@@ -965,5 +990,22 @@ export default class WebGL2Renderer
       WarpedMapEventType.TEXTURESUPDATED,
       this.throttledChanged.bind(this)
     )
+  }
+
+  contextLost() {
+    this.disableRender = true
+
+    this.cancelThrottledFunctions()
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      warpedMap.cancelThrottledFunctions()
+    }
+
+    this.tileCache.clear()
+  }
+
+  contextRestored() {
+    this.initializeWebGL(this.gl)
+
+    this.disableRender = false
   }
 }

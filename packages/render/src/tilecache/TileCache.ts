@@ -218,16 +218,19 @@ export default class TileCache<D> extends EventTarget {
   }
 
   clear() {
+    for (const cacheableTile of this.getCacheableTiles()) {
+      cacheableTile.abort()
+      this.removeEventListenersFromTile(cacheableTile)
+    }
+
     this.tilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.tilesFetchingCount = 0
   }
 
-  dispose() {
-    for (const cacheableTile of this.getCacheableTiles()) {
-      this.removeEventListenersFromTile(cacheableTile)
-    }
+  destroy() {
+    this.clear()
   }
 
   private addMapTile(fetchableTile: FetchableTile) {

@@ -123,6 +123,7 @@ export default class WarpedMap extends EventTarget {
   loadingImageInfo: boolean
 
   fetchFn?: FetchFn
+  protected abortController?: AbortController
 
   visible: boolean
 
@@ -457,7 +458,11 @@ export default class WarpedMap extends EventTarget {
       if (this.imageInformations?.get(imageUri)) {
         imageInfo = this.imageInformations.get(imageUri)
       } else {
-        imageInfo = await fetchImageInfo(imageUri, undefined, this.fetchFn)
+        this.abortController = new AbortController()
+        const signal = this.abortController.signal
+        imageInfo = await fetchImageInfo(imageUri, { signal }, this.fetchFn)
+        this.abortController = undefined
+
         this.imageInformations?.set(imageUri, imageInfo)
       }
 
@@ -471,10 +476,6 @@ export default class WarpedMap extends EventTarget {
     } finally {
       this.loadingImageInfo = false
     }
-  }
-
-  dispose() {
-    // TODO: consider adding all heavy properties in here
   }
 
   private updateResourceMaskProperties() {
@@ -570,6 +571,12 @@ export default class WarpedMap extends EventTarget {
       this.resourceMaskRectangle,
       this.projectedGeoMaskRectangle
     )
+  }
+
+  destroy() {
+    if (this.abortController) {
+      this.abortController.abort()
+    }
   }
 }
 

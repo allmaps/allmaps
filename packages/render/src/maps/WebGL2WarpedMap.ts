@@ -55,7 +55,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
-  vao: WebGLVertexArrayObject | null
+  vao: WebGLVertexArrayObject | null = null
 
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
   previousTextureTileUrls: string[] = []
@@ -64,9 +64,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
-  cachedTilesTextureArray: WebGLTexture | null
-  cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
-  cachedTilesScaleFactorsTexture: WebGLTexture | null
+  cachedTilesTextureArray: WebGLTexture | null = null
+  cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null = null
+  cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
   projectedGeoToClipTransform: Transform | undefined
 
@@ -94,7 +94,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl = gl
     this.program = program
 
-    this.vao = gl.createVertexArray()
+    this.initializeWebGL(program)
 
     this.cachedTilesTextureArray = gl.createTexture()
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
@@ -105,6 +105,17 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
+  }
+
+  initializeWebGL(program: WebGLProgram) {
+    this.program = program
+
+    this.vao = this.gl.createVertexArray()
+
+    this.cachedTilesTextureArray = this.gl.createTexture()
+    this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
+    this.cachedTilesResourcePositionsAndDimensionsTexture =
+      this.gl.createTexture()
   }
 
   /**
@@ -137,14 +148,19 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.clearTextures()
   }
 
-  // TODO: implement clearing, e.g. drawing transparent 1x1 pixel
-  clearTexture() {}
+  cancelThrottledFunctions() {
+    this.clearTextures.cancel()
+  }
 
-  dispose() {
+  destroy() {
     this.gl.deleteVertexArray(this.vao)
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
+
+    this.cancelThrottledFunctions()
+
+    super.destroy()
   }
 
   private updateVertexBuffersInternal() {

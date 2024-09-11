@@ -371,6 +371,11 @@ export default abstract class BaseRenderer<
     this.tileCache.prune(pruneInfoByMapId)
   }
 
+  destroy() {
+    this.tileCache.destroy()
+    this.warpedMapList.destroy()
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected clearMapTextures(mapId: string): void {}
 

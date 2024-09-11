@@ -32,6 +32,9 @@ export type LeafletWarpedMapLayerOptions = WarpedMapLayerOptions & {
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
 
+const NO_CANVAS_ERROR_MESSAGE =
+  'Canvas not defined. Add the layer to a map before calling this function.'
+
 const DEFAULT_PANE = 'tilePane'
 const DEFAULT_OPACITY = 1
 
@@ -40,6 +43,14 @@ function assertRenderer(
 ): asserts renderer is WebGL2Renderer {
   if (!renderer) {
     throw new Error(NO_RENDERER_ERROR_MESSAGE)
+  }
+}
+
+function assertCanvas(
+  canvas?: HTMLCanvasElement
+): asserts canvas is HTMLCanvasElement {
+  if (!canvas) {
+    throw new Error(NO_CANVAS_ERROR_MESSAGE)
   }
 }
 
@@ -938,8 +949,28 @@ export class WarpedMapLayer extends L.Layer {
     return this.container
   }
 
+  _contextLost(event: Event) {
+    event.preventDefault()
+    this.renderer?.contextLost()
+  }
+
+  _contextRestored(event: Event) {
+    event.preventDefault()
+    this.renderer?.contextRestored()
+  }
+
   _addEventListeners() {
     assertRenderer(this.renderer)
+    assertCanvas(this.canvas)
+
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this._contextLost.bind(this)
+    )
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this._contextRestored.bind(this)
+    )
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -994,6 +1025,16 @@ export class WarpedMapLayer extends L.Layer {
 
   _removeEventListeners() {
     assertRenderer(this.renderer)
+    assertCanvas(this.canvas)
+
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this._contextLost.bind(this)
+    )
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this._contextRestored.bind(this)
+    )
 
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
@@ -1061,7 +1102,7 @@ export class WarpedMapLayer extends L.Layer {
       return
     }
 
-    this.renderer.dispose()
+    this.renderer.destroy()
 
     const extension = this.gl.getExtension('WEBGL_lose_context')
     if (extension) {
