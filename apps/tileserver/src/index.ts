@@ -47,9 +47,19 @@ function xyzFromParams(params: unknown): XYZTile {
 // Direct template URL requests - redirect to tiles.allmaps.org
 // -------------------------------------------------------------------------------------------
 
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D@2x.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+})
+
 router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
   const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
   return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
 })
 
 router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
@@ -57,10 +67,23 @@ router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
   return generateTilesHtml(req, tileViewerBaseUrl)
 })
 
+router.get('/images/:imageId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.png', (req, env) => {
+  const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+})
+
 router.get('/images/:imageId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
   const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
   return generateTilesHtml(req, tileViewerBaseUrl)
 })
+
+router.get(
+  '/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.png',
+  (req, env) => {
+    const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
+    return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+  }
+)
 
 router.get('/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
   const tileViewerBaseUrl = env.TILE_VIEWER_BASE_URL
@@ -71,12 +94,33 @@ router.get('/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
 // TileJSON
 // -------------------------------------------------------------------------------------------
 
+router.get('/tiles@2x.json', async (req, env) => {
+  const maps = await mapsFromQuery(req)
+  const options = optionsFromQuery(req)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.png${url.search}`
+
+  return generateTileJsonResponse(maps, options, urlTemplate)
+})
+
 router.get('/tiles.json', async (req, env) => {
   const maps = await mapsFromQuery(req)
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`
+
+  return generateTileJsonResponse(maps, options, urlTemplate)
+})
+
+router.get('/maps/:mapId/tiles@2x.json', async (req, env) => {
+  const mapId = req.params?.mapId
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.png${url.search}`
 
   return generateTileJsonResponse(maps, options, urlTemplate)
 })
@@ -92,6 +136,17 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
   return generateTileJsonResponse(maps, options, urlTemplate)
 })
 
+router.get('/images/:imageId/tiles@2x.json', async (req, env) => {
+  const imageId = req.params?.imageId
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.png${url.search}`
+
+  return generateTileJsonResponse(maps, options, urlTemplate)
+})
+
 router.get('/images/:imageId/tiles.json', async (req, env) => {
   const imageId = req.params?.imageId
   const maps = await mapsFromParams(env, req)
@@ -99,6 +154,17 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplate = `${env.TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`
+
+  return generateTileJsonResponse(maps, options, urlTemplate)
+})
+
+router.get('/manifests/:manifestId/tiles@2x.json', async (req, env) => {
+  const manifestId = req.params?.manifestId
+  const maps = await mapsFromParams(env, req)
+  const options = optionsFromQuery(req)
+
+  const url = new URL(req.url)
+  const urlTemplate = `${env.TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.png${url.search}`
 
   return generateTileJsonResponse(maps, options, urlTemplate)
 })
@@ -118,13 +184,28 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
 // PNG tiles
 // -------------------------------------------------------------------------------------------
 
-// TODO: support retina tiles @2x
+router.get('/:z/:x/:y@2x.png', async (req) => {
+  const maps = await mapsFromQuery(req)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req)
+
+  return createWarpedTileResponse(maps, options, { x, y, z }, 'retina')
+})
+
 router.get('/:z/:x/:y.png', async (req) => {
   const maps = await mapsFromQuery(req)
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
   return createWarpedTileResponse(maps, options, { x, y, z })
+})
+
+router.get('/maps/:mapId/:z/:x/:y@2x.png', async (req, env) => {
+  const maps = await mapsFromParams(env, req)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req)
+
+  return createWarpedTileResponse(maps, options, { x, y, z }, 'retina')
 })
 
 router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
@@ -135,12 +216,28 @@ router.get('/maps/:mapId/:z/:x/:y.png', async (req, env) => {
   return createWarpedTileResponse(maps, options, { x, y, z })
 })
 
+router.get('/images/:imageId/:z/:x/:y@2x.png', async (req, env) => {
+  const maps = await mapsFromParams(env, req)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req)
+
+  return createWarpedTileResponse(maps, options, { x, y, z }, 'retina')
+})
+
 router.get('/images/:imageId/:z/:x/:y.png', async (req, env) => {
   const maps = await mapsFromParams(env, req)
   const { x, y, z } = xyzFromParams(req.params)
   const options = optionsFromQuery(req)
 
   return createWarpedTileResponse(maps, options, { x, y, z })
+})
+
+router.get('/manifests/:manifestId/:z/:x/:y@2x.png', async (req, env) => {
+  const maps = await mapsFromParams(env, req)
+  const { x, y, z } = xyzFromParams(req.params)
+  const options = optionsFromQuery(req)
+
+  return createWarpedTileResponse(maps, options, { x, y, z }, 'retina')
 })
 
 router.get('/manifests/:manifestId/:z/:x/:y.png', async (req, env) => {

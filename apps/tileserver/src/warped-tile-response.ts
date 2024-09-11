@@ -6,12 +6,11 @@ import { IntArrayRenderer, Viewport } from '@allmaps/render/int-array'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'
+import { getTileSize } from './tile-size.js'
 
 import type { Size, Bbox, FetchFn } from '@allmaps/types'
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
-import type { XYZTile, TransformationOptions } from './types.js'
-
-const TILE_SIZE = 256
+import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
 
 function getImageData(input: Uint8ClampedArray) {
   return decodeJpeg(input, { useTArray: true })
@@ -28,7 +27,8 @@ function getImageDataSize(decodedJpeg: UintArrRet): Size {
 export async function createWarpedTileResponse(
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
-  { x, y, z }: XYZTile
+  { x, y, z }: XYZTile,
+  resolution: TileResolution = 'normal'
 ): Promise<Response> {
   if (!(x >= 0 && y >= 0 && z >= 0)) {
     throw new Error('x, y and z must be positive integers')
@@ -59,13 +59,12 @@ export async function createWarpedTileResponse(
 
   const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
 
-  const viewport = Viewport.fromProjectedGeoBbox(
-    [TILE_SIZE, TILE_SIZE],
-    projectedGeoBbox
-  )
+  const tileSize = getTileSize(resolution)
+
+  const viewport = Viewport.fromProjectedGeoBbox(tileSize, projectedGeoBbox)
 
   const warpedTile = await renderer.render(viewport)
 
-  const pngBuffer = encodePng([warpedTile.buffer], TILE_SIZE, TILE_SIZE, 0)
+  const pngBuffer = encodePng([warpedTile.buffer], tileSize[0], tileSize[1], 0)
   return png(pngBuffer)
 }
