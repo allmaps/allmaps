@@ -211,15 +211,6 @@ export default class TileCache<D> extends EventTarget {
         }
       }
     }
-
-    // console.log(
-    //   'prune info for',
-    //   mapsPruneInfo.size,
-    //   'cache by mapId',
-    //   Array.from(this.tileUrlsByMapId.values()).map((set) => set.size),
-    //   'maps with overview kept',
-    //   mapIdsWithOverviewKept.size
-    // )
   }
 
   getTileUrlsForMapId(mapId: string) {

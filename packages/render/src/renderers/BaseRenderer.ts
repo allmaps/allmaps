@@ -127,7 +127,7 @@ export default abstract class BaseRenderer<
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
       .map((warpedMap) => warpedMap.hasImageInfo())
-      .some((val) => val === true)
+      .some(Boolean)
   }
 
   protected shouldUpdateRequestedTiles() {
@@ -274,8 +274,6 @@ export default abstract class BaseRenderer<
       ...requestedTiles,
       ...requestedOverviewTiles
     ])
-
-    // console.log('requesting', [...requestedTiles, ...requestedOverviewTiles])
 
     this.updateMapsInViewport(requestedTiles)
     this.pruneTileCache()

@@ -451,38 +451,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
     textureTiles = [...textureTilesByTileUrl.values()]
 
-    // console.log(
-    //   'request:',
-    //   this.currentFetchableTiles.length,
-    //   '+',
-    //   this.currentOverviewFetchableTiles.length,
-    //   ', texture:',
-    //   requestedCachedTiles.length,
-    //   '+',
-    //   otherTileZoomLevelsCachedTiles.length,
-    //   '+',
-    //   overviewCachedTiles.length,
-    //   '=',
-    //   textureTiles.length,
-    //   ', cache:',
-    //   this.cachedTilesByTileUrl.size
-    // )
-
-    // console.log(
-    //   requestedCachedTiles.map(
-    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
-    //   ),
-    //   otherTileZoomLevelsCachedTiles.map(
-    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
-    //   ),
-    //   overviewCachedTiles.map(
-    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
-    //   ),
-    //   Array.from(this.cachedTilesByTileUrl.values()).map(
-    //     (cachedTile) => cachedTile.tile.tileZoomLevel.scaleFactor
-    //   )
-    // )
-
     return textureTiles
   }
 }

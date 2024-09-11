@@ -419,26 +419,6 @@ export function computeBboxTile(tile: Tile): Bbox {
   ]
 }
 
-// // Unused?
-// export function getTileZoomLevelFromScaleFactor(
-//   scaleFactor: number,
-//   imageSize: Size,
-//   tileSize: Size
-// ): TileZoomLevel {
-//   const originalWidth = tileSize[0] * scaleFactor
-//   const originalHeight = tileSize[1] * scaleFactor
-
-//   return {
-//     scaleFactor,
-//     width: tileSize[0],
-//     height: tileSize[1],
-//     originalWidth,
-//     originalHeight,
-//     columns: Math.ceil(imageSize[0] / originalWidth),
-//     rows: Math.ceil(imageSize[1] / originalHeight)
-//   }
-// }
-
 // Resolution
 
 export function getTileResolution(tile: Tile): number {
@@ -455,8 +435,6 @@ export function getTileZoomLevelResolution(
     tileZoomLevel.height
   )
 }
-
-//
 
 export function getTilesAtOtherScaleFactors(
   tile: Tile,
@@ -586,17 +564,6 @@ export function getTileAtHigherScaleFactor(
       validTile
     )
 
-  // console.log(
-  //   'at',
-  //   higherScaleFactor,
-  //   'found',
-  //   tilesCoveringTileAtHigherScaleFactor.map((tile) => [
-  //     tile.column,
-  //     tile.row,
-  //     tile.tileZoomLevel.scaleFactor
-  //   ])
-  // )
-
   if (tilesCoveringTileAtHigherScaleFactor.length == 0) {
     return undefined
   }
@@ -616,17 +583,6 @@ export function getTilesAtLowerScaleFactor(
     lowerScaleFactor,
     validTile
   )
-
-  // console.log(
-  //   'at',
-  //   lowerScaleFactor,
-  //   'found',
-  //   tilesCoveringTileAtLowerScaleFactor.map((tile) => [
-  //     tile.column,
-  //     tile.row,
-  //     tile.tileZoomLevel.scaleFactor
-  //   ])
-  // )
 
   return tilesCoveringTileAtLowerScaleFactor
 }
