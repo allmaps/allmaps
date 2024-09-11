@@ -102,146 +102,149 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [setBestScaleFactor](#setbestscalefactor)
     *   [Parameters](#parameters-18)
 *   [hasImageInfo](#hasimageinfo)
+*   [resetPrevious](#resetprevious)
+*   [mixPreviousAndNew](#mixpreviousandnew)
+    *   [Parameters](#parameters-19)
 *   [loadImageInfo](#loadimageinfo)
 *   [constructor](#constructor-2)
-    *   [Parameters](#parameters-19)
-*   [setResourceMask](#setresourcemask-1)
     *   [Parameters](#parameters-20)
-*   [setBestScaleFactor](#setbestscalefactor-1)
+*   [setResourceMask](#setresourcemask-1)
     *   [Parameters](#parameters-21)
-*   [updateTriangulation](#updatetriangulation)
+*   [setBestScaleFactor](#setbestscalefactor-1)
     *   [Parameters](#parameters-22)
-*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
+*   [resetPrevious](#resetprevious-1)
+*   [mixPreviousAndNew](#mixpreviousandnew-1)
     *   [Parameters](#parameters-23)
-*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
+*   [updateTriangulation](#updatetriangulation)
     *   [Parameters](#parameters-24)
-*   [resetTrianglePoints](#resettrianglepoints)
-*   [mixTrianglePoints](#mixtrianglepoints)
+*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
     *   [Parameters](#parameters-25)
-*   [constructor](#constructor-3)
+*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
     *   [Parameters](#parameters-26)
-*   [updateVertexBuffers](#updatevertexbuffers)
+*   [constructor](#constructor-3)
     *   [Parameters](#parameters-27)
-*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
+*   [updateVertexBuffers](#updatevertexbuffers)
     *   [Parameters](#parameters-28)
-*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
+*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
     *   [Parameters](#parameters-29)
-*   [constructor](#constructor-4)
+*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
     *   [Parameters](#parameters-30)
+*   [constructor](#constructor-4)
+    *   [Parameters](#parameters-31)
 *   [getMapIds](#getmapids)
 *   [getWarpedMap](#getwarpedmap)
-    *   [Parameters](#parameters-31)
-*   [getMapZIndex](#getmapzindex)
     *   [Parameters](#parameters-32)
+*   [getMapZIndex](#getmapzindex)
+    *   [Parameters](#parameters-33)
 *   [getBbox](#getbbox)
 *   [getProjectedBbox](#getprojectedbbox)
 *   [getMapsByGeoBbox](#getmapsbygeobbox)
-    *   [Parameters](#parameters-33)
-*   [setImageInformations](#setimageinformations)
     *   [Parameters](#parameters-34)
-*   [setMapResourceMask](#setmapresourcemask)
+*   [setImageInformations](#setimageinformations)
     *   [Parameters](#parameters-35)
-*   [setMapsTransformationType](#setmapstransformationtype)
+*   [setMapResourceMask](#setmapresourcemask)
     *   [Parameters](#parameters-36)
-*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
+*   [setMapsTransformationType](#setmapstransformationtype)
     *   [Parameters](#parameters-37)
-*   [bringMapsToFront](#bringmapstofront)
+*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [Parameters](#parameters-38)
-*   [sendMapsToBack](#sendmapstoback)
+*   [bringMapsToFront](#bringmapstofront)
     *   [Parameters](#parameters-39)
-*   [bringMapsForward](#bringmapsforward)
+*   [sendMapsToBack](#sendmapstoback)
     *   [Parameters](#parameters-40)
-*   [sendMapsBackward](#sendmapsbackward)
+*   [bringMapsForward](#bringmapsforward)
     *   [Parameters](#parameters-41)
-*   [showMaps](#showmaps)
+*   [sendMapsBackward](#sendmapsbackward)
     *   [Parameters](#parameters-42)
-*   [hideMaps](#hidemaps)
+*   [showMaps](#showmaps)
     *   [Parameters](#parameters-43)
-*   [addGeoreferencedMap](#addgeoreferencedmap)
+*   [hideMaps](#hidemaps)
     *   [Parameters](#parameters-44)
-*   [removeGeoreferencedMap](#removegeoreferencedmap)
+*   [addGeoreferencedMap](#addgeoreferencedmap)
     *   [Parameters](#parameters-45)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+*   [removeGeoreferencedMap](#removegeoreferencedmap)
     *   [Parameters](#parameters-46)
-*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
     *   [Parameters](#parameters-47)
-*   [constructor](#constructor-5)
+*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
     *   [Parameters](#parameters-48)
+*   [constructor](#constructor-5)
+    *   [Parameters](#parameters-49)
 *   [isCachedTile](#iscachedtile)
 *   [abort](#abort)
 *   [constructor](#constructor-6)
-    *   [Parameters](#parameters-49)
+    *   [Parameters](#parameters-50)
 *   [fetch](#fetch)
 *   [fetch](#fetch-1)
 *   [fetch](#fetch-2)
 *   [getCacheableTile](#getcacheabletile)
-    *   [Parameters](#parameters-50)
-*   [getCachedTile](#getcachedtile)
     *   [Parameters](#parameters-51)
+*   [getCachedTile](#getcachedtile)
+    *   [Parameters](#parameters-52)
 *   [getCacheableTiles](#getcacheabletiles)
 *   [getCachedTiles](#getcachedtiles)
 *   [getTileUrls](#gettileurls)
 *   [requestFetchableTiles](#requestfetchabletiles)
-    *   [Parameters](#parameters-52)
+    *   [Parameters](#parameters-53)
 *   [allRequestedTilesLoaded](#allrequestedtilesloaded)
 *   [constructor](#constructor-7)
-    *   [Parameters](#parameters-53)
+    *   [Parameters](#parameters-54)
 *   [getOpacity](#getopacity)
 *   [setOpacity](#setopacity)
-    *   [Parameters](#parameters-54)
+    *   [Parameters](#parameters-55)
 *   [resetOpacity](#resetopacity)
 *   [getMapOpacity](#getmapopacity)
-    *   [Parameters](#parameters-55)
-*   [setMapOpacity](#setmapopacity)
     *   [Parameters](#parameters-56)
-*   [resetMapOpacity](#resetmapopacity)
+*   [setMapOpacity](#setmapopacity)
     *   [Parameters](#parameters-57)
+*   [resetMapOpacity](#resetmapopacity)
+    *   [Parameters](#parameters-58)
 *   [getRemoveColorOptions](#getremovecoloroptions)
 *   [setRemoveColorOptions](#setremovecoloroptions)
-    *   [Parameters](#parameters-58)
+    *   [Parameters](#parameters-59)
 *   [resetRemoveColorOptions](#resetremovecoloroptions)
 *   [getMapRemoveColorOptions](#getmapremovecoloroptions)
-    *   [Parameters](#parameters-59)
-*   [setMapRemoveColorOptions](#setmapremovecoloroptions)
     *   [Parameters](#parameters-60)
-*   [resetMapRemoveColorOptions](#resetmapremovecoloroptions)
+*   [setMapRemoveColorOptions](#setmapremovecoloroptions)
     *   [Parameters](#parameters-61)
+*   [resetMapRemoveColorOptions](#resetmapremovecoloroptions)
+    *   [Parameters](#parameters-62)
 *   [getColorizeOptions](#getcolorizeoptions)
 *   [setColorizeOptions](#setcolorizeoptions)
-    *   [Parameters](#parameters-62)
+    *   [Parameters](#parameters-63)
 *   [resetColorizeOptions](#resetcolorizeoptions)
 *   [getMapColorizeOptions](#getmapcolorizeoptions)
-    *   [Parameters](#parameters-63)
-*   [setMapColorizeOptions](#setmapcolorizeoptions)
     *   [Parameters](#parameters-64)
-*   [resetMapColorizeOptions](#resetmapcolorizeoptions)
+*   [setMapColorizeOptions](#setmapcolorizeoptions)
     *   [Parameters](#parameters-65)
+*   [resetMapColorizeOptions](#resetmapcolorizeoptions)
+    *   [Parameters](#parameters-66)
 *   [getGridOptions](#getgridoptions)
 *   [setGridOptions](#setgridoptions)
-    *   [Parameters](#parameters-66)
+    *   [Parameters](#parameters-67)
 *   [resetGridOptions](#resetgridoptions)
 *   [getMapGridOptions](#getmapgridoptions)
-    *   [Parameters](#parameters-67)
-*   [setMapGridOptions](#setmapgridoptions)
     *   [Parameters](#parameters-68)
-*   [resetMapGridOptions](#resetmapgridoptions)
+*   [setMapGridOptions](#setmapgridoptions)
     *   [Parameters](#parameters-69)
+*   [resetMapGridOptions](#resetmapgridoptions)
+    *   [Parameters](#parameters-70)
 *   [getSaturation](#getsaturation)
 *   [setSaturation](#setsaturation)
-    *   [Parameters](#parameters-70)
+    *   [Parameters](#parameters-71)
 *   [resetSaturation](#resetsaturation)
 *   [getMapSaturation](#getmapsaturation)
-    *   [Parameters](#parameters-71)
-*   [setMapSaturation](#setmapsaturation)
     *   [Parameters](#parameters-72)
-*   [resetMapSaturation](#resetmapsaturation)
+*   [setMapSaturation](#setmapsaturation)
     *   [Parameters](#parameters-73)
-*   [render](#render)
+*   [resetMapSaturation](#resetmapsaturation)
     *   [Parameters](#parameters-74)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
+*   [render](#render)
     *   [Parameters](#parameters-75)
-*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
     *   [Parameters](#parameters-76)
+*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+    *   [Parameters](#parameters-77)
 
 ### constructor
 
@@ -314,7 +317,7 @@ Creates an instance of WarpedMap.
 
 *   `e` &#x20;
 *   `r` &#x20;
-*   `s` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `options` **WarpedMapOptions?** options
@@ -473,6 +476,19 @@ Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 Check if warpedMap has image info
 
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
 ### loadImageInfo
 
 Fetch and parse the image info, and generate the image ID
@@ -485,8 +501,8 @@ Creates an instance of a TriangulatedWarpedMap.
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `i` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
@@ -498,7 +514,7 @@ Update the resourceMask.
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `resourceMask` **Ring**&#x20;
 
 ### setBestScaleFactor
@@ -507,10 +523,22 @@ Set the bestScaleFactor for the current viewport
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
 ### updateTriangulation
 
@@ -518,7 +546,7 @@ Update the triangulation of the resourceMask, at the current bestScaleFactor. Us
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether the previous and new triangulation are the same - true by default, false during a transformation transition
 
 ### updateProjectedGeoTrianglePoints
@@ -527,7 +555,7 @@ Update the (previous and new) points of the triangulated resourceMask, at the cu
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
 
 ### updateTrianglePointsDistortion
@@ -536,21 +564,8 @@ Update the (previous and new) distortion at the points of the triangulated resou
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
-
-### resetTrianglePoints
-
-Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
-
-### mixTrianglePoints
-
-Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
-
-#### Parameters
-
-*   `e` &#x20;
-*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
 ### constructor
 
@@ -559,14 +574,16 @@ Creates an instance of WebGL2WarpedMap.
 #### Parameters
 
 *   `e` &#x20;
-*   `i` &#x20;
-*   `r` &#x20;
-*   `s` &#x20;
-*   `n` &#x20;
+*   `o` &#x20;
+*   `a` &#x20;
+*   `c` &#x20;
+*   `l` &#x20;
+*   `p` &#x20;
+*   `d` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `gl` **WebGL2RenderingContext** WebGL rendering context
-*   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
+*   `mapsProgram` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
 *   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
 
 ### updateVertexBuffers
@@ -911,8 +928,8 @@ Creates an instance of WebGL2Renderer.
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `gl` **WebGL2RenderingContext** WebGL 2 rendering context
 *   `options` **WebGL2RendererOptions** options
 
@@ -928,7 +945,7 @@ Set the opacity of the renderer
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
 
 ### resetOpacity
@@ -941,7 +958,7 @@ Get the opacity of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -952,8 +969,8 @@ Set the opacity of a map
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
 
@@ -963,7 +980,7 @@ Rreset the opacity of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getRemoveColorOptions
@@ -978,7 +995,7 @@ Set the remove color options of the renderer
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `removeColorOptions` **RemoveColorOptions**&#x20;
 
 ### resetRemoveColorOptions
@@ -991,7 +1008,7 @@ Get the remove color options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1002,8 +1019,8 @@ Set the remove color options of a map
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `removeColorOptions` **RemoveColorOptions** the 'remove color options' to set
 
@@ -1013,7 +1030,7 @@ Reset the remove color options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getColorizeOptions
@@ -1028,7 +1045,7 @@ Set the colorize options of the renderer
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
 
 ### resetColorizeOptions
@@ -1041,7 +1058,7 @@ Get the colorize options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<ColorizeOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1052,8 +1069,8 @@ Set the colorize options of a map
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
 
@@ -1063,7 +1080,7 @@ Reset the colorize options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getGridOptions
@@ -1078,7 +1095,7 @@ Set the grid options of the renderer
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `gridOptions` **GridOptions** the grid options to set
 
 ### resetGridOptions
@@ -1091,7 +1108,7 @@ Get the grid options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<GridOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1102,8 +1119,8 @@ Set the grid options of a map
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `gridOptions` **GridOptions** the grid options to set
 
@@ -1113,7 +1130,7 @@ Reset the grid options of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getSaturation
@@ -1130,7 +1147,7 @@ Set the saturation of the renderer
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `saturation`  the satuation to set
 
 ### resetSaturation
@@ -1143,7 +1160,7 @@ Get the saturation of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1156,8 +1173,8 @@ Set the saturation of a map
 
 #### Parameters
 
-*   `o` &#x20;
 *   `t` &#x20;
+*   `o` &#x20;
 *   `mapId`  ID of the map
 *   `saturation`  the saturation to set
 
@@ -1167,7 +1184,7 @@ Reset the saturation of a map
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### render
@@ -1176,7 +1193,7 @@ Render the map for a given viewport
 
 #### Parameters
 
-*   `o` &#x20;
+*   `t` &#x20;
 *   `viewport` **Viewport** the current viewport
 
 ### addGeoreferenceAnnotation

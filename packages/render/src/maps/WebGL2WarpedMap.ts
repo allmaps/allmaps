@@ -41,6 +41,9 @@ const THROTTLE_OPTIONS = {
 }
 
 const DEBUG = false // TODO: set using options
+const RENDER_MAPS = true // TODO: set using options
+const RENDER_LINES = false // TODO: set using options
+const RENDER_POINTS = false // TODO: set using options
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -162,9 +165,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.projectedGeoToClipTransform = projectedGeoToClipTransform
-    this.updateVertexBuffersMaps()
-    this.updateVertexBuffersLines()
-    this.updateVertexBuffersPoints()
+
+    if (RENDER_MAPS) {
+      this.updateVertexBuffersMaps()
+    }
+    if (RENDER_LINES) {
+      this.updateVertexBuffersLines()
+    }
+    if (RENDER_POINTS) {
+      this.updateVertexBuffersPoints()
+    }
   }
 
   /**
@@ -482,7 +492,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.hasOwnProperty('viewportSize')
+              Object.prototype.hasOwnProperty.call(lineLayer, 'viewportSize') // Note: using hasOwnPropery to ensure 0 is passed as 0
                 ? lineLayer.viewportSize
                 : DEFAULT_LINE_LAYER_VIEWPORT_SIZE
             )
@@ -503,7 +513,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.hasOwnProperty('color')
+              Object.prototype.hasOwnProperty.call(lineLayer, 'color')
                 ? lineLayer.color
                 : DEFAULT_LINE_LAYER_COLOR
             )
@@ -538,7 +548,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.hasOwnProperty('borderColor')
+              Object.prototype.hasOwnProperty.call(lineLayer, 'borderColor')
                 ? lineLayer.borderColor
                 : DEFAULT_LINE_LAYER_BORDER_COLOR
             )
@@ -598,7 +608,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (accumulator: number[], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
-            pointLayer.hasOwnProperty('viewportSize')
+            Object.prototype.hasOwnProperty.call(pointLayer, 'viewportSize')
               ? (pointLayer.viewportSize as number)
               : DEFAULT_POINT_LAYER_VIEWPORT_SIZE
           )
@@ -617,7 +627,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
-            pointLayer.hasOwnProperty('color')
+            Object.prototype.hasOwnProperty.call(pointLayer, 'color')
               ? (pointLayer.color as ColorWithTransparancy)
               : DEFAULT_POINT_LAYER_COLOR
           )
@@ -649,7 +659,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (accumulator: number[][], pointLayer) =>
         accumulator.concat(
           pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
-            pointLayer.hasOwnProperty('borderColor')
+            Object.prototype.hasOwnProperty.call(pointLayer, 'borderColor')
               ? (pointLayer.borderColor as ColorWithTransparancy)
               : DEFAULT_POINT_LAYER_BORDER_COLOR
           )
