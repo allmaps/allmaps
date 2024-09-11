@@ -4,6 +4,8 @@
   import maplibregl, { Map, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
+
+  // @ts-ignore
   import { default as mlcontour } from 'maplibre-contour'
 
   // @ts-ignore
