@@ -96,10 +96,6 @@
   onMount(() => {
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
-    var demSource = new mlcontour.DemSource({
-      url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
-    })
-    demSource.setupMaplibre(maplibregl)
 
     map = new Map({
       container,
