@@ -4,6 +4,7 @@
   import maplibregl, { Map, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
+  import { default as mlcontour } from 'maplibre-contour'
 
   // @ts-ignore
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
@@ -95,6 +96,10 @@
   onMount(() => {
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
+    var demSource = new mlcontour.DemSource({
+      url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
+    })
+    demSource.setupMaplibre(maplibregl)
 
     map = new Map({
       container,
@@ -110,6 +115,66 @@
     addTerrain(map)
 
     map.on('load', () => {
+      map.addSource('terrain', {
+        type: 'raster-dem',
+        tiles: [demSource.sharedDemProtocolUrl],
+        maxzoom: 13,
+        encoding: 'terrarium',
+        attribution:
+          "<a href='https://github.com/tilezen/joerd/tree/master'>Joerd</a>"
+      })
+
+      map.addSource('contour-source', {
+        type: 'vector',
+        tiles: [
+          demSource.contourProtocolUrl({
+            thresholds: {
+              // zoom: [minor, major]
+              11: [200, 1000],
+              12: [100, 500],
+              14: [50, 200],
+              15: [20, 100]
+            },
+            // optional, override vector tile parameters:
+            contourLayer: 'contours',
+            elevationKey: 'ele',
+            levelKey: 'level',
+            extent: 4096,
+            buffer: 1
+          })
+        ],
+        maxzoom: 15
+      })
+
+      map.addLayer(
+        {
+          id: 'hillshade',
+          type: 'hillshade',
+          source: 'terrain',
+          paint: {
+            'hillshade-exaggeration': 0.6,
+            'hillshade-shadow-color': '#bbb',
+            'hillshade-highlight-color': 'white',
+            'hillshade-accent-color': 'green'
+          }
+        },
+        'water'
+      )
+
+      map.addLayer(
+        {
+          id: 'contour-lines',
+          type: 'line',
+          source: 'contour-source',
+          'source-layer': 'contours',
+          paint: {
+            // level = highest index in thresholds array the elevation is a multiple of
+            'line-width': ['match', ['get', 'level'], 1, 1, 0.5]
+          }
+        },
+        'water'
+      )
+
       map.addSource('masks', {
         type: 'vector',
         url: `pmtiles://${pmtilesUrl}`
