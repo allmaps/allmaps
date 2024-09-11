@@ -10,6 +10,6 @@ export default defineConfig({
   },
   plugins: [sveltekit()],
   ssr: {
-    noExternal: 'maplibre-gl'
+    noExternal: ['maplibre-gl', 'maplibre-contour']
   }
 })
