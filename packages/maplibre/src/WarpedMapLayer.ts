@@ -83,9 +83,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
     if (!this.renderer) {
       return
     }
-    this.renderer.dispose()
 
     this.removeEventListeners()
+    this.renderer.destroy()
   }
 
   /**
@@ -722,10 +722,21 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.render(viewport)
   }
 
+  private contextLost() {
+    this.renderer?.contextLost()
+  }
+
+  private contextRestored() {
+    this.renderer?.contextRestored()
+  }
+
   private addEventListeners() {
-    if (!this.renderer) {
+    if (!this.renderer || !this.map) {
       return
     }
+
+    this.map.on('webglcontextlost', this.contextLost.bind(this))
+    this.map.on('webglcontextrestored', this.contextRestored.bind(this))
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -784,9 +795,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   private removeEventListeners() {
-    if (!this.renderer) {
+    if (!this.renderer || !this.map) {
       return
     }
+
+    this.map.off('webglcontextlost', this.contextLost.bind(this))
+    this.map.off('webglcontextrestored', this.contextRestored.bind(this))
 
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,

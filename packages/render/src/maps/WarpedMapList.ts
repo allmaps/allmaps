@@ -100,8 +100,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @returns {Iterable<W>}
    */
   getWarpedMaps(): Iterable<W>
-  getWarpedMaps(mapIds: string[]): Iterable<W>
-  getWarpedMaps(mapIds?: string[]): Iterable<W> {
+  getWarpedMaps(mapIds: Iterable<string>): Iterable<W>
+  getWarpedMaps(mapIds?: Iterable<string>): Iterable<W> {
     if (mapIds === undefined) {
       return this.warpedMapsById.values()
     } else {
@@ -501,11 +501,13 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
   }
 
-  dispose() {
+  destroy() {
     for (const warpedMap of this.getWarpedMaps()) {
       this.removeEventListenersFromWarpedMap(warpedMap)
-      warpedMap.dispose()
+      warpedMap.destroy()
     }
+
+    this.clear()
   }
 
   private async addGeoreferencedMapInternal(
@@ -542,6 +544,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       )
       this.removeZIndexHoles()
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+
+      warpedMap.destroy()
     } else {
       throw new Error(`No map found with ID ${mapId}`)
     }

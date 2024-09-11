@@ -23,7 +23,8 @@ import type {
   Bbox,
   GeojsonPolygon,
   FetchFn,
-  ImageInformations
+  ImageInformations,
+  TileZoomLevel
 } from '@allmaps/types'
 import type {
   Helmert,
@@ -33,6 +34,7 @@ import type {
 } from '@allmaps/transform'
 
 import type Viewport from '../viewport/Viewport.js'
+import type FetchableTile from '../tilecache/FetchableTile.js'
 
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
@@ -94,9 +96,12 @@ export function createWarpedMapFactory() {
  * @param {Rectangle} projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
- * @param {number} bestScaleFactor - The best tile scale factor for displaying this map, in the current viewport
- * @param {Ring} resourceViewportRing - The viewport transformed back to resource coordinates, in the current viewport
- * @param {Bbox} [resourceViewportRingBbox] - Bbox of the resourceViewportRing
+ * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {TileZoomLevel} [currentOverviewTileZoomLevel] - The overview tile zoom level, at the current viewport
+ * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
+ * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
+ * @param {Tile[]} currentFetchableTiles - The fetchable tiles for displaying this map, at the current viewport
+ * @param {Tile[]} currentOverviewFetchableTiles - The overview fetchable tiles, at the current viewport
  */
 export default class WarpedMap extends EventTarget {
   mapId: string
@@ -118,6 +123,7 @@ export default class WarpedMap extends EventTarget {
   loadingImageInfo: boolean
 
   fetchFn?: FetchFn
+  protected abortController?: AbortController
 
   visible: boolean
 
@@ -153,10 +159,14 @@ export default class WarpedMap extends EventTarget {
 
   // The properties below are for the current viewport
 
-  bestScaleFactor!: number
+  currentBestScaleFactor!: number
+  currentOverviewTileZoomLevel?: TileZoomLevel
 
-  resourceViewportRing: Ring = []
-  resourceViewportRingBbox?: Bbox
+  currentResourceViewportRing: Ring = []
+  currentResourceViewportRingBbox!: Bbox
+
+  currentFetchableTiles: FetchableTile[] = []
+  currentOverviewFetchableTiles: FetchableTile[] = []
 
   /**
    * Creates an instance of WarpedMap.
@@ -332,9 +342,29 @@ export default class WarpedMap extends EventTarget {
    *
    * @param {Ring} resourceViewportRing
    */
-  setResourceViewportRing(resourceViewportRing: Ring): void {
-    this.resourceViewportRing = resourceViewportRing
-    this.resourceViewportRingBbox = computeBbox(resourceViewportRing)
+  setCurrentResourceViewportRing(resourceViewportRing: Ring): void {
+    this.currentResourceViewportRing = resourceViewportRing
+    this.currentResourceViewportRingBbox = computeBbox(resourceViewportRing)
+  }
+
+  /**
+   * Set tiles at current viewport
+   *
+   * @param {FetchableTile[]} fetchableTiles
+   */
+  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]): void {
+    this.currentFetchableTiles = fetchableTiles
+  }
+
+  /**
+   * Set overview tiles at current viewport
+   *
+   * @param {FetchableTile[]} overviewFetchableTiles
+   */
+  setCurrentOverviewFetchableTiles(
+    overviewFetchableTiles: FetchableTile[]
+  ): void {
+    this.currentOverviewFetchableTiles = overviewFetchableTiles
   }
 
   /**
@@ -385,12 +415,22 @@ export default class WarpedMap extends EventTarget {
    * @param {number} scaleFactor - scale factor
    * @returns {boolean}
    */
-  setBestScaleFactor(scaleFactor: number): boolean {
-    const updating = this.bestScaleFactor != scaleFactor
+  setCurrentBestScaleFactor(scaleFactor: number): boolean {
+    const updating = this.currentBestScaleFactor != scaleFactor
     if (updating) {
-      this.bestScaleFactor = scaleFactor
+      this.currentBestScaleFactor = scaleFactor
     }
     return updating
+  }
+
+  /**
+   * Set the overview tile zoom level for the current viewport
+   *
+   * @param {TileZoomLevel} tileZoomLevel - tile zoom level
+   * @returns {boolean}
+   */
+  setCurrentOverviewTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
+    this.currentOverviewTileZoomLevel = tileZoomLevel
   }
 
   /**
@@ -418,7 +458,11 @@ export default class WarpedMap extends EventTarget {
       if (this.imageInformations?.get(imageUri)) {
         imageInfo = this.imageInformations.get(imageUri)
       } else {
-        imageInfo = await fetchImageInfo(imageUri, undefined, this.fetchFn)
+        this.abortController = new AbortController()
+        const signal = this.abortController.signal
+        imageInfo = await fetchImageInfo(imageUri, { signal }, this.fetchFn)
+        this.abortController = undefined
+
         this.imageInformations?.set(imageUri, imageInfo)
       }
 
@@ -432,10 +476,6 @@ export default class WarpedMap extends EventTarget {
     } finally {
       this.loadingImageInfo = false
     }
-  }
-
-  dispose() {
-    // TODO: consider adding all heavy properties in here
   }
 
   private updateResourceMaskProperties() {
@@ -531,6 +571,12 @@ export default class WarpedMap extends EventTarget {
       this.resourceMaskRectangle,
       this.projectedGeoMaskRectangle
     )
+  }
+
+  destroy() {
+    if (this.abortController) {
+      this.abortController.abort()
+    }
   }
 }
 

@@ -1,5 +1,9 @@
 import WarpedMapList from '../maps/WarpedMapList.js'
-import { composeTransform } from '../shared/matrix.js'
+import {
+  composeTransform,
+  applyTransform,
+  invertTransform
+} from '../shared/matrix.js'
 
 import {
   computeBbox,
@@ -7,6 +11,7 @@ import {
   bboxToRectangle,
   bboxToSize,
   sizesToScale,
+  bufferBboxByRatio,
   webMercatorToLonLat
 } from '@allmaps/stdlib'
 
@@ -216,6 +221,20 @@ export default class Viewport {
       0,
       devicePixelRatio
     )
+  }
+
+  getProjectedGeoBufferedRectangle(bufferFraction: number): Rectangle {
+    const viewportBufferedBbox = bufferBboxByRatio(
+      this.viewportBbox,
+      bufferFraction
+    )
+    const viewportBufferedRectangle = bboxToRectangle(viewportBufferedBbox)
+    return viewportBufferedRectangle.map((point) =>
+      applyTransform(
+        invertTransform(this.projectedGeoToViewportTransform),
+        point
+      )
+    ) as Rectangle
   }
 
   private composeProjectedGeoToViewportTransform(): Transform {

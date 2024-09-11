@@ -57,6 +57,11 @@ export function createBuffer(
   name: string
 ) {
   const buffer = gl.createBuffer()
+
+  if (!buffer) {
+    throw new Error('Failed to create buffer')
+  }
+
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
 
@@ -75,4 +80,6 @@ export function createBuffer(
     offset
   )
   gl.enableVertexAttribArray(positionAttributeLocation)
+
+  return buffer
 }

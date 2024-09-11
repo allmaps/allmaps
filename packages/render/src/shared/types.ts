@@ -3,7 +3,13 @@ import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import type FetchableTile from '../tilecache/FetchableTile.js'
 import type CacheableTile from '../tilecache/CacheableTile.js'
 
-import type { Size, FetchFn, ImageInformations, Color } from '@allmaps/types'
+import type {
+  Size,
+  FetchFn,
+  ImageInformations,
+  Color,
+  Bbox
+} from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 export type TransformationOptions = {
@@ -85,3 +91,11 @@ export type CachableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
+
+export type pruneInfo = {
+  bestScaleFactor: number
+  overviewScaleFactor: number | undefined
+  resourceViewportRingBbox: Bbox
+}
+
+export type PruneInfoByMapId = Map<string, pruneInfo>

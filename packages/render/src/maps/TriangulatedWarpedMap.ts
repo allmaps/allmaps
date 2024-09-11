@@ -128,8 +128,8 @@ export default class TriangulatedWarpedMap extends WarpedMap {
    * @param {number} scaleFactor - scale factor
    * @returns {boolean}
    */
-  setBestScaleFactor(scaleFactor: number): boolean {
-    const updating = super.setBestScaleFactor(scaleFactor)
+  setCurrentBestScaleFactor(scaleFactor: number): boolean {
+    const updating = super.setCurrentBestScaleFactor(scaleFactor)
     if (updating) {
       this.updateTriangulation(true)
     }
@@ -145,10 +145,11 @@ export default class TriangulatedWarpedMap extends WarpedMap {
     const { trianglePointsUniquePointsIndex, resourceUniquePoints } =
       getPropertyFromCacheOrComputation(
         this.triangulationByBestScaleFactor,
-        this.bestScaleFactor,
+        this.currentBestScaleFactor,
         () => {
           const diameter =
-            (geometryToDiameter(this.resourceMask) * this.bestScaleFactor) /
+            (geometryToDiameter(this.resourceMask) *
+              this.currentBestScaleFactor) /
             DIAMETER_FRACTION
 
           // TODO: make this obsolete by cleaning mask using conformPolygon() in @allmaps/annotation or in WarpedMap constructor
@@ -202,7 +203,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   updateProjectedGeoTrianglePoints(previousIsNew = false) {
     this.projectedGeoUniquePoints = getPropertyFromDoubleCacheOrComputation(
       this.projectedGeoUniquePointsByBestScaleFactorAndTransformationType,
-      this.bestScaleFactor,
+      this.currentBestScaleFactor,
       this.transformationType,
       () =>
         this.resourceUniquePoints.map((point) =>
@@ -231,7 +232,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
         getPropertyFromDoubleCacheOrComputation(
           this
             .projectedGeoUniquePointsPartialDerivativeXByBestScaleFactorAndTransformationType,
-          this.bestScaleFactor,
+          this.currentBestScaleFactor,
           this.transformationType,
           () =>
             this.resourceUniquePoints.map((point) =>
@@ -245,7 +246,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
         getPropertyFromDoubleCacheOrComputation(
           this
             .projectedGeoUniquePointsPartialDerivativeYByBestScaleFactorAndTransformationType,
-          this.bestScaleFactor,
+          this.currentBestScaleFactor,
           this.transformationType,
           () =>
             this.resourceUniquePoints.map((point) =>

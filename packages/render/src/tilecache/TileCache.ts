@@ -3,20 +3,22 @@ import { equalSet } from '@allmaps/stdlib'
 import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import {
-  tileByteSize,
-  createKeyFromTile,
-  createKeyFromMapIdAndTileUrl,
-  fetchableTilesToKeys
-} from '../shared/tiles.js'
+import { isOverviewTile, shouldPruneTile } from '../shared/tiles.js'
 import FetchableTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
 
-import type { CachableTileFactory, TileCacheOptions } from '../shared/types.js'
+import type {
+  CachableTileFactory,
+  TileCacheOptions,
+  PruneInfoByMapId
+} from '../shared/types.js'
 
-const MAX_HISTORY_TOTAL_COUNT = 0
-const MAX_HISTORY_SIZE = 32 * 1000 * 1000 // size in bytes
+const PRUNE_MANY_MAPS = 50 // For this amount of maps, prune more tiles
+
+const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
+const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
+const PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO = 1
 
 /**
  * Class that fetches and caches IIIF tiles.
@@ -37,7 +39,6 @@ export default class TileCache<D> extends EventTarget {
   protected tilesFetchingCount = 0
 
   protected previousRequestedTiles: FetchableTile[] = []
-  protected outgoingTilesHistory: FetchableTile[] = []
 
   constructor(
     cachableTileFactory: CachableTileFactory<D>,
@@ -129,53 +130,14 @@ export default class TileCache<D> extends EventTarget {
    * @param {FetchableTile[]} tiles
    */
   requestFetchableTiles(tiles: FetchableTile[]) {
-    const previousTilesKeys = fetchableTilesToKeys(this.previousRequestedTiles)
-    const requestedTilesKeys = fetchableTilesToKeys(tiles)
+    const previousTilesKeys = FetchableTile.toKeys(this.previousRequestedTiles)
+    const requestedTilesKeys = FetchableTile.toKeys(tiles)
 
     // If previous requested tiles is the same as current requested tiles, don't do anything
     if (equalSet(previousTilesKeys, requestedTilesKeys)) {
       return
     }
 
-    // Compute outgoing tiles by comparing requested tiles to previous requested tiles
-    const outgoingTiles = []
-    for (const previousRequestedTile of this.previousRequestedTiles) {
-      if (!requestedTilesKeys.has(createKeyFromTile(previousRequestedTile))) {
-        outgoingTiles.push(previousRequestedTile)
-      }
-    }
-
-    // Add outgoing tiles to outgoingTilesHistory
-    this.updateOutgoingTilesHistory(outgoingTiles, tiles.length)
-
-    const outgoingTilesHistoryKeys = fetchableTilesToKeys(
-      this.outgoingTilesHistory
-    )
-
-    // TODO: use union() when it becomes official
-    const requestedTilesAndOutgoingTilesHistoryKeys = new Set([
-      ...requestedTilesKeys,
-      ...outgoingTilesHistoryKeys
-    ])
-
-    // Remove tiles from cache if not in request (or outgoing tiles history)
-    // Loop over all cached tileUrls and their mapIds
-    for (const [tileUrl, mapIds] of this.mapIdsByTileUrl) {
-      for (const mapId of mapIds) {
-        // If the requested tiles (or outgoing tiles history) keys
-        // don't include the (mapId, tileUrl) key of the loop
-        // remove that (mapId, tileUrl) key from the cache
-        if (
-          !requestedTilesAndOutgoingTilesHistoryKeys.has(
-            createKeyFromMapIdAndTileUrl(mapId, tileUrl)
-          )
-        ) {
-          this.removeMapTile(mapId, tileUrl)
-        }
-      }
-    }
-
-    // Add requested tiles
     // Loop over all requested tiles, and add them (also do this if the cache already contains them,
     // so as to trigger the loading events in addMapTile() which will trigger a rerender etc.)
     for (const requestedTile of tiles) {
@@ -214,22 +176,61 @@ export default class TileCache<D> extends EventTarget {
     })
   }
 
+  prune(pruneInfoByMapId: PruneInfoByMapId) {
+    const mapIdsWithOverviewKept = new Set()
+    for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
+      for (const mapId of mapIds) {
+        const pruneInfo = pruneInfoByMapId.get(mapId)
+        const tile = this.tilesByTileUrl.get(tileUrl)?.tile
+
+        if (tile) {
+          const keepMapOverview = mapIdsWithOverviewKept.size < PRUNE_MANY_MAPS
+          if (
+            !pruneInfo ||
+            shouldPruneTile(
+              tile,
+              pruneInfo,
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
+                ? PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+                : 0,
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
+                ? PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+                : 0,
+              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
+                ? PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
+                : 0,
+              keepMapOverview
+            )
+          ) {
+            this.removeMapTile(mapId, tileUrl)
+          } else {
+            if (keepMapOverview && isOverviewTile(tile, pruneInfo)) {
+              mapIdsWithOverviewKept.add(mapId)
+            }
+          }
+        }
+      }
+    }
+  }
+
   getTileUrlsForMapId(mapId: string) {
     return this.tileUrlsByMapId.get(mapId) || new Set()
   }
 
   clear() {
+    for (const cacheableTile of this.getCacheableTiles()) {
+      cacheableTile.abort()
+      this.removeEventListenersFromTile(cacheableTile)
+    }
+
     this.tilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.tilesFetchingCount = 0
-    this.outgoingTilesHistory = []
   }
 
-  dispose() {
-    for (const cacheableTile of this.getCacheableTiles()) {
-      this.removeEventListenersFromTile(cacheableTile)
-    }
+  destroy() {
+    this.clear()
   }
 
   private addMapTile(fetchableTile: FetchableTile) {
@@ -291,45 +292,6 @@ export default class TileCache<D> extends EventTarget {
         tileUrl
       })
     )
-  }
-
-  private updateOutgoingTilesHistory(
-    outgoingTiles: FetchableTile[],
-    requestCount: number
-  ) {
-    // Add outgoing tiles to history:
-    // to keep the most relevant tiles when trimming,
-    // add the outgoing tiles are at the front of the Array
-    // and add the first tiles of this request last
-    // (since these are closest to the viewport center and hence more important)
-    for (let index = outgoingTiles.length - 1; index >= 0; index--) {
-      const fetchableTile = outgoingTiles[index]
-      this.outgoingTilesHistory.unshift(fetchableTile)
-    }
-
-    // Make history unique
-    this.outgoingTilesHistory = Array.from(new Set(this.outgoingTilesHistory))
-
-    // Trim history based on maximum amounts
-    let count = 0
-    let size = 0
-    let lastSize = 0
-    for (const fetchableTile of this.outgoingTilesHistory) {
-      count += 1
-      lastSize = tileByteSize(fetchableTile)
-      size += lastSize
-      if (count + requestCount > MAX_HISTORY_TOTAL_COUNT) {
-        count -= 1
-        size -= lastSize
-        break
-      }
-      if (size > MAX_HISTORY_SIZE) {
-        count -= 1
-        size -= lastSize
-        break
-      }
-    }
-    this.outgoingTilesHistory = this.outgoingTilesHistory.slice(0, count)
   }
 
   private tileFetched(event: Event) {

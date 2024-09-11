@@ -1,23 +1,24 @@
-import potpack from 'potpack'
-
 import { throttle } from 'lodash-es'
 
-import { isOverlapping } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
-import { computeBboxTile } from '../shared/tiles.js'
 import { applyTransform } from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
+import {
+  equalTileByRowColumnScaleFactor,
+  getTilesAtOtherScaleFactors
+} from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Transform } from '@allmaps/types'
+import type { Tile, Transform } from '@allmaps/types'
 
 import type { WarpedMapOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
+import { equalArray } from '@allmaps/stdlib'
 
 const THROTTLE_WAIT_MS = 100
 const THROTTLE_OPTIONS = {
@@ -27,6 +28,9 @@ const THROTTLE_OPTIONS = {
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
+
+const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
+const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -51,22 +55,22 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
   program: WebGLProgram
 
-  vao: WebGLVertexArrayObject | null
+  vao: WebGLVertexArrayObject | null = null
 
-  CachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
+  previousTextureTileUrls: string[] = []
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
-  packedTilesTexture: WebGLTexture | null
-  packedTilesPositionsTexture: WebGLTexture | null
-  packedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null
-  packedTilesScaleFactorsTexture: WebGLTexture | null
+  cachedTilesTextureArray: WebGLTexture | null = null
+  cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null = null
+  cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
   projectedGeoToClipTransform: Transform | undefined
 
-  throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
+  clearTextures: DebouncedFunc<typeof this.updateTextures>
 
   /**
    * Creates an instance of WebGL2WarpedMap.
@@ -90,18 +94,28 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl = gl
     this.program = program
 
-    this.vao = gl.createVertexArray()
+    this.initializeWebGL(program)
 
-    this.packedTilesTexture = gl.createTexture()
-    this.packedTilesScaleFactorsTexture = gl.createTexture()
-    this.packedTilesPositionsTexture = gl.createTexture()
-    this.packedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
+    this.cachedTilesTextureArray = gl.createTexture()
+    this.cachedTilesScaleFactorsTexture = gl.createTexture()
+    this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
-    this.throttledUpdateTextures = throttle(
+    this.clearTextures = throttle(
       this.updateTextures.bind(this),
       THROTTLE_WAIT_MS,
       THROTTLE_OPTIONS
     )
+  }
+
+  initializeWebGL(program: WebGLProgram) {
+    this.program = program
+
+    this.vao = this.gl.createVertexArray()
+
+    this.cachedTilesTextureArray = this.gl.createTexture()
+    this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
+    this.cachedTilesResourcePositionsAndDimensionsTexture =
+      this.gl.createTexture()
   }
 
   /**
@@ -120,8 +134,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {CachedTile} cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
-    this.CachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
-    this.throttledUpdateTextures()
+    this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    this.clearTextures()
   }
 
   /**
@@ -130,16 +144,23 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {string} tileUrl
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
-    this.CachedTilesByTileUrl.delete(tileUrl)
-    this.throttledUpdateTextures()
+    this.cachedTilesByTileUrl.delete(tileUrl)
+    this.clearTextures()
   }
 
-  dispose() {
+  cancelThrottledFunctions() {
+    this.clearTextures.cancel()
+  }
+
+  destroy() {
     this.gl.deleteVertexArray(this.vao)
-    this.gl.deleteTexture(this.packedTilesTexture)
-    this.gl.deleteTexture(this.packedTilesScaleFactorsTexture)
-    this.gl.deleteTexture(this.packedTilesPositionsTexture)
-    this.gl.deleteTexture(this.packedTilesResourcePositionsAndDimensionsTexture)
+    this.gl.deleteTexture(this.cachedTilesTextureArray)
+    this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
+    this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
+
+    this.cancelThrottledFunctions()
+
+    super.destroy()
   }
 
   private updateVertexBuffersInternal() {
@@ -150,12 +171,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.bindVertexArray(this.vao)
 
     // Resource triangle points
-
-    const resourceTrianglePoints = this.resourceTrianglePoints
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(resourceTrianglePoints.flat()),
+      new Float32Array(this.resourceTrianglePoints.flat()),
       2,
       'a_resourceTrianglePoint'
     )
@@ -163,12 +182,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Clip previous and new triangle points
 
     const clipPreviousTrianglePoints =
-      this.projectedGeoPreviousTrianglePoints.map((point) => {
-        return applyTransform(
-          this.projectedGeoToClipTransform as Transform,
-          point
-        )
-      })
+      this.projectedGeoPreviousTrianglePoints.map((point) =>
+        applyTransform(this.projectedGeoToClipTransform as Transform, point)
+      )
+
     createBuffer(
       this.gl,
       this.program,
@@ -177,12 +194,10 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) => {
-      return applyTransform(
-        this.projectedGeoToClipTransform as Transform,
-        point
-      )
-    })
+    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
+      applyTransform(this.projectedGeoToClipTransform as Transform, point)
+    )
+
     createBuffer(
       this.gl,
       this.program,
@@ -195,21 +210,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Note: we must update the distortion data even when we don't render distortions
     // to ensure this array buffer is of the correct length, for example when triangulation changes
 
-    const previousTrianglePointsDistortion =
-      this.previousTrianglePointsDistortion
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(previousTrianglePointsDistortion),
+      new Float32Array(this.previousTrianglePointsDistortion),
       1,
       'a_previousTrianglePointDistortion'
     )
 
-    const trianglePointsDistortion = this.trianglePointsDistortion
     createBuffer(
       this.gl,
       this.program,
-      new Float32Array(trianglePointsDistortion),
+      new Float32Array(this.trianglePointsDistortion),
       1,
       'a_trianglePointDistortion'
     )
@@ -228,122 +240,133 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_triangleIndex'
     )
   }
+  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
+    return Array.from(this.cachedTilesByTileUrl.values()).find((cachedTile) =>
+      equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
+    )
+  }
+
+  private tileInCachedTiles(tile: Tile): boolean {
+    return Array.from(this.cachedTilesByTileUrl.values())
+      .map((cachedTile) =>
+        equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
+      )
+      .some((b) => b)
+  }
+
+  private getCachedTilesAtOtherScaleFactors(
+    tile: Tile
+  ): CachedTile<ImageBitmap>[] {
+    if (this.cachedTilesByTileUrl.size == 0) {
+      return []
+    }
+
+    if (!this.hasImageInfo()) {
+      return []
+    }
+
+    const cachedTiles = []
+    for (tile of getTilesAtOtherScaleFactors(
+      tile,
+      this.parsedImage,
+      this.currentBestScaleFactor,
+      TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
+      TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+      this.tileInCachedTiles.bind(this) // Only consider tiles in cache,
+    )) {
+      const cachedTile = this.tileToCachedTile(tile)
+      if (cachedTile) {
+        cachedTiles.push(cachedTile)
+      } else {
+        throw new Error("Tile supposed to be in cache isn't.")
+      }
+    }
+
+    return cachedTiles
+  }
 
   private async updateTextures() {
     const gl = this.gl
 
-    if (this.CachedTilesByTileUrl.size === 0) {
+    if (!this.hasImageInfo()) {
       return
     }
 
-    let cachedTiles = [...this.CachedTilesByTileUrl.values()]
+    const textureTiles = this.getTextureTiles()
 
-    // Only pack tiles that are inside the viewport (as drawn on the resource)
-    // and don't differ too much in scale level from the optimal one at this viewport
-    cachedTiles = cachedTiles.filter((cachedTile) => {
-      return this.resourceViewportRingBbox
-        ? isOverlapping(
-            computeBboxTile(cachedTile.tile),
-            this.resourceViewportRingBbox
-          )
-        : true
-    })
-
-    const CachedTilesByTileUrlCount = cachedTiles.length
-
-    const packedTiles = cachedTiles.map((cachedTile, index) => ({
-      w: cachedTile.data.width,
-      h: cachedTile.data.height,
-      // Calling potpack will add x and y properties
-      // with the position of the tile's origin in the pack
-      // By adding them here already, we'll make TypeScript happy!
-      x: 0,
-      y: 0,
-      index
-    }))
-
-    const { w: packedTilesTextureWidth, h: packedTilesTextureHeight } =
-      potpack(packedTiles)
+    // Don't update if same request as before
+    // This prevents the event TEXTURESUPDATED from being fired
+    // Which would otherwise trigger an infinite loop
+    if (
+      equalArray(
+        textureTiles.map((textureTile) => textureTile.tileUrl),
+        this.previousTextureTileUrls
+      )
+    ) {
+      return
+    }
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
-    // Packed tiles texture
+    // Cached tiles texture array
 
-    // if (Math.max(textureWidth, textureHeight) > MAX_TEXTURE_SIZE) {
-    //   throw new Error('tile texture too large')
-    // }
+    const maxTileWidth = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.width)
+    )
+    const maxTileHeight = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.height)
+    )
 
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesTexture)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
+
+    gl.texImage3D(
+      gl.TEXTURE_2D_ARRAY,
       0,
       gl.RGBA,
-      packedTilesTextureWidth,
-      packedTilesTextureHeight,
+      maxTileWidth,
+      maxTileHeight,
+      textureTiles.length,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
       null
     )
-    for (const packedTile of packedTiles) {
-      // Fill with the TileImageBitmap of each packed tile
-      const imageBitmap = cachedTiles[packedTile.index].data
-      gl.texSubImage2D(
-        gl.TEXTURE_2D,
+    for (let i = 0; i < textureTiles.length; i++) {
+      const imageBitmap = textureTiles[i].data
+
+      gl.texSubImage3D(
+        gl.TEXTURE_2D_ARRAY,
         0,
-        packedTile.x,
-        packedTile.y,
+        0,
+        0,
+        i,
         imageBitmap.width,
         imageBitmap.height,
+        1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
         imageBitmap
       )
     }
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed Tiles Positions Texture
+    // Cached tiles resource positions and dimensions texture
 
-    const packedTilesPositions = packedTiles.map((packedTile) => [
-      packedTile.x,
-      packedTile.y
-    ])
-
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesPositionsTexture)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RG32I,
-      1,
-      CachedTilesByTileUrlCount,
-      0,
-      gl.RG_INTEGER,
-      gl.INT,
-      new Int32Array(packedTilesPositions.flat())
-    )
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-    // Packed tiles resource positions and dimensions texture
-
-    const packedTilesResourcePositionsAndDimensions = packedTiles.map(
-      (packedTile) => {
-        const cachedTile = cachedTiles[packedTile.index]
+    const cachedTilesResourcePositionsAndDimensions = textureTiles.map(
+      (textureTile) => {
         if (
-          cachedTile &&
-          cachedTile.imageRequest &&
-          cachedTile.imageRequest.region
+          textureTile &&
+          textureTile.imageRequest &&
+          textureTile.imageRequest.region
         ) {
           return [
-            cachedTile.imageRequest.region.x,
-            cachedTile.imageRequest.region.y,
-            cachedTile.imageRequest.region.width,
-            cachedTile.imageRequest.region.height
+            textureTile.imageRequest.region.x,
+            textureTile.imageRequest.region.y,
+            textureTile.imageRequest.region.width,
+            textureTile.imageRequest.region.height
           ]
         }
       }
@@ -351,47 +374,99 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.bindTexture(
       gl.TEXTURE_2D,
-      this.packedTilesResourcePositionsAndDimensionsTexture
+      this.cachedTilesResourcePositionsAndDimensionsTexture
     )
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.RGBA32I,
       1,
-      CachedTilesByTileUrlCount,
+      textureTiles.length,
       0,
       gl.RGBA_INTEGER,
       gl.INT,
-      new Int32Array(packedTilesResourcePositionsAndDimensions.flat())
+      new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Packed tiles scale factors texture
+    // Cached tiles scale factors texture
 
-    const packedTilesScaleFactors = packedTiles.map(
-      ({ index }) => cachedTiles[index].tile.tileZoomLevel.scaleFactor
+    const cachedTilesScaleFactors = textureTiles.map(
+      (textureTile) => textureTile.tile.tileZoomLevel.scaleFactor
     )
 
-    gl.bindTexture(gl.TEXTURE_2D, this.packedTilesScaleFactorsTexture)
+    gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.R32I,
       1,
-      CachedTilesByTileUrlCount,
+      textureTiles.length,
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(packedTilesScaleFactors)
+      new Int32Array(cachedTilesScaleFactors)
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
+    this.previousTextureTileUrls = textureTiles.map(
+      (textureTile) => textureTile.tileUrl
+    )
+
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+  }
+
+  getTextureTiles() {
+    // Select tiles for tileCache that make sense for this map
+    // Either because they are requested, or because they are it's parents or children
+    const requestedCachedTiles = []
+    const otherTileZoomLevelsCachedTiles = []
+
+    for (const fetchableTile of this.currentFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        requestedCachedTiles.push(cachedTile)
+      } else {
+        for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
+          fetchableTile.tile
+        )) {
+          otherTileZoomLevelsCachedTiles.push(cachedTile)
+        }
+      }
+    }
+
+    // Select tiles for tileCache that are at overview zoomlevel
+    const overviewCachedTiles = []
+
+    for (const fetchableTile of this.currentOverviewFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        overviewCachedTiles.push(cachedTile)
+      }
+    }
+
+    let textureTiles = [
+      ...requestedCachedTiles,
+      ...otherTileZoomLevelsCachedTiles,
+      ...overviewCachedTiles
+    ]
+
+    // Making textureTiles unique by tileUrl
+    const textureTilesByTileUrl: Map<
+      string,
+      CachedTile<ImageBitmap>
+    > = new Map()
+    textureTiles.forEach((cachedTile) =>
+      textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    )
+    textureTiles = [...textureTilesByTileUrl.values()]
+
+    return textureTiles
   }
 }

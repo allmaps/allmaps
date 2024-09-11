@@ -31,9 +31,12 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
         this.fetchFn
       )
 
+      const width = this.tile.tileZoomLevel.width
+      const height = this.tile.tileZoomLevel.height
+
       const blob = await response.blob()
       const bitmap = await createImageBitmap(blob)
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+      const canvas = new OffscreenCanvas(width, height)
       const context = canvas.getContext('2d')
 
       if (!context) {
@@ -41,7 +44,7 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
       }
 
       context.drawImage(bitmap, 0, 0)
-      this.data = context.getImageData(0, 0, bitmap.width, bitmap.height)
+      this.data = context.getImageData(0, 0, width, height)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)

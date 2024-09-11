@@ -39,7 +39,7 @@ import type {
   WebGL2RendererOptions
 } from '../shared/types.js'
 
-const THROTTLE_PREPARE_WAIT_MS = 500
+const THROTTLE_PREPARE_WAIT_MS = 200
 const THROTTLE_PREPARE_OPTIONS = {
   leading: true,
   trailing: true
@@ -86,6 +86,8 @@ export default class WebGL2Renderer
   transformationTransitionStart: number | undefined
   animationProgress = 1
 
+  disableRender = false
+
   private throttledPrepareRenderInternal: DebouncedFunc<
     typeof this.prepareRenderInternal
   >
@@ -121,12 +123,6 @@ export default class WebGL2Renderer
     this.gl = gl
     this.program = program
 
-    // Unclear how to remove shaders, possibly already after linking to program, see:
-    // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
-    // https://stackoverflow.com/questions/27237696/webgl-detach-and-delete-shaders-after-linking
-    gl.deleteShader(vertexShader)
-    gl.deleteShader(fragmentShader)
-
     gl.disable(gl.DEPTH_TEST)
 
     this.invertedRenderTransform = createTransform()
@@ -144,6 +140,28 @@ export default class WebGL2Renderer
       THROTTLE_CHANGED_WAIT_MS,
       THROTTLE_CHANGED_OPTIONS
     )
+  }
+
+  initializeWebGL(gl: WebGL2RenderingContext) {
+    // This code is duplicated from the constructor to allow for context loss and restoration
+    // Can't call this function in the constructor, because 'super' must be called before accessing 'this'
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
+    const fragmentShader = createShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      fragmentShaderSource
+    )
+
+    const program = createProgram(gl, vertexShader, fragmentShader)
+
+    this.gl = gl
+    this.program = program
+
+    gl.disable(gl.DEPTH_TEST)
+
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      warpedMap.initializeWebGL(program)
+    }
   }
 
   /**
@@ -477,6 +495,10 @@ export default class WebGL2Renderer
    * @param {Viewport} viewport - the current viewport
    */
   render(viewport: Viewport): void {
+    if (this.disableRender) {
+      return
+    }
+
     this.viewport = viewport
 
     // Not awaiting this, using events to trigger new render calls
@@ -498,20 +520,23 @@ export default class WebGL2Renderer
     this.tileCache.clear()
   }
 
-  dispose() {
+  cancelThrottledFunctions() {
+    this.throttledPrepareRenderInternal.cancel()
+    this.throttledChanged.cancel()
+  }
+
+  destroy() {
+    this.cancelThrottledFunctions()
+
     for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
       this.removeEventListenersFromWebGL2WarpedMap(warpedMap)
-      warpedMap.dispose()
     }
-
-    this.tileCache.clear()
-    this.tileCache.dispose()
 
     this.removeEventListeners()
 
+    super.destroy()
+
     this.gl.deleteProgram(this.program)
-    // Can't delete context, see:
-    // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
   private prepareRenderInternal(): void {
@@ -522,7 +547,7 @@ export default class WebGL2Renderer
   protected shouldUpdateRequestedTiles(): boolean {
     // Returns whether requested tiles should be updated
 
-    // Returns true wehn the viewport moved significantly
+    // Returns true when the viewport moved significantly
     // > to prevent updating requested tiles on minimal movements/
     // Returns true when the viewport didn't move at all
     // > since this function is called (possibly multiple times) during startup, without changes to the viewport
@@ -573,7 +598,7 @@ export default class WebGL2Renderer
       this.viewport.projectedGeoToClipTransform
     )
 
-    for (const mapId of this.mapsInViewport) {
+    for (const mapId of this.possibleMapsInViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (!warpedMap) {
         break
@@ -673,56 +698,47 @@ export default class WebGL2Renderer
 
       // Best scale factor
 
-      const bestScaleFactorLocation = gl.getUniformLocation(
+      const currentBestScaleFactorLocation = gl.getUniformLocation(
         this.program,
-        'u_bestScaleFactor'
+        'u_currentBestScaleFactor'
       )
-      const bestScaleFactor = warpedMap.bestScaleFactor
-      gl.uniform1i(bestScaleFactorLocation, bestScaleFactor)
+      const currentBestScaleFactor = warpedMap.currentBestScaleFactor
+      gl.uniform1i(currentBestScaleFactorLocation, currentBestScaleFactor)
 
-      // Packed tiles texture
+      // Cached tiles texture array
 
-      const packedTilesTextureLocation = gl.getUniformLocation(
+      const cachedTilesTextureArrayLocation = gl.getUniformLocation(
         this.program,
-        'u_packedTilesTexture'
+        'u_cachedTilesTextureArray'
       )
-      gl.uniform1i(packedTilesTextureLocation, 0)
+      gl.uniform1i(cachedTilesTextureArrayLocation, 0)
       gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesTexture)
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY, warpedMap.cachedTilesTextureArray)
 
-      // Packed tiles positions texture
+      // Cached tiles resource positions and dimensions texture
 
-      const packedTilesPositionsTextureLocation = gl.getUniformLocation(
-        this.program,
-        'u_packedTilesPositionsTexture'
-      )
-      gl.uniform1i(packedTilesPositionsTextureLocation, 1)
-      gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesPositionsTexture)
-
-      // Packed tiles resource positions and dimensions texture
-
-      const packedTilesResourcePositionsAndDimensionsLocation =
+      const cachedTilesResourcePositionsAndDimensionsLocation =
         gl.getUniformLocation(
           this.program,
-          'u_packedTilesResourcePositionsAndDimensionsTexture'
+          'u_cachedTilesResourcePositionsAndDimensionsTexture'
         )
-      gl.uniform1i(packedTilesResourcePositionsAndDimensionsLocation, 2)
+      gl.uniform1i(cachedTilesResourcePositionsAndDimensionsLocation, 2)
       gl.activeTexture(gl.TEXTURE2)
+
       gl.bindTexture(
         gl.TEXTURE_2D,
-        warpedMap.packedTilesResourcePositionsAndDimensionsTexture
+        warpedMap.cachedTilesResourcePositionsAndDimensionsTexture
       )
 
-      // Packed tiles scale factors texture
+      // Cached tiles scale factors texture
 
-      const packedTileScaleFactorsTextureLocation = gl.getUniformLocation(
+      const cachedTileScaleFactorsTextureLocation = gl.getUniformLocation(
         this.program,
-        'u_packedTilesScaleFactorsTexture'
+        'u_cachedTilesScaleFactorsTexture'
       )
-      gl.uniform1i(packedTileScaleFactorsTextureLocation, 3)
+      gl.uniform1i(cachedTileScaleFactorsTextureLocation, 3)
       gl.activeTexture(gl.TEXTURE3)
-      gl.bindTexture(gl.TEXTURE_2D, warpedMap.packedTilesScaleFactorsTexture)
+      gl.bindTexture(gl.TEXTURE_2D, warpedMap.cachedTilesScaleFactorsTexture)
 
       // Draw each map
 
@@ -733,6 +749,7 @@ export default class WebGL2Renderer
       const offset = 0
 
       gl.bindVertexArray(vao)
+
       gl.drawArrays(primitiveType, offset, count)
     }
   }
@@ -863,6 +880,7 @@ export default class WebGL2Renderer
       this.animating = false
       this.animationProgress = 0
       this.transformationTransitionStart = undefined
+      this.changed()
     }
   }
 
@@ -873,6 +891,13 @@ export default class WebGL2Renderer
   protected imageInfoLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+    }
+  }
+
+  protected clearMapTextures(mapId: string) {
+    const webGL2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+    if (webGL2WarpedMap) {
+      webGL2WarpedMap.clearTextures()
     }
   }
 
@@ -965,5 +990,22 @@ export default class WebGL2Renderer
       WarpedMapEventType.TEXTURESUPDATED,
       this.throttledChanged.bind(this)
     )
+  }
+
+  contextLost() {
+    this.disableRender = true
+
+    this.cancelThrottledFunctions()
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      warpedMap.cancelThrottledFunctions()
+    }
+
+    this.tileCache.clear()
+  }
+
+  contextRestored() {
+    this.initializeWebGL(this.gl)
+
+    this.disableRender = false
   }
 }
