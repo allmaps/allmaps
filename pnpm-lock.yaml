@@ -147,12 +147,18 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      maplibre-contour:
+        specifier: ^0.0.7
+        version: 0.0.7
       maplibre-gl:
         specifier: ^4.5.0
         version: 4.5.1
       pmtiles:
         specifier: ^3.0.6
         version: 3.0.7
+      protomaps-themes-base:
+        specifier: ^3.0.1
+        version: 3.0.1
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
