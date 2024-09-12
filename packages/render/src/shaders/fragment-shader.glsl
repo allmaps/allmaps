@@ -72,7 +72,7 @@ void main() {
   int cachedTilesCount = cachedTilesTextureSize.z;
 
   // Setting references for the for loop
-  int smallestScaleFactor = int(pow(2.0, 20.0)); // Starting with very high number
+  int smallestScaleFactor = int(pow(2.0, 8.0)); // Starting with very high number
   bool found = false;
   int foundIndex;
 
