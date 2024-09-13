@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import maplibregl, { Map, addProtocol } from 'maplibre-gl'
+  import { Map, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
 
-  // @ts-ignore
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
@@ -98,7 +97,7 @@
 
     map = new Map({
       container,
-      // @ts-ignore
+      // @ts-expect-error: ignore incompatible sources property
       style: basemapStyle(),
       center: [14.2437, 40.8384],
       zoom: 7,
