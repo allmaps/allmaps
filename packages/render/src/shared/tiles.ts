@@ -68,9 +68,9 @@ export function getBestTileZoomLevelForScale(
   // diff = abs(3 - 1.80) = abs(0.20) = 0.20
   //
   // => Pick scale factor 4, with minimum diff.
-  // Notice how 3 lies in the middle of 2 and 4, but on the log scale log2(3) lies closer to log2(4) then log2(2)
+  // Notice how 3 lies in the middle of 2 and 4, but on the log scale log2(3) lies closer to log2(4) than log2(2)
   // Notice how the scaleFactorCorrection corrects the current scale for which the closest scaleFactor is searched.
-  // Notice when this happens before taking a Math.log2(), making it have more effect on smaller scales then on bigger.
+  // Notice when this happens before taking a Math.log2(), making it have more effect on smaller scales than on bigger scales.
 
   let smallestdiffLogScaleFactor = Number.POSITIVE_INFINITY
   let bestTileZoomLevel = tileZoomLevels.at(-1) as TileZoomLevel

@@ -743,7 +743,8 @@ export default class WebGL2Renderer
     // renderTransform is the product of:
     // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
     // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
-    // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
+    // since updateVertexBuffers ('where to draw triangles') run with possibly a different
+    // Viewport taen renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
     // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
     // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
     const renderTransform = multiplyTransform(
