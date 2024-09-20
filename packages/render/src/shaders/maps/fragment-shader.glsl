@@ -68,14 +68,12 @@ void main() {
   for(int index = 0; index < cachedTilesCount; index += 1) {
 
     // Read the information of the tile
-    ivec4 cachedTileResourcePositionAndDimension = texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, index), 0);
+    float cachedTileResourcePositionX = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4)), 0));
+    float cachedTileResourcePositionY = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 1), 0));
+    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 2), 0));
+    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 3), 0));
+
     int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
-
-    float cachedTileResourcePositionX = float(cachedTileResourcePositionAndDimension.r);
-    float cachedTileResourcePositionY = float(cachedTileResourcePositionAndDimension.g);
-
-    float cachedTileDimensionWidth = float(cachedTileResourcePositionAndDimension.b);
-    float cachedTileDimensionHeight = float(cachedTileResourcePositionAndDimension.a);
 
     // If the triangle point is inside the tile, consider to use the tile:
     if(resourceTrianglePointX >= cachedTileResourcePositionX &&

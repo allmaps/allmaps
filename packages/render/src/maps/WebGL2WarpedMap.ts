@@ -831,14 +831,19 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       gl.TEXTURE_2D,
       this.cachedTilesResourcePositionsAndDimensionsTexture
     )
+
+    // A previous verions used gl.RGBA_INTEGER as this texture's format
+    // However, this seemed to cause Chrome to crash on some systems while
+    // zooming in and out. Using gl.RED_INTEGER and multiplying the width by 4
+    // to account for the 4 values per tile seems to fix the issue.
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
-      gl.RGBA32I,
+      gl.R32I,
       1,
-      textureTiles.length,
+      textureTiles.length * 4,
       0,
-      gl.RGBA_INTEGER,
+      gl.RED_INTEGER,
       gl.INT,
       new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
     )
