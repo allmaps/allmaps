@@ -207,7 +207,7 @@
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
-            />
+            ></textarea>
             <button
               type="submit"
               disabled={annotationString.length === 0 &&
