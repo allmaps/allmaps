@@ -54,6 +54,7 @@ import type {
  * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (resolution/devicePixelRatio).
  * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
  * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
+ * @property {Transform} viewportToClipTransform - Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
  */
 export default class Viewport {
   geoCenter: Point
@@ -81,6 +82,7 @@ export default class Viewport {
   projectedGeoPerCanvasScale: number
   projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
   projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
+  viewportToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
 
   /**
    * Creates a new Viewport
@@ -146,6 +148,7 @@ export default class Viewport {
     this.projectedGeoToViewportTransform =
       this.composeProjectedGeoToViewportTransform()
     this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
+    this.viewportToClipTransform = this.composeViewportToClipTransform()
   }
 
   /**
@@ -239,8 +242,8 @@ export default class Viewport {
 
   private composeProjectedGeoToViewportTransform(): Transform {
     return composeTransform(
-      this.viewportSize[0] / 2,
-      this.viewportSize[1] / 2,
+      this.viewportCenter[0],
+      this.viewportCenter[1],
       1 / this.projectedGeoPerViewportScale,
       -1 / this.projectedGeoPerViewportScale,
       -this.rotation,
@@ -258,6 +261,18 @@ export default class Viewport {
       -this.rotation,
       -this.projectedGeoCenter[0],
       -this.projectedGeoCenter[1]
+    )
+  }
+
+  private composeViewportToClipTransform(): Transform {
+    return composeTransform(
+      0,
+      0,
+      2 / this.viewportSize[0],
+      -2 / this.viewportSize[1],
+      0,
+      -this.viewportCenter[0],
+      -this.viewportCenter[1]
     )
   }
 

@@ -8,7 +8,8 @@ import {
   rectanglesToScale,
   fetchImageInfo,
   lonLatToWebMecator,
-  getPropertyFromCacheOrComputation
+  getPropertyFromCacheOrComputation,
+  mixPoints
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -18,6 +19,7 @@ import type { WarpedMapOptions } from '../shared/types.js'
 
 import type {
   Gcp,
+  Point,
   Ring,
   Rectangle,
   Bbox,
@@ -36,6 +38,7 @@ import type {
 import type Viewport from '../viewport/Viewport.js'
 import type FetchableTile from '../tilecache/FetchableTile.js'
 
+// TODO: consider to make the default options more precise
 const TRANSFORMER_OPTIONS = {
   maxOffsetRatio: 0.05,
   maxDepth: 2,
@@ -70,6 +73,12 @@ export function createWarpedMapFactory() {
  * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
  * @param {Gcp[]} gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param {Gcp[]} projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
+ * @param {Point[]} projectedGeoControlPoints - The projected geospatial coordinates of the projected ground control points
+ * @param {Point[]} projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
+ * @param {Point[]} projectedGeoTransformedResourcePoints - The resource coordinates of the ground control points, transformed to projected geospatial coordinates using the projected transformer
+ * @param {Ring} resourcePreviousLongerMask - Previous resourceLongerMask
+ * @param {Ring} resourcePreviousMask - Resource mask of the previous transformation type
+ * @param {Ring} resourceLongerMask - Resource mask, possibly longer so it's the same length as the longest of projectedGeoMask and projectedGeoPreviousMask
  * @param {Ring} resourceMask - Resource mask
  * @param {Bbox} resourceMaskBbox - Bbox of the resourceMask
  * @param {Rectangle} resourceMaskRectangle - Rectangle of the resourceMaskBbox
@@ -81,13 +90,17 @@ export function createWarpedMapFactory() {
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
- * @param {GcpTransformer} projectedTransformer - Ttransformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param {GcpTransformer} projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param {GcpTransformer} projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param {GeojsonPolygon} geoMask - resourceMask in geospatial coordinates
  * @param {Bbox} geoMaskBbox - Bbox of the geoMask
  * @param {Rectangle} geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
  * @param {GeojsonPolygon} geoFullMask - resourceFullMask in geospatial coordinates
  * @param {Bbox} geoFullMaskBbox - Bbox of the geoFullMask
  * @param {Rectangle} geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
+ * @param {Ring} projectedGeoPreviousLongerMask - The projectedGeoMask of the previous transformation type, possibly longer so it's the same length as the longest of projectedGeoPreviousMask and projectedGeoMask, used during transformation transitions
+ * @param {Ring} projectedGeoPreviousMask - The projectedGeoMask of the previous transformation type, used during transformation transitions
+ * @param {Ring} projectedGeoLongerMask - The projectedGeoMask of the previous transformation type, possibly longer so it's the same length as the longest of projectedGeoPreviousMask and projectedGeoMask, used during transformation transitions
  * @param {Ring} projectedGeoMask - resourceMask in projected geospatial coordinates
  * @param {Bbox} projectedGeoMaskBbox - Bbox of the projectedGeoMask
  * @param {Rectangle} projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
@@ -109,7 +122,13 @@ export default class WarpedMap extends EventTarget {
 
   gcps: Gcp[]
   projectedGcps: Gcp[]
+  projectedGeoPoints: Point[]
+  projectedGeoPreviousTransformedResourcePoints!: Point[]
+  projectedGeoTransformedResourcePoints!: Point[]
 
+  resourcePreviousLongerMask!: Ring
+  resourcePreviousMask!: Ring
+  resourceLongerMask!: Ring
   resourceMask: Ring
   resourceMaskBbox!: Bbox
   resourceMaskRectangle!: Rectangle
@@ -129,6 +148,7 @@ export default class WarpedMap extends EventTarget {
 
   transformationType: TransformationType
   transformer!: GcpTransformer
+  projectedPreviousTransformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
   private transformerByTransformationType: Map<
     TransformationType,
@@ -146,6 +166,8 @@ export default class WarpedMap extends EventTarget {
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
 
+  projectedGeoPreviousLongerMask!: Ring
+  projectedGeoLongerMask!: Ring
   projectedGeoMask!: Ring
   projectedGeoMaskBbox!: Bbox
   projectedGeoMaskRectangle!: Rectangle
@@ -196,6 +218,9 @@ export default class WarpedMap extends EventTarget {
       resource,
       geo: lonLatToWebMecator(geo)
     }))
+    this.projectedGeoPoints = this.projectedGcps.map(
+      (projectedGcp) => projectedGcp.geo
+    )
 
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
@@ -397,6 +422,7 @@ export default class WarpedMap extends EventTarget {
    */
   setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     this.distortionMeasure = distortionMeasure
+    this.updateDistortionProperties()
   }
 
   /**
@@ -443,6 +469,39 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Reset the previous points and values.
+   */
+  resetPrevious() {
+    this.projectedPreviousTransformer = this.projectedTransformer
+    this.projectedGeoPreviousTransformedResourcePoints =
+      this.projectedGeoTransformedResourcePoints
+    this.resourcePreviousMask = this.resourceMask
+    this.resourcePreviousLongerMask = this.resourceLongerMask
+    this.projectedGeoPreviousLongerMask = this.projectedGeoLongerMask
+  }
+
+  /**
+   * Mix the previous and new points and values.
+   *
+   * @param {number} t
+   */
+  mixPreviousAndNew(t: number) {
+    this.projectedGeoPreviousTransformedResourcePoints =
+      this.projectedGeoTransformedResourcePoints.map((point, index) => {
+        return mixPoints(
+          point,
+          this.projectedGeoPreviousTransformedResourcePoints[index],
+          t
+        )
+      })
+    this.projectedGeoPreviousLongerMask = this.projectedGeoLongerMask.map(
+      (point, index) => {
+        return mixPoints(point, this.projectedGeoPreviousLongerMask[index], t)
+      }
+    )
+  }
+
+  /**
    * Fetch and parse the image info, and generate the image ID
    *
    * @async
@@ -481,11 +540,16 @@ export default class WarpedMap extends EventTarget {
   private updateResourceMaskProperties() {
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
+
+    if (!this.resourcePreviousMask) {
+      this.resourcePreviousMask = this.resourceMask
+    }
   }
 
-  private updateTransformerProperties(useCache = true): void {
+  protected updateTransformerProperties(useCache = true): void {
     this.updateTransformer(useCache)
     this.updateProjectedTransformer(useCache)
+    this.updateProjectedGeoTransformedResourcePoints()
     this.updateGeoMask()
     this.updateFullGeoMask()
     this.updateProjectedGeoMask()
@@ -519,6 +583,20 @@ export default class WarpedMap extends EventTarget {
         ),
       useCache
     )
+    if (!this.projectedPreviousTransformer) {
+      this.projectedPreviousTransformer = this.projectedTransformer
+    }
+  }
+
+  private updateProjectedGeoTransformedResourcePoints(): void {
+    this.projectedGeoTransformedResourcePoints = this.gcps.map((projectedGcp) =>
+      this.projectedTransformer.transformForward(projectedGcp.resource)
+    )
+
+    if (!this.projectedGeoPreviousTransformedResourcePoints) {
+      this.projectedGeoPreviousTransformedResourcePoints =
+        this.projectedGeoTransformedResourcePoints
+    }
   }
 
   private updateGeoMask(): void {
@@ -552,6 +630,38 @@ export default class WarpedMap extends EventTarget {
       [this.resourceMaskRectangle],
       { maxDepth: 0 }
     )[0] as Rectangle
+
+    // Computing the resourceLongerMask as the longest resource
+    // coordinates corresponding to projectedGeoMask and projectedGeoPreviousMask
+    // such that projectedGeoPreviousLongerMask and projectedGeoLongerMask
+    // can be computed from this equal length starting point to be equally long as well
+    this.resourceLongerMask = this.projectedTransformer.transformForward(
+      [this.resourceMask],
+      { returnDomain: 'inverse' } // refine this lineString but return resource coordinates
+    )[0]
+    if (!this.resourcePreviousLongerMask) {
+      this.resourcePreviousLongerMask = this.resourceLongerMask
+    }
+    const previousWasLonger =
+      this.resourceLongerMask.length < this.resourcePreviousLongerMask.length
+    const newIsLonger =
+      this.resourceLongerMask.length > this.resourcePreviousLongerMask.length
+    if (previousWasLonger) {
+      this.resourceLongerMask = this.resourcePreviousLongerMask
+    }
+    this.projectedGeoLongerMask = this.projectedTransformer.transformForward(
+      this.resourceLongerMask,
+      { inputIsMultiGeometry: true } // treat the input as an array of points instead of a lineString to refine
+    )
+    if (!this.projectedGeoPreviousLongerMask || newIsLonger) {
+      this.projectedGeoPreviousLongerMask =
+        this.projectedPreviousTransformer.transformForward(
+          this.resourceLongerMask,
+          {
+            inputIsMultiGeometry: true
+          }
+        )
+    }
   }
 
   private updateProjectedFullGeoMask(): void {
@@ -572,6 +682,8 @@ export default class WarpedMap extends EventTarget {
       this.projectedGeoMaskRectangle
     )
   }
+
+  protected updateDistortionProperties(): void {}
 
   destroy() {
     if (this.abortController) {

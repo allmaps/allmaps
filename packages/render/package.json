@@ -71,6 +71,7 @@
     "@allmaps/id": "^1.0.0-beta.29",
     "@allmaps/iiif-parser": "^1.0.0-beta.39",
     "@allmaps/stdlib": "^1.0.0-beta.30",
+    "@allmaps/tailwind": "^1.0.0-beta.12",
     "@allmaps/transform": "^1.0.0-beta.40",
     "@allmaps/triangulate": "^1.0.0-beta.22",
     "@allmaps/types": "^1.0.0-beta.14",

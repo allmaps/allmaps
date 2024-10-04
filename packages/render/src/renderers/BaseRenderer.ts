@@ -219,6 +219,7 @@ export default abstract class BaseRenderer<
           transformerOptions
         )[0]
       warpedMap.setCurrentResourceViewportRing(resourceViewportRing)
+      // TODO: consider to transform viewport.projectedGeoRectable backward using projectedTransform
 
       // Find tiles covering this back-transformed viewport
       const tiles = computeTilesCoveringRingAtTileZoomLevel(
@@ -390,6 +391,9 @@ export default abstract class BaseRenderer<
   protected warpedMapRemoved(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected preChange(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected transformationChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
@@ -419,6 +423,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.preChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -456,6 +465,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.preChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(

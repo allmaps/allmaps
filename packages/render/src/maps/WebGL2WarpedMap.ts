@@ -1,6 +1,12 @@
 import { throttle } from 'lodash-es'
 
+import {
+  hexToFractionalRgb,
+  lineStringToLines,
+  pointsAndPointsToLines
+} from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
+import { black, blue, green, pink, white } from '@allmaps/tailwind'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -13,9 +19,19 @@ import {
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { Tile, Transform } from '@allmaps/types'
+import type {
+  ColorWithTransparancy,
+  Line,
+  Point,
+  Tile,
+  Transform
+} from '@allmaps/types'
 
-import type { WarpedMapOptions } from '../shared/types.js'
+import type {
+  LineLayer,
+  PointLayer,
+  WarpedMapOptions
+} from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
 import { equalArray } from '@allmaps/stdlib'
@@ -26,21 +42,47 @@ const THROTTLE_OPTIONS = {
   trailing: true
 }
 
+const DEBUG = false // TODO: set using options
+const RENDER_MAPS = true // TODO: set using options
+const RENDER_LINES = false // TODO: set using options
+const RENDER_POINTS = false // TODO: set using options
+
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
+
+const DEFAULT_LINE_LAYER_VIEWPORT_SIZE = 6
+const DEFAULT_LINE_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
+const DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE = 0
+const DEFAULT_LINE_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
+
+const DEFAULT_POINT_LAYER_VIEWPORT_SIZE = 16
+const DEFAULT_POINT_LAYER_COLOR = [...hexToFractionalRgb(black), 1]
+const DEFAULT_POINT_LAYER_VIEWPORT_BORDER_SIZE = 1
+const DEFAULT_POINT_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
-  program: WebGLProgram
+  mapsProgram: WebGLProgram,
+  pointsProgram: WebGLProgram,
+  linesProgram: WebGLProgram
 ) {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
     options?: Partial<WarpedMapOptions>
-  ) => new WebGL2WarpedMap(mapId, georeferencedMap, gl, program, options)
+  ) =>
+    new WebGL2WarpedMap(
+      mapId,
+      georeferencedMap,
+      gl,
+      mapsProgram,
+      linesProgram,
+      pointsProgram,
+      options
+    )
 }
 
 /**
@@ -53,9 +95,16 @@ export function createWebGL2WarpedMapFactory(
  */
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   gl: WebGL2RenderingContext
-  program: WebGLProgram
+  mapsProgram: WebGLProgram
+  linesProgram: WebGLProgram
+  pointsProgram: WebGLProgram
 
-  vao: WebGLVertexArrayObject | null = null
+  mapsVao: WebGLVertexArrayObject | null = null
+  linesVao: WebGLVertexArrayObject | null = null
+  pointsVao: WebGLVertexArrayObject | null = null
+
+  lineLayers: LineLayer[] = []
+  pointLayers: PointLayer[] = []
 
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
   previousTextureTileUrls: string[] = []
@@ -79,22 +128,27 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {string} mapId - ID of the map
    * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
    * @param {WebGL2RenderingContext} gl - WebGL rendering context
-   * @param {WebGLProgram} program - WebGL program
+   * @param {WebGLProgram} mapsProgram - WebGL program
    * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
    */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
     gl: WebGL2RenderingContext,
-    program: WebGLProgram,
+    mapsProgram: WebGLProgram,
+    linesProgram: WebGLProgram,
+    pointsProgram: WebGLProgram,
     options?: Partial<WarpedMapOptions>
   ) {
     super(mapId, georeferencedMap, options)
 
     this.gl = gl
-    this.program = program
+    // TODO: could these be removed since set in initializeWebGL()?
+    this.mapsProgram = mapsProgram
+    this.linesProgram = linesProgram
+    this.pointsProgram = pointsProgram
 
-    this.initializeWebGL(program)
+    this.initializeWebGL(mapsProgram, linesProgram, pointsProgram)
 
     this.cachedTilesTextureArray = gl.createTexture()
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
@@ -107,10 +161,18 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  initializeWebGL(program: WebGLProgram) {
-    this.program = program
+  initializeWebGL(
+    mapsProgram: WebGLProgram,
+    linesProgram: WebGLProgram,
+    pointsProgram: WebGLProgram
+  ) {
+    this.mapsProgram = mapsProgram
+    this.linesProgram = linesProgram
+    this.pointsProgram = pointsProgram
 
-    this.vao = this.gl.createVertexArray()
+    this.mapsVao = this.gl.createVertexArray()
+    this.linesVao = this.gl.createVertexArray()
+    this.pointsVao = this.gl.createVertexArray()
 
     this.cachedTilesTextureArray = this.gl.createTexture()
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
@@ -125,7 +187,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.projectedGeoToClipTransform = projectedGeoToClipTransform
-    this.updateVertexBuffersInternal()
+
+    if (RENDER_MAPS) {
+      this.updateVertexBuffersMaps()
+    }
+    if (RENDER_LINES) {
+      this.updateVertexBuffersLines()
+    }
+    if (RENDER_POINTS) {
+      this.updateVertexBuffersPoints()
+    }
   }
 
   /**
@@ -153,7 +224,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   destroy() {
-    this.gl.deleteVertexArray(this.vao)
+    this.gl.deleteVertexArray(this.mapsVao)
+    this.gl.deleteVertexArray(this.linesVao)
+    this.gl.deleteVertexArray(this.pointsVao)
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
@@ -163,17 +236,68 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super.destroy()
   }
 
-  private updateVertexBuffersInternal() {
-    if (!this.vao || !this.projectedGeoToClipTransform) {
+  private setLineLayers() {
+    this.lineLayers = [
+      {
+        projectedGeoLines: lineStringToLines(this.projectedGeoLongerMask),
+        projectedGeoPreviousLines: lineStringToLines(
+          this.projectedGeoPreviousLongerMask
+        ),
+        viewportSize: 8,
+        color: [...hexToFractionalRgb(pink), 1]
+      },
+      {
+        projectedGeoLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoTransformedResourcePoints
+        ),
+        projectedGeoPreviousLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoPreviousTransformedResourcePoints
+        ),
+        color: [...hexToFractionalRgb(black), 1],
+        borderColor: [...hexToFractionalRgb(white), 1]
+      }
+    ]
+
+    if (DEBUG) {
+      this.lineLayers = this.lineLayers.concat([
+        {
+          projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
+          color: [...hexToFractionalRgb(green), 1]
+        }
+      ])
+    }
+  }
+
+  private setPointLayers() {
+    this.pointLayers = [
+      {
+        projectedGeoPoints: this.projectedGeoPoints,
+        color: [...hexToFractionalRgb(blue), 1]
+      },
+      {
+        projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
+        projectedGeoPreviousPoints:
+          this.projectedGeoPreviousTransformedResourcePoints,
+        color: [...hexToFractionalRgb(pink), 1]
+      }
+    ]
+  }
+
+  private updateVertexBuffersMaps() {
+    if (!this.mapsVao || !this.projectedGeoToClipTransform) {
       return
     }
 
-    this.gl.bindVertexArray(this.vao)
+    const gl = this.gl
+    const program = this.mapsProgram
+    gl.bindVertexArray(this.mapsVao)
 
     // Resource triangle points
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(this.resourceTrianglePoints.flat()),
       2,
       'a_resourceTrianglePoint'
@@ -187,8 +311,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       )
 
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(clipPreviousTrianglePoints.flat()),
       2,
       'a_clipPreviousTrianglePoint'
@@ -199,8 +323,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(clipTrianglePoints.flat()),
       2,
       'a_clipTrianglePoint'
@@ -211,35 +335,366 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // to ensure this array buffer is of the correct length, for example when triangulation changes
 
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(this.previousTrianglePointsDistortion),
       1,
       'a_previousTrianglePointDistortion'
     )
 
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       new Float32Array(this.trianglePointsDistortion),
       1,
       'a_trianglePointDistortion'
     )
 
-    // Triangle index
+    // Triangle Point index
 
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
-    ).map((_v, i) => Math.round((i - 1) / 3))
-
+    ).map((_v, i) => {
+      return i
+    })
     createBuffer(
-      this.gl,
-      this.program,
+      gl,
+      program,
       trianglePointsTriangleIndex,
       1,
-      'a_triangleIndex'
+      'a_trianglePointIndex'
     )
   }
+
+  private updateVertexBuffersLines() {
+    if (!this.linesVao) {
+      return
+    }
+
+    const gl = this.gl
+    const program = this.linesProgram
+    gl.bindVertexArray(this.linesVao)
+
+    this.setLineLayers()
+
+    const sixProjectedGeoPoints = this.lineLayers
+      .reduce(
+        (accumulator: Line[], lineLayer) =>
+          accumulator.concat(lineLayer.projectedGeoLines),
+        []
+      )
+      .map((projectedGeoLine) => [
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1]
+      ])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixProjectedGeoPoints.flat()),
+      2,
+      'a_projectedGeoPoint'
+    )
+
+    const sixProjectedGeoOtherPoints = this.lineLayers
+      .reduce(
+        (accumulator: Line[], lineLayer) =>
+          accumulator.concat(lineLayer.projectedGeoLines),
+        []
+      )
+      .map((projectedGeoLine) => [
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0]
+      ])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixProjectedGeoOtherPoints.flat()),
+      2,
+      'a_projectedGeoOtherPoint'
+    )
+
+    const sixProjectedGeoPreviousPoints = this.lineLayers
+      .reduce(
+        (accumulator: Line[], lineLayer) =>
+          accumulator.concat(
+            lineLayer.projectedGeoPreviousLines || lineLayer.projectedGeoLines
+          ),
+        []
+      )
+      .map((projectedGeoLine) => [
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1]
+      ])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixProjectedGeoPreviousPoints.flat()),
+      2,
+      'a_projectedGeoPreviousPoint'
+    )
+
+    const sixProjectedGeoPreviousOtherPoints = this.lineLayers
+      .reduce(
+        (accumulator: Line[], lineLayer) =>
+          accumulator.concat(
+            lineLayer.projectedGeoPreviousLines || lineLayer.projectedGeoLines
+          ),
+        []
+      )
+      .map((projectedGeoLine) => [
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[1],
+        projectedGeoLine[0],
+        projectedGeoLine[0],
+        projectedGeoLine[0]
+      ])
+      .flat()
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixProjectedGeoPreviousOtherPoints.flat()),
+      2,
+      'a_projectedGeoPreviousOtherPoint'
+    )
+
+    const sixIsOtherPoints = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+            0, 0, 1, 0, 0, 1
+          ])
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixIsOtherPoints),
+      1,
+      'a_isOtherPoint'
+    )
+
+    const sixNormalSigns = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+            +1, -1, +1, +1, -1, +1
+          ])
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(sixNormalSigns),
+      1,
+      'a_normalSign'
+    )
+
+    const viewportSizes = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              Object.prototype.hasOwnProperty.call(lineLayer, 'viewportSize') // Note: using hasOwnPropery to ensure 0 is passed as 0
+                ? lineLayer.viewportSize
+                : DEFAULT_LINE_LAYER_VIEWPORT_SIZE
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportSizes),
+      1,
+      'a_viewportSize'
+    )
+
+    const colors = this.lineLayers.reduce(
+      (accumulator: number[][], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              Object.prototype.hasOwnProperty.call(lineLayer, 'color')
+                ? lineLayer.color
+                : DEFAULT_LINE_LAYER_COLOR
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
+
+    const viewportBorderSizes = this.lineLayers.reduce(
+      (accumulator: number[], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              lineLayer.viewportBorderSize ||
+                DEFAULT_LINE_LAYER_VIEWPORT_BORDER_SIZE
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportBorderSizes),
+      1,
+      'a_viewportBorderSize'
+    )
+
+    const borderColors = this.lineLayers.reduce(
+      (accumulator: number[][], lineLayer) =>
+        accumulator.concat(
+          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+            Array(6).fill(
+              Object.prototype.hasOwnProperty.call(lineLayer, 'borderColor')
+                ? lineLayer.borderColor
+                : DEFAULT_LINE_LAYER_BORDER_COLOR
+            )
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(borderColors.flat()),
+      4,
+      'a_borderColor'
+    )
+  }
+
+  private updateVertexBuffersPoints() {
+    if (!this.pointsVao) {
+      return
+    }
+
+    const gl = this.gl
+    const program = this.pointsProgram
+    gl.bindVertexArray(this.pointsVao)
+
+    this.setPointLayers()
+
+    const projectedGeoPoints = this.pointLayers.reduce(
+      (accumulator: Point[], pointLayer) =>
+        accumulator.concat(pointLayer.projectedGeoPoints),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(projectedGeoPoints.flat()),
+      2,
+      'a_projectedGeoPoint'
+    )
+
+    const projectedGeoPreviousPoints = this.pointLayers.reduce(
+      (accumulator: Point[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPreviousPoints || pointLayer.projectedGeoPoints
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(projectedGeoPreviousPoints.flat()),
+      2,
+      'a_projectedGeoPreviousPoint'
+    )
+
+    const viewportSizes = this.pointLayers.reduce(
+      (accumulator: number[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            Object.prototype.hasOwnProperty.call(pointLayer, 'viewportSize')
+              ? (pointLayer.viewportSize as number)
+              : DEFAULT_POINT_LAYER_VIEWPORT_SIZE
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportSizes),
+      1,
+      'a_viewportSize'
+    )
+
+    const colors = this.pointLayers.reduce(
+      (accumulator: number[][], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            Object.prototype.hasOwnProperty.call(pointLayer, 'color')
+              ? (pointLayer.color as ColorWithTransparancy)
+              : DEFAULT_POINT_LAYER_COLOR
+          )
+        ),
+      []
+    )
+    createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
+
+    const viewportBorderSizes = this.pointLayers.reduce(
+      (accumulator: number[], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map(
+            (_projectedGeoPoint) =>
+              pointLayer.viewportBorderSize ||
+              DEFAULT_POINT_LAYER_VIEWPORT_BORDER_SIZE
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(viewportBorderSizes),
+      1,
+      'a_viewportBorderSize'
+    )
+
+    const borderColors = this.pointLayers.reduce(
+      (accumulator: number[][], pointLayer) =>
+        accumulator.concat(
+          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+            Object.prototype.hasOwnProperty.call(pointLayer, 'borderColor')
+              ? (pointLayer.borderColor as ColorWithTransparancy)
+              : DEFAULT_POINT_LAYER_BORDER_COLOR
+          )
+        ),
+      []
+    )
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(borderColors.flat()),
+      4,
+      'a_borderColor'
+    )
+  }
+
   private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
     return Array.from(this.cachedTilesByTileUrl.values()).find((cachedTile) =>
       equalTileByRowColumnScaleFactor(cachedTile.tile, tile)

@@ -269,6 +269,26 @@ export function isEqualPointArrayArray(
 
 // Compute
 
+export function pointsAndPointsToLines(
+  points0: Point[],
+  points1: Point[]
+): Line[] {
+  if (points0.length != points1.length)
+    throw new Error('Point arrays should be of same lenght')
+
+  return points0.map((point0, index) => [point0, points1[index]])
+}
+
+export function lineStringToLines(lineString: LineString): Line[] {
+  return lineString.reduce(
+    (accumulator: Line[], point, index) => [
+      ...accumulator,
+      [point, lineString[(index + 1) % lineString.length]]
+    ],
+    []
+  )
+}
+
 export function pointToPixel(point: Point, translate: Point = [0, 0]): Point {
   return point.map((coordinate, index) => {
     return Math.floor(coordinate + translate[index])
@@ -306,21 +326,24 @@ export function mixNumbers(
   number1: number,
   t: number
 ): number {
-  return number0 * t + number1 * (1 - t)
+  return number0 * (1 - t) + number1 * t
 }
 
 export function mixPoints(point0: Point, point1: Point, t: number): Point {
   return [
-    point0[0] * t + point1[0] * (1 - t),
-    point0[1] * t + point1[1] * (1 - t)
+    mixNumbers(point0[0], point1[0], t),
+    mixNumbers(point0[1], point1[1], t)
   ]
 }
 
-export function distance(line: Line): number
+export function distance(from: Line): number
+export function distance(from: Point): number
 export function distance(from: Point, to: Point): number
 export function distance(from: Point | Line, to?: Point): number {
   if (isLineString(from) && from.length === 2) {
     return distance(from[0], from[1])
+  } else if (isPoint(from) && to === undefined) {
+    return distance(from, [0, 0])
   } else if (isPoint(from) && isPoint(to)) {
     return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
   } else {

@@ -4,10 +4,13 @@ import type FetchableTile from '../tilecache/FetchableTile.js'
 import type CacheableTile from '../tilecache/CacheableTile.js'
 
 import type {
+  Point,
+  Line,
   Size,
   FetchFn,
   ImageInformations,
   Color,
+  ColorWithTransparancy,
   Bbox
 } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
@@ -91,6 +94,24 @@ export type CachableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
+
+export type LineLayer = {
+  projectedGeoLines: Line[]
+  projectedGeoPreviousLines?: Line[]
+  viewportSize?: number
+  color?: ColorWithTransparancy
+  viewportBorderSize?: number
+  borderColor?: ColorWithTransparancy
+}
+
+export type PointLayer = {
+  projectedGeoPoints: Point[]
+  projectedGeoPreviousPoints?: Point[]
+  viewportSize?: number
+  color?: ColorWithTransparancy
+  viewportBorderSize?: number
+  borderColor?: ColorWithTransparancy
+}
 
 export type pruneInfo = {
   bestScaleFactor: number
