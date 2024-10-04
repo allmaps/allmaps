@@ -184,6 +184,7 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [fetch](#fetch)
 *   [fetch](#fetch-1)
 *   [fetch](#fetch-2)
+*   [fetch](#fetch-3)
 *   [getCacheableTiles](#getcacheabletiles)
 *   [getCacheableTile](#getcacheabletile)
     *   [Parameters](#parameters-54)
@@ -821,7 +822,7 @@ Creates an instance of WebGL2WarpedMap.
 
 *   `e` &#x20;
 *   `r` &#x20;
-*   `i` &#x20;
+*   `c` &#x20;
 *   `a` &#x20;
 *   `T` &#x20;
 *   `s` &#x20;
@@ -898,6 +899,12 @@ Creates an instance of FetchableTile.
 ### fetch
 
 Fetch the tile and create its ImageBitMap.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### fetch
+
+Fetch the tile and create its ImageData using a WebWorker.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 

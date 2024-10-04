@@ -3,7 +3,7 @@ import FetchableTile from './FetchableTile.js'
 import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
 
 /**
- * Class for map tiles that can be cached.
+ * Class for tiles that can be cached.
  *
  * @export
  * @tamplate D
@@ -61,7 +61,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
 }
 
 /**
- * Class for tiles of which the data has been fetched
+ * Class for tiles that are cached, i.e. their data has been fetched and processed
  *
  * @export
  * @class CachedTile

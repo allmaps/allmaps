@@ -7,7 +7,7 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import type { FetchFn } from '@allmaps/types'
 
 /**
- * Class for tiles that are cached using the Canvas 2D ImageData object.
+ * Class for tiles that can be cached, and whose data can be processed to an ImageData object.
  *
  * @export
  * @class CacheableImageDataTile
@@ -70,7 +70,7 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
 }
 
 /**
- * Class for cacheable tiles that have been fetched.
+ * Class for tiles that is cached, and whose data has been processed to an ImageData object.
  *
  * @export
  * @class CachedImageDataTile

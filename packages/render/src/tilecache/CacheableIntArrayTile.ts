@@ -9,7 +9,7 @@ import type { FetchFn } from '@allmaps/types'
 import type { GetImageData } from '../shared/types.js'
 
 /**
- * Class for tiles that are cached using an IntArray
+ * Class for tiles that can be cached, and whose data can be processed to an IntArray.
  *
  * @export
  * @class CacheableIntArrayTile
@@ -72,7 +72,7 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
 }
 
 /**
- * Class for cacheable tiles that have been fetched.
+ * Class for tiles that is cached, and whose data has been processed to an IntArray.
  *
  * @export
  * @class CachedIntArrayTile

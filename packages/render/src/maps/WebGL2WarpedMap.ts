@@ -66,13 +66,6 @@ const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 const TEXTURE_DEPTH_BUFFER_RATIO = 0
 // const TEXTURE_DEPTH_SHRINK_RATIO = 1 / 10
 
-const getImageDataWorker = new ComlinkWorker<
-  typeof import('../workers/image-bitmap-to-array.js')
->(new URL('../workers/image-bitmap-to-array.js', import.meta.url), {
-  name: 'getImageData',
-  type: 'module'
-})
-
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
   mapsProgram: WebGLProgram,
@@ -121,8 +114,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   lineLayers: LineLayer[] = []
   pointLayers: PointLayer[] = []
 
-  cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
-  cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageData>> = new Map()
+  cachedTilesForTexture: CachedTile<ImageData>[] = []
   textureTileUrls: string[] = []
   textureWidth: number = 0
   textureHeight: number = 0
@@ -235,7 +228,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    *
    * @param {CachedTile} cachedTile
    */
-  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
+  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
@@ -806,7 +799,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
       this.textureTileUrls[i] = this.cachedTilesForTexture[i].tileUrl
 
-      const imageBitmap = this.cachedTilesForTexture[i].data
+      const imageData = this.cachedTilesForTexture[i].data
 
       // Using Pixel Buffer Objects to write to textures asynchonously
 
@@ -820,26 +813,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         gl.STREAM_DRAW
       )
 
-      // PBO needs intArray, so getting it from imageBitMap
-      // Option 1) using private function
-      // const intArray = this.getPixelData(imageBitmap)
-      // Option 2) using WebWorker
-
-      // const getImageDataWorker = new ComlinkWorker<
-      //   typeof import('../workers/getImageData.js')
-      // >(new URL('../workers/getImageData.js', import.meta.url), {
-      //   name: 'getImageData',
-      //   type: 'module'
-      // })
-      const intArray = await getImageDataWorker.getImageData(imageBitmap)
-
-      // TODO: this results in flickering currently
-      // To solve this, get improve worker so it can get image data for all tiles at the same time
-      // And when promise resolves use .then() to call the part of the current updateTexturesInternal() that's actually updating the textures.
-      // (Or better: make a separate function preparing updateTexturesInternal, that calls it when the promise resolves)
-
       // Upload data into the PBO
-      gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, 0, intArray)
+      gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, 0, imageData.data)
 
       // Bind the texture and asynchronously copy data from the PBO to the texture
       gl.texSubImage3D(
@@ -848,8 +823,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         0,
         0,
         i,
-        imageBitmap.width,
-        imageBitmap.height,
+        imageData.width,
+        imageData.height,
         1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
@@ -973,7 +948,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Making tiles unique by tileUrl
     const cachedTilesForTexturesByTileUrl: Map<
       string,
-      CachedTile<ImageBitmap>
+      CachedTile<ImageData>
     > = new Map()
     cachedTilesForTextures.forEach((cachedTile) =>
       cachedTilesForTexturesByTileUrl.set(cachedTile.tileUrl, cachedTile)
@@ -1005,7 +980,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   private getCachedTilesAtOtherScaleFactors(
     tile: Tile
-  ): CachedTile<ImageBitmap>[] {
+  ): CachedTile<ImageData>[] {
     if (this.cachedTilesByTileUrl.size == 0) {
       return []
     }
@@ -1039,29 +1014,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return this.parsedImage.getImageUrl(imageRequest)
   }
 
-  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
+  private tileToCachedTile(tile: Tile): CachedTile<ImageData> | undefined {
     return this.cachedTilesByTileUrl.get(this.tileToTileUrl(tile))
   }
 
   private tileInCachedTiles(tile: Tile): boolean {
     return this.cachedTilesByTileUrl.has(this.tileToTileUrl(tile))
-  }
-
-  // TODO: needs to go once we use WebWorker
-  private getPixelData(imageBitmap: ImageBitmap): Uint8ClampedArray {
-    const canvas = document.createElement('canvas')
-    canvas.width = imageBitmap.width
-    canvas.height = imageBitmap.height
-    const ctx = canvas.getContext('2d')
-    ctx!.drawImage(imageBitmap, 0, 0)
-
-    // Extract pixel data from the canvas
-    const imageData = ctx!.getImageData(
-      0,
-      0,
-      imageBitmap.width,
-      imageBitmap.height
-    )
-    return imageData.data
   }
 }
