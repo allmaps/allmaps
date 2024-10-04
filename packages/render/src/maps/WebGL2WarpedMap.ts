@@ -12,13 +12,11 @@ import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import { applyTransform } from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
-import {
-  equalTileByRowColumnScaleFactor,
-  getTilesAtOtherScaleFactors
-} from '../shared/tiles.js'
+import { getTilesAtOtherScaleFactors } from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
+import type { Image } from '@allmaps/iiif-parser'
 import type {
   ColorWithTransparancy,
   Line,
@@ -34,10 +32,11 @@ import type {
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
+
 import { equalArray } from '@allmaps/stdlib'
 
-const THROTTLE_WAIT_MS = 100
-const THROTTLE_OPTIONS = {
+const THROTTLE_UPDATE_TEXTURES_WAIT_MS = 200
+const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
   leading: true,
   trailing: true
 }
@@ -62,6 +61,17 @@ const DEFAULT_POINT_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
+
+// TODO: this can go, we're not using this anymore!
+const TEXTURE_DEPTH_BUFFER_RATIO = 0
+// const TEXTURE_DEPTH_SHRINK_RATIO = 1 / 10
+
+const getImageDataWorker = new ComlinkWorker<
+  typeof import('../workers/image-bitmap-to-array.js')
+>(new URL('../workers/image-bitmap-to-array.js', import.meta.url), {
+  name: 'getImageData',
+  type: 'module'
+})
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -94,6 +104,11 @@ export function createWebGL2WarpedMapFactory(
  * @extends {TriangulatedWarpedMap}
  */
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
+  // De facto make this a WarpedMapWithImageInfo
+  // (Multiple inhertance is not possible in TypeScript)
+  declare imageId: string
+  declare parsedImage: Image
+
   gl: WebGL2RenderingContext
   mapsProgram: WebGLProgram
   linesProgram: WebGLProgram
@@ -107,7 +122,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   pointLayers: PointLayer[] = []
 
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
-  previousTextureTileUrls: string[] = []
+  cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
+  textureTileUrls: string[] = []
+  textureWidth: number = 0
+  textureHeight: number = 0
+  textureDepth: number = 0
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
@@ -117,9 +136,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
+  pbo: WebGLBuffer | null
+
   projectedGeoToClipTransform: Transform | undefined
 
-  clearTextures: DebouncedFunc<typeof this.updateTextures>
+  private throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
 
   /**
    * Creates an instance of WebGL2WarpedMap.
@@ -154,10 +175,12 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
     this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
 
-    this.clearTextures = throttle(
+    this.pbo = gl.createBuffer()
+
+    this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
-      THROTTLE_WAIT_MS,
-      THROTTLE_OPTIONS
+      THROTTLE_UPDATE_TEXTURES_WAIT_MS,
+      THROTTLE_UPDATE_TEXTURES_OPTIONS
     )
   }
 
@@ -200,13 +223,21 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
+   * Clear textures for this map
+   */
+  clearTextures() {
+    // TODO: implement clearing of texture: maybe a 1x1x1 texture that's empty
+    this.throttledUpdateTextures()
+  }
+
+  /**
    * Add cached tile to the textures of this map and update textures
    *
    * @param {CachedTile} cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
-    this.clearTextures()
+    this.throttledUpdateTextures()
   }
 
   /**
@@ -216,11 +247,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     this.cachedTilesByTileUrl.delete(tileUrl)
-    this.clearTextures()
+    this.throttledUpdateTextures()
   }
 
   cancelThrottledFunctions() {
-    this.clearTextures.cancel()
+    this.throttledUpdateTextures.cancel()
   }
 
   destroy() {
@@ -695,28 +726,287 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
-    return Array.from(this.cachedTilesByTileUrl.values()).find((cachedTile) =>
-      equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
+  private async updateTextures() {
+    const gl = this.gl
+
+    // Find out which tiles to include in texture
+    this.updateCachedTilesForTextures()
+
+    // Don't update if same request as before
+    // This prevents the event TEXTURESUPDATED from being fired
+    // Which would otherwise trigger an infinite loop
+    if (
+      equalArray(
+        this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl),
+        this.textureTileUrls
+      )
+    ) {
+      return
+    }
+
+    // Cached tiles texture array
+
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
+
+    // Check if a new texture should be recreated
+
+    const requiredTextureWidth = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.width)
     )
+    const requiredTextureHeigt = Math.max(
+      ...this.parsedImage.tileZoomLevels.map((size) => size.height)
+    )
+    let requiredTextureDepth = this.cachedTilesForTexture.length
+
+    // TODO: this can go, we're not using this anymore!
+    const newTexture = true
+    // requiredTextureWidth != this.textureWidth ||
+    // requiredTextureHeigt != this.textureHeight ||
+    // requiredTextureDepth > this.textureDepth ||
+    // requiredTextureDepth <
+    //   Math.floor(this.textureDepth * TEXTURE_DEPTH_SHRINK_RATIO)
+
+    if (newTexture) {
+      const textureDepthBuffer = Math.floor(
+        requiredTextureDepth * TEXTURE_DEPTH_BUFFER_RATIO
+      )
+      requiredTextureDepth = requiredTextureDepth + textureDepthBuffer
+      this.textureTileUrls = new Array(requiredTextureDepth)
+
+      gl.texImage3D(
+        gl.TEXTURE_2D_ARRAY,
+        0,
+        gl.RGBA,
+        requiredTextureWidth,
+        requiredTextureHeigt,
+        requiredTextureDepth,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        null
+      )
+
+      this.textureWidth = requiredTextureWidth
+      this.textureHeight = requiredTextureHeigt
+      this.textureDepth = requiredTextureDepth
+    }
+    for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
+      // TODO: this can go, we're not using this anymore!
+      // If the texture already exists and
+      // this cached tile for the texture is the same as
+      // the tile already in the texture at this location,
+      // then don't draw it again
+      if (
+        !newTexture &&
+        this.cachedTilesForTexture[i].tileUrl == this.textureTileUrls[i]
+      ) {
+        continue
+      }
+
+      this.textureTileUrls[i] = this.cachedTilesForTexture[i].tileUrl
+
+      const imageBitmap = this.cachedTilesForTexture[i].data
+
+      // Using Pixel Buffer Objects to write to textures asynchonously
+
+      // Bind to the PBO
+      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, this.pbo)
+
+      // Allocate space in the PBO for the texture data
+      gl.bufferData(
+        gl.PIXEL_UNPACK_BUFFER,
+        requiredTextureWidth * requiredTextureHeigt * 4,
+        gl.STREAM_DRAW
+      )
+
+      // PBO needs intArray, so getting it from imageBitMap
+      // Option 1) using private function
+      // const intArray = this.getPixelData(imageBitmap)
+      // Option 2) using WebWorker
+
+      // const getImageDataWorker = new ComlinkWorker<
+      //   typeof import('../workers/getImageData.js')
+      // >(new URL('../workers/getImageData.js', import.meta.url), {
+      //   name: 'getImageData',
+      //   type: 'module'
+      // })
+      const intArray = await getImageDataWorker.getImageData(imageBitmap)
+
+      // TODO: this results in flickering currently
+      // To solve this, get improve worker so it can get image data for all tiles at the same time
+      // And when promise resolves use .then() to call the part of the current updateTexturesInternal() that's actually updating the textures.
+      // (Or better: make a separate function preparing updateTexturesInternal, that calls it when the promise resolves)
+
+      // Upload data into the PBO
+      gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, 0, intArray)
+
+      // Bind the texture and asynchronously copy data from the PBO to the texture
+      gl.texSubImage3D(
+        gl.TEXTURE_2D_ARRAY,
+        0,
+        0,
+        0,
+        i,
+        imageBitmap.width,
+        imageBitmap.height,
+        1,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        0 // 0 indicates that we are loading from the PBO
+      )
+
+      // Unbind the PBO
+      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
+    }
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    // Cached tiles resource positions and dimensions texture
+
+    const cachedTilesResourcePositionsAndDimensions =
+      this.cachedTilesForTexture.map((textureTile) => {
+        if (
+          textureTile &&
+          textureTile.imageRequest &&
+          textureTile.imageRequest.region
+        ) {
+          return [
+            textureTile.imageRequest.region.x,
+            textureTile.imageRequest.region.y,
+            textureTile.imageRequest.region.width,
+            textureTile.imageRequest.region.height
+          ]
+        }
+      }) as number[][]
+
+    gl.bindTexture(
+      gl.TEXTURE_2D,
+      this.cachedTilesResourcePositionsAndDimensionsTexture
+    )
+
+    // A previous verions used gl.RGBA_INTEGER as this texture's format
+    // However, this seemed to cause Chrome to crash on some systems while
+    // zooming in and out. Using gl.RED_INTEGER and multiplying the width by 4
+    // to account for the 4 values per tile seems to fix the issue.
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.R32I,
+      1,
+      this.cachedTilesForTexture.length * 4,
+      0,
+      gl.RED_INTEGER,
+      gl.INT,
+      new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
+    )
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    // Cached tiles scale factors texture
+
+    const cachedTilesScaleFactors = this.cachedTilesForTexture.map(
+      (textureTile) => textureTile.tile.tileZoomLevel.scaleFactor
+    )
+
+    gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.R32I,
+      1,
+      this.cachedTilesForTexture.length,
+      0,
+      gl.RED_INTEGER,
+      gl.INT,
+      new Int32Array(cachedTilesScaleFactors)
+    )
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
   }
 
-  private tileInCachedTiles(tile: Tile): boolean {
-    return Array.from(this.cachedTilesByTileUrl.values())
-      .map((cachedTile) =>
-        equalTileByRowColumnScaleFactor(cachedTile.tile, tile)
+  private updateCachedTilesForTextures() {
+    // Select tiles form tileCache that should be included in the texture
+    const requestedCachedTiles = []
+    const requestedCachedTilesAtOtherScaleFactors = []
+    const overviewCachedTiles = []
+
+    // Try to include tiles that were requested
+    for (const fetchableTile of this.currentFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        // If they are available, include them
+        requestedCachedTiles.push(cachedTile)
+      } else {
+        // If they are not available, include their parents or children if they are available
+        for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
+          fetchableTile.tile
+        )) {
+          requestedCachedTilesAtOtherScaleFactors.push(cachedTile)
+        }
+      }
+    }
+
+    // Try to include tiles that are at overview zoomlevel
+    for (const fetchableTile of this.currentOverviewFetchableTiles) {
+      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
+      if (cachedTile) {
+        // If they are available, include them
+        overviewCachedTiles.push(cachedTile)
+      }
+    }
+
+    let cachedTilesForTextures = [
+      ...requestedCachedTiles,
+      ...requestedCachedTilesAtOtherScaleFactors,
+      ...overviewCachedTiles
+    ]
+
+    // Making tiles unique by tileUrl
+    const cachedTilesForTexturesByTileUrl: Map<
+      string,
+      CachedTile<ImageBitmap>
+    > = new Map()
+    cachedTilesForTextures.forEach((cachedTile) =>
+      cachedTilesForTexturesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    )
+    cachedTilesForTextures = [...cachedTilesForTexturesByTileUrl.values()]
+
+    // TODO: this can go, we're not using this anymore!
+    // Reorder tiles to align with previous cachedTilesForTextures
+    // So we can later skip writing tiles that are already in texture
+    for (
+      let i = 0;
+      i < Math.min(this.textureTileUrls.length, cachedTilesForTextures.length);
+      i++
+    ) {
+      const index = cachedTilesForTextures.findIndex(
+        (textureTile) => this.textureTileUrls[i] == textureTile.tileUrl
       )
-      .some((b) => b)
+      if (index >= 0) {
+        const movedTextureTile = cachedTilesForTextures[index]
+        cachedTilesForTextures[index] = cachedTilesForTextures[i]
+        cachedTilesForTextures[i] = movedTextureTile
+      }
+    }
+
+    this.cachedTilesForTexture = cachedTilesForTextures
+
+    return
   }
 
   private getCachedTilesAtOtherScaleFactors(
     tile: Tile
   ): CachedTile<ImageBitmap>[] {
     if (this.cachedTilesByTileUrl.size == 0) {
-      return []
-    }
-
-    if (!this.hasImageInfo()) {
       return []
     }
 
@@ -740,193 +1030,38 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return cachedTiles
   }
 
-  private async updateTextures() {
-    const gl = this.gl
-
-    if (!this.hasImageInfo()) {
-      return
-    }
-
-    const textureTiles = this.getTextureTiles()
-
-    // Don't update if same request as before
-    // This prevents the event TEXTURESUPDATED from being fired
-    // Which would otherwise trigger an infinite loop
-    if (
-      equalArray(
-        textureTiles.map((textureTile) => textureTile.tileUrl),
-        this.previousTextureTileUrls
-      )
-    ) {
-      return
-    }
-
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
-
-    // Cached tiles texture array
-
-    const maxTileWidth = Math.max(
-      ...this.parsedImage.tileZoomLevels.map((size) => size.width)
+  private tileToTileUrl(tile: Tile): string {
+    const imageRequest = this.parsedImage.getIiifTile(
+      tile.tileZoomLevel,
+      tile.column,
+      tile.row
     )
-    const maxTileHeight = Math.max(
-      ...this.parsedImage.tileZoomLevels.map((size) => size.height)
-    )
-
-    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
-
-    gl.texImage3D(
-      gl.TEXTURE_2D_ARRAY,
-      0,
-      gl.RGBA,
-      maxTileWidth,
-      maxTileHeight,
-      textureTiles.length,
-      0,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      null
-    )
-    for (let i = 0; i < textureTiles.length; i++) {
-      const imageBitmap = textureTiles[i].data
-
-      gl.texSubImage3D(
-        gl.TEXTURE_2D_ARRAY,
-        0,
-        0,
-        0,
-        i,
-        imageBitmap.width,
-        imageBitmap.height,
-        1,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        imageBitmap
-      )
-    }
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-    // Cached tiles resource positions and dimensions texture
-
-    const cachedTilesResourcePositionsAndDimensions = textureTiles.map(
-      (textureTile) => {
-        if (
-          textureTile &&
-          textureTile.imageRequest &&
-          textureTile.imageRequest.region
-        ) {
-          return [
-            textureTile.imageRequest.region.x,
-            textureTile.imageRequest.region.y,
-            textureTile.imageRequest.region.width,
-            textureTile.imageRequest.region.height
-          ]
-        }
-      }
-    ) as number[][]
-
-    gl.bindTexture(
-      gl.TEXTURE_2D,
-      this.cachedTilesResourcePositionsAndDimensionsTexture
-    )
-
-    // A previous verions used gl.RGBA_INTEGER as this texture's format
-    // However, this seemed to cause Chrome to crash on some systems while
-    // zooming in and out. Using gl.RED_INTEGER and multiplying the width by 4
-    // to account for the 4 values per tile seems to fix the issue.
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.R32I,
-      1,
-      textureTiles.length * 4,
-      0,
-      gl.RED_INTEGER,
-      gl.INT,
-      new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
-    )
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-    // Cached tiles scale factors texture
-
-    const cachedTilesScaleFactors = textureTiles.map(
-      (textureTile) => textureTile.tile.tileZoomLevel.scaleFactor
-    )
-
-    gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.R32I,
-      1,
-      textureTiles.length,
-      0,
-      gl.RED_INTEGER,
-      gl.INT,
-      new Int32Array(cachedTilesScaleFactors)
-    )
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-    this.previousTextureTileUrls = textureTiles.map(
-      (textureTile) => textureTile.tileUrl
-    )
-
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+    return this.parsedImage.getImageUrl(imageRequest)
   }
 
-  getTextureTiles() {
-    // Select tiles for tileCache that make sense for this map
-    // Either because they are requested, or because they are it's parents or children
-    const requestedCachedTiles = []
-    const otherTileZoomLevelsCachedTiles = []
+  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
+    return this.cachedTilesByTileUrl.get(this.tileToTileUrl(tile))
+  }
 
-    for (const fetchableTile of this.currentFetchableTiles) {
-      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
-      if (cachedTile) {
-        requestedCachedTiles.push(cachedTile)
-      } else {
-        for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
-          fetchableTile.tile
-        )) {
-          otherTileZoomLevelsCachedTiles.push(cachedTile)
-        }
-      }
-    }
+  private tileInCachedTiles(tile: Tile): boolean {
+    return this.cachedTilesByTileUrl.has(this.tileToTileUrl(tile))
+  }
 
-    // Select tiles for tileCache that are at overview zoomlevel
-    const overviewCachedTiles = []
+  // TODO: needs to go once we use WebWorker
+  private getPixelData(imageBitmap: ImageBitmap): Uint8ClampedArray {
+    const canvas = document.createElement('canvas')
+    canvas.width = imageBitmap.width
+    canvas.height = imageBitmap.height
+    const ctx = canvas.getContext('2d')
+    ctx!.drawImage(imageBitmap, 0, 0)
 
-    for (const fetchableTile of this.currentOverviewFetchableTiles) {
-      const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
-      if (cachedTile) {
-        overviewCachedTiles.push(cachedTile)
-      }
-    }
-
-    let textureTiles = [
-      ...requestedCachedTiles,
-      ...otherTileZoomLevelsCachedTiles,
-      ...overviewCachedTiles
-    ]
-
-    // Making textureTiles unique by tileUrl
-    const textureTilesByTileUrl: Map<
-      string,
-      CachedTile<ImageBitmap>
-    > = new Map()
-    textureTiles.forEach((cachedTile) =>
-      textureTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    // Extract pixel data from the canvas
+    const imageData = ctx!.getImageData(
+      0,
+      0,
+      imageBitmap.width,
+      imageBitmap.height
     )
-    textureTiles = [...textureTilesByTileUrl.values()]
-
-    return textureTiles
+    return imageData.data
   }
 }

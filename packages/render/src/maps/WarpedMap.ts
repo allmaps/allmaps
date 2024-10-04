@@ -1,6 +1,6 @@
 import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
-import { Image as IIIFImage } from '@allmaps/iiif-parser'
+import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
   computeBbox,
@@ -86,7 +86,7 @@ export function createWarpedMapFactory() {
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
  * @param {string} [imageId] - ID of the image
- * @param {IIIFImage} [parsedImage] - ID of the image
+ * @param {Image} [parsedImage] - ID of the image
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
@@ -138,7 +138,7 @@ export default class WarpedMap extends EventTarget {
 
   imageInformations?: ImageInformations
   imageId?: string
-  parsedImage?: IIIFImage
+  parsedImage?: Image
   loadingImageInfo: boolean
 
   fetchFn?: FetchFn
@@ -525,7 +525,7 @@ export default class WarpedMap extends EventTarget {
         this.imageInformations?.set(imageUri, imageInfo)
       }
 
-      this.parsedImage = IIIFImage.parse(imageInfo)
+      this.parsedImage = Image.parse(imageInfo)
       this.imageId = await generateId(imageUri)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
@@ -702,7 +702,7 @@ export default class WarpedMap extends EventTarget {
  */
 export class WarpedMapWithImageInfo extends WarpedMap {
   declare imageId: string
-  declare parsedImage: IIIFImage
+  declare parsedImage: Image
 
   constructor(
     mapId: string,

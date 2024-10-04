@@ -344,7 +344,7 @@ export default abstract class BaseRenderer<
       )
     }
     for (const mapId of leavingMapsInViewport) {
-      this.clearMapTextures(mapId)
+      this.clearMap(mapId)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
@@ -372,9 +372,8 @@ export default abstract class BaseRenderer<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected clearMapTextures(mapId: string): void {}
+  protected clearMap(mapId: string): void {}
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected mapTileLoaded(event: Event): void {}
 

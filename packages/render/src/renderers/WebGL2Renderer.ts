@@ -48,8 +48,8 @@ import type {
   WebGL2RendererOptions
 } from '../shared/types.js'
 
-const THROTTLE_PREPARE_WAIT_MS = 200
-const THROTTLE_PREPARE_OPTIONS = {
+const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
+const THROTTLE_PREPARE_RENDER_OPTIONS = {
   leading: true,
   trailing: true
 }
@@ -197,8 +197,8 @@ export default class WebGL2Renderer
 
     this.throttledPrepareRenderInternal = throttle(
       this.prepareRenderInternal.bind(this),
-      THROTTLE_PREPARE_WAIT_MS,
-      THROTTLE_PREPARE_OPTIONS
+      THROTTLE_PREPARE_RENDER_WAIT_MS,
+      THROTTLE_PREPARE_RENDER_OPTIONS
     )
 
     this.throttledChanged = throttle(
@@ -1179,7 +1179,7 @@ export default class WebGL2Renderer
     }
   }
 
-  protected clearMapTextures(mapId: string) {
+  protected clearMap(mapId: string) {
     const webGL2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.clearTextures()
