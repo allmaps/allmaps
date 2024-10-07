@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import glsl from 'vite-plugin-glsl'
 import noBundlePlugin from 'vite-plugin-no-bundle'
 import dts from 'vite-plugin-dts'
-import { comlink } from 'vite-plugin-comlink'
 
 import ports from '../../ports.json'
 
@@ -53,12 +52,8 @@ export default defineConfig({
     dts({
       insertTypesEntry: true
     }),
-    noBundlePlugin(),
-    comlink()
+    noBundlePlugin()
   ],
-  worker: {
-    plugins: () => [comlink()]
-  },
 
   define: {
     // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:

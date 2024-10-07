@@ -5,7 +5,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "module": "es2022",
-    "types": ["vite-plugin-glsl/ext", "vite-plugin-comlink/client", "vite/client"],
+    "types": ["vite-plugin-glsl/ext"],
     "paths": {}
   },
   "references": [
