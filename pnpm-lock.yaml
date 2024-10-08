@@ -88,29 +88,38 @@ importers:
   apps/editor:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.27
+        specifier: workspace:^1.0.0-beta.27
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.27
+        specifier: workspace:^1.0.0-beta.27
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.37
+        specifier: workspace:^1.0.0-beta.37
         version: link:../../packages/iiif-parser
       '@allmaps/maplibre':
-        specifier: ^1.0.0-beta.25
+        specifier: workspace:^1.0.0-beta.25
         version: link:../../packages/maplibre
+      '@allmaps/openlayers':
+        specifier: workspace:^1.0.0-beta.68
+        version: link:../../packages/openlayers
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.28
+        specifier: workspace:^1.0.0-beta.28
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.12
+        specifier: workspace:^1.0.0-beta.12
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.38
+        specifier: workspace:^1.0.0-beta.38
         version: link:../../packages/transform
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.29
+        specifier: workspace:^1.0.0-beta.29
         version: link:../../packages/ui
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.16)
+      '@tailwindcss/typography':
+        specifier: ^0.5.9
+        version: 0.5.15(tailwindcss@3.4.16)
       bits-ui:
         specifier: ^0.21.11
         version: 0.21.16(svelte@5.16.5)
@@ -185,7 +194,7 @@ importers:
         specifier: ^3.2.6
         version: 3.3.2(prettier@3.4.2)(svelte@5.16.5)
       svelte:
-        specifier: ^5.0.0-next.259
+        specifier: ^5.0.0-next.262
         version: 5.16.5
       svelte-check:
         specifier: ^3.6.0
@@ -4451,7 +4460,6 @@ packages:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.16
-    dev: true
 
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -9564,7 +9572,6 @@ packages:
 
   /lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
-    dev: true
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
@@ -9580,7 +9587,6 @@ packages:
 
   /lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
-    dev: true
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -12311,7 +12317,6 @@ packages:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
-    dev: true
 
   /postcss-selector-parser@6.1.2:
     resolution: {integrity: sha512-Q8qQfPiZ+THO/3ZrOrO0cJJKfpYCagtMUkXbnEfmgUjwXg6z/WBeOyS9APBBPCTSiDV+s4SwQGu8yFsiMRIudg==}
