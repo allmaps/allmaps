@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 1877 709" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-40853,-3925)">
-        <g id="Block-Arrow-1" serif:id="Block Arrow 1" transform="matrix(0.917824,0,0,0.491128,1997.97,1777.52)">
-            <rect x="42334.9" y="4373.65" width="2043.94" height="1441.74" style="fill:none;"/>
+<svg width="100%" height="100%" viewBox="0 0 1867 604" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-40859.7,-3943.81)">
+        <g transform="matrix(0.917824,0,0,0.491128,1997.97,1777.52)">
             <g transform="matrix(1.07119,0.37205,-0.199084,2.00185,2156.25,-24589.1)">
                 <path d="M40338.6,7202.24C40271.9,7169.82 38964.1,7600.37 38964.1,7600.37C38964.1,7600.37 38970.4,7711.54 39008.5,7801.86C39339.1,7699.75 39326.9,7665.11 39841.9,7546.26C40072.5,7493.05 40290.8,7433.83 40329.6,7423.3C40332.7,7434.61 40330.7,7434.74 40363.5,7565.87C40386.5,7540.69 40523.2,7391.27 40727.2,7248.81C40518.6,7185.55 40490.8,7124.63 40340.8,7021.63C40340.1,7078 40338.6,7202.24 40338.6,7202.24Z" style="fill:rgb(70,103,136);"/>
-                <g transform="matrix(0.983164,-0.182724,0.182724,0.983164,38854.2,7246.25)">
-                    <use xlink:href="#_Image1" x="11.735" y="30.814" width="1850px" height="584px"/>
+                <g transform="matrix(0.983164,-0.182724,0.182724,0.983164,38864.2,7263.51)">
+                    <use xlink:href="#_Image1" x="5" y="12" width="1850px" height="584px"/>
                 </g>
             </g>
         </g>
