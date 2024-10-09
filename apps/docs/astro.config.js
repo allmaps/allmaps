@@ -42,7 +42,9 @@ export default defineConfig({
             { label: 'For Historians', link: '/tutorials/for-historians/' },
             { label: 'For Students', link: '/tutorials/for-students/' },
             { label: 'For Developers', link: '/tutorials/for-developers/' },
-            { label: 'For Curators', link: '/tutorials/for-curators/' }
+            { label: 'For Curators', link: '/tutorials/for-curators/' },
+            { label: 'Allmaps IDs', link: '/tutorials/allmaps-ids/' },
+            { label: 'Allmaps Plugin', link: '/tutorials/allmaps-plugin/' }
           ]
         },
         {
