@@ -62,10 +62,6 @@ const DEFAULT_POINT_LAYER_BORDER_COLOR = [...hexToFractionalRgb(white), 1]
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
-// TODO: this can go, we're not using this anymore!
-const TEXTURE_DEPTH_BUFFER_RATIO = 0
-// const TEXTURE_DEPTH_SHRINK_RATIO = 1 / 10
-
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
   mapsProgram: WebGLProgram,
@@ -103,9 +99,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   declare parsedImage: Image
 
   gl: WebGL2RenderingContext
-  mapsProgram: WebGLProgram
-  linesProgram: WebGLProgram
-  pointsProgram: WebGLProgram
+  mapsProgram!: WebGLProgram
+  linesProgram!: WebGLProgram
+  pointsProgram!: WebGLProgram
 
   mapsVao: WebGLVertexArrayObject | null = null
   linesVao: WebGLVertexArrayObject | null = null
@@ -116,7 +112,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
   cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
-  textureTileUrls: string[] = []
+  previousCachedTilesForTexture: CachedTile<ImageBitmap>[] = []
   textureWidth: number = 0
   textureHeight: number = 0
   textureDepth: number = 0
@@ -155,11 +151,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super(mapId, georeferencedMap, options)
 
     this.gl = gl
-    // TODO: could these be removed since set in initializeWebGL()?
-    this.mapsProgram = mapsProgram
-    this.linesProgram = linesProgram
-    this.pointsProgram = pointsProgram
-
     this.initializeWebGL(mapsProgram, linesProgram, pointsProgram)
 
     this.cachedTilesTextureArray = gl.createTexture()
@@ -727,7 +718,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (
       equalArray(
         this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl),
-        this.textureTileUrls
+        this.previousCachedTilesForTexture.map(
+          (textureTile) => textureTile.tileUrl
+        )
       )
     ) {
       return
@@ -735,66 +728,31 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     // Cached tiles texture array
 
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
-    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
-
-    // Check if a new texture should be recreated
-
     const requiredTextureWidth = Math.max(
       ...this.parsedImage.tileZoomLevels.map((size) => size.width)
     )
     const requiredTextureHeigt = Math.max(
       ...this.parsedImage.tileZoomLevels.map((size) => size.height)
     )
-    let requiredTextureDepth = this.cachedTilesForTexture.length
+    const requiredTextureDepth = this.cachedTilesForTexture.length
 
-    // TODO: this can go, we're not using this anymore!
-    const newTexture = true
-    // requiredTextureWidth != this.textureWidth ||
-    // requiredTextureHeigt != this.textureHeight ||
-    // requiredTextureDepth > this.textureDepth ||
-    // requiredTextureDepth <
-    //   Math.floor(this.textureDepth * TEXTURE_DEPTH_SHRINK_RATIO)
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
 
-    if (newTexture) {
-      const textureDepthBuffer = Math.floor(
-        requiredTextureDepth * TEXTURE_DEPTH_BUFFER_RATIO
-      )
-      requiredTextureDepth = requiredTextureDepth + textureDepthBuffer
-      this.textureTileUrls = new Array(requiredTextureDepth)
+    gl.texImage3D(
+      gl.TEXTURE_2D_ARRAY,
+      0,
+      gl.RGBA,
+      requiredTextureWidth,
+      requiredTextureHeigt,
+      requiredTextureDepth,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      null
+    )
 
-      gl.texImage3D(
-        gl.TEXTURE_2D_ARRAY,
-        0,
-        gl.RGBA,
-        requiredTextureWidth,
-        requiredTextureHeigt,
-        requiredTextureDepth,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        null
-      )
-
-      this.textureWidth = requiredTextureWidth
-      this.textureHeight = requiredTextureHeigt
-      this.textureDepth = requiredTextureDepth
-    }
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
-      // TODO: this can go, we're not using this anymore!
-      // If the texture already exists and
-      // this cached tile for the texture is the same as
-      // the tile already in the texture at this location,
-      // then don't draw it again
-      if (
-        !newTexture &&
-        this.cachedTilesForTexture[i].tileUrl == this.textureTileUrls[i]
-      ) {
-        continue
-      }
-
-      this.textureTileUrls[i] = this.cachedTilesForTexture[i].tileUrl
-
       const imageBitmap = this.cachedTilesForTexture[i].data
 
       gl.texSubImage3D(
@@ -932,24 +890,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
     cachedTilesForTextures = [...cachedTilesForTexturesByTileUrl.values()]
 
-    // TODO: this can go, we're not using this anymore!
-    // Reorder tiles to align with previous cachedTilesForTextures
-    // So we can later skip writing tiles that are already in texture
-    for (
-      let i = 0;
-      i < Math.min(this.textureTileUrls.length, cachedTilesForTextures.length);
-      i++
-    ) {
-      const index = cachedTilesForTextures.findIndex(
-        (textureTile) => this.textureTileUrls[i] == textureTile.tileUrl
-      )
-      if (index >= 0) {
-        const movedTextureTile = cachedTilesForTextures[index]
-        cachedTilesForTextures[index] = cachedTilesForTextures[i]
-        cachedTilesForTextures[i] = movedTextureTile
-      }
-    }
-
+    this.previousCachedTilesForTexture = this.cachedTilesForTexture
     this.cachedTilesForTexture = cachedTilesForTextures
 
     return
