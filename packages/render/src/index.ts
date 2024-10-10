@@ -34,9 +34,9 @@ import CacheableImageDataTile, {
 import CacheableIntArrayTile, {
   CachedIntArrayTile
 } from './tilecache/CacheableIntArrayTile.js'
-import CacheableWorkerImageDataTile, {
-  CachedWorkerImageDataTile
-} from './tilecache/CacheableWorkerImageDataTile.js'
+import CacheableWorkerImageBitmapTile, {
+  CachedWorkerImageBitmapTile
+} from './tilecache/CacheableWorkerImageBitmapTile.js'
 import TileCache from './tilecache/TileCache.js'
 
 export {
@@ -49,8 +49,8 @@ export {
   CachedImageDataTile,
   CacheableIntArrayTile,
   CachedIntArrayTile,
-  CacheableWorkerImageDataTile,
-  CachedWorkerImageDataTile
+  CacheableWorkerImageBitmapTile,
+  CachedWorkerImageBitmapTile
 }
 
 import WebGL2Renderer from './renderers/WebGL2Renderer.js'

@@ -114,8 +114,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   lineLayers: LineLayer[] = []
   pointLayers: PointLayer[] = []
 
-  cachedTilesByTileUrl: Map<string, CachedTile<ImageData>> = new Map()
-  cachedTilesForTexture: CachedTile<ImageData>[] = []
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>> = new Map()
+  cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
   textureTileUrls: string[] = []
   textureWidth: number = 0
   textureHeight: number = 0
@@ -128,8 +128,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
-
-  pbo: WebGLBuffer | null
 
   projectedGeoToClipTransform: Transform | undefined
 
@@ -167,8 +165,6 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesTextureArray = gl.createTexture()
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
     this.cachedTilesResourcePositionsAndDimensionsTexture = gl.createTexture()
-
-    this.pbo = gl.createBuffer()
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -228,7 +224,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    *
    * @param {CachedTile} cachedTile
    */
-  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
+  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
@@ -799,40 +795,21 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
       this.textureTileUrls[i] = this.cachedTilesForTexture[i].tileUrl
 
-      const imageData = this.cachedTilesForTexture[i].data
+      const imageBitmap = this.cachedTilesForTexture[i].data
 
-      // Using Pixel Buffer Objects to write to textures asynchonously
-
-      // Bind to the PBO
-      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, this.pbo)
-
-      // Allocate space in the PBO for the texture data
-      gl.bufferData(
-        gl.PIXEL_UNPACK_BUFFER,
-        requiredTextureWidth * requiredTextureHeigt * 4,
-        gl.STREAM_DRAW
-      )
-
-      // Upload data into the PBO
-      gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, 0, imageData.data)
-
-      // Bind the texture and asynchronously copy data from the PBO to the texture
       gl.texSubImage3D(
         gl.TEXTURE_2D_ARRAY,
         0,
         0,
         0,
         i,
-        imageData.width,
-        imageData.height,
+        imageBitmap.width,
+        imageBitmap.height,
         1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        0 // 0 indicates that we are loading from the PBO
+        imageBitmap
       )
-
-      // Unbind the PBO
-      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
     }
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
@@ -948,7 +925,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Making tiles unique by tileUrl
     const cachedTilesForTexturesByTileUrl: Map<
       string,
-      CachedTile<ImageData>
+      CachedTile<ImageBitmap>
     > = new Map()
     cachedTilesForTextures.forEach((cachedTile) =>
       cachedTilesForTexturesByTileUrl.set(cachedTile.tileUrl, cachedTile)
@@ -980,7 +957,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   private getCachedTilesAtOtherScaleFactors(
     tile: Tile
-  ): CachedTile<ImageData>[] {
+  ): CachedTile<ImageBitmap>[] {
     if (this.cachedTilesByTileUrl.size == 0) {
       return []
     }
@@ -1014,7 +991,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return this.parsedImage.getImageUrl(imageRequest)
   }
 
-  private tileToCachedTile(tile: Tile): CachedTile<ImageData> | undefined {
+  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
     return this.cachedTilesByTileUrl.get(this.tileToTileUrl(tile))
   }
 

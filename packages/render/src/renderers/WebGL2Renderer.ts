@@ -4,7 +4,7 @@ import BaseRenderer from './BaseRenderer.js'
 import WebGL2WarpedMap, {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
-import CachedWorkerImageDataTile from '../tilecache/CacheableWorkerImageDataTile.js'
+import CachedImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
 import {
   distance,
   hexToFractionalRgb,
@@ -78,7 +78,7 @@ const ANIMATION_DURATION = 750
  * @extends {BaseRenderer}
  */
 export default class WebGL2Renderer
-  extends BaseRenderer<WebGL2WarpedMap, ImageData>
+  extends BaseRenderer<WebGL2WarpedMap, ImageBitmap>
   implements Renderer
 {
   gl: WebGL2RenderingContext
@@ -164,7 +164,7 @@ export default class WebGL2Renderer
     )
 
     super(
-      CachedWorkerImageDataTile.createFactory(),
+      CachedImageBitmapTile.createFactory(),
       createWebGL2WarpedMapFactory(
         gl,
         mapsProgram,

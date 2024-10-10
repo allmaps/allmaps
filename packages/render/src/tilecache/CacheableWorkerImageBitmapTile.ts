@@ -1,53 +1,44 @@
 import * as Comlink from 'comlink'
 
-import { fetchUrl } from '@allmaps/stdlib'
-
 import FetchableTile from './FetchableTile.js'
 import CacheableTile from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
-import type { BlobToImageDataWorkerType } from '../workers/blob-to-image-data.js'
+import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-image-bitmap.js'
 
 /**
- * Class for tiles that can be cached, and whose data can be processed to an ImageData object using a WebWorker.
+ * Class for tiles that can be cached, and whose data can be processed to its imageBitmap using a WebWorker.
  *
  * @export
- * @class CacheableWorkerImageDataTile
- * @typedef {CacheableWorkerImageDataTile}
+ * @class CacheableWorkerImageBitmapTile
+ * @typedef {CacheableWorkerImageBitmapTile}
  * @extends {CacheableTile}
  */
-export default class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
+export default class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
   /**
-   * Fetch the tile and create its ImageData using a WebWorker.
+   * Fetch the tile and create its ImageBitmap using a WebWorker.
    *
    * @async
    * @returns {Promise<void>}
    */
   async fetch() {
     try {
-      const response = await fetchUrl(
-        this.tileUrl,
-        {
-          signal: this.abortController.signal
-        },
-        this.fetchFn
-      )
-
-      const blob = await response.blob()
-
       // TODO: move fetch to WebWorker too?
 
       // Note: Could this become obsolete in the future
       // once we can pull bytes directly from Blob?
       // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
       const worker = new Worker(
-        new URL('../workers/blob-to-image-data', import.meta.url)
+        new URL('../workers/fetch-and-get-image-bitmap', import.meta.url)
       )
-      const wrappedWorker = Comlink.wrap<BlobToImageDataWorkerType>(worker)
+      const wrappedWorker =
+        Comlink.wrap<FetchAndGetImageBitmapWorkerType>(worker)
       wrappedWorker
-        .getImageData(
-          blob,
+        .getImageBitmap(
+          this.tileUrl,
+          Comlink.proxy(this.abortController.signal),
+          this.fetchFn,
           this.tile.tileZoomLevel.width,
           this.tile.tileZoomLevel.height
         )
@@ -74,18 +65,18 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
 
   static createFactory() {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
-      new CacheableWorkerImageDataTile(fetchableTile, fetchFn)
+      new CacheableWorkerImageBitmapTile(fetchableTile, fetchFn)
   }
 }
 
 /**
- * Class for tiles that is cached, and whose data has been processed to an ImageData object using a WebWorker.
+ * Class for tiles that is cached, and whose data has been processed to an ImageBitmap object using a WebWorker.
  *
  * @export
- * @class CachedWorkerImageDataTile
- * @typedef {CachedWorkerImageDataTile}
- * @extends {CacheableWorkerImageDataTile}
+ * @class CachedWorkerImageBitmapTile
+ * @typedef {CachedWorkerImageBitmapTile}
+ * @extends {CacheableWorkerImageBitmapTile}
  */
-export class CachedWorkerImageDataTile extends CacheableWorkerImageDataTile {
-  declare data: ImageData
+export class CachedWorkerImageBitmapTile extends CacheableWorkerImageBitmapTile {
+  declare data: ImageBitmap
 }

@@ -821,12 +821,12 @@ Creates an instance of WebGL2WarpedMap.
 #### Parameters
 
 *   `e` &#x20;
-*   `r` &#x20;
+*   `o` &#x20;
 *   `c` &#x20;
 *   `a` &#x20;
 *   `T` &#x20;
 *   `s` &#x20;
-*   `o` &#x20;
+*   `r` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `gl` **WebGL2RenderingContext** WebGL rendering context
@@ -916,7 +916,7 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 ### fetch
 
-Fetch the tile and create its ImageData using a WebWorker.
+Fetch the tile and create its ImageBitmap using a WebWorker.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
