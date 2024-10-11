@@ -1,5 +1,5 @@
 import { WarpedMapWithImageInfo } from '../maps/WarpedMap.js'
-import { createKeyFromTile } from '../shared/tiles.js'
+import { fetchableTileKey } from '../shared/tiles.js'
 
 import type { Tile, ImageRequest } from '@allmaps/types'
 
@@ -36,9 +36,9 @@ export default class FetchableTile {
     this.tileUrl = warpedMap.parsedImage.getImageUrl(imageRequest)
   }
 
-  static toKeys(fetchableTiles: FetchableTile[]): Set<string> {
+  static toFetchableTileKeys(fetchableTiles: FetchableTile[]): Set<string> {
     return new Set(
-      fetchableTiles.map((fetchableTile) => createKeyFromTile(fetchableTile))
+      fetchableTiles.map((fetchableTile) => fetchableTileKey(fetchableTile))
     )
   }
 }

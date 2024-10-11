@@ -164,8 +164,8 @@ export default class TileCache<D> extends EventTarget {
    * @param {FetchableTile[]} fetchableTiles
    */
   requestFetchableTiles(fetchableTiles: FetchableTile[]) {
-    const previousKeys = FetchableTile.toKeys(this.fetchableTiles)
-    const keys = FetchableTile.toKeys(fetchableTiles)
+    const previousKeys = FetchableTile.toFetchableTileKeys(this.fetchableTiles)
+    const keys = FetchableTile.toFetchableTileKeys(fetchableTiles)
 
     // If previous and current request are the same, don't do anything
     if (equalSet(previousKeys, keys)) {

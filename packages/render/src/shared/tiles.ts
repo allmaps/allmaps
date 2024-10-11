@@ -435,7 +435,7 @@ export function computeBboxTile(tile: Tile): Bbox {
 // Resolution
 
 export function getTileResolution(tile: Tile): number {
-  return getTileZoomLevelResolution(tile.tileZoomLevel)
+  return tile.tileZoomLevel.width * tile.tileZoomLevel.height
 }
 
 export function getTileZoomLevelResolution(
@@ -448,6 +448,8 @@ export function getTileZoomLevelResolution(
     tileZoomLevel.height
   )
 }
+
+// Search at other scalefactors
 
 export function getTilesAtOtherScaleFactors(
   tile: Tile,
@@ -600,24 +602,47 @@ export function getTilesAtLowerScaleFactor(
   return tilesCoveringTileAtLowerScaleFactor
 }
 
-// TileCache
+// Keys for search
 
 // TODO: consider a way to make this more elegant:
 // - many-to-many data structure
 // - a new compact class with just these two properties and an equality function between elements
 // - new JS tuple - https://github.com/tc39/proposal-record-tuple
-export function createKeyFromMapIdAndTileUrl(
-  mapId: string,
-  tileUrl: string
-): string {
+
+export function fetchableTileKey(fetchableTile: FetchableTile): string {
+  return keyFromMapIdTileUrl(fetchableTile.mapId, fetchableTile.tileUrl)
+}
+
+export function keyFromMapIdTileUrl(mapId: string, tileUrl: string): string {
   return `${mapId}:${tileUrl}`
 }
-export function createKeyFromTile(fetchableTile: FetchableTile): string {
-  return createKeyFromMapIdAndTileUrl(
-    fetchableTile.mapId,
-    fetchableTile.tileUrl
+
+export function tileKey(tile: Tile): string {
+  return keyFromScaleFactorRowColumn(
+    tile.tileZoomLevel.scaleFactor,
+    tile.row,
+    tile.column
   )
 }
+
+export function keyFromScaleFactorRowColumn(
+  scaleFactor: number,
+  row: number,
+  column: number
+): string {
+  return `${scaleFactor}:${row}:${column}`
+}
+
+export function tileUrl(tile: Tile, parsedImage: Image): string {
+  const imageRequest = parsedImage.getIiifTile(
+    tile.tileZoomLevel,
+    tile.column,
+    tile.row
+  )
+  return parsedImage.getImageUrl(imageRequest)
+}
+
+// TileCache
 
 export function isOverviewTile(tile: Tile, pruneInfo: pruneInfo) {
   return (

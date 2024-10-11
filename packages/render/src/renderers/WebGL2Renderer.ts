@@ -724,12 +724,12 @@ export default class WebGL2Renderer
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    this.renderMaps()
-    this.renderLines()
-    this.renderPoints()
+    this.renderMapsInternal()
+    this.renderLinesInternal()
+    this.renderPointsInternal()
   }
 
-  private renderMaps(): void {
+  private renderMapsInternal(): void {
     if (!this.viewport) {
       return
     }
@@ -904,7 +904,7 @@ export default class WebGL2Renderer
     }
   }
 
-  private renderLines(): void {
+  private renderLinesInternal(): void {
     if (!this.viewport) {
       return
     }
@@ -970,7 +970,7 @@ export default class WebGL2Renderer
     }
   }
 
-  private renderPoints(): void {
+  private renderPointsInternal(): void {
     if (!this.viewport) {
       return
     }
