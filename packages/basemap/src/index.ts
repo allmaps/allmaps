@@ -9,19 +9,19 @@ export function basemapStyle(): StyleSpecification {
     version: 8,
     glyphs:
       'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-    sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v3/light',
+    sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
       protomaps: {
         type: 'vector',
         tiles: [
-          'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
+          'https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
         ],
         maxzoom: 14,
         attribution:
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME)
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME, "en")
   }
 }
 
