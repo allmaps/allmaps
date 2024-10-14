@@ -1,6 +1,6 @@
 import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
-import maplibregl from 'maplibre-gl'
+import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
 import { ALLMAPS_THEME_5, TERRAIN_THEME } from './colors'
 
@@ -25,12 +25,12 @@ export function basemapStyle(): StyleSpecification {
   }
 }
 
-export function addTerrain(map: maplibregl.Map) {
+export function addTerrain(map: Map, maplibregl: any) {
   const demSource = new mlcontour.DemSource({
     url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
-  demSource.setupMaplibre(maplibregl)
+  demSource.setupMaplibre(maplibregl);
   map.on('load', () => {
     map.addSource('terrain', {
       type: 'raster-dem',

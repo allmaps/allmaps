@@ -107,7 +107,7 @@
       hash: true
     })
 
-    addTerrain(map)
+    addTerrain(map, maplibregl)
 
     map.on('load', () => {
       map.addSource('masks', {
