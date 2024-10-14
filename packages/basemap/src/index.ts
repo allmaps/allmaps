@@ -2,7 +2,7 @@ import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
 import maplibregl from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
+import { ALLMAPS_THEME_5, TERRAIN_THEME } from './colors'
 
 export function basemapStyle(): StyleSpecification {
   return {
@@ -21,7 +21,7 @@ export function basemapStyle(): StyleSpecification {
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME, "en")
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, "en")
   }
 }
 
@@ -69,9 +69,9 @@ export function addTerrain(map: maplibregl.Map) {
         type: 'hillshade',
         source: 'terrain',
         paint: {
-          'hillshade-exaggeration': 0.6,
+          'hillshade-exaggeration': 0.33,
           'hillshade-shadow-color': TERRAIN_THEME.hillshade_shadow_color,
-          'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
+          // 'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
           'hillshade-accent-color': TERRAIN_THEME.hillshade_accent_color
         }
       },
