@@ -2,26 +2,26 @@ import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
 import maplibregl from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
+import { ALLMAPS_THEME_5, TERRAIN_THEME } from './colors'
 
 export function basemapStyle(): StyleSpecification {
   return {
     version: 8,
     glyphs:
       'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-    sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v3/light',
+    sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
       protomaps: {
         type: 'vector',
         tiles: [
-          'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
+          'https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
         ],
         maxzoom: 14,
         attribution:
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME)
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, "en")
   }
 }
 
@@ -69,9 +69,9 @@ export function addTerrain(map: maplibregl.Map) {
         type: 'hillshade',
         source: 'terrain',
         paint: {
-          'hillshade-exaggeration': 0.6,
+          'hillshade-exaggeration': 0.33,
           'hillshade-shadow-color': TERRAIN_THEME.hillshade_shadow_color,
-          'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
+          // 'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
           'hillshade-accent-color': TERRAIN_THEME.hillshade_accent_color
         }
       },
