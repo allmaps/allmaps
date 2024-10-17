@@ -110,6 +110,7 @@ export function createWarpedMapFactory() {
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
  * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {TileZoomLevel} [currentTileZoomLevel] - The tile zoom level, at the current viewport
  * @param {TileZoomLevel} [currentOverviewTileZoomLevel] - The overview tile zoom level, at the current viewport
  * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
  * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
@@ -182,6 +183,7 @@ export default class WarpedMap extends EventTarget {
   // The properties below are for the current viewport
 
   currentBestScaleFactor!: number
+  currentTileZoomLevel?: TileZoomLevel
   currentOverviewTileZoomLevel?: TileZoomLevel
 
   currentResourceViewportRing: Ring = []
@@ -363,36 +365,6 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set resourceViewportRing at current viewport
-   *
-   * @param {Ring} resourceViewportRing
-   */
-  setCurrentResourceViewportRing(resourceViewportRing: Ring): void {
-    this.currentResourceViewportRing = resourceViewportRing
-    this.currentResourceViewportRingBbox = computeBbox(resourceViewportRing)
-  }
-
-  /**
-   * Set tiles at current viewport
-   *
-   * @param {FetchableTile[]} fetchableTiles
-   */
-  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]): void {
-    this.currentFetchableTiles = fetchableTiles
-  }
-
-  /**
-   * Set overview tiles at current viewport
-   *
-   * @param {FetchableTile[]} overviewFetchableTiles
-   */
-  setCurrentOverviewFetchableTiles(
-    overviewFetchableTiles: FetchableTile[]
-  ): void {
-    this.currentOverviewFetchableTiles = overviewFetchableTiles
-  }
-
-  /**
    * Update the resourceMask loaded from a georeferenced map to a new mask.
    *
    * @param {Ring} resourceMask
@@ -435,6 +407,9 @@ export default class WarpedMap extends EventTarget {
     this.updateTransformerProperties(false)
   }
 
+  // TODO: connect/merge setCurrentBestScaleFactor and setCurrentTileZoomLevel
+  // Once triangulation will not be updated directly after setting best scale factor
+  // TODO: change 'current best' to 'current' scale factor
   /**
    * Set the bestScaleFactor for the current viewport
    *
@@ -450,13 +425,51 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Set the tile zoom level for the current viewport
+   *
+   * @param {number} [tileZoomLevel] - tile zoom level
+   */
+  setCurrentTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
+    this.currentTileZoomLevel = tileZoomLevel
+  }
+
+  /**
    * Set the overview tile zoom level for the current viewport
    *
-   * @param {TileZoomLevel} tileZoomLevel - tile zoom level
-   * @returns {boolean}
+   * @param {TileZoomLevel} [tileZoomLevel] - tile zoom level
    */
   setCurrentOverviewTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
     this.currentOverviewTileZoomLevel = tileZoomLevel
+  }
+
+  /**
+   * Set resourceViewportRing at current viewport
+   *
+   * @param {Ring} resourceViewportRing
+   */
+  setCurrentResourceViewportRing(resourceViewportRing: Ring): void {
+    this.currentResourceViewportRing = resourceViewportRing
+    this.currentResourceViewportRingBbox = computeBbox(resourceViewportRing)
+  }
+
+  /**
+   * Set tiles at current viewport
+   *
+   * @param {FetchableTile[]} fetchableTiles
+   */
+  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]): void {
+    this.currentFetchableTiles = fetchableTiles
+  }
+
+  /**
+   * Set overview tiles at current viewport
+   *
+   * @param {FetchableTile[]} overviewFetchableTiles
+   */
+  setCurrentOverviewFetchableTiles(
+    overviewFetchableTiles: FetchableTile[]
+  ): void {
+    this.currentOverviewFetchableTiles = overviewFetchableTiles
   }
 
   /**

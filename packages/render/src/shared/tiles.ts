@@ -89,25 +89,6 @@ export function getBestTileZoomLevelForScale(
   return bestTileZoomLevel
 }
 
-export function getOverviewTileZoomLevel(
-  tileZoomLevels: TileZoomLevel[],
-  bestScaleFactor: number,
-  maxResolution: number,
-  manyMap: boolean
-): TileZoomLevel | undefined {
-  const overviewTileZoomLevels = tileZoomLevels
-    .filter((tileZoomLevel) => tileZoomLevel.scaleFactor > bestScaleFactor)
-    .filter(
-      (tileZoomLevel) =>
-        getTileZoomLevelResolution(tileZoomLevel) <= maxResolution
-    )
-    .sort(
-      (tileZoomLevel0, tileZoomLevel1) =>
-        tileZoomLevel1.scaleFactor - tileZoomLevel0.scaleFactor
-    )
-  return manyMap ? overviewTileZoomLevels.at(1) : overviewTileZoomLevels.at(-1)
-}
-
 // Making tiles
 
 export function computeTilesCoveringRingAtTileZoomLevel(
@@ -438,6 +419,20 @@ export function getTileResolution(tile: Tile): number {
   return tile.tileZoomLevel.width * tile.tileZoomLevel.height
 }
 
+export function getTileOriginalResolution(tile: Tile): number {
+  return tile.tileZoomLevel.originalWidth * tile.tileZoomLevel.originalHeight
+}
+
+export function getTilesResolution(tiles: Tile[]): number {
+  return tiles.map((tile) => getTileResolution(tile)).reduce((a, c) => a + c, 0)
+}
+
+export function getTilesOriginalResolution(tiles: Tile[]): number {
+  return tiles
+    .map((tile) => getTileOriginalResolution(tile))
+    .reduce((a, c) => a + c, 0)
+}
+
 export function getTileZoomLevelResolution(
   tileZoomLevel: TileZoomLevel
 ): number {
@@ -446,6 +441,17 @@ export function getTileZoomLevelResolution(
     tileZoomLevel.width *
     tileZoomLevel.columns *
     tileZoomLevel.height
+  )
+}
+
+export function getTileZoomLevelOriginalResolution(
+  tileZoomLevel: TileZoomLevel
+): number {
+  return (
+    tileZoomLevel.rows *
+    tileZoomLevel.originalWidth *
+    tileZoomLevel.columns *
+    tileZoomLevel.originalHeight
   )
 }
 
@@ -661,14 +667,14 @@ export function shouldPruneTile(
 ) {
   // Example:
   // Available scaleFactors in tileZoomLevels:
-  // 1 (full resolution), 2, 4, 8, 16 (zoomed out)
+  // 1 (full original resolution), 2, 4, 8, 16 (zoomed out)
   //
   // Tile scale factor: 16, so log2 tile scale factor: 4
   // Best scale factor: 8, so log2 best scale factor: 3
   // Difference: 4 - 3 = 1, check if not more then max
-  // This is positive if tile scale factor is higher then best scale factor, so tiles are lower resolution
+  // This is positive if tile scale factor is higher then best scale factor, so tiles are lower original resolution
   //
-  // Since there are less lower resolution tiles,
+  // Since there are less lower original resolution tiles,
   // MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF can be higher then MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
 
   if (keepOverview && isOverviewTile(tile, mapPruneInfo)) {
