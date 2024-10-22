@@ -4,11 +4,11 @@ import BaseRenderer from './BaseRenderer.js'
 import WebGL2WarpedMap, {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
-import CacheableImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
+import CachedImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
 import {
-  distance,
   hexToFractionalRgb,
-  maxOfNumberOrUndefined
+  maxOfNumberOrUndefined,
+  squaredDistance
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
 import { red, green, darkblue, yellow, black } from '@allmaps/tailwind'
@@ -48,8 +48,8 @@ import type {
   WebGL2RendererOptions
 } from '../shared/types.js'
 
-const THROTTLE_PREPARE_WAIT_MS = 200
-const THROTTLE_PREPARE_OPTIONS = {
+const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
+const THROTTLE_PREPARE_RENDER_OPTIONS = {
   leading: true,
   trailing: true
 }
@@ -164,7 +164,7 @@ export default class WebGL2Renderer
     )
 
     super(
-      CacheableImageBitmapTile.createFactory(),
+      CachedImageBitmapTile.createFactory(),
       createWebGL2WarpedMapFactory(
         gl,
         mapsProgram,
@@ -197,8 +197,8 @@ export default class WebGL2Renderer
 
     this.throttledPrepareRenderInternal = throttle(
       this.prepareRenderInternal.bind(this),
-      THROTTLE_PREPARE_WAIT_MS,
-      THROTTLE_PREPARE_OPTIONS
+      THROTTLE_PREPARE_RENDER_WAIT_MS,
+      THROTTLE_PREPARE_RENDER_OPTIONS
     )
 
     this.throttledChanged = throttle(
@@ -620,6 +620,7 @@ export default class WebGL2Renderer
   clear() {
     this.warpedMapList.clear()
     this.mapsInViewport = new Set()
+    this.mapsWithRequestedTilesForViewport = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
@@ -646,11 +647,11 @@ export default class WebGL2Renderer
   }
 
   private prepareRenderInternal(): void {
-    this.updateRequestedTiles()
+    this.requestFetchableTiles()
     this.updateVertexBuffers()
   }
 
-  protected shouldUpdateRequestedTiles(): boolean {
+  protected shouldRequestFetchableTiles(): boolean {
     // Returns whether requested tiles should be updated
 
     // Returns true when the viewport moved significantly
@@ -673,26 +674,31 @@ export default class WebGL2Renderer
       this.previousSignificantViewport = this.viewport
       return true
     } else {
-      const rectangleDistances = []
+      const rectangleSquaredDistances = []
       for (let i = 0; i < 4; i++) {
-        rectangleDistances.push(
-          distance(
+        rectangleSquaredDistances.push(
+          squaredDistance(
             this.previousSignificantViewport.projectedGeoRectangle[i],
             this.viewport.projectedGeoRectangle[i]
-          ) / this.viewport.projectedGeoPerViewportScale
+          ) / Math.pow(this.viewport.projectedGeoPerViewportScale, 2)
         )
       }
-      const dist = Math.max(...rectangleDistances)
-      if (dist === 0) {
+      const maxSquaredDistance = Math.max(...rectangleSquaredDistances)
+      if (maxSquaredDistance === 0) {
         return true
       }
-      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
+      if (maxSquaredDistance > Math.pow(SIGNIFICANT_VIEWPORT_DISTANCE, 2)) {
         this.previousSignificantViewport = this.viewport
         return true
       } else {
         return false
       }
     }
+  }
+
+  protected shouldAnticipateInteraction() {
+    // Get a map's overview tiles only for this render
+    return true
   }
 
   private updateVertexBuffers() {
@@ -704,7 +710,7 @@ export default class WebGL2Renderer
       this.viewport.projectedGeoToClipTransform
     )
 
-    for (const mapId of this.possibleMapsInViewport) {
+    for (const mapId of this.mapsWithRequestedTilesForViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (!warpedMap) {
         break
@@ -724,12 +730,12 @@ export default class WebGL2Renderer
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    this.renderMaps()
-    this.renderLines()
-    this.renderPoints()
+    this.renderMapsInternal()
+    this.renderLinesInternal()
+    this.renderPointsInternal()
   }
 
-  private renderMaps(): void {
+  private renderMapsInternal(): void {
     if (!this.viewport) {
       return
     }
@@ -813,7 +819,7 @@ export default class WebGL2Renderer
     const colorGrid = gl.getUniformLocation(program, 'u_colorGrid')
     gl.uniform4f(colorGrid, ...hexToFractionalRgb(black), 1)
 
-    for (const mapId of this.mapsInViewport) {
+    for (const mapId of this.mapsWithRequestedTilesForViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
@@ -904,7 +910,7 @@ export default class WebGL2Renderer
     }
   }
 
-  private renderLines(): void {
+  private renderLinesInternal(): void {
     if (!this.viewport) {
       return
     }
@@ -944,7 +950,7 @@ export default class WebGL2Renderer
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
-    for (const mapId of this.mapsInViewport) {
+    for (const mapId of this.mapsWithRequestedTilesForViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
@@ -970,7 +976,7 @@ export default class WebGL2Renderer
     }
   }
 
-  private renderPoints(): void {
+  private renderPointsInternal(): void {
     if (!this.viewport) {
       return
     }
@@ -979,8 +985,6 @@ export default class WebGL2Renderer
     const program = this.pointsProgram
 
     // Render Points
-    // TODO: place in separate function
-    // So 'pointsProgramRenderTransformLocation' can be renamed 'RenderTransformLocation'
 
     gl.useProgram(program)
 
@@ -1014,7 +1018,7 @@ export default class WebGL2Renderer
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
-    for (const mapId of this.mapsInViewport) {
+    for (const mapId of this.mapsWithRequestedTilesForViewport) {
       const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!warpedMap) {
@@ -1179,7 +1183,7 @@ export default class WebGL2Renderer
     }
   }
 
-  protected clearMapTextures(mapId: string) {
+  protected clearMap(mapId: string) {
     const webGL2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
     if (webGL2WarpedMap) {
       webGL2WarpedMap.clearTextures()

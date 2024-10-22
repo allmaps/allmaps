@@ -52,7 +52,7 @@ export default class IntArrayRenderer<D>
 
     await Promise.allSettled(this.loadMissingImageInfosInViewport())
 
-    this.updateRequestedTiles()
+    this.requestFetchableTiles()
     await this.tileCache.allRequestedTilesLoaded()
 
     const intArray = new Uint8ClampedArray(

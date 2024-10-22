@@ -3,7 +3,7 @@ import { equalSet } from '@allmaps/stdlib'
 import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import { isOverviewTile, shouldPruneTile } from '../shared/tiles.js'
+import { shouldPruneTile } from '../shared/tiles.js'
 import FetchableTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -11,14 +11,11 @@ import type { FetchFn } from '@allmaps/types'
 import type {
   CachableTileFactory,
   TileCacheOptions,
-  PruneInfoByMapId
+  MapPruneInfo
 } from '../shared/types.js'
 
-const PRUNE_MANY_MAPS = 50 // For this amount of maps, prune more tiles
-
-const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
+const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 4
 const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
-const PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO = 1
 
 /**
  * Class that fetches and caches IIIF tiles.
@@ -38,7 +35,7 @@ export default class TileCache<D> extends EventTarget {
 
   protected tilesFetchingCount = 0
 
-  protected previousRequestedTiles: FetchableTile[] = []
+  protected fetchableTiles: FetchableTile[] = []
 
   constructor(
     cachableTileFactory: CachableTileFactory<D>,
@@ -48,6 +45,15 @@ export default class TileCache<D> extends EventTarget {
 
     this.cachableTileFactory = cachableTileFactory
     this.fetchFn = options?.fetchFn
+  }
+
+  /**
+   * Get the tiles in this cache
+   *
+   * @returns {IterableIterator<CacheableTile>}
+   */
+  getCacheableTiles(): IterableIterator<CacheableTile<D>> {
+    return this.tilesByTileUrl.values()
   }
 
   /**
@@ -61,25 +67,21 @@ export default class TileCache<D> extends EventTarget {
   }
 
   /**
-   * Get a specific cached tile in this cache that has been fetched
+   * Get the tiles in this cache, corresponding to a specific map
    *
-   * @param {string} tileUrl - the URL of the requested tile
-   * @returns {(CachedTile | undefined)}
+   * @param {string} mapId - ID of the map
+   * @returns {CacheableTile[]}
    */
-  getCachedTile(tileUrl: string): CachedTile<D> | undefined {
-    const cacheableTile = this.tilesByTileUrl.get(tileUrl)
-    if (cacheableTile && cacheableTile.isCachedTile()) {
-      return cacheableTile as CachedTile<D>
-    }
-  }
+  getMapCacheableTiles(mapId: string): CacheableTile<D>[] {
+    const cacheableTiles: CacheableTile<D>[] = []
 
-  /**
-   * Get the tiles in this cache
-   *
-   * @returns {IterableIterator<CacheableTile>}
-   */
-  getCacheableTiles(): IterableIterator<CacheableTile<D>> {
-    return this.tilesByTileUrl.values()
+    for (const cacheableTile of this.tilesByTileUrl.values()) {
+      if (this.tileUrlsByMapId.get(mapId)?.has(cacheableTile.tileUrl)) {
+        cacheableTiles.push(cacheableTile)
+      }
+    }
+
+    return cacheableTiles
   }
 
   /**
@@ -99,7 +101,26 @@ export default class TileCache<D> extends EventTarget {
     return cachedTiles
   }
 
-  getCachedTilesForMapId(mapId: string): CachedTile<D>[] {
+  /**
+   * Get a specific cached tile in this cache that has been fetched
+   *
+   * @param {string} tileUrl - the URL of the requested tile
+   * @returns {(CachedTile | undefined)}
+   */
+  getCachedTile(tileUrl: string): CachedTile<D> | undefined {
+    const cacheableTile = this.tilesByTileUrl.get(tileUrl)
+    if (cacheableTile && cacheableTile.isCachedTile()) {
+      return cacheableTile as CachedTile<D>
+    }
+  }
+
+  /**
+   * Get the tiles in this cache, corresponding to a specific map, that have been fetched
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {CachedTile[]}
+   */
+  getMapCachedTiles(mapId: string): CachedTile<D>[] {
     const cachedTiles: CachedTile<D>[] = []
 
     for (const cacheableTile of this.tilesByTileUrl.values()) {
@@ -115,7 +136,7 @@ export default class TileCache<D> extends EventTarget {
   }
 
   /**
-   * Get the URLs of all tiles in this cache
+   * Get the URLs of tiles in this cache
    *
    * @returns {IterableIterator<string>}
    */
@@ -123,29 +144,43 @@ export default class TileCache<D> extends EventTarget {
     return this.tilesByTileUrl.keys()
   }
 
+  /**
+   * Get the URLs of tiles in this cache, corresponding to a specific map
+   *
+   * @param {string} mapId - ID of the map
+   * @returns {IterableIterator<string>}
+   */
+  getMapTileUrls(mapId: string) {
+    return this.tileUrlsByMapId.get(mapId) || new Set()
+  }
+
   // TODO: this function needs a new name!
   /**
    * Process the request for new tiles to be added to this cache
    *
-   * @param {FetchableTile[]} tiles
+   * @param {FetchableTile[]} fetchableTiles
    */
-  requestFetchableTiles(tiles: FetchableTile[]) {
-    const previousTilesKeys = FetchableTile.toKeys(this.previousRequestedTiles)
-    const requestedTilesKeys = FetchableTile.toKeys(tiles)
+  requestFetchableTiles(fetchableTiles: FetchableTile[]) {
+    const previousKeys = new Set(
+      this.fetchableTiles.map((fetchableTile) => fetchableTile.fetchableTileKey)
+    )
+    const keys = new Set(
+      fetchableTiles.map((fetchableTile) => fetchableTile.fetchableTileKey)
+    )
 
-    // If previous requested tiles is the same as current requested tiles, don't do anything
-    if (equalSet(previousTilesKeys, requestedTilesKeys)) {
+    // If previous and current request are the same, don't do anything
+    // TODO: replace with Set equality once supported
+    if (equalSet(previousKeys, keys)) {
       return
     }
 
-    // Loop over all requested tiles, and add them (also do this if the cache already contains them,
-    // so as to trigger the loading events in addMapTile() which will trigger a rerender etc.)
-    for (const requestedTile of tiles) {
-      this.addMapTile(requestedTile)
+    // Loop over all tiles, and add them (also do this if the cache already contains them,
+    // so as to trigger the loading events which will trigger a rerender etc.)
+    for (const fetchableTile of fetchableTiles) {
+      this.requestFetchableTile(fetchableTile)
     }
 
-    // Update previous requested tiles
-    this.previousRequestedTiles = tiles
+    this.fetchableTiles = fetchableTiles
   }
 
   /**
@@ -176,51 +211,38 @@ export default class TileCache<D> extends EventTarget {
     })
   }
 
-  prune(pruneInfoByMapId: PruneInfoByMapId) {
-    const mapIdsWithOverviewKept = new Set()
+  /**
+   * Prune tiles in this cache using the provided prune info
+   */
+  prune(pruneInfoByMapId: Map<string, MapPruneInfo>) {
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
         const pruneInfo = pruneInfoByMapId.get(mapId)
         const tile = this.tilesByTileUrl.get(tileUrl)?.tile
 
         if (tile) {
-          const keepMapOverview = mapIdsWithOverviewKept.size < PRUNE_MANY_MAPS
+          // Prune for each mapId that doesn't have pruneInfo
+          // Or for which it should be pruned
           if (
             !pruneInfo ||
-            shouldPruneTile(
-              tile,
-              pruneInfo,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
-                : 0,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-                : 0,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
-                : 0,
-              keepMapOverview
-            )
+            shouldPruneTile(tile, pruneInfo, {
+              maxHigherLog2ScaleFactorDiff:
+                PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+              maxLowerLog2ScaleFactorDiff:
+                PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+            })
           ) {
-            this.removeMapTile(mapId, tileUrl)
-          } else {
-            if (keepMapOverview && isOverviewTile(tile, pruneInfo)) {
-              mapIdsWithOverviewKept.add(mapId)
-            }
+            this.removeCacheableTileForMapId(tileUrl, mapId)
           }
         }
       }
     }
   }
 
-  getTileUrlsForMapId(mapId: string) {
-    return this.tileUrlsByMapId.get(mapId) || new Set()
-  }
-
   clear() {
     for (const cacheableTile of this.getCacheableTiles()) {
       cacheableTile.abort()
-      this.removeEventListenersFromTile(cacheableTile)
+      this.removeEventListenersFromCacheableTile(cacheableTile)
     }
 
     this.tilesByTileUrl = new Map()
@@ -233,7 +255,7 @@ export default class TileCache<D> extends EventTarget {
     this.clear()
   }
 
-  private addMapTile(fetchableTile: FetchableTile) {
+  private requestFetchableTile(fetchableTile: FetchableTile) {
     const mapId = fetchableTile.mapId
     const tileUrl = fetchableTile.tileUrl
 
@@ -242,29 +264,35 @@ export default class TileCache<D> extends EventTarget {
         fetchableTile,
         this.fetchFn
       )
+      this.addEventListenersToCacheableTile(cacheableTile)
 
-      this.addEventListenersToTile(cacheableTile)
-
-      this.tilesByTileUrl.set(tileUrl, cacheableTile)
-      this.updateTilesFetchingCount(1)
-
-      // This is an async function that we are not awaiting to continue
-      // The results are handled inside the tile using events
-      cacheableTile.fetch()
+      this.addCacheableTile(cacheableTile)
     } else {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
-          mapId,
-          tileUrl
-        })
-      )
+      const cachedTile = this.tilesByTileUrl.get(tileUrl)
+      if (cachedTile?.isCachedTile()) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
+            mapId,
+            tileUrl
+          })
+        )
+      }
     }
 
-    this.addTileUrlForMapId(mapId, tileUrl)
+    this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
   }
 
-  private removeMapTile(mapId: string, tileUrl: string) {
+  private addCacheableTile(cacheableTile: CacheableTile<D>) {
+    this.tilesByTileUrl.set(cacheableTile.tileUrl, cacheableTile)
+
+    // This is an async function that we are not awaiting to continue
+    // The results are handled inside the tile using events
+    cacheableTile.fetch()
+    this.updateTilesFetchingCount(1)
+  }
+
+  private removeCacheableTileForMapId(tileUrl: string, mapId: string) {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
 
     if (!cacheableTile) {
@@ -272,7 +300,7 @@ export default class TileCache<D> extends EventTarget {
     }
 
     const mapIds = this.removeMapIdForTileUrl(mapId, tileUrl)
-    this.removeTileUrlForMapId(mapId, tileUrl)
+    this.removeTileUrlForMapId(tileUrl, mapId)
 
     // If there are no other maps for this tile and it's still fetching,
     // abort the fetch and delete the tile from the cache.
@@ -365,7 +393,7 @@ export default class TileCache<D> extends EventTarget {
     return mapIds
   }
 
-  private addTileUrlForMapId(mapId: string, tileUrl: string) {
+  private addTileUrlForMapId(tileUrl: string, mapId: string) {
     let tileUrls = this.tileUrlsByMapId.get(mapId)
 
     if (!tileUrls) {
@@ -379,7 +407,7 @@ export default class TileCache<D> extends EventTarget {
     return tileUrls
   }
 
-  private removeTileUrlForMapId(mapId: string, tileUrl: string) {
+  private removeTileUrlForMapId(tileUrl: string, mapId: string) {
     const tileUrls = this.tileUrlsByMapId.get(mapId)
 
     if (!tileUrls) {
@@ -411,7 +439,7 @@ export default class TileCache<D> extends EventTarget {
     }
   }
 
-  private addEventListenersToTile(cacheableTile: CacheableTile<D>) {
+  private addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)
@@ -422,7 +450,9 @@ export default class TileCache<D> extends EventTarget {
     )
   }
 
-  private removeEventListenersFromTile(cacheableTile: CacheableTile<D>) {
+  private removeEventListenersFromCacheableTile(
+    cacheableTile: CacheableTile<D>
+  ) {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)

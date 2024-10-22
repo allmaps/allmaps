@@ -1157,6 +1157,9 @@ importers:
       '@turf/boolean-point-in-polygon':
         specifier: ^6.5.0
         version: 6.5.0
+      comlink:
+        specifier: ^4.4.1
+        version: 4.4.1
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21

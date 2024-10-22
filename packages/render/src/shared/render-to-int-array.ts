@@ -46,7 +46,7 @@ export async function renderToIntArray<W extends WarpedMap, D>(
   for (const warpedMap of warpedMapList.getWarpedMaps()) {
     // TODO: viewport.projectedGeoRectangleBbox not in warpedMap.projectedGeoBbox, continue
 
-    const cachedTiles = tileCache.getCachedTilesForMapId(warpedMap.mapId)
+    const cachedTiles = tileCache.getMapCachedTiles(warpedMap.mapId)
 
     // Step through all viewport pixels and set their color
     // Note: naming variables 'Pixel' instead of 'Point' when we are sure they are integer coordinate values

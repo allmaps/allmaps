@@ -11,7 +11,8 @@ import type {
   ImageInformations,
   Color,
   ColorWithTransparancy,
-  Bbox
+  Bbox,
+  TileZoomLevel
 } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
@@ -113,10 +114,13 @@ export type PointLayer = {
   borderColor?: ColorWithTransparancy
 }
 
-export type pruneInfo = {
-  bestScaleFactor: number
-  overviewScaleFactor: number | undefined
-  resourceViewportRingBbox: Bbox
+export type MapPruneInfo = {
+  currentTileZoomLevel?: TileZoomLevel
+  currentOverviewTileZoomLevel?: TileZoomLevel
+  currentResourceViewportRingBbox?: Bbox
 }
 
-export type PruneInfoByMapId = Map<string, pruneInfo>
+export type MapPruneConstants = {
+  maxHigherLog2ScaleFactorDiff: number
+  maxLowerLog2ScaleFactorDiff: number
+}

@@ -4,6 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
     "outDir": "./dist",
+    "module": "es2022",
     "types": ["vite-plugin-glsl/ext"],
     "paths": {}
   },

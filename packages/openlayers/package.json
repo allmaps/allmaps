@@ -15,14 +15,14 @@
   ],
   "description": "OpenLayers classes for Allmaps",
   "type": "module",
-  "main": "./dist/bundled/allmaps-openlayers-8.umd.js",
-  "module": "./dist/bundled/allmaps-openlayers-8.es.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/bundled/allmaps-openlayers-8.umd.js",
-      "import": "./dist/bundled/allmaps-openlayers-8.es.js"
+      "import": "./dist/index.js",
+      "require": "./dist/bundles/allmaps-openlayers-8.umd.cjs"
     }
   },
   "files": [

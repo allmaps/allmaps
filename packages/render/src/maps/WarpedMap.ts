@@ -1,6 +1,6 @@
 import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
-import { Image as IIIFImage } from '@allmaps/iiif-parser'
+import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
 import {
   computeBbox,
@@ -86,7 +86,7 @@ export function createWarpedMapFactory() {
  * @param {Bbox} resourceFullMaskBbox - Bbox of the resource full mask
  * @param {Rectangle} resourceFullMaskRectangle - Rectangle of the resource full mask bbox
  * @param {string} [imageId] - ID of the image
- * @param {IIIFImage} [parsedImage] - ID of the image
+ * @param {Image} [parsedImage] - ID of the image
  * @param {boolean} visible - Whether the map is visible
  * @param {TransformationType} transformationType - Transformation type used in the transfomer
  * @param {GcpTransformer} transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
@@ -110,8 +110,9 @@ export function createWarpedMapFactory() {
  * @param {number} resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param {DistortionMeasure} [distortionMeasure] - Distortion measure displayed for this map
  * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
+ * @param {TileZoomLevel} [currentTileZoomLevel] - The tile zoom level, at the current viewport
  * @param {TileZoomLevel} [currentOverviewTileZoomLevel] - The overview tile zoom level, at the current viewport
- * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
+ * @param {Ring} currentResourceViewportRing - The (buffered) viewport transformed back to resource coordinates
  * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Tile[]} currentFetchableTiles - The fetchable tiles for displaying this map, at the current viewport
  * @param {Tile[]} currentOverviewFetchableTiles - The overview fetchable tiles, at the current viewport
@@ -138,7 +139,7 @@ export default class WarpedMap extends EventTarget {
 
   imageInformations?: ImageInformations
   imageId?: string
-  parsedImage?: IIIFImage
+  parsedImage?: Image
   loadingImageInfo: boolean
 
   fetchFn?: FetchFn
@@ -182,10 +183,11 @@ export default class WarpedMap extends EventTarget {
   // The properties below are for the current viewport
 
   currentBestScaleFactor!: number
+  currentTileZoomLevel?: TileZoomLevel
   currentOverviewTileZoomLevel?: TileZoomLevel
 
-  currentResourceViewportRing: Ring = []
-  currentResourceViewportRingBbox!: Bbox
+  currentResourceViewportRing?: Ring = []
+  currentResourceViewportRingBbox?: Bbox
 
   currentFetchableTiles: FetchableTile[] = []
   currentOverviewFetchableTiles: FetchableTile[] = []
@@ -363,36 +365,6 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set resourceViewportRing at current viewport
-   *
-   * @param {Ring} resourceViewportRing
-   */
-  setCurrentResourceViewportRing(resourceViewportRing: Ring): void {
-    this.currentResourceViewportRing = resourceViewportRing
-    this.currentResourceViewportRingBbox = computeBbox(resourceViewportRing)
-  }
-
-  /**
-   * Set tiles at current viewport
-   *
-   * @param {FetchableTile[]} fetchableTiles
-   */
-  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]): void {
-    this.currentFetchableTiles = fetchableTiles
-  }
-
-  /**
-   * Set overview tiles at current viewport
-   *
-   * @param {FetchableTile[]} overviewFetchableTiles
-   */
-  setCurrentOverviewFetchableTiles(
-    overviewFetchableTiles: FetchableTile[]
-  ): void {
-    this.currentOverviewFetchableTiles = overviewFetchableTiles
-  }
-
-  /**
    * Update the resourceMask loaded from a georeferenced map to a new mask.
    *
    * @param {Ring} resourceMask
@@ -435,6 +407,10 @@ export default class WarpedMap extends EventTarget {
     this.updateTransformerProperties(false)
   }
 
+  // TODO: connect/merge setCurrentBestScaleFactor and setCurrentTileZoomLevel
+  // Once triangulation will not be updated directly after setting best scale factor
+  // This also includes allowing undefined
+  // TODO: change 'current best' to 'current' scale factor
   /**
    * Set the bestScaleFactor for the current viewport
    *
@@ -450,22 +426,62 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Set the tile zoom level for the current viewport
+   *
+   * @param {number} [tileZoomLevel] - tile zoom level
+   */
+  setCurrentTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
+    this.currentTileZoomLevel = tileZoomLevel
+  }
+
+  /**
    * Set the overview tile zoom level for the current viewport
    *
-   * @param {TileZoomLevel} tileZoomLevel - tile zoom level
-   * @returns {boolean}
+   * @param {TileZoomLevel} [tileZoomLevel] - tile zoom level
    */
   setCurrentOverviewTileZoomLevel(tileZoomLevel?: TileZoomLevel) {
     this.currentOverviewTileZoomLevel = tileZoomLevel
   }
 
   /**
-   * Check if warpedMap has image info
+   * Set resourceViewportRing at current viewport
    *
-   * @returns {this is WarpedMapWithImageInfo}
+   * @param {Ring} [resourceViewportRing]
    */
-  hasImageInfo(): this is WarpedMapWithImageInfo {
-    return this.imageId !== undefined && this.parsedImage !== undefined
+  setCurrentResourceViewportRing(resourceViewportRing?: Ring) {
+    this.currentResourceViewportRing = resourceViewportRing
+    this.currentResourceViewportRingBbox = resourceViewportRing
+      ? computeBbox(resourceViewportRing)
+      : undefined
+  }
+
+  /**
+   * Set tiles at current viewport
+   *
+   * @param {FetchableTile[]} fetchableTiles
+   */
+  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]) {
+    this.currentFetchableTiles = fetchableTiles
+  }
+
+  /**
+   * Set overview tiles at current viewport
+   *
+   * @param {FetchableTile[]} overviewFetchableTiles
+   */
+  setCurrentOverviewFetchableTiles(overviewFetchableTiles: FetchableTile[]) {
+    this.currentOverviewFetchableTiles = overviewFetchableTiles
+  }
+
+  /**
+   * Reset current values
+   */
+  resetCurrent() {
+    this.setCurrentTileZoomLevel()
+    this.setCurrentOverviewTileZoomLevel()
+    this.setCurrentResourceViewportRing()
+    this.setCurrentFetchableTiles([])
+    this.setCurrentOverviewFetchableTiles([])
   }
 
   /**
@@ -502,6 +518,15 @@ export default class WarpedMap extends EventTarget {
   }
 
   /**
+   * Check if warpedMap has image info
+   *
+   * @returns {this is WarpedMapWithImageInfo}
+   */
+  hasImageInfo(): this is WarpedMapWithImageInfo {
+    return this.imageId !== undefined && this.parsedImage !== undefined
+  }
+
+  /**
    * Fetch and parse the image info, and generate the image ID
    *
    * @async
@@ -525,7 +550,7 @@ export default class WarpedMap extends EventTarget {
         this.imageInformations?.set(imageUri, imageInfo)
       }
 
-      this.parsedImage = IIIFImage.parse(imageInfo)
+      this.parsedImage = Image.parse(imageInfo)
       this.imageId = await generateId(imageUri)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
@@ -702,7 +727,7 @@ export default class WarpedMap extends EventTarget {
  */
 export class WarpedMapWithImageInfo extends WarpedMap {
   declare imageId: string
-  declare parsedImage: IIIFImage
+  declare parsedImage: Image
 
   constructor(
     mapId: string,
