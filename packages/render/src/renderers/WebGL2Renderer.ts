@@ -6,9 +6,9 @@ import WebGL2WarpedMap, {
 } from '../maps/WebGL2WarpedMap.js'
 import CachedImageBitmapTile from '../tilecache/CacheableImageBitmapTile.js'
 import {
-  distance,
   hexToFractionalRgb,
-  maxOfNumberOrUndefined
+  maxOfNumberOrUndefined,
+  squaredDistance
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
 import { red, green, darkblue, yellow, black } from '@allmaps/tailwind'
@@ -674,20 +674,20 @@ export default class WebGL2Renderer
       this.previousSignificantViewport = this.viewport
       return true
     } else {
-      const rectangleDistances = []
+      const rectangleSquaredDistances = []
       for (let i = 0; i < 4; i++) {
-        rectangleDistances.push(
-          distance(
+        rectangleSquaredDistances.push(
+          squaredDistance(
             this.previousSignificantViewport.projectedGeoRectangle[i],
             this.viewport.projectedGeoRectangle[i]
-          ) / this.viewport.projectedGeoPerViewportScale
+          ) / Math.pow(this.viewport.projectedGeoPerViewportScale, 2)
         )
       }
-      const dist = Math.max(...rectangleDistances)
-      if (dist === 0) {
+      const maxSquaredDistance = Math.max(...rectangleSquaredDistances)
+      if (maxSquaredDistance === 0) {
         return true
       }
-      if (dist > SIGNIFICANT_VIEWPORT_DISTANCE) {
+      if (maxSquaredDistance > Math.pow(SIGNIFICANT_VIEWPORT_DISTANCE, 2)) {
         this.previousSignificantViewport = this.viewport
         return true
       } else {
@@ -696,7 +696,7 @@ export default class WebGL2Renderer
     }
   }
 
-  protected shouldGetMapOverviewFetchableTiles() {
+  protected shouldAnticipateInteraction() {
     // Get a map's overview tiles only for this render
     return true
   }

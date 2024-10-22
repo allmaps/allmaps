@@ -112,7 +112,7 @@ export function createWarpedMapFactory() {
  * @param {number} currentBestScaleFactor - The best tile scale factor for displaying this map, at the current viewport
  * @param {TileZoomLevel} [currentTileZoomLevel] - The tile zoom level, at the current viewport
  * @param {TileZoomLevel} [currentOverviewTileZoomLevel] - The overview tile zoom level, at the current viewport
- * @param {Ring} currentResourceViewportRing - The viewport transformed back to resource coordinates
+ * @param {Ring} currentResourceViewportRing - The (buffered) viewport transformed back to resource coordinates
  * @param {Bbox} currentResourceViewportRingBbox - Bbox of the resourceViewportRing
  * @param {Tile[]} currentFetchableTiles - The fetchable tiles for displaying this map, at the current viewport
  * @param {Tile[]} currentOverviewFetchableTiles - The overview fetchable tiles, at the current viewport
@@ -186,8 +186,8 @@ export default class WarpedMap extends EventTarget {
   currentTileZoomLevel?: TileZoomLevel
   currentOverviewTileZoomLevel?: TileZoomLevel
 
-  currentResourceViewportRing: Ring = []
-  currentResourceViewportRingBbox!: Bbox
+  currentResourceViewportRing?: Ring = []
+  currentResourceViewportRingBbox?: Bbox
 
   currentFetchableTiles: FetchableTile[] = []
   currentOverviewFetchableTiles: FetchableTile[] = []
@@ -409,6 +409,7 @@ export default class WarpedMap extends EventTarget {
 
   // TODO: connect/merge setCurrentBestScaleFactor and setCurrentTileZoomLevel
   // Once triangulation will not be updated directly after setting best scale factor
+  // This also includes allowing undefined
   // TODO: change 'current best' to 'current' scale factor
   /**
    * Set the bestScaleFactor for the current viewport
@@ -445,11 +446,13 @@ export default class WarpedMap extends EventTarget {
   /**
    * Set resourceViewportRing at current viewport
    *
-   * @param {Ring} resourceViewportRing
+   * @param {Ring} [resourceViewportRing]
    */
-  setCurrentResourceViewportRing(resourceViewportRing: Ring): void {
+  setCurrentResourceViewportRing(resourceViewportRing?: Ring) {
     this.currentResourceViewportRing = resourceViewportRing
-    this.currentResourceViewportRingBbox = computeBbox(resourceViewportRing)
+    this.currentResourceViewportRingBbox = resourceViewportRing
+      ? computeBbox(resourceViewportRing)
+      : undefined
   }
 
   /**
@@ -457,7 +460,7 @@ export default class WarpedMap extends EventTarget {
    *
    * @param {FetchableTile[]} fetchableTiles
    */
-  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]): void {
+  setCurrentFetchableTiles(fetchableTiles: FetchableTile[]) {
     this.currentFetchableTiles = fetchableTiles
   }
 
@@ -466,19 +469,19 @@ export default class WarpedMap extends EventTarget {
    *
    * @param {FetchableTile[]} overviewFetchableTiles
    */
-  setCurrentOverviewFetchableTiles(
-    overviewFetchableTiles: FetchableTile[]
-  ): void {
+  setCurrentOverviewFetchableTiles(overviewFetchableTiles: FetchableTile[]) {
     this.currentOverviewFetchableTiles = overviewFetchableTiles
   }
 
   /**
-   * Check if warpedMap has image info
-   *
-   * @returns {this is WarpedMapWithImageInfo}
+   * Reset current values
    */
-  hasImageInfo(): this is WarpedMapWithImageInfo {
-    return this.imageId !== undefined && this.parsedImage !== undefined
+  resetCurrent() {
+    this.setCurrentTileZoomLevel()
+    this.setCurrentOverviewTileZoomLevel()
+    this.setCurrentResourceViewportRing()
+    this.setCurrentFetchableTiles([])
+    this.setCurrentOverviewFetchableTiles([])
   }
 
   /**
@@ -512,6 +515,15 @@ export default class WarpedMap extends EventTarget {
         return mixPoints(point, this.projectedGeoPreviousLongerMask[index], t)
       }
     )
+  }
+
+  /**
+   * Check if warpedMap has image info
+   *
+   * @returns {this is WarpedMapWithImageInfo}
+   */
+  hasImageInfo(): this is WarpedMapWithImageInfo {
+    return this.imageId !== undefined && this.parsedImage !== undefined
   }
 
   /**

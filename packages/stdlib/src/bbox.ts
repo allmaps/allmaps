@@ -92,6 +92,9 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
 // Ratio 2 add half the current width (or height) both left and right of the current (width or height)
 // so the total resolution goes * 4
 export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
+  if (ratio == 0) {
+    return bbox
+  }
   const size = bboxToSize(bbox)
   return bufferBbox(
     bbox,

@@ -3,7 +3,8 @@ import { throttle } from 'lodash-es'
 import {
   hexToFractionalRgb,
   lineStringToLines,
-  pointsAndPointsToLines
+  pointsAndPointsToLines,
+  subSetArray
 } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { black, blue, green, pink, white } from '@allmaps/tailwind'
@@ -32,8 +33,6 @@ import type {
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { RenderOptions } from '../shared/types.js'
-
-import { equalArray } from '@allmaps/stdlib'
 
 const THROTTLE_UPDATE_TEXTURES_WAIT_MS = 200
 const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
@@ -214,7 +213,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {CachedTile} cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
-    this.cachedTilesByTileKey.set(tileKey(cachedTile.tile), cachedTile)
+    this.cachedTilesByTileKey.set(cachedTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
@@ -227,7 +226,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)
     if (cachedTile) {
-      this.cachedTilesByTileKey.delete(tileKey(cachedTile.tile))
+      this.cachedTilesByTileKey.delete(cachedTile.tileKey)
     }
     this.cachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
@@ -715,15 +714,19 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
 
-    // Don't update if same request as before
-    // This prevents the event TEXTURESUPDATED from being fired
-    // Which would otherwise trigger an infinite loop
+    // Don't update if same request is (non-null) subset of previous request
+    // This reduces (expensive) texture updates when just reducing the number of tiles
+    // (But keeps them when all tiles are gone to free up texture)
+    // And blocking updates on equal requests is important to
+    // prevent triggering an infinite loop
+    // caused by the TEXTURESUPDATED event at the end
     if (
-      equalArray(
-        this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl),
+      this.cachedTilesForTexture.length != 0 &&
+      subSetArray(
         this.previousCachedTilesForTexture.map(
           (textureTile) => textureTile.tileUrl
-        )
+        ),
+        this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl)
       )
     ) {
       return

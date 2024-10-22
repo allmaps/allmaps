@@ -3,7 +3,7 @@ import { equalSet } from '@allmaps/stdlib'
 import CacheableTile, { CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import { isOverviewTile, shouldPruneTile } from '../shared/tiles.js'
+import { shouldPruneTile } from '../shared/tiles.js'
 import FetchableTile from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -11,14 +11,11 @@ import type { FetchFn } from '@allmaps/types'
 import type {
   CachableTileFactory,
   TileCacheOptions,
-  PruneInfoByMapId
+  MapPruneInfo
 } from '../shared/types.js'
 
-const PRUNE_MANY_MAPS = 50 // For this amount of maps, prune more tiles
-
-const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 6
+const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 4
 const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
-const PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO = 1
 
 /**
  * Class that fetches and caches IIIF tiles.
@@ -164,10 +161,15 @@ export default class TileCache<D> extends EventTarget {
    * @param {FetchableTile[]} fetchableTiles
    */
   requestFetchableTiles(fetchableTiles: FetchableTile[]) {
-    const previousKeys = FetchableTile.toFetchableTileKeys(this.fetchableTiles)
-    const keys = FetchableTile.toFetchableTileKeys(fetchableTiles)
+    const previousKeys = new Set(
+      this.fetchableTiles.map((fetchableTile) => fetchableTile.fetchableTileKey)
+    )
+    const keys = new Set(
+      fetchableTiles.map((fetchableTile) => fetchableTile.fetchableTileKey)
+    )
 
     // If previous and current request are the same, don't do anything
+    // TODO: replace with Set equality once supported
     if (equalSet(previousKeys, keys)) {
       return
     }
@@ -212,37 +214,25 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Prune tiles in this cache using the provided prune info
    */
-  prune(pruneInfoByMapId: PruneInfoByMapId) {
-    const mapIdsWithOverviewKept = new Set()
+  prune(pruneInfoByMapId: Map<string, MapPruneInfo>) {
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
         const pruneInfo = pruneInfoByMapId.get(mapId)
         const tile = this.tilesByTileUrl.get(tileUrl)?.tile
 
         if (tile) {
-          const keepMapOverview = mapIdsWithOverviewKept.size < PRUNE_MANY_MAPS
+          // Prune for each mapId that doesn't have pruneInfo
+          // Or for which it should be pruned
           if (
             !pruneInfo ||
-            shouldPruneTile(
-              tile,
-              pruneInfo,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
-                : 0,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-                : 0,
-              pruneInfoByMapId.size <= PRUNE_MANY_MAPS
-                ? PRUNE_RESOURCE_VIEWPORT_BUFFER_RATIO
-                : 0,
-              keepMapOverview
-            )
+            shouldPruneTile(tile, pruneInfo, {
+              maxHigherLog2ScaleFactorDiff:
+                PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+              maxLowerLog2ScaleFactorDiff:
+                PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+            })
           ) {
             this.removeCacheableTileForMapId(tileUrl, mapId)
-          } else {
-            if (keepMapOverview && isOverviewTile(tile, pruneInfo)) {
-              mapIdsWithOverviewKept.add(mapId)
-            }
           }
         }
       }

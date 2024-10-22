@@ -15,6 +15,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
   readonly tile: Tile
   readonly imageRequest: ImageRequest
   readonly tileUrl: string
+  readonly tileKey: string
   readonly fetchFn?: FetchFn
 
   protected abortController: AbortController
@@ -34,6 +35,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
     this.tile = fetchableTile.tile
     this.imageRequest = fetchableTile.imageRequest
     this.tileUrl = fetchableTile.tileUrl
+    this.tileKey = fetchableTile.tileKey
     this.fetchFn = fetchFn
 
     this.abortController = new AbortController()

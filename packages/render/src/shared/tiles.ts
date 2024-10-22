@@ -3,9 +3,10 @@ import {
   bboxToCenter,
   distance,
   isOverlapping,
-  bufferBboxByRatio
+  bufferBboxByRatio,
+  squaredDistance
 } from '@allmaps/stdlib'
-import { pruneInfo } from './types'
+import { MapPruneConstants, MapPruneInfo } from './types'
 import FetchableTile from '../tilecache/FetchableTile'
 
 import type { Image } from '@allmaps/iiif-parser'
@@ -104,8 +105,8 @@ export function computeTilesCoveringRingAtTileZoomLevel(
   const resourceRingCenter = bboxToCenter(computeBbox(resourceRing))
   tiles.sort(
     (tileA, tileB) =>
-      distanceTileToPoint(tileA, resourceRingCenter) -
-      distanceTileToPoint(tileB, resourceRingCenter)
+      squaredDistanceTileToPoint(tileA, resourceRingCenter) -
+      squaredDistanceTileToPoint(tileB, resourceRingCenter)
   )
 
   return tiles
@@ -262,10 +263,8 @@ export function getTilesAtScaleFactor(
   columnEnd?: number,
   rowStart?: number,
   rowEnd?: number,
-  validTile?: (tile: Tile) => boolean
+  validTile: (tile: Tile) => boolean = (_tile: Tile) => true
 ) {
-  validTile = validTile ? validTile : (_tile: Tile) => true
-
   const tileZoomLevel = parsedImage.tileZoomLevels.find(
     (tileZoomLevel) => tileZoomLevel.scaleFactor == scaleFactor
   )
@@ -315,6 +314,10 @@ export function equalTileByRowColumnScaleFactor(
 
 export function distanceTileToPoint(tile: Tile, point: Point): number {
   return distance(tileCenter(tile), point)
+}
+
+export function squaredDistanceTileToPoint(tile: Tile, point: Point): number {
+  return squaredDistance(tileCenter(tile), point)
 }
 
 export function tileCenter(tile: Tile): Point {
@@ -650,62 +653,77 @@ export function tileUrl(tile: Tile, parsedImage: Image): string {
 
 // TileCache
 
-export function isOverviewTile(tile: Tile, pruneInfo: pruneInfo) {
-  return (
-    pruneInfo.overviewScaleFactor &&
-    tile.tileZoomLevel.scaleFactor >= pruneInfo.overviewScaleFactor
-  )
-}
-
 export function shouldPruneTile(
   tile: Tile,
-  mapPruneInfo: pruneInfo,
-  maxHigherLog2ScaleFactorDiff: number,
-  maxLowerLog2ScaleFactorDiff: number,
-  viewportBufferRatio: number,
-  keepOverview = true
+  mapPruneInfo: MapPruneInfo,
+  mapPruneConstants: MapPruneConstants
 ) {
+  // Don't prune if overview
+  // Note that currentResourceViewportRingBbox and currentTileZoomLevel are only undefined
+  // if overview tile, so we add them here to prevent TypeScript errors furter on
+  if (
+    mapPruneInfo.currentOverviewTileZoomLevel &&
+    tile.tileZoomLevel.scaleFactor ==
+      mapPruneInfo.currentOverviewTileZoomLevel.scaleFactor
+  ) {
+    return false
+  }
+
+  // Prune if the current tile zoomlevel or current resourceViewportRingBbox are undefined
+  // (this only happens if the map is too small to render)
+  if (
+    mapPruneInfo.currentResourceViewportRingBbox == undefined ||
+    mapPruneInfo.currentTileZoomLevel == undefined
+  ) {
+    return true
+  }
+
+  // Should prune if scale factor too much off
+  //
   // Example:
   // Available scaleFactors in tileZoomLevels:
   // 1 (full original resolution), 2, 4, 8, 16 (zoomed out)
   //
   // Tile scale factor: 16, so log2 tile scale factor: 4
-  // Best scale factor: 8, so log2 best scale factor: 3
+  // Current scale factor: 8, so log2 current scale factor: 3
   // Difference: 4 - 3 = 1, check if not more then max
-  // This is positive if tile scale factor is higher then best scale factor, so tiles are lower original resolution
+  // This is positive if tile scale factor is higher then current scale factor, so tiles are lower original resolution
   //
   // Since there are less lower original resolution tiles,
   // MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF can be higher then MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-
-  if (keepOverview && isOverviewTile(tile, mapPruneInfo)) {
-    return false
+  //
+  const log2ScaleFactorDiff =
+    Math.log2(tile.tileZoomLevel.scaleFactor) -
+    Math.log2(mapPruneInfo.currentTileZoomLevel.scaleFactor)
+  // Check if scale factor not too high, i.e. tile resolution too low
+  const tileScaleFactorTooHigh =
+    log2ScaleFactorDiff > mapPruneConstants.maxHigherLog2ScaleFactorDiff
+  if (tileScaleFactorTooHigh) {
+    return true
+  }
+  // Check if scale factor not too low, i.e. tile resolution too high
+  const tileScaleFactorTooLow =
+    -log2ScaleFactorDiff > mapPruneConstants.maxLowerLog2ScaleFactorDiff
+  if (tileScaleFactorTooLow) {
+    return true
   }
 
+  // Prune if too far away
+  // Note that we correct the tile bbox by buffering the scale factor difference (if positive)
+  // This allows us to keep all tiles that would be needed if we zoom out again
+  // Even if they currently don't overlap with the viewport ring bbox
   if (
     !isOverlapping(
-      computeBboxTile(tile),
       bufferBboxByRatio(
-        mapPruneInfo.resourceViewportRingBbox,
-        viewportBufferRatio
-      )
+        computeBboxTile(tile),
+        Math.max(0, log2ScaleFactorDiff)
+      ),
+      mapPruneInfo.currentResourceViewportRingBbox
     )
   ) {
     return true
   }
 
-  const log2ScaleFactorDiff =
-    Math.log2(tile.tileZoomLevel.scaleFactor) -
-    Math.log2(mapPruneInfo.bestScaleFactor)
-  // Check if scale factor not too high, i.e. tile resolution too low
-  const tileScaleFactorTooHigh =
-    log2ScaleFactorDiff > maxHigherLog2ScaleFactorDiff
-  // Check if scale factor not too low, i.e. tile resolution too high
-  const tileScaleFactorTooLow =
-    -log2ScaleFactorDiff > maxLowerLog2ScaleFactorDiff
-
-  if (tileScaleFactorTooHigh || tileScaleFactorTooLow) {
-    return true
-  }
-
+  // By default, don't prune
   return false
 }

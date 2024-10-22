@@ -345,7 +345,25 @@ export function distance(from: Point | Line, to?: Point): number {
   } else if (isPoint(from) && to === undefined) {
     return distance(from, [0, 0])
   } else if (isPoint(from) && isPoint(to)) {
-    return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
+    return Math.sqrt(squaredDistance(from, to))
+  } else {
+    throw new Error('Input type not supported')
+  }
+}
+
+// Squared distance is faster to compute then distance
+// (which requires espensive square root)
+// and can be used for things like sorting distance etc.
+export function squaredDistance(from: Line): number
+export function squaredDistance(from: Point): number
+export function squaredDistance(from: Point, to: Point): number
+export function squaredDistance(from: Point | Line, to?: Point): number {
+  if (isLineString(from) && from.length === 2) {
+    return squaredDistance(from[0], from[1])
+  } else if (isPoint(from) && to === undefined) {
+    return squaredDistance(from, [0, 0])
+  } else if (isPoint(from) && isPoint(to)) {
+    return (to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2
   } else {
     throw new Error('Input type not supported')
   }
