@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "maplibre-contour": "^0.0.7",
-    "protomaps-themes-base": "^4.1.0",
+    "protomaps-themes-base": "^4.2.0",
     "maplibre-gl": "^4.7.1"
   }
 }
