@@ -21,7 +21,7 @@ export function basemapStyle(): StyleSpecification {
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, "en")
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, 'en')
   }
 }
 
