@@ -85,9 +85,9 @@ export const ALLMAPS_THEME_5 = {
   state_label_halo: 'rgba(255, 252, 247, 1)',
   country_label: 'rgba(132, 132, 132, 1)',
 
-  regular: "Jost Regular",
-  bold: "Jost Medium",
-  italic: "Jost Italic"
+  regular: 'Jost Regular',
+  bold: 'Jost Medium',
+  italic: 'Jost Italic'
 }
 
 export const TERRAIN_THEME = {

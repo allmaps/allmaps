@@ -30,7 +30,7 @@ export function addTerrain(map: Map, maplibregl: any) {
     url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
-  demSource.setupMaplibre(maplibregl);
+  demSource.setupMaplibre(maplibregl)
   map.on('load', () => {
     map.addSource('terrain', {
       type: 'raster-dem',
