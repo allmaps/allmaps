@@ -53,9 +53,11 @@
       const $page = get(page)
       // console.log('param store', $param)
 
+      const searchParams = $page.url.searchParams
+      const searchParamsString = searchParams.toString()
+      const hashParams = $page.url.hash.replace('#', '')
+
       if ($param.type === 'url' && $param.urls && $param.urls.length > 0) {
-        const searchParams = $page.url.searchParams
-        const searchParamsString = searchParams.toString()
         searchParams.delete('data')
         $param.urls.forEach((url, index) => {
           if (index === 0) {
@@ -76,12 +78,19 @@
           const searchParams = new URLSearchParams()
           searchParams.set('data', $param.data)
           searchParams.toString()
-          goto('/#' + searchParams.toString())
+          if (hashParams !== searchParams.toString()) {
+            console.log('searchParams', searchParams.toString())
+            console.log('hashParams', hashParams)
+            goto('/#' + searchParams.toString())
+          }
         } else {
+          // why not skip this and just use the existing searchParams with hash?
           const searchParams = $page.url.searchParams
           searchParams.delete('url')
           searchParams.set('data', $param.data)
-          gotoSearchParams(searchParams)
+          if (searchParamsString !== searchParams.toString()) {
+            gotoSearchParams(searchParams)
+          }
         }
       }
     }
