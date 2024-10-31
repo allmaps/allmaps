@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/basemap",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "author": {
     "name": "Brandon Liu",
     "email": "brandon@protomaps.com",
@@ -43,6 +43,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@maplibre/maplibre-gl-style-spec": "^19.3.1",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
@@ -50,12 +51,11 @@
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^8.4.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.5.4",
-    "@maplibre/maplibre-gl-style-spec": "^19.3.1"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "maplibre-contour": "^0.0.7",
-    "protomaps-themes-base": "^4.2.0",
-    "maplibre-gl": "^4.7.1"
+    "maplibre-gl": "^4.7.1",
+    "protomaps-themes-base": "^4.2.0"
   }
 }
