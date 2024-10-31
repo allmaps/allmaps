@@ -232,10 +232,10 @@
             </div> -->
           </div>
 
-          <div class="inline-flex flex-row gap-2 justify-self-end">
+          <div class="inline-flex flex-row gap-1 sm:gap-2 justify-self-end">
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
+                class="inline-flex p-0.5 sm:p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-6 h-6 sm:w-8 sm:h-8 bg-gray-100"
                 class:border-pink-500={$selected && $view === 'image'}
                 class:border-gray-500={!$selected || $view === 'list'}
                 class:bg-pink-100={$selected && $view === 'image'}
@@ -251,13 +251,13 @@
                   }}
                   class="sr-only peer"
                 />
-                <IconPhoto />
+                <IconPhoto class="w-4 h-4 sm:w-5 sm:h-5" />
               </label>
             </div>
 
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
+                class="inline-flex p-0.5 sm:p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-6 h-6 sm:w-8 sm:h-8 bg-gray-100"
                 class:border-pink-500={!$visible}
                 class:border-gray-500={$visible}
                 class:bg-pink-100={!$visible}
@@ -269,13 +269,13 @@
                   bind:checked={$visible}
                   class="sr-only peer"
                 />
-                <Opacity closed={!$visible} />
+                <Opacity closed={!$visible} class="w-4 h-4 sm:w-5 sm:h-5" />
               </label>
             </div>
 
             <div>
               <label
-                class="inline-flex p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-9 h-9 bg-gray-100"
+                class="inline-flex p-0.5 sm:p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-6 h-6 sm:w-8 sm:h-8 bg-gray-100"
                 class:border-pink-500={!$useMask}
                 class:border-gray-500={$useMask}
                 class:bg-pink-100={!$useMask}
@@ -287,14 +287,14 @@
                   bind:checked={$useMask}
                   class="sr-only peer"
                 />
-                <Crop />
+                <Crop class="w-4 h-4 sm:w-5 sm:h-5" />
               </label>
             </div>
 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
-              class="rounded-full p-1 inline-flex items-center border-2 w-9 h-9 bg-gray-100"
+              class="rounded-full p-0.5 sm:p-1 inline-flex items-center border-2 w-6 h-6 sm:w-8 sm:h-8 bg-gray-100"
               class:border-gray-600={$colorize}
               on:click={() => {
                 $colorize = !$colorize
