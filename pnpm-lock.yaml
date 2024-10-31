@@ -873,8 +873,8 @@ importers:
         specifier: ^4.7.1
         version: 4.7.1
       protomaps-themes-base:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.2.0
+        version: 4.2.0
     devDependencies:
       '@maplibre/maplibre-gl-style-spec':
         specifier: ^19.3.1
@@ -11561,8 +11561,8 @@ packages:
     resolution: {integrity: sha512-/XJ368cyBJ7fzLMwLKv1e4vLxOju2MNAIokcr7meSaNcVbWz/CPcW22cP04mwxOErdA5mwjA8Q6w/cdAQxVn7Q==}
     dev: true
 
-  /protomaps-themes-base@4.1.0:
-    resolution: {integrity: sha512-JHIaJB9W7lfbOgWCbohjnl3LjpDqBlN/8T3WFWeeLMkXpzz6ab9/Bdg1kdoryE0clevHMjv0tUAHnwsf937sQw==}
+  /protomaps-themes-base@4.2.0:
+    resolution: {integrity: sha512-g3BgIM0NMgkicygbOUm4VwUy37jEpAi513CsO5A3Q1MHNUah+nX76vJ9sOdJuapbAmO4BLaTyXtz0bpvj2n6nw==}
     dev: false
 
   /proxy-from-env@1.1.0:
