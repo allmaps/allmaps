@@ -107,6 +107,7 @@
     })
 
     // @ts-expect-error maplibregl is a global UMD module
+    // eslint-disable-next-line no-undef
     addTerrain(map, maplibregl)
 
     map.on('load', () => {
