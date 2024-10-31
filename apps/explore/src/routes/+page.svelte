@@ -106,6 +106,7 @@
       hash: true
     })
 
+    // @ts-expect-error maplibregl is a global UMD module
     addTerrain(map, maplibregl)
 
     map.on('load', () => {

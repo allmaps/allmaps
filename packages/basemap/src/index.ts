@@ -25,11 +25,13 @@ export function basemapStyle(): StyleSpecification {
   }
 }
 
-export function addTerrain(map: Map, maplibregl: any) {
+export function addTerrain(map: Map, maplibregl: unknown) {
   const demSource = new mlcontour.DemSource({
     url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
+
+  // @ts-expect-error maplibregl is of unknown type
   demSource.setupMaplibre(maplibregl)
   map.on('load', () => {
     map.addSource('terrain', {
