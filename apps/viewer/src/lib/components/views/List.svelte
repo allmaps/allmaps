@@ -2,7 +2,7 @@
   import { mapsBySourceId, removeAnnotation } from '$lib/shared/stores/maps.js'
   import MapsItem from '$lib/components/dropdowns/MapsItem.svelte'
   import { Copy, paramStore } from '@allmaps/ui'
-  import { selectedMaps } from '$lib/shared/stores/selected.js'
+  // import { selectedMaps } from '$lib/shared/stores/selected.js'
   import { sourcesById, addUrlSource } from '$lib/shared/stores/sources.js'
   import {
     IconColumns1,
