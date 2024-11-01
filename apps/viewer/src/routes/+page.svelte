@@ -173,13 +173,13 @@
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
   <div class="z-10">
-    <Header appName="Viewer" transparent={true}></Header>
+    <Header appName="Viewer" transparent={!showForm}></Header>
   </div>
   <main class="relative h-full overflow-hidden">
     {#if showForm}
       <div class="h-full flex overflow-y-auto">
         <div
-          class="container mx-auto mt-10 p-2"
+          class="md:container mx-auto mt-10 p-2"
           transition:fade={{ duration: 120 }}
         >
           <p class="mb-3">
