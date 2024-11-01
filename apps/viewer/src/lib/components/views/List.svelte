@@ -1,13 +1,15 @@
 <script lang="ts">
   import { mapsBySourceId, removeAnnotation } from '$lib/shared/stores/maps.js'
   import MapsItem from '$lib/components/dropdowns/MapsItem.svelte'
-  import { Copy } from '@allmaps/ui'
+  import { Copy, paramStore } from '@allmaps/ui'
   import { selectedMaps } from '$lib/shared/stores/selected.js'
-  import { sourcesById } from '$lib/shared/stores/sources.js'
-  import { addUrlSource } from '$lib/shared/stores/sources.js'
+  import { sourcesById, addUrlSource } from '$lib/shared/stores/sources.js'
   import { IconListDetails, IconTrash } from '@tabler/icons-svelte'
 
   const getUrlbyId = (id: string) => {
+    // this is not working because the source is not loaded yet but the map is already created
+    // console.log('getUrlbyId', id)
+    // console.log('sources', $sourcesById.entries())
     return $sourcesById?.get(id)?.url || ''
   }
 
@@ -27,8 +29,14 @@
     gridCols = gridCols === 1 ? 2 : 1
   }
 
-  const deleteMap = (sourceId: string) => {
-    removeAnnotation(sourceId)
+  const deleteMap = async (sourceId: string) => {
+    await removeAnnotation(sourceId)
+    let urls = $paramStore?.urls || []
+    urls = urls.filter((url: string) => url !== getUrlbyId(sourceId))
+    paramStore.set({
+      type: 'url',
+      urls
+    })
   }
 
   $: mapsBySourceIdEntries = Object.entries($mapsBySourceId)
@@ -82,7 +90,7 @@
       {#each mapsBySourceIdEntries as [sourceId, maps]}
         <div class="mb-5 p-3 border border-gray-300 rounded-lg bg-gray-50">
           <div class="flex flex-row items-center justify-between gap-1">
-            <Copy string={getUrlbyId(sourceId)} />
+            <Copy string={maps[0].mapId} />
             <button
               class="p-2 text-sm w-8 font-medium text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:hover:bg-transparent"
               disabled={mapsBySourceIdEntries.length === 1}

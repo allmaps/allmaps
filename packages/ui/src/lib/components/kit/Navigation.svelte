@@ -78,10 +78,15 @@
           const searchParams = new URLSearchParams()
           searchParams.set('data', $param.data)
           searchParams.toString()
+
           if (hashParams !== searchParams.toString()) {
-            console.log('searchParams', searchParams.toString())
-            console.log('hashParams', hashParams)
-            goto('/#' + searchParams.toString())
+            // console.log('searchParams', searchParams.toString())
+            // console.log('hashParams', hashParams)
+            if (hashParams === '') {
+              goto('/')
+            } else {
+              goto('/#' + searchParams.toString())
+            }
           }
         } else {
           // why not skip this and just use the existing searchParams with hash?

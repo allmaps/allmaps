@@ -152,16 +152,22 @@ export function setRemoveBackgroundColor(
 }
 
 export async function removeAnnotation(sourceId: string) {
+  const mapsToRemove: ViewerMap[] = []
+
   mapsById.update(($mapsById) => {
     for (const [id, viewerMap] of $mapsById.entries()) {
       if (viewerMap.sourceId === sourceId) {
+        mapsToRemove.push(viewerMap)
         $mapsById.delete(id)
-        removeMap(viewerMap.map)
       }
     }
-
     return $mapsById
   })
+
+  // Handle async operations outside the update callback
+  for (const map of mapsToRemove) {
+    await removeMap(map.map)
+  }
 }
 
 export function resetMaps() {

@@ -3,18 +3,12 @@
 
   export let appName: string
   export let transparent = false
-
-  function reset(e: MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    window.location.href = '/'
-  }
 </script>
 
 {#if transparent}
   <header class="p-1 md:p-2 absolute">
     <nav class="mx-auto flex flex-wrap justify-between items-center gap-3">
-      <a href="/" class="flex gap-2 no-underline" on:click={reset}>
+      <a href="/" class="flex gap-2 no-underline">
         <div class="w-8 inline">
           <Logo />
         </div>
@@ -31,7 +25,7 @@
 {:else}
   <header class="shadow-md p-1 md:p-2">
     <nav class="mx-auto flex flex-wrap justify-between items-center gap-3">
-      <a href="/" class="flex gap-2 no-underline" on:click={reset}>
+      <a href="/" class="flex gap-2 no-underline">
         <div class="w-8 inline">
           <Logo />
         </div>
