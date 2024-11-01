@@ -1,19 +1,19 @@
 <script lang="ts">
   import { view } from '$lib/shared/stores/view.js'
   import experimentalFeatures from '$lib/shared/experimental-features.js'
-  import { Hamburger, Close } from '@allmaps/ui'
+  import { IconMenu2, IconX } from '@tabler/icons-svelte'
 </script>
 
 <div class="inline-flex rounded-md shadow-sm">
   {#if experimentalFeatures}
     <button
       on:click={() => ($view == 'map' ? ($view = 'list') : ($view = 'map'))}
-      class="px-3 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
+      class="p-2 h-9 w-9 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
     >
       {#if $view === 'map'}
-        <Hamburger />
+        <IconMenu2 class="w-full h-full" />
       {:else}
-        <Close />
+        <IconX class="w-full h-full" />
       {/if}
     </button>
   {:else}
