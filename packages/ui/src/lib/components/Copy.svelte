@@ -63,7 +63,7 @@
     on:focus={handleFocus}
     on:mouseup={handleMouseup}
     on:touchend={handleMouseup}
-    class="block p-1 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis text-sm"
+    class="block p-1 pl-2 resize-none whitespace-nowrap leading-5 w-full h-8 overflow-hidden text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis text-sm"
     class:text-base={big}
     class:h-12={big}
     class:p-4={big}

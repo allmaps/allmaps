@@ -30,6 +30,8 @@
   const deleteMap = (sourceId: string) => {
     removeAnnotation(sourceId)
   }
+
+  let mapsBySourceIdEntries = Object.entries($mapsBySourceId)
 </script>
 
 <section class="w-full h-full overflow-y-auto">
@@ -77,12 +79,13 @@
     </div>
 
     <div class="flex flex-col mb-5">
-      {#each Object.entries($mapsBySourceId) as [sourceId, maps]}
+      {#each mapsBySourceIdEntries as [sourceId, maps]}
         <div class="mb-5 p-3 border border-gray-300 rounded-lg bg-gray-50">
           <div class="flex flex-row items-center justify-between gap-1">
-            <Copy string={getUrlbyId(sourceId)} big />
+            <Copy string={getUrlbyId(sourceId)} />
             <button
-              class="p-2 text-sm w-8 font-medium text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-200"
+              class="p-2 text-sm w-8 font-medium text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:hover:bg-transparent"
+              disabled={mapsBySourceIdEntries.length === 1}
               on:click={() => deleteMap(sourceId)}
             >
               <IconTrash class="w-full h-full" />
