@@ -31,7 +31,7 @@
     removeAnnotation(sourceId)
   }
 
-  let mapsBySourceIdEntries = Object.entries($mapsBySourceId)
+  $: mapsBySourceIdEntries = Object.entries($mapsBySourceId)
 </script>
 
 <section class="w-full h-full overflow-y-auto">
