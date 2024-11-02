@@ -12,7 +12,7 @@
 </script>
 
 <div class="w-full h-full relative">
-  {#if $view === 'map' || $view === 'list'}
+  {#if $view === 'map'}
     <MapView />
   {:else}
     <ImageView />

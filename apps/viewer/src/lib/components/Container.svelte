@@ -2,7 +2,7 @@
   import { SplitPane } from '@rich_harris/svelte-split-pane'
   import experimentalFeatures from '$lib/shared/experimental-features.js'
 
-  import { view, mobile } from '$lib/shared/stores/view.js'
+  import { mobile, sidebar } from '$lib/shared/stores/view.js'
   import { error } from '$lib/shared/stores/error.js'
   import { mapCount } from '$lib/shared/stores/maps.js'
 
@@ -26,7 +26,7 @@
   <!-- <div>EMPTY!</div> -->
 {:else}
   <div class="w-full h-full relative flex flex-row" bind:clientWidth={width}>
-    {#if $view === 'list' && experimentalFeatures}
+    {#if $sidebar && experimentalFeatures}
       <SplitPane
         type={$mobile ? 'vertical' : 'horizontal'}
         id="main"

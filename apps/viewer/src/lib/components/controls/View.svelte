@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { view } from '$lib/shared/stores/view.js'
+  import { view, sidebar } from '$lib/shared/stores/view.js'
   import experimentalFeatures from '$lib/shared/experimental-features.js'
   import { IconMenu2, IconX } from '@tabler/icons-svelte'
 </script>
@@ -26,16 +26,13 @@
       Image
     </button>
     <button
-      on:click={() =>
-        $view === 'map' || $view === 'image'
-          ? ($view = 'list')
-          : ($view = 'map')}
+      on:click={() => ($sidebar = !$sidebar)}
       class="ml-2 p-2 w-9 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
-      class:text-black={$view !== 'list'}
-      class:text-pink-500={$view === 'list'}
-      aria-current={$view === 'list' ? 'page' : 'false'}
+      class:text-black={!$sidebar}
+      class:text-pink-500={$sidebar}
+      aria-current={$sidebar ? 'page' : 'false'}
     >
-      {#if $view !== 'list'}
+      {#if !$sidebar}
         <IconMenu2 class="w-full h-full" />
       {:else}
         <IconX class="w-full h-full" />
