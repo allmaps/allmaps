@@ -12,7 +12,6 @@
     firstSelectedMapId
   } from '$lib/shared/stores/selected.js'
   import { showMap, hideMap } from '$lib/shared/stores/visible.js'
-  import { view } from '$lib/shared/stores/view.js'
   import {
     // mapWarpedMapSource,
     mapWarpedMapLayer
@@ -23,17 +22,14 @@
   import { getHue, fromHue } from '$lib/shared/color.js'
 
   import { fetchImageInfo, getFullResourceMask } from '@allmaps/stdlib'
-  import { IconPhoto } from '@tabler/icons-svelte'
   import {
     Thumbnail,
-    // Copy,
     Dial,
     // BringMapsToFront,
     // BringMapsForward,
     // SendMapsBackward,
     // SendMapsToBack,
     Opacity,
-    // Mask,
     Crop
   } from '@allmaps/ui'
 
@@ -233,7 +229,7 @@
           </div>
 
           <div class="inline-flex flex-row gap-1 sm:gap-2 justify-self-end">
-            <div>
+            <!-- <div>
               <label
                 class="inline-flex p-0.5 sm:p-1 items-center justify-center rounded-full border-2 select-none cursor-pointer w-6 h-6 sm:w-8 sm:h-8 bg-gray-100"
                 class:border-pink-500={$selected && $view === 'image'}
@@ -253,7 +249,7 @@
                 />
                 <IconPhoto class="w-4 h-4 sm:w-5 sm:h-5" />
               </label>
-            </div>
+            </div> -->
 
             <div>
               <label

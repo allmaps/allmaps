@@ -67,7 +67,7 @@
 
     <div class="relative w-full flex flex-row mb-4">
       <input
-        class="p-4 h-8 text-sm grow text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis"
+        class="p-4 pl-2 h-8 text-sm grow text-gray-900 bg-gray-50 rounded-l-lg border-gray-100 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-ellipsis"
         placeholder="Add a Annotation"
         bind:value={newAnnotation}
       />
