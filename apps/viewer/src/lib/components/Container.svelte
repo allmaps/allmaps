@@ -26,7 +26,7 @@
   <!-- <div>EMPTY!</div> -->
 {:else}
   <div class="w-full h-full relative flex flex-row" bind:clientWidth={width}>
-    {#if $view !== 'map' && experimentalFeatures}
+    {#if $view === 'list' && experimentalFeatures}
       <SplitPane
         type={$mobile ? 'vertical' : 'horizontal'}
         id="main"

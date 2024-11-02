@@ -7,10 +7,35 @@
 <div class="inline-flex rounded-md shadow-sm">
   {#if experimentalFeatures}
     <button
-      on:click={() => ($view == 'map' ? ($view = 'list') : ($view = 'map'))}
-      class="p-2 h-9 w-9 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
+      on:click={() => ($view = 'map')}
+      aria-current={$view === 'map' ? 'page' : 'false'}
+      class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
+      class:text-black={$view !== 'map'}
+      class:text-pink-500={$view === 'map'}
     >
-      {#if $view === 'map'}
+      Map
+    </button>
+
+    <button
+      on:click={() => ($view = 'image')}
+      aria-current={$view === 'image' ? 'page' : 'false'}
+      class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
+      class:text-black={$view !== 'image'}
+      class:text-pink-500={$view === 'image'}
+    >
+      Image
+    </button>
+    <button
+      on:click={() =>
+        $view === 'map' || $view === 'image'
+          ? ($view = 'list')
+          : ($view = 'map')}
+      class="ml-2 p-2 w-9 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
+      class:text-black={$view !== 'list'}
+      class:text-pink-500={$view === 'list'}
+      aria-current={$view === 'list' ? 'page' : 'false'}
+    >
+      {#if $view !== 'list'}
         <IconMenu2 class="w-full h-full" />
       {:else}
         <IconX class="w-full h-full" />
