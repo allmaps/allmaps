@@ -4,18 +4,26 @@ import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
 import { ALLMAPS_THEME_5, TERRAIN_THEME } from './colors'
 
-export function basemapStyle(lang: string, glyphs?: string, sprite?: string, tileJson?: string): StyleSpecification {
+export function basemapStyle(
+  lang: string,
+  glyphs?: string,
+  sprite?: string,
+  tileJson?: string
+): StyleSpecification {
   return {
     version: 8,
     glyphs:
-      glyphs || 'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-    sprite: sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
+      glyphs ||
+      'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+    sprite:
+      sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
       protomaps: {
         type: 'vector',
-        url: tileJson || 'https://api.protomaps.com/tiles/v4.json?key=ca7652ec836f269a',
-        attribution:
-          '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+        url:
+          tileJson ||
+          'https://api.protomaps.com/tiles/v4.json?key=ca7652ec836f269a',
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
     layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, lang)
@@ -24,7 +32,9 @@ export function basemapStyle(lang: string, glyphs?: string, sprite?: string, til
 
 export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
   const demSource = new mlcontour.DemSource({
-    url: tiles || 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+    url:
+      tiles ||
+      'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
 
