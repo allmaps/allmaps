@@ -21,19 +21,19 @@ importers:
   apps/cli:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       commander:
         specifier: ^10.0.0
@@ -88,13 +88,13 @@ importers:
   apps/docs:
     dependencies:
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       '@astrojs/check':
         specifier: ^0.4.1
@@ -130,19 +130,19 @@ importers:
   apps/explore:
     dependencies:
       '@allmaps/basemap':
-        specifier: ^1.0.0-beta.0
+        specifier: ^1.0.0-beta.1
         version: link:../../packages/basemap
       '@allmaps/maplibre':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/maplibre
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       lodash-es:
         specifier: ^4.17.21
@@ -209,25 +209,25 @@ importers:
   apps/here:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
@@ -291,16 +291,16 @@ importers:
   apps/iiif:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static':
@@ -361,16 +361,16 @@ importers:
   apps/info:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static':
@@ -422,22 +422,22 @@ importers:
   apps/latest:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       '@turf/rewind':
         specifier: ^6.5.0
@@ -516,13 +516,13 @@ importers:
   apps/preview:
     devDependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../../packages/types
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
@@ -579,13 +579,13 @@ importers:
   apps/tiles:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       ol:
         specifier: ^8.2.0
@@ -646,25 +646,25 @@ importers:
   apps/tileserver:
     devDependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../../packages/types
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
@@ -721,34 +721,34 @@ importers:
   apps/viewer:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.72
+        specifier: ^1.0.0-beta.73
         version: link:../../packages/openlayers
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       comlink:
         specifier: ^4.4.1
@@ -873,8 +873,8 @@ importers:
         specifier: ^4.7.1
         version: 4.7.1
       protomaps-themes-base:
-        specifier: ^4.2.0
-        version: 4.2.0
+        specifier: ^4.3.0
+        version: 4.3.0
     devDependencies:
       '@maplibre/maplibre-gl-style-spec':
         specifier: ^19.3.1
@@ -907,7 +907,7 @@ importers:
   packages/id:
     dependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
     devDependencies:
       '@types/eslint':
@@ -944,7 +944,7 @@ importers:
   packages/iiif-parser:
     dependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       zod:
         specifier: ^3.22.4
@@ -987,19 +987,19 @@ importers:
   packages/leaflet:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../annotation
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       leaflet:
         specifier: ^1.9.4
@@ -1042,10 +1042,10 @@ importers:
   packages/maplibre:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       maplibre-gl:
         specifier: ^4.5.0
@@ -1085,10 +1085,10 @@ importers:
   packages/openlayers:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.67
+        specifier: ^1.0.0-beta.68
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       lodash-es:
         specifier: ^4.17.21
@@ -1131,28 +1131,28 @@ importers:
   packages/render:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.12
+        specifier: ^1.0.0-beta.14
         version: link:../tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.41
         version: link:../transform
       '@allmaps/triangulate':
-        specifier: ^1.0.0-beta.22
+        specifier: ^1.0.0-beta.23
         version: link:../triangulate
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       '@turf/boolean-point-in-polygon':
         specifier: ^6.5.0
@@ -1228,7 +1228,7 @@ importers:
   packages/schemas:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../annotation
       zod:
         specifier: ^3.22.4
@@ -1265,13 +1265,13 @@ importers:
   packages/stdlib:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.29
+        specifier: ^1.0.0-beta.30
         version: link:../annotation
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../iiif-parser
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       '@placemarkio/geojson-rewind':
         specifier: ^1.0.2
@@ -1347,7 +1347,7 @@ importers:
   packages/transform:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       '@turf/distance':
         specifier: ^6.3.0
@@ -1360,7 +1360,7 @@ importers:
         version: 6.11.0
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1405,10 +1405,10 @@ importers:
   packages/triangulate:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.31
         version: link:../stdlib
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       poly2tri:
         specifier: ^1.5.0
@@ -1484,13 +1484,13 @@ importers:
   packages/ui:
     dependencies:
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.39
+        specifier: ^1.0.0-beta.40
         version: link:../iiif-parser
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.13
+        specifier: ^1.0.0-beta.14
         version: link:../tailwind
       '@allmaps/types':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.15
         version: link:../types
       flowbite:
         specifier: ^1.6.4
@@ -11561,8 +11561,8 @@ packages:
     resolution: {integrity: sha512-/XJ368cyBJ7fzLMwLKv1e4vLxOju2MNAIokcr7meSaNcVbWz/CPcW22cP04mwxOErdA5mwjA8Q6w/cdAQxVn7Q==}
     dev: true
 
-  /protomaps-themes-base@4.2.0:
-    resolution: {integrity: sha512-g3BgIM0NMgkicygbOUm4VwUy37jEpAi513CsO5A3Q1MHNUah+nX76vJ9sOdJuapbAmO4BLaTyXtz0bpvj2n6nw==}
+  /protomaps-themes-base@4.3.0:
+    resolution: {integrity: sha512-XNLs3zamw/XucflU0qBXgiPN72/YEo6h01ClsVrfUUQCDzA4r8Eu23hG/fqYqFuocciwu0doCxGBBpE8xGMtoA==}
     dev: false
 
   /proxy-from-env@1.1.0:

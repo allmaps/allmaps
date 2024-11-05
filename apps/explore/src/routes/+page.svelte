@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
 
   import { Map, addProtocol } from 'maplibre-gl'
+  import maplibregl from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
 
@@ -97,8 +98,7 @@
 
     map = new Map({
       container,
-      // @ts-expect-error: ignore incompatible sources property
-      style: basemapStyle(),
+      style: basemapStyle("en"),
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
