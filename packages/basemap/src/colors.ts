@@ -87,7 +87,17 @@ export const ALLMAPS_THEME_5 = {
 
   regular: 'Jost Regular',
   bold: 'Jost Medium',
-  italic: 'Jost Italic'
+  italic: 'Jost Italic',
+
+  landcover: {
+    grassland: "rgba(210, 239, 207, 1)",
+    barren: "rgba(255, 243, 215, 1)",
+    urban_area: "rgba(230, 230, 230, 1)",
+    farmland: "rgba(216, 239, 210, 1)",
+    glacier: "rgba(255, 255, 255, 1)",
+    scrub: "rgba(234, 239, 210, 1)",
+    forest: "rgba(196, 231, 210, 1)",
+  },
 }
 
 export const TERRAIN_THEME = {

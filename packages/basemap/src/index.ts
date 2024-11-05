@@ -4,30 +4,27 @@ import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
 import { ALLMAPS_THEME_5, TERRAIN_THEME } from './colors'
 
-export function basemapStyle(): StyleSpecification {
+export function basemapStyle(lang: string, glyphs?: string, sprite?: string, tileJson?: string): StyleSpecification {
   return {
     version: 8,
     glyphs:
-      'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-    sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
+      glyphs || 'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+    sprite: sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
       protomaps: {
         type: 'vector',
-        tiles: [
-          'https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
-        ],
-        maxzoom: 14,
+        url: tileJson || 'https://api.protomaps.com/tiles/v4.json?key=ca7652ec836f269a',
         attribution:
-          '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
+          '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, 'en')
+    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_5, lang)
   }
 }
 
-export function addTerrain(map: Map, maplibregl: unknown) {
+export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
   const demSource = new mlcontour.DemSource({
-    url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+    url: tiles || 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
     maxzoom: 13
   })
 
