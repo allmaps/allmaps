@@ -35,7 +35,7 @@
     "@allmaps/types": "^1.0.0-beta.15",
     "@allmaps/ui": "^1.0.0-beta.32",
     "@tailwindcss/container-queries": "^0.1.1",
-    "ol": "^8.2.0"
+    "ol": "^10.2.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
