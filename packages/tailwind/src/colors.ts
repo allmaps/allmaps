@@ -5,6 +5,9 @@ import type { Shades } from './types.js'
 
 const black = '#222222'
 const white = '#ffffff'
+const inherit = 'inherit'
+const current = 'currentColor'
+const transparent = 'transparent'
 
 // Original color from Luuk's design
 export const originalColorIndex = 4
@@ -153,5 +156,8 @@ export {
   yellow,
   gray,
   black,
-  white
+  white,
+  inherit,
+  current,
+  transparent
 }
