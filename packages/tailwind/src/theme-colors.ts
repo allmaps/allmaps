@@ -10,6 +10,9 @@ import {
   gray,
   black,
   white,
+  inherit,
+  current,
+  transparent,
   shades
 } from './colors.js'
 
@@ -36,6 +39,9 @@ export default {
   gray,
   black,
   white,
+  inherit,
+  current,
+  transparent,
 
   // Add shades
   ...flattenShades('blue', shades.blue),

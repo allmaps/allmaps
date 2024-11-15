@@ -1,0 +1,23 @@
+---
+import { Picture } from 'astro:assets'
+
+const { title, src, href } = Astro.props
+
+const image = import(`../images/cards/${src}.jpg`)
+---
+
+<li
+  class="flex flex-col md:flex-row md:odd:flex-row-reverse items-center gap-0 sm:gap-8 md:gap-16"
+>
+  <div class="md:w-1/2">
+    <h3>{title}</h3>
+    <section class="text-lg leading-relaxed">
+      <slot />
+    </section>
+  </div>
+  <div class="md:w-1/2">
+    <a {href} class="inline-block max-w-md">
+      <Picture src={image} alt={title} densities={[1.5, 2]} />
+    </a>
+  </div>
+</li>

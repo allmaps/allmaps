@@ -1,0 +1,55 @@
+---
+import AstroPageFrame from '@astrojs/starlight/components/PageFrame.astro'
+
+import Header from './Header.astro'
+
+import Splash from '../Splash.svelte'
+import Footer from '../../components/Footer.svelte'
+
+const isHomepage = Astro.props.slug === ''
+---
+
+{
+  isHomepage ? (
+    <div class="homepage">
+      <Splash />
+      <header class="header">
+        <Header {...Astro.props} />
+      </header>
+      <slot />
+      <Footer />
+    </div>
+  ) : (
+    <AstroPageFrame {...Astro.props}>
+      <slot />
+      <Fragment slot="header">
+        <slot name="header" />
+      </Fragment>
+      <Fragment slot="sidebar">
+        <slot name="sidebar" />
+      </Fragment>
+    </AstroPageFrame>
+  )
+}
+
+<style>
+  .header {
+    z-index: var(--sl-z-index-navbar);
+    position: sticky;
+    top: 0;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    width: 100%;
+    height: var(--sl-nav-height);
+    border-bottom: 1px solid var(--sl-color-hairline-shade);
+    padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+    padding-inline-end: var(--sl-nav-pad-x);
+    background-color: var(--sl-color-bg-nav);
+  }
+
+  :global([data-has-sidebar]) .header {
+    padding-inline-end: calc(
+      var(--sl-nav-gap) + var(--sl-nav-pad-x) + var(--sl-menu-button-size)
+    );
+  }
+</style>
