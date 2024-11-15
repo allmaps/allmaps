@@ -90,6 +90,9 @@ importers:
       '@allmaps/id':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/id
+      '@allmaps/latest':
+        specifier: ^1.0.0-beta.36
+        version: link:../latest
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
@@ -2405,7 +2408,7 @@ packages:
     resolution: {integrity: sha512-bV21/9LQmcQeCPEg3BDFtvwL6cwiTMksYNWQQ4KOxCZikEGalWtenoZ0wCiukJINlGCIi2KXx01g4FoH/LxpzQ==}
     requiresBuild: true
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
     dev: false
     optional: true
 
