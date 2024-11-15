@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.40",
+  "version": "1.0.0-beta.41",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -42,13 +42,13 @@
     "map"
   ],
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.30",
+    "@allmaps/stdlib": "^1.0.0-beta.31",
     "@turf/distance": "^6.3.0",
     "@turf/midpoint": "^6.3.0",
     "ml-matrix": "^6.11.0"
   },
   "devDependencies": {
-    "@allmaps/types": "^1.0.0-beta.14",
+    "@allmaps/types": "^1.0.0-beta.15",
     "@types/eslint": "^8.56.0",
     "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

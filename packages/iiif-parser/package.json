@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-beta.39",
+  "version": "1.0.0-beta.40",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -58,7 +58,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@allmaps/types": "^1.0.0-beta.14",
+    "@allmaps/types": "^1.0.0-beta.15",
     "zod": "^3.22.4"
   }
 }

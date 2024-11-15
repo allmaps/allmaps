@@ -100,8 +100,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @returns {Iterable<W>}
    */
   getWarpedMaps(): Iterable<W>
-  getWarpedMaps(mapIds: string[]): Iterable<W>
-  getWarpedMaps(mapIds?: string[]): Iterable<W> {
+  getWarpedMaps(mapIds: Iterable<string>): Iterable<W>
+  getWarpedMaps(mapIds?: Iterable<string>): Iterable<W> {
     if (mapIds === undefined) {
       return this.warpedMapsById.values()
     } else {
@@ -260,12 +260,20 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap && warpedMap.transformationType != transformationType) {
-        warpedMap.setTransformationType(transformationType)
-        this.addToOrUpdateRtree(warpedMap)
         mapIdsChanged.push(mapId)
       }
     }
     if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
+      )
+      mapIdsChanged.forEach((mapId) => {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMap.setTransformationType(transformationType)
+          this.addToOrUpdateRtree(warpedMap)
+        }
+      })
       this.dispatchEvent(
         new WarpedMapEvent(
           WarpedMapEventType.TRANSFORMATIONCHANGED,
@@ -289,11 +297,20 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (warpedMap && warpedMap.distortionMeasure != distortionMeasure) {
-        warpedMap.setDistortionMeasure(distortionMeasure)
         mapIdsChanged.push(mapId)
       }
     }
     if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
+      )
+      mapIdsChanged.forEach((mapId) => {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMap.setDistortionMeasure(distortionMeasure)
+          this.addToOrUpdateRtree(warpedMap)
+        }
+      })
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIdsChanged)
       )
@@ -314,7 +331,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
   }
 
   /**
@@ -331,7 +348,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
   }
 
   /**
@@ -350,7 +367,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
   }
 
   /**
@@ -369,7 +386,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
   }
 
   /**
@@ -468,7 +485,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
     )
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
     return results
   }
 
@@ -501,11 +518,13 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
   }
 
-  dispose() {
+  destroy() {
     for (const warpedMap of this.getWarpedMaps()) {
       this.removeEventListenersFromWarpedMap(warpedMap)
-      warpedMap.dispose()
+      warpedMap.destroy()
     }
+
+    this.clear()
   }
 
   private async addGeoreferencedMapInternal(
@@ -541,7 +560,9 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
       )
       this.removeZIndexHoles()
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGES))
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+
+      warpedMap.destroy()
     } else {
       throw new Error(`No map found with ID ${mapId}`)
     }

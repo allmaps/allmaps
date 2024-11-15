@@ -1,5 +1,7 @@
 import { writable, derived } from 'svelte/store'
 
+import { computeGeoreferencedMapBearing } from '@allmaps/stdlib'
+
 import { mapsWithImageInfo } from '$lib/shared/stores/maps-with-image-info.js'
 
 export const selectedMapId = writable<string | undefined>(undefined)
@@ -39,6 +41,17 @@ export const nextMapId = derived(
       return $mapsWithImageInfo[
         (index + 1 + $mapsWithImageInfo.length) % $mapsWithImageInfo.length
       ].map.id
+    }
+  }
+)
+
+export const bearing = derived(
+  selectedMapWithImageInfo,
+  ($selectedMapWithImageInfo) => {
+    if ($selectedMapWithImageInfo) {
+      return computeGeoreferencedMapBearing($selectedMapWithImageInfo.map)
+    } else {
+      return 0
     }
   }
 )

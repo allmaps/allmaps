@@ -26,7 +26,6 @@ export default defineConfig({
         '@allmaps/transform',
         '@allmaps/triangulate',
         '@allmaps/stdlib',
-        'potpack',
         'rbush'
       ],
       output: {
@@ -37,8 +36,7 @@ export default defineConfig({
           '@allmaps/transform': '@allmaps/transform',
           '@allmaps/triangulate': '@allmaps/triangulate',
           '@allmaps/stdlib': '@allmaps/stdlib',
-          rbush: 'rbush',
-          potpack: 'potpack'
+          rbush: 'rbush'
         }
       }
     }

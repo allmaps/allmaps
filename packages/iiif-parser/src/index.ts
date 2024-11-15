@@ -8,6 +8,7 @@ export type { Region, Size, ImageRequest, TileZoomLevel } from '@allmaps/types'
 export type {
   Tileset,
   MajorVersion,
+  Metadata,
   ProfileProperties,
   LanguageString
 } from './lib/types.js'

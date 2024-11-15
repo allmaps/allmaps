@@ -19,7 +19,8 @@ export default class Polynomial extends Transformation {
   ) {
     order = order || 1
     const pointsCountMinimum = ((order + 1) * (order + 2)) / 2
-    // If there are less control points then there are coefficients to be determined (for each dimension), the system can not be solved
+    // If there are less control points than there are coefficients to be determined (for each dimension),
+    // the system can not be solved
 
     super(
       sourcePoints,

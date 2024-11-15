@@ -82,6 +82,29 @@ export function pointInBbox(point: Point, bbox: Bbox): boolean {
   return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
 }
 
+export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
+  if (dist1 === undefined) {
+    dist1 = dist0
+  }
+  return [bbox[0] - dist0, bbox[1] - dist1, bbox[2] + dist0, bbox[3] + dist1]
+}
+
+// Ratio 2 add half the current width (or height) both left and right of the current (width or height)
+// so the total resolution goes * 4
+export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
+  if (ratio == 0) {
+    return bbox
+  }
+  const size = bboxToSize(bbox)
+  return bufferBbox(
+    bbox,
+    ...(size.map((widthOrHeigth) => (widthOrHeigth * ratio) / 2) as [
+      number,
+      number
+    ])
+  )
+}
+
 // Transform
 
 // Returns a rectangle with four points, starting from lower left and going anti-clockwise.

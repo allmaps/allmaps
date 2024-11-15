@@ -49,7 +49,7 @@ export default class CanvasRenderer
 
     await Promise.allSettled(this.loadMissingImageInfosInViewport())
 
-    this.updateRequestedTiles()
+    this.requestFetchableTiles()
     await this.tileCache.allRequestedTilesLoaded()
 
     const imageData = new ImageData(width, height)

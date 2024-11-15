@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.29",
+  "version": "1.0.0-beta.30",
   "description": "IDs for Allmaps",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -25,13 +25,12 @@
   },
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc && pnpm run documentation",
     "preversion": "pnpm run lint && pnpm test",
     "test": "NODE_ENV=test pnpm run build && mocha",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "prebuild": "npm run documentation",
     "documentation": "documentation readme ./dist/index.js --section=API"
   },
   "keywords": [
@@ -50,7 +49,7 @@
   },
   "homepage": "https://allmaps.org",
   "dependencies": {
-    "@allmaps/types": "^1.0.0-beta.14"
+    "@allmaps/types": "^1.0.0-beta.15"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",

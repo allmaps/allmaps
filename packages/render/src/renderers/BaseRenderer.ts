@@ -5,20 +5,47 @@ import FetchableTile from '../tilecache/FetchableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   getBestTileZoomLevelForScale,
-  computeTilesCoveringRingAtTileZoomLevel
+  computeTilesCoveringRingAtTileZoomLevel,
+  getTilesResolution,
+  getTilesAtScaleFactor,
+  getTileZoomLevelResolution
 } from '../shared/tiles.js'
 
-import { distance, bboxToDiameter, bboxToCenter } from '@allmaps/stdlib'
+import {
+  bboxToDiameter,
+  bboxToCenter,
+  computeBbox,
+  webMercatorToLonLat,
+  squaredDistance
+} from '@allmaps/stdlib'
 
 import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
-  RendererOptions
+  RendererOptions,
+  MapPruneInfo
 } from '../shared/types.js'
 
 const MIN_VIEWPORT_DIAMETER = 5
+
+// These buffers should be in growing order
+const REQUEST_VIEWPORT_BUFFER_RATIO = 0
+const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 2
+const PRUNE_VIEWPORT_BUFFER_RATIO = 4
+const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 10
+
+/**
+ * 0 = no correction, -1 = shaper, +1 = less sharp
+ * Normal has more effect on smaller scale factors
+ * Log2 (i.e. per zoomlevel) has equal effect all scale factors
+ */
+const SCALE_FACTOR_CORRECTION = 0
+const LOG2_SCALE_FACTOR_CORRECTION = 0.4
+
+const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
+const MAX_TOTAL_RESOLUTION_RATIO = 10
 
 /**
  * Abstract base class for renderers.
@@ -39,6 +66,7 @@ export default abstract class BaseRenderer<
   tileCache: TileCache<D>
 
   mapsInViewport: Set<string> = new Set()
+  mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
   constructor(
@@ -94,138 +122,342 @@ export default abstract class BaseRenderer<
       return false
     }
 
+    // Note: this must be the largest buffer
+    // to make sure prune info is made and maps are pruned
     return Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
+      this.findMapsInViewport(
+        this.shouldAnticipateInteraction()
+          ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+          : 0
+      )
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
       .map((warpedMap) => warpedMap.hasImageInfo())
-      .some((val) => val === true)
+      .some(Boolean)
   }
 
-  protected shouldUpdateRequestedTiles() {
+  protected shouldRequestFetchableTiles() {
     return true
   }
 
-  protected updateRequestedTiles(): void {
-    if (!this.viewport) {
-      return
-    }
-
-    const viewport = this.viewport
-
-    if (!this.shouldUpdateRequestedTiles()) {
-      return
-    }
-
-    const possibleMapsInViewport = Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
-    ).sort((mapIdA, mapIdB) => {
-      const warpedMapA = this.warpedMapList.getWarpedMap(mapIdA)
-      const warpedMapB = this.warpedMapList.getWarpedMap(mapIdB)
-      if (warpedMapA && warpedMapB) {
-        return (
-          distance(bboxToCenter(warpedMapA.geoMaskBbox), viewport.geoCenter) -
-          distance(bboxToCenter(warpedMapB.geoMaskBbox), viewport.geoCenter)
-        )
-      } else {
-        return 0
-      }
-    })
-
-    const requestedTiles: FetchableTile[] = []
-    for (const mapId of possibleMapsInViewport) {
-      const warpedMap = this.warpedMapList.getWarpedMap(mapId)
-
-      if (!warpedMap) {
-        continue
-      }
-
-      if (!warpedMap.visible) {
-        continue
-      }
-
-      if (!warpedMap.hasImageInfo()) {
-        // Note: don't load image information here
-        // this would imply waiting for the first throttling cycle to complete
-        // before acting on a sucessful load
-        continue
-      }
-
-      // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
-      // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
-      if (
-        bboxToDiameter(warpedMap.getViewportMaskBbox(viewport)) <
-        MIN_VIEWPORT_DIAMETER
-      ) {
-        continue
-      }
-
-      // Note the equivalence of the following two:
-      // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
-      // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
-      const tileZoomLevel = getBestTileZoomLevelForScale(
-        warpedMap.parsedImage,
-        warpedMap.getResourceToCanvasScale(viewport)
-      )
-
-      warpedMap.setBestScaleFactor(tileZoomLevel.scaleFactor)
-
-      // Transforming the viewport back to resource
-      const transformerOptions = {
-        maxDepth: 0,
-        // maxDepth: 2,
-        // maxOffsetRatio: 0.00001,
-        sourceIsGeographic: false,
-        destinationIsGeographic: true
-      }
-      // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-      // TODO: Consider recusive refinement via options like {maxOffsetRatio: 0.00001, maxDepth: 2}
-      // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
-
-      const resourceViewportRing = warpedMap.transformer.transformBackward(
-        [viewport.geoRectangle],
-        transformerOptions
-      )[0]
-
-      warpedMap.setResourceViewportRing(resourceViewportRing)
-
-      // This returns tiles sorted by distance from center of resourceViewportRing
-      const tiles = computeTilesCoveringRingAtTileZoomLevel(
-        resourceViewportRing,
-        tileZoomLevel,
-        warpedMap.parsedImage
-      )
-
-      for (const tile of tiles) {
-        requestedTiles.push(new FetchableTile(tile, warpedMap))
-      }
-    }
-
-    this.tileCache.requestFetchableTiles(requestedTiles)
-    this.updateMapsInViewport(requestedTiles)
+  // Should we anticipate user interaction (panning or zooming)
+  // and hence buffer the viewport or get overview tiles
+  protected shouldAnticipateInteraction() {
+    return false
   }
 
-  protected updateMapsInViewport(tiles: FetchableTile[]) {
+  protected requestFetchableTiles(): void {
+    if (!this.shouldRequestFetchableTiles()) {
+      return
+    }
+
+    const fetchableTilesForViewport: FetchableTile[] = []
+    const overviewFetchableTilesForViewport: FetchableTile[] = []
+
+    const mapsInViewportForRequest = this.findMapsInViewport(
+      this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 0
+    )
+    const mapsInViewportForOverviewRequest = this.findMapsInViewport(
+      this.shouldAnticipateInteraction()
+        ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
+        : 0
+    )
+    const mapsInViewportForPrune = this.findMapsInViewport(
+      this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 0
+    )
+    const mapsInViewportForOverviewPrune = this.findMapsInViewport(
+      this.shouldAnticipateInteraction()
+        ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+        : 0
+    )
+
+    // Reset current (overview) zoomlevels, resource viewport ring and fetchable tiles on maps
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      warpedMap.resetCurrent()
+    }
+
+    // Get fetchable tiles for all maps in viewport with request buffer
+    // (and set current valies for all maps in viewport with prune buffer)
+    for (const mapId of mapsInViewportForPrune) {
+      fetchableTilesForViewport.push(
+        ...this.getMapFetchableTilesForViewport(mapId, mapsInViewportForRequest)
+      )
+    }
+
+    // Get overview fetchable tiles for all maps in viewport with overview buffer
+    // (and set current valies for all maps in viewport with prune buffer)
+    if (this.shouldAnticipateInteraction()) {
+      for (const mapId of mapsInViewportForOverviewPrune) {
+        overviewFetchableTilesForViewport.push(
+          ...this.getMapOverviewFetchableTilesForViewport(
+            mapId,
+            [
+              ...fetchableTilesForViewport,
+              ...overviewFetchableTilesForViewport
+            ],
+            mapsInViewportForOverviewRequest
+          )
+        )
+      }
+    }
+
+    // Request all those fetchable tiles
+    this.tileCache.requestFetchableTiles([
+      ...fetchableTilesForViewport,
+      ...overviewFetchableTilesForViewport
+    ])
+
+    this.updateMapsForViewport([
+      ...fetchableTilesForViewport,
+      ...overviewFetchableTilesForViewport
+    ])
+    this.pruneTileCache(mapsInViewportForOverviewPrune)
+  }
+
+  protected findMapsInViewport(viewportBufferRatio: number = 0): Set<string> {
+    if (!this.viewport) {
+      return new Set()
+    }
+    const viewport = this.viewport
+
+    const projectedGeoBufferedRectangle =
+      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
+    const geoBufferedRectangleBbox = computeBbox(
+      projectedGeoBufferedRectangle.map((point) => webMercatorToLonLat(point))
+    )
+
+    return new Set(
+      Array.from(
+        this.warpedMapList.getMapsByGeoBbox(geoBufferedRectangleBbox)
+      ).sort((mapIdA, mapIdB) => {
+        const warpedMapA = this.warpedMapList.getWarpedMap(mapIdA)
+        const warpedMapB = this.warpedMapList.getWarpedMap(mapIdB)
+        if (warpedMapA && warpedMapB) {
+          return (
+            squaredDistance(
+              bboxToCenter(warpedMapA.geoMaskBbox),
+              viewport.geoCenter
+            ) -
+            squaredDistance(
+              bboxToCenter(warpedMapB.geoMaskBbox),
+              viewport.geoCenter
+            )
+          )
+        } else {
+          return 0
+        }
+      })
+    )
+  }
+
+  protected getMapFetchableTilesForViewport(
+    mapId: string,
+    mapsInViewportForRequest: Set<string>
+  ): FetchableTile[] {
+    if (!this.viewport) {
+      return []
+    }
+    const viewport = this.viewport
+
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+    if (!warpedMap) {
+      return []
+    }
+
+    if (!warpedMap.visible) {
+      return []
+    }
+
+    if (!warpedMap.hasImageInfo()) {
+      // Note: don't load image information here
+      // this would imply waiting for the first throttling cycle to complete
+      // before acting on a sucessful load
+      return []
+    }
+
+    // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
+    // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
+    if (
+      bboxToDiameter(warpedMap.getViewportMaskBbox(viewport)) <
+      MIN_VIEWPORT_DIAMETER
+    ) {
+      return []
+    }
+
+    // Find bestTileZoomLevel for current viewport
+    const bestTileZoomLevel = getBestTileZoomLevelForScale(
+      warpedMap.parsedImage.tileZoomLevels,
+      warpedMap.getResourceToCanvasScale(viewport),
+      SCALE_FACTOR_CORRECTION,
+      LOG2_SCALE_FACTOR_CORRECTION
+    )
+    warpedMap.setCurrentTileZoomLevel(bestTileZoomLevel)
+    warpedMap.setCurrentBestScaleFactor(bestTileZoomLevel.scaleFactor)
+    // Note the equivalence of the following two:
+    // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
+    // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
+
+    // Transforming the viewport back to resource
+    const transformerOptions = {
+      maxDepth: 0,
+      // maxDepth: 2,
+      // maxOffsetRatio: 0.00001,
+      sourceIsGeographic: false,
+      destinationIsGeographic: true
+    }
+    // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
+    // TODO: Consider recusive refinement via options like {maxOffsetRatio: 0.00001, maxDepth: 2}
+    // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
+    const resourceViewportRing =
+      warpedMap.projectedTransformer.transformBackward(
+        [
+          viewport.getProjectedGeoBufferedRectangle(
+            this.shouldAnticipateInteraction()
+              ? REQUEST_VIEWPORT_BUFFER_RATIO
+              : 0
+          )
+        ],
+        transformerOptions
+      )[0]
+    warpedMap.setCurrentResourceViewportRing(resourceViewportRing)
+    // TODO: consider to transform viewport.projectedGeoRectable backward using projectedTransform
+
+    // If this map it ourside of the viewport with request buffer, stop here:
+    // in thise case we only ran this function to set the current variables
+    // so we can use them relyably while pruning
+    if (!mapsInViewportForRequest.has(mapId)) {
+      return []
+    }
+
+    // Find tiles covering this back-transformed viewport
+    // This returns tiles sorted by distance from center of resourceViewportRing
+    const tiles = computeTilesCoveringRingAtTileZoomLevel(
+      resourceViewportRing,
+      bestTileZoomLevel,
+      [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
+    )
+
+    // Make fetchable tiles
+    const fetchableTiles = tiles.map(
+      (tile) => new FetchableTile(tile, warpedMap)
+    )
+    warpedMap.setCurrentFetchableTiles(fetchableTiles)
+
+    return fetchableTiles
+  }
+
+  protected getMapOverviewFetchableTilesForViewport(
+    mapId: string,
+    totalFetchableTilesForViewport: FetchableTile[],
+    mapsInViewportForOverviewRequest: Set<string>
+  ): FetchableTile[] {
+    if (!this.viewport) {
+      return []
+    }
+
+    const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+
+    if (!warpedMap) {
+      return []
+    }
+
+    if (!warpedMap.visible) {
+      return []
+    }
+
+    if (!warpedMap.hasImageInfo()) {
+      // Note: don't load image information here
+      // this would imply waiting for the first throttling cycle to complete
+      // before acting on a sucessful load
+      return []
+    }
+
+    // No overview tiles if too many fetchable tiles in total already
+    const totalFetchableTilesResolution = getTilesResolution(
+      totalFetchableTilesForViewport.map((fetchableTile) => fetchableTile.tile)
+    )
+    const maxTotalFetchableTilesResolution =
+      this.viewport.canvasResolution * MAX_TOTAL_RESOLUTION_RATIO
+
+    if (totalFetchableTilesResolution > maxTotalFetchableTilesResolution) {
+      return []
+    }
+
+    // Find the fitting overview zoomlevel, if any
+    const overviewTileZoomLevel = warpedMap.parsedImage.tileZoomLevels
+      .filter(
+        (tileZoomLevel) =>
+          getTileZoomLevelResolution(tileZoomLevel) <=
+          MAX_MAP_OVERVIEW_RESOLUTION
+        // Neglect zoomlevels that contain too many pixels
+      )
+      .sort(
+        (tileZoomLevel0, tileZoomLevel1) =>
+          tileZoomLevel0.scaleFactor - tileZoomLevel1.scaleFactor
+        // Enforcing default ascending order, e.g. from 1 to 16
+      )
+      .at(-1)
+    warpedMap.setCurrentOverviewTileZoomLevel(overviewTileZoomLevel)
+
+    // If this map it ourside of the viewport with overview buffer, stop here:
+    // in thise case we only ran this function to set the current variables
+    // so we can use them relyably while pruning
+    if (!mapsInViewportForOverviewRequest.has(mapId)) {
+      return []
+    }
+
+    // If the overview tile zoomlevel scalefactor is the same or lower then the current tile zoom level scalefactor
+    // then this is not really an 'overview' tilezoomlevel, so don't proceed
+    if (
+      !overviewTileZoomLevel ||
+      (warpedMap.currentTileZoomLevel &&
+        overviewTileZoomLevel.scaleFactor <=
+          warpedMap.currentTileZoomLevel.scaleFactor)
+    ) {
+      return []
+    }
+
+    // Find all tiles at overview scalefactor
+    const overviewTiles = getTilesAtScaleFactor(
+      overviewTileZoomLevel.scaleFactor,
+      warpedMap.parsedImage
+    )
+
+    // Make fechable tiles
+    const overviewFetchableTiles = overviewTiles.map(
+      (tile) => new FetchableTile(tile, warpedMap)
+    )
+    warpedMap.setCurrentOverviewFetchableTiles(overviewFetchableTiles)
+
+    return overviewFetchableTiles
+  }
+
+  protected updateMapsForViewport(tiles: FetchableTile[]) {
+    // Sort to process by zIndex later
+    this.mapsWithRequestedTilesForViewport = new Set(
+      tiles
+        .map((tile) => tile.mapId)
+        .filter((v, i, a) => {
+          // filter out duplicate mapIds
+          return a.indexOf(v) === i
+        })
+        .sort((mapIdA, mapIdB) => {
+          const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
+          const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
+          if (zIndexA !== undefined && zIndexB !== undefined) {
+            return zIndexA - zIndexB
+          }
+          return 0
+        })
+    )
+
+    this.mapsInViewport = this.findMapsInViewport()
+
     // TODO: handle everything as Set() once JS supports filter on sets.
     // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
     const oldMapsInViewportAsArray = Array.from(this.mapsInViewport)
-    const newMapsInViewportAsArray = tiles
-      .map((tile) => tile.mapId)
-      .filter((v, i, a) => {
-        // filter out duplicate mapIds
-        return a.indexOf(v) === i
-      })
-
-    this.mapsInViewport = new Set(
-      newMapsInViewportAsArray.sort((mapIdA, mapIdB) => {
-        const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-        const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-        if (zIndexA !== undefined && zIndexB !== undefined) {
-          return zIndexA - zIndexB
-        }
-        return 0
-      })
-    )
+    const newMapsInViewportAsArray = Array.from(this.mapsInViewport)
 
     const enteringMapsInViewport = newMapsInViewportAsArray.filter(
       (mapId) => !oldMapsInViewportAsArray.includes(mapId)
@@ -234,17 +466,42 @@ export default abstract class BaseRenderer<
       (mapId) => !newMapsInViewportAsArray.includes(mapId)
     )
 
-    for (const mapId in enteringMapsInViewport) {
+    for (const mapId of enteringMapsInViewport) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
       )
     }
-    for (const mapId in leavingMapsInViewport) {
+    for (const mapId of leavingMapsInViewport) {
+      this.clearMap(mapId)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
       )
     }
   }
+
+  protected pruneTileCache(mapsInViewportForOverviewPrune: Set<string>) {
+    // Create pruneInfo for all maps in viewport with prune overview buffer
+    const pruneInfoByMapId: Map<string, MapPruneInfo> = new Map()
+    for (const warpedMap of this.warpedMapList.getWarpedMaps(
+      mapsInViewportForOverviewPrune
+    )) {
+      pruneInfoByMapId.set(warpedMap.mapId, {
+        currentTileZoomLevel: warpedMap.currentTileZoomLevel,
+        currentOverviewTileZoomLevel: warpedMap.currentOverviewTileZoomLevel,
+        currentResourceViewportRingBbox:
+          warpedMap.currentResourceViewportRingBbox
+      })
+    }
+    this.tileCache.prune(pruneInfoByMapId)
+  }
+
+  destroy() {
+    this.tileCache.destroy()
+    this.warpedMapList.destroy()
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected clearMap(mapId: string): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected mapTileLoaded(event: Event): void {}
@@ -260,6 +517,9 @@ export default abstract class BaseRenderer<
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected warpedMapRemoved(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected preChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected transformationChanged(event: Event): void {}
@@ -291,6 +551,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.preChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -328,6 +593,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
       this.warpedMapRemoved.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.PRECHANGE,
+      this.preChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(

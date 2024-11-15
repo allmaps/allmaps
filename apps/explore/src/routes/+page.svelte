@@ -2,9 +2,11 @@
   import { onMount } from 'svelte'
 
   import { Map, addProtocol } from 'maplibre-gl'
-  import layers from 'protomaps-themes-base'
+  import maplibregl from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
   import { uniqWith } from 'lodash-es'
+
+  import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
@@ -96,29 +98,17 @@
 
     map = new Map({
       container,
-      style: {
-        version: 8,
-        glyphs:
-          'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-        sources: {
-          protomaps: {
-            type: 'vector',
-            tiles: [
-              'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
-            ],
-            maxzoom: 14,
-            attribution:
-              '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
-          }
-        },
-        layers: layers('protomaps', 'light')
-      },
+      style: basemapStyle("en"),
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
       preserveDrawingBuffer: true,
       hash: true
     })
+
+    // @ts-expect-error maplibregl is a global UMD module
+    // eslint-disable-next-line no-undef
+    addTerrain(map, maplibregl)
 
     map.on('load', () => {
       map.addSource('masks', {

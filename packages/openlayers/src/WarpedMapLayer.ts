@@ -31,7 +31,7 @@ export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
 export default class WarpedMapLayer extends Layer {
   container: HTMLElement
 
-  canvas: HTMLCanvasElement | null = null
+  canvas: HTMLCanvasElement
   gl: WebGL2RenderingContext
 
   canvasSize: [number, number] = [0, 0]
@@ -574,9 +574,10 @@ export default class WarpedMapLayer extends Layer {
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
-    this.renderer.dispose()
+    this.renderer.destroy()
 
     const extension = this.gl.getExtension('WEBGL_lose_context')
+
     if (extension) {
       extension.loseContext()
     }
@@ -668,7 +669,27 @@ export default class WarpedMapLayer extends Layer {
     return needResize
   }
 
+  private contextLost(event: Event) {
+    event.preventDefault()
+    this.renderer.contextLost()
+  }
+
+  private contextRestored(event: Event) {
+    event.preventDefault()
+    this.renderer.contextRestored()
+  }
+
   private addEventListeners() {
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this.contextLost.bind(this)
+    )
+
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this.contextRestored.bind(this)
+    )
+
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
       this.changed.bind(this)
@@ -726,6 +747,16 @@ export default class WarpedMapLayer extends Layer {
   }
 
   private removeEventListeners() {
+    this.canvas.removeEventListener(
+      'webglcontextlost',
+      this.contextLost.bind(this)
+    )
+
+    this.canvas.removeEventListener(
+      'webglcontextrestored',
+      this.contextRestored.bind(this)
+    )
+
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
       this.changed.bind(this)

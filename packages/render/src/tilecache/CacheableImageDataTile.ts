@@ -7,7 +7,7 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import type { FetchFn } from '@allmaps/types'
 
 /**
- * Class for tiles that are cached using the Canvas 2D ImageData object.
+ * Class for tiles that can be cached, and whose data can be processed to an ImageData object.
  *
  * @export
  * @class CacheableImageDataTile
@@ -31,9 +31,12 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
         this.fetchFn
       )
 
+      const width = this.tile.tileZoomLevel.width
+      const height = this.tile.tileZoomLevel.height
+
       const blob = await response.blob()
       const bitmap = await createImageBitmap(blob)
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+      const canvas = new OffscreenCanvas(width, height)
       const context = canvas.getContext('2d')
 
       if (!context) {
@@ -41,7 +44,7 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
       }
 
       context.drawImage(bitmap, 0, 0)
-      this.data = context.getImageData(0, 0, bitmap.width, bitmap.height)
+      this.data = context.getImageData(0, 0, width, height)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
@@ -67,7 +70,7 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
 }
 
 /**
- * Class for cacheable tiles that have been fetched.
+ * Class for tiles that is cached, and whose data has been processed to an ImageData object.
  *
  * @export
  * @class CachedImageDataTile

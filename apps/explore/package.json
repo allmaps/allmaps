@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/explore",
-  "version": "0.0.2-alpha.39",
+  "version": "0.0.2-alpha.41",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -46,13 +46,13 @@
     "vite": "^5.0.3"
   },
   "dependencies": {
-    "@allmaps/maplibre": "^1.0.0-beta.29",
-    "@allmaps/stdlib": "^1.0.0-beta.30",
-    "@allmaps/tailwind": "^1.0.0-beta.13",
-    "@allmaps/ui": "^1.0.0-beta.31",
+    "@allmaps/basemap": "^1.0.0-beta.2",
+    "@allmaps/maplibre": "^1.0.0-beta.30",
+    "@allmaps/stdlib": "^1.0.0-beta.31",
+    "@allmaps/tailwind": "^1.0.0-beta.14",
+    "@allmaps/ui": "^1.0.0-beta.32",
     "lodash-es": "^4.17.21",
-    "maplibre-gl": "^4.0.0",
-    "pmtiles": "^3.0.3",
-    "protomaps-themes-base": "2.0.0-alpha.5"
+    "maplibre-gl": "^4.5.0",
+    "pmtiles": "^3.0.6"
   }
 }

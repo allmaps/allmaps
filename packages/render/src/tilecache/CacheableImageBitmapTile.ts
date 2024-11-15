@@ -7,7 +7,7 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import type { FetchFn } from '@allmaps/types'
 
 /**
- * Class for tiles that are cached using an ImageBitMap.
+ * Class for tiles that can be cached, and whose data can be processed to an ImageBitMap.
  *
  * @export
  * @class CacheableImageBitmapTile
@@ -29,8 +29,15 @@ export default class CacheableImageBitmapTile extends CacheableTile<ImageBitmap>
         },
         this.fetchFn
       )
+
       const blob = await response.blob()
-      this.data = await createImageBitmap(blob)
+      this.data = await createImageBitmap(
+        blob,
+        0,
+        0,
+        this.tile.tileZoomLevel.width,
+        this.tile.tileZoomLevel.height
+      )
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)

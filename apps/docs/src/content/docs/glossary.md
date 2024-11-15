@@ -7,21 +7,21 @@ description: ''
 
 The following are common, general concepts we use:
 
-- ***Map***
+- **_Map_**
   - A general term for an image with geographical meaning. In this sense, a Georeference Annotation specifies a map: it points to an image through its IIIF Manifest, which it gives a geographical context using the ground control points. We identify and pass through various functions using their unique `mapId`.
     - As explained in the [@allmaps/render](../reference/packages/render) package, along the rendering pipeline a series of objects are created from an initial annotation, each with the same `mapId`, to assure the correct rendering of the map it specifies: parsing a georeferencing annotation creates a `Georeferenced Map` (this is what's stored in the Allmaps database), preparing to warp it with a specific transformation type creates a `Warped Map`, and preparing to draw it using WebGL creates a `WebGL2WarpedMap`.
   - Note that many other projects like webmapping libraries often have specific objects named a 'map'.
-- ***Image***
+- **_Image_**
   - A general term for a picture of a map. In practice, we refer to image content that is part of a IIIF Canvas.
-- ***Manifest***
+- **_Manifest_**
   - The prime unit of the [IIIF presentation API](https://iiif.io/api/presentation/3.0/#2-resource-type-overview). It describes the structure and properties of a compound object (for example a physical book). It contains IIIF Canvasses as items.
-- ***Canvas***
+- **_Canvas_**
   - A virtual container or 'blank page' that represents a particular view of a compound object (for example a page of a book). These are filled with content resources, such as images (either 'embedded' within the canvas description or 'referenced' using annotations).
-- ***Annotation***
-  - A IIIF Annotation associates content (images, audio, video, or text) resources with IIIF Canvases. They can be used to add images on a canvas, but also to annotate a part of a IIIF object. *We often use this as a short for Georeference Annotation, or an Annotation page of Georeference Annotations!*
-- ***Annotation Page***
+- **_Annotation_**
+  - A IIIF Annotation associates content (images, audio, video, or text) resources with IIIF Canvases. They can be used to add images on a canvas, but also to annotate a part of a IIIF object. _We often use this as a short for Georeference Annotation, or an Annotation page of Georeference Annotations!_
+- **_Annotation Page_**
   - An ordered list of Annotations.
-- ***Georeference Annotation***
+- **_Georeference Annotation_**
   - A IIIF Annotation that follows the [Georeference Annotation spec](https://preview.iiif.io/api/georef/extension/georef/) and describes the geographic context of an image. Hence, it turns an 'image' into a 'map'!
 
 ## Code terminology and conventions
@@ -44,7 +44,7 @@ Referring to 'pixels' or 'coordinates' is not unambiguous, since there are many 
 - `viewport`: a position in the viewport (for example an OpenLayers `<div id='map'>...</div>` element), expressed in logical pixels (i.e. device pixels times the [device pixel ratio](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)). The position is relative to the top left origin, and the coordinate order is `(down, right)`
 - `canvas`: a position in the viewport, expressed in physical pixels
 - `clip`: a position in the viewport, expressed in clip space. The origin in the center of the viewport, the coordinate order is (x, y). Coordinates go from -1 to 1 in both directions.
-- `packedTilesTexture`: a position in a map's texture WebGL texture. Coordinates go from 0 to 1 from left to right across the texture and 0 to 1 from the first pixel on the first line to the last pixel on the last line.
+- `cachedTilesTexture`: a position in a map's texture WebGL texture. Coordinates go from 0 to 1 from left to right across the texture and 0 to 1 from the first pixel on the first line to the last pixel on the last line.
 
 ### Shapes
 
@@ -53,17 +53,20 @@ Shapes are defined using (nested) arrays of coordinates (e.g. `X` and `Y` or `ln
 We use the following shapes, as defined in [@allmaps/type](../reference/packages/types):
 
 **Geometric shapes**: we use these by default
+
 - `Point`: `[X, Y]`
 - `LineString`: a continuous line defined by 2 or more points (a `Line` is a LineString of exactly 2 points)
 - `Ring`: a closed shape defined by 3 or more points. It is unclosed (as opposed to GeoJSON) in that the first position is not repeated at the end. There are currently no restrictions on winding order.
 - `Polygon`: a closed shape, possibly with holes, defined as an array of rings. The first ring is the outer ring of the polygon, the following are the inner rings and define the holes. There are currently no restrictions on winding order of the rings.
 
 **GeoJSON geometries**: we use GeoJSON geometries, as defined in the [GeoJSON spec](https://geojson.org/) for input and output
+
 - `Point`
 - `LineString`
 - `Polygon`
 
 **SVG elements**: we use the following [SVG elements](https://developer.mozilla.org/en-US/docs/Web/SVG/Element#svg_elements_by_category) for input and output
+
 - `Circle`
 - `Line`
 - `PolyLine`
@@ -75,7 +78,8 @@ GeoJSON geometries always have `geo` coordinates `(lng, lat)`, they can't be use
 ### Shader variables
 
 Standard shader variable follow `camelCase` like TypeScript variables, but variables that are passed to or between shaders are given a prefix:
-- `a_` for attributes which is the data provided by buffers. 
+
+- `a_` for attributes which is the data provided by buffers.
 - `u_` for uniforms which are inputs to the shaders
 - `v_` for varyings which are values passed from a vertex shader to a fragment shader and interpolated (or varied) between the vertices for each pixel drawn.
 

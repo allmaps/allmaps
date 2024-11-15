@@ -89,159 +89,181 @@ For a complete example, see the source code of the Allmaps plugins for [Leaflet]
 *   [getResourceToCanvasScale](#getresourcetocanvasscale)
     *   [Parameters](#parameters-12)
 *   [getReferenceScale](#getreferencescale)
-*   [setResourceViewportRing](#setresourceviewportring)
-    *   [Parameters](#parameters-13)
 *   [setResourceMask](#setresourcemask)
-    *   [Parameters](#parameters-14)
+    *   [Parameters](#parameters-13)
 *   [setTransformationType](#settransformationtype)
-    *   [Parameters](#parameters-15)
+    *   [Parameters](#parameters-14)
 *   [setDistortionMeasure](#setdistortionmeasure)
-    *   [Parameters](#parameters-16)
+    *   [Parameters](#parameters-15)
 *   [setGcps](#setgcps)
+    *   [Parameters](#parameters-16)
+*   [setCurrentBestScaleFactor](#setcurrentbestscalefactor)
     *   [Parameters](#parameters-17)
-*   [setBestScaleFactor](#setbestscalefactor)
+*   [setCurrentTileZoomLevel](#setcurrenttilezoomlevel)
     *   [Parameters](#parameters-18)
+*   [setCurrentOverviewTileZoomLevel](#setcurrentoverviewtilezoomlevel)
+    *   [Parameters](#parameters-19)
+*   [setCurrentResourceViewportRing](#setcurrentresourceviewportring)
+    *   [Parameters](#parameters-20)
+*   [setCurrentFetchableTiles](#setcurrentfetchabletiles)
+    *   [Parameters](#parameters-21)
+*   [setCurrentOverviewFetchableTiles](#setcurrentoverviewfetchabletiles)
+    *   [Parameters](#parameters-22)
+*   [resetCurrent](#resetcurrent)
+*   [resetPrevious](#resetprevious)
+*   [mixPreviousAndNew](#mixpreviousandnew)
+    *   [Parameters](#parameters-23)
 *   [hasImageInfo](#hasimageinfo)
 *   [loadImageInfo](#loadimageinfo)
 *   [constructor](#constructor-2)
-    *   [Parameters](#parameters-19)
-*   [setResourceMask](#setresourcemask-1)
-    *   [Parameters](#parameters-20)
-*   [setBestScaleFactor](#setbestscalefactor-1)
-    *   [Parameters](#parameters-21)
-*   [updateTriangulation](#updatetriangulation)
-    *   [Parameters](#parameters-22)
-*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
-    *   [Parameters](#parameters-23)
-*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
     *   [Parameters](#parameters-24)
-*   [resetTrianglePoints](#resettrianglepoints)
-*   [mixTrianglePoints](#mixtrianglepoints)
+*   [setResourceMask](#setresourcemask-1)
     *   [Parameters](#parameters-25)
-*   [constructor](#constructor-3)
+*   [setCurrentBestScaleFactor](#setcurrentbestscalefactor-1)
     *   [Parameters](#parameters-26)
-*   [updateVertexBuffers](#updatevertexbuffers)
+*   [resetPrevious](#resetprevious-1)
+*   [mixPreviousAndNew](#mixpreviousandnew-1)
     *   [Parameters](#parameters-27)
-*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
+*   [updateTriangulation](#updatetriangulation)
     *   [Parameters](#parameters-28)
-*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
+*   [updateProjectedGeoTrianglePoints](#updateprojectedgeotrianglepoints)
     *   [Parameters](#parameters-29)
-*   [constructor](#constructor-4)
+*   [updateTrianglePointsDistortion](#updatetrianglepointsdistortion)
     *   [Parameters](#parameters-30)
+*   [constructor](#constructor-3)
+    *   [Parameters](#parameters-31)
+*   [updateVertexBuffers](#updatevertexbuffers)
+    *   [Parameters](#parameters-32)
+*   [clearTextures](#cleartextures)
+*   [addCachedTileAndUpdateTextures](#addcachedtileandupdatetextures)
+    *   [Parameters](#parameters-33)
+*   [removeCachedTileAndUpdateTextures](#removecachedtileandupdatetextures)
+    *   [Parameters](#parameters-34)
+*   [constructor](#constructor-4)
+    *   [Parameters](#parameters-35)
 *   [getMapIds](#getmapids)
 *   [getWarpedMap](#getwarpedmap)
-    *   [Parameters](#parameters-31)
+    *   [Parameters](#parameters-36)
 *   [getMapZIndex](#getmapzindex)
-    *   [Parameters](#parameters-32)
+    *   [Parameters](#parameters-37)
 *   [getBbox](#getbbox)
 *   [getProjectedBbox](#getprojectedbbox)
 *   [getMapsByGeoBbox](#getmapsbygeobbox)
-    *   [Parameters](#parameters-33)
-*   [setImageInformations](#setimageinformations)
-    *   [Parameters](#parameters-34)
-*   [setMapResourceMask](#setmapresourcemask)
-    *   [Parameters](#parameters-35)
-*   [setMapsTransformationType](#setmapstransformationtype)
-    *   [Parameters](#parameters-36)
-*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
-    *   [Parameters](#parameters-37)
-*   [bringMapsToFront](#bringmapstofront)
     *   [Parameters](#parameters-38)
-*   [sendMapsToBack](#sendmapstoback)
+*   [setImageInformations](#setimageinformations)
     *   [Parameters](#parameters-39)
-*   [bringMapsForward](#bringmapsforward)
+*   [setMapResourceMask](#setmapresourcemask)
     *   [Parameters](#parameters-40)
-*   [sendMapsBackward](#sendmapsbackward)
+*   [setMapsTransformationType](#setmapstransformationtype)
     *   [Parameters](#parameters-41)
-*   [showMaps](#showmaps)
+*   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [Parameters](#parameters-42)
-*   [hideMaps](#hidemaps)
+*   [bringMapsToFront](#bringmapstofront)
     *   [Parameters](#parameters-43)
-*   [addGeoreferencedMap](#addgeoreferencedmap)
+*   [sendMapsToBack](#sendmapstoback)
     *   [Parameters](#parameters-44)
-*   [removeGeoreferencedMap](#removegeoreferencedmap)
+*   [bringMapsForward](#bringmapsforward)
     *   [Parameters](#parameters-45)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+*   [sendMapsBackward](#sendmapsbackward)
     *   [Parameters](#parameters-46)
-*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+*   [showMaps](#showmaps)
     *   [Parameters](#parameters-47)
-*   [constructor](#constructor-5)
+*   [hideMaps](#hidemaps)
     *   [Parameters](#parameters-48)
+*   [addGeoreferencedMap](#addgeoreferencedmap)
+    *   [Parameters](#parameters-49)
+*   [removeGeoreferencedMap](#removegeoreferencedmap)
+    *   [Parameters](#parameters-50)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
+    *   [Parameters](#parameters-51)
+*   [removeGeoreferenceAnnotation](#removegeoreferenceannotation)
+    *   [Parameters](#parameters-52)
+*   [constructor](#constructor-5)
+    *   [Parameters](#parameters-53)
 *   [isCachedTile](#iscachedtile)
 *   [abort](#abort)
 *   [constructor](#constructor-6)
-    *   [Parameters](#parameters-49)
+    *   [Parameters](#parameters-54)
 *   [fetch](#fetch)
 *   [fetch](#fetch-1)
 *   [fetch](#fetch-2)
-*   [getCacheableTile](#getcacheabletile)
-    *   [Parameters](#parameters-50)
-*   [getCachedTile](#getcachedtile)
-    *   [Parameters](#parameters-51)
+*   [fetch](#fetch-3)
 *   [getCacheableTiles](#getcacheabletiles)
+*   [getCacheableTile](#getcacheabletile)
+    *   [Parameters](#parameters-55)
+*   [getMapCacheableTiles](#getmapcacheabletiles)
+    *   [Parameters](#parameters-56)
 *   [getCachedTiles](#getcachedtiles)
+*   [getCachedTile](#getcachedtile)
+    *   [Parameters](#parameters-57)
+*   [getMapCachedTiles](#getmapcachedtiles)
+    *   [Parameters](#parameters-58)
 *   [getTileUrls](#gettileurls)
+*   [getMapTileUrls](#getmaptileurls)
+    *   [Parameters](#parameters-59)
 *   [requestFetchableTiles](#requestfetchabletiles)
-    *   [Parameters](#parameters-52)
+    *   [Parameters](#parameters-60)
 *   [allRequestedTilesLoaded](#allrequestedtilesloaded)
+*   [prune](#prune)
+    *   [Parameters](#parameters-61)
+*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
+    *   [Parameters](#parameters-62)
+*   [addGeoreferencedMap](#addgeoreferencedmap-1)
+    *   [Parameters](#parameters-63)
 *   [constructor](#constructor-7)
-    *   [Parameters](#parameters-53)
+    *   [Parameters](#parameters-64)
 *   [getOpacity](#getopacity)
 *   [setOpacity](#setopacity)
-    *   [Parameters](#parameters-54)
+    *   [Parameters](#parameters-65)
 *   [resetOpacity](#resetopacity)
 *   [getMapOpacity](#getmapopacity)
-    *   [Parameters](#parameters-55)
+    *   [Parameters](#parameters-66)
 *   [setMapOpacity](#setmapopacity)
-    *   [Parameters](#parameters-56)
+    *   [Parameters](#parameters-67)
 *   [resetMapOpacity](#resetmapopacity)
-    *   [Parameters](#parameters-57)
+    *   [Parameters](#parameters-68)
 *   [getRemoveColorOptions](#getremovecoloroptions)
 *   [setRemoveColorOptions](#setremovecoloroptions)
-    *   [Parameters](#parameters-58)
+    *   [Parameters](#parameters-69)
 *   [resetRemoveColorOptions](#resetremovecoloroptions)
 *   [getMapRemoveColorOptions](#getmapremovecoloroptions)
-    *   [Parameters](#parameters-59)
+    *   [Parameters](#parameters-70)
 *   [setMapRemoveColorOptions](#setmapremovecoloroptions)
-    *   [Parameters](#parameters-60)
+    *   [Parameters](#parameters-71)
 *   [resetMapRemoveColorOptions](#resetmapremovecoloroptions)
-    *   [Parameters](#parameters-61)
+    *   [Parameters](#parameters-72)
 *   [getColorizeOptions](#getcolorizeoptions)
 *   [setColorizeOptions](#setcolorizeoptions)
-    *   [Parameters](#parameters-62)
+    *   [Parameters](#parameters-73)
 *   [resetColorizeOptions](#resetcolorizeoptions)
 *   [getMapColorizeOptions](#getmapcolorizeoptions)
-    *   [Parameters](#parameters-63)
+    *   [Parameters](#parameters-74)
 *   [setMapColorizeOptions](#setmapcolorizeoptions)
-    *   [Parameters](#parameters-64)
+    *   [Parameters](#parameters-75)
 *   [resetMapColorizeOptions](#resetmapcolorizeoptions)
-    *   [Parameters](#parameters-65)
+    *   [Parameters](#parameters-76)
 *   [getGridOptions](#getgridoptions)
 *   [setGridOptions](#setgridoptions)
-    *   [Parameters](#parameters-66)
+    *   [Parameters](#parameters-77)
 *   [resetGridOptions](#resetgridoptions)
 *   [getMapGridOptions](#getmapgridoptions)
-    *   [Parameters](#parameters-67)
+    *   [Parameters](#parameters-78)
 *   [setMapGridOptions](#setmapgridoptions)
-    *   [Parameters](#parameters-68)
+    *   [Parameters](#parameters-79)
 *   [resetMapGridOptions](#resetmapgridoptions)
-    *   [Parameters](#parameters-69)
+    *   [Parameters](#parameters-80)
 *   [getSaturation](#getsaturation)
 *   [setSaturation](#setsaturation)
-    *   [Parameters](#parameters-70)
+    *   [Parameters](#parameters-81)
 *   [resetSaturation](#resetsaturation)
 *   [getMapSaturation](#getmapsaturation)
-    *   [Parameters](#parameters-71)
+    *   [Parameters](#parameters-82)
 *   [setMapSaturation](#setmapsaturation)
-    *   [Parameters](#parameters-72)
+    *   [Parameters](#parameters-83)
 *   [resetMapSaturation](#resetmapsaturation)
-    *   [Parameters](#parameters-73)
+    *   [Parameters](#parameters-84)
 *   [render](#render)
-    *   [Parameters](#parameters-74)
-*   [addGeoreferenceAnnotation](#addgeoreferenceannotation-1)
-    *   [Parameters](#parameters-75)
-*   [addGeoreferencedMap](#addgeoreferencedmap-1)
-    *   [Parameters](#parameters-76)
+    *   [Parameters](#parameters-85)
 
 ### constructor
 
@@ -252,11 +274,11 @@ Creates a new Viewport
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `r` &#x20;
+*   `i` &#x20;
 *   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoCenter` **Point** Center point of the viewport, in projected coordinates.
-*   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Resolution of the viewport, in projection coordinates per viewport pixel.
+*   `projectedGeoPerViewportScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Scale of the viewport, in projection coordinates per viewport pixel.
 *   `rotation` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Rotation of the viewport with respect to the project coordinate system.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The devicePixelRatio of the viewport. (optional, default `1`)
 
@@ -269,7 +291,7 @@ Returns a rotated rectangle in projected geo coordinates
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `r` &#x20;
+*   `i` &#x20;
 
 ### fromWarpedMapList
 
@@ -280,7 +302,7 @@ Static method creates that creates a Viewport from a WarpedMapList
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `r`   (optional, default `"contain"`)
+*   `i`   (optional, default `"contain"`)
 *   `s`   (optional, default `1`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
@@ -298,7 +320,7 @@ Static method creates that creates a Viewport from Bbox in projected geospatial 
 *   `e` &#x20;
 *   `t` &#x20;
 *   `o` &#x20;
-*   `r`   (optional, default `"contain"`)
+*   `i`   (optional, default `"contain"`)
 *   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
 *   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
 *   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
@@ -314,7 +336,7 @@ Creates an instance of WarpedMap.
 
 *   `e` &#x20;
 *   `r` &#x20;
-*   `s` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `options` **WarpedMapOptions?** options
@@ -413,15 +435,6 @@ Get the reference scaling from the forward transformation of the projected Helme
 
 Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
-### setResourceViewportRing
-
-Set resourceViewportRing at current viewport
-
-#### Parameters
-
-*   `e` &#x20;
-*   `resourceViewportRing` **Ring**&#x20;
-
 ### setResourceMask
 
 Update the resourceMask loaded from a georeferenced map to a new mask.
@@ -458,7 +471,7 @@ Update the Ground Controle Points loaded from a georeferenced map to new Ground 
 *   `e` &#x20;
 *   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GCP>**&#x20;
 
-### setBestScaleFactor
+### setCurrentBestScaleFactor
 
 Set the bestScaleFactor for the current viewport
 
@@ -468,6 +481,68 @@ Set the bestScaleFactor for the current viewport
 *   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### setCurrentTileZoomLevel
+
+Set the tile zoom level for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileZoomLevel` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** tile zoom level
+
+### setCurrentOverviewTileZoomLevel
+
+Set the overview tile zoom level for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileZoomLevel` **TileZoomLevel?** tile zoom level
+
+### setCurrentResourceViewportRing
+
+Set resourceViewportRing at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceViewportRing` **Ring?**&#x20;
+
+### setCurrentFetchableTiles
+
+Set tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### setCurrentOverviewFetchableTiles
+
+Set overview tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `overviewFetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### resetCurrent
+
+Reset current values
+
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
 ### hasImageInfo
 
@@ -485,8 +560,8 @@ Creates an instance of a TriangulatedWarpedMap.
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `i` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
@@ -498,19 +573,31 @@ Update the resourceMask.
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `resourceMask` **Ring**&#x20;
 
-### setBestScaleFactor
+### setCurrentBestScaleFactor
 
 Set the bestScaleFactor for the current viewport
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
 ### updateTriangulation
 
@@ -518,7 +605,7 @@ Update the triangulation of the resourceMask, at the current bestScaleFactor. Us
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether the previous and new triangulation are the same - true by default, false during a transformation transition
 
 ### updateProjectedGeoTrianglePoints
@@ -527,7 +614,7 @@ Update the (previous and new) points of the triangulated resourceMask, at the cu
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
 
 ### updateTrianglePointsDistortion
@@ -536,21 +623,8 @@ Update the (previous and new) distortion at the points of the triangulated resou
 
 #### Parameters
 
-*   `e`   (optional, default `!1`)
+*   `t`   (optional, default `!1`)
 *   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
-
-### resetTrianglePoints
-
-Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
-
-### mixTrianglePoints
-
-Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
-
-#### Parameters
-
-*   `e` &#x20;
-*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
 
 ### constructor
 
@@ -559,14 +633,16 @@ Creates an instance of WebGL2WarpedMap.
 #### Parameters
 
 *   `e` &#x20;
-*   `i` &#x20;
 *   `r` &#x20;
-*   `s` &#x20;
 *   `n` &#x20;
+*   `l` &#x20;
+*   `T` &#x20;
+*   `i` &#x20;
+*   `o` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
 *   `gl` **WebGL2RenderingContext** WebGL rendering context
-*   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
+*   `mapsProgram` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
 *   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
 
 ### updateVertexBuffers
@@ -577,6 +653,10 @@ Update the vertex buffers of this warped map
 
 *   `e` &#x20;
 *   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+
+### clearTextures
+
+Clear textures for this map
 
 ### addCachedTileAndUpdateTextures
 
@@ -848,6 +928,18 @@ Fetch the tile and create its IntArray data using the supplied getImageData func
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
+### fetch
+
+Fetch the tile and create its ImageBitmap using a WebWorker.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### getCacheableTiles
+
+Get the tiles in this cache
+
+Returns **IterableIterator\<CacheableTile>**&#x20;
+
 ### getCacheableTile
 
 Get a specific tile in this cache
@@ -858,6 +950,23 @@ Get a specific tile in this cache
 *   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the URL of the requested tile
 
 Returns **(CacheableTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getMapCacheableTiles
+
+Get the tiles in this cache, corresponding to a specific map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
+
+### getCachedTiles
+
+Get the tiles in this cache that have been fetched
+
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
 
 ### getCachedTile
 
@@ -870,21 +979,31 @@ Get a specific cached tile in this cache that has been fetched
 
 Returns **(CachedTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
 
-### getCacheableTiles
+### getMapCachedTiles
 
-Get the tiles in this cache
+Get the tiles in this cache, corresponding to a specific map, that have been fetched
 
-Returns **IterableIterator\<CacheableTile>**&#x20;
+#### Parameters
 
-### getCachedTiles
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
-Get the tiles in this cache that have been fetched
-
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CachedTile>**&#x20;
 
 ### getTileUrls
 
-Get the URLs of all tiles in this cache
+Get the URLs of tiles in this cache
+
+Returns **IterableIterator<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### getMapTileUrls
+
+Get the URLs of tiles in this cache, corresponding to a specific map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **IterableIterator<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
 
@@ -895,7 +1014,7 @@ Process the request for new tiles to be added to this cache
 #### Parameters
 
 *   `e` &#x20;
-*   `tiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
 
 ### allRequestedTilesLoaded
 
@@ -905,14 +1024,44 @@ or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
+### prune
+
+Prune tiles in this cache using the provided prune info
+
+#### Parameters
+
+*   `e` &#x20;
+
+### addGeoreferenceAnnotation
+
+Parses an annotation and adds its georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+### addGeoreferencedMap
+
+Adds a georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
 ### constructor
 
 Creates an instance of WebGL2Renderer.
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `gl` **WebGL2RenderingContext** WebGL 2 rendering context
 *   `options` **WebGL2RendererOptions** options
 
@@ -928,7 +1077,7 @@ Set the opacity of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
 
 ### resetOpacity
@@ -941,7 +1090,7 @@ Get the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -952,8 +1101,8 @@ Set the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
 
@@ -963,7 +1112,7 @@ Rreset the opacity of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getRemoveColorOptions
@@ -978,7 +1127,7 @@ Set the remove color options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `removeColorOptions` **RemoveColorOptions**&#x20;
 
 ### resetRemoveColorOptions
@@ -991,7 +1140,7 @@ Get the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1002,8 +1151,8 @@ Set the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `removeColorOptions` **RemoveColorOptions** the 'remove color options' to set
 
@@ -1013,7 +1162,7 @@ Reset the remove color options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getColorizeOptions
@@ -1028,7 +1177,7 @@ Set the colorize options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
 
 ### resetColorizeOptions
@@ -1041,7 +1190,7 @@ Get the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<ColorizeOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1052,8 +1201,8 @@ Set the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `colorizeOptions` **ColorizeOptions** the colorize options to set
 
@@ -1063,7 +1212,7 @@ Reset the colorize options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getGridOptions
@@ -1078,7 +1227,7 @@ Set the grid options of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `gridOptions` **GridOptions** the grid options to set
 
 ### resetGridOptions
@@ -1091,7 +1240,7 @@ Get the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **(Partial\<GridOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1102,8 +1251,8 @@ Set the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `gridOptions` **GridOptions** the grid options to set
 
@@ -1113,7 +1262,7 @@ Reset the grid options of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### getSaturation
@@ -1130,7 +1279,7 @@ Set the saturation of the renderer
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `saturation`  the satuation to set
 
 ### resetSaturation
@@ -1143,7 +1292,7 @@ Get the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
@@ -1156,8 +1305,8 @@ Set the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
 *   `t` &#x20;
+*   `e` &#x20;
 *   `mapId`  ID of the map
 *   `saturation`  the saturation to set
 
@@ -1167,7 +1316,7 @@ Reset the saturation of a map
 
 #### Parameters
 
-*   `e` &#x20;
+*   `t` &#x20;
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
 ### render
@@ -1176,7 +1325,1405 @@ Render the map for a given viewport
 
 #### Parameters
 
+*   `t` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+# <<<<<<< HEAD
+
+### computeProjectedGeoRectangle
+
+Returns a rotated rectangle in projected geo coordinates
+
+#### Parameters
+
 *   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r` &#x20;
+
+### fromWarpedMapList
+
+Static method creates that creates a Viewport from a WarpedMapList
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r`   (optional, default `"contain"`)
+*   `s`   (optional, default `1`)
+*   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
+*   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
+*   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
+
+Returns **Viewport** A new Viewport object
+
+### fromProjectedGeoBbox
+
+Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r`   (optional, default `"contain"`)
+*   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
+*   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
+*   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
+
+Returns **Viewport** A new Viewport object
+
+### constructor
+
+Creates an instance of WarpedMap.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `r` &#x20;
+*   `o` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** options
+
+### getViewportMask
+
+Get resourceMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Ring**&#x20;
+
+### getViewportMaskBbox
+
+Get Bbox of resourceMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Bbox**&#x20;
+
+### getViewportMaskRectangle
+
+Get resourceMaskRectangle in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Rectangle**&#x20;
+
+### getViewportFullMask
+
+Get resourceFullMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Ring**&#x20;
+
+### getViewportFullMaskBbox
+
+Get bbox of rresourceFullMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Bbox**&#x20;
+
+### getViewportFullMaskRectangle
+
+Get resourceFullMaskRectangle in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Rectangle**&#x20;
+
+### getResourceToViewportScale
+
+Get scale of the warped map, in resource pixels per viewport pixels.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### getResourceToCanvasScale
+
+Get scale of the warped map, in resource pixels per canvas pixels.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### getReferenceScale
+
+Get the reference scaling from the forward transformation of the projected Helmert transformer
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### setCurrentResourceViewportRing
+
+Set resourceViewportRing at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceViewportRing` **Ring**&#x20;
+
+### setCurrentFetchableTiles
+
+Set tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### setCurrentOverviewFetchableTiles
+
+Set overview tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `overviewFetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### setResourceMask
+
+Update the resourceMask loaded from a georeferenced map to a new mask.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceMask` **Ring**&#x20;
+
+### setTransformationType
+
+Update the transformationType loaded from a georeferenced map to a new transformation type.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `transformationType` **TransformationType**&#x20;
+
+### setDistortionMeasure
+
+Set the distortionMeasure
+
+#### Parameters
+
+*   `e` &#x20;
+*   `distortionMeasure` **DistortionMeasure?** the disortion measure
+
+### setGcps
+
+Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GCP>**&#x20;
+
+### setCurrentBestScaleFactor
+
+Set the bestScaleFactor for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### setCurrentOverviewTileZoomLevel
+
+Set the overview tile zoom level for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileZoomLevel` **TileZoomLevel** tile zoom level
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### hasImageInfo
+
+Check if warpedMap has image info
+
+### loadImageInfo
+
+Fetch and parse the image info, and generate the image ID
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### addGeoreferenceAnnotation
+
+Parses an annotation and adds its georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+### addGeoreferencedMap
+
+Adds a georeferenced map to this renderer's warped map list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
+### constructor
+
+Creates an instance of a TriangulatedWarpedMap.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `i` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** Options
+
+### setResourceMask
+
+Update the resourceMask.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceMask` **Ring**&#x20;
+
+### setCurrentBestScaleFactor
+
+Set the bestScaleFactor for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### updateTriangulation
+
+Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
+
+#### Parameters
+
+*   `e`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether the previous and new triangulation are the same - true by default, false during a transformation transition
+
+### updateProjectedGeoTrianglePoints
+
+Update the (previous and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
+
+#### Parameters
+
+*   `e`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+### updateTrianglePointsDistortion
+
+Update the (previous and new) distortion at the points of the triangulated resourceMask. Use cache if available.
+
+#### Parameters
+
+*   `e`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+### resetTrianglePoints
+
+Reset the previous points of the triangulated resourceMask in projectedGeo coordinates.
+
+### mixTrianglePoints
+
+Mix the previous and new points of the triangulated resourceMask in projectedGeo coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### constructor
+
+Creates an instance of WebGL2WarpedMap.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `s` &#x20;
+*   `i` &#x20;
+*   `r` &#x20;
+*   `l` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `gl` **WebGL2RenderingContext** WebGL rendering context
+*   `program` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
+*   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
+
+### updateVertexBuffers
+
+Update the vertex buffers of this warped map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+
+### clearTextures
+
+Clear textures for this map
+
+### addCachedTileAndUpdateTextures
+
+Add cached tile to the textures of this map and update textures
+
+#### Parameters
+
+*   `e` &#x20;
+*   `cachedTile` **CachedTile**&#x20;
+
+### removeCachedTileAndUpdateTextures
+
+Remove cached tile from the textures of this map and update textures
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+> > > > > > > 8f9db659 (WIP: texture buffer depth, improve tileInCachedTiles, webworker, changed @allmaps/openlayers ESM export, and changed viewer's vite settings to allow importing web worker directly from render dir)
+
+### constructor
+
+Creates an instance of a WarpedMapList.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `warpedMapFactory` **WarpedMapFactory\<W>?** Factory function for creating WarpedMap objects
+*   `options` **WarpedMapListOptions?** Options
+
+### computeProjectedGeoRectangle
+
+Returns a rotated rectangle in projected geo coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r` &#x20;
+
+### getMapIds
+
+Returns mapIds for the maps in this list.
+
+Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### getWarpedMap
+
+Returns the WarpedMap object in this list of map specified by its ID.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+Returns **(W | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getMapZIndex
+
+Returns the z-index of a map.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getBbox
+
+Return the bounding box of all visible maps in this list, in longitude/latitude coordinates
+
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getProjectedBbox
+
+Return the bounding box of all visible maps in this list, in projected coordinates
+
+Returns **(Bbox | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getMapsByGeoBbox
+
+Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `geoBbox` **Bbox**&#x20;
+
+Returns **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### setImageInformations
+
+Sets the object that caches image information
+
+#### Parameters
+
+*   `e` &#x20;
+*   `imageInformations` **ImageInformations** object that caches image information
+
+### setMapResourceMask
+
+Sets the resource mask for a specified map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `resourceMask` **Ring** the new resource mask
+
+### setMapsTransformationType
+
+Sets the transformation type of specified maps
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
+*   `transformationType` **TransformationType** the new transformation type
+
+### setMapsDistortionMeasure
+
+Sets the distortion measure of specified maps
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** the IDs of the maps
+*   `distortionMeasure` **DistortionMeasure?** the distortion measure
+
+### bringMapsToFront
+
+Changes the z-index of the specified maps to bring them to front
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### sendMapsToBack
+
+Changes the z-index of the specified maps to send them to back
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### bringMapsForward
+
+Changes the z-index of the specified maps to bring them forward
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### sendMapsBackward
+
+Changes the zIndex of the specified maps to send them backward
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### showMaps
+
+Changes the visibility of the specified maps to `true`
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### hideMaps
+
+Changes the visibility of the specified maps to `false`
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### addGeoreferencedMap
+
+Adds a georeferenced map to this list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
+### removeGeoreferencedMap
+
+Removes a georeferenced map from this list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `georeferencedMap` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>**&#x20;
+
+### addGeoreferenceAnnotation
+
+Parses an annotation and adds its georeferenced map to this list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+### removeGeoreferenceAnnotation
+
+Parses an annotation and removes its georeferenced map from this list
+
+#### Parameters
+
+*   `e` &#x20;
+*   `annotation` **unknown**&#x20;
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))>>**&#x20;
+
+### fromWarpedMapList
+
+Static method creates that creates a Viewport from a WarpedMapList
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r`   (optional, default `"contain"`)
+*   `s`   (optional, default `1`)
+*   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
+*   `warpedMapList` **WarpedMapList\<W>** A WarpedMapList.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
+*   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
+
+Returns **Viewport** A new Viewport object
+
+### fromProjectedGeoBbox
+
+Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `o` &#x20;
+*   `r`   (optional, default `"contain"`)
+*   `viewportSize` **Size** Size of the viewport in viewport pixels, as \[width, height].
+*   `projectedGeoBbox` **WarpedMapList\<W>** A projectedGeoBbox.
+*   `devicePixelRatio` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The devicePixelRatio of the viewport.
+*   `fit` **Fit** Whether the viewport should contain or cover the bbox of the warpedMapList. (optional, default `'contain'`)
+
+Returns **Viewport** A new Viewport object
+
+### constructor
+
+Creates an instance of WarpedMap.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `r` &#x20;
+*   `o` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** options
+
+### getViewportMask
+
+Get resourceMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Ring**&#x20;
+
+### getViewportMaskBbox
+
+Get Bbox of resourceMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Bbox**&#x20;
+
+### getViewportMaskRectangle
+
+Get resourceMaskRectangle in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Rectangle**&#x20;
+
+### getViewportFullMask
+
+Get resourceFullMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Ring**&#x20;
+
+### getViewportFullMaskBbox
+
+Get bbox of rresourceFullMask in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Bbox**&#x20;
+
+### getViewportFullMaskRectangle
+
+Get resourceFullMaskRectangle in viewport coordinates
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **Rectangle**&#x20;
+
+### getResourceToViewportScale
+
+Get scale of the warped map, in resource pixels per viewport pixels.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### getResourceToCanvasScale
+
+Get scale of the warped map, in resource pixels per canvas pixels.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `viewport` **Viewport** the current viewport
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### getReferenceScale
+
+Get the reference scaling from the forward transformation of the projected Helmert transformer
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### setCurrentResourceViewportRing
+
+Set resourceViewportRing at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceViewportRing` **Ring**&#x20;
+
+### setCurrentFetchableTiles
+
+Set tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### setCurrentOverviewFetchableTiles
+
+Set overview tiles at current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `overviewFetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### setResourceMask
+
+Update the resourceMask loaded from a georeferenced map to a new mask.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `resourceMask` **Ring**&#x20;
+
+### setTransformationType
+
+Update the transformationType loaded from a georeferenced map to a new transformation type.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `transformationType` **TransformationType**&#x20;
+
+### setDistortionMeasure
+
+Set the distortionMeasure
+
+#### Parameters
+
+*   `e` &#x20;
+*   `distortionMeasure` **DistortionMeasure?** the disortion measure
+
+### setGcps
+
+Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `gcps` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GCP>**&#x20;
+
+### setCurrentBestScaleFactor
+
+Set the bestScaleFactor for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### setCurrentOverviewTileZoomLevel
+
+Set the overview tile zoom level for the current viewport
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileZoomLevel` **TileZoomLevel** tile zoom level
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### hasImageInfo
+
+Check if warpedMap has image info
+
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### loadImageInfo
+
+Fetch and parse the image info, and generate the image ID
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### constructor
+
+Creates an instance of a TriangulatedWarpedMap.
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `i` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `options` **WarpedMapOptions?** Options
+
+### setResourceMask
+
+Update the resourceMask.
+
+#### Parameters
+
+*   `t` &#x20;
+*   `resourceMask` **Ring**&#x20;
+
+### setCurrentBestScaleFactor
+
+Set the bestScaleFactor for the current viewport
+
+#### Parameters
+
+*   `t` &#x20;
+*   `scaleFactor` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** scale factor
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### resetPrevious
+
+Reset the previous points and values.
+
+### mixPreviousAndNew
+
+Mix the previous and new points and values.
+
+#### Parameters
+
+*   `t` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### updateTriangulation
+
+Update the triangulation of the resourceMask, at the current bestScaleFactor. Use cache if available.
+
+#### Parameters
+
+*   `t`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether the previous and new triangulation are the same - true by default, false during a transformation transition
+
+### updateProjectedGeoTrianglePoints
+
+Update the (previous and new) points of the triangulated resourceMask, at the current bestScaleFactor, in projectedGeo coordinates. Use cache if available.
+
+#### Parameters
+
+*   `t`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+### updateTrianglePointsDistortion
+
+Update the (previous and new) distortion at the points of the triangulated resourceMask. Use cache if available.
+
+#### Parameters
+
+*   `t`   (optional, default `!1`)
+*   `previousIsNew` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  (optional, default `false`)
+
+### constructor
+
+Creates an instance of WebGL2WarpedMap.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `a` &#x20;
+*   `l` &#x20;
+*   `T` &#x20;
+*   `i` &#x20;
+*   `o` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `georeferencedMap` **GeoreferencedMap** Georeferenced map used to construct the WarpedMap
+*   `gl` **WebGL2RenderingContext** WebGL rendering context
+*   `mapsProgram` **[WebGLProgram](https://developer.mozilla.org/docs/Web/API/WebGLProgram)** WebGL program
+*   `options` **Partial\<WarpedMapOptions>** WarpedMapOptions
+
+### updateVertexBuffers
+
+Update the vertex buffers of this warped map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `projectedGeoToClipTransform` **Transform** Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+
+### addCachedTileAndUpdateTextures
+
+Add cached tile to the textures of this map and update textures
+
+#### Parameters
+
+*   `e` &#x20;
+*   `cachedTile` **CachedTile**&#x20;
+
+### removeCachedTileAndUpdateTextures
+
+Remove cached tile from the textures of this map and update textures
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+### constructor
+
+Creates an instance of CacheableTile.
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `fetchableTile` **FetchableTile**&#x20;
+*   `fetchFn` **FetchFn?** Optional fetch function to use
+
+### isCachedTile
+
+Whether a tile has fetched its data
+
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+
+### abort
+
+Abort the fetch
+
+### constructor
+
+Creates an instance of FetchableTile.
+
+#### Parameters
+
+*   `e` &#x20;
+*   `t` &#x20;
+*   `tile` **Tile** the tile
+*   `warpedMap` **WarpedMapWithImageInfo** A WarpedMap with fetched image information
+
+### fetch
+
+Fetch the tile and create its ImageBitMap.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### fetch
+
+Fetch the tile and create its ImageData object.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### fetch
+
+Fetch the tile and create its IntArray data using the supplied getImageData function.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### getCacheableTiles
+
+Get the tiles in this cache
+
+Returns **IterableIterator\<CacheableTile>**&#x20;
+
+### getCacheableTile
+
+Get a specific tile in this cache
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the URL of the requested tile
+
+Returns **(CacheableTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getMapCacheableTiles
+
+Get the tiles in this cache, corresponding to a specific map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
+
+### getCachedTiles
+
+Get the tiles in this cache that have been fetched
+
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CacheableTile>**&#x20;
+
+### getCachedTile
+
+Get a specific cached tile in this cache that has been fetched
+
+#### Parameters
+
+*   `e` &#x20;
+*   `tileUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the URL of the requested tile
+
+Returns **(CachedTile | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### getMapCachedTiles
+
+Get the tiles in this cache, corresponding to a specific map, that have been fetched
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<CachedTile>**&#x20;
+
+### getTileUrls
+
+Get the URLs of tiles in this cache
+
+Returns **IterableIterator<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### getMapTileUrls
+
+Get the URLs of tiles in this cache, corresponding to a specific map
+
+#### Parameters
+
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **IterableIterator<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>**&#x20;
+
+### requestFetchableTiles
+
+Process the request for new tiles to be added to this cache
+
+#### Parameters
+
+*   `e` &#x20;
+*   `fetchableTiles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<FetchableTile>**&#x20;
+
+### allRequestedTilesLoaded
+
+Returns a promise that resolves when all requested tiles are loaded.
+This could happen immidiately, in case there are no current requests and the tilesFetchingCount is zero,
+or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
+
+### prune
+
+Prune tiles in this cache using the provided prune info
+
+#### Parameters
+
+*   `e` &#x20;
+
+### constructor
+
+Creates an instance of WebGL2Renderer.
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `gl` **WebGL2RenderingContext** WebGL 2 rendering context
+*   `options` **WebGL2RendererOptions** options
+
+### getOpacity
+
+Get the opacity of the renderer
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setOpacity
+
+Set the opacity of the renderer
+
+#### Parameters
+
+*   `t` &#x20;
+*   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
+
+### resetOpacity
+
+Reset the opacity of the renderer
+
+### getMapOpacity
+
+Get the opacity of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setMapOpacity
+
+Set the opacity of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `opacity` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** opacity to set
+
+### resetMapOpacity
+
+Rreset the opacity of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+### getRemoveColorOptions
+
+Get the remove color options of the renderer
+
+Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setRemoveColorOptions
+
+Set the remove color options of the renderer
+
+#### Parameters
+
+*   `t` &#x20;
+*   `removeColorOptions` **RemoveColorOptions**&#x20;
+
+### resetRemoveColorOptions
+
+Reset the remove color options of the renderer
+
+### getMapRemoveColorOptions
+
+Get the remove color options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **(Partial\<RemoveColorOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setMapRemoveColorOptions
+
+Set the remove color options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `removeColorOptions` **RemoveColorOptions** the 'remove color options' to set
+
+### resetMapRemoveColorOptions
+
+Reset the remove color options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+### getColorizeOptions
+
+Get the colorize options of the renderer
+
+Returns **(Partial\<ColorizeOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setColorizeOptions
+
+Set the colorize options of the renderer
+
+#### Parameters
+
+*   `t` &#x20;
+*   `colorizeOptions` **ColorizeOptions** the colorize options to set
+
+### resetColorizeOptions
+
+Reset the colorize options of the renderer
+
+### getMapColorizeOptions
+
+Get the colorize options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **(Partial\<ColorizeOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setMapColorizeOptions
+
+Set the colorize options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `colorizeOptions` **ColorizeOptions** the colorize options to set
+
+### resetMapColorizeOptions
+
+Reset the colorize options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+### getGridOptions
+
+Get the grid options of the renderer
+
+Returns **(Partial\<GridOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setGridOptions
+
+Set the grid options of the renderer
+
+#### Parameters
+
+*   `t` &#x20;
+*   `gridOptions` **GridOptions** the grid options to set
+
+### resetGridOptions
+
+Reset the grid options of the renderer
+
+### getMapGridOptions
+
+Get the grid options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **(Partial\<GridOptions> | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setMapGridOptions
+
+Set the grid options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `gridOptions` **GridOptions** the grid options to set
+
+### resetMapGridOptions
+
+Reset the grid options of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+### getSaturation
+
+Get the saturation of the renderer
+
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**&#x20;
+
+### setSaturation
+
+Set the saturation of the renderer
+
+0 - grayscale, 1 - original colors
+
+#### Parameters
+
+*   `t` &#x20;
+*   `saturation`  the satuation to set
+
+### resetSaturation
+
+Reset the satuation of the renderer
+
+### getMapSaturation
+
+Get the saturation of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))**&#x20;
+
+### setMapSaturation
+
+Set the saturation of a map
+
+0 - grayscale, 1 - original colors
+
+#### Parameters
+
+*   `t` &#x20;
+*   `e` &#x20;
+*   `mapId`  ID of the map
+*   `saturation`  the saturation to set
+
+### resetMapSaturation
+
+Reset the saturation of a map
+
+#### Parameters
+
+*   `t` &#x20;
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+
+### render
+
+Render the map for a given viewport
+
+#### Parameters
+
+*   `t` &#x20;
 *   `viewport` **Viewport** the current viewport
 
 ### addGeoreferenceAnnotation
