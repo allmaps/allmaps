@@ -1,18 +1,305 @@
 ---
-title: Allmaps Documentation
-description: Documentation, guides and API reference for Allmaps
+title: Allmaps
+head:
+  - tag: title
+    content: Allmaps | Curating, georeferencing and exploring for IIIF maps
+description: Curating, georeferencing and exploring for IIIF maps
+editUrl: false
+lastUpdated: false
 template: splash
-hero:
-  title: Allmaps Documentation
-  tagline: Documentation, guides and API reference for Allmaps
-  actions:
-    - text: Get Started
-      link: /get-started/
-      icon: right-arrow
-      variant: primary
-    # - text: Read the Starlight docs
-    #   link: https://starlight.astro.build
-    #   icon: external
 ---
 
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components'
+
+import { Latest } from '@allmaps/latest'
 import { MapMonster } from '@allmaps/ui'
+import { pink, white } from '@allmaps/tailwind'
+
+import Wider from '../../components/Wider.astro'
+import Card from '../../components/Card.astro'
+import Cards from '../../components/Cards.astro'
+import Example from '../../components/Example.astro'
+import Examples from '../../components/Examples.astro'
+import DataTable from '../../components/DataTable.svelte'
+import UrlInput from '../../components/UrlInput.svelte'
+
+import About from '../../components/About.astro'
+import Libraries from '../../components/Libraries.mdx'
+
+import IIIFLogo from '../../images/iiif.svg'
+
+export const speechBalloonBackgroundColor = pink
+export const speechBalloonTextColor = white
+
+<Wider>
+  <Cards>
+    <Card title="Works with any IIIF map" src="allmaps-editor" href="https://editor.allmaps.org/#/collection?url=https://cdm21033.contentdm.oclc.org/iiif/info/krt/2175/manifest.json">
+      <p>
+      More and more institutions across the world are adopting <a href="https://iiif.io/">IIIF</a> to provide access to
+      their collections of digitized images. Among all these images are 100,000s of maps.
+      </p>
+      <p>
+        With Allmaps, you can georeference any map from any institution that supports IIIF. Allmaps doesn't require
+        complicated GIS infrastructure and it doesn't need to generate XYZ map tiles. All that's needed is a IIIF server.
+      </p>
+    </Card>
+
+    <Card title="Built on open standards" src="georef-annotation" href="https://iiif.io/api/extension/georef/">
+      <p>
+        All components of Allmaps use <a href="https://iiif.io/api/extension/georef/">Georeference Annotations</a>
+        that hold each map's georeference data. Georeference Annotations are based on W3C's
+        <a href="https://www.w3.org/TR/annotation-model/">Web Annotation standard</a> and are an
+        <a href="https://iiif.io/api/index.html#approved-extensions">approved extension</a> to the IIIF Presentation API.
+      </p>
+    </Card>
+
+    <Card title="Client-side map warping" src="allmaps-viewer" href="https://viewer.allmaps.org/?url=https://annotations.allmaps.org/images/a7afe9a34c3b8633">
+      <p>
+        Allmaps can warp maps on-the-fly, in the browser. Allmaps functions without the need to first create image derivatives
+        such as GeoTIFFs or map tiles.
+      </p>
+      <p>
+        To warp a map, Allmaps uses the <a href="https://iiif.io/api/image/3.0/#4-image-requests">IIIF Image API</a> to only
+        download the portion of the image that's needed, in the right scale.
+        <a href="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmanifests%2Fc390af06ea724803">Allmaps Viewer</a> can stitch maps that are composed of multiple sheets together in real-time.
+      </p>
+    </Card>
+
+    <Card title="More than displaying map layers" src="annotorious" href="https://observablehq.com/@allmaps/allmaps-and-annotorious">
+      <p>
+      But Allmaps is not just about warping images and displaying map overlays: it's about open standards and open data. A
+      Georeference Annotation can be used to display a warped map, but there's much more Allmaps can do with this data.
+      </p>
+      <p>
+        You can build geospatial indexes to quickly find the maps you're looking for, improve tools for
+        <a href="https://twitter.com/aboutgeo/status/1408063666176487426">map vectorization</a>,
+        <a href="https://observablehq.com/@allmaps/using-allmaps-to-draw-geojson-on-a-iiif-image">draw GeoJSON on an
+        unwarped map</a> or automatically georeference maps by
+        <a href="https://observablehq.com/@allmaps/georeferencing-a-map-by-transcribing-toponyms">geocoding transcribed
+        toponyms</a>.
+      </p>
+    </Card>
+
+    <Card title="It's all about the URL" src="allmaps-viewer-url" href="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fimages%2Fa7afe9a34c3b8633">
+      <p>
+        All that's needed to georeference a map with <a href="https://editor.allmaps.org/">Allmaps Editor</a> is the
+        URL of a <a href="https://iiif.io/api/image/3.0/#22-image-information-request-uri-syntax">IIIF Image</a> or
+        <a href="https://iiif.io/api/presentation/3.0/#52-manifest">IIIF Manifest</a>. You don't need to create an account or
+        to first upload and import images.
+      </p>
+      <p>
+        <a href="https://viewer.allmaps.org/">Allmaps Viewer</a> just needs the URL of a Georeference Annotation to warp a
+        map. Allmaps Editor and Allmaps Viewer are simple static sites that don't need a database or GIS infrastructure to run — just a IIIF server.
+      </p>
+    </Card>
+
+    <Card title="Open source components" src="github" href="https://github.com/allmaps">
+      <p>
+        The core components of Allmaps are open source and will always be freely available. The most important goal of the project
+        is to make maps more accessible, from map collections from institutions big and small.
+      </p>
+      <p>
+        Our plugins for <a href="https://maplibre.org/">MapLibre</a>, <a href="https://openlayers.org/">OpenLayers</a> and
+        <a href="https://leafletjs.com/">Leaflet</a> make it easy to display georeferenced maps on
+        your own website, without using infrastructure provided by Allmaps.
+      </p>
+    </Card>
+
+    <Card title="Not just the browser" src="qgis" href="https://observablehq.com/@allmaps/allmaps-tile-server">
+      <p>
+        The <a href="https://observablehq.com/@allmaps/allmaps-tile-server">Allmaps Tile Server</a>, a tiny proxy server
+        that turns Georeference Annotations into <a href="https://en.wikipedia.org/wiki/Tiled_web_map">XYZ map tile layers</a>,
+        can be used to view warped maps in existing mapping websites or applications like QGIS.
+      </p>
+      {/* <p>
+        Allmaps can export georeferenced maps to formats like GeoJSON or GeoTIFF. You can keep using your favorite
+        scripting language, database or GIS.
+      </p> */}
+    </Card>
+
+    <Card title="Aerial photos & building plans" src="allmaps-viewer-building-plan" href="https://viewer.allmaps.org/?url=https%3A%2F%2Fsammeltassen.nl%2Fiiif-manifests%2Fallmaps%2Frivierahal-blijdorp.json">
+      <p>
+        Allmaps works with any IIIF resource that can be georeferenced. Maps hiding out as illustrations in books, newspapers or
+        archival folders can be edited and viewed as well. Or other types of documents such as
+        <a href="https://viewer.allmaps.org/?url=https%3A%2F%2Fsammeltassen.nl%2Fiiif-manifests%2Fallmaps%2Frivierahal-blijdorp.json">architectural
+        drawings</a> or <a href="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fimages%2F4bcc9463d2a68df4">aerial photographs</a>.
+      </p>
+      <p>
+        You can use Allmaps to study the past, but also to present contemporary maps or future proposals. In
+        <a href="https://cityatlas.theberlage.nl/">education contexts</a>, it can be used to study a site accross different
+        times and scales.
+      </p>
+    </Card>
+  </Cards>
+</Wider>
+
+{/* <section class="contents snot-content prose prose-sm sm:prose-base xl:prose-lg m-auto"> */}
+<section class="contents m-auto">
+
+## Getting started
+
+<Steps>
+
+1. Find a map in the digital collections of an institution or public repository that supports IIIF. For example:
+
+    - [Leventhal Map & Education Center](https://collections.leventhalmap.org/search?utf8=%E2%9C%93&q=)
+    - [American Geographical Society Library](https://collections.lib.uwm.edu/digital/collection/agdm/search/searchterm/)
+    - [Leiden University Libraries](https://digitalcollections.universiteitleiden.nl/islandora/search?type=dismax&islandora_solr_search_navigation=0&f%5B0%5D=RELS_EXT_isMemberOfCollection_uri_ms:%22info%5C:fedora%5C/collection%5C:ubl_maps%22)
+    - [Library of Congress](https://loc.gov/maps)
+    - [Internet Archive](https://iiif.io/guides/guides/archive.org/)
+    - Many other institutions around the world with IIIF-enabled map collections can be found in [this list](https://github.com/allmaps/iiif-map-collections).
+
+2. Find the URL of the IIIF resource of the map you want to use and copy the URL to your clipboard. Often, you can find this URL by clicking the <img class="w-5 !inline top-0.5 relative" src={IIIFLogo.src} alt="IIIF" /> logo somewhere on the web page that displays the digitized map.
+
+3. Open the map in [Allmaps Editor](https://editor.allmaps.org/) by pasting its IIIF URL:
+
+    <UrlInput
+      client:load
+      placeholder="URL of IIIF Manifest or IIIF Image"
+      baseUrl="https://editor.allmaps.org/?#/collection?url="/>
+
+    The Leventhal Map & Education Center has published [a tutorial](https://www.leventhalmap.org/projects/digital-projects/georeferencing/) about georeferencing maps from their collections using Allmaps.
+
+4. View the resulting Georeference Annotation in [Allmaps Viewer](https://viewer.allmaps.org/):
+
+    <UrlInput client:load placeholder="URL of Georeference Annotation" baseUrl="https://viewer.allmaps.org/?url="/>
+
+5. Use the Georeference Annotation in our [plugins](#plugins) for MapLibre, OpenLayers or Leaflet.
+    With [Allmaps Tile Server](https://observablehq.com/@allmaps/allmaps-tile-server) you can display the georeferenced map in applications like QGIS.
+
+</Steps>
+
+## Examples
+
+A few examples of maps georeferenced with Allmaps:
+
+<Wider>
+  {/* Consider adding:
+  - Vienna: https://annotations.allmaps.org/maps/751ae05935adba4f
+  - Beijng https://annotations.allmaps.org/maps/8350fc8ec1585e60
+  - Tokyo https://annotations.allmaps.org/maps/99d0daaaf937d93e */}
+  <Examples>
+    <Example
+      src="manifests-631b96e4d6d3f421"
+      title="Plattegrond van Rotterdam in 10 bladen (1895 - 1897)"
+      institution="Stadsarchief Rotterdam"
+      annotationUrl="https://annotations.allmaps.org/manifests/631b96e4d6d3f421" />
+    <Example
+      src="manifests-23379602e8187445"
+      title="Atlas of the city of Lynn, Massachusetts"
+      institution="Leventhal Map & Education Center"
+      annotationUrl="https://annotations.allmaps.org/manifests/23379602e8187445" />
+    <Example
+      src="manifests-64d6e35b64564692"
+      title="Nirenstein Atlas, Hollywood, 1956"
+      institution="Los Angeles Public Library"
+      annotationUrl="https://annotations.allmaps.org/manifests/64d6e35b64564692" />
+      <Example
+      src="manifests-06b7d15dc577b7ee"
+      title="Aerial survey, Manhattan Island, New York City"
+      institution="Library of Congress"
+      annotationUrl="https://annotations.allmaps.org/manifests/06b7d15dc577b7ee" />
+  </Examples>
+</Wider>
+
+<p class="my-4">The latest maps georeferenced with Allmaps:</p>
+
+<div class="contents reset-lists not-prose">
+  <Latest client:load count={12} showProperties={false} showUrls={false} />
+</div>
+
+You can view more recent maps in [Allmaps Latest](https://latest.allmaps.org).
+
+## Tools
+
+- [Georeference Annotation](https://iiif.io/api/extension/georef/): specification of the data format used by Allmaps.
+- [Allmaps Editor](https://editor.allmaps.org/): georeference a map by entering the URL of a IIIF resource.
+- [Allmaps Viewer](https://viewer.allmaps.org/): view georeferenced maps by entering the URL of a Georeference Annotation.
+- [Allmaps Latest](https://latest.allmaps.org): the latest maps georeferenced with Allmaps.
+- [Allmaps CLI](https://github.com/allmaps/allmaps/tree/main/apps/cli): command-line interface for Allmaps.
+- [Allmaps Tile Server](https://observablehq.com/@allmaps/allmaps-tile-server): proxy server that generates an XYZ map tile
+  layer from one or more Georeference Annotations. You can use the Allmaps Tile Server to display warped maps in applications like QGIS.
+- More tools and experiments can be found on [GitHub](https://github.com/allmaps) and [Observable](https://observablehq.com/@allmaps).
+
+### Experiments
+
+- [Allmaps Here](https://dev.here.allmaps.org): shows georeferenced maps around your current location.
+- [Allmaps Explore](https://dev.explore.allmaps.org): experimental interface for exploring all maps georeferenced with Allmaps, built with [Protomaps](https://protomaps.com/).
+
+### Plugins
+
+Allmaps provides plugins for the three most widely-used JavaScript mapping libraries.
+By loading a Georeference Annotation you can display a georeferenced IIIF map with just a few lines of code.
+
+<Libraries />
+
+### Developers
+
+The core functionality of Allmaps is published on npm as individual JavaScript packages:
+
+- [`@allmaps/annotation`](https://github.com/allmaps/allmaps/tree/main/packages/annotation): parses and generates Georeference Annotations.
+- [`@allmaps/transform`](https://github.com/allmaps/allmaps/tree/main/packages/transform): transforms pixel coordinates to geospatial coordinates
+    (and vice versa) using the ground control points (GCPs) from a parsed Georeference Annotation.
+- [`@allmaps/render`](https://github.com/allmaps/allmaps/tree/main/packages/render): renders georeferenced maps with WebGL,
+    with the Canvas API or as raw pixel values.
+- [`@allmaps/id`](https://github.com/allmaps/allmaps/tree/main/packages/id): uses the SHA-1 hashing algorithm to turn
+    IIIF URLs into the identifiers used internally by Allmaps.
+- More packages and apps can be found in the [Allmaps monorepo](https://github.com/allmaps/allmaps) on GitHub.
+
+## Open data
+
+Allmaps publishes the georeference data of __all maps__ georeferenced with Allmaps Editor as open data in different formats.
+This metadata contains the ground control points (GCPs), the clipping mask and pointers to the map's IIIF resource.
+
+<DataTable client:load baseUrl={import.meta.env.VITE_DATA_FILES_BASE_URL} />
+
+The files above are updated twice per day. The data is licensed under
+[CCO](https://creativecommons.org/public-domain/cc0/).
+
+## About Allmaps
+
+<About />
+
+### Contributors
+
+- [Bert Spaan](https://bertspaan.nl/): Freelance creative technologist. Founder of Allmaps and lead developer.
+- [Jules Schoonman](https://www.tudelft.nl/en/staff/j.a.schoonman/): Digital curator at Delft University of Technology Library. Founder of Allmaps and lead for educational projects.
+- [Manuel Claeys Bouuaert](https://manuelclaeysbouuaert.be/): Freelance facilitator and cartographer. Developer and strategic thinker for Allmaps, expert in the mathematics that make it all work.
+- [Ian Spangler](https://www.leventhalmap.org/about/people/ian-spangler/): Assistant Curator of Digital & Participatory Geography at the Leventhal Map & Education Center. Director of the [NEH-funded project](https://www.neh.gov/news/neh-announces-413-million-280-humanities-projects-nationwide) that supports the development of Allmaps.
+- [Luuk van de Ven](https://luukvandeven.nl/): Brand designer and art director. Art direction and wireframes for Allmaps.
+- [Bryan Haberberger](https://habesoftware.rocks/): Independent contractor and full stack developer at Saint Louis University. Independent consultant for the Georeference Extension.
+
+Other contributions have been made in the form of pull requests, issues or discussions on [GitHub](https://github.com/allmaps/), feedback and ideas provided in the [IIIF Maps Community Group](https://iiif.io/community/groups/maps/) and by our institutional partners.
+
+{/* Div for sticky map monster */}
+<div>
+
+### Partners
+
+Allmaps is supported and funded by the following organizations:
+
+- <a href="https://heritage.tudelft.nl/">Delft University of Technology Library</a>
+- <a href="https://www.library.universiteitleiden.nl/">Leiden University Libraries</a>
+- <a href="https://geoplaza.vu.nl/cms/">Vrije Universiteit Amsterdam</a>
+- <a href="https://www.leventhalmap.org/">Leventhal Map & Education Center</a> at the Boston Public Library
+- <a href="https://openhistoricalmap.org/">OpenHistoricalMap</a>
+- <a href="https://www.kb.nl/en">National Library of the Netherlands</a>
+- <a href="https://di.huc.knaw.nl/">Humanties Cluster Digital Infrastructure</a> and <a href="https://hisgis.nl/">HisGIS</a> of the <a href="https://www.knaw.nl/en">Royal Netherlands Academy of Arts and Sciences</a>
+- <a href="https://clariahvl.hypotheses.org/">CLARIAH-VL</a>
+- <a href="https://uwm.edu/libraries/agsl/">American Geographical Society Library</a> at the University of Wisconsin-Milwaukee
+- <a href="https://www.neh.gov/news/neh-announces-413-million-280-humanities-projects-nationwide">National Endowment for the Humanities</a>
+
+<div class="p-4 flex justify-end w-full sticky bottom-0">
+  <div class="drop-shadow-md max-w-full">
+    <MapMonster mood="happy" color="pink"
+      speechBalloonBackgroundColor={speechBalloonBackgroundColor}
+      speechBalloonTextColor={speechBalloonTextColor}>
+      <div class="[&>a]:text-white">If you think Allmaps can be useful for your institution or if you have questions about the project, you can <a class="text-white underline" href="mailto:hello@allmaps.org">send us an email</a> or reach us in the <code class="text-white">#allmaps</code> channel of the <a class="text-white underline" href="http://bit.ly/iiif-slack">IIIF&nbsp;Slack</a>.</div>
+    </MapMonster>
+  </div>
+</div>
+
+{/* Div for sticky map monster */}
+</div>
+
+</section>

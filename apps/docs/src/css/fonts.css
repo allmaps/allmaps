@@ -38,11 +38,8 @@
 :root {
   --geograph-ss01: 'ss01' off;
   --geograph-ss02: 'ss02' off;
-  --geograph-ss03: 'ss03' on;
+  --geograph-ss03: 'ss03' off;
   --geograph-tnum: 'tnum' off;
-
-  font-feature-settings: var(--geograph-ss01), var(--geograph-ss02),
-    var(--geograph-ss03), var(--geograph-tnum);
 }
 
 /*
