@@ -1,5 +1,5 @@
 {
-  "name": "@allmaps/docs",
+  "name": "@allmaps/homepage",
   "description": "Allmaps Documentation",
   "version": "1.0.0-beta.18",
   "private": true,
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "apps/docs"
+    "directory": "apps/homepage"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
@@ -31,7 +31,7 @@
     "start": "astro dev",
     "prebuild": "pnpm run copy-readmes",
     "build": "astro check && astro build",
-    "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
+    "lerna-build": "lerna run build --scope @allmaps/homepage --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
     "copy-readmes": "node ./scripts/copy-readmes.js"

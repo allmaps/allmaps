@@ -85,60 +85,6 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
 
-  apps/docs:
-    dependencies:
-      '@allmaps/id':
-        specifier: ^1.0.0-beta.30
-        version: link:../../packages/id
-      '@allmaps/latest':
-        specifier: ^1.0.0-beta.36
-        version: link:../latest
-      '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
-        version: link:../../packages/tailwind
-      '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
-        version: link:../../packages/ui
-      '@astrojs/check':
-        specifier: ^0.9.3
-        version: 0.9.3(typescript@5.5.4)
-      '@astrojs/starlight':
-        specifier: ^0.29.0
-        version: 0.29.0(astro@4.16.12)
-      '@astrojs/starlight-tailwind':
-        specifier: ^2.0.3
-        version: 2.0.3(@astrojs/starlight@0.29.0)(@astrojs/tailwind@5.1.0)(tailwindcss@3.4.7)
-      '@astrojs/svelte':
-        specifier: ^5.7.0
-        version: 5.7.0(astro@4.16.12)(svelte@4.2.18)(typescript@5.5.4)(vite@5.4.11)
-      '@astrojs/tailwind':
-        specifier: ^5.1.0
-        version: 5.1.0(astro@4.16.12)(tailwindcss@3.4.7)
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.7)
-      astro:
-        specifier: ^4.16.12
-        version: 4.16.12(typescript@5.5.4)
-      bits-ui:
-        specifier: ^0.21.13
-        version: 0.21.16(svelte@4.2.18)
-      phosphor-svelte:
-        specifier: ^2.0.1
-        version: 2.0.1(svelte@4.2.18)
-      sharp:
-        specifier: ^0.32.3
-        version: 0.32.6
-      svelte:
-        specifier: ^4.1.1
-        version: 4.2.18
-      tailwindcss:
-        specifier: ^3.3.3
-        version: 3.4.7
-      typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
-
   apps/explore:
     dependencies:
       '@allmaps/basemap':
@@ -299,6 +245,60 @@ importers:
       vite:
         specifier: ^5.0.3
         version: 5.3.5(@types/node@18.19.43)
+
+  apps/homepage:
+    dependencies:
+      '@allmaps/id':
+        specifier: ^1.0.0-beta.30
+        version: link:../../packages/id
+      '@allmaps/latest':
+        specifier: ^1.0.0-beta.36
+        version: link:../latest
+      '@allmaps/tailwind':
+        specifier: ^1.0.0-beta.14
+        version: link:../../packages/tailwind
+      '@allmaps/ui':
+        specifier: ^1.0.0-beta.32
+        version: link:../../packages/ui
+      '@astrojs/check':
+        specifier: ^0.9.3
+        version: 0.9.3(typescript@5.5.4)
+      '@astrojs/starlight':
+        specifier: ^0.29.0
+        version: 0.29.0(astro@4.16.12)
+      '@astrojs/starlight-tailwind':
+        specifier: ^2.0.3
+        version: 2.0.3(@astrojs/starlight@0.29.0)(@astrojs/tailwind@5.1.0)(tailwindcss@3.4.7)
+      '@astrojs/svelte':
+        specifier: ^5.7.0
+        version: 5.7.0(astro@4.16.12)(svelte@4.2.18)(typescript@5.5.4)(vite@5.4.11)
+      '@astrojs/tailwind':
+        specifier: ^5.1.0
+        version: 5.1.0(astro@4.16.12)(tailwindcss@3.4.7)
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.7)
+      astro:
+        specifier: ^4.16.12
+        version: 4.16.12(typescript@5.5.4)
+      bits-ui:
+        specifier: ^0.21.13
+        version: 0.21.16(svelte@4.2.18)
+      phosphor-svelte:
+        specifier: ^2.0.1
+        version: 2.0.1(svelte@4.2.18)
+      sharp:
+        specifier: ^0.32.3
+        version: 0.32.6
+      svelte:
+        specifier: ^4.1.1
+        version: 4.2.18
+      tailwindcss:
+        specifier: ^3.3.3
+        version: 3.4.7
+      typescript:
+        specifier: ^5.5.4
+        version: 5.5.4
 
   apps/iiif:
     dependencies:

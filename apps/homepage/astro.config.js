@@ -13,7 +13,7 @@ const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${bra
 
 // https://astro.build/config
 export default defineConfig({
-  server: { port: ports.docs, host: true },
+  server: { port: ports.homepage, host: true },
   integrations: [
     starlight({
       title: 'Allmaps',
