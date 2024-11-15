@@ -9,7 +9,7 @@ import { readdir, readFile, writeFile } from 'fs/promises'
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const packagesDir = path.join(__dirname, '../../../packages')
-const outputDir = path.join(__dirname, '../src/content/docs/reference/packages')
+const outputDir = path.join(__dirname, '../src/content/docs/docs/packages')
 
 /**
  * Function to check if a README.md file is valid.

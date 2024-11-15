@@ -57,8 +57,6 @@
 
   <div><a class="text-black no-underline" href="/#about-allmaps">About</a></div>
   <div>
-    <a class="text-black no-underline" href="/reference/packages/annotation"
-      >Docs</a
-    >
+    <a class="text-black no-underline" href="/docs/introduction">Docs</a>
   </div>
 </div>

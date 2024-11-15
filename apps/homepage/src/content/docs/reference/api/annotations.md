@@ -1,4 +1,0 @@
----
-title: 'Annotations API'
-description: ''
----

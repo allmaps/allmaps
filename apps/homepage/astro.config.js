@@ -40,49 +40,27 @@ export default defineConfig({
         baseUrl: editLinkBaseUrl
       },
       sidebar: [
-        { label: 'Introduction', link: '/introduction/' },
-        { label: 'Get Started', link: '/get-started/' },
         {
           label: 'Guides',
-          // items: [{ label: 'Data', link: '/data/' }]
           autogenerate: {
             directory: 'guides'
           }
         },
         {
-          label: 'Tutorials',
-          items: [
-            { label: 'For Historians', link: '/tutorials/for-historians/' },
-            { label: 'For Students', link: '/tutorials/for-students/' },
-            { label: 'For Developers', link: '/tutorials/for-developers/' },
-            { label: 'For Curators', link: '/tutorials/for-curators/' }
-          ]
-        },
-        {
-          label: 'Reference',
+          label: 'Docs',
           items: [
             {
-              label: 'REST API',
-              autogenerate: {
-                directory: 'reference/api'
-              }
+              label: 'Introduction',
+              link: '/docs/introduction'
             },
             {
               label: 'Packages',
               autogenerate: {
-                directory: 'reference/packages'
-              }
-            },
-            {
-              label: 'Apps',
-              autogenerate: {
-                directory: 'reference/apps'
+                directory: 'docs/packages'
               }
             }
           ]
         }
-        // { label: 'FAQ', link: '/faq/' },
-        // { label: 'Glossary', link: '/glossary/' }
       ],
       components: {
         Header: './src/components/overrides/Header.astro',

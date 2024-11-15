@@ -1,4 +1,0 @@
----
-title: Georeferencing
-description: ''
----
