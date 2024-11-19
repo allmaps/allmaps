@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store'
 
-import { computeGeoreferencedMapBearing } from '@allmaps/stdlib'
+import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
 
 import { mapsWithImageInfo } from '$lib/shared/stores/maps-with-image-info.js'
 

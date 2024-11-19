@@ -20,6 +20,7 @@
       "@allmaps/openlayers": ["./packages/openlayers/src"],
       "@allmaps/ui": ["./packages/ui/src"],
       "@allmaps/tailwind": ["./packages/tailwind/src"],
+      "@allmaps/bearing": ["./packages/bearing/src"],
 
       "@allmaps/types/*": ["./packages/types/src/*"],
       "@allmaps/transform/*": ["./packages/transform/src/*"],
@@ -30,7 +31,8 @@
       "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
       "@allmaps/openlayers/*": ["./packages/openlayers/src/*"],
       "@allmaps/ui/*": ["./packages/ui/src/*"],
-      "@allmaps/tailwind/*": ["./packages/tailwind/src/*"]
+      "@allmaps/tailwind/*": ["./packages/tailwind/src/*"],
+      "@allmaps/bearing/*": ["./packages/bearing/src/*"]
     }
   }
 }

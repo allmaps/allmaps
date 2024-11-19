@@ -13,6 +13,7 @@
     { "path": "./packages/transform" },
     { "path": "./packages/triangulate" },
     { "path": "./packages/types" },
-    { "path": "./packages/ui" }
+    { "path": "./packages/ui" },
+    { "path": "./packages/bearing" }
   ]
 }
