@@ -41,6 +41,27 @@ export default defineConfig({
       },
       sidebar: [
         {
+          label: 'Welcome to Allmaps',
+          items: [
+            {
+              label: 'Introduction',
+              link: '/introduction'
+            },
+            {
+              label: 'Getting Started',
+              link: '/getting-started'
+            },
+            {
+              label: 'FAQ',
+              link: '/faq'
+            },
+            {
+              label: 'Timeline',
+              link: '/timeline'
+            }
+          ]
+        },
+        {
           label: 'Guides',
           autogenerate: {
             directory: 'guides'
