@@ -3,7 +3,7 @@ import AstroPageFrame from '@astrojs/starlight/components/PageFrame.astro'
 
 import Header from './Header.astro'
 
-import Splash from '../Splash.svelte'
+import Title from '../Title.svelte'
 import Footer from '../../components/Footer.svelte'
 
 import type { Props } from '@astrojs/starlight/props'
@@ -14,7 +14,7 @@ const isHomepage = Astro.props.slug === ''
 {
   isHomepage ? (
     <div class="homepage">
-      <Splash />
+      <Title client:load />
       <header class="header">
         <Header {...Astro.props} />
       </header>
