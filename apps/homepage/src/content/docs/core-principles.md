@@ -1,6 +1,6 @@
 ---
 title: Core Principles
-description: ''
+description: Core principles of the Allmaps project
 ---
 
 <!-- Use CSS counter to style principle headings? -->

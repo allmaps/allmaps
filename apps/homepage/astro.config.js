@@ -14,6 +14,9 @@ const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${bra
 // https://astro.build/config
 export default defineConfig({
   server: { port: ports.homepage, host: true },
+  devToolbar: {
+    enabled: false
+  },
   integrations: [
     starlight({
       title: 'Allmaps',
@@ -40,6 +43,27 @@ export default defineConfig({
         baseUrl: editLinkBaseUrl
       },
       sidebar: [
+        {
+          label: 'Welcome to Allmaps',
+          items: [
+            {
+              label: 'Introduction',
+              link: '/introduction'
+            },
+            {
+              label: 'Getting Started',
+              link: '/getting-started'
+            },
+            {
+              label: 'FAQ',
+              link: '/faq'
+            },
+            {
+              label: 'Timeline',
+              link: '/timeline'
+            }
+          ]
+        },
         {
           label: 'Guides',
           autogenerate: {
@@ -82,6 +106,11 @@ export default defineConfig({
   image: {
     service: {
       entrypoint: 'astro/assets/services/sharp'
+    }
+  },
+  vite: {
+    ssr: {
+      noExternal: ['maplibre-gl', 'maplibre-contour']
     }
   }
 })
