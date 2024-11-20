@@ -2,7 +2,7 @@ import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
 import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_THEME_5, ALLMAPS_THEME_2A, TERRAIN_THEME } from './colors'
+import { ALLMAPS_THEME_2A, TERRAIN_THEME } from './colors'
 
 export function basemapStyle(
   lang: string,
