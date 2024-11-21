@@ -119,10 +119,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
         mapWarpedMapLayer.renderer.tileCache.getCachedTile(tileUrl)
 
       if (cachedTile) {
-        const imageBitmap = cachedTile.data
         const backgroundColor = await detectBackgroundColor(
           sourceMap.map,
-          imageBitmap
+          cachedTile.data
         )
 
         if (backgroundColor) {
