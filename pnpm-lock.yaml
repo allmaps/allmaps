@@ -112,6 +112,9 @@ importers:
         specifier: ^3.0.6
         version: 3.0.7
     devDependencies:
+      '@allmaps/types':
+        specifier: 1.0.0-beta.13
+        version: 1.0.0-beta.13
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
         version: 3.0.1(@sveltejs/kit@2.5.10)
@@ -1713,6 +1716,10 @@ packages:
       '@turf/midpoint': 6.5.0
       ml-matrix: 6.12.0
     dev: false
+
+  /@allmaps/types@1.0.0-beta.13:
+    resolution: {integrity: sha512-X/OPatNULf8c7Dnq90Wq6Kg6xaRaq+DbF0CFO/JkoQxMjH30OqGmNvAIPhtqLqdTvhO7XWzpkoFsXRqCuKNoNg==}
+    dev: true
 
   /@allmaps/types@1.0.0-beta.14:
     resolution: {integrity: sha512-5HQfCesCv3PnYGzM+a05IWY3+3S5xqkil3BXK1bHtidfxgNgT0kL1y06waoqQagXTbYISy2o0ap0EF0pTNVRjQ==}
