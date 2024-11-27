@@ -68,7 +68,7 @@ export type TypedMultiPolygon<P> = P[][][]
 export type Gcp = { resource: Point; geo: Point }
 
 /**
- * Bboxx. Defined as [xMin, yMin, xMax, yMax]
+ * Bbox. Defined as [xMin, yMin, xMax, yMax]
  *
  * @export
  * @typedef {Bbox}
