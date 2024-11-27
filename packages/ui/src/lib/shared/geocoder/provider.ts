@@ -1,4 +1,4 @@
-import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types.js'
 
 export default abstract class GeocoderProvider {
   name: string
@@ -37,8 +37,6 @@ export default abstract class GeocoderProvider {
     } catch (error) {
       if (!signal.aborted) {
         console.error('Error fetching', this.name, ': ', error)
-      } else {
-        console.warn('Previous fetch to', this.name, 'aborted')
       }
     }
 

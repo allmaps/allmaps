@@ -1,12 +1,14 @@
+import GeocoderProvider from '../provider.js'
+
 import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
-import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
-import GeocoderProvider from '../provider'
+
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types.js'
 
 type GeoJsonFeatureWHG = {
   geometry?: GeojsonGeometry
   properties: { title: string; variants?: string[]; ccodes?: string[] }
 }
-// WHG return 'GeoJSON features', but not necessarilly points, and sometimes without geometry.
+// WHG returns GeoJSON Features, but not always points, and sometimes even without geometry.
 
 export default class WorldHistoricalGazetteer extends GeocoderProvider {
   constructor() {

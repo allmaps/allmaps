@@ -18,6 +18,10 @@
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
   let opacity = 1
+
+  function handleGeocoderSelect(event: CustomEvent) {
+    console.log('Geocoder select:', event.detail)
+  }
 </script>
 
 <Header appName="Style Guide">
@@ -32,7 +36,7 @@
         new GeocodeEarth(PUBLIC_GEOCODE_EARTH_API_KEY),
         new WorldHistoricalGazetteer()
       ]}
-      on:select={(event) => console.log(event.detail)}
+      on:select={handleGeocoderSelect}
     />
   </section>
   <section>

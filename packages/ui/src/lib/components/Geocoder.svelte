@@ -62,18 +62,16 @@
   }}
   items={featuresItems}
 >
-  <div class="relative">
+  <div class="relative w-full">
     <img
       alt="Search Icon"
       src={searchIcon}
       class="absolute start-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
     />
     <Combobox.Input
-      class="
-              pl-10 pr-2 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
-              focus:z-10 focus:outline-none
-              focus:ring-2 focus:ring-blue-700
-              "
+      class="pl-10 pr-2 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
+        focus:z-10 focus:outline-none
+        focus:ring-2 focus:ring-pink w-full"
       placeholder="Search Location"
       aria-label="Search Location"
       spellcheck="false"

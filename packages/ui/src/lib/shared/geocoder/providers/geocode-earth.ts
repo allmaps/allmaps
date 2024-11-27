@@ -1,6 +1,8 @@
+import GeocoderProvider from '../provider.js'
+
 import type { GeojsonPoint } from '@allmaps/types'
-import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
-import GeocoderProvider from '../provider'
+
+import type { GeocoderGeoJsonFeature } from '$lib/shared/types.js'
 
 type GeoJsonFeatureGE = {
   geometry: GeojsonPoint
