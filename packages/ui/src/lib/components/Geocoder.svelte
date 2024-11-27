@@ -1,10 +1,17 @@
 <script lang="ts">
+  import { Combobox, Dialog } from 'bits-ui'
+
+  let touchedInput = false
+  let dialogOpen = false
+
   import { throttle } from 'lodash-es'
   import { onMount, createEventDispatcher } from 'svelte'
   import searchIcon from '$lib/shared/images/search.svg'
 
-  import type { GeoJsonFeatureGeocoder } from '$lib/shared/types'
+  import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
   import type GeocoderProvider from '$lib/shared/geocoder/provider'
+
+  type Selected<T> = { value: T; label?: string }
 
   export let providers: GeocoderProvider[]
 
@@ -13,10 +20,11 @@
     geocoderPopover = document.getElementById('geocoder-popover')
   })
 
-  let searchTerm = ''
-  let providerFeatures: GeoJsonFeatureGeocoder[][] = [[]]
-  let features: GeoJsonFeatureGeocoder[] = []
-  let selectedFeature: GeoJsonFeatureGeocoder | undefined
+  let inputValue = ''
+  let providerFeatures: GeocoderGeoJsonFeature[][] = [[]]
+  let features: GeocoderGeoJsonFeature[] = []
+  let selectedFeature: GeocoderGeoJsonFeature | undefined
+  let selectedFeatures: Selected<GeocoderGeoJsonFeature>[]
   let softFocusIndex = -1
   let softFocusedElement: HTMLButtonElement | undefined
 
@@ -32,7 +40,7 @@
     THROTTLE_OPTIONS
   )
 
-  $: throttledGetFeatures(searchTerm)
+  $: throttledGetFeatures(inputValue)
 
   function getFeatures(text: string): void {
     for (let [index, provider] of providers.entries()) {
@@ -43,8 +51,11 @@
   }
 
   $: features = providerFeatures.flat(1).slice(0, 5)
+  $: selectedFeatures = features.map((feature) => {
+    return { value: feature, label: feature.properties.label }
+  })
 
-  function handleClick(feature: GeoJsonFeatureGeocoder): void {
+  function handleClick(feature?: GeocoderGeoJsonFeature): void {
     selectedFeature = feature
     geocoderPopover?.hidePopover()
     // This doesn't seem to work when the click comes from an 'Enter'
@@ -92,11 +103,77 @@
   <img alt="Search Icon" src={searchIcon} />
 </button>
 
+<button on:click={() => (dialogOpen = true)}>Open Dialog</button>
+<Dialog.Root bind:open={dialogOpen}>
+  <Dialog.Trigger />
+  <Dialog.Portal>
+    <Dialog.Overlay class="fixed inset-0 z-50" />
+    <Dialog.Content
+      class="fixed left-[50%] top-[50%] z-50 w-full max-w-[94%] translate-x-[-50%] translate-y-[-50%] rounded-card-lg border bg-background p-5 shadow-popover outline-none sm:max-w-[490px] md:w-full bg-white"
+    >
+      <Dialog.Description class="text-sm text-foreground-alt">
+        <Combobox.Root
+          bind:inputValue
+          bind:touchedInput
+          loop
+          onSelectedChange={(item) => {
+            handleClick(item?.value)
+          }}
+          items={selectedFeatures}
+        >
+          <div class="relative">
+            <img
+              alt="Search Icon"
+              src={searchIcon}
+              class="absolute start-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+            />
+            <Combobox.Input
+              class="
+              px-10 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
+              focus:z-10 focus:outline-none
+              focus:ring-2 focus:ring-blue-700
+              focus-within:ring-1 focus-within:ring-pink-500
+              "
+              placeholder="Search Location"
+              aria-label="Search Location"
+              autofocus
+            />
+          </div>
+
+          <Combobox.Content
+            class="w-full rounded-xl border border-muted bg-white px-1 py-3 shadow-popover outline-none"
+            sideOffset={8}
+          >
+            {#each features as feature}
+              <Combobox.Item
+                class="
+                flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm capitalize outline-none transition-all duration-75 data-[highlighted]:bg-gray-100
+                truncate"
+                value={feature}
+                label={feature.properties.label}
+              >
+                {feature.properties.label}
+                {#if feature.properties.alt}
+                  <span class="alt">{feature.properties.alt}</span>
+                {/if}
+              </Combobox.Item>
+            {:else}
+              <span class="block px-5 py-2 text-sm text-muted-foreground">
+                No results found
+              </span>
+            {/each}
+          </Combobox.Content>
+        </Combobox.Root>
+      </Dialog.Description>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
+
 <div popover="auto" id="geocoder-popover">
   <img alt="Search Icon" src={searchIcon} />
   <!-- svelte-ignore a11y-autofocus -->
   <input
-    bind:value={searchTerm}
+    bind:value={inputValue}
     placeholder="Search Location"
     autocomplete="off"
     spellcheck="false"
@@ -125,7 +202,7 @@
     </ul>
   </div>
 </div>
-
+<!--
 <style>
   :popover-open {
     position: fixed;
@@ -189,4 +266,4 @@
       }
     }
   }
-</style>
+</style> -->

@@ -80,6 +80,7 @@
     "@allmaps/iiif-parser": "1.0.0-beta.40",
     "@allmaps/tailwind": "1.0.0-beta.14",
     "@allmaps/types": "1.0.0-beta.15",
+    "bits-ui": "^0.21.12",
     "flowbite": "^1.6.4",
     "lodash-es": "^4.17.21"
   }
