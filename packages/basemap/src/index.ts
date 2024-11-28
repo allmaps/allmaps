@@ -14,7 +14,7 @@ export function basemapStyle(
     version: 8,
     glyphs:
       glyphs ||
-      'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+      'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
     sprite:
       sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
