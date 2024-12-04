@@ -2,7 +2,7 @@ import { layersWithCustomTheme } from 'protomaps-themes-base'
 import mlcontour from 'maplibre-contour'
 import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_THEME_2A, TERRAIN_THEME } from './colors'
+import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
 
 export function basemapStyle(
   lang: string,
@@ -10,11 +10,19 @@ export function basemapStyle(
   sprite?: string,
   tileJson?: string
 ): StyleSpecification {
+  const layers = layersWithCustomTheme('protomaps', ALLMAPS_THEME, lang);
+  // modify the buildings layer
+  layers.forEach(l => {
+    if (l.id === "buildings") {
+      (l.paint as any)['fill-outline-color'] = 'rgba(139, 134, 123, 1)';
+      (l.paint as any)['fill-opacity'] = 0.5;
+    }
+  })
   return {
     version: 8,
     glyphs:
       glyphs ||
-      'https://bdon.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+      'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
     sprite:
       sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
@@ -26,7 +34,7 @@ export function basemapStyle(
         attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME_2A, lang)
+    layers: layers
   }
 }
 
@@ -56,10 +64,10 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         demSource.contourProtocolUrl({
           thresholds: {
             // zoom: [minor, major]
-            11: [200, 1000],
-            12: [100, 500],
-            14: [50, 200],
-            15: [20, 100]
+            11: [50, 200],
+            12: [30, 120],
+            14: [20, 80],
+            15: [10, 40]
           },
           // optional, override vector tile parameters:
           contourLayer: 'contours',
@@ -93,10 +101,12 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         type: 'line',
         source: 'contour-source',
         'source-layer': 'contours',
+        filter: [">", ["get", "ele"], 100],
         paint: {
           // level = highest index in thresholds array the elevation is a multiple of
           'line-width': ['match', ['get', 'level'], 1, 1, 0.5],
-          'line-color': TERRAIN_THEME.contour_line_color
+          'line-color': TERRAIN_THEME.contour_line_color,
+          'line-opacity': 0.1
         }
       },
       'water'
