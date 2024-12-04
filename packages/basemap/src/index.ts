@@ -64,10 +64,10 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         demSource.contourProtocolUrl({
           thresholds: {
             // zoom: [minor, major]
-            11: [200, 1000],
-            12: [100, 500],
-            14: [50, 200],
-            15: [20, 100]
+            11: [50, 200],
+            12: [30, 120],
+            14: [20, 80],
+            15: [10, 40]
           },
           // optional, override vector tile parameters:
           contourLayer: 'contours',
@@ -101,10 +101,12 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         type: 'line',
         source: 'contour-source',
         'source-layer': 'contours',
+        filter: [">", ["get", "ele"], 100],
         paint: {
           // level = highest index in thresholds array the elevation is a multiple of
           'line-width': ['match', ['get', 'level'], 1, 1, 0.5],
-          'line-color': TERRAIN_THEME.contour_line_color
+          'line-color': TERRAIN_THEME.contour_line_color,
+          'line-opacity': 0.1
         }
       },
       'water'
