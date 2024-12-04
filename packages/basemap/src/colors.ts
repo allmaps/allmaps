@@ -35,7 +35,7 @@ export const ALLMAPS_THEME = {
   tunnel_highway: 'rgba(205, 204, 200, 1)',
 
   transit_pier: 'rgba(205, 241, 240, 1)',
-  buildings: 'rgba(139, 134, 123, 1)',
+  buildings: 'rgba(241, 235, 221, 1)',
 
   minor_service_casing: 'rgba(255, 252, 244, 1)',
   minor_casing: 'rgba(255, 252, 244, 1)',

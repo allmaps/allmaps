@@ -10,6 +10,14 @@ export function basemapStyle(
   sprite?: string,
   tileJson?: string
 ): StyleSpecification {
+  const layers = layersWithCustomTheme('protomaps', ALLMAPS_THEME, lang);
+  // modify the buildings layer
+  layers.forEach(l => {
+    if (l.id === "buildings") {
+      (l.paint as any)['fill-outline-color'] = 'rgba(139, 134, 123, 1)';
+      (l.paint as any)['fill-opacity'] = 0.5;
+    }
+  })
   return {
     version: 8,
     glyphs:
@@ -26,7 +34,7 @@ export function basemapStyle(
         attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
       }
     },
-    layers: layersWithCustomTheme('protomaps', ALLMAPS_THEME, lang)
+    layers: layers
   }
 }
 
