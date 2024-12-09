@@ -14,16 +14,6 @@ export type Line = [Point, Point]
 export type Triangle = [Point, Point, Point]
 
 /**
- * Unique Index Triangle
- * As `[index0, index1, index2]` with each index pointing to a unique point
- *
- * Winding order of points is free.
- *
- * @typedef {Object} UniquePointsIndexTriangle
- */
-export type UniquePointsIndexTriangle = [number, number, number]
-
-/**
  * Rectangle (or possibly quadrilateral). Winding order of points is free.
  *
  * @export
@@ -64,6 +54,16 @@ export type Geometry =
   | MultiPoint
   | MultiLineString
   | MultiPolygon
+
+export type TypedLine<P> = [P, P]
+export type TypedTriangle<P> = [P, P, P]
+export type TypedRectangle<P> = [P, P, P, P]
+export type TypedLineString<P> = P[]
+export type TypedRing<P> = P[]
+export type TypedPolygon<P> = P[][]
+export type TypedMultiPoint<P> = P[]
+export type TypedMultiLineString<P> = P[][]
+export type TypedMultiPolygon<P> = P[][][]
 
 export type Gcp = { resource: Point; geo: Point }
 

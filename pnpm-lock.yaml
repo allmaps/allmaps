@@ -22,19 +22,19 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../../packages/transform
+        version: 1.0.0-beta.41
       commander:
         specifier: ^10.0.0
         version: 10.0.1
@@ -89,13 +89,13 @@ importers:
     dependencies:
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@astrojs/check':
         specifier: ^0.4.1
         version: 0.4.1(typescript@5.5.4)
@@ -131,19 +131,19 @@ importers:
     dependencies:
       '@allmaps/basemap':
         specifier: ^1.0.0-beta.0
-        version: link:../../packages/basemap
+        version: 1.0.0-beta.2
       '@allmaps/maplibre':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/maplibre
+        version: 1.0.0-beta.30
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -210,25 +210,25 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../../packages/transform
+        version: 1.0.0-beta.41
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../../packages/types
+        version: 1.0.0-beta.15
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.3)
@@ -292,16 +292,16 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -362,16 +362,16 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -423,22 +423,22 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../../packages/transform
+        version: 1.0.0-beta.41
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../../packages/types
+        version: 1.0.0-beta.15
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       '@turf/rewind':
         specifier: ^6.5.0
         version: 6.5.0
@@ -517,13 +517,13 @@ importers:
     devDependencies:
       '@allmaps/render':
         specifier: ^1.0.0-beta.67
-        version: link:../../packages/render
+        version: 1.0.0-beta.68
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../../packages/types
+        version: 1.0.0-beta.15
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
         version: 0.3.2
@@ -583,10 +583,10 @@ importers:
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       ol:
         specifier: ^8.2.0
         version: 8.2.0
@@ -647,25 +647,25 @@ importers:
     devDependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/render':
         specifier: ^1.0.0-beta.67
-        version: link:../../packages/render
+        version: 1.0.0-beta.68
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../../packages/transform
+        version: 1.0.0-beta.41
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../../packages/types
+        version: 1.0.0-beta.15
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
         version: 0.3.2
@@ -722,34 +722,34 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../../packages/id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../../packages/iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/openlayers':
         specifier: ^1.0.0-beta.72
         version: link:../../packages/openlayers
       '@allmaps/render':
         specifier: ^1.0.0-beta.67
-        version: link:../../packages/render
+        version: 1.0.0-beta.68
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../../packages/tailwind
+        version: 1.0.0-beta.14
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../../packages/transform
+        version: 1.0.0-beta.41
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../../packages/types
+        version: 1.0.0-beta.15
       '@allmaps/ui':
         specifier: ^1.0.0-beta.31
-        version: link:../../packages/ui
+        version: 1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17)
       comlink:
         specifier: ^4.4.1
         version: 4.4.1
@@ -908,7 +908,7 @@ importers:
     dependencies:
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../types
+        version: 1.0.0-beta.15
     devDependencies:
       '@types/eslint':
         specifier: ^8.56.0
@@ -945,7 +945,7 @@ importers:
     dependencies:
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../types
+        version: 1.0.0-beta.15
       zod:
         specifier: ^3.22.4
         version: 3.23.8
@@ -988,19 +988,19 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../annotation
+        version: 1.0.0-beta.30
       '@allmaps/render':
         specifier: ^1.0.0-beta.67
-        version: link:../render
+        version: 1.0.0-beta.68
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../stdlib
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
-        version: link:../transform
+        version: 1.0.0-beta.41
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../types
+        version: 1.0.0-beta.15
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -1043,7 +1043,7 @@ importers:
     dependencies:
       '@allmaps/render':
         specifier: ^1.0.0-beta.67
-        version: link:../render
+        version: 1.0.0-beta.68
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../stdlib
@@ -1132,19 +1132,19 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../annotation
+        version: 1.0.0-beta.30
       '@allmaps/id':
         specifier: ^1.0.0-beta.29
-        version: link:../id
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../stdlib
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.12
-        version: link:../tailwind
+        version: 1.0.0-beta.14
       '@allmaps/transform':
         specifier: ^1.0.0-beta.40
         version: link:../transform
@@ -1229,7 +1229,7 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../annotation
+        version: 1.0.0-beta.30
       zod:
         specifier: ^3.22.4
         version: 3.23.8
@@ -1266,10 +1266,10 @@ importers:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.29
-        version: link:../annotation
+        version: 1.0.0-beta.30
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
         version: link:../types
@@ -1410,13 +1410,19 @@ importers:
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
         version: link:../types
-      poly2tri:
-        specifier: ^1.5.0
-        version: 1.5.0
+      '@kninnug/constrainautor':
+        specifier: ^4.0.0
+        version: 4.0.0
+      delaunator:
+        specifier: ^5.0.1
+        version: 5.0.1
       robust-point-in-polygon:
         specifier: ^1.0.3
         version: 1.0.3
     devDependencies:
+      '@types/delaunator':
+        specifier: ^5.0.3
+        version: 5.0.3
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.10
@@ -1485,13 +1491,13 @@ importers:
     dependencies:
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.39
-        version: link:../iiif-parser
+        version: 1.0.0-beta.40
       '@allmaps/tailwind':
         specifier: ^1.0.0-beta.13
-        version: link:../tailwind
+        version: 1.0.0-beta.14
       '@allmaps/types':
         specifier: ^1.0.0-beta.14
-        version: link:../types
+        version: 1.0.0-beta.15
       flowbite:
         specifier: ^1.6.4
         version: 1.8.1
@@ -1561,6 +1567,101 @@ importers:
         version: 5.2.12(@types/node@18.19.33)
 
 packages:
+
+  /@allmaps/annotation@1.0.0-beta.30:
+    resolution: {integrity: sha512-XsQfGdX+TBaha+Zt9s86waSrEUcM1pnVkaCnyJN6/04j/2wzpubHRhPPUM+SYby+FHsxbd7hKNjhmIpnzKlj4w==}
+    dependencies:
+      zod: 3.23.8
+
+  /@allmaps/basemap@1.0.0-beta.2:
+    resolution: {integrity: sha512-Z+4cjTTgravUTaEI2AfJRFaT/xy1JQnfRpz4+fzM0f0GkvVZeTUp6R/k/6INKemWtrrqI7P3UXKJc6ZwyVkYHA==}
+    dependencies:
+      maplibre-contour: 0.0.7
+      maplibre-gl: 4.7.1
+      protomaps-themes-base: 4.3.0
+    dev: false
+
+  /@allmaps/id@1.0.0-beta.30:
+    resolution: {integrity: sha512-HxFwBSDzCzcHe82cOsdTyKUiNWCbxCA1oQ06B7DcNvUuTXd1QC40frGMVP8/+PVpWEPsH0dctE6S4txtHdUc1A==}
+    engines: {node: '>=v19.0.0'}
+    dependencies:
+      '@allmaps/types': 1.0.0-beta.15
+
+  /@allmaps/iiif-parser@1.0.0-beta.40:
+    resolution: {integrity: sha512-92pk/zoiNGpqOR4WooFkCIZnEwUjAu4fOsi5LnMLeydxbV8sKGBmbN3BWg9Imlqcf7/qW0sl8QM4aJcepvAsJw==}
+    dependencies:
+      '@allmaps/types': 1.0.0-beta.15
+      zod: 3.23.8
+
+  /@allmaps/maplibre@1.0.0-beta.30:
+    resolution: {integrity: sha512-9NU0ESaFM6BHsQqxfMDDtc2RqQkU6ZeGh8JBMrEpwv4Q7FQuc7o04+tOgg558AsC997vwVazDLL827BngzF9/g==}
+    dependencies:
+      '@allmaps/render': 1.0.0-beta.68
+      '@allmaps/stdlib': 1.0.0-beta.31
+      maplibre-gl: 4.7.1
+    dev: false
+
+  /@allmaps/render@1.0.0-beta.68:
+    resolution: {integrity: sha512-kYJGDNFunnlgcTX4Fc6RKx6C3e3cnP1JSb0VV+wHRjzB9W0KX90Z4uE9HBYCMlcCu0i2vm30/hFmlKy83zxLvQ==}
+    dependencies:
+      '@allmaps/annotation': 1.0.0-beta.30
+      '@allmaps/id': 1.0.0-beta.30
+      '@allmaps/iiif-parser': 1.0.0-beta.40
+      '@allmaps/stdlib': 1.0.0-beta.31
+      '@allmaps/tailwind': 1.0.0-beta.14
+      '@allmaps/transform': 1.0.0-beta.41
+      '@allmaps/triangulate': 1.0.0-beta.23
+      '@allmaps/types': 1.0.0-beta.15
+      '@turf/boolean-point-in-polygon': 6.5.0
+      comlink: 4.4.1
+      lodash-es: 4.17.21
+      rbush: 3.0.1
+      robust-point-in-polygon: 1.0.3
+
+  /@allmaps/stdlib@1.0.0-beta.31:
+    resolution: {integrity: sha512-/QcBmdT8XOiZQj+5y58bt4hPkdiK1wfv5z2caxvFmePYrlRh+n0etezKdqMK34CA/HrgJWXjgYt6fcvCVHMzow==}
+    dependencies:
+      '@allmaps/annotation': 1.0.0-beta.30
+      '@allmaps/iiif-parser': 1.0.0-beta.40
+      '@allmaps/types': 1.0.0-beta.15
+      '@placemarkio/geojson-rewind': 1.0.2
+      svg-parser: 2.0.4
+
+  /@allmaps/tailwind@1.0.0-beta.14:
+    resolution: {integrity: sha512-qb9VPnKW6Cykx3qFM2wQLkMdX0lKLA1OFH/uSHUtybHkz3DEclHn2B2SLWEiVD1FuZ6b9LqoBVo/mlqAmbpcPw==}
+
+  /@allmaps/transform@1.0.0-beta.41:
+    resolution: {integrity: sha512-heGk4FCCWAv1olae/gMSkIj4RD7Io++entz7CYsLjtacqJiAmrd7bBkSmkL8h4Z0rm9lzuE6pf7sRciP09I8sQ==}
+    dependencies:
+      '@allmaps/stdlib': 1.0.0-beta.31
+      '@turf/distance': 6.5.0
+      '@turf/midpoint': 6.5.0
+      ml-matrix: 6.11.0
+
+  /@allmaps/triangulate@1.0.0-beta.23:
+    resolution: {integrity: sha512-KxRIVR3IL6zz2i/T06s7sc3mFcJa50z2nyVs7tZeouJ6niNQbogjYQ3LvyAw8yS+wosIYl8YfkaV8cRj2/cjbw==}
+    dependencies:
+      '@allmaps/stdlib': 1.0.0-beta.31
+      '@allmaps/types': 1.0.0-beta.15
+      poly2tri: 1.5.0
+      robust-point-in-polygon: 1.0.3
+
+  /@allmaps/types@1.0.0-beta.15:
+    resolution: {integrity: sha512-iA2dxCUQbzj3mvKT5fz9nENtmMD3BtD9+uuDTRw2JuACBqA6GJkbDJz9wyxHHSYcCy4JL3xuTy0ucRHLZZkGfg==}
+
+  /@allmaps/ui@1.0.0-beta.32(@sveltejs/kit@2.5.10)(svelte@4.2.17):
+    resolution: {integrity: sha512-ARSX+YgAErgQuN1+V5a63sMd0WbmJGgW/3haCthWo+i9Y9lU1ssw21xWFbxv3Y8g3P3nxyzrW3FvBWb5LaofaA==}
+    peerDependencies:
+      '@sveltejs/kit': ^2.0.0
+      svelte: ^4.2.7
+    dependencies:
+      '@allmaps/iiif-parser': 1.0.0-beta.40
+      '@allmaps/tailwind': 1.0.0-beta.14
+      '@allmaps/types': 1.0.0-beta.15
+      '@sveltejs/kit': 2.5.10(@sveltejs/vite-plugin-svelte@3.1.0)(svelte@4.2.17)(vite@5.2.12)
+      flowbite: 1.8.1
+      svelte: 4.2.17
+    dev: false
 
   /@alloc/quick-lru@5.2.0:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -3149,6 +3250,12 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
+  /@kninnug/constrainautor@4.0.0:
+    resolution: {integrity: sha512-tIlqPYscvULOA4jkAYxczIXm8bX7t9h2cvnE0p5KYHVQai58XkjoxCWRDhdmEEub/pLurFKdhWmuJrOxKD1qzw==}
+    dependencies:
+      robust-predicates: 3.0.2
+    dev: false
+
   /@lerna/child-process@7.4.2:
     resolution: {integrity: sha512-je+kkrfcvPcwL5Tg8JRENRqlbzjdlZXyaR88UcnCdNW0AJ1jX9IfHRys1X7AwSroU2ug8ESNC+suoBw1vX833Q==}
     engines: {node: '>=16.0.0'}
@@ -3817,11 +3924,9 @@ packages:
 
   /@placemarkio/geojson-rewind@1.0.2:
     resolution: {integrity: sha512-ulBdZOCvKlUIe9v+/PDVfe4wDvfkJRzRXstGEHbAJGiUN8IDYw3wD3156DcN/rO9DiHfjcF8KUQlQ7iiMd+rrA==}
-    dev: false
 
   /@polka/url@1.0.0-next.25:
     resolution: {integrity: sha512-j7P6Rgr3mmtdkeDGTe0E/aYyWEWVtc5yFXtHCRHs28/jptDEWfaVOc5T7cblqy1XKPPfCxJc/8DwQ5YgLOZOVQ==}
-    dev: true
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -4089,7 +4194,6 @@ packages:
       svelte: 4.2.17
       tiny-glob: 0.2.9
       vite: 5.2.12(@types/node@18.19.33)
-    dev: true
 
   /@sveltejs/package@2.3.1(svelte@4.2.17)(typescript@5.5.4):
     resolution: {integrity: sha512-JvR2J4ost1oCn1CSdqenYRwGX/1RX+7LN+VZ71aPnz3JAlIFaEKQd1pBxlb+OSQTfeugJO0W39gB9voAbBO5ow==}
@@ -4184,7 +4288,6 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/boolean-clockwise@6.5.0:
     resolution: {integrity: sha512-45+C7LC5RMbRWrxh3Z0Eihsc8db1VGBO5d9BLTOAwU4jR6SgsunTfRWR16X7JUwIDYlCVEmnjcXJNi/kIU3VIw==}
@@ -4198,7 +4301,6 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/clone@6.5.0:
     resolution: {integrity: sha512-mzVtTFj/QycXOn6ig+annKrM6ZlimreKYz6f/GSERytOpgzodbQyOgkfwru100O1KQhhjSudKK4DsQ0oyi9cTw==}
@@ -4211,24 +4313,20 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/distance@6.5.0:
     resolution: {integrity: sha512-xzykSLfoURec5qvQJcfifw/1mJa+5UwByZZ5TZ8iaqjGYN0vomhV9aiSLeYdUGtYRESZ+DYC/OzY+4RclZYgMg==}
     dependencies:
       '@turf/helpers': 6.5.0
       '@turf/invariant': 6.5.0
-    dev: false
 
   /@turf/helpers@6.5.0:
     resolution: {integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==}
-    dev: false
 
   /@turf/invariant@6.5.0:
     resolution: {integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==}
     dependencies:
       '@turf/helpers': 6.5.0
-    dev: false
 
   /@turf/meta@6.5.0:
     resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
@@ -4243,7 +4341,6 @@ packages:
       '@turf/destination': 6.5.0
       '@turf/distance': 6.5.0
       '@turf/helpers': 6.5.0
-    dev: false
 
   /@turf/rewind@6.5.0:
     resolution: {integrity: sha512-IoUAMcHWotBWYwSYuYypw/LlqZmO+wcBpn8ysrBNbazkFNkLf3btSDZMkKJO/bvOzl55imr/Xj4fi3DdsLsbzQ==}
@@ -4307,6 +4404,10 @@ packages:
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
     dependencies:
       '@types/ms': 0.7.34
+
+  /@types/delaunator@5.0.3:
+    resolution: {integrity: sha512-6tTLP8NX0OwtB/fmW9bXp4EWPptawTSsrSGjboWRuzqkxNEEJGyzRPHbr8wnV2DBWfAZ+EPTOvW3B/KysJrl2g==}
+    dev: true
 
   /@types/eslint@8.56.10:
     resolution: {integrity: sha512-Shavhk87gCtY2fhXDctcfS3e6FdxWkCx1iUZ9eEUbh7rTqlZT0/IzOkCOVt0fCjcFuZ9FPYfuezTBImfHCDBGQ==}
@@ -4936,6 +5037,7 @@ packages:
 
   /@vue/compiler-dom@3.4.27:
     resolution: {integrity: sha512-kUTvochG/oVgE1w5ViSr3KUBh9X7CWirebA3bezTbB5ZKBQZwR2Mwj9uoSKRMFcz4gSMzzLXBPD6KpCLb9nvWw==}
+    requiresBuild: true
     dependencies:
       '@vue/compiler-core': 3.4.27
       '@vue/shared': 3.4.27
@@ -4988,6 +5090,7 @@ packages:
 
   /@vue/shared@3.4.27:
     resolution: {integrity: sha512-DL3NmY2OFlqmYYrzp39yi3LDkKxa5vZVwxWdQ3rG0ekuWscHraeIbnI8t+aZK7qhYqEqWKTUdijadunb9pnrgA==}
+    requiresBuild: true
     dev: true
 
   /@yarnpkg/lockfile@1.1.0:
@@ -5945,7 +6048,6 @@ packages:
 
   /comlink@4.4.1:
     resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
-    dev: false
 
   /comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -6285,6 +6387,12 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /delaunator@5.0.1:
+    resolution: {integrity: sha512-8nvh+XBe96aCESrGOqMp/84b13H9cdKbG5P2ejQCh4d4sK9RL4371qou9drQjMhvnPmhWl5hnmqbEE0fXr9Xnw==}
+    dependencies:
+      robust-predicates: 3.0.2
+    dev: false
+
   /delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
@@ -6524,6 +6632,7 @@ packages:
   /entities@4.5.0:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
     engines: {node: '>=0.12'}
+    requiresBuild: true
 
   /env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
@@ -6784,7 +6893,6 @@ packages:
 
   /esm-env@1.0.0:
     resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
-    dev: true
 
   /espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
@@ -6864,6 +6972,7 @@ packages:
 
   /estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
+    requiresBuild: true
     dev: true
 
   /estree-walker@3.0.3:
@@ -7469,7 +7578,6 @@ packages:
 
   /globalyzer@0.1.0:
     resolution: {integrity: sha512-40oNTM9UfG6aBmuKxk/giHn5nQ8RVz/SS4Ir6zgzOv9/qC3kKZ9v4etGTcJbEl/NyVQH7FGU7d+X1egr57Md2Q==}
-    dev: true
 
   /globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
@@ -7485,7 +7593,6 @@ packages:
 
   /globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
-    dev: true
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
@@ -8079,7 +8186,6 @@ packages:
 
   /is-any-array@2.0.1:
     resolution: {integrity: sha512-UtilS7hLRu++wb/WBAw9bNuP1Eg04Ivn1vERJck8zJthEvXCBEBpGR/33u/xLKWEQf95803oalHrVDptcAvFdQ==}
-    dev: false
 
   /is-arrayish@0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
@@ -8742,7 +8848,6 @@ packages:
 
   /lodash-es@4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
 
   /lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
@@ -8838,6 +8943,7 @@ packages:
 
   /magic-string@0.30.10:
     resolution: {integrity: sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==}
+    requiresBuild: true
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
 
@@ -10243,13 +10349,11 @@ packages:
     resolution: {integrity: sha512-BlEeg80jI0tW6WaPyGxf5Sa4sqvcyY6lbSn5Vcv44lp1I2GR6AWojfUvLnGTNsIXrZ8uqWmo8VcG1WpkI2ONMQ==}
     dependencies:
       is-any-array: 2.0.1
-    dev: false
 
   /ml-array-min@1.2.3:
     resolution: {integrity: sha512-VcZ5f3VZ1iihtrGvgfh/q0XlMobG6GQ8FsNyQXD3T+IlstDv85g8kfV0xUG1QPRO/t21aukaJowDzMTc7j5V6Q==}
     dependencies:
       is-any-array: 2.0.1
-    dev: false
 
   /ml-array-rescale@1.3.7:
     resolution: {integrity: sha512-48NGChTouvEo9KBctDfHC3udWnQKNKEWN0ziELvY3KG25GR5cA8K8wNVzracsqSW1QEkAXjTNx+ycgAv06/1mQ==}
@@ -10257,14 +10361,12 @@ packages:
       is-any-array: 2.0.1
       ml-array-max: 1.2.4
       ml-array-min: 1.2.3
-    dev: false
 
   /ml-matrix@6.11.0:
     resolution: {integrity: sha512-7jr9NmFRkaUxbKslfRu3aZOjJd2LkSitCGv+QH9PF0eJoEG7jIpjXra1Vw8/kgao8+kHCSsJONG6vfWmXQ+/Eg==}
     dependencies:
       is-any-array: 2.0.1
       ml-array-rescale: 1.3.7
-    dev: false
 
   /mlly@1.7.0:
     resolution: {integrity: sha512-U9SDaXGEREBYQgfejV97coK0UL1r+qnF2SyO9A3qcI8MzKnsIFKHNVEkrDyNncQTKQQumsasmeq84eNMdBfsNQ==}
@@ -10315,7 +10417,6 @@ packages:
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
-    dev: true
 
   /mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
@@ -10382,6 +10483,7 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+    requiresBuild: true
 
   /napi-build-utils@1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
@@ -11323,7 +11425,6 @@ packages:
 
   /poly2tri@1.5.0:
     resolution: {integrity: sha512-5yACqznqRrlFA9RhdWyD2blNPVhlB3qK+iRYJCfHtJGINb+XNBgKTw+pJOsJZ+oaGxFsIyFmOVapuREHnRhXPg==}
-    dev: false
 
   /postcss-import@15.1.0(postcss@8.4.38):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
@@ -11426,6 +11527,7 @@ packages:
   /postcss@8.4.38:
     resolution: {integrity: sha512-Wglpdk03BSfXkHoQa3b/oulrotAkwrlLDRSOb9D0bN86FdRyE9lppSp33aHNPgBa0JKCoB+drFLZkQoRRYae5A==}
     engines: {node: ^10 || ^12 || >=14}
+    requiresBuild: true
     dependencies:
       nanoid: 3.3.7
       picocolors: 1.0.1
@@ -11565,6 +11667,10 @@ packages:
     resolution: {integrity: sha512-JHIaJB9W7lfbOgWCbohjnl3LjpDqBlN/8T3WFWeeLMkXpzz6ab9/Bdg1kdoryE0clevHMjv0tUAHnwsf937sQw==}
     dev: false
 
+  /protomaps-themes-base@4.3.0:
+    resolution: {integrity: sha512-XNLs3zamw/XucflU0qBXgiPN72/YEo6h01ClsVrfUUQCDzA4r8Eu23hG/fqYqFuocciwu0doCxGBBpE8xGMtoA==}
+    dev: false
+
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: true
@@ -11610,7 +11716,6 @@ packages:
 
   /quickselect@2.0.0:
     resolution: {integrity: sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==}
-    dev: false
 
   /quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
@@ -11626,7 +11731,6 @@ packages:
     resolution: {integrity: sha512-XRaVO0YecOpEuIvbhbpTrZgoiI6xBlz6hnlr6EHhd+0x9ase6EmeN+hdwwUaJvLcsFFQ8iWVF1GAK1yB0BWi0w==}
     dependencies:
       quickselect: 2.0.0
-    dev: false
 
   /rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -12100,12 +12204,14 @@ packages:
       robust-subtract: 1.0.0
       robust-sum: 1.0.0
       two-product: 1.0.2
-    dev: false
 
   /robust-point-in-polygon@1.0.3:
     resolution: {integrity: sha512-pPzz7AevOOcPYnFv4Vs5L0C7BKOq6C/TfAw5EUE58CylbjGiPyMjAnPLzzSuPZ2zftUGwWbmLWPOjPOz61tAcA==}
     dependencies:
       robust-orientation: 1.2.1
+
+  /robust-predicates@3.0.2:
+    resolution: {integrity: sha512-IXgzBWvWQwE6PrDI05OvmXUIruQTcoMDzRsOd5CDvHCVLcLHMTSYvOK5Cm46kWqlV3yAbuSpBZdJ5oP5OUoStg==}
     dev: false
 
   /robust-scale@1.0.2:
@@ -12113,15 +12219,12 @@ packages:
     dependencies:
       two-product: 1.0.2
       two-sum: 1.0.0
-    dev: false
 
   /robust-subtract@1.0.0:
     resolution: {integrity: sha512-xhKUno+Rl+trmxAIVwjQMiVdpF5llxytozXJOdoT4eTIqmqsndQqFb1A0oiW3sZGlhMRhOi6pAD4MF1YYW6o/A==}
-    dev: false
 
   /robust-sum@1.0.0:
     resolution: {integrity: sha512-AvLExwpaqUqD1uwLU6MwzzfRdaI6VEZsyvQ3IAQ0ZJ08v1H+DTyqskrf2ZJyh0BDduFVLN7H04Zmc+qTiahhAw==}
-    dev: false
 
   /rollup-plugin-inject@3.0.2:
     resolution: {integrity: sha512-ptg9PQwzs3orn4jkgXJ74bfs5vYz1NCZlSQMBUA0wKcGp5i5pA1AO3fOUEte8enhGUC+iapTCzEWw2jEFFUO/w==}
@@ -12193,7 +12296,6 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       mri: 1.2.0
-    dev: true
 
   /safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -12306,7 +12408,6 @@ packages:
 
   /set-cookie-parser@2.6.0:
     resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
-    dev: true
 
   /set-value@2.0.1:
     resolution: {integrity: sha512-JxHc1weCN68wRY0fhCoXpyK55m/XPHafOmK4UWD7m2CI14GMcFypt4w/0+NV5f/ZMby2F6S2wwA7fgynh9gWSw==}
@@ -12442,7 +12543,6 @@ packages:
       '@polka/url': 1.0.0-next.25
       mrmime: 2.0.0
       totalist: 3.0.1
-    dev: true
 
   /sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
@@ -12527,6 +12627,7 @@ packages:
   /source-map-js@1.2.0:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
 
   /source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
@@ -13006,7 +13107,6 @@ packages:
 
   /svg-parser@2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
-    dev: false
 
   /tailwindcss@3.4.3:
     resolution: {integrity: sha512-U7sxQk/n397Bmx4JHbJx/iSOOv5G+II3f1kpLpY2QeUv5DcPdcTsYLlusZfq1NthHS1c1cZoyFmmkex1rzke0A==}
@@ -13128,7 +13228,6 @@ packages:
     dependencies:
       globalyzer: 0.1.0
       globrex: 0.1.2
-    dev: true
 
   /tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -13185,7 +13284,6 @@ packages:
   /totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
     engines: {node: '>=6'}
-    dev: true
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
@@ -13295,11 +13393,9 @@ packages:
 
   /two-product@1.0.2:
     resolution: {integrity: sha512-vOyrqmeYvzjToVM08iU52OFocWT6eB/I5LUWYnxeAPGXAhAxXYU/Yr/R2uY5/5n4bvJQL9AQulIuxpIsMoT8XQ==}
-    dev: false
 
   /two-sum@1.0.0:
     resolution: {integrity: sha512-phP48e8AawgsNUjEY2WvoIWqdie8PoiDZGxTDv70LDr01uX5wLEQbOgSP7Z/B6+SW5oLtbe8qaYX2fKJs3CGTw==}
-    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -14074,6 +14170,7 @@ packages:
 
   /vue-template-compiler@2.7.16:
     resolution: {integrity: sha512-AYbUWAJHLGGQM7+cNTELw+KsOG9nl2CnSv467WobS5Cv9uk3wFcnr1Etsz2sEIHEZvw1U+o9mRlEO6QbZvUPGQ==}
+    requiresBuild: true
     dependencies:
       de-indent: 1.0.2
       he: 1.2.0

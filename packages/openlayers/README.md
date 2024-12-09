@@ -28,7 +28,7 @@ Install with pnpm:
 pnpm install @allmaps/openlayers
 ```
 
-You can build this package locally by running:
+You can optionally build this package locally by running:
 
 ```sh
 pnpm run build

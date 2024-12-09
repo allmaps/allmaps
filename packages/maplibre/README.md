@@ -26,7 +26,7 @@ Install with pnpm:
 pnpm install @allmaps/maplibre
 ```
 
-You can build this package locally by running:
+You can optionally build this package locally by running:
 
 ```sh
 pnpm run build

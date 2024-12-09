@@ -5,7 +5,7 @@ import { pixelToIntArrayIndex, pointToPixel } from '@allmaps/stdlib'
 import { GetImageDataValue, GetImageDataSize } from './types.js'
 import {
   resourcePointInTile,
-  tilePosition,
+  tileToTileOriginPoint,
   clipTilePointToTile
 } from './tiles.js'
 import { applyTransform, invertTransform } from './matrix.js'
@@ -110,10 +110,10 @@ export async function renderToIntArray<W extends WarpedMap, D>(
           //        |   +     |
           // [0, 0] *---------* [1, 0] > X
           //
-          const resourceTilePosition = tilePosition(tile)
+          const resourceTileOriginPoint = tileToTileOriginPoint(tile)
           const tilePoint = resourcePoint.map(
             (coordinate, index) =>
-              (coordinate - resourceTilePosition[index]) /
+              (coordinate - resourceTileOriginPoint[index]) /
               tile.tileZoomLevel.scaleFactor
           ) as Point
 

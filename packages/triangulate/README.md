@@ -1,14 +1,16 @@
 # @allmaps/triangulate
 
-This module triangulates a polygon: it returns a set of small triangule that partition the polygon.
+This module triangulates a polygon: it returns a set of triangles that partition the polygon.
 
-It is used in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
+If a `distance` parameter is provided, the triangles are well-conditioned and generally not larger then `distance`: the triangles are made to follow the polygon, who's edges are interpolated every `distance`, and also a grid of points inside the polygon, spaced `distance` apart.
+
+This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
 
 ## How it works
 
-It uses a simple **constrained Delaunay triangulation algorithm** for polygons, built using [poly2tri.js](https://github.com/r3mi/poly2tri.js).
+It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Contrainautor](https://github.com/kninnug/Constrainautor), and uses [Robust-Point-In-Polygon](https://github.com/mikolalysenko/robust-point-in-polygon/tree/master) to only allow resulting triangles are indeed inside the original polygon.
 
-To learn more on how it works, check out this [Observable notebook](https://observablehq.com/@allmaps/a-simple-polygon-triangulation-algorithm).
+To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/efde1d04f1a9bc17).
 
 ## Installation
 
@@ -25,24 +27,26 @@ npm install @allmaps/triangulate
 ```js
 import { triangulate } from '@allmaps/triangulate'
 
-// polygons are not round-trip
+// Note that polygons are in double brackets (an array of an outer ring, and possibly inner rings if there are holes) and their rings are not round-trip (the first coordinate is not repeated at the and)
 const polygon = [
-  [0.592, 0.953],
-  [0.304, 2.394],
-  [2.904, 2.201],
-  [2.394, 0.232]
+  [
+    [0.592, 0.953],
+    [0.304, 2.394],
+    [2.904, 2.201],
+    [2.394, 0.232]
+  ]
 ]
 
 const distance = 1
 
-// compute constrained triangulation of `polygon` using a mesh of size `distance`
+// Compute constrained triangulation of `polygon` using a grid of size `distance`
 const triangles = triangulate(polygon, distance)
 
 // triangles = [
 //   [
-//     [1.3012562303117026, 2.3199729029037854],
-//     [0.304, 2.394],
-//     [1.304, 2.232]
+//     [ 1.304, 1.232 ],
+//     [ 1.4655588463411926, 0.6034795070965593 ],
+//     [ 0.592, 0.953 ]
 //   ],
 //   ...
 // ]
@@ -54,80 +58,55 @@ const triangles = triangulate(polygon, distance)
 
 #### Table of Contents
 
-*   [Triangulation](#triangulation)
-    *   [triangulate](#triangulate)
-        *   [Parameters](#parameters)
-    *   [triangulatePoly2tri](#triangulatepoly2tri)
-        *   [Parameters](#parameters-1)
-*   [Types](#types)
-    *   [poly2tri.Triangle](#poly2tritriangle)
+*   [triangulate](#triangulate)
+    *   [Parameters](#parameters)
 *   [triangulateToUnique](#triangulatetounique)
-    *   [Parameters](#parameters-2)
+    *   [Parameters](#parameters-1)
 
-### Triangulation
+### triangulate
 
+Triangulate a polygon to triangles smaller then a distance
 
-
-#### triangulate
-
-Triangulates a polygon
-
-##### Parameters
-
-*   `polygon` **Ring** Polygon
-*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
-
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Triangle>** Array of triangles partitioning the polygon
-
-#### triangulatePoly2tri
-
-Triangulates a polygon (and returns the full Poly2tri output)
-
-##### Parameters
-
-*   `polygon` **Ring** Polygon
-*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
-
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[poly2tri.Triangle](#poly2tritriangle)>** Array of triangles partitioning the polygon
-
-### Types
-
-The types used in this module are described below.
-
-#### poly2tri.Triangle
-
-Triangle object from [poly2tri](https://github.com/r3mi/poly2tri.js/) package
-
-Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)
-
-### triangulateToUnique
-
-Triangulates a polygon and return unique points.
-Grid points typically occure in 6 triangles
-This function reutrns the list of unique points, and returns the triangles as uniquePointsIndexTriangles with indices refering to the unique points
+Grid points are placed inside the polygon to obtain small, well conditioned triangles.
 
 #### Parameters
 
-*   `polygon` **Ring** Polygon
-*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Distance between the Steiner points placed in a grid inside the polygon
+*   `polygon` **Polygon** Polygon
+*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Distance that conditions the triangles
+*   `minimumTriangleArea` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise (optional, default `EPSILON`)
 
-Returns **{uniquePointsIndexTriangles: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<UniquePointsIndexTriangle>, uniquePoints: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>}** Object with uniquePointsIndexTriangles and uniquePoints
+Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Triangle>** Array of triangles partitioning the polygon
+
+### triangulateToUnique
+
+Triangulate a polygon to triangles smaller then a distance, and return them via unique points.
+
+Grid points are placed inside the polygon to obtain small, well conditioned triangles.
+
+This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
+
+#### Parameters
+
+*   `polygon` **Polygon** Polygon
+*   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Distance that conditions the triangles
+*   `minimumTriangleArea` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise (optional, default `EPSILON`)
+
+Returns **TriangulationToUnique** Triangulation Object with uniquePointIndexTriangles and uniquePoints
 
 ## Notes
 
 ### Stability
 
-*   `poly2tri` doesn't allow self-intersection polygons and will raise an error for such inputs.
-*   For certain polygon vertex configurations an especially for round numbers or small distance sizes, poly2tri is known to throw errors such as 'point collinearity' or 'pointerror'.
+*   Constrainautor doesn't allow self-intersection polygons and will raise an error for such inputs.
 
 ### Benchmark
 
-For a 10 point polygon, here are some benchmarks for computing the triangulation with the distance as a fraction of the polygon's bbox diameter:
+For a 10 point polygon (with diameter ~ 200), here are some benchmarks for computing the triangulation with given distances:
 
-*   `triangulate(polygon, 1)`: 66719 ops/s to compute 8 triangles
-*   `triangulate(polygon, bboxDiameter / 10)`: 10924 ops/s to compute 86 triangles
-*   `triangulate(polygon, bboxDiameter / 40)`: 1115 ops/s to compute 1048 triangles
-*   `triangulate(polygon, bboxDiameter / 100)`: 167 ops/s to compute 6216 triangles
+*   `triangulate(polygon, 1000)` (no grid points): 100839 ops/s to compute 8 triangles
+*   `triangulate(polygon, 100)`: 87436 ops/s to compute 11 triangles
+*   `triangulate(polygon, 10)`: 5447 ops/s to compute 435 triangles
+*   `triangulate(polygon, 1)`: 56 ops/s to compute 38352 triangles
 
 See [`./bench/index.js`](`./bench/index.js`).
 

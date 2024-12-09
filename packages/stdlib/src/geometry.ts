@@ -18,7 +18,8 @@ import type {
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
   GeojsonGeometry,
-  Size
+  Size,
+  Triangle
 } from '@allmaps/types'
 
 // Assert
@@ -122,14 +123,14 @@ export function conformMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
 
 // Convert to GeoJSON
 
-export function convertPointToGeojsonPoint(point: Point): GeojsonPoint {
+export function pointToGeojsonPoint(point: Point): GeojsonPoint {
   return {
     type: 'Point',
     coordinates: point
   }
 }
 
-export function convertLineStringToGeojsonLineString(
+export function lineStringToGeojsonLineString(
   lineString: LineString
 ): GeojsonLineString {
   return {
@@ -138,10 +139,7 @@ export function convertLineStringToGeojsonLineString(
   }
 }
 
-export function convertRingToGeojsonPolygon(
-  ring: Ring,
-  close = true
-): GeojsonPolygon {
+export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
     coordinates: close ? [[...ring, ring[0]]] : [ring]
@@ -149,7 +147,7 @@ export function convertRingToGeojsonPolygon(
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
-export function convertPolygonToGeojsonPolygon(
+export function polygonToGeojsonPolygon(
   polygon: Polygon,
   close = true
 ): GeojsonPolygon {
@@ -165,7 +163,7 @@ export function convertPolygonToGeojsonPolygon(
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
-export function convertMultiPointToGeojsonMultiPoint(
+export function multiPointToGeojsonMultiPoint(
   multiPoint: MultiPoint
 ): GeojsonMultiPoint {
   return {
@@ -174,7 +172,7 @@ export function convertMultiPointToGeojsonMultiPoint(
   }
 }
 
-export function convertMultiLineStringToGeojsonMultiLineString(
+export function multiLineStringToGeojsonMultiLineString(
   multiLineString: MultiLineString
 ): GeojsonMultiLineString {
   return {
@@ -183,7 +181,7 @@ export function convertMultiLineStringToGeojsonMultiLineString(
   }
 }
 
-export function convertMultiPolygonToGeojsonMultiPolygon(
+export function multiPolygonToGeojsonMultiPolygon(
   multiPolygon: MultiPolygon,
   close = true
 ): GeojsonMultiPolygon {
@@ -201,21 +199,19 @@ export function convertMultiPolygonToGeojsonMultiPolygon(
   return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
-export function convertGeometryToGeojsonGeometry(
-  geometry: Geometry
-): GeojsonGeometry {
+export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
   if (isPoint(geometry)) {
-    return convertPointToGeojsonPoint(geometry)
+    return pointToGeojsonPoint(geometry)
   } else if (isLineString(geometry)) {
-    return convertLineStringToGeojsonLineString(geometry)
+    return lineStringToGeojsonLineString(geometry)
   } else if (isPolygon(geometry)) {
-    return convertPolygonToGeojsonPolygon(geometry)
+    return polygonToGeojsonPolygon(geometry)
   } else if (isMultiPoint(geometry)) {
-    return convertMultiPointToGeojsonMultiPoint(geometry)
+    return multiPointToGeojsonMultiPoint(geometry)
   } else if (isMultiLineString(geometry)) {
-    return convertMultiLineStringToGeojsonMultiLineString(geometry)
+    return multiLineStringToGeojsonMultiLineString(geometry)
   } else if (isMultiPolygon(geometry)) {
-    return convertMultiPolygonToGeojsonMultiPolygon(geometry)
+    return multiPolygonToGeojsonMultiPolygon(geometry)
   } else {
     throw new Error('Geometry type not supported')
   }
@@ -267,7 +263,7 @@ export function isEqualPointArrayArray(
   return true
 }
 
-// Compute
+// Split, combine, shift, flip
 
 export function pointsAndPointsToLines(
   points0: Point[],
@@ -314,12 +310,7 @@ export function flipY(point: Point): Point {
   return [point[0], -point[1]]
 }
 
-export function midPoint(point0: Point, point1: Point): Point {
-  return [
-    (point1[0] - point0[0]) / 2 + point0[0],
-    (point1[1] - point0[1]) / 2 + point0[1]
-  ]
-}
+// Mix
 
 export function mixNumbers(
   number0: number,
@@ -334,6 +325,33 @@ export function mixPoints(point0: Point, point1: Point, t: number): Point {
     mixNumbers(point0[0], point1[0], t),
     mixNumbers(point0[1], point1[1], t)
   ]
+}
+
+// Compute
+
+export function midPoint(...points: Point[]): Point {
+  const result: Point = [0, 0]
+  for (let i = 0; i < points.length; i++) {
+    result[0] += points[i][0]
+    result[1] += points[i][1]
+  }
+  result[0] = result[0] / points.length
+  result[1] = result[1] / points.length
+  return result
+}
+
+// Return angle of line (in radians, signed)
+export function lineAngle(line: Line): number {
+  return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
+}
+
+// Return the next point starting from a point going a certian distance in a certain direction
+export function stepDistanceAngle(
+  point: Point,
+  dist: number,
+  angle: number
+): Point {
+  return [point[0] + Math.cos(angle) * dist, point[1] + Math.sin(angle) * dist]
 }
 
 export function distance(from: Line): number
@@ -369,6 +387,13 @@ export function squaredDistance(from: Point | Line, to?: Point): number {
   }
 }
 
-export function degreesToRadians(degrees: number) {
-  return degrees * (Math.PI / 180)
+export function triangleArea(triangle: Triangle): number {
+  return (
+    0.5 *
+    Math.abs(
+      triangle[0][0] * (triangle[1][1] - triangle[2][1]) +
+        triangle[1][0] * (triangle[2][1] - triangle[0][1]) +
+        triangle[2][0] * (triangle[0][1] - triangle[1][1])
+    )
+  )
 }

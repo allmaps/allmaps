@@ -3,8 +3,10 @@
 precision highp float;
 precision highp isampler2D;
 
-// Color mixing from Spectral.js
-#include ../spectral.frag;
+// Color mixing from Spectral.js to be used in distortion.frag
+// Note: not including this for now since spectal_mix() appears to be slower then mix()
+// #include ../spectral.frag;
+
 #include ../helpers.frag;
 
 uniform float u_debug;
@@ -25,10 +27,10 @@ uniform float u_saturation;
 uniform bool u_distortion;
 uniform int u_distortionOptionsdistortionMeasure;
 
-uniform int u_currentBestScaleFactor;
+uniform int u_scaleFactorForViewport;
 
 uniform lowp sampler2DArray u_cachedTilesTextureArray;
-uniform isampler2D u_cachedTilesResourcePositionsAndDimensionsTexture;
+uniform isampler2D u_cachedTilesResourceOriginPointsAndDimensionsTexture;
 uniform isampler2D u_cachedTilesScaleFactorsTexture;
 
 uniform vec4 u_colorDistortion00;
@@ -68,30 +70,30 @@ void main() {
   for(int index = 0; index < cachedTilesCount; index += 1) {
 
     // Read the information of the tile
-    float cachedTileResourcePositionX = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4)), 0));
-    float cachedTileResourcePositionY = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 1), 0));
-    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 2), 0));
-    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourcePositionsAndDimensionsTexture, ivec2(0, (index * 4) + 3), 0));
+    float cachedTileResourceOriginPointX = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4)), 0));
+    float cachedTileResourceOriginPointY = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 1), 0));
+    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 2), 0));
+    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 3), 0));
 
     int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
 
     // If the triangle point is inside the tile, consider to use the tile:
-    if(resourceTrianglePointX >= cachedTileResourcePositionX &&
-      resourceTrianglePointX < cachedTileResourcePositionX + cachedTileDimensionWidth &&
-      resourceTrianglePointY >= cachedTileResourcePositionY &&
-      resourceTrianglePointY < cachedTileResourcePositionY + cachedTileDimensionHeight) {
+    if(resourceTrianglePointX >= cachedTileResourceOriginPointX &&
+      resourceTrianglePointX < cachedTileResourceOriginPointX + cachedTileDimensionWidth &&
+      resourceTrianglePointY >= cachedTileResourceOriginPointY &&
+      resourceTrianglePointY < cachedTileResourceOriginPointY + cachedTileDimensionHeight) {
 
-      // If the scale factor is smaller (more detailed) then the best scale factor for this map then currently known
-      // update the current best scale factor
+      // If the scale factor of this tile is smaller (more detailed) then the scale factor currently known
+      // update the smallest scale factor
       // and compute the cached tiles texture point that corresponds to the triangle point
-      // Note: we can safely take the deepest one, since the depth is limited when we gather texture tiles
+      // Note: we can safely take the most detailed tile, since the depth is limited when we gather texture tiles
       if(cachedTileScaleFactor < smallestScaleFactor) {
         smallestScaleFactor = cachedTileScaleFactor;
         found = true;
         foundIndex = index;
 
-        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourcePositionX) / float(cachedTileScaleFactor);
-        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourcePositionY) / float(cachedTileScaleFactor);
+        float cachedTilePointX = (resourceTrianglePointX - cachedTileResourceOriginPointX) / float(cachedTileScaleFactor);
+        float cachedTilePointY = (resourceTrianglePointY - cachedTileResourceOriginPointY) / float(cachedTileScaleFactor);
 
         float cachedTilesTexturePointX = cachedTilePointX / float(cachedTilesTextureSize.x);
         float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);

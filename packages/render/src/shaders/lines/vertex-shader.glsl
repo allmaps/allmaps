@@ -4,14 +4,15 @@ precision highp float;
 
 #include ../helpers.frag;
 
-uniform mat4 u_projectedGeoToViewportTransform;
+uniform mat4 u_renderTransform;
 uniform mat4 u_viewportToClipTransform;
+uniform mat4 u_clipToViewportTransform;
 uniform float u_animationProgress;
 
-in vec2 a_projectedGeoPoint;
-in vec2 a_projectedGeoOtherPoint;
-in vec2 a_projectedGeoPreviousPoint;
-in vec2 a_projectedGeoPreviousOtherPoint;
+in vec2 a_clipPoint;
+in vec2 a_clipOtherPoint;
+in vec2 a_clipPreviousPoint;
+in vec2 a_clipPreviousOtherPoint;
 in float a_isOtherPoint;
 in float a_normalSign;
 in float a_viewportSize;
@@ -29,11 +30,11 @@ out float v_viewportFeatherSize;
 out float v_viewportTotalSize;
 
 void main() {
-  vec2 projectedGeoPoint = mix(a_projectedGeoPreviousPoint, a_projectedGeoPoint, easing(u_animationProgress));
-  vec2 projectedGeoOtherPoint = mix(a_projectedGeoPreviousOtherPoint, a_projectedGeoOtherPoint, easing(u_animationProgress));
+  vec2 clipPoint = mix(a_clipPreviousPoint, a_clipPoint, easing(u_animationProgress));
+  vec2 clipOtherPoint = mix(a_clipPreviousOtherPoint, a_clipOtherPoint, easing(u_animationProgress));
 
-  vec2 viewportPoint = (u_projectedGeoToViewportTransform * vec4(projectedGeoPoint, 0.0f, 1.0f)).xy;
-  vec2 viewportOtherPoint = (u_projectedGeoToViewportTransform * vec4(projectedGeoOtherPoint, 0.0f, 1.0f)).xy;
+  vec2 viewportPoint = (u_clipToViewportTransform * u_renderTransform * vec4(clipPoint, 0.0f, 1.0f)).xy;
+  vec2 viewportOtherPoint = (u_clipToViewportTransform * u_renderTransform * vec4(clipOtherPoint, 0.0f, 1.0f)).xy;
 
   vec2 viewportLine = vec2(viewportOtherPoint.x-viewportPoint.x, viewportOtherPoint.y-viewportPoint.y);
   vec2 viewportNormalizedLine = normalize(viewportLine);
@@ -65,5 +66,5 @@ void main() {
   v_viewportBorderSize = viewportBorderSize;
   v_borderColor = a_borderColor;
 
-  gl_Position = u_viewportToClipTransform * vec4(viewportPoint + lineX * viewportNormalizedLine + lineY * viewportNormalizedLineNormal, 0, 1);
+  gl_Position =  u_viewportToClipTransform * vec4(viewportPoint + lineX * viewportNormalizedLine + lineY * viewportNormalizedLineNormal, 0, 1);
 }

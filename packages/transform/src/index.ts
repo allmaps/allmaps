@@ -10,10 +10,14 @@ import Straight from './transformation-types/straight.js'
 
 import {
   supportedDistortionMeasures,
-  computeDistortionFromPartialDerivatives
+  computeDistortionsFromPartialDerivatives
 } from './distortion.js'
 
-import { defaultTransformOptions } from './shared/transform-helper-functions.js'
+import {
+  defaultTransformOptions,
+  getForwardTransformResolution,
+  getBackwardTransformResolution
+} from './shared/transform-helper-functions.js'
 import { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
 
 /** @module allmaps/transform */
@@ -28,7 +32,9 @@ export {
   RBF,
   Straight,
   supportedDistortionMeasures,
-  computeDistortionFromPartialDerivatives,
+  computeDistortionsFromPartialDerivatives,
+  getForwardTransformResolution,
+  getBackwardTransformResolution,
   defaultTransformOptions,
   defaultRefinementOptions
 }

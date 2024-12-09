@@ -1,4 +1,4 @@
-import { degreesToRadians } from './geometry.js'
+import { degreesToRadians } from './main.js'
 
 import type { Point } from '@allmaps/types'
 

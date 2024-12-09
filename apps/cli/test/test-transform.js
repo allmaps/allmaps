@@ -119,9 +119,9 @@ describe('allmaps transform resource-mask', () => {
   })
 
   it('should read a Georeference Annotation from a filename and transform its resource mask to GeoJSON, using the custom transform options', () => {
-    const expected = readFileJson('output/geojson/13fd7a1921f2b011-d8.geojson')
+    const expected = readFileJson('output/geojson/13fd7a1921f2b011-d2.geojson')
     const output = execJson(
-      'transform resource-mask -p 0.01 -d 8 input/annotations/13fd7a1921f2b011.json'
+      'transform resource-mask -p 0.01 -d 2 input/annotations/13fd7a1921f2b011.json'
     )
 
     expect(expected).to.roughly(0.0001).deep.equal(output)
