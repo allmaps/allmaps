@@ -1,6 +1,6 @@
 import type { Command } from 'commander'
 
-const DEFAULT_MAX_OFFSET_RATIO = 0
+const DEFAULT_MIN_OFFSET_RATIO = 0
 const DEFAULT_MAX_DEPTH = 0
 
 export function addAnnotationOptions(command: Command): Command {
@@ -37,15 +37,15 @@ export function addTransformationOptions(command: Command) {
 export function addTransformOptions(command: Command) {
   return command
     .option(
-      '-p, --max-offset-ratio <number>',
-      // TODO: needs better description
-      'Maximum offset ratio between original and transformed midpoints',
-      `${DEFAULT_MAX_OFFSET_RATIO}`
+      '-d, --max-depth <number>',
+      'Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default 0 (i.e. no midpoints by default!).',
+      `${DEFAULT_MAX_DEPTH}`
     )
     .option(
-      '-d, --max-depth <number>',
-      'Maximum recursion depth',
-      `${DEFAULT_MAX_DEPTH}`
+      '-p, --min-offset-ratio <number>',
+      // TODO: needs better description
+      'Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default 0.',
+      `${DEFAULT_MIN_OFFSET_RATIO}`
     )
 }
 

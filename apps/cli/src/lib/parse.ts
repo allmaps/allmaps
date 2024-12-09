@@ -125,8 +125,8 @@ export function parseTransformOptions(
   const transformOptions: Partial<TransformOptions> = {}
 
   if (options && typeof options === 'object') {
-    if ('maxOffsetRatio' in options && options.maxOffsetRatio) {
-      transformOptions.maxOffsetRatio = Number(options.maxOffsetRatio)
+    if ('minOffsetRatio' in options && options.minOffsetRatio) {
+      transformOptions.minOffsetRatio = Number(options.minOffsetRatio)
     }
 
     if ('maxDepth' in options && options.maxDepth) {

@@ -151,7 +151,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Return the bounding box of all visible maps in this list, in longitude/latitude coordinates
+   * Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
    *
    * @returns {(Bbox | undefined)}
    */
@@ -172,7 +172,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Return the bounding box of all visible maps in this list, in projected coordinates
+   * Return the bounding box of all visible maps in this list, in projected geospatial coordinates
    *
    * @returns {(Bbox | undefined)}
    */

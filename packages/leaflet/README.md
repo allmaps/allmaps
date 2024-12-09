@@ -32,7 +32,7 @@ Install with pnpm:
 npm install @allmaps/leaflet
 ```
 
-You can build this package locally by running:
+You can optionally build this package locally by running:
 
 ```sh
 pnpm run build

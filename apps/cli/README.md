@@ -211,12 +211,12 @@ All the commands above accept the following options for specifying the transform
 
 All the commands above (except `point`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
-| Option                            | Description                                                           | Default                                                 |
-| :-------------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------ |
-| `-p, --max-offset-ratio <number>` | Maximum offset ratio between original and transformed midpoints       | `0`                                                     |
-| `-d, --max-depth <number>`        | Maximum recursion depth                                               | `0`                                                     |
-| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source points      | `false` (`true` for `geojson` command)                  |
-| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination points | `false` (`true` for `svg` and `resource-mask` commands) |
+| Option                            | Description                                                                                   | Default                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+| `-d, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints) depth | `0` (i.e. no midpoints by default!)                     |
+| `-p, --min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
+| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source points                              | `false` (`true` for `geojson` command)                  |
+| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination points                         | `false` (`true` for `svg` and `resource-mask` commands) |
 
 ### Parse and generate IIIF resources
 

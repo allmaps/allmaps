@@ -1,3 +1,7 @@
+export function degreesToRadians(degrees: number) {
+  return degrees * (Math.PI / 180)
+}
+
 // Note: this checks equality of the object
 // which is only a good idea for primitive types (string, number), not JSON objects
 export function equalArray<T>(

@@ -53,10 +53,5 @@ export default defineConfig({
       insertTypesEntry: true
     }),
     noBundlePlugin()
-  ],
-
-  define: {
-    // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:
-    global: 'globalThis'
-  }
+  ]
 })

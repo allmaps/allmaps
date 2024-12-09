@@ -115,9 +115,9 @@ export type PointLayer = {
 }
 
 export type MapPruneInfo = {
-  currentTileZoomLevel?: TileZoomLevel
-  currentOverviewTileZoomLevel?: TileZoomLevel
-  currentResourceViewportRingBbox?: Bbox
+  tileZoomLevelForViewport?: TileZoomLevel
+  overviewTileZoomLevelForViewport?: TileZoomLevel
+  resourceViewportRingBboxForViewport?: Bbox
 }
 
 export type MapPruneConstants = {

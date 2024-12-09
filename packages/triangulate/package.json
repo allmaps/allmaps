@@ -32,7 +32,8 @@
     "triangulate",
     "polygon triangulation",
     "Constrained Delaunay Triangulation",
-    "poly2tri.js"
+    "Delaunator",
+    "Constrainautor"
   ],
   "scripts": {
     "watch": "tsc --watch",
@@ -43,17 +44,19 @@
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit",
-    "documentation": "documentation readme dist/index.js --config documentation.yml --section=API"
+    "documentation": "documentation readme dist/index.js --section=API"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@allmaps/stdlib": "^1.0.0-beta.31",
     "@allmaps/types": "^1.0.0-beta.15",
-    "poly2tri": "^1.5.0",
+    "@kninnug/constrainautor": "^4.0.0",
+    "delaunator": "^5.0.1",
     "robust-point-in-polygon": "^1.0.3"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
+    "@types/delaunator": "^5.0.3",
     "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

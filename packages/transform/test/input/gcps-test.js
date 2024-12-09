@@ -1,4 +1,4 @@
-export const transformGcps3 = [
+export const generalGcps3 = [
   {
     source: [518, 991],
     destination: [4.9516614, 52.4633102]
@@ -13,7 +13,7 @@ export const transformGcps3 = [
   }
 ]
 
-export const transformGcps3Identity = [
+export const generalGcps3Identity = [
   {
     source: [0, 0],
     destination: [0, 0]
@@ -28,7 +28,7 @@ export const transformGcps3Identity = [
   }
 ]
 
-export const transformGcps6 = [
+export const generalGcps6 = [
   {
     source: [1344, 4098],
     destination: [4.4091165, 51.9017125]
@@ -55,7 +55,7 @@ export const transformGcps6 = [
   }
 ]
 
-// These gcps are of type GCP instead of TransformGCP
+// These gcps are of type GCP instead of GeneralGCP
 export const gcps6 = [
   {
     resource: [1344, 4098],
@@ -85,7 +85,7 @@ export const gcps6 = [
 
 // There points are correct according to Helmert, except point i=4
 // The geo coordinates span big arc, so these can be used to test for geographic features
-export const transformGcps7 = [
+export const generalGcps7 = [
   {
     source: [0, 0],
     destination: [0, 0]
@@ -116,7 +116,7 @@ export const transformGcps7 = [
   }
 ]
 
-export const transformGcps10 = [
+export const generalGcps10 = [
   { source: [6933, 3641], destination: [-5.6931398, 56.1290282] },
   {
     source: [6158, 1470],

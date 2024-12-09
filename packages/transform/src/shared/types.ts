@@ -4,18 +4,10 @@ import type { Point } from '@allmaps/types'
  * Ground Control Point (GCP).
  * A GCP contains a mapping between a source and destination point.
  */
-export type TransformGcp = { source: Point; destination: Point }
-
-export type TransformGcpLine = [TransformGcp, TransformGcp]
-export type TransformGcpRectangle = [
-  TransformGcp,
-  TransformGcp,
-  TransformGcp,
-  TransformGcp
-]
+export type GeneralGcp = { source: Point; destination: Point }
 
 export type RefinementOptions = {
-  maxOffsetRatio: number
+  minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
   maxDepth: number
@@ -23,6 +15,17 @@ export type RefinementOptions = {
   destinationMidPointFunction: (p0: Point, p1: Point) => Point
   destinationDistanceFunction: (p0: Point, p1: Point) => number
   returnDomain: 'source' | 'destination'
+}
+
+export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
+  sourceMidPoint: Point
+  destinationMidPointFromRefinementFunction: Point
+}
+
+export type SplitGcpLineInfo = {
+  destinationMidPointsDistance: number
+  destinationLineDistance: number
+  destinationRefinedLineDistance: number
 }
 
 /** Transformation type. */
@@ -37,7 +40,7 @@ export type TransformationType =
   | 'thinPlateSpline'
 
 export type TransformOptions = {
-  maxOffsetRatio: number
+  minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
   maxDepth: number

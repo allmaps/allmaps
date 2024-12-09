@@ -168,7 +168,7 @@ export default class TileCache<D> extends EventTarget {
       fetchableTiles.map((fetchableTile) => fetchableTile.fetchableTileKey)
     )
 
-    // If previous and current request are the same, don't do anything
+    // If the keys are the same as the previous ones, don't do anything
     // TODO: replace with Set equality once supported
     if (equalSet(previousKeys, keys)) {
       return
@@ -185,7 +185,7 @@ export default class TileCache<D> extends EventTarget {
 
   /**
    * Returns a promise that resolves when all requested tiles are loaded.
-   * This could happen immidiately, in case there are no current requests and the tilesFetchingCount is zero,
+   * This could happen immidiately, in case there are no ongoing requests and the tilesFetchingCount is zero,
    * or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
    *
    * @async

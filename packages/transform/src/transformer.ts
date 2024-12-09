@@ -11,12 +11,12 @@ import {
   isGeojsonMultiPoint,
   isGeojsonMultiLineString,
   isGeojsonMultiPolygon,
-  convertPointToGeojsonPoint,
-  convertLineStringToGeojsonLineString,
-  convertPolygonToGeojsonPolygon,
-  convertGeojsonPointToPoint,
-  convertGeojsonLineStringToLineString,
-  convertGeojsonPolygonToPolygon,
+  pointToGeojsonPoint,
+  lineStringToGeojsonLineString,
+  polygonToGeojsonPolygon,
+  geojsonPointToPoint,
+  geojsonLineStringToLineString,
+  geojsonPolygonToPolygon,
   geometriesToFeatureCollection,
   featureCollectionToGeometries,
   stringToSvgGeometriesGenerator,
@@ -71,7 +71,7 @@ import type {
 } from '@allmaps/types'
 
 import type {
-  TransformGcp,
+  GeneralGcp,
   TransformationType,
   TransformOptions
 } from './shared/types.js'
@@ -81,7 +81,7 @@ import type {
  * specifying functions to transform geometries using these transformations.
  * */
 export default class GcpTransformer {
-  gcps: TransformGcp[]
+  gcps: GeneralGcp[]
   sourcePoints: Point[]
   destinationPoints: Point[]
   type: TransformationType
@@ -92,10 +92,10 @@ export default class GcpTransformer {
 
   /**
    * Create a GcpTransformer
-   * @param {TransformGcp[] | Gcp[]} gcps - An array of Ground Control Points (GCPs)
+   * @param {GeneralGcp[] | Gcp[]} gcps - An array of Ground Control Points (GCPs)
    * @param {TransformationType} [type='polynomial'] - The transformation type
    */ constructor(
-    gcps: TransformGcp[] | Gcp[],
+    gcps: GeneralGcp[] | Gcp[],
     type: TransformationType = 'polynomial',
     options?: Partial<TransformOptions>
   ) {
@@ -104,6 +104,7 @@ export default class GcpTransformer {
       throw new Error('No control points')
     }
     this.gcps = gcps.map((gcp) => {
+      // TODO: replace by generalGcpToGcp()
       if ('resource' in gcp && 'geo' in gcp) {
         return {
           source: gcp.resource,
@@ -194,10 +195,7 @@ export default class GcpTransformer {
           mergedOptions.evaluationType
         )
       } else if (isGeojsonPoint(input)) {
-        return this.transformForward(
-          convertGeojsonPointToPoint(input),
-          mergedOptions
-        )
+        return this.transformForward(geojsonPointToPoint(input), mergedOptions)
       } else if (isLineString(input)) {
         return transformLineStringForwardToLineString(
           input,
@@ -206,7 +204,7 @@ export default class GcpTransformer {
         )
       } else if (isGeojsonLineString(input)) {
         return transformLineStringForwardToLineString(
-          convertGeojsonLineStringToLineString(input),
+          geojsonLineStringToLineString(input),
           this,
           mergeOptions(mergedOptions, {
             sourceIsGeographic: true
@@ -216,7 +214,7 @@ export default class GcpTransformer {
         return transformPolygonForwardToPolygon(input, this, mergedOptions)
       } else if (isGeojsonPolygon(input)) {
         return transformPolygonForwardToPolygon(
-          convertGeojsonPolygonToPolygon(input),
+          geojsonPolygonToPolygon(input),
           this,
           mergeOptions(mergedOptions, {
             sourceIsGeographic: true
@@ -295,13 +293,13 @@ export default class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        return convertPointToGeojsonPoint(this.transformForward(input))
+        return pointToGeojsonPoint(this.transformForward(input))
       } else if (isGeojsonPoint(input)) {
-        return convertPointToGeojsonPoint(
-          this.transformForward(convertGeojsonPointToPoint(input))
+        return pointToGeojsonPoint(
+          this.transformForward(geojsonPointToPoint(input))
         )
       } else if (isLineString(input)) {
-        return convertLineStringToGeojsonLineString(
+        return lineStringToGeojsonLineString(
           transformLineStringForwardToLineString(
             input,
             this,
@@ -311,9 +309,9 @@ export default class GcpTransformer {
           )
         )
       } else if (isGeojsonLineString(input)) {
-        return convertLineStringToGeojsonLineString(
+        return lineStringToGeojsonLineString(
           transformLineStringForwardToLineString(
-            convertGeojsonLineStringToLineString(input),
+            geojsonLineStringToLineString(input),
             this,
             mergeOptions(mergedOptions, {
               sourceIsGeographic: true,
@@ -322,7 +320,7 @@ export default class GcpTransformer {
           )
         )
       } else if (isPolygon(input)) {
-        return convertPolygonToGeojsonPolygon(
+        return polygonToGeojsonPolygon(
           transformPolygonForwardToPolygon(
             input,
             this,
@@ -332,9 +330,9 @@ export default class GcpTransformer {
           )
         )
       } else if (isGeojsonPolygon(input)) {
-        return convertPolygonToGeojsonPolygon(
+        return polygonToGeojsonPolygon(
           transformPolygonForwardToPolygon(
-            convertGeojsonPolygonToPolygon(input),
+            geojsonPolygonToPolygon(input),
             this,
             mergeOptions(mergedOptions, {
               sourceIsGeographic: true,
@@ -434,7 +432,7 @@ export default class GcpTransformer {
           this.backwardTransformation!.evaluate(input)
         )
       } else if (isGeojsonPoint(input)) {
-        return this.transformBackward(convertGeojsonPointToPoint(input))
+        return this.transformBackward(geojsonPointToPoint(input))
       } else if (isLineString(input)) {
         return transformLineStringBackwardToLineString(
           input,
@@ -443,7 +441,7 @@ export default class GcpTransformer {
         )
       } else if (isGeojsonLineString(input)) {
         return transformLineStringBackwardToLineString(
-          convertGeojsonLineStringToLineString(input),
+          geojsonLineStringToLineString(input),
           this,
           mergeOptions(mergedOptions, {
             destinationIsGeographic: true
@@ -453,7 +451,7 @@ export default class GcpTransformer {
         return transformPolygonBackwardToPolygon(input, this, mergedOptions)
       } else if (isGeojsonPolygon(input)) {
         return transformPolygonBackwardToPolygon(
-          convertGeojsonPolygonToPolygon(input),
+          geojsonPolygonToPolygon(input),
           this,
           mergeOptions(mergedOptions, {
             destinationIsGeographic: true
@@ -532,13 +530,13 @@ export default class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        return convertPointToGeojsonPoint(this.transformBackward(input))
+        return pointToGeojsonPoint(this.transformBackward(input))
       } else if (isGeojsonPoint(input)) {
-        return convertPointToGeojsonPoint(
-          this.transformBackward(convertGeojsonPointToPoint(input))
+        return pointToGeojsonPoint(
+          this.transformBackward(geojsonPointToPoint(input))
         )
       } else if (isLineString(input)) {
-        return convertLineStringToGeojsonLineString(
+        return lineStringToGeojsonLineString(
           transformLineStringBackwardToLineString(
             input,
             this,
@@ -548,9 +546,9 @@ export default class GcpTransformer {
           )
         )
       } else if (isGeojsonLineString(input)) {
-        return convertLineStringToGeojsonLineString(
+        return lineStringToGeojsonLineString(
           transformLineStringBackwardToLineString(
-            convertGeojsonLineStringToLineString(input),
+            geojsonLineStringToLineString(input),
             this,
             mergeOptions(mergedOptions, {
               sourceIsGeographic: true,
@@ -559,7 +557,7 @@ export default class GcpTransformer {
           )
         )
       } else if (isPolygon(input)) {
-        return convertPolygonToGeojsonPolygon(
+        return polygonToGeojsonPolygon(
           transformPolygonBackwardToPolygon(
             input,
             this,
@@ -569,9 +567,9 @@ export default class GcpTransformer {
           )
         )
       } else if (isGeojsonPolygon(input)) {
-        return convertPolygonToGeojsonPolygon(
+        return polygonToGeojsonPolygon(
           transformPolygonBackwardToPolygon(
-            convertGeojsonPolygonToPolygon(input),
+            geojsonPolygonToPolygon(input),
             this,
             mergeOptions(mergedOptions, {
               sourceIsGeographic: true,

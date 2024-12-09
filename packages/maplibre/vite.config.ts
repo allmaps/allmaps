@@ -47,9 +47,5 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [buildTypes],
-  define: {
-    // To fix error "Uncaught ReferenceError: global is not defined" in poly2tri.js, add this:
-    global: 'globalThis'
-  }
+  plugins: [buildTypes]
 })

@@ -7,11 +7,23 @@ import {
   subSetArray
 } from '@allmaps/stdlib'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
-import { black, blue, green, pink, white } from '@allmaps/tailwind'
+import {
+  black,
+  blue,
+  gray,
+  green,
+  pink,
+  white,
+  yellow
+} from '@allmaps/tailwind'
 
 import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
-import { applyTransform } from '../shared/matrix.js'
+import {
+  applyTransform,
+  createTransform,
+  invertTransform
+} from '../shared/matrix.js'
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
 
@@ -25,6 +37,12 @@ import type {
   Tile,
   Transform
 } from '@allmaps/types'
+
+import {
+  RENDER_MAPS,
+  RENDER_LINES,
+  RENDER_POINTS
+} from '../renderers/WebGL2Renderer.js'
 
 import type {
   LineLayer,
@@ -41,9 +59,6 @@ const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
 }
 
 const DEBUG = false // TODO: set using options
-const RENDER_MAPS = true // TODO: set using options
-const RENDER_LINES = false // TODO: set using options
-const RENDER_POINTS = false // TODO: set using options
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -63,9 +78,9 @@ const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
-  mapsProgram: WebGLProgram,
-  pointsProgram: WebGLProgram,
-  linesProgram: WebGLProgram
+  mapProgram: WebGLProgram,
+  linesProgram: WebGLProgram,
+  pointsProgram: WebGLProgram
 ) {
   return (
     mapId: string,
@@ -76,7 +91,7 @@ export function createWebGL2WarpedMapFactory(
       mapId,
       georeferencedMap,
       gl,
-      mapsProgram,
+      mapProgram,
       linesProgram,
       pointsProgram,
       options
@@ -98,11 +113,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   declare parsedImage: Image
 
   gl: WebGL2RenderingContext
-  mapsProgram!: WebGLProgram
+  mapProgram!: WebGLProgram
   linesProgram!: WebGLProgram
   pointsProgram!: WebGLProgram
 
-  mapsVao: WebGLVertexArrayObject | null = null
+  mapVao: WebGLVertexArrayObject | null = null
   linesVao: WebGLVertexArrayObject | null = null
   pointsVao: WebGLVertexArrayObject | null = null
 
@@ -114,19 +129,24 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesByTileUrl: Map<string, CachedTile<ImageData>> = new Map()
   cachedTilesForTexture: CachedTile<ImageData>[] = []
   previousCachedTilesForTexture: CachedTile<ImageData>[] = []
-  textureWidth: number = 0
-  textureHeight: number = 0
-  textureDepth: number = 0
 
   opacity: number = DEFAULT_OPACITY
   saturation: number = DEFAULT_SATURATION
   renderOptions: RenderOptions = {}
 
   cachedTilesTextureArray: WebGLTexture | null = null
-  cachedTilesResourcePositionsAndDimensionsTexture: WebGLTexture | null = null
+  cachedTilesResourceOriginPointsAndDimensionsTexture: WebGLTexture | null =
+    null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
-  projectedGeoToClipTransform: Transform | undefined
+  // About renderTransform and InvertedRenderTransform:
+  // renderTransform is the product of:
+  // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
+  // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
+  // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
+  // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
+  // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
+  invertedRenderTransform: Transform
 
   private throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
 
@@ -137,14 +157,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {string} mapId - ID of the map
    * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
    * @param {WebGL2RenderingContext} gl - WebGL rendering context
-   * @param {WebGLProgram} mapsProgram - WebGL program
+   * @param {WebGLProgram} mapProgram - WebGL program for map
    * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
    */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
     gl: WebGL2RenderingContext,
-    mapsProgram: WebGLProgram,
+    mapProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     pointsProgram: WebGLProgram,
     options?: Partial<WarpedMapOptions>
@@ -152,7 +172,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super(mapId, georeferencedMap, options)
 
     this.gl = gl
-    this.initializeWebGL(mapsProgram, linesProgram, pointsProgram)
+    this.initializeWebGL(mapProgram, linesProgram, pointsProgram)
+
+    this.invertedRenderTransform = createTransform()
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -162,21 +184,21 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   initializeWebGL(
-    mapsProgram: WebGLProgram,
+    mapProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     pointsProgram: WebGLProgram
   ) {
-    this.mapsProgram = mapsProgram
+    this.mapProgram = mapProgram
     this.linesProgram = linesProgram
     this.pointsProgram = pointsProgram
 
-    this.mapsVao = this.gl.createVertexArray()
+    this.mapVao = this.gl.createVertexArray()
     this.linesVao = this.gl.createVertexArray()
     this.pointsVao = this.gl.createVertexArray()
 
     this.cachedTilesTextureArray = this.gl.createTexture()
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
-    this.cachedTilesResourcePositionsAndDimensionsTexture =
+    this.cachedTilesResourceOriginPointsAndDimensionsTexture =
       this.gl.createTexture()
   }
 
@@ -186,16 +208,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
-    this.projectedGeoToClipTransform = projectedGeoToClipTransform
+    this.invertedRenderTransform = invertTransform(projectedGeoToClipTransform)
 
     if (RENDER_MAPS) {
-      this.updateVertexBuffersMaps()
+      this.updateVertexBuffersMap(projectedGeoToClipTransform)
     }
     if (RENDER_LINES) {
-      this.updateVertexBuffersLines()
+      this.updateVertexBuffersLines(projectedGeoToClipTransform)
     }
     if (RENDER_POINTS) {
-      this.updateVertexBuffersPoints()
+      this.updateVertexBuffersPoints(projectedGeoToClipTransform)
     }
   }
 
@@ -237,12 +259,14 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   destroy() {
-    this.gl.deleteVertexArray(this.mapsVao)
+    this.gl.deleteVertexArray(this.mapVao)
     this.gl.deleteVertexArray(this.linesVao)
     this.gl.deleteVertexArray(this.pointsVao)
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
-    this.gl.deleteTexture(this.cachedTilesResourcePositionsAndDimensionsTexture)
+    this.gl.deleteTexture(
+      this.cachedTilesResourceOriginPointsAndDimensionsTexture
+    )
 
     this.cancelThrottledFunctions()
 
@@ -252,9 +276,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineLayers() {
     this.lineLayers = [
       {
-        projectedGeoLines: lineStringToLines(this.projectedGeoLongerMask),
+        projectedGeoLines: lineStringToLines(
+          this.projectedGeoTriangulationMask
+        ),
         projectedGeoPreviousLines: lineStringToLines(
-          this.projectedGeoPreviousLongerMask
+          this.projectedGeoPreviousTriangulationMask
         ),
         viewportSize: 8,
         color: [...hexToFractionalRgb(pink), 1]
@@ -294,18 +320,26 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoPreviousPoints:
           this.projectedGeoPreviousTransformedResourcePoints,
         color: [...hexToFractionalRgb(pink), 1]
+      },
+      {
+        projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
+        color: [...hexToFractionalRgb(gray), 1]
+      },
+      {
+        projectedGeoPoints: this.projectedGeoTrianglePoints,
+        color: [...hexToFractionalRgb(yellow), 1]
       }
     ]
   }
 
-  private updateVertexBuffersMaps() {
-    if (!this.mapsVao || !this.projectedGeoToClipTransform) {
+  private updateVertexBuffersMap(projectedGeoToClipTransform: Transform) {
+    if (!this.mapVao) {
       return
     }
 
     const gl = this.gl
-    const program = this.mapsProgram
-    gl.bindVertexArray(this.mapsVao)
+    const program = this.mapProgram
+    gl.bindVertexArray(this.mapVao)
 
     // Resource triangle points
     createBuffer(
@@ -320,9 +354,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const clipPreviousTrianglePoints =
       this.projectedGeoPreviousTrianglePoints.map((point) =>
-        applyTransform(this.projectedGeoToClipTransform as Transform, point)
+        applyTransform(projectedGeoToClipTransform, point)
       )
-
     createBuffer(
       gl,
       program,
@@ -332,9 +365,8 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
-      applyTransform(this.projectedGeoToClipTransform as Transform, point)
+      applyTransform(projectedGeoToClipTransform, point)
     )
-
     createBuffer(
       gl,
       program,
@@ -379,7 +411,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private updateVertexBuffersLines() {
+  private updateVertexBuffersLines(projectedGeoToClipTransform: Transform) {
     if (!this.linesVao) {
       return
     }
@@ -390,7 +422,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.setLineLayers()
 
-    const sixProjectedGeoPoints = this.lineLayers
+    const clipSixPoints = this.lineLayers
       .reduce(
         (accumulator: Line[], lineLayer) =>
           accumulator.concat(lineLayer.projectedGeoLines),
@@ -405,15 +437,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[1]
       ])
       .flat()
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(sixProjectedGeoPoints.flat()),
+      new Float32Array(clipSixPoints.flat()),
       2,
-      'a_projectedGeoPoint'
+      'a_clipPoint'
     )
 
-    const sixProjectedGeoOtherPoints = this.lineLayers
+    const clipSixOtherPoints = this.lineLayers
       .reduce(
         (accumulator: Line[], lineLayer) =>
           accumulator.concat(lineLayer.projectedGeoLines),
@@ -428,15 +461,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[0]
       ])
       .flat()
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(sixProjectedGeoOtherPoints.flat()),
+      new Float32Array(clipSixOtherPoints.flat()),
       2,
-      'a_projectedGeoOtherPoint'
+      'a_clipOtherPoint'
     )
 
-    const sixProjectedGeoPreviousPoints = this.lineLayers
+    const clipSixPreviousPoints = this.lineLayers
       .reduce(
         (accumulator: Line[], lineLayer) =>
           accumulator.concat(
@@ -453,15 +487,16 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[1]
       ])
       .flat()
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(sixProjectedGeoPreviousPoints.flat()),
+      new Float32Array(clipSixPreviousPoints.flat()),
       2,
-      'a_projectedGeoPreviousPoint'
+      'a_clipPreviousPoint'
     )
 
-    const sixProjectedGeoPreviousOtherPoints = this.lineLayers
+    const clipSixPreviousOtherPoints = this.lineLayers
       .reduce(
         (accumulator: Line[], lineLayer) =>
           accumulator.concat(
@@ -478,12 +513,13 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[0]
       ])
       .flat()
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(sixProjectedGeoPreviousOtherPoints.flat()),
+      new Float32Array(clipSixPreviousOtherPoints.flat()),
       2,
-      'a_projectedGeoPreviousOtherPoint'
+      'a_clipPreviousOtherPoint'
     )
 
     const sixIsOtherPoints = this.lineLayers.reduce(
@@ -598,7 +634,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private updateVertexBuffersPoints() {
+  private updateVertexBuffersPoints(projectedGeoToClipTransform: Transform) {
     if (!this.pointsVao) {
       return
     }
@@ -609,32 +645,37 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.setPointLayers()
 
-    const projectedGeoPoints = this.pointLayers.reduce(
-      (accumulator: Point[], pointLayer) =>
-        accumulator.concat(pointLayer.projectedGeoPoints),
-      []
-    )
+    const clipPoints = this.pointLayers
+      .reduce(
+        (accumulator: Point[], pointLayer) =>
+          accumulator.concat(pointLayer.projectedGeoPoints),
+        []
+      )
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(projectedGeoPoints.flat()),
+      new Float32Array(clipPoints.flat()),
       2,
-      'a_projectedGeoPoint'
+      'a_clipPoint'
     )
 
-    const projectedGeoPreviousPoints = this.pointLayers.reduce(
-      (accumulator: Point[], pointLayer) =>
-        accumulator.concat(
-          pointLayer.projectedGeoPreviousPoints || pointLayer.projectedGeoPoints
-        ),
-      []
-    )
+    const clipPreviousPoints = this.pointLayers
+      .reduce(
+        (accumulator: Point[], pointLayer) =>
+          accumulator.concat(
+            pointLayer.projectedGeoPreviousPoints ||
+              pointLayer.projectedGeoPoints
+          ),
+        []
+      )
+      .map((point) => applyTransform(projectedGeoToClipTransform, point))
     createBuffer(
       gl,
       program,
-      new Float32Array(projectedGeoPreviousPoints.flat()),
+      new Float32Array(clipPreviousPoints.flat()),
       2,
-      'a_projectedGeoPreviousPoint'
+      'a_clipPreviousPoint'
     )
 
     const viewportSizes = this.pointLayers.reduce(
@@ -787,9 +828,9 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Cached tiles resource positions and dimensions texture
+    // Cached tiles resource origin points and dimensions texture
 
-    const cachedTilesResourcePositionsAndDimensions =
+    const cachedTilesResourceOriginPointsAndDimensions =
       this.cachedTilesForTexture.map((textureTile) => {
         if (
           textureTile &&
@@ -807,7 +848,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.bindTexture(
       gl.TEXTURE_2D,
-      this.cachedTilesResourcePositionsAndDimensionsTexture
+      this.cachedTilesResourceOriginPointsAndDimensionsTexture
     )
 
     // A previous verions used gl.RGBA_INTEGER as this texture's format
@@ -823,7 +864,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(cachedTilesResourcePositionsAndDimensions.flat())
+      new Int32Array(cachedTilesResourceOriginPointsAndDimensions.flat())
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
@@ -858,49 +899,50 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   private updateCachedTilesForTextures() {
     // Select tiles form tileCache that should be included in the texture
-    const currentCachedTiles = []
-    const currentCachedTilesAtOtherScaleFactors = []
-    const currentOverviewCachedTiles = []
+    const cachedTiles = []
+    const cachedTilesAtOtherScaleFactors = []
+    const overviewCachedTiles = []
 
     // Try to include tiles that were requested
-    for (const fetchableTile of this.currentFetchableTiles) {
+    for (const fetchableTile of this.fetchableTilesForViewport) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
         // If they are available, include them
-        currentCachedTiles.push(cachedTile)
+        cachedTiles.push(cachedTile)
       } else {
         // If they are not available, include their parents or children if they are available
         for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
           fetchableTile.tile
         )) {
-          currentCachedTilesAtOtherScaleFactors.push(cachedTile)
+          cachedTilesAtOtherScaleFactors.push(cachedTile)
         }
       }
     }
 
     // Try to include tiles that are at overview zoomlevel
-    for (const fetchableTile of this.currentOverviewFetchableTiles) {
+    for (const fetchableTile of this.overviewFetchableTilesForViewport) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
         // If they are available, consider to include them
-        const currentTileZoolLevelTilesCount = this.currentTileZoomLevel
-          ? this.currentTileZoomLevel.rows * this.currentTileZoomLevel.columns
+        const tileZoolLevelTilesCount = this.tileZoomLevelForViewport
+          ? this.tileZoomLevelForViewport.rows *
+            this.tileZoomLevelForViewport.columns
           : undefined
         // If this map's cached tiles don't already cover the entire zoomlevel
         if (
-          currentCachedTiles.length == 0 ||
-          (currentTileZoolLevelTilesCount &&
-            currentCachedTiles.length < currentTileZoolLevelTilesCount)
+          cachedTiles.length == 0 ||
+          (tileZoolLevelTilesCount &&
+            cachedTiles.length < tileZoolLevelTilesCount)
         ) {
-          currentOverviewCachedTiles.push(cachedTile)
+          overviewCachedTiles.push(cachedTile)
         }
       }
     }
 
     let cachedTilesForTextures = [
-      ...currentCachedTiles,
-      ...currentCachedTilesAtOtherScaleFactors,
-      ...currentOverviewCachedTiles
+      ...cachedTiles,
+      ...cachedTilesAtOtherScaleFactors,
+      ...overviewCachedTiles
     ]
 
     // Making tiles unique by tileUrl
@@ -925,12 +967,15 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (this.cachedTilesByTileUrl.size == 0) {
       return []
     }
+    if (!this.tileZoomLevelForViewport) {
+      return []
+    }
 
     const cachedTiles = []
     for (tile of getTilesAtOtherScaleFactors(
       tile,
       this.parsedImage,
-      this.currentBestScaleFactor,
+      this.tileZoomLevelForViewport.scaleFactor,
       TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
       TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
       this.tileInCachedTiles.bind(this) // Only consider tiles in cache,

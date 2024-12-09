@@ -65,7 +65,9 @@ export default class WarpedMapLayer extends Layer {
 
     container.appendChild(canvas)
 
-    const gl = canvas.getContext('webgl2', { premultipliedAlpha: true })
+    const gl = canvas.getContext('webgl2', {
+      premultipliedAlpha: true
+    })
 
     if (!gl) {
       throw new Error('WebGL 2 not available')
