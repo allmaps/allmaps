@@ -47,7 +47,7 @@
 
   import 'ol/ol.css'
 
-  let type: 'annotation'
+  let type: 'annotation' | undefined
 
   let initialized = false
   let showForm = false
@@ -172,7 +172,9 @@
     <Header appName="Viewer">
       {#if !showForm && initialized}
         <URLInput>
-          <URLType {type} />
+          {#if type}
+            <URLType {type} />
+          {/if}
         </URLInput>
       {/if}
     </Header>

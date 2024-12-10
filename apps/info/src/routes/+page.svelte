@@ -17,7 +17,7 @@
   } from '@allmaps/iiif-parser'
 
   let loaded = false
-  let type: 'image' | 'annotation' | 'collection' | 'manifest'
+  let type: 'image' | 'annotation' | 'collection' | 'manifest' | undefined
   let error: string
 
   let parsedIiif: IIIFImage | IIIFManifest | IIIFCollection | undefined
@@ -59,7 +59,9 @@
 <Header appName="Info">
   {#if loaded}
     <URLInput>
-      <URLType {type} />
+      {#if type}
+        <URLType {type} />
+      {/if}
     </URLInput>
   {/if}
 </Header>
