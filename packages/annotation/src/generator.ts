@@ -34,8 +34,8 @@ type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
 type PartOf = z.infer<typeof PartOfSchema>
 
 function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
-  let width: number
-  let height: number
+  let width: number | undefined
+  let height: number | undefined
   let resourceMask: ResourceMask
 
   if (isMap2(map)) {
@@ -48,9 +48,14 @@ function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
     resourceMask = map.pixelMask
   }
 
+  let svg = `<svg>`
+  if (width && height) {
+    svg = `<svg width="${width}" height="${height}">`
+  }
+
   return {
     type: 'SvgSelector',
-    value: `<svg width="${width}" height="${height}"><polygon points="${resourceMask
+    value: `${svg}<polygon points="${resourceMask
       .map((point) => point.join(','))
       .join(' ')}" /></svg>`
   }
@@ -60,8 +65,8 @@ function generateSource(map: MapAllVersions) {
   let id: string
   let type: ImageService
 
-  let width: number
-  let height: number
+  let width: number | undefined
+  let height: number | undefined
 
   let partOf: PartOf[] | undefined
 

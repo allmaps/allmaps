@@ -224,15 +224,20 @@ export default class WarpedMap extends EventTarget {
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
 
-    this.resourceFullMask = [
-      [0, 0],
-      [this.georeferencedMap.resource.width, 0],
-      [
-        this.georeferencedMap.resource.width,
-        this.georeferencedMap.resource.height
-      ],
-      [0, this.georeferencedMap.resource.height]
-    ]
+    const resourceWidth = this.georeferencedMap.resource.width
+    const resourceHeight = this.georeferencedMap.resource.height
+
+    if (resourceWidth && resourceHeight) {
+      this.resourceFullMask = [
+        [0, 0],
+        [resourceWidth, 0],
+        [resourceWidth, resourceHeight],
+        [0, resourceHeight]
+      ]
+    } else {
+      this.resourceFullMask = bboxToRectangle(this.resourceMaskBbox)
+    }
+
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
 
