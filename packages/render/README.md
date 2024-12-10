@@ -395,6 +395,7 @@ In this package the following naming conventions are used:
     *   [Parameters](#parameters-80)
 *   [render](#render)
     *   [Parameters](#parameters-81)
+*   [fetch](#fetch-4)
 
 ### constructor
 
@@ -1433,6 +1434,12 @@ Render the map for a given viewport
 
 *   `t` &#x20;
 *   `viewport` **Viewport** the current viewport
+
+### fetch
+
+Fetch the tile and create its ImageData using a WebWorker.
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
 # <<<<<<< HEAD
 
