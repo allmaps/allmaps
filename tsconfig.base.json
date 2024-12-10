@@ -4,6 +4,8 @@
     "strict": true,
     "allowJs": true,
     "target": "es2022",
+    "module": "es2022",
+    "allowSyntheticDefaultImports": true,
     "composite": true,
     "declaration": true,
     "moduleResolution": "node",
