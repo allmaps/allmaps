@@ -6,7 +6,7 @@ import {
 
 import { cachedFetch } from './fetch.js'
 
-import type { Tilejson, TransformationOptions } from './types.js'
+import type { TransformationOptions } from './types.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
@@ -17,7 +17,7 @@ export async function generateTileJsonResponse(
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
   urlTemplate: string
-): Promise<Tilejson> {
+): Promise<Response> {
   // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
   let transformationOptions
   if (options['transformation.type']) {
