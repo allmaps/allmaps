@@ -1,4 +1,0 @@
----
-title: Georeference Annotations
-description: ''
----

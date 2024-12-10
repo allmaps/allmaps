@@ -1,6 +1,5 @@
 export type Color = [number, number, number]
-
-export type OptionalColor = Color | undefined
+export type ColorWithTransparancy = [number, number, number, number]
 
 export type ColorCount = {
   count: number

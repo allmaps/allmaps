@@ -2,7 +2,7 @@ import { Map, CustomLayerInterface } from 'maplibre-gl'
 import {
   Viewport,
   WebGL2Renderer,
-  WarpedMap,
+  WebGL2WarpedMap,
   WarpedMapList,
   WarpedMapEvent,
   WarpedMapEventType
@@ -16,8 +16,11 @@ import {
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
-import type { TransformationType } from '@allmaps/transform'
-import type { Rectangle, Ring } from '@allmaps/types'
+import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
+import type { WarpedMapLayerOptions } from '@allmaps/render'
+import type { Rectangle, Ring, ImageInformations } from '@allmaps/types'
+
+export type MapLibreWarpedMapLayerOptions = WarpedMapLayerOptions
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
@@ -33,7 +36,7 @@ function assertRenderer(
 /**
  * WarpedMapLayer class.
  *
- * This class renders georeferenced maps of a IIIF Georeference Annotation on a MapLibre map.
+ * This class renders maps from a IIIF Georeference Annotation on a MapLibre map.
  * WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/).
  *
  * @class WarpedMapLayer
@@ -44,37 +47,32 @@ export class WarpedMapLayer implements CustomLayerInterface {
   renderingMode = '2d' as const
 
   map?: Map
-
   renderer?: WebGL2Renderer
-
-  private imageInfoCache?: Cache
+  options?: Partial<MapLibreWarpedMapLayerOptions>
 
   /**
    * Creates a WarpedMapLayer instance
    *
    * @constructor
-   * @param {string} [id] - unique id for this layer
-   * @param {Cache} imageInfoCache - image info cache
+   * @param {string} [id] - Unique ID for this layer
+   * @param {MapLibreWarpedMapLayerOptions} [options] - options
    */
-  constructor(id?: string, imageInfoCache?: Cache) {
+  constructor(id?: string, options?: Partial<MapLibreWarpedMapLayerOptions>) {
     if (id) {
       this.id = id
     }
-    this.imageInfoCache = imageInfoCache
+    this.options = options
   }
 
   /**
    * Method called when the layer has been added to the Map.
    * @param {Map} map - The Map this custom layer was just added to.
-   * @param {WebGL2RenderingContext} gl - The gl context for the map.
+   * @param {WebGL2RenderingContext} gl - The WebGL 2 context for the map.
    */
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map
 
-    const warpedMapList = new WarpedMapList(this.imageInfoCache)
-
-    this.renderer = new WebGL2Renderer(gl, warpedMapList)
-
+    this.renderer = new WebGL2Renderer(gl, this.options)
     this.addEventListeners()
   }
 
@@ -85,9 +83,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
     if (!this.renderer) {
       return
     }
-    this.renderer.dispose()
 
     this.removeEventListeners()
+    this.renderer.destroy()
   }
 
   /**
@@ -194,7 +192,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
    * @returns {WarpedMapList} the warped map list
    */
-  getWarpedMapList(): WarpedMapList {
+  getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList
@@ -203,9 +201,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Returns a single map's warped map
    * @param {string} mapId - ID of the map
-   * @returns {WarpedMap | undefined} the warped map
+   * @returns {WebGL2WarpedMap | undefined} the warped map
    */
-  getWarpedMap(mapId: string): WarpedMap | undefined {
+  getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMap(mapId)
@@ -297,6 +295,24 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapsDistortionMeasure(
+      mapIds,
+      distortionMeasure
+    )
+    this.map?.triggerRepaint()
+  }
+
+  /**
    * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
    * @returns {Bbox | undefined} - bounding box of all warped maps
    */
@@ -370,13 +386,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
-   * Sets the image info cache of the WarpedMapList
-   * @param {Cache} cache - the image info cache
+   * Sets the object that caches image information
+   * @param {ImageInformations} imageInformations - Object that caches image information
    */
-  setImageInfoCache(cache: Cache) {
+  setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setImageInfoCache(cache)
+    this.renderer.warpedMapList.setImageInformations(imageInformations)
   }
 
   // No setOpacity() and getOpacity() here since these are
@@ -384,7 +400,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   /**
    * Gets the opacity of the layer
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getOpacity(): number | undefined {
     assertRenderer(this.renderer)
@@ -416,7 +432,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     assertRenderer(this.renderer)
@@ -639,12 +655,6 @@ export class WarpedMapLayer implements CustomLayerInterface {
       return
     }
 
-    const projectedGeoCenterAsLngLat = this.map.getCenter()
-    const projectedGeoCenter = lonLatToWebMecator([
-      projectedGeoCenterAsLngLat.lng,
-      projectedGeoCenterAsLngLat.lat
-    ])
-
     // Getting the viewportSize should also be possible through getting the bounds
     // And using project() to go to resource coordintas
     const canvas = this.map.getCanvas()
@@ -653,7 +663,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
       canvas.height / window.devicePixelRatio
     ] as [number, number]
 
-    const rotation = -(this.map.getBearing() / 180) * Math.PI
+    const projectedGeoCenterAsLngLat = this.map.getCenter()
+    const projectedGeoCenter = lonLatToWebMecator([
+      projectedGeoCenterAsLngLat.lng,
+      projectedGeoCenterAsLngLat.lat
+    ])
 
     const geoLowerLeftAsLngLat = this.map.unproject([0, viewportSize[1]])
     const geoLowerRightAsLngLat = this.map.unproject([
@@ -695,21 +709,34 @@ export class WarpedMapLayer implements CustomLayerInterface {
       viewportSize
     )
 
+    const rotation = -(this.map.getBearing() / 180) * Math.PI
+
     const viewport = new Viewport(
-      projectedGeoCenter,
       viewportSize,
-      rotation,
+      projectedGeoCenter,
       projectedGeoPerViewportScale,
+      rotation,
       window.devicePixelRatio
     )
 
     this.renderer.render(viewport)
   }
 
+  private contextLost() {
+    this.renderer?.contextLost()
+  }
+
+  private contextRestored() {
+    this.renderer?.contextRestored()
+  }
+
   private addEventListeners() {
-    if (!this.renderer) {
+    if (!this.renderer || !this.map) {
       return
     }
+
+    this.map.on('webglcontextlost', this.contextLost.bind(this))
+    this.map.on('webglcontextrestored', this.contextRestored.bind(this))
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -768,9 +795,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   private removeEventListeners() {
-    if (!this.renderer) {
+    if (!this.renderer || !this.map) {
       return
     }
+
+    this.map.off('webglcontextlost', this.contextLost.bind(this))
+    this.map.off('webglcontextrestored', this.contextRestored.bind(this))
 
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,

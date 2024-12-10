@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["@cloudflare/workers-types"]
+  },
+  "references": [
+    { "path": "../../packages/render" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/types" }
+  ],
+  "include": ["./src/**/*"],
+  "exclude": ["test"]
+}

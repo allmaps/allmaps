@@ -1,30 +1,37 @@
 import Layer from 'ol/layer/Layer.js'
 import {
   Viewport,
+  WebGL2WarpedMap,
+  WarpedMapList,
+  WebGL2Renderer,
   WarpedMapEvent,
-  WarpedMapEventType,
-  WebGL2Renderer
+  WarpedMapEventType
 } from '@allmaps/render'
 import { hexToFractionalRgb } from '@allmaps/stdlib'
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
 import type { FrameState } from 'ol/Map.js'
-import type { WarpedMapSource } from './WarpedMapSource.js'
+import type { Extent } from 'ol/extent'
+
+import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
+import type { WarpedMapLayerOptions } from '@allmaps/render'
+import type { Ring, ImageInformations } from '@allmaps/types'
+
+export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
 
 /**
  * WarpedMapLayer class.
  *
- * Together with a WarpedMapSource, this class renders georeferenced maps of a IIIF Georeference Annotation on an OpenLayers map.
+ * This class renders georeferenced maps from a Georeference Annotation on an OpenLayers map.
  * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
  *
  * @class WarpedMapLayer
+ * @param {WebGL2RendererOptions} [options] - the WebGL2 renderer options
  */
-export class WarpedMapLayer extends Layer {
-  source: WarpedMapSource | null = null
-
+export default class WarpedMapLayer extends Layer {
   container: HTMLElement
 
-  canvas: HTMLCanvasElement | null = null
+  canvas: HTMLCanvasElement
   gl: WebGL2RenderingContext
 
   canvasSize: [number, number] = [0, 0]
@@ -36,10 +43,9 @@ export class WarpedMapLayer extends Layer {
   /**
    * Creates a WarpedMapLayer instance
    * @param {Object} options
-   * @param {WarpedMapSource} options.source - source that holds the maps
    */
-  constructor(options: { source: WarpedMapSource }) {
-    super(options)
+  constructor(options?: Partial<OpenLayersWarpedMapLayerOptions>) {
+    super({})
 
     const container = document.createElement('div')
     this.container = container
@@ -59,7 +65,9 @@ export class WarpedMapLayer extends Layer {
 
     container.appendChild(canvas)
 
-    const gl = canvas.getContext('webgl2', { premultipliedAlpha: true })
+    const gl = canvas.getContext('webgl2', {
+      premultipliedAlpha: true
+    })
 
     if (!gl) {
       throw new Error('WebGL 2 not available')
@@ -71,19 +79,280 @@ export class WarpedMapLayer extends Layer {
     this.canvas = canvas
     this.gl = gl
 
-    this.source = this.getSource() as WarpedMapSource
-    // TODO: listen to change:source
-
-    const warpedMapList = this.source.getWarpedMapList()
-
-    this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
+    this.renderer = new WebGL2Renderer(this.gl, options)
 
     this.addEventListeners()
   }
 
   /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
+  async addGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
+      annotation
+    )
+    this.changed()
+
+    return results
+  }
+
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * @param {any} annotation - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results =
+      await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+    this.changed()
+
+    return results
+  }
+
+  /**
+   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   */
+  async addGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.addGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+   * @param {string} annotationUrl - Georeference Annotation
+   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotationByUrl(
+    annotationUrl: string
+  ): Promise<(string | Error)[]> {
+    const annotation = await fetch(annotationUrl).then((response) =>
+      response.json()
+    )
+    const results = this.removeGeoreferenceAnnotation(annotation)
+
+    return results
+  }
+
+  /**
+   * Adds a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was added, or an error
+   */
+  async addGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result =
+      this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
+    this.changed()
+
+    return result
+  }
+
+  /**
+   * Removes a Georeferenced map.
+   * @param {unknown} georeferencedMap - Georeferenced map
+   * @returns {Promise<(string | Error)>} - the map ID of the map that was remvoed, or an error
+   */
+  async removeGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const result =
+      this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
+    this.changed()
+
+    return result
+  }
+
+  /**
+   * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
+   * @returns {WarpedMapList} the warped map list
+   */
+  getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
+    return this.renderer.warpedMapList
+  }
+
+  /**
+   * Returns a single map's warped map
+   * @param {string} mapId - ID of the map
+   * @returns {WebGL2WarpedMap | undefined} the warped map
+   */
+  getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
+    return this.renderer.warpedMapList.getWarpedMap(mapId)
+  }
+
+  /**
+   * Make a single map visible
+   * @param {string} mapId - ID of the map
+   */
+  showMap(mapId: string) {
+    this.renderer.warpedMapList.showMaps([mapId])
+    this.changed()
+  }
+
+  /**
+   * Make multiple maps visible
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  showMaps(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.showMaps(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Make a single map invisible
+   * @param {string} mapId - ID of the map
+   */
+  hideMap(mapId: string) {
+    this.renderer.warpedMapList.hideMaps([mapId])
+    this.changed()
+  }
+
+  /**
+   * Make multiple maps invisible
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  hideMaps(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.hideMaps(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Returns the visibility of a single map
+   * @returns {boolean | undefined} - whether the map is visible
+   */
+  isMapVisible(mapId: string): boolean | undefined {
+    const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
+    return warpedMap?.visible
+  }
+
+  /**
+   * Sets the resource mask of a single map
+   * @param {string} mapId - ID of the map
+   * @param {Ring} resourceMask - new resource mask
+   */
+  setMapResourceMask(mapId: string, resourceMask: Ring) {
+    this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
+    this.changed()
+  }
+
+  /**
+   * Sets the transformation type of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {TransformationType} transformation - new transformation type
+   */
+  setMapsTransformationType(
+    mapIds: Iterable<string>,
+    transformation: TransformationType
+  ) {
+    this.renderer.warpedMapList.setMapsTransformationType(
+      mapIds,
+      transformation
+    )
+    this.changed()
+  }
+
+  /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new distortion measure
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    this.renderer.warpedMapList.setMapsDistortionMeasure(
+      mapIds,
+      distortionMeasure
+    )
+    this.changed()
+  }
+
+  /**
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+   * @returns {Bbox | undefined} - Bounding box of all warped maps
+   */
+  getLonLatExtent(): Extent | undefined {
+    return this.renderer.warpedMapList.getBbox()
+  }
+
+  /**
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+   * @returns {Bbox | undefined} - bounding box of all warped maps
+   */
+  getExtent(): Extent | undefined {
+    return this.renderer.warpedMapList.getProjectedBbox()
+  }
+
+  /**
+   * Bring maps to front
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  bringMapsToFront(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.bringMapsToFront(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Send maps to back
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  sendMapsToBack(mapIds: string[]) {
+    this.renderer.warpedMapList.sendMapsToBack(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Bring maps forward
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  bringMapsForward(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.bringMapsForward(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Send maps backward
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   */
+  sendMapsBackward(mapIds: Iterable<string>) {
+    this.renderer.warpedMapList.sendMapsBackward(mapIds)
+    this.changed()
+  }
+
+  /**
+   * Returns the z-index of a single map
+   * @param {string} mapId - ID of the warped map
+   * @returns {number | undefined} - z-index of the warped map
+   */
+  getMapZIndex(mapId: string): number | undefined {
+    return this.renderer.warpedMapList.getMapZIndex(mapId)
+  }
+
+  /**
+   * Sets the object that caches image information
+   * @param {ImageInformations} imageInformations - Object that caches image information
+   */
+  setImageInformations(imageInformations: ImageInformations) {
+    this.renderer.warpedMapList.setImageInformations(imageInformations)
+  }
+
+  /**
    * Gets the HTML container element of the layer
-   * @return {HTMLElement} HTML Div Element
+   * @returns {HTMLElement} HTML element
    */
   getContainer(): HTMLElement {
     return this.container
@@ -91,7 +360,7 @@ export class WarpedMapLayer extends Layer {
 
   /**
    * Gets the HTML canvas element of the layer
-   * @return {HTMLCanvasElement | null} HTML Canvas Element
+   * @returns {HTMLCanvasElement | null} HTML Canvas element
    */
   getCanvas(): HTMLCanvasElement | null {
     return this.canvas
@@ -102,7 +371,7 @@ export class WarpedMapLayer extends Layer {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} Opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     return this.renderer.getMapOpacity(mapId)
@@ -165,10 +434,10 @@ export class WarpedMapLayer extends Layer {
 
   /**
    * Removes a color from all maps
-   * @param {Object} options - remove color options
-   * @param {string} [options.hexColor] - hex color to remove
-   * @param {number} [options.threshold] - threshold between 0 and 1
-   * @param {number} [options.hardness] - hardness between 0 and 1
+   * @param {Object} transformOptions - remove color options
+   * @param {string} [transformOptions.hexColor] - hex color to remove
+   * @param {number} [transformOptions.threshold] - threshold between 0 and 1
+   * @param {number} [transformOptions.hardness] - hardness between 0 and 1
    */
   setRemoveColor(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
@@ -196,10 +465,10 @@ export class WarpedMapLayer extends Layer {
   /**
    * Removes a color from a single map
    * @param {string} mapId - ID of the map
-   * @param {Object} options - remove color options
-   * @param {string} [options.hexColor] - hex color to remove
-   * @param {number} [options.threshold] - threshold between 0 and 1
-   * @param {number} [options.hardness] - hardness between 0 and 1
+   * @param {Object} transformOptions - remove color options
+   * @param {string} [transformOptions.hexColor] - hex color to remove
+   * @param {number} [transformOptions.threshold] - threshold between 0 and 1
+   * @param {number} [transformOptions.hardness] - hardness between 0 and 1
    */
   setMapRemoveColor(
     mapId: string,
@@ -268,12 +537,49 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Sets the grid for all maps
+   * @param {boolean} enabled - whether to show the grid
+   */
+  setGrid(enabled: boolean) {
+    this.renderer.setGridOptions({ enabled })
+    this.changed()
+  }
+
+  /**
+   * Resets the grid for all maps
+   */
+  resetGrid() {
+    this.renderer.resetGridOptions()
+    this.changed()
+  }
+
+  /**
+   * Sets the grid for a single mapID of the map
+   * @param {string} mapId - ID of the map
+   * @param {boolean} enabled - whether to show the grid
+   */
+  setMapGrid(mapId: string, enabled: boolean) {
+    this.renderer.setMapGridOptions(mapId, { enabled })
+    this.changed()
+  }
+
+  /**
+   * Resets the grid of a single map
+   * @param {string} mapId - ID of the map
+   */
+  resetMapGrid(mapId: string) {
+    this.renderer.resetMapGridOptions(mapId)
+    this.changed()
+  }
+
+  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
-    this.renderer.dispose()
+    this.renderer.destroy()
 
     const extension = this.gl.getExtension('WEBGL_lose_context')
+
     if (extension) {
       extension.loseContext()
     }
@@ -289,9 +595,17 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Clears: removes all maps
+   */
+  clear() {
+    this.renderer.warpedMapList.clear()
+    this.changed()
+  }
+
+  /**
    * Render the layer.
    * @param {import("ol/Map.js").FrameState} frameState - OpenLayers frame state
-   * @return {HTMLElement} The rendered element
+   * @returns {HTMLElement} The rendered element
    */
   render(frameState: FrameState): HTMLElement {
     if (this.canvas) {
@@ -301,12 +615,13 @@ export class WarpedMapLayer extends Layer {
     this.renderer.setOpacity(Math.min(Math.max(this.getOpacity(), 0), 1))
 
     const viewport = new Viewport(
-      frameState.viewState.center as [number, number],
       frameState.size as [number, number],
-      frameState.viewState.rotation,
+      frameState.viewState.center as [number, number],
       frameState.viewState.resolution,
+      frameState.viewState.rotation,
       window.devicePixelRatio
     )
+
     this.renderer.render(viewport)
 
     return this.container
@@ -356,7 +671,27 @@ export class WarpedMapLayer extends Layer {
     return needResize
   }
 
+  private contextLost(event: Event) {
+    event.preventDefault()
+    this.renderer.contextLost()
+  }
+
+  private contextRestored(event: Event) {
+    event.preventDefault()
+    this.renderer.contextRestored()
+  }
+
   private addEventListeners() {
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this.contextLost.bind(this)
+    )
+
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this.contextRestored.bind(this)
+    )
+
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
       this.changed.bind(this)
@@ -414,6 +749,16 @@ export class WarpedMapLayer extends Layer {
   }
 
   private removeEventListeners() {
+    this.canvas.removeEventListener(
+      'webglcontextlost',
+      this.contextLost.bind(this)
+    )
+
+    this.canvas.removeEventListener(
+      'webglcontextrestored',
+      this.contextRestored.bind(this)
+    )
+
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
       this.changed.bind(this)

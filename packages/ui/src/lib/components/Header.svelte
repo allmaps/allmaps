@@ -1,5 +1,5 @@
 <script lang="ts">
-  import logo from '$lib/shared/images/allmaps-logo.svg'
+  import Logo from './Logo.svelte'
 
   export let appName: string
 </script>
@@ -7,8 +7,9 @@
 <header class="shadow-md p-1 md:p-2">
   <nav class="mx-auto flex flex-wrap justify-between items-center gap-3">
     <a href="/" class="flex gap-2 no-underline">
-      <!-- TODO: use Logo.svelte -->
-      <img class="w-8 inline" alt="Allmaps logo" src={logo} />
+      <div class="w-8 inline">
+        <Logo />
+      </div>
       <h1 class="self-center whitespace-nowrap text-xl font-medium inline">
         <span class="hidden sm:inline">Allmaps</span>
         <span class="font-light">{appName}</span>

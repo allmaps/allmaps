@@ -372,6 +372,7 @@ export class Image extends EmbeddedImage {
     return new Image(parsedImage)
   }
 
+  // TODO: rename this to getImageRequest
   /**
    * Returns a Image request object for a tile with the requested zoom level, column, and row
    * @param {TileZoomLevel} zoomLevel - Desired zoom level of the requested tile

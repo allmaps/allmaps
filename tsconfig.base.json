@@ -3,7 +3,9 @@
     "baseUrl": ".",
     "strict": true,
     "allowJs": true,
-    "target": "es2021",
+    "target": "es2022",
+    "module": "es2022",
+    "allowSyntheticDefaultImports": true,
     "composite": true,
     "declaration": true,
     "moduleResolution": "node",
@@ -20,6 +22,7 @@
       "@allmaps/openlayers": ["./packages/openlayers/src"],
       "@allmaps/ui": ["./packages/ui/src"],
       "@allmaps/tailwind": ["./packages/tailwind/src"],
+      "@allmaps/bearing": ["./packages/bearing/src"],
 
       "@allmaps/types/*": ["./packages/types/src/*"],
       "@allmaps/transform/*": ["./packages/transform/src/*"],
@@ -30,7 +33,8 @@
       "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
       "@allmaps/openlayers/*": ["./packages/openlayers/src/*"],
       "@allmaps/ui/*": ["./packages/ui/src/*"],
-      "@allmaps/tailwind/*": ["./packages/tailwind/src/*"]
+      "@allmaps/tailwind/*": ["./packages/tailwind/src/*"],
+      "@allmaps/bearing/*": ["./packages/bearing/src/*"]
     }
   }
 }

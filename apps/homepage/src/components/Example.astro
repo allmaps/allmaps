@@ -1,0 +1,22 @@
+---
+import { Picture } from 'astro:assets'
+
+const { src, title, institution, annotationUrl } = Astro.props
+
+const image = import(`../images/examples/${src}.jpg`)
+---
+
+<li>
+  <a
+    class="block w-full aspect-[3/1] sm:aspect-[4/1] md:aspect-[6/1]"
+    href={`https://viewer.allmaps.org/?url=${annotationUrl}`}
+    ><Picture
+      class="block object-cover w-full h-full"
+      densities={[1.5, 2]}
+      src={image}
+      alt={title}
+    /></a
+  >
+
+  <span>{title}, <span class="font-light">{institution}</span></span>
+</li>

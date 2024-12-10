@@ -1,7 +1,4 @@
-import {
-  isGeojsonGeometry,
-  convertGeojsonGeometryToGeometry
-} from './geojson.js'
+import { isGeojsonGeometry, geojsonGeometryToGeometry } from './geojson.js'
 import { isPoint, isPolygon, distance } from './geometry.js'
 
 import type {
@@ -13,6 +10,7 @@ import type {
   Rectangle,
   Bbox,
   Size,
+  Fit,
   GeojsonGeometry
 } from '@allmaps/types'
 
@@ -43,7 +41,7 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
     points = points.flat()
   }
   if (isGeojsonGeometry(points)) {
-    return computeBbox(convertGeojsonGeometryToGeometry(points))
+    return computeBbox(geojsonGeometryToGeometry(points))
   }
 
   // TODO: do this without making two new arrays
@@ -70,15 +68,51 @@ export function combineBboxes(bbox0: Bbox, bbox1: Bbox): Bbox {
   ]
 }
 
-export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
+export function doBboxesIntersect(bbox0: Bbox, bbox1: Bbox): boolean {
   const isOverlappingInX = bbox0[2] >= bbox1[0] && bbox1[2] >= bbox0[0]
   const isOverlappingInY = bbox0[3] >= bbox1[1] && bbox1[3] >= bbox0[1]
 
   return isOverlappingInX && isOverlappingInY
 }
 
+export function bboxesIntersect(bbox0: Bbox, bbox1: Bbox): Bbox | undefined {
+  const minX = Math.max(bbox0[0], bbox1[0])
+  const maxX = Math.min(bbox0[2], bbox1[2])
+  const minY = Math.max(bbox0[1], bbox1[1])
+  const maxY = Math.min(bbox0[3], bbox1[3])
+
+  if (minX < maxX && minY < maxY) {
+    return [minX, minY, maxX, maxY]
+  } else {
+    return undefined
+  }
+}
+
 export function pointInBbox(point: Point, bbox: Bbox): boolean {
-  return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
+  return doBboxesIntersect([point[0], point[1], point[0], point[1]], bbox)
+}
+
+export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
+  if (dist1 === undefined) {
+    dist1 = dist0
+  }
+  return [bbox[0] - dist0, bbox[1] - dist1, bbox[2] + dist0, bbox[3] + dist1]
+}
+
+// Ratio 2 adds half the current width (or height) both left and right of the current (width or height)
+// so the total width (or height) goes * 2 and the total surface goes * 4
+export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
+  if (ratio == 0) {
+    return bbox
+  }
+  const size = bboxToSize(bbox)
+  return bufferBbox(
+    bbox,
+    ...(size.map((widthOrHeigth) => (widthOrHeigth * ratio) / 2) as [
+      number,
+      number
+    ])
+  )
 }
 
 // Transform
@@ -104,6 +138,10 @@ export function bboxToLine(bbox: Bbox): Line {
   ]
 }
 
+export function bboxToPoint(bbox: Bbox): Point {
+  return [bbox[0], bbox[1]]
+}
+
 export function bboxToDiameter(bbox: Bbox): number {
   return distance(bboxToLine(bbox))
 }
@@ -122,7 +160,9 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
-// Approximate results, for rectangles coming from bboxes. A more precise result would require a minimal-covering-rectangle algorithm
+// Approximate results, for rectangles coming from bboxes.
+// A more precise result would require a minimal-covering-rectangle algorithm
+// Or computing and comparing rectangle surfaces
 export function rectangleToSize(rectangle: Rectangle): Size {
   return [
     0.5 *
@@ -136,8 +176,18 @@ export function rectangleToSize(rectangle: Rectangle): Size {
 
 // Scales
 
-export function sizesToScale(size0: Size, size1: Size): number {
-  return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
+export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
+  if (!fit) {
+    return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
+  } else if (fit === 'contain') {
+    return size1[0] >= size1[1] ? size0[0] / size1[0] : size0[1] / size1[1]
+  } else {
+    return size1[0] >= size1[1] ? size0[1] / size1[1] : size0[0] / size1[0]
+  }
+}
+
+export function sizeToResolution(size: Size): number {
+  return size[0] * size[1]
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {

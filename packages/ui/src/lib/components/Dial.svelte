@@ -248,6 +248,9 @@
 
     <div
       data-tooltip-target="tooltip-animation"
+      role="slider"
+      aria-valuenow={value}
+      tabindex="0"
       bind:this={tooltipTrigger}
       class="select-none relative bg-white w-7 h-7 peer-focus:outline-none peer-focus:ring peer-focus:ring-pink-500 cursor-pointer text-gray-900 font-medium border-gray-200 rounded-full hover:bg-gray-100 peer-focus:z-10 drop-shadow"
       on:mousedown={handleMousedown}

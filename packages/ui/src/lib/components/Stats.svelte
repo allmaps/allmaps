@@ -14,14 +14,16 @@
 
   // import { env } from '$env/dynamic/public'
   const env = import.meta.env
+
+  export let statsWebsiteId = env.VITE_STATS_WEBSITE_ID || ''
 </script>
 
 <svelte:head>
-  {#if env.VITE_STATS_WEBSITE_ID}
+  {#if statsWebsiteId}
     <script
       async
       src="https://stats.allmaps.org/script.js"
-      data-website-id={env.VITE_STATS_WEBSITE_ID}
+      data-website-id={statsWebsiteId}
     ></script>
   {/if}
 </svelte:head>

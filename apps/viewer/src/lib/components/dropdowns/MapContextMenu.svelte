@@ -5,7 +5,7 @@
 
   // import MenuSeparator from '$lib/components/menu/MenuSeparator.svelte'
 
-  import { mapWarpedMapSource } from '$lib/shared/stores/openlayers.js'
+  import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
   // import { hideMaps } from '$lib/shared/stores/visible.js'
   // import { mapsById } from '$lib/shared/stores/maps.js'
   // import { setCustomResourceMask } from '$lib/shared/stores/maps.js'
@@ -43,19 +43,19 @@
   // }
 
   function handleBringMapsToFront() {
-    mapWarpedMapSource.bringMapsToFront([mapId])
+    mapWarpedMapLayer.bringMapsToFront([mapId])
   }
 
   function handleBringMapsForward() {
-    mapWarpedMapSource.bringMapsForward([mapId])
+    mapWarpedMapLayer.bringMapsForward([mapId])
   }
 
   function handleSendMapsBackward() {
-    mapWarpedMapSource.sendMapsBackward([mapId])
+    mapWarpedMapLayer.sendMapsBackward([mapId])
   }
 
   function handleSendMapsToBack() {
-    mapWarpedMapSource.sendMapsToBack([mapId])
+    mapWarpedMapLayer.sendMapsToBack([mapId])
   }
 </script>
 

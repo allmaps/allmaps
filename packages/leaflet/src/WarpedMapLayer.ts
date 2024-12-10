@@ -1,12 +1,13 @@
 import * as L from 'leaflet'
 
 import {
-  WarpedMap,
+  WebGL2WarpedMap,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2Renderer
+  WebGL2Renderer,
+  WarpedMapLayerOptions
 } from '@allmaps/render'
 import {
   rectangleToSize,
@@ -16,26 +17,40 @@ import {
 } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-import type { Point, Rectangle } from '@allmaps/types'
-import type { TransformationType } from '@allmaps/transform'
+import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
+import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 
-export type WarpedMapLayerOptions = {
+export type LeafletWarpedMapLayerOptions = WarpedMapLayerOptions & {
   opacity: number
   interactive: boolean
   className: string
   pane: string
   zIndex?: number
-  imageInfoCache?: Cache
+  imageInformations?: ImageInformations
 }
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
+
+const NO_CANVAS_ERROR_MESSAGE =
+  'Canvas not defined. Add the layer to a map before calling this function.'
+
+const DEFAULT_PANE = 'tilePane'
+const DEFAULT_OPACITY = 1
 
 function assertRenderer(
   renderer?: WebGL2Renderer
 ): asserts renderer is WebGL2Renderer {
   if (!renderer) {
     throw new Error(NO_RENDERER_ERROR_MESSAGE)
+  }
+}
+
+function assertCanvas(
+  canvas?: HTMLCanvasElement
+): asserts canvas is HTMLCanvasElement {
+  if (!canvas) {
+    throw new Error(NO_CANVAS_ERROR_MESSAGE)
   }
 }
 
@@ -59,30 +74,30 @@ export class WarpedMapLayer extends L.Layer {
 
   resizeObserver: ResizeObserver | undefined
 
-  options: WarpedMapLayerOptions = {
-    opacity: 1,
+  options: Partial<LeafletWarpedMapLayerOptions> = {
+    opacity: DEFAULT_OPACITY,
     interactive: false,
     className: '',
-    pane: 'tilePane',
+    pane: DEFAULT_PANE,
     zIndex: 1
   }
 
+  /**
+   * Creates a WarpedMapLayer
+   * @param {unknown} annotationOrAnnotationUrl - Georeference Annotation or URL of a Georeference Annotation
+   * @param {WarpedMapLayerOptions} [options] - Options for the layer
+   */
   constructor(
     annotationOrAnnotationUrl: unknown,
-    options: WarpedMapLayerOptions
+    options?: Partial<LeafletWarpedMapLayerOptions>
   ) {
     super()
     this.initialize(annotationOrAnnotationUrl, options)
   }
 
-  /**
-   * Creates a WarpedMapLayer
-   * @param {unknown} [annotation] - Georeference Annotation or URL of a Georeference Annotation
-   * @param {WarpedMapLayerOptions} options
-   */
   initialize(
     annotationOrAnnotationUrl: unknown,
-    options: WarpedMapLayerOptions
+    options?: Partial<LeafletWarpedMapLayerOptions>
   ) {
     this._annotationOrAnnotationUrl = annotationOrAnnotationUrl
     L.setOptions(this, options)
@@ -92,7 +107,6 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Contains all code code that creates DOM elements for the layer and adds them to map panes where they belong.
-   * @async
    */
   onAdd(map: Map) {
     if (!this._map || !this.container) {
@@ -252,7 +266,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML container element of the layer
-   * @return {HTMLElement} HTML Div Element
+   * @returns {HTMLElement} HTML Div Element
    */
   getContainer(): HTMLDivElement | undefined {
     return this.container
@@ -260,7 +274,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML canvas element of the layer
-   * @return {HTMLCanvasElement | null} HTML Canvas Element
+   * @returns {HTMLCanvasElement | null} HTML Canvas Element
    */
   getCanvas(): HTMLCanvasElement | undefined {
     return this.canvas
@@ -269,7 +283,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
-  getWarpedMapList(): WarpedMapList {
+  getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList
@@ -278,9 +292,9 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Returns a single map's warped map
    * @param {string} mapId - ID of the map
-   * @returns {WarpedMap | undefined} the warped map
+   * @returns {WebGL2WarpedMap | undefined} the warped map
    */
-  getWarpedMap(mapId: string): WarpedMap | undefined {
+  getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMap(mapId)
@@ -368,6 +382,24 @@ export class WarpedMapLayer extends L.Layer {
     this.renderer.warpedMapList.setMapsTransformationType(
       mapIds,
       transformation
+    )
+    this._update()
+  }
+
+  /**
+   * Sets the distortion measure of multiple maps
+   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   */
+  setMapsDistortionMeasure(
+    mapIds: Iterable<string>,
+    distortionMeasure?: DistortionMeasure
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapsDistortionMeasure(
+      mapIds,
+      distortionMeasure
     )
     this._update()
   }
@@ -464,15 +496,15 @@ export class WarpedMapLayer extends L.Layer {
   }
 
   /**
-   * Gets the zIndex of the layer.
+   * Gets the z-index of the layer.
    */
   getZIndex() {
     return this.options.zIndex
   }
 
   /**
-   * Changes the zIndex of the layer.
-   * @param {number} value - zIndex
+   * Changes the z-index of the layer.
+   * @param {number} value - z-index
    */
   setZIndex(value: number) {
     this.options.zIndex = value
@@ -481,13 +513,14 @@ export class WarpedMapLayer extends L.Layer {
   }
 
   /**
-   * Sets the image info Cache of the warpedMapList
-   * @param {Cache} cache - the image info cache
+   * Sets the object that caches image information
+   *
+   * @param {ImageInformations} imageInformations - Object that caches image information
    */
-  setImageInfoCache(cache: Cache) {
+  setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setImageInfoCache(cache)
+    this.renderer.warpedMapList.setImageInformations(imageInformations)
   }
 
   /**
@@ -495,7 +528,8 @@ export class WarpedMapLayer extends L.Layer {
    * @returns {string} Pane name
    */
   getPaneName(): string {
-    return this._map.getPane(this.options.pane) ? this.options.pane : 'tilePane'
+    // this._map.getPane(this.options.pane) ? this.options.pane : DEFAULT_PANE
+    return this.options.pane || DEFAULT_PANE
   }
 
   /**
@@ -503,7 +537,7 @@ export class WarpedMapLayer extends L.Layer {
    * @returns {number} Layer opacity
    */
   getOpacity(): number {
-    return this.options.opacity
+    return this.options.opacity || DEFAULT_OPACITY
   }
 
   /**
@@ -528,7 +562,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Gets the opacity of a single map
    * @param {string} mapId - ID of the map
-   * @return {number | undefined} opacity of the map
+   * @returns {number | undefined} opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     assertRenderer(this.renderer)
@@ -777,9 +811,7 @@ export class WarpedMapLayer extends L.Layer {
       throw new Error('WebGL 2 not available')
     }
 
-    const warpedMapList = new WarpedMapList(this.options.imageInfoCache)
-
-    this.renderer = new WebGL2Renderer(this.gl, warpedMapList)
+    this.renderer = new WebGL2Renderer(this.gl)
 
     this._addEventListeners()
   }
@@ -865,6 +897,12 @@ export class WarpedMapLayer extends L.Layer {
     this.renderer.setOpacity(this.getOpacity())
 
     // Prepare Viewport input
+    const viewportSizeAsPoint = this._map.getSize()
+    const viewportSize = [viewportSizeAsPoint.x, viewportSizeAsPoint.y] as [
+      number,
+      number
+    ]
+
     const geoCenterAsPoint = this._map.getCenter()
     const projectedGeoCenterAsPoint =
       this._map.options.crs.project(geoCenterAsPoint)
@@ -872,12 +910,6 @@ export class WarpedMapLayer extends L.Layer {
       projectedGeoCenterAsPoint.x,
       projectedGeoCenterAsPoint.y
     ] as [number, number]
-
-    const viewportSizeAsPoint = this._map.getSize()
-    const viewportSize = [viewportSizeAsPoint.x, viewportSizeAsPoint.y] as [
-      number,
-      number
-    ]
 
     const geoBboxAsLatLngBounds = this._map.getBounds()
     const projectedNorthEastAsPoint = this._map.options.crs.project(
@@ -905,10 +937,10 @@ export class WarpedMapLayer extends L.Layer {
     )
 
     const viewport = new Viewport(
-      projectedGeoCenter,
       viewportSize,
-      0,
+      projectedGeoCenter,
       projectedGeoPerViewportScale,
+      0,
       window.devicePixelRatio
     )
 
@@ -917,8 +949,28 @@ export class WarpedMapLayer extends L.Layer {
     return this.container
   }
 
+  _contextLost(event: Event) {
+    event.preventDefault()
+    this.renderer?.contextLost()
+  }
+
+  _contextRestored(event: Event) {
+    event.preventDefault()
+    this.renderer?.contextRestored()
+  }
+
   _addEventListeners() {
     assertRenderer(this.renderer)
+    assertCanvas(this.canvas)
+
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this._contextLost.bind(this)
+    )
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this._contextRestored.bind(this)
+    )
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
@@ -973,6 +1025,16 @@ export class WarpedMapLayer extends L.Layer {
 
   _removeEventListeners() {
     assertRenderer(this.renderer)
+    assertCanvas(this.canvas)
+
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      this._contextLost.bind(this)
+    )
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      this._contextRestored.bind(this)
+    )
 
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
@@ -1040,7 +1102,7 @@ export class WarpedMapLayer extends L.Layer {
       return
     }
 
-    this.renderer.dispose()
+    this.renderer.destroy()
 
     const extension = this.gl.getExtension('WEBGL_lose_context')
     if (extension) {

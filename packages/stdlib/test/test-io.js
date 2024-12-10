@@ -8,14 +8,14 @@ import {
   isPolygon,
   conformLineString,
   conformPolygon,
-  convertPolygonToGeojsonPolygon
+  polygonToGeojsonPolygon
 } from '../dist/geometry.js'
 
 import {
   isGeojsonPoint,
   isGeojsonLineString,
   isGeojsonPolygon,
-  convertGeojsonPolygonToPolygon
+  geojsonPolygonToPolygon
 } from '../dist/geojson.js'
 
 import {
@@ -204,26 +204,22 @@ describe('conformPolygon()', async () => {
   })
 })
 
-describe('convertGeojsonPolygonToPolygon()', async () => {
+describe('geojsonPolygonToPolygon()', async () => {
   it(`should not close`, () => {
-    expect(convertGeojsonPolygonToPolygon(geojsonPolygonGeo)).to.deep.equal(
-      polygonGeo
-    )
+    expect(geojsonPolygonToPolygon(geojsonPolygonGeo)).to.deep.equal(polygonGeo)
   })
 })
 
-describe('convertGeojsonPolygonToPolygon()', async () => {
+describe('geojsonPolygonToPolygon()', async () => {
   it(`should close when asked`, () => {
-    expect(
-      convertGeojsonPolygonToPolygon(geojsonPolygonGeo, true)
-    ).to.deep.equal(polygonGeoClosed)
+    expect(geojsonPolygonToPolygon(geojsonPolygonGeo, true)).to.deep.equal(
+      polygonGeoClosed
+    )
   })
 })
 
-describe('convertPolygonToGeojsonPolygon()', async () => {
+describe('polygonToGeojsonPolygon()', async () => {
   it(`should respect Geojson spec`, () => {
-    expect(convertPolygonToGeojsonPolygon(polygonGeo)).to.deep.equal(
-      geojsonPolygonGeo
-    )
+    expect(polygonToGeojsonPolygon(polygonGeo)).to.deep.equal(geojsonPolygonGeo)
   })
 })

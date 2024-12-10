@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Feature Request
+    url: https://github.com/allmaps/allmaps/discussions
+    about:
+      We use the Discussions for this instead of the issues tab 🙂. Check the pinned discussions for planned features, and open a new discussion if your idea is not mentioned yet.

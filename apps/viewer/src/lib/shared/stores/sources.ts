@@ -9,8 +9,8 @@ import {
   resetMaps
 } from '$lib/shared/stores/maps.js'
 import {
-  mapWarpedMapSource,
-  mapVectorSource
+  mapVectorSource,
+  mapWarpedMapLayer
 } from '$lib/shared/stores/openlayers.js'
 import { resetTransformation } from '$lib/shared/stores/transformation.js'
 
@@ -42,7 +42,7 @@ async function addSource(
     annotations = [json]
   } else {
     if (parsed.iiif.type === 'collection') {
-      await parsed.iiif.fetchAll(fetchJson, {
+      await parsed.iiif.fetchAll({
         fetchManifests: true,
         fetchImages: false
       })
@@ -109,7 +109,7 @@ export function removeSource(id: string) {
 }
 
 export function resetSources() {
-  mapWarpedMapSource.clear()
+  mapWarpedMapLayer.clear()
   mapVectorSource.clear()
 
   resetTransformation()

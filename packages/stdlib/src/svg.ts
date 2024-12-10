@@ -193,7 +193,7 @@ export function mapToResourceMaskSvgPolygon(map: Map): SvgPolygon {
 
 // Convert to geojson
 
-export function convertSvgToGeojson(geometry: SvgGeometry): GeojsonGeometry {
+export function svgToGeojson(geometry: SvgGeometry): GeojsonGeometry {
   if (geometry.type === 'circle') {
     return {
       type: 'Point',

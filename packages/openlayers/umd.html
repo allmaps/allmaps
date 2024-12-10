@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/openlayers</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="examples/style.css" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
+    <script src="./dist/bundled/allmaps-openlayers-8.umd.js"></script>
+    <script src="examples/controls.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="controls"></div>
+    <script defer>
+      const warpedMapLayer = new Allmaps.WarpedMapLayer()
+
+      const map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          warpedMapLayer
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-71.00661, 42.37124]),
+          zoom: 14
+        })
+      })
+
+      warpedMapLayer.addGeoreferenceAnnotationByUrl(
+        'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
+      )
+
+      async function handleAddMapClicked() {
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(
+          'https://annotations.allmaps.org/maps/4d7b3c96d3e89c4f'
+        )
+
+        map.getView().fit(warpedMapLayer.getExtent(), {
+          padding: [25, 25, 25, 25]
+        })
+      }
+
+      if (window.initializeControls) {
+        initializeControls(
+          'examples/controls.html',
+          warpedMapLayer,
+          handleAddMapClicked
+        )
+      }
+    </script>
+  </body>
+</html>

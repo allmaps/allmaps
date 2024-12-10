@@ -1,0 +1,86 @@
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+<Tabs>
+  <TabItem label="MapLibre">
+    ```js
+    import { Map } from 'maplibre-gl'
+    import { WarpedMapLayer } from '@allmaps/maplibre'
+
+    const map = new Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-73.9337, 40.8011],
+      zoom: 11.5,
+      // These options are required for the Allmaps plugin:
+      maxPitch: 0,
+      preserveDrawingBuffer: true
+    })
+
+    const annotationUrl =
+      'https://annotations.allmaps.org/images/d180902cb93d5bf2'
+    const warpedMapLayer = new WarpedMapLayer()
+
+    map.on('load', () => {
+      map.addLayer(warpedMapLayer)
+      warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+    })
+    ```
+
+    View an interactive example of the Allmaps MapLibre plugin on [Observable](https://observablehq.com/@allmaps/maplibre-plugin).
+  </TabItem>
+  <TabItem label="OpenLayers">
+    ```js
+    import ol from 'ol'
+    import { WarpedMapLayer } from '@allmaps/openlayers'
+
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([-71.00661, 42.37124]),
+        zoom: 14
+      })
+    })
+
+    const warpedMapLayer = new WarpedMapLayer()
+    const annotationUrl =
+      'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
+    map.addLayer(warpedMapLayer)
+    warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+    ```
+
+    View an interactive example of the Allmaps OpenLayers plugin on [Observable](https://observablehq.com/@allmaps/openlayers-plugin).
+  </TabItem>
+  <TabItem label="Leaflet">
+    ```js
+    import L from 'leaflet'
+    import { WarpedMapLayer } from '@allmaps/leaflet'
+
+    const map = L.map('map', {
+      center: [51.0518, 3.7278],
+      zoom: 14,
+      // Zoom animations for more than one zoom level are
+      // currently not supported by the Allmaps plugin for Leafet
+      zoomAnimationThreshold: 1
+    })
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">' +
+        'OpenStreetMap</a> contributors'
+    }).addTo(map)
+
+    const annotationUrl =
+      'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+    const warpedMapLayer = new WarpedMapLayer(annotationUrl)
+      .addTo(map)
+    ```
+
+    View an interactive example of the Allmaps Leaflet plugin on [Observable](https://observablehq.com/@allmaps/leaflet-plugin).
+  </TabItem>
+</Tabs>
+

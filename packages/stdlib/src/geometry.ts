@@ -17,7 +17,9 @@ import type {
   GeojsonMultiPoint,
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
-  GeojsonGeometry
+  GeojsonGeometry,
+  Size,
+  Triangle
 } from '@allmaps/types'
 
 // Assert
@@ -41,7 +43,7 @@ export function isLineString(input: any): input is LineString {
 function isRing(input: any): input is Ring {
   return (
     Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) == closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
+    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
   )
 }
 
@@ -121,14 +123,14 @@ export function conformMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
 
 // Convert to GeoJSON
 
-export function convertPointToGeojsonPoint(point: Point): GeojsonPoint {
+export function pointToGeojsonPoint(point: Point): GeojsonPoint {
   return {
     type: 'Point',
     coordinates: point
   }
 }
 
-export function convertLineStringToGeojsonLineString(
+export function lineStringToGeojsonLineString(
   lineString: LineString
 ): GeojsonLineString {
   return {
@@ -137,10 +139,7 @@ export function convertLineStringToGeojsonLineString(
   }
 }
 
-export function convertRingToGeojsonPolygon(
-  ring: Ring,
-  close = true
-): GeojsonPolygon {
+export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
     coordinates: close ? [[...ring, ring[0]]] : [ring]
@@ -148,7 +147,7 @@ export function convertRingToGeojsonPolygon(
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
-export function convertPolygonToGeojsonPolygon(
+export function polygonToGeojsonPolygon(
   polygon: Polygon,
   close = true
 ): GeojsonPolygon {
@@ -164,7 +163,7 @@ export function convertPolygonToGeojsonPolygon(
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
-export function convertMultiPointToGeojsonMultiPoint(
+export function multiPointToGeojsonMultiPoint(
   multiPoint: MultiPoint
 ): GeojsonMultiPoint {
   return {
@@ -173,7 +172,7 @@ export function convertMultiPointToGeojsonMultiPoint(
   }
 }
 
-export function convertMultiLineStringToGeojsonMultiLineString(
+export function multiLineStringToGeojsonMultiLineString(
   multiLineString: MultiLineString
 ): GeojsonMultiLineString {
   return {
@@ -182,7 +181,7 @@ export function convertMultiLineStringToGeojsonMultiLineString(
   }
 }
 
-export function convertMultiPolygonToGeojsonMultiPolygon(
+export function multiPolygonToGeojsonMultiPolygon(
   multiPolygon: MultiPolygon,
   close = true
 ): GeojsonMultiPolygon {
@@ -200,21 +199,19 @@ export function convertMultiPolygonToGeojsonMultiPolygon(
   return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
-export function convertGeometryToGeojsonGeometry(
-  geometry: Geometry
-): GeojsonGeometry {
+export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
   if (isPoint(geometry)) {
-    return convertPointToGeojsonPoint(geometry)
+    return pointToGeojsonPoint(geometry)
   } else if (isLineString(geometry)) {
-    return convertLineStringToGeojsonLineString(geometry)
+    return lineStringToGeojsonLineString(geometry)
   } else if (isPolygon(geometry)) {
-    return convertPolygonToGeojsonPolygon(geometry)
+    return polygonToGeojsonPolygon(geometry)
   } else if (isMultiPoint(geometry)) {
-    return convertMultiPointToGeojsonMultiPoint(geometry)
+    return multiPointToGeojsonMultiPoint(geometry)
   } else if (isMultiLineString(geometry)) {
-    return convertMultiLineStringToGeojsonMultiLineString(geometry)
+    return multiLineStringToGeojsonMultiLineString(geometry)
   } else if (isMultiPolygon(geometry)) {
-    return convertMultiPolygonToGeojsonMultiPolygon(geometry)
+    return multiPolygonToGeojsonMultiPolygon(geometry)
   } else {
     throw new Error('Geometry type not supported')
   }
@@ -230,43 +227,80 @@ export function isClosed(input: Point[]): boolean {
   )
 }
 
-export function isEqualPoint(point1: Point, point: Point): boolean {
-  if (point1 === point) return true
-  if (point1 == null || point == null) return false
+export function isEqualPoint(point0: Point, point1: Point): boolean {
+  if (point0 === point1) return true
+  if (point0 === null || point1 === null) return false
 
-  return point1[0] == point[0] && point1[1] == point[1]
+  return point0[0] === point1[0] && point0[1] === point1[1]
 }
 
 export function isEqualPointArray(
-  pointArray1: Point[],
-  pointArray2: Point[]
+  pointArray0: Point[],
+  pointArray1: Point[]
 ): boolean {
-  if (pointArray1 === pointArray2) return true
-  if (pointArray1 == null || pointArray2 == null) return false
-  if (pointArray1.length !== pointArray2.length) return false
+  if (pointArray0 === pointArray1) return true
+  if (!pointArray0 || !pointArray1) return false
+  if (pointArray0.length !== pointArray1.length) return false
 
-  for (let i = 0; i < pointArray1.length; ++i) {
-    if (isEqualPoint(pointArray1[i], pointArray2[i])) return false
+  for (let i = 0; i < pointArray0.length; ++i) {
+    if (isEqualPoint(pointArray0[i], pointArray1[i])) return false
   }
   return true
 }
 
 export function isEqualPointArrayArray(
-  pointArrayArray1: Point[][],
-  pointArrayArray2: Point[][]
+  pointArrayArray0: Point[][],
+  pointArrayArray1: Point[][]
 ): boolean {
-  if (pointArrayArray1 === pointArrayArray2) return true
-  if (pointArrayArray1 == null || pointArrayArray2 == null) return false
-  if (pointArrayArray1.length !== pointArrayArray2.length) return false
+  if (pointArrayArray0 === pointArrayArray1) return true
+  if (!pointArrayArray0 || !pointArrayArray1) return false
+  if (pointArrayArray0.length !== pointArrayArray1.length) return false
 
-  for (let i = 0; i < pointArrayArray1.length; ++i) {
-    if (isEqualPointArray(pointArrayArray1[i], pointArrayArray2[i]))
+  for (let i = 0; i < pointArrayArray0.length; ++i) {
+    if (isEqualPointArray(pointArrayArray0[i], pointArrayArray1[i]))
       return false
   }
   return true
 }
 
-// Compute
+// Split, combine, shift, flip
+
+export function pointsAndPointsToLines(
+  points0: Point[],
+  points1: Point[]
+): Line[] {
+  if (points0.length != points1.length)
+    throw new Error('Point arrays should be of same lenght')
+
+  return points0.map((point0, index) => [point0, points1[index]])
+}
+
+export function lineStringToLines(lineString: LineString): Line[] {
+  return lineString.reduce(
+    (accumulator: Line[], point, index) => [
+      ...accumulator,
+      [point, lineString[(index + 1) % lineString.length]]
+    ],
+    []
+  )
+}
+
+export function pointToPixel(point: Point, translate: Point = [0, 0]): Point {
+  return point.map((coordinate, index) => {
+    return Math.floor(coordinate + translate[index])
+  }) as Point
+}
+
+export function pixelToIntArrayIndex(
+  pixel: Point,
+  size: Size,
+  channels: number,
+  flipY = false
+): number {
+  const column = pixel[0]
+  const row = flipY ? size[1] - 1 - pixel[1] : pixel[1]
+  return (row * size[0] + column) * channels
+}
 
 export function flipX(point: Point): Point {
   return [-point[0], point[1]]
@@ -276,32 +310,90 @@ export function flipY(point: Point): Point {
   return [point[0], -point[1]]
 }
 
-export function midPoint(point0: Point, point1: Point): Point {
-  return [
-    (point1[0] - point0[0]) / 2 + point0[0],
-    (point1[1] - point0[1]) / 2 + point0[1]
-  ]
+// Mix
+
+export function mixNumbers(
+  number0: number,
+  number1: number,
+  t: number
+): number {
+  return number0 * (1 - t) + number1 * t
 }
 
 export function mixPoints(point0: Point, point1: Point, t: number): Point {
   return [
-    point0[0] * t + point1[0] * (1 - t),
-    point0[1] * t + point1[1] * (1 - t)
+    mixNumbers(point0[0], point1[0], t),
+    mixNumbers(point0[1], point1[1], t)
   ]
 }
 
-export function distance(line: Line): number
+// Compute
+
+export function midPoint(...points: Point[]): Point {
+  const result: Point = [0, 0]
+  for (let i = 0; i < points.length; i++) {
+    result[0] += points[i][0]
+    result[1] += points[i][1]
+  }
+  result[0] = result[0] / points.length
+  result[1] = result[1] / points.length
+  return result
+}
+
+// Return angle of line (in radians, signed)
+export function lineAngle(line: Line): number {
+  return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
+}
+
+// Return the next point starting from a point going a certian distance in a certain direction
+export function stepDistanceAngle(
+  point: Point,
+  dist: number,
+  angle: number
+): Point {
+  return [point[0] + Math.cos(angle) * dist, point[1] + Math.sin(angle) * dist]
+}
+
+export function distance(from: Line): number
+export function distance(from: Point): number
 export function distance(from: Point, to: Point): number
 export function distance(from: Point | Line, to?: Point): number {
-  if (isLineString(from) && from.length == 2) {
+  if (isLineString(from) && from.length === 2) {
     return distance(from[0], from[1])
+  } else if (isPoint(from) && to === undefined) {
+    return distance(from, [0, 0])
   } else if (isPoint(from) && isPoint(to)) {
-    return Math.sqrt((to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2)
+    return Math.sqrt(squaredDistance(from, to))
   } else {
     throw new Error('Input type not supported')
   }
 }
 
-export function degreesToRadians(degrees: number) {
-  return degrees * (Math.PI / 180)
+// Squared distance is faster to compute then distance
+// (which requires espensive square root)
+// and can be used for things like sorting distance etc.
+export function squaredDistance(from: Line): number
+export function squaredDistance(from: Point): number
+export function squaredDistance(from: Point, to: Point): number
+export function squaredDistance(from: Point | Line, to?: Point): number {
+  if (isLineString(from) && from.length === 2) {
+    return squaredDistance(from[0], from[1])
+  } else if (isPoint(from) && to === undefined) {
+    return squaredDistance(from, [0, 0])
+  } else if (isPoint(from) && isPoint(to)) {
+    return (to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2
+  } else {
+    throw new Error('Input type not supported')
+  }
+}
+
+export function triangleArea(triangle: Triangle): number {
+  return (
+    0.5 *
+    Math.abs(
+      triangle[0][0] * (triangle[1][1] - triangle[2][1]) +
+        triangle[1][0] * (triangle[2][1] - triangle[0][1]) +
+        triangle[2][0] * (triangle[0][1] - triangle[1][1])
+    )
+  )
 }

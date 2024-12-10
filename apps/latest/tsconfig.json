@@ -5,19 +5,18 @@
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
-    "paths": {
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"]
-    }
+    "strict": true
   },
   "references": [
     { "path": "../../packages/transform" },
     { "path": "../../packages/annotation" },
     { "path": "../../packages/tailwind" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/id" }
   ]
 }

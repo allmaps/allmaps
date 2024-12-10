@@ -22,15 +22,9 @@
       import TileLayer from 'https://cdn.skypack.dev/ol@8.2.0/layer/Tile.js'
       import OSMSource from 'https://cdn.skypack.dev/ol@8.2.0/source/OSM.js'
 
-      import {
-        WarpedMapLayer,
-        WarpedMapSource
-      } from 'https://cdn.skypack.dev/@allmaps/openlayers'
+      import { WarpedMapLayer } from 'https://cdn.skypack.dev/@allmaps/openlayers'
 
-      const warpedMapSource = new WarpedMapSource()
-      const warpedMapLayer = new WarpedMapLayer({
-        source: warpedMapSource
-      })
+      const warpedMapLayer = new WarpedMapLayer()
 
       const map = new Map({
         target: 'map',
@@ -46,16 +40,16 @@
         })
       })
 
-      warpedMapSource.addGeoreferenceAnnotationByUrl(
+      warpedMapLayer.addGeoreferenceAnnotationByUrl(
         'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
       )
 
       async function handleAddMapClicked() {
-        await warpedMapSource.addGeoreferenceAnnotationByUrl(
+        await warpedMapLayer.addGeoreferenceAnnotationByUrl(
           'https://annotations.allmaps.org/maps/4d7b3c96d3e89c4f'
         )
 
-        map.getView().fit(warpedMapSource.getExtent(), {
+        map.getView().fit(warpedMapLayer.getExtent(), {
           padding: [25, 25, 25, 25]
         })
       }

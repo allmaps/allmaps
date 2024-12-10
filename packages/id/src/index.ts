@@ -22,7 +22,7 @@ async function generateHash(str: string): Promise<string> {
  * Generates an ID from a string using the SHA-1 algorithm. Given the same input, the ID will always be the same.
  *
  * @param {string} str - Input string.
- * @param {number} [length=16] - Length of returned hash.  The maximum length of the hash is 40 characters.
+ * @param {number} [length] - Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16.
  * @returns {Promise<string>} First `length` characters of the SHA-1 hash of `str`.
  */
 export async function generateId(str: string, length = 16): Promise<string> {
@@ -34,7 +34,7 @@ export async function generateId(str: string, length = 16): Promise<string> {
  * Generates a random ID.
  *
  * @async
- * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
+ * @param {number} [length] - Length of returned hash. The maximum length of the hash is 40 characters.
  * @returns {Promise<string>} First `length` characters of the SHA-1 hash of a random UUID.
  */
 export async function generateRandomId(length?: number): Promise<string> {
@@ -48,7 +48,7 @@ export async function generateRandomId(length?: number): Promise<string> {
  *
  * @async
  * @param {Object} obj - JSON object.
- * @param {number} [length=16] - Length of returned hash. The maximum length of the hash is 40 characters.
+ * @param {number} [length] Length of returned hash. The maximum length of the hash is 40 characters.
  * @returns {Promise<string>} First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.
  */
 export async function generateChecksum(

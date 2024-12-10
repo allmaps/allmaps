@@ -1,7 +1,8 @@
-export * from './WarpedMapLayer.js'
-export * from './WarpedMapSource.js'
-export * from './OLWarpedMapEvent.js'
+import WarpedMapLayer from './WarpedMapLayer.js'
 
+import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
+
+export { WarpedMapLayer, OLWarpedMapEvent }
 export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
 /**

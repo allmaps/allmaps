@@ -1,1 +1,0 @@
-# @allmaps/docs

@@ -7,7 +7,7 @@ import {
   parseAnnotationsValidateMaps,
   parseTransformOptions
 } from '../../lib/parse.js'
-import { addTransformOptions } from '../../lib/options.js'
+import { addCoordinateTransformOptions } from '../../lib/options.js'
 import { featuresToFeatureCollection, geometryToFeature } from '@allmaps/stdlib'
 
 export default function resourceMask() {
@@ -19,7 +19,7 @@ export default function resourceMask() {
         "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
     )
 
-  command = addTransformOptions(command)
+  command = addCoordinateTransformOptions(command)
 
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files as string[])

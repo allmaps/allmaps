@@ -11,10 +11,19 @@ export const LanguageValue3Schema = z.record(
   SingleValue3Schema.array()
 )
 
-export const MetadataItem3Schema = z.object({
-  label: LanguageValue3Schema.optional(),
-  value: LanguageValue3Schema.optional()
-})
+export const MetadataItem3Schema = z
+  .union([
+    z.any(),
+    z.object({
+      label: LanguageValue3Schema.optional(),
+      value: LanguageValue3Schema.optional()
+    })
+  ])
+  .transform((val) => {
+    if (val && typeof val === 'object' && 'label' in val && 'value' in val) {
+      return val
+    }
+  })
 
 export const Metadata3Schema = MetadataItem3Schema.array()
 

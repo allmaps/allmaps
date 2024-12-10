@@ -2,9 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
-    "module": "es2020",
-    "allowSyntheticDefaultImports": true
+    "outDir": "./dist"
   },
   "references": [
     { "path": "../render" },

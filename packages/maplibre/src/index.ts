@@ -1,1 +1,1 @@
-export * from './WarpedMapLayer.js'
+export { WarpedMapLayer } from './WarpedMapLayer.js'

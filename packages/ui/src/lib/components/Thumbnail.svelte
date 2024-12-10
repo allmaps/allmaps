@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-
   import { Image, type ImageRequest } from '@allmaps/iiif-parser'
+
+  import type { Fit } from '@allmaps/types'
 
   export let imageInfo: unknown
   export let width: number
   export let height = width
-  export let mode: 'cover' | 'contain' = 'cover'
+  export let mode: Fit = 'cover'
 
   let imageRequest: ImageRequest | ImageRequest[][] | undefined = undefined
 
@@ -44,13 +44,8 @@
     return `${(100 - (tilesHeight / tilesWidth) * 100) / 2}%`
   }
 
-  // "{(100 - (tilesWidth / tilesHeight) * 100) / 2}%"
-  // style:top="{(100 - (tilesHeight / tilesWidth) * 100) / 2}%"
-
-  onMount(() => {
-    parsedImage = Image.parse(imageInfo)
-    imageRequest = parsedImage.getThumbnail({ width, height }, mode)
-  })
+  $: parsedImage = Image.parse(imageInfo)
+  $: imageRequest = parsedImage.getThumbnail({ width, height }, mode)
 </script>
 
 <div style:aspect-ratio="{width} / {height}" class="overflow-hidden">

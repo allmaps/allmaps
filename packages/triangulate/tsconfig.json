@@ -1,12 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist"
   },
-  "references": [
-    { "path": "../types" },
-    { "path": "../../packages/stdlib" }
-  ],
+  "references": [{ "path": "../types" }, { "path": "../../packages/stdlib" }],
   "include": ["./src/**/*"]
 }

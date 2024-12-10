@@ -13,7 +13,6 @@ import {
 
 import {
   Map2Schema,
-  Maps2Schema,
   GCPSchema,
   ResourceSchema,
   PartOfSchema,
@@ -29,7 +28,6 @@ import { isAnnotation1 } from './guards.js'
 type AnnotationAllVersions = z.infer<typeof AnnotationAllVersionsSchema>
 type AnnotationPageAllVersions = z.infer<typeof AnnotationPageAllVersionsSchema>
 type Map2 = z.infer<typeof Map2Schema>
-type Maps2 = z.infer<typeof Maps2Schema>
 type Resource = z.infer<typeof ResourceSchema>
 type ResourceMask = z.infer<typeof ResourceMaskSchema>
 type GCP = z.infer<typeof GCPSchema>
@@ -188,7 +186,7 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
  * const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
  * const maps = parseAnnotation(annotation)
  */
-export function parseAnnotation(annotation: unknown): Maps2 {
+export function parseAnnotation(annotation: unknown): Map2[] {
   if (isAnnotationPageBeforeParse(annotation)) {
     // Seperate .parse for different versions for better Zod errors
     let parsedAnnotationPage: AnnotationPageAllVersions

@@ -3,7 +3,10 @@ export type Point = [number, number]
 export type Line = [Point, Point]
 
 /**
- * Triangle. Winding order of points is free.
+ * Triangle
+ * As `[[x0, y0], [x1, y1], [x2, y2]]`
+ *
+ * Winding order of points is free.
  *
  * @export
  * @typedef {Trianle}
@@ -23,12 +26,17 @@ export type Rectangle = [Point, Point, Point, Point]
 // - No duplicate points
 export type LineString = Point[]
 
-// Note:
-// - At least 3 points
-// - No duplicate points
-// - Unclosed: last element is not a repetition of the first
-// - So far no requirement on self-intersection although that may be useful in future
-// - So far no requirement on winding order. This is only applied when exporting to GeoJSON
+/**
+ * Ring as `[[number, number], ...]`
+ *
+ * Must contain at least 3 points
+ * May not contain duplicate points
+ * Must be unclosed: last element is not a repetition of the first
+ * May not be self-intersecting
+ * So far no requirement on self-intersection although that may be useful in future
+ * So far no requirement on winding order. This is only applied when exporting to GeoJSON
+ * @typedef {Object} Ring
+ */
 export type Ring = Point[]
 
 export type Polygon = Point[][]
@@ -46,6 +54,16 @@ export type Geometry =
   | MultiPoint
   | MultiLineString
   | MultiPolygon
+
+export type TypedLine<P> = [P, P]
+export type TypedTriangle<P> = [P, P, P]
+export type TypedRectangle<P> = [P, P, P, P]
+export type TypedLineString<P> = P[]
+export type TypedRing<P> = P[]
+export type TypedPolygon<P> = P[][]
+export type TypedMultiPoint<P> = P[]
+export type TypedMultiLineString<P> = P[][]
+export type TypedMultiPolygon<P> = P[][][]
 
 export type Gcp = { resource: Point; geo: Point }
 

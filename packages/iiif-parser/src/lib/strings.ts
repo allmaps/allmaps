@@ -101,6 +101,7 @@ export function parseVersion2Metadata(
     return (
       metadata
         // Only process metadata entries that have both label & value
+        .filter((entry) => entry)
         .filter(({ label, value }) => label && value)
         .map(({ label, value }) => ({
           label: parseVersion2String(label),

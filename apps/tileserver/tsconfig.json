@@ -1,21 +1,22 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020"],
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": [
-      "@cloudflare/workers-types"
-      // "vitest-environment-miniflare/globals"
-    ],
+    "types": ["@cloudflare/workers-types"]
   },
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/render" },
     { "path": "../../packages/transform" },
+    { "path": "../../packages/stdlib" },
     { "path": "../../packages/types" }
   ],
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["test"]
 }

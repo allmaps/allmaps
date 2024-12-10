@@ -13,8 +13,8 @@ Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows display
 Examples:
 
 *   [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
-*   [HTML example using ESM and Skypack](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/leaflet/examples/skypack.html)
-*   [HTML example using UMD and jsDelivr](https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/leaflet/examples/jsdelivr.html)
+*   [HTML example using ESM and Skypack](https://allmaps.org/allmaps/packages/leaflet/examples/skypack.html)
+*   [HTML example using UMD and jsDelivr](https://allmaps.org/allmaps/packages/leaflet/examples/jsdelivr.html)
 
 ## How it works
 
@@ -32,7 +32,7 @@ Install with pnpm:
 npm install @allmaps/leaflet
 ```
 
-You can build this package locally by running:
+You can optionally build this package locally by running:
 
 ```sh
 pnpm run build
@@ -111,13 +111,9 @@ The following events are emitted to inform you of the state of the WarpedMapLaye
 You can listen to them in the typical Leaflet way. Here's an example:
 
 ```js
-map.on(
-  'warpedmapadded',
-  (event) => {
-    console.log(event.mapId, warpedMapLayer.getBounds())
-  },
-  map
-)
+map.on('warpedmapadded', (event) => {
+  console.log(event.mapId, WarpedMapLayer.getBounds())
+})
 ```
 
 Some of the functions specified in the API only make sense once a warped map is loaded into the `WarpedMapLayer`. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
@@ -141,7 +137,6 @@ All these map phases originate from the same Georeference Annotation have the sa
 #### Table of Contents
 
 *   [WarpedMapLayer](#warpedmaplayer)
-    *   [initialize](#initialize)
     *   [onAdd](#onadd)
     *   [onRemove](#onremove)
     *   [addGeoreferenceAnnotation](#addgeoreferenceannotation)
@@ -161,6 +156,7 @@ All these map phases originate from the same Georeference Annotation have the sa
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [getBounds](#getbounds)
     *   [bringMapsToFront](#bringmapstofront)
     *   [sendMapsToBack](#sendmapstoback)
@@ -171,7 +167,7 @@ All these map phases originate from the same Georeference Annotation have the sa
     *   [getMapZIndex](#getmapzindex)
     *   [getZIndex](#getzindex)
     *   [setZIndex](#setzindex)
-    *   [setImageInfoCache](#setimageinfocache)
+    *   [setImageInformations](#setimageinformations)
     *   [getPaneName](#getpanename)
     *   [getOpacity](#getopacity)
     *   [setOpacity](#setopacity)
@@ -199,16 +195,6 @@ WarpedMapLayer class.
 
 Renders georeferenced maps of a Georeference Annotation on a Leaflet map.
 WarpedMapLayer extends Leaflet's [L.Layer](https://leafletjs.com/reference.html#layer).
-
-#### initialize
-
-Creates a WarpedMapLayer
-
-##### Parameters
-
-*   `annotationOrAnnotationUrl` &#x20;
-*   `options` **WarpedMapLayerOptions**&#x20;
-*   `annotation` **unknown?** Georeference Annotation or URL of a Georeference Annotation
 
 #### onAdd
 
@@ -310,7 +296,7 @@ Returns a single map's warped map
 
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
-Returns **(WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
+Returns **(WebGL2WarpedMap | [undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the warped map
 
 #### showMap
 
@@ -372,6 +358,15 @@ Sets the transformation type of multiple maps
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
 *   `transformation` **TransformationType** new transformation type
 
+#### setMapsDistortionMeasure
+
+Sets the distortion measure of multiple maps
+
+##### Parameters
+
+*   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `distortionMeasure` **DistortionMeasure** new transformation type
+
 #### getBounds
 
 Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
@@ -428,23 +423,23 @@ Returns **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### getZIndex
 
-Gets the zIndex of the layer.
+Gets the z-index of the layer.
 
 #### setZIndex
 
-Changes the zIndex of the layer.
+Changes the z-index of the layer.
 
 ##### Parameters
 
-*   `value` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** zIndex
+*   `value` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** z-index
 
-#### setImageInfoCache
+#### setImageInformations
 
-Sets the image info Cache of the warpedMapList
+Sets the object that caches image information
 
 ##### Parameters
 
-*   `cache` **Cache** the image info cache
+*   `imageInformations` **ImageInformations** Object that caches image information
 
 #### getPaneName
 

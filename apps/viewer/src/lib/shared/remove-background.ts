@@ -1,5 +1,5 @@
 import {
-  fetchImage,
+  fetchImageBitmap,
   getImageData,
   getColorsArray,
   getColorHistogram,
@@ -24,16 +24,16 @@ export async function getBackgroundColor(map: Map, parsedImage: Image) {
   }
 
   const url = parsedImage.getImageUrl(imageRequest)
-  const imageElement = await fetchImage(url)
+  const imageBitmap = await fetchImageBitmap(url)
 
-  const scale = imageElement.width / map.resource.width
+  const scale = imageBitmap.width / map.resource.width
 
   const mask: Ring = map.resourceMask.map((point) => [
     point[0] * scale,
     point[1] * scale
   ])
 
-  const imageData = getImageData(imageElement, mask)
+  const imageData = getImageData(imageBitmap, mask)
   const colors = getColorsArray(imageData)
   const histogram = getColorHistogram(colors)
   const backgroundColor = getMaxOccurringColor(histogram)

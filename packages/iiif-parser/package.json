@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-beta.36",
+  "version": "1.0.0-beta.40",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -35,30 +35,30 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && npm run documentation",
-    "preversion": "pnpm run types && pnpm run lint && pnpm test",
+    "build": "tsc && pnpm run documentation",
+    "preversion": "pnpm run lint && pnpm test",
     "types": "tsc --noEmit",
-    "test": "NODE_ENV=test mocha",
-    "pretest": "pnpm run build",
+    "test": "NODE_ENV=test pnpm run build && mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API",
     "format": "prettier --write src test"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@types/node": "^18.14.2",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
     "documentation": "^14.0.0",
-    "eslint": "^8.35.0",
-    "mocha": "^8.4.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "mocha": "^10.8.2",
     "prettier": "^2.8.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.0"
   },
   "dependencies": {
-    "@allmaps/types": "^1.0.0-beta.12",
+    "@allmaps/types": "^1.0.0-beta.15",
     "zod": "^3.22.4"
   }
 }

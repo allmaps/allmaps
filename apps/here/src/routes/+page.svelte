@@ -2,58 +2,52 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
-
-  import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
-  import { parseAnnotation } from '@allmaps/annotation'
-
   import { Header, Loading, URLInput, paramStore } from '@allmaps/ui'
 
   import { Navigation } from '@allmaps/ui/kit'
 
-  import { map } from '$lib/shared/stores/maps.js'
-  import { imageInfo } from '$lib/shared/stores/image-info.js'
+  import {
+    maps,
+    loadMapsFromCoordinates,
+    loadMapsFromUrl
+  } from '$lib/shared/stores/maps.js'
+  import { error } from '$lib/shared/stores/error.js'
+  import { position } from '$lib/shared/stores/geolocation.js'
+  import {
+    selectedMapId,
+    selectedMapWithImageInfo
+  } from '$lib/shared/stores/selected-map.js'
 
   import Here from '$lib/components/Here.svelte'
-  import Suggestions from '$lib/components/Suggestions.svelte'
+  import NearbyMaps from '$lib/components/NearbyMaps.svelte'
 
-  let initialized = false
-  let showForm = false
-  let error: Error | null
+  // eslint-disable-next-line no-undef
+  async function handleGeolocation(position: GeolocationPosition) {
+    loadMapsFromCoordinates(position.coords.latitude, position.coords.longitude)
+  }
 
-  function resetForm() {
-    $map = undefined
-    $imageInfo = undefined
-
-    error = null
-    showForm = true
+  $: {
+    if ($position) {
+      try {
+        handleGeolocation($position)
+      } catch (err) {
+        if (err instanceof Error) {
+          $error = err
+        } else {
+          $error = new Error('Unknown error')
+        }
+      }
+    }
   }
 
   onMount(async () => {
     paramStore.subscribe(async (value) => {
-      initialized = true
       if (!value) {
-        resetForm()
+        $selectedMapId = undefined
       } else {
-        showForm = false
-
-        try {
-          if (value.type === 'url' && value.url) {
-            const annotation = await fetchJson(value.url)
-            const maps = parseAnnotation(annotation)
-
-            const newMap = maps[0]
-
-            $imageInfo = (await fetchImageInfo(
-              newMap.resource.id
-            )) as ImageInformationResponse
-
-            $map = newMap
-          }
-        } catch (err) {
-          if (err instanceof Error) {
-            error = err
-          }
+        if (value.type === 'url' && value.url) {
+          loadMapsFromUrl(value.url)
+          $selectedMapId = value.url
         }
       }
     })
@@ -62,41 +56,23 @@
 
 <Navigation />
 <div class="absolute w-full h-full flex flex-col">
-  <div class="z-10">
-    <Header appName="Here">
-      {#if !showForm && initialized}
-        <URLInput />
-      {/if}
-    </Header>
-  </div>
-  <main class="relative h-full overflow-hidden">
-    {#if showForm}
-      <div class="h-full flex overflow-y-auto">
-        <div
-          class="container mx-auto mt-10 p-2"
-          transition:fade={{ duration: 120 }}
-        >
-          <p class="mb-3 text-2xl">Follow your location on a map</p>
-          <p class="mb-3">
-            Open a IIIF Resource or Georeference Annotation from a URL:
-          </p>
-          <div class="mb-4">
-            <URLInput />
-          </div>
-          <p class="mb-3">
-            Or pick one of these suggestions around your location:
-          </p>
-          <Suggestions />
-        </div>
-      </div>
-    {:else if $map && $imageInfo}
+  <Header appName="Here">
+    {#if $selectedMapId}
+      <URLInput />
+    {/if}
+  </Header>
+  <main class="relative h-full overflow-auto">
+    {#if $selectedMapWithImageInfo}
       <Here />
-    {:else if error}
+    {:else if $maps.size > 0}
+      <section class="p-3" transition:fade={{ duration: 120 }}>
+        <NearbyMaps />
+      </section>
+    {:else if $error}
       <div class="h-full flex flex-col gap-2 items-center justify-center">
-        Error: {error.message}
-        <!-- <ErrorElement {error} /> -->
+        Error: {$error.message}
       </div>
-    {:else if initialized}
+    {:else}
       <div class="h-full flex items-center justify-center">
         <Loading />
       </div>

@@ -10,17 +10,14 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
-    "paths": {
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"]
-    }
+    "strict": true
   },
   "references": [
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/iiif-parser" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/bearing" }
   ]
 }

@@ -1,0 +1,47 @@
+---
+import Face from './Face.astro'
+import Masks from './Masks.svelte'
+---
+
+<div
+  class="about relative p-4 md:p-10 bg-white rounded-lg box max-w-2xl mx-auto my-8"
+>
+  <p>
+    Allmaps is a project by <Face
+      src="bert"
+      name="Bert Spaan"
+      href="https://bertspaan.nl"
+    /> and <Face
+      src="jules"
+      name="Jules Schoonman"
+      href="https://www.tudelft.nl/en/staff/j.a.schoonman"
+    />. We love maps, but we can never find the maps we're looking for. We both
+    think working with digitized maps is far too complicated and expensive. It
+    should be easier and more fun!
+  </p>
+  <div class="not-contents">
+    <div class="absolute w-full h-full top-0 left-0 overflow-hidden">
+      <Masks client:load />
+    </div>
+  </div>
+</div>
+
+<style scoped>
+  .about::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(
+      135deg,
+      rgba(255, 199, 66, 0.4) 0%,
+      rgba(255, 86, 186, 0.4) 100%
+    );
+
+    filter: blur(15px);
+  }
+</style>

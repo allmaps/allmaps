@@ -3,5 +3,5 @@ import type {
   mapMonsterMoods
 } from '$lib/shared/constants.js'
 
-export type MapMonsterColor = typeof mapMonsterColors[number]
-export type MapMonsterMood = typeof mapMonsterMoods[number]
+export type MapMonsterColor = (typeof mapMonsterColors)[number]
+export type MapMonsterMood = (typeof mapMonsterMoods)[number]

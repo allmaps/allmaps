@@ -2,7 +2,8 @@ import { browser } from '$app/environment'
 import { writable } from 'svelte/store'
 
 export const position = writable<GeolocationPosition>()
-export const positionError = writable<GeolocationPositionError | Error>()
+
+import { error } from '$lib/shared/stores/error.js'
 
 const options: PositionOptions = {
   enableHighAccuracy: true,
@@ -14,13 +15,13 @@ function handlePosition(newPosition: GeolocationPosition) {
   position.set(newPosition)
 }
 
-function handleError(error: GeolocationPositionError) {
-  positionError.set(error)
+function handleError(err: GeolocationPositionError) {
+  error.set(err)
 }
 
 if (browser && 'geolocation' in navigator) {
   // TODO: cancel watch on destroy
   navigator.geolocation.watchPosition(handlePosition, handleError, options)
 } else {
-  positionError.set(new Error('Geolocation API is not available'))
+  error.set(new Error('Geolocation API is not available'))
 }

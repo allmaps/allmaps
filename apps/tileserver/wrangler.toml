@@ -1,20 +1,17 @@
 name = "tileserver"
-usage_model = 'unbound'
-main = "dist/worker.es.js"
-compatibility_flags = []
-compatibility_date = "2021-12-29"
-account_id = "514081276e13c9aa2894e2efde2dc41f"
-workers_dev = true
+main = "src/index.ts"
+compatibility_date = "2024-05-24"
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
+USE_CACHE=true
 API_BASE_URL="https://api.allmaps.org"
 TILE_SERVER_BASE_URL="https://allmaps.xyz"
 TILE_VIEWER_BASE_URL="https://tiles.allmaps.org"
 
-[build]
-command="npm run build"
-watch_dir="./src"
+[env.dev.vars]
+USE_CACHE=false
+API_BASE_URL="https://api.allmaps.org"
+TILE_SERVER_BASE_URL="http://localhost:5504"
+TILE_VIEWER_BASE_URL="https://tiles.allmaps.org"
 
-[[rules]]
-type = "ESModule"
-globs = ["**/*.js"]

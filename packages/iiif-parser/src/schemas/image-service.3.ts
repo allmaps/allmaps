@@ -1,14 +1,9 @@
 import { z } from 'zod'
 
 import { Image2ProfileSchema } from './image.2.js'
+import { ImageServiceTypesSchema } from './shared.js'
 
 export const complianceLevels = ['level0', 'level1', 'level2'] as const
-
-export const imageServiceTypes = [
-  'ImageService1',
-  'ImageService2',
-  'ImageService3'
-] as const
 
 export const Presentation3ImageService2Schema = z
   .object({
@@ -26,7 +21,7 @@ export const Presentation3ImageService2Schema = z
 
 export const Presentation3ImageService3Schema = z.object({
   id: z.string().url(),
-  type: z.enum(imageServiceTypes),
+  type: ImageServiceTypesSchema,
   profile: z.enum(complianceLevels)
 })
 

@@ -2,11 +2,14 @@ import { defineConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {
     port: ports.explore
   },
-  plugins: [sveltekit()]
+  plugins: [sveltekit()],
+  ssr: {
+    noExternal: ['maplibre-gl', 'maplibre-contour']
+  }
 })

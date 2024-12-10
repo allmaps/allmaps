@@ -2,13 +2,16 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["vite-plugin-glsl/ext"],
+    "paths": {}
   },
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/id" },
     { "path": "../../packages/stdlib" },
+    { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/triangulate" },
     { "path": "../../packages/types" }

@@ -9,7 +9,10 @@ import {
   parseTransformOptions,
   parseTransformationType
 } from '../../lib/parse.js'
-import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+import {
+  addAnnotationOptions,
+  addCoordinateTransformOptions
+} from '../../lib/options.js'
 import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
 
 export default function geojson() {
@@ -21,7 +24,7 @@ export default function geojson() {
     )
 
   command = addAnnotationOptions(command)
-  command = addTransformOptions(command)
+  command = addCoordinateTransformOptions(command)
 
   return command.action(async (files, options) => {
     const map = parseMap(options)
@@ -35,13 +38,14 @@ export default function geojson() {
       throw new Error('Inverse transformation not supported for this command')
     }
 
-    const geoJsonGeometries = await parseJsonInput(files as string[])
+    const geojsonGeometries = await parseJsonInput(files as string[])
 
+    // TODO: consider to use transformGeojsonFeatureCollectionToSvgString()
     const svgGeometries = []
-    for (const geoJsonGeometry of geoJsonGeometries) {
-      if (isGeojsonGeometry(geoJsonGeometry)) {
+    for (const geojsonGeometry of geojsonGeometries) {
+      if (isGeojsonGeometry(geojsonGeometry)) {
         const svgGeometry = transformer.transformGeojsonToSvg(
-          geoJsonGeometry,
+          geojsonGeometry,
           transformOptions
         )
         svgGeometries.push(svgGeometry)

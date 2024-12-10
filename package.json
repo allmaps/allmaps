@@ -6,11 +6,13 @@
     "watch": "pnpm --recursive --parallel run watch",
     "dev": "pnpm --recursive --parallel run dev",
     "types": "pnpm --recursive run types",
+    "build:packages": "pnpm --recursive --filter \"./packages/**\" run build",
+    "build:apps": "pnpm --recursive --filter \"./apps/**\" run build",
+    "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
     "build": "pnpm --recursive run build",
+    "check": "pnpm --recursive run check",
     "lint": "pnpm --recursive run lint",
     "test": "pnpm --recursive run test",
-    "check": "pnpm --recursive run check",
-    "init": "pnpm run build:dev && pnpm run check",
     "documentation": "pnpm --recursive run documentation",
     "precommit": "pnpm run types && pnpm run test && pnpm run lint && pnpm run documentation",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
@@ -25,5 +27,5 @@
   "engines": {
     "node": ">=20.8.0"
   },
-  "packageManager": "pnpm@8.10.0"
+  "packageManager": "pnpm@8.10.0+sha512.9c2cb83f2b6cf6a25d8c58300bf99197c7ef3be84cf3e766f29054b40b83b42f8aaba6fcc314a9ecf27c00f7ce80a757bb4c608800e7adbe2d29dc5c7056f5be"
 }

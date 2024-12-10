@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
+    { "path": "./packages/basemap" },
     { "path": "./packages/annotation" },
     { "path": "./packages/id" },
     { "path": "./packages/iiif-parser" },
@@ -12,6 +13,7 @@
     { "path": "./packages/transform" },
     { "path": "./packages/triangulate" },
     { "path": "./packages/types" },
-    { "path": "./packages/ui" }
+    { "path": "./packages/ui" },
+    { "path": "./packages/bearing" }
   ]
 }

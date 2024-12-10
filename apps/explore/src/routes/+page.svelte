@@ -2,8 +2,11 @@
   import { onMount } from 'svelte'
 
   import { Map, addProtocol } from 'maplibre-gl'
-  import layers from 'protomaps-themes-base'
+  import maplibregl from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
+  import { uniqWith } from 'lodash-es'
+
+  import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
@@ -15,6 +18,7 @@
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
+  // TODO: load from config/env
   const pmtilesUrl =
     'https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
 
@@ -22,16 +26,16 @@
   let map: Map
   let warpedMapLayer: WarpedMapLayer
 
-  let currentAnnotationUrl: string | undefined
-
   let layersAdded = false
 
   let features: MapGeoJSONFeature[] = []
 
   let lastModifiedAgo: string | undefined = ''
 
-  const maxMaxAea = 50_000_000_000
-  let maxArea = 5_000_000_000
+  const minMaxArea = 100_000
+  const maxMaxAea = 500_000_000_000
+
+  let maxAreaSqrt = Math.sqrt(5_000_000_000)
 
   function getFilters(maxAea: number): FilterSpecification {
     return [
@@ -44,15 +48,24 @@
 
   $: {
     if (layersAdded) {
-      map.setFilter('masks', getFilters(maxArea))
+      map.setFilter('masks', getFilters(maxAreaSqrt ** 2))
       updateFeatures()
     }
   }
 
   function updateFeatures() {
-    features = map.queryRenderedFeatures({
+    const newFeatures = map.queryRenderedFeatures({
       layers: ['masks']
     })
+
+    features = uniqWith(
+      newFeatures,
+      (a: MapGeoJSONFeature, b: MapGeoJSONFeature) =>
+        a.properties.id === b.properties.id
+    ).toSorted(
+      (a: MapGeoJSONFeature, b: MapGeoJSONFeature) =>
+        a.properties.area - b.properties.area
+    )
   }
 
   async function showOnMap(annotationUrl: string) {
@@ -60,7 +73,6 @@
       warpedMapLayer.clear()
 
       await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-      currentAnnotationUrl = annotationUrl
     }
   }
 
@@ -73,7 +85,11 @@
   }
 
   function getViewerUrl(feature: MapGeoJSONFeature) {
-    return `https://dev.viewer.allmaps.org/?url=${feature.properties.id}`
+    return `https://viewer.allmaps.org/?url=${feature.properties.id}`
+  }
+
+  function getEditorUrl(feature: MapGeoJSONFeature) {
+    return `https://editor.allmaps.org/?#/collection?url=${feature.properties.resourceId}/info.json`
   }
 
   onMount(() => {
@@ -82,29 +98,16 @@
 
     map = new Map({
       container,
-      style: {
-        version: 8,
-        glyphs:
-          'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
-        sources: {
-          protomaps: {
-            type: 'vector',
-            tiles: [
-              'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=ca7652ec836f269a'
-            ],
-            maxzoom: 14,
-            attribution:
-              '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>'
-          }
-        },
-        layers: layers('protomaps', 'light')
-      },
+      // @ts-expect-error maplibre-gl types are incomplete
+      style: basemapStyle('en'),
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
       preserveDrawingBuffer: true,
       hash: true
     })
+
+    addTerrain(map, maplibregl)
 
     map.on('load', () => {
       map.addSource('masks', {
@@ -171,10 +174,10 @@
     <div bind:this={container} />
     <aside class="relative p-2 flex flex-col min-h-0">
       <ol class="w-full h-full overflow-auto grid auto-rows-min gap-2">
-        {#each features.slice(0, 25) as feature}
+        {#each features.slice(0, 25) as feature (feature.properties.id)}
           <li class="grid gap-2">
             {#await fetchImageInfo(feature.properties.resourceId)}
-              <p>Loading...</p>
+              <p class="h-[300px]">Loading...</p>
             {:then imageInfo}
               <a href={getViewerUrl(feature)}>
                 <Thumbnail
@@ -195,9 +198,10 @@
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
                   >Copy URL</button
                 >
-                <a class="underline" href={getViewerUrl(feature)}
-                  >Open in Allmaps Viewer</a
-                >
+                <div>
+                  <a class="underline" href={getViewerUrl(feature)}>viewer</a> /
+                  <a class="underline" href={getEditorUrl(feature)}>editor</a>
+                </div>
               </div>
             {:catch error}
               <p style="color: red">{error.message}</p>
@@ -209,10 +213,10 @@
         <label
           >Max. area: <input
             class="w-full"
-            bind:value={maxArea}
-            min="10000"
-            max={maxMaxAea}
-            step={maxMaxAea / 100}
+            bind:value={maxAreaSqrt}
+            min={Math.sqrt(minMaxArea)}
+            max={Math.sqrt(maxMaxAea)}
+            step={(Math.sqrt(maxMaxAea) - Math.sqrt(minMaxArea)) / 100}
             type="range"
           /></label
         >

@@ -1,4 +1,5 @@
-import typegraphy from '@tailwindcss/typography'
+import typography from '@tailwindcss/typography'
+import containerQueries from '@tailwindcss/container-queries'
 
 import { theme } from '@allmaps/tailwind'
 
@@ -10,5 +11,5 @@ export default {
     './dist/components/**/*.{html,js,svelte,ts}'
   ],
   theme,
-  plugins: [typegraphy]
+  plugins: [typography, containerQueries]
 } satisfies Config
