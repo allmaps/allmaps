@@ -79,7 +79,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       zod:
         specifier: ^3.22.4
@@ -158,7 +158,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -243,7 +243,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -416,7 +416,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -477,7 +477,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -571,7 +571,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -625,7 +625,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       upng-js:
         specifier: ^2.1.0
@@ -701,7 +701,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -770,7 +770,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       upng-js:
         specifier: ^2.1.0
@@ -879,7 +879,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -922,7 +922,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       zod-validation-error:
         specifier: ^1.5.0
@@ -965,7 +965,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/bearing:
@@ -1002,7 +1002,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/id:
@@ -1039,7 +1039,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/iiif-parser:
@@ -1082,7 +1082,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/leaflet:
@@ -1134,7 +1134,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -1177,7 +1177,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -1223,7 +1223,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -1311,7 +1311,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -1360,7 +1360,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/stdlib:
@@ -1412,7 +1412,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/tailwind:
@@ -1442,7 +1442,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/transform:
@@ -1497,7 +1497,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
@@ -1558,7 +1558,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/types:
@@ -1585,7 +1585,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
 
   packages/ui:
@@ -1661,7 +1661,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.16
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.7.0
         version: 5.7.2
       vite:
         specifier: ^5.0.3
