@@ -98,7 +98,8 @@
 
     map = new Map({
       container,
-      style: basemapStyle("en"),
+      // @ts-expect-error maplibre-gl types are incomplete
+      style: basemapStyle('en'),
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
@@ -106,8 +107,6 @@
       hash: true
     })
 
-    // @ts-expect-error maplibregl is a global UMD module
-    // eslint-disable-next-line no-undef
     addTerrain(map, maplibregl)
 
     map.on('load', () => {
