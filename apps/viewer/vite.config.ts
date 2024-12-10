@@ -7,7 +7,7 @@ import { sveltekit } from '@sveltejs/kit/vite'
 // crypto has SubtleCrypto which is needed in the @allmaps/id package
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {

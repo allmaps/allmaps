@@ -3,7 +3,7 @@ import starlight from '@astrojs/starlight'
 import tailwind from '@astrojs/tailwind'
 import svelte from '@astrojs/svelte'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 

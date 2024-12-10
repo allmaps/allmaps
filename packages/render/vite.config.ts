@@ -3,7 +3,7 @@ import glsl from 'vite-plugin-glsl'
 import noBundlePlugin from 'vite-plugin-no-bundle'
 import dts from 'vite-plugin-dts'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {

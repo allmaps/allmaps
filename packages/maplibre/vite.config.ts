@@ -1,7 +1,7 @@
 import { defineConfig, type PluginOption } from 'vite'
 import { exec } from 'child_process'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 // Create TypeScript definition files
 // TODO: move to @allmaps/stdlib?
