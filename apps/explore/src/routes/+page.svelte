@@ -132,6 +132,7 @@
 
     map = new Map({
       container,
+      // @ts-expect-error incorrect MapLibre types
       style: basemapStyle('en'),
       center: [14.2437, 40.8384],
       zoom: 7,
