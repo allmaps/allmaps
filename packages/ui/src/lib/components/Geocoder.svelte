@@ -1,8 +1,6 @@
 <script lang="ts">
   import { Combobox } from 'bits-ui'
 
-  let touchedInput = false
-
   import { throttle } from 'lodash-es'
   import { createEventDispatcher } from 'svelte'
   import searchIcon from '$lib/shared/images/search.svg'
@@ -10,7 +8,12 @@
   import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
   import type GeocoderProvider from '$lib/shared/geocoder/provider'
 
-  type Item<T> = { value: T; label?: string }
+  type Item<T> = {
+    value: T
+    label?: string
+  }
+
+  let touchedInput = false
 
   export let providers: GeocoderProvider[]
 
@@ -38,14 +41,23 @@
     for (let [index, provider] of providers.entries()) {
       provider.getFeatures(text).then((features) => {
         featuresByProviderIndex[index] = features
+          .slice(0, 5)
+          .map((feature) => ({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              provider: provider.name
+            }
+          }))
       })
     }
   }
 
-  $: features = featuresByProviderIndex.flat(1).slice(0, 5)
-  $: featuresItems = features.map((feature) => {
-    return { value: feature, label: feature.properties.label }
-  })
+  $: features = featuresByProviderIndex.flat(1)
+  $: featuresItems = features.map((feature) => ({
+    value: feature,
+    label: feature.properties.label
+  }))
 
   const dispatch = createEventDispatcher()
 
@@ -72,8 +84,8 @@
       class="pl-10 pr-2 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
         focus:z-10 focus:outline-none
         focus:ring-2 focus:ring-pink w-full"
-      placeholder="Search Location"
-      aria-label="Search Location"
+      placeholder="Search location"
+      aria-label="Search location"
       spellcheck="false"
       autocomplete="off"
       type="search"
@@ -81,29 +93,44 @@
     />
   </div>
 
-  <Combobox.Content
-    class="w-full rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md outline-none"
-    sideOffset={8}
-  >
-    {#each features as feature}
-      <Combobox.Item
-        class="flex items-center h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
-        value={feature}
-        label={feature.properties.label}
-      >
-        {feature.properties.label}
-        {#if feature.properties.alt}
-          <span class="text-gray before:content-['〜'] before:ml-1 before:mr-1"
-            >{feature.properties.alt}</span
-          >
-        {/if}
-      </Combobox.Item>
-    {:else}
-      <span
-        class="flex items-center h-10 px-2 py-2 text-sm text-muted-foreground text-gray"
-      >
-        No results found
-      </span>
-    {/each}
-  </Combobox.Content>
+  {#if inputValue !== ''}
+    <Combobox.Content
+      class="w-full rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md outline-none"
+      sideOffset={8}
+    >
+      {#each features as feature}
+        <Combobox.Item
+          class="flex items-center justify-between h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
+          value={feature}
+          label={feature.properties.label}
+        >
+          <div>
+            {feature.properties.label}
+            {#if feature.properties.alt}
+              <span
+                class="text-gray before:content-['〜'] before:ml-1 before:mr-1"
+                >{feature.properties.alt}</span
+              >
+            {/if}
+          </div>
+          <div>
+            {#if feature.properties.provider === 'World Historical Gazetteer' && 'index_id' in feature.properties}
+              <a
+                href="https://whgazetteer.org/places/{feature.properties
+                  .index_id}/portal/"
+                class="text-xs text-white uppercase bg-gray-200 px-2 py-0.5 rounded-lg"
+                >whg</a
+              >
+            {/if}
+          </div>
+        </Combobox.Item>
+      {:else}
+        <span
+          class="flex items-center h-10 px-2 py-2 text-sm text-muted-foreground text-gray"
+        >
+          No results found
+        </span>
+      {/each}
+    </Combobox.Content>
+  {/if}
 </Combobox.Root>

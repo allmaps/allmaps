@@ -2,11 +2,17 @@ import GeocoderProvider from '../provider.js'
 
 import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
 
-import type { GeocoderGeoJsonFeature } from '$lib/shared/types.js'
+import type { GeocoderProviderGeoJsonFeature } from '$lib/shared/types.js'
+
+type GeoJsonFeatureWHGProperties = {
+  title: string
+  variants?: string[]
+  ccodes?: string[]
+}
 
 type GeoJsonFeatureWHG = {
   geometry?: GeojsonGeometry
-  properties: { title: string; variants?: string[]; ccodes?: string[] }
+  properties: GeoJsonFeatureWHGProperties
 }
 // WHG returns GeoJSON Features, but not always points, and sometimes even without geometry.
 
@@ -17,18 +23,29 @@ export default class WorldHistoricalGazetteer extends GeocoderProvider {
   // Strangly WHG seems to crash for some common search terms
   // Example: https://whgazetteer.org/api/index/?name=London
 
-  queryFunction = (text: string) =>
-    `https://whgazetteer.org/api/index/?name=${text}`
+  private getLabel(properties: GeoJsonFeatureWHGProperties) {
+    if (properties.ccodes) {
+      return properties.title + ', ' + properties.ccodes.join(', ')
+    } else {
+      return properties.title
+    }
+  }
 
-  featuresFunction = (features: unknown[]) =>
-    (features as GeoJsonFeatureWHG[])
+  queryFunction(text: string) {
+    return `https://whgazetteer.org/api/index/?name=${text}`
+  }
+
+  featuresFunction(features: unknown[]) {
+    return (features as GeoJsonFeatureWHG[])
       .filter((feature) => feature.geometry?.type == 'Point')
       .map(({ geometry, properties }) => ({
+        type: 'Feature',
         geometry: geometry as GeojsonPoint,
         properties: {
-          label: properties.title + ', ' + properties.ccodes?.join(', '),
+          label: this.getLabel(properties),
           alt: properties.variants?.join(', '),
           ...properties
         }
-      })) as GeocoderGeoJsonFeature[]
+      })) as GeocoderProviderGeoJsonFeature[]
+  }
 }
