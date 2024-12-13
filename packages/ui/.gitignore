@@ -1,2 +1,5 @@
 package
 
+.env
+.env.*
+!.env.example

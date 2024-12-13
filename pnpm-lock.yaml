@@ -112,6 +112,9 @@ importers:
         specifier: ^3.0.6
         version: 3.2.1
     devDependencies:
+      '@allmaps/types':
+        specifier: 1.0.0-beta.13
+        version: 1.0.0-beta.13
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
         version: 3.0.6(@sveltejs/kit@2.9.1)
@@ -1591,17 +1594,23 @@ importers:
   packages/ui:
     dependencies:
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: 1.0.0-beta.40
         version: link:../iiif-parser
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: 1.0.0-beta.14
         version: link:../tailwind
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: 1.0.0-beta.15
         version: link:../types
+      bits-ui:
+        specifier: ^0.21.12
+        version: 0.21.12(svelte@4.2.19)
       flowbite:
         specifier: ^1.6.4
         version: 1.8.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
@@ -1624,6 +1633,9 @@ importers:
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.57.1)(typescript@5.7.2)
@@ -1710,6 +1722,10 @@ packages:
       '@turf/midpoint': 6.5.0
       ml-matrix: 6.12.0
     dev: false
+
+  /@allmaps/types@1.0.0-beta.13:
+    resolution: {integrity: sha512-X/OPatNULf8c7Dnq90Wq6Kg6xaRaq+DbF0CFO/JkoQxMjH30OqGmNvAIPhtqLqdTvhO7XWzpkoFsXRqCuKNoNg==}
+    dev: true
 
   /@allmaps/types@1.0.0-beta.14:
     resolution: {integrity: sha512-5HQfCesCv3PnYGzM+a05IWY3+3S5xqkil3BXK1bHtidfxgNgT0kL1y06waoqQagXTbYISy2o0ap0EF0pTNVRjQ==}
@@ -3021,6 +3037,12 @@ packages:
     dev: false
     optional: true
 
+  /@internationalized/date@3.5.4:
+    resolution: {integrity: sha512-qoVJVro+O0rBaw+8HPjUB1iH8Ihf8oziEnqMnvhJUSuVIrHOuZ6eNLHNvzXJKUvAtaDiqMnRlg8Z2mgh09BlUw==}
+    dependencies:
+      '@swc/helpers': 0.5.12
+    dev: false
+
   /@internationalized/date@3.6.0:
     resolution: {integrity: sha512-+z6ti+CcJnRlLHok/emGEsWQhe7kfSmEW+/6qCzvKY67YPh7YOBfvc7+/+NXq+zJlbArg30tYpqLjNgcAYv2YQ==}
     dependencies:
@@ -4133,6 +4155,12 @@ packages:
       vitefu: 0.2.5(vite@5.4.11)
     transitivePeerDependencies:
       - supports-color
+
+  /@swc/helpers@0.5.12:
+    resolution: {integrity: sha512-KMZNXiGibsW9kvZAO1Pam2JPTDBm+KSHMMHWdsyI/1DbIZjT2A6Gy3hblVXUMEDvUAKq+e0vL0X0o54owWji7g==}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
 
   /@swc/helpers@0.5.15:
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -5487,6 +5515,17 @@ packages:
   /birpc@0.2.14:
     resolution: {integrity: sha512-37FHE8rqsYM5JEKCnXFyHpBCzvgHEExwVVTq+nUmloInU7l8ezD1TpOhKpS8oe1DTYFqEK27rFZVKG43oTqXRA==}
     dev: true
+
+  /bits-ui@0.21.12(svelte@4.2.19):
+    resolution: {integrity: sha512-Cf0iB+ZKwA0ZjkpixrhrZK9PC6pGPFleW/65Xc/z0lpGvWaFtdOhiYEntCHHxZ0VihP3aJaG0OBhUBIbmAePaA==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.118
+    dependencies:
+      '@internationalized/date': 3.5.4
+      '@melt-ui/svelte': 0.76.2(svelte@4.2.19)
+      nanoid: 5.0.7
+      svelte: 4.2.19
+    dev: false
 
   /bits-ui@0.21.16(svelte@4.2.19):
     resolution: {integrity: sha512-XFZ7/bK7j/K+5iktxX/ZpmoFHjYjpPzP5EOO/4bWiaFg5TG1iMcfjDhlBTQnJxD6BoVoHuqeZPHZvaTgF4Iv3Q==}
@@ -10382,6 +10421,12 @@ packages:
     resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid@5.0.7:
+    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    dev: false
 
   /nanoid@5.0.9:
     resolution: {integrity: sha512-Aooyr6MXU6HpvvWXKoVoXwKMs/KyVakWwg7xQfv5/S/RIgJMy0Ifa45H9qqYy7pTCszrHzP21Uk4PZq2HpEM8Q==}

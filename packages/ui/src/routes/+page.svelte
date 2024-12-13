@@ -7,11 +7,21 @@
 
   import MapMonster from '$lib/components/MapMonster.svelte'
 
+  import Geocoder from '$lib/components/Geocoder.svelte'
+
   import { shades, originalColorIndex } from '@allmaps/tailwind'
 
   import { mapMonsterColors, mapMonsterMoods } from '$lib/shared/constants.js'
 
+  import GeocodeEarth from '$lib/shared/geocoder/providers/geocode-earth'
+  import WorldHistoricalGazetteer from '$lib/shared/geocoder/providers/world-historical-gazetteer'
+  import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
+
   let opacity = 1
+
+  function handleGeocoderSelect(event: CustomEvent) {
+    console.log('Geocoder select:', event.detail)
+  }
 </script>
 
 <Header appName="Style Guide">
@@ -19,6 +29,16 @@
 </Header>
 
 <main class="container mx-auto p-4 space-y-8">
+  <section>
+    <h1 class="text-xl font-bold mb-4">Icons:</h1>
+    <Geocoder
+      providers={[
+        new GeocodeEarth(PUBLIC_GEOCODE_EARTH_API_KEY),
+        new WorldHistoricalGazetteer()
+      ]}
+      on:select={handleGeocoderSelect}
+    />
+  </section>
   <section>
     <h1 class="text-xl font-bold mb-4">Colors:</h1>
     <ul class="flex flex-row basis-full gap-2">

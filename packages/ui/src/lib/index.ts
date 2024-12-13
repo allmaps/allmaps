@@ -10,6 +10,7 @@ import Loading from '$lib/components/Loading.svelte'
 import Logo from '$lib/components/Logo.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 import NorthArrow from '$lib/components/NorthArrow.svelte'
+import Geocoder from '$lib/components/Geocoder.svelte'
 import Slider from '$lib/components/Slider.svelte'
 import Stats from '$lib/components/Stats.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
@@ -42,6 +43,7 @@ export {
   Logo,
   MapMonster,
   NorthArrow,
+  Geocoder,
   Slider,
   Stats,
   Thumbnail,
