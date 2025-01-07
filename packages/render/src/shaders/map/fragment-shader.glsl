@@ -56,7 +56,7 @@ void main() {
   int cachedTilesCount = cachedTilesTextureSize.z;
 
   // Setting references for the for loop
-  int smallestScaleFactor = int(pow(2.0, 8.0)); // Starting with very high number
+  int smallestScaleFactor;
   bool found = false;
   int foundIndex;
 
@@ -64,7 +64,7 @@ void main() {
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
 
   // Set the initial values
-  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);;
+  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
   // Loop through all cached tiles
   for(int index = 0; index < cachedTilesCount; index += 1) {
@@ -83,11 +83,12 @@ void main() {
       resourceTrianglePointY >= cachedTileResourceOriginPointY &&
       resourceTrianglePointY < cachedTileResourceOriginPointY + cachedTileDimensionHeight) {
 
-      // If the scale factor of this tile is smaller (more detailed) then the scale factor currently known
+      // If the smallest scale factor currently known is not set yet,
+      // or if the scale factor of this tile is smaller (more detailed) then the scale factor currently known
       // update the smallest scale factor
       // and compute the cached tiles texture point that corresponds to the triangle point
       // Note: we can safely take the most detailed tile, since the depth is limited when we gather texture tiles
-      if(cachedTileScaleFactor < smallestScaleFactor) {
+      if(!(smallestScaleFactor > 0) || cachedTileScaleFactor <= smallestScaleFactor) {
         smallestScaleFactor = cachedTileScaleFactor;
         found = true;
         foundIndex = index;
