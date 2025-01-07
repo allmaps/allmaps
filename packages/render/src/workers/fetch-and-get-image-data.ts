@@ -7,16 +7,15 @@ import type { FetchFn } from '@allmaps/types'
 const fetchAndGetImageDataWorker = {
   async getImageData(
     tileUrl: string,
-    abortControllerSignal: AbortSignal,
+    onAbort: () => void, // Define as a no-arguments function
     fetchFn: FetchFn | undefined,
     width: number,
     height: number
   ): Promise<ImageData> {
     const workerAbortController = new AbortController()
 
-    abortControllerSignal.onabort = () => {
-      workerAbortController.abort()
-    }
+    // Connect the abort signal with a listener
+    onAbort()
 
     const response = await fetchUrl(
       tileUrl,

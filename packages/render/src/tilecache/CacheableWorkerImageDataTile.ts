@@ -36,7 +36,7 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
       wrappedWorker
         .getImageData(
           this.tileUrl,
-          Comlink.proxy(this.abortController.signal),
+          Comlink.proxy(() => this.abortController.abort()),
           this.fetchFn,
           this.tile.tileZoomLevel.width,
           this.tile.tileZoomLevel.height
@@ -46,6 +46,14 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
           )
+          worker.terminate()
+        })
+        .catch((err) => {
+          if (err instanceof Error && err.name === 'AbortError') {
+            console.log('Fetch aborted') // Handle the abort error
+          } else {
+            console.error(err) // Handle other errors
+          }
           worker.terminate()
         })
     } catch (err) {
