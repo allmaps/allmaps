@@ -1,0 +1,3 @@
+- Add URL params
+- Add IIIF Collection support
+- Copy button in Annotation
