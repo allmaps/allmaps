@@ -88,31 +88,28 @@ importers:
   apps/editor:
     dependencies:
       '@allmaps/annotation':
-        specifier: workspace:^1.0.0-beta.27
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: workspace:^1.0.0-beta.27
+        specifier: ^1.0.0-beta.30
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: workspace:^1.0.0-beta.37
+        specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
-      '@allmaps/maplibre':
-        specifier: workspace:^1.0.0-beta.25
-        version: link:../../packages/maplibre
       '@allmaps/openlayers':
-        specifier: workspace:^1.0.0-beta.68
+        specifier: ^1.0.0-beta.73
         version: link:../../packages/openlayers
       '@allmaps/stdlib':
-        specifier: workspace:^1.0.0-beta.28
+        specifier: ^1.0.0-beta.31
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: workspace:^1.0.0-beta.12
+        specifier: ^1.0.0-beta.14
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: workspace:^1.0.0-beta.38
+        specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
       '@allmaps/ui':
-        specifier: workspace:^1.0.0-beta.29
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
