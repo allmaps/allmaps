@@ -26,7 +26,7 @@ export async function getBackgroundColor(map: Map, parsedImage: Image) {
   const url = parsedImage.getImageUrl(imageRequest)
   const imageBitmap = await fetchImageBitmap(url)
 
-  const scale = imageBitmap.width / map.resource.width
+  const scale = imageBitmap.width / parsedImage.width
 
   const mask: Ring = map.resourceMask.map((point) => [
     point[0] * scale,

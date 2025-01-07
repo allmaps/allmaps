@@ -96,8 +96,8 @@ function parseDates(annotation: AnnotationAllVersions) {
 }
 
 function parseImageDimensions(annotation: AnnotationAllVersions): {
-  width: number
-  height: number
+  width: number | undefined
+  height: number | undefined
 } {
   if (isAnnotation1(annotation)) {
     return {

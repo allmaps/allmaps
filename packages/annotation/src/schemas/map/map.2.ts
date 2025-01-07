@@ -15,8 +15,8 @@ export const GCPSchema = z.object({
 
 export const ResourceSchema = z.object({
   id: z.string().url(),
-  width: z.number(),
-  height: z.number(),
+  height: z.number().positive().optional(),
+  width: z.number().positive().optional(),
   type: ImageServiceSchema,
   partOf: PartOfSchema.array().optional()
 })

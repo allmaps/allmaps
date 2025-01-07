@@ -51,8 +51,8 @@ export const SourceSchema1 = z.object({
 export const SourceSchema2 = z.object({
   id: z.string().url(),
   type: ImageServiceSchema,
-  height: z.number().positive(),
-  width: z.number().positive(),
+  height: z.number().positive().optional(),
+  width: z.number().positive().optional(),
   partOf: PartOfSchema.array().optional()
 })
 

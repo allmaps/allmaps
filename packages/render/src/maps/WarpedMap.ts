@@ -1,4 +1,3 @@
-import { generateId } from '@allmaps/id'
 import { Map as GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
@@ -136,7 +135,6 @@ export default class WarpedMap extends EventTarget {
   resourceFullMaskRectangle: Rectangle
 
   imageInformations?: ImageInformations
-  imageId?: string
   parsedImage?: Image
   loadingImageInfo: boolean
 
@@ -226,15 +224,20 @@ export default class WarpedMap extends EventTarget {
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
 
-    this.resourceFullMask = [
-      [0, 0],
-      [this.georeferencedMap.resource.width, 0],
-      [
-        this.georeferencedMap.resource.width,
-        this.georeferencedMap.resource.height
-      ],
-      [0, this.georeferencedMap.resource.height]
-    ]
+    const resourceWidth = this.georeferencedMap.resource.width
+    const resourceHeight = this.georeferencedMap.resource.height
+
+    if (resourceWidth && resourceHeight) {
+      this.resourceFullMask = [
+        [0, 0],
+        [resourceWidth, 0],
+        [resourceWidth, resourceHeight],
+        [0, resourceHeight]
+      ]
+    } else {
+      this.resourceFullMask = bboxToRectangle(this.resourceMaskBbox)
+    }
+
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
 
@@ -527,7 +530,7 @@ export default class WarpedMap extends EventTarget {
    * @returns {this is WarpedMapWithImageInfo}
    */
   hasImageInfo(): this is WarpedMapWithImageInfo {
-    return this.imageId !== undefined && this.parsedImage !== undefined
+    return this.parsedImage !== undefined
   }
 
   /**
@@ -555,7 +558,6 @@ export default class WarpedMap extends EventTarget {
       }
 
       this.parsedImage = Image.parse(imageInfo)
-      this.imageId = await generateId(imageUri)
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
     } catch (err) {
