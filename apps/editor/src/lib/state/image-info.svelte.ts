@@ -1,12 +1,14 @@
 import { setContext, getContext } from 'svelte'
-import { SvelteMap } from 'svelte/reactivity'
 
 import { fetchImageInfo } from '@allmaps/stdlib'
 
 const IMAGE_INFO_KEY = Symbol('image-infos')
 
 export class ImageInfoState {
-  #imageInfoByImageId = $state<SvelteMap<string, unknown>>(new SvelteMap())
+  // TODO: find out why using $state here makes Examples.svelte
+  // call this class's fetchImageInfo function too many times
+  // #imageInfoByImageId = $state<SvelteMap<string, unknown>>(new SvelteMap())
+  #imageInfoByImageId: Map<string, unknown> = new Map()
 
   async fetchImageInfo(imageId: string) {
     if (this.#imageInfoByImageId.has(imageId)) {

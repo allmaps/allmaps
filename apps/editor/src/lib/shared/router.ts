@@ -2,7 +2,7 @@ import { goto } from '$app/navigation'
 
 import type { Page } from '@sveltejs/kit'
 
-import type { RouteID, Params } from '$lib/shared/types.js'
+import type { RouteID, Params } from '$lib/types/shared.js'
 
 export function createRouteUrl(
   $page: Page,

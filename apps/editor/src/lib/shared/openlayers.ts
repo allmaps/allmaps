@@ -1,4 +1,4 @@
-import Feature, { type FeatureLike } from 'ol/Feature'
+import Feature from 'ol/Feature'
 import { Geometry, Polygon, MultiPoint } from 'ol/geom'
 import { shiftKeyOnly, singleClick } from 'ol/events/condition'
 import { Fill, Stroke, Style, Text, Circle } from 'ol/style'
@@ -12,7 +12,10 @@ import { pink } from '@allmaps/tailwind'
 import { getResourceMask } from '$lib/shared/maps.js'
 import { transformResourceMaskToGeo } from '$lib/shared/transform.js'
 
-import type { DbMap, ResourceMask } from '$lib/shared/types.js'
+import type { FeatureLike } from 'ol/Feature'
+
+import type { DbMap, ResourceMask } from '$lib/types/maps.js'
+import type { LabelIndexFromGcpIdFn } from '$lib/types/shared.js'
 
 function polygonToResourceMask(coordinates: Coordinate[][]): ResourceMask {
   const resourceMask = coordinates[0]
@@ -107,7 +110,10 @@ export function editableResourceMaskStyle(feature: FeatureLike) {
   ]
 }
 
-export function gcpStyle(feature: FeatureLike) {
+export function gcpStyle(
+  feature: FeatureLike,
+  labelIndexFromGcpId: LabelIndexFromGcpIdFn
+) {
   const active = feature.getProperties().active || false
 
   return new Style({
@@ -121,14 +127,17 @@ export function gcpStyle(feature: FeatureLike) {
         color: pink
       })
     }),
-    text: gcpTextStyle(feature)
+    text: gcpTextStyle(feature, labelIndexFromGcpId)
   })
 }
 
-function gcpTextStyle(feature: FeatureLike) {
+function gcpTextStyle(
+  feature: FeatureLike,
+  labelIndexFromGcpId: LabelIndexFromGcpIdFn
+) {
   return new Text({
     scale: 1.5,
-    text: gcpLabel(feature),
+    text: gcpLabel(feature, labelIndexFromGcpId),
     fill: new Fill({ color: '#000' }),
     stroke: new Stroke({ color: '#fff', width: 2 }),
     offsetX: 14,
@@ -136,9 +145,15 @@ function gcpTextStyle(feature: FeatureLike) {
   })
 }
 
-function gcpLabel(feature: FeatureLike) {
-  const properties = feature.getProperties()
-  return String(properties.index + 1)
+function gcpLabel(
+  feature: FeatureLike,
+  labelIndexFromGcpId: LabelIndexFromGcpIdFn
+) {
+  const gcpId = feature.getId()
+  if (gcpId && typeof gcpId === 'string') {
+    const labelIndex = labelIndexFromGcpId(gcpId)
+    return String(labelIndex + 1)
+  }
 }
 
 export function getResourceMaskPolygon(map: DbMap): Polygon {

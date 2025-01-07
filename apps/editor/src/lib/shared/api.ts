@@ -1,7 +1,7 @@
 import { generateChecksum } from '@allmaps/id'
 import { fetchJson } from '@allmaps/stdlib'
 
-import type { Source } from '$lib/shared/types.js'
+import type { Source } from '$lib/types/shared.js'
 
 import { PUBLIC_ALLMAPS_API_URL } from '$env/static/public'
 

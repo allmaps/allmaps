@@ -36,16 +36,18 @@
   import type { ModifyEvent } from 'ol/interaction/Modify'
 
   import type {
-    DbImageService,
-    DbMaps,
-    DbMap,
-    ResourceMask,
     InsertMapEvent,
     RemoveMapEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent
-  } from '$lib/shared/types.js'
+  } from '$lib/types/events.js'
+  import type {
+    DbImageService,
+    DbMaps,
+    DbMap,
+    ResourceMask
+  } from '$lib/types/maps.js'
 
   let resourceOlMapTarget: HTMLDivElement
   let resourceOlMap: OLMap
@@ -127,7 +129,8 @@
         mapId,
         map: {
           id: mapId,
-          version: 2,
+          version: 3,
+
           gcps: {},
           resource: {
             id: allmapsId,

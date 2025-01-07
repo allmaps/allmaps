@@ -18,7 +18,7 @@
   import { setExamplesState } from '$lib/state/examples.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
 
-  import { Header, Stats, Loading } from '@allmaps/ui'
+  import { Banner, Header, Stats, Loading } from '@allmaps/ui'
 
   import URLInput from '$lib/components/URLInput.svelte'
   import Controls from '$lib/components/Controls.svelte'
@@ -34,6 +34,8 @@
 
   const { children }: { children: Snippet } = $props()
 
+  const views = ['images', 'mask', 'georeference', 'results']
+
   const urlState = setUrlState($page.url)
   const errorState = setErrorState()
   setExamplesState()
@@ -44,7 +46,7 @@
   const sourceState = setSourceState(urlState, errorState)
   const apiState = setApiState(sourceState)
 
-  const mapsState = setMapsState(sourceState)
+  const mapsState = setMapsState(sourceState, errorState)
   const mapsHistoryState = setMapsHistoryState(mapsState)
   setMapsMergedState(mapsState, mapsHistoryState, apiState)
 
@@ -55,6 +57,13 @@
   }
 
   function handleKeypress(event: KeyboardEvent) {
+    const isView =
+      $page.route.id && views.map((view) => `/${view}`).includes($page.route.id)
+
+    if (!isView) {
+      return
+    }
+
     // keyPressHandler: function (event) {
     //     const tagName = event.target.tagName.toLowerCase()
     //     if (tagName === 'input' || tagName === 'textarea') {
@@ -78,12 +87,6 @@
       gotoRoute(createRouteUrl($page, 'mask'))
     } else if (event.key === '3') {
       gotoRoute(createRouteUrl($page, 'georeference'))
-      // } else if (event.key === 'i') {
-      //   this.toggleDrawer('metadata')
-      // } else if (event.key === 'm') {
-      //   this.toggleDrawer('maps')
-      // } else if (event.key === 'a') {
-      //   this.toggleDrawer('annotation')
     }
   }
 
@@ -96,7 +99,10 @@
 
 <Stats />
 
-<div class="absolute w-full h-full grid grid-rows-[min-content_1fr]">
+<div
+  class="absolute w-full h-full grid grid-rows-[min-content_min-content_1fr]"
+>
+  <Banner />
   <Header appName="Editor">
     {#if urlState.urlParam}
       <div class="flex w-full items-center gap-2">
@@ -115,7 +121,7 @@
       <div class="absolute w-full h-full top-0 left-0">
         {@render children()}
       </div>
-      {#if getRouteId($page) !== ''}
+      {#if views.includes(getRouteId($page))}
         <Controls />
       {/if}
     {/if}
@@ -124,14 +130,16 @@
 
 <Dialog.Root bind:open={uitState.showAboutDialog}>
   <Dialog.Trigger />
-  <Dialog.Portal >
+  <Dialog.Portal>
     <Dialog.Overlay
       transition={fade}
       transitionConfig={{ duration: 150 }}
       class="fixed inset-0 z-50 bg-black/80"
     />
-    <Dialog.Content class="absolute top-0 w-full h-full flex justify-center items-center p-2"
-      transition={fade}>
+    <Dialog.Content
+      class="absolute top-0 w-full h-full flex justify-center items-center p-2"
+      transition={fade}
+    >
       <About />
     </Dialog.Content>
   </Dialog.Portal>

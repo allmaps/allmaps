@@ -7,7 +7,7 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
 
-  import { fromDbMap, fromDbMaps } from '$lib/shared/maps.js'
+  import { toGeoreferencedMap, toGeoreferencedMaps } from '$lib/shared/maps.js'
 
   import Scope from './Scope.svelte'
 
@@ -20,12 +20,12 @@
       return generateAnnotation(mapsMergedState.maps)
     } else if (scopeState.scope === 'image') {
       if (mapsState.maps) {
-        return generateAnnotation(fromDbMaps(mapsState.maps))
+        return generateAnnotation(toGeoreferencedMaps(mapsState.maps))
       }
     } else if (scopeState.scope === 'map') {
       const map = mapsState.activeMap
       if (map) {
-        return generateAnnotation(fromDbMap(map))
+        return generateAnnotation(toGeoreferencedMap(map))
       }
     }
 

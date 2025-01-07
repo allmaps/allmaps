@@ -10,7 +10,7 @@
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
 
-  import type { DbMap } from '$lib/shared/types.js'
+  import type { DbMap } from '$lib/types/maps.js'
 
   const mapsState = getMapsState()
 
@@ -114,11 +114,14 @@
         </button>
 
         {#if isActiveMap && gcpCount > 0}
+          {@const gcps = Object.values(map.gcps).toSorted(
+            (gcpA, gcpB) => gcpA.index - gcpB.index
+          )}
           <ol
             class="col-span-9 grid grid-cols-subgrid"
             transition:slide={{ duration: 250, axis: 'y' }}
           >
-            {#each Object.values(map.gcps) as gcp, index}
+            {#each gcps as gcp, index}
               {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
               <li class="contents">
                 <button

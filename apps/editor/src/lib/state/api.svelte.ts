@@ -6,7 +6,7 @@ import { fetchMaps, checkSource, createSource } from '$lib/shared/api.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
-import type { GeoreferencedMapsByImageId, Source } from '$lib/shared/types.js'
+import type { GeoreferencedMapsByImageId, Source } from '$lib/types/shared.js'
 import type { SourceState } from '$lib/state/source.svelte.js'
 
 const API_KEY = Symbol('api')

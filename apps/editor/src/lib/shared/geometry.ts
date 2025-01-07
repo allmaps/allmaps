@@ -1,4 +1,5 @@
-import type { Point, DbMap } from '$lib/shared/types.js'
+import type { Point } from '$lib/types/shared.js'
+import type { DbMap } from '$lib/types/maps.js'
 
 import { getResourceMask } from '$lib/shared/maps.js'
 

@@ -1,9 +1,11 @@
 import { setContext, getContext } from 'svelte'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
+
 import Client from 'sharedb-client-browser/dist/sharedb-client-umd.cjs'
-import { type as json1Type, insertOp, replaceOp, removeOp } from 'ot-json1'
+
 import { throttle } from 'lodash-es'
+import { type as json1Type, insertOp, replaceOp, removeOp } from 'ot-json1'
 
 import { generateId } from '@allmaps/id'
 
@@ -13,19 +15,19 @@ import {
   isRemoveInstruction,
   isReplaceInstruction
 } from '$lib/shared/json1-operations.js'
-import { getGcps, isGcpComplete } from '$lib/shared/maps.js'
+import { getIncompleteGcps, toDbMap3s } from '$lib/shared/maps.js'
 import { MapsEvents } from '$lib/shared/maps-events.js'
 
 import { MapsEventTarget } from '$lib/shared/maps-events.js'
 
-import type { SourceState } from '$lib/state/source.svelte'
+import type { Error as ShareDBError } from 'sharedb-client-browser/dist/sharedb-client-umd.cjs'
 
+import type { SourceState } from '$lib/state/source.svelte'
+import type { ErrorState } from '$lib/state/error.svelte'
+
+import type { Point } from '$lib/types/shared.js'
+import type { DbMap, DbMaps, DbGcp3, DbMap3, DbMaps3 } from '$lib/types/maps.js'
 import type {
-  DbMap,
-  DbMap2,
-  DbMaps,
-  DbGcp2,
-  Point,
   InsertMap,
   RemoveMap,
   InsertResourceMaskPoint,
@@ -34,7 +36,7 @@ import type {
   InsertGcp,
   ReplaceGcp,
   RemoveGcp
-} from '$lib/shared/types.js'
+} from '$lib/types/events'
 
 import { PUBLIC_ALLMAPS_API_WS_URL } from '$env/static/public'
 
@@ -46,7 +48,7 @@ export class MapsState extends MapsEventTarget {
 
   #doc: ReturnType<Client.Connection['get']> | undefined
 
-  #maps = $state.raw<DbMaps | undefined>()
+  #maps = $state.raw<DbMaps3 | undefined>()
   #connecting = false
   #connected = $state(false)
 
@@ -54,6 +56,7 @@ export class MapsState extends MapsEventTarget {
   #imageId: string | undefined
 
   #sourceState: SourceState
+  #errorState: ErrorState
 
   #activeMapId = $state<string | null>()
   #activeGcpIdPerMap = $state<Record<string, string>>({})
@@ -81,8 +84,7 @@ export class MapsState extends MapsEventTarget {
 
   #incompleteGcps = $derived.by(() => {
     if (this.activeMap) {
-      const gcps = getGcps(this.activeMap)
-      return gcps.filter((gcp) => !isGcpComplete(gcp))
+      return getIncompleteGcps(this.activeMap)
     }
 
     return []
@@ -93,10 +95,11 @@ export class MapsState extends MapsEventTarget {
     trailing: true
   })
 
-  constructor(sourceState: SourceState) {
+  constructor(sourceState: SourceState, errorState: ErrorState) {
     super()
 
     this.#sourceState = sourceState
+    this.#errorState = errorState
 
     this.#rws = new ReconnectingWebSocket(PUBLIC_ALLMAPS_API_WS_URL, [], {
       maxEnqueuedMessages: 0
@@ -104,6 +107,7 @@ export class MapsState extends MapsEventTarget {
 
     Client.types.register(json1Type)
 
+    // @ts-expect-error incorrect types
     this.#connection = new Client.Connection(this.#rws)
 
     $effect(() => {
@@ -143,7 +147,7 @@ export class MapsState extends MapsEventTarget {
     this.#doc.on('op', this.#handleRemoteOperation.bind(this))
   }
 
-  #handleSnapshot(err?: Error) {
+  #handleSnapshot(err: ShareDBError) {
     if (err) {
       console.error(err)
       return
@@ -166,16 +170,39 @@ export class MapsState extends MapsEventTarget {
       this.#doc.create({}, json1Type.name)
     }
 
-    this.#maps = this.#doc.data
-    this.#activeMapId = this.#maps ? Object.keys(this.#maps)[0] : undefined
-    this.#activeGcpIdPerMap = {}
+    // TODO: use Zod to validate the data
+    const maps = this.#doc.data as unknown as DbMaps
 
-    this.#connected = true
-    this.#connecting = false
+    try {
+      const maps3 = toDbMap3s(maps)
+
+      const mapsNeedUpdate = Object.values(maps).some(
+        (map) => map.version !== 3
+      )
+
+      if (mapsNeedUpdate) {
+        for (const mapId of Object.keys(maps3)) {
+          this.#doc.submitOp(removeOp([mapId]))
+        }
+
+        for (const [mapId, dbMap3] of Object.entries(maps3)) {
+          this.#doc.submitOp(insertOp([mapId], dbMap3))
+        }
+      }
+
+      this.#maps = maps3
+      this.#activeMapId = this.#maps ? Object.keys(this.#maps)[0] : undefined
+      this.#activeGcpIdPerMap = {}
+
+      this.#connected = true
+      this.#connecting = false
+    } catch (err) {
+      this.#errorState.error = err
+    }
   }
 
   #handleRemoteOperation(op: unknown) {
-    if (op) {
+    if (op && this.#doc) {
       this.#maps = this.#doc.data
 
       const operations = parseOperations(op)
@@ -185,7 +212,7 @@ export class MapsState extends MapsEventTarget {
           if (isInsertInstruction(instruction)) {
             // TODO: convert to DbMap2!
             // const map = instruction.i as DbMap
-            const map = instruction.i as DbMap2
+            const map = instruction.i as DbMap3
 
             const detail = {
               mapId,
@@ -212,6 +239,7 @@ export class MapsState extends MapsEventTarget {
           }
 
           if (isInsertInstruction(instruction)) {
+            // TODO: use Zod to validate the data
             const point = instruction.i as Point
 
             const detail = {
@@ -227,6 +255,7 @@ export class MapsState extends MapsEventTarget {
               )
             )
           } else if (isReplaceInstruction(instruction)) {
+            // TODO: use Zod to validate the data
             const point = instruction.i as Point
 
             const detail = {
@@ -264,8 +293,8 @@ export class MapsState extends MapsEventTarget {
           }
 
           if (isInsertInstruction(instruction)) {
-            // TODO: this is not always the case, can also be DbGcp1!
-            const gcp = instruction.i as DbGcp2
+            // TODO: use Zod to validate the data
+            const gcp = instruction.i as DbGcp3
 
             const detail = {
               mapId,
@@ -277,8 +306,8 @@ export class MapsState extends MapsEventTarget {
               new CustomEvent<InsertGcp>(MapsEvents.INSERT_GCP, { detail })
             )
           } else if (isReplaceInstruction(instruction)) {
-            // TODO: this is not always the case, can also be DbGcp1!
-            const gcp = instruction.i as DbGcp2
+            // TODO: use Zod to validate the data
+            const gcp = instruction.i as DbGcp3
 
             const detail = {
               mapId,
@@ -377,42 +406,74 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertMap({ mapId, map }: InsertMap) {
+    if (!this.#doc) {
+      return
+    }
+
     this.#doc.submitOp(insertOp([mapId], structuredClone(map)))
     this.activeMapId = mapId
   }
 
   removeMap({ mapId }: RemoveMap) {
+    if (!this.#doc) {
+      return
+    }
+
     this.#doc.submitOp(removeOp([mapId]))
   }
 
   insertResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
+    if (!this.#doc) {
+      return
+    }
+
     this.#doc.submitOp(insertOp([mapId, 'resourceMask', index], point))
     this.activeMapId = mapId
   }
 
   replaceResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
+    if (!this.#doc) {
+      return
+    }
+
     this.#doc.submitOp(replaceOp([mapId, 'resourceMask', index], true, point))
     this.activeMapId = mapId
   }
 
   removeResourceMaskPoint({ mapId, index }: RemoveResourceMaskPoint) {
+    if (!this.#doc) {
+      return
+    }
+
     this.#doc.submitOp(removeOp([mapId, 'resourceMask', index], false))
     this.activeMapId = mapId
   }
 
-  insertGcp({ mapId, gcpId, gcp }: InsertGcp) {
-    this.#doc.submitOp(insertOp([mapId, 'gcps', gcpId], gcp))
+  insertGcp({ mapId, gcp }: InsertGcp) {
+    if (!this.#doc || !this.#maps) {
+      return
+    }
+
+    this.#doc.submitOp(insertOp([mapId, 'gcps', gcp.id], gcp))
     this.activeMapId = mapId
-    this.activeGcpId = gcpId
+    this.activeGcpId = gcp.id
   }
 
-  replaceGcp({ mapId, gcpId, gcp }: ReplaceGcp) {
-    this.#doc.submitOp(replaceOp([mapId, 'gcps', gcpId], true, gcp))
+  replaceGcp({ mapId, gcp }: ReplaceGcp) {
+    if (!this.#doc || !this.#maps) {
+      return
+    }
+
+    this.#doc.submitOp(replaceOp([mapId, 'gcps', gcp.id], true, gcp))
     this.activeMapId = mapId
-    this.activeGcpId = gcpId
+    this.activeGcpId = gcp.id
   }
 
   removeGcp({ mapId, gcpId }: RemoveGcp) {
+    if (!this.#doc || !this.#maps) {
+      return
+    }
+
     this.#doc.submitOp(removeOp([mapId, 'gcps', gcpId], false))
     this.activeMapId = mapId
   }
@@ -436,8 +497,8 @@ export class MapsState extends MapsEventTarget {
   }
 }
 
-export function setMapsState(sourceState: SourceState) {
-  return setContext(MAPS_KEY, new MapsState(sourceState))
+export function setMapsState(sourceState: SourceState, errorState: ErrorState) {
+  return setContext(MAPS_KEY, new MapsState(sourceState, errorState))
 }
 
 export function getMapsState() {

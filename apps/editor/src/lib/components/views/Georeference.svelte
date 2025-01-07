@@ -37,15 +37,13 @@
   import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
 
+  import type { FeatureLike } from 'ol/Feature'
   import type { VectorSourceEvent } from 'ol/source/Vector'
   import type { ModifyEvent } from 'ol/interaction/Modify'
 
+  import type { DbMaps, DbMap, DbGcp, DbGcp3 } from '$lib/types/maps.js'
+  import type { Point, GcpCoordinates } from '$lib/types/shared.js'
   import type {
-    DbMaps,
-    DbMap,
-    DbGcp,
-    DbGcp2,
-    Point,
     InsertMapEvent,
     RemoveMapEvent,
     InsertGcpEvent,
@@ -54,7 +52,7 @@
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent
-  } from '$lib/shared/types.js'
+  } from '$lib/types/events.js'
 
   let resourceOlMapTarget: HTMLDivElement
   let geoOlMapTarget: HTMLDivElement
@@ -85,14 +83,16 @@
   const uiState = getUiState()
   const imageInfoState = getImageInfoState()
 
-  function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp2[]) {
-    // TODO: take order into account, by index or by date
-    return incompleteGcps.find((gcp) => !getGcpResourcePoint(gcp))
+  function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp3[]) {
+    return incompleteGcps
+      .toSorted((gcpA, gcpB) => gcpA.index - gcpB.index)
+      .find((gcp) => !getGcpResourcePoint(gcp))
   }
 
-  function getFirstGcpWithMissingGeoPoint(incompleteGcps: DbGcp2[]) {
-    // TODO: take order into account, by index or by date
-    return incompleteGcps.find((gcp) => !getGcpGeoPoint(gcp))
+  function getFirstGcpWithMissingGeoPoint(incompleteGcps: DbGcp3[]) {
+    return incompleteGcps
+      .toSorted((gcpA, gcpB) => gcpA.index - gcpB.index)
+      .find((gcp) => !getGcpGeoPoint(gcp))
   }
 
   function resourceFeatureToPoint(
@@ -129,7 +129,18 @@
     return new OLPoint(fromLonLat(point))
   }
 
-  function gcpFromGcpId(gcpId: string): DbGcp2 | undefined {
+  function gcpFromGcpId(gcpId: string): DbGcp3 {
+    const gcpCoordinates = gcpCoordinatesFromGcpId(gcpId)
+    const gcpIndex = gcpIndexFromGcpId(gcpId)
+
+    return {
+      id: gcpId,
+      index: gcpIndex,
+      ...gcpCoordinates
+    }
+  }
+
+  function gcpCoordinatesFromGcpId(gcpId: string): GcpCoordinates {
     const resourceFeature = resourceGcpVectorSource.getFeatureById(gcpId)
     const geoFeature = geoGcpVectorSource.getFeatureById(gcpId)
 
@@ -146,14 +157,32 @@
 
     if (resourcePoint || geoPoint) {
       return {
-        id: gcpId,
-        // TODO: order:
         resource: resourcePoint,
         geo: geoPoint
       }
     }
 
-    console.error(`Cannot create GCP for ${gcpId}`)
+    throw new Error(`Cannot create GCP for ${gcpId}`)
+  }
+
+  function gcpIndexFromGcpId(gcpId: string): number {
+    const map = mapsState.activeMap
+
+    if (map) {
+      const sortedGcps = Object.values(map.gcps).toSorted(
+        (gcpA, gcpB) => gcpA.index - gcpB.index
+      )
+      const gcp = sortedGcps.find((gcp) => gcp.id === gcpId)
+
+      if (gcp) {
+        return gcp.index
+      } else if (sortedGcps.length) {
+        const highestIndex = sortedGcps[sortedGcps.length - 1].index || 0
+        return Math.floor(highestIndex) + 1 + Math.random()
+      }
+    }
+
+    return Math.random()
   }
 
   async function updateImage(imageId: string | undefined) {
@@ -197,14 +226,13 @@
     }
   }
 
-  function addGcp(gcp: DbGcp, index: number) {
+  function addGcp(gcp: DbGcp) {
     const resourcePoint = getGcpResourcePoint(gcp)
     const geoPoint = getGcpGeoPoint(gcp)
 
-    // TODO: don't order by index but by date!
     if (resourcePoint) {
       const resourceFeature = new Feature({
-        index,
+        id: gcp.id,
         geometry: pointToResourceGeometry(resourcePoint)
       })
       resourceFeature.setId(gcp.id)
@@ -213,7 +241,7 @@
 
     if (geoPoint) {
       const geoFeature = new Feature({
-        index,
+        id: gcp.id,
         geometry: pointToGeoGeometry(geoPoint)
       })
       geoFeature.setId(gcp.id)
@@ -305,6 +333,26 @@
         const geoMaskFeature = geoMaskVectorSource.getFeatureById(mapId)
         geoMaskFeature?.setGeometry(geoMaskPolygon)
       }
+
+      // if (currentActiveMapId) {
+      //   const mapId = `https://dev.annotations.allmaps.org/maps/${currentActiveMapId}`
+      //   const warpedMap = warpedMapLayer.getWarpedMap(mapId)
+
+      //   if (warpedMap) {
+      //     warpedMap.setGcps(getCompleteGcps(map))
+
+      //     const renderer = warpedMapLayer.getRenderer()
+      //     if (renderer) {
+      //       renderer.changed()
+      //     }
+
+      //     warpedMapLayer.changed()
+      //   } else {
+      //     warpedMapLayer.addGeoreferencedMap(toGeoreferencedMap(map))
+      //   }
+      // } else {
+      //   warpedMapLayer.clear()
+      // }
     }
   }
 
@@ -312,20 +360,17 @@
     const gcp = mapsState.activeMap?.gcps[gcpId]
 
     if (gcp) {
-      let index = 0
       const resourceGcpFeature = resourceGcpVectorSource.getFeatureById(gcpId)
       if (resourceGcpFeature) {
-        index = resourceGcpFeature.getProperties().index
         resourceGcpVectorSource.removeFeature(resourceGcpFeature)
       }
 
       const geoGcpFeature = geoGcpVectorSource.getFeatureById(gcpId)
       if (geoGcpFeature) {
-        index = geoGcpFeature.getProperties().index
         geoGcpVectorSource.removeFeature(geoGcpFeature)
       }
 
-      addGcp(gcp, index)
+      addGcp(gcp)
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
     }
@@ -343,15 +388,7 @@
   function handleInsertGcp(event: InsertGcpEvent) {
     const mapId = event.detail.mapId
     if (mapId === currentActiveMapId) {
-      let index = 0
-      const gcps = mapsState.activeMap?.gcps
-
-      if (gcps) {
-        const gcpCount = Object.values(gcps).length
-        index = gcpCount
-      }
-
-      addGcp(event.detail.gcp, index)
+      addGcp(event.detail.gcp)
     }
 
     replaceMapFromState(mapId)
@@ -360,7 +397,7 @@
   function handleReplaceGcp(event: ReplaceGcpEvent) {
     const mapId = event.detail.mapId
     if (mapId === currentActiveMapId) {
-      const gcpId = event.detail.gcpId
+      const gcpId = event.detail.gcp.id
       replaceGcpFromState(gcpId)
     }
 
@@ -441,38 +478,20 @@
     }
 
     feature.setId(gcpId)
-
-    // TODO: set order
-    let index
-    if (event.target === resourceGcpVectorSource) {
-      index = resourceGcpVectorSource.getFeatures().length - 1
-    } else {
-      index = geoGcpVectorSource.getFeatures().length - 1
-    }
-
-    feature.setProperties({
-      index
-    })
-
     const gcp = gcpFromGcpId(gcpId)
 
-    if (!gcp) {
-      throw new Error(`Can't find GCP ${gcpId}`)
-    }
+    if (mapsState.activeMap) {
+      const mapId = mapsState.activeMap.id
 
-    if (mapsState.activeMapId) {
-      const mapId = mapsState.activeMapId
       if (newGcpId) {
-        mapsState.insertGcp({ mapId, gcpId, gcp })
+        mapsState.insertGcp({ mapId, gcp })
       } else {
-        mapsState.replaceGcp({ mapId, gcpId, gcp })
+        mapsState.replaceGcp({ mapId, gcp })
       }
     } else if (sourceState.activeImage) {
       const map = {
         ...(await createMapWithFullImageResourceMask(sourceState.activeImage)),
-        gcps: {
-          [gcpId]: gcp
-        }
+        gcps: { [gcp.id]: gcp }
       }
 
       currentActiveMapId = map.id
@@ -490,9 +509,7 @@
     const gcpId = feature.getId()
     if (mapId && gcpId && typeof gcpId === 'string') {
       const gcp = gcpFromGcpId(gcpId)
-      if (gcp) {
-        mapsState.replaceGcp({ mapId, gcpId, gcp })
-      }
+      mapsState.replaceGcp({ mapId, gcp })
     } else {
       console.error('GCP without ID encountered')
     }
@@ -519,6 +536,25 @@
     makeFeatureActive(geoGcpFeatures, gcpId)
   }
 
+  function labelIndexFromGcpId(gcpId: string) {
+    const map = mapsState.activeMap
+
+    if (map) {
+      const sortedGcps = Object.values(map.gcps).toSorted(
+        (gcpA, gcpB) => gcpA.index - gcpB.index
+      )
+      const gcpIndex = sortedGcps.findIndex((gcp) => gcp.id === gcpId)
+
+      if (gcpIndex !== -1) {
+        return gcpIndex
+      } else {
+        return 0
+      }
+    }
+
+    return 0
+  }
+
   onMount(() => {
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // Left pane: resource
@@ -529,7 +565,7 @@
 
     const resourceVectorLayer = new VectorLayer({
       source: resourceGcpVectorSource,
-      style: gcpStyle
+      style: (feature: FeatureLike) => gcpStyle(feature, labelIndexFromGcpId)
     })
 
     resourceMaskVectorSource = new VectorSource()
@@ -586,7 +622,7 @@
 
     const geoVectorLayer = new VectorLayer({
       source: geoGcpVectorSource,
-      style: gcpStyle
+      style: (feature: FeatureLike) => gcpStyle(feature, labelIndexFromGcpId)
     })
 
     geoMaskVectorSource = new VectorSource()

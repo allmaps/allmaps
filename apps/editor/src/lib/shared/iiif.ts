@@ -14,7 +14,7 @@ function getImagesInternal(
 ) {
   if (parsedIiif.type === 'collection') {
     parsedIiif.items.map((item) => getImagesInternal(images, item))
-    // TODO
+    // TODO: don't load all images in collection. Show tree view instead.
   } else if (parsedIiif.type === 'manifest' && 'canvases' in parsedIiif) {
     for (const canvas of parsedIiif.canvases) {
       images.push(canvas.image)

@@ -15,7 +15,7 @@ import type {
   Collection as IIIFCollection
 } from '@allmaps/iiif-parser'
 
-import type { Source, SourceType } from '$lib/shared/types.js'
+import type { Source, SourceType } from '$lib/types/shared.js'
 
 const SOURCE_KEY = Symbol('source')
 

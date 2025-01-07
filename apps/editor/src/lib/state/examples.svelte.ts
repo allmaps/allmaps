@@ -1,51 +1,40 @@
 import { setContext, getContext } from 'svelte'
 
+import { SvelteMap } from 'svelte/reactivity'
+
 import { uniqBy } from 'lodash-es'
 
 import { PUBLIC_EXAMPLES_API_URL } from '$env/static/public'
 
-type Example = {
-  title: string
-  manifestId: string
-  imageId: string
-}
+import type { Example } from '$lib/types/shared.js'
 
 const EXAMPLES_KEY = Symbol('maps-history')
 
-const count = 750
-
 export class ExamplesState {
-  #examples = $state<Example[]>([])
-  #loading = $derived(this.#examples.length === 0)
-  #page = $state(1)
+  #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
+    new SvelteMap()
+  )
 
-  constructor() {
-    $effect(() => {
-      this.fetchExamples()
-    })
-  }
-
-  async fetchExamples() {
+  async fetchExamples(organizationId: string, count: number) {
     const fetchedExamples = (await fetch(
-      `${PUBLIC_EXAMPLES_API_URL}/?count=${count}`
+      `${PUBLIC_EXAMPLES_API_URL}/?org=${organizationId}&count=${count}`
     ).then((response) => response.json())) as Example[]
-    this.#examples = uniqBy(fetchedExamples, (example) => example.imageId)
+
+    const examples = uniqBy(fetchedExamples, 'imageId')
+
+    this.#examplesByOrganizationId.set(organizationId, examples)
+
+    return examples
   }
 
-  get examples() {
-    return this.#examples
-  }
+  async getExamplesByOrganization(organizationId: string, count: number) {
+    const examples = this.#examplesByOrganizationId.get(organizationId) || []
 
-  get loading() {
-    return this.#loading
-  }
+    if (examples.length < count) {
+      return await this.fetchExamples(organizationId, count)
+    }
 
-  get page() {
-    return this.#page
-  }
-
-  set page(page: number) {
-    this.#page = page
+    return examples.slice(0, count)
   }
 }
 

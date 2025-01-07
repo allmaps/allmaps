@@ -1,7 +1,7 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteMap } from 'svelte/reactivity'
 
-import { fromDbMap } from '$lib/shared/maps.js'
+import { toGeoreferencedMap } from '$lib/shared/maps.js'
 
 import type { Map as GeoreferencedMap } from '@allmaps/annotation'
 
@@ -18,7 +18,7 @@ export class MapsHistoryState {
     $effect(() => {
       if ((mapsState.connectedImageId, mapsState.maps)) {
         if (mapsState.connectedImageId && mapsState.maps) {
-          const maps = Object.values(mapsState.maps).map(fromDbMap)
+          const maps = Object.values(mapsState.maps).map(toGeoreferencedMap)
           this.#mapsByImageId.set(mapsState.connectedImageId, maps)
         }
       }

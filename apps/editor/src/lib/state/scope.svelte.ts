@@ -1,7 +1,7 @@
 import { setContext, getContext } from 'svelte'
 
 import type { SourceState } from '$lib/state/source.svelte'
-import type { Scope } from '$lib/shared/types.js'
+import type { Scope } from '$lib/types/shared.js'
 
 const SCOPE_KEY = Symbol('scope')
 

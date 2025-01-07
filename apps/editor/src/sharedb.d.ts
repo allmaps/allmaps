@@ -5,7 +5,7 @@ declare module 'sharedb-client-browser/dist/sharedb-client-umd.cjs' {
   import { Duplex } from 'stream'
   import Agent = require('sharedb/lib/agent')
   import { Connection } from 'sharedb/lib/client'
-  import * as ShareDB from 'sharedb/lib/shaedb'
+  import * as ShareDB from 'sharedb/lib/sharedb'
 
   interface PubSubOptions {
     prefix?: string

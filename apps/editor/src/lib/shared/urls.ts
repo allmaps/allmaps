@@ -1,4 +1,4 @@
-import type { SourceType } from './types.js'
+import type { SourceType } from '../types/shared.js'
 
 import {
   PUBLIC_ALLMAPS_ANNOTATIONS_API_URL,

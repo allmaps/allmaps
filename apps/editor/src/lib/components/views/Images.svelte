@@ -44,13 +44,16 @@
           <div class="relative">
             <!-- TODO: move to load function -->
             {#await imageInfoState.fetchImageInfo(image.uri)}
-              <div class="aspect-square bg-white/50 p-2">
+              <div
+                class="aspect-square bg-white/50 p-2 flex items-center justify-center"
+              >
                 <p>Loading…</p>
               </div>
             {:then imageInfo}
               <Thumbnail
                 {imageInfo}
                 width={300}
+                mode="cover"
                 alt={parseLanguageString(canvas?.label, 'en')}
               />
             {:catch error}

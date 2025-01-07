@@ -7,7 +7,7 @@ import type {
   InsertGcp,
   ReplaceGcp,
   RemoveGcp
-} from '$lib/shared/types.js'
+} from '$lib/types/events'
 
 export const MapsEvents = {
   INSERT_MAP: 'INSERT_MAP' as const,

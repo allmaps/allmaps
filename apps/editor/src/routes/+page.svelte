@@ -9,7 +9,11 @@
   import { getUrlState } from '$lib/state/url.svelte.js'
 
   import URLInput from '$lib/components/URLInput.svelte'
-  import Examples from '$lib/components/Examples.svelte'
+  import Organizations from '$lib/components/Organizations.svelte'
+
+  import masks from '$lib/images/masks.svg'
+
+  import organizations from '$lib/shared/organizations.js'
 
   let autofocus = $state(false)
 
@@ -52,17 +56,40 @@
   })
 </script>
 
-<div class="max-w-screen-lg p-4 m-auto space-y-4">
-  <p class="mb-3">Open a IIIF Resource from a URL:</p>
-  <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />
-  <!-- <URLInput {autofocus} bind:this={urlInput} on:value={handleUrlInputValue} /> -->
-  <!-- disabled={urlInputValue.length === 0} -->
-  <!-- <button
-    type="submit"
-    onclick={handleSubmit}
-    class="text-white bg-pink-500 hover:bg-pink-400 transition-colors disabled:bg-gray-500 focus:ring focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
-    >View</button
-  > -->
-  <p class="mb-3">Or use one of the following examples:</p>
-  <Examples />
+<div class="*:p-4 flex flex-col items-center gap-4">
+  <section
+    class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-end aspect-[715/387] bg-cover my-2 sm:my-12 bg-center"
+    style:background-image="url({masks})"
+  >
+    <div class="max-w-sm w-full flex flex-col gap-6 items-center mt-24">
+      <h1 class="text-2xl sm:text-4xl font-bold text-black text-center">
+        Start georeferencing
+      </h1>
+
+      <p class="text-black text-center">
+        Allmaps Editor is an easy-to-use app for georeferencing IIIF maps
+      </p>
+      <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />
+      <p>
+        <a
+          href="https://dev.allmaps.org/guides/georeferencing/"
+          class="inline-block font-bold text-pink text-center hover:underline after:content-['_›']"
+          >Learn more about georeferencing IIIF maps</a
+        >
+      </p>
+    </div>
+  </section>
+  <section class="w-full bg-[#f2feff] flex flex-col items-center">
+    <div class="max-w-screen-lg flex flex-col items-center">
+      <div
+        class="flex flex-col items-center max-w-sm p-8 space-y-4 text-center"
+      >
+        <h2 class="text-black text-2xl font-bold">Get started</h2>
+        <p class="text-gray-600">
+          Start georeferencing maps from these collections
+        </p>
+      </div>
+      <Organizations {organizations} />
+    </div>
+  </section>
 </div>

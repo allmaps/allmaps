@@ -1,8 +1,8 @@
 import { setContext, getContext } from 'svelte'
 
-import { fromDbMap } from '$lib/shared/maps.js'
+import { toGeoreferencedMap } from '$lib/shared/maps.js'
 
-import type { GeoreferencedMapsByImageId } from '$lib/shared/types.js'
+import type { GeoreferencedMapsByImageId } from '$lib/types/shared.js'
 
 import type { MapsState } from '$lib/state/maps.svelte.js'
 import type { ApiState } from '$lib/state/api.svelte.js'
@@ -19,7 +19,9 @@ export class MapsMergedState {
     const activeImageMapsByImageId: GeoreferencedMapsByImageId = {}
 
     if (this.#mapsState.connectedImageId && this.#mapsState.maps) {
-      const activeImageMaps = Object.values(this.#mapsState.maps).map(fromDbMap)
+      const activeImageMaps = Object.values(this.#mapsState.maps).map(
+        toGeoreferencedMap
+      )
       activeImageMapsByImageId[this.#mapsState.connectedImageId] =
         activeImageMaps
     }

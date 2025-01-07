@@ -14,10 +14,7 @@
 
   <div class="p-4">
     <h2 class="text-xl text-center mt-1">About Allmaps Editor</h2>
-    <p>
-      Allmaps Editor is a web-based tool for georeferencing historical IIIF
-      maps.
-    </p>
+    <p>Allmaps Editor is a web-based tool for georeferencing IIIF maps.</p>
     <p>
       For more information about Allmaps, see <a href="https://allmaps.org"
         >allmaps.org</a
