@@ -351,14 +351,16 @@ curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest
     *   [Properties](#properties-3)
 *   [IIIF](#iiif)
     *   [parse](#parse)
+*   [parse](#parse-1)
+    *   [Parameters](#parameters-1)
 *   [Collection](#collection)
     *   [Properties](#properties-4)
-    *   [parse](#parse-1)
+    *   [parse](#parse-2)
 *   [EmbeddedManifest](#embeddedmanifest)
     *   [Properties](#properties-5)
 *   [Manifest](#manifest)
     *   [Properties](#properties-6)
-    *   [parse](#parse-2)
+    *   [parse](#parse-3)
 *   [Canvas](#canvas)
     *   [Properties](#properties-7)
 *   [EmbeddedImage](#embeddedimage)
@@ -368,7 +370,7 @@ curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest
     *   [Properties](#properties-9)
     *   [getIiifTile](#getiiiftile)
     *   [getThumbnail](#getthumbnail)
-    *   [parse](#parse-3)
+    *   [parse](#parse-4)
 
 ### MajorVersion
 
@@ -446,6 +448,17 @@ Parses as IIIF resource and returns a class containing the parsed version
 *   `majorVersion` **[MajorVersion](#majorversion)** IIIF API version of resource. If not provided, it will be determined automatically (optional, default `null`)
 
 Returns **([Image](#image) | [Manifest](#manifest) | [Collection](#collection))** Parsed IIIF resource
+
+### parse
+
+Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
+
+#### Parameters
+
+*   `iiifCollection` **any** Source data of IIIF Collection
+*   `majorVersion` **[MajorVersion](#majorversion)** IIIF API version of Collection. If not provided, it will be determined automatically (optional, default `null`)
+
+Returns **[Collection](#collection)** Parsed IIIF Collection
 
 ### Collection
 

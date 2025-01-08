@@ -29,25 +29,16 @@ const defaulfFetchNextOptions = {
   fetchFn: globalThis.fetch
 }
 
-/**
- * Parsed IIIF Collection
- * @class Collection
- * @property {string} [uri] - URI of Collection
- * @property {LanguageString} [label] - Label of Collection
- * @property {Collection[] | Manifest[] | EmbeddedManifest[]} [items] - Items in Collection
- * @property {MajorVersion} [majorVersion] - IIIF API version of Collection
- * @property {string} [type] - Resource type, equals 'collection'
- */
-export class Collection {
+export class EmbeddedCollection {
   uri: string
   type: typeof CollectionTypeString = CollectionTypeString
   majorVersion: MajorVersion
 
-  items: (Collection | Manifest | EmbeddedManifest)[] = []
-
   // TODO: add description?
   // TODO: add metadata?
   label?: LanguageString
+
+  embedded = true
 
   constructor(parsedCollection: CollectionType) {
     if ('@type' in parsedCollection) {
@@ -58,12 +49,81 @@ export class Collection {
       if (parsedCollection.label) {
         this.label = parseVersion2String(parsedCollection.label)
       }
+    } else if ('type' in parsedCollection) {
+      // IIIF Presentation API 3.0
+      this.uri = parsedCollection.id
+      this.majorVersion = 3
 
-      this.items = [
-        ...(parsedCollection.manifests || []),
-        ...(parsedCollection.collections || []),
-        ...(parsedCollection.members || [])
-      ].map((item) => {
+      this.label = parseVersion3String(parsedCollection.label)
+    } else {
+      // TODO: improve error message
+      throw new Error('Unsupported Collection')
+    }
+  }
+
+  /**
+   * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
+   * @param {any} iiifCollection - Source data of IIIF Collection
+   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns {Collection} Parsed IIIF Collection
+   * @static
+   */
+  static parse(
+    iiifCollection: unknown,
+    majorVersion: MajorVersion | null = null
+  ) {
+    let parsedCollection
+
+    if (majorVersion === 2) {
+      parsedCollection = Collection2Schema.parse(iiifCollection)
+    } else if (majorVersion === 3) {
+      parsedCollection = Collection3Schema.parse(iiifCollection)
+    } else {
+      parsedCollection = CollectionSchema.parse(iiifCollection)
+    }
+
+    return new Collection(parsedCollection)
+  }
+}
+
+/**
+ * Parsed IIIF Collection
+ * @class Collection
+ * @property {string} [uri] - URI of Collection
+ * @property {LanguageString} [label] - Label of Collection
+ * @property {Collection[] | Manifest[] | EmbeddedManifest[]} [items] - Items in Collection
+ * @property {MajorVersion} [majorVersion] - IIIF API version of Collection
+ * @property {string} [type] - Resource type, equals 'collection'
+ */
+export class Collection extends EmbeddedCollection {
+  items: (Collection | EmbeddedCollection | Manifest | EmbeddedManifest)[] = []
+
+  embedded = false
+
+  constructor(parsedCollection: CollectionType) {
+    super(parsedCollection)
+
+    if ('@type' in parsedCollection) {
+      // IIIF Presentation API 2.0
+
+      const manifests =
+        'manifests' in parsedCollection && parsedCollection.manifests
+          ? parsedCollection.manifests
+          : []
+
+      const collections =
+        'collections' in parsedCollection && parsedCollection.collections
+          ? parsedCollection.collections
+          : []
+
+      const members =
+        'members' in parsedCollection && parsedCollection.members
+          ? parsedCollection.members
+          : []
+
+      const items = [...manifests, ...collections, ...members]
+
+      this.items = items.map((item) => {
         if (item['@type'] === 'sc:Collection') {
           return new Collection(item)
         } else {
@@ -72,18 +132,20 @@ export class Collection {
       })
     } else if ('type' in parsedCollection) {
       // IIIF Presentation API 3.0
-      this.uri = parsedCollection.id
-      this.majorVersion = 3
 
-      this.label = parseVersion3String(parsedCollection.label)
-
-      this.items = parsedCollection.items.map((item) => {
-        if (item.type === 'Collection') {
-          return new Collection(item)
-        } else {
-          return new EmbeddedManifest(item)
-        }
-      })
+      if ('items' in parsedCollection) {
+        this.items = parsedCollection.items.map((item) => {
+          if (item.type === 'Collection') {
+            if ('items' in item) {
+              return new Collection(item)
+            } else {
+              return new EmbeddedCollection(item)
+            }
+          } else {
+            return new EmbeddedManifest(item)
+          }
+        })
+      }
     } else {
       // TODO: improve error message
       throw new Error('Unsupported Collection')
@@ -139,6 +201,10 @@ export class Collection {
       ...options
     }
 
+    if (Number.isNaN(options.maxDepth)) {
+      return
+    }
+
     if (options.maxDepth === undefined) {
       options.maxDepth = defaulfFetchNextOptions.maxDepth
     }
@@ -188,32 +254,31 @@ export class Collection {
         if (depth + 1 < options.maxDepth && options.fetchImages) {
           yield* newParsedManifest.fetchNext(fetchFn, depth + 2)
         }
-      } else if (item instanceof Collection && options.fetchCollections) {
-        // item is Collection
-        // TODO: use embedded
-        if (!item.items.length) {
-          const collectionUri = item.uri
-          const iiifCollection = await fetchFn(collectionUri).then((response) =>
-            response.json()
-          )
-          const newParsedCollection = Collection.parse(iiifCollection)
+      } else if (
+        item instanceof EmbeddedCollection &&
+        options.fetchCollections
+      ) {
+        const collectionUri = item.uri
+        const iiifCollection = await fetchFn(collectionUri).then((response) =>
+          response.json()
+        )
+        const newParsedCollection = Collection.parse(iiifCollection)
 
-          this.items[itemIndex] = newParsedCollection
+        this.items[itemIndex] = newParsedCollection
 
-          yield {
-            item: newParsedCollection,
-            depth: depth + 1,
-            parent: {
-              uri: this.uri,
-              type: this.type
-            }
+        yield {
+          item: newParsedCollection,
+          depth: depth + 1,
+          parent: {
+            uri: this.uri,
+            type: this.type
           }
-
-          item = newParsedCollection
         }
 
+        item = newParsedCollection
+
         if (depth + 1 < options.maxDepth) {
-          yield* item.fetchNext(options, depth + 2)
+          yield* newParsedCollection.fetchNext(options, depth + 2)
         }
       }
     }

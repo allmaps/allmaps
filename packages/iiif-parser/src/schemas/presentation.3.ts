@@ -34,9 +34,18 @@ export const AnnotationBody3Schema = z.object({
   service: ImageServiceSchema.array()
 })
 
+const Choice3Schema = z.object({
+  type: z.literal('Choice'),
+  items: AnnotationBody3Schema.array()
+})
+
 const Annotation3Schema = z.object({
   type: z.literal('Annotation'),
-  body: AnnotationBody3Schema.or(AnnotationBody3Schema.array().length(1))
+  body: z.union([
+    AnnotationBody3Schema,
+    AnnotationBody3Schema.array().length(1),
+    Choice3Schema
+  ])
 })
 
 const AnnotationPage3Schema = z.object({
@@ -73,7 +82,11 @@ export type Collection3 = {
   id: string
   type: 'Collection'
   label?: z.infer<typeof LanguageValue3Schema>
-  items: (EmbeddedManifest3 | Collection3)[]
+  items: (
+    | EmbeddedManifest3
+    | Collection3
+    | z.infer<typeof EmbeddedCollection3Schema>
+  )[]
 }
 
 export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
@@ -85,12 +98,23 @@ export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
     })
 )
 
-// TODO: introduce embedded collection without items
 export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
   z.object({
     id: z.string().url(),
     type: z.literal('Collection'),
     label: LanguageValue3Schema.optional(),
-    items: EmbeddedManifest3Schema.or(Collection3Schema).array()
+    items: z
+      .union([
+        EmbeddedManifest3Schema,
+        Collection3Schema,
+        EmbeddedCollection3Schema
+      ])
+      .array()
   })
 )
+
+export const EmbeddedCollection3Schema = z.object({
+  id: z.string().url(),
+  type: z.literal('Collection'),
+  label: LanguageValue3Schema.optional()
+})

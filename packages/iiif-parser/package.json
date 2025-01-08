@@ -59,6 +59,6 @@
   },
   "dependencies": {
     "@allmaps/types": "^1.0.0-beta.15",
-    "zod": "^3.22.4"
+    "zod": "^3.24.1"
   }
 }

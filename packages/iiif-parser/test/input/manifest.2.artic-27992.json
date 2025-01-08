@@ -1,0 +1,99 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://api.artic.edu/api/v1/artworks/27992/manifest.json",
+  "@type": "sc:Manifest",
+  "label": "A Sunday on La Grande Jatte — 1884",
+  "description": [
+    {
+      "value": "In his best-known and largest painting, Georges Seurat depicted people from different social classes strolling and relaxing in a park just west of Paris on La Grande Jatte, an island in the Seine River. Although he took his subject from modern life, Seurat sought to evoke the sense of timelessness associated with ancient art, especially Egyptian and Greek sculpture. He once wrote, “I want to make modern people, in their essential traits, move about as they do on those friezes, and place them on canvases organized by harmonies of color.”\nSeurat painted A Sunday on La Grande Jatte—1884 using pointillism, a highly systematic and scientific technique based on the hypothesis that closely positioned points of pure color mix together in the viewer’s eye. He began work on the canvas in 1884 (and included this date in the title) with a layer of small, horizontal brushstrokes in complementary colors. He next added a series of dots that coalesce into solid and luminous forms when seen from a distance. Sometime before 1889 Seurat added a border of blue, orange, and red dots that provide a visual transition between the painting’s interior and the specially designed white frame, which has been re-created at the Art Institute.\n",
+      "language": "en"
+    }
+  ],
+  "metadata": [
+    {
+      "label": "Artist / Maker",
+      "value": "Georges Seurat (French, 1859–1891)"
+    },
+    {
+      "label": "Medium",
+      "value": "Oil on canvas"
+    },
+    {
+      "label": "Dimensions",
+      "value": "207.5 × 308.1 cm (81 3/4 × 121 1/4 in.)"
+    },
+    {
+      "label": "Object Number",
+      "value": "1926.224"
+    },
+    {
+      "label": "Collection",
+      "value": "<a href='http://www.artic.edu/collection' target='_blank'>Art Institute of Chicago</a>"
+    }
+  ],
+  "attribution": "Digital image courtesy of the Art Institute of Chicago.",
+  "logo": "https://raw.githubusercontent.com/Art-Institute-of-Chicago/template/master/aic-logo.gif",
+  "within": "http://www.artic.edu/collection",
+  "rendering": {
+    "@id": "http://www.artic.edu/artworks/27992",
+    "format": "text/html",
+    "label": "Full record"
+  },
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@type": "sc:Canvas",
+          "@id": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb",
+          "label": "A Sunday on La Grande Jatte — 1884, 1884–86, border added 1888–89. Georges Seurat (French, 1859–1891)",
+          "width": 843,
+          "height": 565,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb",
+              "resource": {
+                "@type": "dctypes:Image",
+                "@id": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb/full/843,/0/default.jpg",
+                "width": 843,
+                "height": 565,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "@type": "sc:Canvas",
+          "@id": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6",
+          "label": "A Sunday on La Grande Jatte — 1884, 1884–86, border added 1888–89. Georges Seurat (French, 1859–1891)",
+          "width": 843,
+          "height": 599,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6",
+              "resource": {
+                "@type": "dctypes:Image",
+                "@id": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6/full/843,/0/default.jpg",
+                "width": 843,
+                "height": 599,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

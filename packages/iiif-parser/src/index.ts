@@ -1,5 +1,5 @@
 export { IIIF } from './classes/iiif.js'
-export { Collection } from './classes/collection.js'
+export { Collection, EmbeddedCollection } from './classes/collection.js'
 export { Manifest, EmbeddedManifest } from './classes/manifest.js'
 export { Canvas } from './classes/canvas.js'
 export { Image, EmbeddedImage } from './classes/image.js'

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
+import { CanvasSchema, ImageSchema } from '../schemas/iiif.js'
+import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
+import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { EmbeddedImage, Image } from './image.js'
-import { CanvasSchema } from '../schemas/iiif.js'
 
 import type { LanguageString, Metadata } from '../lib/types.js'
 import {
@@ -12,6 +14,10 @@ import {
 } from '../lib/strings.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
+type ImageType = z.infer<typeof ImageSchema>
+type EmbeddedImageType =
+  | z.infer<typeof AnnotationBody3Schema>
+  | z.infer<typeof ImageResource2Schema>
 
 const CanvasTypeString = 'canvas'
 
@@ -69,11 +75,15 @@ export class Canvas {
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
 
-      let annotationBody
+      let annotationBody: ImageType | EmbeddedImageType
       if (Array.isArray(annotationBodyOrBodies)) {
         annotationBody = annotationBodyOrBodies[0]
-      } else {
+      } else if (annotationBodyOrBodies.type === 'Image') {
         annotationBody = annotationBodyOrBodies
+      } else if (annotationBodyOrBodies.type === 'Choice') {
+        annotationBody = annotationBodyOrBodies.items[0]
+      } else {
+        throw new Error('Invalid IIIF Canvas')
       }
 
       this.image = new EmbeddedImage(annotationBody, parsedCanvas)
