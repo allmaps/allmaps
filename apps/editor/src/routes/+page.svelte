@@ -11,8 +11,6 @@
   import URLInput from '$lib/components/URLInput.svelte'
   import Organizations from '$lib/components/Organizations.svelte'
 
-  import masks from '$lib/images/masks.svg'
-
   import organizations from '$lib/shared/organizations.js'
 
   let autofocus = $state(false)
@@ -58,8 +56,8 @@
 
 <div class="*:p-4 flex flex-col items-center gap-4">
   <section
+    id="start-georeferencing"
     class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-end aspect-[715/387] bg-cover my-2 sm:my-12 bg-center"
-    style:background-image="url({masks})"
   >
     <div class="max-w-sm w-full flex flex-col gap-6 items-center mt-24">
       <h1 class="text-2xl sm:text-4xl font-bold text-black text-center">
@@ -93,3 +91,9 @@
     </div>
   </section>
 </div>
+
+<style scoped>
+  #start-georeferencing {
+    background-image: url('$lib/images/masks.svg');
+  }
+</style>
