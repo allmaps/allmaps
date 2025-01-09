@@ -9,7 +9,6 @@
   } from 'phosphor-svelte'
 
   import { getExamplesState } from '$lib/state/examples.svelte.js'
-  import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
   import Example from '$lib/components/Example.svelte'
 
@@ -93,20 +92,20 @@
   </div>
 
   {#if usePagination}
-    <div class="my-8 flex items-center justify-center">
+    <div class="my-8 flex items-center justify-center text-xs">
       <Pagination.PrevButton
-        class="mr-[25px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+        class="mr-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
       >
         <CaretLeftIcon class="size-6" />
       </Pagination.PrevButton>
       <div class="flex items-center gap-2.5">
         {#each pages as page (page.key)}
           {#if page.type === 'ellipsis'}
-            <div class="text-[15px] font-medium text-foreground-alt">...</div>
+            <div class="font-medium text-foreground-alt">...</div>
           {:else}
             <Pagination.Page
               {page}
-              class="inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent text-[15px] font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-[selected]:bg-gray-100 data-[selected]:text-background"
+              class="inline-flex size-10 items-center justify-center rounded-lg bg-transparent font-medium hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-[selected]:bg-blue-200"
             >
               {page.value}
             </Pagination.Page>
@@ -114,13 +113,10 @@
         {/each}
       </div>
       <Pagination.NextButton
-        class="ml-[29px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+        class="ml-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
       >
         <CaretRightIcon class="size-6" />
       </Pagination.NextButton>
     </div>
-    <!-- <p class="text-center text-[13px] text-muted-foreground">
-      Examples {range.start + 1} – {range.end}
-    </p> -->
   {/if}
 </Pagination.Root>
