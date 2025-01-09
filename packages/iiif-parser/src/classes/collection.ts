@@ -185,9 +185,11 @@ export class Collection extends EmbeddedCollection {
         return [...canvases, ...item.canvases]
       } else if (item instanceof EmbeddedManifest) {
         return canvases
-      } else {
+      } else if (item instanceof Collection) {
         return [...canvases, ...item.canvases]
       }
+
+      return canvases
     }, initialValue)
   }
 
