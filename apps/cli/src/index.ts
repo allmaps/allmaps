@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command, CommanderError } from 'commander'
+import { Command, CommanderError } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
 import annotation from './commands/annotation.js'

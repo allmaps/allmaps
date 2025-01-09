@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import dezoomify from './script/dezoomify.js'
 import geotiff from './script/geotiff.js'

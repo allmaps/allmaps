@@ -7,13 +7,15 @@ type ParseOptions = {
   fetchManifests: boolean
   fetchImages: boolean
   fetchAll: boolean
+  maxDepth: number
 }
 
 const defaultParseOptions = {
   fetchCollections: false,
   fetchManifests: false,
   fetchImages: false,
-  fetchAll: false
+  fetchAll: false,
+  maxDepth: Number.POSITIVE_INFINITY
 }
 
 function fetchFn(
@@ -30,6 +32,7 @@ export async function parseIiif(
 ) {
   if (options && options.fetchAll) {
     options = {
+      ...options,
       fetchCollections: true,
       fetchManifests: true,
       fetchImages: true

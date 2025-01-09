@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import parse from './annotation/parse.js'
 import generate from './annotation/generate.js'

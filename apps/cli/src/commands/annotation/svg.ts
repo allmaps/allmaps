@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import { parseJsonInput, printString } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
@@ -15,7 +15,7 @@ export default function svg() {
       'Generates SVG from resource masks of input Georeference Annotations'
     )
     .action(async (files) => {
-      const jsonValues = await parseJsonInput(files as string[])
+      const jsonValues = await parseJsonInput(files)
       const maps = parseAnnotationsValidateMaps(jsonValues)
 
       const polygons = maps.map(mapToResourceMaskSvgPolygon)

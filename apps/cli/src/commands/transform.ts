@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import svg from './transform/svg.js'
 import geojson from './transform/geojson.js'
