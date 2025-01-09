@@ -1,0 +1,1695 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://codexxolotl.com/iiif/manifest.json",
+  "type": "Manifest",
+  "behavior": ["individuals", "no-auto-advance"],
+  "viewingDirection": "left-to-right",
+  "label": {
+    "none": ["Codex Xolotl"]
+  },
+  "summary": {
+    "none": [""]
+  },
+  "provider": [
+    {
+      "id": "https://codexxolotl.com/",
+      "type": "Agent",
+      "label": {
+        "none": ["Codex Xolotl"]
+      }
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://dlc.services/iiif-img/22/2/?pretty_print=1",
+      "type": "Dataset",
+      "label": {
+        "none": ["Item metadata"]
+      },
+      "format": "application/ld+json",
+      "profile": "https://www.w3.org/TR/json-ld/"
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "en": ["Title"]
+      },
+      "value": {
+        "en": ["Codex Xolotl X.010r"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Identifier"]
+      },
+      "value": {
+        "none": ["en"]
+      }
+    }
+  ],
+  "homepage": [
+    {
+      "id": "https://codexxolotl.com",
+      "type": "Text",
+      "label": {
+        "none": ["Codex Xolotl"]
+      },
+      "format": "text/html"
+    }
+  ],
+  "items": [
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/1",
+      "type": "Canvas",
+      "width": 3694,
+      "height": 5106,
+      "label": {
+        "en": ["X.012v"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.012v/annotation-page/1",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.012v/annotation/1",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012v_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3694,
+                    "height": 5106,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012v_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012v_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3694,
+                    "height": 5106,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012v_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012v_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3694,
+                    "height": 5106,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012v_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012v_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3694,
+                    "height": 5106,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012v_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/2",
+      "type": "Canvas",
+      "width": 2757,
+      "height": 4979,
+      "label": {
+        "en": ["X.011v"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.011v/annotation-page/2",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.011v/annotation/2",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011v_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 2757,
+                    "height": 4979,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011v_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011v_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 2757,
+                    "height": 4979,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011v_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011v_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 2757,
+                    "height": 4979,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011v_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011v_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 2757,
+                    "height": 4979,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011v_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/3",
+      "type": "Canvas",
+      "width": 3669,
+      "height": 5199,
+      "label": {
+        "en": ["X.012r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.012r/annotation-page/3",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.012r/annotation/3",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012r_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3669,
+                    "height": 5199,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012r_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012r_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3669,
+                    "height": 5199,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012r_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012r_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3669,
+                    "height": 5199,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012r_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.012r_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3669,
+                    "height": 5199,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.012r_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/4",
+      "type": "Canvas",
+      "width": 3053,
+      "height": 5082,
+      "label": {
+        "en": ["X.011r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.011r/annotation-page/4",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.011r/annotation/4",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011r_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3053,
+                    "height": 5082,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011r_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011r_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3053,
+                    "height": 5082,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011r_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011r_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3053,
+                    "height": 5082,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011r_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.011r_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3053,
+                    "height": 5082,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.011r_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/5",
+      "type": "Canvas",
+      "width": 6076,
+      "height": 5221,
+      "label": {
+        "en": ["X.010v"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.010v/annotation-page/5",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.010v/annotation/5",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010v_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6076,
+                    "height": 5221,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010v_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010v_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6076,
+                    "height": 5221,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010v_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010v_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6076,
+                    "height": 5221,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010v_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010v_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6076,
+                    "height": 5221,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010v_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/6",
+      "type": "Canvas",
+      "width": 6072,
+      "height": 4981,
+      "label": {
+        "en": ["X.010r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.010r/annotation-page/6",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.010r/annotation/6",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010r_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6072,
+                    "height": 4981,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010r_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010r_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6072,
+                    "height": 4981,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010r_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010r_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6072,
+                    "height": 4981,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010r_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.010r_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 6072,
+                    "height": 4981,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.010r_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/7",
+      "type": "Canvas",
+      "width": 8141,
+      "height": 7457,
+      "label": {
+        "en": ["X.020r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.020r/annotation-page/7",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.020r/annotation/7",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.020r_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8141,
+                    "height": 7457,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.020r_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.020r_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8141,
+                    "height": 7457,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.020r_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.020r_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8141,
+                    "height": 7457,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.020r_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.020r_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8141,
+                    "height": 7457,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.020r_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/8",
+      "type": "Canvas",
+      "width": 8272,
+      "height": 7561,
+      "label": {
+        "en": ["X.030r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.030r/annotation-page/8",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.030r/annotation/8",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.030_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8272,
+                    "height": 7561,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.030_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.030_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8272,
+                    "height": 7561,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.030_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.030_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8272,
+                    "height": 7561,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.030_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.030_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8272,
+                    "height": 7561,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.030_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/9",
+      "type": "Canvas",
+      "width": 8399,
+      "height": 7532,
+      "label": {
+        "en": ["X.040"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.040/annotation-page/9",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.040/annotation/9",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.040_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8399,
+                    "height": 7532,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.040_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.040_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8399,
+                    "height": 7532,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.040_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.040_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8399,
+                    "height": 7532,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.040_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.040_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8399,
+                    "height": 7532,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.040_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/10",
+      "type": "Canvas",
+      "width": 9139,
+      "height": 7704,
+      "label": {
+        "en": ["X.050"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.050/annotation-page/10",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.050/annotation/10",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.050_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9139,
+                    "height": 7704,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.050_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.050_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9139,
+                    "height": 7704,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.050_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.050_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9139,
+                    "height": 7704,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.050_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.050_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9139,
+                    "height": 7704,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.050_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/11",
+      "type": "Canvas",
+      "width": 8976,
+      "height": 7496,
+      "label": {
+        "en": ["X.060"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.060/annotation-page/11",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.060/annotation/11",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.060_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8976,
+                    "height": 7496,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.060_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.060_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8976,
+                    "height": 7496,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.060_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.060_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8976,
+                    "height": 7496,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.060_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.060_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8976,
+                    "height": 7496,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.060_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/11"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/12",
+      "type": "Canvas",
+      "width": 9656,
+      "height": 7677,
+      "label": {
+        "en": ["X.070"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.070/annotation-page/12",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.070/annotation/12",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.070_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9656,
+                    "height": 7677,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.070_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.070_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9656,
+                    "height": 7677,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.070_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.070_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9656,
+                    "height": 7677,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.070_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.070_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9656,
+                    "height": 7677,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.070_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/13",
+      "type": "Canvas",
+      "width": 9119,
+      "height": 7443,
+      "label": {
+        "en": ["X.080"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.080/annotation-page/13",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.080/annotation/13",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.080_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9119,
+                    "height": 7443,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.080_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.080_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9119,
+                    "height": 7443,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.080_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.080_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9119,
+                    "height": 7443,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.080_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.080_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9119,
+                    "height": 7443,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.080_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/13"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/14",
+      "type": "Canvas",
+      "width": 9299,
+      "height": 7044,
+      "label": {
+        "en": ["X.090"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.090/annotation-page/14",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.090/annotation/14",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.090_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9299,
+                    "height": 7044,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.090_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.090_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9299,
+                    "height": 7044,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.090_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.090_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9299,
+                    "height": 7044,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.090_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.090_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9299,
+                    "height": 7044,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.090_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/15",
+      "type": "Canvas",
+      "width": 9678,
+      "height": 7619,
+      "label": {
+        "en": ["X.100r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.100r/annotation-page/15",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.100r/annotation/15",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100r_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9678,
+                    "height": 7619,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100r_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100r_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9678,
+                    "height": 7619,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100r_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100r_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9678,
+                    "height": 7619,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100r_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100r_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 9678,
+                    "height": 7619,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100r_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/16",
+      "type": "Canvas",
+      "width": 8462,
+      "height": 7625,
+      "label": {
+        "en": ["X.100v"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.100v/annotation-page/16",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.100v/annotation/16",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100v_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8462,
+                    "height": 7625,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100v_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100v_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8462,
+                    "height": 7625,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100v_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100v_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8462,
+                    "height": 7625,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100v_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.100v_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 8462,
+                    "height": 7625,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.100v_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/16"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://codexxolotl.com/iiif-img/22/2/canvas/17",
+      "type": "Canvas",
+      "width": 3746,
+      "height": 3239,
+      "label": {
+        "en": ["X.013r"]
+      },
+      "items": [
+        {
+          "id": "https://codexxolotl.com/iiif-img/22/2/X.013r/annotation-page/17",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://codexxolotl.com/iiif-img/22/2/X.013r/annotation/17",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "type": "Choice",
+                "items": [
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.013_VIS/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3746,
+                    "height": 3239,
+                    "label": {
+                      "en": ["Visible light"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.013_VIS",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.013_UVR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3746,
+                    "height": 3239,
+                    "label": {
+                      "en": ["UVR"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.013_UVR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.013_UVF/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3746,
+                    "height": 3239,
+                    "label": {
+                      "en": ["UVF"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.013_UVF",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "https://dlc.services/iiif-img/22/2/X.013_IR/full/max/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "width": 3746,
+                    "height": 3239,
+                    "label": {
+                      "en": ["Infrared"]
+                    },
+                    "service": [
+                      {
+                        "id": "https://dlc.services/iiif-img/22/2/X.013_IR",
+                        "type": "ImageService3",
+                        "profile": "level1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "target": "https://dlc.services/iiif-img/22/2/canvas/17"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

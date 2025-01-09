@@ -8,14 +8,37 @@ import { ImageServiceSchema } from './image-service.js'
 export const SingleValue2Schema = z.string().or(z.number()).or(z.boolean())
 export const Value2Schema = SingleValue2Schema.or(SingleValue2Schema.array())
 
-export const LanguageValue2Schema = z.object({
-  '@language': z.string().optional(),
-  '@value': Value2Schema
-})
+export const LanguageValue2Schema = z
+  .union([
+    z.object({
+      '@language': z.string().optional(),
+      '@value': Value2Schema
+    }),
+    // This is invalid but some IIIF manifests use this incorrect format
+    z.object({
+      language: z.string().optional(),
+      value: Value2Schema
+    }),
+    z.any()
+  ])
+  .transform((val) => {
+    if (val && typeof val === 'object') {
+      if ('@language' in val && '@value' in val) {
+        return val
+      } else if ('language' in val && 'value' in val) {
+        return {
+          '@language': val.language,
+          '@value': val.value
+        }
+      }
+    }
+  })
 
-export const PossibleLanguageValue2Schema = Value2Schema.or(
+export const PossibleLanguageValue2Schema = z.union([
+  Value2Schema,
+  LanguageValue2Schema.array(),
   LanguageValue2Schema
-).or(LanguageValue2Schema.array())
+])
 
 export const MetadataItem2Schema = z
   .union([
@@ -77,8 +100,12 @@ export type Collection2 = {
   '@type': 'sc:Collection'
   label?: z.infer<typeof PossibleLanguageValue2Schema>
   manifests?: EmbeddedManifest2[]
-  collections?: Collection2[]
-  members?: (EmbeddedManifest2 | Collection2)[]
+  collections?: (Collection2 | z.infer<typeof EmbeddedCollection2Schema>)[]
+  members?: (
+    | EmbeddedManifest2
+    | Collection2
+    | z.infer<typeof EmbeddedCollection2Schema>
+  )[]
 }
 
 export const EmbeddedManifest2Schema: z.ZodType<EmbeddedManifest2> = z.lazy(
@@ -97,6 +124,19 @@ export const Collection2Schema: z.ZodType<Collection2> = z.lazy(() =>
     label: PossibleLanguageValue2Schema.optional(),
     manifests: EmbeddedManifest2Schema.array().optional(),
     collections: Collection2Schema.array().optional(),
-    members: EmbeddedManifest2Schema.or(Collection2Schema).array().optional()
+    members: z
+      .union([
+        EmbeddedManifest2Schema,
+        Collection2Schema,
+        EmbeddedCollection2Schema
+      ])
+      .array()
+      .optional()
   })
 )
+
+export const EmbeddedCollection2Schema = z.object({
+  '@id': z.string().url(),
+  '@type': z.literal('sc:Collection'),
+  label: PossibleLanguageValue2Schema.optional()
+})

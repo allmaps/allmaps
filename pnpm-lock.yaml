@@ -35,9 +35,12 @@ importers:
       '@allmaps/transform':
         specifier: ^1.0.0-beta.41
         version: link:../../packages/transform
+      '@commander-js/extra-typings':
+        specifier: ^13.0.0
+        version: 13.0.0(commander@13.0.0)
       commander:
-        specifier: ^10.0.0
-        version: 10.0.1
+        specifier: ^13.0.0
+        version: 13.0.0
       stream-json:
         specifier: ^1.7.4
         version: 1.9.1
@@ -1175,8 +1178,8 @@ importers:
         specifier: ^1.0.0-beta.15
         version: link:../types
       zod:
-        specifier: ^3.22.4
-        version: 3.24.0
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@types/eslint':
         specifier: ^8.56.0
@@ -1808,14 +1811,14 @@ packages:
   /@allmaps/annotation@1.0.0-beta.30:
     resolution: {integrity: sha512-XsQfGdX+TBaha+Zt9s86waSrEUcM1pnVkaCnyJN6/04j/2wzpubHRhPPUM+SYby+FHsxbd7hKNjhmIpnzKlj4w==}
     dependencies:
-      zod: 3.24.0
+      zod: 3.24.1
     dev: false
 
   /@allmaps/iiif-parser@1.0.0-beta.40:
     resolution: {integrity: sha512-92pk/zoiNGpqOR4WooFkCIZnEwUjAu4fOsi5LnMLeydxbV8sKGBmbN3BWg9Imlqcf7/qW0sl8QM4aJcepvAsJw==}
     dependencies:
       '@allmaps/types': 1.0.0-beta.15
-      zod: 3.24.0
+      zod: 3.24.1
     dev: false
 
   /@allmaps/stdlib@1.0.0-beta.30:
@@ -1991,7 +1994,7 @@ packages:
     dependencies:
       sitemap: 8.0.0
       stream-replace-string: 2.0.0
-      zod: 3.24.0
+      zod: 3.24.1
     dev: false
 
   /@astrojs/starlight-tailwind@2.0.3(@astrojs/starlight@0.29.2)(@astrojs/tailwind@5.1.3)(tailwindcss@3.4.16):
@@ -2401,12 +2404,20 @@ packages:
     engines: {node: '>=16.7.0'}
     dependencies:
       mime: 3.0.0
-      zod: 3.24.0
+      zod: 3.24.1
     dev: true
 
   /@cloudflare/workers-types@4.20241205.0:
     resolution: {integrity: sha512-pj1VKRHT/ScQbHOIMFODZaNAlJHQHdBSZXNIdr9ebJzwBff9Qz8VdqhbhggV7f+aUEh8WSbrsPIo4a+WtgjUvw==}
     dev: true
+
+  /@commander-js/extra-typings@13.0.0(commander@13.0.0):
+    resolution: {integrity: sha512-4or44L3saI49QRBvdSzfCtzqONlFg0/qy0Cfl+LRynDaxlGs7r2KRTLCELaAoKh4oQguICxRwQfm77/Up+0wTw==}
+    peerDependencies:
+      commander: ~13.0.0
+    dependencies:
+      commander: 13.0.0
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -6440,15 +6451,15 @@ packages:
   /comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
 
-  /commander@10.0.1:
-    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
-    engines: {node: '>=14'}
-    dev: false
-
   /commander@12.1.0:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
     dev: true
+
+  /commander@13.0.0:
+    resolution: {integrity: sha512-oPYleIY8wmTVzkvQq10AEok6YcTC4sRUBl8F9gVuwchGVUCTbl/vhLTaQqutuuySYOsu8YTgV+OxKc/8Yvx+mQ==}
+    engines: {node: '>=18'}
+    dev: false
 
   /commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
@@ -10675,7 +10686,7 @@ packages:
       workerd: 1.20240405.0
       ws: 8.18.0
       youch: 3.3.4
-      zod: 3.24.0
+      zod: 3.24.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -10698,7 +10709,7 @@ packages:
       workerd: 1.20241205.0
       ws: 8.18.0
       youch: 3.3.4
-      zod: 3.24.0
+      zod: 3.24.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -15576,6 +15587,9 @@ packages:
 
   /zod@3.24.0:
     resolution: {integrity: sha512-Hz+wiY8yD0VLA2k/+nsg2Abez674dDGTai33SwNvMPuf9uIrBC9eFgIMQxBBbHFxVXi8W+5nX9DcAh9YNSQm/w==}
+
+  /zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
   /zstddec@0.1.0:
     resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}

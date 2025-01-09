@@ -2,7 +2,8 @@ import type {
   Image,
   EmbeddedImage,
   Manifest,
-  Collection
+  Collection,
+  EmbeddedCollection
 } from '@allmaps/iiif-parser'
 
 import { fetchJson } from './fetch.js'
@@ -43,20 +44,22 @@ async function fetchAnnotationsForManifest(
 }
 
 async function fetchAnnotationsForCollection(
-  parsedCollection: Collection
+  parsedCollection: Collection | EmbeddedCollection
 ): Promise<unknown[]> {
   try {
     const annotations = await fetchAnnotationsByIiifUrl(parsedCollection.uri)
     return [annotations]
   } catch (err) {
     const annotations: unknown[] = []
-    for (const item of parsedCollection.items) {
-      if (item.type === 'collection') {
-        const itemAnnotations = await fetchAnnotationsForCollection(item)
-        annotations.push(...itemAnnotations)
-      } else if (item.type === 'manifest' && 'canvases' in item) {
-        const itemAnnotations = await fetchAnnotationsForManifest(item)
-        annotations.push(...itemAnnotations)
+    if ('items' in parsedCollection) {
+      for (const item of parsedCollection.items) {
+        if (item.type === 'collection') {
+          const itemAnnotations = await fetchAnnotationsForCollection(item)
+          annotations.push(...itemAnnotations)
+        } else if (item.type === 'manifest' && 'canvases' in item) {
+          const itemAnnotations = await fetchAnnotationsForManifest(item)
+          annotations.push(...itemAnnotations)
+        }
       }
     }
 

@@ -2,6 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "composite": false,
     "rootDir": "./src",
     "outDir": "./dist"
   },

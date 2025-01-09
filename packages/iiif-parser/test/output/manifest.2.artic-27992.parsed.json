@@ -1,0 +1,100 @@
+{
+  "embedded": false,
+  "uri": "https://api.artic.edu/api/v1/artworks/27992/manifest.json",
+  "type": "manifest",
+  "label": {
+    "none": ["A Sunday on La Grande Jatte — 1884"]
+  },
+  "majorVersion": 2,
+  "canvases": [
+    {
+      "uri": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb",
+      "type": "canvas",
+      "height": 565,
+      "width": 843,
+      "image": {
+        "embedded": true,
+        "uri": "https://www.artic.edu/iiif/2/2d484387-2509-5e8e-2c43-22f9981972eb",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 843,
+        "height": 565,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": [
+          "A Sunday on La Grande Jatte — 1884, 1884–86, border added 1888–89. Georges Seurat (French, 1859–1891)"
+        ]
+      }
+    },
+    {
+      "uri": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6",
+      "type": "canvas",
+      "height": 599,
+      "width": 843,
+      "image": {
+        "embedded": true,
+        "uri": "https://www.artic.edu/iiif/2/6782523e-056b-ba22-69f9-b5f1b59efcb6",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 843,
+        "height": 599,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": [
+          "A Sunday on La Grande Jatte — 1884, 1884–86, border added 1888–89. Georges Seurat (French, 1859–1891)"
+        ]
+      }
+    }
+  ],
+  "description": {
+    "en": [
+      "In his best-known and largest painting, Georges Seurat depicted people from different social classes strolling and relaxing in a park just west of Paris on La Grande Jatte, an island in the Seine River. Although he took his subject from modern life, Seurat sought to evoke the sense of timelessness associated with ancient art, especially Egyptian and Greek sculpture. He once wrote, “I want to make modern people, in their essential traits, move about as they do on those friezes, and place them on canvases organized by harmonies of color.”\nSeurat painted A Sunday on La Grande Jatte—1884 using pointillism, a highly systematic and scientific technique based on the hypothesis that closely positioned points of pure color mix together in the viewer’s eye. He began work on the canvas in 1884 (and included this date in the title) with a layer of small, horizontal brushstrokes in complementary colors. He next added a series of dots that coalesce into solid and luminous forms when seen from a distance. Sometime before 1889 Seurat added a border of blue, orange, and red dots that provide a visual transition between the painting’s interior and the specially designed white frame, which has been re-created at the Art Institute.\n"
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["Artist / Maker"]
+      },
+      "value": {
+        "none": ["Georges Seurat (French, 1859–1891)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Medium"]
+      },
+      "value": {
+        "none": ["Oil on canvas"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Dimensions"]
+      },
+      "value": {
+        "none": ["207.5 × 308.1 cm (81 3/4 × 121 1/4 in.)"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Object Number"]
+      },
+      "value": {
+        "none": ["1926.224"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Collection"]
+      },
+      "value": {
+        "none": [
+          "<a href='http://www.artic.edu/collection' target='_blank'>Art Institute of Chicago</a>"
+        ]
+      }
+    }
+  ]
+}

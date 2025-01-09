@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import { IIIF, Image, Manifest } from '@allmaps/iiif-parser'
 
@@ -18,7 +18,7 @@ export default function manifest() {
       // TODO: add version option to allow choosing between IIIF Presentation API 2.1 and 3.0
       .option('-i, --id <id>', 'Manifest ID', 'https://example.org/manifest')
       .action(async (files, options) => {
-        const jsonValues = await parseJsonInput(files as string[])
+        const jsonValues = await parseJsonInput(files)
 
         const parsedImages = []
         const parsedIiif = jsonValues.map((jsonValue) => IIIF.parse(jsonValue))
@@ -31,7 +31,7 @@ export default function manifest() {
             throw new Error('IIIF Collections not yet supported')
           }
         }
-        const manifest = generateManifest(options.id as string, parsedImages)
+        const manifest = generateManifest(options.id, parsedImages)
         printJson(manifest)
       })
   )

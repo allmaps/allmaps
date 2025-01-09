@@ -37,7 +37,7 @@ type EmbeddedImageType =
   | z.infer<typeof AnnotationBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
-const ImageTypeString = 'image'
+const ImageTypeString = 'image' as const
 
 /**
  * Parsed IIIF Image, embedded in a Canvas
@@ -70,15 +70,18 @@ export class EmbeddedImage {
 
   majorVersion: MajorVersion
 
-  constructor(
-    parsedImage: ImageType | EmbeddedImageType,
-    parsedCanvas?: CanvasType
-  ) {
-    if (parsedCanvas) {
-      const parsedEmbeddedImage = parsedImage as EmbeddedImageType
+  constructor(parsedImage: ImageType)
+  constructor(parsedEmbeddedImage: EmbeddedImageType, parsedCanvas: CanvasType)
+  constructor(...args: [ImageType] | [EmbeddedImageType, CanvasType]) {
+    const parsedImage = args[0]
+    const parsedCanvas = args[1]
+
+    if (args.length === 2) {
+      const parsedEmbeddedImage = args[0]
 
       let imageService: ImageServiceType | undefined
       let majorVersion: MajorVersion | undefined
+
       if (Array.isArray(parsedEmbeddedImage.service)) {
         parsedEmbeddedImage.service.forEach((currentImageService) => {
           try {
@@ -88,7 +91,7 @@ export class EmbeddedImage {
               majorVersion = currentMajorVersion
               imageService = currentImageService
             }
-          } catch (err) {
+          } catch {
             // Ignore this error, throw error later if no valid image service is found
           }
         })

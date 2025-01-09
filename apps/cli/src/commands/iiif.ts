@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import parse from './iiif/parse.js'
 import manifest from './iiif/manifest.js'
