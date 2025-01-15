@@ -28,8 +28,6 @@ import type {
   MapPruneInfo
 } from '../shared/types.js'
 
-const MIN_VIEWPORT_DIAMETER = 5
-
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
 const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 2
@@ -274,15 +272,6 @@ export default abstract class BaseRenderer<
       // Note: don't load image information here
       // this would imply waiting for the first throttling cycle to complete
       // before acting on a sucessful load
-      return []
-    }
-
-    // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
-    // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
-    if (
-      bboxToDiameter(warpedMap.getViewportMaskBbox(viewport)) <
-      MIN_VIEWPORT_DIAMETER
-    ) {
       return []
     }
 
