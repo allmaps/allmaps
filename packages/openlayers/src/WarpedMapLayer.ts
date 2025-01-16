@@ -15,7 +15,7 @@ import type { Extent } from 'ol/extent'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { WarpedMapLayerOptions } from '@allmaps/render'
-import type { Ring, ImageInformations } from '@allmaps/types'
+import type { Ring, ImageInformations, Gcp } from '@allmaps/types'
 
 export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
 
@@ -250,6 +250,16 @@ export default class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Sets the GCOs of a single map
+   * @param {string} mapId - ID of the map
+   * @param {Gcp[]} gcos - new GCPs
+   */
+  setMapGcps(mapId: string, gcps: Gcp[]) {
+    this.renderer.warpedMapList.setMapGcps(mapId, gcps)
+    this.changed()
+  }
+
+  /**
    * Sets the transformation type of multiple maps
    * @param {Iterable<string>} mapIds - IDs of the maps
    * @param {TransformationType} transformation - new transformation type
@@ -266,6 +276,16 @@ export default class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Sets the transformation type of a single map
+   * @param {string} mapId - ID of the map
+   * @param {TransformationType} transformation - new transformation type
+   */
+  setMapTransformationType(mapId: string, transformation: TransformationType) {
+    this.renderer.warpedMapList.setMapTransformationType(mapId, transformation)
+    this.changed()
+  }
+
+  /**
    * Sets the distortion measure of multiple maps
    * @param {Iterable<string>} mapIds - IDs of the maps
    * @param {DistortionMeasure} distortionMeasure - new distortion measure
@@ -278,6 +298,11 @@ export default class WarpedMapLayer extends Layer {
       mapIds,
       distortionMeasure
     )
+    this.changed()
+  }
+
+  removeGeoreferencedMapById(mapId: string) {
+    this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
     this.changed()
   }
 

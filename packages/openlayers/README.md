@@ -152,7 +152,9 @@ All these map phases originating from the same Georeference Annotation have the 
     *   [hideMaps](#hidemaps)
     *   [isMapVisible](#ismapvisible)
     *   [setMapResourceMask](#setmapresourcemask)
+    *   [setMapGcps](#setmapgcps)
     *   [setMapsTransformationType](#setmapstransformationtype)
+    *   [setMapTransformationType](#setmaptransformationtype)
     *   [setMapsDistortionMeasure](#setmapsdistortionmeasure)
     *   [getLonLatExtent](#getlonlatextent)
     *   [getExtent](#getextent)
@@ -343,6 +345,16 @@ Sets the resource mask of a single map
 *   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `resourceMask` **Ring** new resource mask
 
+#### setMapGcps
+
+Sets the GCOs of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `gcps` &#x20;
+*   `gcos` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>** new GCPs
+
 #### setMapsTransformationType
 
 Sets the transformation type of multiple maps
@@ -350,6 +362,15 @@ Sets the transformation type of multiple maps
 ##### Parameters
 
 *   `mapIds` **Iterable<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** IDs of the maps
+*   `transformation` **[TransformationType](#transformationtype)** new transformation type
+
+#### setMapTransformationType
+
+Sets the transformation type of a single map
+
+##### Parameters
+
+*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 *   `transformation` **[TransformationType](#transformationtype)** new transformation type
 
 #### setMapsDistortionMeasure

@@ -762,7 +762,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // prevent triggering an infinite loop
     // caused by the TEXTURESUPDATED event at the end
     if (
-      this.cachedTilesForTexture.length != 0 &&
+      this.cachedTilesForTexture.length !== 0 &&
       subSetArray(
         this.previousCachedTilesForTexture.map(
           (textureTile) => textureTile.tileUrl

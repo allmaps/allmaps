@@ -545,7 +545,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
     higherScaleFactor,
     validTile
   )
-  if (tileAtHigherScaleFactor != undefined) {
+  if (tileAtHigherScaleFactor !== undefined) {
     return tileAtHigherScaleFactor
   } else {
     return recursivelyGetTilesAtHigherScaleFactor(

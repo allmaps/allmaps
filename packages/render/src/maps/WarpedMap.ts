@@ -403,7 +403,7 @@ export default class WarpedMap extends EventTarget {
   /**
    * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
    *
-   * @param {GCP[]} gcps
+   * @param {Gcp[]} gcps
    */
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps

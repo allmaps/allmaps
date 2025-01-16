@@ -21,6 +21,7 @@ import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type {
   Ring,
   Bbox,
+  Gcp,
   Point,
   FetchFn,
   ImageInformations
@@ -247,6 +248,36 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
+   * Sets the GCPs for a specified map
+   *
+   * @param {string} mapId - ID of the map
+   * @param {Gcp[]} gcps - new GCPs
+   */
+  setMapGcps(mapId: string, gcps: Gcp[]): void {
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      warpedMap.setGcps(gcps)
+      this.addToOrUpdateRtree(warpedMap)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.GCPSUPDATED, mapId)
+      )
+    }
+  }
+
+  /**
+   * Sets the transformation type of a single map
+   *
+   * @param {string} mapId - the ID of the map
+   * @param {TransformationType} transformationType - the new transformation type
+   */
+  setMapTransformationType(
+    mapId: string,
+    transformationType: TransformationType
+  ): void {
+    this.setMapsTransformationType([mapId], transformationType)
+  }
+
+  /**
    * Sets the transformation type of specified maps
    *
    * @param {Iterable<string>} mapIds - the IDs of the maps
@@ -259,10 +290,11 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const mapIdsChanged = []
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.transformationType != transformationType) {
+      if (warpedMap && warpedMap.transformationType !== transformationType) {
         mapIdsChanged.push(mapId)
       }
     }
+
     if (mapIdsChanged.length > 0) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
@@ -296,7 +328,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const mapIdsChanged = []
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.distortionMeasure != distortionMeasure) {
+      if (warpedMap && warpedMap.distortionMeasure !== distortionMeasure) {
         mapIdsChanged.push(mapId)
       }
     }
@@ -313,6 +345,25 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
       })
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIdsChanged)
+      )
+    }
+  }
+
+  /**
+   * Removes a warped map by its ID
+   *
+   * @param {string} mapId - the ID of the map
+   *
+   * @param {Iterable<string>} mapIds
+   */
+  removeGeoreferencedMapById(mapId: string) {
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      this.removeGeoreferencedMap(warpedMap)
+      this.removeFromRtree(warpedMap)
+
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
       )
     }
   }

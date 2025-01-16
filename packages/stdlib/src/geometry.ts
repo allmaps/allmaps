@@ -269,7 +269,7 @@ export function pointsAndPointsToLines(
   points0: Point[],
   points1: Point[]
 ): Line[] {
-  if (points0.length != points1.length)
+  if (points0.length !== points1.length)
     throw new Error('Point arrays should be of same lenght')
 
   return points0.map((point0, index) => [point0, points1[index]])

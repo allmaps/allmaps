@@ -286,7 +286,7 @@
         </div>
 
         <div>
-          <!-- eslint-expect-error-next-line -->
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="relative inline-flex items-center cursor-pointer">
             <Dial
               bind:value={$opacity}
