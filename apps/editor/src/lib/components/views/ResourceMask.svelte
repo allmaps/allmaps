@@ -130,7 +130,6 @@
         map: {
           id: mapId,
           version: 3,
-
           gcps: {},
           resource: {
             id: allmapsId,

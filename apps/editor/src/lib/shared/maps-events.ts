@@ -6,8 +6,9 @@ import type {
   RemoveResourceMaskPoint,
   InsertGcp,
   ReplaceGcp,
-  RemoveGcp
-} from '$lib/types/events'
+  RemoveGcp,
+  SetTransformation
+} from '$lib/types/events.js'
 
 export const MapsEvents = {
   INSERT_MAP: 'INSERT_MAP' as const,
@@ -17,7 +18,8 @@ export const MapsEvents = {
   REMOVE_RESOURCE_MASK_POINT: 'REMOVE_RESOURCE_MASK_POINT' as const,
   INSERT_GCP: 'INSERT_GCP' as const,
   REPLACE_GCP: 'REPLACE_GCP' as const,
-  REMOVE_GCP: 'REMOVE_GCP' as const
+  REMOVE_GCP: 'REMOVE_GCP' as const,
+  SET_TRANSFORMATION: 'SET_TRANSFORMATION' as const
 }
 
 interface MapsEventMap {
@@ -29,6 +31,7 @@ interface MapsEventMap {
   INSERT_GCP: InsertGcp
   REPLACE_GCP: ReplaceGcp
   REMOVE_GCP: RemoveGcp
+  SET_TRANSFORMATION: SetTransformation
 }
 
 interface IMapsEventTarget extends EventTarget {

@@ -87,6 +87,8 @@
       gotoRoute(createRouteUrl($page, 'mask'))
     } else if (event.key === '3') {
       gotoRoute(createRouteUrl($page, 'georeference'))
+    } else if (event.key === '4') {
+      gotoRoute(createRouteUrl($page, 'results'))
     }
   }
 

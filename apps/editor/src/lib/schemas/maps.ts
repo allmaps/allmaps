@@ -3,10 +3,16 @@ import { z } from 'zod'
 export const PointSchema = z.tuple([z.number(), z.number()])
 export const ResourceMaskSchema = PointSchema.array().min(3)
 
-export const TransformationSchema = z.object({
-  type: z.string(),
-  options: z.object({}).optional()
-})
+export const DbTransformationSchema = z.enum([
+  'straight',
+  'helmert',
+  'polynomial',
+  'polynomial1',
+  'polynomial2',
+  'polynomial3',
+  'projective',
+  'thinPlateSpline'
+])
 
 export const DbImageServiceSchema = z.enum([
   'ImageService1',
@@ -98,7 +104,7 @@ export const DbResource3Schema = DbResource2Schema
 
 export const DbMap3Schema = z.object({
   id: z.string(),
-  transformation: TransformationSchema.optional(),
+  transformation: DbTransformationSchema.optional(),
   gcps: DbGcps3Schema,
   resource: DbResource3Schema,
   version: z.literal(3),

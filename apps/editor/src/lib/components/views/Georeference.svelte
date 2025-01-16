@@ -84,15 +84,21 @@
   const imageInfoState = getImageInfoState()
 
   function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp3[]) {
-    return incompleteGcps
-      .toSorted((gcpA, gcpB) => gcpA.index - gcpB.index)
-      .find((gcp) => !getGcpResourcePoint(gcp))
+    return (
+      incompleteGcps
+        // TODO: create sortGcps function
+        .toSorted((gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0))
+        .find((gcp) => !getGcpResourcePoint(gcp))
+    )
   }
 
   function getFirstGcpWithMissingGeoPoint(incompleteGcps: DbGcp3[]) {
-    return incompleteGcps
-      .toSorted((gcpA, gcpB) => gcpA.index - gcpB.index)
-      .find((gcp) => !getGcpGeoPoint(gcp))
+    return (
+      incompleteGcps
+        // TODO: create sortGcps function
+        .toSorted((gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0))
+        .find((gcp) => !getGcpGeoPoint(gcp))
+    )
   }
 
   function resourceFeatureToPoint(
@@ -169,13 +175,14 @@
     const map = mapsState.activeMap
 
     if (map) {
+      // TODO: create sortGcps function
       const sortedGcps = Object.values(map.gcps).toSorted(
-        (gcpA, gcpB) => gcpA.index - gcpB.index
+        (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
       )
       const gcp = sortedGcps.find((gcp) => gcp.id === gcpId)
 
       if (gcp) {
-        return gcp.index
+        return gcp.index || 0
       } else if (sortedGcps.length) {
         const highestIndex = sortedGcps[sortedGcps.length - 1].index || 0
         return Math.floor(highestIndex) + 1 + Math.random()
@@ -540,8 +547,9 @@
     const map = mapsState.activeMap
 
     if (map) {
+      // TODO: create sortGcps function
       const sortedGcps = Object.values(map.gcps).toSorted(
-        (gcpA, gcpB) => gcpA.index - gcpB.index
+        (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
       )
       const gcpIndex = sortedGcps.findIndex((gcp) => gcp.id === gcpId)
 

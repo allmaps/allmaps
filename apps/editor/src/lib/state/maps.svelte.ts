@@ -26,7 +26,14 @@ import type { SourceState } from '$lib/state/source.svelte'
 import type { ErrorState } from '$lib/state/error.svelte'
 
 import type { Point } from '$lib/types/shared.js'
-import type { DbMap, DbMaps, DbGcp3, DbMap3, DbMaps3 } from '$lib/types/maps.js'
+import type {
+  DbMap,
+  DbMaps,
+  DbGcp3,
+  DbMap3,
+  DbMaps3,
+  DbTransformation
+} from '$lib/types/maps.js'
 import type {
   InsertMap,
   RemoveMap,
@@ -35,8 +42,9 @@ import type {
   RemoveResourceMaskPoint,
   InsertGcp,
   ReplaceGcp,
-  RemoveGcp
-} from '$lib/types/events'
+  RemoveGcp,
+  SetTransformation
+} from '$lib/types/events.js'
 
 import { PUBLIC_ALLMAPS_API_WS_URL } from '$env/static/public'
 
@@ -328,6 +336,24 @@ export class MapsState extends MapsEventTarget {
               new CustomEvent<RemoveGcp>(MapsEvents.REMOVE_GCP, { detail })
             )
           }
+        } else if (type === 'transformation') {
+          let transformation: DbTransformation | undefined
+
+          if ('i' in instruction) {
+            // TODO: use Zod to validate the data
+            transformation = instruction.i as DbTransformation
+          }
+
+          const detail = {
+            mapId,
+            transformation
+          }
+
+          this.dispatchEvent(
+            new CustomEvent<SetTransformation>(MapsEvents.SET_TRANSFORMATION, {
+              detail
+            })
+          )
         }
       }
     }
@@ -415,7 +441,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeMap({ mapId }: RemoveMap) {
-    if (!this.#doc) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -423,7 +449,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
-    if (!this.#doc) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -432,7 +458,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   replaceResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
-    if (!this.#doc) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -441,7 +467,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeResourceMaskPoint({ mapId, index }: RemoveResourceMaskPoint) {
-    if (!this.#doc) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -450,7 +476,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertGcp({ mapId, gcp }: InsertGcp) {
-    if (!this.#doc || !this.#maps) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -460,7 +486,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   replaceGcp({ mapId, gcp }: ReplaceGcp) {
-    if (!this.#doc || !this.#maps) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
@@ -470,12 +496,32 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeGcp({ mapId, gcpId }: RemoveGcp) {
-    if (!this.#doc || !this.#maps) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
       return
     }
 
     this.#doc.submitOp(removeOp([mapId, 'gcps', gcpId], false))
     this.activeMapId = mapId
+  }
+
+  setTransformation({ mapId, transformation }: SetTransformation) {
+    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+      return
+    }
+
+    const map = this.#maps[mapId]
+
+    if (transformation) {
+      if (map.transformation) {
+        this.#doc.submitOp(
+          replaceOp([mapId, 'transformation'], true, transformation)
+        )
+      } else {
+        this.#doc.submitOp(insertOp([mapId, 'transformation'], transformation))
+      }
+    } else if (map.transformation) {
+      this.#doc.submitOp(removeOp([mapId, 'transformation'], false))
+    }
   }
 
   get connected() {

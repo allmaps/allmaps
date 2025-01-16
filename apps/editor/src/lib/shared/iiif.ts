@@ -5,14 +5,19 @@ import type {
   EmbeddedImage as EmbeddedIIIFImage,
   Manifest as IIIFManifest,
   EmbeddedManifest as EmbeddedIIIFManifest,
-  Collection as IIIFCollection
+  Collection as IIIFCollection,
+  EmbeddedCollection as EmbeddedIIIFCollection
 } from '@allmaps/iiif-parser'
 
 function getImagesInternal(
   images: (IIIFImage | EmbeddedIIIFImage)[],
-  parsedIiif: IIIFManifest | EmbeddedIIIFManifest | IIIFCollection
+  parsedIiif:
+    | IIIFManifest
+    | EmbeddedIIIFManifest
+    | IIIFCollection
+    | EmbeddedIIIFCollection
 ) {
-  if (parsedIiif.type === 'collection') {
+  if (parsedIiif.type === 'collection' && 'items' in parsedIiif) {
     parsedIiif.items.map((item) => getImagesInternal(images, item))
     // TODO: don't load all images in collection. Show tree view instead.
   } else if (parsedIiif.type === 'manifest' && 'canvases' in parsedIiif) {
@@ -23,7 +28,7 @@ function getImagesInternal(
 }
 
 export function getImages(
-  parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
+  parsedIiif: IIIFImage | IIIFManifest | IIIFCollection | EmbeddedIIIFCollection
 ): (IIIFImage | EmbeddedIIIFImage)[] {
   const images: (IIIFImage | EmbeddedIIIFImage)[] = []
   if (parsedIiif.type === 'image') {

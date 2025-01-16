@@ -10,6 +10,9 @@ export type Params = {
   url: string | null
   image: string | null
   map: string | null
+  userBaseMapUrl: string | null
+  callback: string | null
+  bbox: string | null
 }
 
 export type Organization = {
@@ -25,7 +28,7 @@ export type GCP = {
 
 export type Point = [number, number]
 
-export type RouteID = 'images' | 'mask' | 'georeference' | ''
+export type RouteID = 'images' | 'mask' | 'georeference' | 'results' | ''
 
 export type Scope = 'images' | 'image' | 'map'
 

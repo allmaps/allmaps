@@ -17,6 +17,7 @@ import type {
   DbGcp2,
   DbGcp3,
   DbGcp,
+  DbTransformation,
   ResourceMask,
   CompleteDbGcp3
 } from '$lib/types/maps.js'
@@ -56,15 +57,17 @@ export function getResourceMask(dbMap: DbMap): ResourceMask {
   }
 }
 
-export function getTransformation(dbMap: DbMap3) {
-  if (dbMap.transformation) {
-    return dbMap.transformation
+export function getTransformation(dbMap: DbMap): DbTransformation | undefined {
+  if (isDbMap3(dbMap)) {
+    if (dbMap.transformation) {
+      return dbMap.transformation
+    }
   }
 
   return undefined
 }
 
-function getGcps(dbMap: DbMap): DbGcp3[] {
+export function getGcps(dbMap: DbMap): DbGcp3[] {
   let gcps: DbGcp[]
   if (isDbMap3(dbMap)) {
     gcps = Object.values(dbMap.gcps)
@@ -101,7 +104,7 @@ export function getGcpGeoPoint(dbGcp: DbGcp) {
 
 export async function createMapWithFullImageResourceMask(
   image: IIIFImage | EmbeddedIIIFImage
-) {
+): Promise<DbMap3> {
   const mapId = await generateRandomId()
   const imageAllmapsId = await generateId(image.uri)
 
@@ -132,9 +135,7 @@ export async function createMapWithFullImageResourceMask(
 
 export function toDbGcps3(gcps: DbGcp[]): DbGcp3[] {
   return gcps.map((gcp, index) => {
-    let id = gcp.id
-
-    index = 'index' in gcp ? gcp.index : index
+    index = 'index' in gcp ? gcp.index || 0 : index
 
     let geo
     let resource
@@ -148,7 +149,7 @@ export function toDbGcps3(gcps: DbGcp[]): DbGcp3[] {
     }
 
     return {
-      id,
+      id: gcp.id,
       index,
       geo,
       resource
@@ -172,7 +173,6 @@ export function toDbMap3(dbMap: DbMap): DbMap3 {
         }),
         {}
       ),
-
       resource: dbMap.image,
       resourceMask: dbMap.pixelMask,
       version: 3
@@ -215,19 +215,53 @@ export function isGcpComplete(gcp: DbGcp3): gcp is CompleteDbGcp3 {
   return gcp.resource && gcp.geo ? true : false
 }
 
+export function getFullMapId(mapId: string) {
+  return `${PUBLIC_ALLMAPS_ANNOTATIONS_API_URL}/maps/${mapId}`
+}
+
+function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
+  if (transformation === 'polynomial2') {
+    return {
+      type: 'polynomial',
+      options: {
+        order: 2
+      }
+    }
+  } else if (transformation === 'polynomial3') {
+    return {
+      type: 'polynomial',
+      options: {
+        order: 3
+      }
+    }
+  } else if (transformation === 'thinPlateSpline') {
+    return {
+      type: 'thinPlateSpline'
+    }
+  }
+
+  // TODO: add other tranformation types
+
+  return {
+    type: 'polynomial',
+    options: {
+      order: 1
+    }
+  }
+}
+
 export function toGeoreferencedMap(dbMap: DbMap): GeoreferencedMap {
   const dbMap3 = toDbMap3(dbMap)
 
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
-    id: `${PUBLIC_ALLMAPS_ANNOTATIONS_API_URL}/maps/${dbMap3.id}`,
+    id: getFullMapId(dbMap3.id),
     resource: {
       ...dbMap3.resource,
       id: dbMap3.resource.uri || dbMap3.resource.id
     },
-
-    transformation: getTransformation(dbMap3),
+    transformation: toGeoreferencedMapTransformation(getTransformation(dbMap3)),
     gcps: getCompleteGcps(dbMap3),
     resourceMask: getResourceMask(dbMap3)
   }

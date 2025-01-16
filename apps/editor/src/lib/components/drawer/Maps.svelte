@@ -9,6 +9,7 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
+  import SelectTransformation from '$lib/components/SelectTransformation.svelte'
 
   import type { DbMap } from '$lib/types/maps.js'
 
@@ -104,6 +105,9 @@
             <span class="font-light text-sm text-black/75"
               >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
             </span>
+            <div class="max-w-fit">
+              <SelectTransformation {map} />
+            </div>
           </div>
         </button>
         <button
@@ -115,7 +119,7 @@
 
         {#if isActiveMap && gcpCount > 0}
           {@const gcps = Object.values(map.gcps).toSorted(
-            (gcpA, gcpB) => gcpA.index - gcpB.index
+            (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
           )}
           <ol
             class="col-span-9 grid grid-cols-subgrid"

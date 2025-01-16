@@ -67,8 +67,12 @@ function parsePropOp(
   if (isArray(op)) {
     if (isArray(op[0])) {
       return op.map((op) => parsePropOp(mapId, prop, op)).flat()
-    } else if (isObject(op[0])) {
-      throw new Error('Oh no!')
+    } else if (prop === 'transformation' && isObject(op[0])) {
+      return {
+        mapId,
+        type: prop,
+        instruction: op[0] as Instruction
+      }
     } else if (typeof op[0] === 'string' || typeof op[0] === 'number') {
       const key = op[0]
 

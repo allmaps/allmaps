@@ -1,5 +1,5 @@
 import type { Point } from '$lib/types/shared.js'
-import type { DbMap3, DbGcp3 } from '$lib/types/maps.js'
+import type { DbMap3, DbGcp3, DbTransformation } from '$lib/types/maps.js'
 
 // ============================================================================
 // Events
@@ -33,19 +33,22 @@ export type RemoveResourceMaskPoint = {
 
 export type InsertGcp = {
   mapId: string
-  // gcpId: string
   gcp: DbGcp3
 }
 
 export type ReplaceGcp = {
   mapId: string
-  // gcpId: string
   gcp: DbGcp3
 }
 
 export type RemoveGcp = {
   mapId: string
   gcpId: string
+}
+
+export type SetTransformation = {
+  mapId: string
+  transformation?: DbTransformation
 }
 
 export type InsertMapEvent = CustomEvent<InsertMap>
@@ -59,3 +62,5 @@ export type RemoveResourceMaskPointEvent = CustomEvent<RemoveResourceMaskPoint>
 export type InsertGcpEvent = CustomEvent<InsertGcp>
 export type ReplaceGcpEvent = CustomEvent<ReplaceGcp>
 export type RemoveGcpEvent = CustomEvent<RemoveGcp>
+
+export type SetTransformationEvent = CustomEvent<SetTransformation>
