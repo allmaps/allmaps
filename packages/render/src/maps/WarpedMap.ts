@@ -21,6 +21,7 @@ import type {
   Point,
   Ring,
   Rectangle,
+  MultiPolygon,
   Bbox,
   GeojsonPolygon,
   FetchFn,
@@ -113,6 +114,8 @@ export function createWarpedMapFactory() {
  * @param {Bbox} [projectedGeoBufferedViewportRectangleBboxForViewport] - Bbox of the projectedGeoBufferedViewportRectangle
  * @param {Ring} [resourceBufferedViewportRingForViewport] - The (buffered) viewport transformed back to resource coordinates, for the current viewport
  * @param {Bbox} [resourceBufferedViewportRingBboxForViewport] - Bbox of the resourceViewportRing
+ * @param {Ring} [resourceBufferedViewportRingAndMaskIntersectionForViewport] - The intersection of the (buffered) viewport transformed back to resource coordinates and the resource mask, for the current viewport
+ * @param {Bbox} [resourceBufferedViewportRingAndMaskIntersectionBboxForViewport] - Bbox of the resourceBufferedViewportRingAndMaskIntersection
  * @param {Tile[]} fetchableTilesForViewport - The fetchable tiles for displaying this map, for the current viewport
  * @param {Tile[]} overviewFetchableTilesForViewport - The overview fetchable tiles, for the current viewport
  */
@@ -185,6 +188,9 @@ export default class WarpedMap extends EventTarget {
 
   resourceBufferedViewportRingForViewport?: Ring
   resourceBufferedViewportRingBboxForViewport?: Bbox
+
+  resourceBufferedViewportRingAndMaskIntersectionForViewport?: MultiPolygon
+  resourceBufferedViewportRingAndMaskIntersectionBboxForViewport?: Bbox
 
   fetchableTilesForViewport: FetchableTile[] = []
   overviewFetchableTilesForViewport: FetchableTile[] = []
@@ -456,6 +462,22 @@ export default class WarpedMap extends EventTarget {
     this.resourceBufferedViewportRingBboxForViewport =
       resourceBufferedViewportRing
         ? computeBbox(resourceBufferedViewportRing)
+        : undefined
+  }
+
+  /**
+   * Set resourceBufferedViewportRingAndMaskIntersection for the current viewport
+   *
+   * @param {MultiPolygon} [resourceBufferedViewportRingAndMaskIntersection]
+   */
+  setResourceBufferedViewportRingAndMaskIntersectionForViewport(
+    resourceBufferedViewportRingAndMaskIntersection?: MultiPolygon
+  ) {
+    this.resourceBufferedViewportRingAndMaskIntersectionForViewport =
+      resourceBufferedViewportRingAndMaskIntersection
+    this.resourceBufferedViewportRingAndMaskIntersectionBboxForViewport =
+      resourceBufferedViewportRingAndMaskIntersection
+        ? computeBbox(resourceBufferedViewportRingAndMaskIntersection)
         : undefined
   }
 

@@ -1,3 +1,5 @@
+import { intersection } from 'polyclip-ts'
+
 import TileCache from '../tilecache/TileCache.js'
 import WarpedMapList from '../maps/WarpedMapList.js'
 import FetchableTile from '../tilecache/FetchableTile.js'
@@ -8,16 +10,18 @@ import {
   computeTilesCoveringRingAtTileZoomLevel,
   getTilesResolution,
   getTilesAtScaleFactor,
-  getTileZoomLevelResolution
+  getTileZoomLevelResolution,
+  squaredDistanceTileToPoint
 } from '../shared/tiles.js'
 
 import {
-  bboxToDiameter,
   bboxToCenter,
   computeBbox,
   webMercatorToLonLat,
   squaredDistance
 } from '@allmaps/stdlib'
+
+import type { Tile } from '@allmaps/types'
 
 import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
@@ -314,6 +318,16 @@ export default abstract class BaseRenderer<
       resourceBufferedViewportRing
     )
 
+    // Compute intersection of to-resource-back-transformed viewport and mask
+    // Note: this is a MultiPolygon since it is the result of an intersection
+    const resourceBufferedViewportRingAndMaskIntersection = intersection(
+      [resourceBufferedViewportRing],
+      [warpedMap.resourceMask]
+    )
+    warpedMap.setResourceBufferedViewportRingAndMaskIntersectionForViewport(
+      resourceBufferedViewportRingAndMaskIntersection
+    )
+
     // If this map it ourside of the viewport with request buffer, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
@@ -321,12 +335,29 @@ export default abstract class BaseRenderer<
       return []
     }
 
-    // Find tiles covering this back-transformed viewport
-    // This returns tiles sorted by distance from center of resourceViewportRing
-    const tiles = computeTilesCoveringRingAtTileZoomLevel(
-      resourceBufferedViewportRing,
-      tileZoomLevel,
-      [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
+    // Find tiles covering this intersection of to-resource-back-transformed viewport and mask
+    // by computing, for each of this multipolygon's polygons, for their outer ring,
+    // the tiles covering this ring at the tilezoomlevel
+    // (in most cases there will be just one polygon with only an outer ring)
+    // TODO: consider taking holes into account once masks with holes are supported.
+    const tiles: Tile[] = []
+    resourceBufferedViewportRingAndMaskIntersection.forEach((polygon) => {
+      tiles.push(
+        ...computeTilesCoveringRingAtTileZoomLevel(polygon[0], tileZoomLevel, [
+          warpedMap.parsedImage.width,
+          warpedMap.parsedImage.height
+        ])
+      )
+    })
+
+    // Sort tiles to load in order of their distance to viewport center
+    const resourceBufferedViewportRingCenter = bboxToCenter(
+      computeBbox(resourceBufferedViewportRing)
+    )
+    tiles.sort(
+      (tileA, tileB) =>
+        squaredDistanceTileToPoint(tileA, resourceBufferedViewportRingCenter) -
+        squaredDistanceTileToPoint(tileB, resourceBufferedViewportRingCenter)
     )
 
     // Make fetchable tiles

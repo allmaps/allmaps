@@ -1,6 +1,4 @@
 import {
-  computeBbox,
-  bboxToCenter,
   distance,
   doBboxesIntersect,
   bufferBboxByRatio,
@@ -105,14 +103,6 @@ export function computeTilesCoveringRingAtTileZoomLevel(
   const scaledResourceRing = scaleResourcePoints(resourceRing, tileZoomLevel)
   const tilesByColumn = ringToTilesByColumn(scaledResourceRing)
   const tiles = tilesByColumnToTiles(tilesByColumn, tileZoomLevel, imageSize)
-
-  // Sort tiles to load tiles in order of their distance to center
-  const resourceRingCenter = bboxToCenter(computeBbox(resourceRing))
-  tiles.sort(
-    (tileA, tileB) =>
-      squaredDistanceTileToPoint(tileA, resourceRingCenter) -
-      squaredDistanceTileToPoint(tileB, resourceRingCenter)
-  )
 
   return tiles
 }
