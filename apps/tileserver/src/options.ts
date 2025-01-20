@@ -15,6 +15,8 @@ export function optionsFromQuery(req: IRequest): TransformationOptions {
     queryTransformationType === 'thinPlateSpline'
   ) {
     transformationType = 'thinPlateSpline'
+  } else if (queryTransformationType === 'helmert') {
+    transformationType = 'helmert'
   }
 
   return {
