@@ -1,11 +1,11 @@
 import type { Point } from '@allmaps/types'
 
-import type { EvaluationType, TransformationType } from './shared/types'
+import type { EvaluationType, TransformationType } from './shared/types.js'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
  * */
-export default abstract class Transformation {
+export abstract class Transformation {
   sourcePoints: Point[]
   destinationPoints: Point[]
 

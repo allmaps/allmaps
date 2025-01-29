@@ -1,11 +1,11 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import Transformation from '../transformation.js'
+import { Transformation } from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 import type { TransformationType } from '../shared/types.js'
 
-export default class Polynomial extends Transformation {
+export class Polynomial extends Transformation {
   polynomialParametersMatrices: [Matrix, Matrix]
   polynomialParameters: [number[], number[]]
 

@@ -31,13 +31,13 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import Transformation from './transformation.js'
+import { Transformation } from './transformation.js'
 
-import Straight from './transformation-types/straight.js'
-import Helmert from './transformation-types/helmert.js'
-import Polynomial from './transformation-types/polynomial.js'
-import Projective from './transformation-types/projective.js'
-import RBF from './transformation-types/radial-basis-function.js'
+import { Straight } from './transformation-types/straight.js'
+import { Helmert } from './transformation-types/helmert.js'
+import { Polynomial } from './transformation-types/polynomial.js'
+import { Projective } from './transformation-types/projective.js'
+import { RBF } from './transformation-types/radial-basis-function.js'
 
 import { thinPlateKernel } from './shared/kernel-functions.js'
 import { euclideanNorm } from './shared/norm-functions.js'
@@ -80,7 +80,7 @@ import type {
  * A Ground Control Point Transformer, containing a forward and backward transformation and
  * specifying functions to transform geometries using these transformations.
  * */
-export default class GcpTransformer {
+export class GcpTransformer {
   gcps: GeneralGcp[]
   sourcePoints: Point[]
   destinationPoints: Point[]

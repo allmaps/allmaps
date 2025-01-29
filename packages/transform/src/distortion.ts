@@ -1,6 +1,6 @@
 import { Point } from '@allmaps/types'
 
-import { DistortionMeasure } from './shared/types'
+import { DistortionMeasure } from './shared/types.js'
 
 export const supportedDistortionMeasures = [
   'log2sigma',
