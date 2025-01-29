@@ -1,16 +1,9 @@
-import { z } from 'zod'
-
-import { MapAllVersionsSchema, Map2Schema } from './schemas/map.js'
-import {
-  AnnotationAllVersionsSchema,
-  Annotation1Schema
-} from './schemas/annotation.js'
-
-type AnnotationAllVersions = z.infer<typeof AnnotationAllVersionsSchema>
-type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-
-type Annotation1 = z.infer<typeof Annotation1Schema>
-type Map2 = z.infer<typeof Map2Schema>
+import type {
+  AnnotationAllVersions,
+  MapAllVersions,
+  Annotation1,
+  Map2
+} from './types.js'
 
 // Type guard that checks if map is v2 Map
 export function isMap2(map: MapAllVersions): map is Map2 {

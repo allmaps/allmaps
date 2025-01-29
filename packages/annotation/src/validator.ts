@@ -1,21 +1,15 @@
-import { z } from 'zod'
-
 import {
   Annotation0Schema,
   Annotation1Schema,
   AnnotationPage0Schema,
-  AnnotationPage1Schema,
-  AnnotationAllVersionsSchema,
-  AnnotationPageAllVersionsSchema
+  AnnotationPage1Schema
 } from './schemas/annotation.js'
 
 import {
   Map1Schema,
   Maps1Schema,
   Map2Schema,
-  Maps2Schema,
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema
+  Maps2Schema
 } from './schemas/map.js'
 
 import { toAnnotation1, toAnnotationPage1, toMap2, toMaps2 } from './convert.js'
@@ -26,14 +20,15 @@ import {
   isMap2BeforeParse
 } from './before-parse.js'
 
-type Annotation1 = z.infer<typeof Annotation1Schema>
-type AnnotationAllVersions = z.infer<typeof AnnotationAllVersionsSchema>
-type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
-type AnnotationPageAllVersions = z.infer<typeof AnnotationPageAllVersionsSchema>
-
-type Map2 = z.infer<typeof Map2Schema>
-type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
+import type {
+  Annotation1,
+  AnnotationAllVersions,
+  AnnotationPage1,
+  AnnotationPageAllVersions,
+  Map2,
+  MapAllVersions,
+  MapsAllVersions
+} from './types.js'
 
 export function validateAnnotation(
   annotation: unknown

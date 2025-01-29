@@ -1,37 +1,24 @@
-import { z } from 'zod'
-
-import { ImageServiceSchema, ResourceMaskSchema } from './schemas/shared.js'
 import {
   Map1Schema,
   Map2Schema,
   Maps1Schema,
-  Maps2Schema,
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema,
-  GCPAllVersionsSchema
+  Maps2Schema
 } from './schemas/map.js'
-import {
-  Annotation1Schema,
-  AnnotationPage1Schema,
-  SvgSelector1Schema,
-  PartOfSchema
-} from './schemas/annotation.js'
 
 import { isMapsBeforeParse, isMap2BeforeParse } from './before-parse.js'
 import { isMap2 } from './guards.js'
 
-type ImageService = z.infer<typeof ImageServiceSchema>
-
-type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
-type ResourceMask = z.infer<typeof ResourceMaskSchema>
-type GCP = z.infer<typeof GCPAllVersionsSchema>
-
-type Annotation1 = z.infer<typeof Annotation1Schema>
-type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
-type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
-
-type PartOf = z.infer<typeof PartOfSchema>
+import type {
+  ImageService,
+  MapAllVersions,
+  MapsAllVersions,
+  SvgSelector1,
+  ResourceMask,
+  Annotation1,
+  AnnotationPage1,
+  GCP,
+  PartOf
+} from './types.js'
 
 function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
   let width: number | undefined
@@ -159,14 +146,16 @@ function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
 /**
  * Generates a {@link Annotation Georeference Annotation} from a single {@link Map map} or
  * an {@link AnnotationPage AnnotationPage} containing multiple Georeference Annotations from an array of {@link Map maps}.
- * @param {Map | Map[]} mapOrMaps - Single map object, or array of maps
- * @returns {Annotation | AnnotationPage} Georeference Annotation
+ * @param mapOrMaps - Single Georeferenced Map, or an array of Georeferenced Maps
+ * @returns Georeference Annotation
  * @example
+ * ```js
  * import fs from 'fs'
  * import { generateAnnotation } from '@allmaps/annotation'
  *
  * const map = JSON.parse(fs.readFileSync('./examples/map.example.json'))
  * const annotation = generateAnnotation(map)
+ * ```
  */
 export function generateAnnotation(
   mapOrMaps: unknown
