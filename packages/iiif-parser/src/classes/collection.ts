@@ -64,9 +64,9 @@ export class EmbeddedCollection {
 
   /**
    * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
-   * @param {any} iiifCollection - Source data of IIIF Collection
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
-   * @returns {Collection} Parsed IIIF Collection
+   * @param iiifCollection - Source data of IIIF Collection
+   * @param majorVersion - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Collection
    * @static
    */
   static parse(
@@ -155,10 +155,9 @@ export class Collection extends EmbeddedCollection {
 
   /**
    * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
-   * @param {any} iiifCollection - Source data of IIIF Collection
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
-   * @returns {Collection} Parsed IIIF Collection
-   * @static
+   * @param iiifCollection - Source data of IIIF Collection
+   * @param majorVersion - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Collection
    */
   static parse(
     iiifCollection: unknown,

@@ -217,8 +217,8 @@ export class EmbeddedImage {
 
   /**
    * Generates a IIIF Image API URL for the requested region and size
-   * @param {ImageRequest} imageRequest - Image request object containing the desired region and size of the requested image
-   * @returns {string} Image API URL that can be used to fetch the requested image
+   * @param imageRequest - Image request object containing the desired region and size of the requested image
+   * @returns Image API URL that can be used to fetch the requested image
    */
   getImageUrl(imageRequest: ImageRequest): string {
     const { region, size } = imageRequest
@@ -354,9 +354,9 @@ export class Image extends EmbeddedImage {
 
   /**
    * Parses a IIIF image and returns a [Image](#image) containing the parsed version
-   * @param {any} iiifImage - Source data of IIIF Image
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Image. If not provided, it will be determined automatically
-   * @returns {Image} Parsed IIIF Image
+   * @param iiifImage - Source data of IIIF Image
+   * @param majorVersion - IIIF API version of Image. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Image
    * @static
    */
   static parse(iiifImage: unknown, majorVersion: MajorVersion | null = null) {
@@ -378,10 +378,10 @@ export class Image extends EmbeddedImage {
   // TODO: rename this to getImageRequest
   /**
    * Returns a Image request object for a tile with the requested zoom level, column, and row
-   * @param {TileZoomLevel} zoomLevel - Desired zoom level of the requested tile
-   * @param {number} column - Column of the requested tile
-   * @param {number} row - Row of the requested tile
-   * @returns {ImageRequest} Image request object that can be used to fetch the requested tile
+   * @param zoomLevel - Desired zoom level of the requested tile
+   * @param column - Column of the requested tile
+   * @param row - Row of the requested tile
+   * @returns Image request object that can be used to fetch the requested tile
    */
   getIiifTile(
     zoomLevel: TileZoomLevel,
@@ -398,9 +398,9 @@ export class Image extends EmbeddedImage {
 
   /**
    * Returns a Image request object for the requested region and size
-   * @param {SizeObject} size - Size of the requested thumbnail
-   * @param {'cover' | 'contain'} mode - Desired fit mode of the requested thumbnail
-   * @returns {ImageRequest} Image request object that can be used to fetch the requested thumbnail
+   * @param size - Size of the requested thumbnail
+   * @param mode - Desired fit mode of the requested thumbnail
+   * @returns Image request object that can be used to fetch the requested thumbnail
    */
   getThumbnail(
     size: SizeObject,

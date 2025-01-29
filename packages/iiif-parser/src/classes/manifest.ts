@@ -116,10 +116,9 @@ export class Manifest extends EmbeddedManifest {
 
   /**
    * Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed version
-   * @param {any} iiifManifest - Source data of IIIF Manifest
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Manifest. If not provided, it will be determined automatically
-   * @returns {Manifest} Parsed IIIF Manifest
-   * @static
+   * @param iiifManifest - Source data of IIIF Manifest
+   * @param majorVersion - IIIF API version of Manifest. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Manifest
    */
   static parse(
     iiifManifest: unknown,
