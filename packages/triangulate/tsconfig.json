@@ -3,8 +3,9 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {}
   },
-  "references": [{ "path": "../types" }, { "path": "../../packages/stdlib" }],
+  "references": [{ "path": "../types" }, { "path": "../stdlib" }],
   "include": ["./src/**/*"]
 }

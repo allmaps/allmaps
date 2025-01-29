@@ -11,6 +11,8 @@ import {
 } from '@allmaps/stdlib'
 
 import Delaunator from 'delaunator'
+
+// @ts-expect-error Ignore missing types
 import Constrainautor from '@kninnug/constrainautor'
 
 import type {
@@ -24,7 +26,6 @@ import type {
 } from '@allmaps/types'
 
 export type TriangulationToUnique = {
-  constrainautor: Constrainautor
   interpolatedPolygon: Polygon
   interpolatedPolygonPoints: Point[]
   gridPoints: Point[]
@@ -179,7 +180,6 @@ export function triangulateToUnique(
   }
 
   return {
-    constrainautor,
     interpolatedPolygon,
     interpolatedPolygonPoints,
     gridPoints,
