@@ -5,6 +5,13 @@ import { computeBbox } from '@allmaps/stdlib'
 
 import type { Map } from '@allmaps/annotation'
 
+/**
+ * Computes the bearing of a Georeferenced Map.
+ *
+ * @param map - Georeferenced Map
+ * @returns The bearing of the map in degrees, measured from the north line
+ */
+
 export function computeGeoreferencedMapBearing(map: Map) {
   const transformer = new GcpTransformer(map.gcps)
 
