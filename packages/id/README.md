@@ -61,8 +61,8 @@ Generates a checksum of a JSON object.
 
 * `obj` (`unknown`)
   * JSON object.
-* `length?` (`number | undefined`)
-  — length of returned hash. The maximum length of the hash is 40 characters
+* `length` (`number | undefined`)
+  * Length of returned hash. The maximum length of the hash is 40 characters.
 
 ###### Returns
 
@@ -75,7 +75,7 @@ Generates an ID from a string using the SHA-1 algorithm. Given the same input, t
 ###### Parameters
 
 * `str` (`string`)
-  * Input string.
+  * Input string
 * `length` (`number | undefined`)
   * Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16.
 
@@ -89,7 +89,7 @@ Generates a random ID.
 
 ###### Parameters
 
-* `length?` (`number | undefined`)
+* `length` (`number | undefined`)
   * Length of returned hash. The maximum length of the hash is 40 characters.
 
 ###### Returns
