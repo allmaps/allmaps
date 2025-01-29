@@ -2,7 +2,12 @@
 
 This module triangulates a polygon: it returns a set of triangles that partition the polygon.
 
-If a `distance` parameter is provided, the triangles are well-conditioned and generally not larger then `distance`: the triangles are made to follow the polygon, who's edges are interpolated every `distance`, and also a grid of points inside the polygon, spaced `distance` apart.
+If a `distance` parameter is provided, the triangles are well-conditioned and not larger then `distance`: the triangles are made firstly using a grid of points inside the polygon, spaced `distance` apart, with each grid cell resulting in two triangles, and secondly using points along the polygon's edges, by interpolating each edge using `distance`.
+
+The following options can be passed:
+
+*   `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
+*   `minimumTriangleArea`: The minimum area of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. This is interpreted as an absolute measure if no distance is provided, or a relative measure (relative to the squared distance) otherwise.
 
 This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
 
@@ -73,7 +78,7 @@ Grid points are placed inside the polygon to obtain small, well conditioned tria
 
 *   `polygon` **Polygon** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Distance that conditions the triangles
-*   `minimumTriangleArea` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise (optional, default `EPSILON`)
+*   `triangulationOptions` **TriangulationOptions?** Triangulation Options.
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Triangle>** Array of triangles partitioning the polygon
 
@@ -89,7 +94,7 @@ This function returns the triangulation as an array of unique points, and triang
 
 *   `polygon` **Polygon** Polygon
 *   `distance` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Distance that conditions the triangles
-*   `minimumTriangleArea` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise (optional, default `EPSILON`)
+*   `triangulationOptions` **TriangulationOptions?** Triangulation Options.
 
 Returns **TriangulationToUnique** Triangulation Object with uniquePointIndexTriangles and uniquePoints
 

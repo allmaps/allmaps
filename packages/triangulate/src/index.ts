@@ -6,6 +6,7 @@ import {
 import {
   computeBbox,
   conformPolygon,
+  mergeOptions,
   midPoint,
   triangleArea
 } from '@allmaps/stdlib'
@@ -38,6 +39,16 @@ export type TriangulationToUnique = {
 
 const EPSILON = 0.001
 
+export type TriangluationOptions = {
+  steinerPoints: Point[]
+  minimumTriangleArea: number
+}
+
+const defaultTriangulationOptions = {
+  steinerPoints: [],
+  minimumTriangleArea: EPSILON
+} as TriangluationOptions
+
 /**
  * Triangulate a polygon to triangles smaller then a distance
  *
@@ -45,19 +56,19 @@ const EPSILON = 0.001
  *
  * @param {Polygon} polygon - Polygon
  * @param {number} [distance] - Distance that conditions the triangles
- * @param {number} [minimumTriangleArea] - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @param {TriangulationOptions} [triangulationOptions] - Triangulation Options.
  * @returns {Triangle[]} Array of triangles partitioning the polygon
  */
 export function triangulate(
   polygon: Polygon,
   distance?: number,
-  minimumTriangleArea = EPSILON
+  triangulationOptions?: Partial<TriangluationOptions>
 ): Triangle[] {
   {
     const { triangles } = triangulateToUnique(
       polygon,
       distance,
-      minimumTriangleArea
+      triangulationOptions
     )
     return triangles
   }
@@ -72,14 +83,21 @@ export function triangulate(
  *
  * @param {Polygon} polygon - Polygon
  * @param {number} [distance] - Distance that conditions the triangles
- * @param {number} [minimumTriangleArea] - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @param {TriangulationOptions} [triangulationOptions] - Triangulation Options.
  * @returns {TriangulationToUnique} Triangulation Object with uniquePointIndexTriangles and uniquePoints
  */
 export function triangulateToUnique(
   polygon: Polygon,
   distance?: number,
-  minimumTriangleArea = EPSILON
+  triangulationOptions?: Partial<TriangluationOptions>
 ): TriangulationToUnique {
+  const mergedTriangulationOptions = mergeOptions(
+    defaultTriangulationOptions,
+    triangulationOptions
+  )
+  const steinerPoints = mergedTriangulationOptions.steinerPoints
+  let minimumTriangleArea = mergedTriangulationOptions.minimumTriangleArea
+
   // Conform polygon (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
 
@@ -101,7 +119,14 @@ export function triangulateToUnique(
     interpolatedPolygon = polygon
     interpolatedPolygonPoints = polygon.flat()
   }
-  const uniquePoints = [...interpolatedPolygonPoints, ...gridPointsInPolygon]
+  const steinerPointsInPolygon = steinerPoints.filter((point) =>
+    pointInPolygon(point, polygon)
+  )
+  const uniquePoints = [
+    ...interpolatedPolygonPoints,
+    ...gridPointsInPolygon,
+    ...steinerPointsInPolygon
+  ]
 
   // Initialize Delaunay triangulation from polygon + grid points
   const delautator = new Delaunator(uniquePoints.flat())

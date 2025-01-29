@@ -216,7 +216,10 @@ describe('Rectangle', async () => {
       ]
     ]
 
-    expectToBeCloseToArrayArrayArray(triangulate([rectangle], 1, 0), output)
+    expectToBeCloseToArrayArrayArray(
+      triangulate([rectangle], 1, { minimumTriangleArea: 0 }),
+      output
+    )
   })
 
   it(`should work with rectangles on grid (collinearity check) with no distance provided`, () => {
