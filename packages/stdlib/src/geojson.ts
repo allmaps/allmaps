@@ -12,7 +12,6 @@ import {
   conformMultiPolygon
 } from './geometry.js'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   Point,
   LineString,

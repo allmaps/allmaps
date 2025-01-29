@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
+import { rewind } from '@turf/rewind'
 
 import type {
   Point,
@@ -144,7 +143,7 @@ export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
     type: 'Polygon',
     coordinates: close ? [[...ring, ring[0]]] : [ring]
   }
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function polygonToGeojsonPolygon(
@@ -160,7 +159,7 @@ export function polygonToGeojsonPolygon(
       : polygon
   }
 
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function multiPointToGeojsonMultiPoint(
@@ -196,7 +195,7 @@ export function multiPolygonToGeojsonMultiPolygon(
       : multiPolygon
   }
 
-  return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
+  return rewind(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
 export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {

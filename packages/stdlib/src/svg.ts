@@ -10,12 +10,6 @@ import type {
   SvgGeometry
 } from '@allmaps/types'
 
-// Assert
-
-// TODO!
-
-// Read from string
-
 export function* stringToSvgGeometriesGenerator(svg: string) {
   function* helper(
     node: Node | ElementNode | RootNode
