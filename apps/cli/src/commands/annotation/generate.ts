@@ -5,7 +5,7 @@ import { generateAnnotation } from '@allmaps/annotation'
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 
-export default function generate() {
+export function generate() {
   return new Command('generate')
     .argument('[files...]')
     .summary('generate Georeference Annotation')

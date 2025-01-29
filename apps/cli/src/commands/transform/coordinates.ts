@@ -11,7 +11,7 @@ import {
 import type { GcpTransformer } from '@allmaps/transform'
 import type { Point } from '@allmaps/types'
 
-export default function coordinates() {
+export function coordinates() {
   const command = addCoordinateTransformOptions(
     addAnnotationOptions(
       new Command('coordinates')

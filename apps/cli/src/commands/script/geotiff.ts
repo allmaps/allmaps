@@ -25,7 +25,7 @@ import {
   gdalbuildvrt
 } from '../../lib/gdal.js'
 
-export default function generate() {
+export function geotiff() {
   const command = addTransformationOptions(
     addTransformOptions(
       new Command('geotiff')

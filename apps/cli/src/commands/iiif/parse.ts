@@ -7,7 +7,7 @@ import { addParseIiifOptions } from '../../lib/options.js'
 
 import type { ZodError } from 'zod'
 
-export default function parse() {
+export function parse() {
   const command = addParseIiifOptions(
     new Command('parse')
       .argument('[files...]')

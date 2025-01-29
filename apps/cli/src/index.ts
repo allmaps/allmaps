@@ -3,12 +3,12 @@
 import { Command, CommanderError } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
-import annotation from './commands/annotation.js'
-import script from './commands/script.js'
-import fetch from './commands/fetch.js'
-import id from './commands/id.js'
-import iiif from './commands/iiif.js'
-import transform from './commands/transform.js'
+import { annotation } from './commands/annotation.js'
+import { script } from './commands/script.js'
+import { fetch } from './commands/fetch.js'
+import { id } from './commands/id.js'
+import { iiif } from './commands/iiif.js'
+import { transform } from './commands/transform.js'
 
 import type { ZodError } from 'zod'
 

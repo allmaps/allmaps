@@ -9,7 +9,7 @@ import {
 } from '../../lib/options.js'
 import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
 
-export default function geojson() {
+export function geojson() {
   const command = addCoordinateTransformOptions(
     addAnnotationOptions(
       new Command('geojson')

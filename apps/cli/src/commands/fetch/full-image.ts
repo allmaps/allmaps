@@ -10,7 +10,7 @@ import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
 import { readLines } from '../../lib/io.js'
 
-export default function fullImage() {
+export function fullImage() {
   return new Command('full-image')
     .argument('[image IDs...]')
     .option('-d, --output-dir <dir>', 'Output directory', '.')

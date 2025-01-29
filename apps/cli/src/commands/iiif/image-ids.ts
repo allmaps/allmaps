@@ -49,7 +49,7 @@ function collectImageIds(
   return imageIds
 }
 
-export default function parse() {
+export function imageIds() {
   const command = addParseIiifOptions(
     new Command('image-ids')
       .argument('[files...]')

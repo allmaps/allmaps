@@ -19,7 +19,7 @@ ${checkCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
 `.trim()
 }
 
-export default function generate() {
+export function dezoomify() {
   return new Command('dezoomify')
     .argument('[files...]')
     .summary('generate a Bash script to create Cloud Optimized GeoTIFFs')

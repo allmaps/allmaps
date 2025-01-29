@@ -12,7 +12,7 @@ import {
   geometriesToFeatureCollection
 } from '@allmaps/stdlib'
 
-export default function svg() {
+export function svg() {
   const command = addCoordinateTransformOptions(
     addAnnotationOptions(
       new Command('svg')
