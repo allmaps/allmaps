@@ -1,28 +1,28 @@
 export { parseAnnotation } from './parser.js'
 export { generateAnnotation } from './generator.js'
-export { validateAnnotation, validateMap } from './validator.js'
+export { validateAnnotation, validateGeoreferencedMap } from './validator.js'
 
 export {
-  Map1Schema,
-  Maps1Schema,
-  Map1GCPSchema,
-  Map1ImageSchema,
-  Map2Schema,
-  Maps2Schema,
-  Map2GCPSchema,
-  Map2ResourceSchema,
+  GeoreferencedMap1Schema,
+  GeoreferencedMaps1Schema,
+  GeoreferencedMap1GCPSchema,
+  GeoreferencedMap1ImageSchema,
+  GeoreferencedMap2Schema,
+  GeoreferencedMaps2Schema,
+  GeoreferencedMap2GCPSchema,
+  GeoreferencedMap2ResourceSchema,
 
   // Default schemas
-  MapSchema,
-  MapsSchema,
+  GeoreferencedMapSchema,
+  GeoreferencedMapsSchema,
   GCPSchema,
   ResourceSchema,
 
   // All versions
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema,
+  GeoreferencedMapAllVersionsSchema,
+  GeoreferencedMapsAllVersionsSchema,
   GCPAllVersionsSchema
-} from './schemas/map.js'
+} from './schemas/georeferenced-map.js'
 
 export {
   Annotation0Schema,
@@ -37,7 +37,7 @@ export {
   AnnotationSchema,
   AnnotationPageSchema,
   FeaturePropertiesSchema,
-  SvgSelector1Schema,
+  SvgSelectorSchema,
 
   // All versions
   AnnotationAllVersionsSchema,
@@ -52,7 +52,7 @@ export {
 } from './schemas/shared.js'
 
 export type {
-  Map2 as Map,
+  GeoreferencedMap2 as GeoreferencedMap,
   Annotation1 as Annotation,
   AnnotationPage1 as AnnotationPage
 } from './types.js'

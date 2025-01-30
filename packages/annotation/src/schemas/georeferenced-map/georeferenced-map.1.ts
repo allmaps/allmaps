@@ -19,7 +19,7 @@ export const ImageSchema = z.object({
   type: ImageServiceSchema
 })
 
-export const MapSchema = z.object({
+export const GeoreferencedMapSchema = z.object({
   id: z.string().optional(),
   version: z.number().min(1).max(1).default(1),
   image: ImageSchema,
@@ -28,4 +28,4 @@ export const MapSchema = z.object({
   transformation: TransformationSchema.optional()
 })
 
-export const MapsSchema = z.array(MapSchema)
+export const GeoreferencedMapsSchema = z.array(GeoreferencedMapSchema)

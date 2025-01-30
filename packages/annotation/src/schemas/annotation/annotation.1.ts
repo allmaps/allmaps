@@ -26,9 +26,11 @@ const SvgHeightWidthRegexSchema = z.string().regex(svgHeightWidthRegex)
 
 export const SvgSelectorSchema = z.object({
   type: z.literal('SvgSelector'),
-  value: SvgRegexSchema.or(SvgWidthHeightRegexSchema).or(
+  value: z.union([
+    SvgRegexSchema,
+    SvgWidthHeightRegexSchema,
     SvgHeightWidthRegexSchema
-  )
+  ])
 })
 
 // const regionRegex = /^\d+,\d+,\d+,\d+$/
@@ -40,26 +42,40 @@ export const SvgSelectorSchema = z.object({
 //   size: z.string().regex(sizeRegex)
 // })
 
-export const SourceSchema1 = z.object({
+export const Source1Schema = z.object({
   '@id': z.string().url(),
   type: ImageServiceSchema,
   height: z.number().positive(),
   width: z.number().positive(),
-  partOf: PartOfSchema.array().optional()
+  partOf: PartOfSchema.optional()
 })
 
-export const SourceSchema2 = z.object({
+export const Source2Schema = z.object({
   id: z.string().url(),
   type: ImageServiceSchema,
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  partOf: PartOfSchema.array().optional()
+  partOf: PartOfSchema.optional()
 })
+
+export const Canvas3Schema = z.object({
+  id: z.string().url(),
+  type: z.literal('Canvas'),
+  height: z.number().positive().optional(),
+  width: z.number().positive().optional(),
+  partOf: PartOfSchema.optional()
+})
+
+export const SourceSchema = z.union([
+  Source1Schema,
+  Source2Schema,
+  Canvas3Schema
+])
 
 export const TargetSchema = z.object({
   type: z.literal('SpecificResource'),
-  source: SourceSchema1.or(SourceSchema2),
-  // selector: SvgSelectorSchema.or(ImageApiSelectorSchema)
+  source: SourceSchema,
+  // selector: z.union([SvgSelectorSchema, ImageApiSelectorSchema])
   selector: SvgSelectorSchema
 })
 

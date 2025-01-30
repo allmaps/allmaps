@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   AnnotationSchema as Annotation0Schema,
   AnnotationPageSchema as AnnotationPage0Schema,
@@ -8,9 +10,12 @@ import {
   AnnotationSchema as Annotation1Schema,
   AnnotationPageSchema as AnnotationPage1Schema,
   FeaturePropertiesSchema as Annotation1FeaturePropertiesSchema,
-  SvgSelectorSchema as SvgSelector1Schema
+  SvgSelectorSchema as SvgSelector1Schema,
+  TargetSchema as Target1Schema,
+  SourceSchema as Source1Schema
 } from './annotation/annotation.1.js'
 import {
+  ResourceTypeSchema,
   PointGeometrySchema,
   ImageServiceSchema,
   TransformationSchema,
@@ -22,13 +27,23 @@ const DefaultAnnotationPageSchema = AnnotationPage1Schema
 
 const DefaultFeaturePropertiesSchema = Annotation1FeaturePropertiesSchema
 
-const AnnotationAllVersionsSchema = Annotation0Schema.or(Annotation1Schema)
-const AnnotationPageAllVersionsSchema = AnnotationPage0Schema.or(
-  AnnotationPage1Schema
-)
+const DefaultTargetSchema = Target1Schema
+const DefaultSourceSchema = Source1Schema
+const DefaultSvgSelectorSchema = SvgSelector1Schema
 
-const FeaturePropertiesAllVersionsSchema =
-  Annotation0FeaturePropertiesSchema.or(Annotation1FeaturePropertiesSchema)
+const AnnotationAllVersionsSchema = z.union([
+  Annotation0Schema,
+  Annotation1Schema
+])
+const AnnotationPageAllVersionsSchema = z.union([
+  AnnotationPage0Schema,
+  AnnotationPage1Schema
+])
+
+const FeaturePropertiesAllVersionsSchema = z.union([
+  Annotation0FeaturePropertiesSchema,
+  Annotation1FeaturePropertiesSchema
+])
 
 export {
   Annotation0Schema,
@@ -43,7 +58,9 @@ export {
   DefaultAnnotationSchema as AnnotationSchema,
   DefaultAnnotationPageSchema as AnnotationPageSchema,
   DefaultFeaturePropertiesSchema as FeaturePropertiesSchema,
-  SvgSelector1Schema,
+  DefaultSvgSelectorSchema as SvgSelectorSchema,
+  DefaultTargetSchema as TargetSchema,
+  DefaultSourceSchema as SourceSchema,
 
   // All versions
   AnnotationAllVersionsSchema,
@@ -54,5 +71,6 @@ export {
   PointGeometrySchema,
   ImageServiceSchema,
   TransformationSchema,
-  PartOfSchema
+  PartOfSchema,
+  ResourceTypeSchema
 }

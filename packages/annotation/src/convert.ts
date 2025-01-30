@@ -1,17 +1,17 @@
 import { parseAnnotation } from './parser.js'
 import { generateAnnotation } from './generator.js'
 
-import { isAnnotation1, isMap2 } from './guards.js'
+import { isAnnotation1, isGeoreferencedMap2 } from './guards.js'
 
 import type {
   Annotation1,
   AnnotationPage1,
   AnnotationAllVersions,
   AnnotationPageAllVersions,
-  Map2,
-  Maps2,
-  MapAllVersions,
-  MapsAllVersions
+  GeoreferencedMap2,
+  GeoreferencedMaps2,
+  GeoreferencedMapAllVersions,
+  GeoreferencedMapsAllVersions
 } from './types.js'
 
 export function toAnnotation1(annotation: AnnotationAllVersions): Annotation1 {
@@ -37,15 +37,19 @@ export function toAnnotationPage1(
   }
 }
 
-export function toMap2(map: MapAllVersions): Map2 {
-  if (isMap2(map)) {
-    return map
+export function toGeoreferencedMap2(
+  georeferencedMap: GeoreferencedMapAllVersions
+): GeoreferencedMap2 {
+  if (isGeoreferencedMap2(georeferencedMap)) {
+    return georeferencedMap
   } else {
-    const convertedMap = parseAnnotation(generateAnnotation(map))
+    const convertedMap = parseAnnotation(generateAnnotation(georeferencedMap))
     return convertedMap[0]
   }
 }
 
-export function toMaps2(maps: MapsAllVersions): Maps2 {
-  return maps.map(toMap2)
+export function toGeoreferencedMaps2(
+  georeferencedMap: GeoreferencedMapsAllVersions
+): GeoreferencedMaps2 {
+  return georeferencedMap.map(toGeoreferencedMap2)
 }

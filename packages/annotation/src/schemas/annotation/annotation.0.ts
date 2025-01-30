@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import {
   PointSchema,
-  ImageServiceSchema,
+  ResourceTypeSchema,
   PointGeometrySchema,
   TransformationSchema,
   ContextSchema
@@ -22,7 +22,7 @@ export const TargetSchema = z.object({
     .array(
       z.object({
         '@id': z.string().url(),
-        type: ImageServiceSchema
+        type: ResourceTypeSchema
       })
     )
     .length(1),

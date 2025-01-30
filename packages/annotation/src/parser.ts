@@ -11,23 +11,23 @@ import {
 } from './before-parse.js'
 import { isAnnotation1 } from './guards.js'
 
-import type {
+import {
   AnnotationAllVersions,
   AnnotationPageAllVersions,
-  Map2,
+  GeoreferencedMap2,
   Resource,
   ResourceMask,
   GCP2,
   PartOf,
   FeatureProperties,
-  ImageService
+  ResourceType
 } from './types.js'
 
 function parseResource(annotation: AnnotationAllVersions): Resource {
   return {
     id: parseImageId(annotation),
     ...parseImageDimensions(annotation),
-    type: parseImageService(annotation),
+    type: parseResourceType(annotation),
     partOf: parsePartOf(annotation)
   }
 }
@@ -45,7 +45,7 @@ function parseImageId(annotation: AnnotationAllVersions): string {
   }
 }
 
-function parseImageService(annotation: AnnotationAllVersions): ImageService {
+function parseResourceType(annotation: AnnotationAllVersions): ResourceType {
   if ('service' in annotation.target) {
     return annotation.target.service[0].type
   } else {
@@ -53,7 +53,7 @@ function parseImageService(annotation: AnnotationAllVersions): ImageService {
   }
 }
 
-function parsePartOf(annotation: AnnotationAllVersions): PartOf[] | undefined {
+function parsePartOf(annotation: AnnotationAllVersions): PartOf {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.partOf
   }
@@ -149,7 +149,9 @@ function parseResourceMask(annotation: AnnotationAllVersions): ResourceMask {
   }
 }
 
-function getMap(annotation: AnnotationAllVersions): Map2 {
+function getGeoreferencedMap(
+  annotation: AnnotationAllVersions
+): GeoreferencedMap2 {
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
@@ -165,8 +167,8 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
 /**
  * Parses a {@link Annotation Georeference Annotation} or an {@link AnnotationPage AnnotationPage}
  * containing multiple Georeference Annotations and returns an array of {@link Map maps}.
- * @param annotation - Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
- * @returns Array of maps
+ * @param {Annotation | AnnotationPage} annotation - Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
+ * @returns {Map[]} Array of maps
  * @example
  * ```js
  * import fs from 'fs'
@@ -176,7 +178,7 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
  * const maps = parseAnnotation(annotation)
  * ```
  */
-export function parseAnnotation(annotation: unknown): Map2[] {
+export function parseAnnotation(annotation: unknown): GeoreferencedMap2[] {
   if (isAnnotationPageBeforeParse(annotation)) {
     // Seperate .parse for different versions for better Zod errors
     let parsedAnnotationPage: AnnotationPageAllVersions
@@ -191,7 +193,7 @@ export function parseAnnotation(annotation: unknown): Map2[] {
     }
 
     return parsedAnnotationPage.items.map((parsedAnnotation) =>
-      getMap(parsedAnnotation)
+      getGeoreferencedMap(parsedAnnotation)
     )
   } else {
     // Seperate .parse for different versions for better Zod errors
@@ -202,6 +204,6 @@ export function parseAnnotation(annotation: unknown): Map2[] {
       parsedAnnotation = Annotation1Schema.parse(annotation)
     }
 
-    return [getMap(parsedAnnotation)]
+    return [getGeoreferencedMap(parsedAnnotation)]
   }
 }

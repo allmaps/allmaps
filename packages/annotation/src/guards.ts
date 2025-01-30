@@ -1,13 +1,17 @@
 import type {
   AnnotationAllVersions,
-  MapAllVersions,
+  GeoreferencedMapAllVersions,
   Annotation1,
-  Map2
+  GeoreferencedMap2
 } from './types.js'
 
-// Type guard that checks if map is v2 Map
-export function isMap2(map: MapAllVersions): map is Map2 {
-  return 'type' in map && map.type === 'GeoreferencedMap'
+// Type guard that checks if georeferencedMap is v2 GeoreferencedMap
+export function isGeoreferencedMap2(
+  georeferencedMap: GeoreferencedMapAllVersions
+): georeferencedMap is GeoreferencedMap2 {
+  return (
+    'type' in georeferencedMap && georeferencedMap.type === 'GeoreferencedMap'
+  )
 }
 
 // Type guard that checks if annotation is v1 Georeference Annotation

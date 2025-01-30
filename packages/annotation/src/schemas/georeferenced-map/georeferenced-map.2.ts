@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import {
   PointSchema,
-  ImageServiceSchema,
+  ResourceTypeSchema,
   PartOfSchema,
   ResourceMaskSchema,
   TransformationSchema
@@ -17,11 +17,11 @@ export const ResourceSchema = z.object({
   id: z.string().url(),
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  type: ImageServiceSchema,
-  partOf: PartOfSchema.array().optional()
+  type: ResourceTypeSchema,
+  partOf: PartOfSchema.optional()
 })
 
-export const MapSchema = z.object({
+export const GeoreferencedMapSchema = z.object({
   '@context': z
     .literal('https://schemas.allmaps.org/map/2/context.json')
     .optional(),
@@ -35,4 +35,4 @@ export const MapSchema = z.object({
   transformation: TransformationSchema.optional()
 })
 
-export const MapsSchema = z.array(MapSchema)
+export const GeoreferencedMapsSchema = z.array(GeoreferencedMapSchema)

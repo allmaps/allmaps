@@ -6,18 +6,23 @@ import {
 } from './schemas/annotation.js'
 
 import {
-  Map1Schema,
-  Maps1Schema,
-  Map2Schema,
-  Maps2Schema
-} from './schemas/map.js'
+  GeoreferencedMap1Schema,
+  GeoreferencedMaps1Schema,
+  GeoreferencedMap2Schema,
+  GeoreferencedMaps2Schema
+} from './schemas/georeferenced-map.js'
 
-import { toAnnotation1, toAnnotationPage1, toMap2, toMaps2 } from './convert.js'
+import {
+  toAnnotation1,
+  toAnnotationPage1,
+  toGeoreferencedMap2,
+  toGeoreferencedMaps2
+} from './convert.js'
 import {
   isAnnotationPageBeforeParse,
   isAnnotation0BeforeParse,
-  isMapsBeforeParse,
-  isMap2BeforeParse
+  isGeoreferencedMapsBeforeParse,
+  isGeoreferencedMap2BeforeParse
 } from './before-parse.js'
 
 import type {
@@ -25,9 +30,9 @@ import type {
   AnnotationAllVersions,
   AnnotationPage1,
   AnnotationPageAllVersions,
-  Map2,
-  MapAllVersions,
-  MapsAllVersions
+  GeoreferencedMap2,
+  GeoreferencedMapAllVersions,
+  GeoreferencedMapsAllVersions
 } from './types.js'
 
 export function validateAnnotation(
@@ -60,26 +65,28 @@ export function validateAnnotation(
   }
 }
 
-export function validateMap(mapOrMaps: unknown): Map2 | Map2[] {
-  if (isMapsBeforeParse(mapOrMaps)) {
+export function validateGeoreferencedMap(
+  mapOrMaps: unknown
+): GeoreferencedMap2 | GeoreferencedMap2[] {
+  if (isGeoreferencedMapsBeforeParse(mapOrMaps)) {
     // Seperate .parse for different versions for better Zod errors
-    let parsedMaps: MapsAllVersions
-    if (isMap2BeforeParse(mapOrMaps[0])) {
-      parsedMaps = Maps2Schema.parse(mapOrMaps)
+    let parsedGeoreferencedMaps: GeoreferencedMapsAllVersions
+    if (isGeoreferencedMap2BeforeParse(mapOrMaps[0])) {
+      parsedGeoreferencedMaps = GeoreferencedMaps2Schema.parse(mapOrMaps)
     } else {
-      parsedMaps = Maps1Schema.parse(mapOrMaps)
+      parsedGeoreferencedMaps = GeoreferencedMaps1Schema.parse(mapOrMaps)
     }
 
-    return toMaps2(parsedMaps)
+    return toGeoreferencedMaps2(parsedGeoreferencedMaps)
   } else {
     // Seperate .parse for different versions for better Zod errors
-    let parsedMap: MapAllVersions
-    if (isMap2BeforeParse(mapOrMaps)) {
-      parsedMap = Map2Schema.parse(mapOrMaps)
+    let parsedGeoreferencedMap: GeoreferencedMapAllVersions
+    if (isGeoreferencedMap2BeforeParse(mapOrMaps)) {
+      parsedGeoreferencedMap = GeoreferencedMap2Schema.parse(mapOrMaps)
     } else {
-      parsedMap = Map1Schema.parse(mapOrMaps)
+      parsedGeoreferencedMap = GeoreferencedMap1Schema.parse(mapOrMaps)
     }
 
-    return toMap2(parsedMap)
+    return toGeoreferencedMap2(parsedGeoreferencedMap)
   }
 }

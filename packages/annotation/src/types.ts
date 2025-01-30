@@ -8,20 +8,23 @@ import {
   Annotation1Schema,
   AnnotationPage0Schema,
   AnnotationPage1Schema,
-  SvgSelector1Schema
+  SvgSelectorSchema,
+  TargetSchema,
+  SourceSchema,
+  ResourceTypeSchema
 } from './schemas/annotation.js'
 
 import {
-  Map1Schema,
-  Map2Schema,
-  Maps1Schema,
-  Maps2Schema,
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema,
+  GeoreferencedMap1Schema,
+  GeoreferencedMap2Schema,
+  GeoreferencedMaps1Schema,
+  GeoreferencedMaps2Schema,
+  GeoreferencedMapAllVersionsSchema,
+  GeoreferencedMapsAllVersionsSchema,
   GCPAllVersionsSchema,
-  Map2GCPSchema,
+  GeoreferencedMap2GCPSchema,
   ResourceSchema
-} from './schemas/map.js'
+} from './schemas/georeferenced-map.js'
 
 import {
   ImageServiceSchema,
@@ -32,17 +35,24 @@ import {
 export type ImageService = z.infer<typeof ImageServiceSchema>
 export type ResourceMask = z.infer<typeof ResourceMaskSchema>
 export type PartOf = z.infer<typeof PartOfSchema>
+export type ResourceType = z.infer<typeof ResourceTypeSchema>
+export type Target = z.infer<typeof TargetSchema>
+export type Source = z.infer<typeof SourceSchema>
 
-export type Map1 = z.infer<typeof Map1Schema>
-export type Maps1 = z.infer<typeof Maps1Schema>
+export type GeoreferencedMap1 = z.infer<typeof GeoreferencedMap1Schema>
+export type GeoreferencedMaps1 = z.infer<typeof GeoreferencedMaps1Schema>
 export type GCP1 = z.infer<typeof GCPAllVersionsSchema>
 
-export type Map2 = z.infer<typeof Map2Schema>
-export type Maps2 = z.infer<typeof Maps2Schema>
-export type GCP2 = z.infer<typeof Map2GCPSchema>
+export type GeoreferencedMap2 = z.infer<typeof GeoreferencedMap2Schema>
+export type GeoreferencedMaps2 = z.infer<typeof GeoreferencedMaps2Schema>
+export type GCP2 = z.infer<typeof GeoreferencedMap2GCPSchema>
 
-export type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-export type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
+export type GeoreferencedMapAllVersions = z.infer<
+  typeof GeoreferencedMapAllVersionsSchema
+>
+export type GeoreferencedMapsAllVersions = z.infer<
+  typeof GeoreferencedMapsAllVersionsSchema
+>
 export type GCP = z.infer<typeof GCPAllVersionsSchema>
 
 export type Annotation0 = z.infer<typeof Annotation0Schema>
@@ -56,7 +66,7 @@ export type AnnotationPageAllVersions = z.infer<
   typeof AnnotationPageAllVersionsSchema
 >
 
-export type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
+export type SvgSelector = z.infer<typeof SvgSelectorSchema>
 
 export type Resource = z.infer<typeof ResourceSchema>
 
