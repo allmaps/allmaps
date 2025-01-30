@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "composite": true,
     "declaration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "ignoreDeprecations": "5.0",
     "paths": {
       "@allmaps/types": ["./packages/types/src"],
