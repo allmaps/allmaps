@@ -23,7 +23,7 @@ import type {
 
 // Assert
 
-export function isPoint(input: any): input is Point {
+export function isPoint(input: unknown): input is Point {
   return (
     Array.isArray(input) &&
     input.length === 2 &&
@@ -32,37 +32,37 @@ export function isPoint(input: any): input is Point {
   )
 }
 
-export function isLineString(input: any): input is LineString {
+export function isLineString(input: unknown): input is LineString {
   return Array.isArray(input) && input.every(isPoint)
   // && !isClosed(input) // Possible addition if we want to check for closedness
 }
 
 // TODO: check if we keep Ring as unclosed.
 // This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
-function isRing(input: any): input is Ring {
+function isRing(input: unknown): input is Ring {
   return (
     Array.isArray(input) && input.every(isPoint)
     // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
   )
 }
 
-export function isPolygon(input: any): input is Polygon {
+export function isPolygon(input: unknown): input is Polygon {
   return Array.isArray(input) && input.every(isRing)
 }
 
-export function isMultiPoint(input: any): input is MultiPoint {
+export function isMultiPoint(input: unknown): input is MultiPoint {
   return Array.isArray(input) && input.every(isPoint)
 }
 
-export function isMultiLineString(input: any): input is MultiLineString {
+export function isMultiLineString(input: unknown): input is MultiLineString {
   return Array.isArray(input) && input.every(isLineString)
 }
 
-export function isMultiPolygon(input: any): input is MultiPolygon {
+export function isMultiPolygon(input: unknown): input is MultiPolygon {
   return Array.isArray(input) && input.every(isPolygon)
 }
 
-export function isGeometry(input: any): input is Geometry {
+export function isGeometry(input: unknown): input is Geometry {
   return (
     isPoint(input) ||
     isLineString(input) ||

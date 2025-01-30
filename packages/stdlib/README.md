@@ -737,7 +737,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -747,7 +747,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -757,7 +757,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -767,7 +767,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -777,7 +777,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -787,7 +787,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -797,7 +797,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -807,7 +807,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -817,7 +817,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -827,7 +827,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -837,7 +837,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -847,7 +847,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 
@@ -857,7 +857,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Parameters
 
-* `input` (`any`)
+* `input` (`unknown`)
 
 ###### Returns
 

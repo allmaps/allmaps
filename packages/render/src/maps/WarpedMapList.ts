@@ -37,12 +37,17 @@ function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
  * for quickly looking up maps using their Bbox.
+ * @template W - The type of WarpedMap objects in this list
  */
 export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   warpedMapFactory: WarpedMapFactory<W>
-  warpedMapsById: Map<string, W> = new Map()
 
-  zIndices: Map<string, number> = new Map()
+  /**
+   * Maps in this list, indexed by their ID
+   */
+  warpedMapsById: Map<string, W>
+  zIndices: Map<string, number>
+
   rtree?: RTree
   imageInformations?: ImageInformations
   transformation?: TransformationOptions
@@ -61,6 +66,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     options?: Partial<WarpedMapListOptions>
   ) {
     super()
+
+    this.warpedMapsById = new Map()
+    this.zIndices = new Map()
 
     this.warpedMapFactory = warpedMapFactory
 
@@ -348,7 +356,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * @param mapId - the ID of the map
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   removeGeoreferencedMapById(mapId: string) {
     const warpedMap = this.warpedMapsById.get(mapId)
@@ -365,7 +373,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to bring them to front
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   bringMapsToFront(mapIds: Iterable<string>): void {
     let newZIndex = this.warpedMapsById.size
@@ -382,7 +390,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to send them to back
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   sendMapsToBack(mapIds: Iterable<string>): void {
     let newZIndex = -Array.from(mapIds).length
@@ -399,7 +407,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to bring them forward
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   bringMapsForward(mapIds: Iterable<string>): void {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
@@ -418,7 +426,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the zIndex of the specified maps to send them backward
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   sendMapsBackward(mapIds: Iterable<string>): void {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
@@ -437,7 +445,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the visibility of the specified maps to `true`
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   showMaps(mapIds: Iterable<string>): void {
     for (const mapId of mapIds) {
@@ -454,7 +462,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the visibility of the specified maps to `false`
    *
-   * @param mapIds
+   * @param mapIds - Map IDs
    */
   hideMaps(mapIds: Iterable<string>): void {
     for (const mapId of mapIds) {

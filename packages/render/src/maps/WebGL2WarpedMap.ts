@@ -120,8 +120,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   pointLayers: PointLayer[] = []
 
   // Consider to store cachedTilesByTileKey as a quadtree for faster lookups
-  cachedTilesByTileKey: Map<string, CachedTile<ImageData>> = new Map()
-  cachedTilesByTileUrl: Map<string, CachedTile<ImageData>> = new Map()
+  cachedTilesByTileKey: Map<string, CachedTile<ImageData>>
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageData>>
   cachedTilesForTexture: CachedTile<ImageData>[] = []
   previousCachedTilesForTexture: CachedTile<ImageData>[] = []
 
@@ -165,6 +165,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     options?: Partial<WarpedMapOptions>
   ) {
     super(mapId, georeferencedMap, options)
+
+    this.cachedTilesByTileKey = new Map()
+    this.cachedTilesByTileUrl = new Map()
 
     this.gl = gl
     this.initializeWebGL(mapProgram, linesProgram, pointsProgram)

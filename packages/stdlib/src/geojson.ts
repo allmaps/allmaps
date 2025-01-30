@@ -35,61 +35,77 @@ import type {
 
 // Assert
 
-export function isGeojsonPoint(input: any): input is GeojsonPoint {
+export function isGeojsonPoint(input: unknown): input is GeojsonPoint {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'Point' &&
+    'coordinates' in input &&
     isPoint(input.coordinates)
   )
 }
 
-export function isGeojsonLineString(input: any): input is GeojsonLineString {
+export function isGeojsonLineString(
+  input: unknown
+): input is GeojsonLineString {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'LineString' &&
+    'coordinates' in input &&
     isLineString(input.coordinates)
   )
 }
 
-export function isGeojsonPolygon(input: any): input is GeojsonPolygon {
+export function isGeojsonPolygon(input: unknown): input is GeojsonPolygon {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'Polygon' &&
+    'coordinates' in input &&
     Array.isArray(input.coordinates) &&
     isPolygon(input.coordinates)
   )
 }
 
-export function isGeojsonMultiPoint(input: any): input is GeojsonMultiPoint {
+export function isGeojsonMultiPoint(
+  input: unknown
+): input is GeojsonMultiPoint {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'MultiPoint' &&
+    'coordinates' in input &&
     isMultiPoint(input.coordinates)
   )
 }
 
 export function isGeojsonMultiLineString(
-  input: any
+  input: unknown
 ): input is GeojsonMultiLineString {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'MultiLineString' &&
+    'coordinates' in input &&
     isMultiLineString(input.coordinates)
   )
 }
 
 export function isGeojsonMultiPolygon(
-  input: any
+  input: unknown
 ): input is GeojsonMultiPolygon {
   return (
     typeof input === 'object' &&
     input !== null &&
+    'type' in input &&
     input.type === 'MultiPolygon' &&
+    'coordinates' in input &&
     Array.isArray(input.coordinates) &&
     isMultiPolygon(input.coordinates)
   )
