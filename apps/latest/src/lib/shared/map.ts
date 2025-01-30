@@ -1,4 +1,3 @@
-// @ts-expect-error - Could not find a declaration file for module '@turf/rewind'
 import turfRewind from '@turf/rewind'
 
 import { GcpTransformer } from '@allmaps/transform'

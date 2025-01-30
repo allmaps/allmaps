@@ -6,14 +6,12 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "UI components and functions for Allmaps. And style guide!",
-  "type": "module",
-  "svelte": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
+  "description": "UI components and functions for Allmaps",
   "publishConfig": {
     "access": "public"
   },
+  "type": "module",
+  "svelte": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

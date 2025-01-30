@@ -1156,7 +1156,7 @@ Convert RBG to hex
 ###### Parameters
 
 * `undefined` (`[number, number, number]`)
-  — , g, b] - rgb, e.g. \[0, 51, 255]
+  * RGB color array, e.g. \[0, 51, 255]
 
 ###### Returns
 

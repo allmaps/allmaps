@@ -1449,9 +1449,7 @@ Compute the distortion value of selected distortion measures from the partial de
 
 ###### Returns
 
-`Map<DistortionMeasure, number>`.
-
-* A map of distortion measures and distortion values at the point
+A map of distortion measures and distortion values at the point (`Map<DistortionMeasure, number>`).
 
 ### `getForwardTransformResolution(bbox, transformer, partialTransformOptions)`
 
