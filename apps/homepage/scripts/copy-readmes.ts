@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-// @ts-check
-
 import url from 'url'
 import path from 'path'
 import { readdir, readFile, writeFile } from 'fs/promises'
@@ -16,8 +12,8 @@ const outputDir = path.join(__dirname, '../src/content/docs/docs/packages')
  * @param readme - Contents of the README.md file
  * @returns - Whether the README.md file is valid
  */
-function isReadmeValid(readme) {
-  return typeof readme === 'string' && readme.length > 150
+function isReadmeValid(readme: string) {
+  return readme.length > 150
 }
 
 /**
@@ -25,7 +21,7 @@ function isReadmeValid(readme) {
  * @param source
  * @returns - The directories in the source directory
  */
-async function getDirectories(source) {
+async function getDirectories(source: string) {
   const dirent = await readdir(source, { withFileTypes: true })
 
   return dirent
@@ -38,7 +34,7 @@ async function getDirectories(source) {
  * @param lines
  * @returns - The string without the first line
  */
-function removeFirstLine(lines) {
+function removeFirstLine(lines: string) {
   if (!lines) {
     return ''
   }
@@ -49,7 +45,7 @@ function removeFirstLine(lines) {
 for (const packageName of await getDirectories(packagesDir)) {
   const readmePath = path.join(packagesDir, packageName, 'README.md')
 
-  let readme
+  let readme = ''
   try {
     readme = await readFile(readmePath, { encoding: 'utf8' })
   } catch (err) {
