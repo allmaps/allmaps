@@ -2,7 +2,8 @@ import { png } from 'itty-router'
 import { decode as decodeJpeg, type UintArrRet } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
-import { IntArrayRenderer, Viewport } from '@allmaps/render/int-array'
+import { Viewport } from '@allmaps/render'
+import { IntArrayRenderer } from '@allmaps/render/intarray'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'

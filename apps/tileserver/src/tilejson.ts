@@ -1,8 +1,5 @@
 import { json } from 'itty-router'
-import {
-  WarpedMapList,
-  createWarpedMapFactory
-} from '@allmaps/render/int-array'
+import { WarpedMapList, createWarpedMapFactory } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
 

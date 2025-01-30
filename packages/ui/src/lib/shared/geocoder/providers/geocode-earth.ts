@@ -1,4 +1,4 @@
-import GeocoderProvider from '../provider.js'
+import { GeocoderProvider } from '../provider.js'
 
 import type { GeojsonPoint } from '@allmaps/types'
 
@@ -9,7 +9,7 @@ type GeoJsonFeatureGE = {
   properties: { label: string }
 }
 
-export default class GeocodeEarth extends GeocoderProvider {
+export class GeocodeEarth extends GeocoderProvider {
   constructor(akiKey: string) {
     super('Geocode.Earth', akiKey)
   }

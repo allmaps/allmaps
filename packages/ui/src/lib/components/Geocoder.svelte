@@ -6,7 +6,7 @@
   import searchIcon from '$lib/shared/images/search.svg'
 
   import type { GeocoderGeoJsonFeature } from '$lib/shared/types'
-  import type GeocoderProvider from '$lib/shared/geocoder/provider'
+  import type { GeocoderProvider } from '$lib/shared/geocoder/provider'
 
   type Item<T> = {
     value: T
