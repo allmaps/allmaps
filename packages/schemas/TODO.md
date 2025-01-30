@@ -1,0 +1,3 @@
+- Add all Zod schemas from annotation and iiif-parser packages to this package?
+- Create JSON-LD contexts and JSON Schemas from these schemas
+- Publish these on schemas.allmaps.org through render.com
