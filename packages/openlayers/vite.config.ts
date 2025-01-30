@@ -1,5 +1,6 @@
 import { defineConfig, type PluginOption } from 'vite'
 import { exec } from 'child_process'
+import { defineConfig, type PluginOption, type UserConfig } from 'vite'
 
 import ports from '../../ports.json' with { type: 'json' }
 
@@ -65,4 +66,4 @@ export default defineConfig({
   },
   base: '',
   plugins: [buildTypes]
-})
+}) satisfies UserConfig

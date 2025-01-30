@@ -1,4 +1,4 @@
-import { defineConfig, searchForWorkspaceRoot } from 'vite'
+import { defineConfig, searchForWorkspaceRoot, type UserConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 
@@ -15,4 +15,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['sharedb-client-browser/dist/sharedb-client-umd.cjs']
   }
-})
+}) satisfies UserConfig

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { defineConfig, type PluginOption, type UserConfig } from 'vite'
 import glsl from 'vite-plugin-glsl'
 import noBundlePlugin from 'vite-plugin-no-bundle'
 import dts from 'vite-plugin-dts'
@@ -54,4 +55,4 @@ export default defineConfig({
     }),
     noBundlePlugin()
   ]
-})
+}) satisfies UserConfig
