@@ -1308,6 +1308,12 @@ export class WebGL2Renderer
     }
   }
 
+  protected gcpsChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      this.throttledChanged.bind(this)
+    }
+  }
+
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
     webgl2WarpedMap.addEventListener(
       WarpedMapEventType.TEXTURESUPDATED,

@@ -528,6 +528,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected distortionChanged(event: Event): void {}
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected gcpsChanged(event: Event): void {}
+
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
@@ -567,6 +570,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.addEventListener(
       WarpedMapEventType.DISTORTIONCHANGED,
       this.distortionChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.GCPSUPDATED,
+      this.gcpsChanged.bind(this)
     )
   }
 
@@ -609,6 +617,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.DISTORTIONCHANGED,
       this.distortionChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.GCPSUPDATED,
+      this.gcpsChanged.bind(this)
     )
   }
 }
