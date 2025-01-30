@@ -4,12 +4,6 @@ import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
 
 /**
  * Class for tiles that can be cached.
- *
- * @export
- * @tamplate D
- * @class CacheableTile
- * @typedef {CacheableTile}
- * @extends {EventTarget}
  */
 export default abstract class CacheableTile<D> extends EventTarget {
   readonly tile: Tile
@@ -26,8 +20,8 @@ export default abstract class CacheableTile<D> extends EventTarget {
    * Creates an instance of CacheableTile.
    *
    * @constructor
-   * @param {FetchableTile} fetchableTile
-   * @param {FetchFn} [fetchFn] Optional fetch function to use
+   * @param fetchableTile
+   * @param fetchFn - Optional fetch function to use
    */
   constructor(fetchableTile: FetchableTile, fetchFn?: FetchFn) {
     super()
@@ -46,7 +40,7 @@ export default abstract class CacheableTile<D> extends EventTarget {
   /**
    * Whether a tile has fetched its data
    *
-   * @returns {boolean}
+   * @returns
    */
   isCachedTile(): this is CachedTile<D> {
     return this.data !== undefined
@@ -64,11 +58,6 @@ export default abstract class CacheableTile<D> extends EventTarget {
 
 /**
  * Class for tiles that are cached, i.e. their data has been fetched and processed
- *
- * @export
- * @class CachedTile
- * @typedef {CachedTile}
- * @extends {CacheableTile}
  */
 export abstract class CachedTile<D> extends CacheableTile<D> {
   declare data: D

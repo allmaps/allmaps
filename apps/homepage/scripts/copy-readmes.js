@@ -13,8 +13,8 @@ const outputDir = path.join(__dirname, '../src/content/docs/docs/packages')
 
 /**
  * Function to check if a README.md file is valid.
- * @param {string | undefined} readme - Contents of the README.md file
- * @returns {boolean} - Whether the README.md file is valid
+ * @param readme - Contents of the README.md file
+ * @returns - Whether the README.md file is valid
  */
 function isReadmeValid(readme) {
   return typeof readme === 'string' && readme.length > 150
@@ -22,8 +22,8 @@ function isReadmeValid(readme) {
 
 /**
  * Get the directories in a directory.
- * @param {string} source
- * @returns {Promise<string[]>} - The directories in the source directory
+ * @param source
+ * @returns - The directories in the source directory
  */
 async function getDirectories(source) {
   const dirent = await readdir(source, { withFileTypes: true })
@@ -35,8 +35,8 @@ async function getDirectories(source) {
 
 /**
  * Remove the first line of a string.
- * @param {string | undefined} lines
- * @returns {string} - The string without the first line
+ * @param lines
+ * @returns - The string without the first line
  */
 function removeFirstLine(lines) {
   if (!lines) {

@@ -89,12 +89,12 @@ export class EmbeddedCollection {
 
 /**
  * Parsed IIIF Collection
- * @class Collection
- * @property {string} [uri] - URI of Collection
- * @property {LanguageString} [label] - Label of Collection
- * @property {Collection[] | Manifest[] | EmbeddedManifest[]} [items] - Items in Collection
- * @property {MajorVersion} [majorVersion] - IIIF API version of Collection
- * @property {string} [type] - Resource type, equals 'collection'
+ *
+ * @property uri - URI of Collection
+ * @property label - Label of Collection
+ * @property items - Items in Collection
+ * @property majorVersion - IIIF API version of Collection
+ * @property type - Resource type, equals 'collection'
  */
 export class Collection extends EmbeddedCollection {
   items: (Collection | EmbeddedCollection | Manifest | EmbeddedManifest)[] = []

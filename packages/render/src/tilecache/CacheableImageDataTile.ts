@@ -8,18 +8,12 @@ import type { FetchFn } from '@allmaps/types'
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to an ImageData object.
- *
- * @export
- * @class CacheableImageDataTile
- * @typedef {CacheableImageDataTile}
- * @extends {CacheableTile}
  */
 export default class CacheableImageDataTile extends CacheableTile<ImageData> {
   /**
    * Fetch the tile and create its ImageData object.
    *
-   * @async
-   * @returns {Promise<void>}
+   * @returns
    */
   async fetch() {
     try {
@@ -71,11 +65,6 @@ export default class CacheableImageDataTile extends CacheableTile<ImageData> {
 
 /**
  * Class for tiles that is cached, and whose data has been processed to an ImageData object.
- *
- * @export
- * @class CachedImageDataTile
- * @typedef {CachedImageDataTile}
- * @extends {CacheableImageDataTile}
  */
 export class CachedImageDataTile extends CacheableImageDataTile {
   declare data: ImageData

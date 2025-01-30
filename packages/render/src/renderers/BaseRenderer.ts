@@ -48,15 +48,7 @@ const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overv
 const MAX_TOTAL_RESOLUTION_RATIO = 10
 
 /**
- * Abstract base class for renderers.
- *
- * @export
- * @abstract
- * @template {WarpedMap} W
- * @template D
- * @class BaseRenderer
- * @typedef {BaseRenderer}
- * @extends {EventTarget}
+ * Abstract base class for renderers
  */
 export default abstract class BaseRenderer<
   W extends WarpedMap,
@@ -84,9 +76,8 @@ export default abstract class BaseRenderer<
   /**
    * Parses an annotation and adds its georeferenced map to this renderer's warped map list
    *
-   * @async
-   * @param {unknown} annotation
-   * @returns {Promise<(string | Error)[]>}
+   * @param annotation
+   * @returns
    */
   async addGeoreferenceAnnotation(annotation: unknown) {
     return this.warpedMapList.addGeoreferenceAnnotation(annotation)
@@ -95,9 +86,8 @@ export default abstract class BaseRenderer<
   /**
    * Adds a georeferenced map to this renderer's warped map list
    *
-   * @async
-   * @param {unknown} georeferencedMap
-   * @returns {Promise<string | Error>}
+   * @param georeferencedMap
+   * @returns
    */
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)

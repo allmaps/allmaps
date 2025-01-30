@@ -72,11 +72,6 @@ const ANIMATION_DURATION = 750
 
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
- *
- * @export
- * @class WebGL2Renderer
- * @typedef {WebGL2Renderer}
- * @extends {BaseRenderer}
  */
 export default class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageData>
@@ -110,8 +105,8 @@ export default class WebGL2Renderer
    * Creates an instance of WebGL2Renderer.
    *
    * @constructor
-   * @param {WebGL2RenderingContext} gl - WebGL 2 rendering context
-   * @param {WebGL2RendererOptions} options - options
+   * @param gl - WebGL 2 rendering context
+   * @param options - options
    */
   constructor(
     gl: WebGL2RenderingContext,
@@ -263,7 +258,7 @@ export default class WebGL2Renderer
   /**
    * Get the opacity of the renderer
    *
-   * @returns {(number | undefined)}
+   * @returns
    */
   getOpacity(): number | undefined {
     return this.opacity
@@ -272,7 +267,7 @@ export default class WebGL2Renderer
   /**
    * Set the opacity of the renderer
    *
-   * @param {number} opacity - opacity to set
+   * @param opacity - opacity to set
    */
   setOpacity(opacity: number): void {
     this.opacity = opacity
@@ -288,8 +283,8 @@ export default class WebGL2Renderer
   /**
    * Get the opacity of a map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {(number | undefined)}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapOpacity(mapId: string): number | undefined {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -302,8 +297,8 @@ export default class WebGL2Renderer
   /**
    * Set the opacity of a map
    *
-   * @param {string} mapId - ID of the map
-   * @param {number} opacity - opacity to set
+   * @param mapId - ID of the map
+   * @param opacity - opacity to set
    */
   setMapOpacity(mapId: string, opacity: number): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -315,7 +310,7 @@ export default class WebGL2Renderer
   /**
    * Rreset the opacity of a map
    *
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapOpacity(mapId: string): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -327,7 +322,7 @@ export default class WebGL2Renderer
   /**
    * Get the remove color options of the renderer
    *
-   * @returns {(Partial<RemoveColorOptions> | undefined)}
+   * @returns
    */
   getRemoveColorOptions(): Partial<RemoveColorOptions> | undefined {
     return this.renderOptions.removeColorOptions
@@ -336,7 +331,7 @@ export default class WebGL2Renderer
   /**
    * Set the remove color options of the renderer
    *
-   * @param {RemoveColorOptions} removeColorOptions
+   * @param removeColorOptions
    */
   setRemoveColorOptions(removeColorOptions: RemoveColorOptions) {
     this.renderOptions.removeColorOptions = removeColorOptions
@@ -352,8 +347,8 @@ export default class WebGL2Renderer
   /**
    * Get the remove color options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {(Partial<RemoveColorOptions> | undefined)}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapRemoveColorOptions(
     mapId: string
@@ -367,8 +362,8 @@ export default class WebGL2Renderer
   /**
    * Set the remove color options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @param {RemoveColorOptions} removeColorOptions - the 'remove color options' to set
+   * @param mapId - ID of the map
+   * @param removeColorOptions - the 'remove color options' to set
    */
   setMapRemoveColorOptions(
     mapId: string,
@@ -383,7 +378,7 @@ export default class WebGL2Renderer
   /**
    * Reset the remove color options of a map
    *
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapRemoveColorOptions(mapId: string): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -395,7 +390,7 @@ export default class WebGL2Renderer
   /**
    * Get the colorize options of the renderer
    *
-   * @returns {(Partial<ColorizeOptions> | undefined)}
+   * @returns
    */
   getColorizeOptions(): Partial<ColorizeOptions> | undefined {
     return this.renderOptions.colorizeOptions
@@ -404,7 +399,7 @@ export default class WebGL2Renderer
   /**
    * Set the colorize options of the renderer
    *
-   * @param {ColorizeOptions} colorizeOptions - the colorize options to set
+   * @param colorizeOptions - the colorize options to set
    */
   setColorizeOptions(colorizeOptions: ColorizeOptions): void {
     this.renderOptions.colorizeOptions = colorizeOptions
@@ -420,8 +415,8 @@ export default class WebGL2Renderer
   /**
    * Get the colorize options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {(Partial<ColorizeOptions> | undefined)}
+   * @param mapId - ID of the map
+   * @returns Colorize options
    */
   getMapColorizeOptions(mapId: string): Partial<ColorizeOptions> | undefined {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -433,8 +428,8 @@ export default class WebGL2Renderer
   /**
    * Set the colorize options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @param {ColorizeOptions} colorizeOptions - the colorize options to set
+   * @param mapId - ID of the map
+   * @param colorizeOptions - the colorize options to set
    */
   setMapColorizeOptions(mapId: string, colorizeOptions: ColorizeOptions): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -446,7 +441,7 @@ export default class WebGL2Renderer
   /**
    * Reset the colorize options of a map
    *
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapColorizeOptions(mapId: string): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -458,7 +453,7 @@ export default class WebGL2Renderer
   /**
    * Get the grid options of the renderer
    *
-   * @returns {(Partial<GridOptions> | undefined)}
+   * @returns
    */
   getGridOptions(): Partial<GridOptions> | undefined {
     return this.renderOptions.gridOptions
@@ -467,7 +462,7 @@ export default class WebGL2Renderer
   /**
    * Set the grid options of the renderer
    *
-   * @param {GridOptions} gridOptions - the grid options to set
+   * @param gridOptions - the grid options to set
    */
   setGridOptions(gridOptions: GridOptions): void {
     this.renderOptions.gridOptions = gridOptions
@@ -483,8 +478,8 @@ export default class WebGL2Renderer
   /**
    * Get the grid options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {(Partial<GridOptions> | undefined)}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapGridOptions(mapId: string): Partial<GridOptions> | undefined {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -496,8 +491,8 @@ export default class WebGL2Renderer
   /**
    * Set the grid options of a map
    *
-   * @param {string} mapId - ID of the map
-   * @param {GridOptions} gridOptions - the grid options to set
+   * @param mapId - ID of the map
+   * @param gridOptions - the grid options to set
    */
   setMapGridOptions(mapId: string, gridOptions: GridOptions): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -509,7 +504,7 @@ export default class WebGL2Renderer
   /**
    * Reset the grid options of a map
    *
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapGridOptions(mapId: string): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -521,7 +516,7 @@ export default class WebGL2Renderer
   /**
    * Get the saturation of the renderer
    *
-   * @returns {number}
+   * @returns
    */
   getSaturation(): number {
     return this.saturation
@@ -548,8 +543,8 @@ export default class WebGL2Renderer
   /**
    * Get the saturation of a map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {(number | undefined)}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapSaturation(mapId: string): number | undefined {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -576,7 +571,7 @@ export default class WebGL2Renderer
   /**
    * Reset the saturation of a map
    *
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapSaturation(mapId: string): void {
     const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -588,7 +583,7 @@ export default class WebGL2Renderer
   /**
    * Render the map for a given viewport
    *
-   * @param {Viewport} viewport - the current viewport
+   * @param viewport - the current viewport
    */
   render(viewport: Viewport): void {
     if (this.disableRender) {

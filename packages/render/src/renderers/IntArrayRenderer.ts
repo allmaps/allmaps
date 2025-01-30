@@ -19,11 +19,6 @@ const CHANNELS = 4
 
 /**
  * Class that renders WarpedMaps to an IntArray
- *
- * @export
- * @class IntArrayRenderer
- * @typedef {IntArrayRenderer}
- * @extends {BaseRenderer}
  */
 export default class IntArrayRenderer<D>
   extends BaseRenderer<WarpedMap, D>

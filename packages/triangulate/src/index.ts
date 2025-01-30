@@ -44,10 +44,10 @@ const EPSILON = 0.001
  *
  * Grid points are placed inside the polygon to obtain small, well conditioned triangles.
  *
- * @param {Polygon} polygon - Polygon
- * @param {number} [distance] - Distance that conditions the triangles
- * @param {number} [minimumTriangleArea] - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
- * @returns {Triangle[]} Array of triangles partitioning the polygon
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param minimumTriangleArea - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @returns Array of triangles partitioning the polygon
  */
 export function triangulate(
   polygon: Polygon,
@@ -71,10 +71,10 @@ export function triangulate(
  *
  * This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
  *
- * @param {Polygon} polygon - Polygon
- * @param {number} [distance] - Distance that conditions the triangles
- * @param {number} [minimumTriangleArea] - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
- * @returns {TriangulationToUnique} Triangulation Object with uniquePointIndexTriangles and uniquePoints
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param minimumTriangleArea - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @returns Triangulation Object with uniquePointIndexTriangles and uniquePoints
  */
 export function triangulateToUnique(
   polygon: Polygon,

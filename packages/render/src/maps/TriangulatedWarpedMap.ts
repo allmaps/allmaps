@@ -55,21 +55,18 @@ type GcpTriangulation = {
 /**
  * Class for triangulated WarpedMaps.
  *
- * @export
- * @class TriangulatedWarpedMap
- *
- * @param {number} resourcePreviousResolution - Resolution (or 'distance') used during the previous triangulation of the resource mask
- * @param {number} resourceResolution - Resolution (or 'distance') used during the triangulation of the resource mask, computed as the finest resource segment resulting from a resource-to-geo transformation of the horizontal and vertical midline of the resource bbox using the current transformation type
- * @param {number} triangulateErrorCount - Number of time the triangulation has resulted in an error
- * @param {GcpTriangulation} projectedGcpPreviousTriangulation - Previous triangulation of the resource mask
- * @param {GcpTriangulation} projectedGcpTriangulation - Triangulation of the resource mask of a specific resource resolution, with unique points in resource and projected geospatial coordinates with distortions, and indices pointing to the triangles points and indices pointing to the triangulation-refined resource mask
- * @param {Point[]} resourceTrianglePoints - Triangle points of the triangles the triangulated resourceMask
- * @param {Point[]} projectedGeoPreviousTrianglePoints - The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
- * @param {Point[]} projectedGeoTrianglePoints - The resourceTrianglePoints in projected geospatial coordinates
- * @param {number[]} previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
- * @param {number[]} trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
- * @param {Ring[]} projectedGeoPreviousTriangulationMask - The resource mask refined by the previous triangulation, in projected geospatial coordinates
- * @param {Ring[]} projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
+ * @param resourcePreviousResolution - Resolution (or 'distance') used during the previous triangulation of the resource mask
+ * @param resourceResolution - Resolution (or 'distance') used during the triangulation of the resource mask, computed as the finest resource segment resulting from a resource-to-geo transformation of the horizontal and vertical midline of the resource bbox using the current transformation type
+ * @param triangulateErrorCount - Number of time the triangulation has resulted in an error
+ * @param projectedGcpPreviousTriangulation - Previous triangulation of the resource mask
+ * @param projectedGcpTriangulation - Triangulation of the resource mask of a specific resource resolution, with unique points in resource and projected geospatial coordinates with distortions, and indices pointing to the triangles points and indices pointing to the triangulation-refined resource mask
+ * @param resourceTrianglePoints - Triangle points of the triangles the triangulated resourceMask
+ * @param projectedGeoPreviousTrianglePoints - The projectedGeoTrianglePoints of the previous transformation type, used during transformation transitions
+ * @param projectedGeoTrianglePoints - The resourceTrianglePoints in projected geospatial coordinates
+ * @param previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
+ * @param trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
+ * @param projectedGeoPreviousTriangulationMask - The resource mask refined by the previous triangulation, in projected geospatial coordinates
+ * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
  */
 export default class TriangulatedWarpedMap extends WarpedMap {
   previousResourceResolution: number | undefined
@@ -98,10 +95,9 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Creates an instance of a TriangulatedWarpedMap.
    *
-   * @constructor
-   * @param {string} mapId - ID of the map
-   * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
-   * @param {WarpedMapOptions} [options] - Options
+   * @param mapId - ID of the map
+   * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
+   * @param options - Options
    */
   constructor(
     mapId: string,
@@ -121,7 +117,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Update the resourceMask.
    *
-   * @param {Ring} resourceMask
+   * @param resourceMask
    */
   setResourceMask(resourceMask: Ring): void {
     super.setResourceMask(resourceMask)
@@ -145,7 +141,7 @@ export default class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Mix the previous and new points and values.
    *
-   * @param {number} t
+   * @param t
    */
   mixPreviousAndNew(t: number) {
     super.mixPreviousAndNew(t)

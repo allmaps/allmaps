@@ -28,9 +28,9 @@ import type {
  * Returns the best TileZoomLevel for a given resource-to-canvas scale.
  *
  * @export
- * @param {Image} image - A parsed IIIF Image
- * @param {number} resourceToCanvasScale - The resource to canvas scale, relating resource pixels to canvas pixels.
- * @returns {TileZoomLevel}
+ * @param image - A parsed IIIF Image
+ * @param resourceToCanvasScale - The resource to canvas scale, relating resource pixels to canvas pixels.
+ * @returns
  */
 export function getTileZoomLevelForScale(
   tileZoomLevels: TileZoomLevel[],
@@ -335,8 +335,8 @@ export function tileCenter(tile: Tile): Point {
  * Returns the resource coordinates of the tile's origin point
  *
  * @export
- * @param {Tile} tile
- * @returns {Point}
+ * @param tile
+ * @returns
  */
 export function tileToTileOriginPoint(tile: Tile): Point {
   return [
@@ -358,11 +358,10 @@ export function clipTilePointToTile(tilePoint: Point, tile: Tile): Point {
  * From the input point in resource coordinates, returns the same point in tile coordinates
  * I.e. relative to the tile's origin point and scaled using the scale factor
  *
- * @export
- * @param {Point} resourcePoint
- * @param {Tile} tile
- * @param {boolean} [clip=true]
- * @returns {Point | undefined}
+ * @param resourcePoint
+ * @param tile
+ * @param clip
+ * @returns
  */
 export function resourcePointToTilePoint(
   resourcePoint: Point,

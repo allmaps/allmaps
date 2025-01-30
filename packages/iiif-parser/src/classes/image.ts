@@ -41,17 +41,17 @@ const ImageTypeString = 'image' as const
 
 /**
  * Parsed IIIF Image, embedded in a Canvas
- * @class EmbeddedImage
- * @property {boolean} embedded - Whether the Image is embedded in a Canvas
- * @property {string} [type] - Resource type, equals 'image'
- * @property {string} uri - URI of Image
- * @property {MajorVersion} majorVersion - IIIF API version of Image
- * @property {boolean} supportsAnyRegionAndSize - Whether the associated Image Service supports any region and size
- * @property {number} [maxWidth] - Maximum width of the associated Image Service
- * @property {number} [maxHeight] - Maximum height of the associated Image Service
- * @property {number} [maxArea] - Maximum area of the associated Image Service
- * @property {number} width - Width of Image
- * @property {number} height - Height of Image
+ *
+ * @property embedded - Whether the Image is embedded in a Canvas
+ * @property type - Resource type, equals 'image'
+ * @property uri - URI of Image
+ * @property majorVersion - IIIF API version of Image
+ * @property supportsAnyRegionAndSize - Whether the associated Image Service supports any region and size
+ * @property maxWidth - Maximum width of the associated Image Service
+ * @property maxHeight - Maximum height of the associated Image Service
+ * @property maxArea - Maximum area of the associated Image Service
+ * @property width - Width of Image
+ * @property height - Height of Image
  */
 export class EmbeddedImage {
   readonly embedded: boolean = true
@@ -320,10 +320,8 @@ export class EmbeddedImage {
 
 /**
  * Parsed IIIF Image
- * @class Image
- * @extends EmbeddedImage
- * @property {TileZoomLevel[]} tileZoomLevels - Array of parsed tile zoom levels
- * @property {Size[]} [sizes] - Array of parsed sizes
+ * @property tileZoomLevels - Array of parsed tile zoom levels
+ * @property sizes - Array of parsed sizes
  */
 export class Image extends EmbeddedImage {
   tileZoomLevels: TileZoomLevel[]

@@ -84,8 +84,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Creates a WarpedMapLayer
-   * @param {unknown} annotationOrAnnotationUrl - Georeference Annotation or URL of a Georeference Annotation
-   * @param {WarpedMapLayerOptions} [options] - Options for the layer
+   * @param annotationOrAnnotationUrl - Georeference Annotation or URL of a Georeference Annotation
+   * @param options - Options for the layer
    */
   constructor(
     annotationOrAnnotationUrl: unknown,
@@ -162,9 +162,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
-   * @async
-   * @param {any} annotation - Georeference Annotation
-   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   * @param annotation - Georeference Annotation
+   * @returns - the map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotation(
     annotation: unknown
@@ -181,9 +180,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
-   * @async
-   * @param {any} annotation - Georeference Annotation
-   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   * @param annotation - Georeference Annotation
+   * @returns - the map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotation(
     annotation: unknown
@@ -199,9 +197,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-   * @async
-   * @param {string} annotationUrl - Georeference Annotation
-   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were added, or an error per map
+   * @param annotationUrl - Georeference Annotation
+   * @returns The map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotationByUrl(
     annotationUrl: string
@@ -215,9 +212,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-   * @async
-   * @param {string} annotationUrl - Georeference Annotation
-   * @returns {Promise<(string | Error)[]>} - the map IDs of the maps that were removed, or an error per map
+   * @param annotationUrl - Georeference Annotation
+   * @returns The map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotationByUrl(
     annotationUrl: string
@@ -232,8 +228,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Adds a Georeferenced map.
-   * @param {any} georeferencedMap - Georeferenced map
-   * @returns {Promise<(string | Error)>} - the map ID of the map that was added, or an error
+   * @param georeferencedMap - Georeferenced map
+   * @returns The map ID of the map that was added, or an error
    */
   async addGeoreferencedMap(
     georeferencedMap: unknown
@@ -249,8 +245,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Removes a Georeferenced map.
-   * @param {any} georeferencedMap - Georeferenced map
-   * @returns {Promise<(string | Error)>} - the map ID of the map that was removed, or an error
+   * @param georeferencedMap - Georeferenced map
+   * @returns The map ID of the map that was removed, or an error
    */
   async removeGeoreferencedMap(
     georeferencedMap: unknown
@@ -266,7 +262,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML container element of the layer
-   * @returns {HTMLElement} HTML Div Element
+   * @returns HTML Div Element
    */
   getContainer(): HTMLDivElement | undefined {
     return this.container
@@ -274,7 +270,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the HTML canvas element of the layer
-   * @returns {HTMLCanvasElement | null} HTML Canvas Element
+   * @returns HTML Canvas Element
    */
   getCanvas(): HTMLCanvasElement | undefined {
     return this.canvas
@@ -291,8 +287,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Returns a single map's warped map
-   * @param {string} mapId - ID of the map
-   * @returns {WebGL2WarpedMap | undefined} the warped map
+   * @param mapId - ID of the map
+   * @returns the warped map
    */
   getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
@@ -302,7 +298,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Make a single map visible
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   showMap(mapId: string) {
     assertRenderer(this.renderer)
@@ -313,7 +309,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Make multiple maps visible
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   showMaps(mapIds: Iterable<string>) {
     assertRenderer(this.renderer)
@@ -324,7 +320,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Make a single map invisible
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   hideMap(mapId: string) {
     assertRenderer(this.renderer)
@@ -336,7 +332,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Make multiple maps invisible
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   hideMaps(mapIds: Iterable<string>) {
     assertRenderer(this.renderer)
@@ -347,7 +343,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Returns the visibility of a single map
-   * @returns {boolean | undefined} - whether the map is visible
+   * @returns - whether the map is visible
    */
   isMapVisible(mapId: string): boolean | undefined {
     assertRenderer(this.renderer)
@@ -358,8 +354,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the resource mask of a single map
-   * @param {string} mapId - ID of the map
-   * @param {Point[]} resourceMask - new resource mask
+   * @param mapId - ID of the map
+   * @param resourceMask - new resource mask
    */
   setMapResourceMask(mapId: string, resourceMask: Point[]) {
     assertRenderer(this.renderer)
@@ -370,8 +366,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the transformation type of multiple maps
-   * @param {Iterable<string>} mapIds - IDs of the maps
-   * @param {TransformationType} transformation - new transformation type
+   * @param mapIds - IDs of the maps
+   * @param transformation - new transformation type
    */
   setMapsTransformationType(
     mapIds: Iterable<string>,
@@ -388,8 +384,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the distortion measure of multiple maps
-   * @param {Iterable<string>} mapIds - IDs of the maps
-   * @param {DistortionMeasure} distortionMeasure - new transformation type
+   * @param mapIds - IDs of the maps
+   * @param distortionMeasure - new transformation type
    */
   setMapsDistortionMeasure(
     mapIds: Iterable<string>,
@@ -406,7 +402,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
-   * @returns {number[][] | undefined} - L.LatLngBounds in array form of all visible maps
+   * @returns - L.LatLngBounds in array form of all visible maps
    */
   getBounds(): number[][] | undefined {
     assertRenderer(this.renderer)
@@ -422,7 +418,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Bring maps to front
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   bringMapsToFront(mapIds: Iterable<string>) {
     assertRenderer(this.renderer)
@@ -433,7 +429,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Send maps to back
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   sendMapsToBack(mapIds: string[]) {
     assertRenderer(this.renderer)
@@ -444,7 +440,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Bring maps forward
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   bringMapsForward(mapIds: Iterable<string>) {
     assertRenderer(this.renderer)
@@ -455,7 +451,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Send maps backward
-   * @param {Iterable<string>} mapIds - IDs of the maps
+   * @param mapIds - IDs of the maps
    */
   sendMapsBackward(mapIds: Iterable<string>) {
     assertRenderer(this.renderer)
@@ -486,8 +482,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Returns the z-index of a single map
-   * @param {string} mapId - ID of the map
-   * @returns {number | undefined} - z-index of the map
+   * @param mapId - ID of the map
+   * @returns - z-index of the map
    */
   getMapZIndex(mapId: string): number | undefined {
     assertRenderer(this.renderer)
@@ -504,7 +500,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Changes the z-index of the layer.
-   * @param {number} value - z-index
+   * @param value - z-index
    */
   setZIndex(value: number) {
     this.options.zIndex = value
@@ -515,7 +511,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Sets the object that caches image information
    *
-   * @param {ImageInformations} imageInformations - Object that caches image information
+   * @param imageInformations - Object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations) {
     assertRenderer(this.renderer)
@@ -525,7 +521,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the pane name the layer is attached to. Defaults to 'tilePane'
-   * @returns {string} Pane name
+   * @returns Pane name
    */
   getPaneName(): string {
     // this._map.getPane(this.options.pane) ? this.options.pane : DEFAULT_PANE
@@ -534,7 +530,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the opacity of the layer
-   * @returns {number} Layer opacity
+   * @returns Layer opacity
    */
   getOpacity(): number {
     return this.options.opacity || DEFAULT_OPACITY
@@ -542,7 +538,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the opacity of the layer
-   * @param {number} opacity - Layer opacity
+   * @param opacity - Layer opacity
    */
   setOpacity(opacity: number) {
     this.options.opacity = opacity
@@ -561,8 +557,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Gets the opacity of a single map
-   * @param {string} mapId - ID of the map
-   * @returns {number | undefined} opacity of the map
+   * @param mapId - ID of the map
+   * @returns opacity of the map
    */
   getMapOpacity(mapId: string): number | undefined {
     assertRenderer(this.renderer)
@@ -572,8 +568,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the opacity of a single map
-   * @param {string} mapId - ID of the map
-   * @param {number} opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+   * @param mapId - ID of the map
+   * @param opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
    */
   setMapOpacity(mapId: string, opacity: number) {
     assertRenderer(this.renderer)
@@ -585,7 +581,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Resets the opacity of a single map to 1
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapOpacity(mapId: string) {
     assertRenderer(this.renderer)
@@ -597,7 +593,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the saturation of a single map
-   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setSaturation(saturation: number) {
     assertRenderer(this.renderer)
@@ -620,8 +616,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the saturation of a single map
-   * @param {string} mapId - ID of the map
-   * @param {number} saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+   * @param mapId - ID of the map
+   * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
    */
   setMapSaturation(mapId: string, saturation: number) {
     assertRenderer(this.renderer)
@@ -633,7 +629,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Resets the saturation of a single map to the original colors
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapSaturation(mapId: string) {
     assertRenderer(this.renderer)
@@ -645,10 +641,10 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Removes a color from all maps
-   * @param {Object} options - remove color options
-   * @param {string} [options.hexColor] - hex color to remove
-   * @param {number} [options.threshold] - threshold between 0 and 1
-   * @param {number} [options.hardness] - hardness between 0 and 1
+   * @param options - remove color options
+   * @param options.hexColor - hex color to remove
+   * @param options.threshold - threshold between 0 and 1
+   * @param options.hardness - hardness between 0 and 1
    */
   setRemoveColor(
     options: Partial<{ hexColor: string; threshold: number; hardness: number }>
@@ -681,11 +677,11 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Removes a color from a single map
-   * @param {string} mapId - ID of the map
-   * @param {Object} options - remove color options
-   * @param {string} [options.hexColor] - hex color to remove
-   * @param {number} [options.threshold] - threshold between 0 and 1
-   * @param {number} [options.hardness] - hardness between 0 and 1
+   * @param mapId - ID of the map
+   * @param options - remove color options
+   * @param options.hexColor - hex color to remove
+   * @param options.threshold - threshold between 0 and 1
+   * @param options.hardness - hardness between 0 and 1
    */
   setMapRemoveColor(
     mapId: string,
@@ -708,7 +704,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Resets the color removal for a single map
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapRemoveColor(mapId: string) {
     assertRenderer(this.renderer)
@@ -719,7 +715,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the colorization for all maps
-   * @param {string} hexColor - desired hex color
+   * @param hexColor - desired hex color
    */
   setColorize(hexColor: string) {
     assertRenderer(this.renderer)
@@ -746,8 +742,8 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Sets the colorization for a single map
-   * @param {string} mapId - ID of the map
-   * @param {string} hexColor - desired hex color
+   * @param mapId - ID of the map
+   * @param hexColor - desired hex color
    */
   setMapColorize(mapId: string, hexColor: string) {
     assertRenderer(this.renderer)
@@ -762,7 +758,7 @@ export class WarpedMapLayer extends L.Layer {
 
   /**
    * Resets the colorization of a single map
-   * @param {string} mapId - ID of the map
+   * @param mapId - ID of the map
    */
   resetMapColorize(mapId: string) {
     assertRenderer(this.renderer)

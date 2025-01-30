@@ -9,18 +9,12 @@ import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-im
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to its imageData using a WebWorker.
- *
- * @export
- * @class CacheableWorkerImageDataTile
- * @typedef {CacheableWorkerImageDataTile}
- * @extends {CacheableTile}
  */
 export default class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
   /**
    * Fetch the tile and create its ImageData using a WebWorker.
    *
-   * @async
-   * @returns {Promise<void>}
+   * @returns
    */
   async fetch() {
     try {
@@ -78,11 +72,6 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
 
 /**
  * Class for tiles that is cached, and whose data has been processed to an ImageData object using a WebWorker.
- *
- * @export
- * @class CachedWorkerImageDataTile
- * @typedef {CachedWorkerImageDataTile}
- * @extends {CacheableWorkerImageDataTile}
  */
 export class CachedWorkerImageDataTile extends CacheableWorkerImageDataTile {
   declare data: ImageData

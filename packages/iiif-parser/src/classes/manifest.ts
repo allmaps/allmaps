@@ -35,12 +35,11 @@ const ManifestTypeString = 'manifest'
 
 /**
  * Parsed IIIF Manifest, embedded in a Collection
- * @class EmbeddedManifest
- * @property {boolean} embedded - Whether the Manifest is embedded in a Collection
- * @property {string} [uri] - URI of Manifest
- * @property {LanguageString} [label] - Label of Manifest
- * @property {MajorVersion} [majorVersion] - IIIF API version of Manifest
- * @property {string} [type] - Resource type, equals 'manifest'
+ * @property embedded - Whether the Manifest is embedded in a Collection
+ * @property uri - URI of Manifest
+ * @property label - Label of Manifest
+ * @property majorVersion - IIIF API version of Manifest
+ * @property type - Resource type, equals 'manifest'
  */
 export class EmbeddedManifest {
   readonly embedded: boolean = true
@@ -75,11 +74,10 @@ export class EmbeddedManifest {
 
 /**
  * Parsed IIIF Manifest
- * @class Manifest
- * @extends EmbeddedManifest
- * @property {Canvas[]} canvases - Array of parsed canvases
- * @property {LanguageString} [description] - Description of Manifest
- * @property {Metadata} [metadata] - Metadata of Manifest
+ *
+ * @property canvases - Array of parsed canvases
+ * @property description - Description of Manifest
+ * @property metadata - Metadata of Manifest
  */
 export class Manifest extends EmbeddedManifest {
   canvases: Canvas[] = []

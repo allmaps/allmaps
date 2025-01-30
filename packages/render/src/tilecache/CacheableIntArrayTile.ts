@@ -10,11 +10,6 @@ import type { GetImageData } from '../shared/types.js'
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to an IntArray.
- *
- * @export
- * @class CacheableIntArrayTile
- * @typedef {CacheableIntArrayTile}
- * @extends {CacheableTile}
  */
 export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
   getImageData: GetImageData<D>
@@ -32,8 +27,7 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
   /**
    * Fetch the tile and create its IntArray data using the supplied getImageData function.
    *
-   * @async
-   * @returns {Promise<void>}
+   * @returns
    */
   async fetch() {
     try {
@@ -73,11 +67,6 @@ export default class CacheableIntArrayTile<D> extends CacheableTile<D> {
 
 /**
  * Class for tiles that is cached, and whose data has been processed to an IntArray.
- *
- * @export
- * @class CachedIntArrayTile
- * @typedef {CachedIntArrayTile}
- * @extends {CacheableIntArrayTile}
  */
 export class CachedIntArrayTile<D> extends CacheableIntArrayTile<D> {
   declare data: D

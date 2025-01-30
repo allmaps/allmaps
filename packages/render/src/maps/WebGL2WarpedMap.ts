@@ -100,11 +100,6 @@ export function createWebGL2WarpedMapFactory(
 
 /**
  * Class for WarpedMaps that are rendered with WebGL 2
- *
- * @export
- * @class WebGL2WarpedMap
- * @typedef {WebGL2WarpedMap}
- * @extends {TriangulatedWarpedMap}
  */
 export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // De facto make this a WarpedMapWithImageInfo
@@ -154,11 +149,11 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * Creates an instance of WebGL2WarpedMap.
    *
    * @constructor
-   * @param {string} mapId - ID of the map
-   * @param {GeoreferencedMap} georeferencedMap - Georeferenced map used to construct the WarpedMap
-   * @param {WebGL2RenderingContext} gl - WebGL rendering context
-   * @param {WebGLProgram} mapProgram - WebGL program for map
-   * @param {Partial<WarpedMapOptions>} options - WarpedMapOptions
+   * @param mapId - ID of the map
+   * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
+   * @param gl - WebGL rendering context
+   * @param mapProgram - WebGL program for map
+   * @param options - WarpedMapOptions
    */
   constructor(
     mapId: string,
@@ -205,7 +200,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Update the vertex buffers of this warped map
    *
-   * @param {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+   * @param projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
    */
   updateVertexBuffers(projectedGeoToClipTransform: Transform) {
     this.invertedRenderTransform = invertTransform(projectedGeoToClipTransform)
@@ -232,7 +227,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Add cached tile to the textures of this map and update textures
    *
-   * @param {CachedTile} cachedTile
+   * @param cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
     this.cachedTilesByTileKey.set(cachedTile.tileKey, cachedTile)
@@ -243,7 +238,7 @@ export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Remove cached tile from the textures of this map and update textures
    *
-   * @param {string} tileUrl
+   * @param tileUrl
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)

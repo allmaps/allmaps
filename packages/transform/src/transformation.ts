@@ -4,7 +4,7 @@ import type { EvaluationType, TransformationType } from './shared/types.js'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
- * */
+ */
 export abstract class Transformation {
   sourcePoints: Point[]
   destinationPoints: Point[]
@@ -16,10 +16,10 @@ export abstract class Transformation {
 
   /**
    * Create a transformation
-   * @param {Point[]} sourcePoints - The source points
-   * @param {Point[]} destinationPoints - The destination points
-   * @param {TransformationType} type - The transformation type
-   * @param {number} pointCountMinimum - The minimum number of points for the transformation type
+   * @param sourcePoints - The source points
+   * @param destinationPoints - The destination points
+   * @param type - The transformation type
+   * @param pointCountMinimum - The minimum number of points for the transformation type
    */
   constructor(
     sourcePoints: Point[],

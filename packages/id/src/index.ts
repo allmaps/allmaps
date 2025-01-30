@@ -38,7 +38,6 @@ export async function generateId(
 /**
  * Generates a random ID.
  *
- * @async
  * @param length - Length of returned hash. The maximum length of the hash is 40 characters.
  * @returns First `length` characters of the SHA-1 hash of a random UUID.
  */
@@ -53,7 +52,6 @@ export async function generateRandomId(
 /**
  * Generates a checksum of a JSON object.
  *
- * @async
  * @param obj - JSON object.
  * @param length - Length of returned hash. The maximum length of the hash is 40 characters.
  * @returns First `length` characters of the SHA-1 hash of sorted and serialized version of `obj`.

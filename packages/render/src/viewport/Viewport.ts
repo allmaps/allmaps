@@ -28,37 +28,34 @@ import type {
 
 /**
  * The viewport describes the view on the rendered map.
- * @export
- * @class Viewport
- * @typedef {Viewport}
- * @extends {EventTarget}
- * @property {Point} geoCenter - Center point of the viewport, in longitude/latitude coordinates.
- * @property {Rectangle} geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
- * @property {Size} geoSize - Size of the viewport in longitude/latitude coordinates, as [width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in that case).
- * @property {number} geoResolution - Resolution of the viewport in longitude/latitude coordinates, as width * height. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in that case).
- * @property {Bbox} geoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
- * @property {Point} projectedGeoCenter - Center point of the viewport, in projected geo coordinates.
- * @property {Rectangle} projectedGeoRectangle - Rotated rectangle of the viewport point, in projected geo coordinates.
- * @property {Size} projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
- * @property {number} projectedGeoResolution - Resolution of the viewport in projected geo coordinates, as width * height. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
- * @property {Bbox} projectedGeoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
- * @property {number} rotation - Rotation of the viewport with respect to the projected coordinate system.
- * @property {number} projectedGeoPerViewportScale - Scale of the viewport, in projected geo coordinates per viewport pixel.
- * @property {Point} viewportCenter - Center point of the viewport, in viewport pixels.
- * @property {Rectangle} viewportRectangle - Rectangle of the viewport point, in viewport pixels.
- * @property {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
- * @property {number} viewportResolution - Resolution of the viewport in viewport pixels, as width * height.
- * @property {Bbox} viewportBbox - Bounding box of the viewport, in viewport pixels.
- * @property {number} devicePixelRatio - The devicePixelRatio of the viewport.
- * @property {Point} canvasCenter - Center point of the HTMLCanvasElement of the viewport, in canvas pixels.
- * @property {Rectangle} canvasRectangle - Rectangle of the HTMLCanvasElement of the viewport, in canvas pixels.
- * @property {Size} canvasSize - Size of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as [width, height].
- * @property {number} canvasResolution - Resolution of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as width * height.
- * @property {Bbox} canvasBbox - Bounding box of the HTMLCanvasElement of the viewport, in canvas pixels.
- * @property {number} projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (projectedGeoPerViewportScale/devicePixelRatio).
- * @property {Transform} projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
- * @property {Transform} projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
- * @property {Transform} viewportToClipTransform - Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
+ *
+ * @property geoCenter - Center point of the viewport, in longitude/latitude coordinates.
+ * @property geoRectangle - Rotated rectangle (possibly quadrilateral) of the viewport point, in longitude/latitude coordinates.
+ * @property geoSize - Size of the viewport in longitude/latitude coordinates, as [width, height]. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in that case).
+ * @property geoResolution - Resolution of the viewport in longitude/latitude coordinates, as width * height. (This is the size of the bounding box of the rectangle, since longitude/latitude only makes sense in that case).
+ * @property geoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in longitude/latitude coordinates.
+ * @property projectedGeoCenter - Center point of the viewport, in projected geo coordinates.
+ * @property projectedGeoRectangle - Rotated rectangle of the viewport point, in projected geo coordinates.
+ * @property projectedGeoSize - Size of the viewport in projected geo coordinates, as [width, height]. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
+ * @property projectedGeoResolution - Resolution of the viewport in projected geo coordinates, as width * height. (This is not the size of the bounding box of the rotated rectangle, but the width and hight of the rectangle).
+ * @property projectedGeoRectangleBbox - Bounding box of the rotated rectangle of the viewport, in projected geo coordinates.
+ * @property rotation - Rotation of the viewport with respect to the projected coordinate system.
+ * @property projectedGeoPerViewportScale - Scale of the viewport, in projected geo coordinates per viewport pixel.
+ * @property viewportCenter - Center point of the viewport, in viewport pixels.
+ * @property viewportRectangle - Rectangle of the viewport point, in viewport pixels.
+ * @property viewportSize - Size of the viewport in viewport pixels, as [width, height].
+ * @property viewportResolution - Resolution of the viewport in viewport pixels, as width * height.
+ * @property viewportBbox - Bounding box of the viewport, in viewport pixels.
+ * @property devicePixelRatio - The devicePixelRatio of the viewport.
+ * @property canvasCenter - Center point of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property canvasRectangle - Rectangle of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property canvasSize - Size of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as [width, height].
+ * @property canvasResolution - Resolution of the HTMLCanvasElement of the viewport in canvas pixels (viewportSize*devicePixelRatio), as width * height.
+ * @property canvasBbox - Bounding box of the HTMLCanvasElement of the viewport, in canvas pixels.
+ * @property projectedGeoPerCanvasScale - Scale of the viewport, in projected geo coordinates per canvas pixel (projectedGeoPerViewportScale/devicePixelRatio).
+ * @property projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
+ * @property projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
+ * @property viewportToClipTransform - Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
  */
 export default class Viewport {
   geoCenter: Point
@@ -96,11 +93,11 @@ export default class Viewport {
    * Creates a new Viewport
    *
    * @constructor
-   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
-   * @param {Point} projectedGeoCenter - Center point of the viewport, in projected coordinates.
-   * @param {number} projectedGeoPerViewportScale - Scale of the viewport, in projection coordinates per viewport pixel.
-   * @param {number} rotation - Rotation of the viewport with respect to the project coordinate system.
-   * @param {number} [devicePixelRatio=1] - The devicePixelRatio of the viewport.
+   * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param projectedGeoCenter - Center point of the viewport, in projected coordinates.
+   * @param projectedGeoPerViewportScale - Scale of the viewport, in projection coordinates per viewport pixel.
+   * @param rotation - Rotation of the viewport with respect to the project coordinate system.
+   * @param devicePixelRatio - The devicePixelRatio of the viewport.
    */
   constructor(
     viewportSize: Size,
@@ -167,13 +164,11 @@ export default class Viewport {
   /**
    * Static method creates that creates a Viewport from a WarpedMapList
    *
-   * @static
-   * @template {WarpedMap} W
-   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
-   * @param {WarpedMapList<W>} warpedMapList - A WarpedMapList.
-   * @param {number} [devicePixelRatio] - The devicePixelRatio of the viewport.
-   * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
-   * @returns {Viewport} - A new Viewport object
+   * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param warpedMapList - A WarpedMapList.
+   * @param devicePixelRatio - The devicePixelRatio of the viewport.
+   * @param fit- Whether the viewport should contain or cover the bbox of the warpedMapList.
+   * @returns - A new Viewport object
    */
   static fromWarpedMapList<W extends WarpedMap>(
     viewportSize: Size,
@@ -207,13 +202,11 @@ export default class Viewport {
   /**
    * Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
    *
-   * @static
-   * @template {WarpedMap} W
-   * @param {Size} viewportSize - Size of the viewport in viewport pixels, as [width, height].
-   * @param {WarpedMapList<W>} projectedGeoBbox - A projectedGeoBbox.
-   * @param {number} [devicePixelRatio] - The devicePixelRatio of the viewport.
-   * @param {Fit} [fit='contain'] - Whether the viewport should contain or cover the bbox of the warpedMapList.
-   * @returns {Viewport} - A new Viewport object
+   * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param projectedGeoBbox - A projectedGeoBbox.
+   * @param devicePixelRatio - The devicePixelRatio of the viewport.
+   * @param fit - Whether the viewport should contain or cover the bbox of the warpedMapList.
+   * @returns - A new Viewport object
    */
   static fromProjectedGeoBbox(
     viewportSize: Size,

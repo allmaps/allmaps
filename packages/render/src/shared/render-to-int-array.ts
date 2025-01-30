@@ -23,17 +23,13 @@ const CHANNELS = 4
 /**
  * Render to IntArray
  *
- * @export
- * @async
- * @template {WarpedMap} W
- * @template D
- * @param {WarpedMapList<W>} warpedMapList - WarpedMapList who's WarpedMaps will be rendered
- * @param {TileCache<D>} tileCache - TileCache who's tiles will be used
- * @param {Viewport} viewport - Viewport to render to. This can be the entire image, or a single XYZ tile
- * @param {GetImageDataValue<D>} getImageDataValue - Function to access the data of the image, at a specific index
- * @param {GetImageDataSize<D>} getImageDataSize - Function to access the size of the image
- * @param {Uint8ClampedArray} intArray - IntArray to render to
- * @returns {Promise<void>}
+ * @param warpedMapList - WarpedMapList who's WarpedMaps will be rendered
+ * @param tileCache - TileCache who's tiles will be used
+ * @param viewport - Viewport to render to. This can be the entire image, or a single XYZ tile
+ * @param getImageDataValue - Function to access the data of the image, at a specific index
+ * @param getImageDataSize - Function to access the size of the image
+ * @param intArray - IntArray to render to
+ * @returns
  */
 export async function renderToIntArray<W extends WarpedMap, D>(
   warpedMapList: WarpedMapList<W>,

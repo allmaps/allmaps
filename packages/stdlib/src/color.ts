@@ -2,8 +2,8 @@ import type { Color } from '@allmaps/types'
 
 /**
  * Convert RBG to hex
- * @param {[number, number, number]} [r, g, b] - rgb, e.g. [0, 51, 255]
- * @returns {Color} hex string, e.g. '#0033ff'
+ * @param rgb - RGB color array, e.g. [0, 51, 255]
+ * @returns hex string, e.g. '#0033ff'
  */
 export function rgbToHex([r, g, b]: Color): string {
   return (
@@ -19,8 +19,8 @@ export function rgbToHex([r, g, b]: Color): string {
 
 /**
  * Convert hex to RGB
- * @param {string} hex - hex string, e.g. '#0033ff'
- * @returns {Color} RGB, e.g. [0, 51, 255]
+ * @param hex - hex string, e.g. '#0033ff'
+ * @returns RGB, e.g. [0, 51, 255]
  */
 export function hexToRgb(hex: string): Color {
   const bigint = parseInt(hex.replace(/^#/, ''), 16)
@@ -32,8 +32,8 @@ export function hexToRgb(hex: string): Color {
 
 /**
  * Convert hex to fractional RGB
- * @param {string} hex - hex string, e.g. '#0033ff'
- * @returns {Color} Fractional RGB, e.g. [0, 0.2, 1]
+ * @param hex - hex string, e.g. '#0033ff'
+ * @returns Fractional RGB, e.g. [0, 0.2, 1]
  */
 export function hexToFractionalRgb(hex: string): Color {
   return hexToRgb(hex).map((c) => c / 255) as [number, number, number]
