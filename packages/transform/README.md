@@ -588,7 +588,7 @@ There are no parameters.
 
 ###### Returns
 
-`void`.
+`Transformation`.
 
 ### `GcpTransformer#createForwardTransformation()`
 
@@ -600,7 +600,7 @@ There are no parameters.
 
 ###### Returns
 
-`void`.
+`Transformation`.
 
 ### `GcpTransformer#destinationPoints`
 
