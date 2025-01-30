@@ -14,6 +14,7 @@ Allmaps is an open source project and consists of multiple apps and packages, al
 
 Apps:
 
+- [Allmaps Editor](apps/editor)
 - [Allmaps Viewer](apps/viewer)
 - [Allmaps Tile Server](apps/tileserver)
 - [Allmaps Latest](apps/latest)
@@ -25,6 +26,7 @@ Apps:
 Packages:
 
 - [@allmaps/annotation](packages/annotation)
+- [@allmaps/basemap](packages/basemap)
 - [@allmaps/id](packages/id)
 - [@allmaps/iiif-parser](packages/iiif-parser)
 - [@allmaps/leaflet](packages/leaflet)
