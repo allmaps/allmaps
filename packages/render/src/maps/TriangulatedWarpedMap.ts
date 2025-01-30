@@ -456,13 +456,22 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
   }
 
-  protected updateTransformerProperties(useCache = true): void {
-    super.updateTransformerProperties(useCache)
+  protected updateTransformerProperties(
+    clearCache = false,
+    useCache = true
+  ): void {
+    super.updateTransformerProperties(clearCache, useCache)
     this.updateTriangulation()
   }
 
   protected updateDistortionProperties(): void {
     super.updateDistortionProperties()
     this.updateTrianglePointsDistortion()
+  }
+
+  protected clearProjectedTransformerCaches() {
+    super.clearProjectedTransformerCaches()
+    this.projectedGcpTriangulationByTransformationTypeAndResourceResolution =
+      new Map()
   }
 }

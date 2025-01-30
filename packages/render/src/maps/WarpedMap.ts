@@ -117,8 +117,8 @@ export class WarpedMap extends EventTarget {
   georeferencedMap: GeoreferencedMap
 
   gcps: Gcp[]
-  projectedGcps: Gcp[]
-  projectedGeoPoints: Point[]
+  projectedGcps!: Gcp[]
+  projectedGeoPoints!: Point[]
   projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
 
@@ -208,13 +208,7 @@ export class WarpedMap extends EventTarget {
     this.georeferencedMap = georeferencedMap
 
     this.gcps = this.georeferencedMap.gcps
-    this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
-      resource,
-      geo: lonLatToWebMecator(geo)
-    }))
-    this.projectedGeoPoints = this.projectedGcps.map(
-      (projectedGcp) => projectedGcp.geo
-    )
+    this.updateGcpsProperties()
 
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
@@ -363,6 +357,17 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
+   * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+   *
+   * @param gcps
+   */
+  setGcps(gcps: Gcp[]): void {
+    this.gcps = gcps
+    this.updateGcpsProperties()
+    this.updateTransformerProperties(true, true)
+  }
+
+  /**
    * Update the resourceMask loaded from a georeferenced map to a new mask.
    *
    * @param resourceMask
@@ -393,16 +398,6 @@ export class WarpedMap extends EventTarget {
   setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     this.distortionMeasure = distortionMeasure
     this.updateDistortionProperties()
-  }
-
-  /**
-   * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
-   *
-   * @param gcps
-   */
-  setGcps(gcps: Gcp[]): void {
-    this.gcps = gcps
-    this.updateTransformerProperties(false)
   }
 
   /**
@@ -571,9 +566,22 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  protected updateTransformerProperties(useCache = true): void {
-    this.updateTransformer(useCache)
-    this.updateProjectedTransformer(useCache)
+  private updateGcpsProperties() {
+    this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: lonLatToWebMecator(geo)
+    }))
+    this.projectedGeoPoints = this.projectedGcps.map(
+      (projectedGcp) => projectedGcp.geo
+    )
+  }
+
+  protected updateTransformerProperties(
+    clearCache = false,
+    useCache = true
+  ): void {
+    this.updateTransformer(clearCache, useCache)
+    this.updateProjectedTransformer(clearCache, useCache)
     this.updateProjectedGeoTransformedResourcePoints()
     this.updateGeoMask()
     this.updateFullGeoMask()
@@ -582,7 +590,10 @@ export class WarpedMap extends EventTarget {
     this.updateResourceToProjectedGeoScale()
   }
 
-  private updateTransformer(useCache = true): void {
+  private updateTransformer(clearCache = false, useCache = true): void {
+    if (clearCache) {
+      this.clearTransformerCaches()
+    }
     this.transformer = getPropertyFromCacheOrComputation(
       this.transformerByTransformationType,
       this.transformationType,
@@ -596,7 +607,13 @@ export class WarpedMap extends EventTarget {
     )
   }
 
-  private updateProjectedTransformer(useCache = true): void {
+  private updateProjectedTransformer(
+    clearCache = false,
+    useCache = true
+  ): void {
+    if (clearCache) {
+      this.clearProjectedTransformerCaches()
+    }
     this.projectedTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
       this.transformationType,
@@ -676,6 +693,14 @@ export class WarpedMap extends EventTarget {
 
   protected updateDistortionProperties(): void {
     // This function is used by classes that extent WarpedMap
+  }
+
+  protected clearTransformerCaches() {
+    this.transformerByTransformationType = new Map()
+  }
+
+  protected clearProjectedTransformerCaches() {
+    this.projectedTransformerByTransformationType = new Map()
   }
 
   destroy() {
