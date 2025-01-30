@@ -1310,7 +1310,8 @@ export class WebGL2Renderer
 
   protected gcpsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      this.throttledChanged.bind(this)
+      const mapId = event.data as string
+      this.startTransformationTransition([mapId])
     }
   }
 
