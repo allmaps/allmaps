@@ -1,11 +1,11 @@
-import FetchableTile from './FetchableTile.js'
+import { FetchableTile } from './FetchableTile.js'
 
 import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
 
 /**
  * Class for tiles that can be cached.
  */
-export default abstract class CacheableTile<D> extends EventTarget {
+export abstract class CacheableTile<D> extends EventTarget {
   readonly tile: Tile
   readonly imageRequest: ImageRequest
   readonly tileUrl: string

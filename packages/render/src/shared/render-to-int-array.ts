@@ -10,12 +10,12 @@ import {
 } from './tiles.js'
 import { applyTransform, invertTransform } from './matrix.js'
 
-import type WarpedMapList from '../maps/WarpedMapList.js'
-import type Viewport from '../viewport/Viewport.js'
-import type TileCache from '../tilecache/TileCache.js'
+import type { WarpedMapList } from '../maps/WarpedMapList.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { TileCache } from '../tilecache/TileCache.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 import type { Point } from '@allmaps/types'
 
 const CHANNELS = 4

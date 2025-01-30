@@ -10,7 +10,7 @@ import {
   getPropertyFromDoubleCacheOrComputation
 } from '@allmaps/stdlib'
 
-import WarpedMap from './WarpedMap.js'
+import { WarpedMap } from './WarpedMap.js'
 
 import type { WarpedMapOptions } from '../shared/types.js'
 
@@ -68,7 +68,7 @@ type GcpTriangulation = {
  * @param projectedGeoPreviousTriangulationMask - The resource mask refined by the previous triangulation, in projected geospatial coordinates
  * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
  */
-export default class TriangulatedWarpedMap extends WarpedMap {
+export class TriangulatedWarpedMap extends WarpedMap {
   previousResourceResolution: number | undefined
   resourceResolution: number | undefined
 

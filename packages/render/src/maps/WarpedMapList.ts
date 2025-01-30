@@ -5,8 +5,8 @@ import {
   type Map as GeoreferencedMap
 } from '@allmaps/annotation'
 
-import RTree from './RTree.js'
-import WarpedMap from './WarpedMap.js'
+import { RTree } from './RTree.js'
+import { WarpedMap } from './WarpedMap.js'
 
 import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -38,7 +38,7 @@ function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
  * An ordered list of WarpedMaps. This class contains an optional RTree
  * for quickly looking up maps using their Bbox.
  */
-export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
+export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   warpedMapFactory: WarpedMapFactory<W>
   warpedMapsById: Map<string, W> = new Map()
 

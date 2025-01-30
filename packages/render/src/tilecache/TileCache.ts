@@ -1,10 +1,10 @@
 import { equalSet } from '@allmaps/stdlib'
 
-import CacheableTile, { CachedTile } from './CacheableTile.js'
+import { CacheableTile, CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import { shouldPruneTile } from '../shared/tiles.js'
-import FetchableTile from './FetchableTile.js'
+import { FetchableTile } from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -20,7 +20,7 @@ const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
 /**
  * Class that fetches and caches IIIF tiles.
  */
-export default class TileCache<D> extends EventTarget {
+export class TileCache<D> extends EventTarget {
   cachableTileFactory: CachableTileFactory<D>
   fetchFn?: FetchFn
 

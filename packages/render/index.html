@@ -1,14 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@allmaps/render</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
     <script type="module">
-      import { CanvasRenderer, Viewport } from './src/index.ts'
+      import { Viewport } from './src/index.ts'
+      import { CanvasRenderer } from './src/canvas.ts'
 
       async function render() {
         const width = 600

@@ -1,10 +1,11 @@
 import { throttle } from 'lodash-es'
 
-import BaseRenderer from './BaseRenderer.js'
-import WebGL2WarpedMap, {
+import { BaseRenderer } from './BaseRenderer.js'
+import {
+  WebGL2WarpedMap,
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
-import CachedImageDataTile from '../tilecache/CacheableWorkerImageDataTile.js'
+import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
 import {
   hexToFractionalRgb,
   maxOfNumberOrUndefined,
@@ -34,8 +35,8 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 
 import type { DebouncedFunc } from 'lodash-es'
 
-import type Viewport from '../viewport/Viewport.js'
-import type FetchableTile from '../tilecache/FetchableTile.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import type {
   Renderer,
@@ -73,7 +74,7 @@ const ANIMATION_DURATION = 750
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
  */
-export default class WebGL2Renderer
+export class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageData>
   implements Renderer
 {
@@ -158,7 +159,7 @@ export default class WebGL2Renderer
     )
 
     super(
-      CachedImageDataTile.createFactory(),
+      CacheableWorkerImageDataTile.createFactory(),
       createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
       options
     )

@@ -1,18 +1,18 @@
-import BaseRenderer from './BaseRenderer.js'
-import CacheableImageDataTile from '../tilecache/CacheableImageDataTile.js'
+import { BaseRenderer } from './BaseRenderer.js'
+import { CacheableImageDataTile } from '../tilecache/CacheableImageDataTile.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
-import Viewport from '../viewport/Viewport.js'
+import { Viewport } from '../viewport/Viewport.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 import type { Renderer, CanvasRendererOptions } from '../shared/types.js'
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import type { Size } from '@allmaps/types'
 
 /**
  * Class that renders WarpedMaps to a HTML Canvas element with the Canvas 2D API
  */
-export default class CanvasRenderer
+export class CanvasRenderer
   extends BaseRenderer<WarpedMap, ImageData>
   implements Renderer
 {

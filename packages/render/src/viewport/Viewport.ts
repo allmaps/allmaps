@@ -1,4 +1,4 @@
-import WarpedMapList from '../maps/WarpedMapList.js'
+import { WarpedMapList } from '../maps/WarpedMapList.js'
 import {
   composeTransform,
   applyTransform,
@@ -15,7 +15,7 @@ import {
   webMercatorToLonLat
 } from '@allmaps/stdlib'
 
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import type {
   Point,
@@ -57,7 +57,7 @@ import type {
  * @property projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
  * @property viewportToClipTransform - Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
  */
-export default class Viewport {
+export class Viewport {
   geoCenter: Point
   geoRectangle: Rectangle
   geoSize: Size

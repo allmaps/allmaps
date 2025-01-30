@@ -6,7 +6,7 @@ import type { Tile, ImageRequest } from '@allmaps/types'
 /**
  * Class for tiles that can be fetched.
  */
-export default class FetchableTile {
+export class FetchableTile {
   readonly mapId: string
   readonly tile: Tile
   readonly imageRequest: ImageRequest

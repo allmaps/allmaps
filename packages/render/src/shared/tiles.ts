@@ -8,7 +8,7 @@ import {
   sizeToResolution
 } from '@allmaps/stdlib'
 import { MapPruneConstants, MapPruneInfo } from './types'
-import FetchableTile from '../tilecache/FetchableTile'
+import { FetchableTile } from '../tilecache/FetchableTile'
 
 import type { Image } from '@allmaps/iiif-parser'
 import type {

@@ -17,7 +17,7 @@ import {
   yellow
 } from '@allmaps/tailwind'
 
-import TriangulatedWarpedMap from './TriangulatedWarpedMap.js'
+import { TriangulatedWarpedMap } from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   applyTransform,
@@ -101,7 +101,7 @@ export function createWebGL2WarpedMapFactory(
 /**
  * Class for WarpedMaps that are rendered with WebGL 2
  */
-export default class WebGL2WarpedMap extends TriangulatedWarpedMap {
+export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // De facto make this a WarpedMapWithImageInfo
   // (Multiple inhertance is not possible in TypeScript)
   declare imageId: string

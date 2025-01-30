@@ -1,7 +1,7 @@
 import { fetchUrl } from '@allmaps/stdlib'
 
-import FetchableTile from './FetchableTile.js'
-import CacheableTile from './CacheableTile.js'
+import { FetchableTile } from './FetchableTile.js'
+import { CacheableTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -9,7 +9,7 @@ import type { FetchFn } from '@allmaps/types'
 /**
  * Class for tiles that can be cached, and whose data can be processed to an ImageData object.
  */
-export default class CacheableImageDataTile extends CacheableTile<ImageData> {
+export class CacheableImageDataTile extends CacheableTile<ImageData> {
   /**
    * Fetch the tile and create its ImageData object.
    *

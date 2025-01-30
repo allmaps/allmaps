@@ -34,8 +34,8 @@ import type {
   DistortionMeasure
 } from '@allmaps/transform'
 
-import type Viewport from '../viewport/Viewport.js'
-import type FetchableTile from '../tilecache/FetchableTile.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 // TODO: consider to make the default options more precise
 const TRANSFORMER_OPTIONS = {
@@ -112,7 +112,7 @@ export function createWarpedMapFactory() {
  * @param fetchableTilesForViewport - The fetchable tiles for displaying this map, for the current viewport
  * @param overviewFetchableTilesForViewport - The overview fetchable tiles, for the current viewport
  */
-export default class WarpedMap extends EventTarget {
+export class WarpedMap extends EventTarget {
   mapId: string
   georeferencedMap: GeoreferencedMap
 

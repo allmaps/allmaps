@@ -1,7 +1,7 @@
-import BaseRenderer from './BaseRenderer.js'
-import Viewport from '../viewport/Viewport.js'
+import { BaseRenderer } from './BaseRenderer.js'
+import { Viewport } from '../viewport/Viewport.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
-import CacheableIntArrayTile from '../tilecache/CacheableIntArrayTile.js'
+import { CacheableIntArrayTile } from '../tilecache/CacheableIntArrayTile.js'
 
 import type {
   Renderer,
@@ -11,7 +11,7 @@ import type {
   IntArrayRendererOptions
 } from '../shared/types.js'
 
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 
@@ -20,7 +20,7 @@ const CHANNELS = 4
 /**
  * Class that renders WarpedMaps to an IntArray
  */
-export default class IntArrayRenderer<D>
+export class IntArrayRenderer<D>
   extends BaseRenderer<WarpedMap, D>
   implements Renderer
 {

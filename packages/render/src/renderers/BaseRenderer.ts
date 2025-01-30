@@ -1,6 +1,6 @@
-import TileCache from '../tilecache/TileCache.js'
-import WarpedMapList from '../maps/WarpedMapList.js'
-import FetchableTile from '../tilecache/FetchableTile.js'
+import { TileCache } from '../tilecache/TileCache.js'
+import { WarpedMapList } from '../maps/WarpedMapList.js'
+import { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
@@ -19,8 +19,8 @@ import {
   squaredDistance
 } from '@allmaps/stdlib'
 
-import type Viewport from '../viewport/Viewport.js'
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
@@ -50,10 +50,7 @@ const MAX_TOTAL_RESOLUTION_RATIO = 10
 /**
  * Abstract base class for renderers
  */
-export default abstract class BaseRenderer<
-  W extends WarpedMap,
-  D
-> extends EventTarget {
+export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
 
