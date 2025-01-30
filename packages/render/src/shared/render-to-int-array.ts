@@ -138,7 +138,7 @@ export async function renderToIntArray<W extends WarpedMap, D>(
               .map(
                 (tilePointPixel) =>
                   getImageDataValue(
-                    cachedTile!.data,
+                    cachedTile.data,
                     pixelToIntArrayIndex(
                       clipTilePointToTile(tilePointPixel, tile),
                       tileSize,

@@ -202,7 +202,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.pruneTileCache(mapsInViewportForOverviewPrune)
   }
 
-  protected findMapsInViewport(viewportBufferRatio: number = 0): Set<string> {
+  protected findMapsInViewport(viewportBufferRatio = 0): Set<string> {
     if (!this.viewport) {
       return new Set()
     }

@@ -674,7 +674,9 @@ export class WarpedMap extends EventTarget {
     )
   }
 
-  protected updateDistortionProperties(): void {}
+  protected updateDistortionProperties(): void {
+    // This function is used by classes that extent WarpedMap
+  }
 
   destroy() {
     if (this.abortController) {

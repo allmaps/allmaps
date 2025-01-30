@@ -124,21 +124,27 @@ export class GcpTransformer {
   /**
    * Create forward transformation
    */
-  createForwardTransformation(): void {
-    this.forwardTransformation = this.computeTransformation(
-      this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
-      this.destinationPoints
-    )
+  createForwardTransformation(): Transformation {
+    if (!this.forwardTransformation) {
+      this.forwardTransformation = this.computeTransformation(
+        this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
+        this.destinationPoints
+      )
+    }
+    return this.forwardTransformation
   }
 
   /**
    * Create backward transformation
    */
-  createBackwardTransformation(): void {
-    this.backwardTransformation = this.computeTransformation(
-      this.destinationPoints,
-      this.sourcePoints.map((point) => this.assureEqualHandedness(point))
-    )
+  createBackwardTransformation(): Transformation {
+    if (!this.backwardTransformation) {
+      this.backwardTransformation = this.computeTransformation(
+        this.destinationPoints,
+        this.sourcePoints.map((point) => this.assureEqualHandedness(point))
+      )
+    }
+    return this.backwardTransformation
   }
 
   // Base functions
@@ -179,10 +185,9 @@ export class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        if (!this.forwardTransformation) {
-          this.createForwardTransformation()
-        }
-        return this.forwardTransformation!.evaluate(
+        const forwardTransformation = this.createForwardTransformation()
+
+        return forwardTransformation.evaluate(
           this.assureEqualHandedness(input),
           mergedOptions.evaluationType
         )
@@ -401,11 +406,9 @@ export class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        if (!this.backwardTransformation) {
-          this.createBackwardTransformation()
-        }
+        const backwardTransformation = this.createBackwardTransformation()
         return this.assureEqualHandedness(
-          this.backwardTransformation!.evaluate(input)
+          backwardTransformation.evaluate(input)
         )
       } else if (isGeojsonPoint(input)) {
         return this.transformBackward(geojsonPointToPoint(input))

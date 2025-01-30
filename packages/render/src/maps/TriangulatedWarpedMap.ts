@@ -150,6 +150,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
       this.projectedGcpPreviousTriangulation &&
       this.projectedGcpTriangulation
     ) {
+      const projectedGcpPreviousTriangulation =
+        this.projectedGcpPreviousTriangulation
+      const projectedGcpTriangulation = this.projectedGcpTriangulation
+
       this.previousResourceResolution = this.resourceResolution
       this.projectedGcpPreviousTriangulation = {
         resourceResolution:
@@ -160,17 +164,16 @@ export class TriangulatedWarpedMap extends WarpedMap {
               return {
                 resource: projectedGcp.resource,
                 geo: mixPoints(
-                  this.projectedGcpTriangulation!.gcpUniquePoints[index].geo,
+                  projectedGcpTriangulation.gcpUniquePoints[index].geo,
                   projectedGcp.geo,
                   t
                 ),
                 // Note: Not mixing the distortions Map, only the active distortion
                 distortions:
-                  this.projectedGcpTriangulation!.gcpUniquePoints[index]
-                    .distortions,
+                  projectedGcpTriangulation.gcpUniquePoints[index].distortions,
                 distortion: mixNumbers(
-                  this.projectedGcpTriangulation!.gcpUniquePoints[index]
-                    .distortion || 0,
+                  projectedGcpTriangulation.gcpUniquePoints[index].distortion ||
+                    0,
                   projectedGcp.distortion || 0,
                   t
                 )
@@ -186,12 +189,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
       this.projectedGeoPreviousTrianglePoints =
         this.projectedGcpPreviousTriangulation.uniquePointIndices.map(
-          (i) => this.projectedGcpPreviousTriangulation!.gcpUniquePoints[i].geo
+          (i) => projectedGcpPreviousTriangulation.gcpUniquePoints[i].geo
         )
       this.previousTrianglePointsDistortion =
         this.projectedGcpPreviousTriangulation.uniquePointIndices.map(
           (i) =>
-            this.projectedGcpPreviousTriangulation!.gcpUniquePoints[i]
+            projectedGcpPreviousTriangulation.gcpUniquePoints[i]
               .distortion as number
         )
     }
@@ -316,11 +319,17 @@ export class TriangulatedWarpedMap extends WarpedMap {
           this.previousTransformationType,
           this.previousResourceResolution,
           () => {
+            if (!this.projectedGcpTriangulation) {
+              // TODO: rewrite this function, make more readble?
+              throw new Error('No projectedGcpTriangulation')
+            }
+            const projectedGcpTriangulation = this.projectedGcpTriangulation
+
             return {
               resourceResolution:
-                this.projectedGcpTriangulation!.resourceResolution,
+                this.projectedGcpTriangulation.resourceResolution,
               gcpUniquePoints:
-                this.projectedGcpTriangulation!.gcpUniquePoints.map(
+                this.projectedGcpTriangulation.gcpUniquePoints.map(
                   (projectedGcp) =>
                     this.resourceToResourceProjectedGeoDistortions(
                       projectedGcp.resource,
@@ -329,10 +338,9 @@ export class TriangulatedWarpedMap extends WarpedMap {
                     )
                 ),
               uniquePointIndices:
-                this.projectedGcpTriangulation!.uniquePointIndices,
+                this.projectedGcpTriangulation.uniquePointIndices,
               uniquePointIndexInterpolatedPolygon:
-                this.projectedGcpTriangulation!
-                  .uniquePointIndexInterpolatedPolygon
+                projectedGcpTriangulation.uniquePointIndexInterpolatedPolygon
             }
           },
           () => !this.mixed,
@@ -355,34 +363,34 @@ export class TriangulatedWarpedMap extends WarpedMap {
     ) {
       return
     }
+    const projectedGcpPreviousTriangulation =
+      this.projectedGcpPreviousTriangulation
+    const projectedGcpTriangulation = this.projectedGcpTriangulation
 
     this.resourceTrianglePoints =
       this.projectedGcpTriangulation.uniquePointIndices.map(
-        (i) => this.projectedGcpTriangulation!.gcpUniquePoints[i].resource
+        (i) => projectedGcpTriangulation.gcpUniquePoints[i].resource
       )
     this.projectedGeoTrianglePoints =
       this.projectedGcpTriangulation.uniquePointIndices.map(
-        (i) => this.projectedGcpTriangulation!.gcpUniquePoints[i].geo
+        (i) => projectedGcpTriangulation.gcpUniquePoints[i].geo
       )
     this.projectedGeoPreviousTrianglePoints =
       this.projectedGcpPreviousTriangulation.uniquePointIndices.map(
-        (i) => this.projectedGcpPreviousTriangulation!.gcpUniquePoints[i].geo
+        (i) => projectedGcpPreviousTriangulation.gcpUniquePoints[i].geo
       )
 
     this.projectedGeoTriangulationMask =
       this.projectedGcpTriangulation.uniquePointIndexInterpolatedPolygon
         .map((typedRing) =>
-          typedRing.map(
-            (i) => this.projectedGcpTriangulation!.gcpUniquePoints[i].geo
-          )
+          typedRing.map((i) => projectedGcpTriangulation.gcpUniquePoints[i].geo)
         )
         .flat()
     this.projectedGeoPreviousTriangulationMask =
       this.projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedPolygon
         .map((typedRing) =>
           typedRing.map(
-            (i) =>
-              this.projectedGcpPreviousTriangulation!.gcpUniquePoints[i].geo
+            (i) => projectedGcpPreviousTriangulation.gcpUniquePoints[i].geo
           )
         )
         .flat()
@@ -400,11 +408,14 @@ export class TriangulatedWarpedMap extends WarpedMap {
     ) {
       return
     }
+    const projectedGcpPreviousTriangulation =
+      this.projectedGcpPreviousTriangulation
+    const projectedGcpTriangulation = this.projectedGcpTriangulation
 
     this.trianglePointsDistortion =
       this.projectedGcpTriangulation.uniquePointIndices.map((i) =>
         this.distortionMeasure
-          ? (this.projectedGcpTriangulation!.gcpUniquePoints[i].distortions.get(
+          ? (projectedGcpTriangulation.gcpUniquePoints[i].distortions.get(
               this.distortionMeasure
             ) as number)
           : 0
@@ -412,7 +423,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.previousTrianglePointsDistortion =
       this.projectedGcpPreviousTriangulation.uniquePointIndices.map((i) =>
         this.previousDistortionMeasure
-          ? (this.projectedGcpPreviousTriangulation!.gcpUniquePoints[
+          ? (projectedGcpPreviousTriangulation.gcpUniquePoints[
               i
             ].distortions.get(this.previousDistortionMeasure) as number)
           : 0
