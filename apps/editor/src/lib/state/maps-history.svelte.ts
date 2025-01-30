@@ -3,7 +3,7 @@ import { SvelteMap } from 'svelte/reactivity'
 
 import { toGeoreferencedMap } from '$lib/shared/maps.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { MapsState } from '$lib/state/maps.svelte'
 

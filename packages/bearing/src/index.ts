@@ -3,7 +3,7 @@ import bearing from '@turf/bearing'
 import { GcpTransformer } from '@allmaps/transform'
 import { computeBbox } from '@allmaps/stdlib'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 /**
  * Computes the bearing of a Georeferenced Map.
@@ -12,7 +12,7 @@ import type { Map } from '@allmaps/annotation'
  * @returns The bearing of the map in degrees, measured from the north line
  */
 
-export function computeGeoreferencedMapBearing(map: Map) {
+export function computeGeoreferencedMapBearing(map: GeoreferencedMap) {
   const transformer = new GcpTransformer(map.gcps)
 
   const bbox = computeBbox(map.resourceMask)

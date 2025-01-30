@@ -1,4 +1,4 @@
-import { Map as GeoreferencedMap } from '@allmaps/annotation'
+import { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { CacheableTile } from '../tilecache/CacheableTile.js'

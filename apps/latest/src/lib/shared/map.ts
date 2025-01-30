@@ -1,7 +1,7 @@
 import turfRewind from '@turf/rewind'
 
 import { GcpTransformer } from '@allmaps/transform'
-import { validateMap } from '@allmaps/annotation'
+import { validateGeoreferencedMap } from '@allmaps/annotation'
 
 import {
   getProperties,
@@ -9,13 +9,13 @@ import {
   getTimeAgo
 } from '$lib/shared/properties.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { DisplayMap } from '$lib/shared/types.js'
 
 export function parseGeoreferencedMap(apiMap: unknown) {
   try {
-    const mapOrMaps = validateMap(apiMap)
+    const mapOrMaps = validateGeoreferencedMap(apiMap)
     return Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
   } catch (err) {
     throw new Error('Error parsing map')

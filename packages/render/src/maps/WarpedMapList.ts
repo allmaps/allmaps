@@ -1,8 +1,8 @@
 import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
-  validateMap,
-  type Map as GeoreferencedMap
+  validateGeoreferencedMap,
+  type GeoreferencedMap
 } from '@allmaps/annotation'
 
 import { RTree } from './RTree.js'
@@ -485,7 +485,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async addGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
       validatedGeoreferencedMapOrMaps
     )
@@ -503,7 +504,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async removeGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
       validatedGeoreferencedMapOrMaps
     )

@@ -5,7 +5,7 @@ import { cachedFetch } from './fetch.js'
 
 import type { TransformationOptions } from './types.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { FetchFn } from '@allmaps/types'
 

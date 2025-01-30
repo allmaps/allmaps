@@ -49,7 +49,7 @@
     "@allmaps/transform": "^1.0.0-beta.41",
     "@commander-js/extra-typings": "^13.0.0",
     "commander": "^13.0.0",
-    "stream-json": "^1.7.4",
+    "stream-json": "^1.9.1",
     "zod-validation-error": "^1.5.0"
   },
   "devDependencies": {

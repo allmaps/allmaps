@@ -6,7 +6,7 @@ import {
   pointsAndPointsToLines,
   subSetArray
 } from '@allmaps/stdlib'
-import { Map as GeoreferencedMap } from '@allmaps/annotation'
+import { GeoreferencedMap } from '@allmaps/annotation'
 import {
   black,
   blue,

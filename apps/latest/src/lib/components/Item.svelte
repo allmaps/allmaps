@@ -9,7 +9,7 @@
   import { getUrls } from '$lib/shared/urls.js'
   import { errorCount } from '$lib/shared/stores/counts.js'
 
-  import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
 
   import type { DisplayMap, Urls } from '$lib/shared/types.js'
 

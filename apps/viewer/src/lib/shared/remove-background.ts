@@ -7,13 +7,16 @@ import {
   rgbToHex
 } from '@allmaps/stdlib'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Image } from '@allmaps/iiif-parser'
 import type { Ring } from '@allmaps/types'
 
 const thumbnailSize = 400
 
-export async function getBackgroundColor(map: Map, parsedImage: Image) {
+export async function getBackgroundColor(
+  map: GeoreferencedMap,
+  parsedImage: Image
+) {
   let imageRequest = parsedImage.getThumbnail({
     width: thumbnailSize,
     height: thumbnailSize

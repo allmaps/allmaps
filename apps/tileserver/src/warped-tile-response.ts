@@ -10,7 +10,7 @@ import { cachedFetch } from './fetch.js'
 import { getTileSize } from './tile-size.js'
 
 import type { Size, Bbox, FetchFn } from '@allmaps/types'
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
 
 function getImageData(input: Uint8ClampedArray) {

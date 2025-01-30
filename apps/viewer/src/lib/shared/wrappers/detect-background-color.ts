@@ -5,10 +5,10 @@ import * as Comlink from 'comlink'
 import DetectBackgroundColorWorker from '$lib/shared/workers/detect-background-color.js?worker'
 import type { DetectBackgroundColorWorkerType } from '$lib/shared/workers/detect-background-color.js'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 export let detectBackgroundColor: (
-  map: Map,
+  map: GeoreferencedMap,
   imageData: ImageData
 ) => Promise<string | undefined> = async () => {
   console.warn('Detect background Web Worker not yet initialized')

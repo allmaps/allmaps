@@ -7,7 +7,7 @@ import { parseAnnotation } from '@allmaps/annotation'
 
 import { addImageInfo } from '$lib/shared/stores/image-infos.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 function getMapId(map: GeoreferencedMap) {
   return map.id || '-'

@@ -4,7 +4,7 @@ import type {
   Collection as IIIFCollection
 } from '@allmaps/iiif-parser'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 export type Params = {
   url: string | null

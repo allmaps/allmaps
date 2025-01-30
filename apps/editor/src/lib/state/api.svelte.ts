@@ -1,10 +1,10 @@
 import { setContext, getContext } from 'svelte'
 
-import { validateMap } from '@allmaps/annotation'
+import { validateGeoreferencedMap } from '@allmaps/annotation'
 
 import { fetchMaps, checkSource, createSource } from '$lib/shared/api.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { GeoreferencedMapsByImageId, Source } from '$lib/types/shared.js'
 import type { SourceState } from '$lib/state/source.svelte.js'
@@ -64,7 +64,7 @@ export class ApiState {
 
   async #fetchMaps(source: Source) {
     const fetchedMaps = await fetchMaps(source)
-    const mapOrMaps = validateMap(fetchedMaps)
+    const mapOrMaps = validateGeoreferencedMap(fetchedMaps)
 
     if (Array.isArray(mapOrMaps)) {
       return mapOrMaps
