@@ -1,21 +1,8 @@
-import { defineConfig, type PluginOption } from 'vite'
-import { exec } from 'child_process'
 import { defineConfig, type PluginOption, type UserConfig } from 'vite'
+import noBundlePlugin from 'vite-plugin-no-bundle'
+import dts from 'vite-plugin-dts'
 
 import ports from '../../ports.json' with { type: 'json' }
-
-// Create TypeScript definition files
-// TODO: move to @allmaps/stdlib?
-const buildTypes: PluginOption = {
-  name: 'build:types',
-  buildEnd: (error) => {
-    if (!error) {
-      return new Promise((resolve, reject) => {
-        exec('npm run build:types', (err) => (err ? reject(err) : resolve()))
-      })
-    }
-  }
-}
 
 export default defineConfig({
   server: {
@@ -25,20 +12,10 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
-    minify: true,
+    minify: false,
     lib: {
       entry: './src/index.ts',
-      name: 'Allmaps',
-      fileName: (format) => `bundled/allmaps-maplibre-4.0.${format}.js`,
-      formats: ['es', 'umd']
-    },
-    rollupOptions: {
-      external: ['maplibre-gl'],
-      output: {
-        globals: {
-          'maplibre-gl': 'maplibre-gl'
-        }
-      }
+      formats: ['es']
     }
   },
   optimizeDeps: {
@@ -47,5 +24,9 @@ export default defineConfig({
     }
   },
   base: '',
-  plugins: [buildTypes]
+  plugins: [
+    dts(),
+    // TODO: find a way to remove type cast
+    noBundlePlugin() as PluginOption
+  ]
 }) satisfies UserConfig

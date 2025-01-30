@@ -1,12 +1,11 @@
-import * as L from 'leaflet'
+import { Layer, DomUtil, setOptions } from 'leaflet'
 
+import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
 import {
-  WebGL2WarpedMap,
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2Renderer,
   WarpedMapLayerOptions
 } from '@allmaps/render'
 import {
@@ -59,10 +58,8 @@ function assertCanvas(
  *
  * Renders georeferenced maps of a Georeference Annotation on a Leaflet map.
  * WarpedMapLayer extends Leaflet's [L.Layer](https://leafletjs.com/reference.html#layer).
- *
- * @class WarpedMapLayer
  */
-export class WarpedMapLayer extends L.Layer {
+export class WarpedMapLayer extends Layer {
   container: HTMLDivElement | undefined
 
   canvas: HTMLCanvasElement | undefined
@@ -100,7 +97,7 @@ export class WarpedMapLayer extends L.Layer {
     options?: Partial<LeafletWarpedMapLayerOptions>
   ) {
     this._annotationOrAnnotationUrl = annotationOrAnnotationUrl
-    L.setOptions(this, options)
+    setOptions(this, options)
 
     this._initGl()
   }
@@ -170,9 +167,8 @@ export class WarpedMapLayer extends L.Layer {
   ): Promise<(string | Error)[]> {
     assertRenderer(this.renderer)
 
-    const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
-      annotation
-    )
+    const results =
+      await this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
     this._update()
 
     return results
@@ -465,7 +461,7 @@ export class WarpedMapLayer extends L.Layer {
    */
   bringToFront() {
     if (this._map && this.container) {
-      L.DomUtil.toFront(this.container)
+      DomUtil.toFront(this.container)
     }
     return this
   }
@@ -475,7 +471,7 @@ export class WarpedMapLayer extends L.Layer {
    */
   bringToBack() {
     if (this._map && this.container) {
-      L.DomUtil.toBack(this.container)
+      DomUtil.toBack(this.container)
     }
     return this
   }
@@ -780,7 +776,7 @@ export class WarpedMapLayer extends L.Layer {
   }
 
   _initGl() {
-    this.container = L.DomUtil.create('div')
+    this.container = DomUtil.create('div')
 
     this.container.classList.add('leaflet-layer')
     this.container.classList.add('allmaps-warped-map-layer')
@@ -788,7 +784,7 @@ export class WarpedMapLayer extends L.Layer {
       this._updateZIndex()
     }
 
-    this.canvas = L.DomUtil.create('canvas', undefined, this.container)
+    this.canvas = DomUtil.create('canvas', undefined, this.container)
 
     this.canvas.classList.add('leaflet-zoom-animated') // Treat canvas element like L.ImageOverlay
     this.canvas.classList.add('leaflet-image-layer') // Treat canvas element like L.ImageOverlay
@@ -867,7 +863,7 @@ export class WarpedMapLayer extends L.Layer {
       e.center
     ).min
 
-    L.DomUtil.setTransform(this.canvas, offset, scale)
+    DomUtil.setTransform(this.canvas, offset, scale)
   }
 
   _updateZIndex() {
@@ -887,7 +883,7 @@ export class WarpedMapLayer extends L.Layer {
     }
 
     const topLeft = this._map.containerPointToLayerPoint([0, 0])
-    L.DomUtil.setPosition(this.canvas, topLeft)
+    DomUtil.setPosition(this.canvas, topLeft)
 
     // Get and Set opacity from Leaflet
     this.renderer.setOpacity(this.getOpacity())

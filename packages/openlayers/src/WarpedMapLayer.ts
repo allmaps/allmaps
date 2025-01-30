@@ -1,9 +1,9 @@
 import Layer from 'ol/layer/Layer.js'
+
+import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
 import {
   Viewport,
-  WebGL2WarpedMap,
   WarpedMapList,
-  WebGL2Renderer,
   WarpedMapEvent,
   WarpedMapEventType
 } from '@allmaps/render'
@@ -24,11 +24,8 @@ export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
  *
  * This class renders georeferenced maps from a Georeference Annotation on an OpenLayers map.
  * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
- *
- * @class WarpedMapLayer
- * @param {WebGL2RendererOptions} [options] - the WebGL2 renderer options
  */
-export default class WarpedMapLayer extends Layer {
+export class WarpedMapLayer extends Layer {
   container: HTMLElement
 
   canvas: HTMLCanvasElement
@@ -92,9 +89,8 @@ export default class WarpedMapLayer extends Layer {
   async addGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
-      annotation
-    )
+    const results =
+      await this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
     this.changed()
 
     return results

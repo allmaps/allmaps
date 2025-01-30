@@ -1,8 +1,8 @@
 import { Map, CustomLayerInterface } from 'maplibre-gl'
+
+import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
 import {
   Viewport,
-  WebGL2Renderer,
-  WebGL2WarpedMap,
   WarpedMapList,
   WarpedMapEvent,
   WarpedMapEventType
@@ -38,13 +38,14 @@ function assertRenderer(
  *
  * This class renders maps from a IIIF Georeference Annotation on a MapLibre map.
  * WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/).
- *
- * @class WarpedMapLayer
  */
 export class WarpedMapLayer implements CustomLayerInterface {
   id = 'warped-map-layer'
-  type = 'custom' as const
-  renderingMode = '2d' as const
+
+  // @ts-expect-error Adding "as const" throws an error in Titus' module-exports library
+  type = 'custom'
+  // @ts-expect-error same as above
+  renderingMode = '2d'
 
   map?: Map
   renderer?: WebGL2Renderer
@@ -97,9 +98,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   ): Promise<(string | Error)[]> {
     assertRenderer(this.renderer)
 
-    const results = await this.renderer.warpedMapList.addGeoreferenceAnnotation(
-      annotation
-    )
+    const results =
+      await this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
     this.map?.triggerRepaint()
 
     return results
