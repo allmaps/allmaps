@@ -1,177 +1,258 @@
 {
-  "type": "manifest",
   "embedded": false,
-  "canvases": [
-    {
-      "type": "canvas",
-      "width": 1496,
-      "height": 2274,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/info.json",
-      "label": {
-        "pl": ["-"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif",
-        "majorVersion": 2,
-        "width": 1496,
-        "height": 2274
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 2915,
-      "height": 2263,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/info.json",
-      "label": {
-        "pl": ["1"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176583.tif",
-        "majorVersion": 2,
-        "width": 2915,
-        "height": 2263
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 2922,
-      "height": 2267,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/info.json",
-      "label": {
-        "pl": ["2,3"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176585.tif",
-        "majorVersion": 2,
-        "width": 2922,
-        "height": 2267
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 2938,
-      "height": 2265,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/info.json",
-      "label": {
-        "pl": ["4,5"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176590.tif",
-        "majorVersion": 2,
-        "width": 2938,
-        "height": 2265
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 2924,
-      "height": 2280,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/info.json",
-      "label": {
-        "pl": ["6,7"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176593.tif",
-        "majorVersion": 2,
-        "width": 2924,
-        "height": 2280
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 2918,
-      "height": 2271,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/info.json",
-      "label": {
-        "pl": ["8"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176598.tif",
-        "majorVersion": 2,
-        "width": 2918,
-        "height": 2271
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 15083,
-      "height": 14957,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/info.json",
-      "label": {
-        "pl": ["[1r]"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176602.tif",
-        "majorVersion": 2,
-        "width": 15083,
-        "height": 14957
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 7462,
-      "height": 7491,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/info.json",
-      "label": {
-        "pl": ["[1v]"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176613.tif",
-        "majorVersion": 2,
-        "width": 7462,
-        "height": 7491
-      }
-    },
-    {
-      "type": "canvas",
-      "width": 1496,
-      "height": 2295,
-      "uri": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/info.json",
-      "label": {
-        "pl": ["-"]
-      },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "supportsAnyRegionAndSize": true,
-        "uri": "https://zas.bn.org.pl/iiif/55951898/56176614.tif",
-        "majorVersion": 2,
-        "width": 1496,
-        "height": 2295
-      }
-    }
-  ],
   "uri": "https://polona.pl/iiif/item/NTU5NTE4OTg/manifest.json",
-  "majorVersion": 3,
+  "type": "manifest",
   "label": {
     "pl": [
       "Pharus-Plan von Königsberg (Pr) : mit Straßenverzeichnis : Maßstab 1:15 000"
     ]
   },
+  "majorVersion": 3,
+  "canvases": [
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif/info.json",
+      "type": "canvas",
+      "height": 2274,
+      "width": 1496,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176580.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1496,
+        "height": 2274,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["-"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176580?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 66,
+          "height": 100
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176583.tif/info.json",
+      "type": "canvas",
+      "height": 2263,
+      "width": 2915,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176583.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2915,
+        "height": 2263,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["1"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176583?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 116
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176585.tif/info.json",
+      "type": "canvas",
+      "height": 2267,
+      "width": 2922,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176585.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2922,
+        "height": 2267,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["2,3"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176585?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 116
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176590.tif/info.json",
+      "type": "canvas",
+      "height": 2265,
+      "width": 2938,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176590.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2938,
+        "height": 2265,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["4,5"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176590?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 116
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176593.tif/info.json",
+      "type": "canvas",
+      "height": 2280,
+      "width": 2924,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176593.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2924,
+        "height": 2280,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["6,7"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176593?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 117
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176598.tif/info.json",
+      "type": "canvas",
+      "height": 2271,
+      "width": 2918,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176598.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2918,
+        "height": 2271,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["8"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176598?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 117
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176602.tif/info.json",
+      "type": "canvas",
+      "height": 14957,
+      "width": 15083,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176602.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 15083,
+        "height": 14957,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["[1r]"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176602?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 150,
+          "height": 149
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176613.tif/info.json",
+      "type": "canvas",
+      "height": 7491,
+      "width": 7462,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176613.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7462,
+        "height": 7491,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["[1v]"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176613?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 100,
+          "height": 100
+        }
+      ]
+    },
+    {
+      "uri": "https://zas.bn.org.pl/iiif/55951898/56176614.tif/info.json",
+      "type": "canvas",
+      "height": 2295,
+      "width": 1496,
+      "image": {
+        "embedded": true,
+        "uri": "https://zas.bn.org.pl/iiif/55951898/56176614.tif",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1496,
+        "height": 2295,
+        "majorVersion": 2
+      },
+      "label": {
+        "pl": ["-"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://zas.bn.org.pl/thumbnail/56176614?uid=55951898",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 65,
+          "height": 100
+        }
+      ]
+    }
+  ],
   "metadata": [
     {
       "label": {
@@ -772,5 +853,10 @@
         "pl": ["Biblioteka Narodowa"]
       }
     }
-  ]
+  ],
+  "summary": {
+    "pl": [
+      "Pharus-Plan von Königsberg (Pr) : mit Straßenverzeichnis : Maßstab 1:15 000"
+    ]
+  }
 }

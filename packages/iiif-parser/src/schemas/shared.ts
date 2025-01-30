@@ -18,3 +18,10 @@ const imageServiceTypes = [
 ] as const
 
 export const ImageServiceTypesSchema = z.enum(imageServiceTypes)
+
+// https://iiif.io/api/presentation/3.0/#navdate
+export const NavDateSchema = z.coerce.date()
+
+// For now, Allmaps does not parse GeoJSON values
+// This is left to clients consuming this data
+export const NavPlaceSchema = z.object({}).passthrough()

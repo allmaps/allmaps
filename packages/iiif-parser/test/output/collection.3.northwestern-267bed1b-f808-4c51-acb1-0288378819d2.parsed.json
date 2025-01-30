@@ -114,5 +114,44 @@
       },
       "embedded": true
     }
-  ]
+  ],
+  "homepage": [
+    {
+      "id": "https://dc.library.northwestern.edu/collections/267bed1b-f808-4c51-acb1-0288378819d2",
+      "type": "Text",
+      "label": {
+        "none": ["Map and Atlas Collection"]
+      },
+      "format": "text/html"
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2/thumbnail",
+      "type": "Image",
+      "format": "image/jpeg",
+      "width": 400,
+      "height": 400
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/collections/267bed1b-f808-4c51-acb1-0288378819d2",
+      "type": "Dataset",
+      "format": "application/json"
+    }
+  ],
+  "summary": {
+    "none": [
+      "Northwestern University Libraries’ Map & Atlas Collection allows access to an ever-growing selection of our cartographic resources in high resolution."
+    ]
+  },
+  "requiredStatement": {
+    "label": {
+      "none": ["Attribution"]
+    },
+    "value": {
+      "none": ["Courtesy of Northwestern University Libraries"]
+    }
+  }
 }

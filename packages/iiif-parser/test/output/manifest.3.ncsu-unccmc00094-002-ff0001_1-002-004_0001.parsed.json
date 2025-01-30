@@ -1,38 +1,94 @@
 {
-  "type": "manifest",
   "embedded": false,
+  "uri": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001/manifest",
+  "type": "manifest",
+  "label": {
+    "en": ["Alternate plan #1"]
+  },
+  "homepage": [
+    {
+      "format": "text/html",
+      "id": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001",
+      "label": {
+        "en": ["Homepage"]
+      },
+      "type": "Text"
+    }
+  ],
+  "majorVersion": 3,
   "canvases": [
     {
       "uri": "https://d.lib.ncsu.edu/collections/canvas/unccmc00094-002-ff0001_1-002-004_0001",
       "type": "canvas",
       "height": 3599,
       "width": 7096,
+      "image": {
+        "embedded": true,
+        "uri": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1170,
+        "height": 593,
+        "majorVersion": 2
+      },
       "label": {
         "en": ["1"]
       },
-      "image": {
-        "embedded": true,
-        "supportsAnyRegionAndSize": true,
-        "type": "image",
-        "width": 1170,
-        "height": 593,
-        "uri": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001",
-        "majorVersion": 2
-      }
+      "thumbnail": [
+        {
+          "id": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001/full/91,/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     }
   ],
-  "uri": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001/manifest",
-  "majorVersion": 3,
-  "label": { "en": ["Alternate plan #1"] },
   "metadata": [
-    { "label": { "en": ["title"] }, "value": { "en": ["Alternate plan #1"] } },
     {
-      "label": { "en": ["Rights and Use"] },
+      "label": {
+        "en": ["title"]
+      },
+      "value": {
+        "en": ["Alternate plan #1"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Rights and Use"]
+      },
       "value": {
         "en": [
-          "\u003ca href=\"https://d.lib.ncsu.edu/collections/about#rights_and_use\"\u003ehttps://d.lib.ncsu.edu/collections/about#rights_and_use\u003c/a\u003e"
+          "<a href=\"https://d.lib.ncsu.edu/collections/about#rights_and_use\">https://d.lib.ncsu.edu/collections/about#rights_and_use</a>"
         ]
       }
     }
-  ]
+  ],
+  "thumbnail": [
+    {
+      "id": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001/full/150,/0/default.jpg",
+      "type": "Image"
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://d.lib.ncsu.edu/collections/catalog/oai?identifier=ncsul%2Funccmc00094-002-ff0001_1-002-004_0001&metadataPrefix=oai_dc&verb=GetRecord",
+      "type": "Dataset",
+      "format": "text/xml"
+    },
+    {
+      "id": "https://d.lib.ncsu.edu/collections/catalog/unccmc00094-002-ff0001_1-002-004_0001/schemaorg.json",
+      "type": "Dataset",
+      "format": "application/ld+json",
+      "profile": "https://schema.org"
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "en": ["Attribution"]
+    },
+    "value": {
+      "en": [
+        "Martin Evans Boyer Papers, 1910-1993 (UNCC MC00094), J. Murrey Atkins Library Special Collections at the University of North Carolina at Charlotte"
+      ]
+    }
+  }
 }

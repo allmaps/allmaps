@@ -129,10 +129,15 @@ export class EmbeddedImage {
         this.majorVersion = 1
       } else if ('profile' in imageService) {
         let profile: string
-        if (Array.isArray(imageService.profile)) {
+        if (
+          Array.isArray(imageService.profile) &&
+          imageService.profile.length > 0
+        ) {
           profile = imageService.profile[0]
-        } else {
+        } else if (typeof imageService.profile === 'string') {
           profile = imageService.profile
+        } else {
+          throw new Error('Unsupported IIIF Image Service')
         }
 
         if (profile.match(image1ProfileUriRegex)) {

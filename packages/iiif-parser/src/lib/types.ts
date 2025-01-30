@@ -41,3 +41,38 @@ export type FetchNextResults<Item> = {
     type: string
   }
 }
+
+export type NavDate = Date
+export type NavPlace = object
+
+export type Summary = LanguageString
+export type RequiredStatement = MetadataItem
+
+export type Homepage = {
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+  language?: string | string[]
+}[]
+
+export type Thumbnail = {
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}[]
+
+export type SeeAlso = {
+  id: string
+  type?: string
+  format?: string
+  profile?: string
+}[]
+
+export type Annotations = {
+  id: string
+  type: 'AnnotationPage'
+  // items?: object[]
+}[]

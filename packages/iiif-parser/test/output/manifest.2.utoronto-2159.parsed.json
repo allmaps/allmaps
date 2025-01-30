@@ -9,6 +9,11 @@
   "canvases": [
     {
       "type": "canvas",
+      "thumbnail": [
+        {
+          "id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159/full/80,/0/default.jpg"
+        }
+      ],
       "width": 6590,
       "height": 4800,
       "uri": "https://iiif.library.utoronto.ca/presentation/v2/mdl:2159/canvas/mdl:2159",
@@ -116,6 +121,21 @@
       "value": {
         "none": ["https://collections.library.utoronto.ca/view/mdl:maps"]
       }
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": [
+        "For rights and reproduction information please contact mdl@library.utoronto.ca"
+      ]
+    }
+  },
+  "thumbnail": [
+    {
+      "id": "https://iiif.library.utoronto.ca/image/v2/mdl:2159/full/80,/0/default.jpg"
     }
   ]
 }

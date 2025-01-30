@@ -6,6 +6,17 @@
   "label": {
     "none": ["River Maps"]
   },
+  "description": {
+    "none": [""]
+  },
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Rijkswaterstaat"]
+    }
+  },
   "items": [
     {
       "label": {

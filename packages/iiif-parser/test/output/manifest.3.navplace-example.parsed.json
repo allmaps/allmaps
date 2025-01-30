@@ -1,0 +1,48 @@
+{
+  "canvases": [
+    {
+      "height": 3024,
+      "image": {
+        "embedded": true,
+        "height": 3024,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
+        "width": 4032
+      },
+      "label": {
+        "en": ["Picture of Göttingen taken during the 2019 IIIF Conference"]
+      },
+      "type": "canvas",
+      "uri": "https://example.org/iiif/canvas/p1",
+      "width": 4032
+    }
+  ],
+  "embedded": false,
+  "label": {
+    "en": ["navPlace Extension Example Manifest"]
+  },
+  "majorVersion": 3,
+  "navPlace": {
+    "features": [
+      {
+        "geometry": {
+          "coordinates": [9.938, 51.533],
+          "type": "Point"
+        },
+        "id": "https://example.org/iiif/feature/2",
+        "properties": {
+          "label": {
+            "en": ["navPlace Extension Example Manifest"]
+          }
+        },
+        "type": "Feature"
+      }
+    ],
+    "id": "https://example.org/iiif/feature-collection/2",
+    "type": "FeatureCollection"
+  },
+  "type": "manifest",
+  "uri": "https://example.org/iiif/manifest/1"
+}

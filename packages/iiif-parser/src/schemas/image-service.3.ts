@@ -5,19 +5,18 @@ import { ImageServiceTypesSchema } from './shared.js'
 
 export const complianceLevels = ['level0', 'level1', 'level2'] as const
 
-export const Presentation3ImageService2Schema = z
-  .object({
+export const Presentation3ImageService2Schema = z.union([
+  z.object({
     id: z.string().url(),
     type: z.literal('ImageService2'),
     profile: Image2ProfileSchema
+  }),
+  z.object({
+    '@id': z.string().url(),
+    '@type': z.literal('ImageService2'),
+    profile: Image2ProfileSchema
   })
-  .or(
-    z.object({
-      '@id': z.string().url(),
-      '@type': z.literal('ImageService2'),
-      profile: Image2ProfileSchema
-    })
-  )
+])
 
 export const Presentation3ImageService3Schema = z.object({
   id: z.string().url(),

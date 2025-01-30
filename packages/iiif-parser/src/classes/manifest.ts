@@ -16,14 +16,25 @@ import {
   parseVersion2String,
   parseVersion3String,
   parseVersion2Metadata,
-  filterInvalidMetadata
-} from '../lib/strings.js'
+  parseVersion3Metadata,
+  parseVersion2Attribution,
+  parseVersion2Thumbnail,
+  parseVersion2Related
+} from '../lib/convert.js'
 
 import type {
   LanguageString,
   Metadata,
   MajorVersion,
-  FetchNextResults
+  FetchNextResults,
+  NavDate,
+  NavPlace,
+  Thumbnail,
+  SeeAlso,
+  Summary,
+  RequiredStatement,
+  Annotations,
+  Homepage
 } from '../lib/types.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
@@ -57,9 +68,7 @@ export class EmbeddedManifest {
       this.uri = parsedManifest['@id']
       this.majorVersion = 2
 
-      if (parsedManifest.label) {
-        this.label = parseVersion2String(parsedManifest.label)
-      }
+      this.label = parseVersion2String(parsedManifest.label)
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
       this.uri = parsedManifest.id
@@ -85,6 +94,16 @@ export class Manifest extends EmbeddedManifest {
   description?: LanguageString
   metadata?: Metadata
 
+  navDate?: NavDate
+  navPlace?: NavPlace
+  homepage?: Homepage
+  thumbnail?: Thumbnail
+  seeAlso?: SeeAlso
+  summary?: Summary
+  requiredStatement?: RequiredStatement
+
+  annotations?: Annotations
+
   readonly embedded = false
 
   constructor(parsedManifest: ManifestType) {
@@ -92,19 +111,38 @@ export class Manifest extends EmbeddedManifest {
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
-      if (parsedManifest.description) {
-        this.description = parseVersion2String(parsedManifest.description)
-      }
 
-      this.metadata = filterInvalidMetadata(
-        parseVersion2Metadata(parsedManifest.metadata)
-      )
+      this.description = parseVersion2String(parsedManifest.description)
+      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
 
       const sequence = parsedManifest.sequences[0]
       this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
+
+      this.navDate = parsedManifest.navDate
+      this.navPlace = parsedManifest.navPlace
+
+      this.requiredStatement = parseVersion2Attribution(
+        parsedManifest.attribution
+      )
+      this.thumbnail = parseVersion2Thumbnail(parsedManifest.thumbnail)
+      this.homepage = parseVersion2Related(parsedManifest.related)
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
-      this.metadata = filterInvalidMetadata(parsedManifest.metadata)
+
+      this.description = parseVersion3String(parsedManifest.description)
+      this.metadata = parseVersion3Metadata(parsedManifest.metadata)
+
+      this.metadata = parseVersion3Metadata(parsedManifest.metadata)
+
+      this.navDate = parsedManifest.navDate
+      this.navPlace = parsedManifest.navPlace
+      this.homepage = parsedManifest.homepage
+      this.thumbnail = parsedManifest.thumbnail
+      this.seeAlso = parsedManifest.seeAlso
+      this.summary = parsedManifest.summary
+      this.requiredStatement = parsedManifest.requiredStatement
+
+      this.annotations = parsedManifest.annotations
 
       this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))
     } else {
