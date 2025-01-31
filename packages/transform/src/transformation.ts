@@ -1,6 +1,7 @@
 import type { Point } from '@allmaps/types'
 
 import type { EvaluationType, TransformationType } from './shared/types.js'
+import { distance, rms } from '@allmaps/stdlib'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
@@ -8,6 +9,8 @@ import type { EvaluationType, TransformationType } from './shared/types.js'
 export abstract class Transformation {
   sourcePoints: Point[]
   destinationPoints: Point[]
+
+  destinationTransformedSourcePoints?: Point[]
 
   pointCount: number
   pointCountMinimum: number
@@ -46,6 +49,42 @@ export abstract class Transformation {
           ' are given.'
       )
     }
+  }
+
+  computeDestinationTransformedSourcePoints(): Point[] {
+    this.destinationTransformedSourcePoints = this.sourcePoints.map(
+      (sourcePoint) => this.evaluate(sourcePoint)
+    )
+
+    return this.destinationTransformedSourcePoints
+  }
+
+  get errors() {
+    let destinationTransformedSourcePoints =
+      this.destinationTransformedSourcePoints
+    if (!destinationTransformedSourcePoints) {
+      destinationTransformedSourcePoints =
+        this.computeDestinationTransformedSourcePoints()
+    }
+
+    return this.destinationPoints.map((destinationPoint, index) =>
+      distance(destinationPoint, destinationTransformedSourcePoints[index])
+    )
+  }
+
+  get rmse() {
+    let destinationTransformedSourcePoints =
+      this.destinationTransformedSourcePoints
+    if (!destinationTransformedSourcePoints) {
+      destinationTransformedSourcePoints =
+        this.computeDestinationTransformedSourcePoints()
+    }
+
+    if (!this.destinationTransformedSourcePoints) {
+      this.computeDestinationTransformedSourcePoints()
+    }
+
+    return rms(this.destinationPoints, destinationTransformedSourcePoints)
   }
 
   evaluate(

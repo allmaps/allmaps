@@ -902,7 +902,7 @@ Array<number>
 Matrix
 ```
 
-### `Helmert#rotation?`
+### `Helmert#rotation`
 
 ###### Type
 
@@ -910,7 +910,7 @@ Matrix
 number
 ```
 
-### `Helmert#scale?`
+### `Helmert#scale`
 
 ###### Type
 
@@ -918,7 +918,7 @@ number
 number
 ```
 
-### `Helmert#translation?`
+### `Helmert#translation`
 
 ###### Type
 
@@ -1025,6 +1025,38 @@ number
 
 ```ts
 [Matrix, Matrix]
+```
+
+### `Polynomial#rotation?`
+
+###### Type
+
+```ts
+number
+```
+
+### `Polynomial#scale?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Polynomial#shear?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Polynomial#translation?`
+
+###### Type
+
+```ts
+[number, number]
 ```
 
 ### `new Projective(sourcePoints, destinationPoints)`
@@ -1334,12 +1366,38 @@ Create a transformation
 
 `Transformation`.
 
+### `Transformation#computeDestinationTransformedSourcePoints()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Point>`.
+
 ### `Transformation#destinationPoints`
 
 ###### Type
 
 ```ts
 Array<Point>
+```
+
+### `Transformation#destinationTransformedSourcePoints?`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `Transformation#errors`
+
+###### Type
+
+```ts
+Array<number>
 ```
 
 ### `Transformation#evaluate(newSourcePoint, evaluationType)`
@@ -1392,6 +1450,14 @@ number
 ```
 
 ### `Transformation#pointCountMinimum`
+
+###### Type
+
+```ts
+number
+```
+
+### `Transformation#rmse`
 
 ###### Type
 

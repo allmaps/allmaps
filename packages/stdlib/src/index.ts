@@ -80,6 +80,7 @@ export {
 export {
   isPoint,
   isLineString,
+  isRing,
   isPolygon,
   isMultiPoint,
   isMultiLineString,
@@ -115,12 +116,14 @@ export {
   stepDistanceAngle,
   distance,
   squaredDistance,
+  rms,
   triangleArea
 } from './geometry.js'
 
 export {
   degreesToRadians,
-  equalArray,
+  isEqualArray,
+  arrayRepeated,
   subSetArray,
   equalSet,
   maxOfNumberOrUndefined,
@@ -131,6 +134,8 @@ export { getFullResourceMask } from './masks.js'
 
 export { mergeOptions, mergePartialOptions } from './options.js'
 
+export { lonLatToWebMecator, webMercatorToLonLat } from './projection.js'
+
 export {
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
@@ -138,4 +143,8 @@ export {
   svgToGeojson
 } from './svg.js'
 
-export { lonLatToWebMecator, webMercatorToLonLat } from './projection.js'
+export {
+  polygonSelfIntersectionPoints,
+  linesIntersectionPoint,
+  prolongedLinesIntersectionPoint
+} from './self-intersect.js'

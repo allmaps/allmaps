@@ -39,7 +39,7 @@ export function isLineString(input: unknown): input is LineString {
 
 // TODO: check if we keep Ring as unclosed.
 // This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
-function isRing(input: unknown): input is Ring {
+export function isRing(input: unknown): input is Ring {
   return (
     Array.isArray(input) && input.every(isPoint)
     // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
@@ -384,6 +384,20 @@ export function squaredDistance(from: Point | Line, to?: Point): number {
   } else {
     throw new Error('Input type not supported')
   }
+}
+
+export function rms(from: Point[], to: Point[]): number {
+  if (from.length !== to.length) {
+    throw new Error('Arrays need to be of same length')
+  }
+  const squaredDistances = from.map((fromPoint, index) =>
+    squaredDistance(fromPoint, to[index])
+  )
+  const meanSquaredDistances =
+    squaredDistances.reduce((sum, squaredDistace) => sum + squaredDistace, 0) /
+    squaredDistances.length
+  const rootMeanSquaredDistances = Math.sqrt(meanSquaredDistances)
+  return rootMeanSquaredDistances
 }
 
 export function triangleArea(triangle: Triangle): number {
