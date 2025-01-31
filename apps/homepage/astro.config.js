@@ -102,11 +102,11 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false })
   ],
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
-  // image: {
-  //   service: {
-  //     entrypoint: 'astro/assets/services/sharp'
-  //   }
-  // },
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    }
+  },
   vite: {
     ssr: {
       noExternal: ['maplibre-gl', 'maplibre-contour']
