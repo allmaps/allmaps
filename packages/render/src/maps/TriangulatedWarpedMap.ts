@@ -82,7 +82,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   private projectedGcpTriangulationByTransformationTypeAndResourceResolution: Map<
     TransformationType,
     Map<number, GcpTriangulation>
-  > = new Map()
+  >
 
   resourceTrianglePoints: Point[] = []
 
@@ -113,6 +113,9 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     super(mapId, georeferencedMap, options)
+
+    this.projectedGcpTriangulationByTransformationTypeAndResourceResolution =
+      new Map()
 
     this.updateTriangulation()
   }

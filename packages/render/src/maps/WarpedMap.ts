@@ -151,12 +151,11 @@ export class WarpedMap extends EventTarget {
   transformer!: GcpTransformer
   projectedPreviousTransformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
-  transformerByTransformationType: Map<TransformationType, GcpTransformer> =
-    new Map()
+  transformerByTransformationType: Map<TransformationType, GcpTransformer>
   projectedTransformerByTransformationType: Map<
     TransformationType,
     GcpTransformer
-  > = new Map()
+  >
 
   geoMask!: GeojsonPolygon
   geoMaskBbox!: Bbox
@@ -207,6 +206,9 @@ export class WarpedMap extends EventTarget {
       ...createDefaultWarpedMapOptions(),
       ...options
     }
+
+    this.transformerByTransformationType = new Map()
+    this.projectedTransformerByTransformationType = new Map()
 
     this.mapId = mapId
     this.georeferencedMap = georeferencedMap
