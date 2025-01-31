@@ -13,8 +13,8 @@
 
   import { mapMonsterColors, mapMonsterMoods } from '$lib/shared/constants.js'
 
-  import GeocodeEarth from '$lib/shared/geocoder/providers/geocode-earth'
-  import WorldHistoricalGazetteer from '$lib/shared/geocoder/providers/world-historical-gazetteer'
+  import { GeocodeEarth } from '$lib/shared/geocoder/providers/geocode-earth'
+  import { WorldHistoricalGazetteer } from '$lib/shared/geocoder/providers/world-historical-gazetteer'
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
   let opacity = 1

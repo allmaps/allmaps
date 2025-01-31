@@ -165,6 +165,8 @@
       })
 
       warpedMapLayer = new WarpedMapLayer()
+
+      // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
 
       layersAdded = true
