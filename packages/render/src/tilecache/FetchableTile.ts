@@ -25,7 +25,7 @@ export class FetchableTile {
     this.mapId = warpedMap.mapId
     this.tile = tile
 
-    const imageRequest = warpedMap.parsedImage.getIiifTile(
+    const imageRequest = warpedMap.parsedImage.getTileImageRequest(
       tile.tileZoomLevel,
       tile.column,
       tile.row

@@ -46,7 +46,7 @@
   }
 
   $: parsedImage = Image.parse(imageInfo)
-  $: imageRequest = parsedImage.getThumbnail({ width, height }, mode)
+  $: imageRequest = parsedImage.getImageRequest({ width, height }, mode)
 </script>
 
 <div style:aspect-ratio="{width} / {height}" class="overflow-hidden">

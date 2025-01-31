@@ -1,7 +1,7 @@
 import type { SizeObject, ImageRequest, TileZoomLevel } from '@allmaps/types'
 import type { Tileset } from './types.js'
 
-export function getIiifTile(
+export function getTileImageRequest(
   { width: imageWidth, height: imageHeight }: SizeObject,
   zoomLevel: TileZoomLevel,
   column: number,

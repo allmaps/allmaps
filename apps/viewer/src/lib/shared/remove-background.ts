@@ -17,7 +17,7 @@ export async function getBackgroundColor(
   map: GeoreferencedMap,
   parsedImage: Image
 ) {
-  let imageRequest = parsedImage.getThumbnail({
+  let imageRequest = parsedImage.getImageRequest({
     width: thumbnailSize,
     height: thumbnailSize
   })

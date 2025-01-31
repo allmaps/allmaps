@@ -665,7 +665,7 @@ export function keyFromScaleFactorRowColumn(
 }
 
 export function tileUrl(tile: Tile, parsedImage: Image): string {
-  const imageRequest = parsedImage.getIiifTile(
+  const imageRequest = parsedImage.getTileImageRequest(
     tile.tileZoomLevel,
     tile.column,
     tile.row

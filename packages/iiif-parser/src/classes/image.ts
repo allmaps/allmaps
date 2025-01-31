@@ -20,8 +20,8 @@ import { ImageServiceSchema } from '../schemas/image-service.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
-import { getTileZoomLevels, getIiifTile } from '../lib/tiles.js'
-import { getThumbnail } from '../lib/thumbnails.js'
+import { getTileZoomLevels, getTileImageRequest } from '../lib/tiles.js'
+import { getImageRequest } from '../lib/thumbnails.js'
 import {
   getProfileProperties,
   getMajorIiifVersionFromImageService
@@ -305,11 +305,11 @@ export class EmbeddedImage {
     return `${this.uri}/${urlRegion}/${urlSize}/0/${quality}.jpg`
   }
 
-  getThumbnail(
+  getImageRequest(
     size: SizeObject,
     mode: Fit = 'cover'
   ): ImageRequest | ImageRequest[][] {
-    return getThumbnail(
+    return getImageRequest(
       { width: this.width, height: this.height },
       size,
       mode,
@@ -386,12 +386,12 @@ export class Image extends EmbeddedImage {
    * @param row - Row of the requested tile
    * @returns Image request object that can be used to fetch the requested tile
    */
-  getIiifTile(
+  getTileImageRequest(
     zoomLevel: TileZoomLevel,
     column: number,
     row: number
   ): ImageRequest {
-    return getIiifTile(
+    return getTileImageRequest(
       { width: this.width, height: this.height },
       zoomLevel,
       column,
@@ -405,11 +405,11 @@ export class Image extends EmbeddedImage {
    * @param mode - Desired fit mode of the requested thumbnail
    * @returns Image request object that can be used to fetch the requested thumbnail
    */
-  getThumbnail(
+  getImageRequest(
     size: SizeObject,
     mode: Fit = 'cover'
   ): ImageRequest | ImageRequest[][] {
-    return getThumbnail(
+    return getImageRequest(
       { width: this.width, height: this.height },
       size,
       mode,

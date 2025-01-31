@@ -337,11 +337,27 @@ curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest
 
 ###### Parameters
 
-* `parsedCanvas` (`{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | Array<any>; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | "http://iiif.io/api/image/2/context.json" | "https://iiif.io/api/image/2/context.json"...`)
+* `parsedCanvas` (`{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | ... 3 more ... | undefined; width?: number | undefined; height?: number |...`)
 
 ###### Returns
 
 `Canvas`.
+
+### `Canvas#annotations?`
+
+###### Type
+
+```ts
+Array<{id: string; type: 'AnnotationPage'}>
+```
+
+### `Canvas#description?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string>}
+```
 
 ### `Canvas#height`
 
@@ -349,6 +365,20 @@ curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest
 
 ```ts
 number
+```
+
+### `Canvas#homepage?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+  language?: string | string[]
+}>
 ```
 
 ### `Canvas#image`
@@ -373,6 +403,60 @@ Image | EmbeddedImage
 
 ```ts
 Array<MetadataItem>
+```
+
+### `Canvas#navDate?`
+
+###### Type
+
+```ts
+Date
+```
+
+### `Canvas#navPlace?`
+
+###### Type
+
+```ts
+object
+```
+
+### `Canvas#requiredStatement?`
+
+###### Type
+
+```ts
+{label: LanguageString; value: LanguageString}
+```
+
+### `Canvas#seeAlso?`
+
+###### Type
+
+```ts
+Array<{id: string; type?: string; format?: string; profile?: string}>
+```
+
+### `Canvas#summary?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string>}
+```
+
+### `Canvas#thumbnail?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}>
 ```
 
 ### `Canvas#type`
@@ -403,14 +487,7 @@ number
 
 ###### Parameters
 
-* `parsedCollection` (`  | Collection2
-    | {'@id': string; '@type': 'sc:Collection'; label?: any}
-    | Collection3
-    | {
-        type: 'Collection'
-        id: string
-        label?: Record<string, Array<string | number | boolean>> | undefined
-      }`)
+* `parsedCollection` (`Collection2 | Collection3`)
 
 ###### Returns
 
@@ -420,12 +497,28 @@ number
 
 * `EmbeddedCollection`
 
+### `Collection#annotations?`
+
+###### Type
+
+```ts
+Array<{id: string; type: 'AnnotationPage'}>
+```
+
 ### `Collection#canvases`
 
 ###### Type
 
 ```ts
 Array<Canvas>
+```
+
+### `Collection#description?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string>}
 ```
 
 ### `Collection#embedded`
@@ -460,6 +553,20 @@ false
   void,
   void >`.
 
+### `Collection#homepage?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+  language?: string | string[]
+}>
+```
+
 ### `Collection#images`
 
 ###### Type
@@ -474,6 +581,68 @@ Array<Image | EmbeddedImage>
 
 ```ts
 Array<never>
+```
+
+### `Collection#metadata?`
+
+###### Type
+
+```ts
+Array<MetadataItem>
+```
+
+### `Collection#navDate?`
+
+###### Type
+
+```ts
+Date
+```
+
+### `Collection#navPlace?`
+
+###### Type
+
+```ts
+object
+```
+
+### `Collection#requiredStatement?`
+
+###### Type
+
+```ts
+{label: LanguageString; value: LanguageString}
+```
+
+### `Collection#seeAlso?`
+
+###### Type
+
+```ts
+Array<{id: string; type?: string; format?: string; profile?: string}>
+```
+
+### `Collection#summary?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string>}
+```
+
+### `Collection#thumbnail?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}>
 ```
 
 ### `Collection.parse(iiifCollection, majorVersion)`
@@ -495,14 +664,7 @@ Parsed IIIF Collection (`Collection`).
 
 ###### Parameters
 
-* `parsedCollection` (`  | Collection2
-    | {'@id': string; '@type': 'sc:Collection'; label?: any}
-    | Collection3
-    | {
-        type: 'Collection'
-        id: string
-        label?: Record<string, Array<string | number | boolean>> | undefined
-      }`)
+* `parsedCollection` (`Collection2 | Collection3 | EmbeddedCollectionType`)
 
 ###### Returns
 
@@ -581,6 +743,17 @@ Parsed IIIF Collection (`Collection`).
 true
 ```
 
+### `EmbeddedImage#getImageRequest(size, mode)`
+
+###### Parameters
+
+* `size` (`{width: number; height: number}`)
+* `mode` (`Fit | undefined`)
+
+###### Returns
+
+`ImageRequest | Array<Array<ImageRequest>>`.
+
 ### `EmbeddedImage#getImageUrl(imageRequest)`
 
 Generates a IIIF Image API URL for the requested region and size
@@ -593,17 +766,6 @@ Generates a IIIF Image API URL for the requested region and size
 ###### Returns
 
 Image API URL that can be used to fetch the requested image (`string`).
-
-### `EmbeddedImage#getThumbnail(size, mode)`
-
-###### Parameters
-
-* `size` (`{width: number; height: number}`)
-* `mode` (`Fit | undefined`)
-
-###### Returns
-
-`ImageRequest | Array<Array<ImageRequest>>`.
 
 ### `EmbeddedImage#height`
 
@@ -681,7 +843,7 @@ number
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | Array<any>; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | ... 3 more ... ...`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | .....`)
 
 ###### Returns
 
@@ -776,7 +938,22 @@ Parsed IIIF resource (`Image | Manifest | Collection`).
 false
 ```
 
-### `Image#getIiifTile(zoomLevel, column, row)`
+### `Image#getImageRequest(size, mode)`
+
+Returns a Image request object for the requested region and size
+
+###### Parameters
+
+* `size` (`{width: number; height: number}`)
+  * Size of the requested thumbnail
+* `mode` (`Fit | undefined`)
+  * Desired fit mode of the requested thumbnail
+
+###### Returns
+
+Image request object that can be used to fetch the requested thumbnail (`ImageRequest | Array<Array<ImageRequest>>`).
+
+### `Image#getTileImageRequest(zoomLevel, column, row)`
 
 Returns a Image request object for a tile with the requested zoom level, column, and row
 
@@ -800,21 +977,6 @@ Returns a Image request object for a tile with the requested zoom level, column,
 ###### Returns
 
 Image request object that can be used to fetch the requested tile (`{region?: Region; size?: SizeObject}`).
-
-### `Image#getThumbnail(size, mode)`
-
-Returns a Image request object for the requested region and size
-
-###### Parameters
-
-* `size` (`{width: number; height: number}`)
-  * Size of the requested thumbnail
-* `mode` (`Fit | undefined`)
-  * Desired fit mode of the requested thumbnail
-
-###### Returns
-
-Image request object that can be used to fetch the requested thumbnail (`ImageRequest | Array<Array<ImageRequest>>`).
 
 ### `Image#sizes?`
 
@@ -872,7 +1034,7 @@ Parsed IIIF Image (`Image`).
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | Array<any>; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | ... 3 more ... ...`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | .....`)
 
 ###### Returns
 
@@ -881,6 +1043,14 @@ Parsed IIIF Image (`Image`).
 ###### Extends
 
 * `EmbeddedManifest`
+
+### `Manifest#annotations?`
+
+###### Type
+
+```ts
+Array<{id: string; type: 'AnnotationPage'}>
+```
 
 ### `Manifest#canvases`
 
@@ -941,6 +1111,20 @@ false
 
 `AsyncGenerator<FetchNextResults<Image>, void, void>`.
 
+### `Manifest#homepage?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+  language?: string | string[]
+}>
+```
+
 ### `Manifest#images`
 
 ###### Type
@@ -955,6 +1139,60 @@ Array<Image | EmbeddedImage>
 
 ```ts
 Array<MetadataItem>
+```
+
+### `Manifest#navDate?`
+
+###### Type
+
+```ts
+Date
+```
+
+### `Manifest#navPlace?`
+
+###### Type
+
+```ts
+object
+```
+
+### `Manifest#requiredStatement?`
+
+###### Type
+
+```ts
+{label: LanguageString; value: LanguageString}
+```
+
+### `Manifest#seeAlso?`
+
+###### Type
+
+```ts
+Array<{id: string; type?: string; format?: string; profile?: string}>
+```
+
+### `Manifest#summary?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string>}
+```
+
+### `Manifest#thumbnail?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}>
 ```
 
 ### `Manifest.parse(iiifManifest, majorVersion)`
