@@ -24,8 +24,11 @@ import type { Gcp, Point, Ring, TypedPolygon } from '@allmaps/types'
 const DEFAULT_RESOURCE_RESOLUTION = undefined // TODO: allow to set via options
 const DEFAULT_DISTORTION_MEASURES: DistortionMeasure[] = [
   'log2sigma',
-  'twoOmega'
-] // TODO: allow to set via options
+  'twoOmega',
+  'signDetJ'
+]
+// TODO: allow to set via options, and set signDetJ only when computing anaysls
+
 const MAX_TRIANGULATE_ERROR_COUNT = 10
 
 function createDefaultTriangulatedWarpedMapOptions(): Partial<WarpedMapOptions> {

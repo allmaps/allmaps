@@ -4,22 +4,82 @@ export function degreesToRadians(degrees: number) {
 
 // Note: this checks equality of the object
 // which is only a good idea for primitive types (string, number), not JSON objects
-export function equalArray<T>(
-  arr1: Array<T> | null,
-  arr2: Array<T> | null
+export function isEqualArray<T>(
+  array0: T[],
+  array1: T[],
+  isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
 ): boolean {
-  if (!arr1 || !arr2) {
+  if (array0.length !== array1.length) {
     return false
   }
-  if (arr1.length !== arr2.length) {
-    return false
-  }
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) {
+  for (let i = 0; i < array0.length; i++) {
+    if (isEqualObject(array0[i], array1[i])) {
       return false
     }
   }
   return true
+}
+
+// Returns objects in array0 that are not in array1
+export function arrayDifference<T>(
+  array0: T[],
+  array1: T[],
+  isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
+): T[] {
+  const result = []
+  for (let i = 0; i < array0.length; i++) {
+    let found = false
+    for (let j = 0; j < array1.length; j++) {
+      if (isEqualObject(array0[i], array1[j])) {
+        found = true
+        break
+      }
+    }
+    if (!found) {
+      result.push(array0[i])
+    }
+  }
+  return result
+}
+
+export function arrayUnique<T>(
+  array: T[],
+  isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
+) {
+  const result = []
+  for (let i = 0; i < array.length; i++) {
+    let found = false
+    for (let j = 0; j < i; j++) {
+      if (isEqualObject(array[i], array[j])) {
+        found = true
+        break
+      }
+    }
+    if (!found) {
+      result.push(array[i])
+    }
+  }
+  return result
+}
+
+export function arrayRepeated<T>(
+  array: T[],
+  isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
+) {
+  const result = []
+  for (let i = 0; i < array.length; i++) {
+    let found = false
+    for (let j = 0; j < i; j++) {
+      if (isEqualObject(array[i], array[j])) {
+        found = true
+        break
+      }
+    }
+    if (found) {
+      result.push(array[i])
+    }
+  }
+  return result
 }
 
 // TODO: replace with Set subset once available

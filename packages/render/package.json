@@ -35,7 +35,7 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && pnpm run documentation",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "NODE_ENV=test pnpm run build && mocha",
     "preversion": "pnpm run lint && pnpm test",

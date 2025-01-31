@@ -4,6 +4,17 @@ Allmaps Standard Library
 
 ## API
 
+### `arrayRepeated(array, isEqualObject)`
+
+###### Parameters
+
+* `array` (`Array<T>`)
+* `isEqualObject` (`((t0: T, t1: T) => boolean) | undefined`)
+
+###### Returns
+
+`Array<T>`.
+
 ### `bboxToCenter(bbox)`
 
 ###### Parameters
@@ -226,17 +237,6 @@ Allmaps Standard Library
 
 * `bbox0` (`[number, number, number, number]`)
 * `bbox1` (`[number, number, number, number]`)
-
-###### Returns
-
-`boolean`.
-
-### `equalArray(arr1, arr2)`
-
-###### Parameters
-
-* `arr1` (`Array<T> | null`)
-* `arr2` (`Array<T> | null`)
 
 ###### Returns
 
@@ -690,6 +690,18 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `boolean`.
 
+### `isEqualArray(array0, array1, isEqualObject)`
+
+###### Parameters
+
+* `array0` (`Array<T>`)
+* `array1` (`Array<T>`)
+* `isEqualObject` (`((t0: T, t1: T) => boolean) | undefined`)
+
+###### Returns
+
+`boolean`.
+
 ### `isEqualPoint(point0, point1)`
 
 ###### Parameters
@@ -863,6 +875,16 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `boolean`.
 
+### `isRing(input)`
+
+###### Parameters
+
+* `input` (`unknown`)
+
+###### Returns
+
+`boolean`.
+
 ### `isValidHttpUrl(string)`
 
 ###### Parameters
@@ -942,6 +964,18 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Returns
 
 `Array<Line>`.
+
+### `linesIntersectionPoint(line0, line1, options)`
+
+###### Parameters
+
+* `line0` (`[Point, Point]`)
+* `line1` (`[Point, Point]`)
+* `options?` (`Partial<IntersectionOptions> | undefined`)
+
+###### Returns
+
+`Point | undefined`.
 
 ### `lonLatToWebMecator(__0)`
 
@@ -1117,6 +1151,17 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `Array<Line>`.
 
+### `polygonSelfIntersectionPoints(polygon, options)`
+
+###### Parameters
+
+* `polygon` (`Array<Array<Point>>`)
+* `options?` (`Partial<IntersectionOptions> | undefined`)
+
+###### Returns
+
+`Array<Point>`.
+
 ### `polygonToGeojsonPolygon(polygon, close)`
 
 ###### Parameters
@@ -1127,6 +1172,17 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Returns
 
 `{type: 'Polygon'; coordinates: Point[][]}`.
+
+### `prolongedLinesIntersectionPoint(line0, line1)`
+
+###### Parameters
+
+* `line0` (`[Point, Point]`)
+* `line1` (`[Point, Point]`)
+
+###### Returns
+
+`Point | undefined`.
 
 ### `rectangleToSize(rectangle)`
 
@@ -1172,6 +1228,17 @@ hex string, e (`string`).g. '#0033ff'
 ###### Returns
 
 `{type: 'Polygon'; coordinates: Point[][]}`.
+
+### `rms(from, to)`
+
+###### Parameters
+
+* `from` (`Array<Point>`)
+* `to` (`Array<Point>`)
+
+###### Returns
+
+`number`.
 
 ### `sizeToResolution(size)`
 

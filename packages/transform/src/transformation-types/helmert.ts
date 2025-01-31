@@ -8,9 +8,9 @@ export class Helmert extends Transformation {
   helmertParametersMatrix: Matrix
   helmertParameters: number[]
 
-  scale?: number
-  rotation?: number
-  translation?: Point
+  scale: number
+  rotation: number
+  translation: Point
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 'helmert', 2)

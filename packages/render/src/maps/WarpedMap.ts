@@ -38,7 +38,7 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 // TODO: consider to make the default options more precise
-const TRANSFORMER_OPTIONS = {
+const DEFAULT_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
   minOffsetDistance: 4,
   maxDepth: 4,
@@ -69,7 +69,9 @@ export function createWarpedMapFactory() {
  * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
- * @param projectedGeoControlPoints - The projected geospatial coordinates of the projected ground control points
+ * @param resourcePoints - The resource coordinates of the ground control points
+ * @param geoPoints - The geospatial coordinates of the ground control points
+ * @param projectedGeoPoints - The projected geospatial coordinates of the projected ground control points
  * @param projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
  * @param projectedGeoTransformedResourcePoints - The resource coordinates of the ground control points, transformed to projected geospatial coordinates using the projected transformer
  * @param resourcePreviousMask - Resource mask of the previous transformation type
@@ -87,6 +89,8 @@ export function createWarpedMapFactory() {
  * @param transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param transformerByTransformationType - A Map of transformers by transformationType
+ * @param projectedTransformerByTransformationType - A Map of projected transformers by transformationType
  * @param geoMask - resourceMask in geospatial coordinates
  * @param geoMaskBbox - Bbox of the geoMask
  * @param geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
@@ -118,6 +122,8 @@ export class WarpedMap extends EventTarget {
 
   gcps: Gcp[]
   projectedGcps!: Gcp[]
+  resourcePoints!: Point[]
+  geoPoints!: Point[]
   projectedGeoPoints!: Point[]
   projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
@@ -145,11 +151,9 @@ export class WarpedMap extends EventTarget {
   transformer!: GcpTransformer
   projectedPreviousTransformer!: GcpTransformer
   projectedTransformer!: GcpTransformer
-  private transformerByTransformationType: Map<
-    TransformationType,
-    GcpTransformer
-  > = new Map()
-  private projectedTransformerByTransformationType: Map<
+  transformerByTransformationType: Map<TransformationType, GcpTransformer> =
+    new Map()
+  projectedTransformerByTransformationType: Map<
     TransformationType,
     GcpTransformer
   > = new Map()
@@ -347,7 +351,11 @@ export class WarpedMap extends EventTarget {
       this.projectedTransformerByTransformationType,
       'helmert',
       () =>
-        new GcpTransformer(this.projectedGcps, 'helmert', TRANSFORMER_OPTIONS)
+        new GcpTransformer(
+          this.projectedGcps,
+          'helmert',
+          DEFAULT_TRANSFORMER_OPTIONS
+        )
     )
     if (!projectedHelmertTransformer.forwardTransformation) {
       projectedHelmertTransformer.createForwardTransformation()
@@ -571,6 +579,8 @@ export class WarpedMap extends EventTarget {
       resource,
       geo: lonLatToWebMecator(geo)
     }))
+    this.resourcePoints = this.gcps.map((gcp) => gcp.resource)
+    this.geoPoints = this.gcps.map((gcp) => gcp.geo)
     this.projectedGeoPoints = this.projectedGcps.map(
       (projectedGcp) => projectedGcp.geo
     )
@@ -601,7 +611,7 @@ export class WarpedMap extends EventTarget {
         new GcpTransformer(
           this.gcps,
           this.transformationType,
-          TRANSFORMER_OPTIONS
+          DEFAULT_TRANSFORMER_OPTIONS
         ),
       () => useCache
     )
@@ -621,7 +631,7 @@ export class WarpedMap extends EventTarget {
         new GcpTransformer(
           this.projectedGcps,
           this.transformationType,
-          TRANSFORMER_OPTIONS
+          DEFAULT_TRANSFORMER_OPTIONS
         ),
       () => useCache
     )
