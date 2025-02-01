@@ -7,11 +7,13 @@ import { IntArrayRenderer } from '@allmaps/render/intarray'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
 import { cachedFetch } from './fetch.js'
-import { getTileSize } from './tile-size.js'
 
 import type { Size, Bbox, FetchFn } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
+import { bboxToRectangle } from '@allmaps/stdlib'
+
+const TILE_WIDTH = 256
 
 function getImageData(input: Uint8ClampedArray) {
   return decodeJpeg(input, { useTArray: true })
@@ -59,10 +61,15 @@ export async function createWarpedTileResponse(
   }
 
   const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
+  const projectedGeoRectangle = bboxToRectangle(projectedGeoBbox)
 
-  const tileSize = getTileSize(resolution)
+  const viewport = Viewport.fromSizeAndPolygon(
+    [TILE_WIDTH, TILE_WIDTH],
+    [projectedGeoRectangle],
+    { devicePixelRatio: resolution === 'retina' ? 2 : 1 }
+  )
 
-  const viewport = Viewport.fromProjectedGeoBbox(tileSize, projectedGeoBbox)
+  const tileSize = viewport.canvasSize
 
   const warpedTile = await renderer.render(viewport)
 

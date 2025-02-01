@@ -7,8 +7,6 @@ export type {
 
 export type { FetchFn } from './fetch.js'
 
-export type { Fit } from './fit.js'
-
 export type {
   GeojsonPoint,
   GeojsonLineString,
@@ -46,6 +44,7 @@ export type {
   Gcp,
   Bbox,
   Size,
+  Fit,
   Transform,
   Matrix4
 } from './geometry.js'

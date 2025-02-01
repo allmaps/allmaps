@@ -130,16 +130,15 @@ Allmaps Standard Library
 
 `[number, number, number, number]`.
 
-### `combineBboxes(bbox0, bbox1)`
+### `combineBboxes(bboxes)`
 
 ###### Parameters
 
-* `bbox0` (`[number, number, number, number]`)
-* `bbox1` (`[number, number, number, number]`)
+* `bboxes` (`[number, number, number, number]`)
 
 ###### Returns
 
-`[number, number, number, number]`.
+`Bbox | undefined`.
 
 ### `computeBbox(points)`
 
@@ -210,6 +209,16 @@ Allmaps Standard Library
 ###### Returns
 
 `Array<Point>`.
+
+### `convexHull(points)`
+
+###### Parameters
+
+* `points` (`Array<Point>`)
+
+###### Returns
+
+`Ring | undefined`.
 
 ### `degreesToRadians(degrees)`
 
@@ -679,6 +688,26 @@ Convert hex to RGB
 ###### Returns
 
 RGB, e (`[number, number, number]`).g. \[0, 51, 255]
+
+### `invertPoint(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `invertPoints(points)`
+
+###### Parameters
+
+* `points` (`Array<Point>`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `isClosed(input)`
 
@@ -1240,6 +1269,97 @@ hex string, e (`string`).g. '#0033ff'
 
 `number`.
 
+### `rotatePoint(point, angle, anchor, cosAngle, sinAngle)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `angle` (`number | undefined`)
+* `anchor` (`Point | undefined`)
+* `cosAngle?` (`number | undefined`)
+* `sinAngle?` (`number | undefined`)
+
+###### Returns
+
+`[number, number]`.
+
+### `rotatePoints(points, angle, anchor, cosAngle, sinAngle)`
+
+###### Parameters
+
+* `points` (`Array<Point>`)
+* `angle` (`number | undefined`)
+* `anchor` (`Point | undefined`)
+* `cosAngle?` (`number | undefined`)
+* `sinAngle?` (`number | undefined`)
+
+###### Returns
+
+`Array<Point>`.
+
+### `scalePoint(point, scale)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `scale` (`number`)
+
+###### Returns
+
+`[number, number]`.
+
+### `scalePoints(points, scale)`
+
+###### Parameters
+
+* `points` (`Array<Point>`)
+* `scale` (`number`)
+
+###### Returns
+
+`Array<Point>`.
+
+### `scaleSize(size, scale)`
+
+###### Parameters
+
+* `size` (`[number, number]`)
+* `scale` (`number`)
+
+###### Returns
+
+`[number, number]`.
+
+### `sizeToBbox(size)`
+
+###### Parameters
+
+* `size` (`[number, number]`)
+
+###### Returns
+
+`[number, number, number, number]`.
+
+### `sizeToCenter(size)`
+
+###### Parameters
+
+* `size` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `sizeToRectangle(size)`
+
+###### Parameters
+
+* `size` (`[number, number]`)
+
+###### Returns
+
+`[Point, Point, Point, Point]`.
+
 ### `sizeToResolution(size)`
 
 ###### Parameters
@@ -1252,11 +1372,51 @@ hex string, e (`string`).g. '#0033ff'
 
 ### `sizesToScale(size0, size1, fit)`
 
+Compute a size from two scales
+
+For unspecified 'fit', the scale is computed based on the surface area derived from the sizes.
+
+For specified 'fit':
+
+Example for square rectangles '\*' and '+':
+
+'contain' where '\*' contains '.'
+(in the first image size0 is relatively wider)
+
+```
+           ****
+           *  *
+```
+
+**....**     ....
+
+* .  . \*     .  .
+  **....**     ....
+  \*  \*
+  \*\*\*\*
+
+'cover' where '\*' is covered by '.'
+(in the first image size0 is relatively wider)
+
+```
+           ....
+           .  .
+```
+
+..****..     \*\*\*\*
+. \*  \* .     \*  \*
+..****..     \*\*\*\*
+.  .
+....
+
 ###### Parameters
 
 * `size0` (`[number, number]`)
+  * first size
 * `size1` (`[number, number]`)
+  * second size
 * `fit?` (`Fit | undefined`)
+  * fit
 
 ###### Returns
 
@@ -1329,6 +1489,30 @@ hex string, e (`string`).g. '#0033ff'
   | GeojsonMultiPoint
   | GeojsonMultiLineString
   | GeojsonMultiPolygon`.
+
+### `translatePoint(point, translationPoint, addOrSubstract)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `translationPoint` (`[number, number]`)
+* `addOrSubstract` (`'add' | 'substract' | undefined`)
+
+###### Returns
+
+`[number, number]`.
+
+### `translatePoints(points, point, addOrSubstract)`
+
+###### Parameters
+
+* `points` (`Array<Point>`)
+* `point` (`[number, number]`)
+* `addOrSubstract` (`'add' | 'substract' | undefined`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `triangleArea(triangle)`
 
