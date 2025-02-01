@@ -33,7 +33,6 @@
         transformation: selected.value
       })
     }
-    // mapsState.setTransformation({ mapId: map.id, transformation })
   }
 
   const selected = $derived(
@@ -51,9 +50,9 @@
 >
   <Select.Trigger
     class="inline-flex w-full items-center rounded-sm border border-border-input
-      bg-white  text-sm transition-colors placeholder:text-foreground-alt/50
+      bg-white text-sm transition-colors placeholder:text-foreground-alt/50
       focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2 focus:ring-offset-background"
-    aria-label="Select a theme"
+    aria-label="Select a transformation algorithm"
   >
     <Select.Value class="text-sm" placeholder="Polynomial" />
   </Select.Trigger>
@@ -63,7 +62,8 @@
   >
     {#each transformationTypes as transformationType}
       <Select.Item
-        class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
+        class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm
+          outline-none transition-all duration-75 data-[highlighted]:bg-muted"
         value={transformationType.value}
         label={transformationType.label}
       >

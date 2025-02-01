@@ -105,7 +105,7 @@
             <span class="font-light text-sm text-black/75"
               >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
             </span>
-            <div class="max-w-fit">
+            <div class="max-w-fit w-96">
               <SelectTransformation {map} />
             </div>
           </div>

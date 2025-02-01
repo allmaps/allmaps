@@ -20,7 +20,7 @@
 
 {#snippet separator()}
   <div class="h-full flex items-center justify-center">
-    <CaretRightIcon size={20} class="inline" weight="bold" />
+    <CaretRightIcon size={16} class="inline" weight="bold" color="#aaa" />
   </div>
 {/snippet}
 

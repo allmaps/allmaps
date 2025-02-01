@@ -19,3 +19,22 @@ export default [
       'American Geographical Society Library at the University of Wisconsin-Milwaukee'
   }
 ] satisfies Organization[]
+
+export const projects = [
+  {
+    label: 'the <strong>Leventhal Map & Education Center</strong>',
+    hostnames: [
+      'leventhalmap.org',
+      'www.leventhalmap.org',
+      'collections.leventhalmap.org'
+    ]
+  },
+  {
+    label: '<strong>DigHimapper</strong>',
+    hostnames: ['dighimapper.eu']
+  },
+  {
+    label: '<strong>Gouda Tijdmachine</strong>',
+    hostnames: ['www.goudatijdmachine.nl']
+  }
+]

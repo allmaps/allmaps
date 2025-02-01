@@ -40,7 +40,7 @@
   >
     <Select.Trigger
       id="select-basemap"
-      class="inline-flex justify-between h-input px-2 py-1 items-center rounded-md border border-red bg-white text-sm transition-colors focus:outline-none focus:ring-2"
+      class="inline-flex justify-between h-input px-2 py-1 items-center rounded-md border border-gray bg-white text-sm transition-colors focus:outline-none focus:ring-2"
       aria-label="Select a base map"
     >
       <Select.Value class="text-sm" placeholder="Select a base map" />
@@ -54,7 +54,8 @@
     >
       {#each uiState.presetBaseMaps as presetBaseMap}
         <Select.Item
-          class="flex h-10 w-full select-none items-center rounded-md py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted hover:bg-red cursor-pointer"
+          class="flex h-10 w-full select-none items-center rounded-md py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75
+          data-[highlighted]:bg-muted hover:bg-pink/50 cursor-pointer"
           value={presetBaseMap.value}
           label={presetBaseMap.label}
         >
