@@ -17,10 +17,9 @@ import {
   computeBbox,
   webMercatorToLonLat,
   squaredDistance,
-  intersection
+  intersectBboxes,
+  bboxToRectangle
 } from '@allmaps/stdlib'
-
-import type { Tile } from '@allmaps/types'
 
 import type Viewport from '../viewport/Viewport.js'
 import type WarpedMap from '../maps/WarpedMap.js'
@@ -316,42 +315,52 @@ export default abstract class BaseRenderer<
     warpedMap.setResourceBufferedViewportRingForViewport(
       resourceBufferedViewportRing
     )
+    // Assure variables exist on warpedMap, that should be computed by the setters above
+    if (
+      !warpedMap.resourceBufferedViewportRingBboxForViewport ||
+      !warpedMap.resourceBufferedViewportRingBboxForViewport
+    ) {
+      throw new Error(
+        'No resourceBufferedViewportRingBboxForViewport or resourceBufferedViewportRingBboxForViewport'
+      )
+    }
 
-    // Compute intersection of to-resource-back-transformed viewport and mask
-    // Note: this is a MultiPolygon since it is the result of an intersection
-    const resourceBufferedViewportRingAndMaskIntersection = intersection(
-      [resourceBufferedViewportRing],
-      [warpedMap.resourceMask]
-    )
-    warpedMap.setResourceBufferedViewportRingAndMaskIntersectionForViewport(
-      resourceBufferedViewportRingAndMaskIntersection
+    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource mask
+    const resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection =
+      intersectBboxes(
+        warpedMap.resourceBufferedViewportRingBboxForViewport,
+        warpedMap.resourceMaskBbox
+      )
+    warpedMap.setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
+      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
     )
 
-    // If this map it ourside of the viewport with request buffer, stop here:
+    // If this map it outside of the viewport with request buffer, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
     if (!mapsInViewportForRequest.has(mapId)) {
       return []
     }
 
-    // Find tiles covering this intersection of to-resource-back-transformed viewport and mask
-    // by computing, for each of this multipolygon's polygons, for their outer ring,
-    // the tiles covering this ring at the tilezoomlevel
-    // (in most cases there will be just one polygon with only an outer ring)
-    // TODO: consider taking holes into account once masks with holes are supported.
-    const tiles: Tile[] = []
-    resourceBufferedViewportRingAndMaskIntersection.forEach((polygon) => {
-      tiles.push(
-        ...computeTilesCoveringRingAtTileZoomLevel(polygon[0], tileZoomLevel, [
-          warpedMap.parsedImage.width,
-          warpedMap.parsedImage.height
-        ])
-      )
-    })
+    // If the intersection of the bboxes is undefined, we don't need to compute any tiles.
+    // This should in general only happen if the previous check also returned false.
+    if (!resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection) {
+      return []
+    }
+
+    // Find tiles covering this intersection of bboxes of to-resource-back-transformed viewport and mask
+    // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
+    const tiles = computeTilesCoveringRingAtTileZoomLevel(
+      bboxToRectangle(
+        resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+      ),
+      tileZoomLevel,
+      [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
+    )
 
     // Sort tiles to load in order of their distance to viewport center
     const resourceBufferedViewportRingCenter = bboxToCenter(
-      computeBbox(resourceBufferedViewportRing)
+      warpedMap.resourceBufferedViewportRingBboxForViewport
     )
     tiles.sort(
       (tileA, tileB) =>
