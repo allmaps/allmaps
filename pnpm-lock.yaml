@@ -1510,12 +1510,6 @@ importers:
       '@placemarkio/geojson-rewind':
         specifier: ^1.0.2
         version: 1.0.2
-      polyclip-ts:
-        specifier: ^0.16.8
-        version: 0.16.8
-      simplify-js:
-        specifier: ^1.2.4
-        version: 1.2.4
       svg-parser:
         specifier: ^2.0.4
         version: 2.0.4
@@ -12070,13 +12064,6 @@ packages:
     engines: {node: '>=12.13.0'}
     dev: true
 
-  /polyclip-ts@0.16.8:
-    resolution: {integrity: sha512-JPtKbDRuPEuAjuTdhR62Gph7Is2BS1Szx69CFOO3g71lpJDFo78k4tFyi+qFOMVPePEzdSKkpGU3NBXPHHjvKQ==}
-    dependencies:
-      bignumber.js: 9.1.2
-      splaytree-ts: 1.0.2
-    dev: false
-
   /postcss-import@15.1.0(postcss@8.4.49):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
@@ -13310,10 +13297,6 @@ packages:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
     dependencies:
       is-arrayish: 0.3.2
-    dev: false
-
-  /simplify-js@1.2.4:
-    resolution: {integrity: sha512-vITfSlwt7h/oyrU42R83mtzFpwYk3+mkH9bOHqq/Qw6n8rtR7aE3NZQ5fbcyCUVVmuMJR6ynsAhOfK2qoah8Jg==}
     dev: false
 
   /sirv@3.0.0:

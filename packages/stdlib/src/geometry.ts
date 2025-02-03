@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
-import {
-  union as unionTS,
-  intersection as intersectionTS,
-  difference as differenceTS,
-  xor as xorTS
-} from 'polyclip-ts'
-import simplifyJS from 'simplify-js'
 
 import type {
   Point,
@@ -26,8 +19,7 @@ import type {
   GeojsonMultiPolygon,
   GeojsonGeometry,
   Size,
-  Triangle,
-  XyPoint
+  Triangle
 } from '@allmaps/types'
 
 // Assert
@@ -237,16 +229,6 @@ export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
   }
 }
 
-// Convert to XY
-
-export function pointToXyPoint(point: Point): XyPoint {
-  return { x: point[0], y: point[1] }
-}
-
-export function xyPointToPoint(xyPoint: XyPoint): Point {
-  return [xyPoint.x, xyPoint.y]
-}
-
 // Check
 
 export function isClosed(input: Point[]): boolean {
@@ -426,41 +408,4 @@ export function triangleArea(triangle: Triangle): number {
         triangle[2][0] * (triangle[0][1] - triangle[1][1])
     )
   )
-}
-
-export function union(
-  geometry: Polygon | MultiPolygon,
-  ...moreGeometries: Polygon[] | MultiPolygon[]
-): MultiPolygon {
-  return uncloseMultiPolygon(unionTS(geometry, ...moreGeometries))
-}
-export function intersection(
-  geometry: Polygon | MultiPolygon,
-  ...moreGeometries: Polygon[] | MultiPolygon[]
-): MultiPolygon {
-  return uncloseMultiPolygon(intersectionTS(geometry, ...moreGeometries))
-}
-export function xor(
-  geometry: Polygon | MultiPolygon,
-  ...moreGeometries: Polygon[] | MultiPolygon[]
-): MultiPolygon {
-  return uncloseMultiPolygon(xorTS(geometry, ...moreGeometries))
-}
-export function difference(
-  geometry: Polygon | MultiPolygon,
-  ...moreGeometries: Polygon[] | MultiPolygon[]
-): MultiPolygon {
-  return uncloseMultiPolygon(differenceTS(geometry, ...moreGeometries))
-}
-
-export function simplify(
-  points: Point[],
-  tolerance?: number,
-  highQuality?: boolean
-) {
-  return simplifyJS(
-    points.map((point) => pointToXyPoint(point)),
-    tolerance,
-    highQuality
-  ).map(xyPointToPoint)
 }
