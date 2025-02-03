@@ -81,7 +81,7 @@
   // TODO: use label=for
 </script>
 
-<div class="grid grid-cols-[max-content_1fr] gap-2 [&>*]:break-all">
+<div class="grid grid-cols-[max-content_1fr] gap-2 *:break-all">
   <div class="col-span-2 font-bold">
     You're georeferencing this IIIF resource:
   </div>

@@ -8,7 +8,7 @@
 </script>
 
 <div class="w-full h-full flex flex-col items-center justify-center gap-4">
-  <div class="w-96 max-w-screen-sm">
+  <div class="w-96 max-w-(--breakpoint-sm)">
     <MapMonster
       color="red"
       mood="sad"

@@ -29,7 +29,7 @@
   }
 </script>
 
-<div class="max-w-screen-lg m-auto p-4">
+<div class="max-w-(--breakpoint-lg) m-auto p-4">
   {#if sourceState.imageCount > 0}
     <Collection>
       {#each [...sourceState.images] as image (image.uri)}
@@ -39,7 +39,7 @@
           onclick={(event) => handleImageClick(event, image.uri)}
           ondblclick={(event) => handleImageDblclick(event, image.uri)}
           href={createRouteUrl($page, 'mask', { image: image.uri })}
-          class="rounded overflow-hidden"
+          class="rounded-sm overflow-hidden"
         >
           <div class="relative">
             <!-- TODO: move to load function -->

@@ -50,7 +50,7 @@
     {autofocus}
     bind:value
     bind:this={input}
-    class="bg-transparent w-full px-2 py-1 focus:outline-none truncate"
+    class="bg-transparent w-full px-2 py-1 focus:outline-hidden truncate"
     {placeholder}
   />
 </form>

@@ -75,7 +75,7 @@
 
   <!-- <div> -->
   <div
-    class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between [&>*]:relative [&>*]:z-10 [&>*]:pointer-events-auto"
+    class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto"
   >
     {#if sourceState.imageCount > 1}
       <ImageSelector />
@@ -83,12 +83,12 @@
       <div></div>
     {/if}
 
-    <!-- <div class="contents [&>*]:z-10 [&>*]:pointer-events-auto"> -->
+    <!-- <div class="contents *:z-10 *:pointer-events-auto"> -->
     <Drawer />
     <!-- </div> -->
   </div>
   <!-- <div
-    class=" z-50 p-2 flex gap-2 justify-between min-w-0 pointer-events-none [&>*]:pointer-events-auto"
+    class=" z-50 p-2 flex gap-2 justify-between min-w-0 pointer-events-none *:pointer-events-auto"
   >
     <div class="flex flex-col justify-end min-w-0 shrink-0">
       {#if sourceState.imageCount > 1}

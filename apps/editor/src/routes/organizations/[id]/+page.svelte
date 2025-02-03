@@ -8,7 +8,7 @@
 </script>
 
 <section class="w-full bg-[#f2feff] flex flex-col items-center p-2 md:p-4">
-  <div class="max-w-screen-lg flex flex-col items-center p-y-4">
+  <div class="max-w-(--breakpoint-lg) flex flex-col items-center p-y-4">
     <Organization {organization} {count} {perPage} />
   </div>
 </section>

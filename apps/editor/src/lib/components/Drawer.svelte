@@ -37,7 +37,7 @@
 </script>
 
 <div
-  class="shrink max-w-screen-sm max-h-full bg-white rounded-md p-2 gap-2 flex flex-col min-w-0"
+  class="shrink max-w-(--breakpoint-sm) max-h-full bg-white rounded-md p-2 gap-2 flex flex-col min-w-0"
 >
   {#if value}
     <div

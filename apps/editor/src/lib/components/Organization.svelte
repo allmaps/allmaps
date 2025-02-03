@@ -105,7 +105,7 @@
           {:else}
             <Pagination.Page
               {page}
-              class="inline-flex size-10 items-center justify-center rounded-lg bg-transparent font-medium hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-[selected]:bg-blue-200"
+              class="inline-flex size-10 items-center justify-center rounded-lg bg-transparent font-medium hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-selected:bg-blue-200"
             >
               {page.value}
             </Pagination.Page>

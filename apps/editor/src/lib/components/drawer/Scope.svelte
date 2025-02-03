@@ -16,7 +16,7 @@
   <div>Show for:</div>
   <RadioGroup.Root
     bind:value={scopeState.scope}
-    class="flex h-input justify-end items-center gap-1 rounded-sm "
+    class="flex h-input justify-end items-center gap-1 rounded-xs "
   >
     {#if scopeState.hasImagesScope}
       <RadioGroup.Item

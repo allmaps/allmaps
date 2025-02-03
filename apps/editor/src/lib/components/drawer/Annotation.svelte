@@ -34,7 +34,7 @@
 </script>
 
 <div
-  class="rounded-md min-w-0 max-w-screen-md max-h-[50vh] overflow-auto [&>*]:overflow-auto [&>*]:p-2 [&>*]:whitespace-pre-wrap [&>*]:break-all"
+  class="rounded-md min-w-0 max-w-(--breakpoint-md) max-h-[50vh] overflow-auto *:overflow-auto *:p-2 *:whitespace-pre-wrap *:break-all"
 >
   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
   {@html highlight(annotation)}

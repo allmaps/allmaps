@@ -47,7 +47,7 @@
 
   <div>URLs:</div>
 
-  <div class="grid grid-cols-[max-content,1fr] gap-2 [&>*]:break-all">
+  <div class="grid grid-cols-[max-content_1fr] gap-2 *:break-all">
     <div>Georeference Annotation:</div>
     <a class="underline" href={getAnnotationUrl(type, allmapsId)}
       >{getAnnotationUrl(type, allmapsId)}</a

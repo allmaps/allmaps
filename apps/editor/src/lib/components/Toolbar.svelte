@@ -39,13 +39,13 @@
   >
     <DropdownMenu.Item
       onclick={handleMenuItemClick}
-      class="flex h-10 select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted hover:bg-pink hover:text-white"
+      class="flex h-10 select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-pink hover:text-white"
     >
       About Allmaps Editor
     </DropdownMenu.Item>
     <DropdownMenu.Item
       onclick={handleMenuItemClick}
-      class="flex h-10 select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted hover:bg-pink hover:text-white"
+      class="flex h-10 select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-pink hover:text-white"
     >
       Terms of use
     </DropdownMenu.Item>
