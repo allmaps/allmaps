@@ -409,3 +409,25 @@ export function triangleArea(triangle: Triangle): number {
     )
   )
 }
+
+export function triangleAngles(triangle: Triangle): [number, number, number] {
+  return [
+    threePointsToAngle(triangle[0], triangle[1], triangle[2]),
+    threePointsToAngle(triangle[1], triangle[2], triangle[0]),
+    threePointsToAngle(triangle[2], triangle[0], triangle[1])
+  ]
+}
+
+/**
+ * Return angle alpha made at point A by points B and C
+ */
+export function threePointsToAngle(
+  pointA: Point,
+  pointB: Point,
+  pointC: Point
+): number {
+  const AB = distance(pointA, pointB)
+  const BC = distance(pointB, pointC)
+  const AC = distance(pointA, pointC)
+  return Math.acos((AB ** 2 + AC ** 2 - BC ** 2) / (2 * AB * AC))
+}

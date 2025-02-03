@@ -8,6 +8,7 @@ import {
   conformPolygon,
   mergeOptions,
   midPoint,
+  triangleAngles,
   triangleArea
 } from '@allmaps/stdlib'
 
@@ -37,16 +38,19 @@ export type TriangulationToUnique = {
   uniquePointIndexEdges: TypedLine<number>[]
 }
 
-const EPSILON = 0.001
+const MINIMUM_TRIANGLE_AREA = 0
+const MINIMUM_TRIANGLE_ANGLE = 0.01
 
 export type TriangluationOptions = {
   steinerPoints: Point[]
   minimumTriangleArea: number
+  minimumTriangleAngle: number
 }
 
 const defaultTriangulationOptions = {
   steinerPoints: [],
-  minimumTriangleArea: EPSILON
+  minimumTriangleArea: MINIMUM_TRIANGLE_AREA,
+  minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
 } as TriangluationOptions
 
 /**
@@ -97,6 +101,7 @@ export function triangulateToUnique(
   )
   const steinerPoints = mergedTriangulationOptions.steinerPoints
   let minimumTriangleArea = mergedTriangulationOptions.minimumTriangleArea
+  const minimumTriangleAngle = mergedTriangulationOptions.minimumTriangleAngle
 
   // Conform polygon (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
@@ -107,7 +112,11 @@ export function triangulateToUnique(
   let gridPointsInPolygon: Point[] = []
   if (distance) {
     // Interpolate polygon
-    interpolatedPolygon = interpolatePolygon(polygon, distance)
+    // Note: rounding interpolated points to
+    // prevent error "Constraining edge intersects point" at small distances
+    interpolatedPolygon = interpolatePolygon(polygon, distance).map((ring) =>
+      ring.map((point) => [Math.round(point[0]), Math.round(point[1])])
+    )
     interpolatedPolygonPoints = interpolatedPolygon.flat()
 
     // Add grid points inside the polygon
@@ -166,6 +175,7 @@ export function triangulateToUnique(
       uniquePoints[constrainautor.del.triangles[i + 1]],
       uniquePoints[constrainautor.del.triangles[i + 2]]
     ])
+    // Only classify triangles if they are along the border
     shouldClassifyTriangles.push(
       constrainautor.del.triangles[i] < interpolatedPolygonPoints.length ||
         constrainautor.del.triangles[i + 1] <
@@ -178,21 +188,22 @@ export function triangulateToUnique(
   minimumTriangleArea = distance
     ? distance * distance * minimumTriangleArea
     : minimumTriangleArea
-  const classifications = triangles.map((triangle, index) => {
+  const shouldKeep = triangles.map((triangle, index) => {
     // Only keep if inside
     if (shouldClassifyTriangles[index]) {
       return (
         pointInPolygon(midPoint(...triangle), polygon) &&
-        triangleArea(triangle) > minimumTriangleArea
+        triangleArea(triangle) >= minimumTriangleArea &&
+        triangleAngles(triangle).every((angle) => angle >= minimumTriangleAngle)
       )
     } else {
       return true
     }
   })
   uniquePointIndexTriangles = uniquePointIndexTriangles.filter(
-    (_triangle, index) => classifications[index]
+    (_triangle, index) => shouldKeep[index]
   )
-  triangles = triangles.filter((_triangle, index) => classifications[index])
+  triangles = triangles.filter((_triangle, index) => shouldKeep[index])
 
   // Fill in edges using unique
   const edges: Line[] = []
