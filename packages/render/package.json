@@ -78,7 +78,6 @@
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
-    "polyclip-ts": "^0.16.8",
     "rbush": "^3.0.1",
     "robust-point-in-polygon": "^1.0.3"
   },

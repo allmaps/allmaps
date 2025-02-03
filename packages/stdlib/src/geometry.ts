@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
+import {
+  union as unionTS,
+  intersection as intersectionTS,
+  difference as differenceTS,
+  xor as xorTS
+} from 'polyclip-ts'
+import simplifyJS from 'simplify-js'
 
 import type {
   Point,
@@ -19,7 +26,8 @@ import type {
   GeojsonMultiPolygon,
   GeojsonGeometry,
   Size,
-  Triangle
+  Triangle,
+  XyPoint
 } from '@allmaps/types'
 
 // Assert
@@ -35,16 +43,11 @@ export function isPoint(input: any): input is Point {
 
 export function isLineString(input: any): input is LineString {
   return Array.isArray(input) && input.every(isPoint)
-  // && !isClosed(input) // Possible addition if we want to check for closedness
 }
 
-// TODO: check if we keep Ring as unclosed.
 // This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
 function isRing(input: any): input is Ring {
-  return (
-    Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
-  )
+  return Array.isArray(input) && input.every(isPoint)
 }
 
 export function isPolygon(input: any): input is Polygon {
@@ -74,6 +77,33 @@ export function isGeometry(input: any): input is Geometry {
   )
 }
 
+// Close
+
+export function closeRing(ring: Ring): Ring {
+  return [...ring, ring[0]]
+}
+
+export function uncloseRing(ring: Ring): Ring {
+  ring.splice(-1)
+  return ring
+}
+
+export function closePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => closeRing(ring))
+}
+
+export function unclosePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => uncloseRing(ring))
+}
+
+export function closeMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => closePolygon(polygon))
+}
+
+export function uncloseMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => unclosePolygon(polygon))
+}
+
 // Conform
 
 export function conformLineString(lineString: LineString): LineString {
@@ -96,7 +126,7 @@ export function conformRing(ring: Ring): Ring {
 
   // Remove last point if input is closed ring
   if (isClosed(ring)) {
-    ring.splice(-1)
+    uncloseRing(ring)
   }
 
   if (ring.length < 3) {
@@ -142,7 +172,7 @@ export function lineStringToGeojsonLineString(
 export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close ? [[...ring, ring[0]]] : [ring]
+    coordinates: close ? [closeRing(ring)] : [ring]
   }
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
 }
@@ -153,11 +183,7 @@ export function polygonToGeojsonPolygon(
 ): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close
-      ? polygon.map((ring) => {
-          return [...ring, ring[0]]
-        })
-      : polygon
+    coordinates: close ? closePolygon(polygon) : polygon
   }
 
   return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
@@ -187,13 +213,7 @@ export function multiPolygonToGeojsonMultiPolygon(
 ): GeojsonMultiPolygon {
   const geometry = {
     type: 'MultiPolygon',
-    coordinates: close
-      ? multiPolygon.map((polygon) =>
-          polygon.map((ring) => {
-            return [...ring, ring[0]]
-          })
-        )
-      : multiPolygon
+    coordinates: close ? closeMultiPolygon(multiPolygon) : multiPolygon
   }
 
   return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
@@ -215,6 +235,16 @@ export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
   } else {
     throw new Error('Geometry type not supported')
   }
+}
+
+// Convert to XY
+
+export function pointToXyPoint(point: Point): XyPoint {
+  return { x: point[0], y: point[1] }
+}
+
+export function xyPointToPoint(xyPoint: XyPoint): Point {
+  return [xyPoint.x, xyPoint.y]
 }
 
 // Check
@@ -396,4 +426,41 @@ export function triangleArea(triangle: Triangle): number {
         triangle[2][0] * (triangle[0][1] - triangle[1][1])
     )
   )
+}
+
+export function union(
+  geometry: Polygon | MultiPolygon,
+  ...moreGeometries: Polygon[] | MultiPolygon[]
+): MultiPolygon {
+  return uncloseMultiPolygon(unionTS(geometry, ...moreGeometries))
+}
+export function intersection(
+  geometry: Polygon | MultiPolygon,
+  ...moreGeometries: Polygon[] | MultiPolygon[]
+): MultiPolygon {
+  return uncloseMultiPolygon(intersectionTS(geometry, ...moreGeometries))
+}
+export function xor(
+  geometry: Polygon | MultiPolygon,
+  ...moreGeometries: Polygon[] | MultiPolygon[]
+): MultiPolygon {
+  return uncloseMultiPolygon(xorTS(geometry, ...moreGeometries))
+}
+export function difference(
+  geometry: Polygon | MultiPolygon,
+  ...moreGeometries: Polygon[] | MultiPolygon[]
+): MultiPolygon {
+  return uncloseMultiPolygon(differenceTS(geometry, ...moreGeometries))
+}
+
+export function simplify(
+  points: Point[],
+  tolerance?: number,
+  highQuality?: boolean
+) {
+  return simplifyJS(
+    points.map((point) => pointToXyPoint(point)),
+    tolerance,
+    highQuality
+  ).map(xyPointToPoint)
 }

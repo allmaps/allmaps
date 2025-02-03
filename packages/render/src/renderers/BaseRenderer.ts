@@ -1,5 +1,3 @@
-import { intersection } from 'polyclip-ts'
-
 import TileCache from '../tilecache/TileCache.js'
 import WarpedMapList from '../maps/WarpedMapList.js'
 import FetchableTile from '../tilecache/FetchableTile.js'
@@ -18,7 +16,8 @@ import {
   bboxToCenter,
   computeBbox,
   webMercatorToLonLat,
-  squaredDistance
+  squaredDistance,
+  intersection
 } from '@allmaps/stdlib'
 
 import type { Tile } from '@allmaps/types'

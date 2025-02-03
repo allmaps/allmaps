@@ -65,6 +65,9 @@ export type TypedMultiPoint<P> = P[]
 export type TypedMultiLineString<P> = P[][]
 export type TypedMultiPolygon<P> = P[][][]
 
+// Used to convert from and to this type, sometimes used in other libraries
+export type XyPoint = { x: number; y: number }
+
 export type Gcp = { resource: Point; geo: Point }
 
 /**

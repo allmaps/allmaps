@@ -1397,9 +1397,6 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
-      polyclip-ts:
-        specifier: ^0.16.8
-        version: 0.16.8
       rbush:
         specifier: ^3.0.1
         version: 3.0.1
@@ -1513,6 +1510,12 @@ importers:
       '@placemarkio/geojson-rewind':
         specifier: ^1.0.2
         version: 1.0.2
+      polyclip-ts:
+        specifier: ^0.16.8
+        version: 0.16.8
+      simplify-js:
+        specifier: ^1.2.4
+        version: 1.2.4
       svg-parser:
         specifier: ^2.0.4
         version: 2.0.4
@@ -13307,6 +13310,10 @@ packages:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
     dependencies:
       is-arrayish: 0.3.2
+    dev: false
+
+  /simplify-js@1.2.4:
+    resolution: {integrity: sha512-vITfSlwt7h/oyrU42R83mtzFpwYk3+mkH9bOHqq/Qw6n8rtR7aE3NZQ5fbcyCUVVmuMJR6ynsAhOfK2qoah8Jg==}
     dev: false
 
   /sirv@3.0.0:

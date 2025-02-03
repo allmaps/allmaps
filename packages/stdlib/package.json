@@ -54,6 +54,8 @@
     "@allmaps/iiif-parser": "^1.0.0-beta.40",
     "@allmaps/types": "^1.0.0-beta.15",
     "@placemarkio/geojson-rewind": "^1.0.2",
+    "polyclip-ts": "^0.16.8",
+    "simplify-js": "^1.2.4",
     "svg-parser": "^2.0.4"
   },
   "devDependencies": {
