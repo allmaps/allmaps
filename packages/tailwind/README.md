@@ -46,6 +46,118 @@ Tailwind CSS theme for Allmaps.
 'inherit'
 ```
 
+### `originalColorIndex`
+
+###### Type
+
+```ts
+4
+```
+
+### `shades`
+
+###### Fields
+
+* `blue` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `darkblue` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `gray` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `green` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `orange` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `pink` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `purple` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `red` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+* `yellow` (`[
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string
+  ]`)
+
 ### `themeColors`
 
 ###### Fields

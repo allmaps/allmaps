@@ -25,8 +25,13 @@ export {
   bboxToCenter,
   bboxToSize,
   rectangleToSize,
+  convexHull,
   sizesToScale,
+  scaleSize,
   sizeToResolution,
+  sizeToCenter,
+  sizeToBbox,
+  sizeToRectangle,
   bboxesToScale,
   rectanglesToScale
 } from './bbox.js'
@@ -117,7 +122,15 @@ export {
   distance,
   squaredDistance,
   rms,
-  triangleArea
+  triangleArea,
+  invertPoint,
+  invertPoints,
+  scalePoint,
+  scalePoints,
+  translatePoint,
+  translatePoints,
+  rotatePoint,
+  rotatePoints
 } from './geometry.js'
 
 export {

@@ -44,11 +44,10 @@ Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 
 ### `Fit`
 
-###### Type
+Two ways two rectangles (or shapes in general) can overlap: (`'cover' | 'contain'`).
 
-```ts
-'cover' | 'contain'
-```
+* 'contain': The first contains the second
+* 'cover': The first is covered by the second
 
 ### `Gcp`
 

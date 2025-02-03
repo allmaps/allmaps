@@ -8,7 +8,8 @@ import {
   fetchImageInfo,
   lonLatToWebMecator,
   getPropertyFromCacheOrComputation,
-  mixPoints
+  mixPoints,
+  sizeToRectangle
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -128,13 +129,12 @@ export class WarpedMap extends EventTarget {
   projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
 
-  resourcePreviousMask!: Ring
   resourceMask: Ring
   resourceMaskBbox!: Bbox
   resourceMaskRectangle!: Rectangle
-  resourceFullMask: Ring
-  resourceFullMaskBbox: Bbox
-  resourceFullMaskRectangle: Rectangle
+  resourceFullMask!: Ring
+  resourceFullMaskBbox!: Bbox
+  resourceFullMaskRectangle!: Rectangle
 
   imageInformations?: ImageInformations
   parsedImage?: Image
@@ -218,23 +218,7 @@ export class WarpedMap extends EventTarget {
 
     this.resourceMask = this.georeferencedMap.resourceMask
     this.updateResourceMaskProperties()
-
-    const resourceWidth = this.georeferencedMap.resource.width
-    const resourceHeight = this.georeferencedMap.resource.height
-
-    if (resourceWidth && resourceHeight) {
-      this.resourceFullMask = [
-        [0, 0],
-        [resourceWidth, 0],
-        [resourceWidth, resourceHeight],
-        [0, resourceHeight]
-      ]
-    } else {
-      this.resourceFullMask = bboxToRectangle(this.resourceMaskBbox)
-    }
-
-    this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
-    this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
+    this.updateResourceFullMaskProperties()
 
     this.imageInformations = options.imageInformations
     this.loadingImageInfo = false
@@ -385,6 +369,7 @@ export class WarpedMap extends EventTarget {
   setResourceMask(resourceMask: Ring): void {
     this.resourceMask = resourceMask
     this.updateResourceMaskProperties()
+    this.updateResourceFullMaskProperties()
     this.updateGeoMask()
     this.updateProjectedGeoMask()
     this.updateResourceToProjectedGeoScale()
@@ -501,7 +486,6 @@ export class WarpedMap extends EventTarget {
     this.projectedPreviousTransformer = this.projectedTransformer
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
-    this.resourcePreviousMask = this.resourceMask
   }
 
   /**
@@ -570,10 +554,20 @@ export class WarpedMap extends EventTarget {
   private updateResourceMaskProperties() {
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
+  }
 
-    if (!this.resourcePreviousMask) {
-      this.resourcePreviousMask = this.resourceMask
+  private updateResourceFullMaskProperties() {
+    const resourceWidth = this.georeferencedMap.resource.width
+    const resourceHeight = this.georeferencedMap.resource.height
+
+    if (resourceWidth && resourceHeight) {
+      this.resourceFullMask = sizeToRectangle([resourceWidth, resourceHeight])
+    } else {
+      this.resourceFullMask = bboxToRectangle(this.resourceMaskBbox)
     }
+
+    this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
+    this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
   }
 
   private updateGcpsProperties() {

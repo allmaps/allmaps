@@ -20,10 +20,10 @@ It is also used in the [Allmaps Preview](../../apps/preview/) app.
 
 The render module accomplishes this task with the following classes:
 
-* Most renderers use the concept of a **`Viewport`**, describing coordinate reach that should be rendered.
+* All renderers use the concept of a **`Viewport`**, describing coordinate reach that should be rendered. Create a viewport using it's constructor or the static methods in the Viewport class. The CanvasRenderer and WebGL2Renderer can deduce a viewport from the current WarpedMapList and the size of their (WebGL2-enabled) canvas.
 * All renderers extend the **`BaseRenderer`** class, which implements the general actions of the (automatically throttled) `render()` calls: checking which maps are inside the current viewport, initially loading their image informations, checking which zoomlevel corresponds to the viewport, getting the IIIF tiles of that zoomlevel that are within the viewport.
   * For the `WebGL2Renderer`, a `WebGL2RenderingContext` contains the rendering context for the drawing surface of an HTML element, and a `WebGLProgram` stores the vertex and fragment shader used for rendering a map, its lines and points.
-* A **`WarpedMap`** is made from every Georeferenced Map (which in term are parsed Georeference Annotations) added to the renderer and hence to its warpedMapList. It contains useful properties like mask, center, size ... in resource, geospatial and projected geospatial coordinates. It contains a copy of the ground control points (GCPs) and resource masks, a projected version of the GCPs, a transformation built using the latter and usable to transform points from IIIF resource coordinates to projected geospatial coordinates.
+* A **`WarpedMap`** is made from every Georeferenced Map (which in term are parsed Georeference Annotations) and is added to the renderer and hence to its warpedMapList. It contains useful properties like mask, center, size ... in resource, geospatial and projected geospatial coordinates. It contains a copy of the ground control points (GCPs) and resource masks, a projected version of the GCPs, a transformation built using the latter and usable to transform points from IIIF resource coordinates to projected geospatial coordinates.
   * If `WebGL2Renderer` is used, a **`TriangulatedWarpedMap`** is created for every WarpedMap, finely triangulating the map, and a **`WebGL2WarpedMap`** is created, containing the WebGL2 information of the map (buffers etc.).
 * A **`WarpedMapList`** contains the list of WarpedMaps to draw and uses an **`RTree`** for geospatial map lookup.
 * A **`TileCache`** fetches and stores the image data of cached IIIF tiles.
@@ -61,7 +61,7 @@ pnpm run build
 
 ## Usage
 
-For the CanvasRenderer
+### CanvasRenderer
 
 ```js
 import { CanvasRenderer } from '@allmaps/render/canvas'
@@ -75,16 +75,24 @@ canvas.height = height // Your height
 const renderer = new CanvasRenderer(canvas)
 
 // Fetch and parse an annotation
-const annotation = await fetch(annoationUrl).then((response) => response.json())
+const annotationUrl = 'https://annotations.allmaps.org/images/4af0fa9c8207b36c'
+const annotation = await fetch(annotationUrl).then((response) =>
+  response.json()
+)
 
 // Add the annotation to the renderer
 await renderer.addGeoreferenceAnnotation(annotation)
 
 // Render
+// Note: no viewport specified, so one will be deduced. See below.
 await renderer.render()
 ```
 
-For the WebGL2Renderer
+Notes:
+
+* Maps with strong warping may appear to not exactly follow the specified viewport. This is due the backwards transform being explicitly used in the CanvasRenderer and IntArrayRenderer (and not in the WebGL2Renderer). For maps with strong warping, the backwards transform is currently not exact (even for polynomial transformations).
+
+### WebGL2Renderer
 
 ```js
 import { WebGL2Renderer } from '@allmaps/render/webgl2'
@@ -101,19 +109,25 @@ const gl = canvas.getContext('webgl2', { premultipliedAlpha: true })
 const renderer = new WebGL2Renderer(gl)
 
 // Fetch and parse an annotation
-const annotation = await fetch(annoationUrl).then((response) => response.json())
+const annotationUrl = 'https://annotations.allmaps.org/images/4af0fa9c8207b36c'
+const annotation = await fetch(annotationUrl).then((response) =>
+  response.json()
+)
 
 // Add the annotation to the renderer
 await renderer.addGeoreferenceAnnotation(annotation)
 
-// Create your viewport
-const viewport = viewport // Your viewport, see below
-
 // Render
-renderer.render(viewport)
+// Note: no viewport specified, so one will be deduced. See below.
+renderer.render()
 ```
 
-For the IntArrayRenderer
+Notes: the WebGL2Renderer is **not fully functional yet**.
+
+* The WebGL2Renderer works with events which are meant to trigger re-renders. This logic can currently be implemented *outside* of this library (see the plugins), and will be implemented *within* this library soon. As this will affect the API, please refrain from using this renderer as described above for now.
+* The WebGL2Renderer loads images via web-workers. The bundling needs to be optimised to support using this renderer in all possible environments.
+
+### IntArrayRenderer
 
 ```js
 import { IntArrayRenderer } from '@allmaps/render/intarray'
@@ -123,23 +137,34 @@ import { IntArrayRenderer } from '@allmaps/render/intarray'
 // And the Allmaps Preview application for a concrete example
 const renderer =
   new IntArrayRenderer() <
-  UintArrRet >
-  getImageData, // A function to get the image date from an image
+  D > // A data type
+  (getImageData, // A function to get the image date from an image
   getImageDataValue, // A function to get the image data value from an image
   getImageDataSize, // A function to get the image data size from an image
-  options // IntArrayRenderer options
+  options) // IntArrayRenderer options
+
+const annotationUrl = 'https://annotations.allmaps.org/images/4af0fa9c8207b36c'
+const annotation = await fetch(annotationUrl).then((response) =>
+  response.json()
+)
 
 await renderer.addGeoreferenceAnnotation(annotation)
 
-// Create your viewport
+// Create your viewport (mandatory for this renderer)
 const viewport = viewport // Your viewport, see below
 
 const image = await renderer.render(viewport)
 ```
 
+Notes:
+
+* Maps with strong warping may appear to not exactly follow the specified viewport. This is due the backwards transform being explicitly used in the CanvasRenderer and IntArrayRenderer (and not in the WebGL2Renderer). For maps with strong warping, the backwards transform is currently not exact (even for polynomial transformations).
+
 ### Creating a Viewport
 
-The WebGL2Renderer and IntArrayRenderer take a Viewport as input. Create one through one of the following options:
+The `render()` call of all renderers take a Viewport as input. For the IntArrayRenderer, this argument is required. For the others, it is optional: if unspecified a viewport will be deduced from the canvas size and the warpedMapList formed by the annotations.
+
+A viewport can be created through one of the following options:
 
 Directly using the Viewport constructor:
 
@@ -155,27 +180,39 @@ new Viewport(
 )
 ```
 
-Using the static method `Viewport.fromWarpedMapList()` to derive a viewport from your WarpedMapList
+Using one of the following static methods:
+
+* `Viewport.fromSizeAndMaps()`
+* `Viewport.fromSizeAndPolygon()`
+* `Viewport.fromScaleAndMaps()`
+* `Viewport.fromScaleAndPolygon()`
+
+For example, to derive a Viewport from a size and maps:
 
 ```js
-const viewport = Viewport.fromWarpedMapList(
+const viewport = Viewport.fromSizeAndMaps(
   viewportSize, // Your viewport size, as [width, height]
-  warpedMapList, // Your WarpedMapList, e.g. renderer.warpedMapList
-  devicePixelRatio, // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
-  fit, // Your fit, i.e. 'cover' or 'contain'
-  zoom // Your zoom, e.g. 1
+  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
+  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio, fit and zoom.
 )
 ```
 
-Using the static method `Viewport.fromProjectedGeoBbox()` to derive a viewport from a bounding box in projected geospatial coordinates
+Or, to derive a Viewport from a scale and maps:
 
 ```js
-const viewport = Viewport.fromProjectedGeoBbox(
-  viewportSize, // Your viewport size, as [width, height]
-  projectedGeoBbox, // Your bbox in projected geospatial coordinates
-  devicePixelRatio, // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
-  fit // Your fit, i.e. 'cover' or 'contain'
+const viewport = Viewport.fromScaleAndMaps(
+  projectedGeoPerViewportScale, // Your scale
+  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
+  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio and zoom (fit is ignored here).
 )
+
+// In this case, resize your canvas to the computed viewport
+// before rendering, to encompass the entire image.
+canvas.width = viewport.canvasSize[0]
+canvas.height = viewport.canvasSize[1]
+canvas.style.width = viewport.viewportSize[0] + 'px'
+canvas.style.height = viewport.viewportSize[1] + 'px'
+context.scale(viewport.devicePixelRatio, viewport.devicePixelRatio)
 ```
 
 For usage examples in webmapping libraries, see the source code of the Allmaps plugins for [Leaflet](../leaflet/),
@@ -185,8 +222,8 @@ For usage examples in webmapping libraries, see the source code of the Allmaps p
 
 In this package the following naming conventions are used:
 
-* `viewport...` indicates properties described in viewport coordinates
-* `canvas...` indicates properties described in canvas coordinates (i.e. viewport but with device pixel ratio taken into account)
+* `viewport...` indicates properties described in viewport coordinates (i.e. with pixel size as perceived by the user)
+* `canvas...` indicates properties described in canvas coordinates, so viewport device pixel ratio (i.e. with effective pixel size in memory)
 * `resource...` indicates properties described in resource coordinates (i.e. IIIF tile coordinates of zoomlevel 1)
 * `geo...` indicates properties described in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
 * `projectedGeo...` indicates properties described in projected geospatial coordinates (following a CRS, by default 'EPSG:3857' WebMercator)
@@ -202,7 +239,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * Options
@@ -458,8 +495,8 @@ Creates a new Viewport
   * Center point of the viewport, in projected coordinates.
 * `projectedGeoPerViewportScale` (`number`)
   * Scale of the viewport, in projection coordinates per viewport pixel.
-* `rotation` (`number`)
-  * Rotation of the viewport with respect to the project coordinate system.
+* `rotation` (`number | undefined`)
+  * Rotation of the viewport with respect to the projected geo coordinate system. Positive values rotate the viewport positively (i.e. counter-clockwise) w.r.t. the map in projected geo coordinates. This is equivalent to rotating the map negatively (i.e. clockwise) within the viewport.
 * `devicePixelRatio` (`number | undefined`)
   * The devicePixelRatio of the viewport.
 
@@ -507,6 +544,16 @@ number
 [number, number]
 ```
 
+### `Viewport#composeProjectedGeoToCanvasTransform()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[number, number, number, number, number, number]`.
+
 ### `Viewport#composeProjectedGeoToClipTransform()`
 
 ###### Parameters
@@ -537,16 +584,20 @@ There are no parameters.
 
 `[number, number, number, number, number, number]`.
 
-### `Viewport#computeProjectedGeoRectangle(projectedGeoCenter, projectedGeoPerViewportScale, rotation, viewportSize)`
+### `Viewport#computeProjectedGeoRectangle(viewportSize, projectedGeoPerViewportScale, rotation, projectedGeoCenter)`
 
-Returns a rotated rectangle in projected geo coordinates
+Returns a rectangle in projected geo coordinates
+
+The rectangle is the result of a horizontal rectangle in Viewport space of size 'viewportSize',
+scaled using projectedGeoPerViewportScale, centered,
+rotated using 'rotation' and translated to 'projectedGeoCenter'.
 
 ###### Parameters
 
-* `projectedGeoCenter` (`[number, number]`)
+* `viewportSize` (`[number, number]`)
 * `projectedGeoPerViewportScale` (`number`)
 * `rotation` (`number`)
-* `viewportSize` (`[number, number]`)
+* `projectedGeoCenter` (`[number, number]`)
 
 ###### Returns
 
@@ -666,6 +717,14 @@ number
 [number, number]
 ```
 
+### `Viewport#projectedGeoToCanvasTransform`
+
+###### Type
+
+```ts
+[number, number, number, number, number, number]
+```
+
 ### `Viewport#projectedGeoToClipTransform`
 
 ###### Type
@@ -738,47 +797,83 @@ number
 [number, number, number, number, number, number]
 ```
 
-### `Viewport.fromProjectedGeoBbox(viewportSize, projectedGeoBbox, devicePixelRatio, fit)`
+### `Viewport.fromScaleAndMaps(projectedGeoPerViewportScale, maps, viewportOptions)`
 
-Static method creates that creates a Viewport from Bbox in projected geospatial coordinates.
+Static method that creates a Viewport from a scale and maps.
+
+###### Parameters
+
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected coordinates per viewport pixel.
+* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
+  * A WarpedMapList or an array of WarpedMaps.
+* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * Optional viewport options. Fit is ignored.
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromScaleAndPolygon(projectedGeoPolygon, projectedGeoPerViewportScale, viewportOptions)`
+
+Static method that creates a Viewport from a scale and a polygon.
+
+###### Parameters
+
+* `projectedGeoPolygon` (`Array<Array<Point>>`)
+  * A polygon in projected geospatial coordinates.
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected geo coordinates per viewport pixel.
+* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * Optional viewport options. Fit is ignored.
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromSizeAndMaps(viewportSize, maps, viewportOptions)`
+
+Static method that creates a Viewport from a size and maps.
 
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
-* `projectedGeoBbox` (`[number, number, number, number]`)
-  * A projectedGeoBbox.
-* `devicePixelRatio?` (`number | undefined`)
-  * The devicePixelRatio of the viewport.
-* `fit` (`Fit | undefined`)
-  * Whether the viewport should contain or cover the bbox of the warpedMapList.
+* `maps` (`WarpedMapList<W> | Array<WarpedMap>`)
+  * A WarpedMapList or an array of WarpedMaps.
+* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * Optional viewport options
 
 ###### Returns
 
-`Viewport`.
+A new Viewport object (`Viewport`).
 
-* A new Viewport object
+### `Viewport.fromSizeAndPolygon(viewportSize, projectedGeoPolygon, viewportOptions)`
 
-### `Viewport.fromWarpedMapList(viewportSize, warpedMapList, devicePixelRatio, fit, zoom)`
-
-Static method creates that creates a Viewport from a WarpedMapList
+Static method that creates a Viewport from a size and a polygon.
 
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
-* `warpedMapList` (`WarpedMapList<W>`)
-  * A WarpedMapList.
-* `devicePixelRatio?` (`number | undefined`)
-  * The devicePixelRatio of the viewport.
-* `fit` (`Fit | undefined`)
-* `zoom` (`number | undefined`)
+* `projectedGeoPolygon` (`Array<Array<Point>>`)
+  * A polygon in projected geo coordinates.
+* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * Optional viewport options
 
 ###### Returns
 
-`Viewport`.
+A new Viewport object (`Viewport`).
 
-* A new Viewport object
+### `Viewport.mapsToProjectedGeoConvexHull(maps)`
+
+###### Parameters
+
+* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `new WarpedMap(mapId, georeferencedMap, options)`
 
@@ -788,7 +883,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * options
@@ -935,7 +1030,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
+GeoreferencedMap
 ```
 
 ### `WarpedMap#getReferenceScale()`
@@ -1393,14 +1488,6 @@ Array<Point>
 Array<Point>
 ```
 
-### `WarpedMap#resourcePreviousMask`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
 ### `WarpedMap#resourceToProjectedGeoScale`
 
 ###### Type
@@ -1810,7 +1897,7 @@ Adds a georeferenced map to this list
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
 
 ###### Returns
 
@@ -1883,13 +1970,15 @@ There are no parameters.
 ) => Promise<Response>
 ```
 
-### `WarpedMapList#getBbox()`
+### `WarpedMapList#getBbox(mapIds)`
 
 Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
 
+Returns undefined if the list is empty.
+
 ###### Parameters
 
-There are no parameters.
+* `mapIds?` (`Iterable<string> | undefined`)
 
 ###### Returns
 
@@ -1904,6 +1993,20 @@ There are no parameters.
 ###### Returns
 
 `Point | undefined`.
+
+### `WarpedMapList#getConvexHull(mapIds)`
+
+Return the convex hull of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
+
+Returns undefined if the list is empty.
+
+###### Parameters
+
+* `mapIds?` (`Iterable<string> | undefined`)
+
+###### Returns
+
+`Ring | undefined`.
 
 ### `WarpedMapList#getMapIds()`
 
@@ -1945,19 +2048,21 @@ Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
 
 ###### Returns
 
 `Promise<string>`.
 
-### `WarpedMapList#getProjectedBbox()`
+### `WarpedMapList#getProjectedBbox(mapIds)`
 
 Return the bounding box of all visible maps in this list, in projected geospatial coordinates
 
+Returns undefined if the list is empty.
+
 ###### Parameters
 
-There are no parameters.
+* `mapIds?` (`Iterable<string> | undefined`)
 
 ###### Returns
 
@@ -1972,6 +2077,20 @@ There are no parameters.
 ###### Returns
 
 `Point | undefined`.
+
+### `WarpedMapList#getProjectedConvexHull(mapIds)`
+
+Return the convex hull of all visible maps in this list, in projected geospatial coordinates
+
+Returns undefined if the list is empty.
+
+###### Parameters
+
+* `mapIds?` (`Iterable<string> | undefined`)
+
+###### Returns
+
+`Ring | undefined`.
 
 ### `WarpedMapList#getWarpedMap(mapId)`
 
@@ -2090,7 +2209,7 @@ Removes a warped map by its ID
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
 
 ###### Returns
 
@@ -2337,9 +2456,12 @@ There are no parameters.
 
 ### `IntArrayRenderer#render(viewport)`
 
+Render the map for a given viewport.
+
 ###### Parameters
 
 * `viewport` (`Viewport`)
+  * the viewport to render
 
 ###### Returns
 
@@ -2398,11 +2520,16 @@ CanvasRenderingContext2D
 
 `[number, number]`.
 
-### `CanvasRenderer#render()`
+### `CanvasRenderer#render(viewport)`
+
+Render the map for a given viewport.
+
+If no viewport is specified, a viewport is deduced based on the WarpedMapList and canvas width and hight.
 
 ###### Parameters
 
-There are no parameters.
+* `viewport?` (`Viewport | undefined`)
+  * the viewport to render
 
 ###### Returns
 
@@ -2792,7 +2919,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-Viewport | undefined
+any
 ```
 
 ### `WebGL2Renderer#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)`
@@ -2807,11 +2934,14 @@ Viewport | undefined
 
 ### `WebGL2Renderer#render(viewport)`
 
-Render the map for a given viewport
+Render the map for a given viewport.
+
+If no viewport is specified the current viewport is rerendered.
+If no current viewport is known, a viewport is deduced based on the WarpedMapList and canvas width and hight.
 
 ###### Parameters
 
-* `viewport` (`Viewport`)
+* `viewport?` (`any`)
   * the current viewport
 
 ###### Returns
@@ -3332,7 +3462,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`GeoreferencedMap`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context
@@ -4680,454 +4810,35 @@ DebouncedFunc<() => void>
 
 ###### Parameters
 
-* `event` (`Event`)
+* `t` &#x20;
+* `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
 
-###### Returns
+### render
 
-`void`.
+Render the map for a given viewport.
 
-### `WebGL2Renderer#transformationTransitionFrame(now, mapIds)`
+If no viewport is specified the current viewport is rerendered.
+If no current viewport is known, a viewport is deduced based on the WarpedMapList and canvas width and hight.
 
-###### Parameters
+#### Parameters
 
-* `now` (`number`)
-* `mapIds` (`Array<string>`)
+* `t` &#x20;
+* `viewport` **Viewport?** the viewport to render
 
-###### Returns
+### fetch
 
-`void`.
+Fetch the tile and create its ImageData using a WebWorker.
 
-### `WebGL2Renderer#transformationTransitionStart`
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
-###### Type
+# Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
-```ts
-number | undefined
-```
+> > > > > > > b384ff6a (Improve static functions for viewport creation)
 
-### `WebGL2Renderer#updateMapsForViewport(tiles)`
+Fetch the tile and create its ImageData using a WebWorker.
 
-###### Parameters
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
 
-* `tiles` (`Array<FetchableTile>`)
+Fetch the tile and create its ImageData using a WebWorker.
 
-###### Returns
-
-`{mapsEnteringViewport: string[]; mapsLeavingViewport: string[]}`.
-
-### `WebGL2Renderer#warpedMapAdded(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `new WebGL2WarpedMap(mapId, georeferencedMap, gl, mapProgram, linesProgram, pointsProgram, options)`
-
-Creates an instance of WebGL2WarpedMap.
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-  * Georeferenced map used to construct the WarpedMap
-* `gl` (`WebGL2RenderingContext`)
-  * WebGL rendering context
-* `mapProgram` (`WebGLProgram`)
-  * WebGL program for map
-* `linesProgram` (`WebGLProgram`)
-* `pointsProgram` (`WebGLProgram`)
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
-  * WarpedMapOptions
-
-###### Returns
-
-`WebGL2WarpedMap`.
-
-###### Extends
-
-* `TriangulatedWarpedMap`
-
-### `WebGL2WarpedMap#addCachedTileAndUpdateTextures(cachedTile)`
-
-Add cached tile to the textures of this map and update textures
-
-###### Parameters
-
-* `cachedTile` (`CachedTile<ImageData>`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#cachedTilesByTileKey`
-
-###### Type
-
-```ts
-Map<string, CachedTile<ImageData>>
-```
-
-### `WebGL2WarpedMap#cachedTilesByTileUrl`
-
-###### Type
-
-```ts
-Map<string, CachedTile<ImageData>>
-```
-
-### `WebGL2WarpedMap#cachedTilesForTexture`
-
-###### Type
-
-```ts
-Array<never>
-```
-
-### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndDimensionsTexture`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#cachedTilesScaleFactorsTexture`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#cachedTilesTextureArray`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#cancelThrottledFunctions()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#clearTextures()`
-
-Clear textures for this map
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#destroy()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#getCachedTilesAtOtherScaleFactors(tile)`
-
-###### Parameters
-
-* `tile` (`{
-    column: number
-    row: number
-    tileZoomLevel: TileZoomLevel
-    imageSize: Size
-  }`)
-
-###### Returns
-
-`Array<CachedTile<ImageData>>`.
-
-### `WebGL2WarpedMap#gl`
-
-###### Type
-
-```ts
-WebGL2RenderingContext
-```
-
-### `WebGL2WarpedMap#imageId`
-
-###### Type
-
-```ts
-string
-```
-
-### `WebGL2WarpedMap#initializeWebGL(mapProgram, linesProgram, pointsProgram)`
-
-###### Parameters
-
-* `mapProgram` (`WebGLProgram`)
-* `linesProgram` (`WebGLProgram`)
-* `pointsProgram` (`WebGLProgram`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#invertedRenderTransform`
-
-###### Type
-
-```ts
-[number, number, number, number, number, number]
-```
-
-### `WebGL2WarpedMap#lineLayers`
-
-###### Type
-
-```ts
-Array<never>
-```
-
-### `WebGL2WarpedMap#linesProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2WarpedMap#linesVao`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#mapProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2WarpedMap#mapVao`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#opacity`
-
-###### Type
-
-```ts
-DEFAULT_OPACITY
-```
-
-### `WebGL2WarpedMap#parsedImage`
-
-###### Type
-
-```ts
-Image
-```
-
-### `WebGL2WarpedMap#pointLayers`
-
-###### Type
-
-```ts
-Array<never>
-```
-
-### `WebGL2WarpedMap#pointsProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2WarpedMap#pointsVao`
-
-###### Type
-
-```ts
-null
-```
-
-### `WebGL2WarpedMap#previousCachedTilesForTexture`
-
-###### Type
-
-```ts
-Array<never>
-```
-
-### `WebGL2WarpedMap#removeCachedTileAndUpdateTextures(tileUrl)`
-
-Remove cached tile from the textures of this map and update textures
-
-###### Parameters
-
-* `tileUrl` (`string`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#renderOptions`
-
-###### Type
-
-```ts
-any
-```
-
-### `WebGL2WarpedMap#saturation`
-
-###### Type
-
-```ts
-DEFAULT_SATURATION
-```
-
-### `WebGL2WarpedMap#setLineLayers()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#setPointLayers()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#throttledUpdateTextures`
-
-###### Type
-
-```ts
-DebouncedFunc<() => Promise<void>>
-```
-
-### `WebGL2WarpedMap#tileInCachedTiles(tile)`
-
-###### Parameters
-
-* `tile` (`{
-    column: number
-    row: number
-    tileZoomLevel: TileZoomLevel
-    imageSize: Size
-  }`)
-
-###### Returns
-
-`boolean`.
-
-### `WebGL2WarpedMap#tileToCachedTile(tile)`
-
-###### Parameters
-
-* `tile` (`{
-    column: number
-    row: number
-    tileZoomLevel: TileZoomLevel
-    imageSize: Size
-  }`)
-
-###### Returns
-
-`CachedTile<ImageData> | undefined`.
-
-### `WebGL2WarpedMap#updateCachedTilesForTextures()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#updateTextures()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Promise<void>`.
-
-### `WebGL2WarpedMap#updateVertexBuffers(projectedGeoToClipTransform)`
-
-Update the vertex buffers of this warped map
-
-###### Parameters
-
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
-  * Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#updateVertexBuffersLines(projectedGeoToClipTransform)`
-
-###### Parameters
-
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#updateVertexBuffersMap(projectedGeoToClipTransform)`
-
-###### Parameters
-
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2WarpedMap#updateVertexBuffersPoints(projectedGeoToClipTransform)`
-
-###### Parameters
-
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
-
-###### Returns
-
-`void`.
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;

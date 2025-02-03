@@ -47,6 +47,7 @@
     "@allmaps/annotation": "^1.0.0-beta.30",
     "@allmaps/iiif-parser": "^1.0.0-beta.40",
     "@turf/rewind": "^7.2.0",
+    "monotone-chain-convex-hull": "^1.1.0",
     "svg-parser": "^2.0.4"
   },
   "devDependencies": {
