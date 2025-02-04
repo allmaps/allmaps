@@ -8,8 +8,7 @@ import {
   conformPolygon,
   mergeOptions,
   midPoint,
-  triangleAngles,
-  triangleArea
+  triangleAngles
 } from '@allmaps/stdlib'
 
 import Delaunator from 'delaunator'
@@ -38,18 +37,15 @@ export type TriangulationToUnique = {
   uniquePointIndexEdges: TypedLine<number>[]
 }
 
-const MINIMUM_TRIANGLE_AREA = 0
 const MINIMUM_TRIANGLE_ANGLE = 0.01
 
 export type TriangluationOptions = {
   steinerPoints: Point[]
-  minimumTriangleArea: number
   minimumTriangleAngle: number
 }
 
 const defaultTriangulationOptions = {
   steinerPoints: [],
-  minimumTriangleArea: MINIMUM_TRIANGLE_AREA,
   minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
 } as TriangluationOptions
 
@@ -100,7 +96,6 @@ export function triangulateToUnique(
     triangulationOptions
   )
   const steinerPoints = mergedTriangulationOptions.steinerPoints
-  let minimumTriangleArea = mergedTriangulationOptions.minimumTriangleArea
   const minimumTriangleAngle = mergedTriangulationOptions.minimumTriangleAngle
 
   // Conform polygon (this also checks if there are at least 3 points)
@@ -185,15 +180,11 @@ export function triangulateToUnique(
   }
 
   // Check if triangles inside
-  minimumTriangleArea = distance
-    ? distance * distance * minimumTriangleArea
-    : minimumTriangleArea
   const shouldKeep = triangles.map((triangle, index) => {
     // Only keep if inside
     if (shouldClassifyTriangles[index]) {
       return (
         pointInPolygon(midPoint(...triangle), polygon) &&
-        triangleArea(triangle) >= minimumTriangleArea &&
         triangleAngles(triangle).every((angle) => angle >= minimumTriangleAngle)
       )
     } else {

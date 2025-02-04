@@ -7,7 +7,6 @@ If a `distance` parameter is provided, the triangles are well-conditioned and no
 The following options can be passed:
 
 *   `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
-*   `minimumTriangleArea`: The minimum area of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. This is interpreted as an absolute measure if no distance is provided, or a relative measure (relative to the squared distance) otherwise. Default: `0`, i.e. not active.
 *   `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
 
 This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
