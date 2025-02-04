@@ -42,7 +42,7 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 const DEFAULT_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
   minOffsetDistance: 4,
-  maxDepth: 4,
+  maxDepth: 5,
   differentHandedness: true
 } as Partial<TransformOptions>
 
@@ -114,6 +114,7 @@ export function createWarpedMapFactory() {
  * @param projectedGeoBufferedViewportRectangleBboxForViewport - Bbox of the projectedGeoBufferedViewportRectangle
  * @param resourceBufferedViewportRingForViewport - The (buffered) viewport transformed back to resource coordinates, for the current viewport
  * @param resourceBufferedViewportRingBboxForViewport - Bbox of the resourceViewportRing
+ * @param resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport - The intersection of the bbox of the (buffered) viewport transformed back to resource coordinates and the bbox of the resource mask, for the current viewport
  * @param fetchableTilesForViewport - The fetchable tiles for displaying this map, for the current viewport
  * @param overviewFetchableTilesForViewport - The overview fetchable tiles, for the current viewport
  */
@@ -184,6 +185,8 @@ export class WarpedMap extends EventTarget {
 
   resourceBufferedViewportRingForViewport?: Ring
   resourceBufferedViewportRingBboxForViewport?: Bbox
+
+  resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport?: Bbox
 
   fetchableTilesForViewport: FetchableTile[] = []
   overviewFetchableTilesForViewport: FetchableTile[] = []
@@ -442,6 +445,18 @@ export class WarpedMap extends EventTarget {
       resourceBufferedViewportRing
         ? computeBbox(resourceBufferedViewportRing)
         : undefined
+  }
+
+  /**
+   * Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the current viewport
+   *
+   * @param resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+   */
+  setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
+    resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection?: Bbox
+  ) {
+    this.resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport =
+      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
   }
 
   /**

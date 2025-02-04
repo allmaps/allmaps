@@ -85,17 +85,6 @@ Allmaps Standard Library
 
 `[number, number]`.
 
-### `bboxesIntersect(bbox0, bbox1)`
-
-###### Parameters
-
-* `bbox0` (`[number, number, number, number]`)
-* `bbox1` (`[number, number, number, number]`)
-
-###### Returns
-
-`Bbox | undefined`.
-
 ### `bboxesToScale(bbox0, bbox1)`
 
 ###### Parameters
@@ -129,6 +118,36 @@ Allmaps Standard Library
 ###### Returns
 
 `[number, number, number, number]`.
+
+### `closeMultiPolygon(multiPolygon)`
+
+###### Parameters
+
+* `multiPolygon` (`Array<Array<Array<Point>>>`)
+
+###### Returns
+
+`Array<Array<Array<Point>>>`.
+
+### `closePolygon(polygon)`
+
+###### Parameters
+
+* `polygon` (`Array<Array<Point>>`)
+
+###### Returns
+
+`Array<Array<Point>>`.
+
+### `closeRing(ring)`
+
+###### Parameters
+
+* `ring` (`Array<Point>`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `combineBboxes(bboxes)`
 
@@ -688,6 +707,17 @@ Convert hex to RGB
 ###### Returns
 
 RGB, e (`[number, number, number]`).g. \[0, 51, 255]
+
+### `intersectBboxes(bbox0, bbox1)`
+
+###### Parameters
+
+* `bbox0` (`[number, number, number, number]`)
+* `bbox1` (`[number, number, number, number]`)
+
+###### Returns
+
+`Bbox | undefined`.
 
 ### `invertPoint(point)`
 
@@ -1490,6 +1520,20 @@ Example for square rectangles '\*' and '+':
   | GeojsonMultiLineString
   | GeojsonMultiPolygon`.
 
+### `threePointsToAngle(pointA, pointB, pointC)`
+
+Return angle alpha made at point A by points B and C
+
+###### Parameters
+
+* `pointA` (`[number, number]`)
+* `pointB` (`[number, number]`)
+* `pointC` (`[number, number]`)
+
+###### Returns
+
+`number`.
+
 ### `translatePoint(point, translationPoint, addOrSubstract)`
 
 ###### Parameters
@@ -1514,6 +1558,16 @@ Example for square rectangles '\*' and '+':
 
 `Array<Point>`.
 
+### `triangleAngles(triangle)`
+
+###### Parameters
+
+* `triangle` (`[Point, Point, Point]`)
+
+###### Returns
+
+`[number, number, number]`.
+
 ### `triangleArea(triangle)`
 
 ###### Parameters
@@ -1523,6 +1577,36 @@ Example for square rectangles '\*' and '+':
 ###### Returns
 
 `number`.
+
+### `uncloseMultiPolygon(multiPolygon)`
+
+###### Parameters
+
+* `multiPolygon` (`Array<Array<Array<Point>>>`)
+
+###### Returns
+
+`Array<Array<Array<Point>>>`.
+
+### `unclosePolygon(polygon)`
+
+###### Parameters
+
+* `polygon` (`Array<Array<Point>>`)
+
+###### Returns
+
+`Array<Array<Point>>`.
+
+### `uncloseRing(ring)`
+
+###### Parameters
+
+* `ring` (`Array<Point>`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `webMercatorToLonLat(__0)`
 

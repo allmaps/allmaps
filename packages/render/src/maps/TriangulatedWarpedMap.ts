@@ -270,7 +270,11 @@ export class TriangulatedWarpedMap extends WarpedMap {
             uniquePoints,
             uniquePointIndexTriangles,
             uniquePointIndexInterpolatedPolygon
-          } = triangulateToUnique([this.resourceMask], this.resourceResolution)
+          } = triangulateToUnique(
+            [this.resourceMask],
+            this.resourceResolution,
+            { steinerPoints: this.gcps.map((gcp) => gcp.resource) }
+          )
 
           // Extend Triangulation to ProjectedGcpTriangulation
           // By inclusing projectedGeo and distortions

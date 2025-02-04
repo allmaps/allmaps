@@ -2,7 +2,12 @@
 
 This module triangulates a polygon: it returns a set of triangles that partition the polygon.
 
-If a `distance` parameter is provided, the triangles are well-conditioned and generally not larger then `distance`: the triangles are made to follow the polygon, who's edges are interpolated every `distance`, and also a grid of points inside the polygon, spaced `distance` apart.
+If a `distance` parameter is provided, the triangles are well-conditioned and not larger then `distance`: the triangles are made firstly using a grid of points inside the polygon, spaced `distance` apart, with each grid cell resulting in two triangles, and secondly using points along the polygon's edges, by interpolating each edge using `distance`.
+
+The following options can be passed:
+
+* `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
+* `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
 
 This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
 
@@ -54,6 +59,13 @@ const triangles = triangulate(polygon, distance)
 
 ## API
 
+### `TriangluationOptions`
+
+###### Fields
+
+* `minimumTriangleAngle` (`number`)
+* `steinerPoints` (`Array<Point>`)
+
 ### `TriangulationToUnique`
 
 ###### Fields
@@ -68,7 +80,7 @@ const triangles = triangulate(polygon, distance)
 * `uniquePointIndexTriangles` (`Array<TypedTriangle<number>>`)
 * `uniquePoints` (`Array<Point>`)
 
-### `triangulate(polygon, distance, minimumTriangleArea)`
+### `triangulate(polygon, distance, triangulationOptions)`
 
 Triangulate a polygon to triangles smaller then a distance
 
@@ -80,14 +92,14 @@ Grid points are placed inside the polygon to obtain small, well conditioned tria
   * Polygon
 * `distance?` (`number | undefined`)
   * Distance that conditions the triangles
-* `minimumTriangleArea` (`number | undefined`)
-  * Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise
+* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
+  * Triangulation Options.
 
 ###### Returns
 
 Array of triangles partitioning the polygon (`Array<Triangle>`).
 
-### `triangulateToUnique(polygon, distance, minimumTriangleArea)`
+### `triangulateToUnique(polygon, distance, triangulationOptions)`
 
 Triangulate a polygon to triangles smaller then a distance, and return them via unique points.
 
@@ -101,9 +113,28 @@ This function returns the triangulation as an array of unique points, and triang
   * Polygon
 * `distance?` (`number | undefined`)
   * Distance that conditions the triangles
-* `minimumTriangleArea` (`number | undefined`)
-  * Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance \* distance otherwise
+* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
+  * Triangulation Options.
 
 ###### Returns
 
 Triangulation Object with uniquePointIndexTriangles and uniquePoints (`{ interpolatedPolygon: Polygon; interpolatedPolygonPoints: Point[]; gridPoints: Point[]; gridPointsInPolygon: Point[]; uniquePoints: Point[]; triangles: Triangle[]; uniquePointIndexTriangles: TypedTriangle<number>[]; uniquePointIndexInterpolatedPolygon: TypedPolygon<number>; uniquePointIndexEdges: TypedLine<number>[...`).
+
+## Notes
+
+### Stability
+
+* Constrainautor doesn't allow self-intersection polygons and will raise an error for such inputs.
+
+### Benchmark
+
+For a 10 point polygon (with diameter ~ 200), here are some benchmarks for computing the triangulation with given distances:
+
+* `triangulate(polygon, 1000)` (no grid points): 100839 ops/s to compute 8 triangles
+* `triangulate(polygon, 100)`: 87436 ops/s to compute 11 triangles
+* `triangulate(polygon, 10)`: 5447 ops/s to compute 435 triangles
+* `triangulate(polygon, 1)`: 56 ops/s to compute 38352 triangles
+
+See [`./bench/index.js`](`./bench/index.js`).
+
+To run the benchmark, run `npm run bench`.

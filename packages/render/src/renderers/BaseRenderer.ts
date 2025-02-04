@@ -8,15 +8,17 @@ import {
   computeTilesCoveringRingAtTileZoomLevel,
   getTilesResolution,
   getTilesAtScaleFactor,
-  getTileZoomLevelResolution
+  getTileZoomLevelResolution,
+  squaredDistanceTileToPoint
 } from '../shared/tiles.js'
 
 import {
-  bboxToDiameter,
   bboxToCenter,
   computeBbox,
   webMercatorToLonLat,
-  squaredDistance
+  squaredDistance,
+  intersectBboxes,
+  bboxToRectangle
 } from '@allmaps/stdlib'
 
 import type { Viewport } from '../viewport/Viewport.js'
@@ -27,8 +29,6 @@ import type {
   RendererOptions,
   MapPruneInfo
 } from '../shared/types.js'
-
-const MIN_VIEWPORT_DIAMETER = 5
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -264,15 +264,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    // Only draw maps that are larger than MIN_VIEWPORT_DIAMETER pixels are returned
-    // Note that diameter is equivalent to geometryToDiameter(warpedMap.projectedGeoMask) / this.viewport.projectedGeoPerViewportScale
-    if (
-      bboxToDiameter(warpedMap.getViewportMaskBbox(viewport)) <
-      MIN_VIEWPORT_DIAMETER
-    ) {
-      return []
-    }
-
     // Find TileZoomLevel for the current viewport
     // Note the equivalence of the following two:
     // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
@@ -311,20 +302,57 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     warpedMap.setResourceBufferedViewportRingForViewport(
       resourceBufferedViewportRing
     )
+    // Assure variables exist on warpedMap, that should be computed by the setters above
+    if (
+      !warpedMap.resourceBufferedViewportRingBboxForViewport ||
+      !warpedMap.resourceBufferedViewportRingBboxForViewport
+    ) {
+      throw new Error(
+        'No resourceBufferedViewportRingBboxForViewport or resourceBufferedViewportRingBboxForViewport'
+      )
+    }
 
-    // If this map it ourside of the viewport with request buffer, stop here:
+    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource mask
+    const resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection =
+      intersectBboxes(
+        warpedMap.resourceBufferedViewportRingBboxForViewport,
+        warpedMap.resourceMaskBbox
+      )
+    warpedMap.setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
+      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+    )
+
+    // If this map it outside of the viewport with request buffer, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
     if (!mapsInViewportForRequest.has(mapId)) {
       return []
     }
 
-    // Find tiles covering this back-transformed viewport
-    // This returns tiles sorted by distance from center of resourceViewportRing
+    // If the intersection of the bboxes is undefined, we don't need to compute any tiles.
+    // This should in general only happen if the previous check also returned false.
+    if (!resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection) {
+      return []
+    }
+
+    // Find tiles covering this intersection of bboxes of to-resource-back-transformed viewport and mask
+    // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
     const tiles = computeTilesCoveringRingAtTileZoomLevel(
-      resourceBufferedViewportRing,
+      bboxToRectangle(
+        resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+      ),
       tileZoomLevel,
       [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
+    )
+
+    // Sort tiles to load in order of their distance to viewport center
+    const resourceBufferedViewportRingCenter = bboxToCenter(
+      warpedMap.resourceBufferedViewportRingBboxForViewport
+    )
+    tiles.sort(
+      (tileA, tileB) =>
+        squaredDistanceTileToPoint(tileA, resourceBufferedViewportRingCenter) -
+        squaredDistanceTileToPoint(tileB, resourceBufferedViewportRingCenter)
     )
 
     // Make fetchable tiles

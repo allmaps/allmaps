@@ -34,16 +34,10 @@ export function isPoint(input: unknown): input is Point {
 
 export function isLineString(input: unknown): input is LineString {
   return Array.isArray(input) && input.every(isPoint)
-  // && !isClosed(input) // Possible addition if we want to check for closedness
 }
 
-// TODO: check if we keep Ring as unclosed.
-// This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
 export function isRing(input: unknown): input is Ring {
-  return (
-    Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
-  )
+  return Array.isArray(input) && input.every(isPoint)
 }
 
 export function isPolygon(input: unknown): input is Polygon {
@@ -73,6 +67,33 @@ export function isGeometry(input: unknown): input is Geometry {
   )
 }
 
+// Close
+
+export function closeRing(ring: Ring): Ring {
+  return [...ring, ring[0]]
+}
+
+export function uncloseRing(ring: Ring): Ring {
+  ring.splice(-1)
+  return ring
+}
+
+export function closePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => closeRing(ring))
+}
+
+export function unclosePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => uncloseRing(ring))
+}
+
+export function closeMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => closePolygon(polygon))
+}
+
+export function uncloseMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => unclosePolygon(polygon))
+}
+
 // Conform
 
 export function conformLineString(lineString: LineString): LineString {
@@ -95,7 +116,7 @@ export function conformRing(ring: Ring): Ring {
 
   // Remove last point if input is closed ring
   if (isClosed(ring)) {
-    ring.splice(-1)
+    uncloseRing(ring)
   }
 
   if (ring.length < 3) {
@@ -141,7 +162,7 @@ export function lineStringToGeojsonLineString(
 export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close ? [[...ring, ring[0]]] : [ring]
+    coordinates: close ? [closeRing(ring)] : [ring]
   }
   return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
@@ -152,11 +173,7 @@ export function polygonToGeojsonPolygon(
 ): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close
-      ? polygon.map((ring) => {
-          return [...ring, ring[0]]
-        })
-      : polygon
+    coordinates: close ? closePolygon(polygon) : polygon
   }
 
   return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
@@ -186,13 +203,7 @@ export function multiPolygonToGeojsonMultiPolygon(
 ): GeojsonMultiPolygon {
   const geometry = {
     type: 'MultiPolygon',
-    coordinates: close
-      ? multiPolygon.map((polygon) =>
-          polygon.map((ring) => {
-            return [...ring, ring[0]]
-          })
-        )
-      : multiPolygon
+    coordinates: close ? closeMultiPolygon(multiPolygon) : multiPolygon
   }
 
   return rewind(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
@@ -508,4 +519,26 @@ export function rotatePoints(
   return points.map((point) =>
     rotatePoint(point, angle, anchor, cosAngle, sinAngle)
   )
+}
+
+export function triangleAngles(triangle: Triangle): [number, number, number] {
+  return [
+    threePointsToAngle(triangle[0], triangle[1], triangle[2]),
+    threePointsToAngle(triangle[1], triangle[2], triangle[0]),
+    threePointsToAngle(triangle[2], triangle[0], triangle[1])
+  ]
+}
+
+/**
+ * Return angle alpha made at point A by points B and C
+ */
+export function threePointsToAngle(
+  pointA: Point,
+  pointB: Point,
+  pointC: Point
+): number {
+  const AB = distance(pointA, pointB)
+  const BC = distance(pointB, pointC)
+  const AC = distance(pointA, pointC)
+  return Math.acos((AB ** 2 + AC ** 2 - BC ** 2) / (2 * AB * AC))
 }

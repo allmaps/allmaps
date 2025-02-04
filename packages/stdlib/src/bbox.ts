@@ -1,7 +1,7 @@
 import monotoneChainConvexHull from 'monotone-chain-convex-hull'
 
 import { isGeojsonGeometry, geojsonGeometryToGeometry } from './geojson.js'
-import { isPoint, isPolygon, distance } from './geometry.js'
+import { isPoint, isPolygon, isMultiPolygon, distance } from './geometry.js'
 
 import type {
   Point,
@@ -43,6 +43,9 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
   if (isPolygon(points)) {
     points = points.flat()
   }
+  if (isMultiPolygon(points)) {
+    points = points.flat()
+  }
   if (isGeojsonGeometry(points)) {
     return computeBbox(geojsonGeometryToGeometry(points))
   }
@@ -82,7 +85,7 @@ export function doBboxesIntersect(bbox0: Bbox, bbox1: Bbox): boolean {
   return isOverlappingInX && isOverlappingInY
 }
 
-export function bboxesIntersect(bbox0: Bbox, bbox1: Bbox): Bbox | undefined {
+export function intersectBboxes(bbox0: Bbox, bbox1: Bbox): Bbox | undefined {
   const minX = Math.max(bbox0[0], bbox1[0])
   const maxX = Math.min(bbox0[2], bbox1[2])
   const minY = Math.max(bbox0[1], bbox1[1])

@@ -6,8 +6,9 @@ import {
 import {
   computeBbox,
   conformPolygon,
+  mergeOptions,
   midPoint,
-  triangleArea
+  triangleAngles
 } from '@allmaps/stdlib'
 
 import Delaunator from 'delaunator'
@@ -37,7 +38,17 @@ export type TriangulationToUnique = {
   uniquePointIndexEdges: TypedLine<number>[]
 }
 
-const EPSILON = 0.001
+const MINIMUM_TRIANGLE_ANGLE = 0.01
+
+export type TriangluationOptions = {
+  steinerPoints: Point[]
+  minimumTriangleAngle: number
+}
+
+const defaultTriangulationOptions = {
+  steinerPoints: [],
+  minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
+} as TriangluationOptions
 
 /**
  * Triangulate a polygon to triangles smaller then a distance
@@ -46,19 +57,19 @@ const EPSILON = 0.001
  *
  * @param polygon - Polygon
  * @param distance - Distance that conditions the triangles
- * @param minimumTriangleArea - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @param triangulationOptions - Triangulation Options.
  * @returns Array of triangles partitioning the polygon
  */
 export function triangulate(
   polygon: Polygon,
   distance?: number,
-  minimumTriangleArea = EPSILON
+  triangulationOptions?: Partial<TriangluationOptions>
 ): Triangle[] {
   {
     const { triangles } = triangulateToUnique(
       polygon,
       distance,
-      minimumTriangleArea
+      triangulationOptions
     )
     return triangles
   }
@@ -73,14 +84,21 @@ export function triangulate(
  *
  * @param polygon - Polygon
  * @param distance - Distance that conditions the triangles
- * @param minimumTriangleArea - Minimum area of the resulting triangles (filters out slivers), absolute if no distance provided, relative to distance * distance otherwise
+ * @param triangulationOptions - Triangulation Options.
  * @returns Triangulation Object with uniquePointIndexTriangles and uniquePoints
  */
 export function triangulateToUnique(
   polygon: Polygon,
   distance?: number,
-  minimumTriangleArea = EPSILON
+  triangulationOptions?: Partial<TriangluationOptions>
 ): TriangulationToUnique {
+  const mergedTriangulationOptions = mergeOptions(
+    defaultTriangulationOptions,
+    triangulationOptions
+  )
+  const steinerPoints = mergedTriangulationOptions.steinerPoints
+  const minimumTriangleAngle = mergedTriangulationOptions.minimumTriangleAngle
+
   // Conform polygon (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
 
@@ -102,7 +120,14 @@ export function triangulateToUnique(
     interpolatedPolygon = polygon
     interpolatedPolygonPoints = polygon.flat()
   }
-  const uniquePoints = [...interpolatedPolygonPoints, ...gridPointsInPolygon]
+  const steinerPointsInPolygon = steinerPoints.filter((point) =>
+    pointInPolygon(point, polygon)
+  )
+  const uniquePoints = [
+    ...interpolatedPolygonPoints,
+    ...gridPointsInPolygon,
+    ...steinerPointsInPolygon
+  ]
 
   // Initialize Delaunay triangulation from polygon + grid points
   const delautator = new Delaunator(uniquePoints.flat())
@@ -142,6 +167,7 @@ export function triangulateToUnique(
       uniquePoints[constrainautor.del.triangles[i + 1]],
       uniquePoints[constrainautor.del.triangles[i + 2]]
     ])
+    // Only classify triangles if they are along the border
     shouldClassifyTriangles.push(
       constrainautor.del.triangles[i] < interpolatedPolygonPoints.length ||
         constrainautor.del.triangles[i + 1] <
@@ -151,24 +177,21 @@ export function triangulateToUnique(
   }
 
   // Check if triangles inside
-  minimumTriangleArea = distance
-    ? distance * distance * minimumTriangleArea
-    : minimumTriangleArea
-  const classifications = triangles.map((triangle, index) => {
+  const shouldKeep = triangles.map((triangle, index) => {
     // Only keep if inside
     if (shouldClassifyTriangles[index]) {
       return (
         pointInPolygon(midPoint(...triangle), polygon) &&
-        triangleArea(triangle) > minimumTriangleArea
+        triangleAngles(triangle).every((angle) => angle >= minimumTriangleAngle)
       )
     } else {
       return true
     }
   })
   uniquePointIndexTriangles = uniquePointIndexTriangles.filter(
-    (_triangle, index) => classifications[index]
+    (_triangle, index) => shouldKeep[index]
   )
-  triangles = triangles.filter((_triangle, index) => classifications[index])
+  triangles = triangles.filter((_triangle, index) => shouldKeep[index])
 
   // Fill in edges using unique
   const edges: Line[] = []

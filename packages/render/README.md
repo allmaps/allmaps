@@ -239,7 +239,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * Options
@@ -883,7 +883,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * options
@@ -1030,7 +1030,7 @@ Array<Point>
 ###### Type
 
 ```ts
-GeoreferencedMap
+{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
 ```
 
 ### `WarpedMap#getReferenceScale()`
@@ -1416,6 +1416,14 @@ There are no parameters.
 
 `void`.
 
+### `WarpedMap#resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport?`
+
+###### Type
+
+```ts
+[number, number, number, number]
+```
+
 ### `WarpedMap#resourceBufferedViewportRingBboxForViewport?`
 
 ###### Type
@@ -1565,6 +1573,18 @@ Set projectedGeoBufferedViewportRectangle for the current viewport
 ###### Parameters
 
 * `projectedGeoBufferedViewportRectangle?` (`Rectangle | undefined`)
+
+###### Returns
+
+`void`.
+
+### `WarpedMap#setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection)`
+
+Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the current viewport
+
+###### Parameters
+
+* `resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection?` (`Bbox | undefined`)
 
 ###### Returns
 
@@ -1754,6 +1774,16 @@ There are no parameters.
 
 `void`.
 
+### `WarpedMap#updateResourceFullMaskProperties()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `WarpedMap#updateResourceMaskProperties()`
 
 ###### Parameters
@@ -1897,7 +1927,7 @@ Adds a georeferenced map to this list
 
 ###### Parameters
 
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2048,7 +2078,7 @@ Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 ###### Parameters
 
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2209,7 +2239,7 @@ Removes a warped map by its ID
 
 ###### Parameters
 
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2919,7 +2949,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-any
+Viewport | undefined
 ```
 
 ### `WebGL2Renderer#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)`
@@ -2941,7 +2971,7 @@ If no current viewport is known, a viewport is deduced based on the WarpedMapLis
 
 ###### Parameters
 
-* `viewport?` (`any`)
+* `viewport?` (`Viewport | undefined`)
   * the current viewport
 
 ###### Returns
@@ -3462,7 +3492,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`GeoreferencedMap`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context

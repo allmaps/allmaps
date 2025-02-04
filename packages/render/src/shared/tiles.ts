@@ -1,6 +1,4 @@
 import {
-  computeBbox,
-  bboxToCenter,
   distance,
   doBboxesIntersect,
   bufferBboxByRatio,
@@ -106,14 +104,6 @@ export function computeTilesCoveringRingAtTileZoomLevel(
   const tilesByColumn = ringToTilesByColumn(scaledResourceRing)
   const tiles = tilesByColumnToTiles(tilesByColumn, tileZoomLevel, imageSize)
 
-  // Sort tiles to load tiles in order of their distance to center
-  const resourceRingCenter = bboxToCenter(computeBbox(resourceRing))
-  tiles.sort(
-    (tileA, tileB) =>
-      squaredDistanceTileToPoint(tileA, resourceRingCenter) -
-      squaredDistanceTileToPoint(tileB, resourceRingCenter)
-  )
-
   return tiles
 }
 
@@ -132,9 +122,9 @@ function ringToTilesByColumn(ring: Ring) {
   const tilesByColumn: TileByColumn = {}
   for (let i = 0; i < ring.length; i++) {
     const line: Line = [ring[i], ring[(i + 1) % ring.length]]
-    const points = pointsIntersectingLine(line)
+    const pixels = lineToPixels(line)
 
-    points.forEach(([x, y]) => {
+    pixels.forEach(([x, y]) => {
       if (!tilesByColumn[x]) {
         tilesByColumn[x] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]
       }
@@ -152,48 +142,58 @@ function ringToTilesByColumn(ring: Ring) {
   return tilesByColumn
 }
 
-function pointsIntersectingLine([a, b]: Line): Point[] {
+function lineToPixels([startPoint, endPoint]: Line): Point[] {
   // From:
   //  https://github.com/vHawk/tiles-intersect
   // See also:
   //  https://www.redblobgames.com/grids/line-drawing.html
 
-  let x = Math.floor(a[0])
-  let y = Math.floor(a[1])
-  const endX = Math.floor(b[0])
-  const endY = Math.floor(b[1])
+  // Start and end pixel coordinates
+  let startPixelX = Math.floor(startPoint[0])
+  let startPixelY = Math.floor(startPoint[1])
+  const endPixelX = Math.floor(endPoint[0])
+  const endPixelY = Math.floor(endPoint[1])
 
-  const points: Point[] = [[x, y]]
+  const points: Point[] = [[startPixelX, startPixelY]]
 
-  if (x === endX && y === endY) {
+  if (startPixelX === endPixelX && startPixelY === endPixelY) {
     return points
   }
 
-  const stepX = Math.sign(b[0] - a[0])
-  const stepY = Math.sign(b[1] - a[1])
+  // The pixel step: 1, 0 or -1
+  const stepX = Math.sign(endPoint[0] - startPoint[0])
+  const stepY = Math.sign(endPoint[1] - startPoint[1])
 
-  const toX = Math.abs(a[0] - x - Math.max(0, stepX))
-  const toY = Math.abs(a[1] - y - Math.max(0, stepY))
+  // The rest in the first pixel before reaching the next one
+  const restX = Math.abs(startPoint[0] - startPixelX - Math.max(0, stepX))
+  const restY = Math.abs(startPoint[1] - startPixelY - Math.max(0, stepY))
 
-  const vX = Math.abs(a[0] - b[0])
-  const vY = Math.abs(a[1] - b[1])
+  // The distance
+  const distanceX = Math.abs(startPoint[0] - endPoint[0])
+  const distanceY = Math.abs(startPoint[1] - endPoint[1])
 
-  let tMaxX = toX / vX
-  let tMaxY = toY / vY
+  // The relative rest
+  let restPerStepX = restX / distanceX
+  let restPerStepY = restY / distanceY
 
-  const tDeltaX = 1 / vX
-  const tDeltaY = 1 / vY
+  // The delta
+  const onePerStepX = 1 / distanceX
+  const onePerStepY = 1 / distanceY
 
-  while (!(x === endX && y === endY)) {
-    if (tMaxX < tMaxY) {
-      tMaxX = tMaxX + tDeltaX
-      x = x + stepX
+  while (!(startPixelX === endPixelX && startPixelY === endPixelY)) {
+    if (distanceY === 0) {
+      startPixelX = startPixelX + stepX
+    } else if (distanceX === 0) {
+      startPixelY = startPixelY + stepY
+    } else if (restPerStepX < restPerStepY) {
+      restPerStepX = restPerStepX + onePerStepX
+      startPixelX = startPixelX + stepX
     } else {
-      tMaxY = tMaxY + tDeltaY
-      y = y + stepY
+      restPerStepY = restPerStepY + onePerStepY
+      startPixelY = startPixelY + stepY
     }
 
-    points.push([x, y])
+    points.push([startPixelX, startPixelY])
   }
 
   return points

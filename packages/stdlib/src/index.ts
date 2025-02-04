@@ -12,7 +12,7 @@ export {
   computeBbox,
   combineBboxes,
   doBboxesIntersect,
-  bboxesIntersect,
+  intersectBboxes,
   pointInBbox,
   bufferBbox,
   bufferBboxByRatio,
@@ -91,6 +91,12 @@ export {
   isMultiLineString,
   isMultiPolygon,
   isGeometry,
+  closeRing,
+  uncloseRing,
+  closePolygon,
+  unclosePolygon,
+  closeMultiPolygon,
+  uncloseMultiPolygon,
   conformLineString,
   conformRing,
   conformPolygon,
@@ -130,7 +136,9 @@ export {
   translatePoint,
   translatePoints,
   rotatePoint,
-  rotatePoints
+  rotatePoints,
+  triangleAngles,
+  threePointsToAngle
 } from './geometry.js'
 
 export {
