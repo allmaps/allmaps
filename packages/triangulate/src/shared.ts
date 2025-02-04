@@ -4,7 +4,8 @@ import {
   distance,
   stepDistanceAngle,
   lineAngle,
-  closeRing
+  closeRing,
+  conformRing
 } from '@allmaps/stdlib'
 
 import type {
@@ -25,12 +26,9 @@ function interpolateLine(line: Line, dist: number): LineString {
   const angle = lineAngle(line)
 
   let currentPoint = line[0]
-  const result = [currentPoint]
+  let result = [currentPoint]
 
-  // TODO: figure out why this is giving an error "Constraining edge exited the hull"
-  // when using "step <= steps" as intended. Using "<" instead gives
-  // larger triangle along all but one edges.
-  for (let step = 1; step < steps; step++) {
+  for (let step = 1; step <= steps; step++) {
     currentPoint = stepDistanceAngle(currentPoint, dist, angle)
     result.push(currentPoint)
   }
@@ -48,6 +46,12 @@ export function interpolateRing(ring: Ring, dist: number): Ring {
   for (let i = 0; i < ring.length - 1; i++) {
     result = result.concat(interpolateLine([ring[i], ring[i + 1]], dist))
   }
+
+  // Note: rounding resulting points to prevent error "Constraining edge intersects point" at small distances
+  result = result.map((point) => [Math.round(point[0]), Math.round(point[1])])
+  // And filter out possible duplicates due to rounding
+  result = conformRing(result)
+
   return result
 }
 

@@ -107,11 +107,7 @@ export function triangulateToUnique(
   let gridPointsInPolygon: Point[] = []
   if (distance) {
     // Interpolate polygon
-    // Note: rounding interpolated points to
-    // prevent error "Constraining edge intersects point" at small distances
-    interpolatedPolygon = interpolatePolygon(polygon, distance).map((ring) =>
-      ring.map((point) => [Math.round(point[0]), Math.round(point[1])])
-    )
+    interpolatedPolygon = interpolatePolygon(polygon, distance)
     interpolatedPolygonPoints = interpolatedPolygon.flat()
 
     // Add grid points inside the polygon
