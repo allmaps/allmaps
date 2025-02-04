@@ -3,10 +3,6 @@
 precision highp float;
 precision highp isampler2D;
 
-// Color mixing from Spectral.js to be used in distortion.frag
-// Note: not including this for now since spectal_mix() appears to be slower then mix()
-// #include ../spectral.frag;
-
 #include ../helpers.frag;
 
 uniform float u_debug;
