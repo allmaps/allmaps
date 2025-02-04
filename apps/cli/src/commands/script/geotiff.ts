@@ -5,6 +5,7 @@ import path from 'path'
 
 import { GcpTransformer } from '@allmaps/transform'
 import { generateId } from '@allmaps/id'
+import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
 import {
   addTransformationOptions,
@@ -96,17 +97,18 @@ export function geotiff() {
       }
 
       const transformer = new GcpTransformer(gcps, transformationType)
-      const polygon = transformer.transformForwardAsGeojson(
+      const polygon = transformer.transformForward(
         [map.resourceMask],
         transformOptions
       )
+      const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       const gdalwarpScript = gdalwarp(
         imageFilename,
         basename,
         options.outputDir,
         gcps,
-        polygon,
+        geojsonPolygon,
         transformationType,
         options.crs,
         Number(options.jpgQuality)

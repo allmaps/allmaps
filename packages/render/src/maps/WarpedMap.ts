@@ -23,7 +23,6 @@ import type {
   Ring,
   Rectangle,
   Bbox,
-  GeojsonPolygon,
   FetchFn,
   ImageInformations,
   TileZoomLevel
@@ -158,10 +157,10 @@ export class WarpedMap extends EventTarget {
     GcpTransformer
   >
 
-  geoMask!: GeojsonPolygon
+  geoMask!: Ring
   geoMaskBbox!: Bbox
   geoMaskRectangle!: Rectangle
-  geoFullMask!: GeojsonPolygon
+  geoFullMask!: Ring
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
 
@@ -346,11 +345,9 @@ export class WarpedMap extends EventTarget {
           DEFAULT_TRANSFORMER_OPTIONS
         )
     )
-    if (!projectedHelmertTransformer.forwardTransformation) {
-      projectedHelmertTransformer.createForwardTransformation()
-    }
-    return (projectedHelmertTransformer.forwardTransformation as Helmert)
-      .scale as number
+    const forwardHelmertTransformation =
+      projectedHelmertTransformer.createForwardTransformation() as Helmert
+    return forwardHelmertTransformation.scale as number
   }
 
   /**
@@ -663,7 +660,7 @@ export class WarpedMap extends EventTarget {
   }
 
   private updateGeoMask(): void {
-    this.geoMask = this.transformer.transformToGeoAsGeojson([this.resourceMask])
+    this.geoMask = this.transformer.transformToGeo([this.resourceMask])[0]
     this.geoMaskBbox = computeBbox(this.geoMask)
     this.geoMaskRectangle = this.transformer.transformToGeo(
       [this.resourceMaskRectangle],
@@ -672,9 +669,9 @@ export class WarpedMap extends EventTarget {
   }
 
   private updateFullGeoMask(): void {
-    this.geoFullMask = this.transformer.transformToGeoAsGeojson([
+    this.geoFullMask = this.transformer.transformToGeo([
       this.resourceFullMask
-    ])
+    ])[0]
     this.geoFullMaskBbox = computeBbox(this.geoFullMask)
     this.geoFullMaskRectangle = this.transformer.transformToGeo(
       [this.resourceFullMaskRectangle],

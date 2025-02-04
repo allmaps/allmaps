@@ -5,30 +5,16 @@ import {
   isMultiPoint,
   isMultiLineString,
   isMultiPolygon,
-  isGeojsonPoint,
-  isGeojsonLineString,
-  isGeojsonPolygon,
-  isGeojsonMultiPoint,
-  isGeojsonMultiLineString,
-  isGeojsonMultiPolygon,
-  pointToGeojsonPoint,
-  lineStringToGeojsonLineString,
-  polygonToGeojsonPolygon,
-  geojsonPointToPoint,
-  geojsonLineStringToLineString,
-  geojsonPolygonToPolygon,
-  geometriesToFeatureCollection,
-  featureCollectionToGeometries,
+  geojsonGeometriesToGeojsonFeatureCollection,
+  geojsonFeatureCollectionToGeojsonGeometries,
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
-  expandGeojsonMultiPointToGeojsonPointArray,
-  expandGeojsonMultiLineStringToGeojsonLineStringArray,
-  expandGeojsonMultiPolygonToGeojsonPolygonArray,
-  joinGeojsonPointArrayToGeojsonMultiPoint,
-  joinGeojsonLineStringArrayToGeojsonMultiLineString,
-  joinGeojsonPolygonArrayToGeojsonMultiPolygon,
   flipY,
-  mergeOptions
+  mergeOptions,
+  geometryToGeojsonGeometry,
+  svgGeometryToGeometry,
+  geojsonGeometryToGeometry,
+  geometryToSvgGeometry
 } from '@allmaps/stdlib'
 
 import { Transformation } from './transformation.js'
@@ -44,13 +30,23 @@ import { euclideanNorm } from './shared/norm-functions.js'
 
 import {
   defaultTransformOptions,
-  transformLineStringForwardToLineString,
-  transformLineStringBackwardToLineString,
-  transformPolygonForwardToPolygon,
-  transformPolygonBackwardToPolygon
+  transformPointForward,
+  transformPointBackward,
+  transformLineStringForward,
+  transformLineStringBackward,
+  transformPolygonForward,
+  transformPolygonBackward
 } from './shared/transform-helper-functions.js'
+import {
+  generalGcpToPointForForward,
+  generalGcpToPointForBackward,
+  gcpToPointForToGeo,
+  gcpToPointForToResource,
+  generalGcpToGcp
+} from './shared/conversion-functions.js'
 
 import type {
+  Gcp,
   Point,
   LineString,
   Polygon,
@@ -58,20 +54,29 @@ import type {
   MultiLineString,
   MultiPolygon,
   Geometry,
-  Gcp,
-  GeojsonPoint,
-  GeojsonLineString,
-  GeojsonPolygon,
-  GeojsonMultiPoint,
-  GeojsonMultiLineString,
-  GeojsonMultiPolygon,
+  TypedLineString,
+  TypedPolygon,
+  TypedMultiPoint,
+  TypedMultiLineString,
+  TypedMultiPolygon,
+  TypedGeometry,
   GeojsonGeometry,
   GeojsonFeatureCollection,
-  SvgGeometry
+  SvgGeometry,
+  SvgCircle,
+  SvgLine,
+  SvgPolyLine,
+  SvgRect,
+  SvgPolygon,
+  GeojsonPoint,
+  GeojsonLineString,
+  GeojsonPolygon
 } from '@allmaps/types'
 
 import type {
   GeneralGcp,
+  GeneralGcpAndDistortions,
+  GcpAndDistortions,
   TransformationType,
   TransformOptions
 } from './shared/types.js'
@@ -127,7 +132,9 @@ export class GcpTransformer {
   createForwardTransformation(): Transformation {
     if (!this.forwardTransformation) {
       this.forwardTransformation = this.computeTransformation(
-        this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
+        this.sourcePoints.map((point) =>
+          this.options?.differentHandedness ? flipY(point) : point
+        ),
         this.destinationPoints
       )
     }
@@ -141,866 +148,521 @@ export class GcpTransformer {
     if (!this.backwardTransformation) {
       this.backwardTransformation = this.computeTransformation(
         this.destinationPoints,
-        this.sourcePoints.map((point) => this.assureEqualHandedness(point))
+        this.sourcePoints.map((point) =>
+          this.options?.differentHandedness ? flipY(point) : point
+        )
       )
     }
     return this.backwardTransformation
   }
 
-  // Base functions
-  transformForward(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): Point
-  transformForward(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): LineString
-  transformForward(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): Polygon
-  transformForward(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): MultiPoint
-  transformForward(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): MultiLineString
-  transformForward(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): MultiPolygon
+  transformForward<P = Point>(
+    point: Point,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): P
+  transformForward<P = Point>(
+    lineString: LineString,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedLineString<P>
+  transformForward<P = Point>(
+    polygon: Polygon,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedPolygon<P>
+  transformForward<P = Point>(
+    multiPoint: MultiPoint,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiPoint<P>
+  transformForward<P = Point>(
+    multiLineString: MultiLineString,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiLineString<P>
+  transformForward<P = Point>(
+    multiPolygon: MultiPolygon,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiPolygon<P>
+  transformForward<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedGeometry<P>
   /**
-   * Transforms a Geometry or a GeoJSON geometry forward to a Geometry
-   * @param input - Geometry or GeoJSON geometry to transform
+   * Transforms a Geometry forward
+   * @param geometry - Geometry to transform
    * @param options - Transform options
-   * @returns Forward transform of input as Geometry
+   * @returns Forward transform of input geometry
    */
-  transformForward(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): Geometry {
+  transformForward<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    generalGcpToP: (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P = generalGcpToPointForForward as (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P
+  ): TypedGeometry<P> {
     const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        const forwardTransformation = this.createForwardTransformation()
-
-        return forwardTransformation.evaluate(
-          this.assureEqualHandedness(input),
-          mergedOptions.evaluationType
-        )
-      } else if (isGeojsonPoint(input)) {
-        return this.transformForward(geojsonPointToPoint(input), mergedOptions)
-      } else if (isLineString(input)) {
-        return transformLineStringForwardToLineString(
-          input,
+    if (!mergedOptions.isMultiGeometry) {
+      if (isPoint(geometry)) {
+        this.createForwardTransformation()
+        return transformPointForward(
+          geometry,
           this,
-          mergedOptions
+          mergedOptions,
+          generalGcpToP
         )
-      } else if (isGeojsonLineString(input)) {
-        return transformLineStringForwardToLineString(
-          geojsonLineStringToLineString(input),
+      } else if (isLineString(geometry)) {
+        return transformLineStringForward(
+          geometry,
           this,
-          mergeOptions(mergedOptions, {
-            sourceIsGeographic: true
-          })
+          mergedOptions,
+          generalGcpToP
         )
-      } else if (isPolygon(input)) {
-        return transformPolygonForwardToPolygon(input, this, mergedOptions)
-      } else if (isGeojsonPolygon(input)) {
-        return transformPolygonForwardToPolygon(
-          geojsonPolygonToPolygon(input),
+      } else if (isPolygon(geometry)) {
+        return transformPolygonForward(
+          geometry,
           this,
-          mergeOptions(mergedOptions, {
-            sourceIsGeographic: true
-          })
+          mergedOptions,
+          generalGcpToP
         )
+      } else {
+        throw new Error('Geometry type not supported')
       }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return input.map((element) => this.transformForward(element, options))
-    } else if (isGeojsonMultiPoint(input)) {
-      return expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
-        this.transformForward(element, options)
-      )
-    } else if (isMultiLineString(input)) {
-      return input.map((element) => this.transformForward(element, options))
-    } else if (isGeojsonMultiLineString(input)) {
-      return expandGeojsonMultiLineStringToGeojsonLineStringArray(input).map(
-        (element) => this.transformForward(element, options)
-      )
-    } else if (isMultiPolygon(input)) {
-      return input.map((element) => this.transformForward(element, options))
-    } else if (isGeojsonMultiPolygon(input)) {
-      return expandGeojsonMultiPolygonToGeojsonPolygonArray(input).map(
-        (element) => this.transformForward(element, options)
-      )
     } else {
-      throw new Error('Input type not supported')
+      if (options) {
+        options.isMultiGeometry = false // false for piecewise single geometries
+      }
+      if (isMultiPoint(geometry)) {
+        return geometry.map((element) =>
+          this.transformForward(element, options, generalGcpToP)
+        )
+      } else if (isMultiLineString(geometry)) {
+        return geometry.map((element) =>
+          this.transformForward(element, options, generalGcpToP)
+        )
+      } else if (isMultiPolygon(geometry)) {
+        return geometry.map((element) =>
+          this.transformForward(element, options, generalGcpToP)
+        )
+      } else {
+        throw new Error('Geometry type not supported')
+      }
     }
   }
 
-  transformForwardAsGeojson(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonPoint
-  transformForwardAsGeojson(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonLineString
-  transformForwardAsGeojson(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonPolygon
-  transformForwardAsGeojson(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPoint
-  transformForwardAsGeojson(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiLineString
-  transformForwardAsGeojson(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPolygon
+  transformBackward<P = Point>(
+    point: Point,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): P
+  transformBackward<P = Point>(
+    lineString: LineString,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedLineString<P>
+  transformBackward<P = Point>(
+    polygon: Polygon,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedPolygon<P>
+  transformBackward<P = Point>(
+    multiPoint: MultiPoint,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiPoint<P>
+  transformBackward<P = Point>(
+    multiLineString: MultiLineString,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiLineString<P>
+  transformBackward<P = Point>(
+    multiPolygon: MultiPolygon,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedMultiPolygon<P>
+  transformBackward<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
+  ): TypedGeometry<P>
   /**
-   * Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
-   * @param input - Geometry or GeoJSON geometry to transform
+   * Transforms a Geometry backward
+   * @param geometry - Geometry to transform
    * @param options - Transform options
-   * @returns Forward transform of input, as GeoJSON geometry
+   * @returns Backward transform of input geometry
    */
-  transformForwardAsGeojson(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): GeojsonGeometry {
+  transformBackward<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    generalGcpToP: (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P = generalGcpToPointForBackward as (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P
+  ): TypedGeometry<P> {
     const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return pointToGeojsonPoint(this.transformForward(input))
-      } else if (isGeojsonPoint(input)) {
-        return pointToGeojsonPoint(
-          this.transformForward(geojsonPointToPoint(input))
-        )
-      } else if (isLineString(input)) {
-        return lineStringToGeojsonLineString(
-          transformLineStringForwardToLineString(
-            input,
-            this,
-            mergeOptions(mergedOptions, {
-              destinationIsGeographic: true
-            })
-          )
-        )
-      } else if (isGeojsonLineString(input)) {
-        return lineStringToGeojsonLineString(
-          transformLineStringForwardToLineString(
-            geojsonLineStringToLineString(input),
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true,
-              destinationIsGeographic: true
-            })
-          )
-        )
-      } else if (isPolygon(input)) {
-        return polygonToGeojsonPolygon(
-          transformPolygonForwardToPolygon(
-            input,
-            this,
-            mergeOptions(mergedOptions, {
-              destinationIsGeographic: true
-            })
-          )
-        )
-      } else if (isGeojsonPolygon(input)) {
-        return polygonToGeojsonPolygon(
-          transformPolygonForwardToPolygon(
-            geojsonPolygonToPolygon(input),
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true,
-              destinationIsGeographic: true
-            })
-          )
-        )
-      }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return joinGeojsonPointArrayToGeojsonMultiPoint(
-        input.map((element) => this.transformForwardAsGeojson(element, options))
-      )
-    } else if (isGeojsonMultiPoint(input)) {
-      return joinGeojsonPointArrayToGeojsonMultiPoint(
-        expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
-          this.transformForwardAsGeojson(element, options)
-        )
-      )
-    } else if (isMultiLineString(input)) {
-      return joinGeojsonLineStringArrayToGeojsonMultiLineString(
-        input.map((element) => this.transformForwardAsGeojson(element, options))
-      )
-    } else if (isGeojsonMultiLineString(input)) {
-      return joinGeojsonLineStringArrayToGeojsonMultiLineString(
-        expandGeojsonMultiLineStringToGeojsonLineStringArray(input).map(
-          (element) => this.transformForwardAsGeojson(element, options)
-        )
-      )
-    } else if (isMultiPolygon(input)) {
-      return joinGeojsonPolygonArrayToGeojsonMultiPolygon(
-        input.map((element) => this.transformForwardAsGeojson(element, options))
-      )
-    } else if (isGeojsonMultiPolygon(input)) {
-      return joinGeojsonPolygonArrayToGeojsonMultiPolygon(
-        expandGeojsonMultiPolygonToGeojsonPolygonArray(input).map((element) =>
-          this.transformForwardAsGeojson(element, options)
-        )
-      )
-    } else {
-      throw new Error('Input type not supported')
-    }
-  }
-
-  transformBackward(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): Point
-  transformBackward(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): LineString
-  transformBackward(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): Polygon
-  transformBackward(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): MultiPoint
-  transformBackward(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): MultiLineString
-  transformBackward(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): MultiPolygon
-  /**
-   * Transforms a geometry or a GeoJSON geometry backward to a Geometry
-   * @param input - Geometry or GeoJSON geometry to transform
-   * @param options - Transform options
-   * @returns backward transform of input, as geometry
-   */
-  transformBackward(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): Geometry {
-    const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        const backwardTransformation = this.createBackwardTransformation()
-        return this.assureEqualHandedness(
-          backwardTransformation.evaluate(input)
-        )
-      } else if (isGeojsonPoint(input)) {
-        return this.transformBackward(geojsonPointToPoint(input))
-      } else if (isLineString(input)) {
-        return transformLineStringBackwardToLineString(
-          input,
+    if (!mergedOptions.isMultiGeometry) {
+      if (isPoint(geometry)) {
+        this.createBackwardTransformation()
+        return transformPointBackward(
+          geometry,
           this,
-          mergedOptions
+          mergedOptions,
+          generalGcpToP
         )
-      } else if (isGeojsonLineString(input)) {
-        return transformLineStringBackwardToLineString(
-          geojsonLineStringToLineString(input),
+      } else if (isLineString(geometry)) {
+        return transformLineStringBackward(
+          geometry,
           this,
-          mergeOptions(mergedOptions, {
-            destinationIsGeographic: true
-          })
+          mergedOptions,
+          generalGcpToP
         )
-      } else if (isPolygon(input)) {
-        return transformPolygonBackwardToPolygon(input, this, mergedOptions)
-      } else if (isGeojsonPolygon(input)) {
-        return transformPolygonBackwardToPolygon(
-          geojsonPolygonToPolygon(input),
+      } else if (isPolygon(geometry)) {
+        return transformPolygonBackward(
+          geometry,
           this,
-          mergeOptions(mergedOptions, {
-            destinationIsGeographic: true
-          })
+          mergedOptions,
+          generalGcpToP
         )
+      } else {
+        throw new Error('Geometry type not supported')
       }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return input.map((element) => this.transformBackward(element, options))
-    } else if (isGeojsonMultiPoint(input)) {
-      return expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
-        this.transformBackward(element, options)
-      )
-    } else if (isMultiLineString(input)) {
-      return input.map((element) => this.transformBackward(element, options))
-    } else if (isGeojsonMultiLineString(input)) {
-      return expandGeojsonMultiLineStringToGeojsonLineStringArray(input).map(
-        (element) => this.transformBackward(element, options)
-      )
-    } else if (isMultiPolygon(input)) {
-      return input.map((element) => this.transformBackward(element, options))
-    } else if (isGeojsonMultiPolygon(input)) {
-      return expandGeojsonMultiPolygonToGeojsonPolygonArray(input).map(
-        (element) => this.transformBackward(element, options)
-      )
     } else {
-      throw new Error('Input type not supported')
-    }
-  }
-
-  transformBackwardAsGeojson(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonPoint
-  transformBackwardAsGeojson(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonLineString
-  transformBackwardAsGeojson(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonPolygon
-  transformBackwardAsGeojson(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPoint
-  transformBackwardAsGeojson(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiLineString
-  transformBackwardAsGeojson(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPolygon
-  /**
-   * Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
-   * @param input - Geometry or GeoJSON geometry to transform
-   * @param options - Transform options
-   * @returns backward transform of input, as GeoJSON geometry
-   */
-  transformBackwardAsGeojson(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): GeojsonGeometry {
-    const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return pointToGeojsonPoint(this.transformBackward(input))
-      } else if (isGeojsonPoint(input)) {
-        return pointToGeojsonPoint(
-          this.transformBackward(geojsonPointToPoint(input))
-        )
-      } else if (isLineString(input)) {
-        return lineStringToGeojsonLineString(
-          transformLineStringBackwardToLineString(
-            input,
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true
-            })
-          )
-        )
-      } else if (isGeojsonLineString(input)) {
-        return lineStringToGeojsonLineString(
-          transformLineStringBackwardToLineString(
-            geojsonLineStringToLineString(input),
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true,
-              destinationIsGeographic: true
-            })
-          )
-        )
-      } else if (isPolygon(input)) {
-        return polygonToGeojsonPolygon(
-          transformPolygonBackwardToPolygon(
-            input,
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true
-            })
-          )
-        )
-      } else if (isGeojsonPolygon(input)) {
-        return polygonToGeojsonPolygon(
-          transformPolygonBackwardToPolygon(
-            geojsonPolygonToPolygon(input),
-            this,
-            mergeOptions(mergedOptions, {
-              sourceIsGeographic: true,
-              destinationIsGeographic: true
-            })
-          )
-        )
+      if (options) {
+        options.isMultiGeometry = false // false for piecewise single geometries
       }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return joinGeojsonPointArrayToGeojsonMultiPoint(
-        input.map((element) =>
-          this.transformBackwardAsGeojson(element, options)
+      if (isMultiPoint(geometry)) {
+        return geometry.map((element) =>
+          this.transformBackward(element, options, generalGcpToP)
         )
-      )
-    } else if (isGeojsonMultiPoint(input)) {
-      return joinGeojsonPointArrayToGeojsonMultiPoint(
-        expandGeojsonMultiPointToGeojsonPointArray(input).map((element) =>
-          this.transformBackwardAsGeojson(element, options)
+      } else if (isMultiLineString(geometry)) {
+        return geometry.map((element) =>
+          this.transformBackward(element, options, generalGcpToP)
         )
-      )
-    } else if (isMultiLineString(input)) {
-      return joinGeojsonLineStringArrayToGeojsonMultiLineString(
-        input.map((element) =>
-          this.transformBackwardAsGeojson(element, options)
+      } else if (isMultiPolygon(geometry)) {
+        return geometry.map((element) =>
+          this.transformBackward(element, options, generalGcpToP)
         )
-      )
-    } else if (isGeojsonMultiLineString(input)) {
-      return joinGeojsonLineStringArrayToGeojsonMultiLineString(
-        expandGeojsonMultiLineStringToGeojsonLineStringArray(input).map(
-          (element) => this.transformBackwardAsGeojson(element, options)
-        )
-      )
-    } else if (isMultiPolygon(input)) {
-      return joinGeojsonPolygonArrayToGeojsonMultiPolygon(
-        input.map((element) =>
-          this.transformBackwardAsGeojson(element, options)
-        )
-      )
-    } else if (isGeojsonMultiPolygon(input)) {
-      return joinGeojsonPolygonArrayToGeojsonMultiPolygon(
-        expandGeojsonMultiPolygonToGeojsonPolygonArray(input).map((element) =>
-          this.transformBackwardAsGeojson(element, options)
-        )
-      )
-    } else {
-      throw new Error('Input type not supported')
+      } else {
+        throw new Error('Geometry type not supported')
+      }
     }
   }
 
   // Alias
 
-  transformToGeo(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): Point
-  transformToGeo(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): LineString
-  transformToGeo(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): Polygon
-  transformToGeo(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): MultiPoint
-  transformToGeo(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): MultiLineString
-  transformToGeo(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): MultiPolygon
+  transformToGeo<P = Point>(
+    point: Point,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): P
+  transformToGeo<P = Point>(
+    lineString: LineString,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedLineString<P>
+  transformToGeo<P = Point>(
+    polygon: Polygon,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedPolygon<P>
+  transformToGeo<P = Point>(
+    multiPoint: MultiPoint,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPoint<P>
+  transformToGeo<P = Point>(
+    multiLineString: MultiLineString,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiLineString<P>
+  transformToGeo<P = Point>(
+    multiPoint: MultiPolygon,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPolygon<P>
+  transformToGeo<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedGeometry<P>
   /**
-   * Transforms Geometry or GeoJSON geometry forward, as Geometry
-   * @param input - Input to transform
+   * Transforms Geometry to geo space
+   * @param geometry - Geometry to transform
    * @param options - Transform options
-   * @returns Forward transform of input, as Geometry
+   * @returns Input geometry transformed to geo space
    */
-  transformToGeo(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): Geometry {
+  transformToGeo<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    gcpToP: (gcp: GcpAndDistortions) => P = gcpToPointForToGeo as (
+      gcp: GcpAndDistortions
+    ) => P
+  ): TypedGeometry<P> {
     const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return this.transformForward(input as Point, options)
-      } else if (isGeojsonPoint(input)) {
-        return this.transformForward(input as GeojsonPoint, options)
-      } else if (isLineString(input)) {
-        return this.transformForward(input as LineString, options)
-      } else if (isGeojsonLineString(input)) {
-        return this.transformForward(input as GeojsonLineString, options)
-      } else if (isPolygon(input)) {
-        return this.transformForward(input as Polygon, options)
-      } else if (isGeojsonPolygon(input)) {
-        return this.transformForward(input as GeojsonPolygon, options)
-      }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return this.transformForward(input as MultiPoint, options)
-    } else if (isGeojsonMultiPoint(input)) {
-      return this.transformForward(input as GeojsonMultiPoint, options)
-    } else if (isMultiLineString(input)) {
-      return this.transformForward(input as MultiLineString, options)
-    } else if (isGeojsonMultiLineString(input)) {
-      return this.transformForward(input as GeojsonMultiLineString, options)
-    } else if (isMultiPolygon(input)) {
-      return this.transformForward(input as MultiPolygon, options)
-    } else if (isGeojsonMultiPolygon(input)) {
-      return this.transformForward(input as GeojsonMultiPolygon, options)
-    } else {
-      throw new Error('Input type not supported')
-    }
-  }
-
-  transformToGeoAsGeojson(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonPoint
-  transformToGeoAsGeojson(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonLineString
-  transformToGeoAsGeojson(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonPolygon
-  transformToGeoAsGeojson(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPoint
-  transformToGeoAsGeojson(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiLineString
-  transformToGeoAsGeojson(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPolygon
-  /**
-   * Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
-   * @param input - Input to transform
-   * @param options - Transform options
-   * @returns Forward transform of input, as GeoJSON geometry
-   */
-  transformToGeoAsGeojson(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): GeojsonGeometry {
-    const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return this.transformForwardAsGeojson(input as Point, options)
-      } else if (isGeojsonPoint(input)) {
-        return this.transformForwardAsGeojson(input as GeojsonPoint, options)
-      } else if (isLineString(input)) {
-        return this.transformForwardAsGeojson(input as LineString, options)
-      } else if (isGeojsonLineString(input)) {
-        return this.transformForwardAsGeojson(
-          input as GeojsonLineString,
-          options
+    const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
+      gcpToP(generalGcpToGcp(generalGcp))
+    if (!mergedOptions.isMultiGeometry) {
+      if (isPoint(geometry)) {
+        return this.transformForward(geometry as Point, options, generalGcpToP)
+      } else if (isLineString(geometry)) {
+        return this.transformForward(
+          geometry as LineString,
+          options,
+          generalGcpToP
         )
-      } else if (isPolygon(input)) {
-        return this.transformForwardAsGeojson(input as Polygon, options)
-      } else if (isGeojsonPolygon(input)) {
-        return this.transformForwardAsGeojson(input as GeojsonPolygon, options)
-      }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return this.transformForwardAsGeojson(input as MultiPoint, options)
-    } else if (isGeojsonMultiPoint(input)) {
-      return this.transformForwardAsGeojson(input as GeojsonMultiPoint, options)
-    } else if (isMultiLineString(input)) {
-      return this.transformForwardAsGeojson(input as MultiLineString, options)
-    } else if (isGeojsonMultiLineString(input)) {
-      return this.transformForwardAsGeojson(
-        input as GeojsonMultiLineString,
-        options
-      )
-    } else if (isMultiPolygon(input)) {
-      return this.transformForwardAsGeojson(input as MultiPolygon, options)
-    } else if (isGeojsonMultiPolygon(input)) {
-      return this.transformForwardAsGeojson(
-        input as GeojsonMultiPolygon,
-        options
-      )
-    } else {
-      throw new Error('Input type not supported')
-    }
-  }
-
-  transformToResource(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): Point
-  transformToResource(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): LineString
-  transformToResource(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): Polygon
-  transformToResource(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): MultiPoint
-  transformToResource(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): MultiLineString
-  transformToResource(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): MultiPolygon
-  /**
-   * Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
-   * @param input - Input to transform
-   * @param options - Transform options
-   * @returns Backward transform of input, as a Geometry
-   */
-  transformToResource(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): Geometry {
-    const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return this.transformBackward(input as Point, options)
-      } else if (isGeojsonPoint(input)) {
-        return this.transformBackward(input as GeojsonPoint, options)
-      } else if (isLineString(input)) {
-        return this.transformBackward(input as LineString, options)
-      } else if (isGeojsonLineString(input)) {
-        return this.transformBackward(input as GeojsonLineString, options)
-      } else if (isPolygon(input)) {
-        return this.transformBackward(input as Polygon, options)
-      } else if (isGeojsonPolygon(input)) {
-        return this.transformBackward(input as GeojsonPolygon, options)
-      }
-    }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return this.transformBackward(input as MultiPoint, options)
-    } else if (isGeojsonMultiPoint(input)) {
-      return this.transformBackward(input as GeojsonMultiPoint, options)
-    } else if (isMultiLineString(input)) {
-      return this.transformBackward(input as MultiLineString, options)
-    } else if (isGeojsonMultiLineString(input)) {
-      return this.transformBackward(input as GeojsonMultiLineString, options)
-    } else if (isMultiPolygon(input)) {
-      return this.transformBackward(input as MultiPolygon, options)
-    } else if (isGeojsonMultiPolygon(input)) {
-      return this.transformBackward(input as GeojsonMultiPolygon, options)
-    } else {
-      throw new Error('Input type not supported')
-    }
-  }
-
-  transformToResourceAsGeojson(
-    input: Point | GeojsonPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonPoint
-  transformToResourceAsGeojson(
-    input: LineString | GeojsonLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonLineString
-  transformToResourceAsGeojson(
-    input: Polygon | GeojsonPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonPolygon
-  transformToResourceAsGeojson(
-    input: MultiPoint | GeojsonMultiPoint,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPoint
-  transformToResourceAsGeojson(
-    input: MultiLineString | GeojsonMultiLineString,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiLineString
-  transformToResourceAsGeojson(
-    input: MultiPolygon | GeojsonMultiPolygon,
-    options?: Partial<TransformOptions>
-  ): GeojsonMultiPolygon
-  /**
-   * Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
-   * @param input - Input to transform
-   * @param options - Transform options
-   * @returns Backward transform of input, as a GeoJSON geometry
-   */
-  transformToResourceAsGeojson(
-    input: Geometry | GeojsonGeometry,
-    options?: Partial<TransformOptions>
-  ): GeojsonGeometry {
-    const mergedOptions = mergeOptions(this.options, options)
-    if (!mergedOptions.inputIsMultiGeometry) {
-      if (isPoint(input)) {
-        return this.transformBackwardAsGeojson(input as Point, options)
-      } else if (isGeojsonPoint(input)) {
-        return this.transformBackwardAsGeojson(input as GeojsonPoint, options)
-      } else if (isLineString(input)) {
-        return this.transformBackwardAsGeojson(input as LineString, options)
-      } else if (isGeojsonLineString(input)) {
-        return this.transformBackwardAsGeojson(
-          input as GeojsonLineString,
-          options
+      } else if (isPolygon(geometry)) {
+        return this.transformForward(
+          geometry as Polygon,
+          options,
+          generalGcpToP
         )
-      } else if (isPolygon(input)) {
-        return this.transformBackwardAsGeojson(input as Polygon, options)
-      } else if (isGeojsonPolygon(input)) {
-        return this.transformBackwardAsGeojson(input as GeojsonPolygon, options)
+      } else {
+        throw new Error('Geometry type not supported')
+      }
+    } else {
+      if (options) {
+        options.isMultiGeometry = false // false for piecewise single geometries
+      }
+      if (isMultiPoint(geometry)) {
+        return this.transformForward(
+          geometry as MultiPoint,
+          options,
+          generalGcpToP
+        )
+      } else if (isMultiLineString(geometry)) {
+        return this.transformForward(
+          geometry as MultiLineString,
+          options,
+          generalGcpToP
+        )
+      } else if (isMultiPolygon(geometry)) {
+        return this.transformForward(
+          geometry as MultiPolygon,
+          options,
+          generalGcpToP
+        )
+      } else {
+        throw new Error('Geometry type not supported')
       }
     }
-    if (options) {
-      options.inputIsMultiGeometry = false // false for piecewise single geometries
-    }
-    if (isMultiPoint(input)) {
-      return this.transformBackwardAsGeojson(input as MultiPoint, options)
-    } else if (isGeojsonMultiPoint(input)) {
-      return this.transformBackwardAsGeojson(
-        input as GeojsonMultiPoint,
-        options
-      )
-    } else if (isMultiLineString(input)) {
-      return this.transformBackwardAsGeojson(input as MultiLineString, options)
-    } else if (isGeojsonMultiLineString(input)) {
-      return this.transformBackwardAsGeojson(
-        input as GeojsonMultiLineString,
-        options
-      )
-    } else if (isMultiPolygon(input)) {
-      return this.transformBackwardAsGeojson(input as MultiPolygon, options)
-    } else if (isGeojsonMultiPolygon(input)) {
-      return this.transformBackwardAsGeojson(
-        input as GeojsonMultiPolygon,
-        options
-      )
+  }
+
+  transformToResource<P = Point>(
+    point: Point,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): P
+  transformToResource<P = Point>(
+    lineString: LineString,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedLineString<P>
+  transformToResource<P = Point>(
+    polygon: Polygon,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedPolygon<P>
+  transformToResource<P = Point>(
+    multiPoint: MultiPoint,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPoint<P>
+  transformToResource<P = Point>(
+    multiLineString: MultiLineString,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiLineString<P>
+  transformToResource<P = Point>(
+    multiPolygon: MultiPolygon,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPolygon<P>
+  transformToResource<P = Point>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedGeometry<P>
+  /**
+   * Transforms a Geometry to resource space
+   * @param geometry - Geometry to transform
+   * @param options - Transform options
+   * @returns Input geometry transformed to resource space
+   */
+  transformToResource<P>(
+    geometry: Geometry,
+    options?: Partial<TransformOptions>,
+    gcpToP: (gcp: GcpAndDistortions) => P = gcpToPointForToResource as (
+      gcp: GcpAndDistortions
+    ) => P
+  ): TypedGeometry<P> {
+    const mergedOptions = mergeOptions(this.options, options)
+    const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
+      gcpToP(generalGcpToGcp(generalGcp))
+    if (!mergedOptions.isMultiGeometry) {
+      if (isPoint(geometry)) {
+        return this.transformBackward(geometry as Point, options, generalGcpToP)
+      } else if (isLineString(geometry)) {
+        return this.transformBackward(
+          geometry as LineString,
+          options,
+          generalGcpToP
+        )
+      } else if (isPolygon(geometry)) {
+        return this.transformBackward(
+          geometry as Polygon,
+          options,
+          generalGcpToP
+        )
+      } else {
+        throw new Error('Geometry type not supported')
+      }
     } else {
-      throw new Error('Input type not supported')
+      if (options) {
+        options.isMultiGeometry = false // false for piecewise single geometries
+      }
+      if (isMultiPoint(geometry)) {
+        return this.transformBackward(
+          geometry as MultiPoint,
+          options,
+          generalGcpToP
+        )
+      } else if (isMultiLineString(geometry)) {
+        return this.transformBackward(
+          geometry as MultiLineString,
+          options,
+          generalGcpToP
+        )
+      } else if (isMultiPolygon(geometry)) {
+        return this.transformBackward(
+          geometry as MultiPolygon,
+          options,
+          generalGcpToP
+        )
+      } else {
+        throw new Error('Geometry type not supported')
+      }
     }
   }
 
   // Shortcuts for SVG <> GeoJSON
 
   /**
-   * Transforms a SVG geometry forward to a GeoJSON geometry
+   * Transforms a SVG geometry to geo space as a GeoJSON Geometry
    *
    * Note: Multi-geometries are not supported
+   *
    * @param geometry - SVG geometry to transform
    * @param options - Transform options
-   * @returns Forward transform of input, as a GeoJSON geometry
+   * @returns Input SVG geometry transformed to geo space, as a GeoJSON Geometry
    */
   transformSvgToGeojson(
-    geometry: SvgGeometry,
+    svgCircle: SvgCircle,
+    options?: Partial<TransformOptions>
+  ): GeojsonPoint
+  transformSvgToGeojson(
+    svgLine: SvgLine,
+    options?: Partial<TransformOptions>
+  ): GeojsonLineString
+  transformSvgToGeojson(
+    svgPolyLine: SvgPolyLine,
+    options?: Partial<TransformOptions>
+  ): GeojsonLineString
+  transformSvgToGeojson(
+    svgRect: SvgRect,
+    options?: Partial<TransformOptions>
+  ): GeojsonPolygon
+  transformSvgToGeojson(
+    svgPolygon: SvgPolygon,
+    options?: Partial<TransformOptions>
+  ): GeojsonPolygon
+  transformSvgToGeojson(
+    svgGeometry: SvgGeometry,
+    options?: Partial<TransformOptions>
+  ): GeojsonGeometry
+  transformSvgToGeojson(
+    svgGeometry: SvgGeometry,
     options?: Partial<TransformOptions>
   ): GeojsonGeometry {
-    if (geometry.type === 'circle') {
-      return this.transformForwardAsGeojson(geometry.coordinates)
-    } else if (geometry.type === 'line') {
-      return this.transformForwardAsGeojson(geometry.coordinates, options)
-    } else if (geometry.type === 'polyline') {
-      return this.transformForwardAsGeojson(geometry.coordinates, options)
-    } else if (geometry.type === 'rect') {
-      return this.transformForwardAsGeojson([geometry.coordinates], options)
-    } else if (geometry.type === 'polygon') {
-      return this.transformForwardAsGeojson([geometry.coordinates], options)
-    } else {
-      throw new Error(`Unsupported SVG geometry`)
-    }
+    // This middle step is needed to make typescript happy
+    const transformedGeometry = this.transformToGeo(
+      svgGeometryToGeometry(svgGeometry),
+      options
+    )
+    return geometryToGeojsonGeometry(transformedGeometry)
   }
 
   /**
-   * Transforms a SVG string forward to a GeoJSON FeatureCollection
+   * Transforms SVG strings to geo space to a GeoJSON FeatureCollection
    *
    * Note: Multi-geometries are not supported
-   * @param svg - SVG string to transform
+   *
+   * @param svgs - An array of SVG strings to transform
    * @param options - Transform options
-   * @returns Forward transform of input, as a GeoJSON FeatureCollection
+   * @returns Input SVG strings transformed to geo space, as a GeoJSON FeatureCollection
    */
-  transformSvgStringToGeojsonFeatureCollection(
-    svg: string,
+  transformSvgStringsToGeojsonFeatureCollection(
+    svgs: string[],
     options?: Partial<TransformOptions>
   ): GeojsonFeatureCollection {
     const geojsonGeometries = []
-    for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
-      const geojsonGeometry = this.transformSvgToGeojson(svgGeometry, options)
-      geojsonGeometries.push(geojsonGeometry)
+    for (const svg of svgs) {
+      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
+        const geojsonGeometry = this.transformSvgToGeojson(svgGeometry, options)
+        geojsonGeometries.push(geojsonGeometry)
+      }
     }
-    return geometriesToFeatureCollection(geojsonGeometries)
+    return geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries)
   }
 
   /**
-   * Transforms a GeoJSON geometry backward to a SVG geometry
+   * Transforms a GeoJSON Geometry to resource space to a SVG geometry
    *
    * Note: Multi-geometries are not supported
-   * @param geometry - GeoJSON geometry to transform
+   *
+   * @param geojsonGeometry - GeoJSON Geometry to transform
    * @param options - Transform options
-   * @returns Backward transform of input, as SVG geometry
+   * @returns Input GeoJSON Geometry transform to resource space, as SVG geometry
    */
   transformGeojsonToSvg(
-    geometry: GeojsonGeometry,
+    geojsonGeometry: GeojsonGeometry,
     options?: Partial<TransformOptions>
   ): SvgGeometry {
-    if (geometry.type === 'Point') {
-      return {
-        type: 'circle',
-        coordinates: this.transformBackward(geometry)
-      }
-    } else if (geometry.type === 'LineString') {
-      return {
-        type: 'polyline',
-        coordinates: this.transformBackward(geometry, options)
-      }
-    } else if (geometry.type === 'Polygon') {
-      return {
-        type: 'polygon',
-        coordinates: this.transformBackward(geometry, options)[0]
-      }
-    } else {
-      throw new Error(`Unsupported GeoJSON geometry`)
-    }
+    // This middle step is needed to make typescript happy
+    const transformedGeometry = this.transformToResource(
+      geojsonGeometryToGeometry(geojsonGeometry),
+      options
+    )
+    return geometryToSvgGeometry(transformedGeometry)
   }
 
   /**
-   * Transforms a GeoJSON FeatureCollection backward to a SVG string
+   * Transforms a GeoJSON FeatureCollection to resource space to a SVG string
    *
    * Note: Multi-geometries are not supported
+   *
    * @param geojson - GeoJSON FeatureCollection to transform
    * @param options - Transform options
-   * @returns Backward transform of input, as SVG string
+   * @returns Input GeoJSON FeaturesCollection transformed to resource space, as SVG string
    */
   transformGeojsonFeatureCollectionToSvgString(
     geojson: GeojsonFeatureCollection,
     options?: Partial<TransformOptions>
   ): string {
     const svgGeometries = []
-    for (const geojsonGeometry of featureCollectionToGeometries(geojson)) {
+    for (const geojsonGeometry of geojsonFeatureCollectionToGeojsonGeometries(
+      geojson
+    )) {
       const svgGeometry = this.transformGeojsonToSvg(geojsonGeometry, options)
       svgGeometries.push(svgGeometry)
     }
 
     return svgGeometriesToSvgString(svgGeometries)
-  }
-
-  private assureEqualHandedness(point: Point): Point {
-    return this.options?.differentHandedness ? flipY(point) : point
   }
 
   private computeTransformation(

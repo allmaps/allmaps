@@ -229,10 +229,9 @@ export function convexHull(points: Point[]): Ring | undefined {
  *                ....
  *
  * @export
- * @param {Size} size0 - first size
- * @param {Size} size1 - second size
- * @param {?Fit} [fit] - fit
- * @returns {number}
+ * @param size0 - first size
+ * @param size1 - second size
+ * @param fit - fit
  */
 export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
   if (!fit) {

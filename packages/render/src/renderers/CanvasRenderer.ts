@@ -38,7 +38,7 @@ export class CanvasRenderer
    *
    * If no viewport is specified, a viewport is deduced based on the WarpedMapList and canvas width and hight.
    *
-   * @param {Viewport} [viewport] - the viewport to render
+   * @param viewport - the viewport to render
    */
   async render(viewport?: Viewport): Promise<void> {
     this.viewport =

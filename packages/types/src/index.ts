@@ -15,6 +15,7 @@ export type {
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
   GeojsonGeometry,
+  GeojsonMultiGeometry,
   GeojsonGeometryType,
   GeojsonFeature,
   GeojsonFeatureCollection
@@ -41,7 +42,9 @@ export type {
   TypedMultiPoint,
   TypedMultiLineString,
   TypedMultiPolygon,
+  TypedGeometry,
   Gcp,
+  ConversionOptions,
   Bbox,
   Size,
   Fit,

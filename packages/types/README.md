@@ -31,6 +31,12 @@ Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 [number, number, number, number]
 ```
 
+### `ConversionOptions`
+
+###### Fields
+
+* `isMultiGeometry` (`false`)
+
 ### `FetchFn`
 
 ###### Type
@@ -108,6 +114,14 @@ Two ways two rectangles (or shapes in general) can overlap: (`'cover' | 'contain
 
 * `coordinates` (`Array<Point>`)
 * `type` (`'LineString'`)
+
+### `GeojsonMultiGeometry`
+
+###### Type
+
+```ts
+GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon
+```
 
 ### `GeojsonMultiLineString`
 
@@ -400,6 +414,14 @@ Triangle
 As `[[x0, y0], [x1, y1], [x2, y2]]` (`[Point, Point, Point]`).
 
 Winding order of points is free.
+
+### `TypedGeometry`
+
+###### Type
+
+```ts
+P | TypedLineString<P> | TypedPolygon<P> | TypedMultiPoint<P> | TypedMultiLineString<P> | TypedMultiPolygon<...>
+```
 
 ### `TypedLine`
 

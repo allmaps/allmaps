@@ -203,7 +203,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     for (const warpedMap of this.getWarpedMaps(mapIds)) {
       if (warpedMap.visible) {
-        maskPoints.push(...warpedMap.geoMask.coordinates[0])
+        maskPoints.push(...warpedMap.geoMask)
       }
     }
 
@@ -214,8 +214,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Return the convex hull of all visible maps in this list, in projected geospatial coordinates
    *
    * Returns undefined if the list is empty.
-   *
-   * @returns {(Ring | undefined)}
    */
   getProjectedConvexHull(mapIds?: Iterable<string>): Ring | undefined {
     const maskPoints: Point[] = []
@@ -665,7 +663,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   private addToOrUpdateRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
-      this.rtree.addItem(warpedMap.mapId, warpedMap.geoMask)
+      this.rtree.addItem(warpedMap.mapId, [warpedMap.geoMask])
     }
   }
 

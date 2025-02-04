@@ -24,12 +24,6 @@ const MAX_SHEAR = 0.1
 /**
  * Class for Analyser.
  * This class describes how a georeferenced map is warped using a specific transformation.
- *
- * @export
- * @class WarpedMap
- * @typedef {WarpedMap}
- * @extends {EventTarget}
- * @param {string} mapId - ID of the map
  */
 export default class Analyser<W extends WarpedMap> {
   warpedMap: W
@@ -45,7 +39,7 @@ export default class Analyser<W extends WarpedMap> {
    * Creates an instance of Analyser.
    *
    * @constructor
-   * @param { WarpedMap } warpedMap - A Warped Map
+   * @param warpedMap - A Warped Map
    */
   constructor(warpedMap: W) {
     this.warpedMap = warpedMap
@@ -55,7 +49,7 @@ export default class Analyser<W extends WarpedMap> {
    * Creates an instance of Analyser from a Warped Map.
    *
    * @constructor
-   * @param { WarpedMap } warpedMap - A Warped Map
+   * @param warpedMap - A Warped Map
    */
   public static fromWarpedMap<W extends WarpedMap>(warpedMap: W): Analyser<W> {
     return new Analyser(warpedMap)
@@ -63,8 +57,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Check if analysis has infos.
-   *
-   * @returns {boolean}
    */
   public hasInfos(): boolean {
     if (!this.infos) {
@@ -76,8 +68,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Check if analysis has warnings.
-   *
-   * @returns {boolean}
    */
   public hasWarnings(): boolean {
     if (!this.warnings) {
@@ -89,8 +79,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Check if analysis has errors.
-   *
-   * @returns {boolean}
    */
   public hasErrors(): boolean {
     if (!this.errors) {
@@ -102,8 +90,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis informations.
-   *
-   * @returns {AnalysisItem[]}
    */
   public getInfos(): AnalysisItem[] {
     if (this.infos) {
@@ -131,8 +117,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis warnings.
-   *
-   * @returns {AnalysisItem[]}
    */
   public getWarnings(): AnalysisItem[] {
     if (this.warnings) {
@@ -223,7 +207,7 @@ export default class Analyser<W extends WarpedMap> {
     if (this.warpedMap instanceof TriangulatedWarpedMap) {
       const signDetJs =
         this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
+          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('signDetJ')
         )
       if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
         this.warnings.push({
@@ -257,8 +241,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis errors.
-   *
-   * @returns {AnalysisItem[]}
    */
   public getErrors(): AnalysisItem[] {
     if (this.errors) {
@@ -349,8 +331,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis measures.
-   *
-   * @returns {Measures}
    */
   public getMeasures(): Measures {
     if (this.measures) {
@@ -371,12 +351,8 @@ export default class Analyser<W extends WarpedMap> {
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
 
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedPolynomialTransformer.forwardTransformation) {
-      projectedPolynomialTransformer.createForwardTransformation()
-    }
     const forwardPolynomialTransformation =
-      projectedPolynomialTransformer.forwardTransformation as Polynomial
+      projectedPolynomialTransformer.createForwardTransformation() as Polynomial
     measures.polynomialRmse = forwardPolynomialTransformation.rmse
     measures.polynomialParameters =
       forwardPolynomialTransformation.polynomialParameters
@@ -395,12 +371,8 @@ export default class Analyser<W extends WarpedMap> {
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
 
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedHelmertTransformer.forwardTransformation) {
-      projectedHelmertTransformer.createForwardTransformation()
-    }
     const forwardHelmertTransformation =
-      projectedHelmertTransformer.forwardTransformation as Helmert
+      projectedHelmertTransformer.createForwardTransformation() as Helmert
 
     measures.helmertRmse = forwardHelmertTransformation.rmse
     measures.helmertParameters = forwardHelmertTransformation.helmertParameters
@@ -410,12 +382,8 @@ export default class Analyser<W extends WarpedMap> {
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedTransformer.forwardTransformation) {
-      projectedTransformer.createForwardTransformation()
-    }
     const forwardTransformation =
-      projectedTransformer.forwardTransformation as Transformation
+      projectedTransformer.createForwardTransformation() as Transformation
     measures.rmse = forwardTransformation.rmse
     measures.destinationErrors = forwardTransformation.errors
     // Note: we scale using the helmert transform instead of computing errors in resource
@@ -438,8 +406,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get distortions.
-   *
-   * @returns {Distortions}
    */
   public getDistortions(): Distortions {
     if (this.distortions) {
@@ -457,8 +423,10 @@ export default class Analyser<W extends WarpedMap> {
       mapId: this.warpedMap.mapId
     }
 
+    const distortionsAtFirstPoint =
+      this.warpedMap.projectedGcpTriangulation.gcpUniquePoints[0].distortions
     const distortionMeasures = Array.from(
-      this.warpedMap.projectedGcpTriangulation.gcpUniquePoints[0].distortions.keys()
+      distortionsAtFirstPoint ? distortionsAtFirstPoint.keys() : []
     )
 
     for (const distortionMeasure of distortionMeasures) {
@@ -468,7 +436,7 @@ export default class Analyser<W extends WarpedMap> {
       const triangulationDistortions =
         this.warpedMap.projectedGcpTriangulation.gcpUniquePoints
           .map((gcpUniquePoint) =>
-            gcpUniquePoint.distortions.get(distortionMeasure)
+            gcpUniquePoint.distortions?.get(distortionMeasure)
           )
           .filter((distortion) => distortion !== undefined)
       const meanTriangulationDistortion =

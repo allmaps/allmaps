@@ -31,7 +31,6 @@ export function geojson() {
 
     const geojsonGeometries = await parseJsonInput(files)
 
-    // TODO: consider to use transformGeojsonFeatureCollectionToSvgString()
     const svgGeometries = []
     for (const geojsonGeometry of geojsonGeometries) {
       if (isGeojsonGeometry(geojsonGeometry)) {
@@ -41,9 +40,7 @@ export function geojson() {
         )
         svgGeometries.push(svgGeometry)
       } else {
-        throw new Error(
-          'Unsupported input. Only GeoJSON Points, LineStrings and Polygons are supported.'
-        )
+        throw new Error('Unsupported input.')
       }
     }
 

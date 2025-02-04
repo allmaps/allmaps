@@ -229,6 +229,46 @@ Allmaps Standard Library
 
 `Array<Point>`.
 
+### `contractGeojsonGeometryArrayToGeojsonMultiGeometry(geojsonGeometryArray)`
+
+###### Parameters
+
+* `geojsonGeometryArray` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
+
+###### Returns
+
+`GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon`.
+
+### `contractGeojsonLineStringArrayToGeojsonMultiLineString(geojsonLineStringArray)`
+
+###### Parameters
+
+* `geojsonLineStringArray` (`Array<GeojsonLineString>`)
+
+###### Returns
+
+`{type: 'MultiLineString'; coordinates: Point[][]}`.
+
+### `contractGeojsonPointArrayToGeojsonMultiPoint(geojsonPointArray)`
+
+###### Parameters
+
+* `geojsonPointArray` (`Array<GeojsonPoint>`)
+
+###### Returns
+
+`{type: 'MultiPoint'; coordinates: Point[]}`.
+
+### `contractGeojsonPolygonArrayToGeojsonMultiPolygon(geojsonPolygonArray)`
+
+###### Parameters
+
+* `geojsonPolygonArray` (`Array<GeojsonPolygon>`)
+
+###### Returns
+
+`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
+
 ### `convexHull(points)`
 
 ###### Parameters
@@ -321,41 +361,6 @@ Allmaps Standard Library
 
 `Array<GeojsonPolygon>`.
 
-### `featureCollectionToGeometries(featureCollection)`
-
-###### Parameters
-
-* `featureCollection` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
-
-###### Returns
-
-`Array<GeojsonGeometry>`.
-
-### `featureToGeometry(feature)`
-
-###### Parameters
-
-* `feature` (`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`)
-
-###### Returns
-
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
-
-### `featuresToFeatureCollection(features)`
-
-###### Parameters
-
-* `features` (`GeojsonFeature | Array<GeojsonFeature>`)
-
-###### Returns
-
-`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
-
 ### `fetchAnnotationsFromApi(parsedIiif)`
 
 ###### Parameters
@@ -434,7 +439,79 @@ Allmaps Standard Library
 
 `[number, number]`.
 
-### `geojsonGeometryToGeometry(geojsonGeometry)`
+### `geojsonFeatureCollectionToGeojsonGeometries(geojsonFeatureCollection)`
+
+###### Parameters
+
+* `geojsonFeatureCollection` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
+
+###### Returns
+
+`Array<GeojsonGeometry>`.
+
+### `geojsonFeatureToGeojsonGeometry(geojsonFeature)`
+
+###### Parameters
+
+* `geojsonFeature` (`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`)
+
+###### Returns
+
+`  | GeojsonPoint
+  | GeojsonLineString
+  | GeojsonPolygon
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon`.
+
+### `geojsonFeaturesToGeojsonFeatureCollection(geojsonFeatures)`
+
+###### Parameters
+
+* `geojsonFeatures` (`GeojsonFeature | Array<GeojsonFeature>`)
+
+###### Returns
+
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
+
+### `geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries, properties)`
+
+###### Parameters
+
+* `geojsonGeometries` (`Array<GeojsonGeometry>`)
+* `properties?` (`Array<unknown> | undefined`)
+
+###### Returns
+
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
+
+### `geojsonGeometryToGeojsonFeature(geojsonGeometry, properties)`
+
+###### Parameters
+
+* `geojsonGeometry` (`  | GeojsonPoint
+    | GeojsonLineString
+    | GeojsonPolygon
+    | GeojsonMultiPoint
+    | GeojsonMultiLineString
+    | GeojsonMultiPolygon`)
+* `properties?` (`unknown`)
+
+###### Returns
+
+`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`.
+
+### `geojsonGeometryToGeometry(geojsonPoint)`
+
+###### Parameters
+
+* `geojsonPoint` (`{type: 'Point'; coordinates: Point}`)
+
+###### Returns
+
+`[number, number]`.
+
+### `geojsonGeometryToSvgGeometry(geojsonGeometry)`
 
 ###### Parameters
 
@@ -447,12 +524,7 @@ Allmaps Standard Library
 
 ###### Returns
 
-`  | Point
-  | LineString
-  | Polygon
-  | MultiPoint
-  | MultiLineString
-  | MultiPolygon`.
+`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`.
 
 ### `geojsonLineStringToLineString(geojsonLineString)`
 
@@ -527,32 +599,6 @@ Allmaps Standard Library
 
 `Array<Point>`.
 
-### `geojsonToSvg(geometry)`
-
-###### Parameters
-
-* `geometry` (`  | GeojsonPoint
-    | GeojsonLineString
-    | GeojsonPolygon
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon`)
-
-###### Returns
-
-`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`.
-
-### `geometriesToFeatureCollection(geometries, properties)`
-
-###### Parameters
-
-* `geometries` (`Array<GeojsonGeometry>`)
-* `properties?` (`Array<unknown> | undefined`)
-
-###### Returns
-
-`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
-
 ### `geometryToDiameter(geometry)`
 
 ###### Parameters
@@ -563,41 +609,26 @@ Allmaps Standard Library
 
 `number`.
 
-### `geometryToFeature(geometry, properties)`
+### `geometryToGeojsonGeometry(point, options)`
 
 ###### Parameters
 
-* `geometry` (`  | GeojsonPoint
-    | GeojsonLineString
-    | GeojsonPolygon
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon`)
-* `properties?` (`unknown`)
+* `point` (`[number, number]`)
+* `options?` (`Partial<ConversionOptions> | undefined`)
 
 ###### Returns
 
-`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`.
+`{type: 'Point'; coordinates: Point}`.
 
-### `geometryToGeojsonGeometry(geometry)`
+### `geometryToSvgGeometry(point)`
 
 ###### Parameters
 
-* `geometry` (`  | Point
-    | LineString
-    | Polygon
-    | MultiPoint
-    | MultiLineString
-    | MultiPolygon`)
+* `point` (`[number, number]`)
 
 ###### Returns
 
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
+`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`.
 
 ### `getColorHistogram(colors, binSize)`
 
@@ -814,6 +845,16 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `boolean`.
 
+### `isGeojsonMultiGeometry(obj)`
+
+###### Parameters
+
+* `obj` (`unknown`)
+
+###### Returns
+
+`boolean`.
+
 ### `isGeojsonMultiLineString(input)`
 
 ###### Parameters
@@ -944,6 +985,56 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `boolean`.
 
+### `isSvgCircle(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgLine(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgPolyLine(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgPolygon(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgRect(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
 ### `isValidHttpUrl(string)`
 
 ###### Parameters
@@ -953,46 +1044,6 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Returns
 
 `boolean`.
-
-### `joinGeojsonGeometryArrayToGeojsonMultiGeometry(geojsonGeometryArray)`
-
-###### Parameters
-
-* `geojsonGeometryArray` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
-
-###### Returns
-
-`GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon`.
-
-### `joinGeojsonLineStringArrayToGeojsonMultiLineString(geojsonLineStringArray)`
-
-###### Parameters
-
-* `geojsonLineStringArray` (`Array<GeojsonLineString>`)
-
-###### Returns
-
-`{type: 'MultiLineString'; coordinates: Point[][]}`.
-
-### `joinGeojsonPointArrayToGeojsonMultiPoint(geojsonPointArray)`
-
-###### Parameters
-
-* `geojsonPointArray` (`Array<GeojsonPoint>`)
-
-###### Returns
-
-`{type: 'MultiPoint'; coordinates: Point[]}`.
-
-### `joinGeojsonPolygonArrayToGeojsonMultiPolygon(geojsonPolygonArray)`
-
-###### Parameters
-
-* `geojsonPolygonArray` (`Array<GeojsonPolygon>`)
-
-###### Returns
-
-`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
 
 ### `lineAngle(line)`
 
@@ -1054,7 +1105,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Returns
 
-`{type: 'polygon'; attributes?: SvgAttributes; coordinates: Point[]}`.
+`{type: 'polygon'; attributes?: SvgAttributes; coordinates: Ring}`.
 
 ### `maxOfNumberOrUndefined(number1, number2)`
 
@@ -1505,7 +1556,17 @@ Example for square rectangles '\*' and '+':
 
 `string`.
 
-### `svgToGeojson(geometry)`
+### `svgGeometryToGeometry(svgCircle)`
+
+###### Parameters
+
+* `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
+
+###### Returns
+
+`[number, number]`.
+
+### `svgGeometryToString(geometry)`
 
 ###### Parameters
 
@@ -1513,12 +1574,7 @@ Example for square rectangles '\*' and '+':
 
 ###### Returns
 
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
+`string`.
 
 ### `threePointsToAngle(pointA, pointB, pointC)`
 

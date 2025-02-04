@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
 import {
-  geometriesToFeatureCollection,
+  geojsonGeometriesToGeojsonFeatureCollection,
   geometryToGeojsonGeometry
 } from '@allmaps/stdlib'
 
@@ -238,19 +238,17 @@ describe('Transform LineString Backward To LineString of vertical line, with des
   })
 })
 
-describe('Transform LineString Backward To LineString from GeoJSON', async () => {
+describe('Transform LineString Backward To LineString, with destinationIsGeographic as true', async () => {
   const transformOptions = {
     minOffsetRatio: 0.001,
-    maxDepth: 2
+    maxDepth: 2,
+    destinationIsGeographic: true
   }
   const transformer = new GcpTransformer(generalGcps7, 'polynomial')
-  const input = {
-    type: 'LineString',
-    coordinates: [
-      [10, 50],
-      [50, 50]
-    ]
-  }
+  const input = [
+    [10, 50],
+    [50, 50]
+  ]
   const output = [
     [31.06060606060611, 155.30303030303048],
     [80.91200458875993, 165.7903106766409],
@@ -259,7 +257,7 @@ describe('Transform LineString Backward To LineString from GeoJSON', async () =>
     [237.12121212121218, 185.60606060606085]
   ]
 
-  it(`should give the same result as transforming from lineString, and destinationIsGeographic should be set automatically`, () => {
+  it(`should give almost the same result as transforming from lineString, since the geographic distance and midpoint functions are used`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformBackward(input, transformOptions),
       output
@@ -271,8 +269,7 @@ describe('Transform MultiPoint Backward To MultiPoint', async () => {
   const transformOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 2,
-    destinationIsGeographic: true,
-    inputIsMultiGeometry: true
+    isMultiGeometry: true
   }
   const transformer = new GcpTransformer(generalGcps7, 'polynomial')
   const input = [
@@ -327,7 +324,7 @@ describe('Transform Polygon Forward To Polygon, with minOffsetRatio very small',
   })
 })
 
-describe('Transform Polygon Forward To GeoJSON Polygon, with minOffsetRatio very small', async () => {
+describe('Transform Polygon Forward, with minOffsetRatio very small, and convert to GeoJSON Polygon', async () => {
   const transformOptions = {
     minOffsetRatio: 0.00001,
     maxDepth: 1
@@ -360,7 +357,9 @@ describe('Transform Polygon Forward To GeoJSON Polygon, with minOffsetRatio very
 
   it(`should give the same result as transforming to polygon, but as GeoJSON Polygon and therefore closed`, () => {
     expect(
-      transformer.transformForwardAsGeojson(input, transformOptions)
+      geometryToGeojsonGeometry(
+        transformer.transformForward(input, transformOptions)
+      )
     ).to.deep.equal(output)
   })
 })
@@ -436,96 +435,34 @@ describe('Transform Polygon Backward To Polygon, with minOffsetRatio very small'
     )
   })
 
-  describe('Transform GeoJSONPolygon Backward To Polygon', async () => {
+  describe('Transform MultiPolygon Backward To MultiPolygon, using isMultiGeometry = true', async () => {
     const transformOptions = {
       minOffsetRatio: 0.00001,
-      maxDepth: 1
+      maxDepth: 1,
+      isMultiGeometry: true
     }
     const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
-    const input = {
-      type: 'Polygon',
-      coordinates: [
+    const input = [
+      [
         [
           [4.388957777030093, 51.959084191571606],
           [4.392938913951547, 51.94062947962427],
           [4.425874493300959, 51.94172557475595],
-          [4.420666790347598, 51.959985351835975],
-          [4.388957777030093, 51.959084191571606]
+          [4.420666790347598, 51.959985351835975]
         ]
-      ]
-    }
-    const output = [
-      [
-        [1032.5263837176526, 992.2883187637146],
-        [1045.038670070595, 1489.2938524267215],
-        [1056.6257766352364, 1986.6566391349374],
-        [1520.5146305339294, 1995.064826625076],
-        [1972.2719445148632, 2006.6657102722945],
-        [1969.4756718048366, 1507.0983522493168],
-        [1957.822599920541, 1009.7982201488556],
-        [1495.7555378955249, 1000.7599463685738]
       ]
     ]
-
-    it(`should give the same result as transforming from polygon`, () => {
-      expect(
-        transformer.transformBackward(input, transformOptions)
-      ).to.deep.equal(output)
-    })
-  })
-
-  describe('Transform GeoJSONMultiPolygon Backward To Polygon', async () => {
-    const transformOptions = {
-      minOffsetRatio: 0.00001,
-      maxDepth: 1
-    }
-    const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
-    const input = {
-      type: 'MultiPolygon',
-      coordinates: [
-        [
-          [
-            [4.388957777030093, 51.959084191571606],
-            [4.392938913951547, 51.94062947962427],
-            [4.425874493300959, 51.94172557475595],
-            [4.420666790347598, 51.959985351835975],
-            [4.388957777030093, 51.959084191571606]
-          ]
-        ],
-        [
-          [
-            [4.388957777030093, 51.959084191571606],
-            [4.392938913951547, 51.94062947962427],
-            [4.425874493300959, 51.94172557475595],
-            [4.420666790347598, 51.959985351835975],
-            [4.388957777030093, 51.959084191571606]
-          ]
-        ]
-      ]
-    }
     const output = [
       [
         [
           [1032.5263837176526, 992.2883187637146],
-          [1045.038670070595, 1489.2938524267215],
+          [1045.0268036997886, 1489.293879156599],
           [1056.6257766352364, 1986.6566391349374],
-          [1520.5146305339294, 1995.064826625076],
+          [1520.5132800975002, 1995.126987432735],
           [1972.2719445148632, 2006.6657102722945],
-          [1969.4756718048366, 1507.0983522493168],
+          [1969.4605377858998, 1507.0986848843686],
           [1957.822599920541, 1009.7982201488556],
-          [1495.7555378955249, 1000.7599463685738]
-        ]
-      ],
-      [
-        [
-          [1032.5263837176526, 992.2883187637146],
-          [1045.038670070595, 1489.2938524267215],
-          [1056.6257766352364, 1986.6566391349374],
-          [1520.5146305339294, 1995.064826625076],
-          [1972.2719445148632, 2006.6657102722945],
-          [1969.4756718048366, 1507.0983522493168],
-          [1957.822599920541, 1009.7982201488556],
-          [1495.7555378955249, 1000.7599463685738]
+          [1495.754239007751, 1000.8172824356742]
         ]
       ]
     ]
@@ -546,19 +483,20 @@ describe('Transform SVG string Backward To Polygon', async () => {
   const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
   const input =
     '<svg><polygon points="4.388957777030093,51.959084191571606 4.392938913951547,51.94062947962427 4.425874493300959,51.94172557475595 4.420666790347598,51.959985351835975" /></svg>'
-  let output = [
-    [
-      [1032.5263837176526, 992.2883187637146],
-      [1045.038670070595, 1489.2938524267215],
-      [1056.6257766352364, 1986.6566391349374],
-      [1520.5146305339294, 1995.064826625076],
-      [1972.2719445148632, 2006.6657102722945],
-      [1969.4756718048366, 1507.0983522493168],
-      [1957.822599920541, 1009.7982201488556],
-      [1495.7555378955249, 1000.7599463685738]
-    ]
-  ]
-  output = geometriesToFeatureCollection(geometryToGeojsonGeometry(output))
+  let output = geojsonGeometriesToGeojsonFeatureCollection(
+    geometryToGeojsonGeometry([
+      [
+        [1032.5263837176526, 992.2883187637146],
+        [1045.038670070595, 1489.2938524267215],
+        [1056.6257766352364, 1986.6566391349374],
+        [1520.5146305339294, 1995.064826625076],
+        [1972.2719445148632, 2006.6657102722945],
+        [1969.4756718048366, 1507.0983522493168],
+        [1957.822599920541, 1009.7982201488556],
+        [1495.7555378955249, 1000.7599463685738]
+      ]
+    ])
+  )
 
   it(`should give the same result as transforming from geojson polygon`, () => {
     expect(
@@ -570,11 +508,10 @@ describe('Transform SVG string Backward To Polygon', async () => {
   })
 })
 
-describe('Transform LineString Forward To LineString, with inverse returnDomain', async () => {
+describe('Transform LineString Forward To LineString, with reading out the source', async () => {
   const transformOptions = {
     minOffsetRatio: 0.01,
-    maxDepth: 1,
-    returnDomain: 'inverse'
+    maxDepth: 1
   }
   const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
   const input = [
@@ -591,9 +528,13 @@ describe('Transform LineString Forward To LineString, with inverse returnDomain'
     [2000, 1000]
   ]
 
-  it(`should give the same result as with normal returnDomain, but return the corresponding points in the source domain`, () => {
+  it(`should give the same result as with normal, but return the corresponding points in the source domain`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformForward(
+        input,
+        transformOptions,
+        (generalGcp) => generalGcp.source
+      ),
       output
     )
   })

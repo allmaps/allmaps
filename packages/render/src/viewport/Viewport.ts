@@ -384,11 +384,10 @@ export class Viewport {
    * rotated using 'rotation' and translated to 'projectedGeoCenter'.
    *
    * @private
-   * @param {Size} viewportSize
-   * @param {number} projectedGeoPerViewportScale
-   * @param {number} rotation
-   * @param {Point} projectedGeoCenter
-   * @returns {Rectangle}
+   * @param viewportSize
+   * @param projectedGeoPerViewportScale
+   * @param rotation
+   * @param projectedGeoCenter
    */
   private computeProjectedGeoRectangle(
     viewportSize: Size,

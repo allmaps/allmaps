@@ -2,6 +2,8 @@
 import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
+import { flipY, mergeOptions } from '@allmaps/stdlib'
+
 import { GcpTransformer } from '../transformer'
 import {
   refineLineString,
@@ -9,11 +11,26 @@ import {
   defaultRefinementOptions,
   getRefinementSourceResolution
 } from './refinement-helper-functions.js'
+import { invertGeneralGcp } from './conversion-functions.js'
+import { computeDistortionsFromPartialDerivatives } from '../distortion.js'
 
-import type { TransformOptions, RefinementOptions } from './types.js'
+import type {
+  GeneralGcpAndDistortions,
+  DistortionMeasure,
+  TransformOptions,
+  RefinementOptions
+} from './types.js'
 
-import type { Point, LineString, Ring, Polygon, Bbox } from '@allmaps/types'
-import { mergeOptions } from '@allmaps/stdlib'
+import type {
+  Point,
+  LineString,
+  Ring,
+  Polygon,
+  Bbox,
+  TypedLineString,
+  TypedRing,
+  TypedPolygon
+} from '@allmaps/types'
 
 // Options
 
@@ -22,12 +39,12 @@ export const defaultTransformOptions: TransformOptions = {
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
   minLineDistance: Infinity,
-  destinationIsGeographic: false,
   sourceIsGeographic: false,
-  inputIsMultiGeometry: false,
+  destinationIsGeographic: false,
+  isMultiGeometry: false,
   differentHandedness: false,
-  evaluationType: 'function',
-  returnDomain: 'normal'
+  distortionMeasures: [],
+  referenceScale: 1
 }
 
 export function refinementOptionsFromForwardTransformOptions(
@@ -50,9 +67,6 @@ export function refinementOptionsFromForwardTransformOptions(
       point1: Point
     ) => getWorldMidpoint(point0, point1).geometry.coordinates as Point
     refinementOptions.destinationDistanceFunction = getWorldDistance
-  }
-  if (transformOptions.returnDomain == 'inverse') {
-    refinementOptions.returnDomain = 'source'
   }
   return refinementOptions
 }
@@ -78,79 +92,175 @@ export function refinementOptionsFromBackwardTransformOptions(
     ) => getWorldMidpoint(point0, point1).geometry.coordinates as Point
     refinementOptions.destinationDistanceFunction = getWorldDistance
   }
-  if (transformOptions.returnDomain == 'inverse') {
-    refinementOptions.returnDomain = 'source'
-  }
   return refinementOptions
 }
 
 // Transform Geometries
 
-export function transformLineStringForwardToLineString(
-  lineString: LineString,
+export function transformPointForward<P>(
+  point: Point,
   transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): LineString {
-  return refineLineString(
-    lineString,
-    (p) => transformer.transformForward(p),
-    refinementOptionsFromForwardTransformOptions(transformOptions)
-  )
-}
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): P {
+  const source = transformOptions.differentHandedness ? flipY(point) : point
+  const destination =
+    transformer.forwardTransformation!.evaluateFunction(source)
 
-export function transformLineStringBackwardToLineString(
-  lineString: LineString,
-  transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): LineString {
-  return refineLineString(
-    lineString,
-    (p) => transformer.transformBackward(p),
-    refinementOptionsFromBackwardTransformOptions(transformOptions)
-  )
-}
+  let partialDerivativeX = undefined
+  let partialDerivativeY = undefined
+  let distortions = new Map<DistortionMeasure, number>()
 
-export function transformRingForwardToRing(
-  ring: Ring,
-  transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Ring {
-  return refineRing(
-    ring,
-    (p) => transformer.transformForward(p),
-    refinementOptionsFromForwardTransformOptions(transformOptions)
-  )
-}
+  if (transformOptions.distortionMeasures.length > 0) {
+    partialDerivativeX =
+      transformer.forwardTransformation!.evaluatePartialDerivativeX(source)
+    partialDerivativeY =
+      transformer.forwardTransformation!.evaluatePartialDerivativeY(source)
 
-export function transformRingBackwardToRing(
-  ring: Ring,
-  transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Ring {
-  return refineRing(
-    ring,
-    (p) => transformer.transformBackward(p),
-    refinementOptionsFromBackwardTransformOptions(transformOptions)
-  )
-}
+    distortions = computeDistortionsFromPartialDerivatives(
+      transformOptions.distortionMeasures,
+      partialDerivativeX,
+      partialDerivativeY,
+      transformOptions.referenceScale
+    )
+  }
 
-export function transformPolygonForwardToPolygon(
-  polygon: Polygon,
-  transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Polygon {
-  return polygon.map((ring) => {
-    return transformRingForwardToRing(ring, transformer, transformOptions)
+  return generalGcpToP({
+    source: point, // don't apply differentHandedness here, this is only internally.
+    destination,
+
+    partialDerivativeX,
+    partialDerivativeY,
+    distortions
   })
 }
 
-export function transformPolygonBackwardToPolygon(
+export function transformPointBackward<P>(
+  point: Point,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): P {
+  const destination = point
+  let source = transformer.backwardTransformation!.evaluateFunction(destination)
+  // apply differentHandedness here again, so it has been applied twice in total and is undone now.
+  source = transformOptions.differentHandedness ? flipY(source) : source
+
+  let partialDerivativeX = undefined
+  let partialDerivativeY = undefined
+  let distortions = new Map<DistortionMeasure, number>()
+
+  if (transformOptions.distortionMeasures.length > 0) {
+    partialDerivativeX =
+      transformer.forwardTransformation!.evaluatePartialDerivativeX(destination)
+    partialDerivativeX = transformOptions.differentHandedness
+      ? flipY(partialDerivativeX)
+      : partialDerivativeX
+    partialDerivativeY =
+      transformer.forwardTransformation!.evaluatePartialDerivativeY(destination)
+    partialDerivativeY = transformOptions.differentHandedness
+      ? flipY(partialDerivativeY)
+      : partialDerivativeY
+
+    distortions = computeDistortionsFromPartialDerivatives(
+      transformOptions.distortionMeasures,
+      partialDerivativeX,
+      partialDerivativeY,
+      transformOptions.referenceScale
+    )
+  }
+
+  return generalGcpToP({
+    source,
+    destination,
+
+    partialDerivativeX,
+    partialDerivativeY,
+    distortions
+  })
+}
+
+export function transformLineStringForward<P>(
+  lineString: LineString,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedLineString<P> {
+  return refineLineString(
+    lineString,
+    (p) => transformer.transformForward(p),
+    refinementOptionsFromForwardTransformOptions(transformOptions)
+  ).map((generalGcp) => generalGcpToP(generalGcp))
+}
+
+export function transformLineStringBackward<P>(
+  lineString: LineString,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedLineString<P> {
+  return refineLineString(
+    lineString,
+    (p) => transformer.transformBackward(p),
+    refinementOptionsFromBackwardTransformOptions(transformOptions)
+  ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
+}
+
+export function transformRingForward<P>(
+  ring: Ring,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedRing<P> {
+  return refineRing(
+    ring,
+    (p) => transformer.transformForward(p),
+    refinementOptionsFromForwardTransformOptions(transformOptions)
+  ).map((generalGcp) => generalGcpToP(generalGcp))
+}
+
+export function transformRingBackward<P>(
+  ring: Ring,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedRing<P> {
+  return refineRing(
+    ring,
+    (p) => transformer.transformBackward(p),
+    refinementOptionsFromBackwardTransformOptions(transformOptions)
+  ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
+}
+
+export function transformPolygonForward<P>(
   polygon: Polygon,
   transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Polygon {
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedPolygon<P> {
   return polygon.map((ring) => {
-    return transformRingBackwardToRing(ring, transformer, transformOptions)
+    return transformRingForward(
+      ring,
+      transformer,
+      transformOptions,
+      generalGcpToP
+    )
+  })
+}
+
+export function transformPolygonBackward<P>(
+  polygon: Polygon,
+  transformer: GcpTransformer,
+  transformOptions: TransformOptions,
+  generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+): TypedPolygon<P> {
+  return polygon.map((ring) => {
+    return transformRingBackward(
+      ring,
+      transformer,
+      transformOptions,
+      generalGcpToP
+    )
   })
 }
 

@@ -1,10 +1,23 @@
-import type { Point } from '@allmaps/types'
+import type { ConversionOptions, Gcp, Point } from '@allmaps/types'
 
 /**
- * Ground Control Point (GCP).
- * A GCP contains a mapping between a source and destination point.
+ * General Ground Control Point (GCP).
+ * A GeneralGCP contains a mapping between a source and destination point.
  */
-export type GeneralGcp = { source: Point; destination: Point }
+export type GeneralGcp = {
+  source: Point
+  destination: Point
+}
+
+export type Distortions = {
+  partialDerivativeX: Point
+  partialDerivativeY: Point
+  distortions: Map<DistortionMeasure, number>
+  distortion: number
+}
+
+export type GeneralGcpAndDistortions = GeneralGcp & Partial<Distortions>
+export type GcpAndDistortions = Gcp & Partial<Distortions>
 
 export type RefinementOptions = {
   minOffsetRatio: number
@@ -14,7 +27,6 @@ export type RefinementOptions = {
   sourceMidPointFunction: (p0: Point, p1: Point) => Point
   destinationMidPointFunction: (p0: Point, p1: Point) => Point
   destinationDistanceFunction: (p0: Point, p1: Point) => number
-  returnDomain: 'source' | 'destination'
 }
 
 export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
@@ -49,12 +61,10 @@ export type TransformOptions = {
   // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there
   destinationIsGeographic: boolean
   // Whether one of the axes should be flipped while computing the transformation parameters.
-  inputIsMultiGeometry: boolean
   differentHandedness: boolean
-  evaluationType: EvaluationType
-  // Whether to return the normal domain (destination for forward and source for backward) or the inverse
-  returnDomain: 'normal' | 'inverse'
-}
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+} & ConversionOptions
 
 export type KernelFunction = (
   r: number,
@@ -62,11 +72,6 @@ export type KernelFunction = (
 ) => number
 export type KernelFunctionOptions = { derivative?: number; epsilon?: number }
 export type NormFunction = (point0: Point, point1: Point) => number
-
-export type EvaluationType =
-  | 'function'
-  | 'partialDerivativeX'
-  | 'partialDerivativeY'
 
 export type DistortionMeasure =
   | 'log2sigma'

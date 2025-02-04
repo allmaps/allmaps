@@ -14,7 +14,7 @@
     lonLatToWebMecator
   } from '@allmaps/stdlib'
 
-  import { getPolygon, geometryToPath } from '../shared/geometry.js'
+  import { getGeojsonPolygon, geometryToPath } from '../shared/geometry.js'
 
   import WarpedMap from './WarpedMap.svelte'
 
@@ -129,10 +129,9 @@
       }))
       const projectedTransformer = new GcpTransformer(projectedGcps)
 
-      const projectedGeoPolygon =
-        projectedTransformer.transformForwardAsGeojson([
-          georeferencedMap.resourceMask
-        ])
+      const projectedGeoPolygon = projectedTransformer.transformForward([
+        georeferencedMap.resourceMask
+      ])
 
       // 1. Use viewport and SVG path sizes to compute viewport's coordinates in spherical mercator
       // 2. Transform these viewport spherical mercator coordinates to resource coordinates using projectedTransformer
@@ -167,11 +166,10 @@
           pixelScreenSize[1] * projectedGeoToPixelScale
       ]
 
-      const resourceScreenRectangle =
-        projectedTransformer.transformBackwardAsGeojson([
-          bboxToRectangle(projectedGeoScreenBbox)
-        ])
-      const geoScreenRectangle = transformer.transformForwardAsGeojson(
+      const resourceScreenRectangle = projectedTransformer.transformBackward([
+        bboxToRectangle(projectedGeoScreenBbox)
+      ])
+      const geoScreenRectangle = transformer.transformForward(
         resourceScreenRectangle
       )
       const geoScreenRectangleBbox = computeBbox(geoScreenRectangle)
@@ -282,7 +280,7 @@
 
     const paths: string[] = []
     maps.forEach((map) => {
-      const polygon = getPolygon(map)
+      const polygon = getGeojsonPolygon(map)
       const path = geometryToPath(polygon, scaleTo)
       if (path) {
         paths.push(path)

@@ -7,10 +7,6 @@ import {
   addAnnotationOptions,
   addCoordinateTransformOptions
 } from '../../lib/options.js'
-import {
-  stringToSvgGeometriesGenerator,
-  geometriesToFeatureCollection
-} from '@allmaps/stdlib'
 
 export function svg() {
   const command = addCoordinateTransformOptions(
@@ -34,19 +30,11 @@ export function svg() {
 
     const svgs = await readInput(files)
 
-    // TODO: consider to use transformSvgStringToGeojsonFeatureCollection()
-    const geojsonGeometries = []
-    for (const svg of svgs) {
-      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
-        const geojsonGeometry = transformer.transformSvgToGeojson(
-          svgGeometry,
-          transformOptions
-        )
-        geojsonGeometries.push(geojsonGeometry)
-      }
-    }
-
-    const featureCollection = geometriesToFeatureCollection(geojsonGeometries)
-    printJson(featureCollection)
+    const geojsonFeatureCollection =
+      transformer.transformSvgStringsToGeojsonFeatureCollection(
+        svgs,
+        transformOptions
+      )
+    printJson(geojsonFeatureCollection)
   })
 }

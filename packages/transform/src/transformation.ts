@@ -1,7 +1,8 @@
+import { distance, rms } from '@allmaps/stdlib'
+
 import type { Point } from '@allmaps/types'
 
-import type { EvaluationType, TransformationType } from './shared/types.js'
-import { distance, rms } from '@allmaps/stdlib'
+import type { TransformationType } from './shared/types.js'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
@@ -53,7 +54,7 @@ export abstract class Transformation {
 
   computeDestinationTransformedSourcePoints(): Point[] {
     this.destinationTransformedSourcePoints = this.sourcePoints.map(
-      (sourcePoint) => this.evaluate(sourcePoint)
+      (sourcePoint) => this.evaluateFunction(sourcePoint)
     )
 
     return this.destinationTransformedSourcePoints
@@ -85,21 +86,6 @@ export abstract class Transformation {
     }
 
     return rms(this.destinationPoints, destinationTransformedSourcePoints)
-  }
-
-  evaluate(
-    newSourcePoint: Point,
-    evaluationType: EvaluationType = 'function'
-  ): Point {
-    if (evaluationType == 'function') {
-      return this.evaluateFunction(newSourcePoint)
-    } else if (evaluationType == 'partialDerivativeX') {
-      return this.evaluatePartialDerivativeX(newSourcePoint)
-    } else if (evaluationType == 'partialDerivativeY') {
-      return this.evaluatePartialDerivativeY(newSourcePoint)
-    } else {
-      throw new Error('Evaluation of type ' + evaluationType + ' not supported')
-    }
   }
 
   abstract evaluateFunction(_newSourcePoint: Point): Point

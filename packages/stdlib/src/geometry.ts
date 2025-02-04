@@ -2,8 +2,9 @@ import { rewind } from '@turf/rewind'
 
 import type {
   Point,
-  LineString,
   Line,
+  LineString,
+  Triangle,
   Ring,
   Polygon,
   MultiPoint,
@@ -17,8 +18,12 @@ import type {
   GeojsonMultiLineString,
   GeojsonMultiPolygon,
   GeojsonGeometry,
+  SvgCircle,
+  SvgPolyLine,
+  SvgPolygon,
+  SvgGeometry,
   Size,
-  Triangle
+  ConversionOptions
 } from '@allmaps/types'
 
 // Assert
@@ -209,21 +214,108 @@ export function multiPolygonToGeojsonMultiPolygon(
   return rewind(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
-export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
-  if (isPoint(geometry)) {
-    return pointToGeojsonPoint(geometry)
-  } else if (isLineString(geometry)) {
-    return lineStringToGeojsonLineString(geometry)
-  } else if (isPolygon(geometry)) {
-    return polygonToGeojsonPolygon(geometry)
-  } else if (isMultiPoint(geometry)) {
-    return multiPointToGeojsonMultiPoint(geometry)
-  } else if (isMultiLineString(geometry)) {
-    return multiLineStringToGeojsonMultiLineString(geometry)
-  } else if (isMultiPolygon(geometry)) {
-    return multiPolygonToGeojsonMultiPolygon(geometry)
+export function geometryToGeojsonGeometry(
+  point: Point,
+  options?: Partial<ConversionOptions>
+): GeojsonPoint
+export function geometryToGeojsonGeometry(
+  lineString: LineString,
+  options?: Partial<ConversionOptions>
+): GeojsonLineString
+export function geometryToGeojsonGeometry(
+  polygon: Polygon,
+  options?: Partial<ConversionOptions>
+): GeojsonPolygon
+export function geometryToGeojsonGeometry(
+  multiPoint: MultiPoint,
+  options?: Partial<ConversionOptions>
+): GeojsonMultiPoint
+export function geometryToGeojsonGeometry(
+  multiLineString: MultiLineString,
+  options?: Partial<ConversionOptions>
+): GeojsonMultiLineString
+export function geometryToGeojsonGeometry(
+  multiPolygon: MultiPolygon,
+  options?: Partial<ConversionOptions>
+): GeojsonMultiPolygon
+export function geometryToGeojsonGeometry(
+  geometry: Geometry,
+  options?: Partial<ConversionOptions>
+): GeojsonGeometry
+/**
+ * Converts a Geometry to a GeoJSON Geometry
+ * @param geometry - Geometry
+ * @returns GeoJSON Geometry
+ */
+export function geometryToGeojsonGeometry(
+  geometry: Geometry,
+  options?: Partial<ConversionOptions>
+): GeojsonGeometry {
+  if (!options || !options.isMultiGeometry) {
+    if (isPoint(geometry)) {
+      return pointToGeojsonPoint(geometry)
+    } else if (isLineString(geometry)) {
+      return lineStringToGeojsonLineString(geometry)
+    } else if (isPolygon(geometry)) {
+      return polygonToGeojsonPolygon(geometry)
+    } else {
+      throw new Error('Geometry type not supported')
+    }
   } else {
-    throw new Error('Geometry type not supported')
+    if (isMultiPoint(geometry)) {
+      return multiPointToGeojsonMultiPoint(geometry)
+    } else if (isMultiLineString(geometry)) {
+      return multiLineStringToGeojsonMultiLineString(geometry)
+    } else if (isMultiPolygon(geometry)) {
+      return multiPolygonToGeojsonMultiPolygon(geometry)
+    } else {
+      throw new Error('Geometry type not supported')
+    }
+  }
+}
+
+// Convert to SVG
+
+export function pointToSvgCircle(point: Point): SvgCircle {
+  return {
+    type: 'circle',
+    coordinates: point
+  }
+}
+
+export function lineStringToSvgPolyLine(lineString: LineString): SvgPolyLine {
+  return {
+    type: 'polyline',
+    coordinates: lineString
+  }
+}
+
+export function polygonToSvgPolygon(polygon: Polygon): SvgPolygon {
+  return {
+    type: 'polygon',
+    coordinates: polygon[0]
+  }
+}
+
+export function geometryToSvgGeometry(point: Point): SvgCircle
+export function geometryToSvgGeometry(lineString: LineString): SvgPolyLine
+export function geometryToSvgGeometry(polygon: Polygon): SvgPolygon
+export function geometryToSvgGeometry(geometry: Geometry): SvgGeometry
+/**
+ * Converts a Geometry to a SVG Geometry
+ * @param geometry - Geometry
+ * @returns SVG Geometry
+ * }}
+ */
+export function geometryToSvgGeometry(geometry: Geometry): SvgGeometry {
+  if (isPoint(geometry)) {
+    return pointToSvgCircle(geometry)
+  } else if (isLineString(geometry)) {
+    return lineStringToSvgPolyLine(geometry)
+  } else if (isPolygon(geometry)) {
+    return polygonToSvgPolygon(geometry)
+  } else {
+    throw new Error(`Unsupported GeoJSON Geometry`)
   }
 }
 

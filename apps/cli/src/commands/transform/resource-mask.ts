@@ -1,6 +1,11 @@
 import { Command } from '@commander-js/extra-typings'
 
 import { GcpTransformer } from '@allmaps/transform'
+import {
+  geojsonFeaturesToGeojsonFeatureCollection,
+  geojsonGeometryToGeojsonFeature,
+  geometryToGeojsonGeometry
+} from '@allmaps/stdlib'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
@@ -8,7 +13,6 @@ import {
   parseTransformOptions
 } from '../../lib/parse.js'
 import { addCoordinateTransformOptions } from '../../lib/options.js'
-import { featuresToFeatureCollection, geometryToFeature } from '@allmaps/stdlib'
 
 export function resourceMask() {
   const command = addCoordinateTransformOptions(
@@ -33,19 +37,21 @@ export function resourceMask() {
     const features = []
     for (const map of maps) {
       const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
-      const polygon = transformer.transformForwardAsGeojson(
+      const polygon = transformer.transformForward(
         [map.resourceMask],
         transformOptions
       )
+      const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       features.push(
-        geometryToFeature(polygon, {
+        geojsonGeometryToGeojsonFeature(geojsonPolygon, {
           imageId: map.resource.id
         })
       )
     }
 
-    const featureCollection = featuresToFeatureCollection(features)
+    const featureCollection =
+      geojsonFeaturesToGeojsonFeatureCollection(features)
     printJson(featureCollection)
   })
 }

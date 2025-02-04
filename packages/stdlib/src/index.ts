@@ -58,6 +58,7 @@ export {
   isGeojsonMultiLineString,
   isGeojsonMultiPolygon,
   isGeojsonGeometry,
+  isGeojsonMultiGeometry,
   geojsonPointToPoint,
   geojsonLineStringToLineString,
   geojsonPolygonToRing,
@@ -66,20 +67,20 @@ export {
   geojsonMultiLineStringToMultiLineString,
   geojsonMultiPolygonToMultiPolygon,
   geojsonGeometryToGeometry,
+  geojsonGeometryToSvgGeometry,
+  geojsonGeometryToGeojsonFeature,
+  geojsonFeaturesToGeojsonFeatureCollection,
+  geojsonGeometriesToGeojsonFeatureCollection,
+  geojsonFeatureToGeojsonGeometry,
+  geojsonFeatureCollectionToGeojsonGeometries,
   expandGeojsonMultiPointToGeojsonPointArray,
   expandGeojsonMultiLineStringToGeojsonLineStringArray,
   expandGeojsonMultiPolygonToGeojsonPolygonArray,
   expandGeojsonMultiGeometryToGeojsonGeometryArray,
-  joinGeojsonPointArrayToGeojsonMultiPoint,
-  joinGeojsonLineStringArrayToGeojsonMultiLineString,
-  joinGeojsonPolygonArrayToGeojsonMultiPolygon,
-  joinGeojsonGeometryArrayToGeojsonMultiGeometry,
-  geojsonToSvg,
-  geometryToFeature,
-  featuresToFeatureCollection,
-  geometriesToFeatureCollection,
-  featureToGeometry,
-  featureCollectionToGeometries
+  contractGeojsonPointArrayToGeojsonMultiPoint,
+  contractGeojsonLineStringArrayToGeojsonMultiLineString,
+  contractGeojsonPolygonArrayToGeojsonMultiPolygon,
+  contractGeojsonGeometryArrayToGeojsonMultiGeometry
 } from './geojson.js'
 
 export {
@@ -110,6 +111,7 @@ export {
   multiLineStringToGeojsonMultiLineString,
   multiPolygonToGeojsonMultiPolygon,
   geometryToGeojsonGeometry,
+  geometryToSvgGeometry,
   isClosed,
   isEqualPoint,
   isEqualPointArray,
@@ -158,10 +160,16 @@ export { mergeOptions, mergePartialOptions } from './options.js'
 export { lonLatToWebMecator, webMercatorToLonLat } from './projection.js'
 
 export {
+  isSvgCircle,
+  isSvgLine,
+  isSvgPolyLine,
+  isSvgRect,
+  isSvgPolygon,
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
+  svgGeometryToString,
   mapToResourceMaskSvgPolygon,
-  svgToGeojson
+  svgGeometryToGeometry
 } from './svg.js'
 
 export {

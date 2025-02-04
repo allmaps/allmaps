@@ -63,13 +63,13 @@ function processPointString(
   // Parse pointString to array of points and transform them
   const outputPoints: Point[] = []
   const pointArray = parseCoordinatesArrayArray(pointString) as Point[]
-  pointArray.forEach((point) =>
+  pointArray.forEach((point) => {
     outputPoints.push(
       options.inverse
         ? transformer.transformToResource(point)
         : transformer.transformToGeo(point)
     )
-  )
+  })
 
   // Print transformed points
   outputPoints.forEach((outputPoint) =>

@@ -1,5 +1,6 @@
 import { writable, derived, get } from 'svelte/store'
 
+import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 import {
   WarpedMapLayer,
   WarpedMapEvent,
@@ -258,11 +259,13 @@ export async function removeMap(map: GeoreferencedMap) {
 export function addMapToVectorSource(mapId: string) {
   const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
   if (warpedMap) {
-    const geoMask = warpedMap.geoMask
-    const feature = new GeoJSON().readFeature(geoMask, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857'
-    }) as Feature
+    const feature = new GeoJSON().readFeature(
+      geometryToGeojsonGeometry([warpedMap.geoMask]),
+      {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      }
+    ) as Feature
     feature.setId(warpedMap.mapId)
 
     if (!mapVectorSource.hasFeature(feature)) {

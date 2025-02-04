@@ -1,10 +1,7 @@
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
 import { expectToBeCloseToArray } from '../../stdlib/test/helper-functions.js'
-import {
-  GcpTransformer,
-  computeDistortionsFromPartialDerivatives
-} from '../dist/index.js'
+import { GcpTransformer } from '../dist/index.js'
 
 import {
   generalGcps3,
@@ -23,14 +20,60 @@ describe('Helmert transformation', async () => {
   })
 })
 
-describe('Helmert transformation', async () => {
-  const transformer = new GcpTransformer(generalGcps3, 'helmert')
+describe('Helmert transformation with different handeness', async () => {
+  const transformer = new GcpTransformer(generalGcps3, 'helmert', {
+    differentHandedness: true
+  })
   const input = [100, 100]
   // from custom test using https://github.com/mclaeysb/distortionAnalysis/blob/master/functions/helmert.m
-  const output = [4.9385700843392435, 52.46580484503631]
+  const output = [4.925027120153211, 52.46506809004473]
 
-  it(`should have the same output as distortionAnalysis Helmert`, () => {
+  it(`should have the same output as distortionAnalysis Helmert, and respect different handedness`, () => {
     expectToBeCloseToArray(transformer.transformForward(input), output)
+  })
+})
+
+describe('Helmert transformation with different handeness only specified in transformation', async () => {
+  const transformer = new GcpTransformer(generalGcps3, 'helmert')
+  const input = [100, 100]
+  const output = [4.925027120153211, 52.46506809004473]
+
+  it(`should have the wrong output since handedness should be specified when building transformer`, () => {
+    expect(
+      transformer.transformForward(input, {
+        differentHandedness: true
+      })[0]
+    ).to.not.be.approximately(output[0], 0.00001)
+  })
+})
+
+describe('Helmert backward transformation with different handeness', async () => {
+  const transformer = new GcpTransformer(generalGcps3, 'helmert', {
+    differentHandedness: true
+  })
+  const input = [4.925027120153211, 52.46506809004473]
+  const output = [146.25183291709982, 122.59989116975339]
+
+  it(`should have the correct output, and respect different handedness`, () => {
+    expectToBeCloseToArray(transformer.transformBackward(input), output)
+  })
+})
+
+describe('Helmert backward transformation with different handeness and flipped y axis', async () => {
+  const transformer = new GcpTransformer(generalGcps3, 'helmert', {
+    differentHandedness: true
+  })
+  const input = [4.925027120153211, 52.46506809004473]
+  const output = [146.25183291709982, -122.59989116975339]
+
+  it(`should have the correct output with flipped y axis, and respect different handedness`, () => {
+    expectToBeCloseToArray(
+      transformer.transformBackward(input, {}, (generalGcp) => [
+        generalGcp.source[0],
+        -generalGcp.source[1]
+      ]),
+      output
+    )
   })
 })
 
@@ -94,27 +137,24 @@ describe('Thin plate spline transformation', async () => {
 
 describe('Thin plate spline transformation distortion', async () => {
   const helmertTransformer = new GcpTransformer(generalGcps6, 'helmert')
-  helmertTransformer.createForwardTransformation()
-  const referenceScale = helmertTransformer.forwardTransformation.scale
+  const forwardHelmertTransformation =
+    helmertTransformer.createForwardTransformation()
+  const referenceScale = forwardHelmertTransformation.scale
 
   const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
   const input = [1000, 1000]
-  const partialDerivativeX = transformer.transformForward(input, {
-    evaluationType: 'partialDerivativeX'
-  })
-  const partialDerivativeY = transformer.transformForward(input, {
-    evaluationType: 'partialDerivativeY'
-  })
-  const distortions = computeDistortionsFromPartialDerivatives(
-    ['log2sigma'],
-    partialDerivativeX,
-    partialDerivativeY,
-    referenceScale
-  )
-  const distortion = distortions.get('log2sigma')
   const output = 1.7800137112938559
 
   it(`should be able to compute distortion`, () => {
-    expect(distortion).to.equal(output)
+    expect(
+      transformer.transformForward(
+        input,
+        {
+          distortionMeasures: ['log2sigma'],
+          referenceScale
+        },
+        (generalGcp) => generalGcp.distortions.get('log2sigma')
+      )
+    ).to.equal(output)
   })
 })

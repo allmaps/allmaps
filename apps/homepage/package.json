@@ -41,7 +41,7 @@
     "@allmaps/id": "^1.0.0-beta.30",
     "@allmaps/latest": "^1.0.0-beta.36",
     "@allmaps/maplibre": "1.0.0-beta.30",
-    "@allmaps/stdlib": "1.0.0-beta.30",
+    "@allmaps/stdlib": "^1.0.0-beta.30",
     "@allmaps/tailwind": "^1.0.0-beta.14",
     "@allmaps/transform": "1.0.0-beta.40",
     "@allmaps/types": "1.0.0-beta.14",

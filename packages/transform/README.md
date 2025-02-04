@@ -58,6 +58,8 @@ const roundtripTransformedPoint = transformer.transformBackward([
 In this example we transform backward, and from a GeoJSON Geometry.
 
 ```js
+import { GcpTransformer } from '@allmaps/transform'
+
 const generalGcps7 = [
   {
     source: [0, 0],
@@ -128,6 +130,8 @@ const transformedLineString = transformer.transformBackward(
 In this example we transform to a GeoJSON Geometry.
 
 ```js
+import { GcpTransformer } from '@allmaps/transform'
+
 const generalGcps6 = [
   {
     source: [1344, 4098],
@@ -198,6 +202,8 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 In this example we transform a MultiPoint to a MultiPoint.
 
 ```js
+import { GcpTransformer } from '@allmaps/transform'
+
 const generalGcps7 = [
   {
     source: [0, 0],
@@ -230,7 +236,7 @@ const generalGcps7 = [
 ]
 
 const options = {
-  inputIsMultiGeometry: true // this assures the transform method recognises the input as a multiPoint, not a LineString
+  isMultiGeometry: true // this assures the transform method recognises the input as a multiPoint, not a LineString
 }
 
 const transformer = new GcpTransformer(generalGcps7, 'polynomial')
@@ -247,9 +253,19 @@ const transformedMultiPoint = transformer.transformForward(multiPoint, options)
 // ]
 ```
 
+## Creating a transformer
+
+A transformer is build from a set of **GCPs**, a **transformation type** and some optional **options**.
+
+### GCPs
+
+GCPs follow the GCP type (see below). Each transformation type has a minimum number of GCPs.
+
+Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+
 ### Transformation types
 
-A transformer is build from a set of GCPs and a transformation type. The following transformation types are supported.
+The following transformation types are supported.
 
 |                                                                                                                 | Type                                       | Description                                                              | Properties                                                                                                                           | Minimum number of GCPs |
 | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
@@ -261,15 +277,45 @@ A transformer is build from a set of GCPs and a transformation type. The followi
 | <img width="100" src="../ui/src/lib/shared/images/transformations/thin-plate-spline.svg" alt="thinPlateSpline"> | `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Applies smooth transformation. Transformation is 'exact' at GPCs. (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
 | <img width="100" src="../ui/src/lib/shared/images/transformations/projective.svg" alt="projective">             | `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Follow perspective rules. Preserves lines and cross-ratios.                                                                          | 4                      |
 
-### Transformer methods
+## Using transformer methods
 
-Once a transformer is built, it can be used to transform geometries forward and backward.
+Once a transformer is built, its methods can be used to transform geometries forward and backward. Transformer methods take a **Geometry or GeoJSON Geometry**, some optional **options** and an optional **'return type function'**.
 
 All transformer methods accepts Points, LineStrings as well as Polygons (and MultiPoints, MultiLineStrings and MultiPolygons), both as standard geometries or GeoJSON geometries. There are, however, separate methods for transforming to standard geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
 
 Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
 
 Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
+
+Note that the transform methods are **map-projection agnostic**: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
+
+### Handling GeoJSON input and output
+
+While this function takes Geometries as input and output, it is also possible to handle GeoJSON Geometries using conversion function available in the standard library:
+
+```ts
+import { GcpTransformer } from '@allmaps/transform'
+import { geojsonGeometryToGeometry, geometryToGeojsonGeometry } from '@allmaps/stdlib'
+
+const generalGcps7 = ... // see above
+
+const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+
+const geojsonLineString = {
+  type: 'LineString',
+  coordinates: [
+    [10, 50],
+    [50, 50]
+  ]
+}
+const lineString = geojsonGeometryToGeometry(geojsonLineString)
+
+const transformedLineString = transformer.transformBackward(
+  lineString,
+  options
+)
+const transformedGeoJsonLineString = geometryToGeojsonGeometry(transformedLineString)
+```
 
 ### Transform options
 
@@ -289,9 +335,10 @@ Here's an overview of the available options:
 | `minLineDistance`         | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                         | `number`                                                     | `Infinity` (i.e. condition not applied by default) |
 | `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                                                                                                             | `boolean`                                                    | `false` (`true` when source is GeoJSON)            |
 | `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                                                                                                        | `boolean`                                                    | `false` (`true` when destination is GeoJSON)       |
-| `inputIsMultiGeometry`    | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry (as opposed to GeoJSON geometries) types are not deterministic: the types of LineString and MultiPoint are identical. | `boolean`                                                    | `false`                                            |
-| `differentHandedness`     | Whether one of the axes should be flipped while computing the transformation parameters. Should be true if the handedness differs between the source and destination.                                                                                        | `boolean`                                                    | `false`                                            |
-| `evaluationType`          | Whether to evaluate the transformation function or one of it's derivatives.                                                                                                                                                                                  | `'function' \| 'partialDerivativeX' \| 'partialDerivativeY'` | `'function'`                                       |
+| `isMultiGeometry`    | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry (as opposed to GeoJSON geometries) types are not deterministic: the types of LineString and MultiPoint are identical. | `boolean`                                                    | `false`                                            |
+| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform.                                                                                        | `boolean`                                                    | `false`                                            |
+| `distortionMeasures`          | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                                                                                                                                                   | `DistortionMeasure[]` | `[]`                                       |
+| `referenceScale`          | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                                                                                                   | `number` | `1`                                       |
 
 #### Recursively adding midpoints
 
@@ -319,6 +366,26 @@ The handedness of the source and destination can differ, for example if the sour
 
 Therefore, in case the handedness differs and this could matter, one can set the `differentHandedness` parameter to `true`. This will (not change the data itself, but) during computation of the transformation parameters and during evaluation of new inputs flip the y-axis of the source so as to align the handedness of both.
 
+It is also possible to explicitly flip the y-axis of the output. This can be useful for example when transforming features backward from (lon, lat) coordinates to image coordinates (with `differentHandedness` set to `true` as it should be): when inspecting the resulting features in image space in an HTML-canvas, the results will display correctly since both the image and features are rendered according to the downward y-axis of the canvas. Some applications will, however, load images and vector features differently: QGIS (with the 'no-CRS' setting) for example loads vector features with an upward y-axis but images with a downward y-axis. For these special cases, (still set the `differentHandedness` set to `true` but also) use the 'return type function' as follows to make your resulting features overlap the image in the application you are using:
+
+```ts
+import { GcpTransformer } from '@allmaps/transform'
+
+const generalGcps3 = ... // see above
+
+const transformer = new GcpTransformer(generalGcps3, 'helmert', {
+    differentHandedness: true
+  })
+const input = [4.925027120153211, 52.46506809004473]
+
+const output = transformer.transformBackward([0, 0], {}, (generalGcp) => [
+  generalGcp.source[0],
+  -generalGcp.source[1]
+])
+// output = [146.25183291709982, -122.59989116975339]
+// instead of [146.25183291709982, 122.59989116975339]
+```
+
 #### Distortions
 
 Some transformations may induce distortions. Let's consider transforming an image to make this more visual. It we take a Helmert transformation of an image, we will see that it doesn't distort the image much: it will scale, rotate and translate the image, but not shear it (angles are preserved) - the only distortion applied is the scaling, and that scaling is the same everywhere across the image. If, on the other hand, we take a Thin Plate Spline transformation (with many GCPs) of that same image, we will see that the image will be distorted much, and will look like a rubber sheet which has been pulled and deformed in many different locations. Every pixel will be distorted in a unique way, such that both the areas and angles of the original image are not preserved.
@@ -340,37 +407,43 @@ This packages supports the evaluation of the partial derivatives in the `transfo
 Here's an example on how to compute local distortion.
 
 ```js
-import { GcpTransformer, computeDistortionFromPartialDerivatives } from '@allmaps/transform'
+import { GcpTransformer } from '@allmaps/transform'
 
 const generalGcps6 = ... // See above
 
+// Obtain the referenceScale
 const helmertTransformer = new GcpTransformer(generalGcps6, 'helmert')
-helmertTransformer.createForwardTransformation()
-const referenceScale = helmertTransformer.forwardTransformation.scale
+const forwardHelmertTransformation = helmertTransformer.createForwardTransformation() as Helmert
+const referenceScale = forwardHelmertTransformation.scale as number
 
 const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
 const input = [1000, 1000]
-const partialDerivativeX = transformer.transformForward(input, {
-  evaluationType: 'partialDerivativeX'
-})
-const partialDerivativeY = transformer.transformForward(input, {
-  evaluationType: 'partialDerivativeY'
-})
-const distortion = computeDistortionFromPartialDerivatives(
-  partialDerivativeX,
-  partialDerivativeY,
-  'log2sigma',
-  referenceScale
-)
+const distortion = transformer.transformForward(
+        input,
+        {
+          returnType: 'gcp',
+          distortionMeasures: ['log2sigma'],
+          referenceScale
+        },
+        (generalGcp) => generalGcp.distortions.get('log2sigma')
+      )
 // distortion = 1.7800137112938559
 // => At this input location the area has significantly expanded after the transformation
 ```
 
-## Notes
+### Return Type Function
 
-### Typing
+The 'return type function' (internally named `generalGcpToP` or `GcpToP`) allows to modify the type of data returned for each point.
 
-#### GCPs
+An example will make this more clear: when forward-transforming a LineString, the input is a LineString in the source space and the (default) output is a LineString in the destination space (i.e. an Array of destination points). Using the 'return type function', you can make this output to be an Array of any function of objects of type GcpAndDistortions, which include the destination points, but also the corresponding source points and (if computed) the distortion information. By default this function this selects the destination points, and hence returns an Array of Points, but you can pass a function `(generalGcpToP) => generalGcpToP` to return an Array of  GcpAndDistortions objects, or you can pass more complex function on this object as well. This can be useful in several cases:
+
+* When you want to refine an input geometry using a transformation but are interested in the coordinates of the refined geometry in the input domain more then those in the output domain.
+* When you want to read out distortion information at each point (see the options for how to specify which distortions measures to compute).
+* When you want to apply a transformation on the outputs point, e.g. flip the output points around their y-axis (see the notes on handedness for example of the latter).
+
+## Typing
+
+### GCPs
 
 GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
 
@@ -390,7 +463,21 @@ type Gcp = {
 }
 ```
 
-#### Geometry types
+When using the option `returnType = 'gcp'`, the data is returned as `GeneralGcpAndDistortions` or `GcpAndDistortions`, which are defined as follows:
+
+```ts
+export type Distortions = {
+  partialDerivativeX: Point
+  partialDerivativeY: Point
+  distortions: Map<DistortionMeasure, number>
+  distortion: number
+}
+
+export type GeneralGcpAndDistortions = GeneralGcp & Partial<Distortions>
+export type GcpAndDistortions = Gcp & Partial<Distortions>
+```
+
+### Geometry types
 
 **Standard geometries**: the following geometry types are used by default in this and other packages.
 
@@ -405,10 +492,10 @@ type Polygon = Point[][]
 // There is no requirement on winding order.
 
 type MultiPoint = Point[]
-// Notice that this is equivalent to the LineString type, hence the `inputIsMultiGeometry` option
+// Notice that this is equivalent to the LineString type, hence the `isMultiGeometry` option
 
 type MultiLineString = Point[][]
-// Notice that this is equivalent to the Polygon type, hence the `inputIsMultiGeometry` option
+// Notice that this is equivalent to the Polygon type, hence the `isMultiGeometry` option
 
 type MultiPolygon = Point[][][]
 
@@ -464,16 +551,11 @@ export type SvgGeometry =
   | SvgRect
 ```
 
-### Transform vs. GDAL
+## Transform vs. GDAL
 
 The transformation algorithms of this package correspond to those of **GDAL** and the results are (nearly) identical. See the [tests](./test/test-transform.js) for details.
 
 For a little history: this library started out as a JavaScript port of [gdaltransform](https://gdal.org/programs/gdaltransform.html) (as described in [this notebook](https://observablehq.com/@bertspaan/gdaltransform?collection=@bertspaan/iiif-maps)) and initially only implemented polynomial transformations of order 1. Later Thin Plate Spline transformations were added (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) amongst other transformations, which lead to a refactoring using the [`ml-matrix`](https://github.com/mljs/matrix) library. This library is used for creating and solving the linear systems of equations that are at the heart of each of each of these transformations.
-
-## Notes
-
-* Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-* The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ## CLI
 
@@ -525,12 +607,21 @@ The benchmark can be run with `pnpm run bench`.
 'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
 ```
 
-### `EvaluationType`
+### `Distortions`
+
+###### Fields
+
+* `distortion` (`number`)
+* `distortions` (`Map<DistortionMeasure, number>`)
+* `partialDerivativeX` (`[number, number]`)
+* `partialDerivativeY` (`[number, number]`)
+
+### `GcpAndDistortions`
 
 ###### Type
 
 ```ts
-'function' | 'partialDerivativeX' | 'partialDerivativeY'
+Gcp & Partial<Distortions>
 ```
 
 ### `new GcpTransformer(gcps, type, options)`
@@ -548,16 +639,6 @@ Create a GcpTransformer
 ###### Returns
 
 `GcpTransformer`.
-
-### `GcpTransformer#assureEqualHandedness(point)`
-
-###### Parameters
-
-* `point` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
 
 ### `GcpTransformer#backwardTransformation?`
 
@@ -638,11 +719,10 @@ Array<GeneralGcp>
   maxDepth: number
   sourceIsGeographic: boolean
   destinationIsGeographic: boolean
-  inputIsMultiGeometry: boolean
   differentHandedness: boolean
-  evaluationType: EvaluationType
-  returnDomain: 'normal' | 'inverse'
-}
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+} & ConversionOptions
 ```
 
 ### `GcpTransformer#sourcePoints`
@@ -653,53 +733,33 @@ Array<GeneralGcp>
 Array<Point>
 ```
 
-### `GcpTransformer#transformBackward(input, options)`
+### `GcpTransformer#transformBackward(point, options, generalGcpToP)`
 
 ###### Parameters
 
-* `input` (`Point | GeojsonPoint`)
+* `point` (`[number, number]`)
 * `options?` (`Partial<TransformOptions> | undefined`)
+* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
-`[number, number]`.
+`P`.
 
-### `GcpTransformer#transformBackwardAsGeojson(input, options)`
+### `GcpTransformer#transformForward(point, options, generalGcpToP)`
 
 ###### Parameters
 
-* `input` (`Point | GeojsonPoint`)
+* `point` (`[number, number]`)
 * `options?` (`Partial<TransformOptions> | undefined`)
+* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
-`{type: 'Point'; coordinates: Point}`.
-
-### `GcpTransformer#transformForward(input, options)`
-
-###### Parameters
-
-* `input` (`Point | GeojsonPoint`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-
-###### Returns
-
-`[number, number]`.
-
-### `GcpTransformer#transformForwardAsGeojson(input, options)`
-
-###### Parameters
-
-* `input` (`Point | GeojsonPoint`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-
-###### Returns
-
-`{type: 'Point'; coordinates: Point}`.
+`P`.
 
 ### `GcpTransformer#transformGeojsonFeatureCollectionToSvgString(geojson, options)`
 
-Transforms a GeoJSON FeatureCollection backward to a SVG string
+Transforms a GeoJSON FeatureCollection to resource space to a SVG string
 
 Note: Multi-geometries are not supported
 
@@ -712,112 +772,86 @@ Note: Multi-geometries are not supported
 
 ###### Returns
 
-Backward transform of input, as SVG string (`string`).
+Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`string`).
 
-### `GcpTransformer#transformGeojsonToSvg(geometry, options)`
+### `GcpTransformer#transformGeojsonToSvg(geojsonGeometry, options)`
 
-Transforms a GeoJSON geometry backward to a SVG geometry
+Transforms a GeoJSON Geometry to resource space to a SVG geometry
 
 Note: Multi-geometries are not supported
 
 ###### Parameters
 
-* `geometry` (`  | GeojsonPoint
+* `geojsonGeometry` (`  | GeojsonPoint
     | GeojsonLineString
     | GeojsonPolygon
     | GeojsonMultiPoint
     | GeojsonMultiLineString
     | GeojsonMultiPolygon`)
-  * GeoJSON geometry to transform
+  * GeoJSON Geometry to transform
 * `options?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
-Backward transform of input, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`).
+Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgRect | SvgPolygon`).
 
-### `GcpTransformer#transformSvgStringToGeojsonFeatureCollection(svg, options)`
+### `GcpTransformer#transformSvgStringsToGeojsonFeatureCollection(svgs, options)`
 
-Transforms a SVG string forward to a GeoJSON FeatureCollection
+Transforms SVG strings to geo space to a GeoJSON FeatureCollection
 
 Note: Multi-geometries are not supported
 
 ###### Parameters
 
-* `svg` (`string`)
-  * SVG string to transform
+* `svgs` (`Array<string>`)
+  * An array of SVG strings to transform
 * `options?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
-Forward transform of input, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
+Input SVG strings transformed to geo space, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
 
-### `GcpTransformer#transformSvgToGeojson(geometry, options)`
+### `GcpTransformer#transformSvgToGeojson(svgCircle, options)`
 
-Transforms a SVG geometry forward to a GeoJSON geometry
+Transforms a SVG geometry to geo space as a GeoJSON Geometry
 
 Note: Multi-geometries are not supported
 
 ###### Parameters
 
-* `geometry` (`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`)
-  * SVG geometry to transform
+* `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
 * `options?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
-Forward transform of input, as a GeoJSON geometry (`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`).
+Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Point'; coordinates: Point}`).
 
-### `GcpTransformer#transformToGeo(input, options)`
+### `GcpTransformer#transformToGeo(point, options, gcpToP)`
 
 ###### Parameters
 
-* `input` (`Point | GeojsonPoint`)
+* `point` (`[number, number]`)
 * `options?` (`Partial<TransformOptions> | undefined`)
+* `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
-`[number, number]`.
+`P`.
 
-### `GcpTransformer#transformToGeoAsGeojson(input, options)`
+### `GcpTransformer#transformToResource(point, options, gcpToP)`
 
 ###### Parameters
 
-* `input` (`Point | GeojsonPoint`)
+* `point` (`[number, number]`)
 * `options?` (`Partial<TransformOptions> | undefined`)
+* `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
-`{type: 'Point'; coordinates: Point}`.
-
-### `GcpTransformer#transformToResource(input, options)`
-
-###### Parameters
-
-* `input` (`Point | GeojsonPoint`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-
-###### Returns
-
-`[number, number]`.
-
-### `GcpTransformer#transformToResourceAsGeojson(input, options)`
-
-###### Parameters
-
-* `input` (`Point | GeojsonPoint`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-
-###### Returns
-
-`{type: 'Point'; coordinates: Point}`.
+`P`.
 
 ### `GcpTransformer#type`
 
@@ -840,6 +874,14 @@ Forward transform of input, as a GeoJSON geometry (`  | GeojsonPoint
 
 * `destination` (`[number, number]`)
 * `source` (`[number, number]`)
+
+### `GeneralGcpAndDistortions`
+
+###### Type
+
+```ts
+GeneralGcp & Partial<Distortions>
+```
 
 ### `new Helmert(sourcePoints, destinationPoints)`
 
@@ -1226,7 +1268,6 @@ number
 * `minLineDistance` (`number`)
 * `minOffsetDistance` (`number`)
 * `minOffsetRatio` (`number`)
-* `returnDomain` (`'source' | 'destination'`)
 * `sourceMidPointFunction` (`(p0: Point, p1: Point) => Point`)
 
 ### `SplitGcpLineInfo`
@@ -1327,18 +1368,21 @@ number
 
 ### `TransformOptions`
 
-###### Fields
+###### Type
 
-* `destinationIsGeographic` (`boolean`)
-* `differentHandedness` (`boolean`)
-* `evaluationType` (`'function' | 'partialDerivativeX' | 'partialDerivativeY'`)
-* `inputIsMultiGeometry` (`boolean`)
-* `maxDepth` (`number`)
-* `minLineDistance` (`number`)
-* `minOffsetDistance` (`number`)
-* `minOffsetRatio` (`number`)
-* `returnDomain` (`'normal' | 'inverse'`)
-* `sourceIsGeographic` (`boolean`)
+```ts
+{
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  maxDepth: number
+  sourceIsGeographic: boolean
+  destinationIsGeographic: boolean
+  differentHandedness: boolean
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+} & ConversionOptions
+```
 
 ### `new Transformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
 
@@ -1399,17 +1443,6 @@ Array<Point>
 ```ts
 Array<number>
 ```
-
-### `Transformation#evaluate(newSourcePoint, evaluationType)`
-
-###### Parameters
-
-* `newSourcePoint` (`[number, number]`)
-* `evaluationType` (`EvaluationType | undefined`)
-
-###### Returns
-
-`[number, number]`.
 
 ### `Transformation#evaluateFunction(_newSourcePoint)`
 
@@ -1523,7 +1556,7 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 
 * `bbox` (`[number, number, number, number]`)
 * `transformer` (`GcpTransformer`)
-* `partialTransformOptions` (`{ minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; maxDepth?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; returnDomain?: "normal" | ... 1 more ... | undefined; }`)
+* `partialTransformOptions` (`{ minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; maxDepth?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
 
 ###### Returns
 

@@ -1,4 +1,4 @@
-import type { Point } from './geometry'
+import type { Line, LineString, Point, Ring } from './geometry'
 
 export type SvgAttributes = Record<string, string | number>
 
@@ -11,25 +11,25 @@ export type SvgCircle = {
 export type SvgLine = {
   type: 'line'
   attributes?: SvgAttributes
-  coordinates: [Point, Point]
+  coordinates: Line
 }
 
 export type SvgPolyLine = {
   type: 'polyline'
   attributes?: SvgAttributes
-  coordinates: Point[]
+  coordinates: LineString
 }
 
 export type SvgPolygon = {
   type: 'polygon'
   attributes?: SvgAttributes
-  coordinates: Point[]
+  coordinates: Ring
 }
 
 export type SvgRect = {
   type: 'rect'
   attributes?: SvgAttributes
-  coordinates: Point[]
+  coordinates: Ring
 }
 
 export type SvgGeometry =

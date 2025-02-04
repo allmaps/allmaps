@@ -23,6 +23,9 @@ export {
 
 export type {
   GeneralGcp,
+  Distortions,
+  GeneralGcpAndDistortions,
+  GcpAndDistortions,
   RefinementOptions,
   SplitGcpLinePointInfo,
   SplitGcpLineInfo,
@@ -31,6 +34,5 @@ export type {
   KernelFunction,
   KernelFunctionOptions,
   NormFunction,
-  EvaluationType,
   DistortionMeasure
 } from './shared/types.js'
