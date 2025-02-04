@@ -1,6 +1,6 @@
 import { GcpTransformer } from '@allmaps/transform'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import { parseMap, parseGcps, parseTransformationType } from './parse.js'
 

@@ -331,5 +331,26 @@
         "none": ["en"]
       }
     }
-  ]
+  ],
+  "homepage": [
+    {
+      "id": "https://codexxolotl.com",
+      "type": "Text",
+      "label": {
+        "none": ["Codex Xolotl"]
+      },
+      "format": "text/html"
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://dlc.services/iiif-img/22/2/?pretty_print=1",
+      "type": "Dataset",
+      "format": "application/ld+json",
+      "profile": "https://www.w3.org/TR/json-ld/"
+    }
+  ],
+  "summary": {
+    "none": [""]
+  }
 }

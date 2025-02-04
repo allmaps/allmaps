@@ -10,7 +10,7 @@ import {
 import { addCoordinateTransformOptions } from '../../lib/options.js'
 import { featuresToFeatureCollection, geometryToFeature } from '@allmaps/stdlib'
 
-export default function resourceMask() {
+export function resourceMask() {
   const command = addCoordinateTransformOptions(
     new Command('resource-mask')
       .argument('[files...]')

@@ -1,6 +1,6 @@
 import { generateId, generateRandomId } from '@allmaps/id'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage
@@ -222,28 +222,28 @@ export function getFullMapId(mapId: string) {
 function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
   if (transformation === 'polynomial2') {
     return {
-      type: 'polynomial',
+      type: 'polynomial' as const,
       options: {
         order: 2
       }
     }
   } else if (transformation === 'polynomial3') {
     return {
-      type: 'polynomial',
+      type: 'polynomial' as const,
       options: {
         order: 3
       }
     }
   } else if (transformation === 'thinPlateSpline') {
     return {
-      type: 'thinPlateSpline'
+      type: 'thinPlateSpline' as const
     }
   }
 
   // TODO: add other tranformation types
 
   return {
-    type: 'polynomial',
+    type: 'polynomial' as const,
     options: {
       order: 1
     }

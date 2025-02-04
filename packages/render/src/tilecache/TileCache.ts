@@ -1,10 +1,10 @@
 import { equalSet } from '@allmaps/stdlib'
 
-import CacheableTile, { CachedTile } from './CacheableTile.js'
+import { CacheableTile, CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import { shouldPruneTile } from '../shared/tiles.js'
-import FetchableTile from './FetchableTile.js'
+import { FetchableTile } from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -19,13 +19,8 @@ const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
 
 /**
  * Class that fetches and caches IIIF tiles.
- *
- * @export
- * @class TileCache
- * @typedef {TileCache}
- * @extends {EventTarget}
  */
-export default class TileCache<D> extends EventTarget {
+export class TileCache<D> extends EventTarget {
   cachableTileFactory: CachableTileFactory<D>
   fetchFn?: FetchFn
 
@@ -50,7 +45,7 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the tiles in this cache
    *
-   * @returns {IterableIterator<CacheableTile>}
+   * @returns
    */
   getCacheableTiles(): IterableIterator<CacheableTile<D>> {
     return this.tilesByTileUrl.values()
@@ -59,8 +54,8 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get a specific tile in this cache
    *
-   * @param {string} tileUrl - the URL of the requested tile
-   * @returns {(CacheableTile | undefined)}
+   * @param tileUrl - the URL of the requested tile
+   * @returns
    */
   getCacheableTile(tileUrl: string): CacheableTile<D> | undefined {
     return this.tilesByTileUrl.get(tileUrl)
@@ -69,8 +64,8 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the tiles in this cache, corresponding to a specific map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {CacheableTile[]}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapCacheableTiles(mapId: string): CacheableTile<D>[] {
     const cacheableTiles: CacheableTile<D>[] = []
@@ -87,7 +82,7 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the tiles in this cache that have been fetched
    *
-   * @returns {CacheableTile[]}
+   * @returns
    */
   getCachedTiles(): CachedTile<D>[] {
     const cachedTiles: CachedTile<D>[] = []
@@ -104,8 +99,8 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get a specific cached tile in this cache that has been fetched
    *
-   * @param {string} tileUrl - the URL of the requested tile
-   * @returns {(CachedTile | undefined)}
+   * @param tileUrl - the URL of the requested tile
+   * @returns
    */
   getCachedTile(tileUrl: string): CachedTile<D> | undefined {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
@@ -117,8 +112,8 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the tiles in this cache, corresponding to a specific map, that have been fetched
    *
-   * @param {string} mapId - ID of the map
-   * @returns {CachedTile[]}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapCachedTiles(mapId: string): CachedTile<D>[] {
     const cachedTiles: CachedTile<D>[] = []
@@ -138,7 +133,7 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the URLs of tiles in this cache
    *
-   * @returns {IterableIterator<string>}
+   * @returns
    */
   getTileUrls(): IterableIterator<string> {
     return this.tilesByTileUrl.keys()
@@ -147,8 +142,8 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Get the URLs of tiles in this cache, corresponding to a specific map
    *
-   * @param {string} mapId - ID of the map
-   * @returns {IterableIterator<string>}
+   * @param mapId - ID of the map
+   * @returns
    */
   getMapTileUrls(mapId: string) {
     return this.tileUrlsByMapId.get(mapId) || new Set()
@@ -158,7 +153,7 @@ export default class TileCache<D> extends EventTarget {
   /**
    * Process the request for new tiles to be added to this cache
    *
-   * @param {FetchableTile[]} fetchableTiles
+   * @param fetchableTiles
    */
   requestFetchableTiles(fetchableTiles: FetchableTile[]) {
     const previousKeys = new Set(
@@ -187,9 +182,6 @@ export default class TileCache<D> extends EventTarget {
    * Returns a promise that resolves when all requested tiles are loaded.
    * This could happen immidiately, in case there are no ongoing requests and the tilesFetchingCount is zero,
    * or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
-   *
-   * @async
-   * @returns {Promise<void>}
    */
   async allRequestedTilesLoaded(): Promise<void> {
     return new Promise((resolve) => {

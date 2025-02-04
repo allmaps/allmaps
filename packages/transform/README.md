@@ -301,9 +301,9 @@ Two factors are at play which may require a more granular transformation: the tr
 
 An algorithm will therefore recursively add midpoints in each segment (i.e. between two Points) to make the line more granular. A midpoint is added at the transformed middle Point of the original segment if the number of iterations is smaller than or equal to `maxDepth`, and if at least one of the following conditions are met:
 
-*   The ratio of (the distance between the middle Point of the transformed segment and the transformed middle Point of the original segment) to the length of the transformed segment, is larger than or equal to the specified `minOffsetRatio`.
-*   The distance between the middle Point of the transformed segment and the transformed middle Point of the original segment is larger than or equal to the specified `minOffsetDistance`.
-*   The transformed segment is larger than or equal to the specified `minLineDistance`.
+* The ratio of (the distance between the middle Point of the transformed segment and the transformed middle Point of the original segment) to the length of the transformed segment, is larger than or equal to the specified `minOffsetRatio`.
+* The distance between the middle Point of the transformed segment and the transformed middle Point of the original segment is larger than or equal to the specified `minOffsetDistance`.
+* The transformed segment is larger than or equal to the specified `minLineDistance`.
 
 Note that only one is met by default. Set a value to a number to opt in to a condition, set a value to `Infinity` to opt out of a condition.
 
@@ -472,18 +472,18 @@ For a little history: this library started out as a JavaScript port of [gdaltran
 
 ## Notes
 
-*   Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
-*   The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
+* Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+* The transform functions are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ## CLI
 
 The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific use cases:
 
-*   Transforming points to points.
-*   Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
-*   Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
-*   Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
-*   Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
+* Transforming points to points.
+* Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
+* Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
+* Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
+* Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
 
 ## Benchmark
 
@@ -517,213 +517,1022 @@ The benchmark can be run with `pnpm run bench`.
 
 ## API
 
-<!-- Generated by documentation.js. Update this documentation by updating the source code. -->
+### `DistortionMeasure`
 
-#### Table of Contents
+###### Type
 
-*   [allmaps/transform](#allmapstransform)
-*   [GcpTransformer](#gcptransformer)
-    *   [Parameters](#parameters)
-    *   [createForwardTransformation](#createforwardtransformation)
-    *   [createBackwardTransformation](#createbackwardtransformation)
-    *   [transformForward](#transformforward)
-    *   [transformForwardAsGeojson](#transformforwardasgeojson)
-    *   [transformBackward](#transformbackward)
-    *   [transformBackwardAsGeojson](#transformbackwardasgeojson)
-    *   [transformToGeo](#transformtogeo)
-    *   [transformToGeoAsGeojson](#transformtogeoasgeojson)
-    *   [transformToResource](#transformtoresource)
-    *   [transformToResourceAsGeojson](#transformtoresourceasgeojson)
-    *   [transformSvgToGeojson](#transformsvgtogeojson)
-    *   [transformSvgStringToGeojsonFeatureCollection](#transformsvgstringtogeojsonfeaturecollection)
-    *   [transformGeojsonToSvg](#transformgeojsontosvg)
-    *   [transformGeojsonFeatureCollectionToSvgString](#transformgeojsonfeaturecollectiontosvgstring)
-*   [Transformation](#transformation)
-    *   [Parameters](#parameters-13)
-*   [computeDistortionsFromPartialDerivatives](#computedistortionsfrompartialderivatives)
-    *   [Parameters](#parameters-14)
+```ts
+'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
+```
 
-### allmaps/transform
+### `EvaluationType`
 
-### GcpTransformer
+###### Type
 
-A Ground Control Point Transformer, containing a forward and backward transformation and
-specifying functions to transform geometries using these transformations.
+```ts
+'function' | 'partialDerivativeX' | 'partialDerivativeY'
+```
 
-#### Parameters
+### `new GcpTransformer(gcps, type, options)`
 
-*   `gcps` **([Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<GeneralGcp> | [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Gcp>)** An array of Ground Control Points (GCPs)
-*   `type` **TransformationType** The transformation type (optional, default `'polynomial'`)
-*   `options` &#x20;
+Create a GcpTransformer
 
-#### createForwardTransformation
+###### Parameters
 
-Create forward transformation
+* `gcps` (`Array<GeneralGcp> | Array<Gcp>`)
+  * An array of Ground Control Points (GCPs)
+* `type` (`TransformationType | undefined`)
+  * The transformation type
+* `options?` (`Partial<TransformOptions> | undefined`)
 
-#### createBackwardTransformation
+###### Returns
+
+`GcpTransformer`.
+
+### `GcpTransformer#assureEqualHandedness(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `GcpTransformer#backwardTransformation?`
+
+###### Type
+
+```ts
+Transformation
+```
+
+### `GcpTransformer#computeTransformation(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Transformation`.
+
+### `GcpTransformer#createBackwardTransformation()`
 
 Create backward transformation
 
-#### transformForward
+###### Parameters
 
-Transforms a Geometry or a GeoJSON geometry forward to a Geometry
+There are no parameters.
 
-##### Parameters
+###### Returns
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+`Transformation`.
 
-Returns **Geometry** Forward transform of input as Geometry
+### `GcpTransformer#createForwardTransformation()`
 
-#### transformForwardAsGeojson
+Create forward transformation
 
-Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
+###### Parameters
 
-##### Parameters
+There are no parameters.
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+###### Returns
 
-Returns **GeojsonGeometry** Forward transform of input, as GeoJSON geometry
+`Transformation`.
 
-#### transformBackward
+### `GcpTransformer#destinationPoints`
 
-Transforms a geometry or a GeoJSON geometry backward to a Geometry
+###### Type
 
-##### Parameters
+```ts
+Array<Point>
+```
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+### `GcpTransformer#forwardTransformation?`
 
-Returns **Geometry** backward transform of input, as geometry
+###### Type
 
-#### transformBackwardAsGeojson
+```ts
+Transformation
+```
 
-Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
+### `GcpTransformer#gcps`
 
-##### Parameters
+###### Type
 
-*   `input` **(Geometry | GeojsonGeometry)** Geometry or GeoJSON geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+```ts
+Array<GeneralGcp>
+```
 
-Returns **GeojsonGeometry** backward transform of input, as GeoJSON geometry
+### `GcpTransformer#options`
 
-#### transformToGeo
+###### Type
 
-Transforms Geometry or GeoJSON geometry forward, as Geometry
+```ts
+{
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  maxDepth: number
+  sourceIsGeographic: boolean
+  destinationIsGeographic: boolean
+  inputIsMultiGeometry: boolean
+  differentHandedness: boolean
+  evaluationType: EvaluationType
+  returnDomain: 'normal' | 'inverse'
+}
+```
 
-##### Parameters
+### `GcpTransformer#sourcePoints`
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+###### Type
 
-Returns **Geometry** Forward transform of input, as Geometry
+```ts
+Array<Point>
+```
 
-#### transformToGeoAsGeojson
+### `GcpTransformer#transformBackward(input, options)`
 
-Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
+###### Parameters
 
-##### Parameters
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+###### Returns
 
-Returns **Geometry** Forward transform of input, as GeoJSON geometry
+`[number, number]`.
 
-#### transformToResource
+### `GcpTransformer#transformBackwardAsGeojson(input, options)`
 
-Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
+###### Parameters
 
-##### Parameters
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+###### Returns
 
-Returns **Geometry** Backward transform of input, as a Geometry
+`{type: 'Point'; coordinates: Point}`.
 
-#### transformToResourceAsGeojson
+### `GcpTransformer#transformForward(input, options)`
 
-Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
+###### Parameters
 
-##### Parameters
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
 
-*   `input` **(Geometry | GeojsonGeometry)** Input to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+###### Returns
 
-Returns **GeojsonGeometry** Backward transform of input, as a GeoJSON geometry
+`[number, number]`.
 
-#### transformSvgToGeojson
+### `GcpTransformer#transformForwardAsGeojson(input, options)`
 
-Transforms a SVG geometry forward to a GeoJSON geometry
+###### Parameters
 
-Note: Multi-geometries are not supported
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
 
-##### Parameters
+###### Returns
 
-*   `geometry` **SvgGeometry** SVG geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+`{type: 'Point'; coordinates: Point}`.
 
-Returns **GeojsonGeometry** Forward transform of input, as a GeoJSON geometry
-
-#### transformSvgStringToGeojsonFeatureCollection
-
-Transforms a SVG string forward to a GeoJSON FeatureCollection
-
-Note: Multi-geometries are not supported
-
-##### Parameters
-
-*   `svg` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** SVG string to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
-
-Returns **GeojsonFeatureCollection** Forward transform of input, as a GeoJSON FeatureCollection
-
-#### transformGeojsonToSvg
-
-Transforms a GeoJSON geometry backward to a SVG geometry
-
-Note: Multi-geometries are not supported
-
-##### Parameters
-
-*   `geometry` **GeojsonGeometry** GeoJSON geometry to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
-
-Returns **SvgGeometry** Backward transform of input, as SVG geometry
-
-#### transformGeojsonFeatureCollectionToSvgString
+### `GcpTransformer#transformGeojsonFeatureCollectionToSvgString(geojson, options)`
 
 Transforms a GeoJSON FeatureCollection backward to a SVG string
 
 Note: Multi-geometries are not supported
 
-##### Parameters
+###### Parameters
 
-*   `geojson` **GeojsonFeatureCollection** GeoJSON FeatureCollection to transform
-*   `options` **Partial\<TransformOptions>?** Transform options
+* `geojson` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
+  * GeoJSON FeatureCollection to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
 
-Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Backward transform of input, as SVG string
+###### Returns
 
-### Transformation
+Backward transform of input, as SVG string (`string`).
 
-Transformation class. Abstract class, extended by the various transformations.
+### `GcpTransformer#transformGeojsonToSvg(geometry, options)`
 
-#### Parameters
+Transforms a GeoJSON geometry backward to a SVG geometry
 
-*   `sourcePoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The source points
-*   `destinationPoints` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Point>** The destination points
-*   `type` **TransformationType** The transformation type
-*   `pointCountMinimum` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The minimum number of points for the transformation type
+Note: Multi-geometries are not supported
 
-### computeDistortionsFromPartialDerivatives
+###### Parameters
+
+* `geometry` (`  | GeojsonPoint
+    | GeojsonLineString
+    | GeojsonPolygon
+    | GeojsonMultiPoint
+    | GeojsonMultiLineString
+    | GeojsonMultiPolygon`)
+  * GeoJSON geometry to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Backward transform of input, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`).
+
+### `GcpTransformer#transformSvgStringToGeojsonFeatureCollection(svg, options)`
+
+Transforms a SVG string forward to a GeoJSON FeatureCollection
+
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `svg` (`string`)
+  * SVG string to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Forward transform of input, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
+
+### `GcpTransformer#transformSvgToGeojson(geometry, options)`
+
+Transforms a SVG geometry forward to a GeoJSON geometry
+
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `geometry` (`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`)
+  * SVG geometry to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Forward transform of input, as a GeoJSON geometry (`  | GeojsonPoint
+  | GeojsonLineString
+  | GeojsonPolygon
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon`).
+
+### `GcpTransformer#transformToGeo(input, options)`
+
+###### Parameters
+
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+
+###### Returns
+
+`[number, number]`.
+
+### `GcpTransformer#transformToGeoAsGeojson(input, options)`
+
+###### Parameters
+
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+
+###### Returns
+
+`{type: 'Point'; coordinates: Point}`.
+
+### `GcpTransformer#transformToResource(input, options)`
+
+###### Parameters
+
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+
+###### Returns
+
+`[number, number]`.
+
+### `GcpTransformer#transformToResourceAsGeojson(input, options)`
+
+###### Parameters
+
+* `input` (`Point | GeojsonPoint`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+
+###### Returns
+
+`{type: 'Point'; coordinates: Point}`.
+
+### `GcpTransformer#type`
+
+###### Type
+
+```ts
+  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'projective'
+  | 'thinPlateSpline'
+```
+
+### `GeneralGcp`
+
+###### Fields
+
+* `destination` (`[number, number]`)
+* `source` (`[number, number]`)
+
+### `new Helmert(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Helmert`.
+
+###### Extends
+
+* `Transformation`
+
+### `Helmert#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Helmert#evaluatePartialDerivativeX(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Helmert#evaluatePartialDerivativeY(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Helmert#helmertParameters`
+
+###### Type
+
+```ts
+Array<number>
+```
+
+### `Helmert#helmertParametersMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Helmert#rotation`
+
+###### Type
+
+```ts
+number
+```
+
+### `Helmert#scale`
+
+###### Type
+
+```ts
+number
+```
+
+### `Helmert#translation`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `KernelFunction`
+
+###### Type
+
+```ts
+(r: number, options: KernelFunctionOptions) => number
+```
+
+### `KernelFunctionOptions`
+
+###### Fields
+
+* `derivative?` (`number`)
+* `epsilon?` (`number`)
+
+### `NormFunction`
+
+###### Type
+
+```ts
+(point0: Point, point1: Point) => number
+```
+
+### `new Polynomial(sourcePoints, destinationPoints, order)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+* `order?` (`number | undefined`)
+
+###### Returns
+
+`Polynomial`.
+
+###### Extends
+
+* `Transformation`
+
+### `Polynomial#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial#order`
+
+###### Type
+
+```ts
+number
+```
+
+### `Polynomial#pointCountMinimum`
+
+###### Type
+
+```ts
+number
+```
+
+### `Polynomial#polynomialParameters`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `Polynomial#polynomialParametersMatrices`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
+
+### `Polynomial#rotation?`
+
+###### Type
+
+```ts
+number
+```
+
+### `Polynomial#scale?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Polynomial#shear?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Polynomial#translation?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `new Projective(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Projective`.
+
+###### Extends
+
+* `Transformation`
+
+### `Projective#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Projective#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Projective#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Projective#projectiveParameters`
+
+###### Type
+
+```ts
+Array<Array<number>>
+```
+
+### `Projective#projectiveParametersMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, epsilon)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+* `kernelFunction` (`(r: number, options: KernelFunctionOptions) => number`)
+* `normFunction` (`(point0: Point, point1: Point) => number`)
+* `epsilon?` (`number | undefined`)
+
+###### Returns
+
+`RBF`.
+
+###### Extends
+
+* `Transformation`
+
+### `RBF#affineWeights`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `RBF#epsilon?`
+
+###### Type
+
+```ts
+number
+```
+
+### `RBF#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `RBF#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `RBF#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `RBF#kernelFunction`
+
+###### Type
+
+```ts
+(r: number, options: KernelFunctionOptions) => number
+```
+
+### `RBF#normFunction`
+
+###### Type
+
+```ts
+(point0: Point, point1: Point) => number
+```
+
+### `RBF#rbfWeights`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `RBF#weightsMatrices`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
+
+### `RefinementOptions`
+
+###### Fields
+
+* `destinationDistanceFunction` (`(p0: Point, p1: Point) => number`)
+* `destinationMidPointFunction` (`(p0: Point, p1: Point) => Point`)
+* `maxDepth` (`number`)
+* `minLineDistance` (`number`)
+* `minOffsetDistance` (`number`)
+* `minOffsetRatio` (`number`)
+* `returnDomain` (`'source' | 'destination'`)
+* `sourceMidPointFunction` (`(p0: Point, p1: Point) => Point`)
+
+### `SplitGcpLineInfo`
+
+###### Fields
+
+* `destinationLineDistance` (`number`)
+* `destinationMidPointsDistance` (`number`)
+* `destinationRefinedLineDistance` (`number`)
+
+### `SplitGcpLinePointInfo`
+
+###### Type
+
+```ts
+SplitGcpLineInfo & {
+  sourceMidPoint: Point
+  destinationMidPointFromRefinementFunction: Point
+}
+```
+
+### `new Straight(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Straight`.
+
+###### Extends
+
+* `Transformation`
+
+### `Straight#destinationPointsCenter`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Straight#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Straight#evaluatePartialDerivativeX(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Straight#evaluatePartialDerivativeY(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Straight#scale?`
+
+###### Type
+
+```ts
+number
+```
+
+### `Straight#sourcePointsCenter`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `Straight#translation?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `TransformOptions`
+
+###### Fields
+
+* `destinationIsGeographic` (`boolean`)
+* `differentHandedness` (`boolean`)
+* `evaluationType` (`'function' | 'partialDerivativeX' | 'partialDerivativeY'`)
+* `inputIsMultiGeometry` (`boolean`)
+* `maxDepth` (`number`)
+* `minLineDistance` (`number`)
+* `minOffsetDistance` (`number`)
+* `minOffsetRatio` (`number`)
+* `returnDomain` (`'normal' | 'inverse'`)
+* `sourceIsGeographic` (`boolean`)
+
+### `new Transformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
+
+Create a transformation
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+  * The source points
+* `destinationPoints` (`Array<Point>`)
+  * The destination points
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'`)
+  * The transformation type
+* `pointCountMinimum` (`number`)
+  * The minimum number of points for the transformation type
+
+###### Returns
+
+`Transformation`.
+
+### `Transformation#computeDestinationTransformedSourcePoints()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Point>`.
+
+### `Transformation#destinationPoints`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `Transformation#destinationTransformedSourcePoints?`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `Transformation#errors`
+
+###### Type
+
+```ts
+Array<number>
+```
+
+### `Transformation#evaluate(newSourcePoint, evaluationType)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+* `evaluationType` (`EvaluationType | undefined`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Transformation#evaluateFunction(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Transformation#evaluatePartialDerivativeX(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Transformation#evaluatePartialDerivativeY(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Transformation#pointCount`
+
+###### Type
+
+```ts
+number
+```
+
+### `Transformation#pointCountMinimum`
+
+###### Type
+
+```ts
+number
+```
+
+### `Transformation#rmse`
+
+###### Type
+
+```ts
+number
+```
+
+### `Transformation#sourcePoints`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `Transformation#type`
+
+###### Type
+
+```ts
+string
+```
+
+### `TransformationType`
+
+Transformation type.
+
+###### Type
+
+```ts
+  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'projective'
+  | 'thinPlateSpline'
+```
+
+### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 
 Compute the distortion value of selected distortion measures from the partial derivatives at a specific point
 
-#### Parameters
+###### Parameters
 
-*   `distortionMeasures` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<DistortionMeasures>** The requested distortion measures
-*   `partialDerivativeX` **Point** The partial derivative to 'x' of the transformation, evaluated at a set point
-*   `partialDerivativeY` **Point** The partial derivative to 'y' of the transformation, evaluated at a set point
-*   `referenceScale` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The reference area scaling (sigma) to take into account for certain distortion measures (like 'log2sigma'), e.g. computed via a helmert transform (optional, default `1`)
+* `distortionMeasures` (`Array<DistortionMeasure>`)
+  * The requested distortion measures
+* `partialDerivativeX?` (`Point | undefined`)
+  * The partial derivative to 'x' of the transformation, evaluated at a set point
+* `partialDerivativeY?` (`Point | undefined`)
+  * The partial derivative to 'y' of the transformation, evaluated at a set point
+* `referenceScale` (`number | undefined`)
+  * The reference area scaling (sigma) to take into account for certain distortion measures (like 'log2sigma'), e.g. computed via a helmert transform
 
-Returns **[Map](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map)\<DistortionMeasure, [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)>** A map of distortion measures and distortion values at the point
+###### Returns
+
+A map of distortion measures and distortion values at the point (`Map<DistortionMeasure, number>`).
+
+### `getForwardTransformResolution(bbox, transformer, partialTransformOptions)`
+
+###### Parameters
+
+* `bbox` (`[number, number, number, number]`)
+* `transformer` (`GcpTransformer`)
+* `partialTransformOptions` (`{ minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; maxDepth?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; returnDomain?: "normal" | ... 1 more ... | undefined; }`)
+
+###### Returns
+
+`number | undefined`.
+
+### `supportedDistortionMeasures`
+
+###### Type
+
+```ts
+Array<string>
+```

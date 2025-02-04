@@ -1,4 +1,11 @@
-export default function serialize(obj: unknown): string {
+/**
+ * Serializes any JavaScript type to a string. If the
+ * type is an object, first sortthe object by its keys.
+ *
+ * @param obj - JavaScript type to serialize.
+ * @returns `obj` serialized to a string.
+ */
+export function serialize(obj: unknown): string {
   if (Array.isArray(obj)) {
     return `[${obj.map((i) => serialize(i)).join(',')}]`
   } else if (typeof obj === 'number') {

@@ -7,7 +7,7 @@ import {
   mapToResourceMaskSvgPolygon
 } from '@allmaps/stdlib'
 
-export default function svg() {
+export function svg() {
   return new Command('svg')
     .argument('[files...]')
     .summary('generate SVG from resource mask')

@@ -5,13 +5,27 @@ import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { EmbeddedImage, Image } from './image.js'
 
-import type { LanguageString, Metadata } from '../lib/types.js'
+import type {
+  LanguageString,
+  Metadata,
+  NavDate,
+  NavPlace,
+  Thumbnail,
+  SeeAlso,
+  RequiredStatement,
+  Summary,
+  Annotations,
+  Homepage
+} from '../lib/types.js'
 import {
   parseVersion2String,
   parseVersion3String,
   parseVersion2Metadata,
-  filterInvalidMetadata
-} from '../lib/strings.js'
+  parseVersion3Metadata,
+  parseVersion2Attribution,
+  parseVersion2Thumbnail,
+  parseVersion2Related
+} from '../lib/convert.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
 type ImageType = z.infer<typeof ImageSchema>
@@ -23,14 +37,14 @@ const CanvasTypeString = 'canvas'
 
 /**
  * Parsed IIIF Canvas
- * @class Canvas
- * @property {string} [uri] - URI of Canvas
- * @property {LanguageString} [label] - Label of Manifest
- * @property {Metadata} [metadata] - Metadata of Manifest
- * @property {EmbeddedImage | Image} [image] - Image of painted on Canvas
- * @property {number} [height] - Height of Canvas
- * @property {number} [width] - Width of Canvas
- * @property {string} [type] - Resource type, equals 'canvas'
+ *
+ * @property uri - URI of Canvas
+ * @property label - Label of Manifest
+ * @property metadata - Metadata of Manifest
+ * @property image - Image of painted on Canvas
+ * @property height - Height of Canvas
+ * @property width - Width of Canvas
+ * @property type - Resource type, equals 'canvas'
  */
 export class Canvas {
   uri: string
@@ -42,7 +56,17 @@ export class Canvas {
   image: EmbeddedImage | Image
 
   label?: LanguageString
+  description?: LanguageString
   metadata?: Metadata
+  navDate?: NavDate
+  navPlace?: NavPlace
+  homepage?: Homepage
+  thumbnail?: Thumbnail
+  seeAlso?: SeeAlso
+  summary?: Summary
+  requiredStatement?: RequiredStatement
+
+  annotations?: Annotations
 
   constructor(parsedCanvas: CanvasType) {
     this.width = parsedCanvas.width
@@ -53,13 +77,18 @@ export class Canvas {
 
       this.uri = parsedCanvas['@id']
 
-      if (parsedCanvas.label) {
-        this.label = parseVersion2String(parsedCanvas.label)
-      }
+      this.description = parseVersion2String(parsedCanvas.description)
+      this.label = parseVersion2String(parsedCanvas.label)
+      this.metadata = parseVersion2Metadata(parsedCanvas.metadata)
 
-      this.metadata = filterInvalidMetadata(
-        parseVersion2Metadata(parsedCanvas.metadata)
+      this.navDate = parsedCanvas.navDate
+      this.navPlace = parsedCanvas.navPlace
+
+      this.requiredStatement = parseVersion2Attribution(
+        parsedCanvas.attribution
       )
+      this.thumbnail = parseVersion2Thumbnail(parsedCanvas.thumbnail)
+      this.homepage = parseVersion2Related(parsedCanvas.related)
 
       this.image = new EmbeddedImage(
         parsedCanvas.images[0].resource,
@@ -71,7 +100,18 @@ export class Canvas {
       this.uri = parsedCanvas.id
 
       this.label = parseVersion3String(parsedCanvas.label)
-      this.metadata = filterInvalidMetadata(parsedCanvas.metadata)
+      this.description = parseVersion3String(parsedCanvas.description)
+      this.metadata = parseVersion3Metadata(parsedCanvas.metadata)
+
+      this.navDate = parsedCanvas.navDate
+      this.navPlace = parsedCanvas.navPlace
+      this.homepage = parsedCanvas.homepage
+      this.thumbnail = parsedCanvas.thumbnail
+      this.seeAlso = parsedCanvas.seeAlso
+      this.summary = parsedCanvas.summary
+      this.requiredStatement = parsedCanvas.requiredStatement
+
+      this.annotations = parsedCanvas.annotations
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
 

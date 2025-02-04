@@ -7,10 +7,10 @@ import {
   rgbToHex
 } from '@allmaps/stdlib'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 export class DetectBackgroundColorWorker {
-  detectBackgroundColor(map: Map, imageData: ImageData) {
+  detectBackgroundColor(map: GeoreferencedMap, imageData: ImageData) {
     // const scale = imageBitmap.width / map.resource.width
     // const mask: SVGPolygon = map.resourceMask.map((point) => [
     //   point[0] * scale,

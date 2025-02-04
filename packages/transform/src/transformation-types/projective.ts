@@ -1,10 +1,10 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import Transformation from '../transformation.js'
+import { Transformation } from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class Projective extends Transformation {
+export class Projective extends Transformation {
   projectiveParametersMatrix: Matrix
   projectiveParameters: number[][]
 

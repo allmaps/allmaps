@@ -3,7 +3,7 @@ import { Command } from '@commander-js/extra-typings'
 import { parseJsonInput, printString } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 
-export default function imageId() {
+export function imageIds() {
   return new Command('image-ids')
     .argument('[files...]')
     .summary('read all IIIF Image IDs from a Georeference Annotation')

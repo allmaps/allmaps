@@ -7,7 +7,7 @@ import { generateManifest } from '../../lib/iiif.js'
 
 // Instead of supplying input files, you can also use the standard input
 
-export default function manifest() {
+export function manifest() {
   return (
     new Command('manifest')
       .argument('[files...]')

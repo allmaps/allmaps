@@ -220,5 +220,10 @@
     }
   ],
   "uri": "https://figgy.princeton.edu/concern/scanned_maps/fa4fb452-5f1d-42ab-a471-53afc176c948/manifest",
-  "majorVersion": 2
+  "majorVersion": 2,
+  "thumbnail": [
+    {
+      "id": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file/full/!200,150/0/default.jpg"
+    }
+  ]
 }

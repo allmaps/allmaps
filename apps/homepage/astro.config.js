@@ -11,7 +11,6 @@ const isDevelop = import.meta.env.DEV
 const branch = isDevelop ? 'develop' : 'main'
 const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${branch}/`
 
-// https://astro.build/config
 export default defineConfig({
   server: { port: ports.homepage, host: true },
   devToolbar: {

@@ -1,6 +1,6 @@
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type {
   Point,
@@ -9,12 +9,6 @@ import type {
   SvgPolygon,
   SvgGeometry
 } from '@allmaps/types'
-
-// Assert
-
-// TODO!
-
-// Read from string
 
 export function* stringToSvgGeometriesGenerator(svg: string) {
   function* helper(
@@ -181,7 +175,7 @@ function elementToString(tag: string, attributes: SvgAttributes): string {
   return `<${tag} ${attributeStrings.join(' ')} />`
 }
 
-export function mapToResourceMaskSvgPolygon(map: Map): SvgPolygon {
+export function mapToResourceMaskSvgPolygon(map: GeoreferencedMap): SvgPolygon {
   return {
     type: 'polygon',
     attributes: {

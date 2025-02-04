@@ -1,4 +1,4 @@
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { Properties } from '$lib/shared/types.js'
 

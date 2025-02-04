@@ -1,8 +1,8 @@
 import type { Config } from 'tailwindcss'
 
-import themeColors from './theme-colors.js'
+import { themeColors } from './theme-colors.js'
 
-export default {
+export const theme = {
   extend: {
     textColor: {
       DEFAULT: themeColors.black

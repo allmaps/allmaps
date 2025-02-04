@@ -15,16 +15,7 @@
   ],
   "description": "OpenLayers classes for Allmaps",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/bundles/allmaps-openlayers-8.umd.cjs"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -55,7 +46,7 @@
     "format": "prettier --write src test",
     "preversion": "pnpm run lint && pnpm test",
     "test": "NODE_ENV=test pnpm run build && mocha",
-    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API"
+    "documentation": "remark . --output --use remark-api"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
@@ -65,15 +56,20 @@
     "ol": "^8.2.0"
   },
   "devDependencies": {
+    "@allmaps/transform": "^1.0.0-beta.41",
+    "@allmaps/types": "^1.0.0-beta.15",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "documentation": "^14.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
+    "prettier": "^3.4.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
     "typescript": "^5.7.0",
-    "vite": "^5.0.3"
+    "vite": "^5.0.3",
+    "vite-plugin-dts": "^3.8.3",
+    "vite-plugin-no-bundle": "^4.0.0"
   }
 }

@@ -1,6 +1,6 @@
-import { parseAnnotation, validateMap } from '@allmaps/annotation'
+import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { TransformOptions, TransformationType } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
 import { readFromFile, parseJsonFromFile } from './io.js'
@@ -76,7 +76,7 @@ export function parseTransformationType(
   },
   map?: GeoreferencedMap
 ): TransformationType {
-  let transformationType
+  let transformationType: TransformationType
   if (
     options.transformationType === 'polynomial' &&
     options.polynomialOrder === 1
@@ -92,13 +92,18 @@ export function parseTransformationType(
     options.polynomialOrder === 3
   ) {
     transformationType = 'polynomial3'
-  } else if (options.transformationType) {
+  } else if (options.transformationType === 'thinPlateSpline') {
     transformationType = options.transformationType
-  } else if (options.annotation && map) {
+  } else if (options.transformationType === 'helmert') {
+    transformationType = options.transformationType
+  } else if (options.transformationType === 'projective') {
+    transformationType = options.transformationType
+  } else if (options.annotation && map?.transformation?.type) {
     transformationType = map.transformation?.type
   } else {
     transformationType = 'polynomial'
   }
+
   return transformationType
 }
 
@@ -113,7 +118,7 @@ export function parseAnnotationValidateMap(
   ) {
     return parseAnnotation(jsonValue)
   } else {
-    return validateMap(jsonValue)
+    return validateGeoreferencedMap(jsonValue)
   }
 }
 

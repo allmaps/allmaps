@@ -1,9 +1,9 @@
-import { getIiifTile } from './tiles.js'
+import { getTileImageRequest } from './tiles.js'
 
 import { ImageRequest, SizeObject, TileZoomLevel } from '@allmaps/types'
 import { Fit } from './types.js'
 
-function getThumbnailSize(
+function getImageRequestSize(
   imageSize: SizeObject,
   containerSize: SizeObject,
   mode: Fit = 'cover'
@@ -32,7 +32,7 @@ function getThumbnailSize(
 const maxThumbnailDownscale = 0.8
 const maxThumbnailUpscale = 1.5
 
-export function getThumbnail(
+export function getImageRequest(
   imageSize: SizeObject,
   containerSize: SizeObject,
   mode: Fit = 'cover',
@@ -52,7 +52,7 @@ export function getThumbnail(
     maxArea?: number
   }
 ): ImageRequest | ImageRequest[][] {
-  let { width, height } = getThumbnailSize(imageSize, containerSize, mode)
+  let { width, height } = getImageRequestSize(imageSize, containerSize, mode)
 
   if (maxWidth && width > maxWidth) {
     height = (height / width) * maxWidth
@@ -131,7 +131,7 @@ export function getThumbnail(
     for (let y = 0; y < tilesY; y++) {
       const thumbnailRow = []
       for (let x = 0; x < tilesX; x++) {
-        const thumbnailTile = getIiifTile(imageSize, zoomLevel, x, y)
+        const thumbnailTile = getTileImageRequest(imageSize, zoomLevel, x, y)
         thumbnailRow.push(thumbnailTile)
       }
       thumbnailTiles.push(thumbnailRow)

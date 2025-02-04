@@ -1,6 +1,6 @@
 import { generateChecksum } from '@allmaps/id'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 export async function getMapId(map: GeoreferencedMap) {
   if (map.id) {

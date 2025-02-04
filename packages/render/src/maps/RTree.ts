@@ -21,7 +21,7 @@ type RTreeItem = {
 /**
  * 2D spatial index for polygons
  */
-export default class RTree {
+export class RTree {
   rbush: RBush<RTreeItem> = new RBush()
 
   polygonsById: Map<string, GeojsonPolygon> = new Map()

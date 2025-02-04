@@ -1,6 +1,6 @@
 import type { GeocoderProviderGeoJsonFeature } from '$lib/shared/types.js'
 
-export default abstract class GeocoderProvider {
+export abstract class GeocoderProvider {
   name: string
   apiKey?: string
 

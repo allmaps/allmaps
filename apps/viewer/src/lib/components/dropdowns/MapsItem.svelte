@@ -59,10 +59,14 @@
   const imageUri = viewerMap.map.resource.id
   const warpedMap = mapWarpedMapLayer.getWarpedMap(mapId)
 
+  if (warpedMap === undefined) {
+    throw new Error(`Warped map with ID ${mapId} not found`)
+  }
+
   const checkboxId = `dropdown-maps-${mapId}`
 
-  const imageWidth = viewerMap.map.resource.width
-  const imageHeight = viewerMap.map.resource.height
+  const imageWidth = warpedMap.parsedImage.width
+  const imageHeight = warpedMap.parsedImage.height
 
   $: {
     $hue

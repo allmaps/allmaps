@@ -1,14 +1,14 @@
 import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
-  validateMap,
-  type Map as GeoreferencedMap
+  validateGeoreferencedMap,
+  type GeoreferencedMap
 } from '@allmaps/annotation'
 
-import RTree from './RTree.js'
-import WarpedMap from './WarpedMap.js'
+import { RTree } from './RTree.js'
+import { WarpedMap } from './WarpedMap.js'
 
-import { bboxToCenter, combineBboxes } from '@allmaps/stdlib'
+import { bboxToCenter, combineBboxes, convexHull } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type {
@@ -37,18 +37,17 @@ function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
  * for quickly looking up maps using their Bbox.
- *
- * @export
- * @class WarpedMapList
- * @template {WarpedMap} W
- * @typedef {WarpedMapList<W>}
- * @extends {EventTarget}
+ * @template W - The type of WarpedMap objects in this list
  */
-export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
+export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   warpedMapFactory: WarpedMapFactory<W>
-  warpedMapsById: Map<string, W> = new Map()
 
-  zIndices: Map<string, number> = new Map()
+  /**
+   * Maps in this list, indexed by their ID
+   */
+  warpedMapsById: Map<string, W>
+  zIndices: Map<string, number>
+
   rtree?: RTree
   imageInformations?: ImageInformations
   transformation?: TransformationOptions
@@ -59,14 +58,17 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Creates an instance of a WarpedMapList.
    *
    * @constructor
-   * @param {WarpedMapFactory<W>} [warpedMapFactory] - Factory function for creating WarpedMap objects
-   * @param {WarpedMapListOptions} [options] - Options
+   * @param warpedMapFactory - Factory function for creating WarpedMap objects
+   * @param options - Options
    */
   constructor(
     warpedMapFactory: WarpedMapFactory<W>,
     options?: Partial<WarpedMapListOptions>
   ) {
     super()
+
+    this.warpedMapsById = new Map()
+    this.zIndices = new Map()
 
     this.warpedMapFactory = warpedMapFactory
 
@@ -88,7 +90,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Returns mapIds for the maps in this list.
    *
-   * @returns {Iterable<string>}
+   * @returns
    */
   getMapIds(): Iterable<string> {
     return this.warpedMapsById.keys()
@@ -98,10 +100,10 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Returns WarpedMap objects of the maps in this list.
    * Optionally specify mapIds whose WarpedMap objects are requested.
    *
-   * @returns {Iterable<W>}
+   * @returns
    */
   getWarpedMaps(): Iterable<W>
-  getWarpedMaps(mapIds: Iterable<string>): Iterable<W>
+  getWarpedMaps(mapIds?: Iterable<string>): Iterable<W>
   getWarpedMaps(mapIds?: Iterable<string>): Iterable<W> {
     if (mapIds === undefined) {
       return this.warpedMapsById.values()
@@ -120,8 +122,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Returns the WarpedMap object in this list of map specified by its ID.
    *
-   * @param {string} mapId
-   * @returns {(W | undefined)}
+   * @param mapId
+   * @returns
    */
   getWarpedMap(mapId: string): W | undefined {
     return this.warpedMapsById.get(mapId)
@@ -130,8 +132,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Returns the z-index of a map.
    *
-   * @param {string} mapId
-   * @returns {number | undefined}
+   * @param mapId
+   * @returns
    */
   getMapZIndex(mapId: string): number | undefined {
     return this.zIndices.get(mapId)
@@ -154,50 +156,84 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
    *
-   * @returns {(Bbox | undefined)}
+   * Returns undefined if the list is empty.
+   *
+   * @returns
    */
-  getBbox(): Bbox | undefined {
-    let bbox
+  getBbox(mapIds?: Iterable<string>): Bbox | undefined {
+    const bboxes = []
 
-    for (const warpedMap of this.getWarpedMaps()) {
+    for (const warpedMap of this.getWarpedMaps(mapIds)) {
       if (warpedMap.visible) {
-        if (!bbox) {
-          bbox = warpedMap.geoMaskBbox
-        } else {
-          bbox = combineBboxes(bbox, warpedMap.geoMaskBbox)
-        }
+        bboxes.push(warpedMap.geoMaskBbox)
       }
     }
 
-    return bbox
+    return combineBboxes(...bboxes)
   }
 
   /**
    * Return the bounding box of all visible maps in this list, in projected geospatial coordinates
    *
-   * @returns {(Bbox | undefined)}
+   * Returns undefined if the list is empty.
+   *
+   * @returns
    */
-  getProjectedBbox(): Bbox | undefined {
-    let bbox
+  getProjectedBbox(mapIds?: Iterable<string>): Bbox | undefined {
+    const bboxes = []
 
-    for (const warpedMap of this.getWarpedMaps()) {
+    for (const warpedMap of this.getWarpedMaps(mapIds)) {
       if (warpedMap.visible) {
-        if (!bbox) {
-          bbox = warpedMap.projectedGeoMaskBbox
-        } else {
-          bbox = combineBboxes(bbox, warpedMap.projectedGeoMaskBbox)
-        }
+        bboxes.push(warpedMap.projectedGeoMaskBbox)
       }
     }
 
-    return bbox
+    return combineBboxes(...bboxes)
+  }
+
+  /**
+   * Return the convex hull of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
+   *
+   * Returns undefined if the list is empty.
+   *
+   * @returns
+   */
+  getConvexHull(mapIds?: Iterable<string>): Ring | undefined {
+    const maskPoints: Point[] = []
+
+    for (const warpedMap of this.getWarpedMaps(mapIds)) {
+      if (warpedMap.visible) {
+        maskPoints.push(...warpedMap.geoMask.coordinates[0])
+      }
+    }
+
+    return convexHull(maskPoints)
+  }
+
+  /**
+   * Return the convex hull of all visible maps in this list, in projected geospatial coordinates
+   *
+   * Returns undefined if the list is empty.
+   *
+   * @returns {(Ring | undefined)}
+   */
+  getProjectedConvexHull(mapIds?: Iterable<string>): Ring | undefined {
+    const maskPoints: Point[] = []
+
+    for (const warpedMap of this.getWarpedMaps(mapIds)) {
+      if (warpedMap.visible) {
+        maskPoints.push(...warpedMap.projectedGeoMask)
+      }
+    }
+
+    return convexHull(maskPoints)
   }
 
   /**
    * Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
    *
-   * @param {Bbox} geoBbox
-   * @returns {Iterable<string>}
+   * @param geoBbox
+   * @returns
    */
   getMapsByGeoBbox(geoBbox: Bbox): Iterable<string> {
     // TODO: to make sure only tiles for visible parts of the map are requested
@@ -224,7 +260,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the object that caches image information
    *
-   * @param {ImageInformations} imageInformations - object that caches image information
+   * @param imageInformations - object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations): void {
     this.imageInformations = imageInformations
@@ -233,8 +269,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the resource mask for a specified map
    *
-   * @param {string} mapId - ID of the map
-   * @param {Ring} resourceMask - the new resource mask
+   * @param mapId - ID of the map
+   * @param resourceMask - the new resource mask
    */
   setMapResourceMask(mapId: string, resourceMask: Ring): void {
     const warpedMap = this.warpedMapsById.get(mapId)
@@ -250,8 +286,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the GCPs for a specified map
    *
-   * @param {string} mapId - ID of the map
-   * @param {Gcp[]} gcps - new GCPs
+   * @param mapId - ID of the map
+   * @param gcps - new GCPs
    */
   setMapGcps(mapId: string, gcps: Gcp[]): void {
     const warpedMap = this.warpedMapsById.get(mapId)
@@ -267,8 +303,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the transformation type of a single map
    *
-   * @param {string} mapId - the ID of the map
-   * @param {TransformationType} transformationType - the new transformation type
+   * @param mapId - the ID of the map
+   * @param transformationType - the new transformation type
    */
   setMapTransformationType(
     mapId: string,
@@ -280,8 +316,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the transformation type of specified maps
    *
-   * @param {Iterable<string>} mapIds - the IDs of the maps
-   * @param {TransformationType} transformationType - the new transformation type
+   * @param mapIds - the IDs of the maps
+   * @param transformationType - the new transformation type
    */
   setMapsTransformationType(
     mapIds: Iterable<string>,
@@ -318,8 +354,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Sets the distortion measure of specified maps
    *
-   * @param {Iterable<string>} mapIds - the IDs of the maps
-   * @param {DistortionMeasure} [distortionMeasure] - the distortion measure
+   * @param mapIds - the IDs of the maps
+   * @param distortionMeasure - the distortion measure
    */
   setMapsDistortionMeasure(
     mapIds: Iterable<string>,
@@ -352,9 +388,9 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Removes a warped map by its ID
    *
-   * @param {string} mapId - the ID of the map
+   * @param mapId - the ID of the map
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   removeGeoreferencedMapById(mapId: string) {
     const warpedMap = this.warpedMapsById.get(mapId)
@@ -371,7 +407,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to bring them to front
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   bringMapsToFront(mapIds: Iterable<string>): void {
     let newZIndex = this.warpedMapsById.size
@@ -388,7 +424,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to send them to back
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   sendMapsToBack(mapIds: Iterable<string>): void {
     let newZIndex = -Array.from(mapIds).length
@@ -405,7 +441,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the z-index of the specified maps to bring them forward
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   bringMapsForward(mapIds: Iterable<string>): void {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
@@ -424,7 +460,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the zIndex of the specified maps to send them backward
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   sendMapsBackward(mapIds: Iterable<string>): void {
     for (const [mapId, zIndex] of this.zIndices.entries()) {
@@ -443,7 +479,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the visibility of the specified maps to `true`
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   showMaps(mapIds: Iterable<string>): void {
     for (const mapId of mapIds) {
@@ -460,7 +496,7 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Changes the visibility of the specified maps to `false`
    *
-   * @param {Iterable<string>} mapIds
+   * @param mapIds - Map IDs
    */
   hideMaps(mapIds: Iterable<string>): void {
     for (const mapId of mapIds) {
@@ -477,14 +513,14 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Adds a georeferenced map to this list
    *
-   * @async
-   * @param {unknown} georeferencedMap
-   * @returns {Promise<string | Error>}
+   * @param georeferencedMap
+   * @returns
    */
   async addGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
       validatedGeoreferencedMapOrMaps
     )
@@ -496,14 +532,14 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Removes a georeferenced map from this list
    *
-   * @async
-   * @param {unknown} georeferencedMap
-   * @returns {Promise<string | Error>}
+   * @param georeferencedMap
+   * @returns
    */
   async removeGeoreferencedMap(
     georeferencedMap: unknown
   ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps = validateMap(georeferencedMap)
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
       validatedGeoreferencedMapOrMaps
     )
@@ -515,9 +551,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Parses an annotation and adds its georeferenced map to this list
    *
-   * @async
-   * @param {unknown} annotation
-   * @returns {Promise<(string | Error)[]>}
+   * @param annotation
+   * @returns
    */
   async addGeoreferenceAnnotation(annotation: unknown) {
     const results: (string | Error)[] = []
@@ -543,9 +578,8 @@ export default class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Parses an annotation and removes its georeferenced map from this list
    *
-   * @async
-   * @param {unknown} annotation
-   * @returns {Promise<(string | Error)[]>}
+   * @param annotation
+   * @returns
    */
   async removeGeoreferenceAnnotation(
     annotation: unknown

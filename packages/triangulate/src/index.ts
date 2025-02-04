@@ -12,6 +12,8 @@ import {
 } from '@allmaps/stdlib'
 
 import Delaunator from 'delaunator'
+
+// @ts-expect-error Ignore missing types
 import Constrainautor from '@kninnug/constrainautor'
 
 import type {
@@ -25,7 +27,6 @@ import type {
 } from '@allmaps/types'
 
 export type TriangulationToUnique = {
-  constrainautor: Constrainautor
   interpolatedPolygon: Polygon
   interpolatedPolygonPoints: Point[]
   gridPoints: Point[]
@@ -54,10 +55,10 @@ const defaultTriangulationOptions = {
  *
  * Grid points are placed inside the polygon to obtain small, well conditioned triangles.
  *
- * @param {Polygon} polygon - Polygon
- * @param {number} [distance] - Distance that conditions the triangles
- * @param {TriangulationOptions} [triangulationOptions] - Triangulation Options.
- * @returns {Triangle[]} Array of triangles partitioning the polygon
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param triangulationOptions - Triangulation Options.
+ * @returns Array of triangles partitioning the polygon
  */
 export function triangulate(
   polygon: Polygon,
@@ -81,10 +82,10 @@ export function triangulate(
  *
  * This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
  *
- * @param {Polygon} polygon - Polygon
- * @param {number} [distance] - Distance that conditions the triangles
- * @param {TriangulationOptions} [triangulationOptions] - Triangulation Options.
- * @returns {TriangulationToUnique} Triangulation Object with uniquePointIndexTriangles and uniquePoints
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param triangulationOptions - Triangulation Options.
+ * @returns Triangulation Object with uniquePointIndexTriangles and uniquePoints
  */
 export function triangulateToUnique(
   polygon: Polygon,
@@ -202,7 +203,6 @@ export function triangulateToUnique(
   }
 
   return {
-    constrainautor,
     interpolatedPolygon,
     interpolatedPolygonPoints,
     gridPoints,

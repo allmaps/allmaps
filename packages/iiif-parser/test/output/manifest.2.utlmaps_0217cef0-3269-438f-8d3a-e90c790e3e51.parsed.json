@@ -261,14 +261,11 @@
           "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/manifests/2/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.json"
         ]
       }
-    },
+    }
+  ],
+  "thumbnail": [
     {
-      "label": {
-        "none": ["extra"]
-      },
-      "value": {
-        "none": ["undefined"]
-      }
+      "id": "https://curio.lib.utexas.edu/assets/DAMS/utlmaps/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51/TN/utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jpg"
     }
   ],
   "type": "manifest",

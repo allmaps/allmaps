@@ -4,28 +4,86 @@
 import { z } from 'zod'
 
 import { ImageServiceSchema } from './image-service.js'
+import { NavDateSchema, NavPlaceSchema } from '../schemas/shared.js'
 
-export const SingleValue3Schema = z.string().or(z.number()).or(z.boolean())
+import { ensureArray } from '../lib/convert.js'
+
+export const SingleValue3Schema = z
+  .union([z.string(), z.number(), z.boolean()])
+  .transform((val) => String(val))
+
 export const LanguageValue3Schema = z.record(
   z.string(),
   SingleValue3Schema.array()
 )
 
+export const Summary3Schema = LanguageValue3Schema
+
+export const HomepageItem3Schema = z.object({
+  id: z.string().url(),
+  type: z.string().optional(),
+  label: LanguageValue3Schema,
+  format: z.string().optional(),
+  language: z.union([z.string(), z.array(z.string())]).optional()
+})
+
+export const Homepage3Schema = z
+  .union([HomepageItem3Schema.array(), HomepageItem3Schema])
+  .transform(ensureArray)
+
+export const ThumbnailItem3Schema = z.object({
+  id: z.string().url(),
+  type: z.string().optional(),
+  format: z.string().optional(),
+  width: z.number().int().optional(),
+  height: z.number().int().optional()
+})
+
+export const Thumbnail3Schema = z
+  .union([ThumbnailItem3Schema.array(), ThumbnailItem3Schema])
+  .transform(ensureArray)
+
+export const SeeAlsoItem3Schema = z.object({
+  id: z.string().url(),
+  type: z.string().optional(),
+  format: z.string().optional(),
+  profile: z.string().optional()
+})
+
+export const SeeAlso3Schema = z
+  .union([SeeAlsoItem3Schema.array(), SeeAlsoItem3Schema])
+  .transform(ensureArray)
+
+export const NonPaintingAnnotations3 = z
+  .object({
+    id: z.string().url(),
+    type: z.literal('AnnotationPage'),
+    items: z.object({}).passthrough().array().optional()
+  })
+  .array()
+
+const ValidMetadataItem3Schema = z.object({
+  label: LanguageValue3Schema,
+  value: LanguageValue3Schema
+})
+
 export const MetadataItem3Schema = z
   .union([
-    z.any(),
-    z.object({
-      label: LanguageValue3Schema.optional(),
-      value: LanguageValue3Schema.optional()
-    })
+    ValidMetadataItem3Schema,
+
+    // Catchall for incorrect values
+    z.any()
   ])
   .transform((val) => {
-    if (val && typeof val === 'object' && 'label' in val && 'value' in val) {
-      return val
+    const { success, data } = ValidMetadataItem3Schema.safeParse(val)
+    if (success) {
+      return data
     }
   })
 
 export const Metadata3Schema = MetadataItem3Schema.array()
+
+export const RequiredStatement3Schema = MetadataItem3Schema
 
 export const AnnotationBody3Schema = z.object({
   type: z.literal('Image'),
@@ -60,7 +118,16 @@ export const Canvas3Schema = z.object({
   height: z.number().int(),
   items: AnnotationPage3Schema.array().length(1),
   label: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional()
+  description: LanguageValue3Schema.optional(),
+  metadata: Metadata3Schema.optional(),
+  navDate: NavDateSchema.optional(),
+  navPlace: NavPlaceSchema.optional(),
+  homepage: Homepage3Schema.optional(),
+  thumbnail: Thumbnail3Schema.optional(),
+  seeAlso: SeeAlso3Schema.optional(),
+  summary: Summary3Schema.optional(),
+  requiredStatement: RequiredStatement3Schema.optional(),
+  annotations: NonPaintingAnnotations3.optional()
 })
 
 export const Manifest3Schema = z.object({
@@ -69,7 +136,15 @@ export const Manifest3Schema = z.object({
   items: Canvas3Schema.array().nonempty(),
   label: LanguageValue3Schema.optional(),
   description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional()
+  metadata: Metadata3Schema.optional(),
+  navDate: NavDateSchema.optional(),
+  navPlace: NavPlaceSchema.optional(),
+  homepage: Homepage3Schema.optional(),
+  thumbnail: Thumbnail3Schema.optional(),
+  seeAlso: SeeAlso3Schema.optional(),
+  summary: Summary3Schema.optional(),
+  requiredStatement: RequiredStatement3Schema.optional(),
+  annotations: NonPaintingAnnotations3.optional()
 })
 
 export type EmbeddedManifest3 = {
@@ -81,14 +156,25 @@ export type EmbeddedManifest3 = {
 export type Collection3 = {
   id: string
   type: 'Collection'
-  label?: z.infer<typeof LanguageValue3Schema>
   items: (
     | EmbeddedManifest3
     | Collection3
     | z.infer<typeof EmbeddedCollection3Schema>
   )[]
+  label?: z.infer<typeof LanguageValue3Schema>
+  description?: z.infer<typeof LanguageValue3Schema>
+  navPlace?: z.infer<typeof NavPlaceSchema>
+  homepage?: z.infer<typeof Homepage3Schema>
+  thumbnail?: z.infer<typeof Thumbnail3Schema>
+  seeAlso?: z.infer<typeof SeeAlso3Schema>
+  summary?: z.infer<typeof Summary3Schema>
+  requiredStatement?: z.infer<typeof RequiredStatement3Schema>
+  annotations?: z.infer<typeof NonPaintingAnnotations3>
+  metadata?: z.infer<typeof Metadata3Schema>
+  navDate?: z.infer<typeof NavDateSchema>
 }
 
+// @ts-expect-error - Lazy type is not correctly inferred
 export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
   () =>
     z.object({
@@ -98,18 +184,29 @@ export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
     })
 )
 
+// @ts-expect-error - Lazy type is not correctly inferred
 export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
   z.object({
     id: z.string().url(),
     type: z.literal('Collection'),
-    label: LanguageValue3Schema.optional(),
     items: z
       .union([
         EmbeddedManifest3Schema,
         Collection3Schema,
         EmbeddedCollection3Schema
       ])
-      .array()
+      .array(),
+    label: LanguageValue3Schema.optional(),
+    description: LanguageValue3Schema.optional(),
+    metadata: Metadata3Schema.optional(),
+    navDate: NavDateSchema.optional(),
+    navPlace: NavPlaceSchema.optional(),
+    homepage: Homepage3Schema.optional(),
+    thumbnail: Thumbnail3Schema.optional(),
+    seeAlso: SeeAlso3Schema.optional(),
+    summary: Summary3Schema.optional(),
+    requiredStatement: RequiredStatement3Schema.optional(),
+    annotations: NonPaintingAnnotations3.optional()
   })
 )
 

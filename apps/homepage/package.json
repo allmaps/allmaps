@@ -34,7 +34,7 @@
     "lerna-build": "lerna run build --scope @allmaps/homepage --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
-    "copy-readmes": "node ./scripts/copy-readmes.js"
+    "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts"
   },
   "dependencies": {
     "@allmaps/annotation": "1.0.0-beta.30",
@@ -52,7 +52,7 @@
     "@astrojs/svelte": "^5.7.0",
     "@astrojs/tailwind": "^5.1.0",
     "@tailwindcss/container-queries": "^0.1.1",
-    "@turf/rewind": "^7.1.0",
+    "@turf/rewind": "^7.2.0",
     "astro": "^4.16.12",
     "bits-ui": "^0.21.16",
     "d3-geo": "^3.1.1",
@@ -61,10 +61,10 @@
     "maplibre-gl": "^4.7.1",
     "phosphor-svelte": "^2.0.1",
     "pmtiles": "^3.0.5",
-    "prettier": "^3.1.1",
+    "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.1.2",
     "protomaps-themes-base": "2.0.0-alpha.5",
-    "sharp": "^0.32.5",
+    "sharp": "^0.33.5",
     "svelte": "^4.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.6.3"

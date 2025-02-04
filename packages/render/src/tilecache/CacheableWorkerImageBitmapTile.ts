@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink'
 
-import FetchableTile from './FetchableTile.js'
-import CacheableTile from './CacheableTile.js'
+import { FetchableTile } from './FetchableTile.js'
+import { CacheableTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -9,18 +9,12 @@ import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to its imageBitmap using a WebWorker.
- *
- * @export
- * @class CacheableWorkerImageBitmapTile
- * @typedef {CacheableWorkerImageBitmapTile}
- * @extends {CacheableTile}
  */
-export default class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
+export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
   /**
    * Fetch the tile and create its ImageBitmap using a WebWorker.
    *
-   * @async
-   * @returns {Promise<void>}
+   * @returns
    */
   async fetch() {
     try {
@@ -30,7 +24,7 @@ export default class CacheableWorkerImageBitmapTile extends CacheableTile<ImageB
       // once we can pull bytes directly from Blob?
       // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
       const worker = new Worker(
-        new URL('../workers/fetch-and-get-image-bitmap', import.meta.url)
+        new URL('../workers/fetch-and-get-image-bitmap.ts', import.meta.url)
       )
       const wrappedWorker =
         Comlink.wrap<FetchAndGetImageBitmapWorkerType>(worker)
@@ -71,11 +65,6 @@ export default class CacheableWorkerImageBitmapTile extends CacheableTile<ImageB
 
 /**
  * Class for tiles that is cached, and whose data has been processed to an ImageBitmap object using a WebWorker.
- *
- * @export
- * @class CachedWorkerImageBitmapTile
- * @typedef {CachedWorkerImageBitmapTile}
- * @extends {CacheableWorkerImageBitmapTile}
  */
 export class CachedWorkerImageBitmapTile extends CacheableWorkerImageBitmapTile {
   declare data: ImageBitmap

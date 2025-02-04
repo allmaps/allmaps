@@ -1,16 +1,16 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import Transformation from '../transformation.js'
+import { Transformation } from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class Helmert extends Transformation {
+export class Helmert extends Transformation {
   helmertParametersMatrix: Matrix
   helmertParameters: number[]
 
-  scale?: number
-  rotation?: number
-  translation?: Point
+  scale: number
+  rotation: number
+  translation: Point
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 'helmert', 2)

@@ -1,35 +1,18 @@
-import { z } from 'zod'
-
-import {
-  Annotation1Schema,
-  AnnotationPage1Schema,
-  AnnotationAllVersionsSchema,
-  AnnotationPageAllVersionsSchema
-} from './schemas/annotation.js'
-
-import {
-  Map2Schema,
-  Maps2Schema,
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema
-} from './schemas/map.js'
-
 import { parseAnnotation } from './parser.js'
 import { generateAnnotation } from './generator.js'
 
-import { isAnnotation1, isMap2 } from './guards.js'
+import { isAnnotation1, isGeoreferencedMap2 } from './guards.js'
 
-type Annotation1 = z.infer<typeof Annotation1Schema>
-type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
-
-type AnnotationAllVersions = z.infer<typeof AnnotationAllVersionsSchema>
-type AnnotationPageAllVersions = z.infer<typeof AnnotationPageAllVersionsSchema>
-
-type Map2 = z.infer<typeof Map2Schema>
-type Maps2 = z.infer<typeof Maps2Schema>
-
-type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
+import type {
+  Annotation1,
+  AnnotationPage1,
+  AnnotationAllVersions,
+  AnnotationPageAllVersions,
+  GeoreferencedMap2,
+  GeoreferencedMaps2,
+  GeoreferencedMapAllVersions,
+  GeoreferencedMapsAllVersions
+} from './types.js'
 
 export function toAnnotation1(annotation: AnnotationAllVersions): Annotation1 {
   if (isAnnotation1(annotation)) {
@@ -54,15 +37,19 @@ export function toAnnotationPage1(
   }
 }
 
-export function toMap2(map: MapAllVersions): Map2 {
-  if (isMap2(map)) {
-    return map
+export function toGeoreferencedMap2(
+  georeferencedMap: GeoreferencedMapAllVersions
+): GeoreferencedMap2 {
+  if (isGeoreferencedMap2(georeferencedMap)) {
+    return georeferencedMap
   } else {
-    const convertedMap = parseAnnotation(generateAnnotation(map))
+    const convertedMap = parseAnnotation(generateAnnotation(georeferencedMap))
     return convertedMap[0]
   }
 }
 
-export function toMaps2(maps: MapsAllVersions): Maps2 {
-  return maps.map(toMap2)
+export function toGeoreferencedMaps2(
+  georeferencedMap: GeoreferencedMapsAllVersions
+): GeoreferencedMaps2 {
+  return georeferencedMap.map(toGeoreferencedMap2)
 }

@@ -1,94 +1,126 @@
 {
+  "embedded": false,
+  "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/manifest.json",
+  "type": "manifest",
+  "label": {
+    "none": ["BnF, département Cartes et plans, GE DD-2998"]
+  },
+  "majorVersion": 2,
   "canvases": [
     {
-      "height": 8034,
-      "image": {
-        "embedded": true,
-        "height": 8034,
-        "majorVersion": 1,
-        "supportsAnyRegionAndSize": true,
-        "type": "image",
-        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f70",
-        "width": 11072
-      },
-      "label": {
-        "none": ["NP"]
-      },
-      "type": "canvas",
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f70",
-      "width": 11072
-    },
-    {
-      "height": 8008,
+      "type": "canvas",
+      "height": 8034,
+      "width": 11072,
       "image": {
         "embedded": true,
-        "height": 8008,
-        "majorVersion": 1,
-        "supportsAnyRegionAndSize": true,
+        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f70",
         "type": "image",
-        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f71",
-        "width": 11102
+        "supportsAnyRegionAndSize": true,
+        "width": 11072,
+        "height": 8034,
+        "majorVersion": 1
       },
       "label": {
         "none": ["NP"]
       },
-      "type": "canvas",
+      "thumbnail": [
+        {
+          "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g/f70.thumbnail"
+        }
+      ]
+    },
+    {
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f71",
-      "width": 11102
-    },
-    {
-      "height": 8050,
+      "type": "canvas",
+      "height": 8008,
+      "width": 11102,
       "image": {
         "embedded": true,
-        "height": 8050,
-        "majorVersion": 1,
-        "supportsAnyRegionAndSize": true,
+        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f71",
         "type": "image",
-        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f72",
-        "width": 11082
+        "supportsAnyRegionAndSize": true,
+        "width": 11102,
+        "height": 8008,
+        "majorVersion": 1
       },
       "label": {
         "none": ["NP"]
       },
-      "type": "canvas",
+      "thumbnail": [
+        {
+          "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g/f71.thumbnail"
+        }
+      ]
+    },
+    {
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f72",
-      "width": 11082
-    },
-    {
-      "height": 7982,
+      "type": "canvas",
+      "height": 8050,
+      "width": 11082,
       "image": {
         "embedded": true,
-        "height": 7982,
-        "majorVersion": 1,
-        "supportsAnyRegionAndSize": true,
+        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f72",
         "type": "image",
-        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f73",
-        "width": 11068
+        "supportsAnyRegionAndSize": true,
+        "width": 11082,
+        "height": 8050,
+        "majorVersion": 1
       },
       "label": {
         "none": ["NP"]
       },
-      "type": "canvas",
+      "thumbnail": [
+        {
+          "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g/f72.thumbnail"
+        }
+      ]
+    },
+    {
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f73",
-      "width": 11068
-    },
-    {
-      "height": 8036,
+      "type": "canvas",
+      "height": 7982,
+      "width": 11068,
       "image": {
         "embedded": true,
-        "height": 8036,
-        "majorVersion": 1,
-        "supportsAnyRegionAndSize": true,
+        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f73",
         "type": "image",
-        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f74",
-        "width": 11088
+        "supportsAnyRegionAndSize": true,
+        "width": 11068,
+        "height": 7982,
+        "majorVersion": 1
       },
       "label": {
         "none": ["NP"]
       },
-      "type": "canvas",
+      "thumbnail": [
+        {
+          "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g/f73.thumbnail"
+        }
+      ]
+    },
+    {
       "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/canvas/f74",
-      "width": 11088
+      "type": "canvas",
+      "height": 8036,
+      "width": 11088,
+      "image": {
+        "embedded": true,
+        "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/f74",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 11088,
+        "height": 8036,
+        "majorVersion": 1
+      },
+      "label": {
+        "none": ["NP"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g/f74.thumbnail"
+        }
+      ]
     }
   ],
   "description": {
@@ -96,11 +128,6 @@
       "Atlas du plan général de la ville de Paris / Levé géométriquement par le Citoyen Verniquet... ; dessiné et gravé par les Citoyens Bartholomé et Mathieu"
     ]
   },
-  "embedded": false,
-  "label": {
-    "none": ["BnF, département Cartes et plans, GE DD-2998"]
-  },
-  "majorVersion": 2,
   "metadata": [
     {
       "label": {
@@ -207,6 +234,22 @@
       }
     }
   ],
-  "type": "manifest",
-  "uri": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53243704g/manifest.json"
+  "homepage": [
+    {
+      "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g"
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://gallica.bnf.fr/ark:/12148/btv1b53243704g.thumbnail"
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Bibliothèque nationale de France"]
+    }
+  }
 }

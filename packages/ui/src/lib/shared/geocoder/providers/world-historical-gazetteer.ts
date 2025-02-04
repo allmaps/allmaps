@@ -1,4 +1,4 @@
-import GeocoderProvider from '../provider.js'
+import { GeocoderProvider } from '../provider.js'
 
 import type { GeojsonPoint, GeojsonGeometry } from '@allmaps/types'
 
@@ -16,7 +16,7 @@ type GeoJsonFeatureWHG = {
 }
 // WHG returns GeoJSON Features, but not always points, and sometimes even without geometry.
 
-export default class WorldHistoricalGazetteer extends GeocoderProvider {
+export class WorldHistoricalGazetteer extends GeocoderProvider {
   constructor() {
     super('World Historical Gazetteer')
   }

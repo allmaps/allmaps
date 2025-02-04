@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink'
 
-import FetchableTile from './FetchableTile.js'
-import CacheableTile from './CacheableTile.js'
+import { FetchableTile } from './FetchableTile.js'
+import { CacheableTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
@@ -9,18 +9,12 @@ import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-im
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to its imageData using a WebWorker.
- *
- * @export
- * @class CacheableWorkerImageDataTile
- * @typedef {CacheableWorkerImageDataTile}
- * @extends {CacheableTile}
  */
-export default class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
+export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
   /**
    * Fetch the tile and create its ImageData using a WebWorker.
    *
-   * @async
-   * @returns {Promise<void>}
+   * @returns
    */
   async fetch() {
     try {
@@ -30,7 +24,7 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
       // once we can pull bytes directly from Blob?
       // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
       const worker = new Worker(
-        new URL('../workers/fetch-and-get-image-data', import.meta.url)
+        new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
       )
       const wrappedWorker = Comlink.wrap<FetchAndGetImageDataWorkerType>(worker)
       wrappedWorker
@@ -78,11 +72,6 @@ export default class CacheableWorkerImageDataTile extends CacheableTile<ImageDat
 
 /**
  * Class for tiles that is cached, and whose data has been processed to an ImageData object using a WebWorker.
- *
- * @export
- * @class CachedWorkerImageDataTile
- * @typedef {CachedWorkerImageDataTile}
- * @extends {CacheableWorkerImageDataTile}
  */
 export class CachedWorkerImageDataTile extends CacheableWorkerImageDataTile {
   declare data: ImageData

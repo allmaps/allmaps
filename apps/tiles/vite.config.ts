@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 
@@ -9,4 +9,4 @@ export default defineConfig({
     port: ports.tiles
   },
   plugins: [sveltekit()]
-})
+}) satisfies UserConfig

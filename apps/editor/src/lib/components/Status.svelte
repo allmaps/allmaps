@@ -7,7 +7,7 @@
     MapTrifold as MapTrifoldIcon
   } from 'phosphor-svelte'
 
-  import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
 
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
 

@@ -1,6 +1,6 @@
-import TileCache from '../tilecache/TileCache.js'
-import WarpedMapList from '../maps/WarpedMapList.js'
-import FetchableTile from '../tilecache/FetchableTile.js'
+import { TileCache } from '../tilecache/TileCache.js'
+import { WarpedMapList } from '../maps/WarpedMapList.js'
+import { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
@@ -21,8 +21,8 @@ import {
   bboxToRectangle
 } from '@allmaps/stdlib'
 
-import type Viewport from '../viewport/Viewport.js'
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
@@ -48,20 +48,9 @@ const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overv
 const MAX_TOTAL_RESOLUTION_RATIO = 10
 
 /**
- * Abstract base class for renderers.
- *
- * @export
- * @abstract
- * @template {WarpedMap} W
- * @template D
- * @class BaseRenderer
- * @typedef {BaseRenderer}
- * @extends {EventTarget}
+ * Abstract base class for renderers
  */
-export default abstract class BaseRenderer<
-  W extends WarpedMap,
-  D
-> extends EventTarget {
+export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
 
@@ -84,9 +73,8 @@ export default abstract class BaseRenderer<
   /**
    * Parses an annotation and adds its georeferenced map to this renderer's warped map list
    *
-   * @async
-   * @param {unknown} annotation
-   * @returns {Promise<(string | Error)[]>}
+   * @param annotation
+   * @returns
    */
   async addGeoreferenceAnnotation(annotation: unknown) {
     return this.warpedMapList.addGeoreferenceAnnotation(annotation)
@@ -95,9 +83,8 @@ export default abstract class BaseRenderer<
   /**
    * Adds a georeferenced map to this renderer's warped map list
    *
-   * @async
-   * @param {unknown} georeferencedMap
-   * @returns {Promise<string | Error>}
+   * @param georeferencedMap
+   * @returns
    */
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
@@ -215,7 +202,7 @@ export default abstract class BaseRenderer<
     this.pruneTileCache(mapsInViewportForOverviewPrune)
   }
 
-  protected findMapsInViewport(viewportBufferRatio: number = 0): Set<string> {
+  protected findMapsInViewport(viewportBufferRatio = 0): Set<string> {
     if (!this.viewport) {
       return new Set()
     }
@@ -305,7 +292,7 @@ export default abstract class BaseRenderer<
         this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 0
       )
     const resourceBufferedViewportRing =
-      warpedMap.projectedTransformer.transformBackward(
+      warpedMap.projectedTransformer.transformToResource(
         [projectedGeoBufferedViewportRectangle],
         transformerOptions
       )[0]
@@ -569,6 +556,9 @@ export default abstract class BaseRenderer<
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected distortionChanged(event: Event): void {}
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected gcpsChanged(event: Event): void {}
+
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
@@ -608,6 +598,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.addEventListener(
       WarpedMapEventType.DISTORTIONCHANGED,
       this.distortionChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.GCPSUPDATED,
+      this.gcpsChanged.bind(this)
     )
   }
 
@@ -650,6 +645,11 @@ export default abstract class BaseRenderer<
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.DISTORTIONCHANGED,
       this.distortionChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.GCPSUPDATED,
+      this.gcpsChanged.bind(this)
     )
   }
 }

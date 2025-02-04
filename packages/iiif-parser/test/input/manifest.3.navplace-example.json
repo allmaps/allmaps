@@ -1,0 +1,73 @@
+{
+  "@context": [
+    "http://iiif.io/api/extension/navplace/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "id": "https://example.org/iiif/manifest/1",
+  "type": "Manifest",
+  "label": {
+    "en": ["navPlace Extension Example Manifest"]
+  },
+  "items": [
+    {
+      "id": "https://example.org/iiif/canvas/p1",
+      "type": "Canvas",
+      "label": {
+        "en": ["Picture of Göttingen taken during the 2019 IIIF Conference"]
+      },
+
+      "height": 3024,
+      "width": 4032,
+      "items": [
+        {
+          "id": "https://example.org/iiif/page/p1/1",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://example.org/iiif/annotation/p0001-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "label": {
+                "en": ["Picture of Göttingen"]
+              },
+              "body": {
+                "id": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/jpeg",
+                "height": 3024,
+                "width": 4032,
+                "service": [
+                  {
+                    "id": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
+                    "profile": "level1",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://example.org/iiif/canvas/p1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "navPlace": {
+    "id": "https://example.org/iiif/feature-collection/2",
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "id": "https://example.org/iiif/feature/2",
+        "type": "Feature",
+        "properties": {
+          "label": {
+            "en": ["navPlace Extension Example Manifest"]
+          }
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [9.938, 51.533]
+        }
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@ import { Command } from '@commander-js/extra-typings'
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 
-export default function parse() {
+export function parse() {
   return new Command('parse')
     .argument('[files...]')
     .summary('parse Georeference Annotation')

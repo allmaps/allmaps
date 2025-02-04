@@ -3,7 +3,8 @@ import { png } from 'itty-router'
 import { decode as decodeJpeg, type UintArrRet } from 'jpeg-js'
 import { encode as encodePng } from 'upng-js'
 
-import { IntArrayRenderer, Viewport } from '@allmaps/render/int-array'
+import { Viewport } from '@allmaps/render'
+import { IntArrayRenderer } from '@allmaps/render/intarray'
 
 import { cachedFetch } from './fetch.js'
 
@@ -55,13 +56,9 @@ export async function generateImage(
 
   await renderer.addGeoreferenceAnnotation(annotation)
 
-  const viewport = Viewport.fromWarpedMapList(
-    size,
-    renderer.warpedMapList,
-    1,
-    'contain',
-    1.25
-  )
+  const viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList, {
+    zoom: 1.25
+  })
   const image = await renderer.render(viewport)
   const pngBuffer = encodePng([image.buffer], size[0], size[1], 0)
 

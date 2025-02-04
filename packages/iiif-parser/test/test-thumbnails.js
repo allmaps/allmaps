@@ -69,7 +69,7 @@ for (let { filename, thumbnailSize, mode, expectedUrl } of tests) {
     it('should match expected URL', () => {
       const image = readJson(filename)
       const parsedImage = Image.parse(image)
-      const imageRequest = parsedImage.getThumbnail(thumbnailSize, mode)
+      const imageRequest = parsedImage.getImageRequest(thumbnailSize, mode)
       const imageUrl = parsedImage.getImageUrl(imageRequest)
       expect(imageUrl).to.equal(expectedUrl)
     })

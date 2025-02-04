@@ -2,7 +2,7 @@
 import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
-import GcpTransformer from '../transformer'
+import { GcpTransformer } from '../transformer'
 import {
   refineLineString,
   refineRing,

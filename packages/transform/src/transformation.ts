@@ -1,13 +1,16 @@
 import type { Point } from '@allmaps/types'
 
-import type { EvaluationType, TransformationType } from './shared/types'
+import type { EvaluationType, TransformationType } from './shared/types.js'
+import { distance, rms } from '@allmaps/stdlib'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
- * */
-export default abstract class Transformation {
+ */
+export abstract class Transformation {
   sourcePoints: Point[]
   destinationPoints: Point[]
+
+  destinationTransformedSourcePoints?: Point[]
 
   pointCount: number
   pointCountMinimum: number
@@ -16,10 +19,10 @@ export default abstract class Transformation {
 
   /**
    * Create a transformation
-   * @param {Point[]} sourcePoints - The source points
-   * @param {Point[]} destinationPoints - The destination points
-   * @param {TransformationType} type - The transformation type
-   * @param {number} pointCountMinimum - The minimum number of points for the transformation type
+   * @param sourcePoints - The source points
+   * @param destinationPoints - The destination points
+   * @param type - The transformation type
+   * @param pointCountMinimum - The minimum number of points for the transformation type
    */
   constructor(
     sourcePoints: Point[],
@@ -46,6 +49,42 @@ export default abstract class Transformation {
           ' are given.'
       )
     }
+  }
+
+  computeDestinationTransformedSourcePoints(): Point[] {
+    this.destinationTransformedSourcePoints = this.sourcePoints.map(
+      (sourcePoint) => this.evaluate(sourcePoint)
+    )
+
+    return this.destinationTransformedSourcePoints
+  }
+
+  get errors() {
+    let destinationTransformedSourcePoints =
+      this.destinationTransformedSourcePoints
+    if (!destinationTransformedSourcePoints) {
+      destinationTransformedSourcePoints =
+        this.computeDestinationTransformedSourcePoints()
+    }
+
+    return this.destinationPoints.map((destinationPoint, index) =>
+      distance(destinationPoint, destinationTransformedSourcePoints[index])
+    )
+  }
+
+  get rmse() {
+    let destinationTransformedSourcePoints =
+      this.destinationTransformedSourcePoints
+    if (!destinationTransformedSourcePoints) {
+      destinationTransformedSourcePoints =
+        this.computeDestinationTransformedSourcePoints()
+    }
+
+    if (!this.destinationTransformedSourcePoints) {
+      this.computeDestinationTransformedSourcePoints()
+    }
+
+    return rms(this.destinationPoints, destinationTransformedSourcePoints)
   }
 
   evaluate(

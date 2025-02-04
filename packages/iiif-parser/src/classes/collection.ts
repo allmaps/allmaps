@@ -6,6 +6,9 @@ import {
   CollectionSchema
 } from '../schemas/iiif.js'
 
+import { EmbeddedCollection2Schema } from '../schemas/presentation.2.js'
+import { EmbeddedCollection3Schema } from '../schemas/presentation.3.js'
+
 import { EmbeddedManifest, Manifest } from './manifest.js'
 import type { Image, EmbeddedImage } from './image.js'
 import type { Canvas } from './canvas.js'
@@ -14,11 +17,32 @@ import type {
   LanguageString,
   MajorVersion,
   FetchNextOptions,
-  FetchNextResults
+  FetchNextResults,
+  Metadata,
+  NavDate,
+  NavPlace,
+  Thumbnail,
+  SeeAlso,
+  Summary,
+  RequiredStatement,
+  Annotations,
+  Homepage
 } from '../lib/types.js'
-import { parseVersion2String, parseVersion3String } from '../lib/strings.js'
+
+import {
+  parseVersion2String,
+  parseVersion3String,
+  parseVersion2Metadata,
+  parseVersion3Metadata,
+  parseVersion2Attribution,
+  parseVersion2Thumbnail,
+  parseVersion2Related
+} from '../lib/convert.js'
 
 type CollectionType = z.infer<typeof CollectionSchema>
+type EmbeddedCollectionType =
+  | z.infer<typeof EmbeddedCollection2Schema>
+  | z.infer<typeof EmbeddedCollection3Schema>
 
 const CollectionTypeString = 'collection'
 
@@ -41,17 +65,17 @@ export class EmbeddedCollection {
 
   embedded = true
 
-  constructor(parsedCollection: CollectionType) {
+  constructor(parsedCollection: CollectionType | EmbeddedCollectionType) {
     if ('@type' in parsedCollection) {
       // IIIF Presentation API 2.0
+
       this.uri = parsedCollection['@id']
       this.majorVersion = 2
 
-      if (parsedCollection.label) {
-        this.label = parseVersion2String(parsedCollection.label)
-      }
+      this.label = parseVersion2String(parsedCollection.label)
     } else if ('type' in parsedCollection) {
       // IIIF Presentation API 3.0
+
       this.uri = parsedCollection.id
       this.majorVersion = 3
 
@@ -64,9 +88,9 @@ export class EmbeddedCollection {
 
   /**
    * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
-   * @param {any} iiifCollection - Source data of IIIF Collection
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
-   * @returns {Collection} Parsed IIIF Collection
+   * @param iiifCollection - Source data of IIIF Collection
+   * @param majorVersion - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Collection
    * @static
    */
   static parse(
@@ -89,23 +113,49 @@ export class EmbeddedCollection {
 
 /**
  * Parsed IIIF Collection
- * @class Collection
- * @property {string} [uri] - URI of Collection
- * @property {LanguageString} [label] - Label of Collection
- * @property {Collection[] | Manifest[] | EmbeddedManifest[]} [items] - Items in Collection
- * @property {MajorVersion} [majorVersion] - IIIF API version of Collection
- * @property {string} [type] - Resource type, equals 'collection'
+ *
+ * @property uri - URI of Collection
+ * @property label - Label of Collection
+ * @property items - Items in Collection
+ * @property majorVersion - IIIF API version of Collection
+ * @property type - Resource type, equals 'collection'
  */
 export class Collection extends EmbeddedCollection {
   items: (Collection | EmbeddedCollection | Manifest | EmbeddedManifest)[] = []
 
   embedded = false
 
+  description?: LanguageString
+  metadata?: Metadata
+
+  navDate?: NavDate
+  navPlace?: NavPlace
+  homepage?: Homepage
+  thumbnail?: Thumbnail
+  seeAlso?: SeeAlso
+  summary?: Summary
+  requiredStatement?: RequiredStatement
+
+  annotations?: Annotations
+
   constructor(parsedCollection: CollectionType) {
     super(parsedCollection)
 
     if ('@type' in parsedCollection) {
       // IIIF Presentation API 2.0
+
+      this.description = parseVersion2String(parsedCollection.description)
+      this.label = parseVersion2String(parsedCollection.label)
+      this.metadata = parseVersion2Metadata(parsedCollection.metadata)
+
+      this.navDate = parsedCollection.navDate
+      this.navPlace = parsedCollection.navPlace
+
+      this.requiredStatement = parseVersion2Attribution(
+        parsedCollection.attribution
+      )
+      this.thumbnail = parseVersion2Thumbnail(parsedCollection.thumbnail)
+      this.homepage = parseVersion2Related(parsedCollection.related)
 
       const manifests =
         'manifests' in parsedCollection && parsedCollection.manifests
@@ -134,12 +184,26 @@ export class Collection extends EmbeddedCollection {
     } else if ('type' in parsedCollection) {
       // IIIF Presentation API 3.0
 
+      this.description = parseVersion3String(parsedCollection.description)
+      this.metadata = parseVersion3Metadata(parsedCollection.metadata)
+
+      this.navDate = parsedCollection.navDate
+      this.navPlace = parsedCollection.navPlace
+      this.homepage = parsedCollection.homepage
+      this.thumbnail = parsedCollection.thumbnail
+      this.seeAlso = parsedCollection.seeAlso
+      this.summary = parsedCollection.summary
+      this.requiredStatement = parsedCollection.requiredStatement
+
+      this.annotations = parsedCollection.annotations
+
       if ('items' in parsedCollection) {
         this.items = parsedCollection.items.map((item) => {
           if (item.type === 'Collection') {
             if ('items' in item) {
               return new Collection(item)
             } else {
+              item
               return new EmbeddedCollection(item)
             }
           } else {
@@ -155,10 +219,9 @@ export class Collection extends EmbeddedCollection {
 
   /**
    * Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
-   * @param {any} iiifCollection - Source data of IIIF Collection
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of Collection. If not provided, it will be determined automatically
-   * @returns {Collection} Parsed IIIF Collection
-   * @static
+   * @param iiifCollection - Source data of IIIF Collection
+   * @param majorVersion - IIIF API version of Collection. If not provided, it will be determined automatically
+   * @returns Parsed IIIF Collection
    */
   static parse(
     iiifCollection: unknown,

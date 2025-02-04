@@ -26,7 +26,7 @@ function interpolateLine(line: Line, dist: number): LineString {
   const angle = lineAngle(line)
 
   let currentPoint = line[0]
-  let result = [currentPoint]
+  const result = [currentPoint]
 
   for (let step = 1; step <= steps; step++) {
     currentPoint = stepDistanceAngle(currentPoint, dist, angle)

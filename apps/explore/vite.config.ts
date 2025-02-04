@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 
@@ -12,4 +12,4 @@ export default defineConfig({
   ssr: {
     noExternal: ['maplibre-gl', 'maplibre-contour']
   }
-})
+}) satisfies UserConfig

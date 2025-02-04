@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
+import { rewind } from '@turf/rewind'
 
 import type {
   Point,
@@ -24,7 +23,7 @@ import type {
 
 // Assert
 
-export function isPoint(input: any): input is Point {
+export function isPoint(input: unknown): input is Point {
   return (
     Array.isArray(input) &&
     input.length === 2 &&
@@ -33,32 +32,31 @@ export function isPoint(input: any): input is Point {
   )
 }
 
-export function isLineString(input: any): input is LineString {
+export function isLineString(input: unknown): input is LineString {
   return Array.isArray(input) && input.every(isPoint)
 }
 
-// This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
-function isRing(input: any): input is Ring {
+export function isRing(input: unknown): input is Ring {
   return Array.isArray(input) && input.every(isPoint)
 }
 
-export function isPolygon(input: any): input is Polygon {
+export function isPolygon(input: unknown): input is Polygon {
   return Array.isArray(input) && input.every(isRing)
 }
 
-export function isMultiPoint(input: any): input is MultiPoint {
+export function isMultiPoint(input: unknown): input is MultiPoint {
   return Array.isArray(input) && input.every(isPoint)
 }
 
-export function isMultiLineString(input: any): input is MultiLineString {
+export function isMultiLineString(input: unknown): input is MultiLineString {
   return Array.isArray(input) && input.every(isLineString)
 }
 
-export function isMultiPolygon(input: any): input is MultiPolygon {
+export function isMultiPolygon(input: unknown): input is MultiPolygon {
   return Array.isArray(input) && input.every(isPolygon)
 }
 
-export function isGeometry(input: any): input is Geometry {
+export function isGeometry(input: unknown): input is Geometry {
   return (
     isPoint(input) ||
     isLineString(input) ||
@@ -166,7 +164,7 @@ export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
     type: 'Polygon',
     coordinates: close ? [closeRing(ring)] : [ring]
   }
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function polygonToGeojsonPolygon(
@@ -178,7 +176,7 @@ export function polygonToGeojsonPolygon(
     coordinates: close ? closePolygon(polygon) : polygon
   }
 
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function multiPointToGeojsonMultiPoint(
@@ -208,7 +206,7 @@ export function multiPolygonToGeojsonMultiPolygon(
     coordinates: close ? closeMultiPolygon(multiPolygon) : multiPolygon
   }
 
-  return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
+  return rewind(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
 export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
@@ -399,6 +397,20 @@ export function squaredDistance(from: Point | Line, to?: Point): number {
   }
 }
 
+export function rms(from: Point[], to: Point[]): number {
+  if (from.length !== to.length) {
+    throw new Error('Arrays need to be of same length')
+  }
+  const squaredDistances = from.map((fromPoint, index) =>
+    squaredDistance(fromPoint, to[index])
+  )
+  const meanSquaredDistances =
+    squaredDistances.reduce((sum, squaredDistace) => sum + squaredDistace, 0) /
+    squaredDistances.length
+  const rootMeanSquaredDistances = Math.sqrt(meanSquaredDistances)
+  return rootMeanSquaredDistances
+}
+
 export function triangleArea(triangle: Triangle): number {
   return (
     0.5 *
@@ -407,6 +419,105 @@ export function triangleArea(triangle: Triangle): number {
         triangle[1][0] * (triangle[2][1] - triangle[0][1]) +
         triangle[2][0] * (triangle[0][1] - triangle[1][1])
     )
+  )
+}
+
+export function invertPoint(point: Point): Point {
+  return [-point[0], -point[1]]
+}
+
+export function invertPoints(points: Point[]): Point[] {
+  return points.map((point) => invertPoint(point))
+}
+
+export function scalePoint(point: Point, scale: number): Point {
+  if (scale == 1) {
+    return point
+  }
+
+  return [point[0] * scale, point[1] * scale]
+}
+
+export function scalePoints(points: Point[], scale: number): Point[] {
+  if (scale === 1) {
+    return points
+  }
+  return points.map((point) => scalePoint(point, scale))
+}
+
+export function translatePoint(
+  point: Point,
+  translationPoint: Point,
+  addOrSubstract: 'add' | 'substract' = 'add'
+): Point {
+  if (addOrSubstract === 'add') {
+    return [point[0] + translationPoint[0], point[1] + translationPoint[1]]
+  } else {
+    return [point[0] - translationPoint[0], point[1] - translationPoint[1]]
+  }
+}
+
+export function translatePoints(
+  points: Point[],
+  point: Point,
+  addOrSubstract: 'add' | 'substract' = 'add'
+): Point[] {
+  if (isEqualPoint(point, [0, 0])) {
+    return points
+  }
+
+  return points.map((p) => translatePoint(p, point, addOrSubstract))
+}
+
+export function rotatePoint(
+  point: Point,
+  angle: number = 0,
+  anchor: Point | undefined = undefined,
+  cosAngle?: number,
+  sinAngle?: number
+): Point {
+  if (angle === 0 || angle === undefined) {
+    return point
+  }
+
+  if (anchor) {
+    return translatePoint(
+      rotatePoint(
+        translatePoint(point, anchor, 'substract'),
+        angle,
+        undefined,
+        cosAngle,
+        sinAngle
+      ),
+      anchor
+    )
+  } else {
+    cosAngle = cosAngle || Math.cos(angle)
+    sinAngle = sinAngle || Math.sin(angle)
+
+    return [
+      point[0] * cosAngle - point[1] * sinAngle,
+      point[0] * sinAngle + point[1] * cosAngle
+    ]
+  }
+}
+
+export function rotatePoints(
+  points: Point[],
+  angle: number = 0,
+  anchor: Point | undefined = undefined,
+  cosAngle?: number,
+  sinAngle?: number
+): Point[] {
+  if (angle === 0 || angle === undefined) {
+    return points
+  }
+
+  cosAngle = cosAngle || Math.cos(angle)
+  sinAngle = sinAngle || Math.sin(angle)
+
+  return points.map((point) =>
+    rotatePoint(point, angle, anchor, cosAngle, sinAngle)
   )
 }
 

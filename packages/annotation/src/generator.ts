@@ -1,51 +1,45 @@
-import { z } from 'zod'
-
-import { ImageServiceSchema, ResourceMaskSchema } from './schemas/shared.js'
 import {
-  Map1Schema,
-  Map2Schema,
-  Maps1Schema,
-  Maps2Schema,
-  MapAllVersionsSchema,
-  MapsAllVersionsSchema,
-  GCPAllVersionsSchema
-} from './schemas/map.js'
+  GeoreferencedMap1Schema,
+  GeoreferencedMap2Schema,
+  GeoreferencedMaps1Schema,
+  GeoreferencedMaps2Schema
+} from './schemas/georeferenced-map.js'
+
 import {
-  Annotation1Schema,
-  AnnotationPage1Schema,
-  SvgSelector1Schema,
-  PartOfSchema
-} from './schemas/annotation.js'
+  isGeoreferencedMapsBeforeParse,
+  isGeoreferencedMap2BeforeParse
+} from './before-parse.js'
+import { isGeoreferencedMap2 } from './guards.js'
 
-import { isMapsBeforeParse, isMap2BeforeParse } from './before-parse.js'
-import { isMap2 } from './guards.js'
+import type {
+  GeoreferencedMapAllVersions,
+  GeoreferencedMapsAllVersions,
+  ResourceMask,
+  GCP,
+  Annotation1,
+  AnnotationPage1,
+  SvgSelector,
+  Target,
+  Source,
+  PartOf,
+  ResourceType
+} from './types.js'
 
-type ImageService = z.infer<typeof ImageServiceSchema>
-
-type MapAllVersions = z.infer<typeof MapAllVersionsSchema>
-type MapsAllVersions = z.infer<typeof MapsAllVersionsSchema>
-type ResourceMask = z.infer<typeof ResourceMaskSchema>
-type GCP = z.infer<typeof GCPAllVersionsSchema>
-
-type Annotation1 = z.infer<typeof Annotation1Schema>
-type AnnotationPage1 = z.infer<typeof AnnotationPage1Schema>
-type SvgSelector1 = z.infer<typeof SvgSelector1Schema>
-
-type PartOf = z.infer<typeof PartOfSchema>
-
-function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
+function generateSvgSelector(
+  georeferencedMap: GeoreferencedMapAllVersions
+): SvgSelector {
   let width: number | undefined
   let height: number | undefined
   let resourceMask: ResourceMask
 
-  if (isMap2(map)) {
-    width = map.resource.width
-    height = map.resource.height
-    resourceMask = map.resourceMask
+  if (isGeoreferencedMap2(georeferencedMap)) {
+    width = georeferencedMap.resource.width
+    height = georeferencedMap.resource.height
+    resourceMask = georeferencedMap.resourceMask
   } else {
-    width = map.image.width
-    height = map.image.height
-    resourceMask = map.pixelMask
+    width = georeferencedMap.image.width
+    height = georeferencedMap.image.height
+    resourceMask = georeferencedMap.pixelMask
   }
 
   let svg = `<svg>`
@@ -61,26 +55,39 @@ function generateSvgSelector(map: MapAllVersions): SvgSelector1 {
   }
 }
 
-function generateSource(map: MapAllVersions) {
+function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
   let id: string
-  let type: ImageService
+  let type: ResourceType
 
   let width: number | undefined
   let height: number | undefined
 
-  let partOf: PartOf[] | undefined
+  let partOf: PartOf
 
-  if (isMap2(map)) {
-    id = map.resource.id
-    type = map.resource.type
-    width = map.resource.width
-    height = map.resource.height
-    partOf = map.resource.partOf
+  if (isGeoreferencedMap2(georeferencedMap)) {
+    if (georeferencedMap.resource.type === 'Canvas') {
+      // TODO: Don't know why TypeScript complains if I don't do this
+      const source: Source = {
+        id: georeferencedMap.resource.id,
+        type: georeferencedMap.resource.type,
+        height: georeferencedMap.resource.height,
+        width: georeferencedMap.resource.width,
+        partOf: georeferencedMap.resource.partOf
+      }
+
+      return source
+    } else {
+      id = georeferencedMap.resource.id
+      type = georeferencedMap.resource.type
+      width = georeferencedMap.resource.width
+      height = georeferencedMap.resource.height
+      partOf = georeferencedMap.resource.partOf
+    }
   } else {
-    id = map.image.uri
-    type = map.image.type
-    width = map.image.width
-    height = map.image.height
+    id = georeferencedMap.image.uri
+    type = georeferencedMap.image.type
+    width = georeferencedMap.image.width
+    height = georeferencedMap.image.height
   }
 
   return {
@@ -92,11 +99,11 @@ function generateSource(map: MapAllVersions) {
   }
 }
 
-function generateDates(map: MapAllVersions) {
-  if (isMap2(map)) {
+function generateDates(georeferencedMap: GeoreferencedMapAllVersions) {
+  if (isGeoreferencedMap2(georeferencedMap)) {
     return {
-      created: map.created,
-      modified: map.modified
+      created: georeferencedMap.created,
+      modified: georeferencedMap.modified
     }
   }
 }
@@ -132,24 +139,26 @@ function generateFeature(gcp: GCP) {
   }
 }
 
-function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
-  const target = {
+function generateGeoreferenceAnnotation(
+  georeferencedMap: GeoreferencedMapAllVersions
+): Annotation1 {
+  const target: Target = {
     type: 'SpecificResource' as const,
-    source: generateSource(map),
-    selector: generateSvgSelector(map)
+    source: generateSource(georeferencedMap),
+    selector: generateSvgSelector(georeferencedMap)
   }
 
   const body = {
     type: 'FeatureCollection' as const,
-    transformation: map.transformation,
-    features: map.gcps.map((gcp) => generateFeature(gcp))
+    transformation: georeferencedMap.transformation,
+    features: georeferencedMap.gcps.map((gcp) => generateFeature(gcp))
   }
 
   return {
-    id: map.id,
+    id: georeferencedMap.id,
     type: 'Annotation',
     '@context': generateContext(),
-    ...generateDates(map),
+    ...generateDates(georeferencedMap),
     motivation: 'georeferencing' as const,
     target,
     body
@@ -159,29 +168,31 @@ function generateGeoreferenceAnnotation(map: MapAllVersions): Annotation1 {
 /**
  * Generates a {@link Annotation Georeference Annotation} from a single {@link Map map} or
  * an {@link AnnotationPage AnnotationPage} containing multiple Georeference Annotations from an array of {@link Map maps}.
- * @param {Map | Map[]} mapOrMaps - Single map object, or array of maps
- * @returns {Annotation | AnnotationPage} Georeference Annotation
+ * @param mapOrMaps - Single Georeferenced Map, or an array of Georeferenced Maps
+ * @returns Georeference Annotation
  * @example
+ * ```js
  * import fs from 'fs'
  * import { generateAnnotation } from '@allmaps/annotation'
  *
  * const map = JSON.parse(fs.readFileSync('./examples/map.example.json'))
  * const annotation = generateAnnotation(map)
+ * ```
  */
 export function generateAnnotation(
   mapOrMaps: unknown
 ): Annotation1 | AnnotationPage1 {
-  if (isMapsBeforeParse(mapOrMaps)) {
+  if (isGeoreferencedMapsBeforeParse(mapOrMaps)) {
     // Seperate .parse for different versions for better Zod errors
-    let parsedMaps: MapsAllVersions
-    if (isMap2BeforeParse(mapOrMaps[0])) {
-      parsedMaps = Maps2Schema.parse(mapOrMaps)
+    let parsedGeoreferencedMaps: GeoreferencedMapsAllVersions
+    if (isGeoreferencedMap2BeforeParse(mapOrMaps[0])) {
+      parsedGeoreferencedMaps = GeoreferencedMaps2Schema.parse(mapOrMaps)
     } else {
-      parsedMaps = Maps1Schema.parse(mapOrMaps)
+      parsedGeoreferencedMaps = GeoreferencedMaps1Schema.parse(mapOrMaps)
     }
 
-    const annotations = parsedMaps.map((parsedMap) =>
-      generateGeoreferenceAnnotation(parsedMap)
+    const annotations = parsedGeoreferencedMaps.map((parsedGeoreferencedMap) =>
+      generateGeoreferenceAnnotation(parsedGeoreferencedMap)
     )
 
     return {
@@ -191,13 +202,13 @@ export function generateAnnotation(
     }
   } else {
     // Seperate .parse for different versions for better Zod errors
-    let parsedMap: MapAllVersions
-    if (isMap2BeforeParse(mapOrMaps)) {
-      parsedMap = Map2Schema.parse(mapOrMaps)
+    let parsedGeoreferencedMap: GeoreferencedMapAllVersions
+    if (isGeoreferencedMap2BeforeParse(mapOrMaps)) {
+      parsedGeoreferencedMap = GeoreferencedMap2Schema.parse(mapOrMaps)
     } else {
-      parsedMap = Map1Schema.parse(mapOrMaps)
+      parsedGeoreferencedMap = GeoreferencedMap1Schema.parse(mapOrMaps)
     }
 
-    return generateGeoreferenceAnnotation(parsedMap)
+    return generateGeoreferenceAnnotation(parsedGeoreferencedMap)
   }
 }
