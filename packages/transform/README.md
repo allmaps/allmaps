@@ -1,14 +1,14 @@
 # @allmaps/transform
 
-This module serves to **transform Points, LineStrings, Polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of Control Points**, who's coordinates are known in both planes, and a specific transformation algorithm.
+This module contains classes and methods to **transform Points, LineStrings, Polygons** and other spatial features from a 2D cartesian `(x, y)` source space to a destination space. The transformation function that accomplish this are constructed from **a set of Control Points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
-It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from Control Points in the annotation and transforms Points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
+Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we transform a IIIF image from the 'resource' space of the image to the '(projected) geospatial' space of a map projection (in most cases WebMercator). We construct the necessary transformation functions from the Ground Control Points that can be found in the map's Georeference Annotation.
 
-Care was taken to make this module **usable and useful outside of the Allmaps context** as well! Feel free to incorporate it in your project.
+Like all other Allmaps modules, care was taken to make this module usable and useful outside of the Allmaps context as well! Feel free to incorporate it in your project if it could be useful.
 
 ## How it works
 
-This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that maps arbitrary Points in one plane to the corresponding Points in the other plane. The transformer has dedicated functions that use this transformation to transform Points and more complex geometries like LineStrings and Polygons.
+This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that map arbitrary Points in one plane to the corresponding Points in the other plane. The transformer has dedicated functions that use these two transformations to transform Points, and more complex geometries like LineStrings and Polygons, forward and backward.
 
 ## Installation
 
@@ -24,138 +24,129 @@ npm install @allmaps/transform
 
 ### Point
 
-```js
-import { GcpTransformer } from '@allmaps/transform'
-
-const generalGcps3 = [
-  {
-    source: [518, 991],
-    destination: [4.9516614, 52.4633102]
-  },
-  {
-    source: [4345, 2357],
-    destination: [5.0480391, 52.5123762]
-  },
-  {
-    source: [2647, 475],
-    destination: [4.9702906, 52.5035815]
-  }
-]
-
-const transformer = new GcpTransformer(generalGcps3, 'helmert')
-
-const transformedPoint = transformer.transformForward([100, 100])
-// transformedPoint = [4.9385700843392435, 52.46580484503631]
-
-const roundtripTransformedPoint = transformer.transformBackward([
-  4.9385700843392435, 52.46580484503631
-])
-// roundtripTransformedPoint = [100, 100]
-```
-
-### LineString
-
-In this example we transform backward, and from a GeoJSON Geometry.
+In this example we transform forward.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
 
-const generalGcps7 = [
+export const generalGcps3 = [
   {
     source: [0, 0],
     destination: [0, 0]
   },
   {
-    source: [100, 0],
-    destination: [20, 0]
+    source: [0, 1],
+    destination: [1, 4]
   },
   {
-    source: [200, 100],
-    destination: [40, 20]
-  },
-  {
-    source: [200, 200],
-    destination: [40, 40]
-  },
-  {
-    source: [150, 250],
-    destination: [40, 100]
-  },
-  {
-    source: [100, 200],
-    destination: [20, 40]
-  },
-  {
-    source: [0, 100],
-    destination: [0, 20]
+    source: [1, 0],
+    destination: [5, 10]
   }
 ]
 
-const options = {
-  minOffsetRatio: 0.001,
-  maxDepth: 2
-}
-// We transform backward (from destination to source) and have GeoJSON input.
-// Hence `destinationIsGeographic: true` will be set automatically
+const transformer = new GcpTransformer(generalGcps3, 'polynomial')
 
-const transformer = new GcpTransformer(generalGcps7, 'polynomial')
-
-const lineStringGeoJSON = {
-  type: 'LineString',
-  coordinates: [
-    [10, 50],
-    [50, 50]
-  ]
-}
-
-const transformedLineString = transformer.transformBackward(
-  lineStringGeoJSON,
-  options
-)
-// transformedLineString = [
-//   [31.06060606060611, 155.30303030303048],
-//   [80.91200458875993, 165.7903106766409],
-//   [133.1658635549907, 174.5511756850417],
-//   [185.89024742146262, 181.22828756380306],
-//   [237.12121212121218, 185.60606060606085]
-// ]
-
-// Notice how the result has two layers of midpoints!
-// In a first step the Point [133.16, 174.55] is added between the start and end Point
-// Then [80.91, 165.79] and [185.89, 181.22] are added in between.
+const transformedPoint = transformer.transformForward([1, 1])
+// transformedPoint = [6, 14]
 ```
 
-### Polygon
+### LineString
 
-In this example we transform to a GeoJSON Geometry.
+In this example we transform backward.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
 
-const generalGcps6 = [
+const gcps7 = [
   {
-    source: [1344, 4098],
-    destination: [4.4091165, 51.9017125]
+    resource: [0, 0],
+    geo: [0, 0]
   },
   {
-    source: [4440, 3441],
-    destination: [4.5029222, 51.9164451]
+    resource: [100, 0],
+    geo: [20, 0]
   },
   {
-    source: [3549, 4403],
-    destination: [4.4764224, 51.897309]
+    resource: [200, 100],
+    geo: [40, 20]
   },
   {
-    source: [1794, 2130],
-    destination: [4.4199066, 51.9391509]
+    resource: [200, 200],
+    geo: [40, 40]
   },
   {
-    source: [3656, 2558],
-    destination: [4.4775683, 51.9324358]
+    resource: [150, 250],
+    geo: [40, 100]
   },
   {
-    source: [2656, 3558],
-    destination: [4.4572643, 51.9143043]
+    resource: [100, 200],
+    geo: [20, 40]
+  },
+  {
+    resource: [0, 100],
+    geo: [0, 20]
+  }
+]
+
+const options = {
+  maxDepth: 2
+}
+
+const transformer = new GcpTransformer(gcps7, 'polynomial')
+
+const lineString = [
+  [10, 50],
+  [50, 50]
+]
+
+const transformedLineString = transformer.transformBackward(
+  lineString,
+  options
+)
+// transformedLineString = [
+//   [31.06060606060611, 155.30303030303048],
+//   [82.57575757575762, 162.8787878787881],
+//   [134.09090909090912, 170.45454545454567],
+//   [185.60606060606065, 178.0303030303033],
+//   [237.12121212121218, 185.60606060606085]
+// ]
+
+// Notice how the result has two layers of midpoints!
+// In a first step the Point [134.09, 170.45] is added between the start and end Point
+// Then [82.57, 162.87] and [185.60, 178.03] are added in between.
+```
+
+### Polygon
+
+In this example we use a Thin Plate Spline transformation.
+
+```js
+import { GcpTransformer } from '@allmaps/transform'
+
+const gcps6 = [
+  {
+    resource: [1344, 4098],
+    geo: [4.4091165, 51.9017125]
+  },
+  {
+    resource: [4440, 3441],
+    geo: [4.5029222, 51.9164451]
+  },
+  {
+    resource: [3549, 4403],
+    geo: [4.4764224, 51.897309]
+  },
+  {
+    resource: [1794, 2130],
+    geo: [4.4199066, 51.9391509]
+  },
+  {
+    resource: [3656, 2558],
+    geo: [4.4775683, 51.9324358]
+  },
+  {
+    resource: [2656, 3558],
+    geo: [4.4572643, 51.9143043]
   }
 ]
 
@@ -164,7 +155,7 @@ const options = {
   maxDepth: 1
 }
 
-const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 
 const polygon = [
   [
@@ -175,13 +166,11 @@ const polygon = [
   ]
 ]
 
-const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
+const transformedPolygon = transformer.transformForward(
   polygon,
   options
 )
-// const transformedPolygonGeoJSON = {
-//   type: 'Polygon',
-//   coordinates: [
+// transformedPolygon = [
 //     [
 //       [4.388957777030093, 51.959084191571606],
 //       [4.390889520773774, 51.94984430356657],
@@ -190,56 +179,26 @@ const transformedPolygonGeoJSON = transformer.transformForwardAsGeojson(
 //       [4.425874493300959, 51.94172557475595],
 //       [4.4230497784967655, 51.950815146974556],
 //       [4.420666790347598, 51.959985351835975],
-//       [4.404906205946158, 51.959549039424715],
-//       [4.388957777030093, 51.959084191571606]
+//       [4.404906205946158, 51.959549039424715]
 //     ]
 //   ]
-// }
 ```
 
 ### MultiPoint
 
-In this example we transform a MultiPoint to a MultiPoint.
+In this example we transform a multi-geometry.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
 
-const generalGcps7 = [
-  {
-    source: [0, 0],
-    destination: [0, 0]
-  },
-  {
-    source: [100, 0],
-    destination: [20, 0]
-  },
-  {
-    source: [200, 100],
-    destination: [40, 20]
-  },
-  {
-    source: [200, 200],
-    destination: [40, 40]
-  },
-  {
-    source: [150, 250],
-    destination: [40, 100]
-  },
-  {
-    source: [100, 200],
-    destination: [20, 40]
-  },
-  {
-    source: [0, 100],
-    destination: [0, 20]
-  }
-]
+const gcps7 = // see above
 
+// The option `isMultiGeometry` assures the transform method recognises the input (an array of points) as a multiPoint, instead of a lineString
 const options = {
-  isMultiGeometry: true // this assures the transform method recognises the input as a multiPoint, not a LineString
+  isMultiGeometry: true
 }
 
-const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+const transformer = new GcpTransformer(gcps7, 'polynomial')
 
 const multiPoint = [
   [10, 50],
@@ -251,24 +210,27 @@ const transformedMultiPoint = transformer.transformForward(multiPoint, options)
 //   [31.06060606060611, 155.30303030303048],
 //   [237.12121212121218, 185.60606060606085]
 // ]
+// Note: if the input would have been recognised as a lineString, more points would have been added!
 ```
 
 ## Creating a transformer
 
-A transformer is build from a set of **GCPs**, a **transformation type** and some optional **options**.
+Let's go over the different steps of using this package: creating a transformer and using transformer methods.
+
+A transformer is created from a set of **GCPs**, a **transformation type** and some optional **options**.
 
 ### GCPs
 
 GCPs follow the GCP type (see below). Each transformation type has a minimum number of GCPs.
 
-Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**).
+Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**). See [@allmaps/analyse](../../packages/analyse/) for ways to analyse and check GCP properties.
 
 ### Transformation types
 
 The following transformation types are supported.
 
 |                                                                                                                 | Type                                       | Description                                                              | Properties                                                                                                                           | Minimum number of GCPs |
-| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+|-----------------------------------------------------------------------------------------------------------------|--------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------|
 | <img width="100" src="../ui/src/lib/shared/images/transformations/straight.svg" alt="straight">                 | `straight`                                 | Straight transformation                                                  | Applies translation and scaling. Preserves shapes and angles.                                                                        | 2                      |
 | <img width="100" src="../ui/src/lib/shared/images/transformations/helmert.svg" alt="helmert">                   | `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Applies translation, scaling and rotation. Preserves shapes and angles.                                                              | 2                      |
 | <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-1.svg" alt="polynomial">           | `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Applies translation, scaling, rotation and shearing. Preserves lines and parallelism.                                                | 3                      |
@@ -279,27 +241,27 @@ The following transformation types are supported.
 
 ## Using transformer methods
 
-Once a transformer is built, its methods can be used to transform geometries forward and backward. Transformer methods take a **Geometry or GeoJSON Geometry**, some optional **options** and an optional **'return type function'**.
+Once a transformer is built, its methods can be used to transform geometries forward and backward. Transformer methods take a **Geometry**, some optional **options** and an optional **'return type function'**.
 
-All transformer methods accepts Points, LineStrings as well as Polygons (and MultiPoints, MultiLineStrings and MultiPolygons), both as standard geometries or GeoJSON geometries. There are, however, separate methods for transforming to standard geometries or to GeoJSON geometries. There are also separate methods for transforming forward or backward.
+There are separate methods for transforming forward or backward: `transformForward()` and `transformBackward()`.
 
-Hence, the main methods are: `transformForward()`, `transformForwardAsGeojson()`, `transformBackward()` and `transformBackwardAsGeojson()`
+These methods accepts Points, LineStrings as well as Polygons (and MultiPoints, MultiLineStrings and MultiPolygons) geometries (as defined in [@allmaps/types](../../packages/types/)).
 
-Alternatively the same four methods are available with more expressive term for the Allmaps use case: replacing `Forward` by `ToGeo` and `Backward` by `ToResource`. E.g.: `transformToGeoAsGeojson()`.
+Alternatively the same two methods are available with more expressive term for the Allmaps use casee: `transformToGeo()` and `transformToResource()`.
 
 Note that the transform methods are **map-projection agnostic**: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ### Handling GeoJSON input and output
 
-While this function takes Geometries as input and output, it is also possible to handle GeoJSON Geometries using conversion function available in the standard library:
+While this package takes Geometries as input and output (as defined in [@allmaps/types](../../packages/types/)) it is also possible to handle GeoJSON Geometries or SVG Geometries, by converting to and from these geometry types using the functions available in [@allmaps/stdlib](../../packages/stdlib/):
 
 ```ts
 import { GcpTransformer } from '@allmaps/transform'
 import { geojsonGeometryToGeometry, geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
-const generalGcps7 = ... // see above
+const gcps7 = ... // see above
 
-const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+const transformer = new GcpTransformer(gcps7, 'polynomial')
 
 const geojsonLineString = {
   type: 'LineString',
@@ -319,26 +281,26 @@ const transformedGeoJsonLineString = geometryToGeojsonGeometry(transformedLineSt
 
 ### Transform options
 
-Some options are available to improve transformations, e.g. to transform LineStrings or Polygons by recursively adding midpoints, or to correctly deal with a possible different handedness of source and destination coordinates.
+Some options are available to improve transformations.
 
-These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the options derived from the data format (e.g. setting 'true' when source is GeoJSON), which in term override the default options.
+These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the default options.
 
 The `differentHandedness` option is used both when a transformer and when a geometry is transformed, and should not be altered between these two actions.
 
 Here's an overview of the available options:
 
-| Option                    | Description                                                                                                                                                                                                                                                  | Type                                                         | Default                                            |
-| :------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------- | :------------------------------------------------- |
-| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                      | `number`                                                     | `0` (i.e. no midpoints by default!)                |
-| `minOffsetRatio`          | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                          | `number`                                                     | `0`                                                |
-| `minOffsetDistance`       | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                       | `number`                                                     | `Infinity` (i.e. condition not applied by default) |
-| `minLineDistance`         | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                         | `number`                                                     | `Infinity` (i.e. condition not applied by default) |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                                                                                                             | `boolean`                                                    | `false` (`true` when source is GeoJSON)            |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                                                                                                        | `boolean`                                                    | `false` (`true` when destination is GeoJSON)       |
-| `isMultiGeometry`    | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry (as opposed to GeoJSON geometries) types are not deterministic: the types of LineString and MultiPoint are identical. | `boolean`                                                    | `false`                                            |
-| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform.                                                                                        | `boolean`                                                    | `false`                                            |
-| `distortionMeasures`          | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                                                                                                                                                   | `DistortionMeasure[]` | `[]`                                       |
-| `referenceScale`          | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                                                                                                   | `number` | `1`                                       |
+| Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
+|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                                                                                                                                   | `number`              | `0` (i.e. no midpoints by default!)                |
+| `minOffsetRatio`          | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                       | `number`              | `0`                                                |
+| `minOffsetDistance`       | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                    | `number`              | `Infinity` (i.e. condition not applied by default) |
+| `minLineDistance`         | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                      | `number`              | `Infinity` (i.e. condition not applied by default) |
+| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points                                                                                                                                                                                                                                                                                                          | `boolean`             | `false`                                            |
+| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points                                                                                                                                                                                                                                                                                                     | `boolean`             | `false`                                            |
+| `isMultiGeometry`         | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry types are not deterministic: the types of LineString and MultiPoint are identical.                                                                                                                                                 | `boolean`             | `false`                                            |
+| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean`             | `false`                                            |
+| `distortionMeasures`      | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                                                                                                                                                                 | `DistortionMeasure[]` | `[]`                                               |
+| `referenceScale`          | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                                                                                                                                                                           | `number`              | `1`                                                |
 
 #### Recursively adding midpoints
 
@@ -397,7 +359,7 @@ We can compute these distortions locally, at every point. The approach implement
 This packages supports the evaluation of the partial derivatives in the `transformForward()` and `transformBackward()` functions via their transform options, and exports a function `computeDistortionFromPartialDerivatives()` to compute the distortion measures from these partial derivatives. The supported distortion measures are available via the exported `supportedDistortionMeasures` constant. These include:
 
 | Key         | Type                               | Description                                                                                                                                                                                                                              | Example                                                                                                              |
-| ----------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+|-------------|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | `log2sigma` | Area distortion measure            | The base-2 logarithm of the area scale factor σ, which indicates how much a local infinitesimal surface element is enlarged on the map (relative to the map’s scale).                                                                    | `0` for no area distortion, `1` if the area is twice as big, `-1` if the are is twice as small after transformation. |
 | `twoOmega`  | Angular distortion measure         | The maximum angular distortion 2Ω, which indicated the maximal (taken over all possible angles between two direction from that point) difference between an angle before and after the transformation, making it a measure for shearing. | `0` for no angular distortion, `>0` for angular distortion.                                                          |
 | `airyKavr`  | Airy-Kavrayskiy distortion measure | A measure combining the effects of areal and angular distortion.                                                                                                                                                                         | `0` for no distortion, `>0` for distortion.                                                                          |
@@ -409,19 +371,18 @@ Here's an example on how to compute local distortion.
 ```js
 import { GcpTransformer } from '@allmaps/transform'
 
-const generalGcps6 = ... // See above
+const gcps6 = ... // See above
 
 // Obtain the referenceScale
-const helmertTransformer = new GcpTransformer(generalGcps6, 'helmert')
+const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
 const forwardHelmertTransformation = helmertTransformer.createForwardTransformation() as Helmert
 const referenceScale = forwardHelmertTransformation.scale as number
 
-const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 const input = [1000, 1000]
 const distortion = transformer.transformForward(
         input,
         {
-          returnType: 'gcp',
           distortionMeasures: ['log2sigma'],
           referenceScale
         },
@@ -443,7 +404,9 @@ An example will make this more clear: when forward-transforming a LineString, th
 
 ## Typing
 
-### GCPs
+For geometries and other types, the same types as in [@allmaps/types](../../packages/types/) are used.
+
+For GCPs, some generalisations have been added:
 
 GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
 
@@ -463,7 +426,7 @@ type Gcp = {
 }
 ```
 
-When using the option `returnType = 'gcp'`, the data is returned as `GeneralGcpAndDistortions` or `GcpAndDistortions`, which are defined as follows:
+The return type functions work on the types GeneralGcpAndDistortions and GcpAndDistortions, defined as follows:
 
 ```ts
 export type Distortions = {
@@ -475,80 +438,6 @@ export type Distortions = {
 
 export type GeneralGcpAndDistortions = GeneralGcp & Partial<Distortions>
 export type GcpAndDistortions = Gcp & Partial<Distortions>
-```
-
-### Geometry types
-
-**Standard geometries**: the following geometry types are used by default in this and other packages.
-
-```ts
-type Point = [number, number]
-
-type LineString = Point[]
-
-type Polygon = Point[][]
-// A Polygon is an array of rings of at least three points
-// Rings are not closed: the first point is not repeated at the end.
-// There is no requirement on winding order.
-
-type MultiPoint = Point[]
-// Notice that this is equivalent to the LineString type, hence the `isMultiGeometry` option
-
-type MultiLineString = Point[][]
-// Notice that this is equivalent to the Polygon type, hence the `isMultiGeometry` option
-
-type MultiPolygon = Point[][][]
-
-type Geometry =
-  | Point
-  | LineString
-  | Polygon
-  | MultiPoint
-  | MultiLineString
-  | MultiPolygon
-```
-
-**GeoJSON geometries** follow the [GeoJSON specification](https://geojson.org/).
-
-**SVG geometries** are expressed using the following types (but note that some functions allow svg's to be passed as a string):
-
-```js
-export type SvgCircle = {
-  type: 'circle'
-  attributes?: SvgAttributes
-  coordinates: Point
-}
-
-export type SvgLine = {
-  type: 'line'
-  attributes?: SvgAttributes
-  coordinates: [Point, Point]
-}
-
-export type SvgPolyLine = {
-  type: 'polyline'
-  attributes?: SvgAttributes
-  coordinates: Point[]
-}
-
-export type SvgPolygon = {
-  type: 'polygon'
-  attributes?: SvgAttributes
-  coordinates: Point[]
-}
-
-export type SvgRect = {
-  type: 'rect'
-  attributes?: SvgAttributes
-  coordinates: Point[]
-}
-
-export type SvgGeometry =
-  | SvgCircle
-  | SvgLine
-  | SvgPolyLine
-  | SvgPolygon
-  | SvgRect
 ```
 
 ## Transform vs. GDAL
@@ -574,7 +463,7 @@ Here are some benchmarks on building and using a transformer, as computed on a 2
 Creating a transformer (with 10 points) (and transform 1 point)
 
 | Type              | Options    | Ops/s  |
-| ----------------- | ---------- | ------ |
+|-------------------|------------|--------|
 | `helmert`         |            | 63499  |
 | `polynomial`      | `order: 1` | 133824 |
 | `polynomial`      | `order: 2` | 66501  |
@@ -585,7 +474,7 @@ Creating a transformer (with 10 points) (and transform 1 point)
 Using a transformer (with 10 points) to transform 1 point
 
 | Type              | Options    | Ops/s    |
-| ----------------- | ---------- | -------- |
+|-------------------|------------|----------|
 | `helmert`         |            | 21612153 |
 | `polynomial`      | `order: 1` | 19993234 |
 | `polynomial`      | `order: 2` | 19887376 |

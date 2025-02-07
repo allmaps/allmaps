@@ -2,6 +2,82 @@
 
 Allmaps TypeScript types
 
+## Geometry types
+
+The following **Geometries** are used by default Allmaps packages.
+
+```ts
+type Point = [number, number]
+
+type LineString = Point[]
+
+type Polygon = Point[][]
+// A Polygon is an array of rings of at least three points
+// Rings are not closed: the first point is not repeated at the end.
+// There is no requirement on winding order.
+
+type MultiPoint = Point[]
+// Notice that this is equivalent to the LineString type, hence the `isMultiGeometry` option
+
+type MultiLineString = Point[][]
+// Notice that this is equivalent to the Polygon type, hence the `isMultiGeometry` option
+
+type MultiPolygon = Point[][][]
+
+type Geometry =
+  | Point
+  | LineString
+  | Polygon
+  | MultiPoint
+  | MultiLineString
+  | MultiPolygon
+```
+
+To interact with external data, the following types are used as well:
+
+**GeoJSON Geometries** follow the [GeoJSON specification](https://geojson.org/).
+
+**SVG Geometries** are expressed using the following types (but note that some functions allow svg's to be passed as a string):
+
+```js
+export type SvgCircle = {
+  type: 'circle'
+  attributes?: SvgAttributes
+  coordinates: Point
+}
+
+export type SvgLine = {
+  type: 'line'
+  attributes?: SvgAttributes
+  coordinates: [Point, Point]
+}
+
+export type SvgPolyLine = {
+  type: 'polyline'
+  attributes?: SvgAttributes
+  coordinates: Point[]
+}
+
+export type SvgPolygon = {
+  type: 'polygon'
+  attributes?: SvgAttributes
+  coordinates: Point[]
+}
+
+export type SvgRect = {
+  type: 'rect'
+  attributes?: SvgAttributes
+  coordinates: Point[]
+}
+
+export type SvgGeometry =
+  | SvgCircle
+  | SvgLine
+  | SvgPolyLine
+  | SvgPolygon
+  | SvgRect
+```
+
 ## API
 
 ### `Bbox`

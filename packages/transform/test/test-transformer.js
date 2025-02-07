@@ -13,14 +13,14 @@ import {
 
 import { GcpTransformer } from '../dist/index.js'
 
-import { generalGcps6, gcps6, generalGcps7 } from './input/gcps-test.js'
+import { gcps6, gcps7 } from './input/gcps-test.js'
 
 describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetRatio', async () => {
   const transformOptions = {
     minOffsetRatio: 0.01,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -48,7 +48,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
     minOffsetRatio: 0,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -79,7 +79,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
     minOffsetDistance: 0.0001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -108,7 +108,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minL
     minLineDistance: 0.02,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -165,7 +165,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and dest
     maxDepth: 1,
     destinationIsGeographic: true
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
@@ -187,13 +187,37 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and dest
   })
 })
 
+describe('Transform LineString Backward To LineString of horizontal line, with maxDepth = 2', async () => {
+  const transformOptions = {
+    maxDepth: 2
+  }
+  const transformer = new GcpTransformer(gcps7, 'polynomial')
+  const input = [
+    [10, 50],
+    [50, 50]
+  ]
+  const output = [
+    [31.06060606060611, 155.30303030303048],
+    [82.57575757575762, 162.8787878787881],
+    [134.09090909090912, 170.45454545454567],
+    [185.60606060606065, 178.0303030303033],
+    [237.12121212121218, 185.60606060606085]
+  ]
+
+  it(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformBackward(input, transformOptions),
+      output
+    )
+  })
+})
+
 describe('Transform LineString Backward To LineString of horizontal line, with destinationIsGeographic = true and maxDepth = 2', async () => {
   const transformOptions = {
-    minOffsetRatio: 0.001,
     maxDepth: 2,
     destinationIsGeographic: true
   }
-  const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'polynomial')
   const input = [
     [10, 50],
     [50, 50]
@@ -206,7 +230,7 @@ describe('Transform LineString Backward To LineString of horizontal line, with d
     [237.12121212121218, 185.60606060606085]
   ]
 
-  it(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
+  it(`should transform the lineString (without closing) and add two layers of midpoints, with slighly different locations since midpoints computed geographically`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformBackward(input, transformOptions),
       output
@@ -214,13 +238,13 @@ describe('Transform LineString Backward To LineString of horizontal line, with d
   })
 })
 
-describe('Transform LineString Backward To LineString of vertical line, with destinationIsGeographic = true and maxDepth = 2', async () => {
+describe('Transform LineString Backward To LineString of vertical line, with destinationIsGeographic = true and maxDepth = 2 and minOffsetRatio = 0.001', async () => {
   const transformOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 2,
     destinationIsGeographic: true
   }
-  const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'polynomial')
   const input = [
     [50, 10],
     [50, 50]
@@ -240,11 +264,10 @@ describe('Transform LineString Backward To LineString of vertical line, with des
 
 describe('Transform LineString Backward To LineString, with destinationIsGeographic as true', async () => {
   const transformOptions = {
-    minOffsetRatio: 0.001,
     maxDepth: 2,
     destinationIsGeographic: true
   }
-  const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'polynomial')
   const input = [
     [10, 50],
     [50, 50]
@@ -267,11 +290,9 @@ describe('Transform LineString Backward To LineString, with destinationIsGeograp
 
 describe('Transform MultiPoint Backward To MultiPoint', async () => {
   const transformOptions = {
-    minOffsetRatio: 0.001,
-    maxDepth: 2,
     isMultiGeometry: true
   }
-  const transformer = new GcpTransformer(generalGcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'polynomial')
   const input = [
     [10, 50],
     [50, 50]
@@ -289,12 +310,12 @@ describe('Transform MultiPoint Backward To MultiPoint', async () => {
   })
 })
 
-describe('Transform Polygon Forward To Polygon, with minOffsetRatio very small', async () => {
+describe('Transform Polygon Forward to polygon, with minOffsetRatio very small', async () => {
   const transformOptions = {
     minOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [
       [1000, 1000],
@@ -324,12 +345,12 @@ describe('Transform Polygon Forward To Polygon, with minOffsetRatio very small',
   })
 })
 
-describe('Transform Polygon Forward, with minOffsetRatio very small, and convert to GeoJSON Polygon', async () => {
+describe('Transform Polygon Forward to polygon, with minOffsetRatio very small, and convert to GeoJSON Polygon', async () => {
   const transformOptions = {
     minOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [
       [1000, 1000],
@@ -364,12 +385,12 @@ describe('Transform Polygon Forward, with minOffsetRatio very small, and convert
   })
 })
 
-describe('Transform unconformed Polygon Forward To Polygon, with minOffsetRatio very small', async () => {
+describe('Transform unconformed Polygon forward to polygon, with minOffsetRatio very small', async () => {
   const transformOptions = {
     minOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [
       [1000, 1000],
@@ -406,7 +427,7 @@ describe('Transform Polygon Backward To Polygon, with minOffsetRatio very small'
     minOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [
       [4.388957777030093, 51.959084191571606],
@@ -441,7 +462,7 @@ describe('Transform Polygon Backward To Polygon, with minOffsetRatio very small'
       maxDepth: 1,
       isMultiGeometry: true
     }
-    const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+    const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
     const input = [
       [
         [
@@ -480,7 +501,7 @@ describe('Transform SVG string Backward To Polygon', async () => {
     minOffsetRatio: 0.00001,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input =
     '<svg><polygon points="4.388957777030093,51.959084191571606 4.392938913951547,51.94062947962427 4.425874493300959,51.94172557475595 4.420666790347598,51.959985351835975" /></svg>'
   let output = geojsonGeometriesToGeojsonFeatureCollection(
@@ -513,7 +534,7 @@ describe('Transform LineString Forward To LineString, with reading out the sourc
     minOffsetRatio: 0.01,
     maxDepth: 1
   }
-  const transformer = new GcpTransformer(generalGcps6, 'thinPlateSpline')
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [
     [1000, 1000],
     [1000, 2000],
