@@ -392,7 +392,7 @@ const gcps6 = ... // See above
 
 // Obtain the referenceScale
 const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
-const forwardHelmertTransformation = helmertTransformer.createForwardTransformation() as Helmert
+const forwardHelmertTransformation = helmertTransformer.getForwardTransformation() as Helmert
 const referenceScale = forwardHelmertTransformation.scale as number
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
@@ -565,30 +565,6 @@ Transformation
 
 `Transformation`.
 
-### `GcpTransformer#createBackwardTransformation()`
-
-Create backward transformation
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Transformation`.
-
-### `GcpTransformer#createForwardTransformation()`
-
-Create forward transformation
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Transformation`.
-
 ### `GcpTransformer#destinationPoints`
 
 ###### Type
@@ -612,6 +588,30 @@ Transformation
 ```ts
 Array<GeneralGcp>
 ```
+
+### `GcpTransformer#getBackwardTransformation()`
+
+Get backward transformation. Create if it doesn't exist yet.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Transformation`.
+
+### `GcpTransformer#getForwardTransformation()`
+
+Get forward transformation. Create if it doesn't exist yet.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Transformation`.
 
 ### `GcpTransformer#options`
 

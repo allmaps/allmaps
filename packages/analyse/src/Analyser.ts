@@ -352,7 +352,7 @@ export default class Analyser<W extends WarpedMap> {
     )
 
     const forwardPolynomialTransformation =
-      projectedPolynomialTransformer.createForwardTransformation() as Polynomial
+      projectedPolynomialTransformer.getForwardTransformation() as Polynomial
     measures.polynomialRmse = forwardPolynomialTransformation.rmse
     measures.polynomialParameters =
       forwardPolynomialTransformation.polynomialParameters
@@ -372,7 +372,7 @@ export default class Analyser<W extends WarpedMap> {
     )
 
     const forwardHelmertTransformation =
-      projectedHelmertTransformer.createForwardTransformation() as Helmert
+      projectedHelmertTransformer.getForwardTransformation() as Helmert
 
     measures.helmertRmse = forwardHelmertTransformation.rmse
     measures.helmertParameters = forwardHelmertTransformation.helmertParameters
@@ -383,7 +383,7 @@ export default class Analyser<W extends WarpedMap> {
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
     const forwardTransformation =
-      projectedTransformer.createForwardTransformation() as Transformation
+      projectedTransformer.getForwardTransformation() as Transformation
     measures.rmse = forwardTransformation.rmse
     measures.destinationErrors = forwardTransformation.errors
     // Note: we scale using the helmert transform instead of computing errors in resource

@@ -159,7 +159,7 @@ describe('Thin plate spline transformation', async () => {
 describe('Thin plate spline transformation distortion', async () => {
   const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
   const forwardHelmertTransformation =
-    helmertTransformer.createForwardTransformation()
+    helmertTransformer.getForwardTransformation()
   const referenceScale = forwardHelmertTransformation.scale
 
   const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')

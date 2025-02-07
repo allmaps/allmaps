@@ -92,8 +92,8 @@ export class GcpTransformer {
   type: TransformationType
   options: TransformOptions
 
-  forwardTransformation?: Transformation
-  backwardTransformation?: Transformation
+  protected forwardTransformation?: Transformation
+  protected backwardTransformation?: Transformation
 
   /**
    * Create a GcpTransformer
@@ -127,9 +127,9 @@ export class GcpTransformer {
   }
 
   /**
-   * Create forward transformation
+   * Get forward transformation. Create if it doesn't exist yet.
    */
-  createForwardTransformation(): Transformation {
+  getForwardTransformation(): Transformation {
     if (!this.forwardTransformation) {
       this.forwardTransformation = this.computeTransformation(
         this.sourcePoints.map((point) =>
@@ -142,9 +142,9 @@ export class GcpTransformer {
   }
 
   /**
-   * Create backward transformation
+   * Get backward transformation. Create if it doesn't exist yet.
    */
-  createBackwardTransformation(): Transformation {
+  getBackwardTransformation(): Transformation {
     if (!this.backwardTransformation) {
       this.backwardTransformation = this.computeTransformation(
         this.destinationPoints,

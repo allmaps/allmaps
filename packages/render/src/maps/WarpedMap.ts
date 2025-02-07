@@ -346,7 +346,7 @@ export class WarpedMap extends EventTarget {
         )
     )
     const forwardHelmertTransformation =
-      projectedHelmertTransformer.createForwardTransformation() as Helmert
+      projectedHelmertTransformer.getForwardTransformation() as Helmert
     return forwardHelmertTransformation.scale as number
   }
 

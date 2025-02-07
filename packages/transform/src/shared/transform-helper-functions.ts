@@ -103,7 +103,7 @@ export function transformPointForward<P>(
   transformOptions: TransformOptions,
   generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
 ): P {
-  const forwardTransformation = transformer.createForwardTransformation()
+  const forwardTransformation = transformer.getForwardTransformation()
 
   const source = transformOptions.differentHandedness ? flipY(point) : point
   const destination = forwardTransformation.evaluateFunction(source)
@@ -142,7 +142,7 @@ export function transformPointBackward<P>(
   transformOptions: TransformOptions,
   generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
 ): P {
-  const backwardTransformation = transformer.createBackwardTransformation()
+  const backwardTransformation = transformer.getBackwardTransformation()
 
   const destination = point
   let source = backwardTransformation.evaluateFunction(destination)
