@@ -249,6 +249,8 @@ These methods accepts Points, LineStrings as well as Polygons (and MultiPoints, 
 
 Alternatively the same two methods are available with more expressive term for the Allmaps use casee: `transformToGeo()` and `transformToResource()`.
 
+Note that the backward methods are in general **not the exact inverse** of the forward methods. They are different function created by interpreting the GCPs in the one sense or the other. In some exceptional cases (like for 1st order polynomial transformations with exactly 3 GCPs) the backwards method is the exact inverse. In some cases, the exact inverse can be computed using some simple math from the transformation parameters (like for general 1st order polynomial transformations). In other cases, an exact inverse function could be obtained by implementing stepwise approximation of the inverse function (e.g. gradient descent).
+
 Note that the transform methods are **map-projection agnostic**: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
 ### Handling GeoJSON input and output

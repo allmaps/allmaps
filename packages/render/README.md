@@ -376,18 +376,6 @@ There are no parameters.
 number | undefined
 ```
 
-### `TriangulatedWarpedMap#resourceToResourceProjectedGeoDistortions(resourcePoint, transformer, referenceScale)`
-
-###### Parameters
-
-* `resourcePoint` (`[number, number]`)
-* `transformer` (`GcpTransformer`)
-* `referenceScale?` (`number | undefined`)
-
-###### Returns
-
-`Gcp & {distortions: Map<DistortionMeasure, number>; distortion: number}`.
-
 ### `TriangulatedWarpedMap#resourceTrianglePoints`
 
 ###### Type
@@ -974,7 +962,7 @@ Array<Gcp>
 ###### Type
 
 ```ts
-{type: 'Polygon'; coordinates: Point[][]}
+Array<Point>
 ```
 
 ### `WarpedMap#geoFullMaskBbox`
@@ -998,7 +986,7 @@ Array<Gcp>
 ###### Type
 
 ```ts
-{type: 'Polygon'; coordinates: Point[][]}
+Array<Point>
 ```
 
 ### `WarpedMap#geoMaskBbox`
