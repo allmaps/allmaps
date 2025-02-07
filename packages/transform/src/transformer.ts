@@ -209,7 +209,6 @@ export class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
-        this.createForwardTransformation()
         return transformPointForward(
           geometry,
           this,
@@ -308,7 +307,6 @@ export class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
-        this.createBackwardTransformation()
         return transformPointBackward(
           geometry,
           this,

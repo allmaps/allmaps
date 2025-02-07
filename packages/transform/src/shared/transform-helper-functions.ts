@@ -103,9 +103,10 @@ export function transformPointForward<P>(
   transformOptions: TransformOptions,
   generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
 ): P {
+  const forwardTransformation = transformer.createForwardTransformation()
+
   const source = transformOptions.differentHandedness ? flipY(point) : point
-  const destination =
-    transformer.forwardTransformation!.evaluateFunction(source)
+  const destination = forwardTransformation.evaluateFunction(source)
 
   let partialDerivativeX = undefined
   let partialDerivativeY = undefined
@@ -113,9 +114,9 @@ export function transformPointForward<P>(
 
   if (transformOptions.distortionMeasures.length > 0) {
     partialDerivativeX =
-      transformer.forwardTransformation!.evaluatePartialDerivativeX(source)
+      forwardTransformation.evaluatePartialDerivativeX(source)
     partialDerivativeY =
-      transformer.forwardTransformation!.evaluatePartialDerivativeY(source)
+      forwardTransformation.evaluatePartialDerivativeY(source)
 
     distortions = computeDistortionsFromPartialDerivatives(
       transformOptions.distortionMeasures,
@@ -141,8 +142,10 @@ export function transformPointBackward<P>(
   transformOptions: TransformOptions,
   generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
 ): P {
+  const backwardTransformation = transformer.createBackwardTransformation()
+
   const destination = point
-  let source = transformer.backwardTransformation!.evaluateFunction(destination)
+  let source = backwardTransformation.evaluateFunction(destination)
   // apply differentHandedness here again, so it has been applied twice in total and is undone now.
   source = transformOptions.differentHandedness ? flipY(source) : source
 
@@ -152,12 +155,12 @@ export function transformPointBackward<P>(
 
   if (transformOptions.distortionMeasures.length > 0) {
     partialDerivativeX =
-      transformer.forwardTransformation!.evaluatePartialDerivativeX(destination)
+      backwardTransformation.evaluatePartialDerivativeX(destination)
     partialDerivativeX = transformOptions.differentHandedness
       ? flipY(partialDerivativeX)
       : partialDerivativeX
     partialDerivativeY =
-      transformer.forwardTransformation!.evaluatePartialDerivativeY(destination)
+      backwardTransformation.evaluatePartialDerivativeY(destination)
     partialDerivativeY = transformOptions.differentHandedness
       ? flipY(partialDerivativeY)
       : partialDerivativeY
