@@ -73,14 +73,15 @@ export {
   geojsonGeometriesToGeojsonFeatureCollection,
   geojsonFeatureToGeojsonGeometry,
   geojsonFeatureCollectionToGeojsonGeometries,
-  expandGeojsonMultiPointToGeojsonPointArray,
-  expandGeojsonMultiLineStringToGeojsonLineStringArray,
-  expandGeojsonMultiPolygonToGeojsonPolygonArray,
-  expandGeojsonMultiGeometryToGeojsonGeometryArray,
-  contractGeojsonPointArrayToGeojsonMultiPoint,
-  contractGeojsonLineStringArrayToGeojsonMultiLineString,
-  contractGeojsonPolygonArrayToGeojsonMultiPolygon,
-  contractGeojsonGeometryArrayToGeojsonMultiGeometry
+  expandGeojsonMultiPointToGeojsonPoints,
+  expandGeojsonMultiLineStringToGeojsonLineStrings,
+  expandGeojsonMultiPolygonToGeojsonPolygons,
+  expandGeojsonMultiGeometryToGeojsonGeometries,
+  contractGeojsonPointsToGeojsonMultiPoint,
+  contractGeojsonLineStringsToGeojsonMultiLineString,
+  contractGeojsonPolygonsToGeojsonMultiPolygon,
+  contractGeojsonGeometriesToGeojsonMultiGeometry,
+  mergeGeojsonFeaturesCollections
 } from './geojson.js'
 
 export {

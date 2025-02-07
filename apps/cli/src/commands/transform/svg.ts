@@ -1,5 +1,8 @@
 import { Command } from '@commander-js/extra-typings'
 
+import { mergeGeojsonFeaturesCollections } from '@allmaps/stdlib'
+import { GcpTransformer } from '@allmaps/transform'
+
 import { readInput, printJson } from '../../lib/io.js'
 import { parseTransformOptions } from '../../lib/parse.js'
 import { getTransformerFromOptions } from '../../lib/transformer.js'
@@ -7,6 +10,8 @@ import {
   addAnnotationOptions,
   addCoordinateTransformOptions
 } from '../../lib/options.js'
+
+import type { GeojsonFeatureCollection } from '@allmaps/types'
 
 export function svg() {
   const command = addCoordinateTransformOptions(
@@ -30,11 +35,19 @@ export function svg() {
 
     const svgs = await readInput(files)
 
-    const geojsonFeatureCollection =
-      transformer.transformSvgStringsToGeojsonFeatureCollection(
-        svgs,
-        transformOptions
+    const geojsonFeatureCollections: GeojsonFeatureCollection[] = []
+    for (const svg of svgs) {
+      geojsonFeatureCollections.push(
+        GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
+          transformer,
+          svg,
+          transformOptions
+        )
       )
+    }
+    const geojsonFeatureCollection = mergeGeojsonFeaturesCollections(
+      geojsonFeatureCollections
+    )
     printJson(geojsonFeatureCollection)
   })
 }

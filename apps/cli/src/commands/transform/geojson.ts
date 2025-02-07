@@ -1,5 +1,8 @@
 import { Command } from '@commander-js/extra-typings'
 
+import { geojsonGeometriesToGeojsonFeatureCollection } from '@allmaps/stdlib'
+import { GcpTransformer } from '@allmaps/transform'
+
 import { parseJsonInput, printString } from '../../lib/io.js'
 import { parseTransformOptions } from '../../lib/parse.js'
 import { getTransformerFromOptions } from '../../lib/transformer.js'
@@ -7,7 +10,7 @@ import {
   addAnnotationOptions,
   addCoordinateTransformOptions
 } from '../../lib/options.js'
-import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
+import { GeojsonGeometry } from '@allmaps/types/geojson.js'
 
 export function geojson() {
   const command = addCoordinateTransformOptions(
@@ -29,22 +32,16 @@ export function geojson() {
       throw new Error('Inverse transformation not supported for this command')
     }
 
-    const geojsonGeometries = await parseJsonInput(files)
+    const geojsonGeometries = (await parseJsonInput(files)) as GeojsonGeometry[]
+    const geojsonFeatureCollection =
+      geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries)
 
-    const svgGeometries = []
-    for (const geojsonGeometry of geojsonGeometries) {
-      if (isGeojsonGeometry(geojsonGeometry)) {
-        const svgGeometry = transformer.transformGeojsonToSvg(
-          geojsonGeometry,
-          transformOptions
-        )
-        svgGeometries.push(svgGeometry)
-      } else {
-        throw new Error('Unsupported input.')
-      }
-    }
+    const svg = GcpTransformer.transformGeojsonFeatureCollectionToSvgString(
+      transformer,
+      geojsonFeatureCollection,
+      transformOptions
+    )
 
-    const svg = svgGeometriesToSvgString(svgGeometries)
     printString(svg)
   })
 }

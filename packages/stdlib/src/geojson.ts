@@ -306,7 +306,7 @@ export function geojsonFeatureCollectionToGeojsonGeometries(
 
 // Expand
 
-export function expandGeojsonMultiPointToGeojsonPointArray(
+export function expandGeojsonMultiPointToGeojsonPoints(
   geojsonMultiPoint: GeojsonMultiPoint
 ): GeojsonPoint[] {
   return geojsonMultiPoint.coordinates.map((point) => {
@@ -317,7 +317,7 @@ export function expandGeojsonMultiPointToGeojsonPointArray(
   })
 }
 
-export function expandGeojsonMultiLineStringToGeojsonLineStringArray(
+export function expandGeojsonMultiLineStringToGeojsonLineStrings(
   geojsonMultiLineString: GeojsonMultiLineString
 ): GeojsonLineString[] {
   return geojsonMultiLineString.coordinates.map((lineString) => {
@@ -328,7 +328,7 @@ export function expandGeojsonMultiLineStringToGeojsonLineStringArray(
   })
 }
 
-export function expandGeojsonMultiPolygonToGeojsonPolygonArray(
+export function expandGeojsonMultiPolygonToGeojsonPolygons(
   geojsonMultiPolygon: GeojsonMultiPolygon
 ): GeojsonPolygon[] {
   return geojsonMultiPolygon.coordinates.map((polygon) => {
@@ -339,20 +339,20 @@ export function expandGeojsonMultiPolygonToGeojsonPolygonArray(
   })
 }
 
-export function expandGeojsonMultiGeometryToGeojsonGeometryArray(
+export function expandGeojsonMultiGeometryToGeojsonGeometries(
   geojsonMultiGeometry:
     | GeojsonMultiPoint
     | GeojsonMultiLineString
     | GeojsonMultiPolygon
 ): GeojsonPoint[] | GeojsonLineString[] | GeojsonPolygon[] {
   if (isGeojsonMultiPoint(geojsonMultiGeometry)) {
-    return expandGeojsonMultiPointToGeojsonPointArray(geojsonMultiGeometry)
+    return expandGeojsonMultiPointToGeojsonPoints(geojsonMultiGeometry)
   } else if (isGeojsonMultiLineString(geojsonMultiGeometry)) {
-    return expandGeojsonMultiLineStringToGeojsonLineStringArray(
+    return expandGeojsonMultiLineStringToGeojsonLineStrings(
       geojsonMultiGeometry
     )
   } else if (isGeojsonMultiPolygon(geojsonMultiGeometry)) {
-    return expandGeojsonMultiPolygonToGeojsonPolygonArray(geojsonMultiGeometry)
+    return expandGeojsonMultiPolygonToGeojsonPolygons(geojsonMultiGeometry)
   } else {
     throw new Error('Geometry type not supported')
   }
@@ -360,53 +360,58 @@ export function expandGeojsonMultiGeometryToGeojsonGeometryArray(
 
 // Contract
 
-export function contractGeojsonPointArrayToGeojsonMultiPoint(
-  geojsonPointArray: GeojsonPoint[]
+export function contractGeojsonPointsToGeojsonMultiPoint(
+  geojsonPoints: GeojsonPoint[]
 ): GeojsonMultiPoint {
   return {
     type: 'MultiPoint',
-    coordinates: geojsonPointArray.map(
-      (geojsonPoint) => geojsonPoint.coordinates
-    )
+    coordinates: geojsonPoints.map((geojsonPoint) => geojsonPoint.coordinates)
   }
 }
 
-export function contractGeojsonLineStringArrayToGeojsonMultiLineString(
-  geojsonLineStringArray: GeojsonLineString[]
+export function contractGeojsonLineStringsToGeojsonMultiLineString(
+  geojsonLineStrings: GeojsonLineString[]
 ): GeojsonMultiLineString {
   return {
     type: 'MultiLineString',
-    coordinates: geojsonLineStringArray.map(
+    coordinates: geojsonLineStrings.map(
       (geojsonLineString) => geojsonLineString.coordinates
     )
   }
 }
 
-export function contractGeojsonPolygonArrayToGeojsonMultiPolygon(
-  geojsonPolygonArray: GeojsonPolygon[]
+export function contractGeojsonPolygonsToGeojsonMultiPolygon(
+  geojsonPolygons: GeojsonPolygon[]
 ): GeojsonMultiPolygon {
   return {
     type: 'MultiPolygon',
-    coordinates: geojsonPolygonArray.map(
+    coordinates: geojsonPolygons.map(
       (geojsonPolygon) => geojsonPolygon.coordinates
     )
   }
 }
 
-export function contractGeojsonGeometryArrayToGeojsonMultiGeometry(
-  geojsonGeometryArray: (GeojsonPoint | GeojsonLineString | GeojsonPolygon)[]
+export function contractGeojsonGeometriesToGeojsonMultiGeometry(
+  geojsonGeometries: (GeojsonPoint | GeojsonLineString | GeojsonPolygon)[]
 ): GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon {
-  if (geojsonGeometryArray.every(isGeojsonPoint)) {
-    return contractGeojsonPointArrayToGeojsonMultiPoint(geojsonGeometryArray)
-  } else if (geojsonGeometryArray.every(isGeojsonLineString)) {
-    return contractGeojsonLineStringArrayToGeojsonMultiLineString(
-      geojsonGeometryArray
-    )
-  } else if (geojsonGeometryArray.every(isGeojsonPolygon)) {
-    return contractGeojsonPolygonArrayToGeojsonMultiPolygon(
-      geojsonGeometryArray
-    )
+  if (geojsonGeometries.every(isGeojsonPoint)) {
+    return contractGeojsonPointsToGeojsonMultiPoint(geojsonGeometries)
+  } else if (geojsonGeometries.every(isGeojsonLineString)) {
+    return contractGeojsonLineStringsToGeojsonMultiLineString(geojsonGeometries)
+  } else if (geojsonGeometries.every(isGeojsonPolygon)) {
+    return contractGeojsonPolygonsToGeojsonMultiPolygon(geojsonGeometries)
   } else {
     throw new Error('Geometry type not supported')
+  }
+}
+
+export function mergeGeojsonFeaturesCollections(
+  geojsonFeatureCollections: GeojsonFeatureCollection[]
+): GeojsonFeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: geojsonFeatureCollections
+      .map((geojsonFeatureCollection) => geojsonFeatureCollection.features)
+      .flat(1)
   }
 }

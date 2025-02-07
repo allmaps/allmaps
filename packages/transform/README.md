@@ -279,6 +279,21 @@ const transformedLineString = transformer.transformBackward(
 const transformedGeoJsonLineString = geometryToGeojsonGeometry(transformedLineString)
 ```
 
+For faster transformation between SVG Geometries and GeoJSON Geometries, the following shortcut methods are available as static methods of the GcpTransformer class: `transformSvgToGeojson()`, `transformSvgStringToGeojsonFeatureCollection()`, `transformGeojsonToSvg()`, `transformGeojsonFeatureCollectionToSvgString()`. Example usage:
+
+```ts
+import { GcpTransformer } from '@allmaps/transform'
+
+const geojsonFeatureCollection = ... // A feature collection
+
+const svg = GcpTransformer.transformGeojsonFeatureCollectionToSvgString(
+  transformer,
+  geojsonFeatureCollection,
+  transformOptions
+)
+// svg = ... an SVG string
+```
+
 ### Transform options
 
 Some options are available to improve transformations.
@@ -646,78 +661,6 @@ Array<Point>
 
 `P`.
 
-### `GcpTransformer#transformGeojsonFeatureCollectionToSvgString(geojson, options)`
-
-Transforms a GeoJSON FeatureCollection to resource space to a SVG string
-
-Note: Multi-geometries are not supported
-
-###### Parameters
-
-* `geojson` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
-  * GeoJSON FeatureCollection to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Transform options
-
-###### Returns
-
-Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`string`).
-
-### `GcpTransformer#transformGeojsonToSvg(geojsonGeometry, options)`
-
-Transforms a GeoJSON Geometry to resource space to a SVG geometry
-
-Note: Multi-geometries are not supported
-
-###### Parameters
-
-* `geojsonGeometry` (`  | GeojsonPoint
-    | GeojsonLineString
-    | GeojsonPolygon
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon`)
-  * GeoJSON Geometry to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Transform options
-
-###### Returns
-
-Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgRect | SvgPolygon`).
-
-### `GcpTransformer#transformSvgStringsToGeojsonFeatureCollection(svgs, options)`
-
-Transforms SVG strings to geo space to a GeoJSON FeatureCollection
-
-Note: Multi-geometries are not supported
-
-###### Parameters
-
-* `svgs` (`Array<string>`)
-  * An array of SVG strings to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Transform options
-
-###### Returns
-
-Input SVG strings transformed to geo space, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
-
-### `GcpTransformer#transformSvgToGeojson(svgCircle, options)`
-
-Transforms a SVG geometry to geo space as a GeoJSON Geometry
-
-Note: Multi-geometries are not supported
-
-###### Parameters
-
-* `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Transform options
-
-###### Returns
-
-Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Point'; coordinates: Point}`).
-
 ### `GcpTransformer#transformToGeo(point, options, gcpToP)`
 
 ###### Parameters
@@ -756,6 +699,90 @@ Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Poi
   | 'projective'
   | 'thinPlateSpline'
 ```
+
+### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, options)`
+
+Transforms a GeoJSON FeatureCollection to resource space to a SVG string
+
+This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `transformer` (`GcpTransformer`)
+  * A GCP Transformer defining the transformation
+* `geojson` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
+  * GeoJSON FeatureCollection to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`string`).
+
+### `GcpTransformer.transformGeojsonToSvg(transformer, geojsonGeometry, options)`
+
+Transforms a GeoJSON Geometry to resource space to a SVG geometry
+
+This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `transformer` (`GcpTransformer`)
+  * A GCP Transformer defining the transformation
+* `geojsonGeometry` (`  | GeojsonPoint
+    | GeojsonLineString
+    | GeojsonPolygon
+    | GeojsonMultiPoint
+    | GeojsonMultiLineString
+    | GeojsonMultiPolygon`)
+  * GeoJSON Geometry to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgRect | SvgPolygon`).
+
+### `GcpTransformer.transformSvgStringToGeojsonFeatureCollection(transformer, svg, options)`
+
+Transforms an SVG string to geo space to a GeoJSON FeatureCollection
+
+This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `transformer` (`GcpTransformer`)
+  * A GCP Transformer defining the transformation
+* `svg` (`string`)
+  * An SVG string to transform
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
+
+### `GcpTransformer.transformSvgToGeojson(transformer, svgCircle, options)`
+
+Transforms a SVG geometry to geo space as a GeoJSON Geometry
+
+This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: Multi-geometries are not supported
+
+###### Parameters
+
+* `transformer` (`GcpTransformer`)
+  * A GCP Transformer defining the transformation
+* `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Transform options
+
+###### Returns
+
+Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Point'; coordinates: Point}`).
 
 ### `GeneralGcp`
 

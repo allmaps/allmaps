@@ -550,47 +550,56 @@ export class GcpTransformer {
     }
   }
 
-  // Shortcuts for SVG <> GeoJSON
+  // Shortcut static methods for SVG <> GeoJSON
 
   /**
    * Transforms a SVG geometry to geo space as a GeoJSON Geometry
    *
+   * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
    * Note: Multi-geometries are not supported
    *
+   * @param transformer - A GCP Transformer defining the transformation
    * @param geometry - SVG geometry to transform
    * @param options - Transform options
    * @returns Input SVG geometry transformed to geo space, as a GeoJSON Geometry
    */
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgCircle: SvgCircle,
     options?: Partial<TransformOptions>
   ): GeojsonPoint
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgLine: SvgLine,
     options?: Partial<TransformOptions>
   ): GeojsonLineString
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgPolyLine: SvgPolyLine,
     options?: Partial<TransformOptions>
   ): GeojsonLineString
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgRect: SvgRect,
     options?: Partial<TransformOptions>
   ): GeojsonPolygon
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgPolygon: SvgPolygon,
     options?: Partial<TransformOptions>
   ): GeojsonPolygon
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgGeometry: SvgGeometry,
     options?: Partial<TransformOptions>
   ): GeojsonGeometry
-  transformSvgToGeojson(
+  static transformSvgToGeojson(
+    transformer: GcpTransformer,
     svgGeometry: SvgGeometry,
     options?: Partial<TransformOptions>
   ): GeojsonGeometry {
     // This middle step is needed to make typescript happy
-    const transformedGeometry = this.transformToGeo(
+    const transformedGeometry = transformer.transformToGeo(
       svgGeometryToGeometry(svgGeometry),
       options
     )
@@ -598,24 +607,29 @@ export class GcpTransformer {
   }
 
   /**
-   * Transforms SVG strings to geo space to a GeoJSON FeatureCollection
+   * Transforms an SVG string to geo space to a GeoJSON FeatureCollection
    *
+   * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
    * Note: Multi-geometries are not supported
    *
-   * @param svgs - An array of SVG strings to transform
+   * @param transformer - A GCP Transformer defining the transformation
+   * @param svg - An SVG string to transform
    * @param options - Transform options
-   * @returns Input SVG strings transformed to geo space, as a GeoJSON FeatureCollection
+   * @returns Input SVG string transformed to geo space, as a GeoJSON FeatureCollection
    */
-  transformSvgStringsToGeojsonFeatureCollection(
-    svgs: string[],
+  static transformSvgStringToGeojsonFeatureCollection(
+    transformer: GcpTransformer,
+    svg: string,
     options?: Partial<TransformOptions>
   ): GeojsonFeatureCollection {
     const geojsonGeometries = []
-    for (const svg of svgs) {
-      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
-        const geojsonGeometry = this.transformSvgToGeojson(svgGeometry, options)
-        geojsonGeometries.push(geojsonGeometry)
-      }
+    for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
+      const geojsonGeometry = this.transformSvgToGeojson(
+        transformer,
+        svgGeometry,
+        options
+      )
+      geojsonGeometries.push(geojsonGeometry)
     }
     return geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries)
   }
@@ -623,18 +637,21 @@ export class GcpTransformer {
   /**
    * Transforms a GeoJSON Geometry to resource space to a SVG geometry
    *
+   * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
    * Note: Multi-geometries are not supported
    *
+   * @param transformer - A GCP Transformer defining the transformation
    * @param geojsonGeometry - GeoJSON Geometry to transform
    * @param options - Transform options
    * @returns Input GeoJSON Geometry transform to resource space, as SVG geometry
    */
-  transformGeojsonToSvg(
+  static transformGeojsonToSvg(
+    transformer: GcpTransformer,
     geojsonGeometry: GeojsonGeometry,
     options?: Partial<TransformOptions>
   ): SvgGeometry {
     // This middle step is needed to make typescript happy
-    const transformedGeometry = this.transformToResource(
+    const transformedGeometry = transformer.transformToResource(
       geojsonGeometryToGeometry(geojsonGeometry),
       options
     )
@@ -644,13 +661,16 @@ export class GcpTransformer {
   /**
    * Transforms a GeoJSON FeatureCollection to resource space to a SVG string
    *
+   * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
    * Note: Multi-geometries are not supported
    *
+   * @param transformer - A GCP Transformer defining the transformation
    * @param geojson - GeoJSON FeatureCollection to transform
    * @param options - Transform options
    * @returns Input GeoJSON FeaturesCollection transformed to resource space, as SVG string
    */
-  transformGeojsonFeatureCollectionToSvgString(
+  static transformGeojsonFeatureCollectionToSvgString(
+    transformer: GcpTransformer,
     geojson: GeojsonFeatureCollection,
     options?: Partial<TransformOptions>
   ): string {
@@ -658,7 +678,11 @@ export class GcpTransformer {
     for (const geojsonGeometry of geojsonFeatureCollectionToGeojsonGeometries(
       geojson
     )) {
-      const svgGeometry = this.transformGeojsonToSvg(geojsonGeometry, options)
+      const svgGeometry = this.transformGeojsonToSvg(
+        transformer,
+        geojsonGeometry,
+        options
+      )
       svgGeometries.push(svgGeometry)
     }
 

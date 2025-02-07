@@ -229,41 +229,41 @@ Allmaps Standard Library
 
 `Array<Point>`.
 
-### `contractGeojsonGeometryArrayToGeojsonMultiGeometry(geojsonGeometryArray)`
+### `contractGeojsonGeometriesToGeojsonMultiGeometry(geojsonGeometries)`
 
 ###### Parameters
 
-* `geojsonGeometryArray` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
+* `geojsonGeometries` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
 
 ###### Returns
 
 `GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon`.
 
-### `contractGeojsonLineStringArrayToGeojsonMultiLineString(geojsonLineStringArray)`
+### `contractGeojsonLineStringsToGeojsonMultiLineString(geojsonLineStrings)`
 
 ###### Parameters
 
-* `geojsonLineStringArray` (`Array<GeojsonLineString>`)
+* `geojsonLineStrings` (`Array<GeojsonLineString>`)
 
 ###### Returns
 
 `{type: 'MultiLineString'; coordinates: Point[][]}`.
 
-### `contractGeojsonPointArrayToGeojsonMultiPoint(geojsonPointArray)`
+### `contractGeojsonPointsToGeojsonMultiPoint(geojsonPoints)`
 
 ###### Parameters
 
-* `geojsonPointArray` (`Array<GeojsonPoint>`)
+* `geojsonPoints` (`Array<GeojsonPoint>`)
 
 ###### Returns
 
 `{type: 'MultiPoint'; coordinates: Point[]}`.
 
-### `contractGeojsonPolygonArrayToGeojsonMultiPolygon(geojsonPolygonArray)`
+### `contractGeojsonPolygonsToGeojsonMultiPolygon(geojsonPolygons)`
 
 ###### Parameters
 
-* `geojsonPolygonArray` (`Array<GeojsonPolygon>`)
+* `geojsonPolygons` (`Array<GeojsonPolygon>`)
 
 ###### Returns
 
@@ -321,7 +321,7 @@ Allmaps Standard Library
 
 `boolean`.
 
-### `expandGeojsonMultiGeometryToGeojsonGeometryArray(geojsonMultiGeometry)`
+### `expandGeojsonMultiGeometryToGeojsonGeometries(geojsonMultiGeometry)`
 
 ###### Parameters
 
@@ -331,7 +331,7 @@ Allmaps Standard Library
 
 `Array<GeojsonPoint> | Array<GeojsonLineString> | Array<GeojsonPolygon>`.
 
-### `expandGeojsonMultiLineStringToGeojsonLineStringArray(geojsonMultiLineString)`
+### `expandGeojsonMultiLineStringToGeojsonLineStrings(geojsonMultiLineString)`
 
 ###### Parameters
 
@@ -341,7 +341,7 @@ Allmaps Standard Library
 
 `Array<GeojsonLineString>`.
 
-### `expandGeojsonMultiPointToGeojsonPointArray(geojsonMultiPoint)`
+### `expandGeojsonMultiPointToGeojsonPoints(geojsonMultiPoint)`
 
 ###### Parameters
 
@@ -351,7 +351,7 @@ Allmaps Standard Library
 
 `Array<GeojsonPoint>`.
 
-### `expandGeojsonMultiPolygonToGeojsonPolygonArray(geojsonMultiPolygon)`
+### `expandGeojsonMultiPolygonToGeojsonPolygons(geojsonMultiPolygon)`
 
 ###### Parameters
 
@@ -1117,6 +1117,16 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Returns
 
 `number | undefined`.
+
+### `mergeGeojsonFeaturesCollections(geojsonFeatureCollections)`
+
+###### Parameters
+
+* `geojsonFeatureCollections` (`Array<GeojsonFeatureCollection>`)
+
+###### Returns
+
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
 
 ### `mergeOptions(options, partialOptions)`
 
