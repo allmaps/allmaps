@@ -5,16 +5,16 @@ import {
   isMultiPoint,
   isMultiLineString,
   isMultiPolygon,
+  flipY,
+  geojsonGeometryToGeometry,
   geojsonGeometriesToGeojsonFeatureCollection,
   geojsonFeatureCollectionToGeojsonGeometries,
+  geometryToGeojsonGeometry,
+  geometryToSvgGeometry,
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
-  flipY,
-  mergeOptions,
-  geometryToGeojsonGeometry,
   svgGeometryToGeometry,
-  geojsonGeometryToGeometry,
-  geometryToSvgGeometry
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { Transformation } from './transformation.js'

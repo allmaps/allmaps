@@ -10,6 +10,10 @@ Like all other Allmaps modules, care was taken to make this module usable and us
 
 This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that map arbitrary Points in one plane to the corresponding Points in the other plane. The transformer has dedicated functions that use these two transformations to transform Points, and more complex geometries like LineStrings and Polygons, forward and backward.
 
+An **example** below using the map *L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae* ([Open in Allmaps Viewer](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec)): based on the map's GCPs in resource and (projected) geo coordinates, a transformer can be built (visualised by the grid) allowing to transform any geometry from resource to geo space. Here, the resource mask is transformed from resource to (projected) geo space.
+
+![](example.png)
+
 ## Installation
 
 This is an ESM-only module that works in browsers and in Node.js.
