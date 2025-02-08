@@ -21,7 +21,7 @@ import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
 
 import { getTileZoomLevels, getTileImageRequest } from '../lib/tiles.js'
-import { getImageRequest } from '../lib/thumbnails.js'
+import { getImageRequest } from '../lib/image-requests.js'
 import {
   getProfileProperties,
   getMajorIiifVersionFromImageService
@@ -259,11 +259,20 @@ export class EmbeddedImage {
       const aspectRatioWidth = height * aspectRatio
       const aspectRatioHeight = aspectRatioWidth / aspectRatio
 
-      // Is this really the right way to do it?
-      // See also:
-      // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
-      if (height === Math.round(aspectRatioHeight)) {
-        heightStr = ''
+      if (this.majorVersion <= 2) {
+        // In IIIF Image API 2.1 and below, use
+        // "the w, syntax for images that should be scaled maintaining the aspect ratio"
+        // In version 3, use "w,h if the size requested does not require upscaling"
+
+        // See:
+        // - https://iiif.io/api/image/2.1/#canonical-uri-syntax
+        // - https://iiif.io/api/image/3.0/#48-canonical-uri-syntax
+
+        // And see also:
+        // - https://www.jack-reed.com/2016/10/14/rounding-strategies-used-in-iiif.html
+        if (height === Math.round(aspectRatioHeight)) {
+          heightStr = ''
+        }
       }
 
       urlSize = `${widthStr},${heightStr}`

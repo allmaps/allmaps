@@ -31,7 +31,7 @@ const tests = [
     region: { x: 0, y: 0, width: 128, height: 128 },
     size: { width: 128, height: 128 },
     expectedUrl:
-      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/0,0,128,128/128,/0/default.jpg'
+      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/0,0,128,128/128,128/0/default.jpg'
   },
   {
     filename: 'image.2.sfo-176-270-383-1.json',
