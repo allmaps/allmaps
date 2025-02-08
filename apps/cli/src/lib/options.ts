@@ -1,7 +1,6 @@
-import type { Command, OptionValues } from '@commander-js/extra-typings'
+import { defaultTransformOptions } from '@allmaps/transform'
 
-const DEFAULT_MIN_OFFSET_RATIO = 0
-const DEFAULT_MAX_DEPTH = 0
+import type { Command, OptionValues } from '@commander-js/extra-typings'
 
 export function addAnnotationOptions<
   Args extends unknown[] = [],
@@ -51,29 +50,49 @@ export function addTransformOptions<
   return command
     .option(
       '-m, --max-depth <number>',
-      `Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default ${DEFAULT_MAX_DEPTH} (i.e. no midpoints by default!).`,
+      `Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default ${defaultTransformOptions.maxDepth} (i.e. no midpoints by default!).`,
       parseInt,
-      DEFAULT_MAX_DEPTH
+      defaultTransformOptions.maxDepth
     )
     .option(
-      '-p, --min-offset-ratio <number>',
-      // TODO: needs better description
-      `Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default ${DEFAULT_MIN_OFFSET_RATIO}.`,
+      '--min-offset-ratio <number>',
+      `Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default ${defaultTransformOptions.minOffsetRatio}.`,
       parseFloat,
-      DEFAULT_MIN_OFFSET_RATIO
+      defaultTransformOptions.minOffsetRatio
+    )
+    .option(
+      '--min-offset-distance <number>',
+      `Minimum offset distance when recursively adding midpoints (lower means more midpoints). Default ${defaultTransformOptions.minOffsetDistance}.`,
+      parseFloat,
+      defaultTransformOptions.minOffsetDistance
+    )
+    .option(
+      '--min-line-distance <number>',
+      `Minimum line distance when recursively adding midpoints (lower means more midpoints). Default ${defaultTransformOptions.minLineDistance}.`,
+      parseFloat,
+      defaultTransformOptions.minLineDistance
+    )
+    .option(
+      '--source-is-geographic',
+      'Use geographic distances and midpoints for lon-lat source points.',
+      defaultTransformOptions.sourceIsGeographic
+    )
+    .option(
+      '--destination-is-geographic',
+      'Use geographic distances and midpoints for lon-lat destination points.',
+      defaultTransformOptions.destinationIsGeographic
     )
 }
 
-export function addCoordinateTransformOptions<
+export function addInverseOptions<
   Args extends unknown[] = [],
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
 >(command: Command<Args, Opts, GlobalOpts>) {
-  return addTransformOptions(
-    command
-      .option('--destination-is-geographic', 'Destination is geographic')
-      .option('--source-is-geographic', 'Source is geographic')
-      .option('-i, --inverse', 'Computes the inverse/backward transformation')
+  return command.option(
+    '-i, --inverse',
+    'Computes the inverse/backward transformation',
+    false
   )
 }
 

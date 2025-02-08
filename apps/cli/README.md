@@ -238,7 +238,7 @@ Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
 allmaps manifest -d <id> [files...]
 ```
 
-The ID of the IIIF Manifest can be supplied with the `-i` or `--id` option.
+The ID of the IIIF Manifest can be supplied with the `--id` option.
 
 Output the IDs of the IIIF Images in the input files:
 

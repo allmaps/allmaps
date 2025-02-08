@@ -16,7 +16,7 @@ export function manifest() {
         'Generates IIIF Manifest from other IIIF Manifests, IIIF Image Information and Georeference Annotations'
       )
       // TODO: add version option to allow choosing between IIIF Presentation API 2.1 and 3.0
-      .option('-i, --id <id>', 'Manifest ID', 'https://example.org/manifest')
+      .option('--id <id>', 'Manifest ID', 'https://example.org/manifest')
       .action(async (files, options) => {
         const jsonValues = await parseJsonInput(files)
 

@@ -54,7 +54,7 @@ export function geotiff() {
         )
         .addOption(
           new Option(
-            '-i, --image-filenames-file <filename>',
+            '--image-filenames-file <filename>',
             'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
           ).conflicts('source-dir')
         )
@@ -64,7 +64,7 @@ export function geotiff() {
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
-    const transformOptions = parseTransformOptions(options)
+    const partialTransformOptions = parseTransformOptions(options)
 
     const basenames: string[] = []
     const gdalwarpScripts: string[] = []
@@ -99,7 +99,7 @@ export function geotiff() {
       const transformer = new GcpTransformer(gcps, transformationType)
       const polygon = transformer.transformForward(
         [map.resourceMask],
-        transformOptions
+        partialTransformOptions
       )
       const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 

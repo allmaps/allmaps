@@ -51,11 +51,22 @@ export type TransformationType =
   | 'projective'
   | 'thinPlateSpline'
 
+// Stored here as object to facilitate parsing in CLI
+export type TransformerInputs = {
+  gcps: Gcp[]
+  transformationType: TransformationType
+}
+
+// Stored here as object to facilitate parsing in CLI
+export type InverseOptions = {
+  inverse: boolean
+}
+
 export type TransformOptions = {
+  maxDepth: number
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
-  maxDepth: number
   // Assume source points are in lon/lat coordinates and use geographic distances and midpoints there
   sourceIsGeographic: boolean
   // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there

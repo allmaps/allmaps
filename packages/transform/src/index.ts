@@ -14,7 +14,7 @@ export {
 } from './distortion.js'
 
 export {
-  //   defaultTransformOptions,
+  defaultTransformOptions,
   getForwardTransformResolution
   //   getBackwardTransformResolution
 } from './shared/transform-helper-functions.js'
@@ -30,6 +30,7 @@ export type {
   SplitGcpLinePointInfo,
   SplitGcpLineInfo,
   TransformationType,
+  TransformerInputs,
   TransformOptions,
   KernelFunction,
   KernelFunctionOptions,

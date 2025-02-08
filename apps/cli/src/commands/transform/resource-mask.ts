@@ -10,12 +10,14 @@ import {
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
   parseAnnotationsValidateMaps,
+  parseGcps,
+  parseTransformationType,
   parseTransformOptions
 } from '../../lib/parse.js'
-import { addCoordinateTransformOptions } from '../../lib/options.js'
+import { addTransformOptions } from '../../lib/options.js'
 
 export function resourceMask() {
-  const command = addCoordinateTransformOptions(
+  const command = addTransformOptions(
     new Command('resource-mask')
       .argument('[files...]')
       .summary('transform resource masks to GeoJSON')
@@ -28,19 +30,20 @@ export function resourceMask() {
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
-    const transformOptions = parseTransformOptions(options)
-
-    if (options.inverse) {
-      throw new Error('Inverse transformation not supported for this command')
-    }
+    const partialTransformOptions = parseTransformOptions(options)
 
     const features = []
     for (const map of maps) {
-      const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
-      const polygon = transformer.transformForward(
-        [map.resourceMask],
-        transformOptions
+      // Note: adding "&& {}" to make typescript happy
+      const gcps = parseGcps(options && {}, map)
+      const transformationType = parseTransformationType(options && {}, map)
+
+      const transformer = new GcpTransformer(
+        gcps,
+        transformationType,
+        partialTransformOptions
       )
+      const polygon = transformer.transformForward([map.resourceMask])
       const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       features.push(

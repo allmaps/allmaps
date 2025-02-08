@@ -4,17 +4,16 @@ import { mergeGeojsonFeaturesCollections } from '@allmaps/stdlib'
 import { GcpTransformer } from '@allmaps/transform'
 
 import { readInput, printJson } from '../../lib/io.js'
-import { parseTransformOptions } from '../../lib/parse.js'
-import { getTransformerFromOptions } from '../../lib/transformer.js'
 import {
-  addAnnotationOptions,
-  addCoordinateTransformOptions
-} from '../../lib/options.js'
+  parseTransformerInputs,
+  parseTransformOptions
+} from '../../lib/parse.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
 
 import type { GeojsonFeatureCollection } from '@allmaps/types'
 
 export function svg() {
-  const command = addCoordinateTransformOptions(
+  const command = addTransformOptions(
     addAnnotationOptions(
       new Command('svg')
         .argument('[files...]')
@@ -26,12 +25,14 @@ export function svg() {
   )
 
   return command.action(async (files, options) => {
-    const transformOptions = parseTransformOptions(options)
-    const transformer = getTransformerFromOptions(options)
+    const { gcps, transformationType } = parseTransformerInputs(options)
+    const partialTransformOptions = parseTransformOptions(options)
 
-    if (options.inverse) {
-      throw new Error('Inverse transformation not supported for this command')
-    }
+    const transformer = new GcpTransformer(
+      gcps,
+      transformationType,
+      partialTransformOptions
+    )
 
     const svgs = await readInput(files)
 
@@ -40,8 +41,7 @@ export function svg() {
       geojsonFeatureCollections.push(
         GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
           transformer,
-          svg,
-          transformOptions
+          svg
         )
       )
     }
