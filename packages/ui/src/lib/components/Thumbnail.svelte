@@ -7,6 +7,7 @@
   export let width: number
   export let height = width
   export let mode: Fit = 'cover'
+  export let borderColor: string | undefined = undefined
   export let alt: string | undefined = undefined
 
   let imageRequest: ImageRequest | ImageRequest[][] | undefined = undefined
@@ -47,9 +48,17 @@
 
   $: parsedImage = Image.parse(imageInfo)
   $: imageRequest = parsedImage.getImageRequest({ width, height }, mode)
+
+  $: borderBoxWidth = mode === 'cover' ? width : parsedImage.width
+  $: borderBoxHeight = mode === 'cover' ? height : parsedImage.height
+  $: borderBoxAspectRatio = borderBoxWidth / borderBoxHeight
 </script>
 
-<div style:aspect-ratio="{width} / {height}" class="overflow-hidden">
+<div
+  style:aspect-ratio="{width} / {height}"
+  style="--border-color: {borderColor}; --border-box-aspect-ratio: {borderBoxAspectRatio}"
+  class="flex overflow-hidden"
+>
   {#if imageRequest && !Array.isArray(imageRequest)}
     <img
       class="w-full h-full {mode === 'cover'
@@ -86,6 +95,20 @@
           />
         {/each}
       {/each}
+    </div>
+  {/if}
+  {#if borderColor}
+    <!-- TODO: make this a slot/snippet, so clients can render
+      their own border box -->
+    <div
+      class="absolute left-0 top-0 w-full h-full flex justify-center items-center pointer-events-none"
+    >
+      <div
+        class="{borderBoxAspectRatio < 1
+          ? 'h-full'
+          : 'w-full'} aspect-(--border-box-aspect-ratio)
+      outline-4 outline-(--border-color)"
+      ></div>
     </div>
   {/if}
 </div>
