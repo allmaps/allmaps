@@ -38,6 +38,7 @@
   class="relative rounded-md min-w-0 max-w-(--breakpoint-md) max-h-[50vh] overflow-auto"
 >
   <div class="contents *:overflow-auto *:p-2 *:whitespace-pre-wrap *:break-all">
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     {@html highlight(annotation)}
   </div>
   <div class="absolute top-0 right-0 p-2">

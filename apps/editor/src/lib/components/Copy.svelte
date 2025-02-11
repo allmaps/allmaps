@@ -18,7 +18,9 @@
       showCheckInterval = window.setTimeout(() => {
         showCheckInterval = null
       }, 1000)
-    } catch {}
+    } catch {
+      console.error('Copying to clipboard failed')
+    }
   }
 
   onMount(() => {
