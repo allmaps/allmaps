@@ -1,15 +1,19 @@
 import { setContext, getContext } from 'svelte'
 
+import type { PresetBaseMapID } from '$lib/types/shared.js'
+
+import type { UrlState } from '$lib/state/url.svelte.js'
+
 const UI_KEY = Symbol('ui')
 
-type PresetBaseMap = {
+type BasemapPreset = {
   label: string
   url: string
   attribution: string
-  value: string
+  value: PresetBaseMapID
 }
 
-const presetBaseMaps: PresetBaseMap[] = [
+const basemapPresets: BasemapPreset[] = [
   {
     label: 'ESRI World Topo',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
@@ -35,17 +39,16 @@ const presetBaseMaps: PresetBaseMap[] = [
 ]
 
 export class UiState {
-  #presetBaseMapIndex = $state(0)
+  #urlState: UrlState
 
-  #presetBaseMaps = $state(presetBaseMaps)
-
-  #userBaseMapUrl = $state<string | undefined>()
-  #userGeoreferenceAnnotationUrl = $state<string | undefined>()
+  #basemapPresets = $state(basemapPresets)
 
   #firstUse = $state(true)
   #showAboutDialog = $state(false)
 
-  constructor() {
+  constructor(urlState: UrlState) {
+    this.#urlState = urlState
+
     // TODO: move localStorage code to shared ts file
     const firstUseKey = `${String(UI_KEY)}-first-use`
 
@@ -66,44 +69,20 @@ export class UiState {
     }
   }
 
-  get presetBaseMaps() {
-    return this.#presetBaseMaps
+  get basemapPresets() {
+    return this.#basemapPresets
   }
 
-  get presetBaseMap(): PresetBaseMap {
-    return presetBaseMaps[this.#presetBaseMapIndex % presetBaseMaps.length]
-  }
-
-  set presetBaseMap(presetBaseMapValue: string) {
-    let index = presetBaseMaps.findIndex(
-      (presetBaseMap) => presetBaseMap.value === presetBaseMapValue
+  get basemapPreset(): BasemapPreset {
+    const basemapPreset = this.#basemapPresets.find(
+      (preset) => preset.value === this.#urlState.basemapPreset
     )
 
-    if (index === -1) {
-      index = 0
+    if (basemapPreset) {
+      return basemapPreset
+    } else {
+      return this.basemapPresets[0]
     }
-
-    this.#presetBaseMapIndex = index
-  }
-
-  set presetBaseMapIndex(index: number) {
-    this.#presetBaseMapIndex = index
-  }
-
-  get userBaseMapUrl(): string | undefined {
-    return this.#userBaseMapUrl
-  }
-
-  set userBaseMapUrl(url: string) {
-    this.#userBaseMapUrl = url
-  }
-
-  get userGeoreferenceAnnotationUrl(): string | undefined {
-    return this.#userGeoreferenceAnnotationUrl
-  }
-
-  set userGeoreferenceAnnotationUrl(url: string) {
-    this.#userGeoreferenceAnnotationUrl = url
   }
 
   get firstUse() {
@@ -119,8 +98,8 @@ export class UiState {
   }
 }
 
-export function setUiState() {
-  return setContext(UI_KEY, new UiState())
+export function setUiState(urlState: UrlState) {
+  return setContext(UI_KEY, new UiState(urlState))
 }
 
 export function getUiState() {

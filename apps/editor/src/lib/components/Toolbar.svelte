@@ -1,14 +1,12 @@
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui'
 
-  import {
-    Cloud as CloudIcon,
-    // CloudSlash
-    DotsThree as DotsThreeIcon
-  } from 'phosphor-svelte'
+  import { DotsThree as DotsThreeIcon } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { flyAndScale } from '$lib/shared/transitions.js'
+
+  import Cloud from '$lib/components/Cloud.svelte'
 
   const uiState = getUiState()
 
@@ -18,13 +16,7 @@
   }
 </script>
 
-<button
-  class="cloud hidden shrink-0 hover:underline text-sm md:flex gap-1"
-  onclick={handleMenuItemClick}
-  ><CloudIcon class="size-5" weight="duotone" /><span
-    >All edits are automatically saved</span
-  ></button
->
+<Cloud />
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger
@@ -51,15 +43,3 @@
     </DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>
-
-<style>
-  :global(.cloud path:first-of-type) {
-    opacity: 0;
-    transition: all 0.5s;
-  }
-
-  :global(.cloud:hover path:first-of-type) {
-    opacity: 0.5;
-    fill: pink;
-  }
-</style>

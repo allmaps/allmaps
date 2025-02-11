@@ -2,14 +2,13 @@
   import { fade } from 'svelte/transition'
 
   import {
-    Empty as EmptyIcon,
     Warning as WarningIcon,
     MapTrifold as MapTrifoldIcon
   } from 'phosphor-svelte'
 
-  import type { GeoreferencedMap } from '@allmaps/annotation'
-
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+
+  import { isComplete } from '$lib/shared/analyze.js'
 
   const mapsMergedState = getMapsMergedState()
 
@@ -33,10 +32,6 @@
 
     return { complete, incomplete }
   })
-
-  function isComplete(map: GeoreferencedMap) {
-    return map.gcps.length > 2
-  }
 </script>
 
 {#if mapsMergedState.fetched}
@@ -55,13 +50,6 @@
       >
         <span>{mapsCounted.incomplete}</span>
         <WarningIcon class="size-4" weight="bold" />
-      </div>
-    {/if}
-    {#if mapsCounted.complete === 0 && mapsCounted.incomplete === 0}
-      <div
-        class="bg-red rounded-full px-2 py-0.5 drop-shadow-md text-xs font-bold"
-      >
-        <EmptyIcon class="size-4" weight="bold" />
       </div>
     {/if}
   </div>

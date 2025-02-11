@@ -21,7 +21,7 @@
     count?: number
     perPage?: number
     organization: Organization
-    sbowMoreLink?: boolean
+    showMoreLink?: boolean
   }
 
   const DEFAULT_COUNT = 6
@@ -32,7 +32,7 @@
     count = DEFAULT_COUNT,
     perPage = Number.POSITIVE_INFINITY,
     organization,
-    sbowMoreLink = false
+    showMoreLink: showMoreLink = false
   }: Props = $props()
 
   const usePagination = $derived(count > perPage)
@@ -49,15 +49,20 @@
 
 {#snippet header(organization: Organization)}
   <div class="contents md:flex flex-col gap-2 sm:gap-4">
-    {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
-      <img
-        class="inline-block size-16 object-contain"
-        {src}
-        alt={organization.title}
-      />
-    {/await}
-    <h3 class="text-black font-bold text-xl">{organization.title}</h3>
-    <!-- <h4 class="text-black">{organization.subtitle}</h4> -->
+    <svelte:element
+      this={showMoreLink ? 'a' : 'div'}
+      href={showMoreLink ? `/organizations/${organization.id}` : undefined}
+    >
+      {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
+        <img
+          class="inline-block size-16 object-contain"
+          {src}
+          alt={organization.title}
+        />
+      {/await}
+      <h3 class="text-black font-bold text-xl">{organization.title}</h3>
+      <!-- <h4 class="text-black">{organization.subtitle}</h4> -->
+    </svelte:element>
   </div>
 {/snippet}
 
@@ -66,7 +71,7 @@
   <div
     class="grid grid-cols-2 md:grid-cols-4 auto-rows-auto md:grid-rows-2 gap-8 bg-white rounded-2xl shadow-md p-4"
   >
-    {#if sbowMoreLink}
+    {#if showMoreLink}
       <div
         class="col-span-2 md:col-span-1 md:row-span-2 grid grid-rows-subgrid"
       >

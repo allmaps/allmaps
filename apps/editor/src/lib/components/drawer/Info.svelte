@@ -78,18 +78,18 @@
     parseLanguageString(sourceState.activeCanvas?.label, 'en')
   )
 
-  // TODO: use label=for
+  // TODO: use labels!
 </script>
 
-<div class="grid grid-cols-[max-content_1fr] gap-2 *:break-all">
+<div class="grid grid-cols-[max-content_1fr] gap-2">
   <div class="col-span-2 font-bold">
-    You're georeferencing this IIIF resource:
+    You're georeferencing this IIIF resource
   </div>
   {#if sourceState.source}
     <div>Type:</div>
     <a class="underline" href={typeUrl}>{typeString}</a>
     <div>URL:</div>
-    <a class="underline" href={sourceState.source.url}
+    <a class="underline break-all" href={sourceState.source.url}
       >{sourceState.source?.url}</a
     >
   {/if}
@@ -108,7 +108,7 @@
     >
       {#each metadataStrings as { label, value }}
         <dt>{label}</dt>
-        <dd>{value}</dd>
+        <dd class="break-all">{value}</dd>
       {/each}
     </dl>
   {/if}
@@ -117,7 +117,9 @@
     <div class="col-span-2 font-bold">Current image:</div>
     <div>URL:</div>
     <div>
-      <a class="underline" href={`${sourceState.activeImage?.uri}/info.json`}
+      <a
+        class="underline break-all"
+        href={`${sourceState.activeImage?.uri}/info.json`}
         >{sourceState.activeImage?.uri}</a
       >
     </div>

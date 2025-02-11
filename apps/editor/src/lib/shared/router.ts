@@ -10,6 +10,7 @@ export function createRouteUrl(
   params?: Partial<Params>
 ) {
   const searchParams = new URLSearchParams($page.url.searchParams)
+  // TODO: consider only setting valid URL params
   for (const [param, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       if (value) {

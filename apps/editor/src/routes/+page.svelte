@@ -1,15 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
   import { goto } from '$app/navigation'
-
   import { browser } from '$app/environment'
 
   import { createRouteUrl, gotoRoute } from '$lib/shared/router'
   import { getUrlState } from '$lib/state/url.svelte.js'
 
+  import Title from '$lib/components/Title.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
   import Organizations from '$lib/components/Organizations.svelte'
+  import Footer from '$lib/components/Footer.svelte'
 
   import organizations from '$lib/shared/organizations.js'
 
@@ -33,39 +34,49 @@
   })
 
   function handleInputSubmit(url: string) {
-    gotoRoute(createRouteUrl($page, 'images', { url }))
+    gotoRoute(createRouteUrl(page, 'images', { url }))
   }
 
   onMount(() => {
     autofocus = !hasTouch()
 
-    const hash = $page.url.hash
+    const hash = page.url.hash
     if (hash) {
-      const pathWithSearchParams = hash.slice(1)
+      let pathWithSearchParams = hash.slice(1)
+
       if (pathWithSearchParams.length > 1) {
+        // Rewrite hash-based routes from old version
+        // of Allmaps Editor
+
         if (pathWithSearchParams.startsWith('/collection')) {
-          pathWithSearchParams.replace('/collection', '/images')
+          pathWithSearchParams = pathWithSearchParams.replace(
+            '/collection',
+            '/images'
+          )
         }
 
-        const newUrl = `${$page.url.origin}${pathWithSearchParams}`
+        const newUrl = `${page.url.origin}${pathWithSearchParams}`
         goto(newUrl)
       }
     }
   })
 </script>
 
-<div class="*:p-4 flex flex-col items-center gap-4">
+<div class="flex flex-col items-center gap-4">
   <section
     id="start-georeferencing"
-    class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-end aspect-715/387 bg-cover my-2 sm:my-12 bg-center"
+    class="max-w-3xl w-full flex flex-col p-4 gap-6 items-center justify-center aspect-715/387 bg-cover my-2 sm:my-12 bg-center"
   >
     <div class="max-w-sm w-full flex flex-col gap-6 items-center mt-24">
-      <h1 class="text-2xl sm:text-4xl font-bold text-black text-center">
-        Start georeferencing
-      </h1>
+      <Title />
 
       <p class="text-black text-center">
-        Allmaps Editor is an easy-to-use app for georeferencing IIIF maps
+        Find a map from a IIIF-enabled map collection, copy its IIIF URL and
+        paste it below to start georeferencing. When you're done, you can view
+        your georeferenced map in <a
+          href="https://viewer.allmaps.org"
+          class="underline">Allmaps Viewer</a
+        > or use it with tools like MapLibre, OpenLayers, Leaflet or QGIS.
       </p>
       <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />
       <p>
@@ -77,20 +88,18 @@
       </p>
     </div>
   </section>
-  <section class="w-full bg-[#f2feff] flex flex-col items-center">
+  <section class="w-full bg-[#f2feff] flex flex-col items-center pb-16">
     <div class="max-w-(--breakpoint-lg) flex flex-col items-center">
-      <div
-        class="flex flex-col items-center max-w-sm p-8 space-y-4 text-center"
-      >
-        <h2 class="text-black text-2xl font-bold">Get started</h2>
-        <p class="text-gray-600">
-          Start georeferencing maps from these collections
-        </p>
+      <div class="flex flex-col items-center p-8 space-y-4 text-center">
+        <h2 class="text-black text-2xl font-bold">
+          Or pick a map from these collections
+        </h2>
       </div>
       <Organizations {organizations} />
     </div>
   </section>
 </div>
+<Footer />
 
 <style scoped>
   #start-georeferencing {

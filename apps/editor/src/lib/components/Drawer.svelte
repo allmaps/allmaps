@@ -3,7 +3,7 @@
 
   import {
     Info as InfoIcon,
-    MapTrifold as MapTrifoldIcon,
+    ListNumbers as ListNumbersIcon,
     Code as CodeIcon,
     Export as ExportIcon,
     Gear as GearIcon
@@ -36,8 +36,9 @@
   const Contents = $derived(value && drawers[value])
 </script>
 
+<!-- TODO: create snippet for buttons -->
 <div
-  class="shrink max-w-(--breakpoint-sm) max-h-full bg-white rounded-md p-2 gap-2 flex flex-col min-w-0"
+  class="shrink min-w-0 max-w-(--breakpoint-sm) max-h-full bg-white rounded-md p-2 gap-2 flex flex-col"
 >
   {#if value}
     <div
@@ -62,7 +63,7 @@
           <SourceLabel />
         </div>
         <div
-          class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20"
+          class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
         >
           <InfoIcon size={24} class="block" weight="bold" />
         </div>
@@ -70,15 +71,15 @@
       <ToggleGroup.Item
         aria-label="maps"
         value="maps"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20"
+        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
-        <MapTrifoldIcon size={24} class="block" weight="bold" />
+        <ListNumbersIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
       <ToggleGroup.Item
         aria-label="show Georeference Annotation"
         title="Show Georeference Annotation"
         value="annotation"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20"
+        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <CodeIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
@@ -86,14 +87,14 @@
         aria-label="export options"
         title="Export options"
         value="export"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20"
+        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <ExportIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
       <ToggleGroup.Item
         aria-label="settings"
         value="settings"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20"
+        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <GearIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>

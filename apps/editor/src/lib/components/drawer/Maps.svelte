@@ -68,16 +68,18 @@
 {#if mapCount === 0}
   <StartGeoreferencing />
 {:else}
-  <ol class="maps grid auto-rows-auto gap-2">
+  <ol
+    class="grid auto-rows-auto grid-cols-[repeat(2,_max-content)_1fr] sm:grid-cols-[repeat(8,_max-content)_1fr] gap-1 sm:gap-2"
+  >
     {#each Object.values(mapsState.maps || {}) as map, index}
       {@const gcpCount = Object.values(map.gcps).length}
       {@const isActiveMap = mapsState.activeMapId === map.id}
       <li
-        class="col-span-9 grid grid-cols-subgrid"
+        class="col-span-3 sm:col-span-9 grid grid-cols-subgrid"
         transition:slide={{ duration: 250, axis: 'y' }}
       >
         <button
-          class="col-span-8 grid grid-cols-subgrid group"
+          class="col-span-2 sm:col-span-8 grid grid-cols-subgrid group"
           onclick={() => handleMapClick(map.id)}
         >
           <div>
@@ -99,13 +101,13 @@
             {/if}
           </div>
           <div
-            class="col-span-7 place-self-start self-center flex gap-3 items-center"
+            class="col-span-1 sm:col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
           >
             <span>Map {index + 1}</span>
-            <span class="font-light text-sm text-black/75"
+            <span class="hidden sm:inline font-light text-sm text-black/75"
               >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
             </span>
-            <div class="max-w-fit w-96">
+            <div class="w-[140px] sm:w-[160px]">
               <SelectTransformation {map} />
             </div>
           </div>
@@ -122,14 +124,14 @@
             (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
           )}
           <ol
-            class="col-span-9 grid grid-cols-subgrid"
+            class="col-span-3 sm:col-span-9 grid grid-cols-subgrid"
             transition:slide={{ duration: 250, axis: 'y' }}
           >
             {#each gcps as gcp, index}
               {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
               <li class="contents">
                 <button
-                  class="col-span-8 grid gap-0 grid-cols-subgrid"
+                  class="col-span-2 sm:col-span-8 grid gap-0 grid-cols-subgrid"
                   onclick={() => handleGcpClick(map.id, gcp.id)}
                 >
                   <div class="inline-block h-8">
@@ -146,7 +148,7 @@
                   </div>
 
                   <div
-                    class="col-span-7 grid gap-1 grid-cols-subgrid geograph-tnum place-items-end"
+                    class="sm:col-span-7 hidden sm:grid text-xs sm:text-base items-center gap-1 grid-cols-subgrid geograph-tnum place-items-end"
                   >
                     {#if gcp.resource}
                       <span inert class="text-gray-300">(</span><span
@@ -195,9 +197,3 @@
     {/each}
   </ol>
 {/if}
-
-<style scoped>
-  .maps {
-    grid-template-columns: repeat(8, max-content) 1fr;
-  }
-</style>

@@ -17,11 +17,11 @@
     placeholder = 'Open a IIIF resource from a URL'
   }: Props = $props()
 
-  let value = $state(urlState.urlParam)
+  let value = $state(urlState.url)
 
   $effect(() => {
-    if (urlState.urlParam) {
-      value = urlState.urlParam
+    if (urlState.url) {
+      value = urlState.url
     } else {
       value = ''
     }
@@ -40,7 +40,7 @@
 
 <form
   onsubmit={handleSubmit}
-  class="text-sm flex items-center px-3 py-0.5 gap-1 w-full rounded-full shadow-md focus-within:shadow-lg bg-white
+  class="text-sm flex items-center px-3 py-0.5 gap-1 w-full rounded-full shadow-xs focus-within:shadow-lg bg-white
     border border-gray-300 focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500 transition-all"
 >
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />

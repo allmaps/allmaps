@@ -1,8 +1,10 @@
 <script lang="ts">
   import { Select } from 'bits-ui'
 
-  import { Check as CheckIcon } from 'phosphor-svelte'
-
+  import {
+    Check as CheckIcon,
+    CaretUpDown as CaretUpDownIcon
+  } from 'phosphor-svelte'
   import { getMapsState } from '$lib/state/maps.svelte.js'
 
   import type { DbMap3, DbTransformation } from '$lib/types/maps.js'
@@ -49,21 +51,23 @@
   onSelectedChange={handleSelectedChange}
 >
   <Select.Trigger
-    class="inline-flex w-full items-center rounded-sm border border-border-input
-      bg-white text-sm transition-colors placeholder:text-foreground-alt/50
-      focus:outline-hidden focus:ring-2 focus:ring-foreground focus:ring-offset-2 focus:ring-offset-background"
+    class="inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
+    border-solid border-gray/50 border-1 transition-colors
+    focus-within:border-pink inset-shadow-xs"
     aria-label="Select a transformation algorithm"
   >
-    <Select.Value class="text-sm" placeholder="Polynomial" />
+    <Select.Value class="text-xs sm:text-xs" placeholder="Polynomial" />
+
+    <CaretUpDownIcon class="size-6" />
   </Select.Trigger>
   <Select.Content
-    class="w-full rounded-xl border border-muted bg-white px-1 py-3 shadow-popover outline-hidden z-50"
+    class="w-full rounded-lg bg-white p-1 shadow-lg outline-hidden z-50"
     sideOffset={8}
   >
     {#each transformationTypes as transformationType}
       <Select.Item
-        class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm
-          outline-hidden transition-all duration-75 data-highlighted:bg-muted"
+        class="flex h-10 w-full text-xs sm:text-xs select-none items-center rounded-sm py-3 pl-5 pr-1.5
+        hover:bg-gray/10 cursor-pointer outline-hidden transition-all"
         value={transformationType.value}
         label={transformationType.label}
       >

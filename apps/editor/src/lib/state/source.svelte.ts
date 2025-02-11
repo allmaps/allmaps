@@ -41,7 +41,7 @@ export class SourceState {
     this.#errorState = errorState
 
     $effect(() => {
-      const url = urlState.urlParam
+      const url = urlState.url
 
       this.#reset()
 
@@ -102,6 +102,21 @@ export class SourceState {
       }
     }
   }
+
+  // callbackProject: (state) => {
+  //   if (!state.callback) {
+  //     return
+  //   }
+
+  //   for (let project of state.projects) {
+  //     for (let hostname of project.hostnames) {
+  //       const url = new URL(state.callback)
+  //       if (url.hostname === hostname) {
+  //         return project.label
+  //       }
+  //     }
+  //   }
+  // },
 
   async #load(url: string) {
     try {
@@ -215,9 +230,21 @@ export class SourceState {
     }
   }
 
+  get navPlace() {
+    // TODO: read navPlace from correct IIIF resource
+    // Either Canvas or Manifest or Collection
+    if (
+      this.#source &&
+      this.#source.parsedIiif &&
+      'navPlace' in this.#source.parsedIiif
+    ) {
+      return this.#source.parsedIiif.navPlace
+    }
+  }
+
   get activeImageId() {
-    if (this.#isImageIdValid(this.#urlState.imageIdParam)) {
-      return this.#urlState.imageIdParam
+    if (this.#isImageIdValid(this.#urlState.imageId)) {
+      return this.#urlState.imageId
     }
 
     const imagesArray = [...this.images]

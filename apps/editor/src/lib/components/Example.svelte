@@ -20,15 +20,14 @@
 
 {#await imageInfoState.fetchImageInfo(example.imageId)}
   <li
-    class="bg-[#fafafa] space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
-flex items-center justify-center
-transition-colors"
+    class="bg-[#fafafa] animate-pulse aspect-square space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
+flex items-center justify-center transition-colors"
   >
     <p>Loading…</p>
   </li>
 {:then imageInfo}
   <li
-    class="bg-[#fafafa] space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
+    class="bg-[#fafafa] aspect-square space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
 flex items-center justify-center
 transition-colors"
   >

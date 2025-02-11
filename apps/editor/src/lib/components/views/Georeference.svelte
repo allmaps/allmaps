@@ -20,7 +20,15 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getViewportsState } from '$lib/state/viewports.svelte.js'
 
+  import {
+    getExtentViewport,
+    getNavPlaceViewport,
+    getBboxViewport,
+    sortGeoViewports
+  } from '$lib/shared/viewport.js'
   import {
     resourceMaskStyle,
     gcpStyle,
@@ -42,7 +50,7 @@
   import type { ModifyEvent } from 'ol/interaction/Modify'
 
   import type { DbMaps, DbMap, DbGcp, DbGcp3 } from '$lib/types/maps.js'
-  import type { Point, GcpCoordinates } from '$lib/types/shared.js'
+  import type { Point, GcpCoordinates, Viewport } from '$lib/types/shared.js'
   import type {
     InsertMapEvent,
     RemoveMapEvent,
@@ -54,34 +62,42 @@
     RemoveResourceMaskPointEvent
   } from '$lib/types/events.js'
 
+  import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
+
+  const MAX_ZOOM = 22
+
   let resourceOlMapTarget: HTMLDivElement
   let geoOlMapTarget: HTMLDivElement
 
-  let resourceOlMap: OLMap
-  let geoOlMap: OLMap
+  let resourceOlMap: OLMap | undefined
+  let geoOlMap: OLMap | undefined
 
   let resourceTileLayer: TileLayer<IIIF>
-  let resourceGcpVectorSource: VectorSource<Feature<OLPoint>>
-  let resourceMaskVectorSource: VectorSource<Feature<Polygon>>
+  let resourceGcpVectorSource: VectorSource<Feature<OLPoint>> | undefined
+  let resourceMaskVectorSource: VectorSource<Feature<Polygon>> | undefined
 
   let resourceDraw: Draw
   let resourceModify: Modify
 
   let geoTileLayer: TileLayer<XYZ>
-  let warpedMapLayer: WarpedMapLayer
-  let geoGcpVectorSource: VectorSource<Feature<OLPoint>>
-  let geoMaskVectorSource: VectorSource<Feature<Polygon>>
+  let warpedMapLayer: WarpedMapLayer | undefined
+  let geoGcpVectorSource: VectorSource<Feature<OLPoint>> | undefined
+  let geoMaskVectorSource: VectorSource<Feature<Polygon>> | undefined
 
   let geoDraw: Draw
   let geoModify: Modify
 
-  let currentImageId = $state<string | undefined>(undefined)
-  let currentActiveMapId: string | undefined
+  let currentMapsImageId = $state<string | undefined>(undefined)
+  let currentDisplayImageId = $state<string | undefined>(undefined)
+
+  let currentActiveMapId = $state<string | undefined>(undefined)
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
   const uiState = getUiState()
   const imageInfoState = getImageInfoState()
+  const urlState = getUrlState()
+  const viewportsState = getViewportsState()
 
   function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp3[]) {
     return (
@@ -147,24 +163,26 @@
   }
 
   function gcpCoordinatesFromGcpId(gcpId: string): GcpCoordinates {
-    const resourceFeature = resourceGcpVectorSource.getFeatureById(gcpId)
-    const geoFeature = geoGcpVectorSource.getFeatureById(gcpId)
+    if (resourceGcpVectorSource && geoGcpVectorSource) {
+      const resourceFeature = resourceGcpVectorSource.getFeatureById(gcpId)
+      const geoFeature = geoGcpVectorSource.getFeatureById(gcpId)
 
-    let resourcePoint
-    let geoPoint
+      let resourcePoint
+      let geoPoint
 
-    if (resourceFeature) {
-      resourcePoint = resourceFeatureToPoint(resourceFeature)
-    }
+      if (resourceFeature) {
+        resourcePoint = resourceFeatureToPoint(resourceFeature)
+      }
 
-    if (geoFeature) {
-      geoPoint = geoFeatureToPoint(geoFeature)
-    }
+      if (geoFeature) {
+        geoPoint = geoFeatureToPoint(geoFeature)
+      }
 
-    if (resourcePoint || geoPoint) {
-      return {
-        resource: resourcePoint,
-        geo: geoPoint
+      if (resourcePoint || geoPoint) {
+        return {
+          resource: resourcePoint,
+          geo: geoPoint
+        }
       }
     }
 
@@ -193,6 +211,26 @@
   }
 
   async function updateImage(imageId: string | undefined) {
+    if (currentDisplayImageId === imageId) {
+      return
+    }
+
+    if (
+      !resourceOlMap ||
+      !resourceGcpVectorSource ||
+      !geoGcpVectorSource ||
+      !resourceMaskVectorSource ||
+      !geoMaskVectorSource
+    ) {
+      return
+    }
+
+    if (currentDisplayImageId) {
+      saveViewport()
+    }
+
+    currentDisplayImageId = imageId
+
     resourceGcpVectorSource.clear()
     geoGcpVectorSource.clear()
 
@@ -215,20 +253,30 @@
 
       const tileGrid = resourceIiifSource.getTileGrid()
 
+      const resourceViewport = viewportsState.getViewport({
+        imageId,
+        view: 'georeference',
+        pane: 'resource'
+      })
+
       const extent = tileGrid?.getExtent()
       if (extent && tileGrid) {
         resourceOlMap.setView(
           new View({
             resolutions: tileGrid.getResolutions(),
             extent,
-            constrainOnlyCenter: true
+            constrainOnlyCenter: true,
+            center: resourceViewport?.center,
+            zoom: resourceViewport?.zoom,
+            rotation: resourceViewport?.rotation
           })
         )
 
-        resourceOlMap.getView().fit(tileGrid.getExtent(), {
-          // TODO: move to settings file
-          padding: [30 + 40 + 20, 10, 30 + 40 + 20, 10]
-        })
+        if (!resourceViewport) {
+          resourceOlMap.getView().fit(tileGrid.getExtent(), {
+            padding: OL_RESOURCE_PADDING
+          })
+        }
       }
     }
   }
@@ -237,7 +285,7 @@
     const resourcePoint = getGcpResourcePoint(gcp)
     const geoPoint = getGcpGeoPoint(gcp)
 
-    if (resourcePoint) {
+    if (resourcePoint && resourceGcpVectorSource) {
       const resourceFeature = new Feature({
         id: gcp.id,
         geometry: pointToResourceGeometry(resourcePoint)
@@ -246,7 +294,7 @@
       resourceGcpVectorSource.addFeature(resourceFeature)
     }
 
-    if (geoPoint) {
+    if (geoPoint && geoGcpVectorSource) {
       const geoFeature = new Feature({
         id: gcp.id,
         geometry: pointToGeoGeometry(geoPoint)
@@ -257,27 +305,63 @@
   }
 
   function setGcps(map: DbMap) {
+    if (
+      !resourceOlMap ||
+      !geoOlMap ||
+      !resourceGcpVectorSource ||
+      !geoGcpVectorSource
+    ) {
+      return
+    }
+
     resourceGcpVectorSource.clear()
     geoGcpVectorSource.clear()
 
     Object.values(map.gcps).forEach(addGcp)
 
-    if (resourceGcpVectorSource.getFeatures().length) {
+    let resourceViewport: Viewport | undefined
+    let geoViewport: Viewport | undefined
+
+    if (currentDisplayImageId) {
+      resourceViewport = viewportsState.getViewport({
+        imageId: currentDisplayImageId,
+        view: 'georeference',
+        pane: 'resource'
+      })
+
+      geoViewport = getGeoViewport(currentDisplayImageId)
+    }
+
+    if (resourceViewport) {
+      const resourceView = resourceOlMap.getView()
+      resourceView.setCenter(resourceViewport.center)
+      resourceView.setZoom(resourceViewport.zoom)
+      resourceView.setRotation(resourceViewport.rotation)
+    } else if (resourceGcpVectorSource.getFeatures().length) {
       const resourceExtent = resourceGcpVectorSource.getExtent()
       resourceOlMap.getView().fit(resourceExtent, {
-        padding: [30 + 40 + 20, 10, 30 + 40 + 20, 10]
+        padding: OL_RESOURCE_PADDING
       })
     }
 
-    if (geoGcpVectorSource.getFeatures().length) {
+    if (geoViewport) {
+      const geoView = geoOlMap.getView()
+      geoView.setCenter(geoViewport.center)
+      geoView.setZoom(geoViewport.zoom)
+      geoView.setRotation(geoViewport.rotation)
+    } else if (geoGcpVectorSource.getFeatures().length) {
       const geoExtent = geoGcpVectorSource.getExtent()
       geoOlMap.getView().fit(geoExtent, {
-        padding: [30 + 40 + 20, 10, 30 + 40 + 20, 10]
+        padding: OL_RESOURCE_PADDING
       })
     }
   }
 
   function initializeMasks(maps: DbMaps) {
+    if (!resourceMaskVectorSource || !geoMaskVectorSource) {
+      return
+    }
+
     resourceMaskVectorSource.clear()
     geoMaskVectorSource.clear()
 
@@ -287,6 +371,10 @@
   }
 
   function addMap(map: DbMap) {
+    if (!resourceMaskVectorSource || !geoMaskVectorSource) {
+      return
+    }
+
     const resourceMaskPolygon = getResourceMaskPolygon(map)
     const geoMaskPolygon = getGeoMaskPolygon(map)
 
@@ -308,6 +396,15 @@
   }
 
   function removeMap(mapId: string) {
+    if (
+      !resourceGcpVectorSource ||
+      !geoGcpVectorSource ||
+      !resourceMaskVectorSource ||
+      !geoMaskVectorSource
+    ) {
+      return
+    }
+
     if (currentActiveMapId === mapId) {
       resourceGcpVectorSource.clear()
       geoGcpVectorSource.clear()
@@ -325,6 +422,10 @@
   }
 
   function replaceMapFromState(mapId: string) {
+    if (!resourceMaskVectorSource || !geoMaskVectorSource) {
+      return
+    }
+
     const map = mapsState.getMapById(mapId)
     if (map) {
       const resourceMaskPolygon = getResourceMaskPolygon(map)
@@ -340,30 +441,14 @@
         const geoMaskFeature = geoMaskVectorSource.getFeatureById(mapId)
         geoMaskFeature?.setGeometry(geoMaskPolygon)
       }
-
-      // if (currentActiveMapId) {
-      //   const mapId = `https://dev.annotations.allmaps.org/maps/${currentActiveMapId}`
-      //   const warpedMap = warpedMapLayer.getWarpedMap(mapId)
-
-      //   if (warpedMap) {
-      //     warpedMap.setGcps(getCompleteGcps(map))
-
-      //     const renderer = warpedMapLayer.getRenderer()
-      //     if (renderer) {
-      //       renderer.changed()
-      //     }
-
-      //     warpedMapLayer.changed()
-      //   } else {
-      //     warpedMapLayer.addGeoreferencedMap(toGeoreferencedMap(map))
-      //   }
-      // } else {
-      //   warpedMapLayer.clear()
-      // }
     }
   }
 
   function replaceGcpFromState(gcpId: string) {
+    if (!resourceGcpVectorSource || !geoGcpVectorSource) {
+      return
+    }
+
     const gcp = mapsState.activeMap?.gcps[gcpId]
 
     if (gcp) {
@@ -412,6 +497,10 @@
   }
 
   function handleRemoveGcp(event: RemoveGcpEvent) {
+    if (!resourceGcpVectorSource || !geoGcpVectorSource) {
+      return
+    }
+
     const mapId = event.detail.mapId
     if (mapId === currentActiveMapId) {
       const gcpId = event.detail.gcpId
@@ -528,19 +617,23 @@
   }
 
   function makeResourceMaskFeatureActive(mapId: string | undefined) {
-    const resourceMaskfeatures = resourceMaskVectorSource.getFeatures()
-    const geoMaskfeatures = geoMaskVectorSource.getFeatures()
+    if (resourceMaskVectorSource && geoMaskVectorSource) {
+      const resourceMaskfeatures = resourceMaskVectorSource.getFeatures()
+      const geoMaskfeatures = geoMaskVectorSource.getFeatures()
 
-    makeFeatureActive(resourceMaskfeatures, mapId)
-    makeFeatureActive(geoMaskfeatures, mapId)
+      makeFeatureActive(resourceMaskfeatures, mapId)
+      makeFeatureActive(geoMaskfeatures, mapId)
+    }
   }
 
   function makeGcpFeatureActive(gcpId: string | undefined) {
-    const resourceGcpFeatures = resourceGcpVectorSource.getFeatures()
-    const geoGcpFeatures = geoGcpVectorSource.getFeatures()
+    if (resourceGcpVectorSource && geoGcpVectorSource) {
+      const resourceGcpFeatures = resourceGcpVectorSource.getFeatures()
+      const geoGcpFeatures = geoGcpVectorSource.getFeatures()
 
-    makeFeatureActive(resourceGcpFeatures, gcpId)
-    makeFeatureActive(geoGcpFeatures, gcpId)
+      makeFeatureActive(resourceGcpFeatures, gcpId)
+      makeFeatureActive(geoGcpFeatures, gcpId)
+    }
   }
 
   function labelIndexFromGcpId(gcpId: string) {
@@ -561,6 +654,88 @@
     }
 
     return 0
+  }
+
+  function getGeoViewport(imageId: string): Viewport | undefined {
+    let stateGeoViewport: Viewport | undefined
+    let navPlaceGeoViewport: Viewport | undefined
+    let urlGeoViewport: Viewport | undefined
+    let dataGeoViewport: Viewport | undefined
+
+    const view = geoOlMap?.getView()
+
+    if (view) {
+      navPlaceGeoViewport = getNavPlaceViewport(view, sourceState.navPlace)
+      urlGeoViewport = getBboxViewport(view, urlState.bbox)
+
+      if (geoGcpVectorSource && geoGcpVectorSource.getFeatures().length > 0) {
+        dataGeoViewport = getExtentViewport(
+          view,
+          geoGcpVectorSource.getExtent()
+        )
+      }
+    }
+
+    if (imageId) {
+      stateGeoViewport = viewportsState.getViewport({
+        imageId,
+        view: 'georeference',
+        pane: 'geo'
+      })
+    }
+
+    const geoViewports = sortGeoViewports({
+      state: stateGeoViewport,
+      navPlace: navPlaceGeoViewport,
+      url: urlGeoViewport,
+      data: dataGeoViewport
+    })
+
+    return geoViewports[0]
+  }
+
+  function saveViewport() {
+    if (currentDisplayImageId && resourceOlMap && geoOlMap) {
+      const resourceZoom = resourceOlMap.getView().getZoom()
+      const resourceCenter = resourceOlMap.getView().getCenter()
+      const resourceRotation = resourceOlMap.getView().getRotation()
+
+      const geoZoom = geoOlMap.getView().getZoom()
+      const geoCenter = geoOlMap.getView().getCenter()
+      const geoRotation = geoOlMap.getView().getRotation()
+
+      if (resourceZoom && resourceCenter) {
+        viewportsState.saveViewport(
+          {
+            imageId: currentDisplayImageId,
+            view: 'georeference',
+            pane: 'resource'
+          },
+          {
+            zoom: resourceZoom,
+            center: resourceCenter,
+            rotation: resourceRotation
+          }
+        )
+      }
+
+      if (geoZoom && geoCenter) {
+        viewportsState.saveViewport(
+          {
+            imageId: currentDisplayImageId,
+            view: 'georeference',
+            pane: 'geo'
+          },
+          {
+            zoom: geoZoom,
+            center: geoCenter,
+            rotation: geoRotation
+          }
+        )
+      }
+    } else {
+      console.log('No current image ID!')
+    }
   }
 
   onMount(() => {
@@ -615,8 +790,8 @@
     // > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
 
     const geoTileSource = new XYZ({
-      url: uiState.presetBaseMap.url,
-      attributions: uiState.presetBaseMap.attribution,
+      url: uiState.basemapPreset.url,
+      attributions: uiState.basemapPreset.attribution,
       maxZoom: 19
     })
 
@@ -640,6 +815,26 @@
       style: resourceMaskStyle
     })
 
+    let viewOptions = {
+      center: fromLonLat([0, 0]),
+      zoom: 2,
+      rotation: 0,
+      maxZoom: MAX_ZOOM
+    }
+
+    if (sourceState.activeImageId) {
+      const geoViewport = getGeoViewport(sourceState.activeImageId)
+
+      if (geoViewport) {
+        viewOptions = {
+          center: geoViewport.center,
+          zoom: geoViewport.zoom,
+          rotation: geoViewport.rotation,
+          maxZoom: MAX_ZOOM
+        }
+      }
+    }
+
     geoOlMap = new OLMap({
       layers: [
         geoTileLayer,
@@ -649,11 +844,7 @@
         geoVectorLayer
       ],
       target: geoOlMapTarget,
-      view: new View({
-        center: fromLonLat([0, 0]),
-        zoom: 2,
-        maxZoom: 22
-      }),
+      view: new View(viewOptions),
       controls: []
     })
 
@@ -685,11 +876,11 @@
       if (
         mapsState.connected === true &&
         mapsState.maps &&
-        mapsState.connectedImageId !== currentImageId
+        mapsState.connectedImageId !== currentMapsImageId
       ) {
         initializeMasks(mapsState.maps)
 
-        currentImageId = mapsState.connectedImageId
+        currentMapsImageId = mapsState.connectedImageId
       }
     })
 
@@ -710,24 +901,23 @@
     })
 
     $effect(() => {
-      warpedMapLayer.clear()
-      if (uiState.userGeoreferenceAnnotationUrl) {
-        warpedMapLayer.addGeoreferenceAnnotationByUrl(
-          uiState.userGeoreferenceAnnotationUrl
-        )
+      if (warpedMapLayer) {
+        warpedMapLayer.clear()
+        if (urlState.backgroundGeoreferenceAnnotationUrl) {
+          warpedMapLayer.addGeoreferenceAnnotationByUrl(
+            urlState.backgroundGeoreferenceAnnotationUrl
+          )
+        }
       }
     })
 
     $effect(() => {
-      if (uiState.userBaseMapUrl || uiState.presetBaseMap) {
-        geoTileSource.setUrl(
-          uiState.userBaseMapUrl || uiState.presetBaseMap.url
-        )
-        if (uiState.presetBaseMap) {
-          geoTileSource.setAttributions(uiState.presetBaseMap.attribution)
-        } else {
-          geoTileSource.setAttributions(undefined)
-        }
+      if (urlState.basemapUrl) {
+        geoTileSource.setUrl(urlState.basemapUrl)
+        geoTileSource.setAttributions(undefined)
+      } else {
+        geoTileSource.setUrl(uiState.basemapPreset.url)
+        geoTileSource.setAttributions(uiState.basemapPreset.attribution)
       }
     })
 
@@ -762,22 +952,26 @@
     )
 
     $effect(() => {
-      if (mapsState.connected) {
-        resourceOlMap.addInteraction(resourceDraw)
-        resourceOlMap.addInteraction(resourceModify)
+      if (resourceOlMap && geoOlMap) {
+        if (mapsState.connected) {
+          resourceOlMap.addInteraction(resourceDraw)
+          resourceOlMap.addInteraction(resourceModify)
 
-        geoOlMap.addInteraction(geoDraw)
-        geoOlMap.addInteraction(geoModify)
-      } else {
-        resourceOlMap.removeInteraction(resourceDraw)
-        resourceOlMap.removeInteraction(resourceModify)
+          geoOlMap.addInteraction(geoDraw)
+          geoOlMap.addInteraction(geoModify)
+        } else {
+          resourceOlMap.removeInteraction(resourceDraw)
+          resourceOlMap.removeInteraction(resourceModify)
 
-        geoOlMap.removeInteraction(geoDraw)
-        geoOlMap.removeInteraction(geoModify)
+          geoOlMap.removeInteraction(geoDraw)
+          geoOlMap.removeInteraction(geoModify)
+        }
       }
     })
 
     return () => {
+      saveViewport()
+
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
 

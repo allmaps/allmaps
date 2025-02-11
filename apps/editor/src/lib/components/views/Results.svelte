@@ -10,8 +10,12 @@
 
   import { WarpedMapLayer } from '@allmaps/openlayers'
 
+  import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getViewportsState } from '$lib/state/viewports.svelte.js'
 
   import {
     getResourceMask,
@@ -19,8 +23,15 @@
     toGeoreferencedMap,
     getFullMapId
   } from '$lib/shared/maps.js'
+  import {
+    getExtentViewport,
+    getNavPlaceViewport,
+    getBboxViewport,
+    sortGeoViewports
+  } from '$lib/shared/viewport.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
 
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { TransformationType } from '@allmaps/transform'
 
   import type {
@@ -34,7 +45,7 @@
     RemoveGcpEvent,
     SetTransformationEvent
   } from '$lib/types/events.js'
-  import type { DbMaps, DbMap } from '$lib/types/maps.js'
+  import type { Viewport } from '$lib/types/shared.js'
 
   let geoOlMapTarget: HTMLDivElement
   let geoOlMap: OLMap
@@ -44,34 +55,41 @@
 
   let currentImageId = $state<string | undefined>(undefined)
 
+  const sourceState = getSourceState()
   const mapsState = getMapsState()
+  const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
+  const urlState = getUrlState()
+  const viewportsState = getViewportsState()
 
-  // async function updateImage(imageId: string | undefined) {
-  //   if (imageId) {
-  //   }
-  // }
-
-  async function initializeMaps(maps: DbMaps) {
+  async function initializeMaps(maps: GeoreferencedMap[]) {
     warpedMapLayer.clear()
     for (const map of Object.values(maps)) {
       await addMap(map)
     }
 
-    const extent = warpedMapLayer.getExtent()
-    if (extent) {
-      geoOlMap.getView().fit(extent)
+    const geoViewport = getGeoViewport()
+
+    if (geoViewport) {
+      const view = geoOlMap.getView()
+      view.setZoom(geoViewport.zoom)
+      view.setCenter(geoViewport.center)
+      view.setRotation(geoViewport.rotation)
+    } else {
+      const extent = warpedMapLayer.getExtent()
+      if (extent) {
+        geoOlMap.getView().fit(extent)
+      }
     }
 
     currentImageId = mapsState.connectedImageId
   }
 
-  async function addMap(map: DbMap) {
-    await warpedMapLayer.addGeoreferencedMap(toGeoreferencedMap(map))
+  async function addMap(map: GeoreferencedMap) {
+    await warpedMapLayer.addGeoreferencedMap(map)
   }
 
   function updateResourceMask(mapId: string) {
-    console.log('n u het masker updaten')
     const map = mapsState.getMapById(mapId)
     if (map) {
       const resourceMask = getResourceMask(map)
@@ -88,7 +106,7 @@
   }
 
   function handleInsertMap(event: InsertMapEvent) {
-    addMap(event.detail.map)
+    addMap(toGeoreferencedMap(event.detail.map))
   }
 
   function handleRemoveMap(event: RemoveMapEvent) {
@@ -152,10 +170,75 @@
     )
   }
 
+  function getGeoViewport(): Viewport | undefined {
+    let stateGeoViewport: Viewport | undefined
+    let navPlaceGeoViewport: Viewport | undefined
+    let urlGeoViewport: Viewport | undefined
+    let dataGeoViewport: Viewport | undefined
+
+    const view = geoOlMap?.getView()
+
+    if (view) {
+      navPlaceGeoViewport = getNavPlaceViewport(view, sourceState.navPlace)
+      urlGeoViewport = getBboxViewport(view, urlState.bbox)
+
+      if (mapsMergedState.completeMaps.length) {
+        const extent = warpedMapLayer.getExtent()
+
+        if (extent) {
+          dataGeoViewport = getExtentViewport(view, extent)
+        }
+      }
+    }
+
+    stateGeoViewport = viewportsState.getViewport({
+      view: 'results'
+    })
+
+    const geoViewports = sortGeoViewports({
+      state: stateGeoViewport,
+      navPlace: navPlaceGeoViewport,
+      url: urlGeoViewport,
+      data: dataGeoViewport
+    })
+
+    return geoViewports[0]
+  }
+
+  function saveViewport() {
+    const geoZoom = geoOlMap.getView().getZoom()
+    const geoCenter = geoOlMap.getView().getCenter()
+    const geoRotation = geoOlMap.getView().getRotation()
+
+    if (geoZoom && geoCenter) {
+      viewportsState.saveViewport(
+        {
+          view: 'results'
+        },
+        {
+          zoom: geoZoom,
+          center: geoCenter,
+          rotation: geoRotation
+        }
+      )
+    }
+  }
+
+  async function addBackgroundGeoreferenceAnnotation(url: string) {
+    const mapIdOrErrors =
+      await warpedMapLayer.addGeoreferenceAnnotationByUrl(url)
+
+    const mapIds = mapIdOrErrors.filter(
+      (mapIdOrError) => typeof mapIdOrError === 'string'
+    )
+
+    warpedMapLayer.sendMapsToBack(mapIds)
+  }
+
   onMount(() => {
     const geoTileSource = new XYZ({
-      url: uiState.presetBaseMap.url,
-      attributions: uiState.presetBaseMap.attribution,
+      url: uiState.basemapPreset.url,
+      attributions: uiState.basemapPreset.attribution,
       maxZoom: 19
     })
 
@@ -180,19 +263,33 @@
       controls: []
     })
 
-    // $effect(() => {
-    //   if (sourceState.activeImageId) {
-    //     updateImage(sourceState.activeImageId)
-    //   }
-    // })
-
     $effect(() => {
       if (
         mapsState.connected === true &&
         mapsState.maps &&
         mapsState.connectedImageId !== currentImageId
       ) {
-        initializeMaps(mapsState.maps)
+        // TODO: load maps from other images as well
+        initializeMaps(mapsMergedState.completeMaps)
+      }
+    })
+
+    $effect(() => {
+      warpedMapLayer.clear()
+      if (urlState.backgroundGeoreferenceAnnotationUrl) {
+        addBackgroundGeoreferenceAnnotation(
+          urlState.backgroundGeoreferenceAnnotationUrl
+        )
+      }
+    })
+
+    $effect(() => {
+      if (urlState.basemapUrl) {
+        geoTileSource.setUrl(urlState.basemapUrl)
+        geoTileSource.setAttributions(undefined)
+      } else {
+        geoTileSource.setUrl(uiState.basemapPreset.url)
+        geoTileSource.setAttributions(uiState.basemapPreset.attribution)
       }
     })
 
@@ -222,6 +319,8 @@
     )
 
     return () => {
+      saveViewport()
+
       warpedMapLayer.clear()
       warpedMapLayer.dispose()
 
