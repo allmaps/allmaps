@@ -114,9 +114,6 @@ importers:
       '@allmaps/ui':
         specifier: ^1.0.0-beta.32
         version: link:../../packages/ui
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@4.0.0)
       '@tailwindcss/typography':
         specifier: ^0.5.9
         version: 0.5.13(tailwindcss@4.0.0)
@@ -148,6 +145,9 @@ importers:
         specifier: ^3.22.4
         version: 3.24.1
     devDependencies:
+      '@allmaps/types':
+        specifier: ^1.0.0-beta.15
+        version: link:../../packages/types
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
         version: 3.0.2(@sveltejs/kit@2.17.0)
@@ -5012,14 +5012,6 @@ packages:
       tailwindcss: '>=3.2.0'
     dependencies:
       tailwindcss: 3.4.7
-
-  /@tailwindcss/container-queries@0.1.1(tailwindcss@4.0.0):
-    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
-    peerDependencies:
-      tailwindcss: '>=3.2.0'
-    dependencies:
-      tailwindcss: 4.0.0
-    dev: false
 
   /@tailwindcss/node@4.0.2:
     resolution: {integrity: sha512-/q5HXvgEc5GaaAhoVj8oeAw1TPRlZtRAnzWz2ChpFdKsEAVoHUAW6EX/tDr3tkUfQ1VVSBpxeGUg0V0gPZSs1A==}
