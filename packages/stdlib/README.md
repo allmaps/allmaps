@@ -45,16 +45,6 @@ Allmaps Standard Library
 
 `[Point, Point]`.
 
-### `bboxToPoint(bbox)`
-
-###### Parameters
-
-* `bbox` (`[number, number, number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
 ### `bboxToPolygon(bbox)`
 
 ###### Parameters
