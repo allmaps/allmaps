@@ -1,66 +1,91 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
+  import { page } from '$app/state'
+
   import { Select } from 'bits-ui'
-  import { Check, CaretUpDown } from 'phosphor-svelte'
+  import {
+    Check as CheckIcon,
+    CaretUpDown as CaretUpDownIcon
+  } from 'phosphor-svelte'
+
+  import { createRouteUrl, getRouteId, gotoRoute } from '$lib/shared/router.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUrlState } from '$lib/state/url.svelte.js'
+
+  import type { Selected } from 'bits-ui'
+
+  import type { PresetBaseMapID } from '$lib/types/shared.js'
 
   const uiState = getUiState()
+  const urlState = getUrlState()
 
-  let userGeoreferenceAnnotationUrl = $state(
-    uiState.userGeoreferenceAnnotationUrl
+  let backgroundGeoreferenceAnnotationUrl = $state(
+    urlState.backgroundGeoreferenceAnnotationUrl
   )
+  let basemapUrl = $state(urlState.basemapUrl)
 
-  let userBaseMapUrl = $state(uiState.userBaseMapUrl)
-
-  function handleXyzTileUrlSubmit(event: Event) {
+  function handleBasemapUrlSubmit(event: Event) {
     event.preventDefault()
 
-    if (userBaseMapUrl) {
-      uiState.userBaseMapUrl = userBaseMapUrl
-    }
+    gotoRoute(
+      createRouteUrl(page, getRouteId(page), {
+        'basemap-url': basemapUrl
+      })
+    )
   }
 
-  function handleGeoreferenceAnnotationUrlSubmit(event: Event) {
+  function handleBackgroundGeoreferenceAnnotationUrlSubmit(event: Event) {
     event.preventDefault()
 
-    if (userGeoreferenceAnnotationUrl) {
-      uiState.userGeoreferenceAnnotationUrl = userGeoreferenceAnnotationUrl
-    }
+    gotoRoute(
+      createRouteUrl(page, getRouteId(page), {
+        'background-georeference-annotation-url':
+          backgroundGeoreferenceAnnotationUrl
+      })
+    )
+  }
+
+  function handleBasemapPresetChange(selected?: Selected<PresetBaseMapID>) {
+    gotoRoute(
+      createRouteUrl(page, getRouteId(page), {
+        'basemap-preset': selected?.value
+      })
+    )
   }
 </script>
 
-<div class="grid grid-cols-1 gap-2 [&>*]:break-all">
-  <label for="select-basemap">Background map:</label>
+<div class="grid grid-cols-1 gap-2 *:break-all">
+  <label for="basemap-preset">Background map:</label>
   <Select.Root
-    items={uiState.presetBaseMaps}
-    selected={uiState.presetBaseMap}
-    onSelectedChange={(selected) =>
-      selected && (uiState.presetBaseMap = selected.value)}
+    disabled={urlState.basemapUrl ? urlState.basemapUrl.length > 0 : false}
+    items={uiState.basemapPresets}
+    selected={uiState.basemapPreset}
+    onSelectedChange={handleBasemapPresetChange}
   >
     <Select.Trigger
-      id="select-basemap"
-      class="inline-flex justify-between h-input px-2 py-1 items-center rounded-md border border-red bg-white text-sm transition-colors focus:outline-none focus:ring-2"
+      id="basemap-preset"
+      class="inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
+    border-solid border-gray/50 border-1 transition-colors
+    focus-within:border-pink inset-shadow-xs"
       aria-label="Select a base map"
     >
       <Select.Value class="text-sm" placeholder="Select a base map" />
-      <CaretUpDown class="size-6" />
+      <CaretUpDownIcon class="size-6" />
     </Select.Trigger>
     <Select.Content
-      class="w-full rounded-xl border border-gray/80 bg-white px-1 py-1 shadow-lg outline-none z-50"
-      transition={fade}
-      transitionConfig={{ duration: 75 }}
+      class="w-full rounded-lg bg-white p-1 shadow-lg outline-hidden z-50"
       sideOffset={8}
     >
-      {#each uiState.presetBaseMaps as presetBaseMap}
+      {#each uiState.basemapPresets as basemapPreset}
         <Select.Item
-          class="flex h-10 w-full select-none items-center rounded-md py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted hover:bg-red cursor-pointer"
-          value={presetBaseMap.value}
-          label={presetBaseMap.label}
+          class="flex h-10 w-full text-sm select-none items-center rounded-sm py-3 pl-5 pr-1.5
+        hover:bg-gray/10 cursor-pointer outline-hidden transition-all"
+          value={basemapPreset.value}
+          label={basemapPreset.label}
         >
-          {presetBaseMap.label}
+          {basemapPreset.label}
           <Select.ItemIndicator class="ml-auto" asChild={false}>
-            <Check />
+            <CheckIcon />
           </Select.ItemIndicator>
         </Select.Item>
       {/each}
@@ -68,16 +93,17 @@
     <Select.Input name="select-basemap" />
   </Select.Root>
 
-  <form class="contents" onsubmit={handleXyzTileUrlSubmit}>
-    <label for="xyz-tile-url">Custom XYZ layer:</label>
+  <form class="contents" onsubmit={handleBasemapUrlSubmit}>
+    <label for="background-xyz-url">Custom XYZ layer:</label>
     <div class="flex gap-2">
       <input
-        bind:value={userBaseMapUrl}
-        id="xyz-tile-url"
+        bind:value={basemapUrl}
+        id="basemap-url"
         type="text"
         autocomplete="off"
         placeholder="XYZ template URL"
-        class="w-full border border-gray px-2 py-1 rounded-lg"
+        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray/50 border-1 transition-colors
+      focus-visible:border-pink inset-shadow-xs"
       />
       <button
         class="shrink-0 px-2 py-1 border border-gray rounded-md hover:bg-gray/10"
@@ -86,18 +112,22 @@
     </div>
   </form>
 
-  <form class="contents" onsubmit={handleGeoreferenceAnnotationUrlSubmit}>
-    <label for="georeference-annotation-url"
-      >Custom Georeference Annotation:</label
+  <form
+    class="contents"
+    onsubmit={handleBackgroundGeoreferenceAnnotationUrlSubmit}
+  >
+    <label for="background-georeference-annotation-url"
+      >Background Georeference Annotation:</label
     >
     <div class="flex gap-2">
       <input
-        bind:value={userGeoreferenceAnnotationUrl}
-        id="georeference-annotation-url"
+        bind:value={backgroundGeoreferenceAnnotationUrl}
+        id="background-georeference-annotation-url"
         type="text"
         autocomplete="off"
-        placeholder="URL of Georeference Annotation"
-        class="w-full border border-gray px-2 py-1 rounded-lg"
+        placeholder="Georeference Annotation URL"
+        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray/50 border-1 transition-colors
+      focus-visible:border-pink inset-shadow-xs"
       />
       <button
         class="shrink-0 px-2 py-1 border border-gray rounded-md hover:bg-gray/10"

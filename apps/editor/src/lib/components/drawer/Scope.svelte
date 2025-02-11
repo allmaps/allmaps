@@ -13,10 +13,9 @@
 </script>
 
 <div class="w-full flex flex-row justify-end items-center gap-2">
-  <div>Show for:</div>
   <RadioGroup.Root
     bind:value={scopeState.scope}
-    class="flex h-input justify-end items-center gap-1 rounded-sm "
+    class="flex h-input justify-end items-center gap-1 rounded-xs "
   >
     {#if scopeState.hasImagesScope}
       <RadioGroup.Item
@@ -40,7 +39,7 @@
     >
       <Label.Root
         for="image"
-        class="cursor-pointer inline-flex gap-2 items-center px-2 py-1 justify-center transition-all"
+        class="cursor-pointer inline-flex gap-2 items-center px-2 py-1 justify-center"
       >
         <ImageIcon class="size-6"><title>Current image</title></ImageIcon><span
           class="hidden sm:inline-block">Current image</span
@@ -55,7 +54,7 @@
     >
       <Label.Root
         for="map"
-        class="cursor-pointer inline-flex gap-2 items-center px-2 py-1 justify-center "
+        class="cursor-pointer inline-flex gap-2 items-center px-2 py-1 justify-center"
         ><MapTrifoldIcon class="size-6" /><span class="hidden sm:inline-block"
           >Current map</span
         ></Label.Root

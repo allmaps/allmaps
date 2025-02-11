@@ -148,10 +148,6 @@ export function bboxToLine(bbox: Bbox): Line {
   ]
 }
 
-export function bboxToPoint(bbox: Bbox): Point {
-  return [bbox[0], bbox[1]]
-}
-
 export function bboxToDiameter(bbox: Bbox): number {
   return distance(bboxToLine(bbox))
 }

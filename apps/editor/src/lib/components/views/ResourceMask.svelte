@@ -19,6 +19,7 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { getViewportsState } from '$lib/state/viewports.svelte.js'
 
   import {
     resourceMaskToPolygon,
@@ -49,6 +50,8 @@
     ResourceMask
   } from '$lib/types/maps.js'
 
+  import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
+
   let resourceOlMapTarget: HTMLDivElement
   let resourceOlMap: OLMap
   let resourceTileLayer: TileLayer<IIIF>
@@ -56,7 +59,9 @@
   let resourceDraw: Draw
   let resourceModify: Modify
 
-  let currentImageId = $state<string | undefined>(undefined)
+  let currentMapsImageId = $state<string | undefined>(undefined)
+  let currentDisplayImageId = $state<string | undefined>(undefined)
+
   let isDrawing = $state(false)
   let canFinishDrawing = $state(false)
   let drawingFeature = $state<Feature<Polygon> | undefined>(undefined)
@@ -66,6 +71,7 @@
   const sourceState = getSourceState()
   const mapsState = getMapsState()
   const imageInfoState = getImageInfoState()
+  const viewportsState = getViewportsState()
 
   function handleDrawStart(event: DrawEvent) {
     isDrawing = true
@@ -104,7 +110,6 @@
       const mapId = await generateRandomId()
       feature.setId(mapId)
 
-      // TODO: don't order by index but by date!
       feature.setProperties({
         index: mapsState.mapsCount
       })
@@ -230,6 +235,16 @@
   }
 
   async function updateImage(imageId: string | undefined) {
+    if (currentDisplayImageId === imageId) {
+      return
+    }
+
+    if (currentDisplayImageId) {
+      saveViewport()
+    }
+
+    currentDisplayImageId = imageId
+
     resourceVectorSource.clear()
 
     if (imageId) {
@@ -248,26 +263,34 @@
 
       const tileGrid = resourceIiifSource.getTileGrid()
 
+      const resourceViewport = viewportsState.getViewport({
+        imageId,
+        view: 'mask'
+      })
+
       const extent = tileGrid?.getExtent()
       if (extent && tileGrid) {
         resourceOlMap.setView(
           new View({
             resolutions: tileGrid.getResolutions(),
             extent,
-            constrainOnlyCenter: true
+            constrainOnlyCenter: true,
+            center: resourceViewport?.center,
+            zoom: resourceViewport?.zoom,
+            rotation: resourceViewport?.rotation
           })
         )
 
-        resourceOlMap.getView().fit(tileGrid.getExtent(), {
-          // TODO: move to settings file
-          padding: [30 + 40 + 20, 10, 30 + 40 + 20, 10]
-        })
+        if (!resourceViewport) {
+          resourceOlMap.getView().fit(tileGrid.getExtent(), {
+            padding: OL_RESOURCE_PADDING
+          })
+        }
       }
     }
   }
 
   function addMap(map: DbMap, index: number) {
-    // TODO: don't order by index but by date!
     const feature = new Feature()
     feature.setGeometry(
       new Polygon(resourceMaskToPolygon(getResourceMask(map)))
@@ -288,7 +311,7 @@
       Object.values(maps).forEach(addMap)
     }
 
-    currentImageId = mapsState.connectedImageId
+    currentMapsImageId = mapsState.connectedImageId
   }
 
   function replaceFeatureFromState(mapId: string) {
@@ -345,6 +368,27 @@
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       abortDrawing()
+    }
+  }
+
+  function saveViewport() {
+    if (currentDisplayImageId) {
+      const resourceZoom = resourceOlMap.getView().getZoom()
+      const resourceCenter = resourceOlMap.getView().getCenter()
+      const resourceRotation = resourceOlMap.getView().getRotation()
+
+      if (resourceZoom && resourceCenter) {
+        viewportsState.saveViewport(
+          { imageId: currentDisplayImageId, view: 'mask' },
+          {
+            zoom: resourceZoom,
+            center: resourceCenter,
+            rotation: resourceRotation
+          }
+        )
+      }
+    } else {
+      console.log('No current image ID!')
     }
   }
 
@@ -409,7 +453,7 @@
       if (
         mapsState.connected === true &&
         mapsState.maps &&
-        mapsState.connectedImageId !== currentImageId
+        mapsState.connectedImageId !== currentMapsImageId
       ) {
         initializeMaps(mapsState.maps)
       }
@@ -432,6 +476,8 @@
     )
 
     return () => {
+      saveViewport()
+
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
 

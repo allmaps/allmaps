@@ -10,7 +10,8 @@
     getXyzTilesUrl
   } from '$lib/shared/urls.js'
 
-  import Scope from './Scope.svelte'
+  import Scope from '$lib/components/drawer/Scope.svelte'
+  import ExportItem from '$lib/components/ExportItem.svelte'
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -38,30 +39,25 @@
 </script>
 
 {#if type && allmapsId}
-  <div>
-    <a
-      class="inline-block p-2 rounded-md text-white bg-pink hover:bg-pink-400 transition-colors"
-      href={getViewerUrl(type, allmapsId)}>View in Allmaps Viewer</a
-    >
-  </div>
+  <ExportItem
+    url={getViewerUrl(type, allmapsId)}
+    label="View in Allmaps Viewer"
+  />
 
-  <div>URLs:</div>
+  <ExportItem
+    url={getAnnotationUrl(type, allmapsId)}
+    label="Georeference Annotation"
+  />
 
-  <div class="grid grid-cols-[max-content,1fr] gap-2 [&>*]:break-all">
-    <div>Georeference Annotation:</div>
-    <a class="underline" href={getAnnotationUrl(type, allmapsId)}
-      >{getAnnotationUrl(type, allmapsId)}</a
-    >
-    <div>GeoJSON:</div>
-    <a class="underline" href={getGeoJsonUrl(type, allmapsId)}
-      >{getGeoJsonUrl(type, allmapsId)}</a
-    >
-    <div>XYZ map tiles:</div>
-    <a class="underline" href={getXyzTilesUrl(type, allmapsId)}
-      >{getXyzTilesUrl(type, allmapsId)}</a
-    >
-    <!-- TODO: add GeoTIFF script -->
-    <!-- TODO: add code for OpenLayers/Leaflet/MapLibre plugins -->
-  </div>
+  <ExportItem
+    url={getGeoJsonUrl(type, allmapsId)}
+    openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(type, allmapsId))}`}
+    label="GeoJSON"
+  />
+
+  <ExportItem url={getXyzTilesUrl(type, allmapsId)} label="XYZ map tiles" />
+
+  <!-- TODO: add GeoTIFF script -->
+  <!-- TODO: add code for OpenLayers/Leaflet/MapLibre plugins -->
 {/if}
 <Scope />

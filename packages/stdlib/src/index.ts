@@ -19,7 +19,6 @@ export {
   bboxToRectangle,
   bboxToPolygon,
   bboxToLine,
-  bboxToPoint,
   bboxToDiameter,
   geometryToDiameter,
   bboxToCenter,

@@ -6,14 +6,18 @@ import type {
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-export type Params = {
-  url: string | null
-  image: string | null
-  map: string | null
-  userBaseMapUrl: string | null
-  callback: string | null
-  bbox: string | null
-}
+export type ParamKey =
+  | 'url'
+  | 'manifest'
+  | 'image'
+  | 'map'
+  | 'callback'
+  | 'bbox'
+  | 'basemap-url'
+  | 'basemap-preset'
+  | 'background-georeference-annotation-url'
+
+export type Params = { [key in ParamKey]?: string | null }
 
 export type Organization = {
   id: string
@@ -28,7 +32,8 @@ export type GCP = {
 
 export type Point = [number, number]
 
-export type RouteID = 'images' | 'mask' | 'georeference' | 'results' | ''
+export type View = 'images' | 'mask' | 'georeference' | 'results'
+export type RouteID = View | ''
 
 export type Scope = 'images' | 'image' | 'map'
 
@@ -77,3 +82,11 @@ export type Example = {
   manifestId: string
   imageId: string
 }
+
+export type Viewport = {
+  zoom: number
+  center: number[]
+  rotation: number
+}
+
+export type PresetBaseMapID = 'esri-world-topo' | 'esri-world-imagery' | 'osm'

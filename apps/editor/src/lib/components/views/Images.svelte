@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
 
   import { Collection, Thumbnail } from '@allmaps/ui'
+  import { darkblue } from '@allmaps/tailwind'
 
   import Status from '$lib/components/Status.svelte'
 
@@ -15,12 +16,12 @@
   const imageInfoState = getImageInfoState()
 
   function handleImageClick(event: Event, imageId: string) {
-    gotoRoute(createRouteUrl($page, 'images', { image: imageId }))
+    gotoRoute(createRouteUrl(page, 'images', { image: imageId }))
     event.preventDefault()
   }
 
   function handleImageDblclick(event: Event, imageId: string) {
-    gotoRoute(createRouteUrl($page, 'mask', { image: imageId }))
+    gotoRoute(createRouteUrl(page, 'mask', { image: imageId }))
     event.preventDefault()
   }
 
@@ -29,7 +30,7 @@
   }
 </script>
 
-<div class="max-w-screen-lg m-auto p-4">
+<div class="max-w-(--breakpoint-lg) m-auto p-4">
   {#if sourceState.imageCount > 0}
     <Collection>
       {#each [...sourceState.images] as image (image.uri)}
@@ -38,14 +39,14 @@
         <a
           onclick={(event) => handleImageClick(event, image.uri)}
           ondblclick={(event) => handleImageDblclick(event, image.uri)}
-          href={createRouteUrl($page, 'mask', { image: image.uri })}
-          class="rounded overflow-hidden"
+          href={createRouteUrl(page, 'mask', { image: image.uri })}
+          class="overflow-hidden bg-white/20 p-2 rounded-lg"
         >
           <div class="relative">
             <!-- TODO: move to load function -->
             {#await imageInfoState.fetchImageInfo(image.uri)}
               <div
-                class="aspect-square bg-white/50 p-2 flex items-center justify-center"
+                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-black/60"
               >
                 <p>Loading…</p>
               </div>
@@ -53,7 +54,8 @@
               <Thumbnail
                 {imageInfo}
                 width={300}
-                mode="cover"
+                mode="contain"
+                borderColor={isActive(image.uri) ? darkblue : undefined}
                 alt={parseLanguageString(canvas?.label, 'en')}
               />
             {:catch error}
@@ -64,11 +66,6 @@
             <div class="absolute bottom-0 w-full flex justify-end p-2">
               <Status imageId={image.uri} />
             </div>
-            <div
-              class="border-solid absolute top-0 w-full h-full pointer-events-none"
-              class:border-pink={isActive(image.uri)}
-              class:border-4={isActive(image.uri)}
-            ></div>
           </div>
         </a>
       {/each}

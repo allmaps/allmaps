@@ -1,6 +1,7 @@
 import { setContext, getContext } from 'svelte'
 
 import { toGeoreferencedMap } from '$lib/shared/maps.js'
+import { isComplete } from '$lib/shared/analyze.js'
 
 import type { GeoreferencedMapsByImageId } from '$lib/types/shared.js'
 
@@ -49,6 +50,10 @@ export class MapsMergedState {
 
   get maps() {
     return Object.values(this.#mapsByImageId).flat()
+  }
+
+  get completeMaps() {
+    return Object.values(this.#mapsByImageId).flat().filter(isComplete)
   }
 
   get fetched() {

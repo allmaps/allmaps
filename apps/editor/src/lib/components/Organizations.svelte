@@ -13,7 +13,7 @@
 <ul class="flex flex-col gap-8">
   {#each organizations as organization}
     <li class="contents">
-      <Organization {organization} sbowMoreLink={true} />
+      <Organization {organization} showMoreLink={true} />
     </li>
   {/each}
 </ul>

@@ -1,14 +1,14 @@
 <script>
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
 
   import { MapMonster } from '@allmaps/ui'
   import { red } from '@allmaps/tailwind'
 
-  const message = $page.error?.message || 'Unknown error '
+  const message = page.error?.message || 'Unknown error'
 </script>
 
-<div class="w-full h-full flex flex-col items-center justify-center gap-4">
-  <div class="w-96 max-w-screen-sm">
+<div class="w-full h-full flex justify-center items-center p-4">
+  <div>
     <MapMonster
       color="red"
       mood="sad"
