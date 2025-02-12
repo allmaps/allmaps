@@ -1,9 +1,7 @@
 ---
-import { Picture } from 'astro:assets'
-
 const { title, src, href } = Astro.props
 
-const image = import(`../images/cards/${src}.jpg`)
+const image = await import(`../images/cards/${src}.jpg`)
 ---
 
 <li
@@ -17,7 +15,8 @@ const image = import(`../images/cards/${src}.jpg`)
   </div>
   <div class="md:w-1/2">
     <a {href} class="inline-block max-w-md">
-      <Picture src={image} alt={title} densities={[1.5, 2]} />
+      <!-- <Picture src={image} alt={title} densities={[1.5, 2]} /> -->
+      <img src={image.default.src} alt={title} />
     </a>
   </div>
 </li>
