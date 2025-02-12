@@ -64,8 +64,8 @@
   >
     <Select.Trigger
       id="basemap-preset"
-      class="inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
-    border-solid border-gray/50 border-1 transition-colors
+      class="cursor-pointer inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
+    border-solid border-gray-100 border-1 transition-colors
     focus-within:border-pink inset-shadow-xs"
       aria-label="Select a base map"
     >
@@ -79,7 +79,7 @@
       {#each uiState.basemapPresets as basemapPreset}
         <Select.Item
           class="flex h-10 w-full text-sm select-none items-center rounded-sm py-3 pl-5 pr-1.5
-        hover:bg-gray/10 cursor-pointer outline-hidden transition-all"
+        hover:bg-gray-100 cursor-pointer outline-hidden transition-all"
           value={basemapPreset.value}
           label={basemapPreset.label}
         >
@@ -102,11 +102,11 @@
         type="text"
         autocomplete="off"
         placeholder="XYZ template URL"
-        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray/50 border-1 transition-colors
+        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
       focus-visible:border-pink inset-shadow-xs"
       />
       <button
-        class="shrink-0 px-2 py-1 border border-gray rounded-md hover:bg-gray/10"
+        class="cursor-pointer shrink-0 px-2 py-1 border border-gray-100 rounded-md hover:bg-gray-100"
         type="submit">Load</button
       >
     </div>
@@ -126,11 +126,11 @@
         type="text"
         autocomplete="off"
         placeholder="Georeference Annotation URL"
-        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray/50 border-1 transition-colors
+        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
       focus-visible:border-pink inset-shadow-xs"
       />
       <button
-        class="shrink-0 px-2 py-1 border border-gray rounded-md hover:bg-gray/10"
+        class="cursor-pointer shrink-0 px-2 py-1 border border-gray-100 rounded-md hover:bg-gray-100"
         type="submit">Load</button
       >
     </div>

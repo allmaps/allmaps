@@ -133,7 +133,7 @@
     <Dialog.Overlay
       transition={fade}
       transitionConfig={{ duration: 150 }}
-      class="fixed inset-0 z-50 bg-black/80"
+      class="fixed inset-0 z-50 bg-[rgba(0,0,0,0.75)]"
     />
     <Dialog.Content
       class="absolute top-0 w-full h-full flex justify-center items-center p-2"

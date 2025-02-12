@@ -51,8 +51,8 @@
   onSelectedChange={handleSelectedChange}
 >
   <Select.Trigger
-    class="inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
-    border-solid border-gray/50 border-1 transition-colors
+    class="cursor-pointer inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
+    border-solid border-gray-100 border-1 transition-colors
     focus-within:border-pink inset-shadow-xs"
     aria-label="Select a transformation algorithm"
   >
@@ -67,7 +67,7 @@
     {#each transformationTypes as transformationType}
       <Select.Item
         class="flex h-10 w-full text-xs sm:text-xs select-none items-center rounded-sm py-3 pl-5 pr-1.5
-        hover:bg-gray/10 cursor-pointer outline-hidden transition-all"
+        hover:bg-gray-100 cursor-pointer outline-hidden transition-all"
         value={transformationType.value}
         label={transformationType.label}
       >

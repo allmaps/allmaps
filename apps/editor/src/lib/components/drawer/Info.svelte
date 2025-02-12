@@ -104,7 +104,7 @@
   {#if metadataStrings.length}
     <div class="col-span-2">Metadata:</div>
     <dl
-      class="grid grid-cols-subgrid col-span-2 gap-2 max-h-36 overflow-scroll shadow-inner p-2 bg-gray/5 rounded-md"
+      class="grid grid-cols-subgrid col-span-2 gap-2 w-full max-h-36 overflow-auto shadow-inner p-2 bg-[rgba(220,220,220,0.1)] rounded-md"
     >
       {#each metadataStrings as { label, value }}
         <dt>{label}</dt>

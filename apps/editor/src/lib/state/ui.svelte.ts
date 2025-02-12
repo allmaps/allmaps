@@ -63,10 +63,6 @@ export class UiState {
     } catch {
       console.warn('Error reading from localStorage')
     }
-
-    if (this.#firstUse) {
-      this.#showAboutDialog = true
-    }
   }
 
   get basemapPresets() {

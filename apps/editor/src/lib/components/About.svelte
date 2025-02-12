@@ -1,5 +1,6 @@
 <script lang="ts">
   import Title from '$lib/components/Title.svelte'
+  import TermsOfUse from '$lib/components/TermsOfUse.svelte'
 
   type Props = {
     onclose?: () => void
@@ -25,11 +26,7 @@
   <!-- TODO: Add link to terms of use -->
 
   <div class="bg-yellow p-4 text-black rounded-xl">
-    All changes are saved automatically and published as open data under <a
-      class="underline"
-      href="https://creativecommons.org/public-domain/cc0/">CC0</a
-    >. By using Allmaps Editor, you're agreeing to our terms of use and to
-    automatically publishing your edits as open data.
+    <TermsOfUse />
   </div>
 
   <div class="flex align-center justify-center pt-4">

@@ -36,7 +36,7 @@
       readonly
       type="text"
       value={url}
-      class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray/50 border-1 transition-colors
+      class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
       focus-visible:border-pink inset-shadow-xs"
       onfocus={handleFocus}
     />

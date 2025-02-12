@@ -104,7 +104,7 @@
             class="col-span-1 sm:col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
           >
             <span>Map {index + 1}</span>
-            <span class="hidden sm:inline font-light text-sm text-black/75"
+            <span class="hidden sm:inline font-light text-sm text-gray-800"
               >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
             </span>
             <div class="w-[140px] sm:w-[160px]">
@@ -113,7 +113,7 @@
           </div>
         </button>
         <button
-          class="place-self-end self-center"
+          class="cursor-pointer place-self-end self-center"
           onclick={() => mapsState.removeMap({ mapId: map.id })}
         >
           <TrashIcon />
@@ -183,7 +183,7 @@
                   </div>
                 </button>
                 <button
-                  class="place-self-end self-center"
+                  class="cursor-pointer place-self-end self-center"
                   onclick={() =>
                     mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
                 >

@@ -46,7 +46,7 @@
             <!-- TODO: move to load function -->
             {#await imageInfoState.fetchImageInfo(image.uri)}
               <div
-                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-black/60"
+                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800"
               >
                 <p>Loading…</p>
               </div>

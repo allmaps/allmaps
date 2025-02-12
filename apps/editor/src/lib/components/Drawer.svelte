@@ -63,7 +63,7 @@
           <SourceLabel />
         </div>
         <div
-          class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
+          class="rounded-full p-1 transition-all border-solid border-gray-100 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
         >
           <InfoIcon size={24} class="block" weight="bold" />
         </div>
@@ -71,7 +71,7 @@
       <ToggleGroup.Item
         aria-label="maps"
         value="maps"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
+        class="rounded-full p-1 transition-all border-solid border-gray-100 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <ListNumbersIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
@@ -79,7 +79,7 @@
         aria-label="show Georeference Annotation"
         title="Show Georeference Annotation"
         value="annotation"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
+        class="rounded-full p-1 transition-all border-solid border-gray-100 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <CodeIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
@@ -87,14 +87,14 @@
         aria-label="export options"
         title="Export options"
         value="export"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
+        class="rounded-full p-1 transition-all border-solid border-gray-100 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <ExportIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>
       <ToggleGroup.Item
         aria-label="settings"
         value="settings"
-        class="rounded-full p-1 transition-all border-solid border-gray/50 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
+        class="rounded-full p-1 transition-all border-solid border-gray-100 border-2 data-[state=on]:border-pink hover:border-pink/50 hover:bg-pink/20 cursor-pointer"
       >
         <GearIcon size={24} class="block" weight="bold" />
       </ToggleGroup.Item>

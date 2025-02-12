@@ -10,6 +10,7 @@
   import Title from '$lib/components/Title.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
   import Organizations from '$lib/components/Organizations.svelte'
+  import TermsOfUse from '$lib/components/TermsOfUse.svelte'
   import Footer from '$lib/components/Footer.svelte'
 
   import organizations from '$lib/shared/organizations.js'
@@ -63,33 +64,40 @@
 </script>
 
 <div class="flex flex-col items-center gap-4">
+  <div
+    id="masks"
+    class="absolute -z-10 top-16 bg-contain bg-no-repeat w-full max-w-5xl h-full"
+  ></div>
   <section
-    id="start-georeferencing"
-    class="max-w-3xl w-full flex flex-col p-4 gap-6 items-center justify-center aspect-715/387 bg-cover my-2 sm:my-12 bg-center"
+    class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center bg-no-repeat my-2 sm:my-6"
   >
-    <div class="max-w-sm w-full flex flex-col gap-6 items-center mt-24">
+    <div class="max-w-md w-full flex flex-col gap-6 items-center">
       <Title />
 
       <p class="text-black text-center">
         Find a map from a IIIF-enabled map collection, copy its IIIF URL and
-        paste it below to start georeferencing. When you're done, you can view
-        your georeferenced map in <a
+        paste it below to start georeferencing. You can view maps that are
+        georeferenced with Allmaps in <a
           href="https://viewer.allmaps.org"
           class="underline">Allmaps Viewer</a
-        > or use it with tools like MapLibre, OpenLayers, Leaflet or QGIS.
+        > or use them in tools like MapLibre, OpenLayers, Leaflet or QGIS.
       </p>
       <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />
-      <p>
+      <!-- TODO: enable when homepage is updated! -->
+      <!-- <p>
         <a
           href="https://dev.allmaps.org/guides/georeferencing/"
           class="inline-block font-bold text-pink text-center hover:underline after:content-['_›']"
           >Learn more about georeferencing IIIF maps</a
         >
+      </p> -->
+      <p class="text-xs text-center text-gray-600">
+        <TermsOfUse />
       </p>
     </div>
   </section>
   <section class="w-full bg-[#f2feff] flex flex-col items-center pb-16">
-    <div class="max-w-(--breakpoint-lg) flex flex-col items-center">
+    <div class="max-w-(--breakpoint-lg) flex flex-col items-center p-2">
       <div class="flex flex-col items-center p-8 space-y-4 text-center">
         <h2 class="text-black text-2xl font-bold">
           Or pick a map from these collections
@@ -102,7 +110,9 @@
 <Footer />
 
 <style scoped>
-  #start-georeferencing {
+  #masks {
     background-image: url('$lib/images/masks.svg');
+    background-position: top center;
+    scale: 1.1;
   }
 </style>

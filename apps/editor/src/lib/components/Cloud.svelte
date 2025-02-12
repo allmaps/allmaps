@@ -14,7 +14,7 @@
       <CloudCheckIcon class="size-5" weight="duotone" />
     </Popover.Trigger>
     <Popover.Content
-      class="z-30 bg-white p-2 shadow-xl border-gray/20 border-1 rounded-xl"
+      class="z-30 bg-white p-2 shadow-xl border-gray-100 border-1 rounded-xl"
       transition={flyAndScale}
       sideOffset={8}
     >
