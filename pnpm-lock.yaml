@@ -158,7 +158,7 @@ importers:
         specifier: ^4.0.0
         version: 4.0.4(svelte@5.19.10)(vite@5.4.11)
       '@tailwindcss/postcss':
-        specifier: ^4.0.0
+        specifier: ^4.0.6
         version: 4.0.6
       '@types/diff-match-patch':
         specifier: ^1.0.36
@@ -200,7 +200,7 @@ importers:
         specifier: ^3.6.0
         version: 3.7.1(postcss@8.4.49)(svelte@5.19.10)
       tailwindcss:
-        specifier: ^4.0.0
+        specifier: ^4.0.6
         version: 4.0.6
       tslib:
         specifier: ^2.4.1
@@ -4908,7 +4908,7 @@ packages:
       '@tailwindcss/node': 4.0.6
       '@tailwindcss/oxide': 4.0.6
       lightningcss: 1.29.1
-      postcss: 8.4.49
+      postcss: 8.5.2
       tailwindcss: 4.0.6
     dev: true
 
