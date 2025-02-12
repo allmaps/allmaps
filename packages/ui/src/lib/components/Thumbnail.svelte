@@ -7,6 +7,8 @@
   export let width: number
   export let height = width
   export let mode: Fit = 'cover'
+  export let borderColor: string | undefined = undefined
+  export let alt: string | undefined = undefined
 
   let imageRequest: ImageRequest | ImageRequest[][] | undefined = undefined
 
@@ -45,16 +47,24 @@
   }
 
   $: parsedImage = Image.parse(imageInfo)
-  $: imageRequest = parsedImage.getThumbnail({ width, height }, mode)
+  $: imageRequest = parsedImage.getImageRequest({ width, height }, mode)
+
+  $: borderBoxWidth = mode === 'cover' ? width : parsedImage.width
+  $: borderBoxHeight = mode === 'cover' ? height : parsedImage.height
+  $: borderBoxAspectRatio = borderBoxWidth / borderBoxHeight
 </script>
 
-<div style:aspect-ratio="{width} / {height}" class="overflow-hidden">
+<div
+  style:aspect-ratio="{width} / {height}"
+  style="--border-color: {borderColor}; --border-box-aspect-ratio: {borderBoxAspectRatio}"
+  class="flex overflow-hidden"
+>
   {#if imageRequest && !Array.isArray(imageRequest)}
     <img
       class="w-full h-full {mode === 'cover'
         ? 'object-cover'
         : 'object-contain'}"
-      alt={`Thumbnail for ${parsedImage.uri}`}
+      alt={alt || `Thumbnail for ${parsedImage.uri}`}
       src={parsedImage.getImageUrl(imageRequest)}
     />
   {:else if imageRequest && Array.isArray(imageRequest)}
@@ -62,8 +72,9 @@
     {@const tilesHeight = getTilesHeight(imageRequest)}
 
     <div
-      class="relative grid h-full"
-      class:w-full={mode === 'cover'}
+      class="relative grid"
+      class:w-full={mode === 'contain'}
+      class:h-full={mode === 'cover'}
       style:grid-template-columns={getColumnPercentages(
         imageRequest,
         tilesWidth
@@ -71,20 +82,33 @@
         .map((percentage) => `${percentage}%`)
         .join(' ')}
       style:aspect-ratio="{tilesWidth} / {tilesHeight}"
-      style:left={mode === 'contain'
-        ? getLeftStyle(tilesWidth, tilesHeight)
-        : ''}
-      style:top={mode === 'cover' ? getTopStyle(tilesWidth, tilesHeight) : ''}
+      style:left={mode === 'cover' ? getLeftStyle(tilesWidth, tilesHeight) : ''}
+      style:top={mode === 'contain' ? getTopStyle(tilesWidth, tilesHeight) : ''}
     >
       {#each imageRequest as row, rowIndex}
         {#each row as tile, columnIndex}
           <img
             class="h-auto max-w-full"
             src={parsedImage.getImageUrl(tile)}
-            alt={`Thumbnail for ${parsedImage.uri} (${rowIndex}, ${columnIndex})`}
+            alt={alt ||
+              `Thumbnail for ${parsedImage.uri} (${rowIndex}, ${columnIndex})`}
           />
         {/each}
       {/each}
+    </div>
+  {/if}
+  {#if borderColor}
+    <!-- TODO: make this a slot/snippet, so clients can render
+      their own border box -->
+    <div
+      class="absolute left-0 top-0 w-full h-full flex justify-center items-center pointer-events-none"
+    >
+      <div
+        class="{borderBoxAspectRatio < 1
+          ? 'h-full'
+          : 'w-full'} aspect-(--border-box-aspect-ratio)
+      outline-4 outline-(--border-color)"
+      ></div>
     </div>
   {/if}
 </div>

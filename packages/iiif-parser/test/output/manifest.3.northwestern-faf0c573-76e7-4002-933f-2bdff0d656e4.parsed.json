@@ -1,29 +1,38 @@
 {
   "embedded": false,
-  "type": "manifest",
   "uri": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif",
-  "majorVersion": 3,
+  "type": "manifest",
   "label": {
     "none": ["Use of property, 1922"]
   },
+  "majorVersion": 3,
   "canvases": [
     {
-      "type": "canvas",
-      "width": 9731,
-      "height": 11333,
       "uri": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4?as=iiif/canvas/access/0",
+      "type": "canvas",
+      "height": 11333,
+      "width": 9731,
+      "image": {
+        "embedded": true,
+        "uri": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9731,
+        "height": 11333,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["P0234-gmap-G3764_B6G4_1922.tif"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 9731,
-        "height": 11333
-      }
+      "thumbnail": [
+        {
+          "id": "https://iiif.dc.library.northwestern.edu/iiif/2/2ac7f817-1223-4388-93c3-f87f1d294f7e/full/!300,300/0/default.jpg",
+          "type": "Image",
+          "format": "image/jpeg",
+          "width": 300,
+          "height": 300
+        }
+      ]
     }
   ],
   "metadata": [
@@ -111,5 +120,46 @@
         "none": ["Massachusetts--Boston", "Land use, Urban", "Maps"]
       }
     }
-  ]
+  ],
+  "homepage": [
+    {
+      "id": "https://dc.library.northwestern.edu/items/faf0c573-76e7-4002-933f-2bdff0d656e4",
+      "type": "Text",
+      "label": {
+        "none": [
+          "Homepage at Northwestern University Libraries Digital Collections"
+        ]
+      },
+      "format": "text/html"
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4/thumbnail",
+      "type": "Image",
+      "format": "image/jpeg",
+      "width": 300,
+      "height": 300
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4",
+      "type": "Dataset",
+      "format": "application/json"
+    }
+  ],
+  "summary": {
+    "none": [
+      "Scale not given (W 71°11'09\"--W 70°59'17\"/N 42°23'42\"--N 42°14'02\")  ; approved, Arthur C. Comey, zoning director. ; Base map: Boston and surroundings published by Walker Lith. & Pub. Co. ; \"14-5-23.\""
+    ]
+  },
+  "requiredStatement": {
+    "label": {
+      "none": ["Attribution"]
+    },
+    "value": {
+      "none": ["Courtesy of Northwestern University Libraries"]
+    }
+  }
 }

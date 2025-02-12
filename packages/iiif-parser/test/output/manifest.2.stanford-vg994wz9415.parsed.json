@@ -184,5 +184,24 @@
     }
   ],
   "uri": "https://purl.stanford.edu/vg994wz9415/iiif/manifest",
-  "majorVersion": 2
+  "majorVersion": 2,
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": [
+        "This work has been identified as being free of known restrictions under copyright law, including all related and neighboring rights. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission."
+      ]
+    }
+  },
+  "thumbnail": [
+    {
+      "format": "image/jpeg",
+      "height": 346,
+      "id": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001/full/!400,400/0/default.jpg",
+      "type": "dctypes:Image",
+      "width": 400
+    }
+  ]
 }

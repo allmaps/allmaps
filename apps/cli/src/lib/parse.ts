@@ -1,27 +1,28 @@
-import { parseAnnotation, validateMap } from '@allmaps/annotation'
+import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { TransformOptions, TransformationType } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
 import { readFromFile, parseJsonFromFile } from './io.js'
 
-export function parseMap(options: { annotation: string }): Map {
-  let map
+export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   if (options.annotation) {
-    const annotation = parseJsonFromFile(options.annotation as string)
+    const annotation = parseJsonFromFile(options.annotation)
     const mapOrMaps = parseAnnotationValidateMap(annotation)
 
     if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
       throw new Error('Annotation must contain exactly 1 georeferenced map')
     }
-    map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
+    const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
+    return map
   }
-  return map as Map
+
+  throw new Error('No Georeference Annotation supplied')
 }
 
 export function parseGcps(
-  options: { gcps: string; annotation: string },
-  map: Map
+  options: { gcps?: string; annotation?: string },
+  map?: GeoreferencedMap
 ): Gcp[] {
   let gcps
   if (options.gcps) {
@@ -33,6 +34,7 @@ export function parseGcps(
       'No GCPs supplied. Supply a Georeference Annotation or a file containing GCPs.'
     )
   }
+
   return gcps
 }
 
@@ -68,39 +70,46 @@ export function parseCoordinatesArrayArray(
 
 export function parseTransformationType(
   options: {
-    annotation: string
+    annotation?: string
     transformationType: string
-    transformationOrder: string
+    polynomialOrder: number
   },
-  map: Map
+  map?: GeoreferencedMap
 ): TransformationType {
-  let transformationType
+  let transformationType: TransformationType
   if (
     options.transformationType === 'polynomial' &&
-    options.transformationOrder === '1'
+    options.polynomialOrder === 1
   ) {
     transformationType = 'polynomial1'
   } else if (
     options.transformationType === 'polynomial' &&
-    options.transformationOrder === '2'
+    options.polynomialOrder === 2
   ) {
     transformationType = 'polynomial2'
   } else if (
     options.transformationType === 'polynomial' &&
-    options.transformationOrder === '3'
+    options.polynomialOrder === 3
   ) {
     transformationType = 'polynomial3'
-  } else if (options.transformationType) {
+  } else if (options.transformationType === 'thinPlateSpline') {
     transformationType = options.transformationType
-  } else if (options.annotation && map) {
+  } else if (options.transformationType === 'helmert') {
+    transformationType = options.transformationType
+  } else if (options.transformationType === 'projective') {
+    transformationType = options.transformationType
+  } else if (options.annotation && map?.transformation?.type) {
     transformationType = map.transformation?.type
   } else {
     transformationType = 'polynomial'
   }
-  return transformationType as TransformationType
+
+  return transformationType
 }
 
-export function parseAnnotationValidateMap(jsonValue: unknown): Map[] | Map {
+export function parseAnnotationValidateMap(
+  jsonValue: unknown
+): GeoreferencedMap[] | GeoreferencedMap {
   if (
     jsonValue &&
     typeof jsonValue === 'object' &&
@@ -109,19 +118,24 @@ export function parseAnnotationValidateMap(jsonValue: unknown): Map[] | Map {
   ) {
     return parseAnnotation(jsonValue)
   } else {
-    return validateMap(jsonValue)
+    return validateGeoreferencedMap(jsonValue)
   }
 }
 
-export function parseAnnotationsValidateMaps(jsonValues: unknown[]): Map[] {
+export function parseAnnotationsValidateMaps(
+  jsonValues: unknown[]
+): GeoreferencedMap[] {
   const maps = jsonValues.map(parseAnnotationValidateMap).flat()
 
   return maps
 }
 
-export function parseTransformOptions(
-  options: unknown
-): Partial<TransformOptions> {
+export function parseTransformOptions(options: {
+  minOffsetRatio?: number
+  maxDepth?: number
+  destinationIsGeographic?: boolean
+  sourceIsGeographic?: boolean
+}): Partial<TransformOptions> {
   const transformOptions: Partial<TransformOptions> = {}
 
   if (options && typeof options === 'object') {
@@ -137,13 +151,11 @@ export function parseTransformOptions(
       'destinationIsGeographic' in options &&
       options.destinationIsGeographic
     ) {
-      transformOptions.destinationIsGeographic =
-        options.destinationIsGeographic as boolean
+      transformOptions.destinationIsGeographic = options.destinationIsGeographic
     }
 
     if ('sourceIsGeographic' in options && options.sourceIsGeographic) {
-      transformOptions.sourceIsGeographic =
-        options.sourceIsGeographic as boolean
+      transformOptions.sourceIsGeographic = options.sourceIsGeographic
     }
   }
 

@@ -7,14 +7,17 @@ import {
   rgbToHex
 } from '@allmaps/stdlib'
 
-import type { Map } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Image } from '@allmaps/iiif-parser'
 import type { Ring } from '@allmaps/types'
 
 const thumbnailSize = 400
 
-export async function getBackgroundColor(map: Map, parsedImage: Image) {
-  let imageRequest = parsedImage.getThumbnail({
+export async function getBackgroundColor(
+  map: GeoreferencedMap,
+  parsedImage: Image
+) {
+  let imageRequest = parsedImage.getImageRequest({
     width: thumbnailSize,
     height: thumbnailSize
   })
@@ -26,7 +29,7 @@ export async function getBackgroundColor(map: Map, parsedImage: Image) {
   const url = parsedImage.getImageUrl(imageRequest)
   const imageBitmap = await fetchImageBitmap(url)
 
-  const scale = imageBitmap.width / map.resource.width
+  const scale = imageBitmap.width / parsedImage.width
 
   const mask: Ring = map.resourceMask.map((point) => [
     point[0] * scale,

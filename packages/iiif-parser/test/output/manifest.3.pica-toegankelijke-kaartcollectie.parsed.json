@@ -1,0 +1,2425 @@
+{
+  "embedded": false,
+  "uri": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/manifest.json",
+  "type": "manifest",
+  "label": {
+    "nl": [
+      "Selectie kaarten voor het PICA-project 'Toegankelijke Kaartencollectie' van de Universiteit van Amsterdam"
+    ]
+  },
+  "majorVersion": 3,
+  "canvases": [
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40099/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6240,
+      "width": 7408,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990037778300205131!HB-KZL-1809-A-3.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7408,
+        "height": 6240,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A1 - Amstelodamum celebre emporium forma plana."]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A1 - Amstelodamum celebre emporium forma plana."]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40099\">https://hdl.handle.net/11245/3.40099</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990037778300205131\">https://pid.uba.uva.nl/ark:/88238/b1990037778300205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40099/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40099/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.870270752, 52.377139406],
+                  [4.87356528, 52.37517493],
+                  [4.86644619, 52.370750908],
+                  [4.893033462, 52.354869419],
+                  [4.899999664, 52.359152067],
+                  [4.906265552, 52.355387909],
+                  [4.917074152, 52.362141778],
+                  [4.920153149, 52.360305818],
+                  [4.938141655, 52.371614873],
+                  [4.931707356, 52.375274818],
+                  [4.92924917, 52.375643016],
+                  [4.928019482, 52.375957692],
+                  [4.926620703, 52.376317384],
+                  [4.924855716, 52.376179223],
+                  [4.923391992, 52.375628885],
+                  [4.922433457, 52.375400513],
+                  [4.920788657, 52.375841794],
+                  [4.919658357, 52.37624603],
+                  [4.916779196, 52.37802794],
+                  [4.916242538, 52.377873563],
+                  [4.905050806, 52.384454007],
+                  [4.90530236, 52.384843498],
+                  [4.903678061, 52.385839947],
+                  [4.902685509, 52.386338775],
+                  [4.90185418, 52.386834484],
+                  [4.901437284, 52.387352818],
+                  [4.901111696, 52.388049244],
+                  [4.901376097, 52.388989166],
+                  [4.90193313, 52.389726691],
+                  [4.90235335, 52.390164434],
+                  [4.901463381, 52.39173688],
+                  [4.898838663, 52.393274055],
+                  [4.897286785, 52.393539008],
+                  [4.894446823, 52.393455841],
+                  [4.892036902, 52.393339485],
+                  [4.890441387, 52.393072366],
+                  [4.887794967, 52.392631953],
+                  [4.886517182, 52.393393877],
+                  [4.873188974, 52.385324048],
+                  [4.878377086, 52.382230457],
+                  [4.870270752, 52.377139406]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A1.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2514/pages/1/canvas/",
+      "type": "canvas",
+      "height": 8665,
+      "width": 10393,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!9!4!6!990009296490205131!100-12-02.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 10393,
+        "height": 8665,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A2 - Amsteldam"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A2 - Amsteldam"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.2514\">https://hdl.handle.net/11245/3.2514</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009296490205131\">https://pid.uba.uva.nl/ark:/88238/b1990009296490205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2514/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2514/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.931851388, 52.368561942],
+                  [4.932384877, 52.372361303],
+                  [4.932511532, 52.372873056],
+                  [4.904900491, 52.377967448],
+                  [4.895473331, 52.381711285],
+                  [4.890927791, 52.389872629],
+                  [4.888568588, 52.389812024],
+                  [4.883829689, 52.390002925],
+                  [4.881431472, 52.386709037],
+                  [4.878427354, 52.383148452],
+                  [4.875218457, 52.37847172],
+                  [4.872865189, 52.372042521],
+                  [4.875573309, 52.367007846],
+                  [4.88418967, 52.359366671],
+                  [4.893965734, 52.357279296],
+                  [4.914006481, 52.360522553],
+                  [4.91468683, 52.36063416],
+                  [4.915445168, 52.361602186],
+                  [4.916454035, 52.361805409],
+                  [4.918318763, 52.361299936],
+                  [4.921779055, 52.362558111],
+                  [4.922525265, 52.362857666],
+                  [4.923025377, 52.363498479],
+                  [4.923085682, 52.364095028],
+                  [4.923630374, 52.364387769],
+                  [4.925461795, 52.364379837],
+                  [4.926932727, 52.364617853],
+                  [4.927714795, 52.365164405],
+                  [4.928014643, 52.365155091],
+                  [4.932387839, 52.365191787],
+                  [4.934622122, 52.366997336],
+                  [4.929217241, 52.36696253],
+                  [4.929211132, 52.367973005],
+                  [4.929978969, 52.36838163],
+                  [4.931713189, 52.368404773],
+                  [4.931851388, 52.368561942]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A2.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_3163/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6314,
+      "width": 7475,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!2!7!7!990009297720205131!102-16-13.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7475,
+        "height": 6314,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": [
+          "A3 - A new map of the city of Amsterdam : most humbly inscrib'd to Iohn Hedworth Esqr."
+        ]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": [
+              "A3 - A new map of the city of Amsterdam : most humbly inscrib'd to Iohn Hedworth Esqr."
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.3163\">https://hdl.handle.net/11245/3.3163</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009297720205131\">https://pid.uba.uva.nl/ark:/88238/b1990009297720205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_3163/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_3163/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.884456005, 52.360124344],
+                  [4.888768495, 52.358103262],
+                  [4.895440598, 52.35755672],
+                  [4.903983005, 52.358612307],
+                  [4.919804556, 52.361687248],
+                  [4.931978965, 52.36940219],
+                  [4.932290458, 52.370179052],
+                  [4.929744297, 52.373697838],
+                  [4.922173879, 52.375056308],
+                  [4.902115939, 52.377655131],
+                  [4.886238163, 52.393482986],
+                  [4.876707474, 52.379633095],
+                  [4.875622551, 52.376918899],
+                  [4.874475384, 52.370702827],
+                  [4.878144618, 52.364256626],
+                  [4.884456005, 52.360124344]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A3.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_321/pages/1/canvas/",
+      "type": "canvas",
+      "height": 11460,
+      "width": 13648,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!5!0!8!990016218050205131!WX012.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 13648,
+        "height": 11460,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A4 - Amsterdam"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A4 - Amsterdam"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.321\">https://hdl.handle.net/11245/3.321</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990016218050205131\">https://pid.uba.uva.nl/ark:/88238/b1990016218050205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_321/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_321/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.927294429, 52.364952074],
+                  [4.932570475, 52.367943544],
+                  [4.932603948, 52.373386388],
+                  [4.905092631, 52.378585116],
+                  [4.897160724, 52.381468525],
+                  [4.892691577, 52.388464505],
+                  [4.891085248, 52.389133186],
+                  [4.889561239, 52.389740335],
+                  [4.883447795, 52.388580322],
+                  [4.879562363, 52.384334414],
+                  [4.874178776, 52.376051735],
+                  [4.873954791, 52.371536082],
+                  [4.878325567, 52.365128861],
+                  [4.881416584, 52.362191253],
+                  [4.889100744, 52.358946774],
+                  [4.897776697, 52.358080163],
+                  [4.913176023, 52.360361181],
+                  [4.920703796, 52.362240069],
+                  [4.927294429, 52.364952074]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A4.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_881/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6261,
+      "width": 8811,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!4!2!9!990009329240205131!101-04-VIE25-26.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8811,
+        "height": 6261,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A5 - Amsterdam"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A5 - Amsterdam"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.881\">https://hdl.handle.net/11245/3.881</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009329240205131\">https://pid.uba.uva.nl/ark:/88238/b1990009329240205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_881/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_881/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.913331306, 52.360227782],
+                  [4.914820306, 52.361278707],
+                  [4.915289524, 52.361332344],
+                  [4.917482386, 52.36117451],
+                  [4.921595928, 52.362544189],
+                  [4.921986489, 52.3632222],
+                  [4.922158623, 52.363646632],
+                  [4.92261077, 52.363878208],
+                  [4.924468504, 52.363727038],
+                  [4.92626457, 52.363891124],
+                  [4.927227372, 52.364473396],
+                  [4.930205659, 52.364337886],
+                  [4.936892978, 52.369951883],
+                  [4.934686891, 52.370928958],
+                  [4.932375784, 52.371616696],
+                  [4.903786931, 52.377673023],
+                  [4.898316261, 52.379899687],
+                  [4.897547825, 52.379568244],
+                  [4.896956647, 52.379613098],
+                  [4.8959392, 52.379579242],
+                  [4.895650736, 52.379992247],
+                  [4.894987825, 52.380737222],
+                  [4.895390283, 52.381206721],
+                  [4.895741121, 52.381580373],
+                  [4.891638199, 52.383374992],
+                  [4.893115302, 52.384634431],
+                  [4.892009889, 52.386790437],
+                  [4.890288397, 52.387676745],
+                  [4.891578058, 52.3887611],
+                  [4.890781358, 52.389918022],
+                  [4.88557193, 52.392163306],
+                  [4.875865056, 52.383966746],
+                  [4.878245865, 52.382087702],
+                  [4.87684189, 52.379622359],
+                  [4.875515261, 52.377169605],
+                  [4.874245277, 52.374607146],
+                  [4.875311806, 52.373458582],
+                  [4.875223774, 52.372860125],
+                  [4.874102533, 52.371768788],
+                  [4.875078357, 52.371216988],
+                  [4.875767264, 52.370808533],
+                  [4.876107264, 52.370360194],
+                  [4.875835486, 52.369991831],
+                  [4.874628883, 52.369790191],
+                  [4.875776439, 52.369033158],
+                  [4.877260986, 52.368498285],
+                  [4.877575227, 52.368080731],
+                  [4.876794239, 52.366934596],
+                  [4.878744459, 52.366284306],
+                  [4.87634137, 52.36557487],
+                  [4.876415171, 52.365418406],
+                  [4.878916207, 52.366105309],
+                  [4.879079318, 52.365857866],
+                  [4.878993251, 52.36564565],
+                  [4.87872443, 52.36452808],
+                  [4.875172996, 52.363342583],
+                  [4.876422061, 52.362758306],
+                  [4.879519652, 52.363745761],
+                  [4.881239162, 52.362446976],
+                  [4.883304771, 52.362173407],
+                  [4.884125988, 52.361727608],
+                  [4.884426063, 52.360660078],
+                  [4.884339795, 52.36013303],
+                  [4.887246785, 52.358696403],
+                  [4.887927457, 52.358849166],
+                  [4.890454052, 52.359190452],
+                  [4.891045212, 52.359119362],
+                  [4.892151482, 52.358301393],
+                  [4.892550126, 52.358182062],
+                  [4.894535533, 52.358802528],
+                  [4.894862057, 52.35877989],
+                  [4.896708987, 52.3578592],
+                  [4.901992533, 52.358639311],
+                  [4.903001175, 52.355658986],
+                  [4.905620877, 52.356471886],
+                  [4.904926492, 52.359060893],
+                  [4.909445215, 52.359783558],
+                  [4.910801821, 52.360740648],
+                  [4.911355258, 52.360803912],
+                  [4.913331306, 52.360227782]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A5.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2714/pages/1/canvas/",
+      "type": "canvas",
+      "height": 7240,
+      "width": 10702,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!7!9!9!990009339970205131!101-04-VI-E-25-33.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 10702,
+        "height": 7240,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": [
+          "A6 - Nieuwe kaart van Amsterdam : waarop zijn gebragt alle de voorgevallen veranderingen : benevens de uitgevoerd wordende kapitale werken van afsluiting der haven door een dijk met sluizen voorzien ..."
+        ]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": [
+              "A6 - Nieuwe kaart van Amsterdam : waarop zijn gebragt alle de voorgevallen veranderingen : benevens de uitgevoerd wordende kapitale werken van afsluiting der haven door een dijk met sluizen voorzien ..."
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.2714\">https://hdl.handle.net/11245/3.2714</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009339970205131\">https://pid.uba.uva.nl/ark:/88238/b1990009339970205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2714/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_2714/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.905380903, 52.359267743],
+                  [4.910134043, 52.360094997],
+                  [4.911387514, 52.361015042],
+                  [4.911954915, 52.361100703],
+                  [4.914049999, 52.360798572],
+                  [4.915293628, 52.36171734],
+                  [4.916101988, 52.361852305],
+                  [4.918518338, 52.361516734],
+                  [4.922729915, 52.363115221],
+                  [4.922917899, 52.362313127],
+                  [4.923317337, 52.362659499],
+                  [4.923057631, 52.363900092],
+                  [4.923265937, 52.364429032],
+                  [4.923492095, 52.364581606],
+                  [4.92540192, 52.364546958],
+                  [4.926748452, 52.364727725],
+                  [4.927385764, 52.365098958],
+                  [4.932308276, 52.364890285],
+                  [4.939817447, 52.371133348],
+                  [4.883118103, 52.393348109],
+                  [4.87250607, 52.384349104],
+                  [4.877187354, 52.382516251],
+                  [4.871492035, 52.377635627],
+                  [4.875512314, 52.376020534],
+                  [4.865592998, 52.367745575],
+                  [4.888719317, 52.358701239],
+                  [4.890526099, 52.359019879],
+                  [4.8916735, 52.358955407],
+                  [4.893092093, 52.358153738],
+                  [4.894773361, 52.358762642],
+                  [4.895760919, 52.358668408],
+                  [4.897247407, 52.357896588],
+                  [4.902912679, 52.358818178],
+                  [4.903883941, 52.355995912],
+                  [4.905711064, 52.35412624],
+                  [4.906350744, 52.353403807],
+                  [4.908043932, 52.354864792],
+                  [4.906443011, 52.356379127],
+                  [4.906125405, 52.357170409],
+                  [4.905380903, 52.359267743]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A6.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1468/pages/1/canvas/",
+      "type": "canvas",
+      "height": 5247,
+      "width": 6526,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!1!7!9!990009349710205131!101-04-VI-E-25-38.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6526,
+        "height": 5247,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": [
+          "A7 - Omnibus kaart, of Nieuwe platte grond der stad Amsterdam : waarop alle de omnibus liniën zijn aangetekend = Carte des omnibus, ou Nouveau plan de la ville d'Amsterdam."
+        ]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": [
+              "A7 - Omnibus kaart, of Nieuwe platte grond der stad Amsterdam : waarop alle de omnibus liniën zijn aangetekend = Carte des omnibus, ou Nouveau plan de la ville d'Amsterdam."
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.1468\">https://hdl.handle.net/11245/3.1468</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009349710205131\">https://pid.uba.uva.nl/ark:/88238/b1990009349710205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1468/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1468/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.943192573, 52.374271632],
+                  [4.885458921, 52.397198763],
+                  [4.852401367, 52.369424906],
+                  [4.9097961, 52.346561035],
+                  [4.943192573, 52.374271632]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A7.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40100/pages/1/canvas/",
+      "type": "canvas",
+      "height": 7201,
+      "width": 9004,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011488790205131!HB-KZL-109-12-57.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9004,
+        "height": 7201,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A8 - Plan tot uitbreiding van Amsterdam."]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A8 - Plan tot uitbreiding van Amsterdam."]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40100\">https://hdl.handle.net/11245/3.40100</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011488790205131\">https://pid.uba.uva.nl/ark:/88238/b1990011488790205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40100/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40100/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.880989625, 52.40470671],
+                  [4.837984464, 52.366923974],
+                  [4.914574452, 52.335064477],
+                  [4.957183848, 52.372638421],
+                  [4.880989625, 52.40470671]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A8.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1005/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6327,
+      "width": 8272,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!6!4!3!990009373460205131!101-05-VI-E-25-62.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8272,
+        "height": 6327,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A9 - Amsterdam in 1882"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A9 - Amsterdam in 1882"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.1005\">https://hdl.handle.net/11245/3.1005</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009373460205131\">https://pid.uba.uva.nl/ark:/88238/b1990009373460205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1005/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1005/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.913414841, 52.367982497],
+                  [4.913054323, 52.367901823],
+                  [4.911762156, 52.366549897],
+                  [4.918893886, 52.364129822],
+                  [4.918396807, 52.363869739],
+                  [4.919318335, 52.363556644],
+                  [4.920992302, 52.365438952],
+                  [4.913414841, 52.367982497]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.881839256, 52.364378555],
+                  [4.853200004, 52.357585404],
+                  [4.855437395, 52.35346791],
+                  [4.884040862, 52.360379236],
+                  [4.881839256, 52.364378555]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.878709804, 52.397794015],
+                  [4.868946753, 52.388639716],
+                  [4.87728336, 52.385183486],
+                  [4.854104869, 52.363624517],
+                  [4.884997154, 52.350863219],
+                  [4.891411469, 52.351675131],
+                  [4.896339672, 52.352686371],
+                  [4.901714616, 52.354208839],
+                  [4.908672181, 52.351237532],
+                  [4.919077059, 52.346789977],
+                  [4.944808886, 52.370332189],
+                  [4.878709804, 52.397794015]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A9.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1246/pages/1/canvas/",
+      "type": "canvas",
+      "height": 8724,
+      "width": 7373,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!1!1!2!990009382110205131!101-05-VI-E-25-69.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7373,
+        "height": 8724,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A10 - Kaart van Amsterdam en omstreken"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A10 - Kaart van Amsterdam en omstreken"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.1246\">https://hdl.handle.net/11245/3.1246</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009382110205131\">https://pid.uba.uva.nl/ark:/88238/b1990009382110205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1246/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_1246/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.842710748, 52.421064626],
+                  [4.844153273, 52.335415251],
+                  [4.963712039, 52.334575964],
+                  [4.961898583, 52.420948975],
+                  [4.842710748, 52.421064626]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A10.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40073/pages/1/canvas/",
+      "type": "canvas",
+      "height": 5368,
+      "width": 6000,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!9941413329105131!HB-KZL_101_09_11_0001.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6000,
+        "height": 5368,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A11 - Plattegrond der stad Amsterdam"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A11 - Plattegrond der stad Amsterdam"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40073 \">https://hdl.handle.net/11245/3.40073 </a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b19941413329105131\">https://pid.uba.uva.nl/ark:/88238/b19941413329105131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40073/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40073/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.879832138, 52.396168798],
+                  [4.852723502, 52.357864577],
+                  [4.852619692, 52.35599314],
+                  [4.852588138, 52.354165324],
+                  [4.852900357, 52.352471211],
+                  [4.851791544, 52.349017929],
+                  [4.85472669, 52.348122837],
+                  [4.85775957, 52.347901973],
+                  [4.861226214, 52.350914516],
+                  [4.862327319, 52.351385446],
+                  [4.915900418, 52.336240675],
+                  [4.945337843, 52.377747226],
+                  [4.879832138, 52.396168798]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A11.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40101/pages/1/canvas/",
+      "type": "canvas",
+      "height": 12224,
+      "width": 12448,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990009413700205131!HB-KZL-25-02-04.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 12448,
+        "height": 12224,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["A12 - Kaart van Amsterdam 1:10.000"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["A12 - Kaart van Amsterdam 1:10.000"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40101\">https://hdl.handle.net/11245/3.40101</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990009413700205131\">https://pid.uba.uva.nl/ark:/88238/b1990009413700205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40101/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40101/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [4.817705828, 52.420521849],
+                  [4.817100533, 52.332703522],
+                  [4.96620436, 52.333611873],
+                  [4.966795486, 52.421287655],
+                  [4.817705828, 52.420521849]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/A12.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40093/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6722,
+      "width": 7864,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990016825380205131!HB-KZL-I-1-A-6-2.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7864,
+        "height": 6722,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC1 - Asiae in tabula geographica delineatio"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC1 - Asiae in tabula geographica delineatio"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40093\">https://hdl.handle.net/11245/3.40093</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990016825380205131\">https://pid.uba.uva.nl/ark:/88238/b1990016825380205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40093/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40093/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [7.259068222, 77.99851429],
+                  [9.24015355, -10.834552782],
+                  [160.797444966, -10.422674589],
+                  [158.793825483, 78.410259788],
+                  [7.259068222, 77.99851429]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC1.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40094/pages/1/canvas/",
+      "type": "canvas",
+      "height": 7687,
+      "width": 7868,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990016001050205131!HB-KZL-I-1-A-6-18.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7868,
+        "height": 7687,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC2 - Carte des Indes et de la Chine"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC2 - Carte des Indes et de la Chine"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40094\">https://hdl.handle.net/11245/3.40094</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990016001050205131\">https://pid.uba.uva.nl/ark:/88238/b1990016001050205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40094/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40094/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [78.985044733, 43.506699748],
+                  [69.367104293, -9.304565578],
+                  [140.420128897, -7.599507906],
+                  [150.61353942, 45.415346022],
+                  [126.471047973, 44.801275028],
+                  [125.653361994, 40.550973562],
+                  [99.810968459, 39.856543745],
+                  [100.514238954, 44.029785766],
+                  [78.985044733, 43.506699748]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC2.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40095/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6554,
+      "width": 7795,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990030285240205131!HB-KZL-I-1-A-6-31.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7795,
+        "height": 6554,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": [
+          "VOC3 - Le royaume de Siam : auec les royaumes qui luy sont tributaires"
+        ]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": [
+              "VOC3 - Le royaume de Siam : auec les royaumes qui luy sont tributaires"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40095\">https://hdl.handle.net/11245/3.40095</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990030285240205131\">https://pid.uba.uva.nl/ark:/88238/b1990030285240205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40095/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40095/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [97.050437756, 5.788962737],
+                  [92.471447816, -12.21306971],
+                  [114.333880457, -14.665986271],
+                  [119.101525525, 3.435684671],
+                  [97.050437756, 5.788962737]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC3.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40096/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6584,
+      "width": 7792,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990014421080205131!HB-KZL-I-1-A-6-32.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7792,
+        "height": 6584,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC4 - Insulae Iavae pars orientalis"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC4 - Insulae Iavae pars orientalis"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40096\">https://hdl.handle.net/11245/3.40096</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990014421080205131\">https://pid.uba.uva.nl/ark:/88238/b1990014421080205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40096/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40096/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [109.714292144, -5.903619812],
+                  [109.465809591, -8.947428942],
+                  [114.945868712, -9.259085171],
+                  [115.173688833, -6.198905374],
+                  [109.714292144, -5.903619812]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC4.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40097/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6704,
+      "width": 8112,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990014421030205131!HB-KZL-I-1-A-6-33.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8112,
+        "height": 6704,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC5 - Insulae Iavae Pars Occidentalis"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC5 - Insulae Iavae Pars Occidentalis"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40097\">https://hdl.handle.net/11245/3.40097</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990014421030205131\">https://pid.uba.uva.nl/ark:/88238/b1990014421030205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40097/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40097/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [104.628966163, -6.650144628],
+                  [106.222936277, -7.079710448],
+                  [106.828865382, -7.717987339],
+                  [107.080642785, -8.766603202],
+                  [109.95155683, -8.978891671],
+                  [110.039763214, -9.305144211],
+                  [108.925305145, -4.942147869],
+                  [104.084526235, -4.537480052],
+                  [104.687682654, -6.888079202],
+                  [104.628966163, -6.650144628]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [106.688459736, -5.901521467],
+                  [106.632092021, -6.167256346],
+                  [106.659222877, -6.168766412],
+                  [107.002696702, -6.213315218],
+                  [107.061797165, -5.95195243],
+                  [106.688459736, -5.901521467]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC5.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40098/pages/1/canvas/",
+      "type": "canvas",
+      "height": 6589,
+      "width": 7816,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990020504540205131!HB-KZL-I-1-A-6-39.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7816,
+        "height": 6589,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": [
+          "VOC6 - Het Koninkryk Japan, verdeelt in acht en zestig provintien"
+        ]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": [
+              "VOC6 - Het Koninkryk Japan, verdeelt in acht en zestig provintien"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.40098\">https://hdl.handle.net/11245/3.40098</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990020504540205131\">https://pid.uba.uva.nl/ark:/88238/b1990020504540205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40098/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_40098/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [128.216223994, 34.896639908],
+                  [128.036860032, 31.131620888],
+                  [142.053526991, 33.889920026],
+                  [142.243797891, 40.415104852],
+                  [134.730028917, 39.000431282],
+                  [134.557283346, 37.121774742],
+                  [132.599885317, 36.705568271],
+                  [132.434223689, 35.710799239],
+                  [128.216223994, 34.896639908]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC6.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/pages/46/canvas/",
+      "type": "canvas",
+      "height": 5272,
+      "width": 6668,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011196990205131!hb-kzl-viii-b-25-44.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6668,
+        "height": 5272,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC7 - Asia"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC7 - Asia"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.39625\">https://hdl.handle.net/11245/3.39625</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011196990205131\">https://pid.uba.uva.nl/ark:/88238/b1990011196990205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [-41.273795635, 110.423054393],
+                  [-31.814529726, -56.29438393],
+                  [220.487465424, -50.550701671],
+                  [211.028199515, 116.166736652],
+                  [-41.273795635, 110.423054393]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC7.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/pages/50/canvas/",
+      "type": "canvas",
+      "height": 3612,
+      "width": 4558,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011196990205131!hb-kzl-viii-b-25-48.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 4558,
+        "height": 3612,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC8 - India"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC8 - India"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.39625\">https://hdl.handle.net/11245/3.39625</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011196990205131\">https://pid.uba.uva.nl/ark:/88238/b1990011196990205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [83.980490454, 27.884178529],
+                  [81.847411868, 0.75374439],
+                  [121.33119308, -0.682250125],
+                  [122.889795765, 23.198934972],
+                  [116.32467523, 23.492362403],
+                  [116.56982716, 26.71836918],
+                  [83.980490454, 27.884178529]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC8.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/pages/52/canvas/",
+      "type": "canvas",
+      "height": 3508,
+      "width": 4421,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011196990205131!hb-kzl-viii-b-25-49.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 4421,
+        "height": 3508,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC9 - Eiland Ceilon"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC9 - Eiland Ceilon"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.39625\">https://hdl.handle.net/11245/3.39625</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011196990205131\">https://pid.uba.uva.nl/ark:/88238/b1990011196990205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [82.298140839, 10.263218824],
+                  [78.680902537, 10.592906035],
+                  [78.996406087, 5.451132642],
+                  [82.613644389, 5.121445431],
+                  [82.298140839, 10.263218824]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC9.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/pages/54/canvas/",
+      "type": "canvas",
+      "height": 3499,
+      "width": 3931,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011196990205131!hb-kzl-viii-b-25-51.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 3931,
+        "height": 3499,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC10 - Japan"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC10 - Japan"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.39625\">https://hdl.handle.net/11245/3.39625</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011196990205131\">https://pid.uba.uva.nl/ark:/88238/b1990011196990205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39625/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [128.468359661, 40.546217076],
+                  [128.11298011, 28.790829956],
+                  [128.398884879, 29.013255038],
+                  [129.403194832, 28.623530674],
+                  [135.021006217, 29.464769355],
+                  [135.059355456, 30.792109296],
+                  [137.620964759, 31.168543898],
+                  [137.568282464, 29.890083312],
+                  [142.03528634, 30.546520196],
+                  [142.434209516, 42.582844167],
+                  [128.468359661, 40.546217076]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC10.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/pages/135/canvas/",
+      "type": "canvas",
+      "height": 6409,
+      "width": 8879,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011183160205131!otm_hb_kzl_xi_a_10_135.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8879,
+        "height": 6409,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC11 - Indiae"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC11 - Indiae"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.20867\">https://hdl.handle.net/11245/3.20867</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011183160205131\">https://pid.uba.uva.nl/ark:/88238/b1990011183160205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [47.727480589, 43.49489925],
+                  [52.447801574, -29.677074771],
+                  [166.401147794, -30.687934564],
+                  [161.680826808, 42.484039458],
+                  [47.727480589, 43.49489925]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC11.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/pages/99/canvas/",
+      "type": "canvas",
+      "height": 6432,
+      "width": 8868,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011183160205131!otm_hb_kzl_xi_a_10_099.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8868,
+        "height": 6432,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC12 - Asiae"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC12 - Asiae"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.20867\">https://hdl.handle.net/11245/3.20867</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011183160205131\">https://pid.uba.uva.nl/ark:/88238/b1990011183160205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_20867/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [11.079878788, 62.954646368],
+                  [9.768938751, -16.050107399],
+                  [155.748502006, -14.959209131],
+                  [157.184031414, 63.948309981],
+                  [11.079878788, 62.954646368]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC12.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    },
+    {
+      "uri": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_19271/pages/35/canvas/",
+      "type": "canvas",
+      "height": 6126,
+      "width": 8078,
+      "image": {
+        "embedded": true,
+        "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990011227590205131!otm-hb-kzl-x-b-12_035.jpg",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8078,
+        "height": 6126,
+        "majorVersion": 2
+      },
+      "label": {
+        "nl": ["VOC13 - Oost-Indien"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "nl": ["Titel"]
+          },
+          "value": {
+            "nl": ["VOC13 - Oost-Indien"]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Beeldbank)"]
+          },
+          "value": {
+            "nl": [
+              "<a href=\"https://hdl.handle.net/11245/3.19271\">https://hdl.handle.net/11245/3.19271</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["URI (Catalogus)"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://pid.uba.uva.nl/ark:/88238/b1990011227590205131\">https://pid.uba.uva.nl/ark:/88238/b1990011227590205131</a>"
+            ]
+          }
+        },
+        {
+          "label": {
+            "nl": ["Origineel manifest"]
+          },
+          "value": {
+            "en": [
+              "<a href=\"https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_19271/manifest/\">https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_19271/manifest/</a>"
+            ]
+          }
+        }
+      ],
+      "navPlace": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [77.146012433, 35.031932743],
+                  [15.104677875, 34.851042715],
+                  [18.638295136, -42.634970383],
+                  [80.75796149, -42.298066245],
+                  [80.131537621, -22.472618879],
+                  [79.533572358, -11.456063037],
+                  [78.863589158, -3.881165409],
+                  [79.146627093, -0.070671138],
+                  [78.894382762, 5.820126193],
+                  [77.146012433, 35.031932743]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": [
+        {
+          "id": "https://amsterdamtimemachine.github.io/pica-toegankelijke-kaartcollectie/annotations/georeferencing/VOC13.json",
+          "type": "AnnotationPage"
+        }
+      ]
+    }
+  ]
+}

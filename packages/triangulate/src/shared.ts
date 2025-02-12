@@ -1,6 +1,12 @@
 import classifyPoint from 'robust-point-in-polygon'
 
-import { distance, stepDistanceAngle, lineAngle } from '@allmaps/stdlib'
+import {
+  distance,
+  stepDistanceAngle,
+  lineAngle,
+  closeRing,
+  conformRing
+} from '@allmaps/stdlib'
 
 import type {
   Bbox,
@@ -14,28 +20,38 @@ import type {
 // Return an array of points containing the first line point,
 // and betwen the first and last line point other points every `dist`
 function interpolateLine(line: Line, dist: number): LineString {
+  const lineDistance = distance(line)
+  // Note: ciel - 1 instead of floor, such that for round numbers we don't include the last step
+  const steps = Math.ceil(lineDistance / dist) - 1
+  const angle = lineAngle(line)
+
   let currentPoint = line[0]
   const result = [currentPoint]
 
-  while (distance([currentPoint, line[1]]) > dist) {
-    const nextPoint = stepDistanceAngle(currentPoint, dist, lineAngle(line))
-    result.push(nextPoint)
-    currentPoint = nextPoint
+  for (let step = 1; step <= steps; step++) {
+    currentPoint = stepDistanceAngle(currentPoint, dist, angle)
+    result.push(currentPoint)
   }
-  // note: the last nextpoint, which is also line[1], is not pushed
+
+  // Note: the last nextpoint, which is also line[1], is not pushed
   return result
 }
 
 // Return an array of points containing the ring points,
 // and between every pair of ring points other points every `dist`
 export function interpolateRing(ring: Ring, dist: number): Ring {
-  // close ring
-  ring = [...ring, ring[0]]
+  ring = closeRing(ring)
 
   let result: Ring = []
   for (let i = 0; i < ring.length - 1; i++) {
     result = result.concat(interpolateLine([ring[i], ring[i + 1]], dist))
   }
+
+  // Note: rounding resulting points to prevent error "Constraining edge intersects point" at small distances
+  result = result.map((point) => [Math.round(point[0]), Math.round(point[1])])
+  // And filter out possible duplicates due to rounding
+  result = conformRing(result)
+
   return result
 }
 

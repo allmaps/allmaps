@@ -1,17 +1,17 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import { generateAnnotation } from '@allmaps/annotation'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
 
-export default function generate() {
+export function generate() {
   return new Command('generate')
     .argument('[files...]')
     .summary('generate Georeference Annotation')
     .description('Generate a single Georeference Annotation from input files')
     .action(async (files) => {
-      const jsonValues = await parseJsonInput(files as string[])
+      const jsonValues = await parseJsonInput(files)
       const maps = parseAnnotationsValidateMaps(jsonValues)
 
       let annotation: unknown

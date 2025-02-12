@@ -1,4 +1,4 @@
-import { Command, Option } from 'commander'
+import { Command, Option } from '@commander-js/extra-typings'
 
 import fs from 'fs'
 import path from 'path'
@@ -25,29 +25,43 @@ import {
   gdalbuildvrt
 } from '../../lib/gdal.js'
 
-export default function generate() {
-  let command = new Command('geotiff')
-    .argument('[files...]')
-    .summary('generate a Bash script to create a Cloud Optimized GeoTIFF')
-    .description(
-      'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one or more Georeference Annotations'
+export function geotiff() {
+  const command = addTransformationOptions(
+    addTransformOptions(
+      new Command('geotiff')
+        .argument('[files...]')
+        .summary('generate a Bash script to create a Cloud Optimized GeoTIFF')
+        .description(
+          'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one or more Georeference Annotations'
+        )
+        .option(
+          '-s, --source-dir <dir>',
+          'Directory containing source images',
+          '.'
+        )
+        .option('-d, --output-dir <dir>', 'Output directory', '.')
+        .option(
+          '-c, --crs <string>',
+          'Coordinate reference system',
+          'EPSG:3857'
+        )
+        .option(
+          '-q, --jpg-quality <number>',
+          'JPG compression quality',
+          parseInt,
+          75
+        )
+        .addOption(
+          new Option(
+            '-i, --image-filenames-file <filename>',
+            'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
+          ).conflicts('source-dir')
+        )
     )
-    .option('-s, --source-dir <dir>', 'Directory containing source images', '.')
-    .option('-d, --output-dir <dir>', 'Output directory', '.')
-    .option('-c, --crs <string>', 'Coordinate reference system', 'EPSG:3857')
-    .option('-q, --jpg-quality <number>', 'JPG compression quality', '75')
-    .addOption(
-      new Option(
-        '-i, --image-filenames-file <filename>',
-        'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
-      ).conflicts('source-dir')
-    )
-
-  command = addTransformOptions(command)
-  command = addTransformationOptions(command)
+  )
 
   return command.action(async (files, options) => {
-    const jsonValues = await parseJsonInput(files as string[])
+    const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
     const transformOptions = parseTransformOptions(options)
 

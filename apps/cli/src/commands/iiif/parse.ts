@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
@@ -7,27 +7,28 @@ import { addParseIiifOptions } from '../../lib/options.js'
 
 import type { ZodError } from 'zod'
 
-export default function parse() {
-  let command = new Command('parse')
-    .argument('[files...]')
-    .summary('parse IIIF resources')
-    .description(
-      'Parses IIIF resources and outputs them in the internal format used by Allmaps'
-    )
-
-  command = addParseIiifOptions(command)
+export function parse() {
+  const command = addParseIiifOptions(
+    new Command('parse')
+      .argument('[files...]')
+      .summary('parse IIIF resources')
+      .description(
+        'Parses IIIF resources and outputs them in the internal format used by Allmaps'
+      )
+  )
 
   return command.action(async (files, options) => {
-    const jsonValues = await parseJsonInput(files as string[])
+    const jsonValues = await parseJsonInput(files)
 
     const parsedIiifs = []
     for (const jsonValue of jsonValues) {
       try {
         const parseIiifOptions = {
-          fetchCollections: options.fetchCollections as boolean,
-          fetchManifests: options.fetchManifests as boolean,
-          fetchImages: options.fetchImages as boolean,
-          fetchAll: options.fetchAll as boolean
+          fetchCollections: options.fetchCollections,
+          fetchManifests: options.fetchManifests,
+          fetchImages: options.fetchImages,
+          fetchAll: options.fetchAll,
+          maxDepth: options.fetchMaxDepth
         }
 
         const parsedIiif = await parseIiif(jsonValue, parseIiifOptions)

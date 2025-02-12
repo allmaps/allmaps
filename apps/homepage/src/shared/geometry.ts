@@ -5,7 +5,7 @@ import { GcpTransformer } from '@allmaps/transform'
 
 import type { Polygon } from 'geojson'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 const mercator = geoProjection((x, y) => [
   x,

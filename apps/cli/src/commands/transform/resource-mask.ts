@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import { GcpTransformer } from '@allmaps/transform'
 
@@ -10,19 +10,19 @@ import {
 import { addCoordinateTransformOptions } from '../../lib/options.js'
 import { featuresToFeatureCollection, geometryToFeature } from '@allmaps/stdlib'
 
-export default function resourceMask() {
-  let command = new Command('resource-mask')
-    .argument('[files...]')
-    .summary('transform resource masks to GeoJSON')
-    .description(
-      'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n' +
-        "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
-    )
-
-  command = addCoordinateTransformOptions(command)
+export function resourceMask() {
+  const command = addCoordinateTransformOptions(
+    new Command('resource-mask')
+      .argument('[files...]')
+      .summary('transform resource masks to GeoJSON')
+      .description(
+        'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n' +
+          "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
+      )
+  )
 
   return command.action(async (files, options) => {
-    const jsonValues = await parseJsonInput(files as string[])
+    const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
     const transformOptions = parseTransformOptions(options)
 

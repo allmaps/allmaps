@@ -1,42 +1,36 @@
-import GcpTransformer from './transformer.js'
+export { GcpTransformer } from './transformer.js'
 
-import Transformation from './transformation.js'
+export { Transformation } from './transformation.js'
 
-import Helmert from './transformation-types/helmert.js'
-import Polynomial from './transformation-types/polynomial.js'
-import Projective from './transformation-types/projective.js'
-import RBF from './transformation-types/radial-basis-function.js'
-import Straight from './transformation-types/straight.js'
+export { Helmert } from './transformation-types/helmert.js'
+export { Polynomial } from './transformation-types/polynomial.js'
+export { Projective } from './transformation-types/projective.js'
+export { RBF } from './transformation-types/radial-basis-function.js'
+export { Straight } from './transformation-types/straight.js'
 
-import {
+export {
   supportedDistortionMeasures,
   computeDistortionsFromPartialDerivatives
 } from './distortion.js'
 
-import {
-  defaultTransformOptions,
-  getForwardTransformResolution,
-  getBackwardTransformResolution
-} from './shared/transform-helper-functions.js'
-import { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
-
-/** @module allmaps/transform */
-
-// TODO: consider only exporting GCPTransformer
 export {
-  GcpTransformer,
-  Transformation,
-  Helmert,
-  Polynomial,
-  Projective,
-  RBF,
-  Straight,
-  supportedDistortionMeasures,
-  computeDistortionsFromPartialDerivatives,
-  getForwardTransformResolution,
-  getBackwardTransformResolution,
-  defaultTransformOptions,
-  defaultRefinementOptions
-}
+  //   defaultTransformOptions,
+  getForwardTransformResolution
+  //   getBackwardTransformResolution
+} from './shared/transform-helper-functions.js'
 
-export * from './shared/types.js'
+// export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
+
+export type {
+  GeneralGcp,
+  RefinementOptions,
+  SplitGcpLinePointInfo,
+  SplitGcpLineInfo,
+  TransformationType,
+  TransformOptions,
+  KernelFunction,
+  KernelFunctionOptions,
+  NormFunction,
+  EvaluationType,
+  DistortionMeasure
+} from './shared/types.js'

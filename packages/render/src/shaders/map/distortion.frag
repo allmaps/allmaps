@@ -5,23 +5,26 @@ if(u_distortion) {
 
   float trianglePointDistortion = v_trianglePointDistortion;
 
+  // Introduce septs
   // TODO: Add component to toggle stepwise vs continuous
   trianglePointDistortion = floor(trianglePointDistortion * 10.0f) / 10.0f;
 
-  // Note: using mix() instead of spectral_mix() for now since faster
+  // Clamp value used in mix between +1 and -1
+  float trianglePointDistortionMix = clamp(trianglePointDistortion, -1.0f, 1.0f);
+
   switch(u_distortionOptionsdistortionMeasure) {
     case 0:
       if(trianglePointDistortion > 0.0f) {
-        color = mix(color, u_colorDistortion00, trianglePointDistortion);
+        color = mix(color, u_colorDistortion00, trianglePointDistortionMix);
       } else {
-        color = mix(color, u_colorDistortion01, abs(trianglePointDistortion));
+        color = mix(color, u_colorDistortion01, abs(trianglePointDistortionMix));
       }
       break;
     case 1:
-      color = mix(color, u_colorDistortion1, trianglePointDistortion);
+      color = mix(color, u_colorDistortion1, trianglePointDistortionMix);
       break;
     case 2:
-      color = mix(color, u_colorDistortion2, trianglePointDistortion);
+      color = mix(color, u_colorDistortion2, trianglePointDistortionMix);
       break;
     case 3:
       color = trianglePointDistortion == -1.0f ? u_colorDistortion3 : color;

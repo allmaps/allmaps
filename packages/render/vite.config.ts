@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type PluginOption, type UserConfig } from 'vite'
 import glsl from 'vite-plugin-glsl'
 import noBundlePlugin from 'vite-plugin-no-bundle'
 import dts from 'vite-plugin-dts'
@@ -13,32 +13,15 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: true,
     emptyOutDir: false,
-    minify: true,
+    minify: false,
     lib: {
-      entry: './src/index.ts',
-      formats: ['es']
-    },
-    rollupOptions: {
-      external: [
-        '@allmaps/annotation',
-        '@allmaps/id',
-        '@allmaps/iiif-parser',
-        '@allmaps/transform',
-        '@allmaps/triangulate',
-        '@allmaps/stdlib',
-        'rbush'
+      entry: [
+        './src/index.ts',
+        './src/canvas.ts',
+        './src/intarray.ts',
+        './src/webgl2.ts'
       ],
-      output: {
-        globals: {
-          '@allmaps/annotation': '@allmaps/annotation',
-          '@allmaps/id': '@allmaps/id',
-          '@allmaps/iiif-parser': '@allmaps/iiif-parser',
-          '@allmaps/transform': '@allmaps/transform',
-          '@allmaps/triangulate': '@allmaps/triangulate',
-          '@allmaps/stdlib': '@allmaps/stdlib',
-          rbush: 'rbush'
-        }
-      }
+      formats: ['es']
     }
   },
   optimizeDeps: {
@@ -47,11 +30,11 @@ export default defineConfig({
     }
   },
   base: '',
+
   plugins: [
     glsl(),
-    dts({
-      insertTypesEntry: true
-    }),
-    noBundlePlugin()
+    dts(),
+    // TODO: find a way to remove type cast
+    noBundlePlugin() as PluginOption
   ]
-})
+}) satisfies UserConfig

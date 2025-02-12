@@ -1,25 +1,31 @@
 {
-  "type": "manifest",
   "embedded": false,
+  "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/manifest",
+  "type": "manifest",
   "label": {
     "none": ["Map of the County of Cornwall"]
   },
   "majorVersion": 2,
-  "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/manifest",
   "canvases": [
     {
+      "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/canvas/c1",
+      "type": "canvas",
       "height": 8318,
+      "width": 10802,
       "image": {
         "embedded": true,
-        "height": 8318,
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "type": "image",
         "uri": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251",
-        "width": 10802
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 10802,
+        "height": 8318,
+        "majorVersion": 2
       },
       "label": {
         "none": ["Map of the County of Cornwall"]
+      },
+      "description": {
+        "none": [""]
       },
       "metadata": [
         {
@@ -331,9 +337,25 @@
           }
         }
       ],
-      "type": "canvas",
-      "uri": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~319335~90088251/canvas/c1",
-      "width": 10802
+      "thumbnail": [
+        {
+          "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~319335~90088251/full/!96,96/0/default.jpg",
+          "format": "image/jpeg"
+        }
+      ]
     }
-  ]
+  ],
+  "homepage": [
+    {
+      "id": "https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~319335~90088251"
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["David Rumsey Historical Map Collection"]
+    }
+  }
 }

@@ -20,7 +20,7 @@
 
   import type { Bbox, Size } from '@allmaps/types'
 
-  import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
 
   // TODO:
   // - use Allmaps basemap

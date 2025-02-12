@@ -1,0 +1,405 @@
+{
+  "@context": ["http://iiif.io/api/presentation/3/context.json"],
+  "id": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2?as=iiif",
+  "type": "Collection",
+  "label": {
+    "none": ["Map and Atlas Collection"]
+  },
+  "summary": {
+    "none": [
+      "Northwestern University Libraries’ Map & Atlas Collection allows access to an ever-growing selection of our cartographic resources in high resolution."
+    ]
+  },
+  "items": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/e574e739-3f8b-4d06-b412-3fe840099452?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/e574e739-3f8b-4d06-b412-3fe840099452",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Congo regnum Christian, in Africa."]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Congo regnum Christian, in Africa."]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/e574e739-3f8b-4d06-b412-3fe840099452/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/00e0e9f5-e289-46a4-b380-ec282591e08c?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/00e0e9f5-e289-46a4-b380-ec282591e08c",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Meridiani equidistant pro ratione 56, paralleli 30 1/2"]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Meridiani equidistant pro ratione 56, paralleli 30 1/2"]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/00e0e9f5-e289-46a4-b380-ec282591e08c/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/13ee1c14-9acd-488c-81c8-ecb145ef332f?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/13ee1c14-9acd-488c-81c8-ecb145ef332f",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": [
+              "Tractus littorales Guineæ a Promontorio Verde usque ad Sinum Catenbelae"
+            ]
+          }
+        }
+      ],
+      "label": {
+        "none": [
+          "Tractus littorales Guineæ a Promontorio Verde usque ad Sinum Catenbelae"
+        ]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/13ee1c14-9acd-488c-81c8-ecb145ef332f/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/5926d45f-0e2b-4171-a1d7-997e968cddcb?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/5926d45f-0e2b-4171-a1d7-997e968cddcb",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": [
+              "Carte de toutes les isles connues a la coste de Zanguebar et Madagascar que l'on trouve dans la route de l'Inde"
+            ]
+          }
+        }
+      ],
+      "label": {
+        "none": [
+          "Carte de toutes les isles connues a la coste de Zanguebar et Madagascar que l'on trouve dans la route de l'Inde"
+        ]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/5926d45f-0e2b-4171-a1d7-997e968cddcb/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/12ec88fe-a9f2-4c2b-82d9-84438aba4cbd?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/12ec88fe-a9f2-4c2b-82d9-84438aba4cbd",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Totius Africæ accuratissima tabula"]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Totius Africæ accuratissima tabula"]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/12ec88fe-a9f2-4c2b-82d9-84438aba4cbd/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/18211f53-8c11-436e-92ba-97c2f07d29cb?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/18211f53-8c11-436e-92ba-97c2f07d29cb",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": [
+              "Æthiopia superior vel interior vulgo Abissinorum sive Presbiteri Ioannis Imperium."
+            ]
+          }
+        }
+      ],
+      "label": {
+        "none": [
+          "Æthiopia superior vel interior vulgo Abissinorum sive Presbiteri Ioannis Imperium."
+        ]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/18211f53-8c11-436e-92ba-97c2f07d29cb/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/1afe2de6-774d-4161-bacb-307261719c93?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/1afe2de6-774d-4161-bacb-307261719c93",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Fessæ et Marocchi regna."]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Fessæ et Marocchi regna."]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/1afe2de6-774d-4161-bacb-307261719c93/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/1f5b2d67-1b03-4ccf-a726-fe96b00ca8db?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/1f5b2d67-1b03-4ccf-a726-fe96b00ca8db",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": [
+              "A new and accurate map of Africa : drawn from the best & most approved modern maps and charts, and regulated by astronomical observations"
+            ]
+          }
+        }
+      ],
+      "label": {
+        "none": [
+          "A new and accurate map of Africa : drawn from the best & most approved modern maps and charts, and regulated by astronomical observations"
+        ]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/1f5b2d67-1b03-4ccf-a726-fe96b00ca8db/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/2a24953c-2c73-4c82-a980-0d4f79ab50f8?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/2a24953c-2c73-4c82-a980-0d4f79ab50f8",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Insula S. Laurentii, vulgo Madagascar."]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Insula S. Laurentii, vulgo Madagascar."]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/2a24953c-2c73-4c82-a980-0d4f79ab50f8/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/works/a0984553-00ab-4a04-812f-5249e3a0a5ca?as=iiif",
+      "type": "Manifest",
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/items/a0984553-00ab-4a04-812f-5249e3a0a5ca",
+          "type": "Text",
+          "format": "text/html",
+          "label": {
+            "none": ["Mauritania nuova tavola."]
+          }
+        }
+      ],
+      "label": {
+        "none": ["Mauritania nuova tavola."]
+      },
+      "summary": {
+        "none": ["Image"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/a0984553-00ab-4a04-812f-5249e3a0a5ca/thumbnail",
+          "format": "image/jpeg",
+          "type": "Image",
+          "width": 400,
+          "height": 400
+        }
+      ]
+    },
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2?as=iiif&page=2",
+      "type": "Collection",
+      "label": {
+        "none": ["Next page"]
+      }
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["Attribution"]
+    },
+    "value": {
+      "none": ["Courtesy of Northwestern University Libraries"]
+    }
+  },
+  "provider": [
+    {
+      "id": "https://www.library.northwestern.edu/",
+      "type": "Agent",
+      "label": {
+        "none": ["Northwestern University Libraries"]
+      },
+      "homepage": [
+        {
+          "id": "https://dc.library.northwestern.edu/",
+          "type": "Text",
+          "label": {
+            "none": [
+              "Northwestern University Libraries Digital Collections Homepage"
+            ]
+          },
+          "format": "text/html",
+          "language": ["en"]
+        }
+      ],
+      "logo": [
+        {
+          "id": "https://iiif.dc.library.northwestern.edu/iiif/2/00000000-0000-0000-0000-000000000003/full/pct:50/0/default.webp",
+          "type": "Image",
+          "format": "image/webp",
+          "height": 139,
+          "width": 1190
+        }
+      ]
+    }
+  ],
+  "logo": [
+    {
+      "id": "https://iiif.dc.library.northwestern.edu/iiif/2/00000000-0000-0000-0000-000000000003/full/pct:50/0/default.webp",
+      "type": "Image",
+      "format": "image/webp",
+      "height": 139,
+      "width": 1190
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/collections/267bed1b-f808-4c51-acb1-0288378819d2",
+      "type": "Dataset",
+      "format": "application/json",
+      "label": {
+        "none": ["Northwestern University Libraries Digital Collections API"]
+      }
+    }
+  ],
+  "homepage": [
+    {
+      "id": "https://dc.library.northwestern.edu/collections/267bed1b-f808-4c51-acb1-0288378819d2",
+      "type": "Text",
+      "format": "text/html",
+      "label": {
+        "none": ["Map and Atlas Collection"]
+      }
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2/thumbnail",
+      "type": "Image",
+      "format": "image/jpeg",
+      "width": 400,
+      "height": 400
+    }
+  ]
+}

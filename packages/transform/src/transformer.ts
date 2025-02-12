@@ -31,13 +31,13 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import Transformation from './transformation.js'
+import { Transformation } from './transformation.js'
 
-import Straight from './transformation-types/straight.js'
-import Helmert from './transformation-types/helmert.js'
-import Polynomial from './transformation-types/polynomial.js'
-import Projective from './transformation-types/projective.js'
-import RBF from './transformation-types/radial-basis-function.js'
+import { Straight } from './transformation-types/straight.js'
+import { Helmert } from './transformation-types/helmert.js'
+import { Polynomial } from './transformation-types/polynomial.js'
+import { Projective } from './transformation-types/projective.js'
+import { RBF } from './transformation-types/radial-basis-function.js'
 
 import { thinPlateKernel } from './shared/kernel-functions.js'
 import { euclideanNorm } from './shared/norm-functions.js'
@@ -80,7 +80,7 @@ import type {
  * A Ground Control Point Transformer, containing a forward and backward transformation and
  * specifying functions to transform geometries using these transformations.
  * */
-export default class GcpTransformer {
+export class GcpTransformer {
   gcps: GeneralGcp[]
   sourcePoints: Point[]
   destinationPoints: Point[]
@@ -92,8 +92,8 @@ export default class GcpTransformer {
 
   /**
    * Create a GcpTransformer
-   * @param {GeneralGcp[] | Gcp[]} gcps - An array of Ground Control Points (GCPs)
-   * @param {TransformationType} [type='polynomial'] - The transformation type
+   * @param gcps - An array of Ground Control Points (GCPs)
+   * @param type - The transformation type
    */ constructor(
     gcps: GeneralGcp[] | Gcp[],
     type: TransformationType = 'polynomial',
@@ -124,21 +124,27 @@ export default class GcpTransformer {
   /**
    * Create forward transformation
    */
-  createForwardTransformation(): void {
-    this.forwardTransformation = this.computeTransformation(
-      this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
-      this.destinationPoints
-    )
+  createForwardTransformation(): Transformation {
+    if (!this.forwardTransformation) {
+      this.forwardTransformation = this.computeTransformation(
+        this.sourcePoints.map((point) => this.assureEqualHandedness(point)),
+        this.destinationPoints
+      )
+    }
+    return this.forwardTransformation
   }
 
   /**
    * Create backward transformation
    */
-  createBackwardTransformation(): void {
-    this.backwardTransformation = this.computeTransformation(
-      this.destinationPoints,
-      this.sourcePoints.map((point) => this.assureEqualHandedness(point))
-    )
+  createBackwardTransformation(): Transformation {
+    if (!this.backwardTransformation) {
+      this.backwardTransformation = this.computeTransformation(
+        this.destinationPoints,
+        this.sourcePoints.map((point) => this.assureEqualHandedness(point))
+      )
+    }
+    return this.backwardTransformation
   }
 
   // Base functions
@@ -168,17 +174,9 @@ export default class GcpTransformer {
   ): MultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry forward to a Geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {Geometry} Forward transform of input as Geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => Point;
-   * (input:LineString | GeojsonLineString) => LineString;
-   * (input:Polygon | GeojsonPolygon) => Polygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => MultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => MultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => MultiPolygon;
-   * }}
+   * @param input - Geometry or GeoJSON geometry to transform
+   * @param options - Transform options
+   * @returns Forward transform of input as Geometry
    */
   transformForward(
     input: Geometry | GeojsonGeometry,
@@ -187,10 +185,9 @@ export default class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        if (!this.forwardTransformation) {
-          this.createForwardTransformation()
-        }
-        return this.forwardTransformation!.evaluate(
+        const forwardTransformation = this.createForwardTransformation()
+
+        return forwardTransformation.evaluate(
           this.assureEqualHandedness(input),
           mergedOptions.evaluationType
         )
@@ -274,17 +271,9 @@ export default class GcpTransformer {
   ): GeojsonMultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry forward to a GeoJSON geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {GeojsonGeometry} Forward transform of input, as GeoJSON geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => GeojsonPoint;
-   * (input:LineString | GeojsonLineString) => GeojsonLineString;
-   * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => GeojsonMultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => GeojsonMultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => GeojsonMultiPolygon;
-   * }}
+   * @param input - Geometry or GeoJSON geometry to transform
+   * @param options - Transform options
+   * @returns Forward transform of input, as GeoJSON geometry
    */
   transformForwardAsGeojson(
     input: Geometry | GeojsonGeometry,
@@ -406,17 +395,9 @@ export default class GcpTransformer {
   ): MultiPolygon
   /**
    * Transforms a geometry or a GeoJSON geometry backward to a Geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {Geometry} backward transform of input, as geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => Point;
-   * (input:LineString | GeojsonLineString) => LineString;
-   * (input:Polygon | GeojsonPolygon) => Polygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => MultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => MultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => MultiPolygon;
-   * }}
+   * @param input - Geometry or GeoJSON geometry to transform
+   * @param options - Transform options
+   * @returns backward transform of input, as geometry
    */
   transformBackward(
     input: Geometry | GeojsonGeometry,
@@ -425,11 +406,9 @@ export default class GcpTransformer {
     const mergedOptions = mergeOptions(this.options, options)
     if (!mergedOptions.inputIsMultiGeometry) {
       if (isPoint(input)) {
-        if (!this.backwardTransformation) {
-          this.createBackwardTransformation()
-        }
+        const backwardTransformation = this.createBackwardTransformation()
         return this.assureEqualHandedness(
-          this.backwardTransformation!.evaluate(input)
+          backwardTransformation.evaluate(input)
         )
       } else if (isGeojsonPoint(input)) {
         return this.transformBackward(geojsonPointToPoint(input))
@@ -511,17 +490,9 @@ export default class GcpTransformer {
   ): GeojsonMultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry backward to a GeoJSON geometry
-   * @param {Geometry | GeojsonGeometry} input - Geometry or GeoJSON geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {GeojsonGeometry} backward transform of input, as GeoJSON geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => GeojsonPoint;
-   * (input:LineString | GeojsonLineString) => GeojsonLineString;
-   * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => GeojsonMultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => GeojsonMultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => GeojsonMultiPolygon;
-   * }}
+   * @param input - Geometry or GeoJSON geometry to transform
+   * @param options - Transform options
+   * @returns backward transform of input, as GeoJSON geometry
    */
   transformBackwardAsGeojson(
     input: Geometry | GeojsonGeometry,
@@ -651,17 +622,9 @@ export default class GcpTransformer {
   ): MultiPolygon
   /**
    * Transforms Geometry or GeoJSON geometry forward, as Geometry
-   * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {Geometry} Forward transform of input, as Geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => Point;
-   * (input:LineString | GeojsonLineString) => LineString;
-   * (input:Polygon | GeojsonPolygon) => Polygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => MultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => MultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => MultiPolygon;
-   * }}
+   * @param input - Input to transform
+   * @param options - Transform options
+   * @returns Forward transform of input, as Geometry
    */
   transformToGeo(
     input: Geometry | GeojsonGeometry,
@@ -729,17 +692,9 @@ export default class GcpTransformer {
   ): GeojsonMultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry forward, to a GeoJSON geometry
-   * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {Geometry} Forward transform of input, as GeoJSON geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => GeojsonPoint;
-   * (input:LineString | GeojsonLineString) => GeojsonLineString;
-   * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => GeojsonMultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => GeojsonMultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => GeojsonMultiPolygon;
-   * }}
+   * @param input - Input to transform
+   * @param options - Transform options
+   * @returns Forward transform of input, as GeoJSON geometry
    */
   transformToGeoAsGeojson(
     input: Geometry | GeojsonGeometry,
@@ -816,17 +771,9 @@ export default class GcpTransformer {
   ): MultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry backward, to a Geometry
-   * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {Geometry} Backward transform of input, as a Geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => Point;
-   * (input:LineString | GeojsonLineString) => LineString;
-   * (input:Polygon | GeojsonPolygon) => Polygon;
-   * (input:MultiPoint | GeojsonMultiPoint) => MultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => MultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => MultiPolygon;
-   * }}
+   * @param input - Input to transform
+   * @param options - Transform options
+   * @returns Backward transform of input, as a Geometry
    */
   transformToResource(
     input: Geometry | GeojsonGeometry,
@@ -894,17 +841,9 @@ export default class GcpTransformer {
   ): GeojsonMultiPolygon
   /**
    * Transforms a Geometry or a GeoJSON geometry backward, to a GeoJSON geometry
-   * @param {Geometry | GeojsonGeometry} input - Input to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {GeojsonGeometry} Backward transform of input, as a GeoJSON geometry
-   * @type {{
-   * (input:Point | GeojsonPoint) => GeojsonPoint;
-   * (input:LineString | GeojsonLineString) => GeojsonLineString;
-   * (input:Polygon | GeojsonPolygon) => GeojsonPolygon;
-   * (input:MultiPoMultiint | GeojsonMultiPoint) => GeojsonMultiPoint;
-   * (input:MultiLineString | GeojsonMultiLineString) => GeojsonMultiLineString;
-   * (input:MultiPolygon | GeojsonMultiPolygon) => GeojsonMultiPolygon;
-   * }}
+   * @param input - Input to transform
+   * @param options - Transform options
+   * @returns Backward transform of input, as a GeoJSON geometry
    */
   transformToResourceAsGeojson(
     input: Geometry | GeojsonGeometry,
@@ -964,9 +903,9 @@ export default class GcpTransformer {
    * Transforms a SVG geometry forward to a GeoJSON geometry
    *
    * Note: Multi-geometries are not supported
-   * @param {SvgGeometry} geometry - SVG geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {GeojsonGeometry} Forward transform of input, as a GeoJSON geometry
+   * @param geometry - SVG geometry to transform
+   * @param options - Transform options
+   * @returns Forward transform of input, as a GeoJSON geometry
    */
   transformSvgToGeojson(
     geometry: SvgGeometry,
@@ -991,9 +930,9 @@ export default class GcpTransformer {
    * Transforms a SVG string forward to a GeoJSON FeatureCollection
    *
    * Note: Multi-geometries are not supported
-   * @param {string} svg - SVG string to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {GeojsonFeatureCollection} Forward transform of input, as a GeoJSON FeatureCollection
+   * @param svg - SVG string to transform
+   * @param options - Transform options
+   * @returns Forward transform of input, as a GeoJSON FeatureCollection
    */
   transformSvgStringToGeojsonFeatureCollection(
     svg: string,
@@ -1011,9 +950,9 @@ export default class GcpTransformer {
    * Transforms a GeoJSON geometry backward to a SVG geometry
    *
    * Note: Multi-geometries are not supported
-   * @param {GeojsonGeometry} geometry - GeoJSON geometry to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {SvgGeometry} Backward transform of input, as SVG geometry
+   * @param geometry - GeoJSON geometry to transform
+   * @param options - Transform options
+   * @returns Backward transform of input, as SVG geometry
    */
   transformGeojsonToSvg(
     geometry: GeojsonGeometry,
@@ -1043,9 +982,9 @@ export default class GcpTransformer {
    * Transforms a GeoJSON FeatureCollection backward to a SVG string
    *
    * Note: Multi-geometries are not supported
-   * @param {GeojsonFeatureCollection} geojson - GeoJSON FeatureCollection to transform
-   * @param {Partial<TransformOptions>} [options] - Transform options
-   * @returns {string} Backward transform of input, as SVG string
+   * @param geojson - GeoJSON FeatureCollection to transform
+   * @param options - Transform options
+   * @returns Backward transform of input, as SVG string
    */
   transformGeojsonFeatureCollectionToSvgString(
     geojson: GeojsonFeatureCollection,

@@ -31,7 +31,9 @@ fs.readdirSync(inputDir)
 
     try {
       parsedIiif = IIIF.parse(input)
-      output = { ...parsedIiif }
+
+      // Make sure Date objects in parsed IIIF data are converted to strings
+      output = JSON.parse(JSON.stringify({ ...parsedIiif }))
     } catch (err) {
       if (err.errors) {
         errors = err.errors.map((error) => error.message)

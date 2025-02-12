@@ -1,6 +1,6 @@
 import { Point } from '@allmaps/types'
 
-import { DistortionMeasure } from './shared/types'
+import { DistortionMeasure } from './shared/types.js'
 
 export const supportedDistortionMeasures = [
   'log2sigma',
@@ -13,12 +13,11 @@ export const supportedDistortionMeasures = [
 /**
  * Compute the distortion value of selected distortion measures from the partial derivatives at a specific point
  *
- * @export
- * @param {DistortionMeasures[]} distortionMeasures - The requested distortion measures
- * @param {Point} partialDerivativeX - The partial derivative to 'x' of the transformation, evaluated at a set point
- * @param {Point} partialDerivativeY - The partial derivative to 'y' of the transformation, evaluated at a set point
- * @param {number} [referenceScale=1] - The reference area scaling (sigma) to take into account for certain distortion measures (like 'log2sigma'), e.g. computed via a helmert transform
- * @returns {Map<DistortionMeasure, number>} - A map of distortion measures and distortion values at the point
+ * @param distortionMeasures - The requested distortion measures
+ * @param partialDerivativeX - The partial derivative to 'x' of the transformation, evaluated at a set point
+ * @param partialDerivativeY - The partial derivative to 'y' of the transformation, evaluated at a set point
+ * @param referenceScale - The reference area scaling (sigma) to take into account for certain distortion measures (like 'log2sigma'), e.g. computed via a helmert transform
+ * @returns A map of distortion measures and distortion values at the point
  */
 export function computeDistortionsFromPartialDerivatives(
   distortionMeasures: DistortionMeasure[],

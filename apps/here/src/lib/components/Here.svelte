@@ -33,7 +33,7 @@
 
   import Controls from '$lib/components/Controls.svelte'
 
-  import type { Map } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
 
   import HereIcon from '$lib/shared/images/here.svg?raw'
@@ -122,7 +122,7 @@
   }
 
   function update(mapWithImageInfo: {
-    map: Map
+    map: GeoreferencedMap
     imageInfo: ImageInformationResponse
   }) {
     if (!mounted) {

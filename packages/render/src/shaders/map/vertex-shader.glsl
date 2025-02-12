@@ -35,8 +35,11 @@ void main() {
   v_trianglePointDistortion = trianglePointDistortion;
   v_trianglePointIndex = a_trianglePointIndex;
 
-  float trianglePointLocalIndex = mod(a_trianglePointIndex, 3.0);
-  if(trianglePointLocalIndex == 0.0) v_trianglePointBarycentric = vec4(1.0, 0, 0, 1.0);
-  if(trianglePointLocalIndex == 1.0) v_trianglePointBarycentric = vec4(0.0, 1.0, 0, 1.0);
-  if(trianglePointLocalIndex == 2.0) v_trianglePointBarycentric = vec4(0.0, 0, 1.0, 1.0);
+  float trianglePointLocalIndex = mod(a_trianglePointIndex, 3.0f);
+  if(trianglePointLocalIndex == 0.0f)
+    v_trianglePointBarycentric = vec4(1.0f, 0, 0, 1.0f);
+  if(trianglePointLocalIndex == 1.0f)
+    v_trianglePointBarycentric = vec4(0.0f, 1.0f, 0, 1.0f);
+  if(trianglePointLocalIndex == 2.0f)
+    v_trianglePointBarycentric = vec4(0.0f, 0, 1.0f, 1.0f);
 }

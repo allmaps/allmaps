@@ -1,11 +1,14 @@
-import {
+export {
   WarpedMapLayer,
   type LeafletWarpedMapLayerOptions
 } from './WarpedMapLayer.js'
 
-export { WarpedMapLayer, type LeafletWarpedMapLayerOptions }
-
 export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
+
+import {
+  WarpedMapLayer,
+  type LeafletWarpedMapLayerOptions
+} from './WarpedMapLayer.js'
 
 const warpedMapLayer = function (
   annotationOrAnnotationUrl: unknown,

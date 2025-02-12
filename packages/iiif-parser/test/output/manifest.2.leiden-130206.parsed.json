@@ -16,7 +16,11 @@
           "Nieuwe afteekening van het eijland Jarseij of Jarzee, Jerseij of Isle Gerseij, behoorende aen de Engelse ... COLLBN 003-02-027"
         ]
       },
-
+      "thumbnail": [
+        {
+          "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206/full/80,/0/default.jpg"
+        }
+      ],
       "type": "canvas",
       "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/canvas/default",
       "width": 11901
@@ -130,5 +134,13 @@
     }
   ],
   "type": "manifest",
-  "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/manifest"
+  "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/manifest",
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Leiden University Libraries"]
+    }
+  }
 }

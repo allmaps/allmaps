@@ -37,5 +37,19 @@
   },
   "majorVersion": 3,
   "type": "manifest",
-  "uri": "https://collection.sfomuseum.org/objects/1762679999/manifest/"
+  "uri": "https://collection.sfomuseum.org/objects/1762679999/manifest/",
+  "summary": {
+    "en": [
+      "Monochrome blue postcard depicting route map of American Airlines Flagship flights; with text, “The pencil line shows the route of my Flagship Flight” on right side; American Airlines logo on top right; American Airlines logotype on bottom right. "
+    ]
+  },
+  "thumbnail": [
+    {
+      "format": "image/jpeg",
+      "height": 320,
+      "id": "https://static.sfomuseum.org/media/176/270/383/1/1762703831_qU3KkLfvbsrnoH8A4dg2pJ9WGsrsztl9_s.jpg",
+      "type": "Image",
+      "width": 320
+    }
+  ]
 }

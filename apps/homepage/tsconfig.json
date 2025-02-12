@@ -1,4 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "references": [{ "path": "../../packages/tailwind" }]
+  "references": [
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/maplibre" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/types" }
+  ]
 }

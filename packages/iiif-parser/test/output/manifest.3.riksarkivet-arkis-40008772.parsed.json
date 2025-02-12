@@ -143,5 +143,12 @@
     }
   ],
   "type": "manifest",
-  "uri": "https://lbiiif.riksarkivet.se/arkis!40008772/manifest"
+  "uri": "https://lbiiif.riksarkivet.se/arkis!40008772/manifest",
+  "thumbnail": [
+    {
+      "format": "image/jpg",
+      "id": "https://lbiiif.riksarkivet.se/arkis!40008772_00001/square/350,/0/default.jpg",
+      "type": "Thumbnail"
+    }
+  ]
 }

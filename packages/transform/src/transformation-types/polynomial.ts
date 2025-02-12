@@ -1,16 +1,21 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import Transformation from '../transformation.js'
+import { Transformation } from '../transformation.js'
 
 import type { Point } from '@allmaps/types'
 import type { TransformationType } from '../shared/types.js'
 
-export default class Polynomial extends Transformation {
+export class Polynomial extends Transformation {
   polynomialParametersMatrices: [Matrix, Matrix]
   polynomialParameters: [number[], number[]]
 
   order: number
   pointCountMinimum: number
+
+  scale?: Point
+  rotation?: number
+  shear?: Point
+  translation?: Point
 
   constructor(
     sourcePoints: Point[],
@@ -133,6 +138,38 @@ export default class Polynomial extends Transformation {
     this.polynomialParameters = this.polynomialParametersMatrices.map(
       (matrix) => matrix.to1DArray()
     ) as [number[], number[]]
+
+    // Set the derived parameters
+    if (this.order == 1) {
+      // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
+
+      this.translation = [
+        this.polynomialParameters[0][0],
+        this.polynomialParameters[1][0]
+      ]
+
+      const a = this.polynomialParameters[0][1]
+      const b = this.polynomialParameters[1][1]
+      const c = this.polynomialParameters[0][2]
+      const d = this.polynomialParameters[1][2]
+      const delta = a * d - b * c
+
+      // Apply the QR-like decomposition.
+      if (a != 0 || b != 0) {
+        const r = Math.sqrt(a * a + b * b)
+        this.rotation = b > 0 ? Math.acos(a / r) : -Math.acos(a / r)
+        this.scale = [r, delta / r]
+        this.shear = [Math.atan((a * c + b * d) / (r * r)), 0]
+      } else if (c != 0 || d != 0) {
+        const s = Math.sqrt(c * c + d * d)
+        this.rotation =
+          Math.PI / 2 - (d > 0 ? Math.acos(-c / s) : -Math.acos(c / s))
+        this.scale = [delta / s, s]
+        this.shear = [0, Math.atan((a * c + b * d) / (s * s))]
+      } else {
+        // a = b = c = d = 0
+      }
+    }
   }
 
   // Evaluate the transformation function at a new point

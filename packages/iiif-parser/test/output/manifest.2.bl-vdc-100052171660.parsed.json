@@ -8,6 +8,32 @@
       "CARTE DU PARAGUAY DU CHILI DU DETROIT DE MAGELLAN &c.   : Dressée sur les Descriptions des PP. Alfonse d'Ovalle, et Nicolas Techo, et sur Relations et memoires de Brouwer, Narboroug, Mr. de Beauchesne &c.   / Par GUILLAUME DE L'ISLE Premier Geographe du Roy de l'Academie Royale des Sciences"
     ]
   },
+  "homepage": [
+    {
+      "format": "text/html",
+      "id": "http://access.bl.uk/item/viewer/ark:/81055/vdc_100052171660.0x000001",
+      "label": {
+        "none": ["View at the British Library"]
+      }
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": [
+        "<span>Public Domain<br/><br/><img src=\"https://i.creativecommons.org/p/mark/1.0/88x31.png\"/></span>"
+      ]
+    }
+  },
+  "thumbnail": [
+    {
+      "format": "image/jpg",
+      "id": "https://api.bl.uk/image/iiif/ark:/81055/vdc_100052179972.0x000001/full/max/0/default.jpg",
+      "type": "dctypes:Image"
+    }
+  ],
   "canvases": [
     {
       "type": "canvas",

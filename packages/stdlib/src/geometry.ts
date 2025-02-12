@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { rewindGeometry } from '@placemarkio/geojson-rewind' // TODO: consider implementing these functions in this module instead of using dependencies
+import { rewind } from '@turf/rewind'
 
 import type {
   Point,
@@ -24,7 +23,7 @@ import type {
 
 // Assert
 
-export function isPoint(input: any): input is Point {
+export function isPoint(input: unknown): input is Point {
   return (
     Array.isArray(input) &&
     input.length === 2 &&
@@ -33,37 +32,31 @@ export function isPoint(input: any): input is Point {
   )
 }
 
-export function isLineString(input: any): input is LineString {
+export function isLineString(input: unknown): input is LineString {
   return Array.isArray(input) && input.every(isPoint)
-  // && !isClosed(input) // Possible addition if we want to check for closedness
 }
 
-// TODO: check if we keep Ring as unclosed.
-// This function is not exported because Ring should not be used externally, since it can not be distingised from LineSting
-function isRing(input: any): input is Ring {
-  return (
-    Array.isArray(input) && input.every(isPoint)
-    // && isClosed(input) === closed // Possible addition if we want to check for closedness, with closed an input parameter with default false
-  )
+export function isRing(input: unknown): input is Ring {
+  return Array.isArray(input) && input.every(isPoint)
 }
 
-export function isPolygon(input: any): input is Polygon {
+export function isPolygon(input: unknown): input is Polygon {
   return Array.isArray(input) && input.every(isRing)
 }
 
-export function isMultiPoint(input: any): input is MultiPoint {
+export function isMultiPoint(input: unknown): input is MultiPoint {
   return Array.isArray(input) && input.every(isPoint)
 }
 
-export function isMultiLineString(input: any): input is MultiLineString {
+export function isMultiLineString(input: unknown): input is MultiLineString {
   return Array.isArray(input) && input.every(isLineString)
 }
 
-export function isMultiPolygon(input: any): input is MultiPolygon {
+export function isMultiPolygon(input: unknown): input is MultiPolygon {
   return Array.isArray(input) && input.every(isPolygon)
 }
 
-export function isGeometry(input: any): input is Geometry {
+export function isGeometry(input: unknown): input is Geometry {
   return (
     isPoint(input) ||
     isLineString(input) ||
@@ -72,6 +65,33 @@ export function isGeometry(input: any): input is Geometry {
     isMultiLineString(input) ||
     isMultiPolygon(input)
   )
+}
+
+// Close
+
+export function closeRing(ring: Ring): Ring {
+  return [...ring, ring[0]]
+}
+
+export function uncloseRing(ring: Ring): Ring {
+  ring.splice(-1)
+  return ring
+}
+
+export function closePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => closeRing(ring))
+}
+
+export function unclosePolygon(polygon: Polygon): Polygon {
+  return polygon.map((ring) => uncloseRing(ring))
+}
+
+export function closeMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => closePolygon(polygon))
+}
+
+export function uncloseMultiPolygon(multiPolygon: MultiPolygon): MultiPolygon {
+  return multiPolygon.map((polygon) => unclosePolygon(polygon))
 }
 
 // Conform
@@ -96,7 +116,7 @@ export function conformRing(ring: Ring): Ring {
 
   // Remove last point if input is closed ring
   if (isClosed(ring)) {
-    ring.splice(-1)
+    uncloseRing(ring)
   }
 
   if (ring.length < 3) {
@@ -142,9 +162,9 @@ export function lineStringToGeojsonLineString(
 export function ringToGeojsonPolygon(ring: Ring, close = true): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close ? [[...ring, ring[0]]] : [ring]
+    coordinates: close ? [closeRing(ring)] : [ring]
   }
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function polygonToGeojsonPolygon(
@@ -153,14 +173,10 @@ export function polygonToGeojsonPolygon(
 ): GeojsonPolygon {
   const geometry = {
     type: 'Polygon',
-    coordinates: close
-      ? polygon.map((ring) => {
-          return [...ring, ring[0]]
-        })
-      : polygon
+    coordinates: close ? closePolygon(polygon) : polygon
   }
 
-  return rewindGeometry(geometry as GeojsonPolygon) as GeojsonPolygon
+  return rewind(geometry as GeojsonPolygon) as GeojsonPolygon
 }
 
 export function multiPointToGeojsonMultiPoint(
@@ -187,16 +203,10 @@ export function multiPolygonToGeojsonMultiPolygon(
 ): GeojsonMultiPolygon {
   const geometry = {
     type: 'MultiPolygon',
-    coordinates: close
-      ? multiPolygon.map((polygon) =>
-          polygon.map((ring) => {
-            return [...ring, ring[0]]
-          })
-        )
-      : multiPolygon
+    coordinates: close ? closeMultiPolygon(multiPolygon) : multiPolygon
   }
 
-  return rewindGeometry(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
+  return rewind(geometry as GeojsonMultiPolygon) as GeojsonMultiPolygon
 }
 
 export function geometryToGeojsonGeometry(geometry: Geometry): GeojsonGeometry {
@@ -269,7 +279,7 @@ export function pointsAndPointsToLines(
   points0: Point[],
   points1: Point[]
 ): Line[] {
-  if (points0.length != points1.length)
+  if (points0.length !== points1.length)
     throw new Error('Point arrays should be of same lenght')
 
   return points0.map((point0, index) => [point0, points1[index]])
@@ -387,6 +397,20 @@ export function squaredDistance(from: Point | Line, to?: Point): number {
   }
 }
 
+export function rms(from: Point[], to: Point[]): number {
+  if (from.length !== to.length) {
+    throw new Error('Arrays need to be of same length')
+  }
+  const squaredDistances = from.map((fromPoint, index) =>
+    squaredDistance(fromPoint, to[index])
+  )
+  const meanSquaredDistances =
+    squaredDistances.reduce((sum, squaredDistace) => sum + squaredDistace, 0) /
+    squaredDistances.length
+  const rootMeanSquaredDistances = Math.sqrt(meanSquaredDistances)
+  return rootMeanSquaredDistances
+}
+
 export function triangleArea(triangle: Triangle): number {
   return (
     0.5 *
@@ -396,4 +420,125 @@ export function triangleArea(triangle: Triangle): number {
         triangle[2][0] * (triangle[0][1] - triangle[1][1])
     )
   )
+}
+
+export function invertPoint(point: Point): Point {
+  return [-point[0], -point[1]]
+}
+
+export function invertPoints(points: Point[]): Point[] {
+  return points.map((point) => invertPoint(point))
+}
+
+export function scalePoint(point: Point, scale: number): Point {
+  if (scale == 1) {
+    return point
+  }
+
+  return [point[0] * scale, point[1] * scale]
+}
+
+export function scalePoints(points: Point[], scale: number): Point[] {
+  if (scale === 1) {
+    return points
+  }
+  return points.map((point) => scalePoint(point, scale))
+}
+
+export function translatePoint(
+  point: Point,
+  translationPoint: Point,
+  addOrSubstract: 'add' | 'substract' = 'add'
+): Point {
+  if (addOrSubstract === 'add') {
+    return [point[0] + translationPoint[0], point[1] + translationPoint[1]]
+  } else {
+    return [point[0] - translationPoint[0], point[1] - translationPoint[1]]
+  }
+}
+
+export function translatePoints(
+  points: Point[],
+  point: Point,
+  addOrSubstract: 'add' | 'substract' = 'add'
+): Point[] {
+  if (isEqualPoint(point, [0, 0])) {
+    return points
+  }
+
+  return points.map((p) => translatePoint(p, point, addOrSubstract))
+}
+
+export function rotatePoint(
+  point: Point,
+  angle: number = 0,
+  anchor: Point | undefined = undefined,
+  cosAngle?: number,
+  sinAngle?: number
+): Point {
+  if (angle === 0 || angle === undefined) {
+    return point
+  }
+
+  if (anchor) {
+    return translatePoint(
+      rotatePoint(
+        translatePoint(point, anchor, 'substract'),
+        angle,
+        undefined,
+        cosAngle,
+        sinAngle
+      ),
+      anchor
+    )
+  } else {
+    cosAngle = cosAngle || Math.cos(angle)
+    sinAngle = sinAngle || Math.sin(angle)
+
+    return [
+      point[0] * cosAngle - point[1] * sinAngle,
+      point[0] * sinAngle + point[1] * cosAngle
+    ]
+  }
+}
+
+export function rotatePoints(
+  points: Point[],
+  angle: number = 0,
+  anchor: Point | undefined = undefined,
+  cosAngle?: number,
+  sinAngle?: number
+): Point[] {
+  if (angle === 0 || angle === undefined) {
+    return points
+  }
+
+  cosAngle = cosAngle || Math.cos(angle)
+  sinAngle = sinAngle || Math.sin(angle)
+
+  return points.map((point) =>
+    rotatePoint(point, angle, anchor, cosAngle, sinAngle)
+  )
+}
+
+export function triangleAngles(triangle: Triangle): [number, number, number] {
+  return [
+    threePointsToAngle(triangle[0], triangle[1], triangle[2]),
+    threePointsToAngle(triangle[1], triangle[2], triangle[0]),
+    threePointsToAngle(triangle[2], triangle[0], triangle[1])
+  ]
+}
+
+/**
+ * Return angle alpha made at point A by points B and C
+ */
+export function threePointsToAngle(
+  pointA: Point,
+  pointB: Point,
+  pointC: Point
+): number {
+  const AB = distance(pointA, pointB)
+  const BC = distance(pointB, pointC)
+  const AC = distance(pointA, pointC)
+  return Math.acos((AB ** 2 + AC ** 2 - BC ** 2) / (2 * AB * AC))
 }

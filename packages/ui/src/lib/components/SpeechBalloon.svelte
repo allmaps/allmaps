@@ -12,8 +12,7 @@
   class="speech-balloon
     p-4 relative
     pointer-events-auto
-    w-[30rem]
-    max-w-[90%]
+    w-full
     rounded-md
     after:content-['']
     after:absolute

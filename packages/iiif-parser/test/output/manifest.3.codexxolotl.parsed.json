@@ -1,0 +1,356 @@
+{
+  "embedded": false,
+  "uri": "https://codexxolotl.com/iiif/manifest.json",
+  "type": "manifest",
+  "label": {
+    "none": ["Codex Xolotl"]
+  },
+  "majorVersion": 3,
+  "canvases": [
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/1",
+      "type": "canvas",
+      "height": 5106,
+      "width": 3694,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.012v_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 3694,
+        "height": 5106,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.012v"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/2",
+      "type": "canvas",
+      "height": 4979,
+      "width": 2757,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.011v_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 2757,
+        "height": 4979,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.011v"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/3",
+      "type": "canvas",
+      "height": 5199,
+      "width": 3669,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.012r_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 3669,
+        "height": 5199,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.012r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/4",
+      "type": "canvas",
+      "height": 5082,
+      "width": 3053,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.011r_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 3053,
+        "height": 5082,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.011r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/5",
+      "type": "canvas",
+      "height": 5221,
+      "width": 6076,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.010v_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6076,
+        "height": 5221,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.010v"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/6",
+      "type": "canvas",
+      "height": 4981,
+      "width": 6072,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.010r_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6072,
+        "height": 4981,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.010r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/7",
+      "type": "canvas",
+      "height": 7457,
+      "width": 8141,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.020r_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8141,
+        "height": 7457,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.020r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/8",
+      "type": "canvas",
+      "height": 7561,
+      "width": 8272,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.030_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8272,
+        "height": 7561,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.030r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/9",
+      "type": "canvas",
+      "height": 7532,
+      "width": 8399,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.040_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8399,
+        "height": 7532,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.040"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/10",
+      "type": "canvas",
+      "height": 7704,
+      "width": 9139,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.050_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9139,
+        "height": 7704,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.050"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/11",
+      "type": "canvas",
+      "height": 7496,
+      "width": 8976,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.060_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8976,
+        "height": 7496,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.060"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/12",
+      "type": "canvas",
+      "height": 7677,
+      "width": 9656,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.070_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9656,
+        "height": 7677,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.070"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/13",
+      "type": "canvas",
+      "height": 7443,
+      "width": 9119,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.080_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9119,
+        "height": 7443,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.080"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/14",
+      "type": "canvas",
+      "height": 7044,
+      "width": 9299,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.090_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9299,
+        "height": 7044,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.090"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/15",
+      "type": "canvas",
+      "height": 7619,
+      "width": 9678,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.100r_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 9678,
+        "height": 7619,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.100r"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/16",
+      "type": "canvas",
+      "height": 7625,
+      "width": 8462,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.100v_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 8462,
+        "height": 7625,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.100v"]
+      }
+    },
+    {
+      "uri": "https://codexxolotl.com/iiif-img/22/2/canvas/17",
+      "type": "canvas",
+      "height": 3239,
+      "width": 3746,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/22/2/X.013_VIS",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 3746,
+        "height": 3239,
+        "majorVersion": 3
+      },
+      "label": {
+        "en": ["X.013r"]
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "en": ["Title"]
+      },
+      "value": {
+        "en": ["Codex Xolotl X.010r"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Identifier"]
+      },
+      "value": {
+        "none": ["en"]
+      }
+    }
+  ],
+  "homepage": [
+    {
+      "id": "https://codexxolotl.com",
+      "type": "Text",
+      "label": {
+        "none": ["Codex Xolotl"]
+      },
+      "format": "text/html"
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://dlc.services/iiif-img/22/2/?pretty_print=1",
+      "type": "Dataset",
+      "format": "application/ld+json",
+      "profile": "https://www.w3.org/TR/json-ld/"
+    }
+  ],
+  "summary": {
+    "none": [""]
+  }
+}

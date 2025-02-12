@@ -1,10 +1,10 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import { generateId } from '@allmaps/id'
 
 import { readFromStdin, printString } from '../lib/io.js'
 
-export default function id() {
+export function id() {
   return new Command('id')
     .argument('[urls...]')
     .summary('generate Allmaps IDs from input URLs')
