@@ -12,6 +12,8 @@ import type { SourceState } from '$lib/state/source.svelte.js'
 const API_KEY = Symbol('api')
 
 export class ApiState {
+  #lastSourceUrl: string | undefined
+
   #maps: GeoreferencedMap[] = $state([])
 
   #fetched = $state(false)
@@ -35,6 +37,17 @@ export class ApiState {
       if (sourceState.source) {
         this.#fetchMapsOrCreateSource(sourceState.source)
       }
+
+      $effect(() => {
+        if (
+          sourceState.source &&
+          this.#lastSourceUrl !== sourceState.source?.url
+        ) {
+          this.#fetchMapsOrCreateSource(sourceState.source)
+        }
+
+        this.#lastSourceUrl = sourceState.source?.url
+      })
     })
   }
 
@@ -42,6 +55,7 @@ export class ApiState {
     try {
       this.#maps = await this.#fetchMaps(source)
     } catch {
+      this.#maps = []
       this.#createSource(source)
     } finally {
       this.#fetched = true

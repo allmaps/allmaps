@@ -17,12 +17,13 @@
   // import { env } from '$env/dynamic/public'
   const env = import.meta.env
 
+  export let bannerTextEnabled = env.VITE_BANNER_ENABLED === 'true' || false
   export let bannerText = env.VITE_BANNER_TEXT || ''
   export let bannerBackgroundColor = env.VITE_BANNER_BACKGROUND_COLOR || red
   export let bannerTextColor = env.VITE_BANNER_TEXT_COLOR || 'white'
 </script>
 
-{#if bannerText.length > 0}
+{#if bannerTextEnabled && bannerText.length > 0}
   <div
     class="p-0.5 text-xs text-center"
     style:color={bannerTextColor}
