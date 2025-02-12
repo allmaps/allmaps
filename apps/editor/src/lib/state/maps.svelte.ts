@@ -75,7 +75,14 @@ export class MapsState extends MapsEventTarget {
     }
   })
 
-  #activeGcpId = $derived.by(() => {
+  // Building Allmaps Editor on Render.com leads to this error:
+  //   Cannot assign to derived state:
+  //   this.activeGcpId = gcp.id;
+  // Maybe this is caused by this bug:
+  //   https://github.com/sveltejs/svelte/issues/15273
+  // For now, rename private property.
+  // TODO: When bug is fixed, update Svelte and rename property.
+  #_activeGcpId = $derived.by(() => {
     if (this.#activeMapId) {
       const gcpId = this.#activeGcpIdPerMap[this.#activeMapId]
       if (gcpId && this.#isGcpIdValidForMapId(this.#activeMapId, gcpId)) {
@@ -85,8 +92,8 @@ export class MapsState extends MapsEventTarget {
   })
 
   #activeGcp = $derived.by(() => {
-    if (this.#maps && this.#activeMapId && this.#activeGcpId) {
-      return this.#maps[this.#activeMapId].gcps[this.#activeGcpId]
+    if (this.#maps && this.#activeMapId && this.#_activeGcpId) {
+      return this.#maps[this.#activeMapId].gcps[this.#_activeGcpId]
     }
   })
 
@@ -405,7 +412,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   get activeGcpId(): string | undefined {
-    return this.#activeGcpId
+    return this.#_activeGcpId
   }
 
   set activeGcpId(gcpId: string) {
