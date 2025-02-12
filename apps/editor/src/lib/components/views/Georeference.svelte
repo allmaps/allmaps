@@ -733,8 +733,6 @@
           }
         )
       }
-    } else {
-      console.log('No current image ID!')
     }
   }
 

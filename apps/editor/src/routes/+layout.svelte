@@ -54,7 +54,7 @@
   setViewportsState()
 
   const mapsState = setMapsState(sourceState, errorState)
-  const mapsHistoryState = setMapsHistoryState(mapsState)
+  const mapsHistoryState = setMapsHistoryState(sourceState, mapsState)
   setMapsMergedState(mapsState, mapsHistoryState, apiState)
 
   setScopeState(sourceState)
