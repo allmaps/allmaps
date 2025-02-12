@@ -65,9 +65,13 @@
 
 <div class="flex flex-col items-center gap-4">
   <div
-    id="masks"
-    class="absolute -z-10 top-16 bg-contain bg-no-repeat w-full max-w-5xl h-full"
-  ></div>
+    class="absolute -z-10 top-0 w-full h-full overflow-hidden flex justify-center items-center sm:p-8"
+  >
+    <div
+      id="masks"
+      class="bg-no-repeat w-full max-w-5xl h-full scale-120 sm:scale-150 transition-transform"
+    ></div>
+  </div>
   <section
     class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center bg-no-repeat my-2 sm:my-6"
   >
@@ -112,7 +116,6 @@
 <style scoped>
   #masks {
     background-image: url('$lib/images/masks.svg');
-    background-position: top center;
-    scale: 1.1;
+    background-position: center 0;
   }
 </style>
