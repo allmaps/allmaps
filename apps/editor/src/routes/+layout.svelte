@@ -102,7 +102,9 @@
 <div
   class="absolute w-full h-full grid grid-rows-[min-content_min-content_1fr]"
 >
-  <Banner />
+  <div>
+    <Banner />
+  </div>
 
   {#if isView}
     <Header />
