@@ -15,7 +15,11 @@ import {
   isRemoveInstruction,
   isReplaceInstruction
 } from '$lib/shared/json1-operations.js'
-import { getIncompleteGcps, toDbMap3s } from '$lib/shared/maps.js'
+import {
+  getIncompleteGcps,
+  toDbMap3s,
+  isGcpComplete
+} from '$lib/shared/maps.js'
 import { MapsEvents } from '$lib/shared/maps-events.js'
 
 import { MapsEventTarget } from '$lib/shared/maps-events.js'
@@ -489,7 +493,11 @@ export class MapsState extends MapsEventTarget {
 
     this.#doc.submitOp(insertOp([mapId, 'gcps', gcp.id], gcp))
     this.activeMapId = mapId
-    this.activeGcpId = gcp.id
+
+    // Only set new GCP active when last GCP is complete
+    if (this.activeGcp && isGcpComplete(this.activeGcp)) {
+      this.activeGcpId = gcp.id
+    }
   }
 
   replaceGcp({ mapId, gcp }: ReplaceGcp) {
