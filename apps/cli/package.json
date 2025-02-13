@@ -50,7 +50,7 @@
     "@commander-js/extra-typings": "^13.0.0",
     "commander": "^13.0.0",
     "stream-json": "^1.9.1",
-    "zod-validation-error": "^1.5.0"
+    "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
