@@ -119,6 +119,8 @@ export class SourceState {
   // },
 
   async #load(url: string) {
+    this.#errorState.error = null
+
     try {
       const sourceIiif = await fetchJson(url)
       const parsedIiif = IIIF.parse(sourceIiif)

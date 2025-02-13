@@ -2,6 +2,7 @@
   import { page } from '$app/state'
 
   import { Collection, Thumbnail } from '@allmaps/ui'
+  import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { darkblue } from '@allmaps/tailwind'
 
   import Status from '$lib/components/Status.svelte'
@@ -28,6 +29,18 @@
   function isActive(imageId: string) {
     return imageId === sourceState.activeImageId
   }
+
+  function handleError(err: Error) {
+    console.log('KOEK', err.cause, err.name, err.message, err.stack)
+  }
+
+  async function fetchImageInfo(url: string) {
+    const imageInfo = await imageInfoState.fetchImageInfo(url)
+
+    IIIFImage.parse(imageInfo)
+
+    return imageInfo
+  }
 </script>
 
 <div class="max-w-(--breakpoint-lg) m-auto p-4">
@@ -43,10 +56,10 @@
           class="overflow-hidden bg-white/20 p-2 rounded-lg"
         >
           <div class="relative">
-            <!-- TODO: move to load function -->
-            {#await imageInfoState.fetchImageInfo(image.uri)}
+            <!-- TODO: move to load function? -->
+            {#await fetchImageInfo(image.uri)}
               <div
-                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800"
+                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
               >
                 <p>Loading…</p>
               </div>
@@ -60,7 +73,11 @@
               />
             {:catch error}
               <div>
-                <p class="aspect-square">{error.message}</p>
+                <p
+                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-red-800 text-center"
+                >
+                  Error: {error.message}
+                </p>
               </div>
             {/await}
             <div class="absolute bottom-0 w-full flex justify-end p-2">

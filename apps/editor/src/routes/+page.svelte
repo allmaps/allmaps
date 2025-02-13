@@ -80,10 +80,9 @@
 
       <p class="text-black text-center">
         Find a map from a IIIF-enabled map collection, copy its IIIF URL and
-        paste it below to start georeferencing. You can view maps that are
-        georeferenced with Allmaps in <a
-          href="https://viewer.allmaps.org"
-          class="underline">Allmaps Viewer</a
+        paste it below to start georeferencing. You can view georeferenced maps
+        in <a href="https://viewer.allmaps.org" class="underline"
+          >Allmaps Viewer</a
         > or use them in tools like MapLibre, OpenLayers, Leaflet or QGIS.
       </p>
       <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />

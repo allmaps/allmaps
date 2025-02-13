@@ -9,8 +9,9 @@
 
   import { toGeoreferencedMap, toGeoreferencedMaps } from '$lib/shared/maps.js'
 
-  import Scope from './Scope.svelte'
-  import Copy from '../Copy.svelte'
+  import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
+  import Scope from '$lib/components/drawer/Scope.svelte'
+  import Copy from '$lib/components/Copy.svelte'
 
   const scopeState = getScopeState()
   const mapsState = getMapsState()
@@ -34,15 +35,21 @@
   })
 </script>
 
-<div
-  class="relative rounded-md min-w-0 max-w-(--breakpoint-md) max-h-[50vh] overflow-auto"
->
-  <div class="contents *:overflow-auto *:p-2 *:whitespace-pre-wrap *:break-all">
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html highlight(annotation)}
+{#if scopeState.mapsCountForScope}
+  <div
+    class="relative rounded-md min-w-0 max-w-(--breakpoint-md) max-h-[50vh] overflow-auto"
+  >
+    <div
+      class="contents *:overflow-auto *:p-2 *:whitespace-pre-wrap *:break-all"
+    >
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      {@html highlight(annotation)}
+    </div>
+    <div class="absolute top-0 right-0 p-2">
+      <Copy text={JSON.stringify(annotation, null, 2)} />
+    </div>
   </div>
-  <div class="absolute top-0 right-0 p-2">
-    <Copy text={JSON.stringify(annotation, null, 2)} />
-  </div>
-</div>
+{:else}
+  <StartGeoreferencing />
+{/if}
 <Scope />

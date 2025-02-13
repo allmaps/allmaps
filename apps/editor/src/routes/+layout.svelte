@@ -24,6 +24,7 @@
   import Header from '$lib/components/Header.svelte'
   import Controls from '$lib/components/Controls.svelte'
   import About from '$lib/components/About.svelte'
+  import Error from '$lib/components/Error.svelte'
 
   import type { Snippet } from 'svelte'
 
@@ -42,8 +43,8 @@
     page.route.id && views.map((view) => `/${view}`).includes(page.route.id)
   )
 
-  const urlState = setUrlState(page.url)
   const errorState = setErrorState()
+  const urlState = setUrlState(page.url, errorState)
   setExamplesState()
 
   const uitState = setUiState(urlState)
@@ -55,9 +56,13 @@
 
   const mapsState = setMapsState(sourceState, errorState)
   const mapsHistoryState = setMapsHistoryState(sourceState, mapsState)
-  setMapsMergedState(mapsState, mapsHistoryState, apiState)
+  const mapsMergedState = setMapsMergedState(
+    mapsState,
+    mapsHistoryState,
+    apiState
+  )
 
-  setScopeState(sourceState)
+  setScopeState(sourceState, mapsState, mapsMergedState)
 
   function handleKeypress(event: KeyboardEvent) {
     if (!isView) {
@@ -118,6 +123,8 @@
       <div class="absolute w-full h-full top-0 left-0">
         <Loading />
       </div>
+    {:else if errorState.error}
+      <Error error={errorState.error} />
     {:else}
       <div class="absolute w-full h-full top-0 left-0">
         {@render children()}

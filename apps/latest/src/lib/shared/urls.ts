@@ -14,6 +14,6 @@ export async function getUrls(map: GeoreferencedMap) {
     viewer: `https://viewer.allmaps.org/?url=${encodeURIComponent(
       annotationUrl
     )}&map=${mapId}`,
-    editor: `https://editor.allmaps.org/#/mask?url=${encodeURIComponent(imageUri)}/info.json`
+    editor: `https://editor.allmaps.org/mask?url=${encodeURIComponent(imageUri)}/info.json`
   }
 }

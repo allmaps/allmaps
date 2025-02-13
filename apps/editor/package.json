@@ -67,6 +67,7 @@
     "sharedb": "^5.0.2",
     "sharedb-client-browser": "^5.0.2",
     "shiki": "^1.11.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zod-validation-error": "^3.4.0"
   }
 }
