@@ -10,6 +10,7 @@
     getXyzTilesUrl
   } from '$lib/shared/urls.js'
 
+  import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import Scope from '$lib/components/drawer/Scope.svelte'
   import ExportItem from '$lib/components/ExportItem.svelte'
 
@@ -38,26 +39,30 @@
   })
 </script>
 
-{#if type && allmapsId}
-  <ExportItem
-    url={getViewerUrl(type, allmapsId)}
-    label="View in Allmaps Viewer"
-  />
+{#if scopeState.mapsCountForScope}
+  {#if type && allmapsId}
+    <ExportItem
+      url={getViewerUrl(type, allmapsId)}
+      label="View in Allmaps Viewer"
+    />
 
-  <ExportItem
-    url={getAnnotationUrl(type, allmapsId)}
-    label="Georeference Annotation"
-  />
+    <ExportItem
+      url={getAnnotationUrl(type, allmapsId)}
+      label="Georeference Annotation"
+    />
 
-  <ExportItem
-    url={getGeoJsonUrl(type, allmapsId)}
-    openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(type, allmapsId))}`}
-    label="GeoJSON"
-  />
+    <ExportItem
+      url={getGeoJsonUrl(type, allmapsId)}
+      openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(type, allmapsId))}`}
+      label="GeoJSON"
+    />
 
-  <ExportItem url={getXyzTilesUrl(type, allmapsId)} label="XYZ map tiles" />
+    <ExportItem url={getXyzTilesUrl(type, allmapsId)} label="XYZ map tiles" />
 
-  <!-- TODO: add GeoTIFF script -->
-  <!-- TODO: add code for OpenLayers/Leaflet/MapLibre plugins -->
+    <!-- TODO: add GeoTIFF script -->
+    <!-- TODO: add code for OpenLayers/Leaflet/MapLibre plugins -->
+  {/if}
+{:else}
+  <StartGeoreferencing />
 {/if}
 <Scope />

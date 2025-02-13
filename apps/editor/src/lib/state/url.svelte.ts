@@ -1,6 +1,8 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteURL } from 'svelte/reactivity'
 
+import { ErrorState } from '$lib/state/error.svelte'
+
 import type { ParamKey } from '$lib/types/shared.js'
 
 const URL_KEY = Symbol('url')
@@ -9,6 +11,8 @@ const INITIAL_URL = 'https://allmaps.org'
 
 export class UrlState {
   #url = new SvelteURL(INITIAL_URL)
+
+  #errorState: ErrorState
 
   #urlParam = $derived(this.#getParam('url'))
 
@@ -30,8 +34,9 @@ export class UrlState {
     this.#bboxParam?.split(',').map((value) => parseFloat(value))
   )
 
-  constructor(url: URL) {
+  constructor(url: URL, errorState: ErrorState) {
     this.#url = new SvelteURL(url)
+    this.#errorState = errorState
   }
 
   #getParam(key: ParamKey) {
@@ -39,6 +44,7 @@ export class UrlState {
   }
 
   updateUrl(url: URL) {
+    this.#errorState.error = null
     this.#url.href = url.href
   }
 
@@ -75,8 +81,8 @@ export class UrlState {
   }
 }
 
-export function setUrlState(url: URL) {
-  return setContext(URL_KEY, new UrlState(url))
+export function setUrlState(url: URL, errorState: ErrorState) {
+  return setContext(URL_KEY, new UrlState(url, errorState))
 }
 
 export function getUrlState() {

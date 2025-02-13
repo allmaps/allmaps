@@ -6,11 +6,15 @@ export class ErrorState {
   #error = $state<Error | null>(null)
 
   set error(error: unknown) {
-    console.error('Error:', error)
-    if (error instanceof Error) {
-      this.#error = error
+    if (error) {
+      console.error('Error:', error)
+      if (error instanceof Error) {
+        this.#error = error
+      } else {
+        this.#error = new Error('Unknown error')
+      }
     } else {
-      this.#error = new Error('Unknown error')
+      this.#error = null
     }
   }
 
