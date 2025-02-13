@@ -95,7 +95,7 @@
   }
 
   function getEditorUrl(feature: MapGeoJSONFeature) {
-    return `https://editor.allmaps.org/?#/collection?url=${encodeURIComponent(feature.properties.resourceId)}/info.json`
+    return `https://editor.allmaps.org/images?url=${encodeURIComponent(feature.properties.resourceId)}/info.json`
   }
 
   function handleGeocoderSelect(event: CustomEvent) {
