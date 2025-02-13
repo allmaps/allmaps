@@ -2,12 +2,12 @@ import { distance, rms } from '@allmaps/stdlib'
 
 import type { Point } from '@allmaps/types'
 
-import type { TransformationType } from './shared/types.js'
+import type { TransformationType } from '../shared/types.js'
 
 /**
  * Transformation class. Abstract class, extended by the various transformations.
  */
-export abstract class Transformation {
+export abstract class BaseTransformation {
   sourcePoints: Point[]
   destinationPoints: Point[]
 

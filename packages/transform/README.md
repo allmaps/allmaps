@@ -396,21 +396,21 @@ const gcps6 = ... // See above
 
 // Obtain the referenceScale
 const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
-const forwardHelmertTransformation = helmertTransformer.getForwardTransformation() as Helmert
-const referenceScale = forwardHelmertTransformation.scale as number
+const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
+const referenceScale = toGeoHelmertTransformation.scale
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 const input = [1000, 1000]
-const distortion = transformer.transformForward(
-        input,
-        {
-          distortionMeasures: ['log2sigma'],
-          referenceScale
-        },
-        (generalGcp) => generalGcp.distortions.get('log2sigma')
-      )
-// distortion = 1.7800137112938559
-// => At this input location the area has significantly expanded after the transformation
+transformer.transformToGeo(
+    input,
+    {
+      distortionMeasures: ['log2sigma'],
+      referenceScale
+    },
+    (gcpAndDistortions) => gcpAndDistortions.distortions.get('log2sigma')
+)
+// distortion = -0.2140907145956012
+// => At this input location the area has slightly contracted after the transformation
 ```
 
 ### Return Type Function
@@ -540,62 +540,24 @@ Create a GcpTransformer
 
 ###### Parameters
 
-* `gcps` (`Array<GeneralGcp> | Array<Gcp>`)
+* `gcps` (`Array<Gcp>`)
   * An array of Ground Control Points (GCPs)
 * `type` (`TransformationType | undefined`)
   * The transformation type
 * `options?` (`Partial<TransformOptions> | undefined`)
+  * Partial transform options
 
 ###### Returns
 
 `GcpTransformer`.
 
-### `GcpTransformer#backwardTransformation?`
+###### Extends
 
-###### Type
+* `BaseGcpTransformer`
 
-```ts
-Transformation
-```
+### `GcpTransformer#getToGeoTransformation()`
 
-### `GcpTransformer#computeTransformation(sourcePoints, destinationPoints)`
-
-###### Parameters
-
-* `sourcePoints` (`Array<Point>`)
-* `destinationPoints` (`Array<Point>`)
-
-###### Returns
-
-`Transformation`.
-
-### `GcpTransformer#destinationPoints`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
-### `GcpTransformer#forwardTransformation?`
-
-###### Type
-
-```ts
-Transformation
-```
-
-### `GcpTransformer#gcps`
-
-###### Type
-
-```ts
-Array<GeneralGcp>
-```
-
-### `GcpTransformer#getBackwardTransformation()`
-
-Get backward transformation. Create if it doesn't exist yet.
+Get the forward transformation. Create if it doesn't exist yet.
 
 ###### Parameters
 
@@ -603,11 +565,36 @@ There are no parameters.
 
 ###### Returns
 
-`Transformation`.
+`BaseTransformation`.
 
-### `GcpTransformer#getForwardTransformation()`
+### `GcpTransformer#getToGeoTransformationResolution(resourceBbox, partialTransformOptions)`
 
-Get forward transformation. Create if it doesn't exist yet.
+Get the resolution of the toGeo transformation in resource space, within a given bbox.
+
+This informs you in how fine the warping is, in resource space.
+It can be useful e.g. to create a triangulation in resource space
+that is fine enough for this warping.
+
+It is obtained by transforming toGeo two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The toGeo transformation will refine these lines:
+it will break then in small enough pieces to obtain a near continous result.
+Returned in the lenght of the shortest piece, measured in resource coordinates.
+
+###### Parameters
+
+* `resourceBbox` (`[number, number, number, number]`)
+  * BBox in resource space where the resolution is requested
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+  * extra parameters to consider
+
+###### Returns
+
+`number | undefined`.
+
+### `GcpTransformer#getToResourceTransformation()`
+
+Get the backward transformation. Create if it doesn't exist yet.
 
 ###### Parameters
 
@@ -615,57 +602,32 @@ There are no parameters.
 
 ###### Returns
 
-`Transformation`.
+`BaseTransformation`.
 
-### `GcpTransformer#options`
+### `GcpTransformer#getToResourceTransformationResolution(geoBbox, partialTransformOptions)`
 
-###### Type
+Get the resolution of the toResource transformation in geo space, within a given bbox.
 
-```ts
-{
-  minOffsetRatio: number
-  minOffsetDistance: number
-  minLineDistance: number
-  maxDepth: number
-  sourceIsGeographic: boolean
-  destinationIsGeographic: boolean
-  differentHandedness: boolean
-  distortionMeasures: DistortionMeasure[]
-  referenceScale: number
-} & ConversionOptions
-```
+This informs you in how fine the warping is, in geo space.
+It can be useful e.g. to create a triangulation in geo space
+that is fine enough for this warping.
 
-### `GcpTransformer#sourcePoints`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
-### `GcpTransformer#transformBackward(point, options, generalGcpToP)`
+It is obtained by transforming toResource two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The toResource transformation will refine these lines:
+it will break then in small enough pieces to obtain a near continous result.
+Returned in the lenght of the shortest piece, measured in geo coordinates.
 
 ###### Parameters
 
-* `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
+* `geoBbox` (`[number, number, number, number]`)
+  * BBox in geo space where the resolution is requested
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+  * extra parameters to consider
 
 ###### Returns
 
-`P`.
-
-### `GcpTransformer#transformForward(point, options, generalGcpToP)`
-
-###### Parameters
-
-* `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
-* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
-
-###### Returns
-
-`P`.
+`number | undefined`.
 
 ### `GcpTransformer#transformToGeo(point, options, gcpToP)`
 
@@ -691,24 +653,9 @@ Array<Point>
 
 `P`.
 
-### `GcpTransformer#type`
-
-###### Type
-
-```ts
-  | 'straight'
-  | 'helmert'
-  | 'polynomial'
-  | 'polynomial1'
-  | 'polynomial2'
-  | 'polynomial3'
-  | 'projective'
-  | 'thinPlateSpline'
-```
-
 ### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, options)`
 
-Transforms a GeoJSON FeatureCollection to resource space to a SVG string
+Transform a GeoJSON FeatureCollection to resource space to a SVG string
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
 Note: Multi-geometries are not supported
@@ -728,7 +675,7 @@ Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`
 
 ### `GcpTransformer.transformGeojsonToSvg(transformer, geojsonGeometry, options)`
 
-Transforms a GeoJSON Geometry to resource space to a SVG geometry
+Transform a GeoJSON Geometry to resource space to a SVG geometry
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
 Note: Multi-geometries are not supported
@@ -753,7 +700,7 @@ Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle 
 
 ### `GcpTransformer.transformSvgStringToGeojsonFeatureCollection(transformer, svg, options)`
 
-Transforms an SVG string to geo space to a GeoJSON FeatureCollection
+Transform an SVG string to geo space to a GeoJSON FeatureCollection
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
 Note: Multi-geometries are not supported
@@ -773,7 +720,7 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 
 ### `GcpTransformer.transformSvgToGeojson(transformer, svgCircle, options)`
 
-Transforms a SVG geometry to geo space as a GeoJSON Geometry
+Transform an SVG geometry to geo space as a GeoJSON Geometry
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
 Note: Multi-geometries are not supported
@@ -805,6 +752,125 @@ Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Poi
 GeneralGcp & Partial<Distortions>
 ```
 
+### `new GeneralGcpTransformer(generalGcps, type, options)`
+
+Create a GeneralGcpTransformer
+
+###### Parameters
+
+* `generalGcps` (`Array<GeneralGcp>`)
+  * An array of General Ground Control Points (GCPs)
+* `type` (`TransformationType | undefined`)
+  * The transformation type
+* `options?` (`Partial<TransformOptions> | undefined`)
+  * Partial transform options
+
+###### Returns
+
+`GeneralGcpTransformer`.
+
+###### Extends
+
+* `BaseGcpTransformer`
+
+### `GeneralGcpTransformer#getBackwardTransformation()`
+
+Get the backward transformation. Create if it doesn't exist yet.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`BaseTransformation`.
+
+### `GeneralGcpTransformer#getBackwardTransformationResolution(destinationBbox, partialTransformOptions)`
+
+Get the resolution of the backward transformation in destination space, within a given bbox.
+
+This informs you in how fine the warping is, in destination space.
+It can be useful e.g. to create a triangulation in destination space
+that is fine enough for this warping.
+
+It is obtained by transforming backward two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The backward transformation will refine these lines:
+it will break then in small enough pieces to obtain a near continous result.
+Returned in the lenght of the shortest piece, measured in destination coordinates.
+
+###### Parameters
+
+* `destinationBbox` (`[number, number, number, number]`)
+  * BBox in destination space where the resolution is requested
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+  * extra parameters to consider
+
+###### Returns
+
+`number | undefined`.
+
+### `GeneralGcpTransformer#getForwardTransformation()`
+
+Get the forward transformation. Create if it doesn't exist yet.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`BaseTransformation`.
+
+### `GeneralGcpTransformer#getForwardTransformationResolution(sourceBbox, partialTransformOptions)`
+
+Get the resolution of the forward transformation in source space, within a given bbox.
+
+This informs you in how fine the warping is, in source space.
+It can be useful e.g. to create a triangulation in source space
+that is fine enough for this warping.
+
+It is obtained by transforming forward two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The forward transformation will refine these lines:
+it will break then in small enough pieces to obtain a near continous result.
+Returned in the lenght of the shortest piece, measured in source coordinates.
+
+###### Parameters
+
+* `sourceBbox` (`[number, number, number, number]`)
+  * BBox in source space where the resolution is requested
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+  * extra parameters to consider
+
+###### Returns
+
+`number | undefined`.
+
+### `GeneralGcpTransformer#transformBackward(point, options, generalGcpToP)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
+
+###### Returns
+
+`P`.
+
+### `GeneralGcpTransformer#transformForward(point, options, generalGcpToP)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `options?` (`Partial<TransformOptions> | undefined`)
+* `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
+
+###### Returns
+
+`P`.
+
 ### `new Helmert(sourcePoints, destinationPoints)`
 
 ###### Parameters
@@ -818,7 +884,7 @@ GeneralGcp & Partial<Distortions>
 
 ###### Extends
 
-* `Transformation`
+* `BaseTransformation`
 
 ### `Helmert#evaluateFunction(newSourcePoint)`
 
@@ -927,7 +993,7 @@ number
 
 ###### Extends
 
-* `Transformation`
+* `BaseTransformation`
 
 ### `Polynomial#evaluateFunction(newSourcePoint)`
 
@@ -1036,7 +1102,7 @@ number
 
 ###### Extends
 
-* `Transformation`
+* `BaseTransformation`
 
 ### `Projective#evaluateFunction(newSourcePoint)`
 
@@ -1100,7 +1166,7 @@ Matrix
 
 ###### Extends
 
-* `Transformation`
+* `BaseTransformation`
 
 ### `RBF#affineWeights`
 
@@ -1224,7 +1290,7 @@ SplitGcpLineInfo & {
 
 ###### Extends
 
-* `Transformation`
+* `BaseTransformation`
 
 ### `Straight#destinationPointsCenter`
 
@@ -1294,146 +1360,16 @@ number
 
 ```ts
 {
+  maxDepth: number
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
-  maxDepth: number
   sourceIsGeographic: boolean
   destinationIsGeographic: boolean
   differentHandedness: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
 } & ConversionOptions
-```
-
-### `new Transformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
-
-Create a transformation
-
-###### Parameters
-
-* `sourcePoints` (`Array<Point>`)
-  * The source points
-* `destinationPoints` (`Array<Point>`)
-  * The destination points
-* `type` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'projective'
-    | 'thinPlateSpline'`)
-  * The transformation type
-* `pointCountMinimum` (`number`)
-  * The minimum number of points for the transformation type
-
-###### Returns
-
-`Transformation`.
-
-### `Transformation#computeDestinationTransformedSourcePoints()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Array<Point>`.
-
-### `Transformation#destinationPoints`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
-### `Transformation#destinationTransformedSourcePoints?`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
-### `Transformation#errors`
-
-###### Type
-
-```ts
-Array<number>
-```
-
-### `Transformation#evaluateFunction(_newSourcePoint)`
-
-###### Parameters
-
-* `_newSourcePoint` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `Transformation#evaluatePartialDerivativeX(_newSourcePoint)`
-
-###### Parameters
-
-* `_newSourcePoint` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `Transformation#evaluatePartialDerivativeY(_newSourcePoint)`
-
-###### Parameters
-
-* `_newSourcePoint` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `Transformation#pointCount`
-
-###### Type
-
-```ts
-number
-```
-
-### `Transformation#pointCountMinimum`
-
-###### Type
-
-```ts
-number
-```
-
-### `Transformation#rmse`
-
-###### Type
-
-```ts
-number
-```
-
-### `Transformation#sourcePoints`
-
-###### Type
-
-```ts
-Array<Point>
-```
-
-### `Transformation#type`
-
-###### Type
-
-```ts
-string
 ```
 
 ### `TransformationType`
@@ -1452,6 +1388,20 @@ Transformation type.
   | 'projective'
   | 'thinPlateSpline'
 ```
+
+### `TransformerInputs`
+
+###### Fields
+
+* `gcps` (`Array<Gcp>`)
+* `transformationType` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'`)
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 
@@ -1472,17 +1422,20 @@ Compute the distortion value of selected distortion measures from the partial de
 
 A map of distortion measures and distortion values at the point (`Map<DistortionMeasure, number>`).
 
-### `getForwardTransformResolution(bbox, transformer, partialTransformOptions)`
+### `defaultTransformOptions`
 
-###### Parameters
+###### Fields
 
-* `bbox` (`[number, number, number, number]`)
-* `transformer` (`GcpTransformer`)
-* `partialTransformOptions` (`{ minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; maxDepth?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
-
-###### Returns
-
-`number | undefined`.
+* `destinationIsGeographic` (`false`)
+* `differentHandedness` (`false`)
+* `distortionMeasures` (`Array<never>`)
+* `isMultiGeometry` (`false`)
+* `maxDepth` (`number`)
+* `minLineDistance` (`number`)
+* `minOffsetDistance` (`number`)
+* `minOffsetRatio` (`number`)
+* `referenceScale` (`number`)
+* `sourceIsGeographic` (`false`)
 
 ### `supportedDistortionMeasures`
 

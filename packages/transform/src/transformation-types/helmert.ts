@@ -1,10 +1,10 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import { Transformation } from '../transformation.js'
+import { BaseTransformation } from './base-transformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export class Helmert extends Transformation {
+export class Helmert extends BaseTransformation {
   helmertParametersMatrix: Matrix
   helmertParameters: number[]
 

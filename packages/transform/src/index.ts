@@ -1,6 +1,5 @@
-export { GcpTransformer } from './transformer.js'
-
-export { Transformation } from './transformation.js'
+export { GcpTransformer } from './transformers/GcpTransformer.js'
+export { GeneralGcpTransformer } from './transformers/GeneralGcpTransformer.js'
 
 export { Helmert } from './transformation-types/helmert.js'
 export { Polynomial } from './transformation-types/polynomial.js'
@@ -13,11 +12,7 @@ export {
   computeDistortionsFromPartialDerivatives
 } from './distortion.js'
 
-export {
-  defaultTransformOptions,
-  getForwardTransformResolution
-  //   getBackwardTransformResolution
-} from './shared/transform-helper-functions.js'
+export { defaultTransformOptions } from './shared/transform-helper-functions.js'
 
 // export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
 

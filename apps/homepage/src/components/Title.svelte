@@ -166,7 +166,7 @@
           pixelScreenSize[1] * projectedGeoToPixelScale
       ]
 
-      const resourceScreenRectangle = projectedTransformer.transformBackward([
+      const resourceScreenRectangle = projectedTransformer.transformToResource([
         bboxToRectangle(projectedGeoScreenBbox)
       ])
       const geoScreenRectangle = transformer.transformForward(

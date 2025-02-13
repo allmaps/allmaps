@@ -1,6 +1,5 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { triangulateToUnique } from '@allmaps/triangulate'
-import { getForwardTransformResolution } from '@allmaps/transform'
 import {
   mixNumbers,
   mixPoints,
@@ -223,9 +222,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // Get resolution from transform
     const resourceResolution =
       DEFAULT_RESOURCE_RESOLUTION ||
-      getForwardTransformResolution(
+      this.projectedTransformer.getToGeoTransformationResolution(
         this.resourceMaskBbox,
-        this.projectedTransformer,
         {}
       )
 

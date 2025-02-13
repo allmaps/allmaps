@@ -223,9 +223,9 @@ function shouldSplitGcpLine(
   )
 }
 
-// Get refinement source resolution
+// Get source refinement resolution
 
-export function getRefinementSourceResolution(
+export function getSourceRefinementResolution(
   sourceBbox: Bbox,
   refinementFunction: (p: Point) => Point,
   refinementOptions: RefinementOptions

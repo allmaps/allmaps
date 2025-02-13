@@ -37,7 +37,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
 
   it(`should transform the lineString (without closing) and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -67,7 +67,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
 
   it(`should transform the lineString (without closing) and add all midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -96,7 +96,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
 
   it(`should transform the lineString (without closing) and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -125,7 +125,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minL
 
   it(`should transform the lineString (without closing) and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -153,7 +153,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and inpu
 
   it(`should give the same result as with input as GeneralGCP`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -181,7 +181,7 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and dest
 
   it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -206,7 +206,7 @@ describe('Transform LineString Backward To LineString of horizontal line, with m
 
   it(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -232,7 +232,7 @@ describe('Transform LineString Backward To LineString of horizontal line, with d
 
   it(`should transform the lineString (without closing) and add two layers of midpoints, with slighly different locations since midpoints computed geographically`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -256,7 +256,7 @@ describe('Transform LineString Backward To LineString of vertical line, with des
 
   it(`should transform the lineString (without closing) and add no midpoints`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -282,7 +282,7 @@ describe('Transform LineString Backward To LineString, with destinationIsGeograp
 
   it(`should give almost the same result as transforming from lineString, since the geographic distance and midpoint functions are used`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -304,7 +304,7 @@ describe('Transform MultiPoint Backward To MultiPoint', async () => {
 
   it(`should recognise multi geometry and transform the points piecewise, not considering the input as lineString, and hence not add midpoints and ignore lineString options`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -339,7 +339,7 @@ describe('Transform Polygon Forward to polygon, with minOffsetRatio very small',
 
   it(`should transform the polygon (without closing) and add midpoints everywhere, including between first and last point`, () => {
     expectToBeCloseToArrayArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -379,7 +379,7 @@ describe('Transform Polygon Forward to polygon, with minOffsetRatio very small, 
   it(`should give the same result as transforming to polygon, but as GeoJSON Polygon and therefore closed`, () => {
     expect(
       geometryToGeojsonGeometry(
-        transformer.transformForward(input, transformOptions)
+        transformer.transformToGeo(input, transformOptions)
       )
     ).to.deep.equal(output)
   })
@@ -416,7 +416,7 @@ describe('Transform unconformed Polygon forward to polygon, with minOffsetRatio 
 
   it(`should accept this unconformed input too and give the same result as transforming to polygon`, () => {
     expectToBeCloseToArrayArrayArray(
-      transformer.transformForward(input, transformOptions),
+      transformer.transformToGeo(input, transformOptions),
       output
     )
   })
@@ -451,7 +451,7 @@ describe('Transform Polygon Backward To Polygon, with minOffsetRatio very small'
 
   it(`should transform the polygon (without closing) and add midpoints everywhere, including on between first and last point`, () => {
     expectToBeCloseToArrayArrayArray(
-      transformer.transformBackward(input, transformOptions),
+      transformer.transformToResource(input, transformOptions),
       output
     )
   })
@@ -490,7 +490,7 @@ describe('Transform Polygon Backward To Polygon, with minOffsetRatio very small'
 
     it(`should give the same result as transforming from geojson polygon`, () => {
       expect(
-        transformer.transformBackward(input, transformOptions)
+        transformer.transformToResource(input, transformOptions)
       ).to.deep.equal(output)
     })
   })
@@ -551,10 +551,10 @@ describe('Transform LineString Forward To LineString, with reading out the sourc
 
   it(`should give the same result as with normal, but return the corresponding points in the source domain`, () => {
     expectToBeCloseToArrayArray(
-      transformer.transformForward(
+      transformer.transformToGeo(
         input,
         transformOptions,
-        (generalGcp) => generalGcp.source
+        (gcp) => gcp.resource
       ),
       output
     )

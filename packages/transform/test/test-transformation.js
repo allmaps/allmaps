@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
 import { expectToBeCloseToArray } from '../../stdlib/test/helper-functions.js'
-import { GcpTransformer } from '../dist/index.js'
+import { GcpTransformer, GeneralGcpTransformer } from '../dist/index.js'
 
 import {
   gcps3,
@@ -12,66 +12,65 @@ import {
 } from './input/gcps-test.js'
 
 describe('Helmert transformation', async () => {
-  const transformer = new GcpTransformer(generalGcps3Identity, 'helmert')
+  const generalTransformer = new GeneralGcpTransformer(
+    generalGcps3Identity,
+    'helmert'
+  )
   const input = [1, 1]
   const output = [1, 1]
 
   it(`should do an identity transform if input and output coordinates are the same`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(generalTransformer.transformForward(input), output)
   })
 })
 
-describe('Helmert transformation with different handeness', async () => {
-  const transformer = new GcpTransformer(gcps3, 'helmert', {
-    differentHandedness: true
-  })
+describe('Helmert transformation', async () => {
+  const transformer = new GcpTransformer(gcps3, 'helmert')
   const input = [100, 100]
   // from custom test using https://github.com/mclaeysb/distortionAnalysis/blob/master/functions/helmert.m
   const output = [4.925027120153211, 52.46506809004473]
 
-  it(`should have the same output as distortionAnalysis Helmert, and respect different handedness`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+  it(`should have the same output as distortionAnalysis Helmert, and respect different handedness automatically`, () => {
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
 describe('Helmert transformation with different handeness only specified in transformation', async () => {
-  const transformer = new GcpTransformer(gcps3, 'helmert')
+  const transformer = new GcpTransformer(gcps3, 'helmert', {
+    differentHandedness: false
+  })
   const input = [100, 100]
   const output = [4.925027120153211, 52.46506809004473]
 
   it(`should have the wrong output since handedness should be specified when building transformer`, () => {
     expect(
-      transformer.transformForward(input, {
+      transformer.transformToGeo(input, {
         differentHandedness: true
       })[0]
     ).to.not.be.approximately(output[0], 0.00001)
   })
 })
 
-describe('Helmert backward transformation with different handeness', async () => {
-  const transformer = new GcpTransformer(gcps3, 'helmert', {
-    differentHandedness: true
-  })
+describe('Helmert backward transformation', async () => {
+  const transformer = new GcpTransformer(gcps3, 'helmert')
   const input = [4.925027120153211, 52.46506809004473]
   const output = [146.25183291709982, 122.59989116975339]
 
-  it(`should have the correct output, and respect different handedness`, () => {
-    expectToBeCloseToArray(transformer.transformBackward(input), output)
+  it(`should have the correct output, and respect different handedness automatically`, () => {
+    expectToBeCloseToArray(transformer.transformToResource(input), output)
   })
 })
 
-describe('Helmert backward transformation with different handeness and flipped y axis', async () => {
-  const transformer = new GcpTransformer(gcps3, 'helmert', {
-    differentHandedness: true
-  })
+describe('Helmert backward transformation with flipped y axis', async () => {
+  const transformer = new GcpTransformer(gcps3, 'helmert')
   const input = [4.925027120153211, 52.46506809004473]
   const output = [146.25183291709982, -122.59989116975339]
 
-  it(`should have the correct output with flipped y axis, and respect different handedness`, () => {
+  it(`should have the correct output with flipped y axis, and respect different handedness automatically`, () => {
     expectToBeCloseToArray(
-      transformer.transformBackward(input, {}, (generalGcp) => [
-        generalGcp.source[0],
-        -generalGcp.source[1]
+      transformer.transformToResource(input, {}, (gcp) => [
+        gcp.resource[0],
+        -gcp.resource[1]
       ]),
       output
     )
@@ -79,22 +78,28 @@ describe('Helmert backward transformation with different handeness and flipped y
 })
 
 describe('Polynomial transformation', async () => {
-  const transformer = new GcpTransformer(generalGcps3Polynomial, 'polynomial')
+  const generalTransformer = new GeneralGcpTransformer(
+    generalGcps3Polynomial,
+    'polynomial'
+  )
   const input = [1, 1]
   const output = [6, 14]
 
   it(`should do a polynomial transform`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(generalTransformer.transformForward(input), output)
   })
 })
 
 describe('Polynomial Backward transformation', async () => {
-  const transformer = new GcpTransformer(generalGcps3Polynomial, 'polynomial')
+  const generalTransformer = new GeneralGcpTransformer(
+    generalGcps3Polynomial,
+    'polynomial'
+  )
   const input = [6, 14]
   const output = [1, 1]
 
   it(`should do a roundtrip backward polynomial transform since there are exactly three GCPs`, () => {
-    expectToBeCloseToArray(transformer.transformBackward(input), output)
+    expectToBeCloseToArray(generalTransformer.transformBackward(input), output)
   })
 })
 
@@ -106,7 +111,7 @@ describe('Polynomial transformation, order 1', async () => {
   const output = [4.92079391286352, 52.4654946986157]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
@@ -118,7 +123,7 @@ describe('Polynomial transformation, order 2', async () => {
   const output = [4.36596042386853, 51.9550430503008]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
@@ -130,7 +135,7 @@ describe('Polynomial transformation, order 3', async () => {
   const output = [-1.34357085609956, 49.7913344676161]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
@@ -140,7 +145,7 @@ describe('Projective transformation', async () => {
   const output = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
 
   it(`should have the same output as (TODO: check reference)`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
@@ -152,29 +157,28 @@ describe('Thin plate spline transformation', async () => {
   const output = [4.38895777703007, 51.9590841915719]
 
   it(`should have the same output as running GDAL's gdaltransform`, () => {
-    expectToBeCloseToArray(transformer.transformForward(input), output)
+    expectToBeCloseToArray(transformer.transformToGeo(input), output)
   })
 })
 
 describe('Thin plate spline transformation distortion', async () => {
   const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
-  const forwardHelmertTransformation =
-    helmertTransformer.getForwardTransformation()
-  const referenceScale = forwardHelmertTransformation.scale
+  const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
+  const referenceScale = toGeoHelmertTransformation.scale
 
   const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const input = [1000, 1000]
-  const output = 1.7800137112938559
+  const output = -0.2140907145956012
 
   it(`should be able to compute distortion`, () => {
     expect(
-      transformer.transformForward(
+      transformer.transformToGeo(
         input,
         {
           distortionMeasures: ['log2sigma'],
           referenceScale
         },
-        (generalGcp) => generalGcp.distortions.get('log2sigma')
+        (gcpAndDistortions) => gcpAndDistortions.distortions.get('log2sigma')
       )
     ).to.equal(output)
   })

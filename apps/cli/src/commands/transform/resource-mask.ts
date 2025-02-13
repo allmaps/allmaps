@@ -43,7 +43,7 @@ export function resourceMask() {
         transformationType,
         partialTransformOptions
       )
-      const polygon = transformer.transformForward([map.resourceMask])
+      const polygon = transformer.transformToGeo([map.resourceMask])
       const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       features.push(

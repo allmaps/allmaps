@@ -11,12 +11,7 @@ import {
   arrayRepeated,
   bboxToDiameter
 } from '@allmaps/stdlib'
-import {
-  GcpTransformer,
-  Helmert,
-  Polynomial,
-  Transformation
-} from '@allmaps/transform'
+import { GcpTransformer, Helmert, Polynomial } from '@allmaps/transform'
 import { AnalysisItem, Distortions, Measures } from './shared/types'
 
 const MAX_SHEAR = 0.1
@@ -351,15 +346,17 @@ export default class Analyser<W extends WarpedMap> {
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
 
-    const forwardPolynomialTransformation =
-      projectedPolynomialTransformer.getForwardTransformation() as Polynomial
-    measures.polynomialRmse = forwardPolynomialTransformation.rmse
+    const toProjectedGeoPolynomialTransformation =
+      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
+    measures.polynomialRmse = toProjectedGeoPolynomialTransformation.rmse
     measures.polynomialParameters =
-      forwardPolynomialTransformation.polynomialParameters
-    measures.polynomialScale = forwardPolynomialTransformation.scale
-    measures.polynomialRotation = forwardPolynomialTransformation.rotation
-    measures.polynomialShear = forwardPolynomialTransformation.shear
-    measures.polynomialTranslation = forwardPolynomialTransformation.translation
+      toProjectedGeoPolynomialTransformation.polynomialParameters
+    measures.polynomialScale = toProjectedGeoPolynomialTransformation.scale
+    measures.polynomialRotation =
+      toProjectedGeoPolynomialTransformation.rotation
+    measures.polynomialShear = toProjectedGeoPolynomialTransformation.shear
+    measures.polynomialTranslation =
+      toProjectedGeoPolynomialTransformation.translation
 
     // Helmert
     const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
@@ -371,31 +368,33 @@ export default class Analyser<W extends WarpedMap> {
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
 
-    const forwardHelmertTransformation =
-      projectedHelmertTransformer.getForwardTransformation() as Helmert
+    const toProjectedGeoHelmertTransformation =
+      projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    measures.helmertRmse = forwardHelmertTransformation.rmse
-    measures.helmertParameters = forwardHelmertTransformation.helmertParameters
-    measures.helmertScale = forwardHelmertTransformation.scale
-    measures.helmertRotation = forwardHelmertTransformation.rotation
-    measures.helmertTranslation = forwardHelmertTransformation.translation
+    measures.helmertRmse = toProjectedGeoHelmertTransformation.rmse
+    measures.helmertParameters =
+      toProjectedGeoHelmertTransformation.helmertParameters
+    measures.helmertScale = toProjectedGeoHelmertTransformation.scale
+    measures.helmertRotation = toProjectedGeoHelmertTransformation.rotation
+    measures.helmertTranslation =
+      toProjectedGeoHelmertTransformation.translation
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
-    const forwardTransformation =
-      projectedTransformer.getForwardTransformation() as Transformation
-    measures.rmse = forwardTransformation.rmse
-    measures.destinationErrors = forwardTransformation.errors
+    const toProjectedGeoTransformation =
+      projectedTransformer.getToGeoTransformation()
+    measures.rmse = toProjectedGeoTransformation.rmse
+    measures.destinationErrors = toProjectedGeoTransformation.errors
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    measures.resourceErrors = forwardTransformation.errors.map(
-      (error) => error / forwardHelmertTransformation.scale
+    measures.resourceErrors = toProjectedGeoTransformation.errors.map(
+      (error) => error / toProjectedGeoHelmertTransformation.scale
     )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
-    measures.resourceRelativeErrors = forwardTransformation.errors.map(
+    measures.resourceRelativeErrors = toProjectedGeoTransformation.errors.map(
       (error) =>
         error /
-        (forwardHelmertTransformation.scale *
+        (toProjectedGeoHelmertTransformation.scale *
           bboxToDiameter(this.warpedMap.resourceMaskBbox))
     )
 

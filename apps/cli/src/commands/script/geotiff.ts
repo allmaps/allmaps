@@ -97,7 +97,7 @@ export function geotiff() {
       }
 
       const transformer = new GcpTransformer(gcps, transformationType)
-      const polygon = transformer.transformForward(
+      const polygon = transformer.transformToGeo(
         [map.resourceMask],
         partialTransformOptions
       )

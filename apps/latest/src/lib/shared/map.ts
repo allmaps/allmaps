@@ -37,7 +37,7 @@ export function getDisplayMap(
           map.transformation?.type
         )
 
-        const polygon = transformer.transformForward([map.resourceMask])
+        const polygon = transformer.transformToGeo([map.resourceMask])
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of

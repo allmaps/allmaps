@@ -116,7 +116,7 @@
         geolocationPositionToGeojsonFeature(geolocationPosition).geometry
       )
       if (positionFeature) {
-        const resourcePosition = transformer.transformBackward(geoPosition)
+        const resourcePosition = transformer.transformToResource(geoPosition)
         positionFeature.setGeometry(new Point(flipY(resourcePosition)))
       }
     }

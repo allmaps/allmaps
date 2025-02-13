@@ -345,9 +345,9 @@ export class WarpedMap extends EventTarget {
           DEFAULT_TRANSFORMER_OPTIONS
         )
     )
-    const forwardHelmertTransformation =
-      projectedHelmertTransformer.getForwardTransformation() as Helmert
-    return forwardHelmertTransformation.scale as number
+    const toProjectedGeoHelmertTransformation =
+      projectedHelmertTransformer.getToGeoTransformation() as Helmert
+    return toProjectedGeoHelmertTransformation.scale as number
   }
 
   /**
