@@ -74,7 +74,7 @@
             {:catch error}
               <div>
                 <p
-                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-red-800 text-center"
+                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
                 >
                   Error: {error.message}
                 </p>
