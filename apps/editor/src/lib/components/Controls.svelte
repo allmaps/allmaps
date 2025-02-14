@@ -30,7 +30,7 @@
 
 <div class="w-full h-full flex flex-col items-center p-2 gap-2">
   <nav
-    class="p-1 z-10 grid grid-cols-[1fr_min-content_1fr_min-content_1fr_min-content_1fr] rounded-lg font-semibold bg-white gap-2"
+    class="p-1 z-10 grid grid-cols-[1fr_min-content_1fr_min-content_1fr_min-content_1fr] rounded-lg shadow-md font-semibold bg-white gap-2"
   >
     <a
       href={createRouteUrl(page, 'images', {

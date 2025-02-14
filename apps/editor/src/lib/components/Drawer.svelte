@@ -38,7 +38,7 @@
 
 <!-- TODO: create snippet for buttons -->
 <div
-  class="shrink min-w-0 max-w-(--breakpoint-sm) max-h-full bg-white rounded-md p-2 gap-2 flex flex-col"
+  class="shrink min-w-0 max-w-(--breakpoint-sm) max-h-full bg-white rounded-md shadow-md p-2 gap-2 flex flex-col"
 >
   {#if value}
     <div

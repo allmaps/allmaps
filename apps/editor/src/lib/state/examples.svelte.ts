@@ -16,6 +16,7 @@ export class ExamplesState {
   )
 
   async fetchExamples(organizationId: string, count: number) {
+    // TODO: parse with Zod
     const fetchedExamples = (await fetch(
       `${PUBLIC_EXAMPLES_API_URL}/?org=${organizationId}&count=${count}`
     ).then((response) => response.json())) as Example[]
@@ -35,6 +36,10 @@ export class ExamplesState {
     }
 
     return examples.slice(0, count)
+  }
+
+  get allExamples() {
+    return Array.from(this.#examplesByOrganizationId.values()).flat()
   }
 }
 

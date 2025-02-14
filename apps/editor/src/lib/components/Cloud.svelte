@@ -4,8 +4,6 @@
   import { CloudCheck as CloudCheckIcon } from 'phosphor-svelte'
 
   import { green } from '@allmaps/tailwind'
-
-  import { flyAndScale } from '$lib/shared/transitions.js'
 </script>
 
 <div class="contents" style="--green: {green}">
@@ -14,8 +12,8 @@
       <CloudCheckIcon class="size-5" weight="duotone" />
     </Popover.Trigger>
     <Popover.Content
-      class="z-30 bg-white p-2 shadow-xl border-gray-100 border-1 rounded-xl"
-      transition={flyAndScale}
+      class="z-30 bg-white p-2 shadow-xl border-gray-100 border-1 rounded-xl
+      data-[state=open]:animate-scale-in"
       sideOffset={8}
     >
       <h2 class="max-w-3xs">

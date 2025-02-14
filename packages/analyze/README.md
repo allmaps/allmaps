@@ -1,14 +1,14 @@
-# @allmaps/analyse
+# @allmaps/analyze
 
-This module analyses warpedMaps: it checks them for possible error and computes accuracy measures.
+This module analyzes warpedMaps: it checks them for possible error and computes accuracy measures.
 
-A warpedMap is an object used in [@allmaps/render](../../packages/render/) to store information about a georeferencedMap (which in turn are parsed [Georeference Annotation's](https://iiif.io/api/extension/georef/)) as it is warped by a transformer in order to be rendered. Hence, these objects have a lot of information that can e used to infer the quality and accuracy of a map's warping.
+A Warped Map is an object used in [@allmaps/render](../../packages/render/) to store information about a georeferencedMap (which in turn are parsed [Georeference Annotation's](https://iiif.io/api/extension/georef/)) as it is warped by a transformer in order to be rendered. Hence, these objects have a lot of information that can e used to infer the quality and accuracy of a map's warping.
 
 In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedMaps is used, which extends WarpedMaps.
 
 ## How it works
 
-This packages analyses maps to return information, warning and error items. These items are objects with a code and text attribute, and possible additional information.
+This packages analyzes maps to return information, warning and error items. These items are objects with a code and text attribute, and possible additional information.
 
 *   **Infos** are notable but not problematic informations on a warping.
     *   Code `maskequalsfullmask`: The mask contains the full image.
@@ -27,7 +27,7 @@ This packages analyses maps to return information, warning and error items. Thes
     *   Code `maskrepeatedpoint`: Mask resource coordinates are repeated.
     *   Code `maskselfintersection`: The mask self-intersects.
 
-An analyser can also compute the following **Measures**:
+An analyzer can also compute the following **Measures**:
 
 *   About the current transformation type:
     *   `rmse`: The root-mean-square error of GCPs in projected geo coordinates
@@ -48,7 +48,7 @@ An analyser can also compute the following **Measures**:
     *   `polynomialShear`: The shear
     *   `polynomialTranslation`: The translation
 
-An analyser can also compute the following **Distortion** information:
+An analyzer can also compute the following **Distortion** information:
 
 *   About the current transformation type:
     *   `meanDistortions`: For each computed distortion measure, the mean distortion over all triangulation points.
@@ -60,17 +60,17 @@ This is an ESM-only module that works in browsers and Node.js.
 Install using npm:
 
 ```sh
-npm install @allmaps/analyse
+npm install @allmaps/analyze
 ```
 
 ## Usage
 
-First, get a warpedMap, either by making it from an annotation, or by getting it from a renderer's warpedMapList. Then analyse it using this library.
+First, get a warpedMap, either by making it from an annotation, or by getting it from a renderer's warpedMapList. Then analyze it using this library.
 
 ```js
 import { parseAnnotation } from '@allmaps/annotation'
 import { TriangulatedWarpedMap } from '@allmaps/render'
-import { Analyser } from '@allmaps/analyse'
+import { Analyzer } from '@allmaps/analyze'
 
 // Fetch an annotation
 const annotation = await fetch(annoationUrl).then((response) => response.json())
@@ -86,22 +86,22 @@ const triangualtedWarpedMap = new TriangulatedWarpedMap(
 // Or add the annotation the a renderer and extract a warpedMap
 // ... create a webGL2Renderer, see the render package
 await renderer.addGeoreferenceAnnotation(annotation)
-const triangualtedWarpedMap = renderer.warpedMapList.getWarpedMaps()[0]
+const triangulatedWarpedMap = renderer.warpedMapList.getWarpedMaps()[0]
 
-// Create Analyser for the warpedMap
-const analyser = new Analyser(triangualtedWarpedMap)
+// Create Analyzer for the warpedMap
+const analyzer = new Analyzer(triangulatedWarpedMap)
 
-// Analyse to get all infos, warnings and errors
-const infos = analyser.getInfos()
-const warnings = analyser.getWarnings()
-const errors = analyser.getErrors()
+// Analyze to get all infos, warnings and errors
+const infos = analyzer.getInfos()
+const warnings = analyzer.getWarnings()
+const errors = analyzer.getErrors()
 
 // Or quickly check e.g. if there are any errors
-const hasErrors = analyser.hasErrors()
+const hasErrors = analyzer.hasErrors()
 
-// Analyse measures and distortions
-const measures = analyser.getMeasures()
-const distortions = analyser.getDistortions()
+// Analyze measures and distortions
+const measures = analyzer.getMeasures()
+const distortions = analyzer.getDistortions()
 ```
 
 ## API
@@ -110,84 +110,77 @@ const distortions = analyser.getDistortions()
 
 #### Table of Contents
 
-*   [WarpedMap](#warpedmap)
+*   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-*   [hasInfos](#hasinfos)
-*   [hasWarnings](#haswarnings)
-*   [hasErrors](#haserrors)
-*   [getInfos](#getinfos)
-*   [getWarnings](#getwarnings)
-*   [getErrors](#geterrors)
-*   [getMeasures](#getmeasures)
-*   [getDistortions](#getdistortions)
-*   [fromWarpedMap](#fromwarpedmap)
-    *   [Parameters](#parameters-1)
+    *   [hasInfos](#hasinfos)
+    *   [hasWarnings](#haswarnings)
+    *   [hasErrors](#haserrors)
+    *   [getInfos](#getinfos)
+    *   [getWarnings](#getwarnings)
+    *   [getErrors](#geterrors)
+    *   [getMeasures](#getmeasures)
+    *   [getDistortions](#getdistortions)
+    *   [fromWarpedMap](#fromwarpedmap)
+        *   [Parameters](#parameters-1)
 
-### WarpedMap
+### Analyzer
 
-**Extends EventTarget**
-
-Class for Analyser.
+Class for Analyzer.
 This class describes how a georeferenced map is warped using a specific transformation.
-
-Type: [WarpedMap](#warpedmap)
 
 #### Parameters
 
-*   `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
+*   `warpedMap`  A Warped Map
+*   `mapId`  ID of the map
 
-### hasInfos
+#### hasInfos
 
 Check if analysis has infos.
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
-### hasWarnings
+#### hasWarnings
 
 Check if analysis has warnings.
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
-### hasErrors
+#### hasErrors
 
 Check if analysis has errors.
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
-### getInfos
+#### getInfos
 
 Get analysis informations.
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
 
-### getWarnings
+#### getWarnings
 
-Get analysis warnings.
+Get zis warnings.
 
 Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
 
-### getErrors
+#### getErrors
 
 Get analysis errors.
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
-
-### getMeasures
+#### getMeasures
 
 Get analysis measures.
 
-Returns **Measures**&#x20;
-
-### getDistortions
+#### getDistortions
 
 Get distortions.
 
 Returns **Distortions**&#x20;
 
-### fromWarpedMap
+#### fromWarpedMap
 
-Creates an instance of Analyser from a Warped Map.
+Creates an instance of Analyzer from a Warped Map.
 
-#### Parameters
+##### Parameters
 
-*   `warpedMap` **[WarpedMap](#warpedmap)** A Warped Map
+*   `warpedMap`  A Warped Map

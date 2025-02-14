@@ -30,7 +30,9 @@
 </script>
 
 {#if sourceState.activeImageIndex !== undefined}
-  <div class="flex bg-white rounded-md p-1 gap-1 sm:p-2 sm:gap-2 items-center">
+  <div
+    class="flex bg-white rounded-md shadow-md p-1 gap-1 sm:p-2 sm:gap-2 items-center"
+  >
     <button
       class="cursor-pointer"
       onclick={handlePreviousClick}

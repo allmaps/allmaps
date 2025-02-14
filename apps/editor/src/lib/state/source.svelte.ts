@@ -3,6 +3,7 @@ import { SvelteMap } from 'svelte/reactivity'
 
 import { fetchJson } from '@allmaps/stdlib'
 import { IIIF } from '@allmaps/iiif-parser'
+import { parseAnnotation } from '@allmaps/annotation'
 import { generateId } from '@allmaps/id'
 
 import { UrlState } from '$lib/state/url.svelte'
@@ -14,8 +15,18 @@ import type {
   Canvas as IIIFCanvas,
   Collection as IIIFCollection
 } from '@allmaps/iiif-parser'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { Source, SourceType } from '$lib/types/shared.js'
+
+import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
+
+type PartOf = GeoreferencedMap['resource']['partOf']
+
+type PartOfItem = {
+  id: string
+  type: string
+}
 
 const SOURCE_KEY = Symbol('source')
 
@@ -118,66 +129,116 @@ export class SourceState {
   //   }
   // },
 
+  async #loadIiif(url: string, sourceIiif: unknown) {
+    const parsedIiif = IIIF.parse(sourceIiif)
+
+    let sourceType: SourceType
+
+    const baseSource = {
+      url,
+      allmapsId: await generateId(parsedIiif.uri),
+      sourceIiif
+    }
+
+    let source: Source
+
+    if (parsedIiif.type === 'collection') {
+      sourceType = 'collection'
+      await this.#fetchCollectionManifestsAndAddImages(parsedIiif)
+
+      source = {
+        ...baseSource,
+        type: sourceType,
+        parsedIiif
+      }
+    } else if (parsedIiif.type === 'manifest') {
+      sourceType = 'manifest'
+      for (const canvas of parsedIiif.canvases) {
+        this.#imagesByImageId.set(canvas.image.uri, canvas.image)
+        this.#canvasesByImageId.set(canvas.image.uri, canvas)
+        this.#allmapsIdsByImageId.set(
+          canvas.image.uri,
+          await generateId(canvas.image.uri)
+        )
+      }
+
+      source = {
+        ...baseSource,
+        type: sourceType,
+        parsedIiif
+      }
+    } else if (parsedIiif.type === 'image') {
+      sourceType = 'image'
+      this.#imagesByImageId.set(parsedIiif.uri, parsedIiif)
+      this.#allmapsIdsByImageId.set(
+        parsedIiif.uri,
+        await generateId(parsedIiif.uri)
+      )
+
+      source = {
+        ...baseSource,
+        type: sourceType,
+        parsedIiif
+      }
+    } else {
+      throw new Error('Unknown IIIF type')
+    }
+
+    this.#source = source
+  }
+
+  *#flattenPartOf(partOf?: PartOf): Generator<PartOfItem> {
+    if (partOf) {
+      for (const partOfItem of partOf) {
+        yield partOfItem
+        if (partOfItem.partOf) {
+          yield* this.#flattenPartOf(partOfItem.partOf)
+        }
+      }
+    }
+  }
+
+  async #loadGeoreferenceAnnotation(sourceAnnotation: unknown) {
+    const maps = parseAnnotation(sourceAnnotation)
+
+    // TODO: load multiple maps!
+    const map = maps[0]
+
+    const partOfs = [...this.#flattenPartOf(map.resource.partOf)]
+
+    const manifestPartOf = partOfs.find((partOf) => partOf.type === 'Manifest')
+
+    // TODO: also support Canvases
+    if (manifestPartOf) {
+      await this.#load(manifestPartOf.id)
+    } else {
+      await this.#load(map.resource.id)
+    }
+  }
+
   async #load(url: string) {
     this.#errorState.error = null
 
     try {
-      const sourceIiif = await fetchJson(url)
-      const parsedIiif = IIIF.parse(sourceIiif)
+      const sourceData = await fetchJson(url)
 
-      let sourceType: SourceType
-
-      const baseSource = {
-        url,
-        allmapsId: await generateId(parsedIiif.uri),
-        sourceIiif
-      }
-
-      let source: Source
-
-      if (parsedIiif.type === 'collection') {
-        sourceType = 'collection'
-        await this.#fetchCollectionManifestsAndAddImages(parsedIiif)
-
-        source = {
-          ...baseSource,
-          type: sourceType,
-          parsedIiif
-        }
-      } else if (parsedIiif.type === 'manifest') {
-        sourceType = 'manifest'
-        for (const canvas of parsedIiif.canvases) {
-          this.#imagesByImageId.set(canvas.image.uri, canvas.image)
-          this.#canvasesByImageId.set(canvas.image.uri, canvas)
-          this.#allmapsIdsByImageId.set(
-            canvas.image.uri,
-            await generateId(canvas.image.uri)
+      if (
+        sourceData &&
+        typeof sourceData === 'object' &&
+        'type' in sourceData &&
+        typeof sourceData.type === 'string' &&
+        ['Annotation', 'AnnotationPage'].includes(sourceData.type)
+      ) {
+        if (url.startsWith(PUBLIC_ALLMAPS_ANNOTATIONS_API_URL)) {
+          await this.#loadGeoreferenceAnnotation(sourceData)
+        } else {
+          throw new Error(
+            'Only Georeference Annotations loaded from Allmaps are supported'
           )
         }
-
-        source = {
-          ...baseSource,
-          type: sourceType,
-          parsedIiif
-        }
-      } else if (parsedIiif.type === 'image') {
-        sourceType = 'image'
-        this.#imagesByImageId.set(parsedIiif.uri, parsedIiif)
-        this.#allmapsIdsByImageId.set(
-          parsedIiif.uri,
-          await generateId(parsedIiif.uri)
-        )
-
-        source = {
-          ...baseSource,
-          type: sourceType,
-          parsedIiif
-        }
       } else {
-        throw new Error('Unknown IIIF type')
+        await this.#loadIiif(url, sourceData)
       }
-
-      this.#source = source
     } catch (err) {
       this.#errorState.error = err
       this.#reset()

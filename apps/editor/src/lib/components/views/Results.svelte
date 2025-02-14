@@ -77,6 +77,7 @@
       view.setRotation(geoViewport.rotation)
     } else {
       const extent = warpedMapLayer.getExtent()
+
       if (extent) {
         geoOlMap.getView().fit(extent)
       }
@@ -267,7 +268,8 @@
       if (
         mapsState.connected === true &&
         mapsState.maps &&
-        mapsState.connectedImageId !== currentImageId
+        mapsState.connectedImageId !== currentImageId &&
+        mapsMergedState.completeMaps.length
       ) {
         // TODO: load maps from other images as well
         initializeMaps(mapsMergedState.completeMaps)

@@ -7,7 +7,7 @@
 
   import Status from '$lib/components/Status.svelte'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router'
+  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
   import { parseLanguageString } from '$lib/shared/iiif.js'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
@@ -28,10 +28,6 @@
 
   function isActive(imageId: string) {
     return imageId === sourceState.activeImageId
-  }
-
-  function handleError(err: Error) {
-    console.log('KOEK', err.cause, err.name, err.message, err.stack)
   }
 
   async function fetchImageInfo(url: string) {
@@ -74,7 +70,7 @@
             {:catch error}
               <div>
                 <p
-                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-red-800 text-center"
+                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
                 >
                   Error: {error.message}
                 </p>

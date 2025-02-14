@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
     "outDir": "./dist"
   },
@@ -11,6 +10,6 @@
     { "path": "../stdlib" },
     { "path": "../transform" },
     { "path": "../types" }
-],
+  ],
   "include": ["./src/**/*"]
 }

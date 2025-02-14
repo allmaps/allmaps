@@ -471,7 +471,7 @@ export function translatePoints(
 
 export function rotatePoint(
   point: Point,
-  angle: number = 0,
+  angle = 0,
   anchor: Point | undefined = undefined,
   cosAngle?: number,
   sinAngle?: number
@@ -504,7 +504,7 @@ export function rotatePoint(
 
 export function rotatePoints(
   points: Point[],
-  angle: number = 0,
+  angle = 0,
   anchor: Point | undefined = undefined,
   cosAngle?: number,
   sinAngle?: number

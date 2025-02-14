@@ -1,5 +1,9 @@
 import { setContext, getContext } from 'svelte'
 
+import { generateAnnotation } from '@allmaps/annotation'
+
+import { toGeoreferencedMap, toGeoreferencedMaps } from '$lib/shared/maps.js'
+
 import type { SourceState } from '$lib/state/source.svelte'
 import type { MapsState } from '$lib/state/maps.svelte'
 import type { MapsMergedState } from '$lib/state/maps-merged.svelte'
@@ -9,6 +13,7 @@ import type { Scope } from '$lib/types/shared.js'
 const SCOPE_KEY = Symbol('scope')
 
 export class ScopeState {
+  #sourceState: SourceState
   #mapsState: MapsState
   #mapsMergedState: MapsMergedState
 
@@ -16,11 +21,43 @@ export class ScopeState {
 
   #hasImagesScope = $state<boolean>(true)
 
+  #allmapsId = $derived.by(() => {
+    if (this.#scope === 'images' && this.#sourceState.source) {
+      // TODO: Collections are not stored in database!
+      return `${this.#sourceState.source?.type}s/${this.#sourceState.source?.allmapsId}`
+    } else if (
+      this.#scope === 'image' &&
+      this.#sourceState.activeImageAllmapsId
+    ) {
+      return `images/${this.#sourceState.activeImageAllmapsId}`
+    } else if (this.#scope === 'map' && this.#mapsState.activeMapId) {
+      return `maps/${this.#mapsState.activeMapId}`
+    }
+  })
+
+  #annotation = $derived.by(() => {
+    if (this.#scope === 'images') {
+      return generateAnnotation(this.#mapsMergedState.maps)
+    } else if (this.#scope === 'image') {
+      if (this.#mapsState.maps) {
+        return generateAnnotation(toGeoreferencedMaps(this.#mapsState.maps))
+      }
+    } else if (this.#scope === 'map') {
+      const map = this.#mapsState.activeMap
+      if (map) {
+        return generateAnnotation(toGeoreferencedMap(map))
+      }
+    }
+
+    return generateAnnotation([])
+  })
+
   constructor(
     sourceState: SourceState,
     mapsState: MapsState,
     mapsMergedState: MapsMergedState
   ) {
+    this.#sourceState = sourceState
     this.#mapsState = mapsState
     this.#mapsMergedState = mapsMergedState
 
@@ -47,7 +84,15 @@ export class ScopeState {
     return this.#scope
   }
 
-  get mapsCountForScope(): number {
+  get annotation() {
+    return this.#annotation
+  }
+
+  get allmapsId() {
+    return this.#allmapsId
+  }
+
+  get mapsCount(): number {
     if (this.#scope === 'images') {
       return this.#mapsMergedState.maps.length
     } else if (this.#scope === 'image') {
