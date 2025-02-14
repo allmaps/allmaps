@@ -1,6 +1,6 @@
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
 
-import { BaseTransformation } from '../transformation-types/base-transformation.js'
+import { BaseTransformation } from '../transformation-types/BaseTransformation.js'
 
 import {
   generalGcpToPointForForward,
@@ -61,6 +61,10 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     options?: Partial<TransformOptions>
   ) {
     super(generalGcps, type, options)
+  }
+
+  public get generalGcps(): GeneralGcp[] {
+    return this._generalGcps
   }
 
   /**

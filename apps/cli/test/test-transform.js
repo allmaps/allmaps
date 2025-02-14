@@ -22,7 +22,7 @@ describe('allmaps transform svg', () => {
   // with -a, but no file
   // with -a, but multiple maps
 
-  it('should read an SVG polygon from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation', () => {
+  it('should read an SVG polygon from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically', () => {
     const expected = readFileJson(
       'output/geojson/7a69f9470b49a744-polygon.geojson'
     )
@@ -30,10 +30,11 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polygon.svg'
     )
-    expect(expected).to.roughly(0.0001).deep.equal(output)
+    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
+    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
   })
 
-  it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation', () => {
+  it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically', () => {
     const expected = readFileJson(
       'output/geojson/7a69f9470b49a744-polylines.geojson'
     )
@@ -41,8 +42,8 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polylines.svg'
     )
-
-    expect(expected).to.roughly(0.0001).deep.equal(output)
+    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
+    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
   })
 })
 
@@ -57,8 +58,7 @@ describe('allmaps transform geojson', () => {
       'transform geojson -a input/maps/26e384d4efabdb32.json',
       'input/geojson/26e384d4efabdb32-linestring.geojson'
     )
-
-    expect(expected).to.roughly(0.0001).deep.equal(output)
+    expect(expected).to.be.equal(output)
   })
 })
 

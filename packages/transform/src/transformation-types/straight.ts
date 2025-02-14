@@ -1,6 +1,6 @@
-import { Helmert } from '../transformation-types/helmert.js'
+import { Helmert } from './Helmert.js'
 
-import { BaseTransformation } from './base-transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
 

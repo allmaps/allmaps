@@ -4,7 +4,7 @@ import getWorldDistance from '@turf/distance'
 
 import { mergeOptions } from '@allmaps/stdlib'
 
-import { defaultRefinementOptions } from './refinement-helper-functions.js'
+import { defaultRefinementOptions } from './refinement-functions.js'
 
 import type { TransformOptions, RefinementOptions } from './types.js'
 

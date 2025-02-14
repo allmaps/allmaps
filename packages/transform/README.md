@@ -555,6 +555,14 @@ Create a GcpTransformer
 
 * `BaseGcpTransformer`
 
+### `GcpTransformer#gcps`
+
+###### Type
+
+```ts
+Array<Gcp>
+```
+
 ### `GcpTransformer#getToGeoTransformation()`
 
 Get the forward transformation. Create if it doesn't exist yet.
@@ -658,6 +666,7 @@ Returned in the lenght of the shortest piece, measured in geo coordinates.
 Transform a GeoJSON FeatureCollection to resource space to a SVG string
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -678,6 +687,7 @@ Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`
 Transform a GeoJSON Geometry to resource space to a SVG geometry
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -703,6 +713,7 @@ Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle 
 Transform an SVG string to geo space to a GeoJSON FeatureCollection
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: since this converts to GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -723,6 +734,7 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 Transform an SVG geometry to geo space as a GeoJSON Geometry
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
+Note: since this converts to GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -772,6 +784,14 @@ Create a GeneralGcpTransformer
 ###### Extends
 
 * `BaseGcpTransformer`
+
+### `GeneralGcpTransformer#generalGcps`
+
+###### Type
+
+```ts
+Array<GeneralGcp>
+```
 
 ### `GeneralGcpTransformer#getBackwardTransformation()`
 

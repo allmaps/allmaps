@@ -1,6 +1,6 @@
 import { Matrix, inverse } from 'ml-matrix'
 
-import { BaseTransformation } from './base-transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
 

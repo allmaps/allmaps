@@ -1,6 +1,6 @@
 import { Matrix, SingularValueDecomposition } from 'ml-matrix'
 
-import { BaseTransformation } from './base-transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
 

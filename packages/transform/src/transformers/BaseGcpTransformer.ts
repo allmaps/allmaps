@@ -9,15 +9,15 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import { computeDistortionsFromPartialDerivatives } from '../distortion.js'
+import { computeDistortionsFromPartialDerivatives } from '../shared/distortion.js'
 
-import { BaseTransformation } from '../transformation-types/base-transformation.js'
+import { BaseTransformation } from '../transformation-types/BaseTransformation.js'
 
-import { Straight } from '../transformation-types/straight.js'
-import { Helmert } from '../transformation-types/helmert.js'
-import { Polynomial } from '../transformation-types/polynomial.js'
-import { Projective } from '../transformation-types/projective.js'
-import { RBF } from '../transformation-types/radial-basis-function.js'
+import { Straight } from '../transformation-types/Straight.js'
+import { Helmert } from '../transformation-types/Helmert.js'
+import { Polynomial } from '../transformation-types/Polynomial.js'
+import { Projective } from '../transformation-types/Projective.js'
+import { RBF } from '../transformation-types/RBF.js'
 
 import { thinPlateKernel } from '../shared/kernel-functions.js'
 import { euclideanNorm } from '../shared/norm-functions.js'
@@ -26,12 +26,12 @@ import {
   defaultTransformOptions,
   refinementOptionsFromBackwardTransformOptions,
   refinementOptionsFromForwardTransformOptions
-} from '../shared/transform-helper-functions.js'
+} from '../shared/transform-functions.js'
 import {
   refineLineString,
   refineRing,
   getSourceRefinementResolution
-} from '../shared/refinement-helper-functions.js'
+} from '../shared/refinement-functions.js'
 import {
   generalGcpToPointForForward,
   generalGcpToPointForBackward,
@@ -82,9 +82,9 @@ import type {
  * - The `differentHandedness` setting is `true` by default, since we expect the resource coordinates to identify pixels on an image, with origin in the top left and the y-axis pointing down.
  * */
 export abstract class BaseGcpTransformer {
-  readonly _generalGcps: GeneralGcp[]
-  readonly _sourcePoints: Point[]
-  readonly _destinationPoints: Point[]
+  protected _generalGcps: GeneralGcp[]
+  private _sourcePoints: Point[]
+  private _destinationPoints: Point[]
   readonly type: TransformationType
   readonly options: TransformOptions
 
