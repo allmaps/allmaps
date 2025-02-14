@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router'
+  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
   import { getUrlState } from '$lib/state/url.svelte.js'
 
   import Title from '$lib/components/Title.svelte'

@@ -45,6 +45,7 @@ export class UiState {
 
   #firstUse = $state(true)
   #showAboutDialog = $state(false)
+  #showCommandPalette = $state(false)
 
   constructor(urlState: UrlState) {
     this.#urlState = urlState

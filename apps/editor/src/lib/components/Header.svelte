@@ -5,7 +5,7 @@
 
   import { getUrlState } from '$lib/state/url.svelte'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router'
+  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
   import Toolbar from '$lib/components/Toolbar.svelte'
   import URLInput from '$lib/components/URLInput.svelte'

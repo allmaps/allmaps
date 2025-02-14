@@ -1,8 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
   import { afterNavigate } from '$app/navigation'
-  import { fade } from 'svelte/transition'
-  import { Dialog } from 'bits-ui'
 
   import { createRouteUrl, gotoRoute, getRouteId } from '$lib/shared/router.js'
 
@@ -25,6 +23,7 @@
   import Controls from '$lib/components/Controls.svelte'
   import About from '$lib/components/About.svelte'
   import Error from '$lib/components/Error.svelte'
+  import Command from '$lib/components/Command.svelte'
 
   import type { Snippet } from 'svelte'
 
@@ -47,7 +46,7 @@
   const urlState = setUrlState(page.url, errorState)
   setExamplesState()
 
-  const uitState = setUiState(urlState)
+  setUiState(urlState)
   setImageInfoState()
 
   const sourceState = setSourceState(urlState, errorState)
@@ -103,7 +102,6 @@
 <svelte:body onkeypress={handleKeypress} />
 
 <Stats />
-
 <div
   class="absolute w-full h-full grid grid-rows-[min-content_min-content_1fr]"
 >
@@ -135,20 +133,7 @@
     {/if}
   </div>
 </div>
-
-<Dialog.Root bind:open={uitState.showAboutDialog}>
-  <Dialog.Trigger />
-  <Dialog.Portal>
-    <Dialog.Overlay
-      transition={fade}
-      transitionConfig={{ duration: 150 }}
-      class="fixed inset-0 z-50 bg-[rgba(0,0,0,0.75)]"
-    />
-    <Dialog.Content
-      class="absolute top-0 w-full h-full flex justify-center items-center p-2"
-      transition={fade}
-    >
-      <About onclose={() => (uitState.showAboutDialog = false)} />
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+{#if isView}
+  <Command />
+  <About />
+{/if}

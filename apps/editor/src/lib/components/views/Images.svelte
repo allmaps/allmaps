@@ -7,7 +7,7 @@
 
   import Status from '$lib/components/Status.svelte'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router'
+  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
   import { parseLanguageString } from '$lib/shared/iiif.js'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
@@ -28,10 +28,6 @@
 
   function isActive(imageId: string) {
     return imageId === sourceState.activeImageId
-  }
-
-  function handleError(err: Error) {
-    console.log('KOEK', err.cause, err.name, err.message, err.stack)
   }
 
   async function fetchImageInfo(url: string) {

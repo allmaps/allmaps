@@ -19,6 +19,8 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { Source, SourceType } from '$lib/types/shared.js'
 
+import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
+
 type PartOf = GeoreferencedMap['resource']['partOf']
 
 type PartOfItem = {
@@ -196,7 +198,7 @@ export class SourceState {
     }
   }
 
-  #loadGeoreferenceAnnotation(url: string, sourceAnnotation: unknown) {
+  async #loadGeoreferenceAnnotation(sourceAnnotation: unknown) {
     const maps = parseAnnotation(sourceAnnotation)
 
     // TODO: load multiple maps!
@@ -208,9 +210,9 @@ export class SourceState {
 
     // TODO: also support Canvases
     if (manifestPartOf) {
-      this.#load(manifestPartOf.id)
+      await this.#load(manifestPartOf.id)
     } else {
-      this.#load(map.resource.id)
+      await this.#load(map.resource.id)
     }
   }
 
@@ -227,9 +229,15 @@ export class SourceState {
         typeof sourceData.type === 'string' &&
         ['Annotation', 'AnnotationPage'].includes(sourceData.type)
       ) {
-        this.#loadGeoreferenceAnnotation(url, sourceData)
+        if (url.startsWith(PUBLIC_ALLMAPS_ANNOTATIONS_API_URL)) {
+          await this.#loadGeoreferenceAnnotation(sourceData)
+        } else {
+          throw new Error(
+            'Only Georeference Annotations loaded from Allmaps are supported'
+          )
+        }
       } else {
-        this.#loadIiif(url, sourceData)
+        await this.#loadIiif(url, sourceData)
       }
     } catch (err) {
       this.#errorState.error = err

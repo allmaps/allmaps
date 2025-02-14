@@ -107,7 +107,7 @@
             <span class="hidden sm:inline font-light text-sm text-gray-800"
               >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
             </span>
-            <div class="w-[140px] sm:w-[160px]">
+            <div class="w-[140px] sm:w-[200px]">
               <SelectTransformation {map} />
             </div>
           </div>

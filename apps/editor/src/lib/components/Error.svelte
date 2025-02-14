@@ -15,7 +15,8 @@
       if (error.name === 'ZodError') {
         const validationError = fromError(error)
         return {
-          message: 'The IIIF you are trying to load seems to be invalid:',
+          message:
+            'The IIIF resource you are trying to load seems to be invalid:',
           details: validationError.toString()
         }
       } else {
@@ -37,7 +38,7 @@
 </script>
 
 <div class="w-full h-full flex justify-center items-center p-4">
-  <div class="max-w-xl">
+  <div class="max-w-xl drop-shadow-lg">
     <MapMonster
       color="red"
       mood="sad"

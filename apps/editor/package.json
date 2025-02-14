@@ -59,7 +59,7 @@
     "@allmaps/transform": "^1.0.0-beta.41",
     "@allmaps/ui": "^1.0.0-beta.32",
     "@tailwindcss/typography": "^0.5.9",
-    "bits-ui": "^0.21.11",
+    "bits-ui": "^1.1.0",
     "lodash-es": "^4.17.21",
     "ol": "^9.1.0",
     "ot-json1": "^1.0.2",
