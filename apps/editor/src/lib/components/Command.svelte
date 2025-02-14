@@ -80,7 +80,7 @@
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
     <Dialog.Overlay
-      class="fixed inset-0 z-50 bg-black/75 p-4
+      class="fixed inset-0 z-50 bg-[rgba(0,0,0,0.75)] p-4
       data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out"
     />
     <Dialog.Content
