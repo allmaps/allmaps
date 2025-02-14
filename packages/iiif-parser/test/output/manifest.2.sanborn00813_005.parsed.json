@@ -1,0 +1,3076 @@
+{
+  "embedded": false,
+  "uri": "https://www.loc.gov/item/sanborn00813_005/manifest.json",
+  "type": "manifest",
+  "label": {
+    "none": [
+      "Sanborn Fire Insurance Map from San Francisco, San Francisco County, California."
+    ]
+  },
+  "majorVersion": 2,
+  "canvases": [
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-ind1",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1363,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-ind1",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1363,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 1"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=1"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=1"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-ind1.gif",
+          "format": "image/jpeg",
+          "width": 100,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0000L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0000L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 2"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=2"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=2"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0000L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0000R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1406,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0000R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1406,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 3"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=3"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=3"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0000R.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0062L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0062L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 4"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=4"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=4"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0062L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0062R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1406,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0062R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1406,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 5"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=5"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=5"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0062R.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0063L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0063L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 6"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=6"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=6"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0063L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0063R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1406,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0063R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1406,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 7"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=7"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=7"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0063R.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0064L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0064L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 8"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=8"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=8"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0064L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0064R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1406,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0064R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1406,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 9"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=9"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=9"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0064R.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0065L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0065L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 10"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=10"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=10"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0065L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0065R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1406,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0065R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1406,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 11"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=11"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=11"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0065R.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0066L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0066L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 12"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=12"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=12"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0066L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0066R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1424,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0066R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1424,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 13"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=13"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=13"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0066R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0067L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1413,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0067L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1413,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 14"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=14"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=14"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0067L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0067R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1424,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0067R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1424,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 15"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=15"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=15"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0067R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0068L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1412,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0068L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1412,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 16"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=16"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=16"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0068L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0068R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1424,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0068R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1424,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 17"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=17"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=17"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0068R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0069L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1412,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0069L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1412,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 18"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=18"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=18"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0069L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0069R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1424,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0069R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1424,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 19"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=19"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=19"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0069R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0070L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1412,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0070L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1412,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 20"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=20"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=20"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0070L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0070R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1425,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0070R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1425,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 21"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=21"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=21"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0070R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0071L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1418,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0071L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1418,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 22"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=22"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=22"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0071L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0071R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1427,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0071R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1427,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 23"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=23"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=23"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0071R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0072L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1418,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0072L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1418,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 24"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=24"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=24"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0072L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0072R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1427,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0072R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1427,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 25"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=25"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=25"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0072R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0073L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1418,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0073L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1418,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 26"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=26"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=26"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0073L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0073R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1427,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0073R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1427,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 27"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=27"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=27"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0073R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0074L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1418,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0074L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1418,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 28"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=28"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=28"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0074L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0074R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1427,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0074R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1427,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 29"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=29"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=29"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0074R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0075L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1417,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0075L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1417,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 30"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=30"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=30"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0075L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0075R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1427,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0075R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1427,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 31"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=31"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=31"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0075R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0076L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1417,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0076L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1417,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 32"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=32"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=32"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0076L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0076R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0076R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 33"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=33"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=33"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0076R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0077L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1405,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0077L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1405,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 34"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=34"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=34"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0077L.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0077R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0077R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 35"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=35"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=35"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0077R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0078L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0078L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 36"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=36"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=36"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0078L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0078R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0078R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 37"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=37"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=37"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0078R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0079L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0079L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 38"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=38"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=38"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0079L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0079R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0079R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 39"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=39"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=39"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0079R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0080L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0080L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 40"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=40"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=40"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0080L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0080R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0080R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 41"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=41"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=41"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0080R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0081L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0081L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 42"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=42"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=42"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0081L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0081R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0081R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 43"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=43"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=43"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0081R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0082L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0082L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 44"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=44"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=44"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0082L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0082R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0082R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 45"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=45"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=45"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0082R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0083L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0083L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 46"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=46"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=46"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0083L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0083R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0083R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 47"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=47"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=47"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0083R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0084L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0084L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 48"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=48"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=48"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0084L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0084R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0084R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 49"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=49"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=49"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0084R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0085L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0085L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 50"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=50"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=50"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0085L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0085R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0085R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 51"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=51"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=51"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0085R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0086L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1414,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0086L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1414,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 52"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=52"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=52"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0086L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0086R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0086R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 53"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=53"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=53"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0086R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0087L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1412,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0087L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1412,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 54"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=54"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=54"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0087L.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0087R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0087R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 55"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=55"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=55"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0087R.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088AL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1420,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088AL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1420,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 56"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=56"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=56"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088AL.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088AR",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1421,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088AR",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1421,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 57"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=57"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=57"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088AR.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088BL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1420,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088BL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1420,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 58"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=58"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=58"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088BL.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088BR",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1408,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088BR",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1408,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 59"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=59"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=59"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088BR.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088CL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1420,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088CL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1420,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 60"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=60"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=60"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088CL.gif",
+          "format": "image/jpeg",
+          "width": 105,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088CR",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1408,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088CR",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1408,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 61"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=61"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=61"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088CR.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088DL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1405,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088DL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1405,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 62"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=62"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=62"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088DL.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088DR",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1408,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088DR",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1408,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 63"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=63"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=63"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088DR.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088EL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1405,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088EL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1405,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 64"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=64"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=64"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088EL.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088ER",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1408,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088ER",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1408,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 65"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=65"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=65"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088ER.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088FL",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1405,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088FL",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1405,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 66"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=66"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=66"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088FL.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088FR",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1408,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088FR",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1408,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 67"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=67"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=67"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088FR.gif",
+          "format": "image/jpeg",
+          "width": 104,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088L",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1405,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088L",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1405,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 68"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=68"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=68"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088L.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088R",
+      "type": "canvas",
+      "height": 2037,
+      "width": 1404,
+      "image": {
+        "embedded": true,
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd436m:g4364m:g4364sm:g4364sm_g00813188903:00813_03_1889-0088R",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 1404,
+        "height": 2037,
+        "majorVersion": 2
+      },
+      "label": {
+        "none": ["Page 69"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": [
+              "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=69"
+            ]
+          }
+        }
+      ],
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4364sm.g4364sm_g00813188903/?sp=69"
+        }
+      ],
+      "thumbnail": [
+        {
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0088R.gif",
+          "format": "image/jpeg",
+          "width": 103,
+          "height": 150
+        }
+      ]
+    }
+  ],
+  "description": {
+    "none": [
+      "1889  Vol. 3. 69 sheet(s). Double-paged plates numbered 62-88F. Bound."
+    ]
+  },
+  "metadata": [
+    {
+      "label": {
+        "none": ["APA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "(1889) <cite>Sanborn Fire Insurance Map from San Francisco, San Francisco County, California</cite>. Sanborn Map Company, Vol. 3. [Map] Retrieved from the Library of Congress, https://www.loc.gov/item/sanborn00813_005/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["MLA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "<cite>Sanborn Fire Insurance Map from San Francisco, San Francisco County, California</cite>. Sanborn Map Company, Vol. 3, 1889. Map. Retrieved from the Library of Congress, &lt;www.loc.gov/item/sanborn00813_005/&gt;."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Chicago Citation Style"]
+      },
+      "value": {
+        "none": [
+          "<cite>Sanborn Fire Insurance Map from San Francisco, San Francisco County, California</cite>. Sanborn Map Company, Vol. 3, 1889. Map. https://www.loc.gov/item/sanborn00813_005/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Contributors"]
+      },
+      "value": {
+        "none": [""]
+      }
+    },
+    {
+      "label": {
+        "none": ["Created Published"]
+      },
+      "value": {
+        "none": ["Sanborn Map Company, 1889  Vol. 3"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Original Format"]
+      },
+      "value": {
+        "none": ["map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subjects"]
+      },
+      "value": {}
+    },
+    {
+      "label": {
+        "none": ["Online Format"]
+      },
+      "value": {
+        "none": ["image"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Item Url"]
+      },
+      "value": {
+        "none": ["https://www.loc.gov/item/sanborn00813_005/"]
+      }
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://tile.loc.gov/storage-services/service/gmd/gmd436m/g4364m/g4364sm/g4364sm_g00813188903/00813_03_1889-0000L.gif"
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Provided by the Library of Congress"]
+    }
+  }
+}
