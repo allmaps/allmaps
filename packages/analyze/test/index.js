@@ -4,7 +4,7 @@ import path from 'path'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import { Analyser } from '../dist/index.js'
+import { Analyzer } from '../dist/index.js'
 import { parseAnnotation } from '../../annotation/dist/index.js'
 import { TriangulatedWarpedMap } from '../../render/dist/index.js'
 
@@ -14,7 +14,7 @@ export function readJSONFile(filename) {
   return JSON.parse(fs.readFileSync(filename))
 }
 
-describe('Analyse a parsed annotation', () => {
+describe('Analyze a parsed annotation', () => {
   it('should run', () => {
     const annotation = readJSONFile(
       path.join(
@@ -30,11 +30,11 @@ describe('Analyse a parsed annotation', () => {
       georeferencedMap
     )
 
-    const analyser = new Analyser(triangualtedWarpedMap)
+    const analyzer = new Analyzer(triangualtedWarpedMap)
 
-    const infos = analyser.getInfos()
-    const warnings = analyser.getWarnings()
-    const errors = analyser.getErrors()
+    const infos = analyzer.getInfos()
+    const warnings = analyzer.getWarnings()
+    const errors = analyzer.getErrors()
     // console.log('infos', infos)
     // console.log('warnings', warnings)
     // console.log('errors', errors)
@@ -42,8 +42,8 @@ describe('Analyse a parsed annotation', () => {
     expect(warnings).to.be.of.length(0)
     expect(errors).to.be.of.length(0)
 
-    // const measures = analyser.getMeasures()
-    // const distortions = analyser.getDistortions()
+    // const measures = analyzer.getMeasures()
+    // const distortions = analyzer.getDistortions()
     // console.log('measures', measures)
     // console.log('distortion', distortions)
   })

@@ -22,16 +22,12 @@ import { AnalysisItem, Distortions, Measures } from './shared/types'
 const MAX_SHEAR = 0.1
 
 /**
- * Class for Analyser.
+ * Class for Analyzer.
  * This class describes how a georeferenced map is warped using a specific transformation.
  *
- * @export
- * @class WarpedMap
- * @typedef {WarpedMap}
- * @extends {EventTarget}
- * @param {string} mapId - ID of the map
+ * @param mapId - ID of the map
  */
-export default class Analyser<W extends WarpedMap> {
+export class Analyzer<W extends WarpedMap> {
   warpedMap: W
 
   protected infos?: AnalysisItem[]
@@ -42,23 +38,21 @@ export default class Analyser<W extends WarpedMap> {
   protected distortions?: Distortions
 
   /**
-   * Creates an instance of Analyser.
+   * Creates an instance of Analyzer.
    *
-   * @constructor
-   * @param { WarpedMap } warpedMap - A Warped Map
+   * @param warpedMap - A Warped Map
    */
   constructor(warpedMap: W) {
     this.warpedMap = warpedMap
   }
 
   /**
-   * Creates an instance of Analyser from a Warped Map.
+   * Creates an instance of Analyzer from a Warped Map.
    *
-   * @constructor
-   * @param { WarpedMap } warpedMap - A Warped Map
+   * @param warpedMap - A Warped Map
    */
-  public static fromWarpedMap<W extends WarpedMap>(warpedMap: W): Analyser<W> {
-    return new Analyser(warpedMap)
+  public static fromWarpedMap<W extends WarpedMap>(warpedMap: W): Analyzer<W> {
+    return new Analyzer(warpedMap)
   }
 
   /**
@@ -130,7 +124,7 @@ export default class Analyser<W extends WarpedMap> {
   }
 
   /**
-   * Get analysis warnings.
+   * Get zis warnings.
    *
    * @returns {AnalysisItem[]}
    */
@@ -257,8 +251,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis errors.
-   *
-   * @returns {AnalysisItem[]}
    */
   public getErrors(): AnalysisItem[] {
     if (this.errors) {
@@ -349,8 +341,6 @@ export default class Analyser<W extends WarpedMap> {
 
   /**
    * Get analysis measures.
-   *
-   * @returns {Measures}
    */
   public getMeasures(): Measures {
     if (this.measures) {
@@ -450,7 +440,7 @@ export default class Analyser<W extends WarpedMap> {
       !(this.warpedMap instanceof TriangulatedWarpedMap) ||
       !this.warpedMap.projectedGcpTriangulation
     ) {
-      throw new Error("Distortions can't be analysed")
+      throw new Error("Distortions can't be analyzed")
     }
 
     const distortions: Partial<Distortions> = {

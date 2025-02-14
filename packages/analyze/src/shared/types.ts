@@ -35,6 +35,5 @@ export type Measures = {
 
 export type Distortions = {
   mapId: string
-
   meanDistortions: Map<DistortionMeasure, number>
 }
