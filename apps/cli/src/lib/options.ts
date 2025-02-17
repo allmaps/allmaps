@@ -1,4 +1,7 @@
-import { defaultTransformOptions } from '@allmaps/transform'
+import {
+  defaultTransformOptions,
+  defaultTransformerOptions
+} from '@allmaps/transform'
 
 import type { Command, OptionValues } from '@commander-js/extra-typings'
 
@@ -82,6 +85,18 @@ export function addTransformOptions<
       'Use geographic distances and midpoints for lon-lat destination points.',
       defaultTransformOptions.destinationIsGeographic
     )
+}
+
+export function addTransformerOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command.option(
+    '--different-handedness',
+    'Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output. Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform.',
+    defaultTransformerOptions.differentHandedness
+  )
 }
 
 export function addInverseOptions<

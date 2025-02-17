@@ -6,6 +6,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   TransformationType,
   TransformerInputs,
+  TransformerOptions,
   TransformOptions
 } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
@@ -150,7 +151,6 @@ export function parseTransformOptions(options: {
   maxDepth?: number
   sourceIsGeographic?: boolean
   destinationIsGeographic?: boolean
-  differentHandedness?: boolean
 }): Partial<TransformOptions> {
   const transformOptions: Partial<TransformOptions> = {}
 
@@ -181,16 +181,26 @@ export function parseTransformOptions(options: {
     ) {
       transformOptions.destinationIsGeographic = options.destinationIsGeographic
     }
-
-    if ('differentHandedness' in options && options.differentHandedness) {
-      transformOptions.differentHandedness = options.differentHandedness
-    }
   }
 
   // Note: distortionMeasures and referenceScale not supported, since this would require output processing function
   // Note: Conversion options, i.e. isMultiGeometry, not supported
 
   return transformOptions
+}
+
+export function parseTransformerOptions(options: {
+  differentHandedness?: boolean
+}): Partial<TransformerOptions> {
+  const transformerOptions: Partial<TransformerOptions> = {}
+
+  if (options && typeof options === 'object') {
+    if ('differentHandedness' in options && options.differentHandedness) {
+      transformerOptions.differentHandedness = options.differentHandedness
+    }
+  }
+
+  return transformerOptions
 }
 
 export function parseInverseOptions(options: {

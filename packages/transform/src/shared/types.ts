@@ -9,6 +9,13 @@ export type GeneralGcp = {
   destination: Point
 }
 
+export type DistortionMeasure =
+  | 'log2sigma'
+  | 'twoOmega'
+  | 'airyKavr'
+  | 'signDetJ'
+  | 'thetaa'
+
 export type Distortions = {
   partialDerivativeX: Point
   partialDerivativeY: Point
@@ -18,27 +25,6 @@ export type Distortions = {
 
 export type GeneralGcpAndDistortions = GeneralGcp & Partial<Distortions>
 export type GcpAndDistortions = Gcp & Partial<Distortions>
-
-export type RefinementOptions = {
-  minOffsetRatio: number
-  minOffsetDistance: number
-  minLineDistance: number
-  maxDepth: number
-  sourceMidPointFunction: (p0: Point, p1: Point) => Point
-  destinationMidPointFunction: (p0: Point, p1: Point) => Point
-  destinationDistanceFunction: (p0: Point, p1: Point) => number
-}
-
-export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
-  sourceMidPoint: Point
-  destinationMidPointFromRefinementFunction: Point
-}
-
-export type SplitGcpLineInfo = {
-  destinationMidPointsDistance: number
-  destinationLineDistance: number
-  destinationRefinedLineDistance: number
-}
 
 /** Transformation type. */
 export type TransformationType =
@@ -62,6 +48,27 @@ export type InverseOptions = {
   inverse: boolean
 }
 
+export type RefinementOptions = {
+  maxDepth: number
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  sourceMidPointFunction: (p0: Point, p1: Point) => Point
+  destinationMidPointFunction: (p0: Point, p1: Point) => Point
+  destinationDistanceFunction: (p0: Point, p1: Point) => number
+}
+
+export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
+  sourceMidPoint: Point
+  destinationMidPointFromRefinementFunction: Point
+}
+
+export type SplitGcpLineInfo = {
+  destinationMidPointsDistance: number
+  destinationLineDistance: number
+  destinationRefinedLineDistance: number
+}
+
 export type TransformOptions = {
   maxDepth: number
   minOffsetRatio: number
@@ -83,10 +90,3 @@ export type KernelFunction = (
 ) => number
 export type KernelFunctionOptions = { derivative?: number; epsilon?: number }
 export type NormFunction = (point0: Point, point1: Point) => number
-
-export type DistortionMeasure =
-  | 'log2sigma'
-  | 'twoOmega'
-  | 'airyKavr'
-  | 'signDetJ'
-  | 'thetaa'

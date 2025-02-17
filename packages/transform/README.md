@@ -1,16 +1,21 @@
 # @allmaps/transform
 
-This module contains classes and methods to **transform Points, LineStrings, Polygons** and other spatial features from a 2D cartesian `(x, y)` source space to a destination space. The transformation function that accomplish this are constructed from **a set of Control Points**, who's coordinates are known in both planes, and a specific transformation algorithm.
+This module contains classes and methods to **transform Points, LineStrings, Polygons** and other spatial features from a 2D cartesian `(x, y)` source space to a destination space. The transformation function that accomplish this are constructed from **a set of Control Points**, who's coordinates are known in both spaces, and a specific **type of transformation** algorithm.
 
-Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we transform a IIIF image from the 'resource' space of the image to the '(projected) geospatial' space of a map projection (in most cases WebMercator). We construct the necessary transformation functions from the Ground Control Points that can be found in the map's Georeference Annotation.
+Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two places where we transform a IIIF image from the 'resource' space of the image to the '(projected) geospatial' space of a map projection (in most cases WebMercator), using the Ground Control Points and transformation type defined in the map's Georeference Annotation.
 
 Like all other Allmaps modules, care was taken to make this module usable and useful outside of the Allmaps context as well! Feel free to incorporate it in your project if it could be useful.
 
 ## How it works
 
-This package exports the `GcpTransformer` class. Its instances (called 'transformers') are built from a set of Ground Control Points (GCPs) and a specified transformation type. Using these, a forward and backward transformation can be built that map arbitrary Points in one plane to the corresponding Points in the other plane. The transformer has dedicated functions that use these two transformations to transform Points, and more complex geometries like LineStrings and Polygons, forward and backward.
+This package exports the `GeneralGcpTransformer` and `GcpTransformer` classes.
 
-An **example** below using the map *L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae* ([Open in Allmaps Viewer](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec)): based on the map's GCPs in resource and (projected) geo coordinates, a transformer can be built (visualised by the grid) allowing to transform any geometry from resource to geo space. Here, the resource mask is transformed from resource to (projected) geo space.
+* A **General GCP Transformer** is useful in the general case: it takes in ground control points of the `GeneralGcp` type, with 'source' and 'destination' fields, and has methods `generalTransformer.transformForward()` to transform geometries from 'source' space to 'destination' space, and `generalTransformer.transformBackward()` to transform from 'destination' space to 'source' space.
+* A **GCP Transformer** it useful in the typical Allmaps case: it takes in ground control points of the `Gcp` type, with 'resource' and 'geo' fields, and has methods `transformer.transformToGeo()` to transform geometries from 'resource' space to 'geo' space, and `transformer.transformToResource()` to transform from 'geo' space to 'resource' space. Apart from naming, there is also one default option set for this type of transformer: `differentHandedness = true` by default, since the most common case is that the resource space had a downward y-axis.
+
+In both cases, calling a transform method will build a transformation of the specified type using the input GCPs, or use it if it already exists. These transformations can then transform points one by one. For lineStrings and polygons the transform options can be used to add extra mid-points to assure sufficiently smooth results.
+
+As an **example** for the georeferenced map *L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae* ([Open in Allmaps Viewer](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec)): based on the map's GCPs in resource and (projected) geo coordinates, a GCP Transformer can be built (visualised by the grid) allowing to transform any geometry from resource to geo space. Here, the resource mask is transformed from resource to (projected) geo space.
 
 ![](example.png)
 
@@ -28,10 +33,10 @@ npm install @allmaps/transform
 
 ### Point
 
-In this example we transform forward.
+In this example we use a general transformer to transform forward.
 
 ```js
-import { GcpTransformer } from '@allmaps/transform'
+import { GeneralGcpTransformer } from '@allmaps/transform'
 
 export const generalGcps3 = [
   {
@@ -48,15 +53,15 @@ export const generalGcps3 = [
   }
 ]
 
-const transformer = new GcpTransformer(generalGcps3, 'polynomial')
+const generalTransformer = new GeneralGcpTransformer(generalGcps3, 'polynomial')
 
-const transformedPoint = transformer.transformForward([1, 1])
+const transformedPoint = generalTransformer.transformForward([1, 1])
 // transformedPoint = [6, 14]
 ```
 
 ### LineString
 
-In this example we transform backward.
+In this example we use a transformer to transform backward.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
@@ -122,7 +127,7 @@ const transformedLineString = transformer.transformBackward(
 
 ### Polygon
 
-In this example we use a Thin Plate Spline transformation.
+In this example we use a transformer to build a Thin Plate Spline transformation.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
@@ -190,7 +195,7 @@ const transformedPolygon = transformer.transformForward(
 
 ### MultiPoint
 
-In this example we transform a multi-geometry.
+In this example we use a transformer to transform a multi-geometry.
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
@@ -225,7 +230,7 @@ A transformer is created from a set of **GCPs**, a **transformation type** and s
 
 ### GCPs
 
-GCPs follow the GCP type (see below). Each transformation type has a minimum number of GCPs.
+GCPs follow the `GeneralGcp` or `Gcp` type (see below) respectively. Each transformation type has a minimum number of GCPs.
 
 Only **linearly independent control points** should be considered when checking if the criterion for the minimum number of control points is met. For example, three control points that are collinear (one the same line) only count as two linearly independent points. The current implementation doesn't check such linear (in)dependance, but building a transformer with insufficient linearly independent control points will result in a badly conditioned matrix (no error but diverging results) or non-invertible matrix (**error when inverting matrix**). See [@allmaps/analyse](../../packages/analyse/) for ways to analyse and check GCP properties.
 
@@ -243,17 +248,53 @@ The following transformation types are supported.
 | <img width="100" src="../ui/src/lib/shared/images/transformations/thin-plate-spline.svg" alt="thinPlateSpline"> | `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Applies smooth transformation. Transformation is 'exact' at GPCs. (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
 | <img width="100" src="../ui/src/lib/shared/images/transformations/projective.svg" alt="projective">             | `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Follow perspective rules. Preserves lines and cross-ratios.                                                                          | 4                      |
 
+### Transformer options
+
+When creating a transformer, 'transformer options' can be specified. Apart from the options below, any 'transform options' (e.g. `maxDepth`) specified when creating a transformer will become the default options, used when calling a transform method.
+
+| Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
+|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
+
+#### Handedness
+
+For some transformation types, it is important that the source and destination planes have the same *handedness*.
+
+When we consider 2D Cartesian planes, there are two types of 'handedness'. A Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the 'first' and the y-axis the 'second' axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates, which have their origin in the top left corner.
+
+The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For most transformation types solving the transformation happens independently for the x- and y-axis is, and hence it does not matter whether the source and destination are considered to have the same handedness or not: the same transformation parameters are obtained. For some transformations, like the Helmert transformation, the transformation of x- and y- coordinates are computed jointly (they are said to be 'coupled') and the difference matters. The algorithms won't produce the desired results unless action is taken to align the handedness.
+
+Therefore, in case the handedness differs and this could matter, one can set the `differentHandedness` parameter to `true`. This will (not change the data itself, but) during computation of the transformation parameters and during evaluation of new inputs flip the y-axis of the source so as to align the handedness of both.
+
+In addition, it is also possible to *explicitly* flip the y-axis of the output. This can be useful for example when transforming features backward from (lon, lat) coordinates to image coordinates (with `differentHandedness` set to `true` as it should be): when inspecting the resulting features in image space in an HTML-canvas, the results will display correctly since both the image and features are rendered according to the downward y-axis of the canvas. Some applications will, however, load images and vector features differently: QGIS (with the 'no-CRS' setting) for example loads vector features with an upward y-axis but images with a downward y-axis. For these special cases, (still set the `differentHandedness` set to `true` but also) use the 'return type function' as follows to make your resulting features overlap the image in the application you are using:
+
+```ts
+import { GeneralGcpTransformer } from '@allmaps/transform'
+
+const generalGcps3 = ... // see above
+
+const transformer = new GeneralGcpTransformer(generalGcps3, 'helmert', {
+    differentHandedness: true
+  })
+const input = [4.925027120153211, 52.46506809004473]
+
+const output = transformer.transformBackward([0, 0], {}, (generalGcp) => [
+  generalGcp.source[0],
+  -generalGcp.source[1]
+])
+// output = [146.25183291709982, -122.59989116975339]
+// instead of [146.25183291709982, 122.59989116975339]
+```
+
 ## Using transformer methods
 
-Once a transformer is built, its methods can be used to transform geometries forward and backward. Transformer methods take a **Geometry**, some optional **options** and an optional **'return type function'**.
+Once a transformer is built, its methods can be used to transform geometries from one space to the other. Transformer methods take a **Geometry**, some optional **options** and an optional **'return type function'**.
 
-There are separate methods for transforming forward or backward: `transformForward()` and `transformBackward()`.
+There are separate methods for transforming one way or the other between the two spaces: a General GCP Transformer has methods `transformForward()` and `transformBackward()`, a GCP Transformer has methods `transformToGeo()` and `transformToResource()`.
 
 These methods accepts Points, LineStrings as well as Polygons (and MultiPoints, MultiLineStrings and MultiPolygons) geometries (as defined in [@allmaps/types](../../packages/types/)).
 
-Alternatively the same two methods are available with more expressive term for the Allmaps use casee: `transformToGeo()` and `transformToResource()`.
-
-Note that the backward methods are in general **not the exact inverse** of the forward methods. They are different function created by interpreting the GCPs in the one sense or the other. In some exceptional cases (like for 1st order polynomial transformations with exactly 3 GCPs) the backwards method is the exact inverse. In some cases, the exact inverse can be computed using some simple math from the transformation parameters (like for general 1st order polynomial transformations). In other cases, an exact inverse function could be obtained by implementing stepwise approximation of the inverse function (e.g. gradient descent).
+Note that the 'backward' (or 'toResource') methods are in general **not the exact inverse** of the 'forward' (or 'toGeo') methods. They are different function created by interpreting the GCPs in the one sense or the other. In some exceptional cases (like for 1st order polynomial transformations with exactly 3 GCPs) the backwards method is the exact inverse. In some cases, the exact inverse can be computed using some simple math from the transformation parameters (like for general 1st order polynomial transformations). In other cases, an exact inverse function could be obtained by implementing stepwise approximation of the inverse function (e.g. gradient descent).
 
 Note that the transform methods are **map-projection agnostic**: they describe a transformation for one cartesian `(x, y)` plane to another. Using control points with `(longitude, latitude)` coordinates will produce a transformation from or to the cartesian plane of an equirectangular projection. (The only semi-exception to this is when using the `destinationIsGeographic` and `sourceIsGeographic` parameters - although these consider coordinates as lying on a sphere more than as projection coordinates.)
 
@@ -302,26 +343,19 @@ const svg = GcpTransformer.transformGeojsonFeatureCollectionToSvgString(
 
 ### Transform options
 
-Some options are available to improve transformations.
+Some 'transform options' are available when we transform geometries:
 
-These options can be specified when using a transformer's method to transform geometries, or earlier upon the creation of the transformer. Options specified in a transformer's method override options specified during the transformer's creation, which in term override the default options.
-
-The `differentHandedness` option is used both when a transformer and when a geometry is transformed, and should not be altered between these two actions.
-
-Here's an overview of the available options:
-
-| Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
-|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
-| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                                                                                                                                   | `number`              | `0` (i.e. no midpoints by default!)                |
-| `minOffsetRatio`          | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                       | `number`              | `0`                                                |
-| `minOffsetDistance`       | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                    | `number`              | `Infinity` (i.e. condition not applied by default) |
-| `minLineDistance`         | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                                                      | `number`              | `Infinity` (i.e. condition not applied by default) |
-| `sourceIsGeographic`      | Use geographic distances and midpoints for lon-lat source points.                                                                                                                                                                                                                                                                                                          | `boolean`             | `false`                                            |
-| `destinationIsGeographic` | Use geographic distances and midpoints for lon-lat destination points.                                                                                                                                                                                                                                                                                                     | `boolean`             | `false`                                            |
-| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean`             | `false`                                            |
-| `distortionMeasures`      | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                                                                                                                                                                 | `DistortionMeasure[]` | `[]`                                               |
-| `referenceScale`          | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                                                                                                                                                                           | `number`              | `1`                                                |
-| `isMultiGeometry`         | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry types are not deterministic: the types of LineString and MultiPoint are identical.                                                                                                                                                 | `boolean`             | `false`                                            |
+| Option                    | Description                                                                                                                                                                                                               | Type                  | Default                                            |
+|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| `maxDepth`                | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                   | `number`              | `0` (i.e. no midpoints by default!)                |
+| `minOffsetRatio`          | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)                                                                                                                                       | `number`              | `0`                                                |
+| `minOffsetDistance`       | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                    | `number`              | `Infinity` (i.e. condition not applied by default) |
+| `minLineDistance`         | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                      | `number`              | `Infinity` (i.e. condition not applied by default) |
+| `sourceIsGeographic`      | Use geographic distances and midpoints in 'source' ('resource') domain in lon-lat WGS84.                                                                                                                                  | `boolean`             | `false`                                            |
+| `destinationIsGeographic` | Use geographic distances and midpoints in 'destination' ('geo') domain in lon-lat WGS84.                                                                                                                                  | `boolean`             | `false`                                            |
+| `distortionMeasures`      | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                 | `DistortionMeasure[]` | `[]`                                               |
+| `referenceScale`          | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                           | `number`              | `1`                                                |
+| `isMultiGeometry`         | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry types are not deterministic: the types of LineString and MultiPoint are identical. | `boolean`             | `false`                                            |
 
 #### Recursively adding midpoints
 
@@ -339,36 +373,6 @@ Note that only one is met by default. Set a value to a number to opt in to a con
 
 The computation of the midpoints and distances in the source and destination domains during this process uses geometric algorithms, unless `sourceIsGeographic` or `destinationIsGeographic` are set to `true`, in which case geographic algorithms (such as 'Great-circle distance') are used.
 
-#### Handedness
-
-For some transformations, it is important that the source and destination planes have the same *handedness*.
-
-When we consider 2D Cartesian planes, there are two types of 'handedness'. A Cartesian plane with the positive x-axis pointing right and the positive y-axis pointing up (and the x-axis being the 'first' and the y-axis the 'second' axis) is said to have *right-handed* orientation (also called *standard*, *positive* or *counter-clockwise*). This is for example the case in the equirectangular projection - at least if the coordinate order is (lon, lat). Alternatively, if the y-axis points downwards, we say the orientation is *left-handed* (or *negative* or *clock-wise*). This is for example the case for typical pixel coordinates, which have their origin in the top left corner.
-
-The handedness of the source and destination can differ, for example if the source are pixels of an image and the destination are (lon, lat) coordinates (which is the typical case for Allmaps). For most transformation types solving the transformation happens independently for the x- and y-axis is, and hence it does not matter whether the source and destination are considered to have the same handedness or not: the same transformation parameters are obtained. For some transformations, like the Helmert transformation, the transformation of x- and y- coordinates are computed jointly (they are said to be 'coupled') and the difference matters. The algorithms won't produce the desired results unless action is taken to align the handedness.
-
-Therefore, in case the handedness differs and this could matter, one can set the `differentHandedness` parameter to `true`. This will (not change the data itself, but) during computation of the transformation parameters and during evaluation of new inputs flip the y-axis of the source so as to align the handedness of both.
-
-It is also possible to explicitly flip the y-axis of the output. This can be useful for example when transforming features backward from (lon, lat) coordinates to image coordinates (with `differentHandedness` set to `true` as it should be): when inspecting the resulting features in image space in an HTML-canvas, the results will display correctly since both the image and features are rendered according to the downward y-axis of the canvas. Some applications will, however, load images and vector features differently: QGIS (with the 'no-CRS' setting) for example loads vector features with an upward y-axis but images with a downward y-axis. For these special cases, (still set the `differentHandedness` set to `true` but also) use the 'return type function' as follows to make your resulting features overlap the image in the application you are using:
-
-```ts
-import { GcpTransformer } from '@allmaps/transform'
-
-const generalGcps3 = ... // see above
-
-const transformer = new GcpTransformer(generalGcps3, 'helmert', {
-    differentHandedness: true
-  })
-const input = [4.925027120153211, 52.46506809004473]
-
-const output = transformer.transformBackward([0, 0], {}, (generalGcp) => [
-  generalGcp.source[0],
-  -generalGcp.source[1]
-])
-// output = [146.25183291709982, -122.59989116975339]
-// instead of [146.25183291709982, 122.59989116975339]
-```
-
 #### Distortions
 
 Some transformations may induce distortions. Let's consider transforming an image to make this more visual. It we take a Helmert transformation of an image, we will see that it doesn't distort the image much: it will scale, rotate and translate the image, but not shear it (angles are preserved) - the only distortion applied is the scaling, and that scaling is the same everywhere across the image. If, on the other hand, we take a Thin Plate Spline transformation (with many GCPs) of that same image, we will see that the image will be distorted much, and will look like a rubber sheet which has been pulled and deformed in many different locations. Every pixel will be distorted in a unique way, such that both the areas and angles of the original image are not preserved.
@@ -377,7 +381,7 @@ We can compute these distortions locally, at every point. The approach implement
 
 'Differential Distortion Analysis' was earlier implemented in [this](https://github.com/mclaeysb/distortionAnalysis) Matlab/Octave package following peer reviewed publications of both the theoretical approach an an application to a historical map.
 
-This packages supports the evaluation of the partial derivatives in the `transformForward()` and `transformBackward()` functions via their transform options, and exports a function `computeDistortionFromPartialDerivatives()` to compute the distortion measures from these partial derivatives. The supported distortion measures are available via the exported `supportedDistortionMeasures` constant. These include:
+The supported distortion measures are available via the exported `supportedDistortionMeasures` constant. These include:
 
 | Key         | Type                               | Description                                                                                                                                                                                                                              | Example                                                                                                              |
 |-------------|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
@@ -387,7 +391,7 @@ This packages supports the evaluation of the partial derivatives in the `transfo
 | `signDetJ`  | Flip measure                       | The transformation's Jacobian determinant flipping sign, describing 'fold-over' of the transformation.                                                                                                                                   | `1` for no flip, `-1` for flip.                                                                                      |
 | `thetaa`    | Tissot indicatrix axis             | The angle between the major axis of the Tissot indicatrix and the cartesian x-axis.                                                                                                                                                      | `0` for no rotation, `>0` for rotation.                                                                              |
 
-Here's an example on how to compute local distortion.
+To compute distortion measures, specify the requested measures in the transform options and read the values using the 'return type function':
 
 ```js
 import { GcpTransformer } from '@allmaps/transform'
@@ -417,7 +421,7 @@ transformer.transformToGeo(
 
 The 'return type function' (internally named `generalGcpToP` or `GcpToP`) allows to modify the type of data returned for each point.
 
-An example will make this more clear: when forward-transforming a LineString, the input is a LineString in the source space and the (default) output is a LineString in the destination space (i.e. an Array of destination points). Using the 'return type function', you can make this output to be an Array of any function of objects of type GcpAndDistortions, which include the destination points, but also the corresponding source points and (if computed) the distortion information. By default this function this selects the destination points, and hence returns an Array of Points, but you can pass a function `(generalGcpToP) => generalGcpToP` to return an Array of  GcpAndDistortions objects, or you can pass more complex function on this object as well. This can be useful in several cases:
+An example will make this more clear: when using a General GCP Transformer to forward-transform a LineString, the input is a LineString in the source space and the (default) output is a LineString in the destination space (i.e. an Array of destination points). Using the 'return type function', you can make this output to be an Array of any function of objects of type GeneralGcpAndDistortions, which include the destination points, but also the corresponding source points and (if computed) the distortion information. By default this function selects the destination points, and hence returns an Array of Points, but you can pass a function `(generalGcpToP) => generalGcpToP` to return an Array of  GcpAndDistortions objects, or you can pass more complex function on this object as well. This can be useful in several cases:
 
 * When you want to refine an input geometry using a transformation but are interested in the coordinates of the refined geometry in the input domain more then those in the output domain.
 * When you want to read out distortion information at each point (see the options for how to specify which distortions measures to compute).
@@ -429,7 +433,7 @@ For geometries and other types, the same types as in [@allmaps/types](../../pack
 
 For GCPs, some generalisations have been added:
 
-GCPs can be supplied as an array of objects containing `source` and `destination` coordinates:
+For a General GCP Transformer, control points can be supplied as an array of objects containing `source` and `destination` coordinates:
 
 ```ts
 type GeneralGcp = {
@@ -438,7 +442,7 @@ type GeneralGcp = {
 }
 ```
 
-Or you can supply an array of objects containing `resource` and `geo` coordinates. This is the format used in [Georeference Annotations](https://iiif.io/api/extension/georef/):
+For a GCP Transformer, supply the control points as an array of objects containing `resource` and `geo` coordinates. This is the format used in [Georeference Annotations](https://iiif.io/api/extension/georef/):
 
 ```ts
 type Gcp = {
@@ -447,7 +451,7 @@ type Gcp = {
 }
 ```
 
-The return type functions work on the types GeneralGcpAndDistortions and GcpAndDistortions, defined as follows:
+The return type functions work on the types `GeneralGcpAndDistortions` and `GcpAndDistortions`, defined as follows:
 
 ```ts
 export type Distortions = {
@@ -469,13 +473,12 @@ For a little history: this library started out as a JavaScript port of [gdaltran
 
 ## CLI
 
-The [@allmaps/cli](../../apps/cli/) package creates and interface for four specific use cases:
+The [@allmaps/cli](../../apps/cli/) package creates and interface for some specific use cases:
 
-* Transforming points to points.
-* Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to **GeoJSON** objects in the geo coordinate space of an interactive map.
-* Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to **SVG** objects in the resource coordinates space of a IIIF resource, **given (the GCPs and transformation type from) a Georeference Annotation**
-* Vice versa: transforming **SVG** objects from the resource coordinates to **GeoJSON** objects in the geo coordinate space.
-* Transforming the **SVG resource mask** included in a Georeference Annotation to a GeoJSON Polygon.
+* Transforming **coordinates** from point to point.
+* Transforming **SVG** geometries from the resource coordinates space of a IIIF resource to GeoJSON objects in the geo coordinate space of an interactive map, using the GCPs and transformation type specified in a Georeference Annotation.
+* Transforming **GeoJSON** objects from the geo coordinate space of an interactive map to SVG objects in the resource coordinates space of a IIIF resource, using the GCPs and transformation type specified in a Georeference Annotation.
+* Transforming the **resource mask** of a Georeference Annotation from the resource coordinates space to a GeoJSON polygon in the geo coordinate space.
 
 ## Benchmark
 
@@ -1422,6 +1425,23 @@ Transformation type.
     | 'projective'
     | 'thinPlateSpline'`)
 
+### `TransformerOptions`
+
+###### Type
+
+```ts
+{differentHandedness: boolean} & {
+  maxDepth: number
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  sourceIsGeographic: boolean
+  destinationIsGeographic: boolean
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+} & MultiGeometryOptions
+```
+
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 
 Compute the distortion value of selected distortion measures from the partial derivatives at a specific point
@@ -1454,6 +1474,12 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 * `minOffsetRatio` (`number`)
 * `referenceScale` (`number`)
 * `sourceIsGeographic` (`false`)
+
+### `defaultTransformerOptions`
+
+###### Fields
+
+* `differentHandedness` (`false`)
 
 ### `supportedDistortionMeasures`
 

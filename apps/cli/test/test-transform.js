@@ -45,6 +45,18 @@ describe('allmaps transform svg', () => {
     // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
     expect(expected).to.roughly(0.00000000000001).deep.equal(output)
   })
+
+  it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically and using the custom transform options', () => {
+    const expected = readFileJson(
+      'output/geojson/7a69f9470b49a744-polylines-max-depth-1.geojson'
+    )
+    const output = execJson(
+      'transform svg -a input/annotations/7a69f9470b49a744.json --max-depth 1',
+      'input/svg/polylines.svg'
+    )
+    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
+    expect(expected).to.roughly(0.0001).deep.equal(output)
+  })
 })
 
 describe('allmaps transform geojson', () => {

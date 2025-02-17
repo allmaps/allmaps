@@ -12,7 +12,10 @@ export {
   computeDistortionsFromPartialDerivatives
 } from './shared/distortion.js'
 
-export { defaultTransformOptions } from './shared/transform-functions.js'
+export {
+  defaultTransformOptions,
+  defaultTransformerOptions
+} from './shared/transform-functions.js'
 
 // export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
 
@@ -26,6 +29,7 @@ export type {
   SplitGcpLineInfo,
   TransformationType,
   TransformerInputs,
+  TransformerOptions,
   TransformOptions,
   KernelFunction,
   KernelFunctionOptions,
