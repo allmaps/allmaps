@@ -54,6 +54,7 @@ import type {
   GeneralGcpAndDistortions,
   GcpAndDistortions,
   TransformationType,
+  TransformerOptions,
   TransformOptions
 } from '../shared/types.js'
 
@@ -81,15 +82,18 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param gcps - An array of Ground Control Points (GCPs)
    * @param type - The transformation type
-   * @param options - Partial transform options
+   * @param partialTransformerOptions - Transformer options
    */ constructor(
     gcps: Gcp[],
     type: TransformationType = 'polynomial',
-    options?: Partial<TransformOptions>
+    partialTransformerOptions?: Partial<TransformerOptions>
   ) {
     const generalGcps = gcps.map(gcpToGeneralGcp)
-    options = mergePartialOptions({ differentHandedness: true }, options)
-    super(generalGcps, type, options)
+    partialTransformerOptions = mergePartialOptions(
+      { differentHandedness: true },
+      partialTransformerOptions
+    )
+    super(generalGcps, type, partialTransformerOptions)
   }
 
   public get gcps(): Gcp[] {
@@ -166,112 +170,120 @@ export class GcpTransformer extends BaseGcpTransformer {
 
   transformToGeo<P = Point>(
     point: Point,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToGeo<P = Point>(
     lineString: LineString,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToGeo<P = Point>(
     polygon: Polygon,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToGeo<P = Point>(
     multiPoint: MultiPoint,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToGeo<P = Point>(
     multiLineString: MultiLineString,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToGeo<P = Point>(
     multiPoint: MultiPolygon,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToGeo<P = Point>(
     geometry: Geometry,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry to geo space
    *
    * @param geometry - Geometry to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @param generalGcpToP - Return type function
    * @returns Input geometry transformed to geo space
    */
   transformToGeo<P = Point>(
     geometry: Geometry,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP: (gcp: GcpAndDistortions) => P = gcpToPointForToGeo as (
       gcp: GcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    return super._transformForward(geometry, options, generalGcpToP)
+    return super._transformForward(
+      geometry,
+      partialTransformOptions,
+      generalGcpToP
+    )
   }
 
   transformToResource<P = Point>(
     point: Point,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToResource<P = Point>(
     lineString: LineString,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToResource<P = Point>(
     polygon: Polygon,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToResource<P = Point>(
     multiPoint: MultiPoint,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToResource<P = Point>(
     multiLineString: MultiLineString,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToResource<P = Point>(
     multiPolygon: MultiPolygon,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToResource<P = Point>(
     geometry: Geometry,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry to resource space
    *
    * @param geometry - Geometry to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @param generalGcpToP - Return type function
    * @returns Input geometry transformed to resource space
    */
   transformToResource<P>(
     geometry: Geometry,
-    options?: Partial<TransformOptions>,
+    partialTransformOptions?: Partial<TransformOptions>,
     gcpToP: (gcp: GcpAndDistortions) => P = gcpToPointForToResource as (
       gcp: GcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    return super._transformBackward(geometry, options, generalGcpToP)
+    return super._transformBackward(
+      geometry,
+      partialTransformOptions,
+      generalGcpToP
+    )
   }
 
   // Shortcut static methods for SVG <> GeoJSON
@@ -285,49 +297,52 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param transformer - A GCP Transformer defining the transformation
    * @param geometry - SVG geometry to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @returns Input SVG geometry transformed to geo space, as a GeoJSON Geometry
    */
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgCircle: SvgCircle,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonPoint
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgLine: SvgLine,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonLineString
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgPolyLine: SvgPolyLine,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonLineString
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgRect: SvgRect,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonPolygon
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgPolygon: SvgPolygon,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonPolygon
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgGeometry: SvgGeometry,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonGeometry
   static transformSvgToGeojson(
     transformer: GcpTransformer,
     svgGeometry: SvgGeometry,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonGeometry {
-    options = mergePartialOptions({ destinationIsGeographic: true }, options)
+    partialTransformOptions = mergePartialOptions(
+      { destinationIsGeographic: true },
+      partialTransformOptions
+    )
     // This middle step is needed to make typescript happy
     const transformedGeometry = transformer.transformToGeo(
       svgGeometryToGeometry(svgGeometry),
-      options
+      partialTransformOptions
     )
     return geometryToGeojsonGeometry(transformedGeometry)
   }
@@ -341,20 +356,20 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param transformer - A GCP Transformer defining the transformation
    * @param svg - An SVG string to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @returns Input SVG string transformed to geo space, as a GeoJSON FeatureCollection
    */
   static transformSvgStringToGeojsonFeatureCollection(
     transformer: GcpTransformer,
     svg: string,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): GeojsonFeatureCollection {
     const geojsonGeometries = []
     for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
       const geojsonGeometry = this.transformSvgToGeojson(
         transformer,
         svgGeometry,
-        options
+        partialTransformOptions
       )
       geojsonGeometries.push(geojsonGeometry)
     }
@@ -370,19 +385,22 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param transformer - A GCP Transformer defining the transformation
    * @param geojsonGeometry - GeoJSON Geometry to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @returns Input GeoJSON Geometry transform to resource space, as SVG geometry
    */
   static transformGeojsonToSvg(
     transformer: GcpTransformer,
     geojsonGeometry: GeojsonGeometry,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): SvgGeometry {
-    options = mergePartialOptions({ destinationIsGeographic: true }, options)
+    partialTransformOptions = mergePartialOptions(
+      { destinationIsGeographic: true },
+      partialTransformOptions
+    )
     // This middle step is needed to make typescript happy
     const transformedGeometry = transformer.transformToResource(
       geojsonGeometryToGeometry(geojsonGeometry),
-      options
+      partialTransformOptions
     )
     return geometryToSvgGeometry(transformedGeometry)
   }
@@ -396,13 +414,13 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param transformer - A GCP Transformer defining the transformation
    * @param geojson - GeoJSON FeatureCollection to transform
-   * @param options - Transform options
+   * @param partialTransformOptions - Transform options
    * @returns Input GeoJSON FeaturesCollection transformed to resource space, as SVG string
    */
   static transformGeojsonFeatureCollectionToSvgString(
     transformer: GcpTransformer,
     geojson: GeojsonFeatureCollection,
-    options?: Partial<TransformOptions>
+    partialTransformOptions?: Partial<TransformOptions>
   ): string {
     const svgGeometries = []
     for (const geojsonGeometry of geojsonFeatureCollectionToGeojsonGeometries(
@@ -411,7 +429,7 @@ export class GcpTransformer extends BaseGcpTransformer {
       const svgGeometry = this.transformGeojsonToSvg(
         transformer,
         geojsonGeometry,
-        options
+        partialTransformOptions
       )
       svgGeometries.push(svgGeometry)
     }

@@ -6,7 +6,11 @@ import { mergeOptions } from '@allmaps/stdlib'
 
 import { defaultRefinementOptions } from './refinement-functions.js'
 
-import type { TransformOptions, RefinementOptions } from './types.js'
+import type {
+  TransformerOptions,
+  TransformOptions,
+  RefinementOptions
+} from './types.js'
 
 import type { Point } from '@allmaps/types'
 
@@ -20,9 +24,13 @@ export const defaultTransformOptions: TransformOptions = {
   sourceIsGeographic: false,
   destinationIsGeographic: false,
   isMultiGeometry: false,
-  differentHandedness: false,
   distortionMeasures: [],
   referenceScale: 1
+}
+
+export const defaultTransformerOptions: TransformerOptions = {
+  differentHandedness: false,
+  ...defaultTransformOptions
 }
 
 export function refinementOptionsFromForwardTransformOptions(

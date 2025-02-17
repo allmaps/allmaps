@@ -534,7 +534,7 @@ The benchmark can be run with `pnpm run bench`.
 Gcp & Partial<Distortions>
 ```
 
-### `new GcpTransformer(gcps, type, options)`
+### `new GcpTransformer(gcps, type, partialTransformerOptions)`
 
 Create a GcpTransformer
 
@@ -544,8 +544,8 @@ Create a GcpTransformer
   * An array of Ground Control Points (GCPs)
 * `type` (`TransformationType | undefined`)
   * The transformation type
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Partial transform options
+* `partialTransformerOptions?` (`Partial<TransformerOptions> | undefined`)
+  * Transformer options
 
 ###### Returns
 
@@ -593,7 +593,7 @@ Returned in the lenght of the shortest piece, measured in resource coordinates.
 
 * `resourceBbox` (`[number, number, number, number]`)
   * BBox in resource space where the resolution is requested
-* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
   * extra parameters to consider
 
 ###### Returns
@@ -630,38 +630,38 @@ Returned in the lenght of the shortest piece, measured in geo coordinates.
 
 * `geoBbox` (`[number, number, number, number]`)
   * BBox in geo space where the resolution is requested
-* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
   * extra parameters to consider
 
 ###### Returns
 
 `number | undefined`.
 
-### `GcpTransformer#transformToGeo(point, options, gcpToP)`
+### `GcpTransformer#transformToGeo(point, partialTransformOptions, gcpToP)`
 
 ###### Parameters
 
 * `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
 `P`.
 
-### `GcpTransformer#transformToResource(point, options, gcpToP)`
+### `GcpTransformer#transformToResource(point, partialTransformOptions, gcpToP)`
 
 ###### Parameters
 
 * `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
 `P`.
 
-### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, options)`
+### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, partialTransformOptions)`
 
 Transform a GeoJSON FeatureCollection to resource space to a SVG string
 
@@ -675,14 +675,14 @@ Note: Multi-geometries are not supported
   * A GCP Transformer defining the transformation
 * `geojson` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
   * GeoJSON FeatureCollection to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
 Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`string`).
 
-### `GcpTransformer.transformGeojsonToSvg(transformer, geojsonGeometry, options)`
+### `GcpTransformer.transformGeojsonToSvg(transformer, geojsonGeometry, partialTransformOptions)`
 
 Transform a GeoJSON Geometry to resource space to a SVG geometry
 
@@ -701,14 +701,14 @@ Note: Multi-geometries are not supported
     | GeojsonMultiLineString
     | GeojsonMultiPolygon`)
   * GeoJSON Geometry to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
 Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle | SvgLine | SvgPolyLine | SvgRect | SvgPolygon`).
 
-### `GcpTransformer.transformSvgStringToGeojsonFeatureCollection(transformer, svg, options)`
+### `GcpTransformer.transformSvgStringToGeojsonFeatureCollection(transformer, svg, partialTransformOptions)`
 
 Transform an SVG string to geo space to a GeoJSON FeatureCollection
 
@@ -722,14 +722,14 @@ Note: Multi-geometries are not supported
   * A GCP Transformer defining the transformation
 * `svg` (`string`)
   * An SVG string to transform
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
 
 Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`).
 
-### `GcpTransformer.transformSvgToGeojson(transformer, svgCircle, options)`
+### `GcpTransformer.transformSvgToGeojson(transformer, svgCircle, partialTransformOptions)`
 
 Transform an SVG geometry to geo space as a GeoJSON Geometry
 
@@ -742,7 +742,7 @@ Note: Multi-geometries are not supported
 * `transformer` (`GcpTransformer`)
   * A GCP Transformer defining the transformation
 * `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
   * Transform options
 
 ###### Returns
@@ -764,7 +764,7 @@ Input SVG geometry transformed to geo space, as a GeoJSON Geometry (`{type: 'Poi
 GeneralGcp & Partial<Distortions>
 ```
 
-### `new GeneralGcpTransformer(generalGcps, type, options)`
+### `new GeneralGcpTransformer(generalGcps, type, partialTransformerOptions)`
 
 Create a GeneralGcpTransformer
 
@@ -774,8 +774,8 @@ Create a GeneralGcpTransformer
   * An array of General Ground Control Points (GCPs)
 * `type` (`TransformationType | undefined`)
   * The transformation type
-* `options?` (`Partial<TransformOptions> | undefined`)
-  * Partial transform options
+* `partialTransformerOptions?` (`Partial<TransformerOptions> | undefined`)
+  * Transformer options
 
 ###### Returns
 
@@ -823,7 +823,7 @@ Returned in the lenght of the shortest piece, measured in destination coordinate
 
 * `destinationBbox` (`[number, number, number, number]`)
   * BBox in destination space where the resolution is requested
-* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
   * extra parameters to consider
 
 ###### Returns
@@ -860,31 +860,31 @@ Returned in the lenght of the shortest piece, measured in source coordinates.
 
 * `sourceBbox` (`[number, number, number, number]`)
   * BBox in source space where the resolution is requested
-* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
   * extra parameters to consider
 
 ###### Returns
 
 `number | undefined`.
 
-### `GeneralGcpTransformer#transformBackward(point, options, generalGcpToP)`
+### `GeneralGcpTransformer#transformBackward(point, partialTransformOptions, generalGcpToP)`
 
 ###### Parameters
 
 * `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
 * `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
 `P`.
 
-### `GeneralGcpTransformer#transformForward(point, options, generalGcpToP)`
+### `GeneralGcpTransformer#transformForward(point, partialTransformOptions, generalGcpToP)`
 
 ###### Parameters
 
 * `point` (`[number, number]`)
-* `options?` (`Partial<TransformOptions> | undefined`)
+* `partialTransformOptions?` (`Partial<TransformOptions> | undefined`)
 * `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
 ###### Returns
@@ -1386,10 +1386,9 @@ number
   minLineDistance: number
   sourceIsGeographic: boolean
   destinationIsGeographic: boolean
-  differentHandedness: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
-} & ConversionOptions
+} & MultiGeometryOptions
 ```
 
 ### `TransformationType`
@@ -1447,7 +1446,6 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 ###### Fields
 
 * `destinationIsGeographic` (`false`)
-* `differentHandedness` (`false`)
 * `distortionMeasures` (`Array<never>`)
 * `isMultiGeometry` (`false`)
 * `maxDepth` (`number`)

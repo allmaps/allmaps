@@ -107,12 +107,6 @@ Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 [number, number, number, number]
 ```
 
-### `ConversionOptions`
-
-###### Fields
-
-* `isMultiGeometry` (`false`)
-
 ### `FetchFn`
 
 ###### Type
@@ -308,6 +302,12 @@ Array<Point>
   number
 ]
 ```
+
+### `MultiGeometryOptions`
+
+###### Fields
+
+* `isMultiGeometry` (`false`)
 
 ### `MultiLineString`
 

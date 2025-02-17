@@ -23,7 +23,7 @@ import type {
   SvgPolygon,
   SvgGeometry,
   Size,
-  ConversionOptions
+  MultiGeometryOptions
 } from '@allmaps/types'
 
 // Assert
@@ -216,31 +216,31 @@ export function multiPolygonToGeojsonMultiPolygon(
 
 export function geometryToGeojsonGeometry(
   point: Point,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonPoint
 export function geometryToGeojsonGeometry(
   lineString: LineString,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonLineString
 export function geometryToGeojsonGeometry(
   polygon: Polygon,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonPolygon
 export function geometryToGeojsonGeometry(
   multiPoint: MultiPoint,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonMultiPoint
 export function geometryToGeojsonGeometry(
   multiLineString: MultiLineString,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonMultiLineString
 export function geometryToGeojsonGeometry(
   multiPolygon: MultiPolygon,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonMultiPolygon
 export function geometryToGeojsonGeometry(
   geometry: Geometry,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonGeometry
 /**
  * Converts a Geometry to a GeoJSON Geometry
@@ -249,7 +249,7 @@ export function geometryToGeojsonGeometry(
  */
 export function geometryToGeojsonGeometry(
   geometry: Geometry,
-  options?: Partial<ConversionOptions>
+  options?: Partial<MultiGeometryOptions>
 ): GeojsonGeometry {
   if (!options || !options.isMultiGeometry) {
     if (isPoint(geometry)) {

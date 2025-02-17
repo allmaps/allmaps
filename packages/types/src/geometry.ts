@@ -64,7 +64,7 @@ export type TypedGeometry<P> =
   | TypedMultiLineString<P>
   | TypedMultiPolygon<P>
 
-export type ConversionOptions = {
+export type MultiGeometryOptions = {
   isMultiGeometry: false
 }
 

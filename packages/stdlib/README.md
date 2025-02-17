@@ -614,7 +614,7 @@ Allmaps Standard Library
 ###### Parameters
 
 * `point` (`[number, number]`)
-* `options?` (`Partial<ConversionOptions> | undefined`)
+* `options?` (`Partial<MultiGeometryOptions> | undefined`)
 
 ###### Returns
 

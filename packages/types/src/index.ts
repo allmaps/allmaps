@@ -44,7 +44,7 @@ export type {
   TypedMultiPolygon,
   TypedGeometry,
   Gcp,
-  ConversionOptions,
+  MultiGeometryOptions,
   Bbox,
   Size,
   Fit,

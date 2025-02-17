@@ -1,4 +1,4 @@
-import type { ConversionOptions, Gcp, Point } from '@allmaps/types'
+import type { MultiGeometryOptions, Gcp, Point } from '@allmaps/types'
 
 /**
  * General Ground Control Point (GCP).
@@ -67,15 +67,15 @@ export type TransformOptions = {
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
-  // Assume source points are in lon/lat coordinates and use geographic distances and midpoints there
   sourceIsGeographic: boolean
-  // Assume destination points are in lon/lat coordinates and use geographic distances and midpoints there
   destinationIsGeographic: boolean
-  // Whether one of the axes should be flipped while computing the transformation parameters.
-  differentHandedness: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
-} & ConversionOptions
+} & MultiGeometryOptions
+
+export type TransformerOptions = {
+  differentHandedness: boolean
+} & TransformOptions
 
 export type KernelFunction = (
   r: number,
