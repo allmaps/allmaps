@@ -1,4 +1,4 @@
-export const ALLMAPS_THEME = {
+export const ALLMAPS_FLAVOR = {
   background: 'rgba(255, 252, 244, 1)',
   earth: 'rgba(255, 252, 244, 1)',
   park_a: '#e0eec9',
@@ -85,6 +85,9 @@ export const ALLMAPS_THEME = {
   state_label_halo: 'rgba(0,0,0,0)',
   country_label: 'rgba(143, 140, 133, 1)',
 
+  address_label: "red",
+  address_label_halo: "blue",
+
   regular: 'Roboto Regular',
   bold: 'Roboto Medium',
   italic: 'Roboto Italic',
@@ -100,7 +103,7 @@ export const ALLMAPS_THEME = {
   }
 }
 
-export const TERRAIN_THEME = {
+export const TERRAIN_COLORS = {
   hillshade_shadow_color: 'rgba(76, 63, 34, 1)',
   hillshade_accent_color: 'rgba(98, 105, 189, 1)',
   contour_line_color: 'black'

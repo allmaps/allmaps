@@ -7,6 +7,12 @@ settings:
 importers:
 
   .:
+    dependencies:
+      packages:
+
+        specifier: link:/Users/bdon/workspace/allmaps/allmaps/packages
+
+        version: link:packages
     devDependencies:
       husky:
         specifier: ^8.0.3
@@ -1063,15 +1069,15 @@ importers:
 
   packages/basemap:
     dependencies:
+      '@protomaps/basemaps':
+        specifier: ^5.0.0
+        version: 5.0.0
       maplibre-contour:
         specifier: ^0.1.0
         version: 0.1.0
       maplibre-gl:
         specifier: ^4.7.1
         version: 4.7.1
-      protomaps-themes-base:
-        specifier: ^4.3.0
-        version: 4.3.0
     devDependencies:
       '@maplibre/maplibre-gl-style-spec':
         specifier: ^19.3.1
@@ -4209,6 +4215,10 @@ packages:
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+    dev: false
+
+  /@protomaps/basemaps@5.0.0:
+    resolution: {integrity: sha512-lp+2ktb9gC9jZ/2L2AKvuQt36MNV1lJPOxDHA3IgD09roloxgp6QwXcMyE36ijGKMuKUiYKnmUuT9ouVhNgdLA==}
     dev: false
 
   /@resvg/resvg-wasm@2.6.2:
@@ -13160,10 +13170,6 @@ packages:
 
   /protomaps-themes-base@2.0.0-alpha.5:
     resolution: {integrity: sha512-IQ63JgClmJY89jyk+5qodvoTlpaAshmy8iJIze1UapPCo4Q+gEuErLrIqgsRWN1aXyL7pNm9CrhkKaNEUmWXBg==}
-    dev: false
-
-  /protomaps-themes-base@4.3.0:
-    resolution: {integrity: sha512-XNLs3zamw/XucflU0qBXgiPN72/YEo6h01ClsVrfUUQCDzA4r8Eu23hG/fqYqFuocciwu0doCxGBBpE8xGMtoA==}
     dev: false
 
   /proxy-from-env@1.1.0:

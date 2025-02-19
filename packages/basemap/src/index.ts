@@ -1,8 +1,8 @@
-import { layersWithCustomTheme } from 'protomaps-themes-base'
+import { layers as basemapLayers } from '@protomaps/basemaps'
 import mlcontour from 'maplibre-contour'
 import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_THEME, TERRAIN_THEME } from './colors'
+import { ALLMAPS_FLAVOR, TERRAIN_COLORS } from './colors.js'
 
 export function basemapStyle(
   lang: string,
@@ -10,7 +10,7 @@ export function basemapStyle(
   sprite?: string,
   tileJson?: string
 ): StyleSpecification {
-  const layers = layersWithCustomTheme('protomaps', ALLMAPS_THEME, lang)
+  const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, {lang: lang})
   // modify the buildings layer
   layers.forEach((layer) => {
     if (layer.id === 'buildings') {
@@ -91,9 +91,9 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         source: 'terrain',
         paint: {
           'hillshade-exaggeration': 0.33,
-          'hillshade-shadow-color': TERRAIN_THEME.hillshade_shadow_color,
+          'hillshade-shadow-color': TERRAIN_COLORS.hillshade_shadow_color,
           // 'hillshade-highlight-color': TERRAIN_THEME.hillshade_highlight_color,
-          'hillshade-accent-color': TERRAIN_THEME.hillshade_accent_color
+          'hillshade-accent-color': TERRAIN_COLORS.hillshade_accent_color
         }
       },
       'water'
@@ -109,7 +109,7 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         paint: {
           // level = highest index in thresholds array the elevation is a multiple of
           'line-width': ['match', ['get', 'level'], 1, 1, 0.5],
-          'line-color': TERRAIN_THEME.contour_line_color,
+          'line-color': TERRAIN_COLORS.contour_line_color,
           'line-opacity': 0.1
         }
       },
