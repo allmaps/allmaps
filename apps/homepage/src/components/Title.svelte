@@ -138,12 +138,12 @@
       return
     }
 
+    loading = true
+
     timeout = setTimeout(() => {
       if (!maps[index]) {
         return
       }
-
-      loading = true
 
       const pixelPath = event.target as SVGPathElement
       const pixelPathRect = pixelPath.getBoundingClientRect()
@@ -373,7 +373,7 @@
               >
                 <path
                   role="presentation"
-                  class="pointer-events-auto cursor-pointer [fill-opacity:0.5] hover:[fill-opacity:0.6] transition-all duration-300"
+                  class="pointer-events-auto cursor-pointer [fill-opacity:0.5] transition-all duration-300"
                   on:click={(event) => handleMaskClick(event, index)}
                   on:mouseenter={(event) => handleMaskMouseenter(event, index)}
                   on:mouseleave={handleMaskMouseleave}
@@ -461,13 +461,16 @@
 
   @keyframes pulse {
     from {
-      opacity: 1;
+      fill-opacity: 0.5;
     }
-    50% {
-      opacity: 0.5;
+    30% {
+      fill-opacity: 0.3;
+    }
+    60% {
+      fill-opacity: 0.7;
     }
     to {
-      opacity: 1;
+      fill-opacity: 0.5;
     }
   }
 
