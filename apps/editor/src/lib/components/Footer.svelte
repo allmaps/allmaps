@@ -2,9 +2,12 @@
   import { Logo } from '@allmaps/ui'
 </script>
 
+<!-- TODO: move to @allmaps/ui -->
 <footer class="w-full h-72 flex justify-center items-center">
   <div class="w-12">
-    <Logo inverted />
+    <a href="https://allmaps.org">
+      <Logo inverted />
+    </a>
   </div>
 </footer>
 
