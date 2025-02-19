@@ -26,12 +26,28 @@
   // - use Allmaps basemap
   // - show gradient right away
   // - make escape work
+  // - make masks appear in random order
 
   let header: HTMLElement
 
   const maskCount = 5
+  let finishedAnimationCount = 0
 
-  let interactive = true
+  let scrolledDown = false
+  let introFinished = false
+
+  $: {
+    if (finishedAnimationCount === maskCount) {
+      introFinished = true
+    }
+  }
+
+  $: {
+    console.log('introFinished', introFinished)
+    console.log('interacrtive', interactive)
+  }
+
+  $: interactive = introFinished && !scrolledDown
 
   let mouseX = 0
   let mouseY = 0
@@ -44,8 +60,14 @@
 
   const gradientMultiplier = 1 / 4
 
-  $: gradientX = `${((mouseX / width) * 100 - 50) * gradientMultiplier + 50}%`
-  $: gradientY = `${((mouseY / height) * 100 - 50) * gradientMultiplier + 50}%`
+  $: gradientX =
+    width === 0
+      ? '50%'
+      : `${((mouseX / width) * 100 - 50) * gradientMultiplier + 50}%`
+  $: gradientY =
+    height === 0
+      ? '50%'
+      : `${((mouseY / height) * 100 - 50) * gradientMultiplier + 50}%`
 
   let timeout: number = 0
 
@@ -95,7 +117,9 @@
     // Medina
     'https://annotations.allmaps.org/maps/31c1d537d0bd9ff2@055378572bd2e2cd',
     // Delft Library
-    'https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b'
+    'https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b',
+    // San Antonio
+    'https://annotations.allmaps.org/maps/a05aca049adadc77@ef2ac6056432f676'
   ]
 
   const gradientFrom = '#25318f'
@@ -179,7 +203,7 @@
       bounds = geoScreenRectangleBbox
 
       showMap = maps[index]
-    }, 500) as unknown as number
+    }, 0) as unknown as number
   }
 
   function shuffleArray(array: unknown[]) {
@@ -206,7 +230,7 @@
       ...entries.map((entry) => entry.intersectionRatio)
     )
 
-    interactive = intersectionRatio === 1
+    scrolledDown = intersectionRatio !== 1
   }
 
   function handleMaskClick(event: MouseEvent, index: number) {
@@ -293,6 +317,8 @@
   })
 </script>
 
+<!-- transition:scale={{ duration: 2000, start: 3, easing: expoOut }} -->
+
 <header
   bind:this={header}
   on:mousemove={handleMousemove}
@@ -302,7 +328,6 @@
 >
   {#if width && height && masks.length}
     <svg
-      transition:scale={{ duration: 2000, start: 3, easing: expoOut }}
       class="background pointer-events-none w-full h-full absolute"
       id="masks"
       version="1.1"
@@ -314,7 +339,17 @@
       viewBox="0 0 {width} {height}"
       ><g transform-origin="{width / 2} {height / 2}" class="scroll-group">
         {#each masks as mask, index}
-          <g transform="translate(0 60)">
+          <g
+            transform="translate(0 60)"
+            transform-origin="50% 50%"
+            transition:scale|global={{
+              duration: Math.random() * 1000 + 1500,
+              delay: Math.random() * 500,
+              start: 3,
+              easing: expoOut
+            }}
+            on:introend={() => finishedAnimationCount++}
+          >
             <g
               transform={pointToTranslate(
                 radialToCartasian((360 / masks.length) * index + 120, distance),
