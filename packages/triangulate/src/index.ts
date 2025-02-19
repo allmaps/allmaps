@@ -1,121 +1,216 @@
-import { createGrid, makePointsOnRing } from './shared.js'
+import {
+  getGridPointsInBbox,
+  interpolatePolygon,
+  pointInPolygon
+} from './shared.js'
+import {
+  computeBbox,
+  conformPolygon,
+  mergeOptions,
+  midPoint,
+  triangleAngles
+} from '@allmaps/stdlib'
 
-import classifyPoint from 'robust-point-in-polygon'
-import * as poly2tri from 'poly2tri'
+import Delaunator from 'delaunator'
+
+// @ts-expect-error Ignore missing types
+import Constrainautor from '@kninnug/constrainautor'
+
 import type {
+  Line,
   Point,
-  Ring,
+  Polygon,
   Triangle,
-  UniquePointsIndexTriangle
+  TypedLine,
+  TypedPolygon,
+  TypedTriangle
 } from '@allmaps/types'
 
-type PointLike = { x: number; y: number; type: string; item: number }
-type PointLikeTriangle = [PointLike, PointLike, PointLike]
+export type TriangulationToUnique = {
+  interpolatedPolygon: Polygon
+  interpolatedPolygonPoints: Point[]
+  gridPoints: Point[]
+  gridPointsInPolygon: Point[]
+  uniquePoints: Point[]
+  triangles: Triangle[]
+  uniquePointIndexTriangles: TypedTriangle<number>[]
+  uniquePointIndexInterpolatedPolygon: TypedPolygon<number>
+  uniquePointIndexEdges: TypedLine<number>[]
+}
+
+const MINIMUM_TRIANGLE_ANGLE = 0.01
+
+export type TriangluationOptions = {
+  steinerPoints: Point[]
+  minimumTriangleAngle: number
+}
+
+const defaultTriangulationOptions = {
+  steinerPoints: [],
+  minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
+} as TriangluationOptions
 
 /**
- * Triangle object from [poly2tri](https://github.com/r3mi/poly2tri.js/) package
- * @typedef {Object} poly2tri.Triangle
- */
-
-/**
- * Triangulates a polygon (and returns the full Poly2tri output)
+ * Triangulate a polygon to triangles smaller then a distance
  *
- * @remark Use this function to access the rich poly2tri triangulation output (information on constrained edges, neighbours, interior).
+ * Grid points are placed inside the polygon to obtain small, well conditioned triangles.
  *
- * @param {Ring} polygon - Polygon
- * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
- * @returns {poly2tri.Triangle[]} Array of triangles partitioning the polygon
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param triangulationOptions - Triangulation Options.
+ * @returns Array of triangles partitioning the polygon
  */
-export function triangulatePoly2tri(polygon: Ring, distance: number) {
-  let item = 0
-
-  // Initialize Constrained Delaunay Triangulation with polygon
-  const swctx = new poly2tri.SweepContext(
-    makePointsOnRing(polygon, distance).map((p) => {
-      return { x: p[0], y: p[1], type: 'p', item: item++ }
-    })
-  )
-
-  // Add grid points as Steiner points if they are inside the polygon
-  swctx.addPoints(
-    createGrid(polygon, distance)
-      .filter((p) => classifyPoint(polygon, p) === -1)
-      .map((p) => {
-        return {
-          x: p[0],
-          y: p[1],
-          type: 'g',
-          item: item++
-        }
-      })
-  )
-
-  // Triangulate
-  try {
-    swctx.triangulate()
-  } catch (e) {
-    // This is a poly2tri PointError. Check e.message and e.points for more information.
-    throw new Error(
-      'A Point Error occured during resource mask triangulation. This is typically because the resource mask contains duplicate or collinear points, or is self-intersecting.'
+export function triangulate(
+  polygon: Polygon,
+  distance?: number,
+  triangulationOptions?: Partial<TriangluationOptions>
+): Triangle[] {
+  {
+    const { triangles } = triangulateToUnique(
+      polygon,
+      distance,
+      triangulationOptions
     )
+    return triangles
   }
-  return swctx.getTriangles()
 }
 
 /**
- * Triangulates a polygon
+ * Triangulate a polygon to triangles smaller then a distance, and return them via unique points.
  *
- * @remark Polygons with < 3 points just return an empty array.
+ * Grid points are placed inside the polygon to obtain small, well conditioned triangles.
  *
- * @param {Ring} polygon - Polygon
- * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
- * @returns {Triangle[]} Array of triangles partitioning the polygon
- */
-export function triangulate(polygon: Ring, distance: number): Triangle[] {
-  return triangulatePoly2tri(polygon, distance).map(
-    (t) => t.getPoints().map((p) => [p.x, p.y]) as Triangle
-  )
-}
-
-/**
- * Triangulates a polygon and return unique points.
- * Grid points typically occure in 6 triangles
- * This function reutrns the list of unique points, and returns the triangles as uniquePointsIndexTriangles with indices refering to the unique points
+ * This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
  *
- * @remark Polygons with < 3 points just return an empty array.
- *
- * @param {Ring} polygon - Polygon
- * @param {number} distance - Distance between the Steiner points placed in a grid inside the polygon
- * @returns {{uniquePointsIndexTriangles: UniquePointsIndexTriangle[], uniquePoints: Point[]}} Object with uniquePointsIndexTriangles and uniquePoints
+ * @param polygon - Polygon
+ * @param distance - Distance that conditions the triangles
+ * @param triangulationOptions - Triangulation Options.
+ * @returns Triangulation Object with uniquePointIndexTriangles and uniquePoints
  */
 export function triangulateToUnique(
-  polygon: Ring,
-  distance: number
-): {
-  uniquePointsIndexTriangles: UniquePointsIndexTriangle[]
-  uniquePoints: Point[]
-} {
-  const pointLikeTriangles = triangulatePoly2tri(polygon, distance).map((t) =>
-    t.getPoints().map((p) => p as PointLike)
-  ) as PointLikeTriangle[]
-
-  const pointLikesByItem = new Map(
-    pointLikeTriangles.flat().map((pl) => [pl.item, pl]) as [
-      number,
-      PointLike
-    ][]
+  polygon: Polygon,
+  distance?: number,
+  triangulationOptions?: Partial<TriangluationOptions>
+): TriangulationToUnique {
+  const mergedTriangulationOptions = mergeOptions(
+    defaultTriangulationOptions,
+    triangulationOptions
   )
-  const uniquePointLikes = [...pointLikesByItem.values()].sort(
-    (pl0, pl1) => pl0.item - pl1.item
-  )
+  const steinerPoints = mergedTriangulationOptions.steinerPoints
+  const minimumTriangleAngle = mergedTriangulationOptions.minimumTriangleAngle
 
-  const uniquePoints = uniquePointLikes.map((pl) => [pl.x, pl.y] as Point)
-  const uniquePointsIndexTriangles = pointLikeTriangles.map((t) =>
-    t.map((pl) => pl.item as number)
-  ) as UniquePointsIndexTriangle[]
+  // Conform polygon (this also checks if there are at least 3 points)
+  polygon = conformPolygon(polygon)
+
+  let interpolatedPolygon: Polygon = []
+  let interpolatedPolygonPoints: Point[] = []
+  let gridPoints: Point[] = []
+  let gridPointsInPolygon: Point[] = []
+  if (distance) {
+    // Interpolate polygon
+    interpolatedPolygon = interpolatePolygon(polygon, distance)
+    interpolatedPolygonPoints = interpolatedPolygon.flat()
+
+    // Add grid points inside the polygon
+    gridPoints = getGridPointsInBbox(computeBbox(polygon), distance)
+    gridPointsInPolygon = gridPoints.filter((point) =>
+      pointInPolygon(point, polygon)
+    )
+  } else {
+    interpolatedPolygon = polygon
+    interpolatedPolygonPoints = polygon.flat()
+  }
+  const steinerPointsInPolygon = steinerPoints.filter((point) =>
+    pointInPolygon(point, polygon)
+  )
+  const uniquePoints = [
+    ...interpolatedPolygonPoints,
+    ...gridPointsInPolygon,
+    ...steinerPointsInPolygon
+  ]
+
+  // Initialize Delaunay triangulation from polygon + grid points
+  const delautator = new Delaunator(uniquePoints.flat())
+
+  // Collect indices of (interpolated) polygon edges
+  let ringOffset = 0
+  const uniquePointIndexInterpolatedPolygon: TypedPolygon<number> =
+    interpolatedPolygon.map((ring) => {
+      const uniqueIndexRing = ring.map((_point, index) => ringOffset + index)
+      ringOffset += ring.length
+      return uniqueIndexRing
+    })
+  const uniquePointIndexEdges: TypedLine<number>[] =
+    uniquePointIndexInterpolatedPolygon
+      .map((ring) =>
+        ring.map(
+          (uniqueIndex) =>
+            [uniqueIndex, (uniqueIndex + 1) % ring.length] as [number, number]
+        )
+      )
+      .flat()
+
+  // Constrain triangulation
+  const constrainautor = new Constrainautor(delautator, uniquePointIndexEdges)
+
+  let uniquePointIndexTriangles: TypedTriangle<number>[] = []
+  let triangles: Triangle[] = []
+  const shouldClassifyTriangles: boolean[] = []
+  for (let i = 0; i < constrainautor.del.triangles.length; i += 3) {
+    uniquePointIndexTriangles.push([
+      constrainautor.del.triangles[i],
+      constrainautor.del.triangles[i + 1],
+      constrainautor.del.triangles[i + 2]
+    ])
+    triangles.push([
+      uniquePoints[constrainautor.del.triangles[i]],
+      uniquePoints[constrainautor.del.triangles[i + 1]],
+      uniquePoints[constrainautor.del.triangles[i + 2]]
+    ])
+    // Only classify triangles if they are along the border
+    shouldClassifyTriangles.push(
+      constrainautor.del.triangles[i] < interpolatedPolygonPoints.length ||
+        constrainautor.del.triangles[i + 1] <
+          interpolatedPolygonPoints.length ||
+        constrainautor.del.triangles[i + 2] < interpolatedPolygonPoints.length
+    )
+  }
+
+  // Check if triangles inside
+  const shouldKeep = triangles.map((triangle, index) => {
+    // Only keep if inside
+    if (shouldClassifyTriangles[index]) {
+      return (
+        pointInPolygon(midPoint(...triangle), polygon) &&
+        triangleAngles(triangle).every((angle) => angle >= minimumTriangleAngle)
+      )
+    } else {
+      return true
+    }
+  })
+  uniquePointIndexTriangles = uniquePointIndexTriangles.filter(
+    (_triangle, index) => shouldKeep[index]
+  )
+  triangles = triangles.filter((_triangle, index) => shouldKeep[index])
+
+  // Fill in edges using unique
+  const edges: Line[] = []
+  for (let i = 0; i < uniquePointIndexEdges.length; i += 1) {
+    edges.push([
+      uniquePoints[uniquePointIndexEdges[i][0]],
+      uniquePoints[uniquePointIndexEdges[i][1]]
+    ])
+  }
 
   return {
-    uniquePointsIndexTriangles,
-    uniquePoints
+    interpolatedPolygon,
+    interpolatedPolygonPoints,
+    gridPoints,
+    gridPointsInPolygon,
+    uniquePoints,
+    triangles,
+    uniquePointIndexTriangles,
+    uniquePointIndexInterpolatedPolygon,
+    uniquePointIndexEdges
   }
 }

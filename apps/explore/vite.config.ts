@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfig } from 'vite'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {
@@ -12,4 +12,4 @@ export default defineConfig({
   ssr: {
     noExternal: ['maplibre-gl', 'maplibre-contour']
   }
-})
+}) satisfies UserConfig

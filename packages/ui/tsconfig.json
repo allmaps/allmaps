@@ -14,8 +14,5 @@
       "$lib/*": ["./src/lib/*"]
     }
   },
-  "references": [
-    { "path": "../../packages/tailwind" },
-    { "path": "../../packages/types" }
-  ]
+  "references": [{ "path": "../tailwind" }, { "path": "../types" }]
 }

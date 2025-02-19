@@ -15,27 +15,11 @@
   ],
   "description": "Render functions for WebGL and image buffers",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "main": "./dist/index.js",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/bundled/index.umd.js",
-      "import": "./dist/index.js"
-    },
-    "./int-array": {
-      "types": "./dist/int-array.d.ts",
-      "import": "./dist/int-array.js"
-    },
-    "./canvas": {
-      "types": "./dist/canvas.d.ts",
-      "import": "./dist/canvas.js"
-    },
-    "./webgl2": {
-      "types": "./dist/webgl2.d.ts",
-      "import": "./dist/webgl2.js"
-    }
+    ".": "./dist/index.js",
+    "./intarray": "./dist/intarray.js",
+    "./canvas": "./dist/canvas.js",
+    "./webgl2": "./dist/webgl2.js"
   },
   "files": [
     "dist"
@@ -51,14 +35,14 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && pnpm run documentation",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "NODE_ENV=test pnpm run build && mocha",
     "preversion": "pnpm run lint && pnpm test",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "documentation": "documentation readme dist/index.js --markdown-toc-max-depth=3 --section=API"
+    "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
@@ -75,10 +59,10 @@
     "@allmaps/transform": "^1.0.0-beta.41",
     "@allmaps/triangulate": "^1.0.0-beta.23",
     "@allmaps/types": "^1.0.0-beta.15",
-    "@turf/boolean-point-in-polygon": "^6.5.0",
+    "@turf/boolean-point-in-polygon": "^7.2.0",
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
-    "rbush": "^3.0.1",
+    "rbush": "^4.0.0",
     "robust-point-in-polygon": "^1.0.3"
   },
   "license": "GPL-3.0-or-later",
@@ -86,17 +70,18 @@
     "@types/eslint": "^8.56.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.14.2",
-    "@types/rbush": "^3.0.0",
+    "@types/rbush": "^4.0.0",
     "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",
-    "documentation": "^14.0.0",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
-    "typescript": "^5.5.4",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0",
     "vite": "^5.0.3",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-glsl": "^1.3.0",

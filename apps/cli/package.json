@@ -8,15 +8,7 @@
   },
   "description": "Allmaps CLI",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -55,9 +47,10 @@
     "@allmaps/iiif-parser": "^1.0.0-beta.40",
     "@allmaps/stdlib": "^1.0.0-beta.31",
     "@allmaps/transform": "^1.0.0-beta.41",
-    "commander": "^10.0.0",
-    "stream-json": "^1.7.4",
-    "zod-validation-error": "^1.5.0"
+    "@commander-js/extra-typings": "^13.0.0",
+    "commander": "^13.0.0",
+    "stream-json": "^1.9.1",
+    "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
@@ -70,8 +63,8 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
-    "typescript": "^5.5.4",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0",
     "zod": "^3.22.4"
   }
 }

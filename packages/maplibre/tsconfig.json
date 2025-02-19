@@ -3,16 +3,13 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "es2022",
-    "allowSyntheticDefaultImports": true
+    "paths": {}
   },
   "references": [
     { "path": "../render" },
-    { "path": "../id" },
-    { "path": "../iiif-parser" },
     { "path": "../transform" },
-    { "path": "../annotation" },
-    { "path": "../stdlib" }
+    { "path": "../stdlib" },
+    { "path": "../types" }
   ],
   "include": ["./src/**/*"]
 }

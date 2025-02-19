@@ -2,6 +2,7 @@ import dataStore from './shared/stores/data.js'
 import paramStore from './shared/stores/param.js'
 import urlStore from './shared/stores/url.js'
 
+import Banner from '$lib/components/Banner.svelte'
 import Collection from '$lib/components/Collection.svelte'
 import Copy from '$lib/components/Copy.svelte'
 import Dial from '$lib/components/Dial.svelte'
@@ -10,6 +11,7 @@ import Loading from '$lib/components/Loading.svelte'
 import Logo from '$lib/components/Logo.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 import NorthArrow from '$lib/components/NorthArrow.svelte'
+import Geocoder from '$lib/components/Geocoder.svelte'
 import Slider from '$lib/components/Slider.svelte'
 import Stats from '$lib/components/Stats.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
@@ -34,6 +36,7 @@ import Straight from './components/icons/transformations/Straight.svelte'
 export { urlStore, dataStore, paramStore }
 
 export {
+  Banner,
   Collection,
   Copy,
   Dial,
@@ -42,6 +45,7 @@ export {
   Logo,
   MapMonster,
   NorthArrow,
+  Geocoder,
   Slider,
   Stats,
   Thumbnail,

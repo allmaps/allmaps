@@ -1,64 +1,88 @@
-import { computeBbox } from '@allmaps/stdlib'
-import type { Bbox, Line, Ring, Point } from '@allmaps/types'
+import classifyPoint from 'robust-point-in-polygon'
 
-function computeLineDistance(line: Line): number {
-  return Math.sqrt(
-    Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2)
-  )
-}
+import {
+  distance,
+  stepDistanceAngle,
+  lineAngle,
+  closeRing,
+  conformRing
+} from '@allmaps/stdlib'
 
-function computeLineAngle(line: Line): number {
-  // line = [[x0, y0], [x1, y1]]
-  // return angle of line (in radians, signed)
-  return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
-}
+import type {
+  Bbox,
+  Line,
+  LineString,
+  Ring,
+  Polygon,
+  Point
+} from '@allmaps/types'
 
-function computeNextPoint(
-  point: Point,
-  distance: number,
-  angle: number
-): Point {
-  return [
-    point[0] + Math.cos(angle) * distance,
-    point[1] + Math.sin(angle) * distance
-  ]
-}
+// Return an array of points containing the first line point,
+// and betwen the first and last line point other points every `dist`
+function interpolateLine(line: Line, dist: number): LineString {
+  const lineDistance = distance(line)
+  // Note: ciel - 1 instead of floor, such that for round numbers we don't include the last step
+  const steps = Math.ceil(lineDistance / dist) - 1
+  const angle = lineAngle(line)
 
-function makePointsOnLine(line: Line, distance: number): Point[] {
   let currentPoint = line[0]
   const result = [currentPoint]
 
-  while (computeLineDistance([currentPoint, line[1]]) > distance) {
-    const nextPoint = computeNextPoint(
-      currentPoint,
-      distance,
-      computeLineAngle(line)
-    )
-    result.push(nextPoint)
-    currentPoint = nextPoint
+  for (let step = 1; step <= steps; step++) {
+    currentPoint = stepDistanceAngle(currentPoint, dist, angle)
+    result.push(currentPoint)
   }
-  // note: the last nextpoint, which is also line[1], is not pushed
+
+  // Note: the last nextpoint, which is also line[1], is not pushed
   return result
 }
 
-export function makePointsOnRing(ring: Ring, distance: number) {
-  // close ring
-  ring = [...ring, ring[0]]
+// Return an array of points containing the ring points,
+// and between every pair of ring points other points every `dist`
+export function interpolateRing(ring: Ring, dist: number): Ring {
+  ring = closeRing(ring)
 
   let result: Ring = []
   for (let i = 0; i < ring.length - 1; i++) {
-    result = result.concat(makePointsOnLine([ring[i], ring[i + 1]], distance))
+    result = result.concat(interpolateLine([ring[i], ring[i + 1]], dist))
   }
+
+  // Note: rounding resulting points to prevent error "Constraining edge intersects point" at small distances
+  result = result.map((point) => [Math.round(point[0]), Math.round(point[1])])
+  // And filter out possible duplicates due to rounding
+  result = conformRing(result)
+
   return result
 }
 
-export function createGrid(ring: Ring, gridSize: number): Point[] {
+export function interpolatePolygon(polygon: Polygon, dist: number): Polygon {
+  return polygon.map((ring) => interpolateRing(ring, dist))
+}
+
+export function getGridPointsInBbox(bbox: Bbox, gridSize: number): Point[] {
   const grid = []
-  const bbox: Bbox = computeBbox(ring)
   for (let x = bbox[0] + gridSize, i = 0; x <= bbox[2]; i++, x += gridSize) {
     for (let y = bbox[1] + gridSize, j = 0; y <= bbox[3]; j++, y += gridSize) {
       grid.push([x, y] as Point)
     }
   }
   return grid
+}
+
+// Returns true if point is inside of polygon with holes
+// Note: classifyPoint return -1 when inside (i.e. not outside or on edge)
+export function pointInPolygon(point: Point, polygon: Polygon): boolean {
+  // Check that inside outer ring
+  let inside = classifyPoint(polygon[0], point) == -1
+  if (!inside) {
+    return inside
+  }
+  // Check that not inside inner rings
+  for (let i = 1; i < polygon.length; i++) {
+    if (classifyPoint(polygon[i], point) == -1) {
+      inside = false
+      break
+    }
+  }
+  return inside
 }

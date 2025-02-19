@@ -2,28 +2,26 @@
 import getWorldMidpoint from '@turf/midpoint'
 import getWorldDistance from '@turf/distance'
 
-import GcpTransformer from '../transformer'
+import { GcpTransformer } from '../transformer'
 import {
   refineLineString,
-  refineRectangleToRectangles,
-  refineRing
+  refineRing,
+  defaultRefinementOptions,
+  getRefinementSourceResolution
 } from './refinement-helper-functions.js'
 
 import type { TransformOptions, RefinementOptions } from './types.js'
 
-import type {
-  Point,
-  LineString,
-  Ring,
-  Polygon,
-  Rectangle
-} from '@allmaps/types'
+import type { Point, LineString, Ring, Polygon, Bbox } from '@allmaps/types'
+import { mergeOptions } from '@allmaps/stdlib'
+
+// Options
 
 export const defaultTransformOptions: TransformOptions = {
-  maxOffsetRatio: 0,
+  maxDepth: 0,
+  minOffsetRatio: 0,
   minOffsetDistance: Infinity,
   minLineDistance: Infinity,
-  maxDepth: 0,
   destinationIsGeographic: false,
   sourceIsGeographic: false,
   inputIsMultiGeometry: false,
@@ -34,13 +32,13 @@ export const defaultTransformOptions: TransformOptions = {
 
 export function refinementOptionsFromForwardTransformOptions(
   transformOptions: TransformOptions
-): Partial<RefinementOptions> {
-  const refinementOptions: Partial<RefinementOptions> = {
-    maxOffsetRatio: transformOptions.maxOffsetRatio,
+): RefinementOptions {
+  const refinementOptions = mergeOptions(defaultRefinementOptions, {
+    minOffsetRatio: transformOptions.minOffsetRatio,
     minOffsetDistance: transformOptions.minOffsetDistance,
     minLineDistance: transformOptions.minLineDistance,
     maxDepth: transformOptions.maxDepth
-  }
+  })
 
   if (transformOptions.sourceIsGeographic) {
     refinementOptions.sourceMidPointFunction = (point0: Point, point1: Point) =>
@@ -61,13 +59,13 @@ export function refinementOptionsFromForwardTransformOptions(
 
 export function refinementOptionsFromBackwardTransformOptions(
   transformOptions: TransformOptions
-): Partial<RefinementOptions> {
-  const refinementOptions: Partial<RefinementOptions> = {
-    maxOffsetRatio: transformOptions.maxOffsetRatio,
+): RefinementOptions {
+  const refinementOptions = mergeOptions(defaultRefinementOptions, {
+    minOffsetRatio: transformOptions.minOffsetRatio,
     minOffsetDistance: transformOptions.minOffsetDistance,
     minLineDistance: transformOptions.minLineDistance,
     maxDepth: transformOptions.maxDepth
-  }
+  })
 
   if (transformOptions.destinationIsGeographic) {
     refinementOptions.sourceMidPointFunction = (point0: Point, point1: Point) =>
@@ -85,6 +83,8 @@ export function refinementOptionsFromBackwardTransformOptions(
   }
   return refinementOptions
 }
+
+// Transform Geometries
 
 export function transformLineStringForwardToLineString(
   lineString: LineString,
@@ -154,27 +154,36 @@ export function transformPolygonBackwardToPolygon(
   })
 }
 
-// TODO: consider to add these as methods on transformer class
-export function transformRectangleForwardToRectangles(
-  rectangle: Rectangle,
+// Get transform resource resolution
+
+export function getForwardTransformResolution(
+  bbox: Bbox,
   transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Rectangle[] {
-  return refineRectangleToRectangles(
-    rectangle,
+  partialTransformOptions: Partial<TransformOptions>
+): number | undefined {
+  const transformOptions = mergeOptions(
+    transformer.options,
+    partialTransformOptions
+  )
+  return getRefinementSourceResolution(
+    bbox,
     (p) => transformer.transformForward(p),
     refinementOptionsFromForwardTransformOptions(transformOptions)
   )
 }
 
-export function transformRectangleBackwardToRectangles(
-  rectangle: Rectangle,
+export function getBackwardTransformResolution(
+  bbox: Bbox,
   transformer: GcpTransformer,
-  transformOptions: TransformOptions
-): Rectangle[] {
-  return refineRectangleToRectangles(
-    rectangle,
-    (p) => transformer.transformForward(p),
+  partialTransformOptions: Partial<TransformOptions>
+): number | undefined {
+  const transformOptions = mergeOptions(
+    transformer.options,
+    partialTransformOptions
+  )
+  return getRefinementSourceResolution(
+    bbox,
+    (p) => transformer.transformBackward(p),
     refinementOptionsFromBackwardTransformOptions(transformOptions)
   )
 }

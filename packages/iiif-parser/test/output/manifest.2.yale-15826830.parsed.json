@@ -6,6 +6,32 @@
       "Map of Canals and Navigable Rivers in Belgium and The North of France."
     ]
   },
+  "homepage": [
+    {
+      "format": "text/html",
+      "id": "https://collections.library.yale.edu/catalog/15826830",
+      "label": {
+        "none": ["Yale Digital Collections page"]
+      }
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Yale University Library"]
+    }
+  },
+  "thumbnail": [
+    {
+      "format": "image/jpeg",
+      "height": 9128,
+      "id": "https://collections.library.yale.edu/iiif/2/15828036/full/!200,200/0/default.jpg",
+      "type": "dctypes:Image",
+      "width": 11560
+    }
+  ],
   "metadata": [
     {
       "label": {

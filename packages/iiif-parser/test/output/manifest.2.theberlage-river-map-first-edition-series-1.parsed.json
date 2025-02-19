@@ -1,417 +1,549 @@
 {
   "embedded": false,
-  "type": "manifest",
   "uri": "https://theberlage.github.io/river-maps/iiif/manifests/river-map-first-edition-series-1.json",
-  "majorVersion": 2,
+  "type": "manifest",
   "label": {
     "none": ["Eerste druk, Serie 1"]
   },
+  "majorVersion": 2,
   "canvases": [
     {
-      "type": "canvas",
-      "width": 7280,
-      "height": 5064,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=0",
+      "type": "canvas",
+      "height": 5064,
+      "width": 7280,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 5064,
+        "majorVersion": 2
+      },
       "label": {
         "none": [
           "00A. Titelblad met bladwijzer en verklaring van de zamenstelling der kaart (1830)"
         ]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7280,
-        "height": 5064
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/4efdcebe-9edf-443d-b80e-ab1d925e84b9/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7936,
-      "height": 4992,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=1",
+      "type": "canvas",
+      "height": 4992,
+      "width": 7936,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7936,
+        "height": 4992,
+        "majorVersion": 2
+      },
       "label": {
         "none": [
           "00B. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Waal, Merwede, Oude- en Nieuwe Maas van Emmerik tot Brielle (1863)"
         ]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7936,
-        "height": 4992
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/fd4457ec-e780-45ba-9c0f-179b6fef2137/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7768,
-      "height": 4572,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=2",
+      "type": "canvas",
+      "height": 4572,
+      "width": 7768,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7768,
+        "height": 4572,
+        "majorVersion": 2
+      },
       "label": {
         "none": [
           "00C. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn, Lek, Nieuwe-Maas en Scheur van Emmerik tot aan zee (1863)"
         ]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7768,
-        "height": 4572
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/f19b2786-1d2b-4d0c-bccc-4ea487f024fa/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7248,
-      "height": 4512,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=3",
+      "type": "canvas",
+      "height": 4512,
+      "width": 7248,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7248,
+        "height": 4512,
+        "majorVersion": 2
+      },
       "label": {
         "none": [
           "00D. Voorstelling van Rivierstanden en Noodpeilen, aan de peilschalen langs de rivieren de Boven-Rijn, Neder-Rijn en Geldersche IJssel van Emmerik tot de Zuiderzee (1863)"
         ]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7248,
-        "height": 4512
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/84f4c3b2-0965-40a4-90fd-a52e9bf1d1af/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7480,
-      "height": 4920,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=4",
+      "type": "canvas",
+      "height": 4920,
+      "width": 7480,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7480,
+        "height": 4920,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["01. Schenkenschans (1830)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7480,
-        "height": 4920
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/275c34fa-3eed-4a54-8bf4-7a7b2891ffe7/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7008,
-      "height": 5040,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=5",
+      "type": "canvas",
+      "height": 5040,
+      "width": 7008,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7008,
+        "height": 5040,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["02. Kekerdom (1830)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7008,
-        "height": 5040
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/58c0a819-0d21-47d6-bc3f-4b7e4c6c85f7/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 4260,
-      "height": 3088,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=6",
+      "type": "canvas",
+      "height": 3088,
+      "width": 4260,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 4260,
+        "height": 3088,
+        "majorVersion": 2
+      },
       "label": {
         "none": [
           "02A. Suplementair Blad, behoorende bij het blad No. 2 Kekerdom (1830)"
         ]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 4260,
-        "height": 3088
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/8919bde8-ff38-4c1d-b11e-c68a2f3c220a/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7280,
-      "height": 4980,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=7",
+      "type": "canvas",
+      "height": 4980,
+      "width": 7280,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 4980,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["03. Nijmegen (1830)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7280,
-        "height": 4980
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/cb36997f-56dc-4bca-9a23-cbf871bfb83b/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7328,
-      "height": 5604,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=8",
+      "type": "canvas",
+      "height": 5604,
+      "width": 7328,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7328,
+        "height": 5604,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["04. Herveld (1830)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7328,
-        "height": 5604
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/199842ed-2aa4-41d8-b4cb-7f02260717ca/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7264,
-      "height": 5052,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=9",
+      "type": "canvas",
+      "height": 5052,
+      "width": 7264,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7264,
+        "height": 5052,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["05. Dodewaard (1831)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7264,
-        "height": 5052
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/b9295f14-2152-4c30-92e0-dcf7d0e3ac7c/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7344,
-      "height": 5100,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=10",
+      "type": "canvas",
+      "height": 5100,
+      "width": 7344,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7344,
+        "height": 5100,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["06. Leeuwen (1831)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7344,
-        "height": 5100
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/9061daf0-d5c2-4a77-b929-6ea937b24920/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 5316,
-      "height": 6592,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=11",
+      "type": "canvas",
+      "height": 6592,
+      "width": 5316,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 5316,
+        "height": 6592,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["07. Tiel (1831)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 5316,
-        "height": 6592
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/1bd5217f-b75a-4c80-a47f-35abcaff9055/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7320,
-      "height": 5088,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=12",
+      "type": "canvas",
+      "height": 5088,
+      "width": 7320,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7320,
+        "height": 5088,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["08. Varik (1831)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7320,
-        "height": 5088
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/1b6b0761-ad2e-4026-9bf7-2871d022b5c8/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7328,
-      "height": 5004,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=13",
+      "type": "canvas",
+      "height": 5004,
+      "width": 7328,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7328,
+        "height": 5004,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["09. Zalt-Boemel (1832)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/4de72774-2c60-466c-9bee-bdd9e827e561",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7328,
-        "height": 5004
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/4de72774-2c60-466c-9bee-bdd9e827e561/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7272,
-      "height": 6336,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=14",
+      "type": "canvas",
+      "height": 6336,
+      "width": 7272,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7272,
+        "height": 6336,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["10. Zuilichem (1832)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7272,
-        "height": 6336
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/b156ebb0-b591-4865-b09c-fe8be8a04dac/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7312,
-      "height": 5856,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=15",
+      "type": "canvas",
+      "height": 5856,
+      "width": 7312,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7312,
+        "height": 5856,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["11. Brakel (1832)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7312,
-        "height": 5856
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/1e771cfd-f9e0-4a28-ba00-cbb313688f5d/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7320,
-      "height": 5376,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=16",
+      "type": "canvas",
+      "height": 5376,
+      "width": 7320,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7320,
+        "height": 5376,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["12. Gorinchem (1833)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7320,
-        "height": 5376
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/1e2762c7-07de-41db-86cb-6f60b01ad924/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7256,
-      "height": 5088,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=17",
+      "type": "canvas",
+      "height": 5088,
+      "width": 7256,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7256,
+        "height": 5088,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["13. Giesendam (1833)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7256,
-        "height": 5088
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/5768accc-4ffe-4726-934d-4ece37a10ad6/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 6856,
-      "height": 4980,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=18",
+      "type": "canvas",
+      "height": 4980,
+      "width": 6856,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6856,
+        "height": 4980,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["14. Dordrecht (1833)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/0adb3cad-0a85-4057-b088-47273f5573de",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 6856,
-        "height": 4980
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/0adb3cad-0a85-4057-b088-47273f5573de/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 6680,
-      "height": 4944,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=19",
+      "type": "canvas",
+      "height": 4944,
+      "width": 6680,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6680,
+        "height": 4944,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["15. Puttershoek (1833)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/2d081f50-2eff-453b-b015-8fec400190c4",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 6680,
-        "height": 4944
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/2d081f50-2eff-453b-b015-8fec400190c4/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 6696,
-      "height": 4956,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=20",
+      "type": "canvas",
+      "height": 4956,
+      "width": 6696,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 6696,
+        "height": 4956,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["16. Heinenoord (1834)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 6696,
-        "height": 4956
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/ab607fe9-3128-4e5a-8e77-a5e41f4b6154/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     },
     {
-      "type": "canvas",
-      "width": 7280,
-      "height": 5040,
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=rivierkaart&n1=&n2=21",
+      "type": "canvas",
+      "height": 5040,
+      "width": 7280,
+      "image": {
+        "embedded": true,
+        "uri": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229",
+        "type": "image",
+        "supportsAnyRegionAndSize": true,
+        "width": 7280,
+        "height": 5040,
+        "majorVersion": 2
+      },
       "label": {
         "none": ["17. Poortugaal (1834)"]
       },
-      "image": {
-        "embedded": true,
-        "type": "image",
-        "uri": "https://dlc.services/iiif-img/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229",
-        "majorVersion": 2,
-        "supportsAnyRegionAndSize": true,
-        "width": 7280,
-        "height": 5040
-      }
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/32/ee152a0b-15ea-43aa-9a80-67eb81c31229/full/full/0/default.jpg",
+          "type": "dctypes:Image"
+        }
+      ]
     }
   ],
   "metadata": [

@@ -1,1 +1,1 @@
-"Validation error: Array must contain exactly 1 element(s) at \"target.service\"; Invalid enum value. Expected 'ImageService1' | 'ImageService2' | 'ImageService3', received 'invalid' at \"target.service[0].type\"; Expected object, received boolean at \"target.service[1]\""
+"Validation error: Array must contain exactly 1 element(s) at \"target.service\"; Invalid enum value. Expected 'ImageService1' | 'ImageService2' | 'ImageService3' | 'Canvas', received 'invalid' at \"target.service[0].type\"; Expected object, received boolean at \"target.service[1]\""

@@ -1,1 +1,1 @@
-"Validation error: Required at \"items\""
+"Validation error: Invalid literal value, expected \"Annotation\" at \"type\"; Required at \"target\"; Required at \"body\""

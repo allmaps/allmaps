@@ -1,8 +1,8 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
-import fullImage from './fetch/full-image.js'
+import { fullImage } from './fetch/full-image.js'
 
-export default function iiif() {
+export function fetch() {
   return new Command('fetch')
     .summary('fetches IIIF images')
     .description(`Fetches IIIF images`)

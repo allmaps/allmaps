@@ -1,16 +1,14 @@
 ---
-import { Image } from 'astro:assets'
-
 const { name, href, src } = Astro.props
 
-const image = import(`../images/faces/${src}.jpg`)
+const image = await import(`../images/faces/${src}.jpg`)
 ---
 
 <a {href} class="no-underline">
-  <Image
+  <img
     width="24"
     class="!inline-block rounded-lg -mb-1.5"
-    src={image}
+    src={image.default.src}
     alt={name}
   />
   <span class="underline">{name}</span></a

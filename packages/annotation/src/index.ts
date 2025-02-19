@@ -1,33 +1,58 @@
-import { z } from 'zod'
-
-// TODO: add  "For details, see its [JSON Schema](schemas/annotation.json) or the [example](examples/annotation.example.json) in the `examples` directory."
-
-/**
- * [Web Annotation](https://www.w3.org/TR/annotation-model/) that contains a single [Georeference Annotation](https://iiif.io/api/extension/georef/).
- * @typedef {Object} Annotation
- */
-
-/**
- * An [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page) that contains multiple [Georeference Annotations](https://iiif.io/api/extension/georef/).
- * @typedef {Object} AnnotationPage
- */
-
-/**
- * Object that contains the data needed to georeference a IIIF resource in the format that is used by Allmaps internally.
- * @typedef {Object} Map
- */
-
 export { parseAnnotation } from './parser.js'
 export { generateAnnotation } from './generator.js'
-export { validateAnnotation, validateMap } from './validator.js'
+export { validateAnnotation, validateGeoreferencedMap } from './validator.js'
 
-import { AnnotationSchema, AnnotationPageSchema } from './schemas/annotation.js'
+export {
+  GeoreferencedMap1Schema,
+  GeoreferencedMaps1Schema,
+  GeoreferencedMap1GCPSchema,
+  GeoreferencedMap1ImageSchema,
+  GeoreferencedMap2Schema,
+  GeoreferencedMaps2Schema,
+  GeoreferencedMap2GCPSchema,
+  GeoreferencedMap2ResourceSchema,
 
-import { MapSchema } from './schemas/map.js'
+  // Default schemas
+  GeoreferencedMapSchema,
+  GeoreferencedMapsSchema,
+  GCPSchema,
+  ResourceSchema,
 
-export type Annotation = z.infer<typeof AnnotationSchema>
-export type AnnotationPage = z.infer<typeof AnnotationPageSchema>
+  // All versions
+  GeoreferencedMapAllVersionsSchema,
+  GeoreferencedMapsAllVersionsSchema,
+  GCPAllVersionsSchema
+} from './schemas/georeferenced-map.js'
 
-export type Map = z.infer<typeof MapSchema>
+export {
+  Annotation0Schema,
+  AnnotationPage0Schema,
+  Annotation0FeaturePropertiesSchema,
+  Annotation1Schema,
+  AnnotationPage1Schema,
+  Annotation1FeaturePropertiesSchema,
+  SvgSelector0Schema,
 
-export { MapSchema, AnnotationSchema, AnnotationPageSchema }
+  // Default schemas
+  AnnotationSchema,
+  AnnotationPageSchema,
+  FeaturePropertiesSchema,
+  SvgSelectorSchema,
+
+  // All versions
+  AnnotationAllVersionsSchema,
+  AnnotationPageAllVersionsSchema,
+  FeaturePropertiesAllVersionsSchema
+} from './schemas/annotation.js'
+
+export {
+  PartOfSchema,
+  ResourceMaskSchema,
+  TransformationSchema
+} from './schemas/shared.js'
+
+export type {
+  GeoreferencedMap2 as GeoreferencedMap,
+  Annotation1 as Annotation,
+  AnnotationPage1 as AnnotationPage
+} from './types.js'

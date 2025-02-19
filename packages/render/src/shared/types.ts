@@ -1,7 +1,7 @@
-import { Map as GeoreferencedMap } from '@allmaps/annotation'
+import { GeoreferencedMap } from '@allmaps/annotation'
 
-import type FetchableTile from '../tilecache/FetchableTile.js'
-import type CacheableTile from '../tilecache/CacheableTile.js'
+import type { FetchableTile } from '../tilecache/FetchableTile.js'
+import type { CacheableTile } from '../tilecache/CacheableTile.js'
 
 import type {
   Point,
@@ -115,9 +115,9 @@ export type PointLayer = {
 }
 
 export type MapPruneInfo = {
-  currentTileZoomLevel?: TileZoomLevel
-  currentOverviewTileZoomLevel?: TileZoomLevel
-  currentResourceViewportRingBbox?: Bbox
+  tileZoomLevelForViewport?: TileZoomLevel
+  overviewTileZoomLevelForViewport?: TileZoomLevel
+  resourceViewportRingBboxForViewport?: Bbox
 }
 
 export type MapPruneConstants = {

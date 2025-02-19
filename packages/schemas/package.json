@@ -8,14 +8,7 @@
   },
   "description": "Allmaps JSON Schemas",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -53,7 +46,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
-    "typescript": "^5.5.4"
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0"
   }
 }

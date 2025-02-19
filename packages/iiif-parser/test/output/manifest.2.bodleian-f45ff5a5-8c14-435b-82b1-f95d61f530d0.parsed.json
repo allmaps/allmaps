@@ -192,5 +192,23 @@
         "none": ["Bodleian Libraries, University of Oxford"]
       }
     }
+  ],
+  "navDate": "1789-01-01T00:00:00.000Z",
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": [
+        "<span>Photo: © Bodleian Libraries, University of Oxford. Terms of use: <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">CC-BY-NC 4.0</a>. For more information, please see <a href=\"https://digital.bodleian.ox.ac.uk/terms/\">https://digital.bodleian.ox.ac.uk/terms/</a></span>"
+      ]
+    }
+  },
+  "thumbnail": [
+    {
+      "format": "image/jpeg",
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037/full/256,/0/default.jpg",
+      "type": "dctypes:Image"
+    }
   ]
 }

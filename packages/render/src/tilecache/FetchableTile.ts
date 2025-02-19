@@ -5,12 +5,8 @@ import type { Tile, ImageRequest } from '@allmaps/types'
 
 /**
  * Class for tiles that can be fetched.
- *
- * @export
- * @class FetchableTile
- * @typedef {FetchableTile}
  */
-export default class FetchableTile {
+export class FetchableTile {
   readonly mapId: string
   readonly tile: Tile
   readonly imageRequest: ImageRequest
@@ -22,14 +18,14 @@ export default class FetchableTile {
    * Creates an instance of FetchableTile.
    *
    * @constructor
-   * @param {Tile} tile - the tile
-   * @param {WarpedMapWithImageInfo} warpedMap - A WarpedMap with fetched image information
+   * @param tile - the tile
+   * @param warpedMap - A WarpedMap with fetched image information
    */
   constructor(tile: Tile, warpedMap: WarpedMapWithImageInfo) {
     this.mapId = warpedMap.mapId
     this.tile = tile
 
-    const imageRequest = warpedMap.parsedImage.getIiifTile(
+    const imageRequest = warpedMap.parsedImage.getTileImageRequest(
       tile.tileZoomLevel,
       tile.column,
       tile.row

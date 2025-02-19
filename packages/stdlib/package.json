@@ -15,14 +15,7 @@
   ],
   "description": "Allmaps Standard Library",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -41,22 +34,24 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc && pnpm run documentation",
     "preversion": "pnpm run lint && pnpm test",
     "test": "NODE_ENV=test pnpm run build && mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "types": "tsc --noEmit"
+    "types": "tsc --noEmit",
+    "documentation": "remark . --output --use remark-api"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.30",
     "@allmaps/iiif-parser": "^1.0.0-beta.40",
-    "@allmaps/types": "^1.0.0-beta.15",
-    "@placemarkio/geojson-rewind": "^1.0.2",
+    "@turf/rewind": "^7.2.0",
+    "monotone-chain-convex-hull": "^1.1.0",
     "svg-parser": "^2.0.4"
   },
   "devDependencies": {
+    "@allmaps/types": "^1.0.0-beta.15",
     "@types/eslint": "^8.56.0",
     "@types/svg-parser": "^2.0.3",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
@@ -66,7 +61,9 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
-    "typescript": "^5.5.4"
+    "prettier": "^3.4.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
+    "typescript": "^5.7.0"
   }
 }

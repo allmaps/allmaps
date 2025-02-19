@@ -8,15 +8,7 @@
   },
   "description": "Functions for generating and parsing IIIF georeference annotations",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "unpkg": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -36,13 +28,13 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "build": "tsc",
     "preversion": "pnpm run lint && pnpm test",
     "test": "NODE_ENV=test pnpm run build && mocha && pnpm run examples",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit",
-    "documentation": "documentation readme dist/index.js --config documentation.yml --markdown-toc-max-depth=3 --section=API",
+    "documentation": "remark . --output --use remark-api",
     "examples": "cp test/input/map.parse-generate.json examples/map.example.json && cp test/input/annotation.parse-generate.json examples/annotation.example.json"
   },
   "license": "GPL-3.0-or-later",
@@ -52,13 +44,14 @@
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
-    "documentation": "^14.0.0",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
-    "typescript": "^5.5.4",
-    "zod-validation-error": "^1.5.0"
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0",
+    "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
     "zod": "^3.22.4"

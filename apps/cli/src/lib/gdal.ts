@@ -2,7 +2,7 @@ import path from 'path'
 
 import { checkCommand } from './bash.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { GeojsonPolygon, Gcp } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 

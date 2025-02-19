@@ -60,7 +60,7 @@ const tests = [
     filename: 'image.3.uvacreate-mmph-wae681.json',
     thumbnailSize: { width: 400, height: 400 },
     expectedUrl:
-      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/full/500,/0/default.jpg'
+      'https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681/full/500,372/0/default.jpg'
   }
 ]
 
@@ -69,7 +69,7 @@ for (let { filename, thumbnailSize, mode, expectedUrl } of tests) {
     it('should match expected URL', () => {
       const image = readJson(filename)
       const parsedImage = Image.parse(image)
-      const imageRequest = parsedImage.getThumbnail(thumbnailSize, mode)
+      const imageRequest = parsedImage.getImageRequest(thumbnailSize, mode)
       const imageUrl = parsedImage.getImageUrl(imageRequest)
       expect(imageUrl).to.equal(expectedUrl)
     })

@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist"
+  },
+  "references": [
+    { "path": "../annotation" },
+    { "path": "../render" },
+    { "path": "../stdlib" },
+    { "path": "../transform" },
+    { "path": "../types" }
+  ],
+  "include": ["./src/**/*"]
+}

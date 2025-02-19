@@ -1,6 +1,6 @@
 import { generateId } from '@allmaps/id'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 export async function getUrls(map: GeoreferencedMap) {
   const mapId = map.id
@@ -14,6 +14,6 @@ export async function getUrls(map: GeoreferencedMap) {
     viewer: `https://viewer.allmaps.org/?url=${encodeURIComponent(
       annotationUrl
     )}&map=${mapId}`,
-    editor: `https://editor.allmaps.org/#/mask?url=${imageUri}/info.json`
+    editor: `https://editor.allmaps.org/mask?url=${encodeURIComponent(imageUri)}/info.json`
   }
 }

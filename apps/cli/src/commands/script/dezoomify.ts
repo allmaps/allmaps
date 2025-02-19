@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 
 import path from 'path'
 
@@ -19,7 +19,7 @@ ${checkCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
 `.trim()
 }
 
-export default function generate() {
+export function dezoomify() {
   return new Command('dezoomify')
     .argument('[files...]')
     .summary('generate a Bash script to create Cloud Optimized GeoTIFFs')
@@ -28,7 +28,7 @@ export default function generate() {
     )
     .option('-d, --output-dir <dir>', 'Output directory', '.')
     .action(async (imageIds, options) => {
-      const outputDir = options.outputDir as string
+      const outputDir = options.outputDir
 
       imageIds = await readLines(imageIds)
 

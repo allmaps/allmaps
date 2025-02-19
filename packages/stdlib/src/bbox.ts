@@ -1,8 +1,7 @@
-import {
-  isGeojsonGeometry,
-  convertGeojsonGeometryToGeometry
-} from './geojson.js'
-import { isPoint, isPolygon, distance } from './geometry.js'
+import monotoneChainConvexHull from 'monotone-chain-convex-hull'
+
+import { isGeojsonGeometry, geojsonGeometryToGeometry } from './geojson.js'
+import { isPoint, isPolygon, isMultiPolygon, distance } from './geometry.js'
 
 import type {
   Point,
@@ -14,7 +13,8 @@ import type {
   Bbox,
   Size,
   Fit,
-  GeojsonGeometry
+  GeojsonGeometry,
+  Ring
 } from '@allmaps/types'
 
 // Compute
@@ -43,8 +43,11 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
   if (isPolygon(points)) {
     points = points.flat()
   }
+  if (isMultiPolygon(points)) {
+    points = points.flat()
+  }
   if (isGeojsonGeometry(points)) {
-    return computeBbox(convertGeojsonGeometryToGeometry(points))
+    return computeBbox(geojsonGeometryToGeometry(points))
   }
 
   // TODO: do this without making two new arrays
@@ -62,24 +65,41 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
   return [minX, minY, maxX, maxY]
 }
 
-export function combineBboxes(bbox0: Bbox, bbox1: Bbox): Bbox {
+export function combineBboxes(...bboxes: Bbox[]): Bbox | undefined {
+  if (bboxes.length == 0) {
+    return undefined
+  }
+
   return [
-    Math.min(bbox0[0], bbox1[0]),
-    Math.min(bbox0[1], bbox1[1]),
-    Math.max(bbox0[2], bbox1[2]),
-    Math.max(bbox0[3], bbox1[3])
+    Math.min(...bboxes.map((bbox) => bbox[0])),
+    Math.min(...bboxes.map((bbox) => bbox[1])),
+    Math.max(...bboxes.map((bbox) => bbox[2])),
+    Math.max(...bboxes.map((bbox) => bbox[3]))
   ]
 }
 
-export function isOverlapping(bbox0: Bbox, bbox1: Bbox): boolean {
+export function doBboxesIntersect(bbox0: Bbox, bbox1: Bbox): boolean {
   const isOverlappingInX = bbox0[2] >= bbox1[0] && bbox1[2] >= bbox0[0]
   const isOverlappingInY = bbox0[3] >= bbox1[1] && bbox1[3] >= bbox0[1]
 
   return isOverlappingInX && isOverlappingInY
 }
 
+export function intersectBboxes(bbox0: Bbox, bbox1: Bbox): Bbox | undefined {
+  const minX = Math.max(bbox0[0], bbox1[0])
+  const maxX = Math.min(bbox0[2], bbox1[2])
+  const minY = Math.max(bbox0[1], bbox1[1])
+  const maxY = Math.min(bbox0[3], bbox1[3])
+
+  if (minX < maxX && minY < maxY) {
+    return [minX, minY, maxX, maxY]
+  } else {
+    return undefined
+  }
+}
+
 export function pointInBbox(point: Point, bbox: Bbox): boolean {
-  return isOverlapping([point[0], point[1], point[0], point[1]], bbox)
+  return doBboxesIntersect([point[0], point[1], point[0], point[1]], bbox)
 }
 
 export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
@@ -89,8 +109,8 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
   return [bbox[0] - dist0, bbox[1] - dist1, bbox[2] + dist0, bbox[3] + dist1]
 }
 
-// Ratio 2 add half the current width (or height) both left and right of the current (width or height)
-// so the total resolution goes * 4
+// Ratio 2 adds half the current width (or height) both left and right of the current (width or height)
+// so the total width (or height) goes * 2 and the total surface goes * 4
 export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
   if (ratio == 0) {
     return bbox
@@ -128,10 +148,6 @@ export function bboxToLine(bbox: Bbox): Line {
   ]
 }
 
-export function bboxToPoint(bbox: Bbox): Point {
-  return [bbox[0], bbox[1]]
-}
-
 export function bboxToDiameter(bbox: Bbox): number {
   return distance(bboxToLine(bbox))
 }
@@ -150,7 +166,7 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
-// Approximate results, for rectangles coming from bboxes.
+// Approximate results for quadrilaterals, exact for rectangles (e.g. coming from bboxes).
 // A more precise result would require a minimal-covering-rectangle algorithm
 // Or computing and comparing rectangle surfaces
 export function rectangleToSize(rectangle: Rectangle): Size {
@@ -164,16 +180,89 @@ export function rectangleToSize(rectangle: Rectangle): Size {
   ]
 }
 
-// Scales
+// Convex hull
 
+export function convexHull(points: Point[]): Ring | undefined {
+  if (points.length == 0) {
+    return undefined
+  }
+
+  return monotoneChainConvexHull(points)
+}
+
+// Sizes and Scales
+
+/**
+ * Compute a size from two scales
+ *
+ * For unspecified 'fit', the scale is computed based on the surface area derived from the sizes.
+ *
+ * For specified 'fit':
+ *
+ * Example for square rectangles '*' and '+':
+ *
+ * 'contain' where '*' contains '.'
+ * (in the first image size0 is relatively wider)
+ *
+ *                ****
+ *                *  *
+ *   **....**     ....
+ *   * .  . *     .  .
+ *   **....**     ....
+ *                *  *
+ *                ****
+ *
+ *
+ * 'cover' where '*' is covered by '.'
+ * (in the first image size0 is relatively wider)
+ *
+ *                ....
+ *                .  .
+ *   ..****..     ****
+ *   . *  * .     *  *
+ *   ..****..     ****
+ *                .  .
+ *                ....
+ *
+ * @export
+ * @param {Size} size0 - first size
+ * @param {Size} size1 - second size
+ * @param {?Fit} [fit] - fit
+ * @returns {number}
+ */
 export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
   if (!fit) {
     return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
   } else if (fit === 'contain') {
-    return size1[0] >= size1[1] ? size0[0] / size1[0] : size0[1] / size1[1]
+    return size0[0] / size0[1] >= size1[0] / size1[1] // size0 is relatively wider
+      ? size0[0] / size1[0]
+      : size0[1] / size1[1]
   } else {
-    return size1[0] >= size1[1] ? size0[1] / size1[1] : size0[0] / size1[0]
+    // fit = 'cover'
+    return size0[0] / size0[1] >= size1[0] / size1[1] // size0 is relatively wider
+      ? size0[1] / size1[1]
+      : size0[0] / size1[0]
   }
+}
+
+export function scaleSize(size: Size, scale: number): Size {
+  return [size[0] * scale, size[1] * scale]
+}
+
+export function sizeToResolution(size: Size): number {
+  return size[0] * size[1]
+}
+
+export function sizeToCenter(size: Size): Point {
+  return [size[0] / 2, size[1] / 2]
+}
+
+export function sizeToBbox(size: Size): Bbox {
+  return [0, 0, ...size]
+}
+
+export function sizeToRectangle(size: Size): Rectangle {
+  return bboxToRectangle(sizeToBbox(size))
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {

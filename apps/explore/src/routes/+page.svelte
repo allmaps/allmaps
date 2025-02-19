@@ -8,19 +8,24 @@
 
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
-  import { Header, Thumbnail, Stats } from '@allmaps/ui'
+  import { Header, Thumbnail, Stats, Geocoder } from '@allmaps/ui'
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
   import type { MapGeoJSONFeature, FilterSpecification } from 'maplibre-gl'
 
+  import { GeocodeEarth, WorldHistoricalGazetteer } from '@allmaps/ui/geocoder'
+
+  import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
+
   import { formatTimeAgo } from '$lib/shared/format.js'
+
+  import type { Bbox } from '@allmaps/types'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
   // TODO: load from config/env
-  const pmtilesUrl =
-    'https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
+  const pmtilesUrl = 'https://files.allmaps.org/maps.pmtiles'
 
   let container: HTMLElement
   let map: Map
@@ -89,7 +94,35 @@
   }
 
   function getEditorUrl(feature: MapGeoJSONFeature) {
-    return `https://editor.allmaps.org/?#/collection?url=${feature.properties.resourceId}/info.json`
+    return `https://editor.allmaps.org/images?url=${encodeURIComponent(feature.properties.resourceId)}/info.json`
+  }
+
+  function handleGeocoderSelect(event: CustomEvent) {
+    if (event.detail?.bbox) {
+      const bbox = event.detail.bbox as Bbox
+
+      map.fitBounds(
+        [
+          [bbox[0], bbox[1]],
+          [bbox[2], bbox[3]]
+        ],
+        {
+          animate: false,
+          padding: 100
+        }
+      )
+    } else if (event.detail?.geometry) {
+      if (event.detail?.geometry?.type === 'Point') {
+        map.setCenter(event.detail.geometry.coordinates)
+      } else {
+        console.error(
+          'Geocoder event geometry type not supported',
+          event.detail
+        )
+      }
+    } else {
+      console.error('Geocoder event missing bbox or geometry', event.detail)
+    }
   }
 
   onMount(() => {
@@ -98,7 +131,8 @@
 
     map = new Map({
       container,
-      style: basemapStyle("en"),
+      // @ts-expect-error incorrect MapLibre types
+      style: basemapStyle('en'),
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
@@ -106,8 +140,6 @@
       hash: true
     })
 
-    // @ts-expect-error maplibregl is a global UMD module
-    // eslint-disable-next-line no-undef
     addTerrain(map, maplibregl)
 
     map.on('load', () => {
@@ -132,6 +164,8 @@
       })
 
       warpedMapLayer = new WarpedMapLayer()
+
+      // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
 
       layersAdded = true
@@ -163,11 +197,22 @@
 
 <div class="absolute w-full h-full grid grid-rows-[min-content_1fr]">
   <Header appName="Explore">
-    {#if lastModifiedAgo}
-      <div class="w-full flex flex-row justify-end">
-        <div class="text-sm">Data updated {lastModifiedAgo}</div>
+    <div class="w-full flex flex-row justify-between items-center gap-2">
+      <div class="w-full max-w-xl">
+        <Geocoder
+          providers={[
+            new GeocodeEarth(PUBLIC_GEOCODE_EARTH_API_KEY),
+            new WorldHistoricalGazetteer()
+          ]}
+          on:select={handleGeocoderSelect}
+        />
       </div>
-    {/if}
+      {#if lastModifiedAgo}
+        <div class="text-sm whitespace-nowrap">
+          Data updated {lastModifiedAgo}
+        </div>
+      {/if}
+    </div>
   </Header>
   <div
     class="overflow-auto grid grid-rows-[50%_50%] sm:grid-rows-none sm:grid-cols-[1fr_300px]"

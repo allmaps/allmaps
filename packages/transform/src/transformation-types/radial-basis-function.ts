@@ -1,12 +1,12 @@
 import { Matrix, inverse } from 'ml-matrix'
 
-import Transformation from '../transformation.js'
+import { Transformation } from '../transformation.js'
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
 
 import type { Point } from '@allmaps/types'
 
-export default class RBF extends Transformation {
+export class RBF extends Transformation {
   kernelFunction: KernelFunction
   normFunction: NormFunction
 

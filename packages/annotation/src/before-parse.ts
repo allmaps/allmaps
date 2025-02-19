@@ -1,4 +1,4 @@
-export function isMapsBeforeParse(
+export function isGeoreferencedMapsBeforeParse(
   mapOrMaps: unknown
 ): mapOrMaps is Array<unknown> {
   return Array.isArray(mapOrMaps)
@@ -14,9 +14,8 @@ export function isAnnotationPageBeforeParse(
     annotation &&
     typeof annotation === 'object' &&
     'type' in annotation &&
-    annotation.type === 'AnnotationPage'
-    // &&
-    // 'items' in annotation
+    annotation.type === 'AnnotationPage' &&
+    'items' in annotation
   ) {
     return true
   } else {
@@ -24,14 +23,16 @@ export function isAnnotationPageBeforeParse(
   }
 }
 
-export function isMap2BeforeParse(map: unknown): map is {
+export function isGeoreferencedMap2BeforeParse(
+  georeferencedMap: unknown
+): georeferencedMap is {
   type: 'GeoreferencedMap'
 } {
   if (
-    map &&
-    typeof map === 'object' &&
-    'type' in map &&
-    map.type === 'GeoreferencedMap'
+    georeferencedMap &&
+    typeof georeferencedMap === 'object' &&
+    'type' in georeferencedMap &&
+    georeferencedMap.type === 'GeoreferencedMap'
   ) {
     return true
   } else {
@@ -58,16 +59,3 @@ export function isAnnotation0BeforeParse(annotation: unknown): annotation is {
     return false
   }
 }
-
-// export function isAnnotationPage(
-//   annotationOrAnnotationPage: AnnotationAllVersions | AnnotationPageAllVersions
-// ): annotationOrAnnotationPage is AnnotationPageAllVersions {}
-
-// annotation &&
-//   typeof annotation === 'object' &&
-//   'type' in annotation &&
-//   annotation.type === 'AnnotationPage'
-
-// isMaps
-// Array.isArray(mapOrMaps)
-// Array.isArray(mapOrMaps)

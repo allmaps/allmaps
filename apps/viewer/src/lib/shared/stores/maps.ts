@@ -1,11 +1,7 @@
 import { writable, derived, get } from 'svelte/store'
 
 import { generateChecksum } from '@allmaps/id'
-import {
-  parseAnnotation,
-  generateAnnotation,
-  type Map as Georef
-} from '@allmaps/annotation'
+import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
 
 import { getDefaultRenderOptions } from '$lib/shared/defaults.js'
 import { fromHue } from '$lib/shared/color.js'
@@ -17,6 +13,7 @@ import {
 
 import type { ViewerMap } from '$lib/shared/types.js'
 
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point } from '@allmaps/types'
 
 type SourceMaps = Map<string, ViewerMap>
@@ -32,7 +29,7 @@ export type MapIDOrError = string | Error
 async function createAndAddViewerMap(
   sourceId: string,
   index: number,
-  map: Georef
+  map: GeoreferencedMap
 ): Promise<ViewerMap> {
   const mapIdOrError = await addMap(map)
 

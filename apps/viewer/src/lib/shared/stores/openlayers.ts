@@ -5,7 +5,6 @@ import {
   WarpedMapEvent,
   WarpedMapEventType
 } from '@allmaps/openlayers'
-import type { Map as Georef } from '@allmaps/annotation'
 
 import OLMap from 'ol/Map.js'
 import VectorSource from 'ol/source/Vector.js'
@@ -40,6 +39,7 @@ import type Feature from 'ol/Feature.js'
 import type { FeatureLike } from 'ol/Feature.js'
 import type { OrderFunction } from 'ol/render.js'
 
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { ImageInformations } from '@allmaps/types'
 
 type XYZLayer = {
@@ -119,10 +119,9 @@ async function mapWarpedMapLayerFirstTileLoaded(event: Event) {
         mapWarpedMapLayer.renderer.tileCache.getCachedTile(tileUrl)
 
       if (cachedTile) {
-        const imageBitmap = cachedTile.data
         const backgroundColor = await detectBackgroundColor(
           sourceMap.map,
-          imageBitmap
+          cachedTile.data
         )
 
         if (backgroundColor) {
@@ -236,7 +235,7 @@ export function hideMap(mapId: string) {
   }
 }
 
-export async function addMap(map: Georef): Promise<MapIDOrError> {
+export async function addMap(map: GeoreferencedMap): Promise<MapIDOrError> {
   const mapIdOrError = await mapWarpedMapLayer.addGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError
@@ -246,7 +245,7 @@ export async function addMap(map: Georef): Promise<MapIDOrError> {
   return mapIdOrError
 }
 
-export async function removeMap(map: Georef) {
+export async function removeMap(map: GeoreferencedMap) {
   const mapIdOrError = await mapWarpedMapLayer.removeGeoreferencedMap(map)
   if (typeof mapIdOrError === 'string') {
     const mapId = mapIdOrError

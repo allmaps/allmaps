@@ -1,8 +1,8 @@
-import { validateMap, parseAnnotation } from '@allmaps/annotation'
+import { validateGeoreferencedMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { IRequest } from 'itty-router'
 
 function parseQueryString(query: string | string[] | undefined) {
@@ -49,7 +49,7 @@ export async function mapsFromParams(
   }
 
   const fetchedMaps = await mapsResponse.json()
-  const georeferencedMapOrMaps = validateMap(fetchedMaps)
+  const georeferencedMapOrMaps = validateGeoreferencedMap(fetchedMaps)
 
   let georeferencedMaps: GeoreferencedMap[]
   if (Array.isArray(georeferencedMapOrMaps)) {

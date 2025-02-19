@@ -10,12 +10,19 @@ import { ImageServiceTypesSchema } from './shared.js'
 export const ImageService2Schema = z.object({
   '@id': z.string().url(),
   '@type': ImageServiceTypesSchema.optional(),
-  profile: Image1ProfileSchema.or(Image2ProfileSchema).or(Image3ProfileSchema),
+  profile: z.union([
+    Image1ProfileSchema,
+    Image2ProfileSchema,
+    Image3ProfileSchema
+  ]),
   width: z.number().int().optional(),
   height: z.number().int().optional(),
-  '@context': Image1Context.or(
-    z.literal('http://iiif.io/api/image/1/context.json')
-  )
-    .or(Image2Context)
+  '@context': z
+    .union([
+      Image1Context,
+      z.literal('http://iiif.io/api/image/1/context.json'),
+
+      Image2Context
+    ])
     .optional()
 })

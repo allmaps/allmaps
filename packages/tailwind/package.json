@@ -8,14 +8,7 @@
   },
   "description": "Allmaps Tailwind CSS presets",
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -35,12 +28,13 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc && pnpm run documentation",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
     "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha"
+    "test": "NODE_ENV=test pnpm run build && mocha",
+    "documentation": "remark . --output --use remark-api"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
@@ -50,8 +44,10 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
-    "prettier": "^2.8.0",
+    "prettier": "^3.4.2",
     "tailwindcss": "^3.3.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.7.0",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1"
   }
 }

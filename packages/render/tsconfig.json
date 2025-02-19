@@ -1,22 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "es2022",
     "types": ["vite-plugin-glsl/ext"],
     "paths": {}
   },
   "references": [
-    { "path": "../../packages/annotation" },
-    { "path": "../../packages/iiif-parser" },
-    { "path": "../../packages/id" },
-    { "path": "../../packages/stdlib" },
-    { "path": "../../packages/tailwind" },
-    { "path": "../../packages/transform" },
-    { "path": "../../packages/triangulate" },
-    { "path": "../../packages/types" }
+    { "path": "../annotation" },
+    { "path": "../iiif-parser" },
+    { "path": "../id" },
+    { "path": "../stdlib" },
+    { "path": "../tailwind" },
+    { "path": "../transform" },
+    { "path": "../triangulate" },
+    { "path": "../types" }
   ],
   "include": ["./src/**/*"]
 }

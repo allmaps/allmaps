@@ -1,21 +1,25 @@
 import classifyPoint from 'robust-point-in-polygon'
 
-import { pixelToIntArrayIndex, pointToPixel } from '@allmaps/stdlib'
+import {
+  doBboxesIntersect,
+  pixelToIntArrayIndex,
+  pointToPixel
+} from '@allmaps/stdlib'
 
 import { GetImageDataValue, GetImageDataSize } from './types.js'
 import {
   resourcePointInTile,
-  tilePosition,
+  tileToTileOriginPoint,
   clipTilePointToTile
 } from './tiles.js'
 import { applyTransform, invertTransform } from './matrix.js'
 
-import type WarpedMapList from '../maps/WarpedMapList.js'
-import type Viewport from '../viewport/Viewport.js'
-import type TileCache from '../tilecache/TileCache.js'
+import type { WarpedMapList } from '../maps/WarpedMapList.js'
+import type { Viewport } from '../viewport/Viewport.js'
+import type { TileCache } from '../tilecache/TileCache.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
-import type WarpedMap from '../maps/WarpedMap.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 import type { Point } from '@allmaps/types'
 
 const CHANNELS = 4
@@ -23,17 +27,13 @@ const CHANNELS = 4
 /**
  * Render to IntArray
  *
- * @export
- * @async
- * @template {WarpedMap} W
- * @template D
- * @param {WarpedMapList<W>} warpedMapList - WarpedMapList who's WarpedMaps will be rendered
- * @param {TileCache<D>} tileCache - TileCache who's tiles will be used
- * @param {Viewport} viewport - Viewport to render to. This can be the entire image, or a single XYZ tile
- * @param {GetImageDataValue<D>} getImageDataValue - Function to access the data of the image, at a specific index
- * @param {GetImageDataSize<D>} getImageDataSize - Function to access the size of the image
- * @param {Uint8ClampedArray} intArray - IntArray to render to
- * @returns {Promise<void>}
+ * @param warpedMapList - WarpedMapList who's WarpedMaps will be rendered
+ * @param tileCache - TileCache who's tiles will be used
+ * @param viewport - Viewport to render to. This can be the entire image, or a single XYZ tile
+ * @param getImageDataValue - Function to access the data of the image, at a specific index
+ * @param getImageDataSize - Function to access the size of the image
+ * @param intArray - IntArray to render to
+ * @returns
  */
 export async function renderToIntArray<W extends WarpedMap, D>(
   warpedMapList: WarpedMapList<W>,
@@ -44,28 +44,38 @@ export async function renderToIntArray<W extends WarpedMap, D>(
   intArray: Uint8ClampedArray
 ): Promise<void> {
   for (const warpedMap of warpedMapList.getWarpedMaps()) {
-    // TODO: viewport.projectedGeoRectangleBbox not in warpedMap.projectedGeoBbox, continue
+    if (
+      !doBboxesIntersect(
+        viewport.projectedGeoRectangleBbox,
+        warpedMap.projectedGeoMaskBbox
+      )
+    ) {
+      continue
+    }
 
     const cachedTiles = tileCache.getMapCachedTiles(warpedMap.mapId)
+    const canvasToProjectedGeoTransform = invertTransform(
+      viewport.projectedGeoToCanvasTransform
+    )
 
     // Step through all viewport pixels and set their color
     // Note: naming variables 'Pixel' instead of 'Point' when we are sure they are integer coordinate values
     for (
-      let viewportPixelX = 0;
-      viewportPixelX < viewport.viewportSize[0];
-      viewportPixelX++
+      let canvasPixelX = 0;
+      canvasPixelX < viewport.canvasSize[0];
+      canvasPixelX++
     ) {
       for (
-        let viewportPixelY = 0;
-        viewportPixelY < viewport.viewportSize[1];
-        viewportPixelY++
+        let canvasPixelY = 0;
+        canvasPixelY < viewport.canvasSize[1];
+        canvasPixelY++
       ) {
-        const viewportPixel = [viewportPixelX, viewportPixelY] as Point
+        const canvasPixel = [canvasPixelX, canvasPixelY] as Point
 
-        // Get resourcePoint corresponding to this viewportPixel
+        // Get resourcePoint corresponding to this canvasPixel
         const projectedGeoPoint = applyTransform(
-          invertTransform(viewport.projectedGeoToViewportTransform),
-          viewportPixel
+          canvasToProjectedGeoTransform,
+          canvasPixel
         )
         const resourcePoint =
           warpedMap.projectedTransformer.transformToResource(projectedGeoPoint)
@@ -91,7 +101,7 @@ export async function renderToIntArray<W extends WarpedMap, D>(
           }
         }
 
-        // If tile is found, set color of this resourcePoint, i.e. viewportPixel
+        // If tile is found, set color of this resourcePoint, i.e. canvasPixel
         if (foundCachedTile && cachedTile) {
           const tile = cachedTile.tile
           const tileSize = getImageDataSize(cachedTile.data)
@@ -110,10 +120,10 @@ export async function renderToIntArray<W extends WarpedMap, D>(
           //        |   +     |
           // [0, 0] *---------* [1, 0] > X
           //
-          const resourceTilePosition = tilePosition(tile)
+          const resourceTileOriginPoint = tileToTileOriginPoint(tile)
           const tilePoint = resourcePoint.map(
             (coordinate, index) =>
-              (coordinate - resourceTilePosition[index]) /
+              (coordinate - resourceTileOriginPoint[index]) /
               tile.tileZoomLevel.scaleFactor
           ) as Point
 
@@ -126,23 +136,23 @@ export async function renderToIntArray<W extends WarpedMap, D>(
           ]
 
           // Determine the index where to write this pixel's information in the IntArray
-          const viewportPixelIntArrayIndex = pixelToIntArrayIndex(
-            viewportPixel,
-            viewport.viewportSize,
+          const canvasPixelIntArrayIndex = pixelToIntArrayIndex(
+            canvasPixel,
+            viewport.canvasSize,
             CHANNELS
           )
 
           // Apply bilinear resampling:
           // for each color, set the color value in the intArray in the following way:
-          // for the current tile point (derived earlier from resourcePoint and hence from viewportPoint)
+          // for the current tile point (derived earlier from resourcePoint and hence from canvasPoint)
           // go over all tile pixels surrounding it
           // multiply their color value and pixel weight, and add all of these together
           for (let color = 0; color < CHANNELS; color++) {
-            intArray[viewportPixelIntArrayIndex + color] = tilePointPixels
+            intArray[canvasPixelIntArrayIndex + color] = tilePointPixels
               .map(
                 (tilePointPixel) =>
                   getImageDataValue(
-                    cachedTile!.data,
+                    cachedTile.data,
                     pixelToIntArrayIndex(
                       clipTilePointToTile(tilePointPixel, tile),
                       tileSize,

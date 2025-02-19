@@ -3,8 +3,12 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "allowSyntheticDefaultImports": true
+    "paths": {}
   },
-  "references": [{ "path": "../transform" }],
+  "references": [
+    { "path": "../transform" },
+    { "path": "../annotation" },
+    { "path": "../stdlib" }
+  ],
   "include": ["./src/**/*"]
 }

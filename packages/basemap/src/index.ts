@@ -2,7 +2,7 @@ import { layers as basemapLayers } from '@protomaps/basemaps'
 import mlcontour from 'maplibre-contour'
 import { Map } from 'maplibre-gl'
 import { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
-import { ALLMAPS_FLAVOR, TERRAIN_COLORS } from './colors'
+import { ALLMAPS_FLAVOR, TERRAIN_COLORS } from './colors.js'
 
 export function basemapStyle(
   lang: string,
@@ -12,17 +12,21 @@ export function basemapStyle(
 ): StyleSpecification {
   const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, {lang: lang})
   // modify the buildings layer
-  layers.forEach(l => {
-    if (l.id === "buildings") {
-      (l.paint as any)['fill-outline-color'] = 'rgba(139, 134, 123, 1)';
-      (l.paint as any)['fill-opacity'] = 0.5;
+  layers.forEach((layer) => {
+    if (layer.id === 'buildings') {
+      if (layer.paint && 'fill-outline-color' in layer.paint) {
+        layer.paint['fill-outline-color'] = 'rgba(139, 134, 123, 1)'
+      }
+
+      if (layer.paint && 'fill-opacity' in layer.paint) {
+        layer.paint['fill-opacity'] = 0.5
+      }
     }
   })
   return {
     version: 8,
     glyphs:
-      glyphs ||
-      'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
+      glyphs || 'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
     sprite:
       sprite || 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
     sources: {
@@ -101,7 +105,7 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
         type: 'line',
         source: 'contour-source',
         'source-layer': 'contours',
-        filter: [">", ["get", "ele"], 100],
+        filter: ['>', ['get', 'ele'], 100],
         paint: {
           // level = highest index in thresholds array the elevation is a multiple of
           'line-width': ['match', ['get', 'level'], 1, 1, 0.5],

@@ -3,7 +3,7 @@ import starlight from '@astrojs/starlight'
 import tailwind from '@astrojs/tailwind'
 import svelte from '@astrojs/svelte'
 
-import ports from '../../ports.json'
+import ports from '../../ports.json' with { type: 'json' }
 
 const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 
@@ -11,7 +11,6 @@ const isDevelop = import.meta.env.DEV
 const branch = isDevelop ? 'develop' : 'main'
 const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${branch}/`
 
-// https://astro.build/config
 export default defineConfig({
   server: { port: ports.homepage, host: true },
   devToolbar: {
@@ -103,11 +102,6 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false })
   ],
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
-  image: {
-    service: {
-      entrypoint: 'astro/assets/services/sharp'
-    }
-  },
   vite: {
     ssr: {
       noExternal: ['maplibre-gl', 'maplibre-contour']

@@ -13,7 +13,7 @@
 
   import { makeStyleTransparent } from '../shared/maplibre.js'
 
-  import type { Map as GeoreferencedMap } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Bbox } from '@allmaps/types'
 
   export let georeferencedMap: GeoreferencedMap
@@ -53,7 +53,6 @@
       setTimeout(() => {
         const bounds = warpedMapLayer.getBounds()
         if (bounds) {
-          // @ts-expect-error maplibre version mismatch
           map.fitBounds(bounds, {
             padding: {
               top: 50,
@@ -86,7 +85,6 @@
     map.on('load', async () => {
       warpedMapLayer = new WarpedMapLayer()
 
-      // @ts-expect-error maplibre version mismatch
       map.addLayer(warpedMapLayer)
 
       await warpedMapLayer.addGeoreferencedMap(georeferencedMap)

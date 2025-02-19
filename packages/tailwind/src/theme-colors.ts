@@ -19,15 +19,18 @@ import {
 import type { Shades } from './types.js'
 
 function flattenShades(color: string, shades: Shades) {
-  return shades.reduce((flattened, hex, index) => {
-    const shade = (index + 1) * 100
-    const key = `${color}-${shade}`
-    flattened[key] = hex
-    return flattened
-  }, {} as Record<string, string>)
+  return shades.reduce(
+    (flattened, hex, index) => {
+      const shade = (index + 1) * 100
+      const key = `${color}-${shade}`
+      flattened[key] = hex
+      return flattened
+    },
+    {} as Record<string, string>
+  )
 }
 
-export default {
+export const themeColors = {
   blue,
   darkblue,
   purple,

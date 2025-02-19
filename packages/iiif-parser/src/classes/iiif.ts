@@ -23,10 +23,9 @@ import type { MajorVersion } from '../lib/types.js'
 export class IIIF {
   /**
    * Parses as IIIF resource and returns a class containing the parsed version
-   * @param {any} iiifResource - Source data of a IIIF resource
-   * @param {MajorVersion} [majorVersion=null] - IIIF API version of resource. If not provided, it will be determined automatically
-   * @returns {Image | Manifest | Collection} Parsed IIIF resource
-   * @static
+   * @param iiifResource - Source data of a IIIF resource
+   * @param majorVersion - IIIF API version of resource. If not provided, it will be determined automatically
+   * @returns Parsed IIIF resource
    */
   static parse(
     iiifResource: unknown,

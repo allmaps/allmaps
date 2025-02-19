@@ -1,10 +1,4 @@
-import { z } from 'zod'
-
 import {
-  AnnotationAllVersionsSchema,
-  AnnotationPageAllVersionsSchema,
-  FeaturePropertiesAllVersionsSchema,
-  ImageServiceSchema,
   Annotation0Schema,
   Annotation1Schema,
   AnnotationPage0Schema,
@@ -12,34 +6,28 @@ import {
 } from './schemas/annotation.js'
 
 import {
-  Map2Schema,
-  GCPSchema,
-  ResourceSchema,
-  PartOfSchema,
-  ResourceMaskSchema
-} from './schemas/map.js'
-
-import {
   isAnnotationPageBeforeParse,
   isAnnotation0BeforeParse
 } from './before-parse.js'
 import { isAnnotation1 } from './guards.js'
 
-type AnnotationAllVersions = z.infer<typeof AnnotationAllVersionsSchema>
-type AnnotationPageAllVersions = z.infer<typeof AnnotationPageAllVersionsSchema>
-type Map2 = z.infer<typeof Map2Schema>
-type Resource = z.infer<typeof ResourceSchema>
-type ResourceMask = z.infer<typeof ResourceMaskSchema>
-type GCP = z.infer<typeof GCPSchema>
-type PartOf = z.infer<typeof PartOfSchema>
-type FeatureProperties = z.infer<typeof FeaturePropertiesAllVersionsSchema>
-type ImageService = z.infer<typeof ImageServiceSchema>
+import {
+  AnnotationAllVersions,
+  AnnotationPageAllVersions,
+  GeoreferencedMap2,
+  Resource,
+  ResourceMask,
+  GCP2,
+  PartOf,
+  FeatureProperties,
+  ResourceType
+} from './types.js'
 
 function parseResource(annotation: AnnotationAllVersions): Resource {
   return {
     id: parseImageId(annotation),
     ...parseImageDimensions(annotation),
-    type: parseImageService(annotation),
+    type: parseResourceType(annotation),
     partOf: parsePartOf(annotation)
   }
 }
@@ -57,7 +45,7 @@ function parseImageId(annotation: AnnotationAllVersions): string {
   }
 }
 
-function parseImageService(annotation: AnnotationAllVersions): ImageService {
+function parseResourceType(annotation: AnnotationAllVersions): ResourceType {
   if ('service' in annotation.target) {
     return annotation.target.service[0].type
   } else {
@@ -65,7 +53,7 @@ function parseImageService(annotation: AnnotationAllVersions): ImageService {
   }
 }
 
-function parsePartOf(annotation: AnnotationAllVersions): PartOf[] | undefined {
+function parsePartOf(annotation: AnnotationAllVersions): PartOf {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.partOf
   }
@@ -79,7 +67,7 @@ function parseResourceCoords(properties: FeatureProperties) {
   }
 }
 
-function parseGcps(annotation: AnnotationAllVersions): GCP[] {
+function parseGcps(annotation: AnnotationAllVersions): GCP2[] {
   return annotation.body.features.map((gcpFeature) => ({
     resource: parseResourceCoords(gcpFeature.properties),
     geo: gcpFeature.geometry.coordinates
@@ -96,8 +84,8 @@ function parseDates(annotation: AnnotationAllVersions) {
 }
 
 function parseImageDimensions(annotation: AnnotationAllVersions): {
-  width: number
-  height: number
+  width: number | undefined
+  height: number | undefined
 } {
   if (isAnnotation1(annotation)) {
     return {
@@ -161,7 +149,9 @@ function parseResourceMask(annotation: AnnotationAllVersions): ResourceMask {
   }
 }
 
-function getMap(annotation: AnnotationAllVersions): Map2 {
+function getGeoreferencedMap(
+  annotation: AnnotationAllVersions
+): GeoreferencedMap2 {
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
@@ -180,13 +170,15 @@ function getMap(annotation: AnnotationAllVersions): Map2 {
  * @param {Annotation | AnnotationPage} annotation - Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
  * @returns {Map[]} Array of maps
  * @example
+ * ```js
  * import fs from 'fs'
  * import { parseAnnotation } from '@allmaps/annotation'
  *
  * const annotation = JSON.parse(fs.readFileSync('./examples/annotation.example.json'))
  * const maps = parseAnnotation(annotation)
+ * ```
  */
-export function parseAnnotation(annotation: unknown): Map2[] {
+export function parseAnnotation(annotation: unknown): GeoreferencedMap2[] {
   if (isAnnotationPageBeforeParse(annotation)) {
     // Seperate .parse for different versions for better Zod errors
     let parsedAnnotationPage: AnnotationPageAllVersions
@@ -201,7 +193,7 @@ export function parseAnnotation(annotation: unknown): Map2[] {
     }
 
     return parsedAnnotationPage.items.map((parsedAnnotation) =>
-      getMap(parsedAnnotation)
+      getGeoreferencedMap(parsedAnnotation)
     )
   } else {
     // Seperate .parse for different versions for better Zod errors
@@ -212,6 +204,6 @@ export function parseAnnotation(annotation: unknown): Map2[] {
       parsedAnnotation = Annotation1Schema.parse(annotation)
     }
 
-    return [getMap(parsedAnnotation)]
+    return [getGeoreferencedMap(parsedAnnotation)]
   }
 }

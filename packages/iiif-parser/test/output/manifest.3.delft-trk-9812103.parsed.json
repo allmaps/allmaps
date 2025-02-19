@@ -20,7 +20,13 @@
         "width": 5920,
         "height": 1703,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/23bd2cd3-320a-49cd-8a9d-fc362d78978a/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=1",
@@ -35,7 +41,13 @@
         "width": 5712,
         "height": 4105,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/9dbc6360-6f1b-4bb1-a638-665dee890001/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=2",
@@ -50,7 +62,13 @@
         "width": 5044,
         "height": 3708,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/2739aed1-7c15-4637-ac7d-73bf85a665f1/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=3",
@@ -65,7 +83,13 @@
         "width": 4993,
         "height": 3609,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/4288f874-f214-4588-a884-da1014b01e99/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=4",
@@ -80,7 +104,13 @@
         "width": 5358,
         "height": 3960,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/0f6fc4e2-b1a5-450f-a486-da31479622a9/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=5",
@@ -95,7 +125,13 @@
         "width": 5397,
         "height": 3838,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/8fff16b6-b11e-4408-9ef0-0ec2ea9b07ab/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=6",
@@ -110,7 +146,13 @@
         "width": 5439,
         "height": 3977,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/94fd3be7-5544-4694-a44a-a4418865c5d2/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=7",
@@ -125,7 +167,13 @@
         "width": 4642,
         "height": 3957,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/d3c3309c-148c-4e7f-9118-7bf7129712bd/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=8",
@@ -140,7 +188,13 @@
         "width": 5646,
         "height": 3714,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/737525b0-4cea-4f2d-a639-7ef27d2de1d0/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=9",
@@ -155,7 +209,13 @@
         "width": 3601,
         "height": 5509,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/a5ede6cf-d095-4aae-b884-8a3fb979ae24/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=10",
@@ -170,7 +230,13 @@
         "width": 5148,
         "height": 3592,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/9b7a8e79-2707-47d2-a85a-c897b8a5eba9/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=11",
@@ -185,7 +251,13 @@
         "width": 4048,
         "height": 3828,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/2899a5fe-fe8e-4a91-97ef-718d6decf60e/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=12",
@@ -200,7 +272,13 @@
         "width": 5391,
         "height": 3725,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/9e83606c-2ae2-4601-89c3-88d84bfc8ae8/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=13",
@@ -215,7 +293,13 @@
         "width": 5752,
         "height": 2334,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/897f37ec-254a-48c2-8d17-05340f7bc215/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=14",
@@ -230,7 +314,13 @@
         "width": 4985,
         "height": 3834,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/36ac98e6-86f9-483c-b3ae-b5102d4fefd4/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=15",
@@ -245,7 +335,13 @@
         "width": 5418,
         "height": 2027,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/786368e6-aebd-4d6e-96da-9b458441ab1f/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=16",
@@ -260,7 +356,13 @@
         "width": 5263,
         "height": 3967,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/929e9ff9-cd2c-4a9e-8eee-a4d8dc4d91ac/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=17",
@@ -275,7 +377,13 @@
         "width": 5494,
         "height": 4011,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/d4699ebf-8e7e-46bb-b776-9676518f2c04/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=18",
@@ -290,7 +398,13 @@
         "width": 3690,
         "height": 3900,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/9030d365-19c2-4da5-82f7-1e00ddb4f490/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=19",
@@ -305,7 +419,13 @@
         "width": 5376,
         "height": 4048,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/2df76358-812e-4cc2-892c-ff88fc75771f/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=20",
@@ -320,7 +440,13 @@
         "width": 4233,
         "height": 3894,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/2656a65e-c09a-4cf5-a199-8abeaf918328/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=21",
@@ -335,7 +461,13 @@
         "width": 5745,
         "height": 3701,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/064a1cab-13bc-4152-9857-d58d4c9b11db/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=22",
@@ -350,7 +482,13 @@
         "width": 5805,
         "height": 2514,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/f39a4c09-1195-4ee2-b528-2680e4101b40/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=23",
@@ -365,7 +503,13 @@
         "width": 4346,
         "height": 3520,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/129c8bca-6576-4fe3-a080-52f70ee5cebb/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=24",
@@ -380,7 +524,13 @@
         "width": 5275,
         "height": 3863,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/1747bb19-459e-415d-a478-f30536633f01/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=25",
@@ -395,7 +545,13 @@
         "width": 5490,
         "height": 3936,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/9a939275-c3f0-41b0-b904-73fe85e2591f/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=26",
@@ -410,7 +566,13 @@
         "width": 5310,
         "height": 3823,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/53882b26-87d0-49d3-9d0c-4d41b03aa7d6/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=27",
@@ -425,7 +587,13 @@
         "width": 4372,
         "height": 3801,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/d0fa8fa0-3de8-4cdd-8020-10c8a7dccc40/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     },
     {
       "uri": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=trk-9812103&n1=&n2=28",
@@ -440,7 +608,13 @@
         "width": 5022,
         "height": 4021,
         "majorVersion": 2
-      }
+      },
+      "thumbnail": [
+        {
+          "id": "https://dlc.services/thumbs/7/6/0f8fd751-46a2-4948-82f3-91b1f619e726/full/full/0/default.jpg",
+          "type": "Image"
+        }
+      ]
     }
   ],
   "metadata": [

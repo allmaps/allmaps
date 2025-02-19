@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
 import { parseJsonInput, printString } from '../../lib/io.js'
@@ -11,13 +11,20 @@ import type {
   Image as IIIFImage,
   Manifest as IIIFManifest,
   EmbeddedManifest as EmbeddedIIIFManifest,
-  Collection as IIIFCollection
+  Collection as IIIFCollection,
+  EmbeddedCollection as EmbeddedIIIFCollection
 } from '@allmaps/iiif-parser'
 
-function isEmbeddedManifest(
-  item: IIIFManifest | EmbeddedIIIFManifest | IIIFCollection
-): item is EmbeddedIIIFManifest {
-  return item.type === 'manifest' && item.embedded === true
+function isCollection(
+  item:
+    | IIIFManifest
+    | EmbeddedIIIFManifest
+    | IIIFCollection
+    | EmbeddedIIIFCollection
+): item is IIIFCollection {
+  return (
+    item.type === 'collection' && item.embedded === false && 'items' in item
+  )
 }
 
 function collectImageIds(
@@ -32,9 +39,7 @@ function collectImageIds(
       imageIds.push(...parsedIiif.canvases.map((canvas) => canvas.image.uri))
     } else if (parsedIiif.type === 'collection' && 'items' in parsedIiif) {
       const collectionImageIds = parsedIiif.items
-        .filter(
-          (item) => item.type === 'collection' || !isEmbeddedManifest(item)
-        )
+        .filter((item) => isCollection(item))
         .map((item) => collectImageIds([item]))
 
       imageIds.push(...collectionImageIds.flat())
@@ -44,25 +49,26 @@ function collectImageIds(
   return imageIds
 }
 
-export default function parse() {
-  let command = new Command('image-ids')
-    .argument('[files...]')
-    .summary('read all IIIF Image IDs from IIIF resources')
-    .description('Reads all IIIF Image IDs from IIIF resources')
-
-  command = addParseIiifOptions(command)
+export function imageIds() {
+  const command = addParseIiifOptions(
+    new Command('image-ids')
+      .argument('[files...]')
+      .summary('read all IIIF Image IDs from IIIF resources')
+      .description('Reads all IIIF Image IDs from IIIF resources')
+  )
 
   return command.action(async (files, options) => {
-    const jsonValues = await parseJsonInput(files as string[])
+    const jsonValues = await parseJsonInput(files)
 
     const parsedIiifs = []
     for (const jsonValue of jsonValues) {
       try {
         const parseIiifOptions = {
-          fetchCollections: options.fetchCollections as boolean,
-          fetchManifests: options.fetchManifests as boolean,
-          fetchImages: options.fetchImages as boolean,
-          fetchAll: options.fetchAll as boolean
+          fetchCollections: options.fetchCollections,
+          fetchManifests: options.fetchManifests,
+          fetchImages: options.fetchImages,
+          fetchAll: options.fetchAll,
+          maxDepth: options.fetchMaxDepth
         }
 
         const parsedIiif = await parseIiif(jsonValue, parseIiifOptions)

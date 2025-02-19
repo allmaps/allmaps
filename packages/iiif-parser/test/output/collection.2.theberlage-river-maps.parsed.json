@@ -1,9 +1,21 @@
 {
   "majorVersion": 2,
   "type": "collection",
+  "embedded": false,
   "uri": "https://theberlage.github.io/river-maps/iiif/collections/river-maps.json",
   "label": {
     "none": ["River Maps"]
+  },
+  "description": {
+    "none": [""]
+  },
+  "requiredStatement": {
+    "label": {
+      "none": ["attribution"]
+    },
+    "value": {
+      "none": ["Rijkswaterstaat"]
+    }
   },
   "items": [
     {
