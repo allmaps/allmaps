@@ -24,14 +24,26 @@
 
   // TODO:
   // - use Allmaps basemap
-  // - show gradient right away
   // - make escape work
 
-  let header: HTMLElement
+  const HOVER_TIMEOUT = 1000
+
+  let topElement: HTMLElement
+  let titleElement: HTMLElement
 
   const maskCount = 5
+  let finishedAnimationCount = 0
 
-  let interactive = true
+  let scrolledDown = false
+  let introFinished = false
+
+  $: {
+    if (finishedAnimationCount === maskCount) {
+      introFinished = true
+    }
+  }
+
+  $: interactive = introFinished && !scrolledDown
 
   let mouseX = 0
   let mouseY = 0
@@ -44,8 +56,14 @@
 
   const gradientMultiplier = 1 / 4
 
-  $: gradientX = `${((mouseX / width) * 100 - 50) * gradientMultiplier + 50}%`
-  $: gradientY = `${((mouseY / height) * 100 - 50) * gradientMultiplier + 50}%`
+  $: gradientX =
+    width === 0
+      ? '50%'
+      : `${((mouseX / width) * 100 - 50) * gradientMultiplier + 50}%`
+  $: gradientY =
+    height === 0
+      ? '50%'
+      : `${((mouseY / height) * 100 - 50) * gradientMultiplier + 50}%`
 
   let timeout: number = 0
 
@@ -95,19 +113,23 @@
     // Medina
     'https://annotations.allmaps.org/maps/31c1d537d0bd9ff2@055378572bd2e2cd',
     // Delft Library
-    'https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b'
+    'https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b',
+    // San Antonio
+    'https://annotations.allmaps.org/maps/a05aca049adadc77@ef2ac6056432f676'
   ]
 
   const gradientFrom = '#25318f'
   const gradientTo = '#101656'
 
-  let maps: GeoreferencedMap[] = []
+  let loading = false
   let showMap: GeoreferencedMap | undefined
   let bounds: Bbox | undefined
   let showBasemap = false
   let warpedMapReady = false
 
-  let masks: string[] = []
+  let maps: (GeoreferencedMap | undefined)[] = Array(maskCount).fill(undefined)
+  let masks: (string | undefined)[] = Array(maskCount).fill(undefined)
+  let maskIntroFinished = Array(maskCount).fill(false)
 
   const maskColors = ['#63D8E6', '#FE5E60', '#ffc742', '#C552B5', '#64C18F']
 
@@ -116,7 +138,13 @@
       return
     }
 
+    loading = true
+
     timeout = setTimeout(() => {
+      if (!maps[index]) {
+        return
+      }
+
       const pixelPath = event.target as SVGPathElement
       const pixelPathRect = pixelPath.getBoundingClientRect()
 
@@ -134,11 +162,16 @@
           georeferencedMap.resourceMask
         ])
 
-      // 1. Use viewport and SVG path sizes to compute viewport's coordinates in spherical mercator
-      // 2. Transform these viewport spherical mercator coordinates to resource coordinates using projectedTransformer
+      // 1. Use viewport and SVG path sizes to compute viewport's
+      //    coordinates in spherical mercator
+      // 2. Transform these viewport spherical mercator coordinates to
+      //    resource coordinates using projectedTransformer
       // 3. Transform these resource coordinates to lat/lon using transformer
 
-      const pixelScreenSize: Size = [header.clientWidth, header.clientHeight]
+      const pixelScreenSize: Size = [
+        titleElement.clientWidth,
+        titleElement.clientHeight
+      ]
       const pixelPathRectSize: Size = [
         pixelPathRect.width,
         pixelPathRect.height
@@ -179,7 +212,7 @@
       bounds = geoScreenRectangleBbox
 
       showMap = maps[index]
-    }, 500) as unknown as number
+    }, HOVER_TIMEOUT) as unknown as number
   }
 
   function shuffleArray(array: unknown[]) {
@@ -206,7 +239,7 @@
       ...entries.map((entry) => entry.intersectionRatio)
     )
 
-    interactive = intersectionRatio === 1
+    scrolledDown = intersectionRatio !== 1
   }
 
   function handleMaskClick(event: MouseEvent, index: number) {
@@ -242,6 +275,7 @@
   }
 
   function handleWarpedMapReady() {
+    loading = false
     warpedMapReady = true
   }
 
@@ -255,54 +289,56 @@
   }
 
   onMount(async () => {
-    mouseX = header.clientWidth / 2
-    mouseY = header.clientHeight / 2
+    mouseX = titleElement.clientWidth / 2
+    mouseY = titleElement.clientHeight / 2
 
-    width = header.clientWidth
-    height = header.clientHeight
+    width = titleElement.clientWidth
+    height = titleElement.clientHeight
 
-    new ResizeObserver(handleResize).observe(header)
+    new ResizeObserver(handleResize).observe(titleElement)
     new IntersectionObserver(handleIntersection, {
-      threshold: 1.0
-    }).observe(header)
-
-    let annotations: unknown[] = []
+      threshold: 1
+    }).observe(topElement)
 
     shuffleArray(annotationUrls)
 
-    try {
-      annotations = await Promise.all(
-        annotationUrls
-          .slice(0, maskCount)
-          .map((url) => fetch(url).then((response) => response.json()))
-      )
-    } catch (err) {}
+    for (const [index, annotationUrl] of annotationUrls
+      .slice(0, maskCount)
+      .entries()) {
+      fetch(annotationUrl)
+        .then((response) => response.json())
+        .then((annotation) => {
+          const annotationMaps = parseAnnotation(annotation)
+          const map = annotationMaps[0]
 
-    maps = annotations.map((annotation) => parseAnnotation(annotation)).flat()
-
-    const paths: string[] = []
-    maps.forEach((map) => {
-      const polygon = getPolygon(map)
-      const path = geometryToPath(polygon, scaleTo)
-      if (path) {
-        paths.push(path)
-      }
-    })
-
-    masks = paths
+          const polygon = getPolygon(map)
+          const path = geometryToPath(polygon, scaleTo)
+          if (path) {
+            maps[index] = map
+            masks[index] = path
+          } else {
+            throw new Error("Can't create path")
+          }
+        })
+        .catch(() => console.error('Error fetching and parsing', annotationUrl))
+    }
   })
 </script>
 
-<header
-  bind:this={header}
+<div bind:this={topElement}></div>
+<div
+  id="title"
+  bind:this={titleElement}
   on:mousemove={handleMousemove}
-  style="--gradient-x: {gradientX}; --gradient-y: {gradientY}; --gradient-from: {gradientFrom}; --gradient-to: {gradientTo};"
+  style="
+    --gradient-x: {gradientX}; --gradient-y: {gradientY};
+    --gradient-from: {gradientFrom}; --gradient-to: {gradientTo};"
   role="img"
   class="relative overflow-hidden flex justify-center items-center h-screen min-h-[600px] text-center"
 >
   {#if width && height && masks.length}
     <svg
-      transition:scale={{ duration: 2000, start: 3, easing: expoOut }}
+      class:loading
       class="background pointer-events-none w-full h-full absolute"
       id="masks"
       version="1.1"
@@ -314,27 +350,42 @@
       viewBox="0 0 {width} {height}"
       ><g transform-origin="{width / 2} {height / 2}" class="scroll-group">
         {#each masks as mask, index}
-          <g transform="translate(0 60)">
+          {#if mask}
             <g
-              transform={pointToTranslate(
-                radialToCartasian((360 / masks.length) * index + 120, distance),
-                [width / 2, height / 2]
-              )}
+              transform="translate(0 60)"
+              transform-origin="50% 50%"
+              transition:scale|global={{
+                duration: Math.random() * 1000 + 1500,
+                delay: Math.random() * 500,
+                start: 3,
+                easing: expoOut
+              }}
+              on:introend={() => finishedAnimationCount++}
             >
-              <path
-                role="presentation"
-                class="pointer-events-auto cursor-pointer [fill-opacity:0.5] hover:[fill-opacity:0.6] transition-all duration-300"
-                on:click={(event) => handleMaskClick(event, index)}
-                on:mouseenter={(event) => handleMaskMouseenter(event, index)}
-                on:mouseleave={handleMaskMouseleave}
-                transform="translate(-{scaleTo / 2} -{scaleTo / 2})"
-                d={mask}
-                style:fill={maskColors[index]}
-                style:stroke={maskColors[index]}
-                paint-order="stroke"
-              />
+              <g
+                transform={pointToTranslate(
+                  radialToCartasian(
+                    (360 / masks.length) * index + 120,
+                    distance
+                  ),
+                  [width / 2, height / 2]
+                )}
+              >
+                <path
+                  role="presentation"
+                  class="pointer-events-auto cursor-pointer [fill-opacity:0.5] transition-all duration-300"
+                  on:click={(event) => handleMaskClick(event, index)}
+                  on:mouseenter={(event) => handleMaskMouseenter(event, index)}
+                  on:mouseleave={handleMaskMouseleave}
+                  transform="translate(-{scaleTo / 2} -{scaleTo / 2})"
+                  d={mask}
+                  style:fill={maskColors[index]}
+                  style:stroke={maskColors[index]}
+                  paint-order="stroke"
+                />
+              </g>
             </g>
-          </g>
+          {/if}
         {/each}
       </g>
     </svg>
@@ -381,10 +432,10 @@
       curate, georeference and explore collections of digitized maps.
     </p>
   </div>
-</header>
+</div>
 
 <style scoped>
-  header {
+  #title {
     background-color: #101656;
     color: white;
     background-image: radial-gradient(
@@ -394,10 +445,33 @@
     );
   }
 
-  header svg .scroll-group {
+  #title svg .scroll-group {
     animation: scroll linear;
     animation-timeline: scroll(block root);
     animation-range: 0 100vh;
+  }
+
+  #masks path {
+    stroke-width: 10;
+  }
+
+  #masks.loading path:hover {
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    from {
+      fill-opacity: 0.5;
+    }
+    30% {
+      fill-opacity: 0.3;
+    }
+    60% {
+      fill-opacity: 0.7;
+    }
+    to {
+      fill-opacity: 0.5;
+    }
   }
 
   @keyframes scroll {
@@ -408,9 +482,5 @@
     100% {
       scale: 1.4;
     }
-  }
-
-  #masks path {
-    stroke-width: 10;
   }
 </style>

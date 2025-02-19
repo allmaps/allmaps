@@ -8,6 +8,8 @@ type Params = {
   }
 }
 
+export const entries = () => organizations.map(({ id }) => ({ id, slug: id }))
+
 export function load({ params }: Params) {
   const organization = organizations.find(
     (organization) => organization.id === params.id
