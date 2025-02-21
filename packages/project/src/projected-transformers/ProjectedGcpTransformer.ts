@@ -6,6 +6,7 @@ import { GcpTransformer, TransformationType } from '@allmaps/transform'
 import { ProjectedTransformerOptions } from '../shared/types.js'
 import {
   defaultProjectedTransformerOptions,
+  defaultProjections,
   lonLatProjection
 } from '../shared/project-functions.js'
 
@@ -51,16 +52,34 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       defaultProjectedTransformerOptions,
       partialProjectedTransformerOptions
     )
+
+    if (
+      !defaultProjections.has(
+        projectedTransformerOptions.internalProjection.name
+      )
+    ) {
+      proj4.defs(
+        projectedTransformerOptions.internalProjection.name,
+        projectedTransformerOptions.internalProjection.definition
+      )
+    }
+    if (!defaultProjections.has(projectedTransformerOptions.projection.name)) {
+      proj4.defs(
+        projectedTransformerOptions.projection.name,
+        projectedTransformerOptions.projection.definition
+      )
+    }
+
     const internalProjectionToProjectionConverter = proj4(
-      projectedTransformerOptions.internalProjection,
-      projectedTransformerOptions.projection
+      projectedTransformerOptions.internalProjection.name,
+      projectedTransformerOptions.projection.name
     )
     const postForward = internalProjectionToProjectionConverter.forward
     const preBackward = internalProjectionToProjectionConverter.inverse
 
     const lonLatToProjectionConverter = proj4(
-      lonLatProjection,
-      projectedTransformerOptions.projection
+      lonLatProjection.name,
+      projectedTransformerOptions.projection.name
     )
     const lonLatToProjection = lonLatToProjectionConverter.forward
 

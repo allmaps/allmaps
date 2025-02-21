@@ -1,6 +1,11 @@
 import { TransformerOptions } from '@allmaps/transform'
 
-export type Projection = string
+import type { ProjectionDefinition } from 'proj4'
+
+export type Projection = {
+  name: string
+  definition: string | ProjectionDefinition
+}
 
 export type ProjectedTransformerOptions = {
   internalProjection: Projection

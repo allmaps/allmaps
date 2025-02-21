@@ -1,6 +1,7 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 import {
   computeBbox,
   bboxToRectangle,
@@ -636,8 +637,8 @@ export class WarpedMap extends EventTarget {
       this.projectedTransformerByTransformationType,
       this.transformationType,
       () =>
-        new GcpTransformer(
-          this.projectedGcps,
+        new ProjectedGcpTransformer(
+          this.gcps,
           this.transformationType,
           DEFAULT_TRANSFORMER_OPTIONS
         ),

@@ -7,6 +7,12 @@ import { ProjectedGcpTransformer } from '../dist/index.js'
 
 import { gcps6, gcps6nad } from './input/gcps-test.js'
 
+const epsg4269 = {
+  name: 'EPSG:4269',
+  definition:
+    '+title=NAD83 (long/lat) +proj=longlat +a=6378137.0 +b=6356752.31414036 +ellps=GRS80 +datum=NAD83 +units=degrees'
+}
+
 describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and projection', async () => {
   const transformerOptions = {
     minOffsetRatio: 0.01,
@@ -105,8 +111,6 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
     [-10573741.366662772, 3465181.0312209423]
   ]
 
-  console.log(projectedTransformer.transformToGeo(resourceLineString))
-
   it(`should transform the lineString to webmercator and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
       projectedTransformer.transformToGeo(resourceLineString),
@@ -119,7 +123,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4269 in
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
-    internalProjection: 'EPSG:4269'
+    internalProjection: epsg4269
   }
   const projectedTransformer = new ProjectedGcpTransformer(
     gcps6nad,
@@ -160,8 +164,8 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4269 in
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
-    internalProjection: 'EPSG:4269',
-    projection: 'EPSG:4269'
+    internalProjection: epsg4269,
+    projection: epsg4269
   }
   const projectedTransformer = new ProjectedGcpTransformer(
     gcps6nad,
