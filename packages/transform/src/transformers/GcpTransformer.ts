@@ -208,7 +208,7 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param geometry - Geometry to transform
    * @param partialTransformOptions - Transform options
-   * @param generalGcpToP - Return type function
+   * @param gcpToP - Return type function
    * @returns Input geometry transformed to geo space
    */
   transformToGeo<P = Point>(
@@ -267,7 +267,7 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param geometry - Geometry to transform
    * @param partialTransformOptions - Transform options
-   * @param generalGcpToP - Return type function
+   * @param gcpToP - Return type function
    * @returns Input geometry transformed to resource space
    */
   transformToResource<P>(

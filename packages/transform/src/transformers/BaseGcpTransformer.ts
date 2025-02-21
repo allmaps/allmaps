@@ -63,7 +63,8 @@ import type {
   TransformationType,
   TransformOptions,
   DistortionMeasure,
-  TransformerOptions
+  TransformerOptions,
+  projectionFunction
 } from '../shared/types.js'
 
 /**
@@ -111,8 +112,15 @@ export abstract class BaseGcpTransformer {
       throw new Error('No control points')
     }
     this._generalGcps = generalGcps
-    this._sourcePoints = this._generalGcps.map((gcp) => gcp.source)
-    this._destinationPoints = this._generalGcps.map((gcp) => gcp.destination)
+    this._sourcePoints = this._generalGcps.map((generalGcp) => {
+      let source = this.transformerOptions.differentHandedness
+        ? flipY(generalGcp.source)
+        : generalGcp.source
+      return this.transformerOptions.preForward(source)
+    })
+    this._destinationPoints = this._generalGcps.map((generalGcp) =>
+      this.transformerOptions.preBackward(generalGcp.destination)
+    )
     this.type = type
   }
 
@@ -122,9 +130,7 @@ export abstract class BaseGcpTransformer {
   protected _getForwardTransformation(): BaseTransformation {
     if (!this.forwardTransformation) {
       this.forwardTransformation = this.computeTransformation(
-        this._sourcePoints.map((point) =>
-          this.transformerOptions?.differentHandedness ? flipY(point) : point
-        ),
+        this._sourcePoints,
         this._destinationPoints
       )
     }
@@ -138,9 +144,7 @@ export abstract class BaseGcpTransformer {
     if (!this.backwardTransformation) {
       this.backwardTransformation = this.computeTransformation(
         this._destinationPoints,
-        this._sourcePoints.map((point) =>
-          this.transformerOptions?.differentHandedness ? flipY(point) : point
-        )
+        this._sourcePoints
       )
     }
     return this.backwardTransformation
@@ -486,8 +490,10 @@ export abstract class BaseGcpTransformer {
   ): P {
     const forwardTransformation = this._getForwardTransformation()
 
-    const source = transformerOptions.differentHandedness ? flipY(point) : point
-    const destination = forwardTransformation.evaluateFunction(source)
+    let source = transformerOptions.differentHandedness ? flipY(point) : point
+    source = transformerOptions.preForward(source)
+    let destination = forwardTransformation.evaluateFunction(source)
+    destination = transformerOptions.postForward(destination)
 
     let partialDerivativeX = undefined
     let partialDerivativeY = undefined
@@ -525,9 +531,10 @@ export abstract class BaseGcpTransformer {
   ): P {
     const backwardTransformation = this._getBackwardTransformation()
 
-    const destination = point
+    const destination = transformerOptions.preBackward(point)
     let source = backwardTransformation.evaluateFunction(destination)
     // apply differentHandedness here again, so it has been applied twice in total and is undone now.
+    source = transformerOptions.postBackward(source)
     source = transformerOptions.differentHandedness ? flipY(source) : source
 
     let partialDerivativeX = undefined

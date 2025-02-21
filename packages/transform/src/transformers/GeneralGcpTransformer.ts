@@ -96,7 +96,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in source coordinates.
    *
    * @param sourceBbox - BBox in source space where the resolution is requested
-   * @param  partialTransformOptions - extra parameters to consider
+   * @param partialTransformOptions - extra parameters to consider
    * @returns
    */
   getForwardTransformationResolution(
@@ -123,7 +123,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in destination coordinates.
    *
    * @param destinationBbox - BBox in destination space where the resolution is requested
-   * @param  partialTransformOptions - extra parameters to consider
+   * @param partialTransformOptions - extra parameters to consider
    * @returns
    */
   getBackwardTransformationResolution(

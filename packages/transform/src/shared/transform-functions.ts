@@ -30,6 +30,10 @@ export const defaultTransformOptions: TransformOptions = {
 
 export const defaultTransformerOptions: TransformerOptions = {
   differentHandedness: false,
+  preForward: (point: Point) => point,
+  postForward: (point: Point) => point,
+  preBackward: (point: Point) => point,
+  postBackward: (point: Point) => point,
   ...defaultTransformOptions
 }
 

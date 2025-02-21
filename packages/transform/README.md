@@ -2,9 +2,7 @@
 
 This module contains classes and methods to **transform Points, LineStrings, Polygons** and other spatial features from a 2D cartesian `(x, y)` source space to a destination space. The transformation function that accomplish this are constructed from **a set of Control Points**, who's coordinates are known in both spaces, and a specific **type of transformation** algorithm.
 
-Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two places where we transform a IIIF image from the 'resource' space of the image to the '(projected) geospatial' space of a map projection (in most cases WebMercator), using the Ground Control Points and transformation type defined in the map's Georeference Annotation.
-
-Like all other Allmaps modules, care was taken to make this module usable and useful outside of the Allmaps context as well! Feel free to incorporate it in your project if it could be useful.
+The classes in this module are further extended in the [@allmaps/project](../../packages/project/) module. If you're looking to build a *projected* transformer, transforming and projecting from the 'resource' space of a IIIF Image to the 'projected geospatial' space of a map projection, use the classes from that module. It can build projected transformers from the Ground Control Points, transformation type and projection information defined in a map's Georeference Annotation.
 
 ## How it works
 
@@ -55,8 +53,10 @@ export const generalGcps3 = [
 
 const generalTransformer = new GeneralGcpTransformer(generalGcps3, 'polynomial')
 
-const transformedPoint = generalTransformer.transformForward([1, 1])
-// transformedPoint = [6, 14]
+const sourcePoint = [1, 1]
+
+const destinationPoint = generalTransformer.transformForward(sourcePoint)
+// destinationPoint = [6, 14]
 ```
 
 ### LineString
@@ -103,16 +103,16 @@ const options = {
 
 const transformer = new GcpTransformer(gcps7, 'polynomial')
 
-const lineString = [
+const resourceLineString = [
   [10, 50],
   [50, 50]
 ]
 
-const transformedLineString = transformer.transformBackward(
-  lineString,
+const geoLineString = transformer.transformBackward(
+  resourceLineString,
   options
 )
-// transformedLineString = [
+// geoLineString = [
 //   [31.06060606060611, 155.30303030303048],
 //   [82.57575757575762, 162.8787878787881],
 //   [134.09090909090912, 170.45454545454567],
@@ -166,7 +166,7 @@ const options = {
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 
-const polygon = [
+const resourcePolygon = [
   [
     [1000, 1000],
     [1000, 2000],
@@ -175,11 +175,11 @@ const polygon = [
   ]
 ]
 
-const transformedPolygon = transformer.transformForward(
-  polygon,
+const geoPolygon = transformer.transformForward(
+  resourcePolygon,
   options
 )
-// transformedPolygon = [
+// geoPolygon = [
 //     [
 //       [4.388957777030093, 51.959084191571606],
 //       [4.390889520773774, 51.94984430356657],
@@ -209,13 +209,13 @@ const options = {
 
 const transformer = new GcpTransformer(gcps7, 'polynomial')
 
-const multiPoint = [
+const resourceMultiPoint = [
   [10, 50],
   [50, 50]
 ]
 
-const transformedMultiPoint = transformer.transformForward(multiPoint, options)
-// const transformedMultiPoint = [
+const geoMultiPoint = transformer.transformForward(resourceMultiPoint, options)
+// const geoMultiPoint = [
 //   [31.06060606060611, 155.30303030303048],
 //   [237.12121212121218, 185.60606060606085]
 // ]
@@ -276,13 +276,13 @@ const generalGcps3 = ... // see above
 const transformer = new GeneralGcpTransformer(generalGcps3, 'helmert', {
     differentHandedness: true
   })
-const input = [4.925027120153211, 52.46506809004473]
+const destinationPoint = [4.925027120153211, 52.46506809004473]
 
-const output = transformer.transformBackward([0, 0], {}, (generalGcp) => [
+const sourcePoint = transformer.transformBackward(destinationPoint, {}, (generalGcp) => [
   generalGcp.source[0],
   -generalGcp.source[1]
 ])
-// output = [146.25183291709982, -122.59989116975339]
+// sourcePoint = [146.25183291709982, -122.59989116975339]
 // instead of [146.25183291709982, 122.59989116975339]
 ```
 
@@ -317,13 +317,14 @@ const geojsonLineString = {
     [50, 50]
   ]
 }
-const lineString = geojsonGeometryToGeometry(geojsonLineString)
+const geoLineString = geojsonGeometryToGeometry(geojsonLineString)
+// geoLineString = [[10, 50],[50, 50]]
 
-const transformedLineString = transformer.transformBackward(
-  lineString,
+const resourceLineString = transformer.transformToResource(
+  geoLineString,
   options
 )
-const transformedGeoJsonLineString = geometryToGeojsonGeometry(transformedLineString)
+const resourceLineStringAsGeojson = geometryToGeojsonGeometry(resourceLineString)
 ```
 
 For faster transformation between SVG Geometries and GeoJSON Geometries, the following shortcut methods are available as static methods of the GcpTransformer class: `transformSvgToGeojson()`, `transformSvgStringToGeojsonFeatureCollection()`, `transformGeojsonToSvg()`, `transformGeojsonFeatureCollectionToSvgString()`. Example usage:
@@ -404,9 +405,9 @@ const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
 const referenceScale = toGeoHelmertTransformation.scale
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
-const input = [1000, 1000]
-transformer.transformToGeo(
-    input,
+const resourcePoint = [1000, 1000]
+const distortion = transformer.transformToGeo(
+    resourcePoint,
     {
       distortionMeasures: ['log2sigma'],
       referenceScale
@@ -414,7 +415,7 @@ transformer.transformToGeo(
     (gcpAndDistortions) => gcpAndDistortions.distortions.get('log2sigma')
 )
 // distortion = -0.2140907145956012
-// => At this input location the area has slightly contracted after the transformation
+// => At this resource location the area has slightly contracted after the transformation
 ```
 
 ### Return Type Function
@@ -1430,16 +1431,7 @@ Transformation type.
 ###### Type
 
 ```ts
-{differentHandedness: boolean} & {
-  maxDepth: number
-  minOffsetRatio: number
-  minOffsetDistance: number
-  minLineDistance: number
-  sourceIsGeographic: boolean
-  destinationIsGeographic: boolean
-  distortionMeasures: DistortionMeasure[]
-  referenceScale: number
-} & MultiGeometryOptions
+{ differentHandedness: boolean; preForward: projectionFunction; postForward: projectionFunction; preBackward: projectionFunction; postBackward: projectionFunction; } & { maxDepth: number; ... 6 more ...; referenceScale: number; } & MultiGeometryOptions
 ```
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
@@ -1480,6 +1472,10 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 ###### Fields
 
 * `differentHandedness` (`false`)
+* `postBackward` (`(point: Point) => Point`)
+* `postForward` (`(point: Point) => Point`)
+* `preBackward` (`(point: Point) => Point`)
+* `preForward` (`(point: Point) => Point`)
 
 ### `supportedDistortionMeasures`
 

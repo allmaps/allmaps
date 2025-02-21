@@ -82,6 +82,10 @@ export type TransformOptions = {
 
 export type TransformerOptions = {
   differentHandedness: boolean
+  preForward: projectionFunction
+  postForward: projectionFunction
+  preBackward: projectionFunction
+  postBackward: projectionFunction
 } & TransformOptions
 
 export type KernelFunction = (
@@ -90,3 +94,5 @@ export type KernelFunction = (
 ) => number
 export type KernelFunctionOptions = { derivative?: number; epsilon?: number }
 export type NormFunction = (point0: Point, point1: Point) => number
+
+export type projectionFunction = (point: Point) => Point
