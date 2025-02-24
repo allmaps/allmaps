@@ -9,7 +9,7 @@ const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 
 const isDevelop = import.meta.env.DEV
 const branch = isDevelop ? 'develop' : 'main'
-const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${branch}/`
+const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/hompage`
 
 export default defineConfig({
   server: { port: ports.homepage, host: true },
