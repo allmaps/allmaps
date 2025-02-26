@@ -25,8 +25,7 @@
   import 'maplibre-gl/dist/maplibre-gl.css'
 
   // TODO: load from config/env
-  const pmtilesUrl =
-    'https://pub-073597ae464e4b54b70bb56886a2ccb6.r2.dev/maps.pmtiles'
+  const pmtilesUrl = 'https://files.allmaps.org/maps.pmtiles'
 
   let container: HTMLElement
   let map: Map

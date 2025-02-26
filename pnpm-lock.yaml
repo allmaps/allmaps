@@ -7,6 +7,12 @@ settings:
 importers:
 
   .:
+    dependencies:
+      packages:
+
+        specifier: link:/Users/bdon/workspace/allmaps/allmaps/packages
+
+        version: link:../../../../bdon/workspace/allmaps/allmaps/packages
     devDependencies:
       husky:
         specifier: ^8.0.3
@@ -118,8 +124,8 @@ importers:
         specifier: ^0.5.9
         version: 0.5.15(tailwindcss@4.0.6)
       bits-ui:
-        specifier: ^0.21.11
-        version: 0.21.16(svelte@5.19.10)
+        specifier: ^1.1.0
+        version: 1.3.1(svelte@5.19.10)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -957,7 +963,7 @@ importers:
         specifier: ^5.0.3
         version: 5.4.11(@types/node@18.19.67)
 
-  packages/analyse:
+  packages/analyze:
     dependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.30
@@ -1063,15 +1069,15 @@ importers:
 
   packages/basemap:
     dependencies:
+      '@protomaps/basemaps':
+        specifier: ^5.0.0
+        version: 5.0.0
       maplibre-contour:
         specifier: ^0.1.0
         version: 0.1.0
       maplibre-gl:
         specifier: ^4.7.1
         version: 4.7.1
-      protomaps-themes-base:
-        specifier: ^4.3.0
-        version: 4.3.0
     devDependencies:
       '@maplibre/maplibre-gl-style-spec':
         specifier: ^19.3.1
@@ -1454,8 +1460,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       rbush:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^4.0.0
+        version: 4.0.1
       robust-point-in-polygon:
         specifier: ^1.0.3
         version: 1.0.3
@@ -1470,8 +1476,8 @@ importers:
         specifier: ^18.14.2
         version: 18.19.67
       '@types/rbush':
-        specifier: ^3.0.0
-        version: 3.0.4
+        specifier: ^4.0.0
+        version: 4.0.0
       '@types/robust-point-in-polygon':
         specifier: ^1.0.4
         version: 1.0.4
@@ -3542,20 +3548,6 @@ packages:
       svelte: 4.2.19
     dev: false
 
-  /@melt-ui/svelte@0.76.2(svelte@5.19.10):
-    resolution: {integrity: sha512-7SbOa11tXUS95T3fReL+dwDs5FyJtCEqrqG3inRziDws346SYLsxOQ6HmX+4BkIsQh1R8U3XNa+EMmdMt38lMA==}
-    peerDependencies:
-      svelte: '>=3 <5'
-    dependencies:
-      '@floating-ui/core': 1.6.8
-      '@floating-ui/dom': 1.6.12
-      '@internationalized/date': 3.6.0
-      dequal: 2.0.3
-      focus-trap: 7.6.2
-      nanoid: 5.0.9
-      svelte: 5.19.10
-    dev: false
-
   /@microsoft/api-extractor-model@7.28.13(@types/node@18.19.67):
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}
     dependencies:
@@ -3686,7 +3678,7 @@ packages:
       ini: 4.1.3
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
       walk-up-path: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -4209,6 +4201,10 @@ packages:
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+    dev: false
+
+  /@protomaps/basemaps@5.0.0:
+    resolution: {integrity: sha512-lp+2ktb9gC9jZ/2L2AKvuQt36MNV1lJPOxDHA3IgD09roloxgp6QwXcMyE36ijGKMuKUiYKnmUuT9ouVhNgdLA==}
     dev: false
 
   /@resvg/resvg-wasm@2.6.2:
@@ -5299,13 +5295,8 @@ packages:
     resolution: {integrity: sha512-Sk/uYFOBAB7mb74XcpizmH0KOR2Pv3D2Hmrh1Dmy5BmK3MpdSa5kqZcg6EKBdklU0bFXX9gCfzvpnyUehrPIuA==}
     dev: true
 
-  /@types/rbush@3.0.4:
-    resolution: {integrity: sha512-knSt9cCW8jj1ZSFcFeBZaX++OucmfPxxHiRwTahZfJlnQsek7O0bazTJHWD2RVj9LEoejUYF2de3/stf+QXcXw==}
-    dev: true
-
   /@types/rbush@4.0.0:
     resolution: {integrity: sha512-+N+2H39P8X+Hy1I5mC6awlTX54k3FhiUmvt7HWzGJZvF+syUAAxP/stwppS8JE84YHqFgRMv6fCy31202CMFxQ==}
-    dev: false
 
   /@types/robust-point-in-polygon@1.0.4:
     resolution: {integrity: sha512-2CT4xvLZDi/FQiln786NnbvqGYDcY1i77NMu4uEeE/Unl4Irj5hMXb/RWM1M2EboUlrJsTvWbAQTsItsD9SRpw==}
@@ -5670,7 +5661,7 @@ packages:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.6.3
+      semver: 7.7.1
       ts-api-utils: 1.4.3(typescript@5.7.2)
       typescript: 5.7.2
     transitivePeerDependencies:
@@ -6409,15 +6400,20 @@ packages:
       svelte: 4.2.19
     dev: false
 
-  /bits-ui@0.21.16(svelte@5.19.10):
-    resolution: {integrity: sha512-XFZ7/bK7j/K+5iktxX/ZpmoFHjYjpPzP5EOO/4bWiaFg5TG1iMcfjDhlBTQnJxD6BoVoHuqeZPHZvaTgF4Iv3Q==}
+  /bits-ui@1.3.1(svelte@5.19.10):
+    resolution: {integrity: sha512-+K2IjTDTlARuGGT32nSvps5AWWev/fEwNWxmcwXN+W6I9wjIKLdZj7wwU5EnGXmVA2s9JvdCVsYD7v8hD/wYPw==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
-      svelte: ^4.0.0 || ^5.0.0-next.118
+      svelte: ^5.11.0
     dependencies:
+      '@floating-ui/core': 1.6.8
+      '@floating-ui/dom': 1.6.12
       '@internationalized/date': 3.6.0
-      '@melt-ui/svelte': 0.76.2(svelte@5.19.10)
-      nanoid: 5.0.9
+      esm-env: 1.2.2
+      runed: 0.23.4(svelte@5.19.10)
       svelte: 5.19.10
+      svelte-toolbelt: 0.7.1(svelte@5.19.10)
+      tabbable: 6.2.0
     dev: false
 
   /bl@4.1.0:
@@ -7840,7 +7836,6 @@ packages:
 
   /esm-env@1.2.2:
     resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
-    dev: true
 
   /espree@10.0.1:
     resolution: {integrity: sha512-MWkrWZbJsL2UwnjxTX3gG8FneachS/Mwg7tdGXce011sJd5b0JG54vat5KHnfSBODZ3Wvzd2WnjxyzsRoVv+ww==}
@@ -13162,10 +13157,6 @@ packages:
     resolution: {integrity: sha512-IQ63JgClmJY89jyk+5qodvoTlpaAshmy8iJIze1UapPCo4Q+gEuErLrIqgsRWN1aXyL7pNm9CrhkKaNEUmWXBg==}
     dev: false
 
-  /protomaps-themes-base@4.3.0:
-    resolution: {integrity: sha512-XNLs3zamw/XucflU0qBXgiPN72/YEo6h01ClsVrfUUQCDzA4r8Eu23hG/fqYqFuocciwu0doCxGBBpE8xGMtoA==}
-    dev: false
-
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: true
@@ -13904,6 +13895,15 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
+  /runed@0.23.4(svelte@5.19.10):
+    resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
+    peerDependencies:
+      svelte: ^5.7.0
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.19.10
+    dev: false
+
   /rw@1.3.3:
     resolution: {integrity: sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==}
 
@@ -14025,7 +14025,6 @@ packages:
     resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: false
 
   /serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}
@@ -14788,6 +14787,18 @@ packages:
       svelte: 5.19.10
       typescript: 5.7.2
     dev: true
+
+  /svelte-toolbelt@0.7.1(svelte@5.19.10):
+    resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+    dependencies:
+      clsx: 2.1.1
+      runed: 0.23.4(svelte@5.19.10)
+      style-to-object: 1.0.8
+      svelte: 5.19.10
+    dev: false
 
   /svelte2tsx@0.7.30(svelte@4.2.19)(typescript@5.7.2):
     resolution: {integrity: sha512-sHXK/vw/sVJmFuPSq6zeKrtuZKvo0jJyEi8ybN0dfrqSYVvHu8zFbO0zQKAL8y/fYackYojH41EJGe6v8rd5fw==}

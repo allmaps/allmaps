@@ -51,7 +51,9 @@
   {:else}
     <main class="grow relative">
       <TileJSON {tileJson} />
-      <div class="absolute bottom-0 w-full pointer-events-none">
+      <div
+        class="absolute bottom-0 right-0 w-full pointer-events-none max-w-sm"
+      >
         <Info {tileUrl} />
       </div>
     </main>
