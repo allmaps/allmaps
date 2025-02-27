@@ -174,7 +174,7 @@ describe('allmaps transform coordinates', () => {
   // TODO: Add test for prompt from stdin
   // TODO: Add test for muliple input files
 
-  it('should read coordinates from a filename and transform these coordinates forward using the supplied Georeference Annotation', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation', () => {
     const expected = readFile('output/coordinates/coordinates.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json',
@@ -183,16 +183,16 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates backward using the supplied Georeference Annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-backward.txt')
+  it('should read coordinates from a filename and transform these coordinates toResource using the supplied Georeference Annotation', () => {
+    const expected = readFile('output/coordinates/coordinates-to-resource.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -i',
-      'input/coordinates/coordinates-backward.txt'
+      'input/coordinates/coordinates-to-resource.txt'
     )
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates forward using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
     const expected = readFile(
       'output/coordinates/coordinates-thin-plate-spline.txt'
     )
@@ -203,7 +203,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates forward using the supplied Georeference Annotation transformation type but overwritable GCPs', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation transformation type but overwritable GCPs', () => {
     const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps.txt',
@@ -212,7 +212,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates forward using the supplied transformation type and GCPs, even without a provided annotation', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied transformation type and GCPs, even without a provided annotation', () => {
     const expected = readFile(
       'output/coordinates/coordinates-other-gcps-thin-plate-spline.txt'
     )
@@ -223,7 +223,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates forward using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
     const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
     const output = exec(
       'transform coordinates -g input/coordinates/gcps.txt',

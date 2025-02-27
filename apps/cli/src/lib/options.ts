@@ -101,7 +101,7 @@ export function addInverseOptions<
 >(command: Command<Args, Opts, GlobalOpts>) {
   return command.option(
     '-i, --inverse',
-    'Computes the inverse/backward transformation',
+    "Computes the inverse 'toResource' transformation",
     false
   )
 }

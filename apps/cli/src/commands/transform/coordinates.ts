@@ -27,9 +27,9 @@ export function coordinates() {
         addAnnotationOptions(
           new Command('coordinates')
             .argument('[files...]')
-            .summary('transform coordinates forwards (or backwards)')
+            .summary('transform coordinates toGeo (or toResource)')
             .description(
-              `Transforms coordinates from input files forward or backward using a transformation built from the GCPs and transformation type specified in a Georeference Annotation.
+              `Transforms coordinates from input files toGeo or toResource using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation.
 
 Coordinates files are expected to contain one coordinate (x, y) on each line, separated by a space, e.g.:
 

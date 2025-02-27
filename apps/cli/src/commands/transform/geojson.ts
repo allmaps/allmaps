@@ -19,7 +19,7 @@ export function geojson() {
         .argument('[files...]')
         .summary('transform GeoJSON to SVG')
         .description(
-          'Transform GeoJSON to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+          "Transform GeoJSON to SVG using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately."
         )
     )
   )
