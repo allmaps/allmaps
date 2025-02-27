@@ -85,7 +85,7 @@ allmaps transform --help
 
 #### Transform coordinates
 
-Transform coordinates from input files forward (or backward) using a transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
+Transform coordinates from input files 'to geo' (or 'to resource') using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
 
 Input files with coordinates are expected to contain one coordinate on each line, formatted as pairs of coordinates in decimal form separated by spaces:
 
@@ -150,7 +150,7 @@ allmaps transform coordinates -g /path/to/gcps.txt -t thinPlateSpline /path/to/c
 
 #### Transform SVG
 
-Transform SVG forward to GeoJSON Geometry using a transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
+Transform SVG to GeoJSON Geometry using a a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
 
 **Examples:**
 
@@ -168,7 +168,7 @@ allmaps transform svg -g /path/to/gcps.txt -t thinPlateSpline /path/to/svg.svg
 
 #### Transform GeoJSON
 
-Transform GeoJSON Geometry backwards to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform GeoJSON Geometry to SVG using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
 
 **Examples:**
 
@@ -186,7 +186,7 @@ allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline /path/to/myGeoJ
 
 #### Transform Resource Mask
 
-Transform SVG resource masks of input Georeference Annotations forward to GeoJSO Polygon using a transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
+Transform SVG resource masks of input Georeference Annotations to GeoJSO Polygon using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
 
 This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG.
 
@@ -204,7 +204,7 @@ All the commands above accept the following options for specifying the transform
 
 | Option                                           | Description                                                                                                                                                                    | Default      |
 | :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
-| `-i, --inverse`                                  | Compute backward ("inverse") transformation                                                                                                                                    |              |
+| `-i, --inverse`                                  | Compute toResource ("inverse") transformation                                                                                                                                    |              |
 | `-g, --gcps <filename>`                          | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
 | `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
 | `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
@@ -215,8 +215,7 @@ All the commands above (except `point`) accept the following options for transfo
 | :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
 | `-d, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints) depth | `0` (i.e. no midpoints by default!)                     |
 | `-p, --min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
-| `--source-is-geographic`          | Use geographic distances and midpoints for lon-lat source points                              | `false` (`true` for `geojson` command)                  |
-| `--destination-is-geographic`     | Use geographic distances and midpoints for lon-lat destination points                         | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--geo-is-geographic`     | Use geographic distances and midpoints for lon-lat geo points                         | `false` (`true` for `svg` and `resource-mask` commands) |
 
 ### Parse and generate IIIF resources
 
