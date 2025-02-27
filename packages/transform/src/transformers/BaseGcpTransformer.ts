@@ -23,7 +23,7 @@ import { thinPlateKernel } from '../shared/kernel-functions.js'
 import { euclideanNorm } from '../shared/norm-functions.js'
 
 import {
-  defaultTransformerOptions,
+  defaultGeneralGcpTransformerOptions,
   refinementOptionsFromBackwardTransformOptions,
   refinementOptionsFromForwardTransformOptions
 } from '../shared/transform-functions.js'
@@ -61,10 +61,9 @@ import type {
   GeneralGcp,
   GeneralGcpAndDistortions,
   TransformationType,
-  TransformOptions,
-  DistortionMeasure,
-  TransformerOptions,
-  projectionFunction
+  GeneralGcpTransformOptions,
+  GeneralGcpTransformerOptions,
+  DistortionMeasure
 } from '../shared/types.js'
 
 /**
@@ -88,7 +87,7 @@ export abstract class BaseGcpTransformer {
   private _sourcePoints: Point[]
   private _destinationPoints: Point[]
   readonly type: TransformationType
-  readonly transformerOptions: TransformerOptions
+  readonly transformerOptions: GeneralGcpTransformerOptions
 
   protected forwardTransformation?: BaseTransformation
   protected backwardTransformation?: BaseTransformation
@@ -98,22 +97,22 @@ export abstract class BaseGcpTransformer {
    *
    * @param generalGcps - An array of General Ground Control Points (GCPs)
    * @param type - The transformation type
-   * @param partialTransformerOptions - Transformer options
+   * @param partialGeneralGcpTransformerOptions - General GCP Transformer options
    */ constructor(
     generalGcps: GeneralGcp[],
     type: TransformationType = 'polynomial',
-    partialTransformerOptions?: Partial<TransformerOptions>
+    partialGeneralGcpTransformerOptions?: Partial<GeneralGcpTransformerOptions>
   ) {
     this.transformerOptions = mergeOptions(
-      defaultTransformerOptions,
-      partialTransformerOptions
+      defaultGeneralGcpTransformerOptions,
+      partialGeneralGcpTransformerOptions
     )
     if (generalGcps.length === 0) {
       throw new Error('No control points')
     }
     this._generalGcps = generalGcps
     this._sourcePoints = this._generalGcps.map((generalGcp) => {
-      let source = this.transformerOptions.differentHandedness
+      const source = this.transformerOptions.differentHandedness
         ? flipY(generalGcp.source)
         : generalGcp.source
       return this.transformerOptions.preForward(source)
@@ -204,16 +203,16 @@ export abstract class BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in source coordinates.
    *
    * @param sourceBbox - BBox in source space where the resolution is requested
-   * @param  partialTransformOptions - extra parameters to consider
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
    * @returns
    */
   protected _getForwardTransformationResolution(
     sourceBbox: Bbox,
-    partialTransformOptions: Partial<TransformOptions>
+    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     const transformOptions = mergeOptions(
       this.transformerOptions,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
     return getSourceRefinementResolution(
       sourceBbox,
@@ -236,16 +235,16 @@ export abstract class BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in destination coordinates.
    *
    * @param destinationBbox - BBox in destination space where the resolution is requested
-   * @param  partialTransformOptions - extra parameters to consider
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
    * @returns
    */
   protected _getBackwardTransformationResolution(
     destinationBbox: Bbox,
-    partialTransformOptions: Partial<TransformOptions>
+    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     const transformOptions = mergeOptions(
       this.transformerOptions,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
     return getSourceRefinementResolution(
       destinationBbox,
@@ -256,50 +255,50 @@ export abstract class BaseGcpTransformer {
 
   protected _transformForward<P = Point>(
     point: Point,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   protected _transformForward<P = Point>(
     lineString: LineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   protected _transformForward<P = Point>(
     polygon: Polygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   protected _transformForward<P = Point>(
     multiPoint: MultiPoint,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   protected _transformForward<P = Point>(
     multiLineString: MultiLineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   protected _transformForward<P = Point>(
     multiPolygon: MultiPolygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   protected _transformForward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry forward
    *
    * @param geometry - Geometry to transform
-   * @param partialTransformOptions - Transform options
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Forward transform of input geometry
    */
   protected _transformForward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
     ) => P = generalGcpToPointForForward as (
@@ -308,7 +307,7 @@ export abstract class BaseGcpTransformer {
   ): TypedGeometry<P> {
     const transformOptions = mergeOptions(
       this.transformerOptions,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
@@ -334,14 +333,14 @@ export abstract class BaseGcpTransformer {
         throw new Error('Geometry type not supported')
       }
     } else {
-      if (partialTransformOptions) {
-        partialTransformOptions.isMultiGeometry = false // false for piecewise single geometries
+      if (partialGeneralGcpTransformOptions) {
+        partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
       }
       if (isMultiPoint(geometry)) {
         return geometry.map((element) =>
           this._transformForward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -349,7 +348,7 @@ export abstract class BaseGcpTransformer {
         return geometry.map((element) =>
           this._transformForward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -357,7 +356,7 @@ export abstract class BaseGcpTransformer {
         return geometry.map((element) =>
           this._transformForward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -369,50 +368,50 @@ export abstract class BaseGcpTransformer {
 
   protected _transformBackward<P = Point>(
     point: Point,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   protected _transformBackward<P = Point>(
     lineString: LineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   protected _transformBackward<P = Point>(
     polygon: Polygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   protected _transformBackward<P = Point>(
     multiPoint: MultiPoint,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   protected _transformBackward<P = Point>(
     multiLineString: MultiLineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   protected _transformBackward<P = Point>(
     multiPolygon: MultiPolygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   protected _transformBackward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry backward
    *
    * @param geometry - Geometry to transform
-   * @param partialTransformOptions - Transform options
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Backward transform of input geometry
    */
   protected _transformBackward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
     ) => P = generalGcpToPointForBackward as (
@@ -421,7 +420,7 @@ export abstract class BaseGcpTransformer {
   ): TypedGeometry<P> {
     const transformOptions = mergeOptions(
       this.transformerOptions,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
@@ -447,14 +446,14 @@ export abstract class BaseGcpTransformer {
         throw new Error('Geometry type not supported')
       }
     } else {
-      if (partialTransformOptions) {
-        partialTransformOptions.isMultiGeometry = false // false for piecewise single geometries
+      if (partialGeneralGcpTransformOptions) {
+        partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
       }
       if (isMultiPoint(geometry)) {
         return geometry.map((element) =>
           this._transformBackward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -462,7 +461,7 @@ export abstract class BaseGcpTransformer {
         return geometry.map((element) =>
           this._transformBackward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -470,7 +469,7 @@ export abstract class BaseGcpTransformer {
         return geometry.map((element) =>
           this._transformBackward(
             element,
-            partialTransformOptions,
+            partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
@@ -484,32 +483,34 @@ export abstract class BaseGcpTransformer {
 
   private _transformPointForward<P>(
     point: Point,
-    transformerOptions: TransformerOptions,
-    transformOptions: TransformOptions,
+    generalGcpTransformerOptions: GeneralGcpTransformerOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): P {
     const forwardTransformation = this._getForwardTransformation()
 
-    let source = transformerOptions.differentHandedness ? flipY(point) : point
-    source = transformerOptions.preForward(source)
+    let source = generalGcpTransformerOptions.differentHandedness
+      ? flipY(point)
+      : point
+    source = generalGcpTransformerOptions.preForward(source)
     let destination = forwardTransformation.evaluateFunction(source)
-    destination = transformerOptions.postForward(destination)
+    destination = generalGcpTransformerOptions.postForward(destination)
 
     let partialDerivativeX = undefined
     let partialDerivativeY = undefined
     let distortions = new Map<DistortionMeasure, number>()
 
-    if (transformOptions.distortionMeasures.length > 0) {
+    if (generalGcpTransformOptions.distortionMeasures.length > 0) {
       partialDerivativeX =
         forwardTransformation.evaluatePartialDerivativeX(source)
       partialDerivativeY =
         forwardTransformation.evaluatePartialDerivativeY(source)
 
       distortions = computeDistortionsFromPartialDerivatives(
-        transformOptions.distortionMeasures,
+        generalGcpTransformOptions.distortionMeasures,
         partialDerivativeX,
         partialDerivativeY,
-        transformOptions.referenceScale
+        generalGcpTransformOptions.referenceScale
       )
     }
 
@@ -525,39 +526,41 @@ export abstract class BaseGcpTransformer {
 
   private _transformPointBackward<P>(
     point: Point,
-    transformerOptions: TransformerOptions,
-    transformOptions: TransformOptions,
+    generalGcpTransformerOptions: GeneralGcpTransformerOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): P {
     const backwardTransformation = this._getBackwardTransformation()
 
-    const destination = transformerOptions.preBackward(point)
+    const destination = generalGcpTransformerOptions.preBackward(point)
     let source = backwardTransformation.evaluateFunction(destination)
     // apply differentHandedness here again, so it has been applied twice in total and is undone now.
-    source = transformerOptions.postBackward(source)
-    source = transformerOptions.differentHandedness ? flipY(source) : source
+    source = generalGcpTransformerOptions.postBackward(source)
+    source = generalGcpTransformerOptions.differentHandedness
+      ? flipY(source)
+      : source
 
     let partialDerivativeX = undefined
     let partialDerivativeY = undefined
     let distortions = new Map<DistortionMeasure, number>()
 
-    if (transformOptions.distortionMeasures.length > 0) {
+    if (generalGcpTransformOptions.distortionMeasures.length > 0) {
       partialDerivativeX =
         backwardTransformation.evaluatePartialDerivativeX(destination)
-      partialDerivativeX = transformerOptions.differentHandedness
+      partialDerivativeX = generalGcpTransformerOptions.differentHandedness
         ? flipY(partialDerivativeX)
         : partialDerivativeX
       partialDerivativeY =
         backwardTransformation.evaluatePartialDerivativeY(destination)
-      partialDerivativeY = transformerOptions.differentHandedness
+      partialDerivativeY = generalGcpTransformerOptions.differentHandedness
         ? flipY(partialDerivativeY)
         : partialDerivativeY
 
       distortions = computeDistortionsFromPartialDerivatives(
-        transformOptions.distortionMeasures,
+        generalGcpTransformOptions.distortionMeasures,
         partialDerivativeX,
         partialDerivativeY,
-        transformOptions.referenceScale
+        generalGcpTransformOptions.referenceScale
       )
     }
 
@@ -573,69 +576,77 @@ export abstract class BaseGcpTransformer {
 
   private _transformLineStringForward<P>(
     lineString: LineString,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
       (p) => this._transformForward(p),
-      refinementOptionsFromForwardTransformOptions(transformOptions)
+      refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
 
   private _transformLineStringBackward<P>(
     lineString: LineString,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
       (p) => this._transformBackward(p),
-      refinementOptionsFromBackwardTransformOptions(transformOptions)
+      refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }
 
   private _transformRingForward<P>(
     ring: Ring,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedRing<P> {
     return refineRing(
       ring,
       (p) => this._transformForward(p),
-      refinementOptionsFromForwardTransformOptions(transformOptions)
+      refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
 
   private _transformRingBackward<P>(
     ring: Ring,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedRing<P> {
     return refineRing(
       ring,
       (p) => this._transformBackward(p),
-      refinementOptionsFromBackwardTransformOptions(transformOptions)
+      refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }
 
   private _transformPolygonForward<P>(
     polygon: Polygon,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P> {
     return polygon.map((ring) => {
-      return this._transformRingForward(ring, transformOptions, generalGcpToP)
+      return this._transformRingForward(
+        ring,
+        generalGcpTransformOptions,
+        generalGcpToP
+      )
     })
   }
 
   private _transformPolygonBackward<P>(
     polygon: Polygon,
-    transformOptions: TransformOptions,
+    generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P> {
     return polygon.map((ring) => {
-      return this._transformRingBackward(ring, transformOptions, generalGcpToP)
+      return this._transformRingBackward(
+        ring,
+        generalGcpTransformOptions,
+        generalGcpToP
+      )
     })
   }
 }

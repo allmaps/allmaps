@@ -31,7 +31,7 @@ import type {
 import type {
   Helmert,
   TransformationType,
-  TransformOptions,
+  GcpTransformerOptions,
   DistortionMeasure
 } from '@allmaps/transform'
 
@@ -39,12 +39,12 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 // TODO: consider to make the default options more precise
-const DEFAULT_TRANSFORMER_OPTIONS = {
+const DEFAULT_GCP_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
   minOffsetDistance: 4,
   maxDepth: 5,
   differentHandedness: true
-} as Partial<TransformOptions>
+} as Partial<GcpTransformerOptions>
 
 const DEFAULT_VISIBLE = true
 
@@ -343,7 +343,7 @@ export class WarpedMap extends EventTarget {
         new GcpTransformer(
           this.projectedGcps,
           'helmert',
-          DEFAULT_TRANSFORMER_OPTIONS
+          DEFAULT_GCP_TRANSFORMER_OPTIONS
         )
     )
     const toProjectedGeoHelmertTransformation =
@@ -620,7 +620,7 @@ export class WarpedMap extends EventTarget {
         new GcpTransformer(
           this.gcps,
           this.transformationType,
-          DEFAULT_TRANSFORMER_OPTIONS
+          DEFAULT_GCP_TRANSFORMER_OPTIONS
         ),
       () => useCache
     )
@@ -636,12 +636,7 @@ export class WarpedMap extends EventTarget {
     this.projectedTransformer = getPropertyFromCacheOrComputation(
       this.projectedTransformerByTransformationType,
       this.transformationType,
-      () =>
-        new ProjectedGcpTransformer(
-          this.gcps,
-          this.transformationType,
-          DEFAULT_TRANSFORMER_OPTIONS
-        ),
+      () => new ProjectedGcpTransformer(this.gcps, this.transformationType),
       () => useCache
     )
     if (!this.projectedPreviousTransformer) {

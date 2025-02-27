@@ -1,8 +1,8 @@
-import { defaultTransformerOptions } from '@allmaps/transform'
+import { defaultGcpTransformerOptions } from '@allmaps/transform'
 
 import type { ProjectionDefinition } from 'proj4'
 
-import type { ProjectedTransformerOptions, Projection } from './types'
+import type { ProjectedGcpTransformerOptions, Projection } from './types'
 
 export const lonLatProjection: Projection = {
   name: 'EPSG:4326',
@@ -25,8 +25,9 @@ defaultProjections.set(
   webMercatorProjection.definition
 )
 
-export const defaultProjectedTransformerOptions: ProjectedTransformerOptions = {
-  internalProjection: webMercatorProjection,
-  projection: webMercatorProjection,
-  ...defaultTransformerOptions
-}
+export const defaultProjectedTransformerOptions: ProjectedGcpTransformerOptions =
+  {
+    internalProjection: webMercatorProjection,
+    projection: webMercatorProjection,
+    ...defaultGcpTransformerOptions
+  }

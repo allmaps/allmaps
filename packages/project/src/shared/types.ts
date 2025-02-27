@@ -1,4 +1,4 @@
-import { TransformerOptions } from '@allmaps/transform'
+import { GcpTransformerOptions } from '@allmaps/transform'
 
 import type { ProjectionDefinition } from 'proj4'
 
@@ -7,7 +7,7 @@ export type Projection = {
   definition: string | ProjectionDefinition
 }
 
-export type ProjectedTransformerOptions = {
+export type ProjectedGcpTransformerOptions = {
   internalProjection: Projection
   projection: Projection
-} & TransformerOptions
+} & GcpTransformerOptions

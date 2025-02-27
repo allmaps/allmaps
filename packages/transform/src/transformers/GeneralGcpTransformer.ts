@@ -28,8 +28,8 @@ import type {
   GeneralGcp,
   GeneralGcpAndDistortions,
   TransformationType,
-  TransformerOptions,
-  TransformOptions
+  GeneralGcpTransformerOptions,
+  GeneralGcpTransformOptions
 } from '../shared/types.js'
 
 /**
@@ -55,13 +55,13 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    *
    * @param generalGcps - An array of General Ground Control Points (GCPs)
    * @param type - The transformation type
-   * @param partialTransformerOptions - Transformer options
+   * @param partialGeneralGcpTransformerOptions - General GCP Transformer options
    */ constructor(
     generalGcps: GeneralGcp[],
     type: TransformationType = 'polynomial',
-    partialTransformerOptions?: Partial<TransformerOptions>
+    partialGeneralGcpTransformerOptions?: Partial<GeneralGcpTransformerOptions>
   ) {
-    super(generalGcps, type, partialTransformerOptions)
+    super(generalGcps, type, partialGeneralGcpTransformerOptions)
   }
 
   public get generalGcps(): GeneralGcp[] {
@@ -96,16 +96,16 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in source coordinates.
    *
    * @param sourceBbox - BBox in source space where the resolution is requested
-   * @param partialTransformOptions - extra parameters to consider
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
    * @returns
    */
   getForwardTransformationResolution(
     sourceBbox: Bbox,
-    partialTransformOptions: Partial<TransformOptions>
+    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     return super._getForwardTransformationResolution(
       sourceBbox,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
   }
 
@@ -123,65 +123,65 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    * Returned in the lenght of the shortest piece, measured in destination coordinates.
    *
    * @param destinationBbox - BBox in destination space where the resolution is requested
-   * @param partialTransformOptions - extra parameters to consider
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
    * @returns
    */
   getBackwardTransformationResolution(
     destinationBbox: Bbox,
-    partialTransformOptions: Partial<TransformOptions>
+    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     return super._getBackwardTransformationResolution(
       destinationBbox,
-      partialTransformOptions
+      partialGeneralGcpTransformOptions
     )
   }
 
   transformForward<P = Point>(
     point: Point,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   transformForward<P = Point>(
     lineString: LineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   transformForward<P = Point>(
     polygon: Polygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   transformForward<P = Point>(
     multiPoint: MultiPoint,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformForward<P = Point>(
     multiLineString: MultiLineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformForward<P = Point>(
     multiPolygon: MultiPolygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformForward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry forward
    *
    * @param geometry - Geometry to transform
-   * @param partialTransformOptions - Transform options
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Forward transform of input geometry
    */
   transformForward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
     ) => P = generalGcpToPointForForward as (
@@ -190,57 +190,57 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     return super._transformForward(
       geometry,
-      partialTransformOptions,
+      partialGeneralGcpTransformOptions,
       generalGcpToP
     )
   }
 
   transformBackward<P = Point>(
     point: Point,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   transformBackward<P = Point>(
     lineString: LineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   transformBackward<P = Point>(
     polygon: Polygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   transformBackward<P = Point>(
     multiPoint: MultiPoint,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformBackward<P = Point>(
     multiLineString: MultiLineString,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformBackward<P = Point>(
     multiPolygon: MultiPolygon,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformBackward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
    * Transform a geometry backward
    *
    * @param geometry - Geometry to transform
-   * @param partialTransformOptions - Transform options
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Backward transform of input geometry
    */
   transformBackward<P = Point>(
     geometry: Geometry,
-    partialTransformOptions?: Partial<TransformOptions>,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
     ) => P = generalGcpToPointForBackward as (
@@ -249,7 +249,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     return super._transformBackward(
       geometry,
-      partialTransformOptions,
+      partialGeneralGcpTransformOptions,
       generalGcpToP
     )
   }

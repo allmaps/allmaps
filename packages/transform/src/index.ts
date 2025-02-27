@@ -13,8 +13,10 @@ export {
 } from './shared/distortion.js'
 
 export {
-  defaultTransformOptions,
-  defaultTransformerOptions
+  defaultGeneralGcpTransformerOptions,
+  defaultGcpTransformerOptions,
+  defaultGeneralGcpTransformOptions,
+  defaultGcpTransformOptions
 } from './shared/transform-functions.js'
 
 // export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
@@ -29,8 +31,10 @@ export type {
   SplitGcpLineInfo,
   TransformationType,
   TransformerInputs,
-  TransformerOptions,
-  TransformOptions,
+  GeneralGcpTransformerOptions,
+  GcpTransformerOptions,
+  GeneralGcpTransformOptions,
+  GcpTransformOptions,
   KernelFunction,
   KernelFunctionOptions,
   NormFunction,
