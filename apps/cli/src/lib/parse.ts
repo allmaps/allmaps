@@ -6,8 +6,8 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   TransformationType,
   TransformerInputs,
-  TransformerOptions,
-  TransformOptions
+  GcpTransformerOptions,
+  GcpTransformOptions
 } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
 import { InverseOptions } from '@allmaps/transform/shared/types.js'
@@ -149,10 +149,9 @@ export function parseTransformOptions(options: {
   minOffsetDistance?: number
   minLineDistance?: number
   maxDepth?: number
-  sourceIsGeographic?: boolean
-  destinationIsGeographic?: boolean
-}): Partial<TransformOptions> {
-  const transformOptions: Partial<TransformOptions> = {}
+  geoIsGeographic?: boolean
+}): Partial<GcpTransformOptions> {
+  const transformOptions: Partial<GcpTransformOptions> = {}
 
   if (options && typeof options === 'object') {
     if ('maxDepth' in options && options.maxDepth) {
@@ -171,15 +170,8 @@ export function parseTransformOptions(options: {
       transformOptions.minLineDistance = Number(options.minLineDistance)
     }
 
-    if ('sourceIsGeographic' in options && options.sourceIsGeographic) {
-      transformOptions.sourceIsGeographic = options.sourceIsGeographic
-    }
-
-    if (
-      'destinationIsGeographic' in options &&
-      options.destinationIsGeographic
-    ) {
-      transformOptions.destinationIsGeographic = options.destinationIsGeographic
+    if ('geoIsGeographic' in options && options.geoIsGeographic) {
+      transformOptions.geoIsGeographic = options.geoIsGeographic
     }
   }
 
@@ -191,14 +183,16 @@ export function parseTransformOptions(options: {
 
 export function parseTransformerOptions(options: {
   differentHandedness?: boolean
-}): Partial<TransformerOptions> {
-  const transformerOptions: Partial<TransformerOptions> = {}
+}): Partial<GcpTransformerOptions> {
+  const transformerOptions: Partial<GcpTransformerOptions> = {}
 
   if (options && typeof options === 'object') {
     if ('differentHandedness' in options && options.differentHandedness) {
       transformerOptions.differentHandedness = options.differentHandedness
     }
   }
+
+  // Note: Project functions postToGeo and preToResource not supported
 
   return transformerOptions
 }
