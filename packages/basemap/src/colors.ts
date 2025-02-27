@@ -85,8 +85,8 @@ export const ALLMAPS_FLAVOR = {
   state_label_halo: 'rgba(0,0,0,0)',
   country_label: 'rgba(143, 140, 133, 1)',
 
-  address_label: "red",
-  address_label_halo: "blue",
+  address_label: "#5c5c5c",
+  address_label_halo: "rgba(255, 252, 244, 1)",
 
   regular: 'Roboto Regular',
   bold: 'Roboto Medium',
