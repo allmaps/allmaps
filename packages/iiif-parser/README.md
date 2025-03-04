@@ -337,7 +337,7 @@ curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest
 
 ###### Parameters
 
-* `parsedCanvas` (`{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | ... 3 more ... | undefined; width?: number | undefined; height?: number |...`)
+* `parsedCanvas` (`{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | undefined; '@type'?: "ImageService2" | ... 2 more ... | undefined; } | ...`)
 
 ###### Returns
 
@@ -843,7 +843,7 @@ number
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | .....`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | ...`)
 
 ###### Returns
 
@@ -1034,7 +1034,7 @@ Parsed IIIF Image (`Image`).
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: "http://library.stanford.edu/iiif/image-api/1.1/context.json" | .....`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | ...`)
 
 ###### Returns
 
