@@ -1,0 +1,17 @@
+{
+  "name": "@allmaps/test",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-strip-types ./dependencies.ts"
+  },
+  "devDependencies": {
+    "chalk": "^5.4.1",
+    "@types/node": "^23.1.0"
+  },
+  "engines": {
+    "node": ">=23.1.0"
+  },
+  "dependencies": {}
+}
