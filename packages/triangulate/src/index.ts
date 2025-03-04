@@ -38,7 +38,7 @@ export type TriangulationToUnique = {
   uniquePointIndexEdges: TypedLine<number>[]
 }
 
-const MINIMUM_TRIANGLE_ANGLE = 0.01
+const MINIMUM_TRIANGLE_ANGLE = 0.0001
 
 export type TriangluationOptions = {
   steinerPoints: Point[]
