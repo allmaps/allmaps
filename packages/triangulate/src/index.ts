@@ -151,7 +151,15 @@ export function triangulateToUnique(
       .flat()
 
   // Constrain triangulation
-  const constrainautor = new Constrainautor(delautator, uniquePointIndexEdges)
+  // Note: instead of
+  // const constrainautor = new Constrainautor(delautator, uniquePointIndexEdges)
+  // which gives an error "Constraining edge intersects point" for small distances, e.g. maxDepth 7 on https://gist.githubusercontent.com/sammeltassen/fa3dbfaf4dfa800e00824478c4bd1928/raw/f182beac911e38b0a1d1eb420fbd54b4e6d2f2eb/nl-railway-map.json
+  // we perform a delaunify check first as proposed by
+  // https://github.com/kninnug/Constrainautor/issues/11#issuecomment-2571296247
+  // Keep an eye on proposed solutions, sinche the delaunify check is expensive
+  const constrainautor = new Constrainautor(delautator)
+  constrainautor.delaunify(true)
+  constrainautor.constrainAll(uniquePointIndexEdges)
 
   let uniquePointIndexTriangles: TypedTriangle<number>[] = []
   let triangles: Triangle[] = []

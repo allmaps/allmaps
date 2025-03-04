@@ -130,10 +130,10 @@ Triangulation Object with uniquePointIndexTriangles and uniquePoints (`{ interpo
 
 For a 10 point polygon (with diameter ~ 200), here are some benchmarks for computing the triangulation with given distances:
 
-* `triangulate(polygon, 1000)` (no grid points): 100839 ops/s to compute 8 triangles
-* `triangulate(polygon, 100)`: 87436 ops/s to compute 11 triangles
-* `triangulate(polygon, 10)`: 5447 ops/s to compute 435 triangles
-* `triangulate(polygon, 1)`: 56 ops/s to compute 38352 triangles
+* `triangulate(polygon, 1000)` (no grid points): 74544 ops/s to compute 8 triangles
+* `triangulate(polygon, 100)`: 56849 ops/s to compute 11 triangles
+* `triangulate(polygon, 10)`: 2163 ops/s to compute 435 triangles
+* `triangulate(polygon, 1)`: 3 ops/s to compute 38352 triangles
 
 See [`./bench/index.js`](`./bench/index.js`).
 

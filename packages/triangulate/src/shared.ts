@@ -4,8 +4,7 @@ import {
   distance,
   stepDistanceAngle,
   lineAngle,
-  closeRing,
-  conformRing
+  closeRing
 } from '@allmaps/stdlib'
 
 import type {
@@ -46,11 +45,6 @@ export function interpolateRing(ring: Ring, dist: number): Ring {
   for (let i = 0; i < ring.length - 1; i++) {
     result = result.concat(interpolateLine([ring[i], ring[i + 1]], dist))
   }
-
-  // Note: rounding resulting points to prevent error "Constraining edge intersects point" at small distances
-  result = result.map((point) => [Math.round(point[0]), Math.round(point[1])])
-  // And filter out possible duplicates due to rounding
-  result = conformRing(result)
 
   return result
 }
