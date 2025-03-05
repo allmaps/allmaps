@@ -32,13 +32,13 @@ describe('Analyze a parsed annotation', () => {
 
     const analyzer = new Analyzer(triangualtedWarpedMap)
 
-    const infos = analyzer.getInfos()
+    const info = analyzer.getInfo()
     const warnings = analyzer.getWarnings()
     const errors = analyzer.getErrors()
-    // console.log('infos', infos)
+    // console.log('info', info)
     // console.log('warnings', warnings)
     // console.log('errors', errors)
-    expect(infos).to.be.of.length(1)
+    expect(info).to.be.of.length(1)
     expect(warnings).to.be.of.length(0)
     expect(errors).to.be.of.length(0)
 

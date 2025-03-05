@@ -10,7 +10,7 @@ In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedM
 
 This packages analyzes maps to return information, warning and error items. These items are objects with a code and text attribute, and possible additional information.
 
-*   **Infos** are notable but not problematic informations on a warping.
+*   **Info** are notable but not problematic informations on a warping.
     *   Code `maskequalsfullmask`: The mask contains the full image.
 *   **Warnings** are possibly problematic findings, but don't invalidate the map.
     *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
@@ -91,8 +91,8 @@ const triangulatedWarpedMap = renderer.warpedMapList.getWarpedMaps()[0]
 // Create Analyzer for the warpedMap
 const analyzer = new Analyzer(triangulatedWarpedMap)
 
-// Analyze to get all infos, warnings and errors
-const infos = analyzer.getInfos()
+// Analyze to get all info, warnings and errors
+const info = analyzer.getInfo()
 const warnings = analyzer.getWarnings()
 const errors = analyzer.getErrors()
 
@@ -112,10 +112,10 @@ const distortions = analyzer.getDistortions()
 
 *   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-    *   [hasInfos](#hasinfos)
+    *   [hasInfo](#hasinfo)
     *   [hasWarnings](#haswarnings)
     *   [hasErrors](#haserrors)
-    *   [getInfos](#getinfos)
+    *   [getInfo](#getinfo)
     *   [getWarnings](#getwarnings)
     *   [getErrors](#geterrors)
     *   [getMeasures](#getmeasures)
@@ -133,9 +133,9 @@ This class describes how a georeferenced map is warped using a specific transfor
 *   `warpedMap`  A Warped Map
 *   `mapId`  ID of the map
 
-#### hasInfos
+#### hasInfo
 
-Check if analysis has infos.
+Check if analysis has info.
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
@@ -151,7 +151,7 @@ Check if analysis has errors.
 
 Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
-#### getInfos
+#### getInfo
 
 Get analysis informations.
 

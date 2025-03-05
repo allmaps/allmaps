@@ -30,7 +30,7 @@ const MAX_SHEAR = 0.1
 export class Analyzer<W extends WarpedMap> {
   warpedMap: W
 
-  protected infos?: AnalysisItem[]
+  protected info?: AnalysisItem[]
   protected warnings?: AnalysisItem[]
   protected errors?: AnalysisItem[]
 
@@ -56,16 +56,16 @@ export class Analyzer<W extends WarpedMap> {
   }
 
   /**
-   * Check if analysis has infos.
+   * Check if analysis has info.
    *
    * @returns {boolean}
    */
-  public hasInfos(): boolean {
-    if (!this.infos) {
-      this.getInfos()
+  public hasInfo(): boolean {
+    if (!this.info) {
+      this.getInfo()
     }
 
-    return this.infos!.length != 0
+    return this.info!.length != 0
   }
 
   /**
@@ -99,11 +99,11 @@ export class Analyzer<W extends WarpedMap> {
    *
    * @returns {AnalysisItem[]}
    */
-  public getInfos(): AnalysisItem[] {
-    if (this.infos) {
-      return this.infos
+  public getInfo(): AnalysisItem[] {
+    if (this.info) {
+      return this.info
     }
-    this.infos = []
+    this.info = []
 
     // Mask equals full Mask
     if (
@@ -113,14 +113,14 @@ export class Analyzer<W extends WarpedMap> {
         isEqualPoint
       )
     ) {
-      this.infos.push({
+      this.info.push({
         mapId: this.warpedMap.mapId,
         code: 'maskequalsfullmask',
         text: 'The mask contains the full image.'
       })
     }
 
-    return this.infos
+    return this.info
   }
 
   /**
