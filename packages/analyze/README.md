@@ -120,8 +120,6 @@ const distortions = analyzer.getDistortions()
     *   [getErrors](#geterrors)
     *   [getMeasures](#getmeasures)
     *   [getDistortions](#getdistortions)
-    *   [fromWarpedMap](#fromwarpedmap)
-        *   [Parameters](#parameters-1)
 
 ### Analyzer
 
@@ -130,14 +128,13 @@ This class describes how a georeferenced map is warped using a specific transfor
 
 #### Parameters
 
-*   `warpedMap`  A Warped Map
-*   `mapId`  ID of the map
+*   `georeferencedOrWarpedMap` &#x20;
 
 #### hasInfo
 
-Check if analysis has info.
+Check if analysis has info
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+Returns **any** Whether the analysis has info
 
 #### hasWarnings
 
@@ -147,40 +144,36 @@ Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 #### hasErrors
 
-Check if analysis has errors.
+Check if analysis has errors
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+Returns **any** Whether the analysis has errors
 
 #### getInfo
 
-Get analysis informations.
+Get analysis informations
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
+Returns **any** Analysis items with info
 
 #### getWarnings
 
-Get zis warnings.
+Get zis warnings
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
+Returns **any** Analysis items with warning
 
 #### getErrors
 
-Get analysis errors.
+Get analysis errors
+
+Returns **any** Analysis items with errors
 
 #### getMeasures
 
-Get analysis measures.
+Get analysis measures
+
+Returns **any** Analysis measures
 
 #### getDistortions
 
 Get distortions.
 
-Returns **Distortions**&#x20;
-
-#### fromWarpedMap
-
-Creates an instance of Analyzer from a Warped Map.
-
-##### Parameters
-
-*   `warpedMap`  A Warped Map
+Returns **any** Analysis distortions

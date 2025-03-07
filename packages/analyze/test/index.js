@@ -6,7 +6,6 @@ import { expect } from 'chai'
 
 import { Analyzer } from '../dist/index.js'
 import { parseAnnotation } from '../../annotation/dist/index.js'
-import { TriangulatedWarpedMap } from '../../render/dist/index.js'
 
 export const inputDir = './test/input'
 
@@ -25,12 +24,7 @@ describe('Analyze a parsed annotation', () => {
     const georeferencedMaps = parseAnnotation(annotation)
     const georeferencedMap = georeferencedMaps[0]
 
-    const triangualtedWarpedMap = new TriangulatedWarpedMap(
-      georeferencedMap.id,
-      georeferencedMap
-    )
-
-    const analyzer = new Analyzer(triangualtedWarpedMap)
+    const analyzer = new Analyzer(georeferencedMap)
 
     const info = analyzer.getInfo()
     const warnings = analyzer.getWarnings()
