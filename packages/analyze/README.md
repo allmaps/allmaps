@@ -13,13 +13,13 @@ This packages analyzes maps to return information, warning and error items. Thes
 *   **Info** are notable but not problematic informations on a warping.
     *   Code `maskequalsfullmask`: The mask contains the full image.
 *   **Warnings** are possibly problematic findings, but don't invalidate the map.
-    *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
-    *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
     *   Code `gcpoutsidemask`: A GCP is outside the mask.
     *   Code `maskpointoutsidefullmask`: A mask point is outside the full mask.
     *   Code `triangulationfoldsover`: The map folds over itself, for the selected transformation type.
     *   Code `polynomialsheartoohigh`: A polynomial transformation shows a shear higher then a set maximum.
 *   **Errors** are problematic findings that invalidate the map.
+    *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
+    *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
     *   Code `gcpamounttoolow`: There are less then 3 GCPs.
     *   Code `gcpresourcerepeatedpoint`: GCP resource coordinates are repeated.
     *   Code `gcpgeorepeatedpoint`: GCP geo coordinates are repeated.

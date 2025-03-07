@@ -9,7 +9,8 @@ import {
   isRing,
   polygonSelfIntersectionPoints,
   arrayRepeated,
-  bboxToDiameter
+  bboxToDiameter,
+  isPoint
 } from '@allmaps/stdlib'
 import {
   GcpTransformer,
@@ -67,7 +68,7 @@ export class Analyzer {
     this.mapId = this.georeferencedMap.id || ''
 
     if (
-      this.warpedMap !== undefined &&
+      this.warpedMap == undefined ||
       !(this.warpedMap instanceof TriangulatedWarpedMap)
     ) {
       try {
@@ -179,38 +180,6 @@ export class Analyzer {
       return this.warnings
     }
 
-    // GCPs not incomplete
-    const gcpsUndefinedResource = []
-    for (const gcp of this.georeferencedMap.gcps) {
-      if (gcp.resource == undefined || gcp.geo == undefined) {
-        gcpsUndefinedResource.push(gcp)
-      }
-    }
-    gcpsUndefinedResource.forEach((gcp, index) => {
-      this.warnings.push({
-        mapId: this.mapId,
-        code: 'gcpincompleteresource',
-        geoPoint: gcp.geo,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing resource coordinates.'
-      })
-    })
-    const gcpsUndefinedGeo = []
-    for (const gcp of this.georeferencedMap.gcps) {
-      if (gcp.resource == undefined || gcp.geo == undefined) {
-        gcpsUndefinedGeo.push(gcp)
-      }
-    }
-    gcpsUndefinedGeo.forEach((gcp, index) => {
-      this.warnings.push({
-        mapId: this.mapId,
-        code: 'gcpincompletegeo',
-        resourcePoint: gcp.resource,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing geo coordinates.'
-      })
-    })
-
     // GCPs not outside mask
     const gcpsOutside = []
     for (const gcp of this.georeferencedMap.gcps) {
@@ -282,8 +251,9 @@ export class Analyzer {
     // Polynomial shear not too high
     const measures = this.getMeasures()
     if (
-      measures.polynomialShear[0] > MAX_SHEAR ||
-      measures.polynomialShear[1] > MAX_SHEAR
+      measures &&
+      (measures.polynomialShear[0] > MAX_SHEAR ||
+        measures.polynomialShear[1] > MAX_SHEAR)
     ) {
       this.warnings.push({
         mapId: this.mapId,
@@ -310,6 +280,41 @@ export class Analyzer {
       return this.errors
     }
 
+    // GCPs not incomplete
+    const gcpsIncompleteResource = []
+    for (const gcp of this.georeferencedMap.gcps) {
+      if (gcp.resource == undefined || !isPoint(gcp.resource)) {
+        gcpsIncompleteResource.push(gcp)
+      }
+    }
+    gcpsIncompleteResource.forEach((gcp, index) => {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'gcpincompleteresource',
+        geoPoint: gcp.geo,
+        gcpIndex: index,
+        text: 'GCP ' + index + ' missing resource coordinates.'
+      })
+    })
+    const gcpsIncompleteGeo = []
+    for (const gcp of this.georeferencedMap.gcps) {
+      if (gcp.geo == undefined || !isPoint(gcp.geo)) {
+        gcpsIncompleteGeo.push(gcp)
+      }
+    }
+    gcpsIncompleteGeo.forEach((gcp, index) => {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'gcpincompletegeo',
+        resourcePoint: gcp.resource,
+        gcpIndex: index,
+        text: 'GCP ' + index + ' missing geo coordinates.'
+      })
+    })
+    if (gcpsIncompleteGeo.length > 0 || gcpsIncompleteResource.length > 0) {
+      return this.errors
+    }
+
     // GCPs amount not to low
     if (this.georeferencedMap.gcps.length < 3) {
       this.errors.push({
@@ -324,10 +329,12 @@ export class Analyzer {
 
     // GCPs no repeated points
     const resourceRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.gcps.map((gcp) => gcp.resource)
+      this.georeferencedMap.gcps.map((gcp) => gcp.resource),
+      isEqualPoint
     )
     const geoRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.gcps.map((gcp) => gcp.geo)
+      this.georeferencedMap.gcps.map((gcp) => gcp.geo),
+      isEqualPoint
     )
     resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
       this.errors.push({
@@ -350,17 +357,22 @@ export class Analyzer {
     })
 
     // Mask valid as ring
-    if (!isRing(this.georeferencedMap.resourceMask)) {
+    const maskIsRing = isRing(this.georeferencedMap.resourceMask)
+    if (!maskIsRing) {
       this.errors.push({
         mapId: this.mapId,
         code: 'masknotring',
         text: 'The mask is not a valid ring (an array of points).'
       })
     }
+    if (!maskIsRing) {
+      return this.errors
+    }
 
     // Mask no repeated points
     const resourceMaskRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.resourceMask
+      this.georeferencedMap.resourceMask,
+      isEqualPoint
     )
     resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
       this.errors.push({
@@ -402,13 +414,13 @@ export class Analyzer {
    *
    * @returns Analysis measures
    */
-  public getMeasures(): Measures {
+  public getMeasures(): Measures | undefined {
     if (this.measuresComputed && this.measures) {
       return this.measures
     }
 
     if (!this.warpedMap) {
-      throw new Error('Could not compute measures since no WarpedMap availble')
+      return
     }
 
     const warpedMap = this.warpedMap
@@ -515,7 +527,7 @@ export class Analyzer {
    *
    * @returns Analysis distortions
    */
-  public getDistortions(): Distortions {
+  public getDistortions(): Distortions | undefined {
     if (this.distortionsComputed && this.distortions) {
       return this.distortions
     }
@@ -524,7 +536,7 @@ export class Analyzer {
       !(this.warpedMap instanceof TriangulatedWarpedMap) ||
       !this.warpedMap.projectedGcpTriangulation
     ) {
-      throw new Error("Distortions can't be analyzed")
+      return
     }
 
     const distortions: Partial<Distortions> = {
