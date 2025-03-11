@@ -12,7 +12,7 @@
 
   let imageRequest: ImageRequest | ImageRequest[][] | undefined = undefined
 
-  let parsedImage: Image
+  let parsedImage: Image | undefined
 
   function getTilesWidth(imageRequestGrid: ImageRequest[][]) {
     const firstRow = imageRequestGrid[0]
@@ -47,11 +47,13 @@
   }
 
   $: parsedImage = Image.parse(imageInfo)
-  $: imageRequest = parsedImage.getImageRequest({ width, height }, mode)
+  $: imageRequest =
+    parsedImage && parsedImage.getImageRequest({ width, height }, mode)
 
-  $: borderBoxWidth = mode === 'cover' ? width : parsedImage.width
-  $: borderBoxHeight = mode === 'cover' ? height : parsedImage.height
-  $: borderBoxAspectRatio = borderBoxWidth / borderBoxHeight
+  $: borderBoxWidth = mode === 'cover' ? width : parsedImage?.width
+  $: borderBoxHeight = mode === 'cover' ? height : parsedImage?.height
+  $: borderBoxAspectRatio =
+    borderBoxWidth && borderBoxHeight ? borderBoxWidth / borderBoxHeight : 0
 </script>
 
 <div
@@ -59,7 +61,7 @@
   style="--border-color: {borderColor}; --border-box-aspect-ratio: {borderBoxAspectRatio}"
   class="flex overflow-hidden"
 >
-  {#if imageRequest && !Array.isArray(imageRequest)}
+  {#if parsedImage && imageRequest && !Array.isArray(imageRequest)}
     <img
       class="w-full h-full {mode === 'cover'
         ? 'object-cover'
@@ -67,7 +69,7 @@
       alt={alt || `Thumbnail for ${parsedImage.uri}`}
       src={parsedImage.getImageUrl(imageRequest)}
     />
-  {:else if imageRequest && Array.isArray(imageRequest)}
+  {:else if parsedImage && imageRequest && Array.isArray(imageRequest)}
     {@const tilesWidth = getTilesWidth(imageRequest)}
     {@const tilesHeight = getTilesHeight(imageRequest)}
 

@@ -1,10 +1,22 @@
-<!-- TODO: is the the !important modifier for the container queries really needed?
-  Is there another way to make sure container queries have precedence over media queries? -->
+<script lang="ts">
+  // TODO: upgrade to Svelte 5, count chilren props
+  export let childrenCount = 0
+</script>
+
 <div class="w-full @container">
-  <ol
-    class="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
-      @xl:!grid-cols-3 @5xl:!grid-cols-4 @7xl:!grid-cols-5"
-  >
-    <slot />
-  </ol>
+  {#if childrenCount !== 1}
+    <ol class="collection grid gap-3">
+      <slot />
+    </ol>
+  {:else}
+    <ol class="flex flex-col gap-3 items-center">
+      <slot />
+    </ol>
+  {/if}
 </div>
+
+<style scoped>
+  .collection {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+</style>

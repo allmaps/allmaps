@@ -51,6 +51,7 @@
   <div class="contents md:flex flex-col gap-2 sm:gap-4">
     <svelte:element
       this={showMoreLink ? 'a' : 'div'}
+      class="flex flex-col gap-2"
       href={showMoreLink ? `/organizations/${organization.id}` : undefined}
     >
       {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
