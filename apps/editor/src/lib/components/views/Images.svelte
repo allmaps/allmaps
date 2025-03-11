@@ -16,6 +16,8 @@
   const sourceState = getSourceState()
   const imageInfoState = getImageInfoState()
 
+  let itemWidth = $state(0)
+
   function handleImageClick(event: Event, imageId: string) {
     gotoRoute(createRouteUrl(page, 'images', { image: imageId }))
     event.preventDefault()
@@ -41,46 +43,51 @@
 
 <div class="max-w-(--breakpoint-lg) m-auto p-4">
   {#if sourceState.imageCount > 0}
-    <Collection>
+    <Collection childrenCount={sourceState.imageCount}>
       {#each [...sourceState.images] as image (image.uri)}
         {@const canvas = sourceState.getCanvasByImageId(image.uri)}
-
-        <a
-          onclick={(event) => handleImageClick(event, image.uri)}
-          ondblclick={(event) => handleImageDblclick(event, image.uri)}
-          href={createRouteUrl(page, 'mask', { image: image.uri })}
-          class="overflow-hidden bg-white/20 p-2 rounded-lg"
+        <!-- TODO: don't bind ALL widths! -->
+        <li
+          bind:clientWidth={itemWidth}
+          class="overflow-hidden bg-white/20 p-2 rounded-lg w-full h-full max-w-xl"
         >
-          <div class="relative">
-            <!-- TODO: move to load function? -->
-            {#await fetchImageInfo(image.uri)}
-              <div
-                class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
-              >
-                <p>Loading…</p>
-              </div>
-            {:then imageInfo}
-              <Thumbnail
-                {imageInfo}
-                width={300}
-                mode="contain"
-                borderColor={isActive(image.uri) ? darkblue : undefined}
-                alt={parseLanguageString(canvas?.label, 'en')}
-              />
-            {:catch error}
-              <div>
-                <p
-                  class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
+          <a
+            onclick={(event) => handleImageClick(event, image.uri)}
+            ondblclick={(event) => handleImageDblclick(event, image.uri)}
+            href={createRouteUrl(page, 'mask', { image: image.uri })}
+          >
+            <div class="relative aspect-square">
+              {#await fetchImageInfo(image.uri)}
+                <div
+                  class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
                 >
-                  Error: {error.message}
-                </p>
+                  <p>Loading…</p>
+                </div>
+              {:then imageInfo}
+                <Thumbnail
+                  {imageInfo}
+                  width={Math.ceil((itemWidth * devicePixelRatio) / 100) * 100}
+                  mode="contain"
+                  borderColor={sourceState.imageCount > 1 && isActive(image.uri)
+                    ? darkblue
+                    : undefined}
+                  alt={parseLanguageString(canvas?.label, 'en')}
+                />
+              {:catch error}
+                <div>
+                  <p
+                    class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
+                  >
+                    Error: {error.message}
+                  </p>
+                </div>
+              {/await}
+              <div class="absolute bottom-0 w-full flex justify-end p-2">
+                <Status imageId={image.uri} />
               </div>
-            {/await}
-            <div class="absolute bottom-0 w-full flex justify-end p-2">
-              <Status imageId={image.uri} />
             </div>
-          </div>
-        </a>
+          </a>
+        </li>
       {/each}
     </Collection>
   {/if}
