@@ -11,6 +11,12 @@
 
   let { example }: { example: Example } = $props()
 
+  let exampleUrl = $derived(
+    example.manifestId && example.manifestId.length
+      ? example.manifestId
+      : `${example.imageId}/info.json`
+  )
+
   function truncate(text: string) {
     return text.length > MAX_POPUP_TEXT_LENGTH
       ? `${text.slice(0, MAX_POPUP_TEXT_LENGTH)}…`
@@ -32,7 +38,7 @@ flex items-center justify-center
 transition-colors"
   >
     <a
-      href={`/images?url=${example.manifestId}`}
+      href={`/images?url=${encodeURIComponent(exampleUrl)}`}
       class="w-full inline-block rounded-md relative overflow-hidden space-y-2 p-4"
     >
       <Thumbnail {imageInfo} width={300} mode="contain" alt={example.title} />

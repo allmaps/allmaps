@@ -17,6 +17,10 @@ export default [
     title: 'American Geographical Society Library',
     subtitle:
       'American Geographical Society Library at the University of Wisconsin-Milwaukee'
+  },
+  {
+    id: 'nls',
+    title: 'National Library of Scotland'
   }
 ] satisfies Organization[]
 
