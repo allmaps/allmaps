@@ -1,5 +1,7 @@
 import { setContext, getContext } from 'svelte'
 
+import type { SourceState } from '$lib/state/source.svelte'
+
 import type { View, Viewport } from '$lib/types/shared.js'
 
 const VIEWPORTS_KEY = Symbol('viewports')
@@ -10,7 +12,19 @@ type Path =
   | { view: View; imageId: string; pane: string }
 
 export class ViewportsState {
+  #lastSourceUrl: string | undefined
+
   #viewports = new Map<string, Viewport>()
+
+  constructor(sourceState: SourceState) {
+    $effect(() => {
+      if (this.#lastSourceUrl !== sourceState.source?.url) {
+        this.#viewports.clear()
+      }
+
+      this.#lastSourceUrl = sourceState.source?.url
+    })
+  }
 
   #getKey(path: Path) {
     return JSON.stringify({
@@ -29,8 +43,8 @@ export class ViewportsState {
   }
 }
 
-export function setViewportsState() {
-  return setContext(VIEWPORTS_KEY, new ViewportsState())
+export function setViewportsState(sourceState: SourceState) {
+  return setContext(VIEWPORTS_KEY, new ViewportsState(sourceState))
 }
 
 export function getViewportsState() {

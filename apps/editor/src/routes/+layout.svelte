@@ -51,7 +51,7 @@
 
   const sourceState = setSourceState(urlState, errorState)
   const apiState = setApiState(sourceState)
-  setViewportsState()
+  setViewportsState(sourceState)
 
   const mapsState = setMapsState(sourceState, errorState)
   const mapsHistoryState = setMapsHistoryState(sourceState, mapsState)
