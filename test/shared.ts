@@ -1,23 +1,18 @@
 import { join } from 'node:path'
 import { glob, readFile } from 'node:fs/promises'
-import chalk from 'chalk'
 
 const dirname = import.meta.dirname
 
-// Check all versions, no duplicates
-// Check Allmaps dependencies, latest version
-// Check no cyclic Allmaps dependencies
-
-type VersionFromPackage = {
+export type VersionFromPackage = {
   version: string
   packageName: string
 }
 
-type Dependencies = Map<string, string>
+export type Dependencies = Map<string, string>
 
-type DependenciesFromPackage = Map<string, VersionFromPackage>
+export type DependenciesFromPackage = Map<string, VersionFromPackage>
 
-type ParsedPackageJson = {
+export type ParsedPackageJson = {
   name: string
   version: string
   dependencies: Dependencies
@@ -33,7 +28,19 @@ async function* combine<T>(...iterables: AsyncIterable<T>[]) {
   }
 }
 
-function parseDenpendencies(dependencies: unknown): Dependencies {
+export async function getParsedPackageJsons() {
+  const parsedPackageJsons: Map<string, ParsedPackageJson> = new Map()
+
+  for await (const entry of combine(apps, packages)) {
+    const packageJson = await readPackageJson(entry)
+    const parsedPackageJson = parsePackageJson(packageJson)
+    parsedPackageJsons.set(parsedPackageJson.name, parsedPackageJson)
+  }
+
+  return parsedPackageJsons
+}
+
+export function parseDenpendencies(dependencies: unknown): Dependencies {
   if (dependencies && typeof dependencies === 'object') {
     const parsedDependencies: Dependencies = new Map()
 
@@ -49,7 +56,7 @@ function parseDenpendencies(dependencies: unknown): Dependencies {
   throw new Error('Invalid dependencies')
 }
 
-function collectDependencyVersions(
+export function collectDependencyVersions(
   dependenciesArray: DependenciesFromPackage[]
 ) {
   const allDependencies: Map<string, Map<string, Set<string>>> = new Map()
@@ -77,7 +84,7 @@ function collectDependencyVersions(
   return allDependencies
 }
 
-function parsePackageJson(packageJson: unknown): ParsedPackageJson {
+export function parsePackageJson(packageJson: unknown): ParsedPackageJson {
   if (packageJson && typeof packageJson === 'object') {
     if (
       'name' in packageJson &&
@@ -106,12 +113,12 @@ function parsePackageJson(packageJson: unknown): ParsedPackageJson {
   throw new Error('Invalid package.json')
 }
 
-async function readPackageJson(path: string) {
+export async function readPackageJson(path: string) {
   const packageJson = await readFile(path, 'utf-8')
   return JSON.parse(packageJson)
 }
 
-function addPackageName(
+export function addPackageName(
   dependencies: Dependencies,
   packageName: string
 ): DependenciesFromPackage {
@@ -120,33 +127,4 @@ function addPackageName(
     dependenciesFromPackage.set(name, { version, packageName })
   }
   return dependenciesFromPackage
-}
-
-const parsedPackageJsons: Map<string, ParsedPackageJson> = new Map()
-
-for await (const entry of combine(apps, packages)) {
-  const packageJson = await readPackageJson(entry)
-  const parsedPackageJson = parsePackageJson(packageJson)
-  parsedPackageJsons.set(parsedPackageJson.name, parsedPackageJson)
-}
-
-const allDependencies = collectDependencyVersions(
-  [...parsedPackageJsons.entries()]
-    .map(([name, { dependencies, devDependencies }]) => [
-      addPackageName(dependencies, name),
-      addPackageName(devDependencies, name)
-    ])
-    .flat()
-)
-
-for (const [dependency, versions] of allDependencies.entries()) {
-  if (versions.size > 1) {
-    console.error(`${chalk.green.bold(dependency)}:`)
-
-    for (const [version, packageNames] of versions) {
-      console.error(
-        `  - ${chalk.yellow(version)}: ${[...packageNames].join(', ')}`
-      )
-    }
-  }
 }
