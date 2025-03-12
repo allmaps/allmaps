@@ -21,7 +21,8 @@
 
   const transformationTypes: Item[] = [
     { value: 'polynomial1', label: 'Polynomial' },
-    { value: 'thinPlateSpline', label: 'Thin plate spline' }
+    { value: 'thinPlateSpline', label: 'Thin plate spline' },
+    { value: 'helmert', label: 'Helmert' }
   ]
 
   let value = $state<DbTransformation>(map.transformation || 'polynomial1')

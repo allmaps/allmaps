@@ -162,6 +162,8 @@
         transformationType = 'polynomial3'
       } else if (event.detail.transformation === 'thinPlateSpline') {
         transformationType = 'thinPlateSpline'
+      } else if (event.detail.transformation === 'helmert') {
+        transformationType = 'helmert'
       }
     }
 
