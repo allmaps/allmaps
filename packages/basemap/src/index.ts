@@ -10,7 +10,7 @@ export function basemapStyle(
   sprite?: string,
   tileJson?: string
 ): StyleSpecification {
-  const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, {lang: lang})
+  const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, { lang: lang })
   // modify the buildings layer
   layers.forEach((layer) => {
     if (layer.id === 'buildings') {
