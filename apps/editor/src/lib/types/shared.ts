@@ -22,7 +22,7 @@ export type Params = { [key in ParamKey]?: string | null }
 export type Organization = {
   id: string
   title: string
-  subtitle: string
+  subtitle?: string
 }
 
 export type GCP = {
