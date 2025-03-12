@@ -5,11 +5,11 @@ import type { Page } from '@sveltejs/kit'
 import type { RouteID, Params } from '$lib/types/shared.js'
 
 export function createRouteUrl(
-  $page: Page,
+  page: Page,
   id: RouteID,
   params?: Partial<Params>
 ) {
-  const searchParams = new URLSearchParams($page.url.searchParams)
+  const searchParams = new URLSearchParams(page.url.searchParams)
   // TODO: consider only setting valid URL params
   for (const [param, value] of Object.entries(params || {})) {
     if (value !== undefined) {
@@ -31,6 +31,6 @@ export function gotoRoute(url: string) {
   })
 }
 
-export function getRouteId($page: Page) {
-  return $page.route.id?.slice(1) as RouteID
+export function getRouteId(page: Page) {
+  return page.route.id?.slice(1) as RouteID
 }

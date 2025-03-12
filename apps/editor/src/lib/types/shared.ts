@@ -22,7 +22,7 @@ export type Params = { [key in ParamKey]?: string | null }
 export type Organization = {
   id: string
   title: string
-  subtitle: string
+  subtitle?: string
 }
 
 export type GCP = {
@@ -79,7 +79,7 @@ export type GcpCoordinates = {
 export type Example = {
   organizationId: string
   title: string
-  manifestId: string
+  manifestId?: string
   imageId: string
 }
 
@@ -90,3 +90,7 @@ export type Viewport = {
 }
 
 export type PresetBaseMapID = 'esri-world-topo' | 'esri-world-imagery' | 'osm'
+
+export type ClickedItem =
+  | { type: 'map'; mapId: string }
+  | { type: 'gcp'; mapId: string; gcpId: string }

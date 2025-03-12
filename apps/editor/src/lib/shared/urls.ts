@@ -16,6 +16,6 @@ export function getGeoJsonUrl(allmapsId: string) {
   return `${getAnnotationUrl(allmapsId)}.geojson`
 }
 
-export function getXyzTilesUrl(allmapsId: string) {
-  return `${PUBLIC_ALLMAPS_TILE_SERVER_URL}/${allmapsId}/{z}/{x}/{y}.png`
+export function getXyzTilesUrl(allmapsId: string, retinaTiles = true) {
+  return `${PUBLIC_ALLMAPS_TILE_SERVER_URL}/${allmapsId}/{z}/{x}/{y}${retinaTiles ? '@2x' : ''}.png`
 }

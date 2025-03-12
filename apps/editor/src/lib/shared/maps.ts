@@ -103,7 +103,8 @@ export function getGcpGeoPoint(dbGcp: DbGcp) {
 }
 
 export async function createMapWithFullImageResourceMask(
-  image: IIIFImage | EmbeddedIIIFImage
+  image: IIIFImage | EmbeddedIIIFImage,
+  index: number
 ): Promise<DbMap3> {
   const mapId = await generateRandomId()
   const imageAllmapsId = await generateId(image.uri)
@@ -118,6 +119,7 @@ export async function createMapWithFullImageResourceMask(
   return {
     id: mapId,
     version: 3 as const,
+    index,
     resource: {
       id: imageAllmapsId,
       uri: image.uri,
@@ -238,6 +240,10 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
     return {
       type: 'thinPlateSpline' as const
     }
+  } else if (transformation === 'helmert') {
+    return {
+      type: 'helmert' as const
+    }
   }
 
   // TODO: add other tranformation types
@@ -267,6 +273,6 @@ export function toGeoreferencedMap(dbMap: DbMap): GeoreferencedMap {
   }
 }
 
-export function toGeoreferencedMaps(dbMaps: DbMaps): GeoreferencedMap[] {
-  return Object.values(dbMaps).map(toGeoreferencedMap)
+export function toGeoreferencedMaps(dbMaps: DbMap[]): GeoreferencedMap[] {
+  return dbMaps.map(toGeoreferencedMap)
 }

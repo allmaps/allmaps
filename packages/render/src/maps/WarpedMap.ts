@@ -82,7 +82,6 @@ export function createWarpedMapFactory() {
  * @param resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param resourceFullMaskBbox - Bbox of the resource full mask
  * @param resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param imageId - ID of the image
  * @param parsedImage - ID of the image
  * @param visible - Whether the map is visible
  * @param previousTransformationType - Previous transformation type

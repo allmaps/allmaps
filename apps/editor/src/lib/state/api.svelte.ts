@@ -34,20 +34,14 @@ export class ApiState {
 
   constructor(sourceState: SourceState) {
     $effect(() => {
-      if (sourceState.source) {
+      if (
+        sourceState.source &&
+        this.#lastSourceUrl !== sourceState.source?.url
+      ) {
         this.#fetchMapsOrCreateSource(sourceState.source)
       }
 
-      $effect(() => {
-        if (
-          sourceState.source &&
-          this.#lastSourceUrl !== sourceState.source?.url
-        ) {
-          this.#fetchMapsOrCreateSource(sourceState.source)
-        }
-
-        this.#lastSourceUrl = sourceState.source?.url
-      })
+      this.#lastSourceUrl = sourceState.source?.url
     })
   }
 
@@ -56,6 +50,7 @@ export class ApiState {
       this.#maps = await this.#fetchMaps(source)
     } catch {
       this.#maps = []
+
       this.#createSource(source)
     } finally {
       this.#fetched = true

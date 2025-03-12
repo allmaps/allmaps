@@ -28,7 +28,7 @@ export function getDisplayMap(
 ): DisplayMap {
   const properties = getProperties(map, apiMap)
 
-  if (map.gcps.length >= 3) {
+  if (map.gcps.length >= 2) {
     if (map.resourceMask.length >= 3) {
       try {
         const transformer = new GcpTransformer(
@@ -61,6 +61,6 @@ export function getDisplayMap(
       throw new Error('resource mask should have more than 2 points')
     }
   } else {
-    throw new Error('map should have more than 2 gcps')
+    throw new Error('map should have 2 or more gcps')
   }
 }

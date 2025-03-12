@@ -49,7 +49,7 @@
   import type { VectorSourceEvent } from 'ol/source/Vector'
   import type { ModifyEvent } from 'ol/interaction/Modify'
 
-  import type { DbMaps, DbMap, DbGcp, DbGcp3 } from '$lib/types/maps.js'
+  import type { DbMap, DbGcp, DbGcp3 } from '$lib/types/maps.js'
   import type { Point, GcpCoordinates, Viewport } from '$lib/types/shared.js'
   import type {
     InsertMapEvent,
@@ -64,7 +64,7 @@
 
   import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
 
-  const MAX_ZOOM = 22
+  const MAX_ZOOM = 20
 
   let resourceOlMapTarget: HTMLDivElement
   let geoOlMapTarget: HTMLDivElement
@@ -357,7 +357,7 @@
     }
   }
 
-  function initializeMasks(maps: DbMaps) {
+  function initializeMasks(maps: DbMap[]) {
     if (!resourceMaskVectorSource || !geoMaskVectorSource) {
       return
     }
@@ -365,9 +365,7 @@
     resourceMaskVectorSource.clear()
     geoMaskVectorSource.clear()
 
-    if (maps) {
-      Object.values(maps).forEach(addMap)
-    }
+    maps.forEach(addMap)
   }
 
   function addMap(map: DbMap) {
@@ -586,7 +584,10 @@
       }
     } else if (sourceState.activeImage) {
       const map = {
-        ...(await createMapWithFullImageResourceMask(sourceState.activeImage)),
+        ...(await createMapWithFullImageResourceMask(
+          sourceState.activeImage,
+          mapsState.mapsCount + Math.random()
+        )),
         gcps: { [gcp.id]: gcp }
       }
 
@@ -895,6 +896,62 @@
     $effect(() => {
       if (mapsState.activeGcpId) {
         makeGcpFeatureActive(mapsState.activeGcpId)
+      }
+    })
+
+    $effect(() => {
+      if (
+        uiState.lastClickedItem?.type === 'gcp' &&
+        mapsState.activeGcpId === uiState.lastClickedItem.gcpId
+      ) {
+        const resourceGcpFeature = resourceGcpVectorSource?.getFeatureById(
+          mapsState.activeGcpId
+        )
+        const geoGcpFeature = geoGcpVectorSource?.getFeatureById(
+          mapsState.activeGcpId
+        )
+
+        const resourceGcpGeometry = resourceGcpFeature?.getGeometry()
+        const geoGcpGeometry = geoGcpFeature?.getGeometry()
+        if (resourceGcpGeometry) {
+          resourceOlMap?.getView().fit(resourceGcpGeometry, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
+
+        if (geoGcpGeometry) {
+          geoOlMap?.getView().fit(geoGcpGeometry, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
+      } else if (
+        uiState.lastClickedItem?.type === 'map' &&
+        mapsState.activeMapId === uiState.lastClickedItem.mapId
+      ) {
+        const resourceMaskFeature = resourceMaskVectorSource?.getFeatureById(
+          mapsState.activeMapId
+        )
+        const geoMaskFeature = geoMaskVectorSource?.getFeatureById(
+          mapsState.activeMapId
+        )
+
+        const resourceMaskGeometry = resourceMaskFeature?.getGeometry()
+        const geoMaskGeometry = geoMaskFeature?.getGeometry()
+        if (resourceMaskGeometry) {
+          resourceOlMap?.getView().fit(resourceMaskGeometry, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
+
+        if (geoMaskGeometry) {
+          geoOlMap?.getView().fit(geoMaskGeometry, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
       }
     })
 

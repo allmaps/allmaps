@@ -1,6 +1,6 @@
 import { setContext, getContext } from 'svelte'
 
-import type { PresetBaseMapID } from '$lib/types/shared.js'
+import type { PresetBaseMapID, ClickedItem } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
 
@@ -45,7 +45,10 @@ export class UiState {
 
   #firstUse = $state(true)
   #showAboutDialog = $state(false)
-  #showCommandPalette = $state(false)
+
+  #retinaTiles = $state(true)
+
+  #lastClickedItem = $state<ClickedItem>()
 
   constructor(urlState: UrlState) {
     this.#urlState = urlState
@@ -92,6 +95,22 @@ export class UiState {
 
   set showAboutDialog(show: boolean) {
     this.#showAboutDialog = show
+  }
+
+  get retinaTiles() {
+    return this.#retinaTiles
+  }
+
+  set retinaTiles(retina: boolean) {
+    this.#retinaTiles = retina
+  }
+
+  get lastClickedItem(): ClickedItem | undefined {
+    return this.#lastClickedItem
+  }
+
+  set lastClickedItem(item: ClickedItem) {
+    this.#lastClickedItem = item
   }
 }
 

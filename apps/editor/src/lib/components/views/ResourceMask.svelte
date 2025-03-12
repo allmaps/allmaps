@@ -20,6 +20,7 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import {
     resourceMaskToPolygon,
@@ -43,19 +44,15 @@
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent
   } from '$lib/types/events.js'
-  import type {
-    DbImageService,
-    DbMaps,
-    DbMap,
-    ResourceMask
-  } from '$lib/types/maps.js'
+  import type { DbImageService, DbMap, ResourceMask } from '$lib/types/maps.js'
 
   import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
 
   let resourceOlMapTarget: HTMLDivElement
   let resourceOlMap: OLMap
   let resourceTileLayer: TileLayer<IIIF>
-  let resourceVectorSource: VectorSource
+  let resourceVectorSource: VectorSource<Feature<Polygon>> | undefined
+
   let resourceDraw: Draw
   let resourceModify: Modify
 
@@ -72,6 +69,7 @@
   const mapsState = getMapsState()
   const imageInfoState = getImageInfoState()
   const viewportsState = getViewportsState()
+  const uiState = getUiState()
 
   function handleDrawStart(event: DrawEvent) {
     isDrawing = true
@@ -135,6 +133,7 @@
         map: {
           id: mapId,
           version: 3,
+          index: mapsState.mapsCount + Math.random(),
           gcps: {},
           resource: {
             id: allmapsId,
@@ -230,8 +229,10 @@
   }
 
   function makeResourceMaskFeatureActive(mapId: string | undefined) {
-    const features = resourceVectorSource.getFeatures()
-    makeFeatureActive(features, mapId)
+    if (resourceVectorSource) {
+      const features = resourceVectorSource.getFeatures()
+      makeFeatureActive(features, mapId)
+    }
   }
 
   async function updateImage(imageId: string | undefined) {
@@ -245,7 +246,9 @@
 
     currentDisplayImageId = imageId
 
-    resourceVectorSource.clear()
+    if (resourceVectorSource) {
+      resourceVectorSource.clear()
+    }
 
     if (imageId) {
       const imageInfo = (await imageInfoState.fetchImageInfo(
@@ -291,7 +294,11 @@
   }
 
   function addMap(map: DbMap, index: number) {
-    const feature = new Feature()
+    if (!resourceVectorSource) {
+      return
+    }
+
+    const feature = new Feature<Polygon>()
     feature.setGeometry(
       new Polygon(resourceMaskToPolygon(getResourceMask(map)))
     )
@@ -304,20 +311,26 @@
     resourceVectorSource.addFeature(feature)
   }
 
-  function initializeMaps(maps: DbMaps) {
+  function initializeMaps(maps: DbMap[]) {
+    if (!resourceVectorSource) {
+      return
+    }
+
     resourceVectorSource.clear()
 
-    if (maps) {
-      Object.values(maps).forEach(addMap)
-    }
+    maps.forEach(addMap)
 
     currentMapsImageId = mapsState.connectedImageId
   }
 
   function replaceFeatureFromState(mapId: string) {
+    if (!resourceVectorSource) {
+      return
+    }
+
     const feature = resourceVectorSource.getFeatureById(mapId)
 
-    const map = mapsState?.maps?.[mapId]
+    const map = mapsState?.maps?.find((map) => map.id === mapId)
 
     if (feature && map) {
       feature.setGeometry(
@@ -331,10 +344,12 @@
   }
 
   function handleRemoveMap(event: RemoveMapEvent) {
-    const mapId = event.detail.mapId
-    const feature = resourceVectorSource.getFeatureById(mapId)
-    if (feature) {
-      resourceVectorSource.removeFeature(feature)
+    if (resourceVectorSource) {
+      const mapId = event.detail.mapId
+      const feature = resourceVectorSource.getFeatureById(mapId)
+      if (feature) {
+        resourceVectorSource.removeFeature(feature)
+      }
     }
   }
 
@@ -406,12 +421,14 @@
     })
 
     resourceModify = new Modify({
+      // @ts-expect-error don't know how to type Modify to only accept Polygon features
       source: resourceVectorSource,
       pixelTolerance: 25,
       deleteCondition
     })
 
     resourceDraw = new Draw({
+      // @ts-expect-error don't know how to type Draw to only accept Polygon features
       source: resourceVectorSource,
       type: 'Polygon',
       freehandCondition: () => false
@@ -444,6 +461,25 @@
     $effect(() => {
       if (mapsState.activeMapId) {
         makeResourceMaskFeatureActive(mapsState.activeMapId)
+      }
+    })
+
+    $effect(() => {
+      if (
+        uiState.lastClickedItem &&
+        mapsState.activeMapId === uiState.lastClickedItem.mapId
+      ) {
+        const resourceFeature = resourceVectorSource?.getFeatureById(
+          mapsState.activeMapId
+        )
+
+        const resourceGeometry = resourceFeature?.getGeometry()
+        if (resourceGeometry) {
+          resourceOlMap?.getView().fit(resourceGeometry, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
       }
     })
 

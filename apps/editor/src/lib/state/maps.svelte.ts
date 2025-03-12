@@ -543,10 +543,18 @@ export class MapsState extends MapsEventTarget {
     return this.#connected
   }
 
-  get maps() {
-    if (this.#connected) {
-      return this.#maps
+  get maps(): DbMap3[] {
+    if (this.#connected && this.#maps) {
+      return Object.values(this.#maps).toSorted((a, b) => {
+        if (a.index !== undefined && b.index !== undefined) {
+          return a.index - b.index
+        }
+
+        return 0
+      })
     }
+
+    return []
   }
 
   get connectedImageId() {
@@ -554,7 +562,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   get mapsCount() {
-    return this.maps ? Object.keys(this.maps).length : 0
+    return this.maps.length
   }
 }
 
