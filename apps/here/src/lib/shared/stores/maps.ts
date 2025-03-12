@@ -10,6 +10,7 @@ import { addImageInfo } from '$lib/shared/stores/image-infos.js'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
 function getMapId(map: GeoreferencedMap) {
+  // TODO: throw error instead of returning '-'??
   return map.id || '-'
 }
 

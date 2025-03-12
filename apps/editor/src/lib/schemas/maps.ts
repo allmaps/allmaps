@@ -104,6 +104,7 @@ export const DbResource3Schema = DbResource2Schema
 
 export const DbMap3Schema = z.object({
   id: z.string(),
+  index: z.number().optional(),
   transformation: DbTransformationSchema.optional(),
   gcps: DbGcps3Schema,
   resource: DbResource3Schema,

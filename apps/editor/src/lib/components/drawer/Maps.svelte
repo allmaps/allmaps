@@ -7,13 +7,16 @@
   import { getMaskDimensions, getMaskExtent } from '$lib/shared/geometry.js'
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
+  import Confirm from '$lib/components/Confirm.svelte'
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import SelectTransformation from '$lib/components/SelectTransformation.svelte'
 
   import type { DbMap } from '$lib/types/maps.js'
 
   const mapsState = getMapsState()
+  const uiState = getUiState()
 
   let mapCount = $derived(
     mapsState.maps ? Object.values(mapsState.maps).length : 0
@@ -56,10 +59,19 @@
   }
 
   function handleMapClick(mapId: string) {
+    uiState.lastClickedItem = {
+      type: 'map',
+      mapId
+    }
     mapsState.activeMapId = mapId
   }
 
   function handleGcpClick(mapId: string, gcpId: string) {
+    uiState.lastClickedItem = {
+      type: 'gcp',
+      mapId,
+      gcpId
+    }
     mapsState.activeMapId = mapId
     mapsState.activeGcpId = gcpId
   }
@@ -71,20 +83,21 @@
   <ol
     class="grid auto-rows-auto grid-cols-[repeat(2,_max-content)_1fr] sm:grid-cols-[repeat(8,_max-content)_1fr] gap-1 sm:gap-2"
   >
-    {#each Object.values(mapsState.maps || {}) as map, index}
+    {#each mapsState.maps as map, index (map.id)}
       {@const gcpCount = Object.values(map.gcps).length}
       {@const isActiveMap = mapsState.activeMapId === map.id}
       <li
         class="col-span-3 sm:col-span-9 grid grid-cols-subgrid"
         transition:slide={{ duration: 250, axis: 'y' }}
       >
-        <button
-          class="col-span-2 sm:col-span-8 grid grid-cols-subgrid group"
-          onclick={() => handleMapClick(map.id)}
-        >
+        <div class="col-span-2 sm:col-span-8 grid grid-cols-subgrid group">
           <div>
             {#if hasResourceMask(map)}
-              <div class="size-16 relative">
+              <button
+                class="size-16 relative cursor-pointer"
+                onclick={() => handleMapClick(map.id)}
+                aria-label="Select map {index + 1}"
+              >
                 <svg
                   class="w-full h-full fill-none stroke-pink stroke-2"
                   viewBox={thumbnailViewbox(map)}
@@ -97,7 +110,7 @@
                     class:fill-none={mapsState.activeMapId !== map.id}
                   />
                 </svg>
-              </div>
+              </button>
             {/if}
           </div>
           <div
@@ -111,13 +124,15 @@
               <SelectTransformation {map} />
             </div>
           </div>
-        </button>
-        <button
-          class="cursor-pointer place-self-end self-center"
-          onclick={() => mapsState.removeMap({ mapId: map.id })}
-        >
-          <TrashIcon />
-        </button>
+        </div>
+        <div class="place-self-end self-center">
+          <Confirm
+            onconfirm={() => mapsState.removeMap({ mapId: map.id })}
+            question="Do you really want to delete this map?"
+          >
+            <TrashIcon />
+          </Confirm>
+        </div>
 
         {#if isActiveMap && gcpCount > 0}
           {@const gcps = Object.values(map.gcps).toSorted(
@@ -130,11 +145,14 @@
             {#each gcps as gcp, index}
               {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
               <li class="contents">
-                <button
+                <div
                   class="col-span-2 sm:col-span-8 grid gap-0 grid-cols-subgrid"
-                  onclick={() => handleGcpClick(map.id, gcp.id)}
                 >
-                  <div class="inline-block h-8">
+                  <button
+                    class="inline-block h-8"
+                    onclick={() => handleGcpClick(map.id, gcp.id)}
+                    aria-label="Select GCP {index + 1}"
+                  >
                     <div class="inline-flex size-4 justify-center items-center">
                       <span
                         class="size-3 rounded-full bg-pink transition-all"
@@ -145,7 +163,7 @@
                     <span class="relative top-2 text-sm">
                       {index + 1}
                     </span>
-                  </div>
+                  </button>
 
                   <div
                     class="sm:col-span-7 hidden sm:grid text-xs sm:text-base items-center gap-1 grid-cols-subgrid geograph-tnum place-items-end"
@@ -181,14 +199,16 @@
                       <span class="col-span-3"></span>
                     {/if}
                   </div>
-                </button>
-                <button
-                  class="cursor-pointer place-self-end self-center"
-                  onclick={() =>
-                    mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
-                >
-                  <TrashIcon />
-                </button>
+                </div>
+                <div class="place-self-end self-center">
+                  <Confirm
+                    onconfirm={() =>
+                      mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
+                    question="Do you really want to delete this GCP?"
+                  >
+                    <TrashIcon />
+                  </Confirm>
+                </div>
               </li>
             {/each}
           </ol>

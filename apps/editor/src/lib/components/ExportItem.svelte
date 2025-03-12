@@ -26,10 +26,11 @@
     <a class="font-bold contents" href={openUrl || url}
       ><span>{label}</span> <ArrowSquareOutIcon /></a
     >
+
+    {#if children}
+      <div>{@render children()}</div>
+    {/if}
   </div>
-  {#if children}
-    <div>{@render children()}</div>
-  {/if}
   <div class="flex justify-between items-center gap-2">
     <input
       bind:this={input}

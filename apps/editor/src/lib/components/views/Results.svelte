@@ -53,7 +53,8 @@
 
   let warpedMapLayer: WarpedMapLayer
 
-  let currentImageId = $state<string | undefined>(undefined)
+  let currentImageId = $state<string>()
+  let currentActiveMapId = $state<string>()
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -67,6 +68,8 @@
     for (const map of Object.values(maps)) {
       await addMap(map)
     }
+
+    currentActiveMapId = mapsState.activeMapId
 
     const geoViewport = getGeoViewport()
 
@@ -294,6 +297,36 @@
       } else {
         geoTileSource.setUrl(uiState.basemapPreset.url)
         geoTileSource.setAttributions(uiState.basemapPreset.attribution)
+      }
+    })
+
+    $effect(() => {
+      if (
+        mapsState.activeMapId &&
+        currentActiveMapId &&
+        mapsState.activeMapId !== currentActiveMapId
+      ) {
+        currentActiveMapId = mapsState.activeMapId
+      }
+    })
+
+    $effect(() => {
+      if (
+        uiState.lastClickedItem?.type === 'map' &&
+        mapsState.activeMapId === uiState.lastClickedItem.mapId
+      ) {
+        currentActiveMapId = mapsState.activeMapId
+        const mapId = getFullMapId(mapsState.activeMapId)
+
+        warpedMapLayer.bringMapsToFront([mapId])
+        const warpedMap = warpedMapLayer.getWarpedMap(mapId)
+
+        if (warpedMap) {
+          geoOlMap.getView().fit(warpedMap.projectedGeoMaskBbox, {
+            duration: 200,
+            padding: [25, 25, 25, 25]
+          })
+        }
       }
     })
 
