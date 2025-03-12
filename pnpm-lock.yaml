@@ -12,7 +12,7 @@ importers:
 
         specifier: link:/Users/bdon/workspace/allmaps/allmaps/packages
 
-        version: link:../../../../bdon/workspace/allmaps/allmaps/packages
+        version: link:../../../../../bdon/workspace/allmaps/allmaps/packages
     devDependencies:
       husky:
         specifier: ^8.0.3
@@ -27,19 +27,19 @@ importers:
   apps/cli:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@commander-js/extra-typings':
         specifier: ^13.0.0
@@ -97,35 +97,35 @@ importers:
   apps/editor:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.73
+        specifier: ^1.0.0-beta.75
         version: link:../../packages/openlayers
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       '@tailwindcss/typography':
         specifier: ^0.5.9
         version: 0.5.15(tailwindcss@4.0.6)
       bits-ui:
-        specifier: ^1.1.0
-        version: 1.3.1(svelte@5.19.10)
+        specifier: ^1.3.10
+        version: 1.3.10(svelte@5.22.6)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -155,17 +155,17 @@ importers:
         version: 3.4.0(zod@3.24.0)
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@sveltejs/adapter-static':
         specifier: ^3.0.0
         version: 3.0.6(@sveltejs/kit@2.17.1)
       '@sveltejs/kit':
         specifier: ^2.16.0
-        version: 2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.19.10)(vite@5.4.11)
+        version: 2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.22.6)(vite@5.4.11)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^4.0.0
-        version: 4.0.4(svelte@5.19.10)(vite@5.4.11)
+        version: 4.0.4(svelte@5.22.6)(vite@5.4.11)
       '@tailwindcss/postcss':
         specifier: ^4.0.6
         version: 4.0.6
@@ -189,25 +189,25 @@ importers:
         version: 9.1.0(eslint@9.4.0)
       eslint-plugin-svelte:
         specifier: ^2.44.0
-        version: 2.46.1(eslint@9.4.0)(svelte@5.19.10)
+        version: 2.46.1(eslint@9.4.0)(svelte@5.22.6)
       globals:
         specifier: ^15.0.0
         version: 15.3.0
       phosphor-svelte:
         specifier: ^2.0.1
-        version: 2.0.1(svelte@5.19.10)
+        version: 2.0.1(svelte@5.22.6)
       prettier:
         specifier: ^3.3.2
         version: 3.4.2
       prettier-plugin-svelte:
         specifier: ^3.2.6
-        version: 3.3.2(prettier@3.4.2)(svelte@5.19.10)
+        version: 3.3.2(prettier@3.4.2)(svelte@5.22.6)
       svelte:
-        specifier: ^5.19.6
-        version: 5.19.10
+        specifier: ^5.22.6
+        version: 5.22.6
       svelte-check:
         specifier: ^3.6.0
-        version: 3.7.1(postcss@8.4.49)(svelte@5.19.10)
+        version: 3.7.1(postcss@8.4.49)(svelte@5.22.6)
       tailwindcss:
         specifier: ^4.0.6
         version: 4.0.6
@@ -227,19 +227,19 @@ importers:
   apps/explore:
     dependencies:
       '@allmaps/basemap':
-        specifier: ^1.0.0-beta.2
+        specifier: ^1.0.0-beta.4
         version: link:../../packages/basemap
       '@allmaps/maplibre':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/maplibre
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       lodash-es:
         specifier: ^4.17.21
@@ -309,28 +309,28 @@ importers:
   apps/here:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/bearing':
-        specifier: ^1.0.0-beta.0
+        specifier: ^1.0.0-beta.2
         version: link:../../packages/bearing
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
@@ -394,28 +394,28 @@ importers:
   apps/homepage:
     dependencies:
       '@allmaps/annotation':
-        specifier: 1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/latest':
-        specifier: ^1.0.0-beta.36
+        specifier: ^1.0.0-beta.38
         version: link:../latest
       '@allmaps/maplibre':
-        specifier: 1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/maplibre
       '@allmaps/stdlib':
-        specifier: 1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: 1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       '@astrojs/check':
         specifier: ^0.9.3
@@ -482,7 +482,7 @@ importers:
         version: 5.7.2
     devDependencies:
       '@allmaps/types':
-        specifier: 1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@types/d3-geo':
         specifier: ^3.1.0
@@ -494,16 +494,16 @@ importers:
   apps/iiif:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static':
@@ -564,22 +564,22 @@ importers:
   apps/latest:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       '@turf/rewind':
         specifier: ^7.2.0
@@ -658,13 +658,13 @@ importers:
   apps/preview:
     devDependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
@@ -721,13 +721,13 @@ importers:
   apps/tiles:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       ol:
         specifier: ^8.2.0
@@ -788,25 +788,25 @@ importers:
   apps/tileserver:
     devDependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.1
@@ -863,34 +863,34 @@ importers:
   apps/viewer:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../../packages/id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../../packages/iiif-parser
       '@allmaps/openlayers':
-        specifier: ^1.0.0-beta.73
+        specifier: ^1.0.0-beta.75
         version: link:../../packages/openlayers
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../../packages/render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../../packages/tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../../packages/transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../../packages/types
       '@allmaps/ui':
-        specifier: ^1.0.0-beta.32
+        specifier: ^1.0.0-beta.34
         version: link:../../packages/ui
       comlink:
         specifier: ^4.4.1
@@ -966,19 +966,19 @@ importers:
   packages/analyze:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../annotation
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       robust-point-in-polygon:
         specifier: ^1.0.3
@@ -1116,13 +1116,13 @@ importers:
   packages/bearing:
     dependencies:
       '@allmaps/annotation':
-        specifier: 1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../annotation
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@turf/bearing':
         specifier: ^7.2.0
@@ -1162,7 +1162,7 @@ importers:
   packages/id:
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1205,7 +1205,7 @@ importers:
         version: 3.24.1
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.12
@@ -1247,20 +1247,20 @@ importers:
   packages/leaflet:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
     devDependencies:
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1308,20 +1308,20 @@ importers:
   packages/maplibre:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       maplibre-gl:
         specifier: ^4.5.0
         version: 4.7.1
     devDependencies:
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1366,10 +1366,10 @@ importers:
   packages/openlayers:
     dependencies:
       '@allmaps/render':
-        specifier: ^1.0.0-beta.68
+        specifier: ^1.0.0-beta.70
         version: link:../render
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       lodash-es:
         specifier: ^4.17.21
@@ -1379,10 +1379,10 @@ importers:
         version: 8.2.0
     devDependencies:
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1427,28 +1427,28 @@ importers:
   packages/render:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../annotation
       '@allmaps/id':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../id
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../iiif-parser
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       '@allmaps/tailwind':
-        specifier: ^1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../tailwind
       '@allmaps/transform':
-        specifier: ^1.0.0-beta.41
+        specifier: ^1.0.0-beta.43
         version: link:../transform
       '@allmaps/triangulate':
-        specifier: ^1.0.0-beta.23
+        specifier: ^1.0.0-beta.25
         version: link:../triangulate
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@turf/boolean-point-in-polygon':
         specifier: ^7.2.0
@@ -1527,7 +1527,7 @@ importers:
   packages/schemas:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../annotation
       zod:
         specifier: ^3.22.4
@@ -1564,10 +1564,10 @@ importers:
   packages/stdlib:
     dependencies:
       '@allmaps/annotation':
-        specifier: ^1.0.0-beta.30
+        specifier: ^1.0.0-beta.32
         version: link:../annotation
       '@allmaps/iiif-parser':
-        specifier: ^1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../iiif-parser
       '@turf/rewind':
         specifier: ^7.2.0
@@ -1580,7 +1580,7 @@ importers:
         version: 2.0.4
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1661,7 +1661,7 @@ importers:
   packages/transform:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       '@turf/distance':
         specifier: ^7.2.0
@@ -1674,7 +1674,7 @@ importers:
         version: 6.12.0
     devDependencies:
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
@@ -1719,10 +1719,10 @@ importers:
   packages/triangulate:
     dependencies:
       '@allmaps/stdlib':
-        specifier: ^1.0.0-beta.31
+        specifier: ^1.0.0-beta.33
         version: link:../stdlib
       '@allmaps/types':
-        specifier: ^1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       '@kninnug/constrainautor':
         specifier: ^4.0.0
@@ -1813,13 +1813,13 @@ importers:
   packages/ui:
     dependencies:
       '@allmaps/iiif-parser':
-        specifier: 1.0.0-beta.40
+        specifier: ^1.0.0-beta.42
         version: link:../iiif-parser
       '@allmaps/tailwind':
-        specifier: 1.0.0-beta.14
+        specifier: ^1.0.0-beta.16
         version: link:../tailwind
       '@allmaps/types':
-        specifier: 1.0.0-beta.15
+        specifier: ^1.0.0-beta.17
         version: link:../types
       bits-ui:
         specifier: ^0.21.12
@@ -3689,14 +3689,14 @@ packages:
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.6.3
+      semver: 7.7.1
     dev: true
 
   /@npmcli/fs@3.1.1:
     resolution: {integrity: sha512-q9CRWjpHCMIh5sVyefoD1cA7PkvILqCZsnSOEUUivORLjxCO/Irmue2DprETiNgEqktDBZaM1Bi+jrarx1XdCg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
-      semver: 7.6.3
+      semver: 7.7.1
     dev: true
 
   /@npmcli/git@4.1.0:
@@ -3726,7 +3726,7 @@ packages:
       proc-log: 4.2.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.6.3
+      semver: 7.7.1
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
@@ -3759,7 +3759,7 @@ packages:
       json-parse-even-better-errors: 3.0.2
       pacote: 18.0.6
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -3794,7 +3794,7 @@ packages:
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 6.0.2
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
     transitivePeerDependencies:
       - bluebird
     dev: true
@@ -4603,12 +4603,19 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
+  /@sveltejs/acorn-typescript@1.0.5(acorn@8.14.0):
+    resolution: {integrity: sha512-IwQk4yfwLdibDlrXVE04jTZYlLnwsTT2PIOQQGNLWfjavGifnk1JD1LcZjZaBTRcxZu2FfPfNLOE04DSu9lqtQ==}
+    peerDependencies:
+      acorn: ^8.9.0
+    dependencies:
+      acorn: 8.14.0
+
   /@sveltejs/adapter-static@3.0.6(@sveltejs/kit@2.17.1):
     resolution: {integrity: sha512-MGJcesnJWj7FxDcB/GbrdYD3q24Uk0PIL4QIX149ku+hlJuj//nxUbb0HxUTpjkecWfHjVveSUnUaQWnPRXlpg==}
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.19.10)(vite@5.4.11)
+      '@sveltejs/kit': 2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.22.6)(vite@5.4.11)
     dev: true
 
   /@sveltejs/adapter-static@3.0.6(@sveltejs/kit@2.9.1):
@@ -4619,7 +4626,7 @@ packages:
       '@sveltejs/kit': 2.9.1(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.11)
     dev: true
 
-  /@sveltejs/kit@2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.19.10)(vite@5.4.11):
+  /@sveltejs/kit@2.17.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.22.6)(vite@5.4.11):
     resolution: {integrity: sha512-CpoGSLqE2MCmcQwA2CWJvOsZ9vW+p/1H3itrFykdgajUNAEyQPbsaSn7fZb6PLHQwe+07njxje9ss0fjZoCAyw==}
     engines: {node: '>=18.13'}
     hasBin: true
@@ -4628,7 +4635,7 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       vite: ^5.0.3 || ^6.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 4.0.4(svelte@5.19.10)(vite@5.4.11)
+      '@sveltejs/vite-plugin-svelte': 4.0.4(svelte@5.22.6)(vite@5.4.11)
       '@types/cookie': 0.6.0
       cookie: 0.6.0
       devalue: 5.1.1
@@ -4640,7 +4647,7 @@ packages:
       sade: 1.8.1
       set-cookie-parser: 2.7.1
       sirv: 3.0.0
-      svelte: 5.19.10
+      svelte: 5.22.6
       vite: 5.4.11(@types/node@18.19.67)
     dev: true
 
@@ -4703,7 +4710,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@sveltejs/vite-plugin-svelte-inspector@3.0.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.19.10)(vite@5.4.11):
+  /@sveltejs/vite-plugin-svelte-inspector@3.0.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.22.6)(vite@5.4.11):
     resolution: {integrity: sha512-2CKypmj1sM4GE7HjllT7UKmo4Q6L5xFRd7VMGEWhYnZ+wc6AUVU01IBd7yUi6WnFndEwWoMNOd6e8UjoN0nbvQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22}
     peerDependencies:
@@ -4711,9 +4718,9 @@ packages:
       svelte: ^5.0.0-next.96 || ^5.0.0
       vite: ^5.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 4.0.4(svelte@5.19.10)(vite@5.4.11)
+      '@sveltejs/vite-plugin-svelte': 4.0.4(svelte@5.22.6)(vite@5.4.11)
       debug: 4.4.0(supports-color@8.1.1)
-      svelte: 5.19.10
+      svelte: 5.22.6
       vite: 5.4.11(@types/node@18.19.67)
     transitivePeerDependencies:
       - supports-color
@@ -4738,19 +4745,19 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.19.10)(vite@5.4.11):
+  /@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.22.6)(vite@5.4.11):
     resolution: {integrity: sha512-0ba1RQ/PHen5FGpdSrW7Y3fAMQjrXantECALeOiOdBdzR5+5vPP6HVZRLmZaQL+W8m++o+haIAKq5qT+MiZ7VA==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22}
     peerDependencies:
       svelte: ^5.0.0-next.96 || ^5.0.0
       vite: ^5.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte-inspector': 3.0.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.19.10)(vite@5.4.11)
+      '@sveltejs/vite-plugin-svelte-inspector': 3.0.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.22.6)(vite@5.4.11)
       debug: 4.4.0(supports-color@8.1.1)
       deepmerge: 4.3.1
       kleur: 4.1.5
       magic-string: 0.30.15
-      svelte: 5.19.10
+      svelte: 5.22.6
       vite: 5.4.11(@types/node@18.19.67)
       vitefu: 1.0.4(vite@5.4.11)
     transitivePeerDependencies:
@@ -5766,7 +5773,7 @@ packages:
   /@vitest/snapshot@1.3.0:
     resolution: {integrity: sha512-swmktcviVVPYx9U4SEQXLV6AEY51Y6bZ14jA2yo6TgMxQ3h+ZYiO0YhAHGJNp0ohCFbPAis1R9kK0cvN6lDPQA==}
     dependencies:
-      magic-string: 0.30.15
+      magic-string: 0.30.17
       pathe: 1.1.2
       pretty-format: 29.7.0
     dev: true
@@ -5988,13 +5995,6 @@ packages:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
-    dependencies:
-      acorn: 8.14.0
-
-  /acorn-typescript@1.4.13(acorn@8.14.0):
-    resolution: {integrity: sha512-xsc9Xv0xlVfwp2o7sQ+GCQ1PgbkdcpWdTzrwXxO3xDMTAywVS3oXVOcOHuRjAPkS4P9b+yc/qNF15460v+jp4Q==}
-    peerDependencies:
-      acorn: '>=8.9.0'
     dependencies:
       acorn: 8.14.0
 
@@ -6400,8 +6400,8 @@ packages:
       svelte: 4.2.19
     dev: false
 
-  /bits-ui@1.3.1(svelte@5.19.10):
-    resolution: {integrity: sha512-+K2IjTDTlARuGGT32nSvps5AWWev/fEwNWxmcwXN+W6I9wjIKLdZj7wwU5EnGXmVA2s9JvdCVsYD7v8hD/wYPw==}
+  /bits-ui@1.3.10(svelte@5.22.6):
+    resolution: {integrity: sha512-Mg6ENVlI/dwHX9hR1cSiAp5gqzwzowPbXPRW32RxFdUKakuL8qYyewwr446VC7UkZLEpNeoHn7HICcBscJhYdw==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.11.0
@@ -6410,9 +6410,9 @@ packages:
       '@floating-ui/dom': 1.6.12
       '@internationalized/date': 3.6.0
       esm-env: 1.2.2
-      runed: 0.23.4(svelte@5.19.10)
-      svelte: 5.19.10
-      svelte-toolbelt: 0.7.1(svelte@5.19.10)
+      runed: 0.23.4(svelte@5.22.6)
+      svelte: 5.22.6
+      svelte-toolbelt: 0.7.1(svelte@5.22.6)
       tabbable: 6.2.0
     dev: false
 
@@ -7682,7 +7682,7 @@ packages:
       - ts-node
     dev: true
 
-  /eslint-plugin-svelte@2.46.1(eslint@9.4.0)(svelte@5.19.10):
+  /eslint-plugin-svelte@2.46.1(eslint@9.4.0)(svelte@5.22.6):
     resolution: {integrity: sha512-7xYr2o4NID/f9OEYMqxsEQsCsj4KaMy4q5sANaKkAb6/QeCjYFxRmDm2S3YC3A3pl1kyPZ/syOx/i7LcWYSbIw==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -7703,8 +7703,8 @@ packages:
       postcss-safe-parser: 6.0.0(postcss@8.4.49)
       postcss-selector-parser: 6.1.2
       semver: 7.6.3
-      svelte: 5.19.10
-      svelte-eslint-parser: 0.43.0(svelte@5.19.10)
+      svelte: 5.22.6
+      svelte-eslint-parser: 0.43.0(svelte@5.22.6)
     transitivePeerDependencies:
       - ts-node
     dev: true
@@ -7833,6 +7833,7 @@ packages:
 
   /esm-env@1.2.1:
     resolution: {integrity: sha512-U9JedYYjCnadUlXk7e1Kr+aENQhtUaoaV9+gZm1T8LC/YBAPJx3NSPIAurFOC0U5vrdSevnUJS2/wUVxGwPhng==}
+    dev: true
 
   /esm-env@1.2.2:
     resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
@@ -11753,7 +11754,7 @@ packages:
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -11838,7 +11839,7 @@ packages:
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
       hosted-git-info: 7.0.2
-      semver: 7.6.3
+      semver: 7.7.1
       validate-npm-package-license: 3.0.4
     dev: true
 
@@ -11875,7 +11876,7 @@ packages:
     resolution: {integrity: sha512-W29RiK/xtpCGqn6f3ixfRYGk+zRyr+Ew9F2E20BfXxT5/euLdA/Nm7fO7OeTGuAmTs30cpgInyJ0cYe708YTZw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
-      semver: 7.6.3
+      semver: 7.7.1
     dev: true
 
   /npm-normalize-package-bin@1.0.1:
@@ -11908,7 +11909,7 @@ packages:
     dependencies:
       hosted-git-info: 7.0.2
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
       validate-npm-package-name: 5.0.0
     dev: true
 
@@ -11974,7 +11975,7 @@ packages:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 11.0.3
-      semver: 7.6.3
+      semver: 7.7.1
     dev: true
 
   /npm-registry-fetch@14.0.5:
@@ -12780,12 +12781,12 @@ packages:
       svelte: 4.2.19
     dev: false
 
-  /phosphor-svelte@2.0.1(svelte@5.19.10):
+  /phosphor-svelte@2.0.1(svelte@5.22.6):
     resolution: {integrity: sha512-2Ryvaf1sfCNOF0zTQVghtxOs/6JKn9MV+e9uluNAT9wAosgNYnaBD210WcFGRrva1sF8cddv7EWSS//ITNN4mg==}
     peerDependencies:
       svelte: '>=3'
     dependencies:
-      svelte: 5.19.10
+      svelte: 5.22.6
     dev: true
 
   /picocolors@1.1.1:
@@ -13036,14 +13037,14 @@ packages:
       prettier: 3.4.2
       svelte: 4.2.19
 
-  /prettier-plugin-svelte@3.3.2(prettier@3.4.2)(svelte@5.19.10):
+  /prettier-plugin-svelte@3.3.2(prettier@3.4.2)(svelte@5.22.6):
     resolution: {integrity: sha512-kRPjH8wSj2iu+dO+XaUv4vD8qr5mdDmlak3IT/7AOgGIMRG86z/EHOLauFcClKEnOUf4A4nOA7sre5KrJD4Raw==}
     peerDependencies:
       prettier: ^3.0.0
       svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
     dependencies:
       prettier: 3.4.2
-      svelte: 5.19.10
+      svelte: 5.22.6
     dev: true
 
   /prettier@2.8.7:
@@ -13895,13 +13896,13 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
-  /runed@0.23.4(svelte@5.19.10):
+  /runed@0.23.4(svelte@5.22.6):
     resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
     peerDependencies:
       svelte: ^5.7.0
     dependencies:
       esm-env: 1.2.2
-      svelte: 5.19.10
+      svelte: 5.22.6
     dev: false
 
   /rw@1.3.3:
@@ -14591,7 +14592,7 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /svelte-check@3.7.1(postcss@8.4.49)(svelte@5.19.10):
+  /svelte-check@3.7.1(postcss@8.4.49)(svelte@5.22.6):
     resolution: {integrity: sha512-U4uJoLCzmz2o2U33c7mPDJNhRYX/DNFV11XTUDlFxaKLsO7P+40gvJHMPpoRfa24jqZfST4/G9fGNcUGMO8NAQ==}
     hasBin: true
     peerDependencies:
@@ -14603,8 +14604,8 @@ packages:
       import-fresh: 3.3.0
       picocolors: 1.1.1
       sade: 1.8.1
-      svelte: 5.19.10
-      svelte-preprocess: 5.1.4(postcss@8.4.49)(svelte@5.19.10)(typescript@5.7.2)
+      svelte: 5.22.6
+      svelte-preprocess: 5.1.4(postcss@8.4.49)(svelte@5.22.6)(typescript@5.7.2)
       typescript: 5.7.2
     transitivePeerDependencies:
       - '@babel/core'
@@ -14660,7 +14661,7 @@ packages:
       svelte: 4.2.19
     dev: true
 
-  /svelte-eslint-parser@0.43.0(svelte@5.19.10):
+  /svelte-eslint-parser@0.43.0(svelte@5.22.6):
     resolution: {integrity: sha512-GpU52uPKKcVnh8tKN5P4UZpJ/fUDndmq7wfsvoVXsyP+aY0anol7Yqo01fyrlaWGMFfm4av5DyrjlaXdLRJvGA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -14674,7 +14675,7 @@ packages:
       espree: 9.6.1
       postcss: 8.4.49
       postcss-scss: 4.0.9(postcss@8.4.49)
-      svelte: 5.19.10
+      svelte: 5.22.6
     dev: true
 
   /svelte-floating-ui@1.5.9:
@@ -14732,7 +14733,7 @@ packages:
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
-      magic-string: 0.30.15
+      magic-string: 0.30.17
       postcss: 8.4.49
       sorcery: 0.11.1
       strip-indent: 3.0.0
@@ -14740,7 +14741,7 @@ packages:
       typescript: 5.7.2
     dev: true
 
-  /svelte-preprocess@5.1.4(postcss@8.4.49)(svelte@5.19.10)(typescript@5.7.2):
+  /svelte-preprocess@5.1.4(postcss@8.4.49)(svelte@5.22.6)(typescript@5.7.2):
     resolution: {integrity: sha512-IvnbQ6D6Ao3Gg6ftiM5tdbR6aAETwjhHV+UKGf5bHGYR69RQvF1ho0JKPcbUON4vy4R7zom13jPjgdOWCQ5hDA==}
     engines: {node: '>= 16.0.0'}
     requiresBuild: true
@@ -14780,24 +14781,24 @@ packages:
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
-      magic-string: 0.30.15
+      magic-string: 0.30.17
       postcss: 8.4.49
       sorcery: 0.11.1
       strip-indent: 3.0.0
-      svelte: 5.19.10
+      svelte: 5.22.6
       typescript: 5.7.2
     dev: true
 
-  /svelte-toolbelt@0.7.1(svelte@5.19.10):
+  /svelte-toolbelt@0.7.1(svelte@5.22.6):
     resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.0.0
     dependencies:
       clsx: 2.1.1
-      runed: 0.23.4(svelte@5.19.10)
+      runed: 0.23.4(svelte@5.22.6)
       style-to-object: 1.0.8
-      svelte: 5.19.10
+      svelte: 5.22.6
     dev: false
 
   /svelte2tsx@0.7.30(svelte@4.2.19)(typescript@5.7.2):
@@ -14843,23 +14844,23 @@ packages:
       magic-string: 0.30.15
       periscopic: 3.1.0
 
-  /svelte@5.19.10:
-    resolution: {integrity: sha512-7lId+z36IZWzuo0N0oGOStEPi3/Wv1VQEnIzMmDaLDSlJSruKplhhVr+NaZ0Wh7ZILfOjbeU7PbTjqmQQYZF4A==}
+  /svelte@5.22.6:
+    resolution: {integrity: sha512-dxHyh3USJyayafSt5I5QD7KuoCM5ZGdIOtLQiKHEro7tymdh0jMcNkiSBVHW+LOA2jEqZEHhyfwN6/pCjx0Fug==}
     engines: {node: '>=18'}
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.0
+      '@sveltejs/acorn-typescript': 1.0.5(acorn@8.14.0)
       '@types/estree': 1.0.6
       acorn: 8.14.0
-      acorn-typescript: 1.4.13(acorn@8.14.0)
       aria-query: 5.3.2
       axobject-query: 4.1.0
       clsx: 2.1.1
-      esm-env: 1.2.1
+      esm-env: 1.2.2
       esrap: 1.4.4
       is-reference: 3.0.3
       locate-character: 3.0.0
-      magic-string: 0.30.15
+      magic-string: 0.30.17
       zimmerframe: 1.1.2
 
   /svg-parser@2.0.4:
