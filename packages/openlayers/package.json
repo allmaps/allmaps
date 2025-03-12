@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.74",
+  "version": "1.0.0-beta.75",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -50,14 +50,14 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.69",
-    "@allmaps/stdlib": "^1.0.0-beta.32",
+    "@allmaps/render": "^1.0.0-beta.70",
+    "@allmaps/stdlib": "^1.0.0-beta.33",
     "lodash-es": "^4.17.21",
     "ol": "^8.2.0"
   },
   "devDependencies": {
-    "@allmaps/transform": "^1.0.0-beta.42",
-    "@allmaps/types": "^1.0.0-beta.16",
+    "@allmaps/transform": "^1.0.0-beta.43",
+    "@allmaps/types": "^1.0.0-beta.17",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

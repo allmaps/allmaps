@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/triangulate",
-  "version": "1.0.0-beta.24",
+  "version": "1.0.0-beta.25",
   "author": {
     "name": "Manuel Claeys Bouuaert",
     "email": "manuel.claeys.b@gmail.com",
@@ -42,8 +42,8 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.32",
-    "@allmaps/types": "^1.0.0-beta.16",
+    "@allmaps/stdlib": "^1.0.0-beta.33",
+    "@allmaps/types": "^1.0.0-beta.17",
     "@kninnug/constrainautor": "^4.0.0",
     "delaunator": "^5.0.1",
     "robust-point-in-polygon": "^1.0.3"

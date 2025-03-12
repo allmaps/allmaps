@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/homepage",
   "description": "Allmaps Documentation",
-  "version": "1.0.0-beta.19",
+  "version": "1.0.0-beta.20",
   "private": true,
   "contributors": [
     {
@@ -37,14 +37,14 @@
     "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.31",
-    "@allmaps/id": "^1.0.0-beta.31",
-    "@allmaps/latest": "^1.0.0-beta.37",
-    "@allmaps/maplibre": "^1.0.0-beta.31",
-    "@allmaps/stdlib": "^1.0.0-beta.32",
-    "@allmaps/tailwind": "^1.0.0-beta.15",
-    "@allmaps/transform": "^1.0.0-beta.42",
-    "@allmaps/ui": "^1.0.0-beta.33",
+    "@allmaps/annotation": "^1.0.0-beta.32",
+    "@allmaps/id": "^1.0.0-beta.32",
+    "@allmaps/latest": "^1.0.0-beta.38",
+    "@allmaps/maplibre": "^1.0.0-beta.32",
+    "@allmaps/stdlib": "^1.0.0-beta.33",
+    "@allmaps/tailwind": "^1.0.0-beta.16",
+    "@allmaps/transform": "^1.0.0-beta.43",
+    "@allmaps/ui": "^1.0.0-beta.34",
     "@astrojs/check": "^0.9.3",
     "@astrojs/starlight": "^0.29.0",
     "@astrojs/starlight-tailwind": "^2.0.3",
@@ -68,7 +68,7 @@
     "typescript": "^5.6.3"
   },
   "devDependencies": {
-    "@allmaps/types": "^1.0.0-beta.16",
+    "@allmaps/types": "^1.0.0-beta.17",
     "@types/d3-geo": "^3.1.0",
     "@types/geojson": "^7946.0.14"
   }
