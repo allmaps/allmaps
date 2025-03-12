@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tailwind",
-  "version": "1.0.0-beta.14",
+  "version": "1.0.0-beta.15",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -45,9 +45,9 @@
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
     "prettier": "^3.4.2",
-    "tailwindcss": "^3.3.3",
-    "typescript": "^5.7.0",
     "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1"
+    "remark-cli": "^12.0.1",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.7.0"
   }
 }

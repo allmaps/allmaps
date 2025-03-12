@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/basemap",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "author": {
     "name": "Brandon Liu",
     "email": "brandon@protomaps.com",
@@ -41,17 +41,17 @@
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
     "prettier": "^3.4.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
     "typescript": "^5.7.0"
   },
   "dependencies": {
+    "@protomaps/basemaps": "^5.0.0",
     "maplibre-contour": "^0.1.0",
-    "maplibre-gl": "^4.7.1",
-    "@protomaps/basemaps": "^5.0.0"
+    "maplibre-gl": "^4.7.1"
   }
 }

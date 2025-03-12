@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/iiif-parser",
-  "version": "1.0.0-beta.40",
+  "version": "1.0.0-beta.41",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -38,6 +38,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@allmaps/types": "^1.0.0-beta.16",
     "@types/eslint": "^8.56.12",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
@@ -49,7 +50,6 @@
     "prettier": "^3.4.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "@allmaps/types": "^1.0.0-beta.15",
     "typescript": "^5.7.0"
   },
   "dependencies": {
