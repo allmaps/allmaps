@@ -72,25 +72,30 @@
   {:else if parsedImage && imageRequest && Array.isArray(imageRequest)}
     {@const tilesWidth = getTilesWidth(imageRequest)}
     {@const tilesHeight = getTilesHeight(imageRequest)}
+    {@const orientationPortrait =
+      (mode === 'contain' && parsedImage.width > parsedImage.height) ||
+      (mode === 'cover' && parsedImage.width < parsedImage.height)}
+    {@const columnPercentages = getColumnPercentages(imageRequest, tilesWidth)}
 
     <div
       class="relative grid"
-      class:w-full={mode === 'contain'}
-      class:h-full={mode === 'cover'}
-      style:grid-template-columns={getColumnPercentages(
-        imageRequest,
-        tilesWidth
-      )
+      class:w-full={orientationPortrait}
+      class:h-full={!orientationPortrait}
+      style:grid-template-columns={columnPercentages
         .map((percentage) => `${percentage}%`)
         .join(' ')}
       style:aspect-ratio="{tilesWidth} / {tilesHeight}"
-      style:left={mode === 'cover' ? getLeftStyle(tilesWidth, tilesHeight) : ''}
-      style:top={mode === 'contain' ? getTopStyle(tilesWidth, tilesHeight) : ''}
+      style:left={!orientationPortrait
+        ? getLeftStyle(tilesWidth, tilesHeight)
+        : ''}
+      style:top={orientationPortrait
+        ? getTopStyle(tilesWidth, tilesHeight)
+        : ''}
     >
       {#each imageRequest as row, rowIndex}
         {#each row as tile, columnIndex}
           <img
-            class="h-auto max-w-full"
+            class="max-w-full h-full"
             src={parsedImage.getImageUrl(tile)}
             alt={alt ||
               `Thumbnail for ${parsedImage.uri} (${rowIndex}, ${columnIndex})`}
