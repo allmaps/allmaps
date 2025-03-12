@@ -562,7 +562,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   get mapsCount() {
-    return this.maps ? Object.keys(this.maps).length : 0
+    return this.maps.length
   }
 }
 
