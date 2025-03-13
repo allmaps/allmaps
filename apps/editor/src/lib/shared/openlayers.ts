@@ -13,6 +13,7 @@ import { getResourceMask } from '$lib/shared/maps.js'
 import { transformResourceMaskToGeo } from '$lib/shared/transform.js'
 
 import type { FeatureLike } from 'ol/Feature'
+import type TileGrid from 'ol/tilegrid/TileGrid'
 
 import type { DbMap, ResourceMask } from '$lib/types/maps.js'
 import type { LabelIndexFromGcpIdFn } from '$lib/types/shared.js'
@@ -190,4 +191,13 @@ export function makeFeatureActive(
       feature.setProperties({ active: false })
     }
   })
+}
+
+export function getResolutions(tileGrid: TileGrid) {
+  let resolutions = tileGrid.getResolutions()
+  if (resolutions.length < 4) {
+    resolutions = [8, 4, 2, 1]
+  }
+
+  return resolutions
 }
