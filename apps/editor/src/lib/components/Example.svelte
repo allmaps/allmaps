@@ -3,11 +3,11 @@
 
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
+  import { truncate } from '$lib/shared/strings.js'
+
   import type { Example } from '$lib/types/shared.js'
 
   const imageInfoState = getImageInfoState()
-
-  const MAX_POPUP_TEXT_LENGTH = 64
 
   let { example }: { example: Example } = $props()
 
@@ -16,12 +16,6 @@
       ? example.manifestId
       : `${example.imageId}/info.json`
   )
-
-  function truncate(text: string) {
-    return text.length > MAX_POPUP_TEXT_LENGTH
-      ? `${text.slice(0, MAX_POPUP_TEXT_LENGTH)}…`
-      : text
-  }
 </script>
 
 {#await imageInfoState.fetchImageInfo(example.imageId)}
