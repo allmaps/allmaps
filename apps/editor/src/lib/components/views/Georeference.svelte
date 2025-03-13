@@ -35,7 +35,8 @@
     deleteCondition,
     getResourceMaskPolygon,
     getGeoMaskPolygon,
-    makeFeatureActive
+    makeFeatureActive,
+    getResolutions
   } from '$lib/shared/openlayers.js'
   import {
     getGcpResourcePoint,
@@ -263,7 +264,7 @@
       if (extent && tileGrid) {
         resourceOlMap.setView(
           new View({
-            resolutions: tileGrid.getResolutions(),
+            resolutions: getResolutions(tileGrid),
             extent,
             constrainOnlyCenter: true,
             center: resourceViewport?.center,

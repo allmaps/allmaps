@@ -149,7 +149,7 @@
                   class="col-span-2 sm:col-span-8 grid gap-0 grid-cols-subgrid"
                 >
                   <button
-                    class="inline-block h-8"
+                    class="inline-block h-8 cursor-pointer"
                     onclick={() => handleGcpClick(map.id, gcp.id)}
                     aria-label="Select GCP {index + 1}"
                   >

@@ -27,7 +27,8 @@
     getResourceMaskFromFeature,
     deleteCondition,
     editableResourceMaskStyle,
-    makeFeatureActive
+    makeFeatureActive,
+    getResolutions
   } from '$lib/shared/openlayers.js'
   import { getResourceMask } from '$lib/shared/maps.js'
   import { polygonDifference } from '$lib/shared/geometry.js'
@@ -275,7 +276,7 @@
       if (extent && tileGrid) {
         resourceOlMap.setView(
           new View({
-            resolutions: tileGrid.getResolutions(),
+            resolutions: getResolutions(tileGrid),
             extent,
             constrainOnlyCenter: true,
             center: resourceViewport?.center,

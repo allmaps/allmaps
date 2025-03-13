@@ -9,6 +9,7 @@
 
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
   import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { truncate } from '$lib/shared/strings.js'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
@@ -44,7 +45,7 @@
 <div class="max-w-(--breakpoint-lg) m-auto p-4">
   {#if sourceState.imageCount > 0}
     <Collection childrenCount={sourceState.imageCount}>
-      {#each [...sourceState.images] as image (image.uri)}
+      {#each [...sourceState.images] as image, index (image.uri)}
         {@const canvas = sourceState.getCanvasByImageId(image.uri)}
         <!-- TODO: don't bind ALL widths! -->
         <li
@@ -52,6 +53,7 @@
           class="overflow-hidden bg-white/20 p-2 rounded-lg w-full h-full max-w-xl"
         >
           <a
+            class="flex flex-col gap-2"
             onclick={(event) => handleImageClick(event, image.uri)}
             ondblclick={(event) => handleImageDblclick(event, image.uri)}
             href={createRouteUrl(page, 'mask', { image: image.uri })}
@@ -85,6 +87,11 @@
               <div class="absolute bottom-0 w-full flex justify-end p-2">
                 <Status imageId={image.uri} />
               </div>
+            </div>
+            <div class="text-center text-blue-900 text-xs">
+              {canvas?.label
+                ? truncate(parseLanguageString(canvas?.label, 'en'))
+                : `Image ${index + 1}`}
             </div>
           </a>
         </li>
