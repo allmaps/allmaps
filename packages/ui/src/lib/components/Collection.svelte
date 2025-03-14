@@ -5,7 +5,11 @@
 
 <div class="w-full @container">
   {#if childrenCount !== 1}
-    <ol class="collection grid gap-3">
+    <ol
+      class="grid gap-3
+        grid-cols-[repeat(auto-fit,_minmax(min(160px,_100%),_1fr))]
+        sm:grid-cols-[repeat(auto-fit,_minmax(min(250px,_100%),_1fr))]"
+    >
       <slot />
     </ol>
   {:else}
@@ -14,9 +18,3 @@
     </ol>
   {/if}
 </div>
-
-<style scoped>
-  .collection {
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  }
-</style>
