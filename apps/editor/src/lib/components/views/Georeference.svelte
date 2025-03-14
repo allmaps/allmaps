@@ -45,6 +45,7 @@
   } from '$lib/shared/maps.js'
   import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
+  import { UiEvents } from '$lib/shared/ui-events.js'
 
   import type { FeatureLike } from 'ol/Feature'
   import type { VectorSourceEvent } from 'ol/source/Vector'
@@ -60,7 +61,8 @@
     RemoveGcpEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
-    RemoveResourceMaskPointEvent
+    RemoveResourceMaskPointEvent,
+    ClickedItemEvent
   } from '$lib/types/events.js'
 
   import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
@@ -88,10 +90,10 @@
   let geoDraw: Draw
   let geoModify: Modify
 
-  let currentMapsImageId = $state<string | undefined>(undefined)
-  let currentDisplayImageId = $state<string | undefined>(undefined)
+  let currentMapsImageId = $state<string>()
+  let currentDisplayImageId = $state<string>()
 
-  let currentActiveMapId = $state<string | undefined>(undefined)
+  let currentActiveMapId = $state<string>()
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -738,6 +740,52 @@
     }
   }
 
+  function handleLastClickedItem(event: ClickedItemEvent) {
+    if (event.detail.type === 'gcp') {
+      const resourceGcpFeature = resourceGcpVectorSource?.getFeatureById(
+        event.detail.gcpId
+      )
+      const geoGcpFeature = geoGcpVectorSource?.getFeatureById(
+        event.detail.gcpId
+      )
+      const resourceGcpGeometry = resourceGcpFeature?.getGeometry()
+      const geoGcpGeometry = geoGcpFeature?.getGeometry()
+      if (resourceGcpGeometry) {
+        resourceOlMap?.getView().fit(resourceGcpGeometry, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+      if (geoGcpGeometry) {
+        geoOlMap?.getView().fit(geoGcpGeometry, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+    } else if (event.detail.type === 'map') {
+      const resourceMaskFeature = resourceMaskVectorSource?.getFeatureById(
+        event.detail.mapId
+      )
+      const geoMaskFeature = geoMaskVectorSource?.getFeatureById(
+        event.detail.mapId
+      )
+      const resourceMaskGeometry = resourceMaskFeature?.getGeometry()
+      const geoMaskGeometry = geoMaskFeature?.getGeometry()
+      if (resourceMaskGeometry) {
+        resourceOlMap?.getView().fit(resourceMaskGeometry, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+      if (geoMaskGeometry) {
+        geoOlMap?.getView().fit(geoMaskGeometry, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+    }
+  }
+
   onMount(() => {
     // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < <
     // Left pane: resource
@@ -901,62 +949,6 @@
     })
 
     $effect(() => {
-      if (
-        uiState.lastClickedItem?.type === 'gcp' &&
-        mapsState.activeGcpId === uiState.lastClickedItem.gcpId
-      ) {
-        const resourceGcpFeature = resourceGcpVectorSource?.getFeatureById(
-          mapsState.activeGcpId
-        )
-        const geoGcpFeature = geoGcpVectorSource?.getFeatureById(
-          mapsState.activeGcpId
-        )
-
-        const resourceGcpGeometry = resourceGcpFeature?.getGeometry()
-        const geoGcpGeometry = geoGcpFeature?.getGeometry()
-        if (resourceGcpGeometry) {
-          resourceOlMap?.getView().fit(resourceGcpGeometry, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-
-        if (geoGcpGeometry) {
-          geoOlMap?.getView().fit(geoGcpGeometry, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-      } else if (
-        uiState.lastClickedItem?.type === 'map' &&
-        mapsState.activeMapId === uiState.lastClickedItem.mapId
-      ) {
-        const resourceMaskFeature = resourceMaskVectorSource?.getFeatureById(
-          mapsState.activeMapId
-        )
-        const geoMaskFeature = geoMaskVectorSource?.getFeatureById(
-          mapsState.activeMapId
-        )
-
-        const resourceMaskGeometry = resourceMaskFeature?.getGeometry()
-        const geoMaskGeometry = geoMaskFeature?.getGeometry()
-        if (resourceMaskGeometry) {
-          resourceOlMap?.getView().fit(resourceMaskGeometry, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-
-        if (geoMaskGeometry) {
-          geoOlMap?.getView().fit(geoMaskGeometry, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-      }
-    })
-
-    $effect(() => {
       if (warpedMapLayer) {
         warpedMapLayer.clear()
         if (urlState.backgroundGeoreferenceAnnotationUrl) {
@@ -980,6 +972,8 @@
     // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     // Events
     // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
     resourceGcpVectorSource.on('addfeature', handleAddGcpFeature)
     geoGcpVectorSource.on('addfeature', handleAddGcpFeature)
@@ -1027,6 +1021,8 @@
 
     return () => {
       saveViewport()
+
+      uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
