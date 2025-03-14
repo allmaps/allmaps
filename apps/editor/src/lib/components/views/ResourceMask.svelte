@@ -33,6 +33,7 @@
   import { getResourceMask } from '$lib/shared/maps.js'
   import { polygonDifference } from '$lib/shared/geometry.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
+  import { UiEvents } from '$lib/shared/ui-events.js'
 
   import type { VectorSourceEvent } from 'ol/source/Vector'
   import type { DrawEvent } from 'ol/interaction/Draw'
@@ -43,7 +44,8 @@
     RemoveMapEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
-    RemoveResourceMaskPointEvent
+    RemoveResourceMaskPointEvent,
+    ClickedItemEvent
   } from '$lib/types/events.js'
   import type { DbImageService, DbMap, ResourceMask } from '$lib/types/maps.js'
 
@@ -57,12 +59,12 @@
   let resourceDraw: Draw
   let resourceModify: Modify
 
-  let currentMapsImageId = $state<string | undefined>(undefined)
-  let currentDisplayImageId = $state<string | undefined>(undefined)
+  let currentMapsImageId = $state<string>()
+  let currentDisplayImageId = $state<string>()
 
   let isDrawing = $state(false)
   let canFinishDrawing = $state(false)
-  let drawingFeature = $state<Feature<Polygon> | undefined>(undefined)
+  let drawingFeature = $state<Feature<Polygon>>()
 
   let resourceMaskBeforeModify: ResourceMask | undefined
 
@@ -406,6 +408,22 @@
     }
   }
 
+  function handleLastClickedItem(event: ClickedItemEvent) {
+    if (resourceOlMap) {
+      const resourceFeature = resourceVectorSource?.getFeatureById(
+        event.detail.mapId
+      )
+
+      const resourceGeometry = resourceFeature?.getGeometry()
+      if (resourceGeometry) {
+        resourceOlMap.getView().fit(resourceGeometry, {
+          duration: 200,
+          padding: [25, 25, 25, 25]
+        })
+      }
+    }
+  }
+
   onMount(() => {
     resourceTileLayer = new TileLayer()
     resourceVectorSource = new VectorSource()
@@ -465,24 +483,7 @@
       }
     })
 
-    $effect(() => {
-      if (
-        uiState.lastClickedItem &&
-        mapsState.activeMapId === uiState.lastClickedItem.mapId
-      ) {
-        const resourceFeature = resourceVectorSource?.getFeatureById(
-          mapsState.activeMapId
-        )
-
-        const resourceGeometry = resourceFeature?.getGeometry()
-        if (resourceGeometry) {
-          resourceOlMap?.getView().fit(resourceGeometry, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-      }
-    })
+    uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
     $effect(() => {
       if (
@@ -512,6 +513,8 @@
 
     return () => {
       saveViewport()
+
+      uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)

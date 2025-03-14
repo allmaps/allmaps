@@ -1,5 +1,7 @@
 import { setContext, getContext } from 'svelte'
 
+import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
+
 import type { PresetBaseMapID, ClickedItem } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
@@ -38,7 +40,7 @@ const basemapPresets: BasemapPreset[] = [
   }
 ]
 
-export class UiState {
+export class UiState extends UiEventTarget {
   #urlState: UrlState
 
   #basemapPresets = $state(basemapPresets)
@@ -51,6 +53,8 @@ export class UiState {
   #lastClickedItem = $state<ClickedItem>()
 
   constructor(urlState: UrlState) {
+    super()
+
     this.#urlState = urlState
 
     // TODO: move localStorage code to shared ts file
@@ -110,6 +114,12 @@ export class UiState {
   }
 
   set lastClickedItem(item: ClickedItem) {
+    this.dispatchEvent(
+      new CustomEvent(UiEvents.CLICKED_ITEM, {
+        detail: item
+      })
+    )
+
     this.#lastClickedItem = item
   }
 }

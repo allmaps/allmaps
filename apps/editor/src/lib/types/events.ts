@@ -1,4 +1,4 @@
-import type { Point } from '$lib/types/shared.js'
+import type { Point, ClickedItem } from '$lib/types/shared.js'
 import type { DbMap3, DbGcp3, DbTransformation } from '$lib/types/maps.js'
 
 // ============================================================================
@@ -64,3 +64,5 @@ export type ReplaceGcpEvent = CustomEvent<ReplaceGcp>
 export type RemoveGcpEvent = CustomEvent<RemoveGcp>
 
 export type SetTransformationEvent = CustomEvent<SetTransformation>
+
+export type ClickedItemEvent = CustomEvent<ClickedItem>
