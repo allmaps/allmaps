@@ -8,19 +8,21 @@ In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedM
 
 ## How it works
 
-This packages analyzes maps to return information, warning and error items. These items are objects with a code and text attribute, and possible additional information.
+This packages analyzes maps to return information, warning and error items. These items are objects with a code and message attribute, and possible additional information.
 
 *   **Info** are notable but not problematic informations on a warping.
     *   Code `maskequalsfullmask`: The mask contains the full image.
 *   **Warnings** are possibly problematic findings, but don't invalidate the map.
     *   Code `gcpoutsidemask`: A GCP is outside the mask.
     *   Code `maskpointoutsidefullmask`: A mask point is outside the full mask.
-    *   Code `triangulationfoldsover`: The map folds over itself, for the selected transformation type.
     *   Code `polynomialsheartoohigh`: A polynomial transformation shows a shear higher then a set maximum.
 *   **Errors** are problematic findings that invalidate the map.
+    *   Code `constructingwarpedmapfailed`: A warped map map could not be constructed.
+    *   Code `constructingtriangulatedwarpedmapfailed`: A triangulated warped map could not be constructed.
     *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
     *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
-    *   Code `gcpamounttoolow`: There are less then 3 GCPs.
+    *   Code `gcpamountlessthen2`: There are less then 2 GCPs.
+    *   Code `gcpamountlessthen3`: There are less then 3 GCPs.
     *   Code `gcpresourcerepeatedpoint`: GCP resource coordinates are repeated.
     *   Code `gcpgeorepeatedpoint`: GCP geo coordinates are repeated.
     *   Code `masknotring`: The mask is not a valid ring (an array of points).
@@ -112,12 +114,14 @@ const distortions = analyzer.getDistortions()
 
 *   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-    *   [hasInfo](#hasinfo)
-    *   [hasWarnings](#haswarnings)
-    *   [hasErrors](#haserrors)
+    *   [analyse](#analyse)
+        *   [Parameters](#parameters-1)
     *   [getInfo](#getinfo)
+        *   [Parameters](#parameters-2)
     *   [getWarnings](#getwarnings)
+        *   [Parameters](#parameters-3)
     *   [getErrors](#geterrors)
+        *   [Parameters](#parameters-4)
     *   [getMeasures](#getmeasures)
     *   [getDistortions](#getdistortions)
 
@@ -129,40 +133,47 @@ This class describes how a georeferenced map is warped using a specific transfor
 #### Parameters
 
 *   `georeferencedOrWarpedMap` &#x20;
+*   `options` &#x20;
 
-#### hasInfo
+#### analyse
 
-Check if analysis has info
+Analyse
 
-Returns **any** Whether the analysis has info
+Applying extra caution: wrapping the getters in a try catch
 
-#### hasWarnings
+##### Parameters
 
-Check if analysis has warnings.
+*   `options`  Analysis options
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
-
-#### hasErrors
-
-Check if analysis has errors
-
-Returns **any** Whether the analysis has errors
+Returns **any** Analysis with info, warnings and errors
 
 #### getInfo
 
 Get analysis informations
 
+##### Parameters
+
+*   `options`  Analysis options
+
 Returns **any** Analysis items with info
 
 #### getWarnings
 
-Get zis warnings
+Get analysis warnings
+
+##### Parameters
+
+*   `options`  Analysis options
 
 Returns **any** Analysis items with warning
 
 #### getErrors
 
 Get analysis errors
+
+##### Parameters
+
+*   `options`  Analysis options
 
 Returns **any** Analysis items with errors
 

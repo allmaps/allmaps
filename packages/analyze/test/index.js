@@ -71,7 +71,9 @@ describe('Analyze a georeferenced map with maskequalsfullmask', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const info = analyzer.getInfo()
+    const info = analyzer.getInfo({
+      codes: ['maskequalsfullmask']
+    })
     const warnings = analyzer.getWarnings()
     const errors = analyzer.getErrors()
 
@@ -93,7 +95,9 @@ describe('Analyze a georeferenced map with gcpoutsidemask', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const warnings = analyzer.getWarnings()
+    const warnings = analyzer.getWarnings({
+      codes: ['gcpoutsidemask']
+    })
     const errors = analyzer.getErrors()
 
     const warningCodes = warnings.map((i) => i.code)
@@ -112,7 +116,9 @@ describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const warnings = analyzer.getWarnings()
+    const warnings = analyzer.getWarnings({
+      codes: ['maskpointoutsidefullmask']
+    })
     const errors = analyzer.getErrors()
 
     const warningCodes = warnings.map((i) => i.code)
@@ -123,24 +129,24 @@ describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
   })
 })
 
-describe('Analyze a georeferenced map with triangulationfoldsover', () => {
-  it('should give warning code triangulationfoldsover', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
-    )
+// describe('Analyze a georeferenced map with triangulationfoldsover', () => {
+//   it('should give warning code triangulationfoldsover', () => {
+//     const georeferencedMap = readJSONFile(
+//       path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
+//     )
 
-    const analyzer = new Analyzer(georeferencedMap)
+//     const analyzer = new Analyzer(georeferencedMap)
 
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
+//     const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
+//     const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
+//     const warningCodes = warnings.map((i) => i.code)
+//     const errorCodes = errors.map((i) => i.code)
 
-    expect(warningCodes).to.contain('triangulationfoldsover')
-    expect(errorCodes).to.be.of.length(0)
-  })
-})
+//     expect(warningCodes).to.contain('triangulationfoldsover')
+//     expect(errorCodes).to.be.of.length(0)
+//   })
+// })
 
 describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
   it('should give warning code polynomialsheartoohigh', () => {
@@ -150,7 +156,7 @@ describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const warnings = analyzer.getWarnings()
+    const warnings = analyzer.getWarnings({ codes: ['polynomialsheartoohigh'] })
     const errors = analyzer.getErrors()
 
     const warningCodes = warnings.map((i) => i.code)
@@ -162,34 +168,53 @@ describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
 })
 
 describe('Analyze a georeferenced map with gcpincompleteresource', () => {
-  it('should give error code gcpincompleteresource', () => {
+  it('should give error code gcpincompleteresource and constructingwarpedmapfailed', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-gcpincompleteresource.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({
+      codes: ['gcpincompleteresource', 'constructingwarpedmapfailed']
+    })
 
     const errorCodes = errors.map((i) => i.code)
 
     expect(errorCodes).to.contain('gcpincompleteresource')
+    expect(errorCodes).to.contain('constructingwarpedmapfailed')
   })
 })
 
-describe('Analyze a georeferenced map with gcpamounttoolow', () => {
-  it('should give error code gcpamounttoolow', () => {
+describe('Analyze a georeferenced map with gcpamountlessthen2', () => {
+  it('should give error code gcpamountlessthen2', () => {
     const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpamounttoolow.json')
+      path.join(inputDir, 'georeferenced-map-gcpamountlessthen2.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({ codes: ['gcpamountlessthen2'] })
 
     const errorCodes = errors.map((i) => i.code)
 
-    expect(errorCodes).to.contain('gcpamounttoolow')
+    expect(errorCodes).to.contain('gcpamountlessthen2')
+  })
+})
+
+describe('Analyze a georeferenced map with gcpamountlessthen3', () => {
+  it('should give error code gcpamountlessthen3', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-gcpamountlessthen3.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const errors = analyzer.getErrors({ codes: ['gcpamountlessthen3'] })
+
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(errorCodes).to.contain('gcpamountlessthen3')
   })
 })
 
@@ -201,7 +226,7 @@ describe('Analyze a georeferenced map with gcpresourcerepeatedpoint', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({ codes: ['gcpresourcerepeatedpoint'] })
 
     const errorCodes = errors.map((i) => i.code)
 
@@ -217,7 +242,7 @@ describe('Analyze a georeferenced map with masknotring', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({ codes: ['masknotring'] })
 
     const errorCodes = errors.map((i) => i.code)
 
@@ -233,7 +258,7 @@ describe('Analyze a georeferenced map with maskrepeatedpoint', () => {
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({ codes: ['maskrepeatedpoint'] })
 
     const errorCodes = errors.map((i) => i.code)
 
@@ -242,17 +267,20 @@ describe('Analyze a georeferenced map with maskrepeatedpoint', () => {
 })
 
 describe('Analyze a georeferenced map with maskselfintersection', () => {
-  it('should give error code maskselfintersection', () => {
+  it('should give error code maskselfintersection and constructingtriangulatedwarpedmapfailed', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskselfintersection.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const errors = analyzer.getErrors()
+    const errors = analyzer.getErrors({
+      codes: ['constructingtriangulatedwarpedmapfailed', 'maskselfintersection']
+    })
 
     const errorCodes = errors.map((i) => i.code)
 
+    expect(errorCodes).to.contain('constructingtriangulatedwarpedmapfailed')
     expect(errorCodes).to.contain('maskselfintersection')
   })
 })

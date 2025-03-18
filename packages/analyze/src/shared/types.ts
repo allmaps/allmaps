@@ -1,6 +1,16 @@
 import { DistortionMeasure } from '@allmaps/transform'
 import { Point } from '@allmaps/types'
 
+/**
+ * Analysis options
+ */
+export type AnalysisOptions = {
+  codes: string[]
+}
+
+/**
+ * Analysis item
+ */
 export type AnalysisItem = {
   mapId: string
   code: string
@@ -8,9 +18,22 @@ export type AnalysisItem = {
   geoPoint?: Point
   gcpIndex?: number
   maskPointIndex?: number
-  text: string
+  message: string
+  originalMessage?: string
 }
 
+/**
+ * Analysis
+ */
+export type Analysis = {
+  info: AnalysisItem[]
+  warnings: AnalysisItem[]
+  errors: AnalysisItem[]
+}
+
+/**
+ * Measures
+ */
 export type Measures = {
   mapId: string
 
@@ -33,6 +56,9 @@ export type Measures = {
   polynomialTranslation: Point
 }
 
+/**
+ * Distortions
+ */
 export type Distortions = {
   mapId: string
   meanDistortions: Map<DistortionMeasure, number>

@@ -18,12 +18,45 @@ import {
   Polynomial,
   Transformation
 } from '@allmaps/transform'
-import { AnalysisItem, Distortions, Measures } from './shared/types'
+import {
+  AnalysisOptions,
+  AnalysisItem,
+  Analysis,
+  Distortions,
+  Measures
+} from './shared/types'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point } from '@allmaps/types'
 
 const MAX_SHEAR = 0.1
+
+// Note: construction errors and failures to get info, warning or errors are always reported
+const defaultInfoCodes = ['maskequalsfullmask']
+const defaultWarningCodes = [
+  'gcpoutsidemask',
+  'maskpointoutsidefullmask'
+  // 'triangulationfoldsover'
+  // 'polynomialsheartoohigh'
+]
+const defaultErrorCodes = [
+  'constructingwarpedmapfailed',
+  'constructingtriangulatedwarpedmapfailed',
+  'gcpincompleteresource',
+  'gcpincompleteregeo',
+  // 'gcpamountlessthen2',
+  'gcpamountlessthen3',
+  'gcpresourcerepeatedpoint',
+  'gcpgeorepeatedpoint',
+  'masknotring',
+  'maskrepeatedpoint',
+  'maskselfintersection'
+]
+const defaultCodes = [
+  ...defaultInfoCodes,
+  ...defaultWarningCodes,
+  ...defaultErrorCodes
+]
 
 /**
  * Class for Analyzer.
@@ -35,28 +68,32 @@ export class Analyzer {
   georeferencedMap: GeoreferencedMap
   warpedMap?: WarpedMap
 
+  options: AnalysisOptions = { codes: defaultCodes }
+
   protected info: AnalysisItem[] = []
   protected warnings: AnalysisItem[] = []
   protected errors: AnalysisItem[] = []
 
+  protected constructionErrors: AnalysisItem[] = []
+
   protected measures?: Measures
   protected distortions?: Distortions
-
-  protected infoComputed: boolean = false
-  protected warningsComputed: boolean = false
-  protected errorsComputed: boolean = false
-
-  protected measuresComputed: boolean = false
-  protected distortionsComputed: boolean = false
 
   /**
    * Creates an instance of Analyzer.
    *
    * @param georeferencedOrWarpedMap - A Georeferenced Map or a Warped Map
    */
-  constructor(georeferenceddMap: GeoreferencedMap)
-  constructor(warpedMap: WarpedMap)
-  constructor(georeferencedOrWarpedMap: GeoreferencedMap | WarpedMap) {
+  constructor(georeferenceddMap: GeoreferencedMap, options?: AnalysisOptions)
+  constructor(warpedMap: WarpedMap, options?: AnalysisOptions)
+  constructor(
+    georeferencedOrWarpedMap: GeoreferencedMap | WarpedMap,
+    options?: AnalysisOptions
+  ) {
+    if (options !== undefined) {
+      this.options = options
+    }
+
     if (georeferencedOrWarpedMap instanceof WarpedMap) {
       this.georeferencedMap = georeferencedOrWarpedMap.georeferencedMap
       this.warpedMap = georeferencedOrWarpedMap
@@ -77,12 +114,12 @@ export class Analyzer {
           this.georeferencedMap
         )
       } catch (error) {
-        this.errors.push({
+        this.constructionErrors.push({
           mapId: this.mapId,
-          code: 'buildingtriangulatedwarpedmapfailed',
-          text:
-            'Building a TriangulatedWarpedMap failed (possibly because triangulating the resourceMask failed). Error: ' +
-            error
+          code: 'constructingtriangulatedwarpedmapfailed',
+          message:
+            'Constructing a TriangulatedWarpedMap failed (possibly because triangulating the resourceMask failed).',
+          originalMessage: String(error)
         })
       }
     }
@@ -91,66 +128,84 @@ export class Analyzer {
       try {
         this.warpedMap = new WarpedMap(this.mapId, this.georeferencedMap)
       } catch (error) {
-        this.errors.push({
+        this.constructionErrors.push({
           mapId: this.mapId,
-          code: 'buildingwarpedmapfailed',
-          text: 'Building a WarpedMap failed. Error: ' + error
+          code: 'constructingwarpedmapfailed',
+          message: 'Constructing a WarpedMap failed.',
+          originalMessage: String(error)
         })
       }
     }
   }
 
   /**
-   * Check if analysis has info
+   * Analyse
    *
-   * @returns Whether the analysis has info
-   */
-  public hasInfo(): boolean {
-    if (!this.infoComputed) {
-      this.getInfo()
-    }
-
-    return this.info.length != 0
-  }
-
-  /**
-   * Check if analysis has warnings.
+   * Applying extra caution: wrapping the getters in a try catch
    *
-   * @returns {boolean}
+   * @param options - Analysis options
+   * @returns Analysis with info, warnings and errors
    */
-  public hasWarnings(): boolean {
-    if (!this.warningsComputed) {
-      this.getWarnings()
+  public analyse(options?: AnalysisOptions): Analysis {
+    let errors: AnalysisItem[] = []
+    let info: AnalysisItem[] = []
+    let warnings: AnalysisItem[] = []
+
+    try {
+      errors = this.getErrors(options)
+    } catch (error) {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'errorsfailed',
+        message: 'Failed to get errors.',
+        originalMessage: String(error)
+      })
     }
-
-    return this.warnings.length != 0
-  }
-
-  /**
-   * Check if analysis has errors
-   *
-   * @returns Whether the analysis has errors
-   */
-  public hasErrors(): boolean {
-    if (!this.errorsComputed) {
-      this.getErrors()
+    if (this.errors.length != 0) {
+      try {
+        info = this.getInfo(options)
+      } catch (error) {
+        this.errors.push({
+          mapId: this.mapId,
+          code: 'infofailed',
+          message: 'Failed to get info.',
+          originalMessage: String(error)
+        })
+      }
+      try {
+        warnings = this.getWarnings(options)
+      } catch (error) {
+        this.errors.push({
+          mapId: this.mapId,
+          code: 'warningsfailed',
+          message: 'Failed to get warnings.',
+          originalMessage: String(error)
+        })
+      }
     }
-
-    return this.errors.length != 0
+    return {
+      info,
+      warnings,
+      errors
+    }
   }
 
   /**
    * Get analysis informations
    *
+   * @param options - Analysis options
    * @returns Analysis items with info
    */
-  public getInfo(): AnalysisItem[] {
-    if (this.infoComputed && this.info) {
-      return this.info
-    }
+  public getInfo(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
+
+    this.info = []
 
     // Mask equals full Mask
+    const code = 'maskequalsfullmask'
     if (
+      codes.includes(code) &&
       this.warpedMap &&
       isEqualArray(
         this.warpedMap.resourceMask,
@@ -160,52 +215,57 @@ export class Analyzer {
     ) {
       this.info.push({
         mapId: this.mapId,
-        code: 'maskequalsfullmask',
-        text: 'The mask contains the full image.'
+        code,
+        message: 'The mask contains the full image.'
       })
     }
-
-    this.infoComputed = true
 
     return this.info
   }
 
   /**
-   * Get zis warnings
+   * Get analysis warnings
    *
+   * @param options - Analysis options
    * @returns Analysis items with warning
    */
-  public getWarnings(): AnalysisItem[] {
-    if (this.warningsComputed && this.warnings) {
-      return this.warnings
-    }
+  public getWarnings(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
+    let code: string
+
+    this.warnings = []
 
     // GCPs not outside mask
-    const gcpsOutside = []
-    for (const gcp of this.georeferencedMap.gcps) {
-      if (
-        classifyPoint(this.georeferencedMap.resourceMask, gcp.resource) == 1
-      ) {
-        gcpsOutside.push(gcp)
+    code = 'gcpoutsidemask'
+    if (codes.includes(code)) {
+      const gcpsOutside = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (
+          classifyPoint(this.georeferencedMap.resourceMask, gcp.resource) == 1
+        ) {
+          gcpsOutside.push(gcp)
+        }
       }
-    }
-    gcpsOutside.forEach((gcp, index) => {
-      this.warnings.push({
-        mapId: this.mapId,
-        code: 'gcpoutsidemask',
-        resourcePoint: gcp.resource,
-        gcpIndex: index,
-        text:
-          'GCP ' +
-          index +
-          ' with resource coordinates [' +
-          gcp.resource +
-          '] outside mask.'
+      gcpsOutside.forEach((gcp, index) => {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: gcp.resource,
+          gcpIndex: index,
+          message:
+            'GCP ' +
+            index +
+            ' with resource coordinates [' +
+            gcp.resource +
+            '] outside mask.'
+        })
       })
-    })
+    }
 
     // Mask points not outside full mask
-    if (this.warpedMap) {
+    code = 'maskpointoutsidefullmask'
+    if (codes.includes(code) && this.warpedMap) {
       const resourceMaskOutsideFullMaskPoints = []
       for (const resourcePoint of this.warpedMap.resourceMask) {
         if (
@@ -218,10 +278,10 @@ export class Analyzer {
         (resourceMaskOutsideFullMaskPoint, index) => {
           this.warnings.push({
             mapId: this.mapId,
-            code: 'maskpointoutsidefullmask',
+            code,
             resourcePoint: resourceMaskOutsideFullMaskPoint,
             gcpIndex: index,
-            text:
+            message:
               'Mask point ' +
               index +
               ' with resource coordinates [' +
@@ -233,39 +293,45 @@ export class Analyzer {
     }
 
     // Transformation folds over
-    // TODO: compute signDetJ only for this test instead of by default, e.g. by updating from existing distortions
-    if (this.warpedMap instanceof TriangulatedWarpedMap) {
-      const signDetJs =
-        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
-        )
-      if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
+    // TODO: set to compute signDetJ for this test (ideally by updating from existing distortions)
+    // TODO: add to readme when implemented
+    // code = 'triangulationfoldsover'
+    // if (
+    //   codes.includes(code) &&
+    //   this.warpedMap instanceof TriangulatedWarpedMap
+    // ) {
+    //   const signDetJs =
+    //     this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
+    //       (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
+    //     )
+    //   if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
+    //     this.warnings.push({
+    //       mapId: this.mapId,
+    //       code,
+    //       message: 'The map folds over itself, for the selected transformation type.'
+    //     })
+    //   }
+    // }
+
+    // Polynomial shear not too high
+    code = 'polynomialsheartoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        (measures.polynomialShear[0] > MAX_SHEAR ||
+          measures.polynomialShear[1] > MAX_SHEAR)
+      ) {
         this.warnings.push({
           mapId: this.mapId,
-          code: 'triangulationfoldsover',
-          text: 'The map folds over itself, for the selected transformation type.'
+          code,
+          message:
+            'A polynomial transformation shows a shear higher then ' +
+            MAX_SHEAR +
+            '.'
         })
       }
     }
-
-    // Polynomial shear not too high
-    const measures = this.getMeasures()
-    if (
-      measures &&
-      (measures.polynomialShear[0] > MAX_SHEAR ||
-        measures.polynomialShear[1] > MAX_SHEAR)
-    ) {
-      this.warnings.push({
-        mapId: this.mapId,
-        code: 'polynomialsheartoohigh',
-        text:
-          'A polynomial transformation shows a shear higher then ' +
-          MAX_SHEAR +
-          '.'
-      })
-    }
-
-    this.warningsComputed = true
 
     return this.warnings
   }
@@ -273,138 +339,181 @@ export class Analyzer {
   /**
    * Get analysis errors
    *
+   * @param options - Analysis options
    * @returns Analysis items with errors
    */
-  public getErrors(): AnalysisItem[] {
-    if (this.errorsComputed && this.errors) {
-      return this.errors
-    }
+  public getErrors(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
+    let code: string
+
+    this.errors = this.constructionErrors
 
     // GCPs not incomplete
-    const gcpsIncompleteResource = []
-    for (const gcp of this.georeferencedMap.gcps) {
-      if (gcp.resource == undefined || !isPoint(gcp.resource)) {
-        gcpsIncompleteResource.push(gcp)
+    code = 'gcpincompleteresource'
+    if (codes.includes(code)) {
+      const gcpsIncompleteResource = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (gcp.resource == undefined || !isPoint(gcp.resource)) {
+          gcpsIncompleteResource.push(gcp)
+        }
       }
-    }
-    gcpsIncompleteResource.forEach((gcp, index) => {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'gcpincompleteresource',
-        geoPoint: gcp.geo,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing resource coordinates.'
+      gcpsIncompleteResource.forEach((gcp, index) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          geoPoint: gcp.geo,
+          gcpIndex: index,
+          message: 'GCP ' + index + ' missing resource coordinates.'
+        })
       })
-    })
-    const gcpsIncompleteGeo = []
-    for (const gcp of this.georeferencedMap.gcps) {
-      if (gcp.geo == undefined || !isPoint(gcp.geo)) {
-        gcpsIncompleteGeo.push(gcp)
+    }
+    code = 'gcpincompletegeo'
+    if (codes.includes(code)) {
+      const gcpsIncompleteGeo = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (gcp.geo == undefined || !isPoint(gcp.geo)) {
+          gcpsIncompleteGeo.push(gcp)
+        }
       }
-    }
-    gcpsIncompleteGeo.forEach((gcp, index) => {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'gcpincompletegeo',
-        resourcePoint: gcp.resource,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing geo coordinates.'
+      gcpsIncompleteGeo.forEach((gcp, index) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: gcp.resource,
+          gcpIndex: index,
+          message: 'GCP ' + index + ' missing geo coordinates.'
+        })
       })
-    })
-    if (gcpsIncompleteGeo.length > 0 || gcpsIncompleteResource.length > 0) {
+    }
+    // Return if gcp incomplete, since other checks would fail then
+    const errorCodes = this.errors.map((i) => i.code)
+    if (
+      errorCodes.includes('gcpincompleteresource') ||
+      errorCodes.includes('gcpincompletegeo')
+    ) {
       return this.errors
     }
 
-    // GCPs amount not to low
-    if (this.georeferencedMap.gcps.length < 3) {
+    // GCPs amount not less then 2
+    code = 'gcpamountlessthen2'
+    if (codes.includes(code) && this.georeferencedMap.gcps.length < 2) {
       this.errors.push({
         mapId: this.mapId,
-        code: 'gcpamounttoolow',
-        text:
-          'There are only ' +
+        code,
+        message:
+          'There are ' +
+          this.georeferencedMap.gcps.length +
+          ' GCPs, but a minimum of 2 are required (for a Helmert transform).'
+      })
+    }
+
+    // GCPs amount not less then 3
+    code = 'gcpamountlessthen3'
+    if (codes.includes(code) && this.georeferencedMap.gcps.length < 3) {
+      this.errors.push({
+        mapId: this.mapId,
+        code,
+        message:
+          'There are ' +
           this.georeferencedMap.gcps.length +
           ' GCPs, but a minimum of 3 are required.'
       })
     }
 
     // GCPs no repeated points
-    const resourceRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.gcps.map((gcp) => gcp.resource),
-      isEqualPoint
-    )
-    const geoRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.gcps.map((gcp) => gcp.geo),
-      isEqualPoint
-    )
-    resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'gcpresourcerepeatedpoint',
-        resourcePoint: resourceRepeatedPoint,
-        text:
-          'GCP resource coordinates [' +
-          resourceRepeatedPoint +
-          '] are repeated.'
-      })
-    })
-    geoRepeatedPoints.forEach((geoRepeatedPoint) => {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'gcpgeorepeatedpoint',
-        geoPoint: geoRepeatedPoint,
-        text: 'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
-      })
-    })
-
-    // Mask valid as ring
-    const maskIsRing = isRing(this.georeferencedMap.resourceMask)
-    if (!maskIsRing) {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'masknotring',
-        text: 'The mask is not a valid ring (an array of points).'
+    code = 'gcpresourcerepeatedpoint'
+    if (codes.includes(code)) {
+      const resourceRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.gcps.map((gcp) => gcp.resource),
+        isEqualPoint
+      )
+      resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: resourceRepeatedPoint,
+          message:
+            'GCP resource coordinates [' +
+            resourceRepeatedPoint +
+            '] are repeated.'
+        })
       })
     }
-    if (!maskIsRing) {
+    code = 'gcpgeorepeatedpoint'
+    if (codes.includes(code)) {
+      const geoRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.gcps.map((gcp) => gcp.geo),
+        isEqualPoint
+      )
+      geoRepeatedPoints.forEach((geoRepeatedPoint) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          geoPoint: geoRepeatedPoint,
+          message:
+            'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
+        })
+      })
+    }
+
+    // Mask valid as ring
+    code = 'masknotring'
+    if (codes.includes(code)) {
+      const maskIsRing = isRing(this.georeferencedMap.resourceMask)
+      if (!maskIsRing) {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          message: 'The mask is not a valid ring (an array of points).'
+        })
+      }
+    }
+    // Return if mask not ring, since other checks would fail then
+    if (this.errors.map((i) => i.code).includes(code)) {
       return this.errors
     }
 
     // Mask no repeated points
-    const resourceMaskRepeatedPoints = arrayRepeated(
-      this.georeferencedMap.resourceMask,
-      isEqualPoint
-    )
-    resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
-      this.errors.push({
-        mapId: this.mapId,
-        code: 'maskrepeatedpoint',
-        resourcePoint: resourceMaskRepeatedPoint,
-        text:
-          'Mask resource coordinates [' +
-          resourceMaskRepeatedPoint +
-          '] are repeated.'
-      })
-    })
-
-    // Mask no self-intersection
-    const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([
-      this.georeferencedMap.resourceMask
-    ])
-    resourceMaskSelfIntersectionPoints.forEach(
-      (resourceMaskSelfIntersectionPoint) => {
+    code = 'maskrepeatedpoint'
+    if (codes.includes(code)) {
+      const resourceMaskRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.resourceMask,
+        isEqualPoint
+      )
+      resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
-          code: 'maskselfintersection',
-          resourcePoint: resourceMaskSelfIntersectionPoint,
-          text:
-            'The mask self-intersects at resource coordinates [' +
-            resourceMaskSelfIntersectionPoint +
-            '].'
+          code,
+          resourcePoint: resourceMaskRepeatedPoint,
+          message:
+            'Mask resource coordinates [' +
+            resourceMaskRepeatedPoint +
+            '] are repeated.'
         })
-      }
-    )
+      })
+    }
 
-    this.errorsComputed = true
+    // Mask no self-intersection
+    code = 'maskselfintersection'
+    if (codes.includes(code)) {
+      const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([
+        this.georeferencedMap.resourceMask
+      ])
+      resourceMaskSelfIntersectionPoints.forEach(
+        (resourceMaskSelfIntersectionPoint) => {
+          this.errors.push({
+            mapId: this.mapId,
+            code,
+            resourcePoint: resourceMaskSelfIntersectionPoint,
+            message:
+              'The mask self-intersects at resource coordinates [' +
+              resourceMaskSelfIntersectionPoint +
+              '].'
+          })
+        }
+      )
+    }
 
     return this.errors
   }
@@ -415,10 +524,6 @@ export class Analyzer {
    * @returns Analysis measures
    */
   public getMeasures(): Measures | undefined {
-    if (this.measuresComputed && this.measures) {
-      return this.measures
-    }
-
     if (!this.warpedMap) {
       return
     }
@@ -517,8 +622,6 @@ export class Analyzer {
       resourceRelativeErrors
     }
 
-    this.measuresComputed = true
-
     return this.measures
   }
 
@@ -528,10 +631,6 @@ export class Analyzer {
    * @returns Analysis distortions
    */
   public getDistortions(): Distortions | undefined {
-    if (this.distortionsComputed && this.distortions) {
-      return this.distortions
-    }
-
     if (
       !(this.warpedMap instanceof TriangulatedWarpedMap) ||
       !this.warpedMap.projectedGcpTriangulation
@@ -567,8 +666,6 @@ export class Analyzer {
     }
 
     this.distortions = distortions as Distortions
-
-    this.distortionsComputed = true
 
     return this.distortions
   }
