@@ -12,7 +12,7 @@ export type AnalysisOptions = {
  * Analysis item
  */
 export type AnalysisItem = {
-  mapId: string
+  mapId?: string
   code: string
   resourcePoint?: Point
   geoPoint?: Point
@@ -35,7 +35,7 @@ export type Analysis = {
  * Measures
  */
 export type Measures = {
-  mapId: string
+  mapId?: string
 
   rmse: number
   destinationErrors: number[]

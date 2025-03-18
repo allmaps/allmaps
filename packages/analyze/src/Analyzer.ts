@@ -63,7 +63,7 @@ const defaultCodes = [
  * This class describes how a georeferenced map is warped using a specific transformation.
  */
 export class Analyzer {
-  mapId: string
+  mapId?: string
 
   georeferencedMap: GeoreferencedMap
   warpedMap?: WarpedMap
@@ -101,8 +101,10 @@ export class Analyzer {
       this.georeferencedMap = georeferencedOrWarpedMap
     }
 
-    // TODO: create mapId properly
-    this.mapId = this.georeferencedMap.id || ''
+    // Note: since we cannot await in a constructor,
+    // we can't compute a missing mapId here using generateChecksum()
+    // and hence it can be undefined in this entire package
+    this.mapId = this.georeferencedMap.id
 
     if (
       this.warpedMap == undefined ||
@@ -110,7 +112,7 @@ export class Analyzer {
     ) {
       try {
         this.warpedMap = new TriangulatedWarpedMap(
-          this.mapId,
+          this.mapId || '',
           this.georeferencedMap
         )
       } catch (error) {
@@ -126,7 +128,7 @@ export class Analyzer {
 
     if (this.warpedMap === undefined) {
       try {
-        this.warpedMap = new WarpedMap(this.mapId, this.georeferencedMap)
+        this.warpedMap = new WarpedMap(this.mapId || '', this.georeferencedMap)
       } catch (error) {
         this.constructionErrors.push({
           mapId: this.mapId,
