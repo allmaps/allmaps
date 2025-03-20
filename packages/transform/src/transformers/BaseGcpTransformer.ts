@@ -204,7 +204,7 @@ export abstract class BaseGcpTransformer {
    *
    * @param sourceBbox - BBox in source space where the resolution is requested
    * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns
+   * @returns Resolution of the forward transformation in source space
    */
   protected _getForwardTransformationResolution(
     sourceBbox: Bbox,
@@ -236,7 +236,7 @@ export abstract class BaseGcpTransformer {
    *
    * @param destinationBbox - BBox in destination space where the resolution is requested
    * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns
+   * @returns Resolution of the backward transformation in destination space
    */
   protected _getBackwardTransformationResolution(
     destinationBbox: Bbox,

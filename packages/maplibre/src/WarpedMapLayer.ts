@@ -10,15 +10,15 @@ import {
 import {
   rectangleToSize,
   sizesToScale,
-  hexToFractionalRgb,
-  lonLatToWebMecator
+  hexToFractionalRgb
 } from '@allmaps/stdlib'
+import { lonLatToWebMercator } from '@allmaps/project'
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 import type { WarpedMapLayerOptions } from '@allmaps/render'
-import type { Rectangle, Ring, ImageInformations } from '@allmaps/types'
+import type { Rectangle, Ring, ImageInformations, Point } from '@allmaps/types'
 
 export type MapLibreWarpedMapLayerOptions = WarpedMapLayerOptions
 
@@ -662,11 +662,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
       canvas.height / window.devicePixelRatio
     ] as [number, number]
 
-    const projectedGeoCenterAsLngLat = this.map.getCenter()
-    const projectedGeoCenter = lonLatToWebMecator([
-      projectedGeoCenterAsLngLat.lng,
-      projectedGeoCenterAsLngLat.lat
-    ])
+    const geoCenterAsLngLat = this.map.getCenter()
+    const projectedGeoCenter = lonLatToWebMercator([
+      geoCenterAsLngLat.lng,
+      geoCenterAsLngLat.lat
+    ]) as Point
 
     const geoLowerLeftAsLngLat = this.map.unproject([0, viewportSize[1]])
     const geoLowerRightAsLngLat = this.map.unproject([
@@ -680,19 +680,19 @@ export class WarpedMapLayer implements CustomLayerInterface {
     // const projectedGeoLowerLeftAsMercatorCoordinate = MercatorCoordinate.fromLngLat(geoLowerLeftAsLngLat)
     // const projectedGeoLowerLeftAsPoint = [projectedGeoLowerLeftAsMercatorCoordinate.x, projectedGeoLowerLeftAsMercatorCoordinate.y]
     // But this delivers results in Mercator coordinates that are rescaled to fit in a [0, 0] to [1, 1] rectangle.
-    const projectedGeoLowerLeftAsPoint = lonLatToWebMecator([
+    const projectedGeoLowerLeftAsPoint = lonLatToWebMercator([
       geoLowerLeftAsLngLat.lng,
       geoLowerLeftAsLngLat.lat
     ])
-    const projectedGeoLowerRightAsPoint = lonLatToWebMecator([
+    const projectedGeoLowerRightAsPoint = lonLatToWebMercator([
       geoLowerRightAsLngLat.lng,
       geoLowerRightAsLngLat.lat
     ])
-    const projectedGeoUpperRightAsPoint = lonLatToWebMecator([
+    const projectedGeoUpperRightAsPoint = lonLatToWebMercator([
       geoUpperRightAsLngLat.lng,
       geoUpperRightAsLngLat.lat
     ])
-    const projectedGeoUpperLeftAsPoint = lonLatToWebMecator([
+    const projectedGeoUpperLeftAsPoint = lonLatToWebMercator([
       geoUpperLeftAsLngLat.lng,
       geoUpperLeftAsLngLat.lat
     ])

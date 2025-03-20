@@ -396,6 +396,9 @@ importers:
       '@allmaps/maplibre':
         specifier: 1.0.0-beta.30
         version: link:../../packages/maplibre
+      '@allmaps/project':
+        specifier: ^1.0.0-beta.0
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: ^1.0.0-beta.30
         version: link:../../packages/stdlib
@@ -793,6 +796,9 @@ importers:
       '@allmaps/iiif-parser':
         specifier: ^1.0.0-beta.40
         version: link:../../packages/iiif-parser
+      '@allmaps/project':
+        specifier: ^1.0.0-beta.0
+        version: link:../../packages/project
       '@allmaps/render':
         specifier: ^1.0.0-beta.68
         version: link:../../packages/render
@@ -1304,6 +1310,9 @@ importers:
 
   packages/maplibre:
     dependencies:
+      '@allmaps/project':
+        specifier: ^1.0.0-beta.0
+        version: link:../project
       '@allmaps/render':
         specifier: ^1.0.0-beta.68
         version: link:../render

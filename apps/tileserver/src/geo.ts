@@ -1,4 +1,4 @@
-import { lonLatToWebMecator } from '@allmaps/stdlib'
+import { lonLatToWebMercator } from '@allmaps/project'
 
 import type { Point, Bbox, GeojsonPolygon } from '@allmaps/types'
 import type { XYZTile } from './types.js'
@@ -30,8 +30,8 @@ export function xyzTileToGeoBbox({ z, x, y }: XYZTile): Bbox {
 
 export function xyzTileToProjectedGeoBbox({ x, y, z }: XYZTile): Bbox {
   return [
-    ...lonLatToWebMecator(xyzTileTopLeft({ x, y, z })),
-    ...lonLatToWebMecator(xyzTileBottomRight({ x, y, z }))
+    ...lonLatToWebMercator(xyzTileTopLeft({ x, y, z })),
+    ...lonLatToWebMercator(xyzTileBottomRight({ x, y, z }))
   ]
 }
 

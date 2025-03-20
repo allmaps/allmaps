@@ -139,7 +139,7 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param resourceBbox - BBox in resource space where the resolution is requested
    * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
-   * @returns
+   * @returns Resolution of the toGeo transformation in resource space
    */
   getToGeoTransformationResolution(
     resourceBbox: Bbox,
@@ -170,7 +170,7 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * @param geoBbox - BBox in geo space where the resolution is requested
    * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
-   * @returns
+   * @returns Resolution of the toResource transformation in geo space
    */
   getToResourceTransformationResolution(
     geoBbox: Bbox,

@@ -6,12 +6,12 @@
   import { Logo } from '@allmaps/ui'
   import { parseAnnotation } from '@allmaps/annotation'
   import { GcpTransformer } from '@allmaps/transform'
+  import { ProjectedGcpTransformer } from '@allmaps/project'
   import {
     computeBbox,
     bboxToRectangle,
     bboxToSize,
-    sizesToScale,
-    lonLatToWebMecator
+    sizesToScale
   } from '@allmaps/stdlib'
 
   import { getGeojsonPolygon, geometryToPath } from '../shared/geometry.js'
@@ -123,13 +123,11 @@
       const georeferencedMap = maps[index]
 
       const transformer = new GcpTransformer(georeferencedMap.gcps)
-      const projectedGcps = georeferencedMap.gcps.map(({ resource, geo }) => ({
-        resource,
-        geo: lonLatToWebMecator(geo)
-      }))
-      const projectedTransformer = new GcpTransformer(projectedGcps)
+      const projectedTransformer = new ProjectedGcpTransformer(
+        georeferencedMap.gcps
+      )
 
-      const projectedGeoPolygon = projectedTransformer.transformForward([
+      const projectedGeoPolygon = projectedTransformer.transformToGeo([
         georeferencedMap.resourceMask
       ])
 

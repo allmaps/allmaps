@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import { defaultGcpTransformerOptions } from '@allmaps/transform'
 
 import type { ProjectionDefinition } from 'proj4'
@@ -31,3 +33,12 @@ export const defaultProjectedTransformerOptions: ProjectedGcpTransformerOptions 
     projection: webMercatorProjection,
     ...defaultGcpTransformerOptions
   }
+
+const lonLatProjectionToWebMecatorProjectionConverter = proj4(
+  lonLatProjection.definition as string,
+  webMercatorProjection.definition as string
+)
+export const lonLatToWebMercator =
+  lonLatProjectionToWebMecatorProjectionConverter.forward
+export const webMercatorToLonLat =
+  lonLatProjectionToWebMecatorProjectionConverter.inverse

@@ -644,7 +644,7 @@ Returned in the lenght of the shortest piece, measured in resource coordinates.
 
 ###### Returns
 
-`number | undefined`.
+Resolution of the toGeo transformation in resource space (`number | undefined`).
 
 ### `GcpTransformer#getToResourceTransformation()`
 
@@ -681,7 +681,7 @@ Returned in the lenght of the shortest piece, measured in geo coordinates.
 
 ###### Returns
 
-`number | undefined`.
+Resolution of the toResource transformation in geo space (`number | undefined`).
 
 ### `GcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
@@ -891,7 +891,7 @@ Returned in the lenght of the shortest piece, measured in destination coordinate
 
 ###### Returns
 
-`number | undefined`.
+Resolution of the backward transformation in destination space (`number | undefined`).
 
 ### `GeneralGcpTransformer#getForwardTransformation()`
 
@@ -928,7 +928,7 @@ Returned in the lenght of the shortest piece, measured in source coordinates.
 
 ###### Returns
 
-`number | undefined`.
+Resolution of the forward transformation in source space (`number | undefined`).
 
 ### `GeneralGcpTransformer#transformBackward(point, partialGeneralGcpTransformOptions, generalGcpToP)`
 

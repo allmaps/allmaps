@@ -1,6 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "references": [
+    { "path": "../../packages/project" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/stdlib" }
   ],

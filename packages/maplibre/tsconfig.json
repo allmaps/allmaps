@@ -6,6 +6,7 @@
     "paths": {}
   },
   "references": [
+    { "path": "../project" },
     { "path": "../render" },
     { "path": "../transform" },
     { "path": "../stdlib" },

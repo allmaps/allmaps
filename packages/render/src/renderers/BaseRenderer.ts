@@ -15,11 +15,11 @@ import {
 import {
   bboxToCenter,
   computeBbox,
-  webMercatorToLonLat,
   squaredDistance,
   intersectBboxes,
   bboxToRectangle
 } from '@allmaps/stdlib'
+import { webMercatorToLonLat } from '@allmaps/project'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'

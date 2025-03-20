@@ -158,8 +158,6 @@ export { getFullResourceMask } from './masks.js'
 
 export { mergeOptions, mergePartialOptions } from './options.js'
 
-export { lonLatToWebMecator, webMercatorToLonLat } from './projection.js'
-
 export {
   isSvgCircle,
   isSvgLine,

@@ -1,13 +1,12 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import { GcpTransformer } from '@allmaps/transform'
-import { ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer, lonLatToWebMercator } from '@allmaps/project'
 import {
   computeBbox,
   bboxToRectangle,
   rectanglesToScale,
   fetchImageInfo,
-  lonLatToWebMecator,
   getPropertyFromCacheOrComputation,
   mixPoints,
   sizeToRectangle
@@ -586,7 +585,7 @@ export class WarpedMap extends EventTarget {
   private updateGcpsProperties() {
     this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
       resource,
-      geo: lonLatToWebMecator(geo)
+      geo: lonLatToWebMercator(geo)
     }))
     this.resourcePoints = this.gcps.map((gcp) => gcp.resource)
     this.geoPoints = this.gcps.map((gcp) => gcp.geo)

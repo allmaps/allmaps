@@ -1087,16 +1087,6 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `Point | undefined`.
 
-### `lonLatToWebMecator(__0)`
-
-###### Parameters
-
-* `undefined` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
 ### `mapToResourceMaskSvgPolygon(map)`
 
 ###### Parameters
@@ -1673,13 +1663,3 @@ Return angle alpha made at point A by points B and C
 ###### Returns
 
 `Array<Point>`.
-
-### `webMercatorToLonLat(__0)`
-
-###### Parameters
-
-* `undefined` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.

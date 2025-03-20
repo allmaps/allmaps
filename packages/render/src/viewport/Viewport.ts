@@ -12,7 +12,6 @@ import {
   bboxToSize,
   sizesToScale,
   bufferBboxByRatio,
-  webMercatorToLonLat,
   scaleSize,
   rotatePoints,
   translatePoints,
@@ -27,6 +26,7 @@ import {
   mergeOptions,
   convexHull
 } from '@allmaps/stdlib'
+import { webMercatorToLonLat } from '@allmaps/project'
 
 import type { WarpedMap } from '../maps/WarpedMap.js'
 
