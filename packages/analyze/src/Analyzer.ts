@@ -9,7 +9,8 @@ import {
   isRing,
   polygonSelfIntersectionPoints,
   arrayRepeated,
-  bboxToDiameter
+  bboxToDiameter,
+  isPoint
 } from '@allmaps/stdlib'
 import {
   GcpTransformer,
@@ -17,22 +18,63 @@ import {
   Polynomial,
   Transformation
 } from '@allmaps/transform'
-import { AnalysisItem, Distortions, Measures } from './shared/types'
+import {
+  AnalysisOptions,
+  AnalysisItem,
+  Analysis,
+  Distortions,
+  Measures
+} from './shared/types'
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { Point } from '@allmaps/types'
 
 const MAX_SHEAR = 0.1
+
+// Note: construction errors and failures to get info, warning or errors are always reported
+const defaultInfoCodes = ['maskequalsfullmask']
+const defaultWarningCodes = [
+  'gcpoutsidemask',
+  'maskpointoutsidefullmask'
+  // 'triangulationfoldsover'
+  // 'polynomialsheartoohigh'
+]
+const defaultErrorCodes = [
+  'constructingwarpedmapfailed',
+  'constructingtriangulatedwarpedmapfailed',
+  'gcpincompleteresource',
+  'gcpincompleteregeo',
+  // 'gcpamountlessthen2',
+  'gcpamountlessthen3',
+  'gcpresourcerepeatedpoint',
+  'gcpgeorepeatedpoint',
+  'masknotring',
+  'maskrepeatedpoint',
+  'maskselfintersection'
+]
+const defaultCodes = [
+  ...defaultInfoCodes,
+  ...defaultWarningCodes,
+  ...defaultErrorCodes
+]
 
 /**
  * Class for Analyzer.
  * This class describes how a georeferenced map is warped using a specific transformation.
- *
- * @param mapId - ID of the map
  */
-export class Analyzer<W extends WarpedMap> {
-  warpedMap: W
+export class Analyzer {
+  mapId?: string
 
-  protected infos?: AnalysisItem[]
-  protected warnings?: AnalysisItem[]
-  protected errors?: AnalysisItem[]
+  georeferencedMap: GeoreferencedMap
+  warpedMap?: WarpedMap
+
+  options: AnalysisOptions = { codes: defaultCodes }
+
+  protected info: AnalysisItem[] = []
+  protected warnings: AnalysisItem[] = []
+  protected errors: AnalysisItem[] = []
+
+  protected constructionErrors: AnalysisItem[] = []
 
   protected measures?: Measures
   protected distortions?: Distortions
@@ -40,323 +82,462 @@ export class Analyzer<W extends WarpedMap> {
   /**
    * Creates an instance of Analyzer.
    *
-   * @param warpedMap - A Warped Map
+   * @param georeferencedOrWarpedMap - A Georeferenced Map or a Warped Map
    */
-  constructor(warpedMap: W) {
-    this.warpedMap = warpedMap
-  }
-
-  /**
-   * Creates an instance of Analyzer from a Warped Map.
-   *
-   * @param warpedMap - A Warped Map
-   */
-  public static fromWarpedMap<W extends WarpedMap>(warpedMap: W): Analyzer<W> {
-    return new Analyzer(warpedMap)
-  }
-
-  /**
-   * Check if analysis has infos.
-   *
-   * @returns {boolean}
-   */
-  public hasInfos(): boolean {
-    if (!this.infos) {
-      this.getInfos()
+  constructor(georeferenceddMap: GeoreferencedMap, options?: AnalysisOptions)
+  constructor(warpedMap: WarpedMap, options?: AnalysisOptions)
+  constructor(
+    georeferencedOrWarpedMap: GeoreferencedMap | WarpedMap,
+    options?: AnalysisOptions
+  ) {
+    if (options !== undefined) {
+      this.options = options
     }
 
-    return this.infos!.length != 0
+    if (georeferencedOrWarpedMap instanceof WarpedMap) {
+      this.georeferencedMap = georeferencedOrWarpedMap.georeferencedMap
+      this.warpedMap = georeferencedOrWarpedMap
+    } else {
+      this.georeferencedMap = georeferencedOrWarpedMap
+    }
+
+    // Note: since we cannot await in a constructor,
+    // we can't compute a missing mapId here using generateChecksum()
+    // and hence it can be undefined in this entire package
+    this.mapId = this.georeferencedMap.id
+
+    if (
+      this.warpedMap == undefined ||
+      !(this.warpedMap instanceof TriangulatedWarpedMap)
+    ) {
+      try {
+        this.warpedMap = new TriangulatedWarpedMap(
+          this.mapId || '',
+          this.georeferencedMap
+        )
+      } catch (error) {
+        this.constructionErrors.push({
+          mapId: this.mapId,
+          code: 'constructingtriangulatedwarpedmapfailed',
+          message:
+            'Constructing a TriangulatedWarpedMap failed (possibly because triangulating the resourceMask failed).',
+          originalMessage: String(error)
+        })
+      }
+    }
+
+    if (this.warpedMap === undefined) {
+      try {
+        this.warpedMap = new WarpedMap(this.mapId || '', this.georeferencedMap)
+      } catch (error) {
+        this.constructionErrors.push({
+          mapId: this.mapId,
+          code: 'constructingwarpedmapfailed',
+          message: 'Constructing a WarpedMap failed.',
+          originalMessage: String(error)
+        })
+      }
+    }
   }
 
   /**
-   * Check if analysis has warnings.
+   * Analyse
    *
-   * @returns {boolean}
+   * Applying extra caution: wrapping the getters in a try catch
+   *
+   * @param options - Analysis options
+   * @returns Analysis with info, warnings and errors
    */
-  public hasWarnings(): boolean {
-    if (!this.warnings) {
-      this.getWarnings()
-    }
+  public analyse(options?: AnalysisOptions): Analysis {
+    let errors: AnalysisItem[] = []
+    let info: AnalysisItem[] = []
+    let warnings: AnalysisItem[] = []
 
-    return this.warnings!.length != 0
+    try {
+      errors = this.getErrors(options)
+    } catch (error) {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'errorsfailed',
+        message: 'Failed to get errors.',
+        originalMessage: String(error)
+      })
+    }
+    if (this.errors.length != 0) {
+      try {
+        info = this.getInfo(options)
+      } catch (error) {
+        this.errors.push({
+          mapId: this.mapId,
+          code: 'infofailed',
+          message: 'Failed to get info.',
+          originalMessage: String(error)
+        })
+      }
+      try {
+        warnings = this.getWarnings(options)
+      } catch (error) {
+        this.errors.push({
+          mapId: this.mapId,
+          code: 'warningsfailed',
+          message: 'Failed to get warnings.',
+          originalMessage: String(error)
+        })
+      }
+    }
+    return {
+      info,
+      warnings,
+      errors
+    }
   }
 
   /**
-   * Check if analysis has errors.
+   * Get analysis informations
    *
-   * @returns {boolean}
+   * @param options - Analysis options
+   * @returns Analysis items with info
    */
-  public hasErrors(): boolean {
-    if (!this.errors) {
-      this.getErrors()
-    }
+  public getInfo(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
 
-    return this.errors!.length != 0
-  }
-
-  /**
-   * Get analysis informations.
-   *
-   * @returns {AnalysisItem[]}
-   */
-  public getInfos(): AnalysisItem[] {
-    if (this.infos) {
-      return this.infos
-    }
-    this.infos = []
+    this.info = []
 
     // Mask equals full Mask
+    const code = 'maskequalsfullmask'
     if (
+      codes.includes(code) &&
+      this.warpedMap &&
       isEqualArray(
         this.warpedMap.resourceMask,
         this.warpedMap.resourceFullMask,
         isEqualPoint
       )
     ) {
-      this.infos.push({
-        mapId: this.warpedMap.mapId,
-        code: 'maskequalsfullmask',
-        text: 'The mask contains the full image.'
+      this.info.push({
+        mapId: this.mapId,
+        code,
+        message: 'The mask contains the full image.'
       })
     }
 
-    return this.infos
+    return this.info
   }
 
   /**
-   * Get zis warnings.
+   * Get analysis warnings
    *
-   * @returns {AnalysisItem[]}
+   * @param options - Analysis options
+   * @returns Analysis items with warning
    */
-  public getWarnings(): AnalysisItem[] {
-    if (this.warnings) {
-      return this.warnings
-    }
+  public getWarnings(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
+    let code: string
+
     this.warnings = []
 
-    // GCPs not incomplete
-    const gcpsUndefinedResource = []
-    for (const gcp of this.warpedMap.gcps) {
-      if (gcp.resource == undefined || gcp.geo == undefined) {
-        gcpsUndefinedResource.push(gcp)
-      }
-    }
-    gcpsUndefinedResource.forEach((gcp, index) => {
-      this.warnings!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpincompleteresource',
-        geoPoint: gcp.geo,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing resource coordinates.'
-      })
-    })
-    const gcpsUndefinedGeo = []
-    for (const gcp of this.warpedMap.gcps) {
-      if (gcp.resource == undefined || gcp.geo == undefined) {
-        gcpsUndefinedGeo.push(gcp)
-      }
-    }
-    gcpsUndefinedGeo.forEach((gcp, index) => {
-      this.warnings!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpincompletegeo',
-        resourcePoint: gcp.resource,
-        gcpIndex: index,
-        text: 'GCP ' + index + ' missing geo coordinates.'
-      })
-    })
-
     // GCPs not outside mask
-    const gcpsOutside = []
-    for (const gcp of this.warpedMap.gcps) {
-      if (classifyPoint(this.warpedMap.resourceMask, gcp.resource) == 1) {
-        gcpsOutside.push(gcp)
+    code = 'gcpoutsidemask'
+    if (codes.includes(code)) {
+      const gcpsOutside = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (
+          classifyPoint(this.georeferencedMap.resourceMask, gcp.resource) == 1
+        ) {
+          gcpsOutside.push(gcp)
+        }
       }
-    }
-    gcpsOutside.forEach((gcp, index) => {
-      this.warnings!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpoutsidemask',
-        resourcePoint: gcp.resource,
-        gcpIndex: index,
-        text:
-          'GCP ' +
-          index +
-          ' with resource coordinates [' +
-          gcp.resource +
-          '] outside mask.'
-      })
-    })
-
-    // Mask points not outside full mask
-    const resourceMaskOutsideFullMaskPoints = []
-    for (const resourcePoint of this.warpedMap.resourceMask) {
-      if (classifyPoint(this.warpedMap.resourceFullMask, resourcePoint) == 1) {
-        resourceMaskOutsideFullMaskPoints.push(resourcePoint)
-      }
-    }
-    resourceMaskOutsideFullMaskPoints.forEach(
-      (resourceMaskOutsideFullMaskPoint, index) => {
-        this.warnings!.push({
-          mapId: this.warpedMap.mapId,
-          code: 'maskpointoutsidefullmask',
-          resourcePoint: resourceMaskOutsideFullMaskPoint,
+      gcpsOutside.forEach((gcp, index) => {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: gcp.resource,
           gcpIndex: index,
-          text:
-            'Mask point ' +
+          message:
+            'GCP ' +
             index +
             ' with resource coordinates [' +
-            resourceMaskOutsideFullMaskPoint +
-            '] outside full mask.'
+            gcp.resource +
+            '] outside mask.'
         })
+      })
+    }
+
+    // Mask points not outside full mask
+    code = 'maskpointoutsidefullmask'
+    if (codes.includes(code) && this.warpedMap) {
+      const resourceMaskOutsideFullMaskPoints = []
+      for (const resourcePoint of this.warpedMap.resourceMask) {
+        if (
+          classifyPoint(this.warpedMap.resourceFullMask, resourcePoint) == 1
+        ) {
+          resourceMaskOutsideFullMaskPoints.push(resourcePoint)
+        }
       }
-    )
+      resourceMaskOutsideFullMaskPoints.forEach(
+        (resourceMaskOutsideFullMaskPoint, index) => {
+          this.warnings.push({
+            mapId: this.mapId,
+            code,
+            resourcePoint: resourceMaskOutsideFullMaskPoint,
+            gcpIndex: index,
+            message:
+              'Mask point ' +
+              index +
+              ' with resource coordinates [' +
+              resourceMaskOutsideFullMaskPoint +
+              '] outside full mask.'
+          })
+        }
+      )
+    }
 
     // Transformation folds over
-    // TODO: compute signDetJ only for this test instead of by default, e.g. by updating from existing distortions
-    if (this.warpedMap instanceof TriangulatedWarpedMap) {
-      const signDetJs =
-        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
-        )
-      if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
-        this.warnings.push({
-          mapId: this.warpedMap.mapId,
-          code: 'triangulationfoldsover',
-          text: 'The map folds over itself, for the selected transformation type.'
-        })
-      }
-    }
+    // TODO: set to compute signDetJ for this test (ideally by updating from existing distortions)
+    // TODO: add to readme when implemented
+    // code = 'triangulationfoldsover'
+    // if (
+    //   codes.includes(code) &&
+    //   this.warpedMap instanceof TriangulatedWarpedMap
+    // ) {
+    //   const signDetJs =
+    //     this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
+    //       (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
+    //     )
+    //   if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
+    //     this.warnings.push({
+    //       mapId: this.mapId,
+    //       code,
+    //       message: 'The map folds over itself, for the selected transformation type.'
+    //     })
+    //   }
+    // }
 
     // Polynomial shear not too high
-    if (!this.measures) {
-      this.getMeasures()
-    }
-    if (
-      this.measures!.polynomialShear![0] > MAX_SHEAR ||
-      this.measures!.polynomialShear![1] > MAX_SHEAR
-    ) {
-      this.warnings.push({
-        mapId: this.warpedMap.mapId,
-        code: 'polynomialsheartoohigh',
-        text:
-          'A polynomial transformation shows a shear higher then ' +
-          MAX_SHEAR +
-          '.'
-      })
+    code = 'polynomialsheartoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        (measures.polynomialShear[0] > MAX_SHEAR ||
+          measures.polynomialShear[1] > MAX_SHEAR)
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message:
+            'A polynomial transformation shows a shear higher then ' +
+            MAX_SHEAR +
+            '.'
+        })
+      }
     }
 
     return this.warnings
   }
 
   /**
-   * Get analysis errors.
+   * Get analysis errors
+   *
+   * @param options - Analysis options
+   * @returns Analysis items with errors
    */
-  public getErrors(): AnalysisItem[] {
-    if (this.errors) {
+  public getErrors(options?: AnalysisOptions): AnalysisItem[] {
+    options = options || this.options
+    const codes = options.codes
+    let code: string
+
+    this.errors = this.constructionErrors
+
+    // GCPs not incomplete
+    code = 'gcpincompleteresource'
+    if (codes.includes(code)) {
+      const gcpsIncompleteResource = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (gcp.resource == undefined || !isPoint(gcp.resource)) {
+          gcpsIncompleteResource.push(gcp)
+        }
+      }
+      gcpsIncompleteResource.forEach((gcp, index) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          geoPoint: gcp.geo,
+          gcpIndex: index,
+          message: 'GCP ' + index + ' missing resource coordinates.'
+        })
+      })
+    }
+    code = 'gcpincompletegeo'
+    if (codes.includes(code)) {
+      const gcpsIncompleteGeo = []
+      for (const gcp of this.georeferencedMap.gcps) {
+        if (gcp.geo == undefined || !isPoint(gcp.geo)) {
+          gcpsIncompleteGeo.push(gcp)
+        }
+      }
+      gcpsIncompleteGeo.forEach((gcp, index) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: gcp.resource,
+          gcpIndex: index,
+          message: 'GCP ' + index + ' missing geo coordinates.'
+        })
+      })
+    }
+    // Return if gcp incomplete, since other checks would fail then
+    const errorCodes = this.errors.map((i) => i.code)
+    if (
+      errorCodes.includes('gcpincompleteresource') ||
+      errorCodes.includes('gcpincompletegeo')
+    ) {
       return this.errors
     }
-    this.errors = []
 
-    // GCPs amount not to low
-    if (this.warpedMap.gcps.length < 3) {
+    // GCPs amount not less then 2
+    code = 'gcpamountlessthen2'
+    if (codes.includes(code) && this.georeferencedMap.gcps.length < 2) {
       this.errors.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpamounttoolow',
-        text:
-          'There are only ' +
-          this.warpedMap.gcps.length +
+        mapId: this.mapId,
+        code,
+        message:
+          'There are ' +
+          this.georeferencedMap.gcps.length +
+          ' GCPs, but a minimum of 2 are required (for a Helmert transform).'
+      })
+    }
+
+    // GCPs amount not less then 3
+    code = 'gcpamountlessthen3'
+    if (codes.includes(code) && this.georeferencedMap.gcps.length < 3) {
+      this.errors.push({
+        mapId: this.mapId,
+        code,
+        message:
+          'There are ' +
+          this.georeferencedMap.gcps.length +
           ' GCPs, but a minimum of 3 are required.'
       })
     }
 
     // GCPs no repeated points
-    const resourceRepeatedPoints = arrayRepeated(this.warpedMap.resourcePoints)
-    const geoRepeatedPoints = arrayRepeated(this.warpedMap.geoPoints)
-    resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
-      this.errors!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpresourcerepeatedpoint',
-        resourcePoint: resourceRepeatedPoint,
-        text:
-          'GCP resource coordinates [' +
-          resourceRepeatedPoint +
-          '] are repeated.'
+    code = 'gcpresourcerepeatedpoint'
+    if (codes.includes(code)) {
+      const resourceRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.gcps.map((gcp) => gcp.resource),
+        isEqualPoint
+      )
+      resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: resourceRepeatedPoint,
+          message:
+            'GCP resource coordinates [' +
+            resourceRepeatedPoint +
+            '] are repeated.'
+        })
       })
-    })
-    geoRepeatedPoints.forEach((geoRepeatedPoint) => {
-      this.errors!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'gcpgeorepeatedpoint',
-        geoPoint: geoRepeatedPoint,
-        text: 'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
-      })
-    })
-
-    // Mask valid as ring
-    if (!isRing(this.warpedMap.resourceMask)) {
-      this.errors.push({
-        mapId: this.warpedMap.mapId,
-        code: 'masknotring',
-        text: 'The mask is not a valid ring (an array of points).'
+    }
+    code = 'gcpgeorepeatedpoint'
+    if (codes.includes(code)) {
+      const geoRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.gcps.map((gcp) => gcp.geo),
+        isEqualPoint
+      )
+      geoRepeatedPoints.forEach((geoRepeatedPoint) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          geoPoint: geoRepeatedPoint,
+          message:
+            'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
+        })
       })
     }
 
-    // Mask no repeated points
-    const resourceMaskRepeatedPoints = arrayRepeated(
-      this.warpedMap.resourceMask
-    )
-    resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
-      this.errors!.push({
-        mapId: this.warpedMap.mapId,
-        code: 'maskrepeatedpoint',
-        resourcePoint: resourceMaskRepeatedPoint,
-        text:
-          'Mask resource coordinates [' +
-          resourceMaskRepeatedPoint +
-          '] are repeated.'
-      })
-    })
-
-    // Mask no self-intersection
-    const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([
-      this.warpedMap.resourceMask
-    ])
-    resourceMaskSelfIntersectionPoints.forEach(
-      (resourceMaskSelfIntersectionPoint) => {
-        this.errors!.push({
-          mapId: this.warpedMap.mapId,
-          code: 'maskselfintersection',
-          resourcePoint: resourceMaskSelfIntersectionPoint,
-          text:
-            'The mask self-intersects at resource coordinates [' +
-            resourceMaskSelfIntersectionPoint +
-            '].'
+    // Mask valid as ring
+    code = 'masknotring'
+    if (codes.includes(code)) {
+      const maskIsRing = isRing(this.georeferencedMap.resourceMask)
+      if (!maskIsRing) {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          message: 'The mask is not a valid ring (an array of points).'
         })
       }
-    )
+    }
+    // Return if mask not ring, since other checks would fail then
+    if (this.errors.map((i) => i.code).includes(code)) {
+      return this.errors
+    }
+
+    // Mask no repeated points
+    code = 'maskrepeatedpoint'
+    if (codes.includes(code)) {
+      const resourceMaskRepeatedPoints = arrayRepeated(
+        this.georeferencedMap.resourceMask,
+        isEqualPoint
+      )
+      resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: resourceMaskRepeatedPoint,
+          message:
+            'Mask resource coordinates [' +
+            resourceMaskRepeatedPoint +
+            '] are repeated.'
+        })
+      })
+    }
+
+    // Mask no self-intersection
+    code = 'maskselfintersection'
+    if (codes.includes(code)) {
+      const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([
+        this.georeferencedMap.resourceMask
+      ])
+      resourceMaskSelfIntersectionPoints.forEach(
+        (resourceMaskSelfIntersectionPoint) => {
+          this.errors.push({
+            mapId: this.mapId,
+            code,
+            resourcePoint: resourceMaskSelfIntersectionPoint,
+            message:
+              'The mask self-intersects at resource coordinates [' +
+              resourceMaskSelfIntersectionPoint +
+              '].'
+          })
+        }
+      )
+    }
 
     return this.errors
   }
 
   /**
-   * Get analysis measures.
+   * Get analysis measures
+   *
+   * @returns Analysis measures
    */
-  public getMeasures(): Measures {
-    if (this.measures) {
-      return this.measures
+  public getMeasures(): Measures | undefined {
+    if (!this.warpedMap) {
+      return
     }
 
-    const measures: Partial<Measures> = {
-      mapId: this.warpedMap.mapId
-    }
+    const warpedMap = this.warpedMap
 
     // Polynomial
     const projectedPolynomialTransformer = getPropertyFromCacheOrComputation(
       this.warpedMap.projectedTransformerByTransformationType,
       'polynomial',
       () =>
-        new GcpTransformer(this.warpedMap.projectedGcps, 'polynomial', {
+        new GcpTransformer(warpedMap.projectedGcps, 'polynomial', {
           differentHandedness: true
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
@@ -366,21 +547,24 @@ export class Analyzer<W extends WarpedMap> {
       projectedPolynomialTransformer.createForwardTransformation()
     }
     const forwardPolynomialTransformation =
+      // We assume rmse, scale, shear exist since this is a first order polynomial transformation
       projectedPolynomialTransformer.forwardTransformation as Polynomial
-    measures.polynomialRmse = forwardPolynomialTransformation.rmse
-    measures.polynomialParameters =
+    const polynomialRmse = forwardPolynomialTransformation.rmse
+    const polynomialParameters =
       forwardPolynomialTransformation.polynomialParameters
-    measures.polynomialScale = forwardPolynomialTransformation.scale
-    measures.polynomialRotation = forwardPolynomialTransformation.rotation
-    measures.polynomialShear = forwardPolynomialTransformation.shear
-    measures.polynomialTranslation = forwardPolynomialTransformation.translation
+    const polynomialScale = forwardPolynomialTransformation.scale as Point
+    const polynomialRotation =
+      forwardPolynomialTransformation.rotation as number
+    const polynomialShear = forwardPolynomialTransformation.shear as Point
+    const polynomialTranslation =
+      forwardPolynomialTransformation.translation as Point
 
     // Helmert
     const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
       this.warpedMap.projectedTransformerByTransformationType,
       'helmert',
       () =>
-        new GcpTransformer(this.warpedMap.projectedGcps, 'helmert', {
+        new GcpTransformer(warpedMap.projectedGcps, 'helmert', {
           differentHandedness: true
         }) // TODO: load default options? Or differentHandedness becomes default?
     )
@@ -392,11 +576,11 @@ export class Analyzer<W extends WarpedMap> {
     const forwardHelmertTransformation =
       projectedHelmertTransformer.forwardTransformation as Helmert
 
-    measures.helmertRmse = forwardHelmertTransformation.rmse
-    measures.helmertParameters = forwardHelmertTransformation.helmertParameters
-    measures.helmertScale = forwardHelmertTransformation.scale
-    measures.helmertRotation = forwardHelmertTransformation.rotation
-    measures.helmertTranslation = forwardHelmertTransformation.translation
+    const helmertRmse = forwardHelmertTransformation.rmse
+    const helmertParameters = forwardHelmertTransformation.helmertParameters
+    const helmertScale = forwardHelmertTransformation.scale
+    const helmertRotation = forwardHelmertTransformation.rotation
+    const helmertTranslation = forwardHelmertTransformation.translation
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
@@ -406,22 +590,39 @@ export class Analyzer<W extends WarpedMap> {
     }
     const forwardTransformation =
       projectedTransformer.forwardTransformation as Transformation
-    measures.rmse = forwardTransformation.rmse
-    measures.destinationErrors = forwardTransformation.errors
+    const rmse = forwardTransformation.rmse
+    const destinationErrors = forwardTransformation.errors
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    measures.resourceErrors = forwardTransformation.errors.map(
+    const resourceErrors = forwardTransformation.errors.map(
       (error) => error / forwardHelmertTransformation.scale
     )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
-    measures.resourceRelativeErrors = forwardTransformation.errors.map(
+    const resourceRelativeErrors = forwardTransformation.errors.map(
       (error) =>
         error /
         (forwardHelmertTransformation.scale *
-          bboxToDiameter(this.warpedMap.resourceMaskBbox))
+          bboxToDiameter(warpedMap.resourceMaskBbox))
     )
 
-    this.measures = measures as Measures
+    this.measures = {
+      mapId: this.mapId,
+      polynomialRmse,
+      polynomialParameters,
+      polynomialScale,
+      polynomialRotation,
+      polynomialShear,
+      polynomialTranslation,
+      helmertRmse,
+      helmertParameters,
+      helmertScale,
+      helmertRotation,
+      helmertTranslation,
+      rmse,
+      destinationErrors,
+      resourceErrors,
+      resourceRelativeErrors
+    }
 
     return this.measures
   }
@@ -429,22 +630,18 @@ export class Analyzer<W extends WarpedMap> {
   /**
    * Get distortions.
    *
-   * @returns {Distortions}
+   * @returns Analysis distortions
    */
-  public getDistortions(): Distortions {
-    if (this.distortions) {
-      return this.distortions
-    }
-
+  public getDistortions(): Distortions | undefined {
     if (
       !(this.warpedMap instanceof TriangulatedWarpedMap) ||
       !this.warpedMap.projectedGcpTriangulation
     ) {
-      throw new Error("Distortions can't be analyzed")
+      return
     }
 
     const distortions: Partial<Distortions> = {
-      mapId: this.warpedMap.mapId
+      mapId: this.mapId
     }
 
     const distortionMeasures = Array.from(

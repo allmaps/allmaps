@@ -24,10 +24,9 @@ import type { Gcp, Point, Ring, TypedPolygon } from '@allmaps/types'
 const DEFAULT_RESOURCE_RESOLUTION = undefined // TODO: allow to set via options
 const DEFAULT_DISTORTION_MEASURES: DistortionMeasure[] = [
   'log2sigma',
-  'twoOmega',
-  'signDetJ'
+  'twoOmega'
 ]
-// TODO: allow to set via options, and set signDetJ only when computing anaysls
+// TODO: allow to set via options
 
 const MAX_TRIANGULATE_ERROR_COUNT = 10
 
@@ -264,54 +263,33 @@ export class TriangulatedWarpedMap extends WarpedMap {
       this.transformationType,
       this.resourceResolution,
       () => {
-        try {
-          // Triangulate resource mask
-          const {
-            uniquePoints,
-            uniquePointIndexTriangles,
-            uniquePointIndexInterpolatedPolygon
-          } = triangulateToUnique(
-            [this.resourceMask],
-            this.resourceResolution,
-            { steinerPoints: this.gcps.map((gcp) => gcp.resource) }
+        // Triangulate resource mask
+        const {
+          uniquePoints,
+          uniquePointIndexTriangles,
+          uniquePointIndexInterpolatedPolygon
+        } = triangulateToUnique([this.resourceMask], this.resourceResolution, {
+          steinerPoints: this.gcps.map((gcp) => gcp.resource)
+        })
+
+        // Extend Triangulation to ProjectedGcpTriangulation
+        // By inclusing projectedGeo and distortions
+        const resourceResolution = this.resourceResolution
+        const resourceUniquePoints = uniquePoints as Point[]
+        const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
+          this.resourceToResourceProjectedGeoDistortions(
+            resourcePoint,
+            this.projectedTransformer,
+            this.getReferenceScale()
           )
+        )
+        const uniquePointIndices = uniquePointIndexTriangles.flat() as number[]
 
-          // Extend Triangulation to ProjectedGcpTriangulation
-          // By inclusing projectedGeo and distortions
-          const resourceResolution = this.resourceResolution
-          const resourceUniquePoints = uniquePoints as Point[]
-          const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
-            this.resourceToResourceProjectedGeoDistortions(
-              resourcePoint,
-              this.projectedTransformer,
-              this.getReferenceScale()
-            )
-          )
-          const uniquePointIndices =
-            uniquePointIndexTriangles.flat() as number[]
-
-          return {
-            resourceResolution,
-            gcpUniquePoints,
-            uniquePointIndices,
-            uniquePointIndexInterpolatedPolygon
-          }
-        } catch (err) {
-          // TODO: check if this try/catch can be removed
-          // and if not use conformPolygon() in @allmaps/annotation of add a check for self-intersection
-          this.triangulateErrorCount++
-
-          if (this.triangulateErrorCount <= MAX_TRIANGULATE_ERROR_COUNT) {
-            // TODO: use function to get Allmaps Editor URL
-            console.error(
-              `Error computing triangulation for map ${this.mapId}.`,
-              `Fix this map with Allmaps Editor: https://editor.allmaps.org/#/collection?url=${this.parsedImage?.uri}/info.json`
-            )
-
-            if (this.triangulateErrorCount === 1) {
-              console.error(err)
-            }
-          }
+        return {
+          resourceResolution,
+          gcpUniquePoints,
+          uniquePointIndices,
+          uniquePointIndexInterpolatedPolygon
         }
       }
     )

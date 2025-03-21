@@ -12,6 +12,7 @@ export class Polynomial extends Transformation {
   order: number
   pointCountMinimum: number
 
+  // These parameters are only guaranteed to exist for a first order polynomial transformation
   scale?: Point
   rotation?: number
   shear?: Point
