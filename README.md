@@ -10,13 +10,12 @@
 
 ## Contents
 
-Allmaps is an open source project and consists of multiple apps and packages, all written in TypeScript and contained by this monorepo.
+Allmaps is an open source project and consists of multiple apps, packages and workers, all written in TypeScript and contained by this monorepo.
 
 Apps:
 
 - [Allmaps Editor](apps/editor)
 - [Allmaps Viewer](apps/viewer)
-- [Allmaps Tile Server](apps/tileserver)
 - [Allmaps Latest](apps/latest)
 - [Allmaps CLI](apps/cli)
 - [Allmaps Explore](apps/explore)
@@ -41,11 +40,23 @@ Packages:
 - [@allmaps/types](packages/types)
 - [@allmaps/ui](packages/ui)
 
-To see how these apps and packages are related, check out the [dependency graph](https://observablehq.com/@allmaps/javascript-dependencies).
+Workers:
+
+- [Allmaps Tile Server](workers/tileserver)
+- [Allmaps Preview Server](workers/preview)
+
+To see how these components are related, check out the [dependency graph](https://observablehq.com/@allmaps/javascript-dependencies).
 
 ## Contributing
 
 We're welcoming contributions! You can read more about the many ways you can contribute [here](./CONTRIBUTING.md).
+
+## License
+
+- **Apps**: all apps are licensed under the [GPL-3.0](https://opensource.org/licenses/GPL-3.0) license, except the homepage and the CLI, which are licensed under the [MIT](https://opensource.org/licenses/MIT) license.
+- **Packages**: all packages are licensed under the [MIT](https://opensource.org/licenses/MIT) license.
+- **Workers**: all workers are licensed under the [MIT](https://opensource.org/licenses/MIT) license.
+- **Data**: georeference data published through the Allmaps project is licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/) license
 
 ## Installation
 

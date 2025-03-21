@@ -331,6 +331,10 @@ For example:
 curl https://collections.leventhalmap.org/search/commonwealth:wd376720z/manifest | allmaps iiif parse
 ```
 
+## License
+
+MIT
+
 ## API
 
 ### `new Canvas(parsedCanvas)`

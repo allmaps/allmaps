@@ -48,7 +48,7 @@
     "test": "NODE_ENV=test pnpm run build && mocha",
     "documentation": "remark . --output --use remark-api"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@allmaps/render": "^1.0.0-beta.70",
     "@allmaps/stdlib": "^1.0.0-beta.33",

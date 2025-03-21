@@ -40,7 +40,7 @@
     "georeference",
     "map"
   ],
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.32",
     "@allmaps/id": "^1.0.0-beta.32",

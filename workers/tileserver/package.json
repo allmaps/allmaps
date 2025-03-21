@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "apps/tileserver"
+    "directory": "workers/tileserver"
   },
   "scripts": {
     "deploy": "wrangler deploy",
@@ -24,7 +24,7 @@
     "format": "prettier --write src test",
     "preversion": "pnpm run types && pnpm run lint && pnpm test"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@allmaps/annotation": "^1.0.0-beta.32",
     "@allmaps/id": "^1.0.0-beta.32",
@@ -49,6 +49,6 @@
     "typescript": "^5.7.0",
     "upng-js": "^2.1.0",
     "vitest": "1.3.0",
-    "wrangler": "^3.57.2"
+    "wrangler": "^4.0.0"
   }
 }

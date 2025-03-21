@@ -14,7 +14,7 @@ This module is mainly used in the Allmaps pipeline by the following packages:
 * [Allmaps plugin for MapLibre](../maplibre/)
 * [Allmaps plugin for OpenLayers](../openlayers/)
 
-It is also used in the [Allmaps Preview](../../apps/preview/) app.
+It is also used in the [Allmaps Preview](../../worker/preview/) worker.
 
 ## How it works
 
@@ -228,6 +228,10 @@ In this package the following naming conventions are used:
 * `geo...` indicates properties described in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
 * `projectedGeo...` indicates properties described in projected geospatial coordinates (following a CRS, by default 'EPSG:3857' WebMercator)
 * `tile...` indicates properties described IIIF tile coordinates
+
+## License
+
+MIT
 
 ## API
 

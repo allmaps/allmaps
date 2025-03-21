@@ -42,7 +42,7 @@
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.32",
     "@allmaps/iiif-parser": "^1.0.0-beta.42",

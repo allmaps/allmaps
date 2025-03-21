@@ -51,6 +51,10 @@ For example:
 echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
 ```
 
+## License
+
+MIT
+
 ## API
 
 ### `generateChecksum(obj, length)`

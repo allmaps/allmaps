@@ -33,7 +33,7 @@
     "test": "NODE_ENV=test pnpm run build && mocha",
     "types": "tsc --noEmit"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "^1.0.0-beta.32",
     "zod": "^3.22.4",

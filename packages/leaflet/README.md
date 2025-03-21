@@ -130,6 +130,10 @@ In Allmaps there are multiple classes describing maps, one for each phase a map 
 
 All these map phases originate from the same Georeference Annotation have the same unique `mapId` property. This string value is used thoughout Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a WarpedMapLayer, so you can use it later to call functions on a specific map.
 
+## License
+
+MIT
+
 ## API
 
 ### `LeafletWarpedMapLayerOptions`

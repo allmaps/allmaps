@@ -57,6 +57,10 @@ const triangles = triangulate(polygon, distance)
 // ]
 ```
 
+## License
+
+MIT
+
 ## API
 
 ### `TriangluationOptions`

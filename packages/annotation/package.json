@@ -37,7 +37,7 @@
     "documentation": "remark . --output --use remark-api",
     "examples": "cp test/input/map.parse-generate.json examples/map.example.json && cp test/input/annotation.parse-generate.json examples/annotation.example.json"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

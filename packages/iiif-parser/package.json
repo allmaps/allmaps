@@ -36,7 +36,7 @@
     "documentation": "remark . --output --use remark-api",
     "format": "prettier --write src test"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@allmaps/types": "^1.0.0-beta.17",
     "@types/eslint": "^8.56.12",
