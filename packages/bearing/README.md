@@ -15,6 +15,10 @@ const bearing = computeGeoreferencedMapBearing(map[0])
 console.log(bearing)
 ```
 
+## License
+
+MIT
+
 ## API
 
 ### `computeGeoreferencedMapBearing(map)`

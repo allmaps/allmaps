@@ -2,6 +2,10 @@
 
 Allmaps TypeScript types
 
+## License
+
+MIT
+
 ## API
 
 ### `Bbox`

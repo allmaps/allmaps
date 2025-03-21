@@ -43,7 +43,7 @@
     "test": "NODE_ENV=test pnpm run build && mocha",
     "documentation": "remark . --output --use remark-api"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

@@ -35,7 +35,7 @@
     "format": "prettier --write src test",
     "documentation": "remark . --output --use remark-api"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@maplibre/maplibre-gl-style-spec": "^19.3.1",
     "@types/eslint": "^8.56.0",

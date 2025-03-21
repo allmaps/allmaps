@@ -2,6 +2,10 @@
 
 [Protomaps](https://protomaps.com/) basemap for MapLibre
 
+## License
+
+MIT
+
 ## API
 
 ### `addTerrain(map, maplibregl, tiles)`

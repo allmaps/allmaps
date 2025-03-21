@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/homepage",
-  "description": "Allmaps Documentation",
+  "description": "Allmaps Homepage",
   "version": "1.0.0-beta.20",
   "private": true,
   "contributors": [
@@ -24,8 +24,10 @@
   "homepage": "https://allmaps.org",
   "keywords": [
     "allmaps",
-    "documenation"
+    "documenation",
+    "homepage"
   ],
+  "license": "MIT",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",

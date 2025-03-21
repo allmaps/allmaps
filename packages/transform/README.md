@@ -2,7 +2,7 @@
 
 This module serves to **transform Points, LineStrings, Polygons** and other spatial features from a cartesian `(x, y)` source plane to a destination plane. It does this **using a set of Control Points**, who's coordinates are known in both planes, and a specific transformation algorithm.
 
-It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from Control Points in the annotation and transforms Points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
+It is used in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../workers/tileserver/), two packages where we produce a georeferenced image by triangulating a IIIF image and drawing these triangles on a map in a specific new location, with the triangle's new vertex location computed by the transformer of this package. The transformer is constructed from Control Points in the annotation and transforms Points from the resource coordinate space of a IIIF Resource to the geo coordinate space of an interactive map.
 
 Care was taken to make this module **usable and useful outside of the Allmaps context** as well! Feel free to incorporate it in your project.
 
@@ -514,6 +514,10 @@ Using a transformer (with 10 points) to transform 1 point
 See [`./bench/index.js`](`./bench/index.js`).
 
 The benchmark can be run with `pnpm run bench`.
+
+## License
+
+MIT
 
 ## API
 

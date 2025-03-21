@@ -2,6 +2,10 @@
 
 Allmaps Standard Library
 
+## License
+
+MIT
+
 ## API
 
 ### `arrayRepeated(array, isEqualObject)`
