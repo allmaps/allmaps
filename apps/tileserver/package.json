@@ -49,6 +49,6 @@
     "typescript": "^5.7.0",
     "upng-js": "^2.1.0",
     "vitest": "1.3.0",
-    "wrangler": "^3.57.2"
+    "wrangler": "^4.0.0"
   }
 }
