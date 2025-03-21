@@ -2,6 +2,10 @@
 
 Tailwind CSS theme for Allmaps.
 
+## License
+
+MIT
+
 ## API
 
 ### `Shades`

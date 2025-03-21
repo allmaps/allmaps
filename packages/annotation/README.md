@@ -37,6 +37,10 @@ Browser:
 </script>
 ```
 
+## License
+
+MIT
+
 ## API
 
 ### `Annotation`

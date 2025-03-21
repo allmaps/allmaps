@@ -444,3 +444,7 @@ curl "https://annotations.allmaps.org/maps/096f57b5ff35b3eb" | \
 
 gdal2tiles.py --xyz 096f57b5ff35b3eb.vrt 096f57b5ff35b3eb
 ```
+
+## License
+
+MIT

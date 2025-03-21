@@ -40,7 +40,7 @@
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@allmaps/stdlib": "^1.0.0-beta.33",
     "@allmaps/types": "^1.0.0-beta.17",

@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "apps/preview"
+    "directory": "workers/preview"
   },
   "scripts": {
     "deploy": "wrangler deploy",
@@ -24,7 +24,7 @@
     "format": "prettier --write src test",
     "preversion": "pnpm run types && pnpm run lint && pnpm test"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@allmaps/render": "^1.0.0-beta.70",
     "@allmaps/stdlib": "^1.0.0-beta.33",

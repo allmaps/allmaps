@@ -65,7 +65,7 @@
     "rbush": "^4.0.0",
     "robust-point-in-polygon": "^1.0.3"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@types/lodash-es": "^4.17.6",
