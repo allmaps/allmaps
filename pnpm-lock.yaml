@@ -932,8 +932,8 @@ importers:
   packages/basemap:
     dependencies:
       '@protomaps/basemaps':
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.0.1
+        version: 5.0.1
       maplibre-contour:
         specifier: ^0.1.0
         version: 0.1.0
@@ -4473,8 +4473,8 @@ packages:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
     dev: false
 
-  /@protomaps/basemaps@5.0.0:
-    resolution: {integrity: sha512-lp+2ktb9gC9jZ/2L2AKvuQt36MNV1lJPOxDHA3IgD09roloxgp6QwXcMyE36ijGKMuKUiYKnmUuT9ouVhNgdLA==}
+  /@protomaps/basemaps@5.0.1:
+    resolution: {integrity: sha512-oLyqC+72bqliRllAv83VoA6dEMUn++zuC5egmMhXgxSo3ogFPVeXkr4GWlGmCpWp+nMGSCtKdN/y23cKrl2y6A==}
     dev: false
 
   /@resvg/resvg-wasm@2.6.2:
