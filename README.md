@@ -57,6 +57,7 @@ We're welcoming contributions! You can read more about the many ways you can con
 - **Packages**: all packages are licensed under the [MIT](https://opensource.org/licenses/MIT) license.
 - **Workers**: all workers are licensed under the [MIT](https://opensource.org/licenses/MIT) license.
 - **Data**: georeference data published through the Allmaps project is licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/) license
+- **Base map**: [ODbL](https://opendatacommons.org/licenses/odbl/), © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors. See Protomap's [licensing and attribution guidelines](https://github.com/protomaps/basemaps?tab=readme-ov-file#licensing-and-attribution-guidelines) for more details.
 
 ## Installation
 
