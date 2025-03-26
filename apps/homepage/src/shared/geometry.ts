@@ -19,12 +19,9 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
   if (map.gcps.length >= 3) {
     if (map.resourceMask.length >= 3) {
       try {
-        const transformer = new GcpTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
+        const transformer = GcpTransformer.fromGeoreferencedMap(map)
 
-        let polygon = transformer.transformForward([map.resourceMask])
+        let polygon = transformer.transformToGeo([map.resourceMask])
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of

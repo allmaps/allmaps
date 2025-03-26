@@ -133,10 +133,7 @@
     const georeferencedMap = mapWithImageInfo.map
     const imageInfo = mapWithImageInfo.imageInfo
 
-    transformer = new GcpTransformer(
-      georeferencedMap.gcps,
-      georeferencedMap.transformation?.type
-    )
+    transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
     const options = new IIIFInfo(imageInfo).getTileSourceOptions()
     if (options) {

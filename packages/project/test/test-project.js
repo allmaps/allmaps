@@ -5,13 +5,12 @@ import { expectToBeCloseToArrayArray } from '../../stdlib/test/helper-functions.
 import { GcpTransformer } from '../../transform/dist/index.js'
 import { ProjectedGcpTransformer } from '../dist/index.js'
 
-import { gcps6, gcps6nad } from './input/gcps-test.js'
+import { gcps6 } from './input/gcps-test.js'
 
-const epsg4269 = {
-  name: 'EPSG:4269',
-  definition:
-    '+title=NAD83 (long/lat) +proj=longlat +a=6378137.0 +b=6356752.31414036 +ellps=GRS80 +datum=NAD83 +units=degrees'
-}
+const epsg31370 =
+  '+proj=lcc +lat_0=90 +lon_0=4.36748666666667 +lat_1=51.1666672333333 +lat_2=49.8333339 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs'
+const epsg28992 =
+  '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.4171,50.3319,465.5524,1.9342,-1.6677,9.1019,4.0725 +units=m +no_defs +type=crs'
 
 describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and projection', async () => {
   const transformerOptions = {
@@ -85,7 +84,7 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
     maxDepth: 1
   }
   const projectedTransformer = new ProjectedGcpTransformer(
-    gcps6nad,
+    gcps6,
     'thinPlateSpline',
     transformerOptions
   )
@@ -98,17 +97,17 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
     [622, 941]
   ]
   const projectedGeoLineString = [
-    [-9026177.672071297, 2891300.5329870014],
-    [-9373198.174393559, 2654148.626758824],
-    [-9662850.753461177, 2421514.565058184],
-    [-9323574.366573505, 3126157.1118264655],
-    [-8894441.863840025, 3865199.098714333],
-    [-9011249.09650844, 3203250.985397358],
-    [-9140112.157890854, 2558728.807026262],
-    [-9529235.163058229, 3035139.8385587526],
-    [-9963856.508100005, 3509362.762248845],
-    [-10279457.661673792, 3487086.428862622],
-    [-10573741.366662772, 3465181.0312209423]
+    [498246.8195647142, 6789061.316027705],
+    [496595.9732655353, 6787546.801212325],
+    [494783.7898554361, 6785995.114473057],
+    [496391.8586632488, 6790623.562354985],
+    [498497.64212101337, 6795403.988950945],
+    [498135.8154413349, 6791100.393518668],
+    [498076.9264938777, 6786883.571136022],
+    [495239.5461210053, 6790036.9871731205],
+    [492300.2095900435, 6793167.011607833],
+    [489770.9992948517, 6793018.672759057],
+    [487201.94796965295, 6792860.379165613]
   ]
 
   it(`should transform the lineString to webmercator and add some midpoints`, () => {
@@ -119,14 +118,14 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:4269 internal projection and default EPSG:3857 projection', async () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and default EPSG:3857 projection', async () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
-    internalProjection: epsg4269
+    internalProjection: epsg31370
   }
   const projectedTransformer = new ProjectedGcpTransformer(
-    gcps6nad,
+    gcps6,
     'thinPlateSpline',
     transformerOptions
   )
@@ -139,20 +138,21 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4269 in
     [622, 941]
   ]
   const projectedGeoLineString = [
-    [-9026177.67207128, 2891300.5329870014],
-    [-9373198.174393559, 2651935.190468196],
-    [-9662850.75346119, 2421514.5650581755],
-    [-9323574.366573494, 3122803.2380395485],
-    [-8894441.863839984, 3865199.0987143135],
-    [-9011249.096508412, 3199299.664478264],
-    [-9140112.157890843, 2558728.807026257],
-    [-9529235.163058225, 3030702.536815768],
-    [-9963856.508100009, 3509362.762248825],
-    [-10279457.661673812, 3487169.5021216697],
-    [-10573741.36666281, 3465181.031220897]
+    [498247.196090505, 6789061.7676701555],
+    [496596.0857961293, 6787546.818863111],
+    [494783.8626652385, 6785995.157771795],
+    [496392.4627162781, 6790624.950878147],
+    [498501.57678734255, 6795410.032138047],
+    [498137.15972611686, 6791102.130838948],
+    [498076.85849569837, 6786883.389086489],
+    [495239.9136289843, 6790037.973029668],
+    [492298.9972965987, 6793169.702451241],
+    [489767.88734149706, 6793019.906716891],
+    [487196.5540720398, 6792859.377809678]
   ]
+  // Note: all points are different, not just the midpoints
 
-  it(`should transform the lineString to webmercator, via an internal EPSG:4269 projection which results in other midpoints`, () => {
+  it(`should transform the lineString to webmercator, via an internal EPSG:31370 projection which results in other points`, () => {
     expectToBeCloseToArrayArray(
       projectedTransformer.transformToGeo(resourceLineString),
       projectedGeoLineString
@@ -160,15 +160,15 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4269 in
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:4269 internal projection and EPSG:4269 projection', async () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:31370 projection', async () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
-    internalProjection: epsg4269,
-    projection: epsg4269
+    internalProjection: epsg31370,
+    projection: epsg31370
   }
   const projectedTransformer = new ProjectedGcpTransformer(
-    gcps6nad,
+    gcps6,
     'thinPlateSpline',
     transformerOptions
   )
@@ -181,23 +181,143 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4269 in
     [622, 941]
   ]
   const projectedGeoLineString = [
-    [-81.0835336000001, 25.126583099999987],
-    [-84.20087181138936, 23.164590032768515],
-    [-86.80286520000027, 21.248334399999994],
-    [-83.75509356117973, 26.99464907818738],
-    [-79.90013070000043, 32.772901599999905],
-    [-80.94942792401763, 27.60528401420956],
-    [-82.10702450000015, 22.392612600000007],
-    [-85.60257592944397, 26.255034795069125],
-    [-89.50684590000033, 30.045212099999933],
-    [-92.34193929941138, 29.872485116151132],
-    [-94.98553480000086, 29.701056499999883]
+    [157364.72155813803, 292213.3880919358],
+    [156345.5951194615, 291278.16064894106],
+    [155226.52356937024, 290320.2264339132],
+    [156217.41595393256, 293175.2561051091],
+    [157516.11682170592, 296124.98325977474],
+    [157294.9165920899, 293470.7466456862],
+    [157261.3838685806, 290870.3819669662],
+    [155505.73158458815, 292812.6936025433],
+    [153687.2076241993, 294740.744872259],
+    [152123.9340341536, 294647.5555558782],
+    [150535.76008321813, 294548.22782318294]
   ]
 
-  it(`should transform the lineString to EPSG:4269 projection, and add some midpoints`, () => {
+  it(`should transform the lineString to EPSG:31370 projection, and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
       projectedTransformer.transformToGeo(resourceLineString),
       projectedGeoLineString
+    )
+  })
+})
+
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:28992 projection', async () => {
+  const transformerOptions = {
+    minOffsetRatio: 0.001,
+    maxDepth: 1,
+    internalProjection: epsg31370,
+    projection: epsg28992
+  }
+  const projectedTransformer = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const resourceLineString = [
+    [3655, 2212],
+    [2325, 3134],
+    [3972, 325],
+    [3451, 2876],
+    [2067, 920],
+    [622, 941]
+  ]
+  const projectedGeoLineString = [
+    [92171.96319801327, 439250.7392195241],
+    [91140.1318550074, 438330.2059945731],
+    [90008.06902330121, 437388.3781427277],
+    [91038.64166624477, 440228.31014306704],
+    [92378.19922071013, 443158.54244443506],
+    [92119.83597131, 440508.5490631829],
+    [92049.81893950628, 437909.7404415105],
+    [90322.16486404435, 439875.89373726887],
+    [88531.49536626287, 441828.6782593381],
+    [86967.57638718556, 441757.502798549],
+    [85378.67808803722, 441680.55210508476]
+  ]
+
+  it(`should transform the lineString to EPSG:31370 projection, and add some midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer.transformToGeo(resourceLineString),
+      projectedGeoLineString
+    )
+  })
+})
+
+describe('Allow to change a projection of a transformer', async () => {
+  const projectedTransformer4326 = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    {
+      minOffsetRatio: 0.01,
+      maxDepth: 1,
+      internalProjection: 'EPSG:3857',
+      projection: 'EPSG:4326'
+    }
+  )
+  const projectedTransformer31370 = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    {
+      minOffsetRatio: 0.01,
+      maxDepth: 1,
+      internalProjection: 'EPSG:3857',
+      projection: epsg31370
+    }
+  )
+  const projectedTransformer31370setTo4326 =
+    projectedTransformer31370.setProjection('EPSG:4326')
+
+  const resourceLineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+
+  it(`should give the same result as a transformer that was given that projection on construction`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer4326.transformToGeo(resourceLineString),
+      projectedTransformer31370setTo4326.transformToGeo(resourceLineString)
+    )
+  })
+})
+
+describe('Allow to modify the requested projection in a transform function', async () => {
+  const projectedTransformer4326 = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    {
+      minOffsetRatio: 0.01,
+      maxDepth: 1,
+      internalProjection: 'EPSG:3857',
+      projection: 'EPSG:4326'
+    }
+  )
+  const projectedTransformer31370 = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    {
+      minOffsetRatio: 0.01,
+      maxDepth: 1,
+      internalProjection: 'EPSG:3857',
+      projection: epsg31370
+    }
+  )
+
+  const resourceLineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+
+  it(`should give the same result as a transformer that was given that projection on construction`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer4326.transformToGeo(resourceLineString),
+      projectedTransformer31370.transformToGeo(resourceLineString, {
+        projection: 'EPSG:4326'
+      })
     )
   })
 })

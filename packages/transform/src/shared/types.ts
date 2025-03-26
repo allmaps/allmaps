@@ -78,6 +78,10 @@ export type GeneralGcpTransformOptions = {
   destinationIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
+  preForward: ProjectionFunction
+  postForward: ProjectionFunction
+  preBackward: ProjectionFunction
+  postBackward: ProjectionFunction
 } & MultiGeometryOptions
 
 export type GcpTransformOptions = {
@@ -88,21 +92,17 @@ export type GcpTransformOptions = {
   geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
+  postToGeo: ProjectionFunction
+  preToResource: ProjectionFunction
 } & MultiGeometryOptions
 
 export type GeneralGcpTransformerOptions = {
   differentHandedness: boolean
-  preForward: ProjectionFunction
-  postForward: ProjectionFunction
-  preBackward: ProjectionFunction
-  postBackward: ProjectionFunction
 } & GeneralGcpTransformOptions
 
 export type GcpTransformerOptions = {
   differentHandedness: boolean
-  postToGeo: ProjectionFunction
-  preToResource: ProjectionFunction
-} & GeneralGcpTransformOptions
+} & GcpTransformOptions
 
 export type KernelFunction = (
   r: number,

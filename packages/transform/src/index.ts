@@ -38,5 +38,6 @@ export type {
   KernelFunction,
   KernelFunctionOptions,
   NormFunction,
-  DistortionMeasure
+  DistortionMeasure,
+  ProjectionFunction
 } from './shared/types.js'

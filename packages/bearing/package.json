@@ -36,6 +36,12 @@
     "format": "prettier --write src test"
   },
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/annotation": "workspace:^",
+    "@turf/bearing": "^7.2.0"
+  },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
@@ -47,11 +53,5 @@
     "typescript": "^5.7.0",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1"
-  },
-  "dependencies": {
-    "@allmaps/transform": "^1.0.0-beta.41",
-    "@allmaps/stdlib": "^1.0.0-beta.31",
-    "@allmaps/annotation": "1.0.0-beta.30",
-    "@turf/bearing": "^7.2.0"
   }
 }

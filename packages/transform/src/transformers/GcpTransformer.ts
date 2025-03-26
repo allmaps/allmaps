@@ -7,13 +7,16 @@ import {
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
   svgGeometryToGeometry,
-  mergePartialOptions
+  mergePartialOptions,
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
-
 import { BaseTransformation } from '../transformation-types/BaseTransformation.js'
-
+import {
+  gcpTransformerOptionsToGeneralGcpTransformerOptions,
+  gcpTransformOptionsToGeneralGcpTransformOptions
+} from '../shared/transform-functions.js'
 import {
   gcpToGeneralGcp,
   gcpToPointForToGeo,
@@ -57,10 +60,7 @@ import type {
   GcpTransformerOptions,
   GcpTransformOptions
 } from '../shared/types.js'
-import {
-  gcpTransformerOptionsToGeneralGcpTransformerOptions,
-  gcpTransformOptionsToGeneralGcpTransformOptions
-} from '../shared/transform-functions.js'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 /**
  * Class for Ground Control Point Transformers.
@@ -186,6 +186,22 @@ export class GcpTransformer extends BaseGcpTransformer {
     )
   }
 
+  /**
+   * Set the transformer options.
+   *
+   * Use with caution, especially for options that have effects in the constructor.
+   */
+  protected _setTransformerOptions(
+    partialGcpTransformerOptions: Partial<GcpTransformerOptions>
+  ) {
+    this.transformerOptions = mergeOptions(
+      this.transformerOptions,
+      gcpTransformerOptionsToGeneralGcpTransformerOptions(
+        partialGcpTransformerOptions
+      )
+    )
+  }
+
   transformToGeo<P = Point>(
     point: Point,
     partialGcpTransformOptions?: Partial<GcpTransformOptions>,
@@ -238,14 +254,14 @@ export class GcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    const generalGcpTransformOptions = partialGcpTransformOptions
+    const partialGeneralGcpTransformOptions = partialGcpTransformOptions
       ? gcpTransformOptionsToGeneralGcpTransformOptions(
           partialGcpTransformOptions
         )
       : undefined
     return super._transformForward(
       geometry,
-      generalGcpTransformOptions,
+      partialGeneralGcpTransformOptions,
       generalGcpToP
     )
   }
@@ -302,14 +318,14 @@ export class GcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    const generalGcpTransformOptions = partialGcpTransformOptions
+    const partialGeneralGcpTransformOptions = partialGcpTransformOptions
       ? gcpTransformOptionsToGeneralGcpTransformOptions(
           partialGcpTransformOptions
         )
       : undefined
     return super._transformBackward(
       geometry,
-      generalGcpTransformOptions,
+      partialGeneralGcpTransformOptions,
       generalGcpToP
     )
   }
@@ -463,5 +479,23 @@ export class GcpTransformer extends BaseGcpTransformer {
     }
 
     return svgGeometriesToSvgString(svgGeometries)
+  }
+
+  /**
+   * Create a Projected GCP Transformer from a Georeferenced Map
+   *
+   * @param georeferencedMap - A Georeferenced Map
+   * @param partialGcpTransformerOptions - Projected GCP Transformer Options
+   * @returns A Projected GCP Transformer
+   */
+  static fromGeoreferencedMap(
+    georeferencedMap: GeoreferencedMap,
+    partialGcpTransformerOptions?: Partial<GcpTransformerOptions>
+  ): GcpTransformer {
+    return new GcpTransformer(
+      georeferencedMap.gcps,
+      georeferencedMap.transformation?.type,
+      partialGcpTransformerOptions
+    )
   }
 }

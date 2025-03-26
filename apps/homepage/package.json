@@ -44,7 +44,7 @@
     "@allmaps/project": "^1.0.0-beta.0",
     "@allmaps/stdlib": "^1.0.0-beta.30",
     "@allmaps/tailwind": "^1.0.0-beta.14",
-    "@allmaps/transform": "1.0.0-beta.40",
+    "@allmaps/transform": "^1.0.0-beta.41",
     "@allmaps/types": "1.0.0-beta.14",
     "@allmaps/ui": "^1.0.0-beta.32",
     "@astrojs/check": "^0.9.3",

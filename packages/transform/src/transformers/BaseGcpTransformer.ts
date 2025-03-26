@@ -87,7 +87,7 @@ export abstract class BaseGcpTransformer {
   private _sourcePoints: Point[]
   private _destinationPoints: Point[]
   readonly type: TransformationType
-  readonly transformerOptions: GeneralGcpTransformerOptions
+  protected transformerOptions: GeneralGcpTransformerOptions
 
   protected forwardTransformation?: BaseTransformation
   protected backwardTransformation?: BaseTransformation
@@ -313,7 +313,6 @@ export abstract class BaseGcpTransformer {
       if (isPoint(geometry)) {
         return this._transformPointForward(
           geometry,
-          this.transformerOptions,
           transformOptions,
           generalGcpToP
         )
@@ -426,7 +425,6 @@ export abstract class BaseGcpTransformer {
       if (isPoint(geometry)) {
         return this._transformPointBackward(
           geometry,
-          this.transformerOptions,
           transformOptions,
           generalGcpToP
         )
@@ -481,20 +479,23 @@ export abstract class BaseGcpTransformer {
 
   // Handle specific geometries
 
-  private _transformPointForward<P>(
+  private _transformPointForward<P = Point>(
     point: Point,
-    generalGcpTransformerOptions: GeneralGcpTransformerOptions,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
-    generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+    generalGcpToP: (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P = generalGcpToPointForForward as (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P
   ): P {
     const forwardTransformation = this._getForwardTransformation()
 
-    let source = generalGcpTransformerOptions.differentHandedness
+    let source = this.transformerOptions.differentHandedness
       ? flipY(point)
       : point
-    source = generalGcpTransformerOptions.preForward(source)
+    source = generalGcpTransformOptions.preForward(source)
     let destination = forwardTransformation.evaluateFunction(source)
-    destination = generalGcpTransformerOptions.postForward(destination)
+    destination = generalGcpTransformOptions.postForward(destination)
 
     let partialDerivativeX = undefined
     let partialDerivativeY = undefined
@@ -524,19 +525,22 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  private _transformPointBackward<P>(
+  private _transformPointBackward<P = Point>(
     point: Point,
-    generalGcpTransformerOptions: GeneralGcpTransformerOptions,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
-    generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
+    generalGcpToP: (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P = generalGcpToPointForBackward as (
+      generalGcp: GeneralGcpAndDistortions
+    ) => P
   ): P {
     const backwardTransformation = this._getBackwardTransformation()
 
-    const destination = generalGcpTransformerOptions.preBackward(point)
+    const destination = generalGcpTransformOptions.preBackward(point)
     let source = backwardTransformation.evaluateFunction(destination)
     // apply differentHandedness here again, so it has been applied twice in total and is undone now.
-    source = generalGcpTransformerOptions.postBackward(source)
-    source = generalGcpTransformerOptions.differentHandedness
+    source = generalGcpTransformOptions.postBackward(source)
+    source = this.transformerOptions.differentHandedness
       ? flipY(source)
       : source
 
@@ -547,12 +551,12 @@ export abstract class BaseGcpTransformer {
     if (generalGcpTransformOptions.distortionMeasures.length > 0) {
       partialDerivativeX =
         backwardTransformation.evaluatePartialDerivativeX(destination)
-      partialDerivativeX = generalGcpTransformerOptions.differentHandedness
+      partialDerivativeX = this.transformerOptions.differentHandedness
         ? flipY(partialDerivativeX)
         : partialDerivativeX
       partialDerivativeY =
         backwardTransformation.evaluatePartialDerivativeY(destination)
-      partialDerivativeY = generalGcpTransformerOptions.differentHandedness
+      partialDerivativeY = this.transformerOptions.differentHandedness
         ? flipY(partialDerivativeY)
         : partialDerivativeY
 
@@ -581,7 +585,7 @@ export abstract class BaseGcpTransformer {
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
-      (p) => this._transformForward(p),
+      (p) => this._transformPointForward(p, generalGcpTransformOptions),
       refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
@@ -593,7 +597,7 @@ export abstract class BaseGcpTransformer {
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
-      (p) => this._transformBackward(p),
+      (p) => this._transformPointBackward(p, generalGcpTransformOptions),
       refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }
@@ -605,7 +609,7 @@ export abstract class BaseGcpTransformer {
   ): TypedRing<P> {
     return refineRing(
       ring,
-      (p) => this._transformForward(p),
+      (p) => this._transformPointForward(p, generalGcpTransformOptions),
       refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
@@ -617,7 +621,7 @@ export abstract class BaseGcpTransformer {
   ): TypedRing<P> {
     return refineRing(
       ring,
-      (p) => this._transformBackward(p),
+      (p) => this._transformPointBackward(p, generalGcpTransformOptions),
       refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }

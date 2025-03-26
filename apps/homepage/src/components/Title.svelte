@@ -5,7 +5,6 @@
 
   import { Logo } from '@allmaps/ui'
   import { parseAnnotation } from '@allmaps/annotation'
-  import { GcpTransformer } from '@allmaps/transform'
   import { ProjectedGcpTransformer } from '@allmaps/project'
   import {
     computeBbox,
@@ -167,7 +166,7 @@
       const resourceScreenRectangle = projectedTransformer.transformToResource([
         bboxToRectangle(projectedGeoScreenBbox)
       ])
-      const geoScreenRectangle = transformer.transformForward(
+      const geoScreenRectangle = transformer.transformToGeo(
         resourceScreenRectangle
       )
       const geoScreenRectangleBbox = computeBbox(geoScreenRectangle)

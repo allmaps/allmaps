@@ -32,10 +32,7 @@ export function getDisplayMap(
   if (map.gcps.length >= 3) {
     if (map.resourceMask.length >= 3) {
       try {
-        const transformer = new GcpTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
+        const transformer = GcpTransformer.fromGeoreferencedMap(map)
 
         const polygon = transformer.transformToGeo([map.resourceMask])
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)

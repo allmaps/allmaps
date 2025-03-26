@@ -27,16 +27,16 @@ export const defaultGeneralGcpTransformOptions: GeneralGcpTransformOptions = {
   destinationIsGeographic: false,
   isMultiGeometry: false,
   distortionMeasures: [],
-  referenceScale: 1
+  referenceScale: 1,
+  preForward: (point: Point) => point,
+  postForward: (point: Point) => point,
+  preBackward: (point: Point) => point,
+  postBackward: (point: Point) => point
 }
 
 export const defaultGeneralGcpTransformerOptions: GeneralGcpTransformerOptions =
   {
     differentHandedness: false,
-    preForward: (point: Point) => point,
-    postForward: (point: Point) => point,
-    preBackward: (point: Point) => point,
-    postBackward: (point: Point) => point,
     ...defaultGeneralGcpTransformOptions
   }
 
@@ -51,22 +51,26 @@ export function gcpTransformOptionsToGeneralGcpTransformOptions(
       gcpTransformOptions.geoIsGeographic
   }
 
+  if (gcpTransformOptions.postToGeo) {
+    generalGcpTransformOptions.postForward = gcpTransformOptions.postToGeo
+  }
+  if (gcpTransformOptions.preToResource) {
+    generalGcpTransformOptions.preBackward = gcpTransformOptions.preToResource
+  }
+
   return generalGcpTransformOptions
 }
 
 export function gcpTransformerOptionsToGeneralGcpTransformerOptions(
   gcpTransformerOptions: Partial<GcpTransformerOptions>
 ): Partial<GeneralGcpTransformerOptions> {
-  const generalGcpTransformerOptions =
-    gcpTransformerOptions as Partial<GeneralGcpTransformerOptions>
+  // Note: None of the transformer options need to be adapted
+  // only the transform options that could be included in them
 
-  if (gcpTransformerOptions.postToGeo) {
-    generalGcpTransformerOptions.postForward = gcpTransformerOptions.postToGeo
-  }
-  if (gcpTransformerOptions.preToResource) {
-    generalGcpTransformerOptions.preBackward =
-      gcpTransformerOptions.preToResource
-  }
+  const generalGcpTransformerOptions =
+    gcpTransformOptionsToGeneralGcpTransformOptions(
+      gcpTransformerOptions
+    ) as Partial<GeneralGcpTransformerOptions>
 
   return generalGcpTransformerOptions
 }
@@ -82,6 +86,13 @@ export function generalGcpTransformOptionsToGcpTransformOptions(
       generalGcpTransformOptions.destinationIsGeographic
   }
 
+  if (generalGcpTransformOptions.postForward) {
+    gcpTransformOptions.postToGeo = generalGcpTransformOptions.postForward
+  }
+  if (generalGcpTransformOptions.preBackward) {
+    gcpTransformOptions.preToResource = generalGcpTransformOptions.preBackward
+  }
+
   return gcpTransformOptions
 }
 
@@ -90,14 +101,6 @@ export function generalGcpTransformerOptionsToGcpTransformerOptions(
 ): Partial<GcpTransformerOptions> {
   const gcpTransformerOptions =
     generalGcpTransformerOptions as Partial<GcpTransformerOptions>
-
-  if (generalGcpTransformerOptions.postForward) {
-    gcpTransformerOptions.postToGeo = generalGcpTransformerOptions.postForward
-  }
-  if (generalGcpTransformerOptions.preBackward) {
-    gcpTransformerOptions.preToResource =
-      generalGcpTransformerOptions.preBackward
-  }
 
   return gcpTransformerOptions
 }

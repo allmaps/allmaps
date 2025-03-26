@@ -29,6 +29,30 @@ npm install @allmaps/transform
 
 ## Usage
 
+### GCP Transformer from Annotation or Georeferenced Map
+
+When starting from an annotation or georeferenced map and building, the fastest way to build a GCP Transformer is:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+// Fetch an annotation
+const annotation = await fetch(annoationUrl).then((response) => response.json())
+
+// Create a georeferencedMap from the annotation
+const georeferencedMaps = parseAnnotation(annotation)
+const georeferencedMap = georeferencedMaps[0]
+
+// Build GCP Transformer
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+// Use it to transform geometries, as below. E.g.:
+// const destinationPoint = transformer.transformToGeo(sourcePoint)
+```
+
+This is equivalent to constructing a transformer from the Annotation's or Georeferefenced Map's GCPs and transformation type, as in the examples below, that showcase transforming various geometries.
+
 ### Point
 
 In this example we use a general transformer to transform forward.
@@ -255,10 +279,6 @@ When creating a transformer, 'transformer options' can be specified. Apart from 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
 | `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
-| `preForward` (not available for GCP Transformer methods)     | A projection function to be applied to the General GCP 'source' (GCP 'resource') points before building a transformation, and to be applied during a 'forward' transform before evaluating the 'forward' transformation at the input points. | `Projection Function`             | Identity projection `(point: Point) => point`
-| `postForward` for General GCP Transformer methods, `postToGeo` for GCP Transformer methods     | A projection function to be applied during a 'forward' ('toGeo') transform after evaluating the 'forward' ('toGeo') transformation. | `Projection Function`             | Identity projection `(point: Point) => point`
-| `preBackward` for General GCP Transformer methods, `preToResource` for GCP Transformer methods     | A projection function to be applied to the General GCP 'destination' (GCP 'geo') points before building a transformation, and to be applied during a 'backward' ('toResource') transform before evaluating the 'backward' ('toResource') transformation at the input points. | `Projection Function`             | Identity projection `(point: Point) => point`
-| `postBackward` (not available for GCP Transformer methods)     | A projection function to be applied during a 'backward' transform after evaluating the 'backward' transformation. | `Projection Function`             | Identity projection `(point: Point) => point`
 
 #### Handedness
 
@@ -289,22 +309,6 @@ const sourcePoint = transformer.transformBackward(destinationPoint, {}, (general
 // sourcePoint = [146.25183291709982, -122.59989116975339]
 // instead of [146.25183291709982, 122.59989116975339]
 ```
-
-### Projections
-
-The (forward and backward) transformations underlying the the General GCP Transformer and GCP Transformer are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another.
-
-If you need to deal with simple map projection situation, e.g. when you are given GCPs in a lon-lat WGS84 geographic projection but want to build a GCP Transformer to WebMercator (as a guess for the map's projection and as the projection of the viewport to render in), you could simply project your GCPs from WGS84 to WebMercator first and build a projected transformed from these projected GCPs.
-
-To deal with more complex map projection situation, e.g. when the map projection and viewport projection are different, the transformer options include optional projection functions `preForward`, `postForward` (`postToGeo`), `preBackward` (`preToResource`) and `postBackward`. When set, these are applied before and after the transformation is evaluated. This is useful when dealing with projected coordinate spaces and when the transformation should be computed in another (internal) projected space then the (projected) 'source' or 'destination' space.
-
-The most common example is when using a GCP Transformer and transforming from the 'resource' space of an image of a map to a 'projected geo' space of the viewport where you want to render the map. Not only in the space you want to render to a projected space, but it is also possible that you know or suppose the geographic projection in which the map is made, and that this geographic projection is different then the geographic projection of the viewport. In that case you want to build your transformation between the 'resource' space of pixels and an 'internal projected geo' space of the maps geographic projection. When transforming to geo, you want to first evaluate this transformation (to geo from 'resource' to 'internal projected geo') and then apply a `postForward` projection function from 'internal projected geo' space to 'projected geo' space.
-
-The crucial insight here is that the maps geographic projection *can* be different then the rendered geographic projection. The first inspires a internal projected space to use when computing the transformation, which will assure that the transformation only takes into account the warping between these two spaces (and ideally, when our information or guess about the map's geographic projection is correct, does not account for warping due to the projections). The latter must be taken into account later, and handles the warping due to the difference in geographic projections. By doing *both within* a transformer, we can use the transformer methods to transform forward (or compute a resolution), and know that our geometries will be refined both by the transformation and the projection functions!
-
-To simplify the computation of these optional projection functions from the maps geographic projection and viewport geographic projection, use the class **Projected GCP Transformer** from the [@allmaps/project](../../packages/project/) module.
-
-Note: there is one other place where projections matter: the `destinationIsGeographic`/`geoIsGeographic` and `sourceIsGeographic` options should only be used when the corresponding coordinates are in lon-lat WGS84 geographic projection. When using these options, coordinates are considered lying on a sphere and geographic distances and midpoints are computed using great arcs (rather than using geometric distances and midpoints on a projected space).
 
 ## Using transformer methods
 
@@ -377,6 +381,10 @@ The 'transform options' for a General GCP Transformer methods and a GCP Transfor
 | `distortionMeasures`                                                                                         | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                 | `DistortionMeasure[]` | `[]`                                               |
 | `referenceScale`                                                                                             | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                           | `number`              | `1`                                                |
 | `isMultiGeometry`                                                                                            | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry types are not deterministic: the types of LineString and MultiPoint are identical. | `boolean`             | `false`                                            |
+| `preForward` (not available for GCP Transformer methods)     | A projection function to be applied to the General GCP 'source' (GCP 'resource') points before building a transformation, and to be applied during a 'forward' transform before evaluating the 'forward' transformation at the input points. | `Projection Function`             | Identity projection `(point: Point) => point`
+| `postForward` for General GCP Transformer methods, `postToGeo` for GCP Transformer methods     | A projection function to be applied during a 'forward' ('toGeo') transform after evaluating the 'forward' ('toGeo') transformation. | `Projection Function`             | Identity projection `(point: Point) => point`
+| `preBackward` for General GCP Transformer methods, `preToResource` for GCP Transformer methods     | A projection function to be applied to the General GCP 'destination' (GCP 'geo') points before building a transformation, and to be applied during a 'backward' ('toResource') transform before evaluating the 'backward' ('toResource') transformation at the input points. | `Projection Function`             | Identity projection `(point: Point) => point`
+| `postBackward` (not available for GCP Transformer methods)     | A projection function to be applied during a 'backward' transform after evaluating the 'backward' transformation. | `Projection Function`             | Identity projection `(point: Point) => point`
 
 #### Recursively adding midpoints
 
@@ -437,6 +445,24 @@ const distortion = transformer.transformToGeo(
 // distortion = -0.2140907145956012
 // => At this resource location the area has slightly contracted after the transformation
 ```
+
+### Projections
+
+The (forward and backward) transformations underlying the the General GCP Transformer and GCP Transformer are map-projection agnostic: they describe a transformation for one cartesian `(x, y)` plane to another.
+
+If you need to deal with simple map projection situation, e.g. when you are given GCPs in a lon-lat WGS84 geographic projection but want to build a GCP Transformer to WebMercator (as a guess for the map's projection and as the projection of the viewport to render in), you could simply project your GCPs from WGS84 to WebMercator first and build a projected transformed from these projected GCPs.
+
+To deal with more complex general projection situations, the transform options includes optional projection functions. This is useful when the transformation should be computed between 'internal' projected spaces that are different then the 'source' and 'destination' spaces of the GCPs. These functions are `preForward`, `postForward` (`postToGeo`), `preBackward` (`preToResource`) and `postBackward`. When set, these are applied when reading the GCPs to form the 'internal' GCPs (`preForward` is applied to the source coordinates and `preBackward` to destination coordinates). They are also applied on each corresponding transform call before and after the transformation is evaluated: a `transformForward()` call thus applies `preForward`, evaluates the forward transformation, and finally applies `postForward`.
+
+To make this general case more concrete, here's how this is works **in the Allmaps case**. Allmaps uses a GCP Transformer and transforms from the 'resource' space of an image of a map to a 'projected geo' space of the viewport to render the map. Not only is the viewport a projected space, but it is also possible that the user knows or supposes the geographic projection in which the map is made, and that this geographic projection is different than the geographic projection of the viewport. In that case one wants to build a transformation between the 'resource' space of pixels and an 'internal projected geo' space of the maps geographic projection. When transforming to geo, one wants to first evaluate this transformation (from 'resource' to 'internal projected geo') and then apply a `postForward` projection function from 'internal projected geo' space to 'projected geo' space.
+
+The crucial insight here is that the map's geographic projection *can* be different then the rendered geographic projection. The first inspires a internal projected space to use when computing the transformation, which will assure that the transformation only takes into account the warping between these two spaces, and ideally, when our information or guess about the map's geographic projection is correct, does not account for warping due to the projections. The latter must be taken into account later, and handles the warping due to the difference in geographic projections. By doing *both within* a transformer, one can use the transformer methods to transform geometries forward or backward (or compute a resolution), and know that our geometries will be refined both by the transformation and the projection functions!
+
+To simplify the computation of these optional projection functions from the map's geographic projection and viewport geographic projection, use the class **Projected GCP Transformer** from the [@allmaps/project](../../packages/project/) module.
+
+The optional projection functions are part of the transform options to allow them to be specified not just at the construction of a transformer but for any transform call. Since they are also applied at construction when reading the GCPs, be careful when specifying such a function in a transform call. In a Projected GCP Transformer, the use-case for specifying a different projection in a transform call (and reusing existing the transformation!) has been implemented with care and can be used safely.
+
+Note: there is one other place where projections matter: the `destinationIsGeographic`/`geoIsGeographic` and `sourceIsGeographic` options should only be used when the corresponding coordinates are in lon-lat WGS84 geographic projection. When using these options, coordinates are considered lying on a sphere and geographic distances and midpoints are computed using great arcs (rather than using geometric distances and midpoints on a projected space).
 
 ### Return Type Function
 
@@ -577,6 +603,8 @@ Gcp & Partial<Distortions>
   geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
+  postToGeo: ProjectionFunction
+  preToResource: ProjectionFunction
 } & MultiGeometryOptions
 ```
 
@@ -600,6 +628,20 @@ Create a GcpTransformer
 ###### Extends
 
 * `BaseGcpTransformer`
+
+### `GcpTransformer#_setTransformerOptions(partialGcpTransformerOptions)`
+
+Set the transformer options.
+
+Use with caution, especially for options that have effects in the constructor.
+
+###### Parameters
+
+* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
+
+###### Returns
+
+`void`.
 
 ### `GcpTransformer#gcps`
 
@@ -639,7 +681,7 @@ Returned in the lenght of the shortest piece, measured in resource coordinates.
 
 * `resourceBbox` (`[number, number, number, number]`)
   * BBox in resource space where the resolution is requested
-* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: number | undefined; isMultiGeometry?: false | undefine...`)
+* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
   * GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -676,7 +718,7 @@ Returned in the lenght of the shortest piece, measured in geo coordinates.
 
 * `geoBbox` (`[number, number, number, number]`)
   * BBox in geo space where the resolution is requested
-* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: number | undefined; isMultiGeometry?: false | undefine...`)
+* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
   * GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -706,6 +748,21 @@ Resolution of the toResource transformation in geo space (`number | undefined`).
 ###### Returns
 
 `P`.
+
+### `GcpTransformer.fromGeoreferencedMap(georeferencedMap, partialGcpTransformerOptions)`
+
+Create a Projected GCP Transformer from a Georeferenced Map
+
+###### Parameters
+
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+  * A Georeferenced Map
+* `partialGcpTransformerOptions?` (`Partial<GcpTransformerOptions> | undefined`)
+  * Projected GCP Transformer Options
+
+###### Returns
+
+A Projected GCP Transformer (`GcpTransformer`).
 
 ### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, partialGcpTransformOptions)`
 
@@ -792,7 +849,17 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 ###### Type
 
 ```ts
-{ differentHandedness: boolean; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale:...
+{differentHandedness: boolean} & {
+  maxDepth: number
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  geoIsGeographic: boolean
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+  postToGeo: ProjectionFunction
+  preToResource: ProjectionFunction
+} & MultiGeometryOptions
 ```
 
 ### `GeneralGcp`
@@ -815,16 +882,7 @@ GeneralGcp & Partial<Distortions>
 ###### Type
 
 ```ts
-{
-  maxDepth: number
-  minOffsetRatio: number
-  minOffsetDistance: number
-  minLineDistance: number
-  sourceIsGeographic: boolean
-  destinationIsGeographic: boolean
-  distortionMeasures: DistortionMeasure[]
-  referenceScale: number
-} & MultiGeometryOptions
+{ maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; ... 4 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
 ```
 
 ### `new GeneralGcpTransformer(generalGcps, type, partialGeneralGcpTransformerOptions)`
@@ -886,7 +944,7 @@ Returned in the lenght of the shortest piece, measured in destination coordinate
 
 * `destinationBbox` (`[number, number, number, number]`)
   * BBox in destination space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
+* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: false | undefined; }`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -923,7 +981,7 @@ Returned in the lenght of the shortest piece, measured in source coordinates.
 
 * `sourceBbox` (`[number, number, number, number]`)
   * BBox in source space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; destinationIsGeographic?: boolean | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; referenceScale?: numb...`)
+* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: false | undefined; }`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -959,7 +1017,7 @@ Resolution of the forward transformation in source space (`number | undefined`).
 ###### Type
 
 ```ts
-{ differentHandedness: boolean; preForward: ProjectionFunction; postForward: ProjectionFunction; preBackward: ProjectionFunction; postBackward: ProjectionFunction; } & { maxDepth: number; ... 6 more ...; referenceScale: number; } & MultiGeometryOptions
+{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; ... 5 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
 ```
 
 ### `new Helmert(sourcePoints, destinationPoints)`
@@ -1178,6 +1236,14 @@ number
 
 ```ts
 [number, number]
+```
+
+### `ProjectionFunction`
+
+###### Type
+
+```ts
+(point: Point) => Point
 ```
 
 ### `new Projective(sourcePoints, destinationPoints)`
@@ -1506,6 +1572,10 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 * `minLineDistance` (`number`)
 * `minOffsetDistance` (`number`)
 * `minOffsetRatio` (`number`)
+* `postBackward` (`(point: Point) => Point`)
+* `postForward` (`(point: Point) => Point`)
+* `preBackward` (`(point: Point) => Point`)
+* `preForward` (`(point: Point) => Point`)
 * `referenceScale` (`number`)
 * `sourceIsGeographic` (`false`)
 
@@ -1514,10 +1584,6 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 ###### Fields
 
 * `differentHandedness` (`false`)
-* `postBackward` (`(point: Point) => Point`)
-* `postForward` (`(point: Point) => Point`)
-* `preBackward` (`(point: Point) => Point`)
-* `preForward` (`(point: Point) => Point`)
 
 ### `supportedDistortionMeasures`
 
