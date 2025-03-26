@@ -18,6 +18,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js preview) --env dev",
+    "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "test": "vitest run --passWithNoTests",
     "types": "tsc --noEmit",
