@@ -31,41 +31,41 @@ router.get('/apps/latest.png', (req, env) => {
   return generateLatestCard(req, env, ogImageSize)
 })
 
-router.get('/apps/editor/maps/:imageId.png', (req, env, ctx) => {
+router.get('/apps/editor/maps/:imageId.png', (req, env) => {
   const imageId = req.params?.imageId
   const options = optionsFromQuery(req)
 
-  return generateEditorCard(imageId, ogImageSize, options)
+  return generateEditorCard(req, env, imageId, ogImageSize, options)
 })
 
-router.get('/apps/viewer/maps/:imageId.png', (req) => {
+router.get('/apps/viewer/maps/:imageId.png', (req, env) => {
   const imageId = req.params?.imageId
   const options = optionsFromQuery(req)
 
-  return generateViewerCard(imageId, ogImageSize, options)
+  return generateViewerCard(req, env, imageId, ogImageSize, options)
 })
 
-router.get('/apps/here/maps/:mapId.png', (req, env, ctx) => {
+router.get('/apps/here/maps/:mapId.png', (req, env) => {
   const mapId = req.params?.mapId
   const options = optionsFromQuery(req)
 
-  return generateHereCard(mapId, ogImageSize, options)
+  return generateHereCard(req, env, mapId, ogImageSize, options)
 })
 
-router.get('/maps/:mapId.png', (req, env, ctx) => {
+router.get('/maps/:mapId.png', (req, env) => {
   const mapId = req.params?.mapId
   const options = optionsFromQuery(req)
 
-  return generateWarpedMapCard(mapId, ogImageSize, options)
+  return generateWarpedMapCard(req, env, mapId, ogImageSize, options)
 })
 
 router.get('/', () => json({ name: 'Allmaps Preview' }))
 
 export default {
-  fetch: async (request: Request, env, ctx) => {
+  fetch: async (request: Request, env: Env) => {
     return (
       (env.USE_CACHE && (await match(request.url))) ||
-      router.fetch(request, env, ctx).catch(error)
+      router.fetch(request, env).catch(error)
     )
   }
-} satisfies ExportedHandler<Env>
+} // satisfies ExportedHandler<Env>

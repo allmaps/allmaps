@@ -1,10 +1,14 @@
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
 
+import type { IRequestStrict } from 'itty-router'
+
 import type { Size } from '@allmaps/types'
 
-import type { QueryOptions } from '../shared/types.js'
+import type { QueryOptions, Env } from '../shared/types.js'
 
 export async function generateViewerCard(
+  req: IRequestStrict,
+  env: Env,
   mapId: string,
   size: Size,
   options: Partial<QueryOptions>

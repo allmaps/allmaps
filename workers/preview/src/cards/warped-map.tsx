@@ -4,11 +4,15 @@ import { cachedFetch } from '../shared/fetch.js'
 import { generateWarpedMapImage } from '../shared/warped-map.js'
 import { arrayBufferToBase64 } from '../shared/base64.js'
 
-import type { TransformationOptions } from '../shared/types.js'
+import type { IRequestStrict } from 'itty-router'
+
+import type { TransformationOptions, Env } from '../shared/types.js'
 
 import type { Size } from '@allmaps/types'
 
 export async function generateWarpedMapCard(
+  req: IRequestStrict,
+  env: Env,
   mapId: string,
   size: Size,
   options: Partial<TransformationOptions>

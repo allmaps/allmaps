@@ -8,7 +8,9 @@ import { computeBbox } from '@allmaps/stdlib'
 import { cachedFetch } from '../shared/fetch.js'
 import { getLocalFont } from '../shared/fonts.js'
 
-import type { QueryOptions } from '../shared/types.js'
+import type { IRequestStrict } from 'itty-router'
+
+import type { QueryOptions, Env } from '../shared/types.js'
 
 import type { Size } from '@allmaps/types'
 
@@ -21,6 +23,8 @@ const PinSize = [182.4, 314.5]
 const StampSize = [300.8, 147.4]
 
 export async function generateHereCard(
+  req: IRequestStrict,
+  env: Env,
   mapId: string,
   size: Size,
   options: Partial<QueryOptions>

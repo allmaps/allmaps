@@ -1,5 +1,5 @@
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
-import { json, IRequestStrict } from 'itty-router'
+import { json } from 'itty-router'
 
 import {
   blue,
@@ -16,6 +16,8 @@ import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { cachedFetch } from '../shared/fetch.js'
 import { getTransformedPolygon, geometryToPath } from '../shared/geometry.js'
 import { hexToRgb } from '../shared/colors.js'
+
+import type { IRequestStrict } from 'itty-router'
 
 import type { Size } from '@allmaps/types'
 
