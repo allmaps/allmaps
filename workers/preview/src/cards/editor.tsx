@@ -1,11 +1,12 @@
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
 
+import { getLocalFont } from '../shared/fonts.js'
+
 import type { IRequestStrict } from 'itty-router'
 
 import type { Size } from '@allmaps/types'
 
 import type { QueryOptions, Env } from '../shared/types.js'
-import { getLocalFont } from '../shared/fonts.js'
 
 export async function generateEditorCard(
   req: IRequestStrict,
