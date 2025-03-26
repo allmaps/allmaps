@@ -9,6 +9,9 @@ assets = { directory = "public",  binding = "ASSETS" }
 USE_CACHE=true
 API_BASE_URL="https://api.allmaps.org"
 
+[env.dev]
+name=preview.next
+
 [env.dev.vars]
 USE_CACHE=false
 API_BASE_URL="https://api.allmaps.org"
