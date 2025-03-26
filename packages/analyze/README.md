@@ -8,19 +8,21 @@ In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedM
 
 ## How it works
 
-This packages analyzes maps to return information, warning and error items. These items are objects with a code and text attribute, and possible additional information.
+This packages analyzes maps to return information, warning and error items. These items are objects with a code and message attribute, and possible additional information.
 
-*   **Infos** are notable but not problematic informations on a warping.
+*   **Info** are notable but not problematic informations on a warping.
     *   Code `maskequalsfullmask`: The mask contains the full image.
 *   **Warnings** are possibly problematic findings, but don't invalidate the map.
-    *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
-    *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
     *   Code `gcpoutsidemask`: A GCP is outside the mask.
     *   Code `maskpointoutsidefullmask`: A mask point is outside the full mask.
-    *   Code `triangulationfoldsover`: The map folds over itself, for the selected transformation type.
     *   Code `polynomialsheartoohigh`: A polynomial transformation shows a shear higher then a set maximum.
 *   **Errors** are problematic findings that invalidate the map.
-    *   Code `gcpamounttoolow`: There are less then 3 GCPs.
+    *   Code `constructingwarpedmapfailed`: A warped map map could not be constructed.
+    *   Code `constructingtriangulatedwarpedmapfailed`: A triangulated warped map could not be constructed.
+    *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
+    *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
+    *   Code `gcpamountlessthen2`: There are less then 2 GCPs.
+    *   Code `gcpamountlessthen3`: There are less then 3 GCPs.
     *   Code `gcpresourcerepeatedpoint`: GCP resource coordinates are repeated.
     *   Code `gcpgeorepeatedpoint`: GCP geo coordinates are repeated.
     *   Code `masknotring`: The mask is not a valid ring (an array of points).
@@ -91,8 +93,8 @@ const triangulatedWarpedMap = renderer.warpedMapList.getWarpedMaps()[0]
 // Create Analyzer for the warpedMap
 const analyzer = new Analyzer(triangulatedWarpedMap)
 
-// Analyze to get all infos, warnings and errors
-const infos = analyzer.getInfos()
+// Analyze to get all info, warnings and errors
+const info = analyzer.getInfo()
 const warnings = analyzer.getWarnings()
 const errors = analyzer.getErrors()
 
@@ -116,16 +118,16 @@ MIT
 
 *   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-    *   [hasInfos](#hasinfos)
-    *   [hasWarnings](#haswarnings)
-    *   [hasErrors](#haserrors)
-    *   [getInfos](#getinfos)
+    *   [analyse](#analyse)
+        *   [Parameters](#parameters-1)
+    *   [getInfo](#getinfo)
+        *   [Parameters](#parameters-2)
     *   [getWarnings](#getwarnings)
+        *   [Parameters](#parameters-3)
     *   [getErrors](#geterrors)
+        *   [Parameters](#parameters-4)
     *   [getMeasures](#getmeasures)
     *   [getDistortions](#getdistortions)
-    *   [fromWarpedMap](#fromwarpedmap)
-        *   [Parameters](#parameters-1)
 
 ### Analyzer
 
@@ -134,57 +136,59 @@ This class describes how a georeferenced map is warped using a specific transfor
 
 #### Parameters
 
-*   `warpedMap`  A Warped Map
-*   `mapId`  ID of the map
+*   `georeferencedOrWarpedMap` &#x20;
+*   `options` &#x20;
 
-#### hasInfos
+#### analyse
 
-Check if analysis has infos.
+Analyse
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+Applying extra caution: wrapping the getters in a try catch
 
-#### hasWarnings
+##### Parameters
 
-Check if analysis has warnings.
+*   `options`  Analysis options
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+Returns **any** Analysis with info, warnings and errors
 
-#### hasErrors
+#### getInfo
 
-Check if analysis has errors.
+Get analysis informations
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
+##### Parameters
 
-#### getInfos
+*   `options`  Analysis options
 
-Get analysis informations.
-
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
+Returns **any** Analysis items with info
 
 #### getWarnings
 
-Get zis warnings.
+Get analysis warnings
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<AnalysisItem>**&#x20;
+##### Parameters
+
+*   `options`  Analysis options
+
+Returns **any** Analysis items with warning
 
 #### getErrors
 
-Get analysis errors.
+Get analysis errors
+
+##### Parameters
+
+*   `options`  Analysis options
+
+Returns **any** Analysis items with errors
 
 #### getMeasures
 
-Get analysis measures.
+Get analysis measures
+
+Returns **any** Analysis measures
 
 #### getDistortions
 
 Get distortions.
 
-Returns **Distortions**&#x20;
-
-#### fromWarpedMap
-
-Creates an instance of Analyzer from a Warped Map.
-
-##### Parameters
-
-*   `warpedMap`  A Warped Map
+Returns **any** Analysis distortions

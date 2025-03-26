@@ -13,7 +13,7 @@ export function isEqualArray<T>(
     return false
   }
   for (let i = 0; i < array0.length; i++) {
-    if (isEqualObject(array0[i], array1[i])) {
+    if (!isEqualObject(array0[i], array1[i])) {
       return false
     }
   }

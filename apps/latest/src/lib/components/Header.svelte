@@ -5,8 +5,8 @@
 
 <li class="rounded-lg aspect-square bg-white p-1.5 h-full">
   <header class="h-full flex flex-col justify-between">
-    <h1 class="font-bold text-2xl">
-      The latest maps edited with <a
+    <h1 class="font-bold text-xl sm:text-2xl">
+      The latest maps georeferenced with <a
         class="underline"
         href="https://editor.allmaps.org">Allmaps Editor</a
       >
