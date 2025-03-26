@@ -8,7 +8,7 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "main": "./dist/worker.es.js",
+  "main": "./src/index.ts",
   "type": "module",
   "repository": {
     "type": "git",
