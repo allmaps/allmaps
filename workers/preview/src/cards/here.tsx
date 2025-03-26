@@ -29,7 +29,18 @@ export async function generateHereCard(
   size: Size,
   options: Partial<QueryOptions>
 ): Promise<ImageResponse> {
-  throw new Error('Not implemented')
+  const font = await getLocalFont(req, env, {
+    path: 'geograph-bold.woff',
+    weight: 500
+  })
+
+  const jsx = <div>Allmaps Editor</div>
+
+  return new ImageResponse(jsx, {
+    width: size[0],
+    height: size[1],
+    fonts: [font]
+  })
 
   // if (!options.from) {
   //   throw new Error('No coordinates provided')
