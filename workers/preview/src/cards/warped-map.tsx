@@ -1,17 +1,17 @@
-import { ImageResponse } from 'workers-og'
+import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
 
-import { cachedFetch } from './fetch.js'
-import { generateImage } from './image.js'
-import { arrayBufferToBase64 } from './base64.js'
+import { cachedFetch } from '../shared/fetch.js'
+import { generateWarpedMapImage } from '../shared/warped-map.js'
+import { arrayBufferToBase64 } from '../shared/base64.js'
 
-import type { TransformationOptions } from './types.js'
+import type { TransformationOptions } from '../shared/types.js'
 
 import type { Size } from '@allmaps/types'
 
-export async function generateCard(
+export async function generateWarpedMapCard(
   mapId: string,
   size: Size,
-  options: TransformationOptions
+  options: Partial<TransformationOptions>
 ) {
   // TODO: move font and logo to static dir or to static.allmaps.org
   const font = await cachedFetch(
@@ -20,7 +20,7 @@ export async function generateCard(
   const logoUrl =
     'https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo-inverted.svg'
 
-  const imageResponse = await generateImage(mapId, size, options)
+  const imageResponse = await generateWarpedMapImage(mapId, size, options)
   const image = await imageResponse.arrayBuffer()
 
   const base64Image = arrayBufferToBase64(image)

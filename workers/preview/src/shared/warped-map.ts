@@ -24,10 +24,10 @@ function getImageDataSize(decodedJpeg: UintArrRet): Size {
   return [decodedJpeg.width, decodedJpeg.height]
 }
 
-export async function generateImage(
+export async function generateWarpedMapImage(
   mapId: string,
   size: Size,
-  options: TransformationOptions
+  options: Partial<TransformationOptions>
 ) {
   const annotationUrl = `https://annotations.allmaps.org/maps/${mapId}`
 
@@ -56,9 +56,7 @@ export async function generateImage(
 
   await renderer.addGeoreferenceAnnotation(annotation)
 
-  const viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList, {
-    zoom: 1.25
-  })
+  const viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList)
   const image = await renderer.render(viewport)
   const pngBuffer = encodePng([image.buffer], size[0], size[1], 0)
 
