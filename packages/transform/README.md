@@ -29,9 +29,9 @@ npm install @allmaps/transform
 
 ## Usage
 
-### GCP Transformer from Annotation or Georeferenced Map
+### Quickstart
 
-When starting from an annotation or georeferenced map and building, the fastest way to build a GCP Transformer is:
+When starting from an **Annotation** or **Georeferenced Map**, the fastest way to build a GCP Transformer is:
 
 ```js
 import { parseAnnotation } from '@allmaps/annotation'
@@ -48,10 +48,32 @@ const georeferencedMap = georeferencedMaps[0]
 const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
 // Use it to transform geometries, as below. E.g.:
-// const destinationPoint = transformer.transformToGeo(sourcePoint)
+const geoPoint = transformer.transformToGeo(resourcePoint)
 ```
 
-This is equivalent to constructing a transformer from the Annotation's or Georeferefenced Map's GCPs and transformation type, as in the examples below, that showcase transforming various geometries.
+This is equivalent to constructing a transformer from the Annotation's or Georeferenced Map's GCPs and transformation type, as in the examples below.
+
+This transformer can then be used to transform geometries between 'resource' space and 'geo' space.
+
+When **rendering** maps, another way to quickly obtain a transformer is to access it directly from a **Warped Map** in the renderer's Warped Map List:
+
+```js
+// Create a renderer from your canvas
+const renderer = new WebGL2Renderer(gl)
+// Fetch and parse annotations, add them to the renderer ...
+
+// There are multiple ways to access the renderer's Warped Map List's Warped Maps, e.g.:
+const warpedMap = renderer.warpedMapList.getWarpedMap(mapId)
+
+// Access the Projected GCP Transformer, in the Warped Map's current transformation type
+const projectedTransformer = warpedMap.projectedTransformer
+// Or select or create the Projected GCP Transformer of a different transformation type
+const projectedHelmertTransformer = warpedMap.getProjectedTransformer('helmert')
+```
+
+The transformer obtained in this way is a Projected GCP Transformer as detailed in [@allmaps/project](../../packages/project/). See also the [@allmaps/render](../../packages/render/) module for more about working with renderers.
+
+Note: only GCP Transformers can be created in these ways. General GCP Transformers must be created using the constructor, as shown below.
 
 ### Point
 
@@ -681,7 +703,7 @@ Returned in the lenght of the shortest piece, measured in resource coordinates.
 
 * `resourceBbox` (`[number, number, number, number]`)
   * BBox in resource space where the resolution is requested
-* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialGcpTransformOptions?` (`Partial<GcpTransformOptions> | undefined`)
   * GCP Transform options to consider during the transformation
 
 ###### Returns

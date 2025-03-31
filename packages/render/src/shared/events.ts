@@ -19,14 +19,15 @@ export enum WarpedMapEventType {
 
   TEXTURESUPDATED = 'texturesupdated',
 
-  // TODO: Maybe have one OPTIONSCHANGED event?
   PRECHANGE = 'prechange',
   ZINDICESCHANGED = 'zindiceschanged',
-  RESOURCEMASKUPDATED = 'resourcemaskupdated',
-  GCPSUPDATED = 'gcpsupdated',
+  RESOURCEMASKCHANGED = 'resourcemaskchanged',
+  GCPSCHANGED = 'gcpschanged',
   VISIBILITYCHANGED = 'visibilitychanged',
   TRANSFORMATIONCHANGED = 'transformationchanged',
   DISTORTIONCHANGED = 'distortionchanged',
+  INTERNALPROJECTIONCHANGED = 'internalprojectionchanged',
+  PROJECTIONCHANGED = 'projectionchanged',
 
   CHANGED = 'changed',
 

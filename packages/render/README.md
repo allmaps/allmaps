@@ -239,7 +239,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * Options
@@ -262,13 +262,34 @@ There are no parameters.
 
 `void`.
 
+### `TriangulatedWarpedMap#clearProjectedTriangulationCaches()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#clearResourceTriangulationCaches()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `TriangulatedWarpedMap#mixPreviousAndNew(t)`
 
-Mix the previous and new points and values.
+Mix previous transform properties with new ones (when changing an ongoing transformer transition).
 
 ###### Parameters
 
 * `t` (`number`)
+  * animation progress
 
 ###### Returns
 
@@ -316,12 +337,12 @@ Array<never>
 }
 ```
 
-### `TriangulatedWarpedMap#projectedGcpTriangulationByTransformationTypeAndResourceResolution`
+### `TriangulatedWarpedMap#projectedGcpTriangulationCache`
 
 ###### Type
 
 ```ts
-Map<TransformationType, Map<number, GcpTriangulation>>
+Map<number, Map<TransformationType, Map<string, GcpTriangulation>>>
 ```
 
 ### `TriangulatedWarpedMap#projectedGeoPreviousTrianglePoints`
@@ -358,7 +379,7 @@ Array<never>
 
 ### `TriangulatedWarpedMap#resetPrevious()`
 
-Reset the previous points and values.
+Reset previous transform properties to new ones (when completing a transformer transitions).
 
 ###### Parameters
 
@@ -384,13 +405,74 @@ number | undefined
 Array<never>
 ```
 
+### `TriangulatedWarpedMap#resourceTriangulationCache`
+
+###### Type
+
+```ts
+Map<number, TriangulationToUnique>
+```
+
+### `TriangulatedWarpedMap#setDistortionMeasure(distortionMeasure)`
+
+Set the distortionMeasure
+
+###### Parameters
+
+* `distortionMeasure?` (`DistortionMeasure | undefined`)
+  * the disortion measure
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setGcps(gcps)`
+
+Update the ground control points loaded from a georeferenced map to new ground control points.
+
+###### Parameters
+
+* `gcps` (`Array<Gcp>`)
+  * the new ground control points
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setInternalProjection(projection)`
+
+Set the internal projection
+
+###### Parameters
+
+* `projection` (`string`)
+  * the internal projection
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setProjection(projection)`
+
+Set the projection
+
+###### Parameters
+
+* `projection` (`string`)
+  * the projection
+
+###### Returns
+
+`void`.
+
 ### `TriangulatedWarpedMap#setResourceMask(resourceMask)`
 
-Update the resourceMask.
+Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
 * `resourceMask` (`Array<Point>`)
+  * the new mask
 
 ###### Returns
 
@@ -412,22 +494,11 @@ Array<never>
 0
 ```
 
-### `TriangulatedWarpedMap#updateDistortionProperties()`
+### `TriangulatedWarpedMap#updateTransformerProperties()`
 
 ###### Parameters
 
 There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `TriangulatedWarpedMap#updateTransformerProperties(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
 
 ###### Returns
 
@@ -871,7 +942,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `options?` (`Partial<WarpedMapOptions> | undefined`)
   * options
@@ -893,16 +964,6 @@ AbortController
 ```
 
 ### `WarpedMap#clearProjectedTransformerCaches()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#clearTransformerCaches()`
 
 ###### Parameters
 
@@ -1018,8 +1079,36 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
+{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...
 ```
+
+### `WarpedMap#getProjectedTransformer(transformationType, partialProjectedGcpTransformerOptions)`
+
+Get a projected transformer of the given transformation type.
+
+Uses cashed projected transformers by transformation type,
+and only computes a new projected transformer if none found.
+
+Returns a projected transformer in the current projection,
+even if the cached transformer was computed in a different projection.
+
+Default settings apply for the options.
+
+###### Parameters
+
+* `transformationType` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'`)
+* `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
+
+###### Returns
+
+A projected transformer (`ProjectedGcpTransformer`).
 
 ### `WarpedMap#getReferenceScale()`
 
@@ -1157,6 +1246,14 @@ There are no parameters.
 Map<string, unknown>
 ```
 
+### `WarpedMap#internalProjection`
+
+###### Type
+
+```ts
+string
+```
+
 ### `WarpedMap#loadImageInfo()`
 
 Fetch and parse the image info, and generate the image ID
@@ -1187,11 +1284,12 @@ string
 
 ### `WarpedMap#mixPreviousAndNew(t)`
 
-Mix the properties of the previous and new transformationType.
+Mix previous transform properties with new ones (when changing an ongoing transformer transition).
 
 ###### Parameters
 
 * `t` (`number`)
+  * animation progress
 
 ###### Returns
 
@@ -1243,6 +1341,14 @@ Image
 
 ```ts
 'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
+```
+
+### `WarpedMap#previousInternalProjection`
+
+###### Type
+
+```ts
+string
 ```
 
 ### `WarpedMap#previousTransformationType`
@@ -1361,7 +1467,7 @@ Array<Point>
 ###### Type
 
 ```ts
-GcpTransformer
+ProjectedGcpTransformer
 ```
 
 ### `WarpedMap#projectedTransformer`
@@ -1369,15 +1475,23 @@ GcpTransformer
 ###### Type
 
 ```ts
-GcpTransformer
+ProjectedGcpTransformer
 ```
 
-### `WarpedMap#projectedTransformerByTransformationType`
+### `WarpedMap#projectedTransformerCache`
 
 ###### Type
 
 ```ts
-Map<TransformationType, GcpTransformer>
+Map<TransformationType, ProjectedGcpTransformer>
+```
+
+### `WarpedMap#projection`
+
+###### Type
+
+```ts
+string
 ```
 
 ### `WarpedMap#resetForViewport()`
@@ -1394,7 +1508,7 @@ There are no parameters.
 
 ### `WarpedMap#resetPrevious()`
 
-Reset the properties of the previous and new transformationType.
+Reset previous transform properties to new ones (when completing a transformer transitions).
 
 ###### Parameters
 
@@ -1519,11 +1633,24 @@ Set tiles for the current viewport
 
 ### `WarpedMap#setGcps(gcps)`
 
-Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+Update the ground control points loaded from a georeferenced map to new ground control points.
 
 ###### Parameters
 
 * `gcps` (`Array<Gcp>`)
+
+###### Returns
+
+`void`.
+
+### `WarpedMap#setInternalProjection(projection)`
+
+Set the internal projection
+
+###### Parameters
+
+* `projection?` (`string | undefined`)
+  * the internal projection
 
 ###### Returns
 
@@ -1566,6 +1693,19 @@ Set projectedGeoBufferedViewportRectangle for the current viewport
 
 `void`.
 
+### `WarpedMap#setProjection(projection)`
+
+Set the projection
+
+###### Parameters
+
+* `projection?` (`string | undefined`)
+  * the projection
+
+###### Returns
+
+`void`.
+
 ### `WarpedMap#setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection)`
 
 Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the current viewport
@@ -1592,7 +1732,7 @@ Set resourceBufferedViewportRing for the current viewport
 
 ### `WarpedMap#setResourceMask(resourceMask)`
 
-Update the resourceMask loaded from a georeferenced map to a new mask.
+Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
@@ -1665,23 +1805,17 @@ Set the transformationType
   | 'thinPlateSpline'
 ```
 
-### `WarpedMap#transformer`
+### `WarpedMap#updatGeoMaskProperties()`
 
-###### Type
+###### Parameters
 
-```ts
-GcpTransformer
-```
+There are no parameters.
 
-### `WarpedMap#transformerByTransformationType`
+###### Returns
 
-###### Type
+`void`.
 
-```ts
-Map<TransformationType, GcpTransformer>
-```
-
-### `WarpedMap#updateDistortionProperties()`
+### `WarpedMap#updatProjectedGeoMaskProperties()`
 
 ###### Parameters
 
@@ -1741,22 +1875,11 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMap#updateProjectedGeoTransformedResourcePoints()`
+### `WarpedMap#updateProjectedTransformer()`
 
 ###### Parameters
 
 There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#updateProjectedTransformer(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
 
 ###### Returns
 
@@ -1792,23 +1915,11 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMap#updateTransformer(clearCache, useCache)`
+### `WarpedMap#updateTransformerProperties()`
 
 ###### Parameters
 
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#updateTransformerProperties(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
+There are no parameters.
 
 ###### Returns
 
@@ -1915,7 +2026,7 @@ Adds a georeferenced map to this list
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
@@ -2066,7 +2177,7 @@ Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
@@ -2227,7 +2338,7 @@ Removes a warped map by its ID
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
@@ -2290,6 +2401,21 @@ Sets the object that caches image information
 
 `void`.
 
+### `WarpedMapList#setMapDistortionMeasure(mapId, distortionMeasure)`
+
+Sets the distortionMeasure of a single map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * the ID of the map
+* `distortionMeasure?` (`DistortionMeasure | undefined`)
+  * the distortion measure
+
+###### Returns
+
+`void`.
+
 ### `WarpedMapList#setMapGcps(mapId, gcps)`
 
 Sets the GCPs for a specified map
@@ -2300,6 +2426,36 @@ Sets the GCPs for a specified map
   * ID of the map
 * `gcps` (`Array<Gcp>`)
   * new GCPs
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapInternalProjection(mapId, projection)`
+
+Sets the internal projection of a single map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * the ID of the map
+* `projection?` (`string | undefined`)
+  * the internal projection
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapProjection(mapId, projection)`
+
+Sets the projection of a single map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * the ID of the map
+* `projection?` (`string | undefined`)
+  * the projection
 
 ###### Returns
 
@@ -2352,6 +2508,36 @@ Sets the distortion measure of specified maps
   * the IDs of the maps
 * `distortionMeasure?` (`DistortionMeasure | undefined`)
   * the distortion measure
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapsInternalProjection(mapIds, projection)`
+
+Sets the internal projection of specified maps
+
+###### Parameters
+
+* `mapIds` (`Iterable<string>`)
+  * the IDs of the maps
+* `projection?` (`string | undefined`)
+  * the internal projection
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapsProjection(mapIds, projection)`
+
+Sets the projection of specified maps
+
+###### Parameters
+
+* `mapIds` (`Iterable<string>`)
+  * the IDs of the maps
+* `projection?` (`string | undefined`)
+  * the projection
 
 ###### Returns
 
@@ -2852,6 +3038,16 @@ WebGL2RenderingContext
 
 `void`.
 
+### `WebGL2Renderer#internalProjectionChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
+
+###### Returns
+
+`void`.
+
 ### `WebGL2Renderer#lastAnimationFrameRequestId`
 
 ###### Type
@@ -2939,6 +3135,16 @@ There are no parameters.
 ```ts
 Viewport | undefined
 ```
+
+### `WebGL2Renderer#projectionChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
+
+###### Returns
+
+`void`.
 
 ### `WebGL2Renderer#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)`
 
@@ -3134,6 +3340,16 @@ Reset the satuation of the renderer
 ###### Parameters
 
 There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `WebGL2Renderer#resourceMaskChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
 
 ###### Returns
 
@@ -3397,7 +3613,7 @@ There are no parameters.
 
 `boolean`.
 
-### `WebGL2Renderer#startTransformationTransition(mapIds)`
+### `WebGL2Renderer#startTransformaterTransition(mapIds)`
 
 ###### Parameters
 
@@ -3423,6 +3639,14 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
+### `WebGL2Renderer#transformaterTransitionStart`
+
+###### Type
+
+```ts
+number | undefined
+```
+
 ### `WebGL2Renderer#transformationChanged(event)`
 
 ###### Parameters
@@ -3433,7 +3657,7 @@ DebouncedFunc<() => void>
 
 `void`.
 
-### `WebGL2Renderer#transformationTransitionFrame(now, mapIds)`
+### `WebGL2Renderer#transformerTransitionFrame(now, mapIds)`
 
 ###### Parameters
 
@@ -3443,14 +3667,6 @@ DebouncedFunc<() => void>
 ###### Returns
 
 `void`.
-
-### `WebGL2Renderer#transformationTransitionStart`
-
-###### Type
-
-```ts
-number | undefined
-```
 
 ### `WebGL2Renderer#updateMapsForViewport(tiles)`
 
@@ -3480,7 +3696,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context

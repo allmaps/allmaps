@@ -91,7 +91,7 @@ export class WebGL2Renderer
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
-  transformationTransitionStart: number | undefined
+  transformaterTransitionStart: number | undefined
   animationProgress = 0
 
   disableRender = false
@@ -1166,7 +1166,7 @@ export class WebGL2Renderer
     )
   }
 
-  private startTransformationTransition(mapIds: string[]) {
+  private startTransformaterTransition(mapIds: string[]) {
     for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
       if (!this.viewport) {
         break
@@ -1182,29 +1182,27 @@ export class WebGL2Renderer
     }
 
     this.animating = true
-    this.transformationTransitionStart = undefined
+    this.transformaterTransitionStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
-      ((now: number) => this.transformationTransitionFrame(now, mapIds)).bind(
-        this
-      )
+      ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(this)
     )
   }
 
-  private transformationTransitionFrame(now: number, mapIds: string[]) {
-    if (!this.transformationTransitionStart) {
-      this.transformationTransitionStart = now
+  private transformerTransitionFrame(now: number, mapIds: string[]) {
+    if (!this.transformaterTransitionStart) {
+      this.transformaterTransitionStart = now
     }
 
-    if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
+    if (now - this.transformaterTransitionStart < ANIMATION_DURATION) {
       // Animation is ongoing
       // animationProgress goes from 0 to 1 throughout animation
       this.animationProgress =
-        (now - this.transformationTransitionStart) / ANIMATION_DURATION
+        (now - this.transformaterTransitionStart) / ANIMATION_DURATION
 
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.transformationTransitionFrame(now, mapIds)).bind(
+        ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(
           this
         )
       )
@@ -1224,7 +1222,7 @@ export class WebGL2Renderer
 
       this.animating = false
       this.animationProgress = 0
-      this.transformationTransitionStart = undefined
+      this.transformaterTransitionStart = undefined
 
       this.changed()
     }
@@ -1303,24 +1301,45 @@ export class WebGL2Renderer
     }
   }
 
+  protected gcpsChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      this.startTransformaterTransition([mapId])
+    }
+  }
+
+  protected resourceMaskChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapId = event.data as string
+      this.startTransformaterTransition([mapId])
+    }
+  }
+
   protected transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformationTransition(mapIds)
+      this.startTransformaterTransition(mapIds)
     }
   }
 
   protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformationTransition(mapIds)
+      this.startTransformaterTransition(mapIds)
     }
   }
 
-  protected gcpsChanged(event: Event) {
+  protected internalProjectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.startTransformationTransition([mapId])
+      const mapIds = event.data as string[]
+      this.startTransformaterTransition(mapIds)
+    }
+  }
+
+  protected projectionChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      this.startTransformaterTransition(mapIds)
     }
   }
 

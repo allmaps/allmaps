@@ -5,7 +5,7 @@
 
   import { Logo } from '@allmaps/ui'
   import { parseAnnotation } from '@allmaps/annotation'
-  import { ProjectedGcpTransformer } from '@allmaps/project'
+  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
   import {
     computeBbox,
     bboxToRectangle,
@@ -121,10 +121,8 @@
 
       const georeferencedMap = maps[index]
 
-      const transformer = new GcpTransformer(georeferencedMap.gcps)
-      const projectedTransformer = new ProjectedGcpTransformer(
-        georeferencedMap.gcps
-      )
+      const projectedTransformer =
+        ProjectedGcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
       const projectedGeoPolygon = projectedTransformer.transformToGeo([
         georeferencedMap.resourceMask
@@ -166,8 +164,9 @@
       const resourceScreenRectangle = projectedTransformer.transformToResource([
         bboxToRectangle(projectedGeoScreenBbox)
       ])
-      const geoScreenRectangle = transformer.transformToGeo(
-        resourceScreenRectangle
+      const geoScreenRectangle = projectedTransformer.transformToGeo(
+        resourceScreenRectangle,
+        { projection: lonLatProjection }
       )
       const geoScreenRectangleBbox = computeBbox(geoScreenRectangle)
 

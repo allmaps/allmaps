@@ -1,4 +1,3 @@
-import { WarpedMapList } from '../maps/WarpedMapList.js'
 import {
   composeTransform,
   applyTransform,
@@ -28,6 +27,7 @@ import {
 } from '@allmaps/stdlib'
 import { webMercatorToLonLat } from '@allmaps/project'
 
+import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import type {

@@ -38,7 +38,8 @@ export {
 
 export {
   getPropertyFromCacheOrComputation,
-  getPropertyFromDoubleCacheOrComputation
+  getPropertyFromDoubleCacheOrComputation,
+  getPropertyFromTrippleCacheOrComputation
 } from './cache.js'
 
 export { rgbToHex, hexToRgb, hexToFractionalRgb } from './color.js'

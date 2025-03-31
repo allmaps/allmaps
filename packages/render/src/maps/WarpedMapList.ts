@@ -18,6 +18,7 @@ import type {
 } from '../shared/types.js'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
 import type {
   Ring,
   Bbox,
@@ -265,23 +266,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the resource mask for a specified map
-   *
-   * @param mapId - ID of the map
-   * @param resourceMask - the new resource mask
-   */
-  setMapResourceMask(mapId: string, resourceMask: Ring): void {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      warpedMap.setResourceMask(resourceMask)
-      this.addToOrUpdateRtree(warpedMap)
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKUPDATED, mapId)
-      )
-    }
-  }
-
-  /**
    * Sets the GCPs for a specified map
    *
    * @param mapId - ID of the map
@@ -293,7 +277,24 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       warpedMap.setGcps(gcps)
       this.addToOrUpdateRtree(warpedMap)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.GCPSUPDATED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.GCPSCHANGED, mapId)
+      )
+    }
+  }
+
+  /**
+   * Sets the resource mask for a specified map
+   *
+   * @param mapId - ID of the map
+   * @param resourceMask - the new resource mask
+   */
+  setMapResourceMask(mapId: string, resourceMask: Ring): void {
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      warpedMap.setResourceMask(resourceMask)
+      this.addToOrUpdateRtree(warpedMap)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKCHANGED, mapId)
       )
     }
   }
@@ -350,6 +351,19 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
+   * Sets the distortionMeasure of a single map
+   *
+   * @param mapId - the ID of the map
+   * @param distortionMeasure - the distortion measure
+   */
+  setMapDistortionMeasure(
+    mapId: string,
+    distortionMeasure?: DistortionMeasure
+  ): void {
+    this.setMapsDistortionMeasure([mapId], distortionMeasure)
+  }
+
+  /**
    * Sets the distortion measure of specified maps
    *
    * @param mapIds - the IDs of the maps
@@ -374,11 +388,96 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         const warpedMap = this.warpedMapsById.get(mapId)
         if (warpedMap) {
           warpedMap.setDistortionMeasure(distortionMeasure)
-          this.addToOrUpdateRtree(warpedMap)
         }
       })
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIdsChanged)
+      )
+    }
+  }
+
+  /**
+   * Sets the internal projection of a single map
+   *
+   * @param mapId - the ID of the map
+   * @param projection - the internal projection
+   */
+  setMapInternalProjection(mapId: string, projection?: Projection): void {
+    this.setMapsInternalProjection([mapId], projection)
+  }
+
+  /**
+   * Sets the internal projection of specified maps
+   *
+   * @param mapIds - the IDs of the maps
+   * @param projection - the internal projection
+   */
+  setMapsInternalProjection(
+    mapIds: Iterable<string>,
+    projection?: Projection
+  ): void {
+    const mapIdsChanged = []
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap && warpedMap.internalProjection !== projection) {
+        mapIdsChanged.push(mapId)
+      }
+    }
+    if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
+      )
+      mapIdsChanged.forEach((mapId) => {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMap.setInternalProjection(projection)
+        }
+      })
+      this.dispatchEvent(
+        new WarpedMapEvent(
+          WarpedMapEventType.INTERNALPROJECTIONCHANGED,
+          mapIdsChanged
+        )
+      )
+    }
+  }
+
+  /**
+   * Sets the projection of a single map
+   *
+   * @param mapId - the ID of the map
+   * @param projection - the projection
+   */
+  setMapProjection(mapId: string, projection?: Projection): void {
+    this.setMapsProjection([mapId], projection)
+  }
+
+  /**
+   * Sets the projection of specified maps
+   *
+   * @param mapIds - the IDs of the maps
+   * @param projection - the projection
+   */
+  setMapsProjection(mapIds: Iterable<string>, projection?: Projection): void {
+    const mapIdsChanged = []
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap && warpedMap.projection !== projection) {
+        mapIdsChanged.push(mapId)
+      }
+    }
+    if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
+      )
+      mapIdsChanged.forEach((mapId) => {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMap.setProjection(projection)
+        }
+      })
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PROJECTIONCHANGED, mapIdsChanged)
       )
     }
   }

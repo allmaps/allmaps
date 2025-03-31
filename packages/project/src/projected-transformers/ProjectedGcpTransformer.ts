@@ -73,8 +73,8 @@ export class ProjectedGcpTransformer extends GcpTransformer {
 
   internalProjectionToProjection: ProjectionFunction
   projectionToInternalProjection: ProjectionFunction
-  postToGeo: ProjectionFunction
-  preToResource: ProjectionFunction
+  lonLatToProjection: ProjectionFunction
+  projectionToLatLon: ProjectionFunction
 
   /**
    * Create a ProjectedGcpTransformer
@@ -104,6 +104,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       projectedGcpTransformerOptions.projection
     )
     const lonLatToProjection = lonLatToProjectionConverter.forward
+    const projectionToLatLon = lonLatToProjectionConverter.inverse
 
     const partialGcpTransformerOptions = {
       ...partialProjectedGcpTransformerOptions,
@@ -125,8 +126,8 @@ export class ProjectedGcpTransformer extends GcpTransformer {
 
     this.internalProjectionToProjection = postToGeo
     this.projectionToInternalProjection = preToResource
-    this.postToGeo = postToGeo
-    this.preToResource = preToResource
+    this.lonLatToProjection = lonLatToProjection
+    this.projectionToLatLon = projectionToLatLon
   }
 
   /**
@@ -137,7 +138,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * it's possible to specify the requested projection in the transform options.
    *
    * This way we circumvent a possibly expensive recomputation
-   * of the forward or backward transformations.
+   * of the toGeo and/or toResource transformations.
    *
    * To do this more systematically, it's possible to set
    * a projected gcp transformer's projection using this method
@@ -148,7 +149,9 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * @returns this
    */
   setProjection(projection: Projection) {
-    this.projection = projection
+    if (projection == this.projection) {
+      return this
+    }
 
     const internalProjectionToProjectionConverter = proj4(
       this.internalProjection,
@@ -157,11 +160,27 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     const postToGeo = internalProjectionToProjectionConverter.forward
     const preToResource = internalProjectionToProjectionConverter.inverse
 
+    const lonLatToProjectionConverter = proj4(lonLatProjection, projection)
+    const lonLatToProjection = lonLatToProjectionConverter.forward
+    const projectionToLatLon = lonLatToProjectionConverter.inverse
+
     const partialGcpTransformerOptions: Partial<GcpTransformerOptions> = {
       postToGeo,
       preToResource
     }
+
+    // Note: no need to change the GCPs!
+    // They have already been converted to the internal projection
+    // in the GCP Transformer constructor
+
     this._setTransformerOptions(partialGcpTransformerOptions)
+
+    this.projection = projection
+
+    this.internalProjectionToProjection = postToGeo
+    this.projectionToInternalProjection = preToResource
+    this.lonLatToProjection = lonLatToProjection
+    this.projectionToLatLon = projectionToLatLon
 
     return this
   }

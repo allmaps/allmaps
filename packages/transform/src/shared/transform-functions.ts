@@ -41,8 +41,12 @@ export const defaultGeneralGcpTransformerOptions: GeneralGcpTransformerOptions =
   }
 
 export function gcpTransformOptionsToGeneralGcpTransformOptions(
-  gcpTransformOptions: Partial<GcpTransformOptions>
+  gcpTransformOptions?: Partial<GcpTransformOptions>
 ): Partial<GeneralGcpTransformOptions> {
+  if (gcpTransformOptions === undefined) {
+    return {}
+  }
+
   const generalGcpTransformOptions =
     gcpTransformOptions as Partial<GeneralGcpTransformOptions>
 
@@ -62,8 +66,12 @@ export function gcpTransformOptionsToGeneralGcpTransformOptions(
 }
 
 export function gcpTransformerOptionsToGeneralGcpTransformerOptions(
-  gcpTransformerOptions: Partial<GcpTransformerOptions>
+  gcpTransformerOptions?: Partial<GcpTransformerOptions>
 ): Partial<GeneralGcpTransformerOptions> {
+  if (gcpTransformerOptions === undefined) {
+    return {}
+  }
+
   // Note: None of the transformer options need to be adapted
   // only the transform options that could be included in them
 
@@ -76,8 +84,12 @@ export function gcpTransformerOptionsToGeneralGcpTransformerOptions(
 }
 
 export function generalGcpTransformOptionsToGcpTransformOptions(
-  generalGcpTransformOptions: Partial<GeneralGcpTransformOptions>
+  generalGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
 ): Partial<GcpTransformOptions> {
+  if (generalGcpTransformOptions === undefined) {
+    return {}
+  }
+
   const gcpTransformOptions =
     generalGcpTransformOptions as Partial<GcpTransformOptions>
 
@@ -97,8 +109,12 @@ export function generalGcpTransformOptionsToGcpTransformOptions(
 }
 
 export function generalGcpTransformerOptionsToGcpTransformerOptions(
-  generalGcpTransformerOptions: Partial<GeneralGcpTransformerOptions>
+  generalGcpTransformerOptions?: Partial<GeneralGcpTransformerOptions>
 ): Partial<GcpTransformerOptions> {
+  if (generalGcpTransformerOptions == undefined) {
+    return {}
+  }
+
   const gcpTransformerOptions =
     generalGcpTransformerOptions as Partial<GcpTransformerOptions>
 

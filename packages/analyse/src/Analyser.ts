@@ -4,7 +4,6 @@ import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
 
 import {
   isEqualArray,
-  getPropertyFromCacheOrComputation,
   isEqualPoint,
   isRing,
   polygonSelfIntersectionPoints,
@@ -337,17 +336,11 @@ export default class Analyser<W extends WarpedMap> {
     }
 
     // Polynomial
-    const projectedPolynomialTransformer = getPropertyFromCacheOrComputation(
-      this.warpedMap.projectedTransformerByTransformationType,
-      'polynomial',
-      () =>
-        new GcpTransformer(this.warpedMap.projectedGcps, 'polynomial', {
-          differentHandedness: true
-        }) // TODO: load default options? Or differentHandedness becomes default?
-    )
-
+    const projectedPolynomialTransformer =
+      this.warpedMap.getProjectedTransformer('polynomial')
     const toProjectedGeoPolynomialTransformation =
       projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
+
     measures.polynomialRmse = toProjectedGeoPolynomialTransformation.rmse
     measures.polynomialParameters =
       toProjectedGeoPolynomialTransformation.polynomialParameters
@@ -359,15 +352,8 @@ export default class Analyser<W extends WarpedMap> {
       toProjectedGeoPolynomialTransformation.translation
 
     // Helmert
-    const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
-      this.warpedMap.projectedTransformerByTransformationType,
-      'helmert',
-      () =>
-        new GcpTransformer(this.warpedMap.projectedGcps, 'helmert', {
-          differentHandedness: true
-        }) // TODO: load default options? Or differentHandedness becomes default?
-    )
-
+    const projectedHelmertTransformer =
+      this.warpedMap.getProjectedTransformer('helmert')
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
 

@@ -47,6 +47,8 @@ const LOG2_SCALE_FACTOR_CORRECTION = 0.4
 const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
 const MAX_TOTAL_RESOLUTION_RATIO = 10
 
+const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
+
 /**
  * Abstract base class for renderers
  */
@@ -291,8 +293,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       viewport.getProjectedGeoBufferedRectangle(
         this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 0
       )
+    // Optimise computation time of backwards transformation:
+    // Since this is the only place transformToResource is called
+    // (and hence backwards transformation is computed)
+    // and computing thinPlateSpline can be expensive for maps with many gcps
+    // we can chose to compute the less expensive polynomial backward transformation.
+    // Note: for very deformed maps (with TPS and many gcps),
+    // this could lead to inaccurate tile loading (in addition to the reason explained below).
+    const projectedTransformer =
+      warpedMap.transformationType == 'thinPlateSpline' &&
+      warpedMap.gcps.length < MAX_GCPS_EXACT_TPS_TO_RESOURCE
+        ? warpedMap.projectedTransformer
+        : warpedMap.getProjectedTransformer('polynomial')
+    // Compute viewport in resource
+    // Note: since the backward transformation is not the exact inverse of the forward
+    // there is an inherent imperfection in this computation
+    // which could lead to inaccurate tile loading.
+    // In general, this is made up for by the buffers.
     const resourceBufferedViewportRing =
-      warpedMap.projectedTransformer.transformToResource(
+      projectedTransformer.transformToResource(
         [projectedGeoBufferedViewportRectangle],
         transformerOptions
       )[0]
@@ -551,13 +570,22 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected preChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected gcpsChanged(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected resourceMaskChanged(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected transformationChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected distortionChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected gcpsChanged(event: Event): void {}
+  protected internalProjectionChanged(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected projectionChanged(event: Event): void {}
 
   protected addEventListeners() {
     this.tileCache.addEventListener(
@@ -591,6 +619,16 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
+      WarpedMapEventType.GCPSCHANGED,
+      this.gcpsChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.RESOURCEMASKCHANGED,
+      this.gcpsChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
@@ -601,8 +639,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.GCPSUPDATED,
-      this.gcpsChanged.bind(this)
+      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
+      this.projectionChanged.bind(this)
+    )
+
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.PROJECTIONCHANGED,
+      this.projectionChanged.bind(this)
     )
   }
 
@@ -638,6 +681,16 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
+      WarpedMapEventType.GCPSCHANGED,
+      this.gcpsChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.RESOURCEMASKCHANGED,
+      this.gcpsChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
       WarpedMapEventType.TRANSFORMATIONCHANGED,
       this.transformationChanged.bind(this)
     )
@@ -648,8 +701,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.GCPSUPDATED,
-      this.gcpsChanged.bind(this)
+      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
+      this.projectionChanged.bind(this)
+    )
+
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.PROJECTIONCHANGED,
+      this.projectionChanged.bind(this)
     )
   }
 }

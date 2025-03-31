@@ -4,7 +4,7 @@ This module extends the GCP Transformer class from [@allmaps/transform](../../pa
 
 Projections are handled by the [Proj4js](https://github.com/proj4js/proj4js) library. This package this supports any projection (or more generally, coordinate reference system or CRS) supported by Proj4js.
 
-Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two places where we transform and project a IIIF image from the 'resource' space of the image to the 'projected geospatial' space of a map projection (in most cases WebMercator), using the Ground Control Points and transformation type defined in the map's Georeference Annotation.
+Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../packages/render/) and [@allmaps/tileserver](../../apps/tileserver/), two places where we transform a IIIF image from the 'resource' space of the image to the 'projected geospatial' space of a map projection (in most cases WebMercator), using the Ground Control Points and transformation type defined in the map's Georeference Annotation.
 
 ## How it works
 
@@ -14,7 +14,7 @@ Like instances of the `GcpTransformer` class, instances of the `ProjectedGcpTran
 
 The **projection** defines the 'projected geo' space of the viewport. Since we will render our geometries in the projected space of our viewport, it is logical to make the transformer aware of this space by supplying its projection, so it can bring the results to this space. It defaults to WebMercator `EPSG:3857`, the projection used by default in most webmaps.
 
-The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. It is important to build a transformer between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection, to make the transformer account *only* for the warping of the image onto its intended projection space, and not for any other warping due to a choice of the viewport projection (which could be different then the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function is computed from 'internal projected geo' to 'projected geo' space, it is set as the `postToGeo` option that is part of the GCP Transform options, and is executed at the end of the transformer's `toGeo()` method. Similarly a `preToResource()` is computed for the inverse projection and executed before the `toResource()` method. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to it's 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
+The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different then the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to it's 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
 
 The GCPs must be provided in lon-lat `EPSG:4326` projection (since this is the default projection used by GeoJSON and Georeference Annotations) and are projected to the 'projected geo' space before building the GCP Transformer (who will project them to the 'internal projected geo' space).
 
@@ -30,9 +30,53 @@ npm install @allmaps/project
 
 ## Usage
 
-### Default (internal) projection: WebMercator `EPSG:3857`
+### Quickstart
 
-In this example we create a projected transformer with a Thin Plate Spline transformation from 'resource' space to the 'internal projected geo' space in the (default) WebMercator `EPSG:3857` projection, which is the same as the 'projected geo' space.
+Similar to GCP Transformers, when starting from an **Annotation** or **Georeferenced Map**, the fastest way to build a Projected GCP Transformer is:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { ProjectedGcpTransformer } from '@allmaps/project'
+
+// Fetch an annotation
+const annotation = await fetch(annoationUrl).then((response) => response.json())
+
+// Create a georeferencedMap from the annotation
+const georeferencedMaps = parseAnnotation(annotation)
+const georeferencedMap = georeferencedMaps[0]
+
+// Build Projected GCP Transformer
+const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+// Use it to transform geometries, as below. E.g.:
+const projectedGeoPoint = projectedTransformer.transformToGeo(resourcePoint)
+```
+
+This is equivalent to constructing a projected transformer from the Annotation's or Georeferenced Map's GCPs, transformation type and projection, as in the examples below.
+
+This projected transformer can then be used to transform geometries between 'resource' space and 'projected geo' space.
+
+When **rendering** maps, another way to quickly obtain a projected transformer is to access it directly from a **Warped Map** in the renderer's Warped Map List:
+
+```js
+// Create a renderer from your canvas
+const renderer = new WebGL2Renderer(gl)
+// Fetch and parse annotations, add them to the renderer ...
+
+// There are multiple ways to access the renderer's Warped Map List's Warped Maps, e.g.:
+const warpedMap = renderer.warpedMapList.getWarpedMap(mapId)
+
+// Access the Projected GCP Transformer, in the Warped Map's current transformation type
+const projectedTransformer = warpedMap.projectedTransformer
+// Or select or create the Projected GCP Transformer of a different transformation type
+const projectedHelmertTransformer = warpedMap.getProjectedTransformer('helmert')
+```
+
+### Using a transformer with the default WebMercator `EPSG:3857` projections
+
+In this example we create a projected transformer with a Thin Plate Spline transformation and the default internal projection and projection: WebMercator `EPSG:3857`.
+
+This projected transformer thus gives WebMercator `EPSG:3857` coordinates when transforming forward.
 
 ```js
 import { ProjectedGcpTransformer } from '@allmaps/project'
@@ -81,7 +125,6 @@ const resourceLineString = [
 ]
 
 const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineString)
-// Returns a lineString in WebMercator coordinates
 // projectedGeoLineString = [
 //   [498246.8195647142, 6789061.316027705],
 //   [496595.9732655353, 6787546.801212325],
@@ -97,9 +140,11 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineS
 // ]
 ```
 
-### Specify internal projection
+Notice how this returns a lineString in WebMercator coordinates.
 
-In this example we create a projected transformer with a Thin Plate Spline transformation from the 'resource' space to the 'internal projected' space in the 'BD72 / Belgian Lambert 72' `EPSG:31370` projection, and bring the results to the (default) 'projected geo' space in the WebMercator `EPSG:3857` projection.
+### Using a transformer with a specific internal projection
+
+In this example we create a projected transformer with a Thin Plate Spline transformation, the internal projection set to 'BD72 / Belgian Lambert 72' `EPSG:31370` and the projection set to the WebMercator `EPSG:3857`.
 
 ```js
 import { ProjectedGcpTransformer } from '@allmaps/project'
@@ -127,8 +172,6 @@ const resourceLineString = [
 ]
 
 const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineString)
-// Returns a lineString in WebMercator coordinates with other points
-// given the other internal projection
 // const projectedGeoLineString = [
 //   [498247.196090505, 6789061.7676701555],
 //   [496596.0857961293, 6787546.818863111],
@@ -144,7 +187,9 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineS
 // ]
 ```
 
-### Specify internal projection and projection
+Notice how this return a lineString in WebMercator coordinates with different points then previously, since it's transformation used another internal projection before projecting the result to WebMercator.
+
+### Using a transformer with a specific internal projection and projection
 
 Likewise, it's possible to specify both the internal projection and projection.
 
@@ -177,7 +222,6 @@ const resourceLineString = [
 ]
 
 const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineString)
-// Returns a lineString in WebMercator coordinates with the same points but in EPSG:28992
 // const projectedGeoLineString = [
 //   [92171.96319801327, 439250.7392195241],
 //   [91140.1318550074, 438330.2059945731],
@@ -193,14 +237,16 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineS
 // ]
 ```
 
-### Modify transform projection
+Notice how this returns a lineString in WebMercator coordinates with the same points as previously but projected to EPSG:28992
 
-Since `projection` is a *transform* option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to *any* projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and it's forward and/or backward transformation (who's computation can be expensive when there are many GCPs).
+### Transforming to a different projection
+
+Since `projection` is a *transform* option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to *any* projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and it's toGeo and/or toResource transformations (who's computation can be expensive when there are many GCPs).
 
 We can request the result of a 'toGeo' transform using the projected transformer above as follows:
 
 ```js
-// projectedTransformer:
+// Same projectedTransformer as above:
 // internalProjection: epsg31370,
 // projection: epsg28992
 
@@ -208,8 +254,6 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(
   resourceLineString,
   {projection: 'EPSG:3857'}
 )
-// Returns a result very close to earlier result for projectedTransformer
-// with internalProjection 'EPSG:31370' and default projection WebMercator 'EPSG:3857'
 // const projectedGeoLineString = [
 //   [ 498247.1996476347, 6789061.760253225 ],
 //   [ 496596.08934986574, 6787546.81144527 ],
@@ -225,7 +269,13 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(
 // ]
 ```
 
-In the code this is implemented by passing a `postToGeo` function that projects from the transformer's internal projection to the requested projection.
+Notice how this returns a result very close to the earlier result for projectedTransformer with internalProjection `EPSG:31370` and default projection WebMercator `EPSG:3857`.
+
+To change a projected transformer's projection in the *transformer* options (such that it will always be used by default), use the `setProjection()` method.
+
+Passing a projection in a transform call, as above, has been implemented as passing a `postToGeo` function that projects from the transformer's internal projection to the requested projection.
+
+Note: there is no equivalent option for the internal projection.
 
 ## Creating and using a projected transformer
 
@@ -268,7 +318,7 @@ An extra 'transform option' is available for Projected GCP Transformers:
 
 As with a GCP Transformer, passing this transform option during the transformer's construction here it the default when using the transform methods.
 
-Like other GCP *Transform* options, this option can be set when constructing a transformer *and* when transform geometries. This can be useful, since it allows us to reusing the forward and/or backward transformations of a transformer (which can be expensive to compute for when there are many GCPs) to transform to a new projection. (See example above.)
+Like other GCP *Transform* options, this option can be set when constructing a transformer *and* when transform geometries. This can be useful, since it allows us to reusing the toGeo and/or toResource transformations of a transformer (which can be expensive to compute for when there are many GCPs) to transform to a new projection. (See example above.)
 
 ## Typing
 
@@ -279,6 +329,24 @@ export type Projection = string
 ```
 
 ## API
+
+### `ProjectedGcpTransformOptions`
+
+###### Type
+
+```ts
+{projection: Projection} & {
+  maxDepth: number
+  minOffsetRatio: number
+  minOffsetDistance: number
+  minLineDistance: number
+  geoIsGeographic: boolean
+  distortionMeasures: DistortionMeasure[]
+  referenceScale: number
+  postToGeo: ProjectionFunction
+  preToResource: ProjectionFunction
+} & MultiGeometryOptions
+```
 
 ### `new ProjectedGcpTransformer(gcps, type, partialProjectedGcpTransformerOptions)`
 
@@ -317,15 +385,7 @@ string
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#postToGeo`
-
-###### Type
-
-```ts
-(point: Point) => Point
-```
-
-### `ProjectedGcpTransformer#preToResource`
+### `ProjectedGcpTransformer#lonLatToProjection`
 
 ###### Type
 
@@ -349,6 +409,14 @@ string
 (point: Point) => Point
 ```
 
+### `ProjectedGcpTransformer#projectionToLatLon`
+
+###### Type
+
+```ts
+(point: Point) => Point
+```
+
 ### `ProjectedGcpTransformer#setProjection(projection)`
 
 Set the projection.
@@ -358,7 +426,7 @@ then set on a transformer's construction (but using the same internal projection
 it's possible to specify the requested projection in the transform options.
 
 This way we circumvent a possibly expensive recomputation
-of the forward or backward transformations.
+of the toGeo and/or toResource transformations.
 
 To do this more systematically, it's possible to set
 a projected gcp transformer's projection using this method
@@ -412,3 +480,35 @@ Create a Projected GCP Transformer from a Georeferenced Map
 ###### Returns
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
+
+### `ProjectedGcpTransformerOptions`
+
+###### Type
+
+```ts
+{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions
+```
+
+### `Projection`
+
+###### Type
+
+```ts
+string
+```
+
+### `lonLatProjection`
+
+###### Type
+
+```ts
+  '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'
+```
+
+### `webMercatorProjection`
+
+###### Type
+
+```ts
+  '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs'
+```

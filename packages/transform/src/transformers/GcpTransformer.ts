@@ -143,15 +143,15 @@ export class GcpTransformer extends BaseGcpTransformer {
    */
   getToGeoTransformationResolution(
     resourceBbox: Bbox,
-    partialGcpTransformOptions: Partial<GcpTransformOptions>
+    partialGcpTransformOptions?: Partial<GcpTransformOptions>
   ): number | undefined {
-    const generalGcpTransformOptions =
+    const partialGeneralGcpTransformOptions =
       gcpTransformOptionsToGeneralGcpTransformOptions(
         partialGcpTransformOptions
       )
     return super._getForwardTransformationResolution(
       resourceBbox,
-      generalGcpTransformOptions
+      partialGeneralGcpTransformOptions
     )
   }
 
