@@ -3,7 +3,7 @@ import tinycolor from 'tinycolor2'
 import type { Color } from '../shared/types.js'
 
 export function Dots(color: Color) {
-  const fill = tinycolor(color).toString()
+  const fill = tinycolor(color).lighten(10).toString()
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
