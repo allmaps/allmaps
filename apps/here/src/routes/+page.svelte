@@ -1,81 +1,38 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import { Header, Loading, URLInput, paramStore } from '@allmaps/ui'
+  import { blue } from '@allmaps/tailwind'
 
-  import { Navigation } from '@allmaps/ui/kit'
+  import { Loading, Collection } from '@allmaps/ui'
 
-  import {
-    maps,
-    loadMapsFromCoordinates,
-    loadMapsFromUrl
-  } from '$lib/shared/stores/maps.js'
-  import { error } from '$lib/shared/stores/error.js'
-  import { position } from '$lib/shared/stores/geolocation.js'
-  import {
-    selectedMapId,
-    selectedMapWithImageInfo
-  } from '$lib/shared/stores/selected-map.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
 
-  import Here from '$lib/components/Here.svelte'
-  import NearbyMaps from '$lib/components/NearbyMaps.svelte'
+  import Thumbnail from '$lib/components/Thumbnail.svelte'
+  import DotsPattern from '$lib/components/DotsPattern.svelte'
 
-  // eslint-disable-next-line no-undef
-  async function handleGeolocation(position: GeolocationPosition) {
-    loadMapsFromCoordinates(position.coords.latitude, position.coords.longitude)
-  }
+  import type { PageProps } from './$types.js'
 
-  $: {
-    if ($position) {
-      try {
-        handleGeolocation($position)
-      } catch (err) {
-        if (err instanceof Error) {
-          $error = err
-        } else {
-          $error = new Error('Unknown error')
-        }
-      }
-    }
-  }
+  let { data }: PageProps = $props()
 
-  onMount(async () => {
-    paramStore.subscribe(async (value) => {
-      if (!value) {
-        $selectedMapId = undefined
-      } else {
-        if (value.type === 'url' && value.url) {
-          loadMapsFromUrl(value.url)
-          $selectedMapId = value.url
-        }
-      }
-    })
-  })
+  const mapsState = getMapsState()
 </script>
 
-<Navigation />
-<div class="absolute w-full h-full flex flex-col">
-  <Header appName="Here">
-    {#if $selectedMapId}
-      <URLInput />
-    {/if}
-  </Header>
-  <main class="relative h-full overflow-auto">
-    {#if $selectedMapWithImageInfo}
-      <Here />
-    {:else if $maps.size > 0}
+<div class="bg-blue/75">
+  <DotsPattern color={blue}>
+    {#if mapsState.maps.size > 0}
       <section class="p-3" transition:fade={{ duration: 120 }}>
-        <NearbyMaps />
+        <Collection>
+          {#each mapsState.mapsFromCoordinates as [mapId, map] (mapId)}
+            <div class="bg-white/40 p-2 rounded-md">
+              <Thumbnail {mapId} {map} geojsonRoute={data.geojsonRoute} />
+            </div>
+          {/each}
+        </Collection>
       </section>
-    {:else if $error}
-      <div class="h-full flex flex-col gap-2 items-center justify-center">
-        Error: {$error.message}
-      </div>
     {:else}
       <div class="h-full flex items-center justify-center">
         <Loading />
       </div>
     {/if}
-  </main>
+  </DotsPattern>
 </div>
