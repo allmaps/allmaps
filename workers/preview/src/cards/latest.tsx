@@ -1,6 +1,8 @@
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
 import { json } from 'itty-router'
 
+import tinycolor from 'tinycolor2'
+
 import {
   blue,
   purple,
@@ -15,7 +17,7 @@ import { validateGeoreferencedMap } from '@allmaps/annotation'
 
 import { cachedFetch } from '../shared/fetch.js'
 import { getTransformedPolygon, geometryToPath } from '../shared/geometry.js'
-import { hexToRgb } from '../shared/colors.js'
+import { shuffleArray } from '../shared/arrays.js'
 
 import type { IRequestStrict } from 'itty-router'
 
@@ -31,7 +33,7 @@ const mapCount = columns * rows
 const padding = 5
 const strokeWidth = 4
 
-function getMapPath(color: string, path: string) {
+function generateMapPath(color: string, path: string) {
   return (
     <svg
       viewBox="0 0 100 100"
@@ -47,7 +49,7 @@ function getMapPath(color: string, path: string) {
   )
 }
 
-function getGrayMapMonster() {
+function generateGrayMapMonster() {
   // TODO: return gray map monster
   return <div></div>
 }
@@ -60,6 +62,8 @@ export async function generateLatestCard(
   try {
     const url = `https://api.allmaps.org/maps?limit=${mapCount}`
     const apiMaps = await cachedFetch(url).then((response) => response.json())
+
+    const shuffledColors = shuffleArray(colors)
 
     const maps = validateGeoreferencedMap(apiMaps)
 
@@ -80,8 +84,8 @@ export async function generateLatestCard(
         }}
       >
         {maps.map((map, index) => {
-          const color = colors[index % colors.length]
-          const rgbColor = hexToRgb(color)
+          const color = shuffledColors[index % colors.length]
+          const rgbColor = tinycolor(color).toRgb()
 
           let path: string | null = null
           try {
@@ -110,7 +114,7 @@ export async function generateLatestCard(
                   borderRadius: '5px'
                 }}
               >
-                {path ? getMapPath(color, path) : getGrayMapMonster()}
+                {path ? generateMapPath(color, path) : generateGrayMapMonster()}
               </span>
             </span>
           )
