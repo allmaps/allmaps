@@ -1761,6 +1761,10 @@ importers:
         version: 5.4.11(@types/node@18.19.67)
 
   workers/preview:
+    dependencies:
+      tinycolor2:
+        specifier: ^1.6.0
+        version: 1.6.0
     devDependencies:
       '@allmaps/annotation':
         specifier: ^1.0.0-beta.32
@@ -1813,6 +1817,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.1
         version: 18.3.5(@types/react@18.3.20)
+      '@types/tinycolor2':
+        specifier: ^1.4.3
+        version: 1.4.6
       '@types/upng-js':
         specifier: ^2.1.2
         version: 2.1.5
