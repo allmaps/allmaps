@@ -42,7 +42,6 @@ export async function generateHereCard(
     weight: 500
   })
 
-  const pin = await loadImage(req, env, 'pin.svg')
   const pinShadow = await loadImage(req, env, 'pin-shadow.svg')
   const stamp = await loadImage(req, env, 'stamp-texture.svg')
 
