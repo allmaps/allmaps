@@ -1,5 +1,5 @@
 name = "here"
-main = "./.cloudflare/worker.js",
+main = "./.cloudflare/worker.js"
 compatibility_date = "2024-11-06"
 
 site = {  bucket = "./.cloudflare/public" }
