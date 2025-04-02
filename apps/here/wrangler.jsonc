@@ -1,0 +1,22 @@
+{
+  "name": "here",
+  "main": "./.cloudflare/worker.js",
+  "site": {
+    "bucket": "./.cloudflare/public"
+  },
+  "build": {
+    "command": "pnpm install --no-frozen-lockfile && pnpm run lerna-build"
+  },
+  "compatibility_date": "2024-11-06",
+  "vars": {
+    "USE_CACHE": true,
+    "API_BASE_URL": "https://api.allmaps.org"
+  },
+  "env.dev": {
+    "name": "here-next",
+    "vars": {
+      "USE_CACHE": false,
+      "API_BASE_URL": "https://api.allmaps.org"
+    }
+  }
+}
