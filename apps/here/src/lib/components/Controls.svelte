@@ -54,10 +54,10 @@
   })
 </script>
 
-<div class="w-full grid grid-cols-[1fr,max-content,1fr]">
+<div class="w-full grid grid-cols-[1fr_max-content_1fr]">
   {#if hasMaps && previousMapId && nextMapId}
     <div
-      class="bg-white text-center self-center inline-grid grid-cols-2 rounded-md place-self-start shadow-sm pointer-events-auto"
+      class="bg-white text-center self-center inline-grid grid-cols-2 rounded-md place-self-start shadow-xs pointer-events-auto"
     >
       <a
         href={createRouteUrl(page, getAllmapsId(previousMapId))}
