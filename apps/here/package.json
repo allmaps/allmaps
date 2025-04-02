@@ -19,6 +19,7 @@
     "dev-ssl": "SSL=true NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev --host",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/here --include-dependencies",
+    "deploy": "wrangler deploy",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
