@@ -3,6 +3,7 @@ main = ".svelte-kit/cloudflare/_worker.js"
 compatibility_date = "2025-01-01"
 
 build = { command = "pnpm install --no-frozen-lockfile && pnpm run lerna-build" }
+assets = { directory = ".svelte-kit/cloudflare",  binding = "ASSETS" }
 
 [vars]
 USE_CACHE=true
