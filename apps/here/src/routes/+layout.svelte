@@ -39,6 +39,10 @@
   })
 </script>
 
+<svelte:head>
+  <meta property="og:description" content="test SSR" />
+</svelte:head>
+
 <div class="absolute w-full h-full flex flex-col">
   <div class="z-10">
     <Header appName="Here"></Header>
