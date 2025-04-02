@@ -14,6 +14,8 @@
   import { setUiState } from '$lib/state/ui.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
 
+  import type { LayoutProps } from './$types.js'
+
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
@@ -21,14 +23,14 @@
   const imageInfoState = setImageInfoState()
   const sensorState = setSensorsState(errorState)
   const urlState = setUrlState(page.url, errorState)
-  setUiState()
+  const uiState = setUiState()
   setMapsState(sensorState, imageInfoState)
 
   interface Props {
     children?: Snippet
   }
 
-  let { children }: Props = $props()
+  let { data, children }: LayoutProps & Props = $props()
 
   afterNavigate(() => {
     urlState.updateUrl(page.url)
@@ -40,7 +42,19 @@
 </script>
 
 <svelte:head>
-  <meta property="og:description" content="test SSR" />
+  <meta property="og:title" content="Allmaps Here" />
+  <meta property="og:description" content="I am here!" />
+
+  {#if data.from}
+    <meta
+      property="og:image"
+      content="https://next.preview.allmaps.org/apps/here/maps/{data.allmapsMapId}.png?from={data.from.join(
+        ','
+      )}&color={uiState.color}"
+    />
+  {/if}
+
+  <meta property="og:type" content="website" />
 </svelte:head>
 
 <div class="absolute w-full h-full flex flex-col">

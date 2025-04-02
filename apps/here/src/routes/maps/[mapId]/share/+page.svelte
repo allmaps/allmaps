@@ -1,10 +1,14 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition'
+
   import { goto } from '$app/navigation'
   import { page } from '$app/state'
 
   import { Dialog } from 'bits-ui'
 
   import { X as XIcon } from 'phosphor-svelte'
+
+  import { Loading } from '@allmaps/ui'
 
   import Colors from '$lib/components/Colors.svelte'
 
@@ -19,6 +23,7 @@
   const ogImageSize = { width: 1200, height: 630 }
 
   let open = $state(true)
+  let imageLoaded = $state(false)
 
   let postcardUrl = $derived(
     createRouteUrl(page, `${page.url.pathname}/../postcard`, {
@@ -32,6 +37,14 @@
     }
   })
 
+  function handleImageLoad() {
+    imageLoaded = true
+  }
+
+  function handleImageError() {
+    // TODO: handle image error
+  }
+
   // TODO:
   // Add full text to copy
   // Show map label/description
@@ -40,6 +53,7 @@
   // Copy image
   // Preview postcard
   // Paste URL in Signal, WhatsApp, Slack, Bluesky
+  // Copy buttons only enabled when image loaded and no error
 </script>
 
 <div class="absolute top-0 w-full h-full">
@@ -57,14 +71,28 @@
           Share map
         </Dialog.Title>
 
-        <div style="aspect-ratio: {ogImageSize.width / ogImageSize.height}">
+        <div
+          class="w-full relative"
+          style="aspect-ratio: {ogImageSize.width / ogImageSize.height}"
+        >
           <img
+            onload={handleImageLoad}
+            onerror={handleImageError}
             alt="Preview"
             class="rounded-md overflow-hidden"
             src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.png?from={data.from?.join(
               ','
             )}"
           />
+          {#if !imageLoaded}
+            <div
+              out:fade
+              class="w-full h-full absolute bg-white
+                top-0 left-0 flex items-center justify-center"
+            >
+              <Loading />
+            </div>
+          {/if}
         </div>
 
         <Colors />
@@ -74,7 +102,9 @@
         </div>
 
         <Dialog.Close
-          class="focus-visible:ring-foreground focus-visible:ring-offset-background focus-visible:outline-hidden absolute right-5 top-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]"
+          class="focus-visible:ring-foreground focus-visible:ring-offset-background focus-visible:outline-hidden absolute right-5 top-5 rounded-md
+          cursor-pointer
+          focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]"
         >
           <div>
             <XIcon class="text-foreground size-5" />

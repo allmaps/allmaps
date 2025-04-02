@@ -4,12 +4,16 @@ import type { GeojsonLineString, Point } from '@allmaps/types'
 
 import type { LayoutLoad } from './$types.js'
 
-export const load: LayoutLoad = async ({ url }) => {
+export const load: LayoutLoad = async ({ url, params }) => {
   let geojsonRoute: GeojsonLineString | undefined
   let from: Point | undefined
+  let color: string | undefined
+
+  const { mapId } = params
 
   const geojsonParam = url.searchParams.get('geojson')
   const fromParam = url.searchParams.get('from')
+  const colorParam = url.searchParams.get('color')
 
   if (geojsonParam) {
     try {
@@ -37,8 +41,27 @@ export const load: LayoutLoad = async ({ url }) => {
     }
   }
 
+  if (colorParam) {
+    const colors = [
+      'blue',
+      'purple',
+      'pink',
+      'orange',
+      'red',
+      'green',
+      'yellow'
+    ]
+
+    if (colors.includes(colorParam)) {
+      color = colorParam
+    }
+  }
+
   return {
+    selectedMapId: `https://annotations.allmaps.org/maps/${mapId}`,
+    allmapsMapId: mapId,
     geojsonRoute,
-    from
+    from,
+    color
   }
 }
