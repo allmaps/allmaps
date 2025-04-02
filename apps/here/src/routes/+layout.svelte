@@ -45,12 +45,12 @@
   <meta property="og:title" content="Allmaps Here" />
   <meta property="og:description" content="I am here!" />
 
-  {#if data.from}
+  {#if data.allmapsMapId && data.from}
     <meta
       property="og:image"
       content="https://next.preview.allmaps.org/apps/here/maps/{data.allmapsMapId}.png?from={data.from.join(
         ','
-      )}&color={uiState.color}"
+      )}"
     />
   {/if}
 
