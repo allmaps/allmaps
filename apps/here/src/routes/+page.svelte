@@ -17,7 +17,7 @@
   const mapsState = getMapsState()
 </script>
 
-<div class="bg-blue/75">
+<div class="h-full bg-blue/75">
   <DotsPattern color={blue}>
     {#if mapsState.maps.size > 0}
       <section class="p-3" transition:fade={{ duration: 120 }}>

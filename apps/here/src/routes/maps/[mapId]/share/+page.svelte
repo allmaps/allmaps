@@ -69,6 +69,10 @@
 
         <Colors />
 
+        <div>
+          <a class="underline" href={postcardUrl}>Preview URL</a>
+        </div>
+
         <Dialog.Close
           class="focus-visible:ring-foreground focus-visible:ring-offset-background focus-visible:outline-hidden absolute right-5 top-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]"
         >

@@ -15,6 +15,7 @@
   import { getAllmapsId } from '$lib/shared/ids.js'
 
   import Pin from '$lib/shared/images/pin.svg?raw'
+  import PinShadow from '$lib/shared/images/pin-shadow.svg?raw'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonLineString, Size } from '@allmaps/types'
@@ -125,7 +126,7 @@
             viewBox="0 0 {svgSize[0]} {svgSize[1]}"
           >
             <g
-              class="opacity-90 group-hover:opacity-100 transition-opacity group-hover:animate-pulse"
+              class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
             >
               {#if resourceRouteCoordinates}
                 <polyline
@@ -173,6 +174,14 @@
                 style:top="calc({pinOriginPosition[1]}% - 3.4rem)"
               >
                 {@html Pin}
+              </div>
+              <div
+                class="absolute w-12 -left-4 transition-all duration-200 delay-200 ease-out
+                opacity-0 group-hover:opacity-100 translate-x-16 group-hover:translate-x-0"
+                style:left="calc({pinOriginPosition[0]}%)"
+                style:top="calc({pinOriginPosition[1]}% - 0.4rem)"
+              >
+                {@html PinShadow}
               </div>
             </div>
           {/if}
