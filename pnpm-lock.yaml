@@ -411,6 +411,9 @@ importers:
       vite-plugin-qrcode:
         specifier: ^0.2.4
         version: 0.2.4(vite@6.1.0)
+      wrangler:
+        specifier: ^3.57.2
+        version: 3.114.0(@cloudflare/workers-types@4.20240524.0)
 
   apps/homepage:
     dependencies:
