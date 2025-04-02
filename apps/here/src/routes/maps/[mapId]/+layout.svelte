@@ -18,7 +18,6 @@
 
   let { data, children }: LayoutProps & Props = $props()
 
-  const urlState = getUrlState()
   const uiState = getUiState()
   const compassState = setCompassState(
     getSensorsState(),
@@ -31,7 +30,7 @@
   })
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
   <meta property="og:title" content="Allmaps Here" />
   <meta property="og:description" content="I am here!" />
 
@@ -45,9 +44,13 @@
   {/if}
 
   <meta property="og:type" content="website" />
-</svelte:head>
+</svelte:head> -->
 
 <div class="relative w-full h-full flex flex-col bg-pink-100">
   <Here selectedMapId={data.selectedMapId} geojsonRoute={data.geojsonRoute} />
   {@render children?.()}
 </div>
+
+<svelte:head>
+  <meta property="og:description" content="Test nested layout head tag" />
+</svelte:head>
