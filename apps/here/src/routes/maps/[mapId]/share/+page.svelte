@@ -14,15 +14,13 @@
 
   import { createRouteUrl } from '$lib/shared/router.js'
 
-  // import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   import type { PageProps } from './$types.js'
 
   let { data }: PageProps = $props()
-
-  const VITE_PREVIEW_URL = import.meta.env.VITE_PREVIEW_URL
 
   let open = $state(true)
   let imageLoaded = $state(false)
@@ -82,7 +80,7 @@
             onerror={handleImageError}
             alt="Preview"
             class="rounded-md overflow-hidden"
-            src="{VITE_PREVIEW_URL}/maps/{data.allmapsMapId}.png?from={data.from?.join(
+            src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.png?from={data.from?.join(
               ','
             )}"
           />

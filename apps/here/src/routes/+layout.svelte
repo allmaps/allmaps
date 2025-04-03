@@ -13,7 +13,7 @@
   import { setUrlState } from '$lib/state/url.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
 
-  // import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
@@ -21,8 +21,6 @@
 
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
-
-  const VITE_PREVIEW_URL = import.meta.env.VITE_PREVIEW_URL
 
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
@@ -53,7 +51,7 @@
   {#if data.allmapsMapId && data.from}
     <meta
       property="og:image"
-      content="{VITE_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
+      content="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
         ','
       )}"
     />
