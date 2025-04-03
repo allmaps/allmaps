@@ -80,7 +80,7 @@
             onerror={handleImageError}
             alt="Preview"
             class="rounded-md overflow-hidden"
-            src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.png?from={data.from?.join(
+            src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from?.join(
               ','
             )}"
           />
