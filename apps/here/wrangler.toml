@@ -9,9 +9,9 @@ assets = { directory = ".svelte-kit/cloudflare",  binding = "ASSETS" }
 name = "here-next"
 
 [vars]
-PUBLIC_ANNOTATIONS_URL = "https://annotations.allmaps.org"
-PUBLIC_PREVIEW_URL= "https://next.preview.allmaps.org/apps/here"
+VITE_ANNOTATIONS_URL = "https://annotations.allmaps.org"
+VITE_PREVIEW_URL= "https://next.preview.allmaps.org/apps/here"
 
 [env.dev.vars]
-PUBLIC_ANNOTATIONS_URL = "https://annotations.allmaps.org"
-PUBLIC_PREVIEW_URL = "http://localhost:5514/apps/here"
+VITE_ANNOTATIONS_URL = "https://annotations.allmaps.org"
+VITE_PREVIEW_URL = "http://localhost:5514/apps/here"

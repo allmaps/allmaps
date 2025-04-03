@@ -4,7 +4,7 @@ import { SvelteMap } from 'svelte/reactivity'
 import { fetchJson } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
-import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
+// import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
 
 import { distance } from '$lib/shared/position.js'
 
@@ -14,6 +14,8 @@ import type { SensorsState } from '$lib/state/sensors.svelte.js'
 import type { ImageInfoState } from '$lib/state/image-info.svelte.js'
 
 import type { MapWithImageInfo } from '$lib/shared/types.ts'
+
+const VITE_ANNOTATIONS_URL = import.meta.env.VITE_ANNOTATIONS_URL
 
 const THRESHOLD_TIMESTAMP = 5000 // 5 seconds in milliseconds
 const THRESHOLD_DISTANCE = 10 // 10 meters
@@ -103,7 +105,7 @@ export class MapsState {
       coords: { latitude, longitude }
     } = position
 
-    const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
+    const url = `${VITE_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
       latitude,
       longitude
     ].join(',')}`

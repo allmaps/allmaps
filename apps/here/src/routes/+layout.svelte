@@ -11,10 +11,9 @@
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
   import { setUrlState } from '$lib/state/url.svelte.js'
-  import { setUiState } from '$lib/state/ui.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  // import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
@@ -23,11 +22,13 @@
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
+  const VITE_PREVIEW_URL = import.meta.env.VITE_PREVIEW_URL
+
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
   const sensorState = setSensorsState(errorState)
   const urlState = setUrlState(page.url, errorState)
-  const uiState = setUiState()
+
   setMapsState(sensorState, imageInfoState)
 
   interface Props {
@@ -52,7 +53,7 @@
   {#if data.allmapsMapId && data.from}
     <meta
       property="og:image"
-      content="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
+      content="{VITE_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
         ','
       )}"
     />
