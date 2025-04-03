@@ -2,6 +2,7 @@ import { AutoRouter, error, cors, json, IRequestStrict } from 'itty-router'
 
 import { optionsFromQuery } from './shared/options.js'
 import { match, put, headers } from './shared/cache.js'
+import { toJpgImageResponse } from './shared/jpg-response.js'
 
 import type { CFArgs, Env } from './shared/types.js'
 
@@ -31,6 +32,10 @@ router.get('/apps/latest.png', (req, env) => {
   return generateLatestCard(req, env, ogImageSize)
 })
 
+router.get('/apps/latest.jpg', async (req, env) => {
+  return toJpgImageResponse(await generateLatestCard(req, env, ogImageSize))
+})
+
 router.get('/apps/editor/maps/:imageId.png', (req, env) => {
   const imageId = req.params?.imageId
   const options = optionsFromQuery(req)
@@ -50,6 +55,15 @@ router.get('/apps/here/maps/:mapId.png', (req, env) => {
   const options = optionsFromQuery(req)
 
   return generateHereCard(req, env, mapId, ogImageSize, options)
+})
+
+router.get('/apps/here/maps/:mapId.jpg', async (req, env) => {
+  const mapId = req.params?.mapId
+  const options = optionsFromQuery(req)
+
+  return toJpgImageResponse(
+    await generateHereCard(req, env, mapId, ogImageSize, options)
+  )
 })
 
 router.get('/maps/:mapId.png', (req, env) => {

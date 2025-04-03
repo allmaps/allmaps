@@ -153,7 +153,6 @@ export async function generateHereCard(
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '16px',
           width: '100%',
           height: '100%'
         }}
@@ -162,7 +161,7 @@ export async function generateHereCard(
           src={imageUrl}
           width={cardResourceSize[0]}
           height={cardResourceSize[1]}
-          style={{ position: 'absolute', top: 0 }}
+          style={{ position: 'absolute', top: 0, borderRadius: '16px' }}
         />
 
         <img
