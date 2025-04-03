@@ -43,8 +43,9 @@
       id={color.value}
       value={color.value}
       style="background-color: {color.color};"
-      class="border-gray border-1 hover:border-black data-[state=checked]:border-6 data-[state=checked]:border-black size-5
-      inset-shadow-md
+      class="border-gray border-1 hover:border-black data-[state=checked]:border-3
+      data-[state=checked]:border-black size-5
+      inset-shadow-sm
       shrink-0 cursor-pointer rounded-full transition-all duration-100 ease-in-out"
     />
   {/each}

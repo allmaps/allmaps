@@ -6,7 +6,11 @@
 
   import { Dialog } from 'bits-ui'
 
-  import { X as XIcon } from 'phosphor-svelte'
+  import {
+    X as XIcon,
+    Copy as CopyIcon,
+    Check as CheckIcon
+  } from 'phosphor-svelte'
 
   import { Loading } from '@allmaps/ui'
 
@@ -24,6 +28,9 @@
 
   let open = $state(true)
   let imageLoaded = $state(false)
+  let copying = $state(false)
+
+  let copyTimeout: number | undefined
 
   let postcardUrl = $derived(
     createRouteUrl(page, `${page.url.pathname}/../postcard`, {
@@ -48,6 +55,13 @@
   function handleCopy() {
     const absolutePostcardUrl = `https://next.here.allmaps.org/maps/${data.allmapsMapId}/postcard?from=${data.from?.join(',')}`
     navigator.clipboard.writeText(absolutePostcardUrl)
+
+    copying = true
+
+    window.clearTimeout(copyTimeout)
+    copyTimeout = window.setTimeout(() => {
+      copying = false
+    }, 2000)
   }
 
   // TODO:
@@ -105,15 +119,25 @@
         <div class="flex flex-row gap-2 items-center">
           <button
             class="disabled:cursor-not-allowed disabled:bg-green/50 bg-green
-              shadow-lg hover:shadow-sm text-white
-              cursor-pointer transition-all px-4 py-2 rounded-full"
+              active:translate-[1px] hover:translate-[0.5px]
+              hover:bg-green/95 select-none
+              shadow-md hover:shadow-sm text-white
+              cursor-pointer transition-all px-4 py-2 rounded-full
+              flex flex-row gap-2 items-center"
             disabled={!imageLoaded}
-            onclick={handleCopy}>Copy to clipboard</button
+            onclick={handleCopy}
+          >
+            {#if copying}
+              <CheckIcon class="size-5" />
+            {:else}
+              <CopyIcon class="size-5" />
+            {/if}
+            Copy to clipboard</button
           >
           <a class="underline" href={postcardUrl}>Preview URL</a>
         </div>
         <div>
-          Copy to clipboard send your location to your friends using Signal,
+          Copy to clipboard and send your location to your friends using Signal,
           WhatsApp, Slack, Bluesky or any other app!
         </div>
 

@@ -64,13 +64,14 @@
         ','
       )}"
     />
+
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
-    <meta property="og:url" content={page.url.href} />
-    <meta property="og:site_name" content="Allmaps Here" />
-    <meta property="og:locale" content="en" />
   {/if}
 
+  <meta property="og:url" content={page.url.href} />
+  <meta property="og:site_name" content="Allmaps Here" />
+  <meta property="og:locale" content="en" />
   <meta property="og:type" content="website" />
 </svelte:head>
 
