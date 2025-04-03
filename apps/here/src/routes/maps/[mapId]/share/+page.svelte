@@ -16,11 +16,11 @@
 
   import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
+  import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
+
   import type { PageProps } from './$types.js'
 
   let { data }: PageProps = $props()
-
-  const ogImageSize = { width: 1200, height: 630 }
 
   let open = $state(true)
   let imageLoaded = $state(false)
@@ -73,7 +73,7 @@
 
         <div
           class="w-full relative"
-          style="aspect-ratio: {ogImageSize.width / ogImageSize.height}"
+          style="aspect-ratio: {OG_IMAGE_SIZE.width / OG_IMAGE_SIZE.height}"
         >
           <img
             onload={handleImageLoad}

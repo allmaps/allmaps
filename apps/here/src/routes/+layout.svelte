@@ -14,6 +14,10 @@
   import { setUiState } from '$lib/state/ui.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
 
+  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+
+  import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
+
   import type { LayoutProps } from './$types.js'
 
   import '../app.css'
@@ -48,10 +52,12 @@
   {#if data.allmapsMapId && data.from}
     <meta
       property="og:image"
-      content="https://next.preview.allmaps.org/apps/here/maps/{data.allmapsMapId}.png?from={data.from.join(
+      content="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
         ','
       )}"
     />
+    <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+    <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
   {/if}
 
   <meta property="og:type" content="website" />

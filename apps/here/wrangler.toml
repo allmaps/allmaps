@@ -2,16 +2,16 @@ name = "here"
 main = ".svelte-kit/cloudflare/_worker.js"
 compatibility_date = "2025-01-01"
 
-build = { command = "pnpm install --no-frozen-lockfile && pnpm run lerna-build" }
 assets = { directory = ".svelte-kit/cloudflare",  binding = "ASSETS" }
-
-[vars]
-USE_CACHE=true
-API_BASE_URL="https://api.allmaps.org"
+observability = { enabled: true }
 
 [env.dev]
 name = "here-next"
 
+[vars]
+PUBLIC_ANNOTATIONS_URL = "https://annotations.allmaps.org"
+PUBLIC_PREVIEW_URL= "https://next.preview.allmaps.org/apps/here"
+
 [env.dev.vars]
-USE_CACHE=false
-API_BASE_URL="https://api.allmaps.org"
+PUBLIC_ANNOTATIONS_URL = "https://annotations.allmaps.org"
+PUBLIC_PREVIEW_URL = "http://localhost:5514/apps/here"
