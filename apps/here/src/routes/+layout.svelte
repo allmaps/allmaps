@@ -55,6 +55,12 @@
         ','
       )}"
     />
+    <meta
+      property="og:image:secure_url"
+      content="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
+        ','
+      )}"
+    />
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
   {/if}
