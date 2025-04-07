@@ -356,7 +356,7 @@ export class WarpedMapLayer extends Layer {
   setMapResourceMask(mapId: string, resourceMask: Point[]) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
+    this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
     this._update()
   }
 
@@ -371,10 +371,9 @@ export class WarpedMapLayer extends Layer {
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsTransformationType(
-      mapIds,
-      transformation
-    )
+    this.renderer.warpedMapList.setMapsTransformationType(transformation, {
+      mapIds
+    })
     this._update()
   }
 
@@ -389,10 +388,9 @@ export class WarpedMapLayer extends Layer {
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsDistortionMeasure(
-      mapIds,
-      distortionMeasure
-    )
+    this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
+      mapIds
+    })
     this._update()
   }
 
@@ -403,7 +401,7 @@ export class WarpedMapLayer extends Layer {
   getBounds(): number[][] | undefined {
     assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getBbox()
+    const bbox = this.renderer.warpedMapList.getMapsBbox()
     if (bbox) {
       return [
         [bbox[1], bbox[0]],

@@ -19,7 +19,7 @@ import {
   intersectBboxes,
   bboxToRectangle
 } from '@allmaps/stdlib'
-import { webMercatorToLonLat } from '@allmaps/project'
+import { lonLatProjection, proj4 } from '@allmaps/project'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -137,6 +137,17 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return false
   }
 
+  protected assureProjection() {
+    if (!this.viewport) {
+      return
+    }
+
+    this.warpedMapList.options.projection = this.viewport.projection
+    this.warpedMapList.setMapsProjection(this.viewport.projection, {
+      onlyVisible: false
+    })
+  }
+
   protected requestFetchableTiles(): void {
     if (!this.shouldRequestFetchableTiles()) {
       return
@@ -214,7 +225,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const projectedGeoBufferedRectangle =
       this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     const geoBufferedRectangleBbox = computeBbox(
-      projectedGeoBufferedRectangle.map((point) => webMercatorToLonLat(point))
+      projectedGeoBufferedRectangle.map((point) =>
+        proj4(viewport.projection, lonLatProjection, point)
+      )
     )
 
     return new Set(

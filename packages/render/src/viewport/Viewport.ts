@@ -235,7 +235,7 @@ export class Viewport {
       ViewportOptions & ZoomOptions & FitOptions & SelectionOptions
     >
   ): Viewport {
-    const projectedGeoConvexHull = warpedMapList.getConvexHull(
+    const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
       partialExtendedViewportOptions
     )
 
@@ -357,7 +357,7 @@ export class Viewport {
       ViewportOptions & ZoomOptions & SelectionOptions
     >
   ): Viewport {
-    const projectedGeoConvexHull = warpedMapList.getConvexHull(
+    const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
       partialExtendedViewportOptions
     )
 

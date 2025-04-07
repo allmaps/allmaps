@@ -8,7 +8,8 @@ export {
   lonLatProjection,
   webMercatorProjection,
   lonLatToWebMercator,
-  webMercatorToLonLat
+  webMercatorToLonLat,
+  equalProjection
 } from './shared/project-functions.js'
 
 export {

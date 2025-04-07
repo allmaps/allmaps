@@ -4,7 +4,7 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { proj4 } from '@allmaps/project'
+import { equalProjection, proj4 } from '@allmaps/project'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
@@ -40,7 +40,7 @@ const defaultWarpedMapListOptions: Partial<WarpedMapListOptions> = {
 
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
- * for quickly looking up maps using their Bbox.
+ * for quickly looking up maps using their Bbox
  * @template W - The type of WarpedMap objects in this list
  */
 export class WarpedMapList<W extends WarpedMap> extends EventTarget {
@@ -57,7 +57,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   options: Partial<WarpedMapListOptions>
 
   /**
-   * Creates an instance of a WarpedMapList.
+   * Creates an instance of a WarpedMapList
    *
    * @constructor
    * @param warpedMapFactory - Factory function for creating WarpedMap objects
@@ -85,11 +85,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get mapIds for the maps in this list.
+   * Get mapIds for selected maps
    *
-   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox.
+   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
    *
-   * @param partialSelectionOptions - Selection options, defaults to visible maps
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    * @returns mapIds
    */
   getMapIds(
@@ -102,11 +102,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the WarpedMap instances from this list.
+   * Get the WarpedMap instances for selected maps
    *
-   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox.
+   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
    *
-   * @param partialSelectionOptions - Selection options, defaults to visible maps
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    * @returns WarpedMap instances
    */
   getWarpedMaps(
@@ -147,7 +147,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get a WarpedMap instance from maps in this list by ID.
+   * Get the WarpedMap instance for a specific map
    *
    * @param mapId - Map ID of the requested WarpedMap instance
    * @returns WarpedMap instance, or undefined
@@ -157,7 +157,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the z-index of a map.
+   * Get the z-index for a specific map
    *
    * @param mapId
    * @returns
@@ -171,15 +171,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
    *
-   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
-  getCenter(
+  getMapsCenter(
     partialSelectionAndProjectionOptions?: Partial<
       SelectionOptions & ProjectionOptions
     >
   ): Point | undefined {
-    const bbox = this.getBbox(partialSelectionAndProjectionOptions)
+    const bbox = this.getMapsBbox(partialSelectionAndProjectionOptions)
     if (bbox) {
       return bboxToCenter(bbox)
     }
@@ -190,10 +190,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
    *
-   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
-  getBbox(
+  getMapsBbox(
     partialSelectionAndProjectionOptions?: Partial<
       SelectionOptions & ProjectionOptions
     >
@@ -212,10 +212,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
    *
-   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
-  getConvexHull(
+  getMapsConvexHull(
     partialSelectionAndProjectionOptions?: Partial<
       SelectionOptions & ProjectionOptions
     >
@@ -236,12 +236,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the GCPs for a specified map
+   * Sets the GCPs for a specific map
    *
-   * @param mapId - ID of the map
    * @param gcps - new GCPs
+   * @param mapId - ID of the map
    */
-  setMapGcps(mapId: string, gcps: Gcp[]): void {
+  setMapGcps(gcps: Gcp[], mapId: string): void {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       warpedMap.setGcps(gcps)
@@ -253,12 +253,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the resource mask for a specified map
+   * Sets the resource mask for a specific map
    *
-   * @param mapId - ID of the map
    * @param resourceMask - the new resource mask
+   * @param mapId - ID of the map
    */
-  setMapResourceMask(mapId: string, resourceMask: Ring): void {
+  setMapResourceMask(resourceMask: Ring, mapId: string): void {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       warpedMap.setResourceMask(resourceMask)
@@ -270,33 +270,33 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the transformation type of a single map
+   * Sets the transformation type for a specific map
    *
-   * @param mapId - the ID of the map
    * @param transformationType - the new transformation type
+   * @param mapId - the ID of the map
    */
   setMapTransformationType(
-    mapId: string,
-    transformationType: TransformationType
+    transformationType: TransformationType,
+    mapId: string
   ): void {
-    this.setMapsTransformationType([mapId], transformationType)
+    this.setMapsTransformationType(transformationType, { mapIds: [mapId] })
   }
 
   /**
-   * Sets the transformation type of specified maps
+   * Sets the transformation type for selected maps
    *
-   * @param mapIds - the IDs of the maps
    * @param transformationType - the new transformation type
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    */
   setMapsTransformationType(
-    mapIds: Iterable<string>,
-    transformationType: TransformationType
+    transformationType: TransformationType,
+    partialSelectionOptions?: Partial<SelectionOptions>
   ): void {
     const mapIdsChanged = []
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.transformationType !== transformationType) {
-        mapIdsChanged.push(mapId)
+    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
+    for (const warpedMap of warpedMaps) {
+      if (warpedMap.transformationType !== transformationType) {
+        mapIdsChanged.push(warpedMap.mapId)
       }
     }
 
@@ -321,33 +321,33 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the distortionMeasure of a single map
+   * Sets the distortionMeasure for a specific map
    *
-   * @param mapId - the ID of the map
    * @param distortionMeasure - the distortion measure
+   * @param mapId - the ID of the map
    */
   setMapDistortionMeasure(
-    mapId: string,
-    distortionMeasure?: DistortionMeasure
+    distortionMeasure: DistortionMeasure | undefined,
+    mapId: string
   ): void {
-    this.setMapsDistortionMeasure([mapId], distortionMeasure)
+    this.setMapsDistortionMeasure(distortionMeasure, { mapIds: [mapId] })
   }
 
   /**
-   * Sets the distortion measure of specified maps
+   * Sets the distortion measure for selected maps
    *
-   * @param mapIds - the IDs of the maps
    * @param distortionMeasure - the distortion measure
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    */
   setMapsDistortionMeasure(
-    mapIds: Iterable<string>,
-    distortionMeasure?: DistortionMeasure
+    distortionMeasure?: DistortionMeasure,
+    partialSelectionOptions?: Partial<SelectionOptions>
   ): void {
     const mapIdsChanged = []
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.distortionMeasure !== distortionMeasure) {
-        mapIdsChanged.push(mapId)
+    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
+    for (const warpedMap of warpedMaps) {
+      if (warpedMap.distortionMeasure !== distortionMeasure) {
+        mapIdsChanged.push(warpedMap.mapId)
       }
     }
     if (mapIdsChanged.length > 0) {
@@ -367,30 +367,30 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the internal projection of a single map
+   * Sets the internal projection for a specific map
    *
-   * @param mapId - the ID of the map
    * @param projection - the internal projection
+   * @param mapId - the ID of the map
    */
-  setMapInternalProjection(mapId: string, projection?: Projection): void {
-    this.setMapsInternalProjection([mapId], projection)
+  setMapInternalProjection(projection: Projection, mapId: string): void {
+    this.setMapsInternalProjection(projection, { mapIds: [mapId] })
   }
 
   /**
-   * Sets the internal projection of specified maps
+   * Sets the internal projection for selected maps
    *
-   * @param mapIds - the IDs of the maps
    * @param projection - the internal projection
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    */
   setMapsInternalProjection(
-    mapIds: Iterable<string>,
-    projection?: Projection
+    projection: Projection | undefined,
+    partialSelectionOptions?: Partial<SelectionOptions>
   ): void {
     const mapIdsChanged = []
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.internalProjection !== projection) {
-        mapIdsChanged.push(mapId)
+    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
+    for (const warpedMap of warpedMaps) {
+      if (!equalProjection(warpedMap.internalProjection, projection)) {
+        mapIdsChanged.push(warpedMap.mapId)
       }
     }
     if (mapIdsChanged.length > 0) {
@@ -414,27 +414,30 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Sets the projection of a single map
+   * Sets the projection for a specific map
    *
-   * @param mapId - the ID of the map
    * @param projection - the projection
+   * @param mapId - the ID of the map
    */
-  setMapProjection(mapId: string, projection?: Projection): void {
-    this.setMapsProjection([mapId], projection)
+  setMapProjection(projection: Projection, mapId: string): void {
+    this.setMapsProjection(projection, { mapIds: [mapId] })
   }
 
   /**
-   * Sets the projection of specified maps
+   * Sets the projection for selected maps
    *
-   * @param mapIds - the IDs of the maps
    * @param projection - the projection
+   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    */
-  setMapsProjection(mapIds: Iterable<string>, projection?: Projection): void {
+  setMapsProjection(
+    projection: Projection | undefined,
+    partialSelectionOptions?: Partial<SelectionOptions>
+  ): void {
     const mapIdsChanged = []
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.projection !== projection) {
-        mapIdsChanged.push(mapId)
+    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
+    for (const warpedMap of warpedMaps) {
+      if (!equalProjection(warpedMap.projection, projection)) {
+        mapIdsChanged.push(warpedMap.mapId)
       }
     }
     if (mapIdsChanged.length > 0) {
@@ -446,40 +449,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         if (warpedMap) {
           warpedMap.setProjection(projection)
           this.addToOrUpdateRtree(warpedMap)
-        }
-      })
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PROJECTIONCHANGED, mapIdsChanged)
-      )
-    }
-  }
-
-  /**
-   * Sets the projection of the warpedMapList
-   *
-   * This sets the projection of all warpedMap
-   *
-   * @param mapIds - the IDs of the maps
-   * @param projection - the projection
-   */
-  setProjection(mapIds: Iterable<string>, projection?: Projection): void {
-    this.options.projection = projection
-
-    const mapIdsChanged = []
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap && warpedMap.projection !== projection) {
-        mapIdsChanged.push(mapId)
-      }
-    }
-    if (mapIdsChanged.length > 0) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
-      )
-      mapIdsChanged.forEach((mapId) => {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMap.setProjection(projection)
         }
       })
       this.dispatchEvent(

@@ -271,7 +271,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   setMapResourceMask(mapId: string, resourceMask: Ring) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
+    this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
     this.map?.triggerRepaint()
   }
 
@@ -286,10 +286,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsTransformationType(
-      mapIds,
-      transformation
-    )
+    this.renderer.warpedMapList.setMapsTransformationType(transformation, {
+      mapIds
+    })
     this.map?.triggerRepaint()
   }
 
@@ -304,10 +303,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsDistortionMeasure(
-      mapIds,
-      distortionMeasure
-    )
+    this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
+      mapIds
+    })
     this.map?.triggerRepaint()
   }
 
@@ -318,7 +316,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   getBounds(): LngLatBoundsLike | undefined {
     assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getBbox()
+    const bbox = this.renderer.warpedMapList.getMapsBbox()
     if (bbox) {
       return [
         [bbox[0], bbox[1]],

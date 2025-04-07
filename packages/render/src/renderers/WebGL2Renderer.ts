@@ -671,6 +671,7 @@ export class WebGL2Renderer
   }
 
   private prepareRenderInternal(): void {
+    this.assureProjection()
     this.requestFetchableTiles()
   }
 

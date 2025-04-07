@@ -52,6 +52,8 @@ export class IntArrayRenderer<D>
 
     await Promise.allSettled(this.loadMissingImageInfosInViewport())
 
+    this.assureProjection()
+
     this.requestFetchableTiles()
     await this.tileCache.allRequestedTilesLoaded()
 
