@@ -314,7 +314,7 @@ export class WarpedMapLayer extends Layer {
    */
   getExtent(): Extent | undefined {
     return this.renderer.warpedMapList.getMapsBbox({
-      projection: 'EPSG:3857'
+      projection: { definition: 'EPSG:3857' }
     })
   }
 

@@ -4,7 +4,7 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { equalProjection, proj4 } from '@allmaps/project'
+import { isEqualProjection, proj4 } from '@allmaps/project'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
@@ -389,7 +389,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const mapIdsChanged = []
     const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
     for (const warpedMap of warpedMaps) {
-      if (!equalProjection(warpedMap.internalProjection, projection)) {
+      if (!isEqualProjection(warpedMap.internalProjection, projection)) {
         mapIdsChanged.push(warpedMap.mapId)
       }
     }
@@ -436,7 +436,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const mapIdsChanged = []
     const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
     for (const warpedMap of warpedMaps) {
-      if (!equalProjection(warpedMap.projection, projection)) {
+      if (!isEqualProjection(warpedMap.projection, projection)) {
         mapIdsChanged.push(warpedMap.mapId)
       }
     }
@@ -752,7 +752,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
 
       const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
-        proj4(projection, point)
+        proj4(projection.definition, point)
       )
       return projectedGeoMaskPoints
     } else {

@@ -1,6 +1,11 @@
 import { GcpTransformerOptions, GcpTransformOptions } from '@allmaps/transform'
 
-export type Projection = string
+export type ProjectionDefinition = string
+
+export type Projection = {
+  name?: string
+  definition: ProjectionDefinition
+}
 
 export type ProjectedGcpTransformerOptions = {
   internalProjection: Projection

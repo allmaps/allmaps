@@ -189,7 +189,11 @@ export class Viewport {
 
     // TODO: improve this with an interpolated back-projection, resulting in a ring
     this.geoRectangle = this.projectedGeoRectangle.map((point) => {
-      return proj4(this.projection, lonLatProjection, point)
+      return proj4(
+        this.projection.definition,
+        lonLatProjection.definition,
+        point
+      )
     }) as Rectangle
     this.geoRectangleBbox = computeBbox(this.geoRectangle)
     this.geoCenter = bboxToCenter(this.geoRectangleBbox)
@@ -278,7 +282,9 @@ export class Viewport {
     )
 
     const projectedGeoPolygon = geoPolygon.map((ring) =>
-      ring.map((point) => proj4(extendedViewportOptions.projection, point))
+      ring.map((point) =>
+        proj4(extendedViewportOptions.projection.definition, point)
+      )
     )
 
     return this.fromSizeAndProjectedGeoPolygon(
@@ -399,7 +405,9 @@ export class Viewport {
     )
 
     const projectedGeoPolygon = geoPolygon.map((ring) =>
-      ring.map((point) => proj4(extendedViewportOptions.projection, point))
+      ring.map((point) =>
+        proj4(extendedViewportOptions.projection.definition, point)
+      )
     )
 
     return this.fromScaleAndProjectedGeoPolygon(

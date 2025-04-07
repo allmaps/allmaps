@@ -226,7 +226,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     const geoBufferedRectangleBbox = computeBbox(
       projectedGeoBufferedRectangle.map((point) =>
-        proj4(viewport.projection, lonLatProjection, point)
+        proj4(
+          viewport.projection.definition,
+          lonLatProjection.definition,
+          point
+        )
       )
     )
 

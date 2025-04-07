@@ -252,7 +252,7 @@ We can request the result of a 'toGeo' transform using the projected transformer
 
 const projectedGeoLineString = projectedTransformer.transformToGeo(
   resourceLineString,
-  {projection: 'EPSG:3857'}
+  { projection: { definition: 'EPSG:3857' } }
 )
 // const projectedGeoLineString = [
 //   [ 498247.1996476347, 6789061.760253225 ],
@@ -374,7 +374,7 @@ Create a ProjectedGcpTransformer
 ###### Type
 
 ```ts
-string
+{name?: string; definition: ProjectionDefinition}
 ```
 
 ### `ProjectedGcpTransformer#internalProjectionToProjection`
@@ -398,7 +398,7 @@ string
 ###### Type
 
 ```ts
-string
+{name?: string; definition: ProjectionDefinition}
 ```
 
 ### `ProjectedGcpTransformer#projectionToInternalProjection`
@@ -436,7 +436,7 @@ to keep the original transformer as well.
 
 ###### Parameters
 
-* `projection` (`string`)
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
 
 ###### Returns
 
@@ -491,24 +491,32 @@ A Projected GCP Transformer (`ProjectedGcpTransformer`).
 
 ### `Projection`
 
-###### Type
+###### Fields
 
-```ts
-string
-```
+* `definition` (`string`)
+* `name?` (`string`)
+
+### `isEqualProjection(projection0, projection1)`
+
+###### Parameters
+
+* `projection0` (`Projection | undefined`)
+* `projection1` (`Projection | undefined`)
+
+###### Returns
+
+`boolean`.
 
 ### `lonLatProjection`
 
-###### Type
+###### Fields
 
-```ts
-  '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'
-```
+* `definition` (`string`)
+* `name` (`string`)
 
 ### `webMercatorProjection`
 
-###### Type
+###### Fields
 
-```ts
-  '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs'
-```
+* `definition` (`string`)
+* `name` (`string`)

@@ -93,15 +93,15 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     )
 
     const internalProjectionToProjectionConverter = proj4(
-      projectedGcpTransformerOptions.internalProjection,
-      projectedGcpTransformerOptions.projection
+      projectedGcpTransformerOptions.internalProjection.definition,
+      projectedGcpTransformerOptions.projection.definition
     )
     const postToGeo = internalProjectionToProjectionConverter.forward
     const preToResource = internalProjectionToProjectionConverter.inverse
 
     const lonLatToProjectionConverter = proj4(
-      lonLatProjection,
-      projectedGcpTransformerOptions.projection
+      lonLatProjection.definition,
+      projectedGcpTransformerOptions.projection.definition
     )
     const lonLatToProjection = lonLatToProjectionConverter.forward
     const projectionToLatLon = lonLatToProjectionConverter.inverse
@@ -154,13 +154,16 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     }
 
     const internalProjectionToProjectionConverter = proj4(
-      this.internalProjection,
-      projection
+      this.internalProjection.definition,
+      projection.definition
     )
     const postToGeo = internalProjectionToProjectionConverter.forward
     const preToResource = internalProjectionToProjectionConverter.inverse
 
-    const lonLatToProjectionConverter = proj4(lonLatProjection, projection)
+    const lonLatToProjectionConverter = proj4(
+      lonLatProjection.definition,
+      projection.definition
+    )
     const lonLatToProjection = lonLatToProjectionConverter.forward
     const projectionToLatLon = lonLatToProjectionConverter.inverse
 
@@ -239,8 +242,8 @@ export class ProjectedGcpTransformer extends GcpTransformer {
 
     if (projection) {
       const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection,
-        projection
+        this.internalProjection.definition,
+        projection.definition
       )
       const postToGeo = internalProjectionToProjectionConverter.forward
       const preToResource = internalProjectionToProjectionConverter.inverse
@@ -311,8 +314,8 @@ export class ProjectedGcpTransformer extends GcpTransformer {
 
     if (projection) {
       const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection,
-        projection
+        this.internalProjection.definition,
+        projection.definition
       )
       const postToGeo = internalProjectionToProjectionConverter.forward
       const preToResource = internalProjectionToProjectionConverter.inverse
