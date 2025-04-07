@@ -245,51 +245,51 @@ export class Viewport {
       )
     }
 
-    return this.fromSizeAndPolygon(
+    return this.fromSizeAndProjectedGeoPolygon(
       viewportSize,
       [projectedGeoConvexHull],
       partialExtendedViewportOptions
     )
   }
 
-  // /**
-  //  * Static method that creates a Viewport from a size and a geo polygon.
-  //  *
-  //  * @static
-  //  * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
-  //  * @param geoPolygon - A polygon in geo coordinates.
-  //  * @param partialExtendedViewportOptions - Optional viewport options
-  //  * @returns A new Viewport object.
-  //  */
-  // static fromSizeAndGeoPolygon(
-  //   viewportSize: Size,
-  //   geoPolygon: Polygon,
-  //   partialExtendedViewportOptions?: Partial<
-  //     ViewportOptions & ZoomOptions & FitOptions
-  //   >
-  // ): Viewport {
-  //   const extendedViewportOptions = mergeOptions(
-  //     {
-  //       ...defaultViewportOptions,
-  //       ...defaultZoomOptions,
-  //       ...defaultFitOptions
-  //     },
-  //     partialExtendedViewportOptions
-  //   )
+  /**
+   * Static method that creates a Viewport from a size and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
+   *
+   * @static
+   * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
+   * @param geoPolygon - A polygon in geospatial coordinates.
+   * @param partialExtendedViewportOptions - Optional viewport options
+   * @returns A new Viewport object.
+   */
+  static fromSizeAndGeoPolygon(
+    viewportSize: Size,
+    geoPolygon: Polygon,
+    partialExtendedViewportOptions?: Partial<
+      ViewportOptions & ZoomOptions & FitOptions
+    >
+  ): Viewport {
+    const extendedViewportOptions = mergeOptions(
+      {
+        ...defaultViewportOptions,
+        ...defaultZoomOptions,
+        ...defaultFitOptions
+      },
+      partialExtendedViewportOptions
+    )
 
-  //   const projectedGeoPolygon = geoPolygon.map((ring) =>
-  //     ring.map((point) => proj4(extendedViewportOptions.projection, point))
-  //   )
+    const projectedGeoPolygon = geoPolygon.map((ring) =>
+      ring.map((point) => proj4(extendedViewportOptions.projection, point))
+    )
 
-  //   return this.fromSizeAndPolygon(
-  //     viewportSize,
-  //     projectedGeoPolygon,
-  //     partialExtendedViewportOptions
-  //   )
-  // }
+    return this.fromSizeAndProjectedGeoPolygon(
+      viewportSize,
+      projectedGeoPolygon,
+      partialExtendedViewportOptions
+    )
+  }
 
   /**
-   * Static method that creates a Viewport from a size and a polygon.
+   * Static method that creates a Viewport from a size and a polygon in projected geospatial coordinates.
    *
    * @static
    * @param viewportSize - Size of the viewport in viewport pixels, as [width, height].
@@ -297,7 +297,7 @@ export class Viewport {
    * @param partialExtendedViewportOptions - Optional viewport options
    * @returns A new Viewport object.
    */
-  static fromSizeAndPolygon(
+  static fromSizeAndProjectedGeoPolygon(
     viewportSize: Size,
     projectedGeoPolygon: Polygon,
     partialExtendedViewportOptions?: Partial<
@@ -367,7 +367,7 @@ export class Viewport {
       )
     }
 
-    return this.fromScaleAndPolygon(
+    return this.fromScaleAndProjectedGeoPolygon(
       projectedGeoPerViewportScale,
       [projectedGeoConvexHull],
       partialExtendedViewportOptions
@@ -375,14 +375,49 @@ export class Viewport {
   }
 
   /**
-   * Static method that creates a Viewport from a scale and a polygon.
+   * Static method that creates a Viewport from a scale and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
    *
-   * @param projectedGeoPolygon - A polygon in projected geospatial coordinates.
+   * Note: the scale is still in *projected* geospatial per viewport pixel!
+   *
    * @param projectedGeoPerViewportScale - Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+   * @param geoPolygon - A polygon in geospatial coordinates.
    * @param partialViewportOptions - Optional viewport options.
    * @returns A new Viewport object.
    */
-  static fromScaleAndPolygon(
+  static fromScaleAndGeoPolygon(
+    projectedGeoPerViewportScale: number,
+    geoPolygon: Polygon,
+    partialExtendedViewportOptions?: Partial<ViewportOptions & ZoomOptions>
+  ): Viewport {
+    const extendedViewportOptions = mergeOptions(
+      {
+        ...defaultViewportOptions,
+        ...defaultZoomOptions,
+        ...defaultFitOptions
+      },
+      partialExtendedViewportOptions
+    )
+
+    const projectedGeoPolygon = geoPolygon.map((ring) =>
+      ring.map((point) => proj4(extendedViewportOptions.projection, point))
+    )
+
+    return this.fromScaleAndProjectedGeoPolygon(
+      projectedGeoPerViewportScale,
+      projectedGeoPolygon,
+      partialExtendedViewportOptions
+    )
+  }
+
+  /**
+   * Static method that creates a Viewport from a scale and a polygon in projected geospatial coordinates.
+   *
+   * @param projectedGeoPerViewportScale - Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+   * @param projectedGeoPolygon - A polygon in projected geospatial coordinates.
+   * @param partialViewportOptions - Optional viewport options.
+   * @returns A new Viewport object.
+   */
+  static fromScaleAndProjectedGeoPolygon(
     projectedGeoPerViewportScale: number,
     projectedGeoPolygon: Polygon,
     partialExtendedViewportOptions?: Partial<ViewportOptions & ZoomOptions>

@@ -61,7 +61,7 @@ export async function createWarpedTileResponse(
   const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
   const projectedGeoRectangle = bboxToRectangle(projectedGeoBbox)
 
-  const viewport = Viewport.fromSizeAndPolygon(
+  const viewport = Viewport.fromSizeAndProjectedGeoPolygon(
     [TILE_WIDTH, TILE_WIDTH],
     [projectedGeoRectangle],
     { devicePixelRatio: resolution === 'retina' ? 2 : 1 }

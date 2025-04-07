@@ -186,9 +186,11 @@ new Viewport(
 Using one of the following static methods:
 
 * `Viewport.fromSizeAndMaps()`
-* `Viewport.fromSizeAndPolygon()`
+* `Viewport.fromSizeAndGeoPolygon()`
+* `Viewport.fromSizeAndProjectedGeoPolygon()`
 * `Viewport.fromScaleAndMaps()`
-* `Viewport.fromScaleAndPolygon()`
+* `Viewport.fromScaleAndGeoPolygon()`
+* `Viewport.fromScaleAndProjectedGeoPolygon()`
 
 For example, to derive a Viewport from a size and maps:
 
@@ -545,7 +547,7 @@ There are no parameters.
 
 `void`.
 
-### `new Viewport(viewportSize, projectedGeoCenter, projectedGeoPerViewportScale, rotation, devicePixelRatio)`
+### `new Viewport(viewportSize, projectedGeoCenter, projectedGeoPerViewportScale, partialViewportOptions)`
 
 Creates a new Viewport
 
@@ -554,13 +556,10 @@ Creates a new Viewport
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
 * `projectedGeoCenter` (`[number, number]`)
-  * Center point of the viewport, in projected coordinates.
+  * Center point of the viewport, in projected geospatial coordinates.
 * `projectedGeoPerViewportScale` (`number`)
   * Scale of the viewport, in projection coordinates per viewport pixel.
-* `rotation` (`number | undefined`)
-  * Rotation of the viewport with respect to the projected geo coordinate system. Positive values rotate the viewport positively (i.e. counter-clockwise) w.r.t. the map in projected geo coordinates. This is equivalent to rotating the map negatively (i.e. clockwise) within the viewport.
-* `devicePixelRatio` (`number | undefined`)
-  * The devicePixelRatio of the viewport.
+* `partialViewportOptions?` (`Partial<ViewportOptions> | undefined`)
 
 ###### Returns
 
@@ -648,7 +647,7 @@ There are no parameters.
 
 ### `Viewport#computeProjectedGeoRectangle(viewportSize, projectedGeoPerViewportScale, rotation, projectedGeoCenter)`
 
-Returns a rectangle in projected geo coordinates
+Returns a rectangle in projected geospatial coordinates
 
 The rectangle is the result of a horizontal rectangle in Viewport space of size 'viewportSize',
 scaled using projectedGeoPerViewportScale, centered,
@@ -803,6 +802,14 @@ number
 [number, number, number, number, number, number]
 ```
 
+### `Viewport#projection`
+
+###### Type
+
+```ts
+string
+```
+
 ### `Viewport#rotation`
 
 ###### Type
@@ -859,85 +866,136 @@ number
 [number, number, number, number, number, number]
 ```
 
-### `Viewport.fromScaleAndMaps(projectedGeoPerViewportScale, maps, viewportOptions)`
+### `Viewport.fromScaleAndGeoPolygon(projectedGeoPerViewportScale, geoPolygon, partialExtendedViewportOptions)`
+
+Static method that creates a Viewport from a scale and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
+
+Note: the scale is still in *projected* geospatial per viewport pixel!
+
+###### Parameters
+
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+* `geoPolygon` (`Array<Array<Point>>`)
+  * A polygon in geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions     >
+    | undefined`)
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromScaleAndMaps(projectedGeoPerViewportScale, warpedMapList, partialExtendedViewportOptions)`
 
 Static method that creates a Viewport from a scale and maps.
 
+Optionally specify a projection, to be used both when obtaining the extent of selected warped maps in projected geospatial coordinates, as well as when create a viewport
+
 ###### Parameters
 
 * `projectedGeoPerViewportScale` (`number`)
-  * Scale of the viewport, in projected coordinates per viewport pixel.
-* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
-  * A WarpedMapList or an array of WarpedMaps.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
-  * Optional viewport options. Fit is ignored.
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+* `warpedMapList` (`WarpedMapList<W>`)
+  * A WarpedMapList.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          SelectionOptions     >
+    | undefined`)
+  * Optional viewport options.
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromScaleAndPolygon(projectedGeoPolygon, projectedGeoPerViewportScale, viewportOptions)`
+### `Viewport.fromScaleAndProjectedGeoPolygon(projectedGeoPerViewportScale, projectedGeoPolygon, partialExtendedViewportOptions)`
 
-Static method that creates a Viewport from a scale and a polygon.
+Static method that creates a Viewport from a scale and a polygon in projected geospatial coordinates.
 
 ###### Parameters
 
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
 * `projectedGeoPolygon` (`Array<Array<Point>>`)
   * A polygon in projected geospatial coordinates.
-* `projectedGeoPerViewportScale` (`number`)
-  * Scale of the viewport, in projected geo coordinates per viewport pixel.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
-  * Optional viewport options. Fit is ignored.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions     >
+    | undefined`)
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromSizeAndMaps(viewportSize, maps, viewportOptions)`
+### `Viewport.fromSizeAndGeoPolygon(viewportSize, geoPolygon, partialExtendedViewportOptions)`
+
+Static method that creates a Viewport from a size and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
+
+###### Parameters
+
+* `viewportSize` (`[number, number]`)
+  * Size of the viewport in viewport pixels, as \[width, height].
+* `geoPolygon` (`Array<Array<Point>>`)
+  * A polygon in geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions     >
+    | undefined`)
+  * Optional viewport options
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromSizeAndMaps(viewportSize, warpedMapList, partialExtendedViewportOptions)`
 
 Static method that creates a Viewport from a size and maps.
 
+Optionally specify a projection, to be used both when obtaining the extent of selected warped maps in projected geospatial coordinates, as well as when create a viewport
+
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
-* `maps` (`WarpedMapList<W> | Array<WarpedMap>`)
-  * A WarpedMapList or an array of WarpedMaps.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+* `warpedMapList` (`WarpedMapList<W>`)
+  * A WarpedMapList.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions &
+          SelectionOptions     >
+    | undefined`)
   * Optional viewport options
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromSizeAndPolygon(viewportSize, projectedGeoPolygon, viewportOptions)`
+### `Viewport.fromSizeAndProjectedGeoPolygon(viewportSize, projectedGeoPolygon, partialExtendedViewportOptions)`
 
-Static method that creates a Viewport from a size and a polygon.
+Static method that creates a Viewport from a size and a polygon in projected geospatial coordinates.
 
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
 * `projectedGeoPolygon` (`Array<Array<Point>>`)
-  * A polygon in projected geo coordinates.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * A polygon in projected geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions     >
+    | undefined`)
   * Optional viewport options
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.mapsToProjectedGeoConvexHull(maps)`
-
-###### Parameters
-
-* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
-
-###### Returns
-
-`Array<Point>`.
-
-### `new WarpedMap(mapId, georeferencedMap, options)`
+### `new WarpedMap(mapId, georeferencedMap, partialWarpedMapOptions)`
 
 Creates an instance of WarpedMap.
 
@@ -947,7 +1005,7 @@ Creates an instance of WarpedMap.
   * ID of the map
 * `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
+* `partialWarpedMapOptions?` (`Partial<WarpedMapOptions> | undefined`)
   * options
 
 ###### Returns
@@ -1964,13 +2022,12 @@ unknown
 ###### Type
 
 ```ts
-WarpedMapListOptions &
-  WarpedMapOptions & {imageInformations: ImageInformations; fetchFn: FetchFn}
+{createRTree: boolean} & WarpedMapOptions
 ```
 
-### `new WarpedMapList(warpedMapFactory, options)`
+### `new WarpedMapList(warpedMapFactory, partialWarpedMapListOptions)`
 
-Creates an instance of a WarpedMapList.
+Creates an instance of a WarpedMapList
 
 ###### Parameters
 
@@ -1980,7 +2037,7 @@ Creates an instance of a WarpedMapList.
     options?: Partial<WarpedMapOptions>
   ) => W`)
   * Factory function for creating WarpedMap objects
-* `options?` (`Partial<WarpedMapListOptions> | undefined`)
+* `partialWarpedMapListOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * Options
 
 ###### Returns
@@ -2091,70 +2148,24 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#fetchFn?`
+### `WarpedMapList#getMapIds(partialSelectionOptions)`
 
-###### Type
+Get mapIds for selected maps
 
-```ts
-(
-  input: Request | string | URL,
-  init?: RequestInit
-) => Promise<Response>
-```
-
-### `WarpedMapList#getBbox(mapIds)`
-
-Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
-
-Returns undefined if the list is empty.
+Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
 
 ###### Parameters
 
-* `mapIds?` (`Iterable<string> | undefined`)
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
-`Bbox | undefined`.
-
-### `WarpedMapList#getCenter()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Point | undefined`.
-
-### `WarpedMapList#getConvexHull(mapIds)`
-
-Return the convex hull of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
-
-Returns undefined if the list is empty.
-
-###### Parameters
-
-* `mapIds?` (`Iterable<string> | undefined`)
-
-###### Returns
-
-`Ring | undefined`.
-
-### `WarpedMapList#getMapIds()`
-
-Returns mapIds for the maps in this list.
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Iterable<string>`.
+mapIds (`Iterable<string>`).
 
 ### `WarpedMapList#getMapZIndex(mapId)`
 
-Returns the z-index of a map.
+Get the z-index for a specific map
 
 ###### Parameters
 
@@ -2164,17 +2175,50 @@ Returns the z-index of a map.
 
 `number | undefined`.
 
-### `WarpedMapList#getMapsByGeoBbox(geoBbox)`
+### `WarpedMapList#getMapsBbox(partialSelectionAndProjectionOptions)`
 
-Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
+Get the bounding box of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
 
 ###### Parameters
 
-* `geoBbox` (`[number, number, number, number]`)
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
 
 ###### Returns
 
-`Iterable<string>`.
+The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Bbox | undefined`).
+
+### `WarpedMapList#getMapsCenter(partialSelectionAndProjectionOptions)`
+
+Get the center of the bounding box of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+###### Parameters
+
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+
+###### Returns
+
+The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Point | undefined`).
+
+### `WarpedMapList#getMapsConvexHull(partialSelectionAndProjectionOptions)`
+
+Get the convex hull of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+###### Parameters
+
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+
+###### Returns
+
+The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Ring | undefined`).
 
 ### `WarpedMapList#getOrComputeMapId(georeferencedMap)`
 
@@ -2186,68 +2230,43 @@ Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 `Promise<string>`.
 
-### `WarpedMapList#getProjectedBbox(mapIds)`
-
-Return the bounding box of all visible maps in this list, in projected geospatial coordinates
-
-Returns undefined if the list is empty.
+### `WarpedMapList#getProjectedGeoMaskPoints(partialSelectionAndProjectionOptions)`
 
 ###### Parameters
 
-* `mapIds?` (`Iterable<string> | undefined`)
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
 
 ###### Returns
 
-`Bbox | undefined`.
-
-### `WarpedMapList#getProjectedCenter()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Point | undefined`.
-
-### `WarpedMapList#getProjectedConvexHull(mapIds)`
-
-Return the convex hull of all visible maps in this list, in projected geospatial coordinates
-
-Returns undefined if the list is empty.
-
-###### Parameters
-
-* `mapIds?` (`Iterable<string> | undefined`)
-
-###### Returns
-
-`Ring | undefined`.
+`Array<Point>`.
 
 ### `WarpedMapList#getWarpedMap(mapId)`
 
-Returns the WarpedMap object in this list of map specified by its ID.
+Get the WarpedMap instance for a specific map
 
 ###### Parameters
 
 * `mapId` (`string`)
+  * Map ID of the requested WarpedMap instance
 
 ###### Returns
 
-`W | undefined`.
+WarpedMap instance, or undefined (`W | undefined`).
 
-### `WarpedMapList#getWarpedMaps()`
+### `WarpedMapList#getWarpedMaps(partialSelectionOptions)`
 
-Returns WarpedMap objects of the maps in this list.
-Optionally specify mapIds whose WarpedMap objects are requested.
+Get the WarpedMap instances for selected maps
+
+Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
 
 ###### Parameters
 
-There are no parameters.
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
-`Iterable<W>`.
+WarpedMap instances (`Iterable<W>`).
 
 ### `WarpedMapList#hideMaps(mapIds)`
 
@@ -2272,12 +2291,20 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#imageInformations?`
+### `WarpedMapList#options`
 
 ###### Type
 
 ```ts
-Map<string, unknown>
+{
+  createRTree?: boolean | undefined
+  fetchFn?: FetchFn | undefined
+  imageInformations?: ImageInformations | undefined
+  visible?: boolean | undefined
+  transformationType?: TransformationType | undefined
+  internalProjection?: string | undefined
+  projection?: string | undefined
+}
 ```
 
 ### `WarpedMapList#removeEventListenersFromWarpedMap(warpedMap)`
@@ -2404,89 +2431,87 @@ Sets the object that caches image information
 
 `void`.
 
-### `WarpedMapList#setMapDistortionMeasure(mapId, distortionMeasure)`
+### `WarpedMapList#setMapDistortionMeasure(distortionMeasure, mapId)`
 
-Sets the distortionMeasure of a single map
+Sets the distortionMeasure for a specific map
 
 ###### Parameters
 
+* `distortionMeasure` (`DistortionMeasure | undefined`)
+  * the distortion measure
 * `mapId` (`string`)
   * the ID of the map
-* `distortionMeasure?` (`DistortionMeasure | undefined`)
-  * the distortion measure
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapGcps(mapId, gcps)`
+### `WarpedMapList#setMapGcps(gcps, mapId)`
 
-Sets the GCPs for a specified map
+Sets the GCPs for a specific map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
 * `gcps` (`Array<Gcp>`)
   * new GCPs
-
-###### Returns
-
-`void`.
-
-### `WarpedMapList#setMapInternalProjection(mapId, projection)`
-
-Sets the internal projection of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * the ID of the map
-* `projection?` (`string | undefined`)
-  * the internal projection
-
-###### Returns
-
-`void`.
-
-### `WarpedMapList#setMapProjection(mapId, projection)`
-
-Sets the projection of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * the ID of the map
-* `projection?` (`string | undefined`)
-  * the projection
-
-###### Returns
-
-`void`.
-
-### `WarpedMapList#setMapResourceMask(mapId, resourceMask)`
-
-Sets the resource mask for a specified map
-
-###### Parameters
-
 * `mapId` (`string`)
   * ID of the map
-* `resourceMask` (`Array<Point>`)
-  * the new resource mask
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapTransformationType(mapId, transformationType)`
+### `WarpedMapList#setMapInternalProjection(projection, mapId)`
 
-Sets the transformation type of a single map
+Sets the internal projection for a specific map
 
 ###### Parameters
 
+* `projection` (`string`)
+  * the internal projection
 * `mapId` (`string`)
   * the ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapProjection(projection, mapId)`
+
+Sets the projection for a specific map
+
+###### Parameters
+
+* `projection` (`string`)
+  * the projection
+* `mapId` (`string`)
+  * the ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapResourceMask(resourceMask, mapId)`
+
+Sets the resource mask for a specific map
+
+###### Parameters
+
+* `resourceMask` (`Array<Point>`)
+  * the new resource mask
+* `mapId` (`string`)
+  * ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapTransformationType(transformationType, mapId)`
+
+Sets the transformation type for a specific map
+
+###### Parameters
+
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -2496,64 +2521,64 @@ Sets the transformation type of a single map
     | 'projective'
     | 'thinPlateSpline'`)
   * the new transformation type
+* `mapId` (`string`)
+  * the ID of the map
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsDistortionMeasure(mapIds, distortionMeasure)`
+### `WarpedMapList#setMapsDistortionMeasure(distortionMeasure, partialSelectionOptions)`
 
-Sets the distortion measure of specified maps
+Sets the distortion measure for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
 * `distortionMeasure?` (`DistortionMeasure | undefined`)
   * the distortion measure
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsInternalProjection(mapIds, projection)`
+### `WarpedMapList#setMapsInternalProjection(projection, partialSelectionOptions)`
 
-Sets the internal projection of specified maps
+Sets the internal projection for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
-* `projection?` (`string | undefined`)
+* `projection` (`string | undefined`)
   * the internal projection
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsProjection(mapIds, projection)`
+### `WarpedMapList#setMapsProjection(projection, partialSelectionOptions)`
 
-Sets the projection of specified maps
+Sets the projection for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
-* `projection?` (`string | undefined`)
+* `projection` (`string | undefined`)
   * the projection
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsTransformationType(mapIds, transformationType)`
+### `WarpedMapList#setMapsTransformationType(transformationType, partialSelectionOptions)`
 
-Sets the transformation type of specified maps
+Sets the transformation type for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -2563,6 +2588,8 @@ Sets the transformation type of specified maps
     | 'projective'
     | 'thinPlateSpline'`)
   * the new transformation type
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
@@ -2580,14 +2607,6 @@ Changes the visibility of the specified maps to `true`
 ###### Returns
 
 `void`.
-
-### `WarpedMapList#transformation?`
-
-###### Type
-
-```ts
-{type: TransformationType; options?: unknown}
-```
 
 ### `WarpedMapList#warpedMapFactory`
 
