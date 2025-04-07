@@ -15,6 +15,17 @@ import type {
   TileZoomLevel
 } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
+
+export type SelectionOptions = {
+  onlyVisible: boolean
+  mapIds?: Iterable<string>
+  geoBbox?: Bbox
+}
+
+export type ProjectionOptions = {
+  projection: Projection
+}
 
 export type TransformationOptions = {
   type: TransformationType
@@ -26,22 +37,16 @@ export type WarpedMapOptions = {
   // TODO: this option needs a better name:
   imageInformations: ImageInformations
   visible: boolean
-  transformation: TransformationOptions
+  transformationType: TransformationType
+  internalProjection: Projection
+  projection: Projection
 }
 
 export type WarpedMapListOptions = {
-  fetchFn: FetchFn
   createRTree: boolean
-  imageInformations: ImageInformations
-  transformation: TransformationOptions
-}
+} & WarpedMapOptions
 
-// TODO: consider to pass these options separately (since most WarpedMapOptions are optional)
-export type RendererOptions = WarpedMapListOptions &
-  WarpedMapOptions & {
-    imageInformations: ImageInformations
-    fetchFn: FetchFn
-  }
+export type RendererOptions = WarpedMapListOptions & WarpedMapOptions
 
 export type WebGL2RendererOptions = RendererOptions
 export type CanvasRendererOptions = RendererOptions

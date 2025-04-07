@@ -710,12 +710,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     const rotation = -(this.map.getBearing() / 180) * Math.PI
 
+    const devicePixelRatio = window.devicePixelRatio
+
     const viewport = new Viewport(
       viewportSize,
       projectedGeoCenter,
       projectedGeoPerViewportScale,
-      rotation,
-      window.devicePixelRatio
+      { rotation, devicePixelRatio }
     )
 
     this.renderer.render(viewport)

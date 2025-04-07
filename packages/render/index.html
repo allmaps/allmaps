@@ -73,15 +73,15 @@
         await renderer.addGeoreferenceAnnotation(annotation)
 
         const mapId = Array.from(renderer.warpedMapList.getMapIds())[0]
-        console.log(mapId)
 
         const viewport = Viewport.fromScaleAndMaps(
           projectedGeoPerViewportScale,
-          renderer.warpedMapList.getWarpedMaps([mapId]),
+          renderer.warpedMapList,
           {
             rotation: rotation,
             devicePixelRatio: ratio,
-            zoom: zoom
+            zoom: zoom,
+            mapIds: [mapId]
           }
         )
 

@@ -157,7 +157,11 @@ export {
 
 export { getFullResourceMask } from './masks.js'
 
-export { mergeOptions, mergePartialOptions } from './options.js'
+export {
+  mergeOptions,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions
+} from './options.js'
 
 export {
   isSvgCircle,

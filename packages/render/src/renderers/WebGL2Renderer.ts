@@ -1167,7 +1167,9 @@ export class WebGL2Renderer
   }
 
   private startTransformaterTransition(mapIds: string[]) {
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+      mapIds
+    })) {
       if (!this.viewport) {
         break
       }
@@ -1208,7 +1210,9 @@ export class WebGL2Renderer
       )
     } else {
       // Animation ended
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+        mapIds
+      })) {
         webgl2WarpedMap.resetPrevious()
 
         if (!this.viewport) {
@@ -1293,7 +1297,9 @@ export class WebGL2Renderer
   protected preChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+        mapIds
+      })) {
         if (this.animating) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }

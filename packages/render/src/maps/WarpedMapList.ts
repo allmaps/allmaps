@@ -4,35 +4,38 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
+import { proj4 } from '@allmaps/project'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
 
-import { bboxToCenter, combineBboxes, convexHull } from '@allmaps/stdlib'
+import {
+  bboxToCenter,
+  computeBbox,
+  convexHull,
+  mergeOptions,
+  mergePartialOptions
+} from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type {
-  TransformationOptions,
+  ProjectionOptions,
+  SelectionOptions,
   WarpedMapFactory,
   WarpedMapListOptions
 } from '../shared/types.js'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { Projection } from '@allmaps/project'
-import type {
-  Ring,
-  Bbox,
-  Gcp,
-  Point,
-  FetchFn,
-  ImageInformations
-} from '@allmaps/types'
+import type { Ring, Bbox, Gcp, Point, ImageInformations } from '@allmaps/types'
 
-function createDefaultWarpedMapListOptions(): Partial<WarpedMapListOptions> {
-  return {
-    createRTree: true,
-    imageInformations: new Map()
-  }
+const defaultSelectionOptions: SelectionOptions = {
+  onlyVisible: true
+}
+
+const defaultWarpedMapListOptions: Partial<WarpedMapListOptions> = {
+  createRTree: true,
+  imageInformations: new Map()
 }
 
 /**
@@ -50,21 +53,19 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   zIndices: Map<string, number>
 
   rtree?: RTree
-  imageInformations?: ImageInformations
-  transformation?: TransformationOptions
 
-  fetchFn?: FetchFn
+  options: Partial<WarpedMapListOptions>
 
   /**
    * Creates an instance of a WarpedMapList.
    *
    * @constructor
    * @param warpedMapFactory - Factory function for creating WarpedMap objects
-   * @param options - Options
+   * @param partialWarpedMapListOptions - Options
    */
   constructor(
     warpedMapFactory: WarpedMapFactory<W>,
-    options?: Partial<WarpedMapListOptions>
+    partialWarpedMapListOptions?: Partial<WarpedMapListOptions>
   ) {
     super()
 
@@ -73,65 +74,90 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapFactory = warpedMapFactory
 
-    options = {
-      ...createDefaultWarpedMapListOptions(),
-      ...options
-    }
+    this.options = mergePartialOptions(
+      defaultWarpedMapListOptions,
+      partialWarpedMapListOptions
+    )
 
-    this.fetchFn = options?.fetchFn
-
-    this.imageInformations = options.imageInformations
-    this.transformation = options.transformation
-
-    if (options.createRTree) {
+    if (this.options.createRTree) {
       this.rtree = new RTree()
     }
   }
 
   /**
-   * Returns mapIds for the maps in this list.
+   * Get mapIds for the maps in this list.
    *
-   * @returns
+   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox.
+   *
+   * @param partialSelectionOptions - Selection options, defaults to visible maps
+   * @returns mapIds
    */
-  getMapIds(): Iterable<string> {
-    return this.warpedMapsById.keys()
+  getMapIds(
+    partialSelectionOptions?: Partial<SelectionOptions>
+  ): Iterable<string> {
+    // Enable the same selection options when getting mapIds
+    return Array.from(this.getWarpedMaps(partialSelectionOptions)).map(
+      (warpedMap) => warpedMap.mapId
+    )
   }
 
   /**
-   * Returns WarpedMap objects of the maps in this list.
-   * Optionally specify mapIds whose WarpedMap objects are requested.
+   * Get the WarpedMap instances from this list.
    *
-   * @returns
+   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox.
+   *
+   * @param partialSelectionOptions - Selection options, defaults to visible maps
+   * @returns WarpedMap instances
    */
-  getWarpedMaps(): Iterable<W>
-  getWarpedMaps(mapIds?: Iterable<string>): Iterable<W>
-  getWarpedMaps(mapIds?: Iterable<string>): Iterable<W> {
-    if (mapIds === undefined) {
-      return this.warpedMapsById.values()
-    } else {
-      const warpedMaps: W[] = []
-      for (const mapId of mapIds) {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMaps.push(warpedMap)
-        }
+  getWarpedMaps(
+    partialSelectionOptions?: Partial<SelectionOptions>
+  ): Iterable<W> {
+    const selectionOptions = mergeOptions(
+      defaultSelectionOptions,
+      partialSelectionOptions
+    )
+
+    let mapIds
+    if (selectionOptions.mapIds === undefined) {
+      if (this.rtree && selectionOptions.geoBbox) {
+        mapIds = this.rtree.searchFromBbox(selectionOptions.geoBbox)
+      } else {
+        mapIds = Array.from(this.warpedMapsById.keys())
       }
+    } else {
+      mapIds = selectionOptions.mapIds
+    }
+
+    const warpedMaps: W[] = []
+
+    if (mapIds === undefined) {
       return warpedMaps
     }
+
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (
+        warpedMap &&
+        (selectionOptions.onlyVisible ? warpedMap.visible : true)
+      ) {
+        warpedMaps.push(warpedMap)
+      }
+    }
+    return warpedMaps
   }
 
   /**
-   * Returns the WarpedMap object in this list of map specified by its ID.
+   * Get a WarpedMap instance from maps in this list by ID.
    *
-   * @param mapId
-   * @returns
+   * @param mapId - Map ID of the requested WarpedMap instance
+   * @returns WarpedMap instance, or undefined
    */
   getWarpedMap(mapId: string): W | undefined {
     return this.warpedMapsById.get(mapId)
   }
 
   /**
-   * Returns the z-index of a map.
+   * Get the z-index of a map.
    *
    * @param mapId
    * @returns
@@ -140,120 +166,64 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     return this.zIndices.get(mapId)
   }
 
-  getCenter(): Point | undefined {
-    const bbox = this.getBbox()
+  /**
+   * Get the center of the bounding box of the maps in this list
+   *
+   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   *
+   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
+   */
+  getCenter(
+    partialSelectionAndProjectionOptions?: Partial<
+      SelectionOptions & ProjectionOptions
+    >
+  ): Point | undefined {
+    const bbox = this.getBbox(partialSelectionAndProjectionOptions)
     if (bbox) {
       return bboxToCenter(bbox)
     }
   }
 
-  getProjectedCenter(): Point | undefined {
-    const bbox = this.getProjectedBbox()
-    if (bbox) {
-      return bboxToCenter(bbox)
-    }
+  /**
+   * Get the bounding box of the maps in this list
+   *
+   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   *
+   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
+   */
+  getBbox(
+    partialSelectionAndProjectionOptions?: Partial<
+      SelectionOptions & ProjectionOptions
+    >
+  ): Bbox | undefined {
+    // Note: we can't use the geoMaskBboxes since creating a bbox
+    // gives a different result in a different projection
+
+    const projectedGeoMaskPoints = this.getProjectedGeoMaskPoints(
+      partialSelectionAndProjectionOptions
+    )
+    return computeBbox(projectedGeoMaskPoints)
   }
 
   /**
-   * Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
+   * Get the convex hull of the maps in this list
    *
-   * Returns undefined if the list is empty.
+   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
    *
-   * @returns
+   * @param partialSelectionAndProjectionOptions - Selection and projection options, defaults to visible maps and current projection
+   * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
-  getBbox(mapIds?: Iterable<string>): Bbox | undefined {
-    const bboxes = []
-
-    for (const warpedMap of this.getWarpedMaps(mapIds)) {
-      if (warpedMap.visible) {
-        bboxes.push(warpedMap.geoMaskBbox)
-      }
-    }
-
-    return combineBboxes(...bboxes)
-  }
-
-  /**
-   * Return the bounding box of all visible maps in this list, in projected geospatial coordinates
-   *
-   * Returns undefined if the list is empty.
-   *
-   * @returns
-   */
-  getProjectedBbox(mapIds?: Iterable<string>): Bbox | undefined {
-    const bboxes = []
-
-    for (const warpedMap of this.getWarpedMaps(mapIds)) {
-      if (warpedMap.visible) {
-        bboxes.push(warpedMap.projectedGeoMaskBbox)
-      }
-    }
-
-    return combineBboxes(...bboxes)
-  }
-
-  /**
-   * Return the convex hull of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
-   *
-   * Returns undefined if the list is empty.
-   *
-   * @returns
-   */
-  getConvexHull(mapIds?: Iterable<string>): Ring | undefined {
-    const maskPoints: Point[] = []
-
-    for (const warpedMap of this.getWarpedMaps(mapIds)) {
-      if (warpedMap.visible) {
-        maskPoints.push(...warpedMap.geoMask)
-      }
-    }
-
-    return convexHull(maskPoints)
-  }
-
-  /**
-   * Return the convex hull of all visible maps in this list, in projected geospatial coordinates
-   *
-   * Returns undefined if the list is empty.
-   */
-  getProjectedConvexHull(mapIds?: Iterable<string>): Ring | undefined {
-    const maskPoints: Point[] = []
-
-    for (const warpedMap of this.getWarpedMaps(mapIds)) {
-      if (warpedMap.visible) {
-        maskPoints.push(...warpedMap.projectedGeoMask)
-      }
-    }
-
-    return convexHull(maskPoints)
-  }
-
-  /**
-   * Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
-   *
-   * @param geoBbox
-   * @returns
-   */
-  getMapsByGeoBbox(geoBbox: Bbox): Iterable<string> {
-    // TODO: to make sure only tiles for visible parts of the map are requested
-    // (and not for parts hidden behind maps on top of it)
-    // Subtract geoMasks of maps that have been added before the current map:
-    // Map A (topmost): show completely
-    // Map B: B - A
-    // Map C: C - B - A
-    // Map D: D - C - B - A
-    //
-    // Possible libraries:
-    //  - https://github.com/w8r/martinez
-    //  - https://github.com/mfogel/polygon-clipping
-    //
-    // Do this only if transparancy of upper map is 0
-
-    if (this.rtree) {
-      return this.rtree.searchFromBbox(geoBbox)
-    } else {
-      return Array.from(this.warpedMapsById.keys())
-    }
+  getConvexHull(
+    partialSelectionAndProjectionOptions?: Partial<
+      SelectionOptions & ProjectionOptions
+    >
+  ): Ring | undefined {
+    const projectedGeoMaskPoints = this.getProjectedGeoMaskPoints(
+      partialSelectionAndProjectionOptions
+    )
+    return convexHull(projectedGeoMaskPoints)
   }
 
   /**
@@ -262,7 +232,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param imageInformations - object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations): void {
-    this.imageInformations = imageInformations
+    this.options.imageInformations = imageInformations
   }
 
   /**
@@ -431,6 +401,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         const warpedMap = this.warpedMapsById.get(mapId)
         if (warpedMap) {
           warpedMap.setInternalProjection(projection)
+          this.addToOrUpdateRtree(warpedMap)
         }
       })
       this.dispatchEvent(
@@ -459,6 +430,41 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param projection - the projection
    */
   setMapsProjection(mapIds: Iterable<string>, projection?: Projection): void {
+    const mapIdsChanged = []
+    for (const mapId of mapIds) {
+      const warpedMap = this.warpedMapsById.get(mapId)
+      if (warpedMap && warpedMap.projection !== projection) {
+        mapIdsChanged.push(mapId)
+      }
+    }
+    if (mapIdsChanged.length > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
+      )
+      mapIdsChanged.forEach((mapId) => {
+        const warpedMap = this.warpedMapsById.get(mapId)
+        if (warpedMap) {
+          warpedMap.setProjection(projection)
+          this.addToOrUpdateRtree(warpedMap)
+        }
+      })
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PROJECTIONCHANGED, mapIdsChanged)
+      )
+    }
+  }
+
+  /**
+   * Sets the projection of the warpedMapList
+   *
+   * This sets the projection of all warpedMap
+   *
+   * @param mapIds - the IDs of the maps
+   * @param projection - the projection
+   */
+  setProjection(mapIds: Iterable<string>, projection?: Projection): void {
+    this.options.projection = projection
+
     const mapIdsChanged = []
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
@@ -714,11 +720,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
 
-    const warpedMap = this.warpedMapFactory(mapId, georeferencedMap, {
-      imageInformations: this.imageInformations,
-      fetchFn: this.fetchFn,
-      transformation: this.transformation
-    })
+    const warpedMap = this.warpedMapFactory(
+      mapId,
+      georeferencedMap,
+      this.options
+    )
+
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
     this.addToOrUpdateRtree(warpedMap)
@@ -757,6 +764,36 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const mapId =
       georeferencedMap.id || (await generateChecksum(georeferencedMap))
     return mapId
+  }
+
+  private getProjectedGeoMaskPoints(
+    partialSelectionAndProjectionOptions?: Partial<
+      SelectionOptions & ProjectionOptions
+    >
+  ): Point[] {
+    const warpedMaps = this.getWarpedMaps(partialSelectionAndProjectionOptions)
+
+    // Project geoMask using projection, if specified in options
+    // otherwise use available projectedGeoMask
+    let projection = partialSelectionAndProjectionOptions?.projection
+    if (projection) {
+      let geoMaskPoints: Point[] = []
+      for (const warpedMap of warpedMaps) {
+        geoMaskPoints.push(...warpedMap.geoMask)
+      }
+
+      const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
+        proj4(projection, point)
+      )
+      return projectedGeoMaskPoints
+    } else {
+      let projectedGeoMaskPoints: Point[] = []
+      for (const warpedMap of warpedMaps) {
+        projectedGeoMaskPoints.push(...warpedMap.projectedGeoMask)
+      }
+
+      return projectedGeoMaskPoints
+    }
   }
 
   private addToOrUpdateRtree(warpedMap: W): void {

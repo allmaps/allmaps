@@ -315,7 +315,9 @@ export class WarpedMapLayer extends Layer {
    * @returns - bounding box of all warped maps
    */
   getExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getProjectedBbox()
+    return this.renderer.warpedMapList.getBbox({
+      projection: 'EPSG:3857'
+    })
   }
 
   /**
@@ -639,8 +641,10 @@ export class WarpedMapLayer extends Layer {
       frameState.size as [number, number],
       frameState.viewState.center as [number, number],
       frameState.viewState.resolution,
-      frameState.viewState.rotation,
-      window.devicePixelRatio
+      {
+        rotation: frameState.viewState.rotation,
+        devicePixelRatio: window.devicePixelRatio
+      }
     )
 
     this.renderer.render(viewport)

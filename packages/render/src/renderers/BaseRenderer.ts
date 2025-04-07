@@ -98,9 +98,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     return Array.from(
-      this.warpedMapList.getMapsByGeoBbox(this.viewport.geoRectangleBbox)
+      this.warpedMapList.getWarpedMaps({
+        geoBbox: this.viewport.geoRectangleBbox
+      })
     )
-      .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
       .filter(
         (warpedMap) => !warpedMap.hasImageInfo() && !warpedMap.loadingImageInfo
       )
@@ -218,25 +219,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     return new Set(
       Array.from(
-        this.warpedMapList.getMapsByGeoBbox(geoBufferedRectangleBbox)
-      ).sort((mapIdA, mapIdB) => {
-        const warpedMapA = this.warpedMapList.getWarpedMap(mapIdA)
-        const warpedMapB = this.warpedMapList.getWarpedMap(mapIdB)
-        if (warpedMapA && warpedMapB) {
-          return (
-            squaredDistance(
-              bboxToCenter(warpedMapA.geoMaskBbox),
-              viewport.geoCenter
-            ) -
-            squaredDistance(
-              bboxToCenter(warpedMapB.geoMaskBbox),
-              viewport.geoCenter
+        this.warpedMapList.getWarpedMaps({ geoBbox: geoBufferedRectangleBbox })
+      )
+        .sort((warpedMapA, warpedMapB) => {
+          if (warpedMapA && warpedMapB) {
+            return (
+              squaredDistance(
+                bboxToCenter(warpedMapA.projectedGeoMaskBbox),
+                viewport.projectedGeoCenter
+              ) -
+              squaredDistance(
+                bboxToCenter(warpedMapB.projectedGeoMaskBbox),
+                viewport.projectedGeoCenter
+              )
             )
-          )
-        } else {
-          return 0
-        }
-      })
+          } else {
+            return 0
+          }
+        })
+        .map((warpedMap) => warpedMap.mapId)
     )
   }
 
@@ -529,9 +530,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected pruneTileCache(mapsInViewportForOverviewPrune: Set<string>) {
     // Create pruneInfo for all maps in viewport with prune overview buffer
     const pruneInfoByMapId: Map<string, MapPruneInfo> = new Map()
-    for (const warpedMap of this.warpedMapList.getWarpedMaps(
-      mapsInViewportForOverviewPrune
-    )) {
+    for (const warpedMap of this.warpedMapList.getWarpedMaps({
+      mapIds: mapsInViewportForOverviewPrune
+    })) {
       pruneInfoByMapId.set(warpedMap.mapId, {
         tileZoomLevelForViewport: warpedMap.tileZoomLevelForViewport,
         overviewTileZoomLevelForViewport:

@@ -32,7 +32,7 @@ The render module accomplishes this task with the following classes:
 
 During a `CanvasRenderer` or `IntArrayRenderer` render call, a map undergoes the following steps from Georeference Annotation to the canvas:
 
-* For each viewport pixel, from its viewport coordinates its projectedGeo coordinates is obtained and transformed to its corresponding resource coordinates, i.e. it's location in the IIIF image.
+* For each viewport pixel, from its viewport coordinates its projected geospatial coordinates are obtained and transformed to its corresponding resource coordinates, i.e. it's location in the IIIF image.
 * We find the tile on which this point is located, and express the resource coordinates in local tile coordinates.
 * We set the color of this pixel from the colors of the four tile pixels surrounding the tile point, through a bilinear interpolation.
 
@@ -175,8 +175,11 @@ new Viewport(
   viewportSize, // Your viewport size, as [width, height]
   projectedGeoCenter, // Your center, in geo coordinates
   projectedGeoPerViewportScale, // Your geo-per-viewport scale
-  rotation, // Your rotation
-  devicePixelRatio // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
+  {
+    rotation, // Your rotation
+    devicePixelRatio, // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
+    projection // Your projection (of the above projected geospatial coordinates), as compatible with Proj4js
+  }
 )
 ```
 
@@ -192,8 +195,8 @@ For example, to derive a Viewport from a size and maps:
 ```js
 const viewport = Viewport.fromSizeAndMaps(
   viewportSize, // Your viewport size, as [width, height]
-  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
-  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio, fit and zoom.
+  warpedMapList, // Your WarpedMapList, e.g. `renderer.warpedMapList`
+  partialExtendedViewportOptions // Your extended viewport options, including viewport options (rotation, devicePixelRatio and projection (used both to retrieve the extent of the maps and for the viewport itself)), a zoom; a fit; and WarpedMapList selection options like mapIds or `onlyVisible`
 )
 ```
 
@@ -202,8 +205,8 @@ Or, to derive a Viewport from a scale and maps:
 ```js
 const viewport = Viewport.fromScaleAndMaps(
   projectedGeoPerViewportScale, // Your scale
-  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
-  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio and zoom (fit is ignored here).
+  warpedMapList, // Your WarpedMapList, e.g. `renderer.warpedMapList`
+  partialExtendedViewportOptions // Your extended viewport options, including viewport options (rotation, devicePixelRatio and projection (used both to retrieve the extent of the maps and for the viewport itself)), a zoom; and WarpedMapList selection options like mapIds or `onlyVisible`
 )
 
 // In this case, resize your canvas to the computed viewport

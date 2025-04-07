@@ -16,17 +16,15 @@ export async function generateTileJsonResponse(
   urlTemplate: string
 ): Promise<Response> {
   // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
-  let transformationOptions
+  let transformationType
   if (options['transformation.type']) {
-    transformationOptions = {
-      type: options['transformation.type']
-    }
+    transformationType = options['transformation.type']
   }
 
   const warpedMapList = new WarpedMapList(createWarpedMapFactory(), {
     fetchFn: cachedFetch as FetchFn,
-    transformation: transformationOptions,
-    createRTree: false
+    createRTree: false,
+    transformationType
   })
 
   for (const georeferencedMap of georeferencedMaps) {

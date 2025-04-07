@@ -38,11 +38,9 @@ export async function createWarpedTileResponse(
   }
 
   // TODO: simplify this when TilejsonOptions will be aligned with TransformationOptions from @allmaps/render
-  let transformationOptions
+  let transformationType
   if (options['transformation.type']) {
-    transformationOptions = {
-      type: options['transformation.type']
-    }
+    transformationType = options['transformation.type']
   }
 
   const renderer = new IntArrayRenderer<UintArrRet>(
@@ -51,8 +49,8 @@ export async function createWarpedTileResponse(
     getImageDataSize,
     {
       fetchFn: cachedFetch as FetchFn,
-      transformation: transformationOptions,
-      createRTree: false
+      createRTree: false,
+      transformationType
     }
   )
 

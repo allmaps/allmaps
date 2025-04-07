@@ -1,3 +1,7 @@
+import proj4 from 'proj4'
+
+export { proj4 }
+
 export { ProjectedGcpTransformer } from './projected-transformers/ProjectedGcpTransformer.js'
 
 export {

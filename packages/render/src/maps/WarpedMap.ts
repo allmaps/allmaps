@@ -15,7 +15,9 @@ import {
   getPropertyFromCacheOrComputation,
   mixPoints,
   sizeToRectangle,
-  mergePartialOptions
+  mergePartialOptions,
+  mergeOptionsUnlessUndefined,
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -50,12 +52,11 @@ const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   differentHandedness: true
 } as Partial<ProjectedGcpTransformerOptions>
 
-const DEFAULT_VISIBLE = true
-
-function createDefaultWarpedMapOptions(): Partial<WarpedMapOptions> {
-  return {
-    visible: DEFAULT_VISIBLE
-  }
+const DEFAULT_WARPED_MAP_OPTIONS = {
+  visible: true,
+  transformationType: 'polynomial' as TransformationType,
+  internalProjection: webMercatorProjection,
+  projection: webMercatorProjection
 }
 
 export function createWarpedMapFactory() {
@@ -91,7 +92,8 @@ export function createWarpedMapFactory() {
  * @param visible - Whether the map is visible
  * @param previousTransformationType - Previous transformation type
  * @param transformationType - Transformation type used in the transfomer. This is loaded from the georeference annotation.
- * @param previousProjection - Previous projection
+ * @param previousInternalProjection - Previous internal projection
+ * @param internalProjection - Internal projection used in the projected transformer
  * @param projection - Projection of the projected geospatial coordinates space
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
@@ -203,19 +205,33 @@ export class WarpedMap extends EventTarget {
    *
    * @param mapId - ID of the map
    * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
-   * @param options - options
+   * @param partialWarpedMapOptions - options
    */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
+    partialWarpedMapOptions?: Partial<WarpedMapOptions>
   ) {
     super()
 
-    options = {
-      ...createDefaultWarpedMapOptions(),
-      ...options
+    // Note: defaults are overwritten by georeferenced map input
+    // (only if they are defined), which is overwritten by options
+    // This way a warped map list's current
+    // transformation and projection can overwrite those of the map
+
+    // TODO: read internal projection and projection from georeferenced map
+    const georeferencedMapInput = {
+      transformationType: georeferencedMap.transformation
+        ?.type as TransformationType
     }
+    const defaultAndMapOptions = mergeOptionsUnlessUndefined(
+      DEFAULT_WARPED_MAP_OPTIONS,
+      georeferencedMapInput
+    )
+    const warpedMapOptions = mergeOptions(
+      defaultAndMapOptions,
+      partialWarpedMapOptions
+    )
 
     this.projectedTransformerCache = new Map()
 
@@ -228,27 +244,19 @@ export class WarpedMap extends EventTarget {
     this.updateResourceMaskProperties()
     this.updateResourceFullMaskProperties()
 
-    this.imageInformations = options.imageInformations
+    this.imageInformations = warpedMapOptions.imageInformations
     this.loadingImageInfo = false
 
-    this.visible = options.visible || DEFAULT_VISIBLE
+    this.visible = warpedMapOptions.visible
 
-    this.fetchFn = options.fetchFn
+    this.fetchFn = warpedMapOptions.fetchFn
 
-    this.transformationType =
-      options.transformation?.type ||
-      this.georeferencedMap.transformation?.type ||
-      'polynomial'
+    this.transformationType = warpedMapOptions.transformationType
     this.previousTransformationType = this.transformationType
 
-    // TODO: read internal projection and projection from georeferenced map
-    this.internalProjection =
-      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS.internalProjection ||
-      webMercatorProjection
+    this.internalProjection = warpedMapOptions.internalProjection
     this.previousInternalProjection = this.internalProjection
-    this.projection =
-      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS.projection ||
-      webMercatorProjection
+    this.projection = warpedMapOptions.projection
 
     this.updateTransformerProperties()
   }

@@ -928,12 +928,13 @@ export class WarpedMapLayer extends Layer {
       viewportSize
     )
 
+    const devicePixelRatio = window.devicePixelRatio
+
     const viewport = new Viewport(
       viewportSize,
       projectedGeoCenter,
       projectedGeoPerViewportScale,
-      0,
-      window.devicePixelRatio
+      { devicePixelRatio }
     )
 
     this.renderer.render(viewport)
