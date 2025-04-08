@@ -30,6 +30,12 @@
 
   let width = $state<number>(320)
 
+  let bodyClientWidth = $state<number>(0)
+
+  let pinRadius = $derived(bodyClientWidth < 500 ? 4 : 2)
+
+  $inspect(bodyClientWidth)
+
   let pinDirection = Math.random() > 0.5 ? 1 : -1
   let pinRotation = (Math.random() * 10 + 10) * pinDirection
 
@@ -103,6 +109,8 @@
   })
 </script>
 
+<svelte:body bind:clientWidth={bodyClientWidth} />
+
 {#if fetchedImageInfo && fetchedImageInfo.state === 'success'}
   <li class="bg-white/40 p-2 rounded-md">
     <a
@@ -146,13 +154,13 @@
               <circle
                 cx={svgPositionCoordinates[0]}
                 cy={svgPositionCoordinates[1]}
-                r="2.0"
+                r={pinRadius}
                 fill="white"
               />
               <circle
                 cx={svgPositionCoordinates[0]}
                 cy={svgPositionCoordinates[1]}
-                r="1.1"
+                r={pinRadius * 0.5}
                 fill={pink}
               />
             </g>
