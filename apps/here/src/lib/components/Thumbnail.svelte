@@ -34,8 +34,6 @@
 
   let pinRadius = $derived(bodyClientWidth < 500 ? 4 : 2)
 
-  $inspect(bodyClientWidth)
-
   let pinDirection = Math.random() > 0.5 ? 1 : -1
   let pinRotation = (Math.random() * 10 + 10) * pinDirection
 
