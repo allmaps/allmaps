@@ -3,7 +3,7 @@
 
   import Feature from 'ol/Feature.js'
   import OLMap from 'ol/Map.js'
-  import Point from 'ol/geom/Point.js'
+  import OLPoint from 'ol/geom/Point.js'
   import LineString from 'ol/geom/LineString.js'
   import View from 'ol/View.js'
   import Icon from 'ol/style/Icon.js'
@@ -27,16 +27,18 @@
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
 
-  import Controls from '$lib/components/Controls.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
-  import type { GeojsonLineString } from '@allmaps/types'
+  import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
+  import type { GeojsonLineString, Point } from '@allmaps/types'
 
   import type { MapWithImageInfo } from '$lib/shared/types.js'
 
   import HereIcon from '$lib/shared/images/here.svg?raw'
   import HereOrientationIcon from '$lib/shared/images/here-orientation.svg?raw'
+  import Pin from '$lib/shared/images/pin.svg?raw'
+  import PinShadow from '$lib/shared/images/pin-shadow.svg?raw'
 
   const mapsState = getMapsState()
   const imageInfoState = getImageInfoState()
@@ -46,14 +48,19 @@
   let mounted = $state(false)
   let lastSelectedMapId = $state<string>()
 
+  type FeatureIconSvg = {
+    svg: string
+  }
+
   type Props = {
     selectedMapId: string
     geojsonRoute?: GeojsonLineString
+    from?: Point
     // sharedCoordinates?
     // backgroundColor?
   }
 
-  let { selectedMapId, geojsonRoute }: Props = $props()
+  let { selectedMapId, geojsonRoute, from }: Props = $props()
 
   // const mapWithImageInfo = mapsState.getMapWithImageInfo(selectedMapId)
   // let selectedMapBearing = $derived(
@@ -67,6 +74,7 @@
 
   const tileLayer = new TileLayer()
   const positionFeature = new Feature()
+  const fromFeature = new Feature({})
   const geojsonFeature = new Feature()
 
   geojsonFeature.setStyle([
@@ -104,16 +112,24 @@
     }
   }
 
-  // eslint-disable-next-line no-undef
   function updatePosition(position?: GeolocationPosition) {
     if (position && transformer) {
       const feature = positionToGeoJsonFeature(position)
       if (positionFeature) {
         const imageCoordinates = transformer.transformBackward(feature.geometry)
         positionFeature.setGeometry(
-          new Point([imageCoordinates[0], -imageCoordinates[1]])
+          new OLPoint([imageCoordinates[0], -imageCoordinates[1]])
         )
       }
+    }
+  }
+
+  function updateFrom(from?: Point) {
+    if (from && transformer) {
+      const imageCoordinates = transformer.transformBackward([from[1], from[0]])
+      fromFeature.setGeometry(
+        new OLPoint([imageCoordinates[0], -imageCoordinates[1]])
+      )
     }
   }
 
@@ -177,37 +193,66 @@
     }
 
     updatePosition(sensorsState.position)
+    updateFrom(from)
 
     lastSelectedMapId = map.id
   }
 
-  function setFeatureImage(svg: string) {
-    // Important! SVG's width, height and viewbox must be set!
-    const iconSrc = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+  function setPositionFeatureImage(svg: string) {
+    setFeatureImage(positionFeature, [
+      {
+        rotateWithView: true,
+        width: 40,
+        height: 40,
+        svg
+      }
+    ])
+  }
 
-    positionFeature.setStyle(
-      new Style({
-        image: new Icon({
-          opacity: 1,
-          rotateWithView: true,
-          width: 40,
-          height: 40,
-          src: iconSrc
-        })
-      })
+  function setFeatureImage(
+    feature: Feature,
+    icons: (FeatureIconOptions & FeatureIconSvg)[]
+  ) {
+    feature.setStyle(
+      icons.map(
+        (icon) =>
+          new Style({
+            image: new Icon({
+              ...icon,
+              // Important! SVG's width, height and viewbox must be set!
+              src: `data:image/svg+xml;utf8,${encodeURIComponent(icon.svg)}`
+            })
+          })
+      )
     )
   }
 
   onMount(async () => {
     if (sensorsState.hasOrientation) {
-      setFeatureImage(HereOrientationIcon)
+      setPositionFeatureImage(HereOrientationIcon)
     } else {
-      setFeatureImage(HereIcon)
+      setPositionFeatureImage(HereIcon)
     }
+
+    setFeatureImage(fromFeature, [
+      {
+        rotateWithView: true,
+        height: 20,
+        displacement: [30, 0],
+        svg: PinShadow
+      },
+      {
+        rotateWithView: true,
+        width: 40,
+        displacement: [0, 34],
+        rotation: 0.2,
+        svg: Pin
+      }
+    ])
 
     const vectorLayer = new VectorLayer({
       source: new VectorSource({
-        features: [geojsonFeature, positionFeature]
+        features: [geojsonFeature, positionFeature, fromFeature]
       })
     })
 
@@ -261,10 +306,16 @@
   $effect(() => {
     if (olMap) {
       if (sensorsState.hasOrientation) {
-        setFeatureImage(HereOrientationIcon)
+        setPositionFeatureImage(HereOrientationIcon)
       } else {
-        setFeatureImage(HereIcon)
+        setPositionFeatureImage(HereIcon)
       }
+    }
+  })
+
+  $effect(() => {
+    if (olMap && from) {
+      updateFrom(from)
     }
   })
 
@@ -298,7 +349,3 @@
 <DotsPattern color={pink} opacity={0.5}>
   <div bind:this={ol} class="w-full h-full"></div>
 </DotsPattern>
-
-<div class="absolute z-50 bottom-0 w-full p-2 pointer-events-none">
-  <Controls {selectedMapId} />
-</div>

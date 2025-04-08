@@ -28,6 +28,10 @@
 </script>
 
 <div class="relative w-full h-full flex flex-col bg-pink-100">
-  <Here selectedMapId={data.selectedMapId} geojsonRoute={data.geojsonRoute} />
+  <Here
+    selectedMapId={data.selectedMapId}
+    geojsonRoute={data.geojsonRoute}
+    from={data.from}
+  />
   {@render children?.()}
 </div>

@@ -1,9 +1,14 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
-  xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+  xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
   viewBox="0 0 182.4 314.5" style="enable-background:new 0 0 182.4 314.5;" xml:space="preserve">
 <style type="text/css">
-	.green1{fill:#DDF2E6;}
-	.green2{fill:#5BBC82;}
+	.green1 {
+    fill: #DDF2E6;
+  }
+
+	.green2 {
+    fill: #5BBC82;
+  }
 </style>
 <g>
 	<circle class="green1" cx="91.2" cy="91.2" r="81.2"/>
