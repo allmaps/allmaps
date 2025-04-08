@@ -1,16 +1,24 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="500" height="500"
   viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;}
-	.st1{fill:url(#SVGID_1_);}
-	.st2{fill:#EC008C;}
-</style>
-<radialGradient id="SVGID_1_" cx="458.594" cy="247.2298" r="289.2072" fx="233.647" fy="248.464" gradientTransform="matrix(1 0 0 -0.9903 0 494.8316)" gradientUnits="userSpaceOnUse">
-	<stop  offset="0" style="stop-color:#EC008C;stop-opacity:0.7"/>
-	<stop  offset="0.6146" style="stop-color:#EC008C;stop-opacity:0"/>
-</radialGradient>
-<path class="st1" d="M419.2,445.2c50-50,80.8-118.9,80.8-195.2s-30.8-145.2-80.8-195.2L224.2,250L419.2,445.2z"/>
-<circle class="st0" cx="250" cy="250" r="75"/>
-<circle class="st2" cx="250" cy="250" r="60"/>
+  <style type="text/css">
+    .white {
+      fill: #ffffff;
+    }
+
+    .pink {
+      fill: #ff56ba;
+    }
+
+    .orientation {
+      fill: url(#gradient);
+    }
+  </style>
+  <radialGradient id="gradient" cx="458.594" cy="247.2298" r="289.2072" fx="233.647" fy="248.464" gradientTransform="matrix(1 0 0 -0.9903 0 494.8316)" gradientUnits="userSpaceOnUse">
+    <stop  offset="0" style="stop-color:#EC008C;stop-opacity:0.7"/>
+    <stop  offset="0.6146" style="stop-color:#EC008C;stop-opacity:0"/>
+  </radialGradient>
+  <path class="orientation" d="M419.2,445.2c50-50,80.8-118.9,80.8-195.2s-30.8-145.2-80.8-195.2L224.2,250L419.2,445.2z"/>
+  <circle class="white" cx="250" cy="250" r="90"/>
+  <circle class="pink" cx="250" cy="250" r="50"/>
 </svg>

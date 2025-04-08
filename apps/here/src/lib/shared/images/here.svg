@@ -1,10 +1,15 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="500" height="500"
   viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;}
-	.st1{fill:#EC008C;}
-</style>
-<circle class="st0" cx="250" cy="250" r="75"/>
-<circle class="st1" cx="250" cy="250" r="60"/>
+  <style type="text/css">
+    .white {
+      fill: #ffffff;
+    }
+
+    .pink {
+      fill: #ff56ba;
+    }
+  </style>
+  <circle class="white" cx="250" cy="250" r="90"/>
+  <circle class="pink" cx="250" cy="250" r="50"/>
 </svg>

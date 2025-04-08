@@ -104,7 +104,7 @@
 </script>
 
 {#if fetchedImageInfo && fetchedImageInfo.state === 'success'}
-  <li class="contents">
+  <li class="bg-white/40 p-2 rounded-md">
     <a
       bind:clientWidth={width}
       class="aspect-square inline-block w-full h-full relative"
@@ -146,7 +146,7 @@
               <circle
                 cx={svgPositionCoordinates[0]}
                 cy={svgPositionCoordinates[1]}
-                r="1.8"
+                r="2.0"
                 fill="white"
               />
               <circle

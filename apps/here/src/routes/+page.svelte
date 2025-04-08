@@ -20,12 +20,10 @@
 <div class="h-full bg-blue/75">
   <DotsPattern color={blue}>
     {#if mapsState.maps.size > 0}
-      <section class="p-3" transition:fade={{ duration: 120 }}>
+      <section class="p-3 overflow-hidden" transition:fade={{ duration: 120 }}>
         <Collection>
           {#each mapsState.mapsFromCoordinates as [mapId, map] (mapId)}
-            <div class="bg-white/40 p-2 rounded-md">
-              <Thumbnail {mapId} {map} geojsonRoute={data.geojsonRoute} />
-            </div>
+            <Thumbnail {mapId} {map} geojsonRoute={data.geojsonRoute} />
           {/each}
         </Collection>
       </section>
