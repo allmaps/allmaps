@@ -339,11 +339,6 @@
       sensorsState.orientationAlpha !== undefined &&
       compassState.compassMode !== 'follow-orientation'
     ) {
-      console.log(
-        'nu set pin rotation',
-        -sensorsState.orientationAlpha,
-        compassState.selectedMapBearing
-      )
       setPinRotation(
         (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
           (Math.PI / 180)
