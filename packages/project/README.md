@@ -314,7 +314,7 @@ An extra 'transform option' is available for Projected GCP Transformers:
 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
-| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `EPSG:3857`
+| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `in a way compatible with [Proj4js](https://github.com/proj4js/proj4js).`
 
 As with a GCP Transformer, passing this transform option during the transformer's construction here it the default when using the transform methods.
 
@@ -322,11 +322,17 @@ Like other GCP *Transform* options, this option can be set when constructing a t
 
 ## Typing
 
-Projections are defined in a way compatible with [Proj4js](https://github.com/proj4js/proj4js).
+Projections are defined as follows:
 
 ```ts
-export type Projection = string
+export type Projection = {
+  name?: string
+  definition: string
+}
 ```
+
+Projection definitions can be anything compatible with [Proj4js](https://github.com/proj4js/proj4js), e.g.
+`'EPSG:3857'` or `'+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs'`
 
 ## API
 
