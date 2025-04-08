@@ -236,13 +236,11 @@
 
     setFeatureImage(fromFeature, [
       {
-        rotateWithView: true,
         height: 20,
         displacement: [30, 0],
         svg: PinShadow
       },
       {
-        rotateWithView: true,
         width: 40,
         displacement: [0, 34],
         rotation: 0.2,
