@@ -45,7 +45,13 @@
 </script>
 
 <svelte:head>
+  <title>Allmaps Here</title>
+  <meta name="title" content="Allmaps Here" />
   <meta property="og:title" content="Look where I am on this map!" />
+  <meta
+    name="description"
+    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
+  />
   <meta
     property="og:description"
     content="Visit Allmaps Here and find out where you are on digitized maps from your area."
@@ -58,13 +64,6 @@
         ','
       )}"
     />
-    <meta
-      property="og:image:secure_url"
-      content="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from.join(
-        ','
-      )}"
-    />
-
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
   {/if}
