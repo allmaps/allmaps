@@ -56,8 +56,6 @@
     selectedMapId: string
     geojsonRoute?: GeojsonLineString
     from?: Point
-    // sharedCoordinates?
-    // backgroundColor?
   }
 
   let { selectedMapId, geojsonRoute, from }: Props = $props()
@@ -117,12 +115,16 @@
     if (positionFeature) {
       const styleLike = positionFeature.getStyle()
 
+      // here-orientation.svg is pointing east.
+      // Substract 90 degrees to rotate it to north.
+      const pinRotationRad = rotationRad - Math.PI / 2
+
       if (Array.isArray(styleLike)) {
         styleLike.map((style) =>
-          rotateFeatureStyleImage(positionFeature, style, rotationRad)
+          rotateFeatureStyleImage(positionFeature, style, pinRotationRad)
         )
       } else if (styleLike && 'getImage' in styleLike) {
-        rotateFeatureStyleImage(positionFeature, styleLike, rotationRad)
+        rotateFeatureStyleImage(positionFeature, styleLike, pinRotationRad)
       }
     }
   }
@@ -334,9 +336,14 @@
 
   $effect(() => {
     if (
-      sensorsState.orientationAlpha &&
+      sensorsState.orientationAlpha !== undefined &&
       compassState.compassMode !== 'follow-orientation'
     ) {
+      console.log(
+        'nu set pin rotation',
+        -sensorsState.orientationAlpha,
+        compassState.selectedMapBearing
+      )
       setPinRotation(
         (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
           (Math.PI / 180)
