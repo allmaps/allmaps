@@ -103,12 +103,27 @@
     }
   }
 
+  function rotateFeatureStyleImage(
+    feature: Feature,
+    style: Style,
+    rotationRad: number
+  ) {
+    const image = style?.getImage()
+    image?.setRotation(rotationRad)
+    feature.changed()
+  }
+
   function setPinRotation(rotationRad: number) {
     if (positionFeature) {
-      const style = positionFeature.getStyle() as Style
-      const image = style?.getImage()
-      image?.setRotation(rotationRad)
-      positionFeature.changed()
+      const styleLike = positionFeature.getStyle()
+
+      if (Array.isArray(styleLike)) {
+        styleLike.map((style) =>
+          rotateFeatureStyleImage(positionFeature, style, rotationRad)
+        )
+      } else if (styleLike && 'getImage' in styleLike) {
+        rotateFeatureStyleImage(positionFeature, styleLike, rotationRad)
+      }
     }
   }
 
