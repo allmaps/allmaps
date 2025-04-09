@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { VirtualElement } from 'svelte-floating-ui/core'
   import { flip, shift } from 'svelte-floating-ui/dom'
   import { createFloatingActions } from 'svelte-floating-ui'
 
@@ -16,7 +15,7 @@
     ]
   })
 
-  const virtualElement: VirtualElement = {
+  const virtualElement = {
     getBoundingClientRect: () => ({
       x: event.clientX,
       y: event.clientY,
