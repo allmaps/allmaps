@@ -20,6 +20,7 @@ export enum WarpedMapEventType {
   TEXTURESUPDATED = 'texturesupdated',
 
   PRECHANGE = 'prechange',
+  OPTIONSCHANGED = 'optionschanged',
   ZINDICESCHANGED = 'zindiceschanged',
   RESOURCEMASKCHANGED = 'resourcemaskchanged',
   GCPSCHANGED = 'gcpschanged',

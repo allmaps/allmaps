@@ -387,6 +387,15 @@ export class WarpedMapLayer extends Layer {
     return this.canvas
   }
 
+  /**
+   * Sets the options
+   *
+   * @param options - Options
+   */
+  setOptions(options?: Partial<OpenLayersWarpedMapLayerOptions>) {
+    this.renderer.setOptions(options)
+  }
+
   // No setOpacity() and getOpacity() here since default for OL Layer class
 
   /**

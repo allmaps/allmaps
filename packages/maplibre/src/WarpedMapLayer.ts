@@ -427,6 +427,17 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
+   * Sets the options
+   *
+   * @param options - Options
+   */
+  setOptions(options?: Partial<MapLibreWarpedMapLayerOptions>) {
+    assertRenderer(this.renderer)
+
+    this.renderer.setOptions(options)
+  }
+
+  /**
    * Gets the opacity of a single map
    * @param mapId - ID of the map
    * @returns opacity of the map

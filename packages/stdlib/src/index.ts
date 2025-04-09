@@ -42,7 +42,16 @@ export {
   getPropertyFromTrippleCacheOrComputation
 } from './cache.js'
 
-export { rgbToHex, hexToRgb, hexToFractionalRgb } from './color.js'
+export {
+  rgbToHex,
+  rgbaToHex,
+  hexToRgb,
+  hexToRgba,
+  hexToOpaqueRgba,
+  hexToFractionalRgb,
+  hexToFractionalRgba,
+  hexToFractionalOpaqueRgba
+} from './color.js'
 
 export {
   fetchUrl,

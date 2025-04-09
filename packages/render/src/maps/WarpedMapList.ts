@@ -54,7 +54,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   rtree?: RTree
 
-  options: Partial<WarpedMapListOptions>
+  partialWarpedMapListOptions: Partial<WarpedMapListOptions>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -74,12 +74,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapFactory = warpedMapFactory
 
-    this.options = mergePartialOptions(
+    this.partialWarpedMapListOptions = mergePartialOptions(
       defaultWarpedMapListOptions,
       partialWarpedMapListOptions
     )
 
-    if (this.options.createRTree) {
+    if (this.partialWarpedMapListOptions.createRTree) {
       this.rtree = new RTree()
     }
   }
@@ -227,12 +227,29 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
+   * Set the Warped Map List options
+   *
+   * @param partialWarpedMapListOptions - Options
+   */
+  setOptions(
+    partialWarpedMapListOptions?: Partial<WarpedMapListOptions>
+  ): void {
+    this.partialWarpedMapListOptions = mergeOptions(
+      this.partialWarpedMapListOptions,
+      partialWarpedMapListOptions
+    )
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.OPTIONSCHANGED, this.getMapIds())
+    )
+  }
+
+  /**
    * Sets the object that caches image information
    *
    * @param imageInformations - object that caches image information
    */
   setImageInformations(imageInformations: ImageInformations): void {
-    this.options.imageInformations = imageInformations
+    this.partialWarpedMapListOptions.imageInformations = imageInformations
   }
 
   /**
@@ -692,7 +709,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const warpedMap = this.warpedMapFactory(
       mapId,
       georeferencedMap,
-      this.options
+      this.partialWarpedMapListOptions
     )
 
     this.warpedMapsById.set(mapId, warpedMap)

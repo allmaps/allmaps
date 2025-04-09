@@ -550,6 +550,17 @@ export class WarpedMapLayer extends Layer {
   }
 
   /**
+   * Sets the options
+   *
+   * @param options - Options
+   */
+  setOptions(options?: Partial<LeafletWarpedMapLayerOptions>) {
+    assertRenderer(this.renderer)
+
+    this.renderer.setOptions(options)
+  }
+
+  /**
    * Gets the opacity of a single map
    * @param mapId - ID of the map
    * @returns opacity of the map
