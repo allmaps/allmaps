@@ -49,14 +49,14 @@
     "leaflet"
   ],
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
     "leaflet": "^1.9.4"
   },
   "license": "MIT",
   "devDependencies": {
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@types/leaflet": "^1.9.3",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

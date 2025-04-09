@@ -49,9 +49,9 @@
     "typescript": "^5.7.0"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/transform": "^1.0.0-beta.43",
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/transform": "workspace:^",
     "@turf/bearing": "^7.2.0"
   }
 }

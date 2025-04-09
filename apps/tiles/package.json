@@ -27,9 +27,9 @@
     "preversion": "pnpm run types && pnpm run lint && pnpm run build"
   },
   "dependencies": {
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/tailwind": "^1.0.0-beta.16",
-    "@allmaps/ui": "^1.0.0-beta.34",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "ol": "^8.2.0"
   },
   "devDependencies": {

@@ -27,14 +27,14 @@
     "preversion": "pnpm run types && pnpm run lint && pnpm run build"
   },
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
-    "@allmaps/bearing": "^1.0.0-beta.2",
-    "@allmaps/iiif-parser": "^1.0.0-beta.42",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/tailwind": "^1.0.0-beta.16",
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/types": "^1.0.0-beta.17",
-    "@allmaps/ui": "^1.0.0-beta.34",
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/bearing": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "@tailwindcss/container-queries": "^0.1.1",
     "ol": "^10.2.1"
   },
