@@ -35,7 +35,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
+    "@allmaps/annotation": "workspace:^",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.4"
   },

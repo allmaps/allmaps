@@ -27,7 +27,7 @@
     "preversion": "pnpm run types && pnpm run lint && pnpm run build"
   },
   "devDependencies": {
-    "@allmaps/types": "1.0.0-beta.13",
+    "@allmaps/types": "workspace:^",
     "@sveltejs/adapter-static": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
@@ -47,11 +47,11 @@
     "vite": "^5.0.3"
   },
   "dependencies": {
-    "@allmaps/basemap": "^1.0.0-beta.4",
-    "@allmaps/maplibre": "^1.0.0-beta.32",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/tailwind": "^1.0.0-beta.16",
-    "@allmaps/ui": "^1.0.0-beta.34",
+    "@allmaps/basemap": "workspace:^",
+    "@allmaps/maplibre": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "lodash-es": "^4.17.21",
     "maplibre-gl": "^4.5.0",
     "pmtiles": "^3.0.6"

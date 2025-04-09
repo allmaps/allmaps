@@ -50,14 +50,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
     "lodash-es": "^4.17.21",
     "ol": "^8.2.0"
   },
   "devDependencies": {
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

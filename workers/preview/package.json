@@ -26,9 +26,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/vitest-pool-workers": "^0.1.0",
     "@cloudflare/workers-types": "^4.20240320.1",
