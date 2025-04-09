@@ -51,9 +51,8 @@ export class SensorsState {
 
     if (browser) {
       if (window.DeviceOrientationEvent) {
-        // TODO: throttle event!
         window.addEventListener(
-          'deviceorientation',
+          'deviceorientationabsolute',
           throttle(this.#handleDeviceOrientation.bind(this), 100),
           { signal: this.#abortController.signal }
         )
