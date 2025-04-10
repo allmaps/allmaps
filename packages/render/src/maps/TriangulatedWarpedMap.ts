@@ -471,8 +471,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
       })
   }
 
-  protected updateTransformerProperties(): void {
-    super.updateTransformerProperties()
+  protected updateProjectedTransformerProperties(): void {
+    super.updateProjectedTransformerProperties()
     this.updateTriangulation()
   }
 

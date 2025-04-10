@@ -699,7 +699,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     this.warpedMapList.addEventListener(
       WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      this.internalProjectionChanged.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -766,7 +766,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      this.internalProjectionChanged.bind(this)
     )
 
     this.warpedMapList.removeEventListener(

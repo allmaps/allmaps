@@ -263,7 +263,7 @@ export class WarpedMap extends EventTarget {
     this.previousInternalProjection = this.internalProjection
     this.projection = warpedMapOptions.projection
 
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -422,7 +422,7 @@ export class WarpedMap extends EventTarget {
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
     this.clearProjectedTransformerCaches()
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
     this.updateGcpsProperties()
   }
 
@@ -447,7 +447,7 @@ export class WarpedMap extends EventTarget {
    */
   setTransformationType(transformationType: TransformationType): void {
     this.transformationType = transformationType
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -472,7 +472,7 @@ export class WarpedMap extends EventTarget {
     this.clearProjectedTransformerCaches()
     // Note: the following will recreate a transformer with the internal projection
     // and also assure the triangulation is updated.
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -487,7 +487,7 @@ export class WarpedMap extends EventTarget {
       webMercatorProjection
     // Note: the following will reuse the existing transformer but set it's projection
     // and also assure the triangulation is updated.
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -694,7 +694,7 @@ export class WarpedMap extends EventTarget {
     this.updateResourceToProjectedGeoScale()
   }
 
-  protected updateTransformerProperties(): void {
+  protected updateProjectedTransformerProperties(): void {
     this.updateProjectedTransformer()
 
     this.updateGeoMaskProperties()
