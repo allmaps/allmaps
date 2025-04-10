@@ -63,7 +63,8 @@
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "documentation": "remark . --output --use remark-api"
+    "documentation": "remark . --output --use remark-api",
+    "bench": "node bench/index.js"
   },
   "license": "GPL-3.0-or-later"
 }

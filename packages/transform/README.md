@@ -557,33 +557,32 @@ The [@allmaps/cli](../../apps/cli/) package creates and interface for some speci
 
 ## Benchmark
 
-Here are some benchmarks on building and using a transformer, as computed on a 2023 MacBook Air M2.
+Here are some benchmarks on building and using a transformer, as computed on a 2023 MacBook Air M2 with 16 GB RAM.
 
-Creating a transformer (with 10 points) (and transform 1 point)
+This benchmark can be run with `pnpm run bench`. For more information, see [`./bench/index.js`](`./bench/index.js`).
 
-| Type              | Options    | Ops/s  |
-|-------------------|------------|--------|
-| `helmert`         |            | 63499  |
-| `polynomial`      | `order: 1` | 133824 |
-| `polynomial`      | `order: 2` | 66501  |
-| `polynomial`      | `order: 3` | 26750  |
-| `thinPlateSpline` |            | 20487  |
-| `projective`      |            | 27581  |
+To create a transformer (with 10 points) and compute its 'toGeo' transformation:
 
-Using a transformer (with 10 points) to transform 1 point
+| Type            | Ops/s  |
+|-----------------|--------|
+| helmert         | 77764  |
+| polynomial1     | 143934 |
+| polynomial2     | 76941  |
+| polynomial3     | 31864  |
+| thinPlateSpline | 25613  |
+| projective      | 31041  |
 
-| Type              | Options    | Ops/s    |
-|-------------------|------------|----------|
-| `helmert`         |            | 21612153 |
-| `polynomial`      | `order: 1` | 19993234 |
-| `polynomial`      | `order: 2` | 19887376 |
-| `polynomial`      | `order: 3` | 3930665  |
-| `thinPlateSpline` |            | 2931361  |
-| `projective`      |            | 20386139 |
 
-See [`./bench/index.js`](`./bench/index.js`).
+To use a transformer (with 10 points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':
 
-The benchmark can be run with `pnpm run bench`.
+| Type            | Ops/s    |
+|-----------------|----------|
+| helmert         | 18566272 |
+| polynomial1     | 16074983 |
+| polynomial2     | 16063110 |
+| polynomial3     | 3743246  |
+| thinPlateSpline | 2946500  |
+| projective      | 16319792 |
 
 ## License
 

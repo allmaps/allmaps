@@ -334,6 +334,35 @@ export type Projection = {
 Projection definitions can be anything compatible with [Proj4js](https://github.com/proj4js/proj4js), e.g.
 `'EPSG:3857'` or `'+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs'`
 
+## Benchmark
+
+Here are some benchmarks on building and using a transformer, as computed on a 2023 MacBook Air M2 with 16 GB RAM.
+
+This benchmark can be run with `pnpm run bench`. For more information, see [`./bench/index.js`](`./bench/index.js`).
+
+To create a projected transformer (with 10 points) and compute its 'toGeo' transformation:
+
+| Type            | Ops/s |
+|-----------------|-------|
+| helmert         | 31178 |
+| polynomial1     | 39583 |
+| polynomial2     | 31907 |
+| polynomial3     | 20137 |
+| thinPlateSpline | 17325 |
+| projective      | 20322 |
+
+
+To use a projected transformer (with 10 points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':
+
+| Type            | Ops/s   |
+|-----------------|---------|
+| helmert         | 3906562 |
+| polynomial1     | 3595760 |
+| polynomial2     | 3568346 |
+| polynomial3     | 2087742 |
+| thinPlateSpline | 1759935 |
+| projective      | 3621210 |
+
 ## API
 
 ### `ProjectedGcpTransformOptions`

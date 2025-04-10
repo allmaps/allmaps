@@ -34,7 +34,6 @@
   ],
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
     "@turf/distance": "^7.2.0",
     "@turf/midpoint": "^7.2.0",
     "ml-matrix": "^6.12.0"

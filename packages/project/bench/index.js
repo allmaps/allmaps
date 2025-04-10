@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { GcpTransformer } from '../dist/index.js'
+import { ProjectedGcpTransformer } from '../dist/index.js'
 
 import { gcps10 } from '../test/input/gcps-test.js'
 
@@ -9,8 +9,8 @@ function logBenchmarkCreateGcpTransformer(input, type) {
   start = Date.now()
   ops = 0
   while (Date.now() - start < 1000) {
-    const transformer = new GcpTransformer(input, type)
-    transformer.getToGeoTransformation()
+    const projectedTransformer = new ProjectedGcpTransformer(input, type)
+    projectedTransformer.getToGeoTransformation()
     ops++
   }
   console.log(
@@ -19,7 +19,7 @@ function logBenchmarkCreateGcpTransformer(input, type) {
 }
 
 console.log(
-  'To create a transformer (with ' +
+  'To create a projected transformer (with ' +
     gcps10.length +
     " points) and compute its 'toGeo' transformation:\n"
 )
@@ -35,10 +35,10 @@ logBenchmarkCreateGcpTransformer(gcps10, 'projective')
 function logBenchmarkUseGcpTransformer(input, type) {
   start = Date.now()
   ops = 0
-  const transformer = new GcpTransformer(input, type)
-  transformer.getToGeoTransformation()
+  const projectedTransformer = new ProjectedGcpTransformer(input, type)
+  projectedTransformer.getToGeoTransformation()
   while (Date.now() - start < 1000) {
-    transformer.transformToGeo([100, 100])
+    projectedTransformer.transformToGeo([100, 100])
     ops++
   }
   console.log(
@@ -49,7 +49,7 @@ function logBenchmarkUseGcpTransformer(input, type) {
 console.log('\n')
 
 console.log(
-  'To use a transformer (with ' +
+  'To use a projected transformer (with ' +
     gcps10.length +
     " points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':\n"
 )
