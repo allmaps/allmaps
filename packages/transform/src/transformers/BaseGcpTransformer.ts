@@ -199,8 +199,8 @@ export abstract class BaseGcpTransformer {
    * It is obtained by transforming forward two linestring,
    * namely the horizontal and vertical midlines of the given bbox.
    * The forward transformation will refine these lines:
-   * it will break then in small enough pieces to obtain a near continous result.
-   * Returned in the lenght of the shortest piece, measured in source coordinates.
+   * it will break them in small enough pieces to obtain a near continuous result.
+   * Returned in the length of the shortest piece, measured in source coordinates.
    *
    * @param sourceBbox - BBox in source space where the resolution is requested
    * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
@@ -231,8 +231,8 @@ export abstract class BaseGcpTransformer {
    * It is obtained by transforming backward two linestring,
    * namely the horizontal and vertical midlines of the given bbox.
    * The backward transformation will refine these lines:
-   * it will break then in small enough pieces to obtain a near continous result.
-   * Returned in the lenght of the shortest piece, measured in destination coordinates.
+   * it will break them in small enough pieces to obtain a near continuous result.
+   * Returned in the length of the shortest piece, measured in destination coordinates.
    *
    * @param destinationBbox - BBox in destination space where the resolution is requested
    * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation

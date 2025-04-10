@@ -134,8 +134,8 @@ export class GcpTransformer extends BaseGcpTransformer {
    * It is obtained by transforming toGeo two linestring,
    * namely the horizontal and vertical midlines of the given bbox.
    * The toGeo transformation will refine these lines:
-   * it will break then in small enough pieces to obtain a near continous result.
-   * Returned in the lenght of the shortest piece, measured in resource coordinates.
+   * it will break them in small enough pieces to obtain a near continuous result.
+   * Returned in the length of the shortest piece, measured in resource coordinates.
    *
    * @param resourceBbox - BBox in resource space where the resolution is requested
    * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
@@ -165,8 +165,8 @@ export class GcpTransformer extends BaseGcpTransformer {
    * It is obtained by transforming toResource two linestring,
    * namely the horizontal and vertical midlines of the given bbox.
    * The toResource transformation will refine these lines:
-   * it will break then in small enough pieces to obtain a near continous result.
-   * Returned in the lenght of the shortest piece, measured in geo coordinates.
+   * it will break them in small enough pieces to obtain a near continuous result.
+   * Returned in the length of the shortest piece, measured in geo coordinates.
    *
    * @param geoBbox - BBox in geo space where the resolution is requested
    * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation

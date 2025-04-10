@@ -14,7 +14,7 @@ Like instances of the `GcpTransformer` class, instances of the `ProjectedGcpTran
 
 The **projection** defines the 'projected geo' space of the viewport. Since we will render our geometries in the projected space of our viewport, it is logical to make the transformer aware of this space by supplying its projection, so it can bring the results to this space. It defaults to WebMercator `EPSG:3857`, the projection used by default in most webmaps.
 
-The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different then the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to it's 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
+The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different than the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to its 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
 
 The GCPs must be provided in lon-lat `EPSG:4326` projection (since this is the default projection used by GeoJSON and Georeference Annotations) and are projected to the 'projected geo' space before building the GCP Transformer (who will project them to the 'internal projected geo' space).
 
@@ -187,7 +187,7 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineS
 // ]
 ```
 
-Notice how this return a lineString in WebMercator coordinates with different points then previously, since it's transformation used another internal projection before projecting the result to WebMercator.
+Notice how this return a lineString in WebMercator coordinates with different points than previously, since its transformation used another internal projection before projecting the result to WebMercator.
 
 ### Using a transformer with a specific internal projection and projection
 
@@ -241,7 +241,7 @@ Notice how this returns a lineString in WebMercator coordinates with the same po
 
 ### Transforming to a different projection
 
-Since `projection` is a *transform* option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to *any* projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and it's toGeo and/or toResource transformations (who's computation can be expensive when there are many GCPs).
+Since `projection` is a *transform* option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to *any* projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and its toGeo and/or toResource transformations (who's computation can be expensive when there are many GCPs).
 
 We can request the result of a 'toGeo' transform using the projected transformer above as follows:
 
@@ -279,7 +279,7 @@ Note: there is no equivalent option for the internal projection.
 
 ## Creating and using a projected transformer
 
-Since the Projected GCP Transformer class extends the GCP Transformer class, a lot of it's usage is similar. (See the [@allmaps/transform](../../packages/transform/) package for more information on the items below).
+Since the Projected GCP Transformer class extends the GCP Transformer class, a lot of its usage is similar. (See the [@allmaps/transform](../../packages/transform/) package for more information on the items below).
 
 When creating an instance from the Projected GCP Transformer class:
 
@@ -287,7 +287,7 @@ When creating an instance from the Projected GCP Transformer class:
 * The same **transformation types** are supported: `polynomial`, `thinPlateSpline`, ...
 * Two **extra options** can be set: `projection` specifies the projected geo space (defaults to WebMercator `EPSG:3857`), and `intenalProjection` specifies the projected using when computing the transformation (also defaults to WebMercator `EPSG:3857`). As with a GCP Transformer, the `differentHandedness` is true by default.
 
-When using it's main methods:
+When using its main methods:
 
 * The method `transformToGeo()` transforms input geometries from 'resource' space to 'projected geo' space, as the method `transformToResource()` transforms input geometries from 'projected geo' space to 'resource' space.
 * Inputs are following the Allmaps Geometries types. To handle GeoJSON Geometries or SVG Geometries, convert to and from these geometry types using the functions available in [@allmaps/stdlib](../../packages/stdlib/).
@@ -461,7 +461,7 @@ Create a ProjectedGcpTransformer
 Set the projection.
 
 To transform 'toGeo' or 'toResource' to or from a different projection
-then set on a transformer's construction (but using the same internal projection)
+than set on a transformer's construction (but using the same internal projection)
 it's possible to specify the requested projection in the transform options.
 
 This way we circumvent a possibly expensive recomputation

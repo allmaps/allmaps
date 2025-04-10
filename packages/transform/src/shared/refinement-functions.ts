@@ -278,37 +278,37 @@ export function getSourceRefinementResolution(
   }
 
   // Compute minimal line length of refinement
-  const sourceMinHorizontalLineSquaredLenghts = []
+  const sourceMinHorizontalLineSquaredLengths = []
   for (let i = 0; i < sourceRefinedHorizontalLineString.length - 1; i++) {
-    sourceMinHorizontalLineSquaredLenghts.push(
+    sourceMinHorizontalLineSquaredLengths.push(
       squaredDistance(
         sourceRefinedHorizontalLineString[i],
         sourceRefinedHorizontalLineString[i + 1]
       )
     )
   }
-  const sourceMinHorizontalLineLenght = Math.sqrt(
-    Math.min(...sourceMinHorizontalLineSquaredLenghts)
+  const sourceMinHorizontalLineLength = Math.sqrt(
+    Math.min(...sourceMinHorizontalLineSquaredLengths)
   )
-  const sourceMinVerticalLineSquaredLenghts = []
+  const sourceMinVerticalLineSquaredLengths = []
   for (let i = 0; i < sourceRefinedVerticalLineString.length - 1; i++) {
-    sourceMinVerticalLineSquaredLenghts.push(
+    sourceMinVerticalLineSquaredLengths.push(
       squaredDistance(
         sourceRefinedVerticalLineString[i],
         sourceRefinedVerticalLineString[i + 1]
       )
     )
   }
-  const sourceMinVerticalLineLenght = Math.sqrt(
-    Math.min(...sourceMinVerticalLineSquaredLenghts)
+  const sourceMinVerticalLineLength = Math.sqrt(
+    Math.min(...sourceMinVerticalLineSquaredLengths)
   )
 
   // Compute cols and rows by comparing minimal line length to original length
   // Note: Tried to acchieve this by working with unflattened refined line and computing depth
   // but that proved difficult for TypeScript
   const sourceMinLineLength = Math.min(
-    sourceMinHorizontalLineLenght,
-    sourceMinVerticalLineLenght
+    sourceMinHorizontalLineLength,
+    sourceMinVerticalLineLength
   )
 
   return sourceMinLineLength

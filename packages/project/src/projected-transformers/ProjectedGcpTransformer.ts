@@ -134,7 +134,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * Set the projection.
    *
    * To transform 'toGeo' or 'toResource' to or from a different projection
-   * then set on a transformer's construction (but using the same internal projection)
+   * than set on a transformer's construction (but using the same internal projection)
    * it's possible to specify the requested projection in the transform options.
    *
    * This way we circumvent a possibly expensive recomputation

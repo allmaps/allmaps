@@ -712,7 +712,7 @@ export class WebGL2Renderer
     // > since this function is called (possibly multiple times) during startup, without changes to the viewport
     // Returns false in other cases
 
-    // TODO: this could be a problem if the viewport is quickly and continously moved
+    // TODO: this could be a problem if the viewport is quickly and continuously moved
     // within the tolerance during initial loading.
     // Possible solution: adding a 'allrendered' event and listening to it.
 

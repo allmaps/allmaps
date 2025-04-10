@@ -474,11 +474,11 @@ The (forward and backward) transformations underlying the the General GCP Transf
 
 If you need to deal with simple map projection situation, e.g. when you are given GCPs in a lon-lat WGS84 geographic projection but want to build a GCP Transformer to WebMercator (as a guess for the map's projection and as the projection of the viewport to render in), you could simply project your GCPs from WGS84 to WebMercator first and build a projected transformed from these projected GCPs.
 
-To deal with more complex general projection situations, the transform options includes optional projection functions. This is useful when the transformation should be computed between 'internal' projected spaces that are different then the 'source' and 'destination' spaces of the GCPs. These functions are `preForward`, `postForward` (`postToGeo`), `preBackward` (`preToResource`) and `postBackward`. When set, these are applied when reading the GCPs to form the 'internal' GCPs (`preForward` is applied to the source coordinates and `preBackward` to destination coordinates). They are also applied on each corresponding transform call before and after the transformation is evaluated: a `transformForward()` call thus applies `preForward`, evaluates the forward transformation, and finally applies `postForward`.
+To deal with more complex general projection situations, the transform options includes optional projection functions. This is useful when the transformation should be computed between 'internal' projected spaces that are different than the 'source' and 'destination' spaces of the GCPs. These functions are `preForward`, `postForward` (`postToGeo`), `preBackward` (`preToResource`) and `postBackward`. When set, these are applied when reading the GCPs to form the 'internal' GCPs (`preForward` is applied to the source coordinates and `preBackward` to destination coordinates). They are also applied on each corresponding transform call before and after the transformation is evaluated: a `transformForward()` call thus applies `preForward`, evaluates the forward transformation, and finally applies `postForward`.
 
 To make this general case more concrete, here's how this is works **in the Allmaps case**. Allmaps uses a GCP Transformer and transforms from the 'resource' space of an image of a map to a 'projected geo' space of the viewport to render the map. Not only is the viewport a projected space, but it is also possible that the user knows or supposes the geographic projection in which the map is made, and that this geographic projection is different than the geographic projection of the viewport. In that case one wants to build a transformation between the 'resource' space of pixels and an 'internal projected geo' space of the maps geographic projection. When transforming to geo, one wants to first evaluate this transformation (from 'resource' to 'internal projected geo') and then apply a `postForward` projection function from 'internal projected geo' space to 'projected geo' space.
 
-The crucial insight here is that the map's geographic projection *can* be different then the rendered geographic projection. The first inspires a internal projected space to use when computing the transformation, which will assure that the transformation only takes into account the warping between these two spaces, and ideally, when our information or guess about the map's geographic projection is correct, does not account for warping due to the projections. The latter must be taken into account later, and handles the warping due to the difference in geographic projections. By doing *both within* a transformer, one can use the transformer methods to transform geometries forward or backward (or compute a resolution), and know that our geometries will be refined both by the transformation and the projection functions!
+The crucial insight here is that the map's geographic projection *can* be different than the rendered geographic projection. The first inspires a internal projected space to use when computing the transformation, which will assure that the transformation only takes into account the warping between these two spaces, and ideally, when our information or guess about the map's geographic projection is correct, does not account for warping due to the projections. The latter must be taken into account later, and handles the warping due to the difference in geographic projections. By doing *both within* a transformer, one can use the transformer methods to transform geometries forward or backward (or compute a resolution), and know that our geometries will be refined both by the transformation and the projection functions!
 
 To simplify the computation of these optional projection functions from the map's geographic projection and viewport geographic projection, use the class **Projected GCP Transformer** from the [@allmaps/project](../../packages/project/) module.
 
@@ -492,7 +492,7 @@ The 'return type function' (internally named `generalGcpToP` or `GcpToP`) allows
 
 An example will make this more clear: when using a General GCP Transformer to forward-transform a LineString, the input is a LineString in the source space and the (default) output is a LineString in the destination space (i.e. an Array of destination points). Using the 'return type function', you can make this output to be an Array of any function of objects of type GeneralGcpAndDistortions, which include the destination points, but also the corresponding source points and (if computed) the distortion information. By default this function selects the destination points, and hence returns an Array of Points, but you can pass a function `(generalGcpToP) => generalGcpToP` to return an Array of  GcpAndDistortions objects, or you can pass more complex function on this object as well. This can be useful in several cases:
 
-* When you want to refine an input geometry using a transformation but are interested in the coordinates of the refined geometry in the input domain more then those in the output domain.
+* When you want to refine an input geometry using a transformation but are interested in the coordinates of the refined geometry in the input domain more than those in the output domain.
 * When you want to read out distortion information at each point (see the options for how to specify which distortions measures to compute).
 * When you want to apply a transformation on the outputs point, e.g. flip the output points around their y-axis (see the notes on handedness for example of the latter).
 
@@ -699,8 +699,8 @@ that is fine enough for this warping.
 It is obtained by transforming toGeo two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The toGeo transformation will refine these lines:
-it will break then in small enough pieces to obtain a near continous result.
-Returned in the lenght of the shortest piece, measured in resource coordinates.
+it will break them in small enough pieces to obtain a near continuous result.
+Returned in the length of the shortest piece, measured in resource coordinates.
 
 ###### Parameters
 
@@ -736,8 +736,8 @@ that is fine enough for this warping.
 It is obtained by transforming toResource two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The toResource transformation will refine these lines:
-it will break then in small enough pieces to obtain a near continous result.
-Returned in the lenght of the shortest piece, measured in geo coordinates.
+it will break them in small enough pieces to obtain a near continuous result.
+Returned in the length of the shortest piece, measured in geo coordinates.
 
 ###### Parameters
 
@@ -962,8 +962,8 @@ that is fine enough for this warping.
 It is obtained by transforming backward two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The backward transformation will refine these lines:
-it will break then in small enough pieces to obtain a near continous result.
-Returned in the lenght of the shortest piece, measured in destination coordinates.
+it will break them in small enough pieces to obtain a near continuous result.
+Returned in the length of the shortest piece, measured in destination coordinates.
 
 ###### Parameters
 
@@ -999,8 +999,8 @@ that is fine enough for this warping.
 It is obtained by transforming forward two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The forward transformation will refine these lines:
-it will break then in small enough pieces to obtain a near continous result.
-Returned in the lenght of the shortest piece, measured in source coordinates.
+it will break them in small enough pieces to obtain a near continuous result.
+Returned in the length of the shortest piece, measured in source coordinates.
 
 ###### Parameters
 

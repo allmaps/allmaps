@@ -22,7 +22,7 @@ export function resourceMask() {
       .argument('[files...]')
       .summary('transform resource masks to GeoJSON')
       .description(
-        "Transform SVG resource masks of input Georeference Annotations to GeoJSON using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n" +
+        'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n' +
           "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
       )
   )
