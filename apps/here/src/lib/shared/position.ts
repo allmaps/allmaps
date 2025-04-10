@@ -1,20 +1,22 @@
-export function positionToGeoJson(position: GeolocationPosition) {
+export function geolocationPositionToGeojsonFeature(
+  geolocationPosition: GeolocationPosition
+) {
   return {
     type: 'Feature' as const,
     geometry: {
       type: 'Point' as const,
-      coordinates: [position.coords.longitude, position.coords.latitude] as [
-        number,
-        number
-      ]
+      coordinates: [
+        geolocationPosition.coords.longitude,
+        geolocationPosition.coords.latitude
+      ] as [number, number]
     },
     properties: {
-      accuracy: position.coords.accuracy,
-      altitude: position.coords.altitude,
-      altitudeAccuracy: position.coords.altitudeAccuracy,
-      heading: position.coords.heading,
-      speed: position.coords.speed,
-      timestamp: position.timestamp
+      accuracy: geolocationPosition.coords.accuracy,
+      altitude: geolocationPosition.coords.altitude,
+      altitudeAccuracy: geolocationPosition.coords.altitudeAccuracy,
+      heading: geolocationPosition.coords.heading,
+      speed: geolocationPosition.coords.speed,
+      timestamp: geolocationPosition.timestamp
     }
   }
 }

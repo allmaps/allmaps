@@ -1,7 +1,9 @@
-import type { Command, OptionValues } from '@commander-js/extra-typings'
+import {
+  defaultGcpTransformOptions,
+  defaultGcpTransformerOptions
+} from '@allmaps/transform'
 
-const DEFAULT_MIN_OFFSET_RATIO = 0
-const DEFAULT_MAX_DEPTH = 0
+import type { Command, OptionValues } from '@commander-js/extra-typings'
 
 export function addAnnotationOptions<
   Args extends unknown[] = [],
@@ -51,29 +53,56 @@ export function addTransformOptions<
   return command
     .option(
       '-m, --max-depth <number>',
-      `Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default ${DEFAULT_MAX_DEPTH} (i.e. no midpoints by default!).`,
+      `Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default ${defaultGcpTransformOptions.maxDepth} (i.e. no midpoints by default!).`,
       parseInt,
-      DEFAULT_MAX_DEPTH
+      defaultGcpTransformOptions.maxDepth
     )
     .option(
-      '-p, --min-offset-ratio <number>',
-      // TODO: needs better description
-      `Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default ${DEFAULT_MIN_OFFSET_RATIO}.`,
+      '--min-offset-ratio <number>',
+      `Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default ${defaultGcpTransformOptions.minOffsetRatio}.`,
       parseFloat,
-      DEFAULT_MIN_OFFSET_RATIO
+      defaultGcpTransformOptions.minOffsetRatio
+    )
+    .option(
+      '--min-offset-distance <number>',
+      `Minimum offset distance when recursively adding midpoints (lower means more midpoints). Default ${defaultGcpTransformOptions.minOffsetDistance}.`,
+      parseFloat,
+      defaultGcpTransformOptions.minOffsetDistance
+    )
+    .option(
+      '--min-line-distance <number>',
+      `Minimum line distance when recursively adding midpoints (lower means more midpoints). Default ${defaultGcpTransformOptions.minLineDistance}.`,
+      parseFloat,
+      defaultGcpTransformOptions.minLineDistance
+    )
+    .option(
+      '--geo-is-geographic',
+      'Use geographic distances and midpoints for lon-lat geo points.',
+      defaultGcpTransformOptions.geoIsGeographic
     )
 }
 
-export function addCoordinateTransformOptions<
+export function addTransformerOptions<
   Args extends unknown[] = [],
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
 >(command: Command<Args, Opts, GlobalOpts>) {
-  return addTransformOptions(
-    command
-      .option('--destination-is-geographic', 'Destination is geographic')
-      .option('--source-is-geographic', 'Source is geographic')
-      .option('-i, --inverse', 'Computes the inverse/backward transformation')
+  return command.option(
+    '--different-handedness',
+    'Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output. Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform.',
+    defaultGcpTransformerOptions.differentHandedness
+  )
+}
+
+export function addInverseOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command.option(
+    '-i, --inverse',
+    "Computes the inverse 'toResource' transformation",
+    false
   )
 }
 

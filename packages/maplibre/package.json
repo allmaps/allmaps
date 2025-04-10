@@ -52,6 +52,7 @@
   "dependencies": {
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "maplibre-gl": "^4.5.0"
   },
   "devDependencies": {

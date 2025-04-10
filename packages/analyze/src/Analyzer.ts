@@ -4,7 +4,6 @@ import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
 
 import {
   isEqualArray,
-  getPropertyFromCacheOrComputation,
   isEqualPoint,
   isRing,
   polygonSelfIntersectionPoints,
@@ -12,12 +11,7 @@ import {
   bboxToDiameter,
   isPoint
 } from '@allmaps/stdlib'
-import {
-  GcpTransformer,
-  Helmert,
-  Polynomial,
-  Transformation
-} from '@allmaps/transform'
+import { Helmert, Polynomial } from '@allmaps/transform'
 import {
   AnalysisOptions,
   AnalysisItem,
@@ -27,7 +21,6 @@ import {
 } from './shared/types'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { Point } from '@allmaps/types'
 
 const MAX_SHEAR = 0.1
 
@@ -321,6 +314,7 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
+        measures.polynomialShear &&
         (measures.polynomialShear[0] > MAX_SHEAR ||
           measures.polynomialShear[1] > MAX_SHEAR)
       ) {
@@ -530,79 +524,53 @@ export class Analyzer {
       return
     }
 
-    const warpedMap = this.warpedMap
-
     // Polynomial
-    const projectedPolynomialTransformer = getPropertyFromCacheOrComputation(
-      this.warpedMap.projectedTransformerByTransformationType,
-      'polynomial',
-      () =>
-        new GcpTransformer(warpedMap.projectedGcps, 'polynomial', {
-          differentHandedness: true
-        }) // TODO: load default options? Or differentHandedness becomes default?
-    )
+    const projectedPolynomialTransformer =
+      this.warpedMap.getProjectedTransformer('polynomial')
+    const toProjectedGeoPolynomialTransformation =
+      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
 
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedPolynomialTransformer.forwardTransformation) {
-      projectedPolynomialTransformer.createForwardTransformation()
-    }
-    const forwardPolynomialTransformation =
-      // We assume rmse, scale, shear exist since this is a first order polynomial transformation
-      projectedPolynomialTransformer.forwardTransformation as Polynomial
-    const polynomialRmse = forwardPolynomialTransformation.rmse
+    const polynomialRmse = toProjectedGeoPolynomialTransformation.rmse
     const polynomialParameters =
-      forwardPolynomialTransformation.polynomialParameters
-    const polynomialScale = forwardPolynomialTransformation.scale as Point
-    const polynomialRotation =
-      forwardPolynomialTransformation.rotation as number
-    const polynomialShear = forwardPolynomialTransformation.shear as Point
+      toProjectedGeoPolynomialTransformation.polynomialParameters
+    const polynomialScale = toProjectedGeoPolynomialTransformation.scale
+    const polynomialRotation = toProjectedGeoPolynomialTransformation.rotation
+    const polynomialShear = toProjectedGeoPolynomialTransformation.shear
     const polynomialTranslation =
-      forwardPolynomialTransformation.translation as Point
+      toProjectedGeoPolynomialTransformation.translation
 
     // Helmert
-    const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
-      this.warpedMap.projectedTransformerByTransformationType,
-      'helmert',
-      () =>
-        new GcpTransformer(warpedMap.projectedGcps, 'helmert', {
-          differentHandedness: true
-        }) // TODO: load default options? Or differentHandedness becomes default?
-    )
+    const projectedHelmertTransformer =
+      this.warpedMap.getProjectedTransformer('helmert')
+    const toProjectedGeoHelmertTransformation =
+      projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedHelmertTransformer.forwardTransformation) {
-      projectedHelmertTransformer.createForwardTransformation()
-    }
-    const forwardHelmertTransformation =
-      projectedHelmertTransformer.forwardTransformation as Helmert
-
-    const helmertRmse = forwardHelmertTransformation.rmse
-    const helmertParameters = forwardHelmertTransformation.helmertParameters
-    const helmertScale = forwardHelmertTransformation.scale
-    const helmertRotation = forwardHelmertTransformation.rotation
-    const helmertTranslation = forwardHelmertTransformation.translation
+    const helmertRmse = toProjectedGeoHelmertTransformation.rmse
+    const helmertParameters =
+      toProjectedGeoHelmertTransformation.helmertParameters
+    const helmertScale = toProjectedGeoHelmertTransformation.scale
+    const helmertRotation = toProjectedGeoHelmertTransformation.rotation
+    const helmertTranslation = toProjectedGeoHelmertTransformation.translation
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
-    // TODO: createForwardTransformation() will soon check, compute and return the transformation
-    if (!projectedTransformer.forwardTransformation) {
-      projectedTransformer.createForwardTransformation()
-    }
-    const forwardTransformation =
-      projectedTransformer.forwardTransformation as Transformation
-    const rmse = forwardTransformation.rmse
-    const destinationErrors = forwardTransformation.errors
+    const toProjectedGeoTransformation =
+      projectedTransformer.getToGeoTransformation()
+    const rmse = toProjectedGeoTransformation.rmse
+    const destinationErrors = toProjectedGeoTransformation.errors
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    const resourceErrors = forwardTransformation.errors.map(
-      (error) => error / forwardHelmertTransformation.scale
+    const resourceErrors = toProjectedGeoTransformation.errors.map(
+      (error) => error / toProjectedGeoHelmertTransformation.scale
     )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
-    const resourceRelativeErrors = forwardTransformation.errors.map(
+    const resourceMaskBboxDiameter = bboxToDiameter(
+      this.warpedMap.resourceMaskBbox
+    )
+    const resourceRelativeErrors = toProjectedGeoTransformation.errors.map(
       (error) =>
         error /
-        (forwardHelmertTransformation.scale *
-          bboxToDiameter(warpedMap.resourceMaskBbox))
+        (toProjectedGeoHelmertTransformation.scale * resourceMaskBboxDiameter)
     )
 
     this.measures = {
@@ -644,8 +612,10 @@ export class Analyzer {
       mapId: this.mapId
     }
 
+    const distortionsAtFirstPoint =
+      this.warpedMap.projectedGcpTriangulation.gcpUniquePoints[0].distortions
     const distortionMeasures = Array.from(
-      this.warpedMap.projectedGcpTriangulation.gcpUniquePoints[0].distortions.keys()
+      distortionsAtFirstPoint ? distortionsAtFirstPoint.keys() : []
     )
 
     for (const distortionMeasure of distortionMeasures) {
@@ -655,7 +625,7 @@ export class Analyzer {
       const triangulationDistortions =
         this.warpedMap.projectedGcpTriangulation.gcpUniquePoints
           .map((gcpUniquePoint) =>
-            gcpUniquePoint.distortions.get(distortionMeasure)
+            gcpUniquePoint.distortions?.get(distortionMeasure)
           )
           .filter((distortion) => distortion !== undefined)
       const meanTriangulationDistortion =

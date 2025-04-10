@@ -36,6 +36,12 @@
     "format": "prettier --write src test"
   },
   "license": "MIT",
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@turf/bearing": "^7.2.0"
+  },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
@@ -47,11 +53,5 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0"
-  },
-  "dependencies": {
-    "@allmaps/annotation": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
-    "@allmaps/transform": "workspace:^",
-    "@turf/bearing": "^7.2.0"
   }
 }

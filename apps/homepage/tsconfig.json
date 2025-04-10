@@ -5,6 +5,7 @@
     { "path": "../../packages/annotation" },
     { "path": "../../packages/id" },
     { "path": "../../packages/maplibre" },
+    { "path": "../../packages/project" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/types" }

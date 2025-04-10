@@ -1,5 +1,12 @@
 import { KernelFunctionOptions } from './types'
 
+/**
+ * Linear kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function linearKernel(
   r: number,
   options: KernelFunctionOptions
@@ -15,6 +22,13 @@ export function linearKernel(
   }
 }
 
+/**
+ * Cubic kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function cubicKernel(r: number, options: KernelFunctionOptions) {
   if (!options.derivative) {
     return Math.pow(r, 3)
@@ -27,6 +41,13 @@ export function cubicKernel(r: number, options: KernelFunctionOptions) {
   }
 }
 
+/**
+ * Quintic kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function quinticKernel(r: number, options: KernelFunctionOptions) {
   if (!options.derivative) {
     return Math.pow(r, 5)
@@ -39,6 +60,13 @@ export function quinticKernel(r: number, options: KernelFunctionOptions) {
   }
 }
 
+/**
+ * Thin Plate Spline
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function thinPlateKernel(r: number, options: KernelFunctionOptions) {
   if (!options.derivative) {
     if (r === 0) {
@@ -57,6 +85,13 @@ export function thinPlateKernel(r: number, options: KernelFunctionOptions) {
   }
 }
 
+/**
+ * Guassian kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function gaussianKernel(r: number, options: KernelFunctionOptions) {
   options.epsilon = options.epsilon || 1
   if (!options.derivative) {
@@ -73,6 +108,13 @@ export function gaussianKernel(r: number, options: KernelFunctionOptions) {
   }
 }
 
+/**
+ * Inverse Multiquadratic kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function inverseMultiquadricKernel(
   r: number,
   options: KernelFunctionOptions
@@ -93,6 +135,13 @@ export function inverseMultiquadricKernel(
   }
 }
 
+/**
+ * Multiquadratic kernel
+ *
+ * @param r - Radius
+ * @param options - Kernel Function Options
+ * @returns Evaluated kernel
+ */
 export function multiquadricKernel(r: number, options: KernelFunctionOptions) {
   options.epsilon = options.epsilon || 1
   if (!options.derivative) {

@@ -13,7 +13,8 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
  */
 
 export function computeGeoreferencedMapBearing(map: GeoreferencedMap) {
-  const transformer = new GcpTransformer(map.gcps)
+  // Using polynomial transformation, not map transformation type, since faster and accurate enough
+  const transformer = new GcpTransformer(map.gcps, 'polynomial')
 
   const bbox = computeBbox(map.resourceMask)
 

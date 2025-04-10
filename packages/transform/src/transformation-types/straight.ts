@@ -1,10 +1,10 @@
-import { Helmert } from '../transformation-types/helmert.js'
+import { Helmert } from './Helmert.js'
 
-import { Transformation } from '../transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export class Straight extends Transformation {
+export class Straight extends BaseTransformation {
   scale?: number
   sourcePointsCenter: Point
   destinationPointsCenter: Point

@@ -45,12 +45,14 @@ export class IntArrayRenderer<D>
   /**
    * Render the map for a given viewport.
    *
-   * @param {Viewport} viewport - the viewport to render
+   * @param viewport - the viewport to render
    */
   async render(viewport: Viewport): Promise<Uint8ClampedArray> {
     this.viewport = viewport
 
     await Promise.allSettled(this.loadMissingImageInfosInViewport())
+
+    this.assureProjection()
 
     this.requestFetchableTiles()
     await this.tileCache.allRequestedTilesLoaded()

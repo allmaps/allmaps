@@ -148,8 +148,7 @@ MIT
 ###### Type
 
 ```ts
-WarpedMapListOptions &
-  WarpedMapOptions & {imageInformations: ImageInformations; fetchFn: FetchFn}
+{ renderMaps: boolean; renderLines: boolean; renderPoints: boolean; debugMaps: boolean; } & SpecificWebGL2WarpedMapOptions & WarpedMapOptions & { ...; }
 ```
 
 ### `new WarpedMapEvent(type, data)`
@@ -183,7 +182,7 @@ Creates a WarpedMapLayer instance
 
 * `id?` (`string | undefined`)
   * Unique ID for this layer
-* `options?` (`Partial<RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
   * options
 
 ###### Returns
@@ -470,13 +469,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-{
-  fetchFn?: FetchFn | undefined
-  createRTree?: boolean | undefined
-  imageInformations?: ImageInformations | undefined
-  transformation?: TransformationOptions | undefined
-  visible?: boolean | undefined
-}
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; debugMaps?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 30 more ...; createRTree?: boolean | undefined; }
 ```
 
 ### `WarpedMapLayer#passWarpedMapEvent(event)`
@@ -858,6 +851,19 @@ Sets the opacity of the layer
 
 * `opacity` (`number`)
   * opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setOptions(options)`
+
+Sets the options
+
+###### Parameters
+
+* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+  * Options
 
 ###### Returns
 

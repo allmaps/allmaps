@@ -185,7 +185,7 @@ Creates a WarpedMapLayer instance
 
 ###### Parameters
 
-* `options?` (`Partial<RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
   * the WebGL2 renderer options
 
 ###### Returns
@@ -962,6 +962,19 @@ Sets the transformation type of multiple maps
     | 'projective'
     | 'thinPlateSpline'`)
   * new transformation type
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setOptions(options)`
+
+Sets the options
+
+###### Parameters
+
+* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+  * Options
 
 ###### Returns
 

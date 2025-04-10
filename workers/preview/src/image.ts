@@ -36,11 +36,9 @@ export async function generateImage(
   )
 
   // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
-  let transformationOptions
+  let transformationType
   if (options['transformation.type']) {
-    transformationOptions = {
-      type: options['transformation.type']
-    }
+    transformationType = options['transformation.type']
   }
 
   const renderer = new IntArrayRenderer<UintArrRet>(
@@ -50,7 +48,7 @@ export async function generateImage(
     {
       fetchFn: cachedFetch as FetchFn,
       createRTree: false,
-      transformation: transformationOptions
+      transformationType
     }
   )
 

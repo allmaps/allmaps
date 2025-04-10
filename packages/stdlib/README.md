@@ -223,6 +223,46 @@ MIT
 
 `Array<Point>`.
 
+### `contractGeojsonGeometriesToGeojsonMultiGeometry(geojsonGeometries)`
+
+###### Parameters
+
+* `geojsonGeometries` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
+
+###### Returns
+
+`GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon`.
+
+### `contractGeojsonLineStringsToGeojsonMultiLineString(geojsonLineStrings)`
+
+###### Parameters
+
+* `geojsonLineStrings` (`Array<GeojsonLineString>`)
+
+###### Returns
+
+`{type: 'MultiLineString'; coordinates: Point[][]}`.
+
+### `contractGeojsonPointsToGeojsonMultiPoint(geojsonPoints)`
+
+###### Parameters
+
+* `geojsonPoints` (`Array<GeojsonPoint>`)
+
+###### Returns
+
+`{type: 'MultiPoint'; coordinates: Point[]}`.
+
+### `contractGeojsonPolygonsToGeojsonMultiPolygon(geojsonPolygons)`
+
+###### Parameters
+
+* `geojsonPolygons` (`Array<GeojsonPolygon>`)
+
+###### Returns
+
+`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
+
 ### `convexHull(points)`
 
 ###### Parameters
@@ -275,7 +315,7 @@ MIT
 
 `boolean`.
 
-### `expandGeojsonMultiGeometryToGeojsonGeometryArray(geojsonMultiGeometry)`
+### `expandGeojsonMultiGeometryToGeojsonGeometries(geojsonMultiGeometry)`
 
 ###### Parameters
 
@@ -285,7 +325,7 @@ MIT
 
 `Array<GeojsonPoint> | Array<GeojsonLineString> | Array<GeojsonPolygon>`.
 
-### `expandGeojsonMultiLineStringToGeojsonLineStringArray(geojsonMultiLineString)`
+### `expandGeojsonMultiLineStringToGeojsonLineStrings(geojsonMultiLineString)`
 
 ###### Parameters
 
@@ -295,7 +335,7 @@ MIT
 
 `Array<GeojsonLineString>`.
 
-### `expandGeojsonMultiPointToGeojsonPointArray(geojsonMultiPoint)`
+### `expandGeojsonMultiPointToGeojsonPoints(geojsonMultiPoint)`
 
 ###### Parameters
 
@@ -305,7 +345,7 @@ MIT
 
 `Array<GeojsonPoint>`.
 
-### `expandGeojsonMultiPolygonToGeojsonPolygonArray(geojsonMultiPolygon)`
+### `expandGeojsonMultiPolygonToGeojsonPolygons(geojsonMultiPolygon)`
 
 ###### Parameters
 
@@ -314,41 +354,6 @@ MIT
 ###### Returns
 
 `Array<GeojsonPolygon>`.
-
-### `featureCollectionToGeometries(featureCollection)`
-
-###### Parameters
-
-* `featureCollection` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
-
-###### Returns
-
-`Array<GeojsonGeometry>`.
-
-### `featureToGeometry(feature)`
-
-###### Parameters
-
-* `feature` (`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`)
-
-###### Returns
-
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
-
-### `featuresToFeatureCollection(features)`
-
-###### Parameters
-
-* `features` (`GeojsonFeature | Array<GeojsonFeature>`)
-
-###### Returns
-
-`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
 
 ### `fetchAnnotationsFromApi(parsedIiif)`
 
@@ -428,7 +433,79 @@ MIT
 
 `[number, number]`.
 
-### `geojsonGeometryToGeometry(geojsonGeometry)`
+### `geojsonFeatureCollectionToGeojsonGeometries(geojsonFeatureCollection)`
+
+###### Parameters
+
+* `geojsonFeatureCollection` (`{type: 'FeatureCollection'; features: GeojsonFeature[]}`)
+
+###### Returns
+
+`Array<GeojsonGeometry>`.
+
+### `geojsonFeatureToGeojsonGeometry(geojsonFeature)`
+
+###### Parameters
+
+* `geojsonFeature` (`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`)
+
+###### Returns
+
+`  | GeojsonPoint
+  | GeojsonLineString
+  | GeojsonPolygon
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon`.
+
+### `geojsonFeaturesToGeojsonFeatureCollection(geojsonFeatures)`
+
+###### Parameters
+
+* `geojsonFeatures` (`GeojsonFeature | Array<GeojsonFeature>`)
+
+###### Returns
+
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
+
+### `geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries, properties)`
+
+###### Parameters
+
+* `geojsonGeometries` (`Array<GeojsonGeometry>`)
+* `properties?` (`Array<unknown> | undefined`)
+
+###### Returns
+
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
+
+### `geojsonGeometryToGeojsonFeature(geojsonGeometry, properties)`
+
+###### Parameters
+
+* `geojsonGeometry` (`  | GeojsonPoint
+    | GeojsonLineString
+    | GeojsonPolygon
+    | GeojsonMultiPoint
+    | GeojsonMultiLineString
+    | GeojsonMultiPolygon`)
+* `properties?` (`unknown`)
+
+###### Returns
+
+`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`.
+
+### `geojsonGeometryToGeometry(geojsonPoint)`
+
+###### Parameters
+
+* `geojsonPoint` (`{type: 'Point'; coordinates: Point}`)
+
+###### Returns
+
+`[number, number]`.
+
+### `geojsonGeometryToSvgGeometry(geojsonGeometry)`
 
 ###### Parameters
 
@@ -441,12 +518,7 @@ MIT
 
 ###### Returns
 
-`  | Point
-  | LineString
-  | Polygon
-  | MultiPoint
-  | MultiLineString
-  | MultiPolygon`.
+`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`.
 
 ### `geojsonLineStringToLineString(geojsonLineString)`
 
@@ -521,32 +593,6 @@ MIT
 
 `Array<Point>`.
 
-### `geojsonToSvg(geometry)`
-
-###### Parameters
-
-* `geometry` (`  | GeojsonPoint
-    | GeojsonLineString
-    | GeojsonPolygon
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon`)
-
-###### Returns
-
-`SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect`.
-
-### `geometriesToFeatureCollection(geometries, properties)`
-
-###### Parameters
-
-* `geometries` (`Array<GeojsonGeometry>`)
-* `properties?` (`Array<unknown> | undefined`)
-
-###### Returns
-
-`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
-
 ### `geometryToDiameter(geometry)`
 
 ###### Parameters
@@ -557,41 +603,26 @@ MIT
 
 `number`.
 
-### `geometryToFeature(geometry, properties)`
+### `geometryToGeojsonGeometry(point, options)`
 
 ###### Parameters
 
-* `geometry` (`  | GeojsonPoint
-    | GeojsonLineString
-    | GeojsonPolygon
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon`)
-* `properties?` (`unknown`)
+* `point` (`[number, number]`)
+* `options?` (`Partial<MultiGeometryOptions> | undefined`)
 
 ###### Returns
 
-`{type: 'Feature'; properties: unknown; geometry: GeojsonGeometry}`.
+`{type: 'Point'; coordinates: Point}`.
 
-### `geometryToGeojsonGeometry(geometry)`
+### `geometryToSvgGeometry(point)`
 
 ###### Parameters
 
-* `geometry` (`  | Point
-    | LineString
-    | Polygon
-    | MultiPoint
-    | MultiLineString
-    | MultiPolygon`)
+* `point` (`[number, number]`)
 
 ###### Returns
 
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
+`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`.
 
 ### `getColorHistogram(colors, binSize)`
 
@@ -676,6 +707,35 @@ MIT
 
 `T`.
 
+### `getPropertyFromTrippleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
+
+###### Parameters
+
+* `cache` (`Map<K0, Map<K1, Map<K2, T>>>`)
+* `key0` (`K0`)
+* `key1` (`K1`)
+* `key2` (`K2`)
+* `computation` (`() => T`)
+* `checkUse` (`((t: T) => boolean) | undefined`)
+* `checkStore` (`((t: T) => boolean) | undefined`)
+
+###### Returns
+
+`T`.
+
+### `hexToFractionalOpaqueRgba(hex)`
+
+Convert hex to fractional RGBA, and sets the transparency to 1
+
+###### Parameters
+
+* `hex` (`string`)
+  * hex string, e.g. '#0033ffcc'
+
+###### Returns
+
+Fractional RGB, e (`[number, number, number, number]`).g. \[0, 0.2, 1, 1]
+
 ### `hexToFractionalRgb(hex)`
 
 Convert hex to fractional RGB
@@ -689,18 +749,57 @@ Convert hex to fractional RGB
 
 Fractional RGB, e (`[number, number, number]`).g. \[0, 0.2, 1]
 
-### `hexToRgb(hex)`
+### `hexToFractionalRgba(hex)`
 
-Convert hex to RGB
+Convert hex to fractional RGBA
 
 ###### Parameters
 
 * `hex` (`string`)
-  * hex string, e.g. '#0033ff'
+  * hex string, e.g. '#0033ffff'
+
+###### Returns
+
+Fractional RGB, e (`[number, number, number, number]`).g. \[0, 0.2, 1, 1]
+
+### `hexToOpaqueRgba(hex)`
+
+Convert HEX to RGB, and sets the transparency to 255
+
+###### Parameters
+
+* `hex` (`string`)
+  * HEX string, e.g. '#0033ffcc'
+
+###### Returns
+
+RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
+
+### `hexToRgb(hex)`
+
+Convert HEX to RGB
+
+###### Parameters
+
+* `hex` (`string`)
+  * HEX string, e.g. '#0033ff'
 
 ###### Returns
 
 RGB, e (`[number, number, number]`).g. \[0, 51, 255]
+
+### `hexToRgba(hex)`
+
+Convert HEX to RGB
+
+###### Parameters
+
+* `hex` (`string`)
+  * HEX string, e.g. '#0033ffff'
+
+###### Returns
+
+RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ### `intersectBboxes(bbox0, bbox1)`
 
@@ -803,6 +902,16 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Parameters
 
 * `input` (`unknown`)
+
+###### Returns
+
+`boolean`.
+
+### `isGeojsonMultiGeometry(obj)`
+
+###### Parameters
+
+* `obj` (`unknown`)
 
 ###### Returns
 
@@ -938,6 +1047,56 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `boolean`.
 
+### `isSvgCircle(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgLine(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgPolyLine(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgPolygon(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
+### `isSvgRect(input)`
+
+###### Parameters
+
+* `input` (`any`)
+
+###### Returns
+
+`boolean`.
+
 ### `isValidHttpUrl(string)`
 
 ###### Parameters
@@ -947,46 +1106,6 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 ###### Returns
 
 `boolean`.
-
-### `joinGeojsonGeometryArrayToGeojsonMultiGeometry(geojsonGeometryArray)`
-
-###### Parameters
-
-* `geojsonGeometryArray` (`Array<GeojsonPoint | GeojsonLineString | GeojsonPolygon>`)
-
-###### Returns
-
-`GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon`.
-
-### `joinGeojsonLineStringArrayToGeojsonMultiLineString(geojsonLineStringArray)`
-
-###### Parameters
-
-* `geojsonLineStringArray` (`Array<GeojsonLineString>`)
-
-###### Returns
-
-`{type: 'MultiLineString'; coordinates: Point[][]}`.
-
-### `joinGeojsonPointArrayToGeojsonMultiPoint(geojsonPointArray)`
-
-###### Parameters
-
-* `geojsonPointArray` (`Array<GeojsonPoint>`)
-
-###### Returns
-
-`{type: 'MultiPoint'; coordinates: Point[]}`.
-
-### `joinGeojsonPolygonArrayToGeojsonMultiPolygon(geojsonPolygonArray)`
-
-###### Parameters
-
-* `geojsonPolygonArray` (`Array<GeojsonPolygon>`)
-
-###### Returns
-
-`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
 
 ### `lineAngle(line)`
 
@@ -1030,16 +1149,6 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `Point | undefined`.
 
-### `lonLatToWebMecator(__0)`
-
-###### Parameters
-
-* `undefined` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
 ### `mapToResourceMaskSvgPolygon(map)`
 
 ###### Parameters
@@ -1048,7 +1157,7 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 ###### Returns
 
-`{type: 'polygon'; attributes?: SvgAttributes; coordinates: Point[]}`.
+`{type: 'polygon'; attributes?: SvgAttributes; coordinates: Ring}`.
 
 ### `maxOfNumberOrUndefined(number1, number2)`
 
@@ -1061,23 +1170,44 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `number | undefined`.
 
-### `mergeOptions(options, partialOptions)`
+### `mergeGeojsonFeaturesCollections(geojsonFeatureCollections)`
 
 ###### Parameters
 
-* `options` (`Options`)
-* `partialOptions?` (`Partial<Options> | undefined`)
+* `geojsonFeatureCollections` (`Array<GeojsonFeatureCollection>`)
 
 ###### Returns
 
-`Options`.
+`{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
 
-### `mergePartialOptions(partialOptions0, partialOptions1)`
+### `mergeOptions(options0, options1)`
 
 ###### Parameters
 
-* `partialOptions0?` (`Partial<Options> | undefined`)
-* `partialOptions1?` (`Partial<Options> | undefined`)
+* `options0` (`Options0`)
+* `options1?` (`Options1 | undefined`)
+
+###### Returns
+
+`Options0 & Options1`.
+
+### `mergeOptionsUnlessUndefined(options0, options1)`
+
+###### Parameters
+
+* `options0` (`Options0`)
+* `options1?` (`Options1 | undefined`)
+
+###### Returns
+
+`Options0 &
+  Partial<{[K in keyof Options1]: Exclude<Options1[K], undefined>}>`.
+
+### `mergePartialOptions(partialOptionsArray)`
+
+###### Parameters
+
+* `partialOptionsArray` (`Partial<Options> | undefined`)
 
 ###### Returns
 
@@ -1258,18 +1388,29 @@ RGB, e (`[number, number, number]`).g. \[0, 51, 255]
 
 `number`.
 
-### `rgbToHex(__0)`
+### `rgbToHex(color)`
 
-Convert RBG to hex
+Convert RBG to HEX
 
 ###### Parameters
 
-* `undefined` (`[number, number, number]`)
-  * RGB color array, e.g. \[0, 51, 255]
+* `color` (`[number, number, number]`)
 
 ###### Returns
 
-hex string, e (`string`).g. '#0033ff'
+HEX string, e (`string`).g. '#0033ff'
+
+### `rgbaToHex(color)`
+
+Convert RBGA to HEX
+
+###### Parameters
+
+* `color` (`[number, number, number, number]`)
+
+###### Returns
+
+HEX string, e (`string`).g. '#0033ffff'
 
 ### `ringToGeojsonPolygon(ring, close)`
 
@@ -1499,7 +1640,17 @@ Example for square rectangles '\*' and '+':
 
 `string`.
 
-### `svgToGeojson(geometry)`
+### `svgGeometryToGeometry(svgCircle)`
+
+###### Parameters
+
+* `svgCircle` (`{type: 'circle'; attributes?: SvgAttributes; coordinates: Point}`)
+
+###### Returns
+
+`[number, number]`.
+
+### `svgGeometryToString(geometry)`
 
 ###### Parameters
 
@@ -1507,12 +1658,7 @@ Example for square rectangles '\*' and '+':
 
 ###### Returns
 
-`  | GeojsonPoint
-  | GeojsonLineString
-  | GeojsonPolygon
-  | GeojsonMultiPoint
-  | GeojsonMultiLineString
-  | GeojsonMultiPolygon`.
+`string`.
 
 ### `threePointsToAngle(pointA, pointB, pointC)`
 
@@ -1601,13 +1747,3 @@ Return angle alpha made at point A by points B and C
 ###### Returns
 
 `Array<Point>`.
-
-### `webMercatorToLonLat(__0)`
-
-###### Parameters
-
-* `undefined` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.

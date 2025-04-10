@@ -10,6 +10,7 @@
     { "path": "../annotation" },
     { "path": "../iiif-parser" },
     { "path": "../id" },
+    { "path": "../project" },
     { "path": "../stdlib" },
     { "path": "../tailwind" },
     { "path": "../transform" },

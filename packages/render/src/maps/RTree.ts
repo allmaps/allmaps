@@ -5,9 +5,9 @@ import RBush from 'rbush'
 // TODO: use robust-point-in-polygon
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 
-import { computeBbox } from '@allmaps/stdlib'
+import { computeBbox, geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
-import type { Bbox, Point, GeojsonPolygon } from '@allmaps/types'
+import type { Bbox, Point, Polygon } from '@allmaps/types'
 
 const DEFAULT_FILTER_INSIDE_POLYGON = true
 
@@ -24,11 +24,11 @@ type RTreeItem = {
 export class RTree {
   rbush: RBush<RTreeItem> = new RBush()
 
-  polygonsById: Map<string, GeojsonPolygon> = new Map()
+  polygonsById: Map<string, Polygon> = new Map()
   bboxesById: Map<string, Bbox> = new Map()
   itemsById: Map<string, RTreeItem> = new Map()
 
-  addItem(id: string, polygon: GeojsonPolygon) {
+  addItem(id: string, polygon: Polygon) {
     this.removeItem(id)
 
     const bbox = computeBbox(polygon)
@@ -109,7 +109,8 @@ export class RTree {
           const polygon = this.polygonsById.get(item.id)
 
           if (polygon) {
-            return booleanPointInPolygon(point, polygon)
+            const geojsonPolygon = geometryToGeojsonGeometry(polygon)
+            return booleanPointInPolygon(point, geojsonPolygon)
           } else {
             return false
           }

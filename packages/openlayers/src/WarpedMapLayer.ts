@@ -155,6 +155,8 @@ export class WarpedMapLayer extends Layer {
       this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this.changed()
 
+    this.setOptions({ renderGcps: true, renderVectors: true })
+
     return result
   }
 
@@ -241,7 +243,7 @@ export class WarpedMapLayer extends Layer {
    * @param resourceMask - new resource mask
    */
   setMapResourceMask(mapId: string, resourceMask: Ring) {
-    this.renderer.warpedMapList.setMapResourceMask(mapId, resourceMask)
+    this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
     this.changed()
   }
 
@@ -251,7 +253,7 @@ export class WarpedMapLayer extends Layer {
    * @param gcos - new GCPs
    */
   setMapGcps(mapId: string, gcps: Gcp[]) {
-    this.renderer.warpedMapList.setMapGcps(mapId, gcps)
+    this.renderer.warpedMapList.setMapGcps(gcps, mapId)
     this.changed()
   }
 
@@ -264,10 +266,9 @@ export class WarpedMapLayer extends Layer {
     mapIds: Iterable<string>,
     transformation: TransformationType
   ) {
-    this.renderer.warpedMapList.setMapsTransformationType(
-      mapIds,
-      transformation
-    )
+    this.renderer.warpedMapList.setMapsTransformationType(transformation, {
+      mapIds
+    })
     this.changed()
   }
 
@@ -277,7 +278,7 @@ export class WarpedMapLayer extends Layer {
    * @param transformation - new transformation type
    */
   setMapTransformationType(mapId: string, transformation: TransformationType) {
-    this.renderer.warpedMapList.setMapTransformationType(mapId, transformation)
+    this.renderer.warpedMapList.setMapTransformationType(transformation, mapId)
     this.changed()
   }
 
@@ -290,10 +291,9 @@ export class WarpedMapLayer extends Layer {
     mapIds: Iterable<string>,
     distortionMeasure?: DistortionMeasure
   ) {
-    this.renderer.warpedMapList.setMapsDistortionMeasure(
-      mapIds,
-      distortionMeasure
-    )
+    this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
+      mapIds
+    })
     this.changed()
   }
 
@@ -307,7 +307,7 @@ export class WarpedMapLayer extends Layer {
    * @returns - Bounding box of all warped maps
    */
   getLonLatExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getBbox()
+    return this.renderer.warpedMapList.getMapsBbox()
   }
 
   /**
@@ -315,7 +315,9 @@ export class WarpedMapLayer extends Layer {
    * @returns - bounding box of all warped maps
    */
   getExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getProjectedBbox()
+    return this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:3857' }
+    })
   }
 
   /**
@@ -385,6 +387,15 @@ export class WarpedMapLayer extends Layer {
    */
   getCanvas(): HTMLCanvasElement | null {
     return this.canvas
+  }
+
+  /**
+   * Sets the options
+   *
+   * @param options - Options
+   */
+  setOptions(options?: Partial<OpenLayersWarpedMapLayerOptions>) {
+    this.renderer.setOptions(options)
   }
 
   // No setOpacity() and getOpacity() here since default for OL Layer class
@@ -639,8 +650,10 @@ export class WarpedMapLayer extends Layer {
       frameState.size as [number, number],
       frameState.viewState.center as [number, number],
       frameState.viewState.resolution,
-      frameState.viewState.rotation,
-      window.devicePixelRatio
+      {
+        rotation: frameState.viewState.rotation,
+        devicePixelRatio: window.devicePixelRatio
+      }
     )
 
     this.renderer.render(viewport)
