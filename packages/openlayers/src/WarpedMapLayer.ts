@@ -155,8 +155,6 @@ export class WarpedMapLayer extends Layer {
       this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
     this.changed()
 
-    this.setOptions({ renderGcps: true, renderVectors: true })
-
     return result
   }
 
