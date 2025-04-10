@@ -316,7 +316,9 @@ export class WarpedMapLayer implements CustomLayerInterface {
   getBounds(): LngLatBoundsLike | undefined {
     assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getMapsBbox()
+    const bbox = this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:4326' }
+    })
     if (bbox) {
       return [
         [bbox[0], bbox[1]],

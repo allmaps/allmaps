@@ -401,7 +401,9 @@ export class WarpedMapLayer extends Layer {
   getBounds(): number[][] | undefined {
     assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getMapsBbox()
+    const bbox = this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:4326' }
+    })
     if (bbox) {
       return [
         [bbox[1], bbox[0]],

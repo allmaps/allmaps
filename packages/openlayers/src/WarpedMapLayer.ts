@@ -305,7 +305,9 @@ export class WarpedMapLayer extends Layer {
    * @returns - Bounding box of all warped maps
    */
   getLonLatExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getMapsBbox()
+    return this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:4326' }
+    })
   }
 
   /**
@@ -313,9 +315,7 @@ export class WarpedMapLayer extends Layer {
    * @returns - bounding box of all warped maps
    */
   getExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:3857' }
-    })
+    return this.renderer.warpedMapList.getMapsBbox()
   }
 
   /**
