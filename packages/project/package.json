@@ -66,5 +66,5 @@
     "documentation": "remark . --output --use remark-api",
     "bench": "node bench/index.js"
   },
-  "license": "GPL-3.0-or-later"
+  "license": "MIT"
 }

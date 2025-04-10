@@ -363,6 +363,10 @@ To use a projected transformer (with 10 points, and its 'toGeo' transformation a
 | thinPlateSpline | 1759935 |
 | projective      | 3621210 |
 
+## License
+
+MIT
+
 ## API
 
 ### `ProjectedGcpTransformOptions`
