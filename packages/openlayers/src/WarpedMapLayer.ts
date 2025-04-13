@@ -650,7 +650,9 @@ export class WarpedMapLayer extends Layer {
       frameState.viewState.resolution,
       {
         rotation: frameState.viewState.rotation,
-        devicePixelRatio: window.devicePixelRatio
+        devicePixelRatio: window.devicePixelRatio,
+        projection: { definition: frameState.viewState.projection.getCode() }
+        // TODO: add a way for viewport and renderer to understand other codes then the two default ones
       }
     )
 

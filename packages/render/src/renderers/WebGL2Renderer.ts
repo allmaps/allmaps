@@ -684,6 +684,13 @@ export class WebGL2Renderer
     return { mapsEnteringViewport, mapsLeavingViewport }
   }
 
+  protected resetPrevious(mapIds?: string[]) {
+    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps({ mapIds })
+    for (const webgl2WarpedMap of webgl2WarpedMaps) {
+      webgl2WarpedMap.resetPrevious()
+    }
+  }
+
   protected updateVertexBuffers(mapIds?: string[]) {
     if (!this.viewport) {
       return
@@ -1232,19 +1239,19 @@ export class WebGL2Renderer
       )
     } else {
       // Animation ended
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
-        mapIds
-      })) {
-        webgl2WarpedMap.resetPrevious()
-      }
-      this.updateVertexBuffers(mapIds)
-
-      this.animating = false
-      this.animationProgress = 0
-      this.transformaterTransitionStart = undefined
-
-      this.changed()
+      this.finishTransition(mapIds)
     }
+  }
+
+  private finishTransition(mapIds: string[]) {
+    this.resetPrevious(mapIds)
+    this.updateVertexBuffers(mapIds)
+
+    this.animating = false
+    this.animationProgress = 0
+    this.transformaterTransitionStart = undefined
+
+    this.changed()
   }
 
   private changed() {
@@ -1325,7 +1332,7 @@ export class WebGL2Renderer
   protected optionsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.updateVertexBuffers(mapIds)
+      this.finishTransition(mapIds)
     }
     this.changed()
   }
@@ -1333,7 +1340,7 @@ export class WebGL2Renderer
   protected gcpsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.updateVertexBuffers(mapIds)
+      this.finishTransition(mapIds)
     }
     this.changed()
   }
@@ -1341,7 +1348,7 @@ export class WebGL2Renderer
   protected resourceMaskChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.updateVertexBuffers(mapIds)
+      this.finishTransition(mapIds)
     }
     this.changed()
   }
@@ -1370,7 +1377,7 @@ export class WebGL2Renderer
   protected projectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.updateVertexBuffers(mapIds)
+      this.finishTransition(mapIds)
     }
     this.changed()
   }
