@@ -77,6 +77,7 @@
       )
 
       if (resourceFeature) {
+        // @ts-expect-error incompatible types
         const bbox = computeBbox(resourceFeature.geometry)
 
         resourceMap?.fitBounds(bbox, {
