@@ -20,9 +20,9 @@
     getFullMapId
   } from '$lib/shared/maps.js'
   import {
-    getExtentViewport,
-    getNavPlaceViewport,
-    getBboxViewport,
+    // getExtentViewport,
+    // getNavPlaceViewport,
+    // getBboxViewport,
     sortGeoViewports
   } from '$lib/shared/viewport.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
