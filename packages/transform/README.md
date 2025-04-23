@@ -572,7 +572,6 @@ To create a transformer (with 10 points) and compute its 'toGeo' transformation:
 | thinPlateSpline | 25613  |
 | projective      | 31041  |
 
-
 To use a transformer (with 10 points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':
 
 | Type            | Ops/s    |
