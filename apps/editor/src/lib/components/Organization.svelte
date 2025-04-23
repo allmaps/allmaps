@@ -51,15 +51,11 @@
   <div class="contents md:flex flex-col gap-2 sm:gap-4">
     <svelte:element
       this={showMoreLink ? 'a' : 'div'}
-      class="flex flex-col gap-2"
+      class="flex flex-col items-start gap-2"
       href={showMoreLink ? `/organizations/${organization.id}` : undefined}
     >
       {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
-        <img
-          class="inline-block size-16 object-contain"
-          {src}
-          alt={organization.title}
-        />
+        <img class="inline-block h-16" {src} alt={organization.title} />
       {/await}
       <h3 class="text-black font-bold text-xl">{organization.title}</h3>
       <!-- <h4 class="text-black">{organization.subtitle}</h4> -->

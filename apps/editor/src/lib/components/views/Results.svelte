@@ -1,14 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import OLMap from 'ol/Map'
-  import View from 'ol/View'
-  import { Tile as TileLayer } from 'ol/layer'
-  import XYZ from 'ol/source/XYZ'
+  import { Map as MapLibreMap } from 'maplibre-gl'
 
-  import { fromLonLat } from 'ol/proj'
-
-  import { WarpedMapLayer } from '@allmaps/openlayers'
+  import { WarpedMapLayer } from '@allmaps/maplibre'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
@@ -16,6 +11,7 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/state/url.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
+  import { getScopeState } from '$lib/state/scope.svelte.js'
 
   import {
     getResourceMask,
@@ -30,8 +26,16 @@
     sortGeoViewports
   } from '$lib/shared/viewport.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
+  import { UiEvents } from '$lib/shared/ui-events.js'
+  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
-  import type { GeoreferencedMap } from '@allmaps/annotation'
+  import Geo from '$lib/components/maplibre/Geo.svelte'
+
+  import type {
+    Annotation,
+    AnnotationPage,
+    GeoreferencedMap
+  } from '@allmaps/annotation'
   import type { TransformationType } from '@allmaps/transform'
 
   import type {
@@ -43,17 +47,18 @@
     InsertGcpEvent,
     ReplaceGcpEvent,
     RemoveGcpEvent,
-    SetTransformationEvent
+    SetTransformationEvent,
+    ClickedItemEvent
   } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
 
-  let geoOlMapTarget: HTMLDivElement
-  let geoOlMap: OLMap
-  let geoTileLayer: TileLayer<XYZ>
+  let geoMap = $state.raw<MapLibreMap>()
 
   let warpedMapLayer: WarpedMapLayer
 
-  let currentImageId = $state<string>()
+  let geoMapReady = $state(false)
+
+  // let currentImageId = $state<string>()
   let currentActiveMapId = $state<string>()
 
   const sourceState = getSourceState()
@@ -62,31 +67,36 @@
   const uiState = getUiState()
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
+  const scopeState = getScopeState()
 
-  async function initializeMaps(maps: GeoreferencedMap[]) {
-    warpedMapLayer.clear()
-    for (const map of Object.values(maps)) {
-      await addMap(map)
+  async function setGeoreferenceAnnotation(
+    annotation: Annotation | AnnotationPage
+  ) {
+    if (!geoMap) {
+      return
     }
 
+    warpedMapLayer.clear()
+    await warpedMapLayer.addGeoreferenceAnnotation(annotation)
     currentActiveMapId = mapsState.activeMapId
 
     const geoViewport = getGeoViewport()
 
     if (geoViewport) {
-      const view = geoOlMap.getView()
-      view.setZoom(geoViewport.zoom)
-      view.setCenter(geoViewport.center)
-      view.setRotation(geoViewport.rotation)
+      geoMap.setZoom(geoViewport.zoom)
+      geoMap.setCenter(geoViewport.center)
+      geoMap.setBearing(geoViewport.bearing)
     } else {
-      const extent = warpedMapLayer.getExtent()
+      const bounds = warpedMapLayer.getBounds()
 
-      if (extent) {
-        geoOlMap.getView().fit(extent)
+      if (bounds) {
+        geoMap.fitBounds(bounds, {
+          padding: MAPLIBRE_PADDING
+        })
       }
     }
 
-    currentImageId = mapsState.connectedImageId
+    // currentImageId = mapsState.connectedImageId
   }
 
   async function addMap(map: GeoreferencedMap) {
@@ -182,20 +192,20 @@
     let urlGeoViewport: Viewport | undefined
     let dataGeoViewport: Viewport | undefined
 
-    const view = geoOlMap?.getView()
+    // const view = geoMap?.getView()
 
-    if (view) {
-      navPlaceGeoViewport = getNavPlaceViewport(view, sourceState.navPlace)
-      urlGeoViewport = getBboxViewport(view, urlState.bbox)
+    // if (view) {
+    //   navPlaceGeoViewport = getNavPlaceViewport(view, sourceState.navPlace)
+    //   urlGeoViewport = getBboxViewport(view, urlState.bbox)
 
-      if (mapsMergedState.completeMaps.length) {
-        const extent = warpedMapLayer.getExtent()
+    //   if (mapsMergedState.completeMaps.length) {
+    //     const extent = warpedMapLayer.getBounds()
 
-        if (extent) {
-          dataGeoViewport = getExtentViewport(view, extent)
-        }
-      }
-    }
+    //     if (extent) {
+    //       dataGeoViewport = getExtentViewport(view, extent)
+    //     }
+    //   }
+    // }
 
     stateGeoViewport = viewportsState.getViewport({
       view: 'results'
@@ -212,9 +222,13 @@
   }
 
   function saveViewport() {
-    const geoZoom = geoOlMap.getView().getZoom()
-    const geoCenter = geoOlMap.getView().getCenter()
-    const geoRotation = geoOlMap.getView().getRotation()
+    if (!geoMap) {
+      return
+    }
+
+    const geoZoom = geoMap.getZoom()
+    const geoCenter = geoMap.getCenter().toArray()
+    const geoBearing = geoMap.getBearing()
 
     if (geoZoom && geoCenter) {
       viewportsState.saveViewport(
@@ -224,7 +238,7 @@
         {
           zoom: geoZoom,
           center: geoCenter,
-          rotation: geoRotation
+          bearing: geoBearing
         }
       )
     }
@@ -241,94 +255,82 @@
     warpedMapLayer.sendMapsToBack(mapIds)
   }
 
+  function handleLastClickedItem(event: ClickedItemEvent) {
+    if (event.detail.type === 'map') {
+      const mapId = getFullMapId(event.detail.mapId)
+      // warpedMapLayer.bringMapsToFront([mapId])
+      const warpedMap = warpedMapLayer.getWarpedMap(mapId)
+      console.log('clicked', mapId, warpedMap)
+      if (warpedMap && geoMap) {
+        geoMap.fitBounds(warpedMap.projectedGeoMaskBbox, {
+          duration: 200,
+          padding: MAPLIBRE_PADDING
+        })
+      }
+    }
+  }
+
+  $effect(() => {
+    if (geoMap) {
+      // const geoTileSource = new XYZ({
+      //   url: uiState.basemapPreset.url,
+      //   attributions: uiState.basemapPreset.attribution,
+      //   maxZoom: 19
+      // })
+
+      // geoTileLayer = new TileLayer({
+      //   source: geoTileSource
+      // })
+
+      warpedMapLayer = new WarpedMapLayer()
+
+      // @ts-expect-error MapLibre types are incompatible
+      geoMap.addLayer(warpedMapLayer)
+
+      geoMapReady = true
+    }
+  })
+
+  $effect(() => {
+    if (
+      geoMapReady &&
+      mapsState.connected === true &&
+      //     // mapsState.connectedImageId !== currentImageId &&
+      scopeState.annotation
+    ) {
+      setGeoreferenceAnnotation(scopeState.annotation)
+    }
+  })
+
+  // $effect(() => {
+  //   if (urlState.backgroundGeoreferenceAnnotationUrl) {
+  //     addBackgroundGeoreferenceAnnotation(
+  //       urlState.backgroundGeoreferenceAnnotationUrl
+  //     )
+  //   }
+  // })
+
+  // $effect(() => {
+  //   if (urlState.basemapUrl) {
+  //     // geoTileSource.setUrl(urlState.basemapUrl)
+  //     // geoTileSource.setAttributions(undefined)
+  //   } else {
+  //     // geoTileSource.setUrl(uiState.basemapPreset.url)
+  //     // geoTileSource.setAttributions(uiState.basemapPreset.attribution)
+  //   }
+  // })
+
+  // $effect(() => {
+  //   if (
+  //     mapsState.activeMapId &&
+  //     currentActiveMapId &&
+  //     mapsState.activeMapId !== currentActiveMapId
+  //   ) {
+  //     currentActiveMapId = mapsState.activeMapId
+  //   }
+
   onMount(() => {
-    const geoTileSource = new XYZ({
-      url: uiState.basemapPreset.url,
-      attributions: uiState.basemapPreset.attribution,
-      maxZoom: 19
-    })
-
-    geoTileLayer = new TileLayer({
-      source: geoTileSource
-    })
-
-    warpedMapLayer = new WarpedMapLayer()
-
-    geoOlMap = new OLMap({
-      layers: [
-        geoTileLayer,
-        // @ts-expect-error @allmaps/openlayers does not yet include types for multiple OpenLayers version
-        warpedMapLayer
-      ],
-      target: geoOlMapTarget,
-      view: new View({
-        center: fromLonLat([0, 0]),
-        zoom: 2,
-        maxZoom: 22
-      }),
-      controls: []
-    })
-
-    $effect(() => {
-      if (
-        mapsState.connected === true &&
-        mapsState.maps &&
-        mapsState.connectedImageId !== currentImageId &&
-        mapsMergedState.completeMaps.length
-      ) {
-        // TODO: load maps from other images as well
-        initializeMaps(mapsMergedState.completeMaps)
-      }
-    })
-
-    $effect(() => {
-      warpedMapLayer.clear()
-      if (urlState.backgroundGeoreferenceAnnotationUrl) {
-        addBackgroundGeoreferenceAnnotation(
-          urlState.backgroundGeoreferenceAnnotationUrl
-        )
-      }
-    })
-
-    $effect(() => {
-      if (urlState.basemapUrl) {
-        geoTileSource.setUrl(urlState.basemapUrl)
-        geoTileSource.setAttributions(undefined)
-      } else {
-        geoTileSource.setUrl(uiState.basemapPreset.url)
-        geoTileSource.setAttributions(uiState.basemapPreset.attribution)
-      }
-    })
-
-    $effect(() => {
-      if (
-        mapsState.activeMapId &&
-        currentActiveMapId &&
-        mapsState.activeMapId !== currentActiveMapId
-      ) {
-        currentActiveMapId = mapsState.activeMapId
-      }
-    })
-
-    $effect(() => {
-      if (
-        uiState.lastClickedItem?.type === 'map' &&
-        mapsState.activeMapId === uiState.lastClickedItem.mapId
-      ) {
-        currentActiveMapId = mapsState.activeMapId
-        const mapId = getFullMapId(mapsState.activeMapId)
-
-        warpedMapLayer.bringMapsToFront([mapId])
-        const warpedMap = warpedMapLayer.getWarpedMap(mapId)
-
-        if (warpedMap) {
-          geoOlMap.getView().fit(warpedMap.projectedGeoMaskBbox, {
-            duration: 200,
-            padding: [25, 25, 25, 25]
-          })
-        }
-      }
-    })
+    uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -359,7 +361,8 @@
       saveViewport()
 
       warpedMapLayer.clear()
-      warpedMapLayer.dispose()
+
+      uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -389,4 +392,4 @@
   })
 </script>
 
-<div bind:this={geoOlMapTarget} class="w-full h-full"></div>
+<Geo bind:geoMap />
