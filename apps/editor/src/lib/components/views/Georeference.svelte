@@ -21,12 +21,12 @@
   import { getUrlState } from '$lib/state/url.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
 
-  import {
-    getExtentViewport,
-    getNavPlaceViewport,
-    getBboxViewport,
-    sortGeoViewports
-  } from '$lib/shared/viewport.js'
+  // import {
+  //   getExtentViewport,
+  //   getNavPlaceViewport,
+  //   getBboxViewport,
+  //   sortGeoViewports
+  // } from '$lib/shared/viewport.js'
   import {
     getGcpResourcePoint,
     getGcpGeoPoint,
