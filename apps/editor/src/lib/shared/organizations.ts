@@ -21,6 +21,10 @@ export default [
   {
     id: 'nls',
     title: 'National Library of Scotland'
+  },
+  {
+    id: 'loc',
+    title: 'Library of Congress'
   }
 ] satisfies Organization[]
 
