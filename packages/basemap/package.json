@@ -50,7 +50,7 @@
     "typescript": "^5.7.0"
   },
   "dependencies": {
-    "@protomaps/basemaps": "^5.0.0",
+    "@protomaps/basemaps": "^5.0.1",
     "maplibre-contour": "^0.1.0",
     "maplibre-gl": "^4.7.1"
   }
