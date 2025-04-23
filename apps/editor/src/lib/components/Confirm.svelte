@@ -47,12 +47,12 @@
       </div>
       <div class="grid grid-cols-2 gap-2">
         <button
-          class="cursor-pointer border border-green-600 rounded-sm bg-green hover:opacity-80"
-          onclick={handleYesClick}>Yes</button
-        >
-        <button
           class="cursor-pointer border border-red-600 rounded-sm bg-red hover:opacity-80"
           onclick={handleNoClick}>No</button
+        >
+        <button
+          class="cursor-pointer border border-green-600 rounded-sm bg-green hover:opacity-80"
+          onclick={handleYesClick}>Yes</button
         >
       </div>
     </Popover.Content>
