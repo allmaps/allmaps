@@ -1,10 +1,10 @@
 // Generated from Luuks color scheme with
 // https://www.colors.tools/tints-and-shades/
 
-import type { Shades } from './types.js'
+import type { HexColor, Shades } from './types.js'
 
-const black = '#222222'
-const white = '#ffffff'
+const black: HexColor = '#222222'
+const white: HexColor = '#ffffff'
 const inherit = 'inherit'
 const current = 'currentColor'
 const transparent = 'transparent'
