@@ -16,9 +16,11 @@
   import { setExamplesState } from '$lib/state/examples.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
+  import { setHeadState } from '$lib/state/head.svelte.js'
 
   import { Banner, Stats, Loading } from '@allmaps/ui'
 
+  import Head from '$lib/components/Head.svelte'
   import Header from '$lib/components/Header.svelte'
   import Controls from '$lib/components/Controls.svelte'
   import About from '$lib/components/About.svelte'
@@ -62,6 +64,7 @@
   )
 
   setScopeState(sourceState, mapsState, mapsMergedState)
+  setHeadState(sourceState)
 
   function handleKeypress(event: KeyboardEvent) {
     if (!isView) {
@@ -101,6 +104,7 @@
 
 <svelte:body onkeypress={handleKeypress} />
 
+<Head />
 <Stats />
 <div
   class="absolute w-full h-full grid grid-rows-[min-content_min-content_1fr]"
