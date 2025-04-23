@@ -34,8 +34,6 @@
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
-  import 'ol/ol.css'
-
   const { children }: { children: Snippet } = $props()
 
   const views: View[] = ['images', 'mask', 'georeference', 'results']
