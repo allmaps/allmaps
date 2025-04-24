@@ -7,12 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      packages:
-
-        specifier: link:/Users/bdon/workspace/allmaps/allmaps/packages
-
-        version: link:../../../../../bdon/workspace/allmaps/allmaps/packages
     devDependencies:
       husky:
         specifier: ^8.0.3
