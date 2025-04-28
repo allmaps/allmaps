@@ -1,11 +1,11 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import { Transformation } from '../transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
 import type { TransformationType } from '../shared/types.js'
 
-export class Polynomial extends Transformation {
+export class Polynomial extends BaseTransformation {
   polynomialParametersMatrices: [Matrix, Matrix]
   polynomialParameters: [number[], number[]]
 
@@ -141,7 +141,7 @@ export class Polynomial extends Transformation {
     ) as [number[], number[]]
 
     // Set the derived parameters
-    if (this.order == 1) {
+    if (this.order === 1) {
       // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
 
       this.translation = [

@@ -87,7 +87,7 @@ export function arrayRepeated<T>(
 // which is only a good idea for primitive types (string, number), not JSON objects
 export function subSetArray<T>(arr1: Array<T>, arr2: Array<T>): boolean {
   for (let i = 0; i < arr2.length; i++) {
-    if (arr1.indexOf(arr2[i]) == -1) {
+    if (arr1.indexOf(arr2[i]) === -1) {
       return false
     }
   }

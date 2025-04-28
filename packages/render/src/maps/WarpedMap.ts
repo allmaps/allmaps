@@ -1,15 +1,23 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
-import { GcpTransformer } from '@allmaps/transform'
+import {
+  ProjectedGcpTransformer,
+  ProjectedGcpTransformerOptions,
+  Projection,
+  lonLatProjection,
+  webMercatorProjection
+} from '@allmaps/project'
 import {
   computeBbox,
   bboxToRectangle,
   rectanglesToScale,
   fetchImageInfo,
-  lonLatToWebMecator,
   getPropertyFromCacheOrComputation,
   mixPoints,
-  sizeToRectangle
+  sizeToRectangle,
+  mergePartialOptions,
+  mergeOptionsUnlessUndefined,
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -23,7 +31,6 @@ import type {
   Ring,
   Rectangle,
   Bbox,
-  GeojsonPolygon,
   FetchFn,
   ImageInformations,
   TileZoomLevel
@@ -31,7 +38,6 @@ import type {
 import type {
   Helmert,
   TransformationType,
-  TransformOptions,
   DistortionMeasure
 } from '@allmaps/transform'
 
@@ -39,19 +45,19 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 // TODO: consider to make the default options more precise
-const DEFAULT_TRANSFORMER_OPTIONS = {
+const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
   minOffsetDistance: 4,
   maxDepth: 5,
   differentHandedness: true
-} as Partial<TransformOptions>
+} as Partial<ProjectedGcpTransformerOptions>
 
-const DEFAULT_VISIBLE = true
-
-function createDefaultWarpedMapOptions(): Partial<WarpedMapOptions> {
-  return {
-    visible: DEFAULT_VISIBLE
-  }
+const DEFAULT_WARPED_MAP_OPTIONS = {
+  visible: true,
+  applyMask: true,
+  transformationType: 'polynomial' as TransformationType,
+  internalProjection: webMercatorProjection,
+  projection: webMercatorProjection
 }
 
 export function createWarpedMapFactory() {
@@ -68,6 +74,10 @@ export function createWarpedMapFactory() {
  *
  * @param mapId - ID of the map
  * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
+ * @param imageInformations - Image informations
+ * @param parsedImage - ID of the image
+ * @param visible - Whether the map is visible
+ * @param applyMask - Whether to apply the mask
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
  * @param resourcePoints - The resource coordinates of the ground control points
@@ -82,14 +92,13 @@ export function createWarpedMapFactory() {
  * @param resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param resourceFullMaskBbox - Bbox of the resource full mask
  * @param resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param parsedImage - ID of the image
- * @param visible - Whether the map is visible
  * @param previousTransformationType - Previous transformation type
  * @param transformationType - Transformation type used in the transfomer. This is loaded from the georeference annotation.
- * @param transformer - Transformer used for warping this map from resource coordinates to geospatial coordinates
+ * @param previousInternalProjection - Previous internal projection
+ * @param internalProjection - Internal projection used in the projected transformer
+ * @param projection - Projection of the projected geospatial coordinates space
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
- * @param transformerByTransformationType - A Map of transformers by transformationType
  * @param projectedTransformerByTransformationType - A Map of projected transformers by transformationType
  * @param geoMask - resourceMask in geospatial coordinates
  * @param geoMaskBbox - Bbox of the geoMask
@@ -121,6 +130,17 @@ export class WarpedMap extends EventTarget {
   mapId: string
   georeferencedMap: GeoreferencedMap
 
+  imageInformations?: ImageInformations
+  parsedImage?: Image
+  loadingImageInfo: boolean
+
+  fetchFn?: FetchFn
+  protected abortController?: AbortController
+
+  visible: boolean
+  applyMask: boolean
+  mixed = false
+
   gcps: Gcp[]
   projectedGcps!: Gcp[]
   resourcePoints!: Point[]
@@ -136,31 +156,24 @@ export class WarpedMap extends EventTarget {
   resourceFullMaskBbox!: Bbox
   resourceFullMaskRectangle!: Rectangle
 
-  imageInformations?: ImageInformations
-  parsedImage?: Image
-  loadingImageInfo: boolean
-
-  fetchFn?: FetchFn
-  protected abortController?: AbortController
-
-  visible: boolean
-  mixed = false
-
   previousTransformationType: TransformationType
   transformationType: TransformationType
-  transformer!: GcpTransformer
-  projectedPreviousTransformer!: GcpTransformer
-  projectedTransformer!: GcpTransformer
-  transformerByTransformationType: Map<TransformationType, GcpTransformer>
-  projectedTransformerByTransformationType: Map<
+
+  previousInternalProjection: Projection
+  internalProjection: Projection
+  projection: Projection
+
+  projectedPreviousTransformer!: ProjectedGcpTransformer
+  projectedTransformer!: ProjectedGcpTransformer
+  protected projectedTransformerCache: Map<
     TransformationType,
-    GcpTransformer
+    ProjectedGcpTransformer
   >
 
-  geoMask!: GeojsonPolygon
+  geoMask!: Ring
   geoMaskBbox!: Bbox
   geoMaskRectangle!: Rectangle
-  geoFullMask!: GeojsonPolygon
+  geoFullMask!: Ring
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
 
@@ -195,47 +208,62 @@ export class WarpedMap extends EventTarget {
    *
    * @param mapId - ID of the map
    * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
-   * @param options - options
+   * @param partialWarpedMapOptions - options
    */
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
+    partialWarpedMapOptions?: Partial<WarpedMapOptions>
   ) {
     super()
 
-    options = {
-      ...createDefaultWarpedMapOptions(),
-      ...options
-    }
+    // Note: defaults are overwritten by georeferenced map input
+    // (only if they are defined), which is overwritten by options
+    // This way a warped map list's current
+    // transformation and projection can overwrite those of the map
 
-    this.transformerByTransformationType = new Map()
-    this.projectedTransformerByTransformationType = new Map()
+    // TODO: read internal projection and projection from georeferenced map
+    const georeferencedMapInput = {
+      transformationType: georeferencedMap.transformation
+        ?.type as TransformationType
+    }
+    const defaultAndMapOptions = mergeOptionsUnlessUndefined(
+      DEFAULT_WARPED_MAP_OPTIONS,
+      georeferencedMapInput
+    )
+    const warpedMapOptions = mergeOptions(
+      defaultAndMapOptions,
+      partialWarpedMapOptions
+    )
+
+    this.projectedTransformerCache = new Map()
 
     this.mapId = mapId
     this.georeferencedMap = georeferencedMap
 
-    this.gcps = this.georeferencedMap.gcps
-    this.updateGcpsProperties()
+    this.imageInformations = warpedMapOptions.imageInformations
+    this.loadingImageInfo = false
 
-    this.resourceMask = this.georeferencedMap.resourceMask
+    this.visible = warpedMapOptions.visible
+    this.applyMask = warpedMapOptions.applyMask
+    this.fetchFn = warpedMapOptions.fetchFn
+
+    this.gcps = this.georeferencedMap.gcps
+
+    this.resourceMask = this.applyMask
+      ? this.georeferencedMap.resourceMask
+      : this.getResourceFullMask()
     this.updateResourceMaskProperties()
     this.updateResourceFullMaskProperties()
 
-    this.imageInformations = options.imageInformations
-    this.loadingImageInfo = false
-
-    this.visible = options.visible || DEFAULT_VISIBLE
-
-    this.fetchFn = options.fetchFn
-
-    this.transformationType =
-      options.transformation?.type ||
-      this.georeferencedMap.transformation?.type ||
-      'polynomial'
+    this.transformationType = warpedMapOptions.transformationType
     this.previousTransformationType = this.transformationType
 
-    this.updateTransformerProperties()
+    this.internalProjection = warpedMapOptions.internalProjection
+    this.previousInternalProjection = this.internalProjection
+    this.projection = warpedMapOptions.projection
+
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -335,46 +363,81 @@ export class WarpedMap extends EventTarget {
    * @returns
    */
   getReferenceScale(): number {
-    const projectedHelmertTransformer = getPropertyFromCacheOrComputation(
-      this.projectedTransformerByTransformationType,
-      'helmert',
-      () =>
-        new GcpTransformer(
-          this.projectedGcps,
-          'helmert',
-          DEFAULT_TRANSFORMER_OPTIONS
-        )
-    )
-    if (!projectedHelmertTransformer.forwardTransformation) {
-      projectedHelmertTransformer.createForwardTransformation()
-    }
-    return (projectedHelmertTransformer.forwardTransformation as Helmert)
-      .scale as number
+    const projectedHelmertTransformer = this.getProjectedTransformer('helmert')
+    const toProjectedGeoHelmertTransformation =
+      projectedHelmertTransformer.getToGeoTransformation() as Helmert
+    return toProjectedGeoHelmertTransformation.scale as number
   }
 
   /**
-   * Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+   * Get a projected transformer of the given transformation type.
+   *
+   * Uses cashed projected transformers by transformation type,
+   * and only computes a new projected transformer if none found.
+   *
+   * Returns a projected transformer in the current projection,
+   * even if the cached transformer was computed in a different projection.
+   *
+   * Default settings apply for the options.
+   *
+   * @params transformationType - the transformation type
+   * @params partialProjectedGcpTransformerOptions - options
+   * @params useCache - whether to use the cached projected transformers previously computed
+   * @returns A projected transformer
+   */
+  getProjectedTransformer(
+    transformationType: TransformationType,
+    partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
+  ): ProjectedGcpTransformer {
+    partialProjectedGcpTransformerOptions = mergePartialOptions(
+      {
+        projection: this.projection,
+        internalProjection: this.internalProjection
+      },
+      partialProjectedGcpTransformerOptions
+    )
+    partialProjectedGcpTransformerOptions = mergePartialOptions(
+      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS,
+      partialProjectedGcpTransformerOptions
+    )
+
+    const projectedTransformer = getPropertyFromCacheOrComputation(
+      this.projectedTransformerCache,
+      transformationType,
+      () =>
+        new ProjectedGcpTransformer(
+          this.gcps,
+          transformationType,
+          partialProjectedGcpTransformerOptions
+        )
+    )
+    return projectedTransformer.setProjection(this.projection)
+  }
+
+  /**
+   * Update the ground control points loaded from a georeferenced map to new ground control points.
    *
    * @param gcps
    */
   setGcps(gcps: Gcp[]): void {
     this.gcps = gcps
+    this.clearProjectedTransformerCaches()
+    this.updateProjectedTransformerProperties()
     this.updateGcpsProperties()
-    this.updateTransformerProperties(true, true)
   }
 
   /**
-   * Update the resourceMask loaded from a georeferenced map to a new mask.
+   * Update the resource mask loaded from a georeferenced map to a new mask.
    *
    * @param resourceMask
    */
   setResourceMask(resourceMask: Ring): void {
+    this.applyMask = true
     this.resourceMask = resourceMask
     this.updateResourceMaskProperties()
     this.updateResourceFullMaskProperties()
-    this.updateGeoMask()
-    this.updateProjectedGeoMask()
-    this.updateResourceToProjectedGeoScale()
+    this.updateGeoMaskProperties()
+    this.updateProjectedGeoMaskProperties()
   }
 
   /**
@@ -384,7 +447,7 @@ export class WarpedMap extends EventTarget {
    */
   setTransformationType(transformationType: TransformationType): void {
     this.transformationType = transformationType
-    this.updateTransformerProperties()
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -394,7 +457,37 @@ export class WarpedMap extends EventTarget {
    */
   setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     this.distortionMeasure = distortionMeasure
-    this.updateDistortionProperties()
+  }
+
+  /**
+   * Set the internal projection
+   *
+   * @param projection - the internal projection
+   */
+  setInternalProjection(projection?: Projection): void {
+    this.internalProjection =
+      projection ||
+      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS.internalProjection ||
+      webMercatorProjection
+    this.clearProjectedTransformerCaches()
+    // Note: the following will recreate a transformer with the internal projection
+    // and also assure the triangulation is updated.
+    this.updateProjectedTransformerProperties()
+  }
+
+  /**
+   * Set the projection
+   *
+   * @param projection - the projection
+   */
+  setProjection(projection?: Projection): void {
+    this.projection =
+      projection ||
+      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS.projection ||
+      webMercatorProjection
+    // Note: the following will reuse the existing transformer but set it's projection
+    // and also assure the triangulation is updated.
+    this.updateProjectedTransformerProperties()
   }
 
   /**
@@ -491,27 +584,29 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Reset the properties of the previous and new transformationType.
+   * Reset previous transform properties to new ones (when completing a transformer transitions).
    */
   resetPrevious() {
     this.mixed = false
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
-    this.projectedPreviousTransformer = this.projectedTransformer
+    this.previousInternalProjection = this.internalProjection
+    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
   }
 
   /**
-   * Mix the properties of the previous and new transformationType.
+   * Mix previous transform properties with new ones (when changing an ongoing transformer transition).
    *
-   * @param t
+   * @param t - animation progress
    */
   mixPreviousAndNew(t: number) {
     this.mixed = true
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
-    this.projectedPreviousTransformer = this.projectedTransformer
+    this.previousInternalProjection = this.internalProjection
+    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints.map((point, index) => {
         return mixPoints(
@@ -570,114 +665,73 @@ export class WarpedMap extends EventTarget {
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
   }
 
-  private updateResourceFullMaskProperties() {
+  private getResourceFullMask() {
     const resourceWidth = this.georeferencedMap.resource.width
     const resourceHeight = this.georeferencedMap.resource.height
 
     if (resourceWidth && resourceHeight) {
-      this.resourceFullMask = sizeToRectangle([resourceWidth, resourceHeight])
+      return sizeToRectangle([resourceWidth, resourceHeight])
     } else {
-      this.resourceFullMask = bboxToRectangle(this.resourceMaskBbox)
+      return bboxToRectangle(this.resourceMaskBbox)
     }
+  }
+
+  private updateResourceFullMaskProperties() {
+    this.resourceFullMask = this.getResourceFullMask()
 
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
   }
 
-  private updateGcpsProperties() {
-    this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
-      resource,
-      geo: lonLatToWebMecator(geo)
-    }))
-    this.resourcePoints = this.gcps.map((gcp) => gcp.resource)
-    this.geoPoints = this.gcps.map((gcp) => gcp.geo)
-    this.projectedGeoPoints = this.projectedGcps.map(
-      (projectedGcp) => projectedGcp.geo
-    )
-  }
-
-  protected updateTransformerProperties(
-    clearCache = false,
-    useCache = true
-  ): void {
-    this.updateTransformer(clearCache, useCache)
-    this.updateProjectedTransformer(clearCache, useCache)
-    this.updateProjectedGeoTransformedResourcePoints()
+  private updateGeoMaskProperties() {
     this.updateGeoMask()
     this.updateFullGeoMask()
+  }
+
+  private updateProjectedGeoMaskProperties() {
     this.updateProjectedGeoMask()
     this.updateProjectedFullGeoMask()
     this.updateResourceToProjectedGeoScale()
   }
 
-  private updateTransformer(clearCache = false, useCache = true): void {
-    if (clearCache) {
-      this.clearTransformerCaches()
-    }
-    this.transformer = getPropertyFromCacheOrComputation(
-      this.transformerByTransformationType,
-      this.transformationType,
-      () =>
-        new GcpTransformer(
-          this.gcps,
-          this.transformationType,
-          DEFAULT_TRANSFORMER_OPTIONS
-        ),
-      () => useCache
-    )
+  protected updateProjectedTransformerProperties(): void {
+    this.updateProjectedTransformer()
+
+    this.updateGeoMaskProperties()
+    this.updateProjectedGeoMaskProperties()
+    this.updateGcpsProperties()
   }
 
-  private updateProjectedTransformer(
-    clearCache = false,
-    useCache = true
-  ): void {
-    if (clearCache) {
-      this.clearProjectedTransformerCaches()
-    }
-    this.projectedTransformer = getPropertyFromCacheOrComputation(
-      this.projectedTransformerByTransformationType,
-      this.transformationType,
-      () =>
-        new GcpTransformer(
-          this.projectedGcps,
-          this.transformationType,
-          DEFAULT_TRANSFORMER_OPTIONS
-        ),
-      () => useCache
+  private updateProjectedTransformer(): void {
+    this.projectedTransformer = this.getProjectedTransformer(
+      this.transformationType
     )
     if (!this.projectedPreviousTransformer) {
       this.projectedPreviousTransformer = this.projectedTransformer
     }
   }
 
-  private updateProjectedGeoTransformedResourcePoints(): void {
-    this.projectedGeoTransformedResourcePoints = this.gcps.map((projectedGcp) =>
-      this.projectedTransformer.transformToGeo(projectedGcp.resource)
-    )
-
-    if (!this.projectedGeoPreviousTransformedResourcePoints) {
-      this.projectedGeoPreviousTransformedResourcePoints =
-        this.projectedGeoTransformedResourcePoints
-    }
-  }
-
   private updateGeoMask(): void {
-    this.geoMask = this.transformer.transformToGeoAsGeojson([this.resourceMask])
+    this.geoMask = this.projectedTransformer.transformToGeo(
+      [this.resourceMask],
+      { projection: lonLatProjection }
+    )[0]
     this.geoMaskBbox = computeBbox(this.geoMask)
-    this.geoMaskRectangle = this.transformer.transformToGeo(
+    this.geoMaskRectangle = this.projectedTransformer.transformToGeo(
       [this.resourceMaskRectangle],
-      { maxDepth: 0 }
+      { maxDepth: 0, projection: lonLatProjection }
     )[0] as Rectangle
   }
 
   private updateFullGeoMask(): void {
-    this.geoFullMask = this.transformer.transformToGeoAsGeojson([
-      this.resourceFullMask
-    ])
+    this.geoFullMask = this.projectedTransformer.transformToGeo(
+      [this.resourceFullMask],
+      { projection: lonLatProjection }
+    )[0]
     this.geoFullMaskBbox = computeBbox(this.geoFullMask)
-    this.geoFullMaskRectangle = this.transformer.transformToGeo(
+    this.geoFullMaskRectangle = this.projectedTransformer.transformToGeo(
       [this.resourceFullMaskRectangle],
-      { maxDepth: 0 }
+      { maxDepth: 0, projection: lonLatProjection }
     )[0] as Rectangle
   }
 
@@ -711,16 +765,29 @@ export class WarpedMap extends EventTarget {
     )
   }
 
-  protected updateDistortionProperties(): void {
-    // This function is used by classes that extent WarpedMap
-  }
+  private updateGcpsProperties() {
+    this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.projectedTransformer.lonLatToProjection(geo)
+    }))
+    this.resourcePoints = this.gcps.map((gcp) => gcp.resource)
+    this.geoPoints = this.gcps.map((gcp) => gcp.geo)
+    this.projectedGeoPoints = this.projectedGcps.map(
+      (projectedGcp) => projectedGcp.geo
+    )
 
-  protected clearTransformerCaches() {
-    this.transformerByTransformationType = new Map()
+    this.projectedGeoTransformedResourcePoints = this.gcps.map((projectedGcp) =>
+      this.projectedTransformer.transformToGeo(projectedGcp.resource)
+    )
+
+    if (!this.projectedGeoPreviousTransformedResourcePoints) {
+      this.projectedGeoPreviousTransformedResourcePoints =
+        this.projectedGeoTransformedResourcePoints
+    }
   }
 
   protected clearProjectedTransformerCaches() {
-    this.projectedTransformerByTransformationType = new Map()
+    this.projectedTransformerCache = new Map()
   }
 
   destroy() {

@@ -1,33 +1,57 @@
-import type { Color } from '@allmaps/types'
+import hexRgb from 'hex-rgb'
+import rgbHex from 'rgb-hex'
+
+import type { Color, ColorWithTransparancy } from '@allmaps/types'
 
 /**
- * Convert RBG to hex
+ * Convert RBG to HEX
  * @param rgb - RGB color array, e.g. [0, 51, 255]
- * @returns hex string, e.g. '#0033ff'
+ * @returns HEX string, e.g. '#0033ff'
  */
-export function rgbToHex([r, g, b]: Color): string {
-  return (
-    '#' +
-    [r, g, b]
-      .map((x) => {
-        const hex = x.toString(16)
-        return hex.length === 1 ? '0' + hex : hex
-      })
-      .join('')
-  )
+export function rgbToHex(color: Color): string {
+  return '#' + rgbHex(...color)
 }
 
 /**
- * Convert hex to RGB
- * @param hex - hex string, e.g. '#0033ff'
+ * Convert RBGA to HEX
+ * @param rgb - RGBA color array, e.g. [0, 51, 255, 255]
+ * @returns HEX string, e.g. '#0033ffff'
+ */
+export function rgbaToHex(color: ColorWithTransparancy): string {
+  return '#' + rgbHex(...color)
+}
+
+/**
+ * Convert HEX to RGB
+ * @param hex - HEX string, e.g. '#0033ff'
  * @returns RGB, e.g. [0, 51, 255]
  */
 export function hexToRgb(hex: string): Color {
-  const bigint = parseInt(hex.replace(/^#/, ''), 16)
-  const r = (bigint >> 16) & 255
-  const g = (bigint >> 8) & 255
-  const b = bigint & 255
-  return [r, g, b]
+  return hexRgb(hex, { format: 'array' }).slice(0, 3) as Color
+}
+
+/**
+ * Convert HEX to RGB
+ * @param hex - HEX string, e.g. '#0033ffff'
+ * @returns RGB, e.g. [0, 51, 255, 255]
+ */
+export function hexToRgba(hex: string): ColorWithTransparancy {
+  const color = hexRgb(hex, { format: 'array' })
+  if (color.length < 4) {
+    color[3] = 255
+  }
+  return color
+}
+
+/**
+ * Convert HEX to RGB, and sets the transparency to 255
+ * @param hex - HEX string, e.g. '#0033ffcc'
+ * @returns RGB, e.g. [0, 51, 255, 255]
+ */
+export function hexToOpaqueRgba(hex: string): ColorWithTransparancy {
+  const color = hexRgb(hex, { format: 'array' })
+  color[3] = 255
+  return color
 }
 
 /**
@@ -36,5 +60,23 @@ export function hexToRgb(hex: string): Color {
  * @returns Fractional RGB, e.g. [0, 0.2, 1]
  */
 export function hexToFractionalRgb(hex: string): Color {
-  return hexToRgb(hex).map((c) => c / 255) as [number, number, number]
+  return hexToRgb(hex).map((c) => c / 255) as Color
+}
+
+/**
+ * Convert hex to fractional RGBA
+ * @param hex - hex string, e.g. '#0033ffff'
+ * @returns Fractional RGB, e.g. [0, 0.2, 1, 1]
+ */
+export function hexToFractionalRgba(hex: string): ColorWithTransparancy {
+  return hexToRgba(hex).map((c) => c / 255) as ColorWithTransparancy
+}
+
+/**
+ * Convert hex to fractional RGBA, and sets the transparency to 1
+ * @param hex - hex string, e.g. '#0033ffcc'
+ * @returns Fractional RGB, e.g. [0, 0.2, 1, 1]
+ */
+export function hexToFractionalOpaqueRgba(hex: string): ColorWithTransparancy {
+  return hexToOpaqueRgba(hex).map((c) => c / 255) as ColorWithTransparancy
 }

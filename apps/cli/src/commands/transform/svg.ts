@@ -1,52 +1,53 @@
 import { Command } from '@commander-js/extra-typings'
 
+import { mergeGeojsonFeaturesCollections } from '@allmaps/stdlib'
+import { GcpTransformer } from '@allmaps/transform'
+
 import { readInput, printJson } from '../../lib/io.js'
-import { parseTransformOptions } from '../../lib/parse.js'
-import { getTransformerFromOptions } from '../../lib/transformer.js'
 import {
-  addAnnotationOptions,
-  addCoordinateTransformOptions
-} from '../../lib/options.js'
-import {
-  stringToSvgGeometriesGenerator,
-  geometriesToFeatureCollection
-} from '@allmaps/stdlib'
+  parseTransformerInputs,
+  parseTransformOptions
+} from '../../lib/parse.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
+
+import type { GeojsonFeatureCollection } from '@allmaps/types'
 
 export function svg() {
-  const command = addCoordinateTransformOptions(
+  const command = addTransformOptions(
     addAnnotationOptions(
       new Command('svg')
         .argument('[files...]')
         .summary('transform SVG to GeoJSON')
         .description(
-          'Transform SVG to GeoJSON using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+          'Transform SVG to GeoJSON using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
         )
     )
   )
 
   return command.action(async (files, options) => {
-    const transformOptions = parseTransformOptions(options)
-    const transformer = getTransformerFromOptions(options)
+    const { gcps, transformationType } = parseTransformerInputs(options)
+    const partialTransformOptions = parseTransformOptions(options)
 
-    if (options.inverse) {
-      throw new Error('Inverse transformation not supported for this command')
-    }
+    const transformer = new GcpTransformer(
+      gcps,
+      transformationType,
+      partialTransformOptions
+    )
 
     const svgs = await readInput(files)
 
-    // TODO: consider to use transformSvgStringToGeojsonFeatureCollection()
-    const geojsonGeometries = []
+    const geojsonFeatureCollections: GeojsonFeatureCollection[] = []
     for (const svg of svgs) {
-      for (const svgGeometry of stringToSvgGeometriesGenerator(svg)) {
-        const geojsonGeometry = transformer.transformSvgToGeojson(
-          svgGeometry,
-          transformOptions
+      geojsonFeatureCollections.push(
+        GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
+          transformer,
+          svg
         )
-        geojsonGeometries.push(geojsonGeometry)
-      }
+      )
     }
-
-    const featureCollection = geometriesToFeatureCollection(geojsonGeometries)
-    printJson(featureCollection)
+    const geojsonFeatureCollection = mergeGeojsonFeaturesCollections(
+      geojsonFeatureCollections
+    )
+    printJson(geojsonFeatureCollection)
   })
 }

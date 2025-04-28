@@ -1,12 +1,12 @@
 import { Matrix, inverse } from 'ml-matrix'
 
-import { Transformation } from '../transformation.js'
+import { BaseTransformation } from './BaseTransformation.js'
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
 
 import type { Point } from '@allmaps/types'
 
-export class RBF extends Transformation {
+export class RBF extends BaseTransformation {
   kernelFunction: KernelFunction
   normFunction: NormFunction
 
@@ -192,7 +192,7 @@ export class RBF extends Transformation {
       newDestinationPointPartDerX[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          (dist == 0
+          (dist === 0
             ? 0
             : this.kernelFunction(dist, {
                 derivative: 1,
@@ -226,7 +226,7 @@ export class RBF extends Transformation {
       newDestinationPointPartDerY[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          (dist == 0
+          (dist === 0
             ? 0
             : this.kernelFunction(dist, {
                 derivative: 1,

@@ -12,6 +12,7 @@
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/project" },
     { "path": "../../packages/render" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },

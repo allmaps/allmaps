@@ -19,7 +19,11 @@
   import { setRenderOptionsForMap } from '$lib/shared/stores/render-options.js'
   import { getHue, fromHue } from '$lib/shared/color.js'
 
-  import { fetchImageInfo, getFullResourceMask } from '@allmaps/stdlib'
+  import {
+    fetchImageInfo,
+    geometryToGeojsonGeometry,
+    getFullResourceMask
+  } from '@allmaps/stdlib'
 
   import {
     Thumbnail,
@@ -357,7 +361,7 @@
               target="_blank"
               rel="noreferrer"
               href="http://geojson.io/#data=data:application/json,{encodeURIComponent(
-                JSON.stringify(warpedMap.geoMask)
+                JSON.stringify(geometryToGeojsonGeometry([warpedMap.geoMask]))
               )}">geojson.io</a
             >,
           {/if}

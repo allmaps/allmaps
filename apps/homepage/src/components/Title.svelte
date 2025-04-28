@@ -5,16 +5,15 @@
 
   import { Logo } from '@allmaps/ui'
   import { parseAnnotation } from '@allmaps/annotation'
-  import { GcpTransformer } from '@allmaps/transform'
+  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
   import {
     computeBbox,
     bboxToRectangle,
     bboxToSize,
-    sizesToScale,
-    lonLatToWebMecator
+    sizesToScale
   } from '@allmaps/stdlib'
 
-  import { getPolygon, geometryToPath } from '../shared/geometry.js'
+  import { getGeojsonPolygon, geometryToPath } from '../shared/geometry.js'
 
   import WarpedMap from './WarpedMap.svelte'
 
@@ -150,17 +149,12 @@
 
       const georeferencedMap = maps[index]
 
-      const transformer = new GcpTransformer(georeferencedMap.gcps)
-      const projectedGcps = georeferencedMap.gcps.map(({ resource, geo }) => ({
-        resource,
-        geo: lonLatToWebMecator(geo)
-      }))
-      const projectedTransformer = new GcpTransformer(projectedGcps)
+      const projectedTransformer =
+        ProjectedGcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
-      const projectedGeoPolygon =
-        projectedTransformer.transformForwardAsGeojson([
-          georeferencedMap.resourceMask
-        ])
+      const projectedGeoPolygon = projectedTransformer.transformToGeo([
+        georeferencedMap.resourceMask
+      ])
 
       // 1. Use viewport and SVG path sizes to compute viewport's
       //    coordinates in spherical mercator
@@ -200,12 +194,12 @@
           pixelScreenSize[1] * projectedGeoToPixelScale
       ]
 
-      const resourceScreenRectangle =
-        projectedTransformer.transformBackwardAsGeojson([
-          bboxToRectangle(projectedGeoScreenBbox)
-        ])
-      const geoScreenRectangle = transformer.transformForwardAsGeojson(
-        resourceScreenRectangle
+      const resourceScreenRectangle = projectedTransformer.transformToResource([
+        bboxToRectangle(projectedGeoScreenBbox)
+      ])
+      const geoScreenRectangle = projectedTransformer.transformToGeo(
+        resourceScreenRectangle,
+        { projection: lonLatProjection }
       )
       const geoScreenRectangleBbox = computeBbox(geoScreenRectangle)
 
@@ -311,7 +305,7 @@
           const annotationMaps = parseAnnotation(annotation)
           const map = annotationMaps[0]
 
-          const polygon = getPolygon(map)
+          const polygon = getGeojsonPolygon(map)
           const path = geometryToPath(polygon, scaleTo)
           if (path) {
             maps[index] = map

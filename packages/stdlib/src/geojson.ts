@@ -9,7 +9,8 @@ import {
   conformRing,
   conformPolygon,
   conformMultiLineString,
-  conformMultiPolygon
+  conformMultiPolygon,
+  geometryToSvgGeometry
 } from './geometry.js'
 
 import type {
@@ -30,7 +31,8 @@ import type {
   GeojsonGeometry,
   GeojsonFeature,
   GeojsonFeatureCollection,
-  SvgGeometry
+  SvgGeometry,
+  GeojsonMultiGeometry
 } from '@allmaps/types'
 
 // Assert
@@ -129,6 +131,23 @@ export function isGeojsonGeometry(obj: unknown): obj is GeojsonGeometry {
   return isValidType && hasCoordinatesArray
 }
 
+export function isGeojsonMultiGeometry(
+  obj: unknown
+): obj is GeojsonMultiGeometry {
+  const isObject = typeof obj === 'object' && obj !== null
+  const hasStringType =
+    isObject && 'type' in obj && typeof obj.type === 'string'
+  const isValidType =
+    hasStringType &&
+    (obj.type === 'MultiPoint' ||
+      obj.type === 'MultiLineString' ||
+      obj.type === 'MultiPolygon')
+  const hasCoordinatesArray =
+    isObject && 'coordinates' in obj && Array.isArray(obj.coordinates)
+
+  return isValidType && hasCoordinatesArray
+}
+
 // Convert to Geometry
 
 export function geojsonPointToPoint(geojsonPoint: GeojsonPoint): Point {
@@ -182,6 +201,30 @@ export function geojsonMultiPolygonToMultiPolygon(
     : multipolygon
 }
 
+export function geojsonGeometryToGeometry(geojsonPoint: GeojsonPoint): Point
+export function geojsonGeometryToGeometry(
+  geojsonLineString: GeojsonLineString
+): LineString
+export function geojsonGeometryToGeometry(
+  geojsonPolygon: GeojsonPolygon
+): Polygon
+export function geojsonGeometryToGeometry(
+  geojsonMultiPoint: GeojsonMultiPoint
+): MultiPoint
+export function geojsonGeometryToGeometry(
+  geojsonMultiLineString: GeojsonMultiLineString
+): MultiLineString
+export function geojsonGeometryToGeometry(
+  geojsonMultiPolygon: GeojsonMultiPolygon
+): MultiPolygon
+export function geojsonGeometryToGeometry(
+  geojsonGeometry: GeojsonGeometry
+): Geometry
+/**
+ * Converts a GeoJSON Geometry to a Geometry
+ * @param geojsonGeometry - GeoJSON Geometry
+ * @returns Geometry
+ */
 export function geojsonGeometryToGeometry(
   geojsonGeometry: GeojsonGeometry
 ): Geometry {
@@ -202,9 +245,68 @@ export function geojsonGeometryToGeometry(
   }
 }
 
+// Convert to SVG
+
+export function geojsonGeometryToSvgGeometry(
+  geojsonGeometry: GeojsonGeometry
+): SvgGeometry {
+  return geometryToSvgGeometry(geojsonGeometryToGeometry(geojsonGeometry))
+}
+
+// Wrap Geometry in Feature
+
+export function geojsonGeometryToGeojsonFeature(
+  geojsonGeometry: GeojsonGeometry,
+  properties?: unknown
+): GeojsonFeature {
+  return {
+    type: 'Feature',
+    properties: properties ? properties : {},
+    geometry: geojsonGeometry
+  }
+}
+
+export function geojsonFeaturesToGeojsonFeatureCollection(
+  geojsonFeatures: GeojsonFeature | GeojsonFeature[]
+): GeojsonFeatureCollection {
+  if (!Array.isArray(geojsonFeatures)) {
+    geojsonFeatures = [geojsonFeatures]
+  }
+  return {
+    type: 'FeatureCollection',
+    features: geojsonFeatures
+  }
+}
+
+export function geojsonGeometriesToGeojsonFeatureCollection(
+  geojsonGeometries: GeojsonGeometry[],
+  properties?: unknown[]
+): GeojsonFeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: geojsonGeometries.map((geometry, i) =>
+      properties
+        ? geojsonGeometryToGeojsonFeature(geometry, properties[i])
+        : geojsonGeometryToGeojsonFeature(geometry)
+    )
+  }
+}
+
+export function geojsonFeatureToGeojsonGeometry(
+  geojsonFeature: GeojsonFeature
+): GeojsonGeometry {
+  return geojsonFeature.geometry
+}
+
+export function geojsonFeatureCollectionToGeojsonGeometries(
+  geojsonFeatureCollection: GeojsonFeatureCollection
+): GeojsonGeometry[] {
+  return geojsonFeatureCollection.features.map(geojsonFeatureToGeojsonGeometry)
+}
+
 // Expand
 
-export function expandGeojsonMultiPointToGeojsonPointArray(
+export function expandGeojsonMultiPointToGeojsonPoints(
   geojsonMultiPoint: GeojsonMultiPoint
 ): GeojsonPoint[] {
   return geojsonMultiPoint.coordinates.map((point) => {
@@ -215,7 +317,7 @@ export function expandGeojsonMultiPointToGeojsonPointArray(
   })
 }
 
-export function expandGeojsonMultiLineStringToGeojsonLineStringArray(
+export function expandGeojsonMultiLineStringToGeojsonLineStrings(
   geojsonMultiLineString: GeojsonMultiLineString
 ): GeojsonLineString[] {
   return geojsonMultiLineString.coordinates.map((lineString) => {
@@ -226,7 +328,7 @@ export function expandGeojsonMultiLineStringToGeojsonLineStringArray(
   })
 }
 
-export function expandGeojsonMultiPolygonToGeojsonPolygonArray(
+export function expandGeojsonMultiPolygonToGeojsonPolygons(
   geojsonMultiPolygon: GeojsonMultiPolygon
 ): GeojsonPolygon[] {
   return geojsonMultiPolygon.coordinates.map((polygon) => {
@@ -237,144 +339,79 @@ export function expandGeojsonMultiPolygonToGeojsonPolygonArray(
   })
 }
 
-export function expandGeojsonMultiGeometryToGeojsonGeometryArray(
+export function expandGeojsonMultiGeometryToGeojsonGeometries(
   geojsonMultiGeometry:
     | GeojsonMultiPoint
     | GeojsonMultiLineString
     | GeojsonMultiPolygon
 ): GeojsonPoint[] | GeojsonLineString[] | GeojsonPolygon[] {
   if (isGeojsonMultiPoint(geojsonMultiGeometry)) {
-    return expandGeojsonMultiPointToGeojsonPointArray(geojsonMultiGeometry)
+    return expandGeojsonMultiPointToGeojsonPoints(geojsonMultiGeometry)
   } else if (isGeojsonMultiLineString(geojsonMultiGeometry)) {
-    return expandGeojsonMultiLineStringToGeojsonLineStringArray(
+    return expandGeojsonMultiLineStringToGeojsonLineStrings(
       geojsonMultiGeometry
     )
   } else if (isGeojsonMultiPolygon(geojsonMultiGeometry)) {
-    return expandGeojsonMultiPolygonToGeojsonPolygonArray(geojsonMultiGeometry)
+    return expandGeojsonMultiPolygonToGeojsonPolygons(geojsonMultiGeometry)
   } else {
     throw new Error('Geometry type not supported')
   }
 }
 
-// Join
+// Contract
 
-export function joinGeojsonPointArrayToGeojsonMultiPoint(
-  geojsonPointArray: GeojsonPoint[]
+export function contractGeojsonPointsToGeojsonMultiPoint(
+  geojsonPoints: GeojsonPoint[]
 ): GeojsonMultiPoint {
   return {
     type: 'MultiPoint',
-    coordinates: geojsonPointArray.map(
-      (geojsonPoint) => geojsonPoint.coordinates
-    )
+    coordinates: geojsonPoints.map((geojsonPoint) => geojsonPoint.coordinates)
   }
 }
 
-export function joinGeojsonLineStringArrayToGeojsonMultiLineString(
-  geojsonLineStringArray: GeojsonLineString[]
+export function contractGeojsonLineStringsToGeojsonMultiLineString(
+  geojsonLineStrings: GeojsonLineString[]
 ): GeojsonMultiLineString {
   return {
     type: 'MultiLineString',
-    coordinates: geojsonLineStringArray.map(
+    coordinates: geojsonLineStrings.map(
       (geojsonLineString) => geojsonLineString.coordinates
     )
   }
 }
 
-export function joinGeojsonPolygonArrayToGeojsonMultiPolygon(
-  geojsonPolygonArray: GeojsonPolygon[]
+export function contractGeojsonPolygonsToGeojsonMultiPolygon(
+  geojsonPolygons: GeojsonPolygon[]
 ): GeojsonMultiPolygon {
   return {
     type: 'MultiPolygon',
-    coordinates: geojsonPolygonArray.map(
+    coordinates: geojsonPolygons.map(
       (geojsonPolygon) => geojsonPolygon.coordinates
     )
   }
 }
 
-export function joinGeojsonGeometryArrayToGeojsonMultiGeometry(
-  geojsonGeometryArray: (GeojsonPoint | GeojsonLineString | GeojsonPolygon)[]
+export function contractGeojsonGeometriesToGeojsonMultiGeometry(
+  geojsonGeometries: (GeojsonPoint | GeojsonLineString | GeojsonPolygon)[]
 ): GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon {
-  if (geojsonGeometryArray.every(isGeojsonPoint)) {
-    return joinGeojsonPointArrayToGeojsonMultiPoint(geojsonGeometryArray)
-  } else if (geojsonGeometryArray.every(isGeojsonLineString)) {
-    return joinGeojsonLineStringArrayToGeojsonMultiLineString(
-      geojsonGeometryArray
-    )
-  } else if (geojsonGeometryArray.every(isGeojsonPolygon)) {
-    return joinGeojsonPolygonArrayToGeojsonMultiPolygon(geojsonGeometryArray)
+  if (geojsonGeometries.every(isGeojsonPoint)) {
+    return contractGeojsonPointsToGeojsonMultiPoint(geojsonGeometries)
+  } else if (geojsonGeometries.every(isGeojsonLineString)) {
+    return contractGeojsonLineStringsToGeojsonMultiLineString(geojsonGeometries)
+  } else if (geojsonGeometries.every(isGeojsonPolygon)) {
+    return contractGeojsonPolygonsToGeojsonMultiPolygon(geojsonGeometries)
   } else {
     throw new Error('Geometry type not supported')
   }
 }
 
-// Convert to SVG
-
-export function geojsonToSvg(geometry: GeojsonGeometry): SvgGeometry {
-  if (geometry.type === 'Point') {
-    return {
-      type: 'circle',
-      coordinates: geometry.coordinates
-    }
-  } else if (geometry.type === 'LineString') {
-    return {
-      type: 'polyline',
-      coordinates: geometry.coordinates
-    }
-  } else if (geometry.type === 'Polygon') {
-    return {
-      type: 'polygon',
-      coordinates: geometry.coordinates[0]
-    }
-  } else {
-    throw new Error(`Unsupported GeoJSON geometry`) // MultiPolygons not supported in SVG
-  }
-}
-
-// Wrap
-
-export function geometryToFeature(
-  geometry: GeojsonGeometry,
-  properties?: unknown
-): GeojsonFeature {
-  return {
-    type: 'Feature',
-    properties: properties ? properties : {},
-    geometry: geometry
-  }
-}
-
-export function featuresToFeatureCollection(
-  features: GeojsonFeature | GeojsonFeature[]
-): GeojsonFeatureCollection {
-  if (!Array.isArray(features)) {
-    features = [features]
-  }
-  return {
-    type: 'FeatureCollection',
-    features: features
-  }
-}
-
-export function geometriesToFeatureCollection(
-  geometries: GeojsonGeometry[],
-  properties?: unknown[]
+export function mergeGeojsonFeaturesCollections(
+  geojsonFeatureCollections: GeojsonFeatureCollection[]
 ): GeojsonFeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: geometries.map((geometry, i) =>
-      properties
-        ? geometryToFeature(geometry, properties[i])
-        : geometryToFeature(geometry)
-    )
+    features: geojsonFeatureCollections
+      .map((geojsonFeatureCollection) => geojsonFeatureCollection.features)
+      .flat(1)
   }
-}
-
-export function featureToGeometry(feature: GeojsonFeature): GeojsonGeometry {
-  return feature.geometry
-}
-
-export function featureCollectionToGeometries(
-  featureCollection: GeojsonFeatureCollection
-): GeojsonGeometry[] {
-  return featureCollection.features.map(featureToGeometry)
 }

@@ -1,6 +1,6 @@
 import { Point } from '@allmaps/types'
 
-import { DistortionMeasure } from './shared/types.js'
+import { DistortionMeasure } from './types.js'
 
 export const supportedDistortionMeasures = [
   'log2sigma',
@@ -25,7 +25,7 @@ export function computeDistortionsFromPartialDerivatives(
   partialDerivativeY?: Point,
   referenceScale = 1
 ): Map<DistortionMeasure, number> {
-  if (distortionMeasures.length == 0) {
+  if (distortionMeasures.length === 0) {
     return new Map()
   }
   if (!partialDerivativeX || !partialDerivativeY) {
@@ -39,7 +39,7 @@ export function computeDistortionsFromPartialDerivatives(
   )
   return new Map(
     distortionMeasures.map((distortionMeasure) => {
-      if (supportedDistortionMeasures.indexOf(distortionMeasure) == -1) {
+      if (supportedDistortionMeasures.indexOf(distortionMeasure) === -1) {
         throw new Error('Distortion ' + distortionMeasure + ' not supported')
       }
       switch (supportedDistortionMeasures.indexOf(distortionMeasure)) {

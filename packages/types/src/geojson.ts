@@ -39,6 +39,11 @@ export type GeojsonGeometry =
   | GeojsonMultiLineString
   | GeojsonMultiPolygon
 
+export type GeojsonMultiGeometry =
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon
+
 // The (string) values of the 'type' field of the type GeojsonGeometrys
 export type GeojsonGeometryType = GeojsonGeometry['type']
 

@@ -9,12 +9,13 @@ import {
 
 import type {
   Point,
+  Line,
   LineString,
   Ring,
-  Gcp,
   TypedLine,
-  Bbox,
-  Line
+  TypedLineString,
+  TypedRing,
+  Bbox
 } from '@allmaps/types'
 
 import type {
@@ -24,15 +25,21 @@ import type {
   SplitGcpLinePointInfo
 } from './types.js'
 
-// Note:
+// About Refinement Functions:
+//
+// Refinement function are used both in forward and backward transformation
+// and are the generalised approach to refine lineStrings, rings etc.
+// when they are transformed using a (forward or backward) 'refinement function'.
+//
+// See the way refinement methods are called:
+// with a different refinementFunction and refinementOptions for the forward and backward case.
+//
 // The concepts of 'source' and 'destination' for refinement methods
-// might differ from those in transform methods that called them.
+// might therefore differ from the from the transform methods that called them.
 // For forward transform methods, 'source' and 'destination' in the refinement context
 // are the same as in their original transform context.
 // For backward transform methods, they are inversed.
 // Hence, in the refinement contect we always act source > destination.
-// See the way refinement methods are called:
-// with a different refinementFunction and refinementOptions for the forward and backward case.
 
 export const defaultRefinementOptions: RefinementOptions = {
   maxDepth: 0,
@@ -41,8 +48,7 @@ export const defaultRefinementOptions: RefinementOptions = {
   minLineDistance: Infinity,
   sourceMidPointFunction: midPoint,
   destinationMidPointFunction: midPoint,
-  destinationDistanceFunction: distance,
-  returnDomain: 'destination'
+  destinationDistanceFunction: distance
 }
 
 // Refine Geometries
@@ -51,7 +57,7 @@ export function refineLineString(
   lineString: LineString,
   refinementFunction: (p: Point) => Point,
   refinementOptions: RefinementOptions
-): LineString {
+): TypedLineString<GeneralGcp> {
   lineString = conformLineString(lineString)
 
   const gcps: GeneralGcp[] = lineString.map((point) => ({
@@ -65,18 +71,14 @@ export function refineLineString(
     )
     .flat(1)
 
-  return gcpLinesToGcps(refinedGcpLines, true).map((gcp) =>
-    refinementOptions.returnDomain == 'destination'
-      ? gcp.destination
-      : gcp.source
-  )
+  return gcpLinesToGcps(refinedGcpLines, true)
 }
 
 export function refineRing(
   ring: Ring,
   refinementFunction: (p: Point) => Point,
   refinementOptions: RefinementOptions
-): Ring {
+): TypedRing<GeneralGcp> {
   ring = conformRing(ring)
 
   const gcps: GeneralGcp[] = ring.map((point) => ({
@@ -90,11 +92,7 @@ export function refineRing(
     )
     .flat(1)
 
-  return gcpLinesToGcps(refinedGcpLines, false).map((gcp) =>
-    refinementOptions.returnDomain == 'destination'
-      ? gcp.destination
-      : gcp.source
-  )
+  return gcpLinesToGcps(refinedGcpLines, false)
 }
 
 function splitGcpLineRecursively(
@@ -225,9 +223,9 @@ function shouldSplitGcpLine(
   )
 }
 
-// Get refinement source resolution
+// Get source refinement resolution
 
-export function getRefinementSourceResolution(
+export function getSourceRefinementResolution(
   sourceBbox: Bbox,
   refinementFunction: (p: Point) => Point,
   refinementOptions: RefinementOptions
@@ -264,75 +262,59 @@ export function getRefinementSourceResolution(
   const sourceRefinedHorizontalLineString = refineLineString(
     sourceHorizontalLine,
     refinementFunction,
-    { ...refinementOptions, returnDomain: 'source' }
-  )
+    refinementOptions
+  ).map((generalGcp) => generalGcp.source)
   const sourceRefinedVerticalLineString = refineLineString(
     sourceVerticalLine,
     refinementFunction,
-    { ...refinementOptions, returnDomain: 'source' }
-  )
+    refinementOptions
+  ).map((generalGcp) => generalGcp.source)
 
   if (
-    sourceRefinedHorizontalLineString.length == 2 &&
-    sourceRefinedVerticalLineString.length == 2
+    sourceRefinedHorizontalLineString.length === 2 &&
+    sourceRefinedVerticalLineString.length === 2
   ) {
     return undefined
   }
 
   // Compute minimal line length of refinement
-  const sourceMinHorizontalLineSquaredLenghts = []
+  const sourceMinHorizontalLineSquaredLengths = []
   for (let i = 0; i < sourceRefinedHorizontalLineString.length - 1; i++) {
-    sourceMinHorizontalLineSquaredLenghts.push(
+    sourceMinHorizontalLineSquaredLengths.push(
       squaredDistance(
         sourceRefinedHorizontalLineString[i],
         sourceRefinedHorizontalLineString[i + 1]
       )
     )
   }
-  const sourceMinHorizontalLineLenght = Math.sqrt(
-    Math.min(...sourceMinHorizontalLineSquaredLenghts)
+  const sourceMinHorizontalLineLength = Math.sqrt(
+    Math.min(...sourceMinHorizontalLineSquaredLengths)
   )
-  const sourceMinVerticalLineSquaredLenghts = []
+  const sourceMinVerticalLineSquaredLengths = []
   for (let i = 0; i < sourceRefinedVerticalLineString.length - 1; i++) {
-    sourceMinVerticalLineSquaredLenghts.push(
+    sourceMinVerticalLineSquaredLengths.push(
       squaredDistance(
         sourceRefinedVerticalLineString[i],
         sourceRefinedVerticalLineString[i + 1]
       )
     )
   }
-  const sourceMinVerticalLineLenght = Math.sqrt(
-    Math.min(...sourceMinVerticalLineSquaredLenghts)
+  const sourceMinVerticalLineLength = Math.sqrt(
+    Math.min(...sourceMinVerticalLineSquaredLengths)
   )
 
   // Compute cols and rows by comparing minimal line length to original length
   // Note: Tried to acchieve this by working with unflattened refined line and computing depth
   // but that proved difficult for TypeScript
   const sourceMinLineLength = Math.min(
-    sourceMinHorizontalLineLenght,
-    sourceMinVerticalLineLenght
+    sourceMinHorizontalLineLength,
+    sourceMinVerticalLineLength
   )
 
   return sourceMinLineLength
 }
 
 // Convert
-
-export function generalGcpToGcpForForward(generalGcp: GeneralGcp): Gcp {
-  return { resource: generalGcp.source, geo: generalGcp.destination }
-}
-
-export function generalGcpToGcpForBackward(generalGcp: GeneralGcp): Gcp {
-  return { resource: generalGcp.destination, geo: generalGcp.source }
-}
-
-export function gcpToGeneralGcpForForward(gcp: Gcp): GeneralGcp {
-  return { source: gcp.resource, destination: gcp.geo }
-}
-
-export function gcpToGeneralGcpForBackward(gcp: Gcp): GeneralGcp {
-  return { destination: gcp.resource, source: gcp.geo }
-}
 
 export function gcpsToGcpLines(
   gcps: GeneralGcp[],

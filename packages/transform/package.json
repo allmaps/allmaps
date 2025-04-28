@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
+    "@allmaps/annotation": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

@@ -20,6 +20,7 @@ export type AnalysisItem = {
   maskPointIndex?: number
   message: string
   originalMessage?: string
+  text?: string
 }
 
 /**
@@ -50,10 +51,10 @@ export type Measures = {
 
   polynomialRmse: number
   polynomialParameters: [number[], number[]]
-  polynomialScale: Point
-  polynomialRotation: number
-  polynomialShear: Point
-  polynomialTranslation: Point
+  polynomialScale?: Point
+  polynomialRotation?: number
+  polynomialShear?: Point
+  polynomialTranslation?: Point
 }
 
 /**

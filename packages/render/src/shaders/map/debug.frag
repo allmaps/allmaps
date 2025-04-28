@@ -1,14 +1,32 @@
-// Triangles
-// TODO: make this a rendering option
 if(bool(u_debug)) {
+  float viewportWidth = 4.0;
+
+  // Triangles
+
+  // Old approach with color
   // float triangleIndex = floor(v_trianglePointIndex / 3.0);
   // color = vec4(abs(sin(triangleIndex)), abs(sin(triangleIndex + 1.0f)), abs(sin(triangleIndex + 2.0f)), 1);
 
-  float dist = 0.99; // Optional improvement: scale with triangle area.
-  if(
-    v_trianglePointBarycentric.x + v_trianglePointBarycentric.y > dist ||
-    v_trianglePointBarycentric.y + v_trianglePointBarycentric.z > dist ||
-    v_trianglePointBarycentric.z + v_trianglePointBarycentric.x > dist
-  )
-  color = vec4(0, 0, 0, 1);
+  float barycentricTriangleDist = min(min(v_trianglePointBarycentric.x, v_trianglePointBarycentric.y), v_trianglePointBarycentric.z);
+  // Convert the desired border width from pixels to normalized units (0-1)
+  // This makes the border width consistent regardless of triangle size
+  float barycentricTriangleDistPixelSize = length(vec2(dFdx(barycentricTriangleDist), dFdy(barycentricTriangleDist)));
+  // Devide width by two, since most edges are displayed on two adjacent triangles.
+  float TriangleDistThreshold = viewportWidth * barycentricTriangleDistPixelSize / 2.0;
+
+  if(barycentricTriangleDist < TriangleDistThreshold) {
+    color = vec4(0.0, 0.0, 0.0, 1.0);
+  }
+
+  // Tiles
+
+  float resourceDist = min(cachedTilesTexturePoint.x, cachedTilesTexturePoint.y);
+  // Convert the desired border width from pixels to normalized units (0-1)
+  // This makes the border width consistent regardless of triangle size
+  float resourceDistPixelSize = length(vec2(dFdx(resourceDist), dFdy(resourceDist)));
+  float resourceDistThreshold = viewportWidth * resourceDistPixelSize;
+
+  if(resourceDist < resourceDistThreshold) {
+    color = vec4(0.0, 0.0, 1.0, 1.0);
+  }
 }

@@ -1,14 +1,42 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { parse, Node, ElementNode, RootNode } from 'svg-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type {
   Point,
-  GeojsonGeometry,
-  SvgAttributes,
+  Line,
+  LineString,
+  Polygon,
+  Geometry,
+  SvgCircle,
+  SvgLine,
+  SvgPolyLine,
+  SvgRect,
   SvgPolygon,
-  SvgGeometry
+  SvgGeometry,
+  SvgAttributes
 } from '@allmaps/types'
+
+// Assert
+
+export function isSvgCircle(input: any): input is SvgCircle {
+  return input.type === 'circle'
+}
+export function isSvgLine(input: any): input is SvgLine {
+  return input.type === 'line'
+}
+export function isSvgPolyLine(input: any): input is SvgPolyLine {
+  return input.type === 'polyline'
+}
+export function isSvgRect(input: any): input is SvgRect {
+  return input.type === 'rect'
+}
+export function isSvgPolygon(input: any): input is SvgPolygon {
+  return input.type === 'polygon'
+}
+
+// Read from string
 
 export function* stringToSvgGeometriesGenerator(svg: string) {
   function* helper(
@@ -130,7 +158,7 @@ export function svgGeometriesToSvgString(geometries: SvgGeometry[]): string {
 </svg>`
 }
 
-function svgGeometryToString(geometry: SvgGeometry): string {
+export function svgGeometryToString(geometry: SvgGeometry): string {
   if (geometry.type === 'circle') {
     return elementToString('circle', {
       ...geometry.attributes,
@@ -185,34 +213,33 @@ export function mapToResourceMaskSvgPolygon(map: GeoreferencedMap): SvgPolygon {
   }
 }
 
-// Convert to geojson
+// Convert to geometry
 
-export function svgToGeojson(geometry: SvgGeometry): GeojsonGeometry {
-  if (geometry.type === 'circle') {
-    return {
-      type: 'Point',
-      coordinates: geometry.coordinates
-    }
-  } else if (geometry.type === 'line') {
-    return {
-      type: 'LineString',
-      coordinates: geometry.coordinates
-    }
-  } else if (geometry.type === 'polyline') {
-    return {
-      type: 'LineString',
-      coordinates: geometry.coordinates
-    }
-  } else if (geometry.type === 'rect') {
-    return {
-      type: 'Polygon',
-      coordinates: [geometry.coordinates]
-    }
-  } else if (geometry.type === 'polygon') {
-    return {
-      type: 'Polygon',
-      coordinates: [geometry.coordinates]
-    }
+export function svgGeometryToGeometry(svgCircle: SvgCircle): Point
+export function svgGeometryToGeometry(svgLine: SvgLine): Line
+export function svgGeometryToGeometry(svgPolyLine: SvgPolyLine): LineString
+export function svgGeometryToGeometry(svgRect: SvgRect): Polygon
+export function svgGeometryToGeometry(svgPolygon: SvgPolygon): Polygon
+export function svgGeometryToGeometry(svgGeometry: SvgGeometry): Geometry
+/**
+ * Convert a SVG Geometry to Geometry
+ *
+ * Note: Multi-geometries are not supported
+ *
+ * @param svgGeometry - SVG Geometry
+ * @returns Geometry
+ */
+export function svgGeometryToGeometry(svgGeometry: SvgGeometry): Geometry {
+  if (isSvgCircle(svgGeometry)) {
+    return svgGeometry.coordinates
+  } else if (isSvgLine(svgGeometry)) {
+    return svgGeometry.coordinates
+  } else if (isSvgPolyLine(svgGeometry)) {
+    return svgGeometry.coordinates
+  } else if (isSvgRect(svgGeometry)) {
+    return [svgGeometry.coordinates]
+  } else if (isSvgPolygon(svgGeometry)) {
+    return [svgGeometry.coordinates]
   } else {
     throw new Error(`Unsupported SVG geometry`)
   }

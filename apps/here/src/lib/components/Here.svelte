@@ -17,7 +17,7 @@
 
   import { GcpTransformer } from '@allmaps/transform'
 
-  import { positionToGeoJson } from '$lib/shared/position.js'
+  import { geolocationPositionToGeojsonFeature } from '$lib/shared/position.js'
 
   import { position } from '$lib/shared/stores/geolocation.js'
   import {
@@ -38,6 +38,7 @@
 
   import HereIcon from '$lib/shared/images/here.svg?raw'
   import HereOrientationIcon from '$lib/shared/images/here-orientation.svg?raw'
+  import { flipY, geojsonGeometryToGeometry } from '@allmaps/stdlib'
 
   let mounted = false
   let lastSelectedMapId: string | undefined = undefined
@@ -109,14 +110,14 @@
   }
 
   // eslint-disable-next-line no-undef
-  function updatePosition(position: GeolocationPosition) {
-    if (position && transformer) {
-      const feature = positionToGeoJson(position)
+  function updatePosition(geolocationPosition: GeolocationPosition) {
+    if (geolocationPosition && transformer) {
+      const geoPosition = geojsonGeometryToGeometry(
+        geolocationPositionToGeojsonFeature(geolocationPosition).geometry
+      )
       if (positionFeature) {
-        const imageCoordinates = transformer.transformBackward(feature.geometry)
-        positionFeature.setGeometry(
-          new Point([imageCoordinates[0], -imageCoordinates[1]])
-        )
+        const resourcePosition = transformer.transformToResource(geoPosition)
+        positionFeature.setGeometry(new Point(flipY(resourcePosition)))
       }
     }
   }
@@ -129,10 +130,10 @@
       return
     }
 
-    const map = mapWithImageInfo.map
+    const georeferencedMap = mapWithImageInfo.map
     const imageInfo = mapWithImageInfo.imageInfo
 
-    transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+    transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
     const options = new IIIFInfo(imageInfo).getTileSourceOptions()
     if (options) {
@@ -168,7 +169,7 @@
 
     updatePosition($position)
 
-    lastSelectedMapId = map.id
+    lastSelectedMapId = georeferencedMap.id
   }
 
   function setFeatureImage(svg: string) {

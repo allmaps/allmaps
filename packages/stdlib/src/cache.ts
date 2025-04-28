@@ -37,3 +37,32 @@ export function getPropertyFromDoubleCacheOrComputation<T, K0, K1>(
     return result
   }
 }
+
+export function getPropertyFromTrippleCacheOrComputation<T, K0, K1, K2>(
+  cache: Map<K0, Map<K1, Map<K2, T>>>,
+  key0: K0,
+  key1: K1,
+  key2: K2,
+  computation: () => T,
+  checkUse: (t: T) => boolean = () => true,
+  checkStore: (t: T) => boolean = () => true
+): T {
+  if (
+    cache.get(key0)?.get(key1)?.has(key2) &&
+    checkUse(cache.get(key0)?.get(key1)?.get(key2) as T)
+  ) {
+    return cache.get(key0)?.get(key1)?.get(key2) as T
+  } else {
+    const result = computation()
+    if (checkStore(result)) {
+      if (!cache.get(key0)) {
+        cache.set(key0, new Map())
+      }
+      if (!cache.get(key0)?.get(key1)) {
+        cache.get(key0)?.set(key1, new Map())
+      }
+      cache.get(key0)?.get(key1)?.set(key2, result)
+    }
+    return result
+  }
+}

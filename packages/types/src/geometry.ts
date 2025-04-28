@@ -35,9 +35,7 @@ export type Ring = Point[]
 export type Polygon = Point[][]
 
 export type MultiPoint = Point[]
-
 export type MultiLineString = Point[][]
-
 export type MultiPolygon = Point[][][]
 
 export type Geometry =
@@ -57,6 +55,18 @@ export type TypedPolygon<P> = P[][]
 export type TypedMultiPoint<P> = P[]
 export type TypedMultiLineString<P> = P[][]
 export type TypedMultiPolygon<P> = P[][][]
+
+export type TypedGeometry<P> =
+  | P
+  | TypedLineString<P>
+  | TypedPolygon<P>
+  | TypedMultiPoint<P>
+  | TypedMultiLineString<P>
+  | TypedMultiPolygon<P>
+
+export type MultiGeometryOptions = {
+  isMultiGeometry: false
+}
 
 export type Gcp = { resource: Point; geo: Point }
 

@@ -37,10 +37,20 @@ export {
 
 export {
   getPropertyFromCacheOrComputation,
-  getPropertyFromDoubleCacheOrComputation
+  getPropertyFromDoubleCacheOrComputation,
+  getPropertyFromTrippleCacheOrComputation
 } from './cache.js'
 
-export { rgbToHex, hexToRgb, hexToFractionalRgb } from './color.js'
+export {
+  rgbToHex,
+  rgbaToHex,
+  hexToRgb,
+  hexToRgba,
+  hexToOpaqueRgba,
+  hexToFractionalRgb,
+  hexToFractionalRgba,
+  hexToFractionalOpaqueRgba
+} from './color.js'
 
 export {
   fetchUrl,
@@ -57,6 +67,7 @@ export {
   isGeojsonMultiLineString,
   isGeojsonMultiPolygon,
   isGeojsonGeometry,
+  isGeojsonMultiGeometry,
   geojsonPointToPoint,
   geojsonLineStringToLineString,
   geojsonPolygonToRing,
@@ -65,20 +76,21 @@ export {
   geojsonMultiLineStringToMultiLineString,
   geojsonMultiPolygonToMultiPolygon,
   geojsonGeometryToGeometry,
-  expandGeojsonMultiPointToGeojsonPointArray,
-  expandGeojsonMultiLineStringToGeojsonLineStringArray,
-  expandGeojsonMultiPolygonToGeojsonPolygonArray,
-  expandGeojsonMultiGeometryToGeojsonGeometryArray,
-  joinGeojsonPointArrayToGeojsonMultiPoint,
-  joinGeojsonLineStringArrayToGeojsonMultiLineString,
-  joinGeojsonPolygonArrayToGeojsonMultiPolygon,
-  joinGeojsonGeometryArrayToGeojsonMultiGeometry,
-  geojsonToSvg,
-  geometryToFeature,
-  featuresToFeatureCollection,
-  geometriesToFeatureCollection,
-  featureToGeometry,
-  featureCollectionToGeometries
+  geojsonGeometryToSvgGeometry,
+  geojsonGeometryToGeojsonFeature,
+  geojsonFeaturesToGeojsonFeatureCollection,
+  geojsonGeometriesToGeojsonFeatureCollection,
+  geojsonFeatureToGeojsonGeometry,
+  geojsonFeatureCollectionToGeojsonGeometries,
+  expandGeojsonMultiPointToGeojsonPoints,
+  expandGeojsonMultiLineStringToGeojsonLineStrings,
+  expandGeojsonMultiPolygonToGeojsonPolygons,
+  expandGeojsonMultiGeometryToGeojsonGeometries,
+  contractGeojsonPointsToGeojsonMultiPoint,
+  contractGeojsonLineStringsToGeojsonMultiLineString,
+  contractGeojsonPolygonsToGeojsonMultiPolygon,
+  contractGeojsonGeometriesToGeojsonMultiGeometry,
+  mergeGeojsonFeaturesCollections
 } from './geojson.js'
 
 export {
@@ -109,6 +121,7 @@ export {
   multiLineStringToGeojsonMultiLineString,
   multiPolygonToGeojsonMultiPolygon,
   geometryToGeojsonGeometry,
+  geometryToSvgGeometry,
   isClosed,
   isEqualPoint,
   isEqualPointArray,
@@ -152,15 +165,23 @@ export {
 
 export { getFullResourceMask } from './masks.js'
 
-export { mergeOptions, mergePartialOptions } from './options.js'
-
-export { lonLatToWebMecator, webMercatorToLonLat } from './projection.js'
+export {
+  mergeOptions,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions
+} from './options.js'
 
 export {
+  isSvgCircle,
+  isSvgLine,
+  isSvgPolyLine,
+  isSvgRect,
+  isSvgPolygon,
   stringToSvgGeometriesGenerator,
   svgGeometriesToSvgString,
+  svgGeometryToString,
   mapToResourceMaskSvgPolygon,
-  svgToGeojson
+  svgGeometryToGeometry
 } from './svg.js'
 
 export {

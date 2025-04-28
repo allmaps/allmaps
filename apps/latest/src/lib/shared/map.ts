@@ -2,6 +2,7 @@ import turfRewind from '@turf/rewind'
 
 import { GcpTransformer } from '@allmaps/transform'
 import { validateGeoreferencedMap } from '@allmaps/annotation'
+import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
 import {
   getProperties,
@@ -31,21 +32,17 @@ export function getDisplayMap(
   if (map.gcps.length >= 2) {
     if (map.resourceMask.length >= 3) {
       try {
-        const transformer = new GcpTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
+        const transformer = GcpTransformer.fromGeoreferencedMap(map)
 
-        const polygon = transformer.transformForwardAsGeojson([
-          map.resourceMask
-        ])
+        const polygon = transformer.transformToGeo([map.resourceMask])
+        const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of
         // the GoeJSON spec: https://github.com/d3/d3-geo
-        turfRewind(polygon, { mutate: true, reverse: true })
+        turfRewind(geojsonPolygon, { mutate: true, reverse: true })
 
         return {
-          polygon,
+          polygon: geojsonPolygon,
           hostname: getHostname(map),
           timeAgo: getTimeAgo(map),
           properties

@@ -34,12 +34,13 @@ export class TileCache<D> extends EventTarget {
 
   constructor(
     cachableTileFactory: CachableTileFactory<D>,
-    options?: Partial<TileCacheOptions>
+    partialTileCacheOptions?: Partial<TileCacheOptions>
   ) {
     super()
 
+    this.setOptions(partialTileCacheOptions)
+
     this.cachableTileFactory = cachableTileFactory
-    this.fetchFn = options?.fetchFn
   }
 
   /**
@@ -147,6 +148,15 @@ export class TileCache<D> extends EventTarget {
    */
   getMapTileUrls(mapId: string) {
     return this.tileUrlsByMapId.get(mapId) || new Set()
+  }
+
+  /**
+   * Get the Tile Cache options
+   *
+   * @param partialTileCacheOptions - Options
+   */
+  setOptions(partialTileCacheOptions?: Partial<TileCacheOptions>) {
+    this.fetchFn = partialTileCacheOptions?.fetchFn
   }
 
   // TODO: this function needs a new name!
