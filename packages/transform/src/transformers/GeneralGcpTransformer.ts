@@ -65,21 +65,21 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
   }
 
   public get generalGcps(): GeneralGcp[] {
-    return this._generalGcps
+    return this.generalGcpsInternal
   }
 
   /**
    * Get the forward transformation. Create if it doesn't exist yet.
    */
   getForwardTransformation(): BaseTransformation {
-    return super._getForwardTransformation()
+    return super.getForwardTransformationInternal()
   }
 
   /**
    * Get the backward transformation. Create if it doesn't exist yet.
    */
   getBackwardTransformation(): BaseTransformation {
-    return super._getBackwardTransformation()
+    return super.getBackwardTransformationInternal()
   }
 
   /**
@@ -103,7 +103,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     sourceBbox: Bbox,
     partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
-    return super._getForwardTransformationResolution(
+    return super.getForwardTransformationResolutionInternal(
       sourceBbox,
       partialGeneralGcpTransformOptions
     )
@@ -130,7 +130,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     destinationBbox: Bbox,
     partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
-    return super._getBackwardTransformationResolution(
+    return super.getBackwardTransformationResolutionInternal(
       destinationBbox,
       partialGeneralGcpTransformOptions
     )
@@ -188,7 +188,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
       generalGcp: GeneralGcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
-    return super._transformForward(
+    return super.transformForwardInternal(
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
@@ -247,7 +247,7 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
       generalGcp: GeneralGcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
-    return super._transformBackward(
+    return super.transformBackwardInternal(
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP

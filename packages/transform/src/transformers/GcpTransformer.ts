@@ -107,21 +107,21 @@ export class GcpTransformer extends BaseGcpTransformer {
   }
 
   public get gcps(): Gcp[] {
-    return this._generalGcps.map(generalGcpToGcp)
+    return this.generalGcpsInternal.map(generalGcpToGcp)
   }
 
   /**
    * Get the forward transformation. Create if it doesn't exist yet.
    */
   getToGeoTransformation(): BaseTransformation {
-    return super._getForwardTransformation()
+    return super.getForwardTransformationInternal()
   }
 
   /**
    * Get the backward transformation. Create if it doesn't exist yet.
    */
   getToResourceTransformation(): BaseTransformation {
-    return super._getBackwardTransformation()
+    return super.getBackwardTransformationInternal()
   }
 
   /**
@@ -149,7 +149,7 @@ export class GcpTransformer extends BaseGcpTransformer {
       gcpTransformOptionsToGeneralGcpTransformOptions(
         partialGcpTransformOptions
       )
-    return super._getForwardTransformationResolution(
+    return super.getForwardTransformationResolutionInternal(
       resourceBbox,
       partialGeneralGcpTransformOptions
     )
@@ -180,7 +180,7 @@ export class GcpTransformer extends BaseGcpTransformer {
       gcpTransformOptionsToGeneralGcpTransformOptions(
         partialGcpTransformOptions
       )
-    return super._getBackwardTransformationResolution(
+    return super.getBackwardTransformationResolutionInternal(
       geoBbox,
       generalGcpTransformOptions
     )
@@ -259,7 +259,7 @@ export class GcpTransformer extends BaseGcpTransformer {
           partialGcpTransformOptions
         )
       : undefined
-    return super._transformForward(
+    return super.transformForwardInternal(
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
@@ -323,7 +323,7 @@ export class GcpTransformer extends BaseGcpTransformer {
           partialGcpTransformOptions
         )
       : undefined
-    return super._transformBackward(
+    return super.transformBackwardInternal(
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
