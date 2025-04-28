@@ -85,7 +85,7 @@ allmaps transform --help
 
 #### Transform coordinates
 
-Transform coordinates from input files 'to geo' (or 'to resource') using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
+Transform coordinates from input files 'to geo' (or 'to resource') using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
 
 Input files with coordinates are expected to contain one coordinate on each line, formatted as pairs of coordinates in decimal form separated by spaces:
 
@@ -150,7 +150,7 @@ allmaps transform coordinates -g /path/to/gcps.txt -t thinPlateSpline /path/to/c
 
 #### Transform SVG
 
-Transform SVG to GeoJSON Geometry using a a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
+Transform SVG to GeoJSON Geometry using a a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
 
 **Examples:**
 
@@ -168,7 +168,7 @@ allmaps transform svg -g /path/to/gcps.txt -t thinPlateSpline /path/to/svg.svg
 
 #### Transform GeoJSON
 
-Transform GeoJSON Geometry to SVG using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
+Transform GeoJSON Geometry to SVG using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
 
 **Examples:**
 
@@ -186,7 +186,7 @@ allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline /path/to/myGeoJ
 
 #### Transform Resource Mask
 
-Transform SVG resource masks of input Georeference Annotations to GeoJSO Polygon using a GCP Transformer and it's transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
+Transform SVG resource masks of input Georeference Annotations to GeoJSO Polygon using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
 
 This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG.
 
