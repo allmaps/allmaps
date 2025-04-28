@@ -975,7 +975,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           : undefined
         // If this map's cached tiles don't already cover the entire zoomlevel
         if (
-          cachedTiles.length == 0 ||
+          cachedTiles.length === 0 ||
           (tileZoolLevelTilesCount &&
             cachedTiles.length < tileZoolLevelTilesCount)
         ) {
@@ -1009,7 +1009,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private getCachedTilesAtOtherScaleFactors(
     tile: Tile
   ): CachedTile<ImageData>[] {
-    if (this.cachedTilesByTileUrl.size == 0) {
+    if (this.cachedTilesByTileUrl.size === 0) {
       return []
     }
     if (!this.tileZoomLevelForViewport) {

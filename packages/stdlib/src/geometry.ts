@@ -523,7 +523,7 @@ export function invertPoints(points: Point[]): Point[] {
 }
 
 export function scalePoint(point: Point, scale: number): Point {
-  if (scale == 1) {
+  if (scale === 1) {
     return point
   }
 

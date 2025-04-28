@@ -13,7 +13,7 @@ export function linearKernel(
 ): number {
   if (!options.derivative) {
     return r
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return 1
   } else {
     throw new Error(
@@ -32,7 +32,7 @@ export function linearKernel(
 export function cubicKernel(r: number, options: KernelFunctionOptions) {
   if (!options.derivative) {
     return Math.pow(r, 3)
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return 3 * Math.pow(r, 2)
   } else {
     throw new Error(
@@ -51,7 +51,7 @@ export function cubicKernel(r: number, options: KernelFunctionOptions) {
 export function quinticKernel(r: number, options: KernelFunctionOptions) {
   if (!options.derivative) {
     return Math.pow(r, 5)
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return 5 * Math.pow(r, 4)
   } else {
     throw new Error(
@@ -73,7 +73,7 @@ export function thinPlateKernel(r: number, options: KernelFunctionOptions) {
       return 0
     }
     return Math.pow(r, 2) * Math.log(r)
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     if (r === 0) {
       return 0
     }
@@ -96,7 +96,7 @@ export function gaussianKernel(r: number, options: KernelFunctionOptions) {
   options.epsilon = options.epsilon || 1
   if (!options.derivative) {
     return Math.exp(-Math.pow(r / options.epsilon, 2))
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return (
       ((-2 * r) / options.epsilon ** 2) *
       Math.exp(-Math.pow(r / options.epsilon, 2))
@@ -122,7 +122,7 @@ export function inverseMultiquadricKernel(
   options.epsilon = options.epsilon || 1
   if (!options.derivative) {
     return 1.0 / Math.sqrt(Math.pow(r / options.epsilon, 2) + 1)
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return (
       -r /
       (options.epsilon ** 2 *
@@ -146,7 +146,7 @@ export function multiquadricKernel(r: number, options: KernelFunctionOptions) {
   options.epsilon = options.epsilon || 1
   if (!options.derivative) {
     return Math.sqrt(Math.pow(r / options.epsilon, 2) + 1)
-  } else if (options.derivative == 1) {
+  } else if (options.derivative === 1) {
     return (
       r /
       (options.epsilon ** 2 * Math.sqrt(Math.pow(r / options.epsilon, 2) + 1))

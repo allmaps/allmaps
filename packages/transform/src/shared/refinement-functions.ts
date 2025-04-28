@@ -271,8 +271,8 @@ export function getSourceRefinementResolution(
   ).map((generalGcp) => generalGcp.source)
 
   if (
-    sourceRefinedHorizontalLineString.length == 2 &&
-    sourceRefinedVerticalLineString.length == 2
+    sourceRefinedHorizontalLineString.length === 2 &&
+    sourceRefinedVerticalLineString.length === 2
   ) {
     return undefined
   }

@@ -82,7 +82,7 @@ export function linesIntersectionPoint(
 
   const intersectionPoint = prolongedLinesIntersectionPoint(line0, line1)
 
-  if (intersectionPoint == undefined) return undefined // discard parallels and coincidence
+  if (intersectionPoint === undefined) return undefined // discard parallels and coincidence
   let frac0, frac1
   if (line0[1][0] != line0[0][0]) {
     frac0 = (intersectionPoint[0] - line0[0][0]) / (line0[1][0] - line0[0][0])
@@ -132,7 +132,7 @@ export function prolongedLinesIntersectionPoint(
   const denom =
     (line0[0][0] - line0[1][0]) * (line1[0][1] - line1[1][1]) -
     (line0[0][1] - line0[1][1]) * (line1[0][0] - line1[1][0])
-  if (denom == 0) return undefined
+  if (denom === 0) return undefined
 
   const x =
     ((line0[0][0] * line0[1][1] - line0[0][1] * line0[1][0]) *

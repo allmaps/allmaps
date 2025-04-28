@@ -351,7 +351,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // Note: for very deformed maps (with TPS and many gcps),
     // this could lead to inaccurate tile loading (in addition to the reason explained below).
     const projectedTransformer =
-      warpedMap.transformationType == 'thinPlateSpline' &&
+      warpedMap.transformationType === 'thinPlateSpline' &&
       warpedMap.gcps.length < MAX_GCPS_EXACT_TPS_TO_RESOURCE
         ? warpedMap.projectedTransformer
         : warpedMap.getProjectedTransformer('polynomial')

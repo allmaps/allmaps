@@ -21,19 +21,19 @@ import type {
 // Assert
 
 export function isSvgCircle(input: any): input is SvgCircle {
-  return input.type == 'circle'
+  return input.type === 'circle'
 }
 export function isSvgLine(input: any): input is SvgLine {
-  return input.type == 'line'
+  return input.type === 'line'
 }
 export function isSvgPolyLine(input: any): input is SvgPolyLine {
-  return input.type == 'polyline'
+  return input.type === 'polyline'
 }
 export function isSvgRect(input: any): input is SvgRect {
-  return input.type == 'rect'
+  return input.type === 'rect'
 }
 export function isSvgPolygon(input: any): input is SvgPolygon {
-  return input.type == 'polygon'
+  return input.type === 'polygon'
 }
 
 // Read from string

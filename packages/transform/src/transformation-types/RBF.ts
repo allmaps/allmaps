@@ -192,7 +192,7 @@ export class RBF extends BaseTransformation {
       newDestinationPointPartDerX[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          (dist == 0
+          (dist === 0
             ? 0
             : this.kernelFunction(dist, {
                 derivative: 1,
@@ -226,7 +226,7 @@ export class RBF extends BaseTransformation {
       newDestinationPointPartDerY[i] = newDistances.reduce(
         (sum, dist, index) =>
           sum +
-          (dist == 0
+          (dist === 0
             ? 0
             : this.kernelFunction(dist, {
                 derivative: 1,

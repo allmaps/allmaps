@@ -141,7 +141,7 @@ export class Polynomial extends BaseTransformation {
     ) as [number[], number[]]
 
     // Set the derived parameters
-    if (this.order == 1) {
+    if (this.order === 1) {
       // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
 
       this.translation = [
