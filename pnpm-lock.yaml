@@ -347,6 +347,9 @@ importers:
       phosphor-svelte:
         specifier: ^3.0.1
         version: 3.0.1(svelte@5.20.2)(vite@6.1.0)
+      robust-point-in-polygon:
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@sveltejs/adapter-cloudflare':
         specifier: ^7.0.0
@@ -366,6 +369,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
+      '@types/robust-point-in-polygon':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.57.0)(typescript@5.7.3)

@@ -6,27 +6,28 @@
   import {
     CaretLeft as CaretLeftIcon,
     CaretRight as CaretRightIcon,
-    Envelope as EnvelopeIcon
+    GpsFix as GpsFixIcon
   } from 'phosphor-svelte'
 
   import { NorthArrow } from '@allmaps/ui'
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
-  import { getSensorsState } from '$lib/state/sensors.svelte.js'
 
-  import { createRouteUrl, getFrom } from '$lib/shared/router.js'
+  import { createRouteUrl } from '$lib/shared/router.js'
   import { getAllmapsId } from '$lib/shared/ids.js'
+
+  import type { Snippet } from 'svelte'
 
   type Props = {
     selectedMapId: string
+    children?: Snippet
   }
 
-  let { selectedMapId }: Props = $props()
+  let { selectedMapId, children }: Props = $props()
 
   const mapsState = getMapsState()
   const compassState = getCompassState()
-  const sensorsState = getSensorsState()
 
   const hasMaps = $derived(mapsState.mapsWithImageInfo.length > 1)
 
@@ -54,10 +55,10 @@
   })
 </script>
 
-<div class="w-full grid grid-cols-[1fr_max-content_1fr]">
+<div class="w-full grid grid-cols-[1fr_max-content_1fr] items-center gap-2">
   {#if hasMaps && previousMapId && nextMapId}
     <div
-      class="bg-white text-center self-center inline-grid grid-cols-2 rounded-md place-self-start shadow-xs pointer-events-auto"
+      class="bg-white shadow text-center self-center inline-grid grid-cols-2 rounded-md place-self-start pointer-events-auto"
     >
       <a
         href={createRouteUrl(page, getAllmapsId(previousMapId))}
@@ -76,23 +77,25 @@
     <a
       href="/"
       role="button"
-      class="place-self-start px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
-      >More maps</a
+      class="place-self-start self-center px-2 py-2 text-sm font-medium bg-white rounded-lg
+      focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
+      flex flex-row items-center gap-1"
     >
+      <GpsFixIcon size="20" weight="bold" />
+      <span>More maps</span></a
+    >
+    <!-- TODO:
+     Add dropdown with options:
+      - "Find more maps around your location"
+      - "Find more maps around shared location"
+      - "Find more maps around both locations"
+      -->
   {/if}
 
-  {#if sensorsState.position}
-    <a
-      class="bg-white rounded-lg self-center pointer-events-auto px-4 py-2 flex gap-2"
-      href={createRouteUrl(page, `${getAllmapsId(selectedMapId)}/share`, {
-        from: getFrom(sensorsState.position)
-      })}
-    >
-      <EnvelopeIcon size="24" />
-      <span>Share this map</span>
-    </a>
+  {#if children}
+    {@render children()}
   {:else}
-    <div></div>
+    <div class="contents"></div>
   {/if}
 
   <div class="pointer-events-auto place-self-end">

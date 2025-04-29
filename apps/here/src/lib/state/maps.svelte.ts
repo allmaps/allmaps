@@ -6,7 +6,7 @@ import { parseAnnotation } from '@allmaps/annotation'
 
 import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
 
-import { distance } from '$lib/shared/position.js'
+import { computePositionDistance } from '$lib/shared/position.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -71,7 +71,10 @@ export class MapsState {
       if (this.#lastPosition) {
         const diffTimestamp =
           newPosition.timestamp - this.#lastPosition.timestamp
-        const diffDistance = distance(newPosition, this.#lastPosition)
+        const diffDistance = computePositionDistance(
+          newPosition,
+          this.#lastPosition
+        )
 
         if (
           diffTimestamp < THRESHOLD_TIMESTAMP ||

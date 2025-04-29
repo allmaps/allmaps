@@ -9,7 +9,8 @@
   import {
     X as XIcon,
     Copy as CopyIcon,
-    Check as CheckIcon
+    Check as CheckIcon,
+    ShareNetwork as ShareNetworkIcon
   } from 'phosphor-svelte'
 
   import { Loading } from '@allmaps/ui'
@@ -84,10 +85,22 @@
         translate-x-[-50%] translate-y-[-50%] border p-5 sm:max-w-xl md:w-full
         flex flex-col gap-4"
       >
-        <Dialog.Title
-          class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
-        >
-          Share map
+        <Dialog.Title class="w-full flex gap-2 justify-between items-center">
+          <div class="flex flex-row gap-2 items-center">
+            <ShareNetworkIcon size="24" />
+            <span class="text-lg font-semibold"
+              >Share your location on this map</span
+            >
+          </div>
+
+          <Dialog.Close
+            class="cursor-pointer justify-self-end p-2 rounded-full hover:bg-gray/10 transition-colors"
+          >
+            <div>
+              <XIcon class="size-6" />
+              <span class="sr-only">Close</span>
+            </div>
+          </Dialog.Close>
         </Dialog.Title>
 
         <div
@@ -114,15 +127,18 @@
           {/if}
         </div>
 
-        <Colors />
+        <div class="p-2 text-center">
+          Copy link to send your location on this map to your friends!
+        </div>
 
-        <div class="flex flex-row gap-2 items-center">
+        <div class="flex flex-row gap-2 items-center justify-between">
+          <Colors />
           <button
             class="disabled:cursor-not-allowed disabled:bg-green/50 bg-green
               active:translate-[1px] hover:translate-[0.5px]
-              hover:bg-green/95 select-none
-              shadow-md hover:shadow-sm text-white
-              cursor-pointer transition-all px-4 py-2 rounded-full
+              hover:bg-green/80 select-none
+              text-white
+              cursor-pointer transition-all px-4 py-2 rounded-lg
               flex flex-row gap-2 items-center"
             disabled={!imageLoaded}
             onclick={handleCopy}
@@ -132,25 +148,11 @@
             {:else}
               <CopyIcon class="size-5" />
             {/if}
-            Copy to clipboard</button
+            Copy link</button
           >
-          <a class="underline" href={postcardUrl}>Preview URL</a>
-        </div>
-        <div>
-          Copy to clipboard and send your location to your friends using Signal,
-          WhatsApp, Slack, Bluesky or any other app!
         </div>
 
-        <Dialog.Close
-          class="focus-visible:ring-foreground focus-visible:ring-offset-background focus-visible:outline-hidden absolute right-5 top-5 rounded-md
-          cursor-pointer
-          focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]"
-        >
-          <div>
-            <XIcon class="text-foreground size-5" />
-            <span class="sr-only">Close</span>
-          </div>
-        </Dialog.Close>
+        <a class="underline bg-orange" href={postcardUrl}>Preview URL</a>
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>

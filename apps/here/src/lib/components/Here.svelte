@@ -26,24 +26,27 @@
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
   import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonLineString, Point } from '@allmaps/types'
 
   import type { MapWithImageInfo } from '$lib/shared/types.js'
 
-  import HereIcon from '$lib/shared/images/here.svg?raw'
-  import HereOrientationIcon from '$lib/shared/images/here-orientation.svg?raw'
-  import Pin from '$lib/shared/images/pin.svg?raw'
-  import PinShadow from '$lib/shared/images/pin-shadow.svg?raw'
+  import HereIcon from '$lib/images/here.svg?raw'
+  import HereOrientationIcon from '$lib/images/here-orientation.svg?raw'
+  import Pin from '$lib/images/pin.svg?raw'
+  import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
   const mapsState = getMapsState()
   const imageInfoState = getImageInfoState()
   const sensorsState = getSensorsState()
   const compassState = getCompassState()
+  const uiState = getUiState()
 
   let mounted = $state(false)
   let lastSelectedMapId = $state<string>()
@@ -60,15 +63,25 @@
 
   let { selectedMapId, geojsonRoute, from }: Props = $props()
 
-  // const mapWithImageInfo = mapsState.getMapWithImageInfo(selectedMapId)
-  // let selectedMapBearing = $derived(
-  //   mapWithImageInfo ? computeGeoreferencedMapBearing(mapWithImageInfo.map) : 0
-  // )
+  let ol = $state.raw<HTMLElement>()
+  let olMap = $state.raw<OLMap>()
+  let map = $state.raw<GeoreferencedMap>()
+  let transformer = $state.raw<GcpTransformer>()
 
-  let transformer: GcpTransformer
+  let positionImageCoordinates = $derived.by<Point | undefined>(() => {
+    if (sensorsState.position && transformer) {
+      const feature = positionToGeoJsonFeature(sensorsState.position)
+      const imageCoordinates = transformer.transformBackward(feature.geometry)
+      return [imageCoordinates[0], -imageCoordinates[1]]
+    }
+  })
 
-  let ol = $state<HTMLElement>()
-  let olMap = $state<OLMap>()
+  let fromImageCoordinates = $derived.by<Point | undefined>(() => {
+    if (from && transformer) {
+      const imageCoordinates = transformer.transformBackward([from[1], from[0]])
+      return [imageCoordinates[0], -imageCoordinates[1]]
+    }
+  })
 
   const tileLayer = new TileLayer()
   const positionFeature = new Feature()
@@ -129,24 +142,17 @@
     }
   }
 
-  function updatePosition(position?: GeolocationPosition) {
-    if (position && transformer) {
-      const feature = positionToGeoJsonFeature(position)
-      if (positionFeature) {
-        const imageCoordinates = transformer.transformBackward(feature.geometry)
-        positionFeature.setGeometry(
-          new OLPoint([imageCoordinates[0], -imageCoordinates[1]])
-        )
-      }
+  function updatePositionFeature(imageCoordinates?: Point) {
+    if (map && imageCoordinates) {
+      showPositionFeature()
+
+      positionFeature.setGeometry(new OLPoint(imageCoordinates))
     }
   }
 
-  function updateFrom(from?: Point) {
-    if (from && transformer) {
-      const imageCoordinates = transformer.transformBackward([from[1], from[0]])
-      fromFeature.setGeometry(
-        new OLPoint([imageCoordinates[0], -imageCoordinates[1]])
-      )
+  function updateFromFeature(imageCoordinates?: Point) {
+    if (imageCoordinates) {
+      fromFeature.setGeometry(new OLPoint(imageCoordinates))
     }
   }
 
@@ -157,7 +163,7 @@
       return
     }
 
-    const map = mapWithImageInfo.map
+    map = mapWithImageInfo.map
     const imageInfo = mapWithImageInfo.imageInfo
 
     transformer = new GcpTransformer(map.gcps, map.transformation?.type)
@@ -165,9 +171,13 @@
     const options = new IIIFInfo(
       imageInfo as ImageInformationResponse
     ).getTileSourceOptions()
-    if (options) {
-      options.zDirection = -1
+
+    if (!options) {
+      return
     }
+
+    options.zDirection = -1
+
     const iiifTileSource = new IIIF(options)
     tileLayer.setSource(iiifTileSource)
 
@@ -209,8 +219,8 @@
       })
     }
 
-    updatePosition(sensorsState.position)
-    updateFrom(from)
+    updatePositionFeature(positionImageCoordinates)
+    updateFromFeature(fromImageCoordinates)
 
     lastSelectedMapId = map.id
   }
@@ -244,12 +254,20 @@
     )
   }
 
-  onMount(async () => {
+  // function hidePositionFeature() {
+  //   positionFeature.setStyle()
+  // }
+
+  function showPositionFeature() {
     if (sensorsState.hasOrientation) {
       setPositionFeatureImage(HereOrientationIcon)
     } else {
       setPositionFeatureImage(HereIcon)
     }
+  }
+
+  onMount(async () => {
+    showPositionFeature()
 
     setFeatureImage(fromFeature, [
       {
@@ -277,6 +295,29 @@
       controls: []
     })
 
+    olMap.on('postrender', () => {
+      if (olMap && fromImageCoordinates) {
+        const fromScreenCoordinates =
+          olMap.getPixelFromCoordinate(fromImageCoordinates)
+
+        uiState.fromScreenCoordinates = [
+          Math.round(fromScreenCoordinates[0]),
+          Math.round(fromScreenCoordinates[1])
+        ]
+      }
+
+      if (olMap && positionImageCoordinates) {
+        const positionScreenCoordinates = olMap.getPixelFromCoordinate(
+          positionImageCoordinates
+        )
+
+        uiState.positionScreenCoordinates = [
+          Math.round(positionScreenCoordinates[0]),
+          Math.round(positionScreenCoordinates[1])
+        ]
+      }
+    })
+
     mounted = true
 
     const map = await mapsState.fetchMapFromMapId(selectedMapId)
@@ -286,7 +327,7 @@
   })
 
   $effect(() => {
-    updatePosition(sensorsState.position)
+    updatePositionFeature(positionImageCoordinates)
   })
 
   $effect(() => {
@@ -329,9 +370,7 @@
   })
 
   $effect(() => {
-    if (olMap && from) {
-      updateFrom(from)
-    }
+    updateFromFeature(fromImageCoordinates)
   })
 
   $effect(() => {

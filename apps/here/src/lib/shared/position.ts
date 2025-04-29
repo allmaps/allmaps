@@ -1,13 +1,11 @@
-import turfDistance from '@turf/distance'
+import { computeDistance } from '$lib/shared/distance.js'
+import { coordinatesToGeoJsonPoint } from '$lib/shared/geojson.js'
 
 export function positionToGeoJsonPoint(position: GeolocationPosition) {
-  return {
-    type: 'Point' as const,
-    coordinates: [position.coords.longitude, position.coords.latitude] as [
-      number,
-      number
-    ]
-  }
+  return coordinatesToGeoJsonPoint([
+    position.coords.longitude,
+    position.coords.latitude
+  ])
 }
 
 export function positionToGeoJsonFeature(position: GeolocationPosition) {
@@ -25,13 +23,12 @@ export function positionToGeoJsonFeature(position: GeolocationPosition) {
   }
 }
 
-export function distance(
+export function computePositionDistance(
   position1: GeolocationPosition,
   position2: GeolocationPosition
 ) {
-  return turfDistance(
+  return computeDistance(
     positionToGeoJsonPoint(position1),
-    positionToGeoJsonPoint(position2),
-    { units: 'meters' }
+    positionToGeoJsonPoint(position2)
   )
 }

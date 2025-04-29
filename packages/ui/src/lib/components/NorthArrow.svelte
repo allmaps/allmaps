@@ -7,7 +7,7 @@
 </script>
 
 <div class="w-12 md:w-14 rounded-full shadow-md">
-  <button class="contents" on:click={() => dispatch('click')}>
+  <button class="contents cursor-pointer" on:click={() => dispatch('click')}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       style="--rotation: {rotation}deg;"

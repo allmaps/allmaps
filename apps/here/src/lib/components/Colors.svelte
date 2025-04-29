@@ -37,14 +37,14 @@
   ]
 </script>
 
-<RadioGroup.Root class="flex flex-row gap-4">
+<RadioGroup.Root class="flex flex-row gap-2">
   {#each colors as color}
     <RadioGroup.Item
       id={color.value}
       value={color.value}
       style="background-color: {color.color};"
-      class="border-gray border-1 hover:border-black data-[state=checked]:border-3
-      data-[state=checked]:border-black size-5
+      class="data-[state=checked]:outline-2 outline-offset-2
+      data-[state=checked]:outline-black size-6
       inset-shadow-sm
       shrink-0 cursor-pointer rounded-full transition-all duration-100 ease-in-out"
     />

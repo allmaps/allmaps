@@ -3,19 +3,18 @@
   import { page } from '$app/state'
   import { afterNavigate } from '$app/navigation'
 
-  import { Header } from '@allmaps/ui'
-
-  import type { Snippet } from 'svelte'
-
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
   import { setUrlState } from '$lib/state/url.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
+  import { setUiState } from '$lib/state/ui.svelte.js'
 
   import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
+
+  import type { Snippet } from 'svelte'
 
   import type { LayoutProps } from './$types.js'
 
@@ -28,6 +27,7 @@
   const urlState = setUrlState(page.url, errorState)
 
   setMapsState(sensorState, imageInfoState)
+  setUiState()
 
   interface Props {
     children?: Snippet
@@ -75,9 +75,6 @@
 </svelte:head>
 
 <div class="absolute w-full h-full flex flex-col">
-  <div class="z-10">
-    <Header appName="Here"></Header>
-  </div>
   <main class="relative h-full overflow-auto">
     {#if errorState.error}
       <div class="h-full flex flex-col gap-2 items-center justify-center">

@@ -13,9 +13,11 @@
   import { getRelativeSizedRectangle, svgCoordinates } from '$lib/shared/svg.js'
   import { createRouteUrl } from '$lib/shared/router.js'
   import { getAllmapsId } from '$lib/shared/ids.js'
+  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { truncate } from '$lib/shared/strings.js'
 
-  import Pin from '$lib/shared/images/pin.svg?raw'
-  import PinShadow from '$lib/shared/images/pin-shadow.svg?raw'
+  import Pin from '$lib/images/pin.svg?raw'
+  import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonLineString, Size } from '@allmaps/types'
@@ -27,6 +29,9 @@
   }
 
   let { mapId, map, geojsonRoute }: Props = $props()
+
+  let label = $derived(map.resource.partOf?.[0].label)
+  let label2 = $derived(map.resource.partOf?.[0].partOf?.[0].label)
 
   let width = $state<number>(320)
 
@@ -193,6 +198,10 @@
           {/if}
         </div>
       {/if}
+      <div class="text-center text-blue-900 text-xs">
+        {label ? truncate(parseLanguageString(label, 'en')) : ``}
+        {label ? truncate(parseLanguageString(label2, 'en')) : ``}
+      </div>
     </a>
   </li>
 {/if}
