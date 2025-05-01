@@ -1188,23 +1188,22 @@ Matrix
 (point0: Point, point1: Point) => number
 ```
 
-### `new Polynomial(sourcePoints, destinationPoints, order)`
+### `new Polynomial1(sourcePoints, destinationPoints)`
 
 ###### Parameters
 
 * `sourcePoints` (`Array<Point>`)
 * `destinationPoints` (`Array<Point>`)
-* `order?` (`number | undefined`)
 
 ###### Returns
 
-`Polynomial`.
+`Polynomial1`.
 
 ###### Extends
 
-* `BaseLinearWeightsTransformation`
+* `BasePolynomialTransformation`
 
-### `Polynomial#coefsMatrix`
+### `Polynomial1#coefsMatrix`
 
 ###### Type
 
@@ -1212,15 +1211,7 @@ Matrix
 Matrix
 ```
 
-### `Polynomial#destinationPointsMatrices`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
-```
-
-### `Polynomial#evaluateFunction(newSourcePoint)`
+### `Polynomial1#evaluateFunction(newSourcePoint)`
 
 ###### Parameters
 
@@ -1230,27 +1221,27 @@ Matrix
 
 `[number, number]`.
 
-### `Polynomial#evaluatePartialDerivativeX(newSourcePoint)`
+### `Polynomial1#evaluatePartialDerivativeX(_newSourcePoint)`
 
 ###### Parameters
 
-* `newSourcePoint` (`[number, number]`)
+* `_newSourcePoint` (`[number, number]`)
 
 ###### Returns
 
 `[number, number]`.
 
-### `Polynomial#evaluatePartialDerivativeY(newSourcePoint)`
+### `Polynomial1#evaluatePartialDerivativeY(_newSourcePoint)`
 
 ###### Parameters
 
-* `newSourcePoint` (`[number, number]`)
+* `_newSourcePoint` (`[number, number]`)
 
 ###### Returns
 
 `[number, number]`.
 
-### `Polynomial#getMeasures()`
+### `Polynomial1#getMeasures()`
 
 ###### Parameters
 
@@ -1260,25 +1251,7 @@ There are no parameters.
 
 `{translation: Point; rotation: number; scales: Point; shears: Point}`.
 
-### `Polynomial#order`
-
-###### Type
-
-```ts
-number
-```
-
-### `Polynomial#solve()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `Polynomial#weights?`
+### `Polynomial1#weights?`
 
 ###### Type
 
@@ -1286,7 +1259,145 @@ There are no parameters.
 [Array<number>, Array<number>]
 ```
 
-### `Polynomial#weightsMatrices?`
+### `Polynomial1#weightsMatrices?`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
+
+### `new Polynomial2(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Polynomial2`.
+
+###### Extends
+
+* `BasePolynomialTransformation`
+
+### `Polynomial2#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Polynomial2#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial2#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial2#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial2#weights?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `Polynomial2#weightsMatrices?`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
+
+### `new Polynomial3(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Polynomial3`.
+
+###### Extends
+
+* `BasePolynomialTransformation`
+
+### `Polynomial3#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Polynomial3#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#weights?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `Polynomial3#weightsMatrices?`
 
 ###### Type
 

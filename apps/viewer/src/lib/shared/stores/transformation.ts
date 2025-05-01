@@ -6,8 +6,7 @@ import { mapIds } from '$lib/shared/stores/maps.js'
 import { mapWarpedMapLayer } from '$lib/shared/stores/openlayers.js'
 
 const transformations: TransformationType[] = [
-  'polynomial',
-  // 'polynomial1',
+  'polynomial1',
   // 'polynomial2',
   // 'polynomial3',
   'thinPlateSpline'

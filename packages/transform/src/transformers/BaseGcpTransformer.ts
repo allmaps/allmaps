@@ -15,7 +15,9 @@ import { BaseTransformation } from '../transformation-types/BaseTransformation.j
 
 import { Straight } from '../transformation-types/Straight.js'
 import { Helmert } from '../transformation-types/Helmert.js'
-import { Polynomial } from '../transformation-types/Polynomial.js'
+import { Polynomial1 } from '../transformation-types/Polynomial1.js'
+import { Polynomial2 } from '../transformation-types/Polynomial2.js'
+import { Polynomial3 } from '../transformation-types/Polynomial3.js'
 import { Projective } from '../transformation-types/Projective.js'
 import { RBF } from '../transformation-types/RBF.js'
 
@@ -171,11 +173,11 @@ export abstract class BaseGcpTransformer {
     } else if (this.type === 'helmert') {
       return new Helmert(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(sourcePoints, destinationPoints)
+      return new Polynomial1(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial2') {
-      return new Polynomial(sourcePoints, destinationPoints, 2)
+      return new Polynomial2(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial3') {
-      return new Polynomial(sourcePoints, destinationPoints, 3)
+      return new Polynomial3(sourcePoints, destinationPoints)
     } else if (this.type === 'projective') {
       return new Projective(sourcePoints, destinationPoints)
     } else if (this.type === 'thinPlateSpline') {
