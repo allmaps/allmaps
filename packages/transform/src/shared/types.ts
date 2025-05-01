@@ -43,6 +43,22 @@ export type TransformerInputs = {
   transformationType: TransformationType
 }
 
+export type HelmertMeasures = {
+  translation: Point
+  rotation: number
+  scale: number
+}
+export type Polynomial1Measures = {
+  translation: Point
+  rotation: number
+  scales: Point
+  shears: Point
+}
+export type TransformationTypeMeasures =
+  | HelmertMeasures
+  | Polynomial1Measures
+  | object
+
 // Stored here as object to facilitate parsing in CLI
 export type InverseOptions = {
   inverse: boolean

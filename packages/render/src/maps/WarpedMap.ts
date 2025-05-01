@@ -366,7 +366,8 @@ export class WarpedMap extends EventTarget {
     const projectedHelmertTransformer = this.getProjectedTransformer('helmert')
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
-    return toProjectedGeoHelmertTransformation.scale as number
+    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
+    return helmertMeasures.scale as number
   }
 
   /**

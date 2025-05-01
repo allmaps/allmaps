@@ -2,10 +2,13 @@ import { distance, rms } from '@allmaps/stdlib'
 
 import type { Point } from '@allmaps/types'
 
-import type { TransformationType } from '../shared/types.js'
+import type {
+  TransformationTypeMeasures,
+  TransformationType
+} from '../shared/types.js'
 
 /**
- * Transformation class. Abstract class, extended by the various transformations.
+ * Base class for transformation.
  */
 export abstract class BaseTransformation {
   sourcePoints: Point[]
@@ -13,10 +16,12 @@ export abstract class BaseTransformation {
 
   destinationTransformedSourcePoints?: Point[]
 
-  pointCount: number
-  pointCountMinimum: number
+  abstract weights?: object
 
   type: string
+
+  pointCount: number
+  pointCountMinimum: number
 
   /**
    * Create a transformation
@@ -52,21 +57,31 @@ export abstract class BaseTransformation {
     }
   }
 
-  computeDestinationTransformedSourcePoints(): Point[] {
-    this.destinationTransformedSourcePoints = this.sourcePoints.map(
-      (sourcePoint) => this.evaluateFunction(sourcePoint)
-    )
+  abstract solve(): void
+
+  abstract evaluateFunction(_newSourcePoint: Point): Point
+
+  abstract evaluatePartialDerivativeX(_newSourcePoint: Point): Point
+
+  abstract evaluatePartialDerivativeY(_newSourcePoint: Point): Point
+
+  getDestinationTransformedSourcePoints(): Point[] {
+    if (!this.destinationTransformedSourcePoints) {
+      this.destinationTransformedSourcePoints = this.sourcePoints.map(
+        (sourcePoint) => this.evaluateFunction(sourcePoint)
+      )
+    }
 
     return this.destinationTransformedSourcePoints
   }
 
+  getMeasures(): TransformationTypeMeasures {
+    return {}
+  }
+
   get errors() {
-    let destinationTransformedSourcePoints =
-      this.destinationTransformedSourcePoints
-    if (!destinationTransformedSourcePoints) {
-      destinationTransformedSourcePoints =
-        this.computeDestinationTransformedSourcePoints()
-    }
+    const destinationTransformedSourcePoints =
+      this.getDestinationTransformedSourcePoints()
 
     return this.destinationPoints.map((destinationPoint, index) =>
       distance(destinationPoint, destinationTransformedSourcePoints[index])
@@ -74,23 +89,13 @@ export abstract class BaseTransformation {
   }
 
   get rmse() {
-    let destinationTransformedSourcePoints =
-      this.destinationTransformedSourcePoints
-    if (!destinationTransformedSourcePoints) {
-      destinationTransformedSourcePoints =
-        this.computeDestinationTransformedSourcePoints()
-    }
+    const destinationTransformedSourcePoints =
+      this.getDestinationTransformedSourcePoints()
 
     if (!this.destinationTransformedSourcePoints) {
-      this.computeDestinationTransformedSourcePoints()
+      this.getDestinationTransformedSourcePoints()
     }
 
     return rms(this.destinationPoints, destinationTransformedSourcePoints)
   }
-
-  abstract evaluateFunction(_newSourcePoint: Point): Point
-
-  abstract evaluatePartialDerivativeX(_newSourcePoint: Point): Point
-
-  abstract evaluatePartialDerivativeY(_newSourcePoint: Point): Point
 }

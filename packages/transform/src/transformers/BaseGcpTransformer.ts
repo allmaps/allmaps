@@ -129,7 +129,7 @@ export abstract class BaseGcpTransformer {
    */
   protected getForwardTransformationInternal(): BaseTransformation {
     if (!this.forwardTransformation) {
-      this.forwardTransformation = this.computeTransformation(
+      this.forwardTransformation = this.createTransformation(
         this.sourcePointsInternal,
         this.destinationPointsInternal
       )
@@ -142,7 +142,7 @@ export abstract class BaseGcpTransformer {
    */
   protected getBackwardTransformationInternal(): BaseTransformation {
     if (!this.backwardTransformation) {
-      this.backwardTransformation = this.computeTransformation(
+      this.backwardTransformation = this.createTransformation(
         this.destinationPointsInternal,
         this.sourcePointsInternal
       )
@@ -151,7 +151,7 @@ export abstract class BaseGcpTransformer {
   }
 
   /**
-   * Compute the (forward or backward) transformation.
+   * Create the (forward or backward) transformation.
    *
    * Results in forward transformation if source and destination points are entered as such.
    * Results in backward if source points are entered for destination points and vice versa.
@@ -162,7 +162,7 @@ export abstract class BaseGcpTransformer {
    * @param destinationPoints - destination points
    * @returns Transformation
    */
-  private computeTransformation(
+  private createTransformation(
     sourcePoints: Point[],
     destinationPoints: Point[]
   ): BaseTransformation {

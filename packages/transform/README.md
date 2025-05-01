@@ -452,7 +452,7 @@ const gcps6 = ... // See above
 // Obtain the referenceScale
 const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
 const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
-const referenceScale = toGeoHelmertTransformation.scale
+const referenceScale = toGeoHelmertTransformation.getMeasures().scale
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 const resourcePoint = [1000, 1000]
@@ -1057,7 +1057,31 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 ###### Extends
 
-* `BaseTransformation`
+* `BaseLinearWeightsTransformation`
+
+### `Helmert#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Helmert#destinationPointsJointMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Helmert#destinationPointsMatrices`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
 
 ### `Helmert#evaluateFunction(newSourcePoint)`
 
@@ -1089,7 +1113,35 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 `[number, number]`.
 
-### `Helmert#helmertParameters`
+### `Helmert#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{translation: Point; rotation: number; scale: number}`.
+
+### `Helmert#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Helmert#weights?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `Helmert#weightsJoint?`
 
 ###### Type
 
@@ -1097,7 +1149,7 @@ Resolution of the forward transformation in source space (`number | undefined`).
 Array<number>
 ```
 
-### `Helmert#helmertParametersMatrix`
+### `Helmert#weightsJointMatrix?`
 
 ###### Type
 
@@ -1105,28 +1157,12 @@ Array<number>
 Matrix
 ```
 
-### `Helmert#rotation`
+### `Helmert#weightsMatrices?`
 
 ###### Type
 
 ```ts
-number
-```
-
-### `Helmert#scale`
-
-###### Type
-
-```ts
-number
-```
-
-### `Helmert#translation`
-
-###### Type
-
-```ts
-[number, number]
+[Matrix, Matrix]
 ```
 
 ### `KernelFunction`
@@ -1166,7 +1202,23 @@ number
 
 ###### Extends
 
-* `BaseTransformation`
+* `BaseLinearWeightsTransformation`
+
+### `Polynomial#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `Polynomial#destinationPointsMatrices`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
+```
 
 ### `Polynomial#evaluateFunction(newSourcePoint)`
 
@@ -1198,6 +1250,16 @@ number
 
 `[number, number]`.
 
+### `Polynomial#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{translation: Point; rotation: number; scales: Point; shears: Point}`.
+
 ### `Polynomial#order`
 
 ###### Type
@@ -1206,15 +1268,17 @@ number
 number
 ```
 
-### `Polynomial#pointCountMinimum`
+### `Polynomial#solve()`
 
-###### Type
+###### Parameters
 
-```ts
-number
-```
+There are no parameters.
 
-### `Polynomial#polynomialParameters`
+###### Returns
+
+`void`.
+
+### `Polynomial#weights?`
 
 ###### Type
 
@@ -1222,44 +1286,12 @@ number
 [Array<number>, Array<number>]
 ```
 
-### `Polynomial#polynomialParametersMatrices`
+### `Polynomial#weightsMatrices?`
 
 ###### Type
 
 ```ts
 [Matrix, Matrix]
-```
-
-### `Polynomial#rotation?`
-
-###### Type
-
-```ts
-number
-```
-
-### `Polynomial#scale?`
-
-###### Type
-
-```ts
-[number, number]
-```
-
-### `Polynomial#shear?`
-
-###### Type
-
-```ts
-[number, number]
-```
-
-### `Polynomial#translation?`
-
-###### Type
-
-```ts
-[number, number]
 ```
 
 ### `ProjectionFunction`
@@ -1284,6 +1316,14 @@ number
 ###### Extends
 
 * `BaseTransformation`
+
+### `Projective#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
 
 ### `Projective#evaluateFunction(newSourcePoint)`
 
@@ -1315,7 +1355,17 @@ number
 
 `[number, number]`.
 
-### `Projective#projectiveParameters`
+### `Projective#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Projective#weights?`
 
 ###### Type
 
@@ -1323,7 +1373,7 @@ number
 Array<Array<number>>
 ```
 
-### `Projective#projectiveParametersMatrix`
+### `Projective#weightsMatrix?`
 
 ###### Type
 
@@ -1347,14 +1397,30 @@ Matrix
 
 ###### Extends
 
-* `BaseTransformation`
+* `BaseLinearWeightsTransformation`
 
-### `RBF#affineWeights`
+### `RBF#affineWeights?`
 
 ###### Type
 
 ```ts
 [Array<number>, Array<number>]
+```
+
+### `RBF#coefsMatrix`
+
+###### Type
+
+```ts
+Matrix
+```
+
+### `RBF#destinationPointsMatrices`
+
+###### Type
+
+```ts
+[Matrix, Matrix]
 ```
 
 ### `RBF#epsilon?`
@@ -1411,7 +1477,7 @@ number
 (point0: Point, point1: Point) => number
 ```
 
-### `RBF#rbfWeights`
+### `RBF#rbfWeights?`
 
 ###### Type
 
@@ -1419,7 +1485,25 @@ number
 [Array<number>, Array<number>]
 ```
 
-### `RBF#weightsMatrices`
+### `RBF#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `RBF#weights?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `RBF#weightsMatrices?`
 
 ###### Type
 
@@ -1473,14 +1557,6 @@ SplitGcpLineInfo & {
 
 * `BaseTransformation`
 
-### `Straight#destinationPointsCenter`
-
-###### Type
-
-```ts
-[number, number]
-```
-
 ### `Straight#evaluateFunction(newSourcePoint)`
 
 ###### Parameters
@@ -1511,28 +1587,27 @@ SplitGcpLineInfo & {
 
 `[number, number]`.
 
-### `Straight#scale?`
+### `Straight#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Straight#weights?`
 
 ###### Type
 
 ```ts
-number
-```
-
-### `Straight#sourcePointsCenter`
-
-###### Type
-
-```ts
-[number, number]
-```
-
-### `Straight#translation?`
-
-###### Type
-
-```ts
-[number, number]
+{
+  scale: number
+  sourcePointsCenter: Point
+  destinationPointsCenter: Point
+  translation: Point
+}
 ```
 
 ### `TransformationType`
