@@ -565,23 +565,24 @@ To create a transformer (with 10 points) and compute its 'toGeo' transformation:
 
 | Type            | Ops/s  |
 |-----------------|--------|
-| helmert         | 77764  |
-| polynomial1     | 143934 |
-| polynomial2     | 76941  |
-| polynomial3     | 31864  |
-| thinPlateSpline | 25613  |
-| projective      | 31041  |
+| helmert         | 68455  |
+| polynomial1     | 117899 |
+| polynomial2     | 68981  |
+| polynomial3     | 30239  |
+| thinPlateSpline | 32927  |
+| projective      | 28530  |
+
 
 To use a transformer (with 10 points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':
 
 | Type            | Ops/s    |
 |-----------------|----------|
-| helmert         | 18566272 |
-| polynomial1     | 16074983 |
-| polynomial2     | 16063110 |
-| polynomial3     | 3743246  |
-| thinPlateSpline | 2946500  |
-| projective      | 16319792 |
+| helmert         | 17049083 |
+| polynomial1     | 17568448 |
+| polynomial2     | 17007445 |
+| polynomial3     | 3774792  |
+| thinPlateSpline | 2933006  |
+| projective      | 16462262 |
 
 ## License
 
