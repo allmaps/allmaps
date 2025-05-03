@@ -1493,6 +1493,58 @@ importers:
         specifier: ^5.7.0
         version: 5.8.3
 
+  packages/staple:
+    dependencies:
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../transform
+    devDependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../annotation
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.8.3)
+      chai:
+        specifier: ^4.3.6
+        version: 4.5.0
+      chai-shallow-deep-equal:
+        specifier: ^1.4.6
+        version: 1.4.6(chai@4.5.0)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.1)
+      mocha:
+        specifier: ^10.8.2
+        version: 10.8.2
+      prettier:
+        specifier: ^3.4.2
+        version: 3.5.3
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: ^5.7.0
+        version: 5.8.3
+
   packages/stdlib:
     dependencies:
       '@allmaps/annotation':
@@ -9909,7 +9961,7 @@ packages:
     hasBin: true
     dependencies:
       async: 3.2.6
-      chalk: 4.1.0
+      chalk: 4.1.2
       filelist: 1.0.4
       minimatch: 3.1.2
     dev: true

@@ -1,6 +1,9 @@
 export { GcpTransformer } from './transformers/GcpTransformer.js'
 export { GeneralGcpTransformer } from './transformers/GeneralGcpTransformer.js'
 
+export { BaseLinearWeightsTransformation } from './transformation-types/BaseLinearWeightsTransformation.js'
+export { BasePolynomialTransformation } from './transformation-types/BasePolynomialTransformation.js'
+export { BaseTransformation } from './transformation-types/BaseTransformation.js'
 export { Helmert } from './transformation-types/Helmert.js'
 export { Polynomial1 } from './transformation-types/Polynomial1.js'
 export { Polynomial2 } from './transformation-types/Polynomial2.js'
