@@ -530,7 +530,7 @@ export class Analyzer {
     const toProjectedGeoPolynomialTransformation =
       projectedPolynomialTransformer.getToGeoTransformation() as Polynomial1
 
-    const polynomial1Rmse = toProjectedGeoPolynomialTransformation.rmse
+    const polynomial1Rmse = toProjectedGeoPolynomialTransformation.getRmse()
     const polynomial1Measures =
       toProjectedGeoPolynomialTransformation.getMeasures()
 
@@ -540,27 +540,29 @@ export class Analyzer {
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    const helmertRmse = toProjectedGeoHelmertTransformation.rmse
+    const helmertRmse = toProjectedGeoHelmertTransformation.getRmse()
     const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
     const toProjectedGeoTransformation =
       projectedTransformer.getToGeoTransformation()
-    const rmse = toProjectedGeoTransformation.rmse
-    const destinationErrors = toProjectedGeoTransformation.errors
+    const rmse = toProjectedGeoTransformation.getRmse()
+    const destinationErrors = toProjectedGeoTransformation.getErrors()
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    const resourceErrors = toProjectedGeoTransformation.errors.map(
-      (error) => error / helmertMeasures.scale
-    )
+    const resourceErrors = toProjectedGeoTransformation
+      .getErrors()
+      .map((error) => error / helmertMeasures.scale)
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
     const resourceMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.resourceMaskBbox
     )
-    const resourceRelativeErrors = toProjectedGeoTransformation.errors.map(
-      (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
-    )
+    const resourceRelativeErrors = toProjectedGeoTransformation
+      .getErrors()
+      .map(
+        (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
+      )
 
     this.measures = {
       mapId: this.mapId,

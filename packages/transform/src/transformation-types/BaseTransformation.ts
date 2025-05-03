@@ -23,6 +23,9 @@ export abstract class BaseTransformation {
   pointCount: number
   pointCountMinimum: number
 
+  private errors?: number[]
+  private rmse?: number
+
   /**
    * Create a transformation
    *
@@ -108,23 +111,32 @@ export abstract class BaseTransformation {
     return {}
   }
 
-  get errors() {
-    const destinationTransformedSourcePoints =
-      this.getDestinationTransformedSourcePoints()
+  getErrors() {
+    if (!this.errors) {
+      const destinationTransformedSourcePoints =
+        this.getDestinationTransformedSourcePoints()
 
-    return this.destinationPoints.map((destinationPoint, index) =>
-      distance(destinationPoint, destinationTransformedSourcePoints[index])
-    )
+      this.errors = this.destinationPoints.map((destinationPoint, index) =>
+        distance(destinationPoint, destinationTransformedSourcePoints[index])
+      )
+    }
+    return this.errors
   }
 
-  get rmse() {
-    const destinationTransformedSourcePoints =
-      this.getDestinationTransformedSourcePoints()
+  getRmse() {
+    if (!this.rmse) {
+      const destinationTransformedSourcePoints =
+        this.getDestinationTransformedSourcePoints()
 
-    if (!this.destinationTransformedSourcePoints) {
-      this.getDestinationTransformedSourcePoints()
+      if (!this.destinationTransformedSourcePoints) {
+        this.getDestinationTransformedSourcePoints()
+      }
+
+      this.rmse = rms(
+        this.destinationPoints,
+        destinationTransformedSourcePoints
+      )
     }
-
-    return rms(this.destinationPoints, destinationTransformedSourcePoints)
+    return this.rmse
   }
 }
