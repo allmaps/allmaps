@@ -11,7 +11,7 @@ import {
   bboxToDiameter,
   isPoint
 } from '@allmaps/stdlib'
-import { Helmert, Polynomial } from '@allmaps/transform'
+import { Helmert, Polynomial1 } from '@allmaps/transform'
 import {
   AnalysisOptions,
   AnalysisItem,
@@ -528,7 +528,7 @@ export class Analyzer {
     const projectedPolynomialTransformer =
       this.warpedMap.getProjectedTransformer('polynomial')
     const toProjectedGeoPolynomialTransformation =
-      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
+      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial1
 
     const polynomial1Rmse = toProjectedGeoPolynomialTransformation.rmse
     const polynomial1Measures =

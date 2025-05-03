@@ -1296,17 +1296,18 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 * `rows` (`number`)
 * `cols` (`number`)
-* `value?` (`T | undefined`)
+* `value` (`T | undefined`)
 
 ###### Returns
 
 `Array<Array<T>>`.
 
-### `newBlockArrayMatrix(blocks)`
+### `newBlockArrayMatrix(blocks, emptyValue)`
 
 ###### Parameters
 
 * `blocks` (`Array<Array<Array<Array<T>>>>`)
+* `emptyValue` (`T | undefined`)
 
 ###### Returns
 

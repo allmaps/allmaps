@@ -3,10 +3,10 @@ import { isEqualArray } from './main.js'
 /**
  * Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as a ml-matrix Matrix
  */
-export function newArrayMatrix<T>(
+export function newArrayMatrix<T = number>(
   rows: number,
   cols: number,
-  value?: T
+  value: T = 0 as T
 ): T[][] {
   if (rows <= 0 || cols <= 0) {
     throw new Error('Empty ArrayMatrix not supported')
@@ -33,6 +33,26 @@ export function arrayMatrixDimensions<T>(arrayMatrix: T[][]): [number, number] {
   return [rows, cols]
 }
 
+export function shallowCopyArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
+  return arrayMatrix.map((row) => [...row])
+}
+
+// Slice specific rows and columns of an arrayMatrix.
+// Just like slice, this returns a copy!
+export function sliceArrayMatrix<T>(
+  arrayMatrix: T[][],
+  rowsStart: number,
+  colsStart: number,
+  rowsEnd?: number,
+  colsEnd?: number
+): T[][] {
+  return arrayMatrix
+    .slice(rowsStart, rowsEnd)
+    .map((row) => row.slice(colsStart, colsEnd))
+}
+
+// Get a submatrix at specified rows and columns.
+// This is more flexible the the range, like in sliceArrayMatrix.
 export function subArrayMatrix<T>(
   arrayMatrix: T[][],
   rows: number[],
@@ -49,13 +69,36 @@ export function subArrayMatrix<T>(
   return result
 }
 
+// Pastes a arrayMatrix inside an arrayMatrix at a specific location.
+// Returns a copy with the pasted subArray.
+export function pasteArrayMatrix<T>(
+  arrayMatrix: T[][],
+  rowsStart: number,
+  colsStart: number,
+  subArrayMatrix: T[][]
+): T[][] {
+  const subDimensions = arrayMatrixDimensions(subArrayMatrix)
+  const result = shallowCopyArrayMatrix(arrayMatrix)
+
+  for (let i = 0; i < subDimensions[0]; i++) {
+    for (let j = 0; j < subDimensions[1]; j++) {
+      result[rowsStart + i][colsStart + j] = subArrayMatrix[i][j]
+    }
+  }
+
+  return result
+}
+
 export function transposeArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
   return arrayMatrix[0].map((_, colIndex) =>
     arrayMatrix.map((row) => row[colIndex])
   )
 }
 
-export function newBlockArrayMatrix<T>(blocks: T[][][][]): T[][] {
+export function newBlockArrayMatrix<T = number>(
+  blocks: T[][][][],
+  emptyValue: T = 0 as T
+): T[][] {
   const dimensions = arrayMatrixDimensions(blocks)
   const dimensionsArrayMatrix = blocks.map((row) =>
     row.map((block) => arrayMatrixDimensions(block))
@@ -75,12 +118,13 @@ export function newBlockArrayMatrix<T>(blocks: T[][][][]): T[][] {
       'The blocks, by block column, must have the same sequence of rows.'
     )
   }
-  const rowsCumulativeArray: number[] = []
+  const rowsTrailingCumulativeArray: number[] = []
   let sum = 0
   rowsArray.forEach((e) => {
+    rowsTrailingCumulativeArray.push(sum)
     sum = sum + e
-    rowsCumulativeArray.push(sum)
   })
+  const rowsCumulative = sum
 
   const colsArrayMatrix = dimensionsArrayMatrix.map((row) =>
     row.map((dims) => dims[1])
@@ -91,27 +135,24 @@ export function newBlockArrayMatrix<T>(blocks: T[][][][]): T[][] {
       'The blocks, by block row, must have the same sequence of columns.'
     )
   }
-  const colsCumulativeArray: number[] = []
+  const colsTrailingCumulativeArray: number[] = []
   sum = 0
   colsArrayMatrix[0].forEach((e) => {
+    colsTrailingCumulativeArray.push(sum)
     sum = sum + e
-    colsCumulativeArray.push(sum)
   })
+  const colsCumulative = sum
 
-  const result = newArrayMatrix<T>(
-    rowsCumulativeArray.at(-1) as number,
-    colsCumulativeArray.at(-1) as number
-  )
+  let result = newArrayMatrix<T>(rowsCumulative, colsCumulative, emptyValue)
 
   for (let i = 0; i < dimensions[0]; i++) {
     for (let j = 0; j < dimensions[1]; j++) {
-      for (let k = 0; k < dimensionsArrayMatrix[i][j][0]; k++) {
-        for (let l = 0; l < dimensionsArrayMatrix[i][j][1]; l++) {
-          result[(i >= 1 ? rowsCumulativeArray[i - 1] : 0) + k][
-            (j >= 1 ? colsCumulativeArray[j - 1] : 0) + l
-          ] = blocks[i][j][k][l]
-        }
-      }
+      result = pasteArrayMatrix(
+        result,
+        rowsTrailingCumulativeArray[i],
+        rowsTrailingCumulativeArray[j],
+        blocks[i][j]
+      )
     }
   }
 
