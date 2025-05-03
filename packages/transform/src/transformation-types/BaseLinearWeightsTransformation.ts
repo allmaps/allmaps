@@ -1,24 +1,25 @@
 import { BaseTransformation } from './BaseTransformation.js'
 
-import type { Matrix } from 'ml-matrix'
-
 import type { Point } from '@allmaps/types'
 
 import type { TransformationType } from '../shared/types.js'
 
 /**
  * Base class for transformation that are a linear combination of weights.
+ *
+ * For some of these transformations, the system of equations is solved for x and y jointly using the 'joint' properties
+ * For other, the system of equations is solved for x and y separately, and the obtained weights can be used for both.
  */
 export abstract class BaseLinearWeightsTransformation extends BaseTransformation {
-  abstract destinationPointsMatrices: [Matrix, Matrix]
+  abstract destinationPointsArrays: [number[], number[]]
 
-  abstract coefsMatrix: Matrix
+  abstract coefsArrayMatrices: [number[][], number[][]]
 
-  abstract weightsMatrices?: [Matrix, Matrix]
-  abstract weights?: [number[], number[]]
+  abstract weightsArrays?: [number[], number[]]
 
   /**
    * Create a transformation
+   *
    * @param sourcePoints - The source points
    * @param destinationPoints - The destination points
    * @param type - The transformation type

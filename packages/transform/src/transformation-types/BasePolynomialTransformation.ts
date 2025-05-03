@@ -9,7 +9,9 @@ import type { TransformationType } from '../shared/types.js'
 export abstract class BasePolynomialTransformation extends BaseLinearWeightsTransformation {
   order: number
 
-  destinationPointsMatrices: [Matrix, Matrix]
+  destinationPointsArrays: [number[], number[]]
+
+  weightsArrays?: [number[], number[]]
 
   constructor(
     sourcePoints: Point[],
@@ -36,36 +38,42 @@ export abstract class BasePolynomialTransformation extends BaseLinearWeightsTran
       )
     }
 
-    // 2D polynomial transformation of order 1, 2 or 3
-    // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-
-    // The system of equations is solved for x and y separately (because they are independent)
-    // Hence destinationPointsMatrices and polynomialWeightsMatrices are one Matrix
-    // Since they both use the same coefficients, there is only one polynomialCoefsMatrix
-
-    this.destinationPointsMatrices = [
-      Matrix.columnVector(this.destinationPoints.map((value) => value[0])),
-      Matrix.columnVector(this.destinationPoints.map((value) => value[1]))
+    this.destinationPointsArrays = [
+      this.destinationPoints.map((value) => value[0]),
+      this.destinationPoints.map((value) => value[1])
     ]
   }
 
+  /**
+   * Solve the x and y components separately.
+   *
+   * This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
+   * a 'best fit' (least squares) approximate solution for the system of linear equations
+   * which is (in general) over-defined and hence lacks an exact solution.
+   *
+   * See https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+   *
+   * This wil result in a weights array for each component:
+   * For order = 1: this.weight = [[a0_x, ax_x, ay_x], [a0_y, ax_y, ay_y]]
+   * For order = 2: ... (similar, following the same order as in coefsArrayMatrix)
+   * For order = 3: ... (similar, following the same order as in coefsArrayMatrix)
+   */
   solve() {
-    // Compute polynomial weights by solving the linear system of equations for each component
-    // Note: this solution uses the 'pseudo inverse' see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-    // This wil result in:
-    // For order = 1: polynomialWeightsMatrices = [Matrix([[a0_x], [ax_x], [ay_x]]), Matrix([[a0_y], [ax_y], [ay_y]])]
-    // For order = 2: ... (simirlar, following the same order as in polynomialCoefsMatrix)
-    // For order = 3: ... (simirlar, following the same order as in polynomialCoefsMatrix)
-    const pseudoInverseCoefsMatrix = pseudoInverse(this.coefsMatrix)
+    const coefsMatrix = new Matrix(this.coefsArrayMatrices[0])
+    const destinationPointsMatrices = [
+      Matrix.columnVector(this.destinationPointsArrays[0]),
+      Matrix.columnVector(this.destinationPointsArrays[1])
+    ]
 
-    this.weightsMatrices = [
-      pseudoInverseCoefsMatrix.mmul(this.destinationPointsMatrices[0]),
-      pseudoInverseCoefsMatrix.mmul(this.destinationPointsMatrices[1])
+    const pseudoInverseCoefsMatrix = pseudoInverse(coefsMatrix)
+
+    const weightsMatrices = [
+      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[0]),
+      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[1])
     ] as [Matrix, Matrix]
 
-    this.weights = this.weightsMatrices.map((matrix) => matrix.to1DArray()) as [
-      number[],
-      number[]
-    ]
+    this.weightsArrays = weightsMatrices.map((matrix) =>
+      matrix.to1DArray()
+    ) as [number[], number[]]
   }
 }

@@ -16,7 +16,7 @@ export abstract class BaseTransformation {
 
   destinationTransformedSourcePoints?: Point[]
 
-  abstract weights?: object
+  abstract weightsArrays?: object
 
   type: string
 
@@ -25,6 +25,7 @@ export abstract class BaseTransformation {
 
   /**
    * Create a transformation
+   *
    * @param sourcePoints - The source points
    * @param destinationPoints - The destination points
    * @param type - The transformation type
@@ -57,14 +58,42 @@ export abstract class BaseTransformation {
     }
   }
 
+  /**
+   * Note: since (writing to and) reading from matrices is expensive,
+   * we convert to and convert from ml-matrix Matrix types in this function,
+   * in order not to use them in the evaluate functions.
+   */
   abstract solve(): void
 
+  /**
+   * Evaluate the transformation function at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the source point, transformed to destination space
+   */
   abstract evaluateFunction(_newSourcePoint: Point): Point
 
+  /**
+   * Evaluate the transformation function's partial derivative to x at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the x and y component of the partial derivative to x at the source point
+   */
   abstract evaluatePartialDerivativeX(_newSourcePoint: Point): Point
 
+  /**
+   * Evaluate the transformation function's partial derivative to y at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the x and y component of the partial derivative to y at the source point
+   */
   abstract evaluatePartialDerivativeY(_newSourcePoint: Point): Point
 
+  /**
+   * Get the destination-transformed source points.
+   *
+   * @returns source points, transformed to destination domain
+   */
   getDestinationTransformedSourcePoints(): Point[] {
     if (!this.destinationTransformedSourcePoints) {
       this.destinationTransformedSourcePoints = this.sourcePoints.map(

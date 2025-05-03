@@ -1,4 +1,4 @@
-import { Matrix } from 'ml-matrix'
+import { newArrayMatrix } from '@allmaps/stdlib'
 
 import { BasePolynomialTransformation } from './BasePolynomialTransformation.js'
 
@@ -6,34 +6,44 @@ import type { Point } from '@allmaps/types'
 
 import type { Polynomial1Measures } from '../shared/types.js'
 
+/**
+ * 2D First-order Polynomial transformation
+ *
+ * This transformation is a composition of a translation, rotation, scaling and shearing.
+ *
+ * For this transformations, the system of equations is solved for x and y separately.
+ */
 export class Polynomial1 extends BasePolynomialTransformation {
-  coefsMatrix: Matrix
-
-  weightsMatrices?: [Matrix, Matrix]
-  weights?: [number[], number[]]
+  coefsArrayMatrices: [number[][], number[][]]
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 1)
 
-    // Construct Nx3 Matrix polynomialCoefsMatrix
+    // Construct Nx3 coefsArrayArray
     // 1 x0 y0
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    this.coefsMatrix = Matrix.zeros(this.pointCount, this.pointCountMinimum)
+    const coefsArrayArray = newArrayMatrix(
+      this.pointCount,
+      this.pointCountMinimum,
+      0
+    )
     for (let i = 0; i < this.pointCount; i++) {
-      this.coefsMatrix.set(i, 0, 1)
-      this.coefsMatrix.set(i, 1, this.sourcePoints[i][0])
-      this.coefsMatrix.set(i, 2, this.sourcePoints[i][1])
+      coefsArrayArray[i][0] = 1
+      coefsArrayArray[i][1] = this.sourcePoints[i][0]
+      coefsArrayArray[i][2] = this.sourcePoints[i][1]
     }
+
+    this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
   }
 
   getMeasures(): Polynomial1Measures {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
@@ -41,12 +51,12 @@ export class Polynomial1 extends BasePolynomialTransformation {
 
     // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
 
-    measures.translation = [this.weights[0][0], this.weights[1][0]]
+    measures.translation = [this.weightsArrays[0][0], this.weightsArrays[1][0]]
 
-    const a = this.weights[0][1]
-    const b = this.weights[1][1]
-    const c = this.weights[0][2]
-    const d = this.weights[1][2]
+    const a = this.weightsArrays[0][1]
+    const b = this.weightsArrays[1][1]
+    const c = this.weightsArrays[0][2]
+    const d = this.weightsArrays[1][2]
     const delta = a * d - b * c
 
     // Apply the QR-like decomposition.
@@ -68,61 +78,55 @@ export class Polynomial1 extends BasePolynomialTransformation {
     return measures as Polynomial1Measures
   }
 
-  // Evaluate the transformation function at a new point
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPoint: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       newDestinationPoint[i] +=
-        this.weights[i][0] +
-        this.weights[i][1] * newSourcePoint[0] +
-        this.weights[i][2] * newSourcePoint[1]
+        this.weightsArrays[i][0] +
+        this.weightsArrays[i][1] * newSourcePoint[0] +
+        this.weightsArrays[i][2] * newSourcePoint[1]
     }
 
     return newDestinationPoint
   }
 
-  // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerX: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
-      newDestinationPointPartDerX[i] += this.weights[i][1]
+      newDestinationPointPartDerX[i] += this.weightsArrays[i][1]
     }
 
     return newDestinationPointPartDerX
   }
 
-  // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerY: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
-      newDestinationPointPartDerY[i] += this.weights[i][2]
+      newDestinationPointPartDerY[i] += this.weightsArrays[i][2]
     }
 
     return newDestinationPointPartDerY

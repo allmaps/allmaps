@@ -1,25 +1,37 @@
 import { Matrix, inverse } from 'ml-matrix'
 
+import {
+  newArrayMatrix,
+  newBlockArrayMatrix,
+  transposeArrayMatrix
+} from '@allmaps/stdlib'
+
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
 
 import type { Point } from '@allmaps/types'
 
+/**
+ * 2D Radial Basis Functions transformation
+ *
+ * For this transformations, the system of equations is solved for x and y separately.
+ *
+ * See notebook https://observablehq.com/d/0b57d3b587542794 for code source and explanation
+ */
 export class RBF extends BaseLinearWeightsTransformation {
-  destinationPointsMatrices: [Matrix, Matrix]
+  destinationPointsArrays: [number[], number[]]
 
   kernelFunction: KernelFunction
   normFunction: NormFunction
 
   epsilon?: number
 
-  coefsMatrix: Matrix
+  coefsArrayMatrices: [number[][], number[][]]
 
-  weightsMatrices?: [Matrix, Matrix]
-  weights?: [number[], number[]]
-  rbfWeights?: [number[], number[]]
-  affineWeights?: [number[], number[]]
+  weightsArrays?: [number[], number[]]
+  rbfWeightsArrays?: [number[], number[]]
+  affineWeightsArrays?: [number[], number[]]
 
   constructor(
     sourcePoints: Point[],
@@ -35,34 +47,23 @@ export class RBF extends BaseLinearWeightsTransformation {
 
     this.epsilon = epsilon
 
-    // 2D Radial Basis Function interpolation
-    // See notebook https://observablehq.com/d/0b57d3b587542794 for code source and explanation
-
-    // The system of equations is solved for x and y separately (because they are independant)
-    // Hence destinationPointsMatrices and weightsMatrices are an Array of two column vector matrices
-    // Since they both use the same coefficients, there is only one kernelsAndAffineCoefsMatrix
-
-    this.destinationPointsMatrices = [
-      Matrix.columnVector(
-        [...this.destinationPoints, [0, 0], [0, 0], [0, 0]].map(
-          (value) => value[0]
-        )
+    this.destinationPointsArrays = [
+      [...this.destinationPoints, [0, 0], [0, 0], [0, 0]].map(
+        (value) => value[0]
       ),
-      Matrix.columnVector(
-        [...this.destinationPoints, [0, 0], [0, 0], [0, 0]].map(
-          (value) => value[1]
-        )
+      [...this.destinationPoints, [0, 0], [0, 0], [0, 0]].map(
+        (value) => value[1]
       )
     ]
 
-    // Pre-compute kernelsMatrix: fill it with the point to point distances between all control points
-    const kernelsMatrix = Matrix.zeros(this.pointCount, this.pointCount)
+    // Pre-compute kernelsArrayArray: fill normsArrayArray
+    // with the point to point distances between all control points
+    const normsArrayArray = newArrayMatrix(this.pointCount, this.pointCount, 0)
     for (let i = 0; i < this.pointCount; i++) {
       for (let j = 0; j < this.pointCount; j++) {
-        kernelsMatrix.set(
-          i,
-          j,
-          this.normFunction(this.sourcePoints[i], this.sourcePoints[j])
+        normsArrayArray[i][j] = this.normFunction(
+          this.sourcePoints[i],
+          this.sourcePoints[j]
         )
       }
     }
@@ -70,99 +71,100 @@ export class RBF extends BaseLinearWeightsTransformation {
     // If it's not provided, and if it's an input to the kernelFunction,
     // compute epsilon as the average distance between the control points
     if (this.epsilon === undefined) {
-      this.epsilon =
-        kernelsMatrix.sum() / (Math.pow(this.pointCount, 2) - this.pointCount)
+      const normsSum = normsArrayArray
+        .map((row) => row.reduce((a, c) => a + c, 0))
+        .reduce((a, c) => a + c, 0)
+      this.epsilon = normsSum / (Math.pow(this.pointCount, 2) - this.pointCount)
     }
 
-    // Finish the computation of kernelsMatrix by applying the requested kernel function
+    // Finish the computation of kernelsArrayArray by applying the requested kernel function
+    const kernelCoefsArrayArray = newArrayMatrix(
+      this.pointCount,
+      this.pointCount,
+      0
+    )
     for (let i = 0; i < this.pointCount; i++) {
       for (let j = 0; j < this.pointCount; j++) {
-        kernelsMatrix.set(
-          i,
-          j,
-          this.kernelFunction(kernelsMatrix.get(i, j), {
+        kernelCoefsArrayArray[i][j] = this.kernelFunction(
+          normsArrayArray[i][j],
+          {
             epsilon: this.epsilon
-          })
+          }
         )
       }
     }
 
-    // Extend kernelsMatrix to include the affine transformation
-    const affineCoefsMatrix = Matrix.zeros(this.pointCount, 3)
-    const coefsMatrix = Matrix.zeros(this.pointCount + 3, this.pointCount + 3)
-    // Construct Nx3 Matrix affineCoefsMatrix
+    // Construct Nx3 affineCoefsArrayArray
     // 1 x0 y0
     // 1 x1 y1
     // 1 x2 y2
     // ...
+    const affineCoefsArrayArray = newArrayMatrix(this.pointCount, 3, 0)
     for (let i = 0; i < this.pointCount; i++) {
-      affineCoefsMatrix.set(i, 0, 1)
-      affineCoefsMatrix.set(i, 1, this.sourcePoints[i][0])
-      affineCoefsMatrix.set(i, 2, this.sourcePoints[i][1])
-    }
-    // Combine kernelsMatrix and affineCoefsMatrix into new matrix kernelsAndAffineCoefsMatrix
-    // Note: mlMatrix has no knowledge of block matrices, but this approach is good enough
-    // To speed this up, we could maybe use kernelsMatrix.addRow() and kernelsMatrix.addVector()
-    for (let i = 0; i < this.pointCount + 3; i++) {
-      for (let j = 0; j < this.pointCount + 3; j++) {
-        if (i < this.pointCount && j < this.pointCount) {
-          coefsMatrix.set(i, j, kernelsMatrix.get(i, j))
-        } else if (i >= this.pointCount && j < this.pointCount) {
-          coefsMatrix.set(
-            i,
-            j,
-            affineCoefsMatrix.transpose().get(i - this.pointCount, j)
-          )
-        } else if (i < this.pointCount && j >= this.pointCount) {
-          coefsMatrix.set(i, j, affineCoefsMatrix.get(i, j - this.pointCount))
-        }
-      }
+      affineCoefsArrayArray[i][0] = 1
+      affineCoefsArrayArray[i][1] = this.sourcePoints[i][0]
+      affineCoefsArrayArray[i][2] = this.sourcePoints[i][1]
     }
 
-    this.coefsMatrix = coefsMatrix
+    // Construct 3x3 zerosArrayArray
+    const zerosArrayArray = newArrayMatrix(3, 3, 0)
+
+    // Combine kernelsArrayArray and affineCoefsArrayArray
+    // into new coefsArrayArray, to include the affine transformation
+    const coefsArrayArray = newBlockArrayMatrix([
+      [kernelCoefsArrayArray, affineCoefsArrayArray],
+      [transposeArrayMatrix(affineCoefsArrayArray), zerosArrayArray]
+    ])
+
+    this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
   }
 
+  /**
+   * Solve the x and y components separately.
+   *
+   * This uses the exact inverse to compute (for each component, using the same coefs for both)
+   * the exact solution for the system of linear equations
+   * which is (in general) invertable to an exact solution.
+   *
+   * This wil result in a weights array for each component with rbf weights and affine weights.
+   */
   solve() {
-    // Compute basis functions weights and the affine weights by solving the linear system of equations for each component
-    // Note: the same kernelsAndAffineCoefsMatrix is used for both solutions
-    const inverseCoefsMatrix = inverse(this.coefsMatrix)
-
-    this.weightsMatrices = [
-      inverseCoefsMatrix.mmul(this.destinationPointsMatrices[0]),
-      inverseCoefsMatrix.mmul(this.destinationPointsMatrices[1])
+    const coefsMatrix = new Matrix(this.coefsArrayMatrices[0])
+    const destinationPointsMatrices = [
+      Matrix.columnVector(this.destinationPointsArrays[0]),
+      Matrix.columnVector(this.destinationPointsArrays[1])
     ]
 
-    this.weights = this.weightsMatrices.map((matrix) => matrix.to1DArray()) as [
-      number[],
-      number[]
-    ]
+    const inverseCoefsMatrix = inverse(coefsMatrix)
 
-    // Store rbf and affine parts of the weights more as arrays for more efficient access on evaluation
-    this.rbfWeights = this.weightsMatrices.map((matrix) =>
-      matrix.selection([...Array(this.pointCount).keys()], [0]).to1DArray()
+    const weightsMatrices = [
+      inverseCoefsMatrix.mmul(destinationPointsMatrices[0]),
+      inverseCoefsMatrix.mmul(destinationPointsMatrices[1])
+    ] as [Matrix, Matrix]
+
+    this.weightsArrays = weightsMatrices.map((matrix) =>
+      matrix.to1DArray()
     ) as [number[], number[]]
-    this.affineWeights = this.weightsMatrices.map((matrix) =>
-      matrix
-        .selection(
-          [0, 1, 2].map((n) => n + this.pointCount),
-          [0]
-        )
-        .to1DArray()
+
+    this.rbfWeightsArrays = this.weightsArrays.map((array) =>
+      array.slice(0, this.pointCount)
+    ) as [number[], number[]]
+    this.affineWeightsArrays = this.weightsArrays.map((array) =>
+      array.slice(this.pointCount)
     ) as [number[], number[]]
   }
 
-  // Evaluate the transformation function at a new point
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.rbfWeights || !this.affineWeights) {
+    if (!this.rbfWeightsArrays || !this.affineWeightsArrays) {
       throw new Error('RBF weights not computed')
     }
 
-    const rbfWeights = this.rbfWeights
-    const affineWeights = this.affineWeights
+    const rbfWeights = this.rbfWeightsArrays
+    const affineWeights = this.affineWeightsArrays
 
     // Compute the distances of that point to all control points
     const newDistances = this.sourcePoints.map((sourcePoint) =>
@@ -189,18 +191,17 @@ export class RBF extends BaseLinearWeightsTransformation {
     return newDestinationPoint
   }
 
-  // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.rbfWeights || !this.affineWeights) {
+    if (!this.rbfWeightsArrays || !this.affineWeightsArrays) {
       throw new Error('RBF weights not computed')
     }
 
-    const rbfWeights = this.rbfWeights
-    const affineWeights = this.affineWeights
+    const rbfWeights = this.rbfWeightsArrays
+    const affineWeights = this.affineWeightsArrays
 
     // Compute the distances of that point to all control points
     const newDistances = this.sourcePoints.map((sourcePoint) =>
@@ -230,18 +231,17 @@ export class RBF extends BaseLinearWeightsTransformation {
     return newDestinationPointPartDerX
   }
 
-  // Evaluate the transformation function's partial derivative to y at a new point
   evaluatePartialDerivativeY(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.rbfWeights || !this.affineWeights) {
+    if (!this.rbfWeightsArrays || !this.affineWeightsArrays) {
       throw new Error('RBF weights not computed')
     }
 
-    const rbfWeights = this.rbfWeights
-    const affineWeights = this.affineWeights
+    const rbfWeights = this.rbfWeightsArrays
+    const affineWeights = this.affineWeightsArrays
 
     // Compute the distances of that point to all control points
     const newDistances = this.sourcePoints.map((sourcePoint) =>

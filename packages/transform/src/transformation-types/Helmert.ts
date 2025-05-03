@@ -1,118 +1,124 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
+import { newArrayMatrix } from '@allmaps/stdlib'
+
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
 import type { Point } from '@allmaps/types'
 
 import type { HelmertMeasures } from '../shared/types.js'
 
+/**
+ * 2D Helmert transformation (= similarity transformation)
+ *
+ * This transformation is a composition of a translation, rotation and scaling. There is no shearing.
+ *
+ * For this transformations, the system of equations is solved for x and y jointly.
+ */
 export class Helmert extends BaseLinearWeightsTransformation {
-  destinationPointsMatrices: [Matrix, Matrix]
-  destinationPointsJointMatrix: Matrix
+  destinationPointsArrays: [number[], number[]]
 
-  coefsMatrix: Matrix
+  coefsArrayMatrices: [number[][], number[][]]
 
-  weightsMatrices?: [Matrix, Matrix]
-  weights?: [number[], number[]]
-  weightsJointMatrix?: Matrix
-  weightsJoint?: number[]
+  weightsArray?: number[]
+  weightsArrays?: [number[], number[]]
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 'helmert', 2)
 
-    // 2D Helmert transformation (= similarity transformation)
-    // This solution uses the 'Pseudo Inverse' for estimating a least-square solution, see https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-
-    // The system of equations is solved for x and y jointly (because they are inter-related)
-    // Hence destinationPointsMatrix and helmertWeightsMatrix are one Matrix
-
-    this.destinationPointsMatrices = [
-      Matrix.columnVector(this.destinationPoints.map((value) => value[0])),
-      Matrix.columnVector(this.destinationPoints.map((value) => value[1]))
+    this.destinationPointsArrays = [
+      this.destinationPoints.map((value) => value[0]),
+      this.destinationPoints.map((value) => value[1])
     ]
 
-    this.destinationPointsJointMatrix = Matrix.columnVector([
-      ...this.destinationPoints.map((value) => value[0]),
-      ...this.destinationPoints.map((value) => value[1])
-    ])
-
-    // Construct 2Nx4 Matrix helmertCoefsMatrices
+    // Construct two 2Nx4 coefsArrayMatrices
     // 1 0 x0 -y0
     // 1 0 x1 -y1
     // ...
     // 0 1 y0 x0
     // 0 1 y1 x1
     // ...
-    this.coefsMatrix = Matrix.zeros(2 * this.pointCount, 4)
+    this.coefsArrayMatrices = [
+      newArrayMatrix(this.pointCount, 4, 0),
+      newArrayMatrix(this.pointCount, 4, 0)
+    ]
     for (let i = 0; i < this.pointCount; i++) {
-      this.coefsMatrix.set(i, 0, 1)
-      this.coefsMatrix.set(i, 1, 0)
-      this.coefsMatrix.set(i, 2, this.sourcePoints[i][0])
-      this.coefsMatrix.set(i, 3, -this.sourcePoints[i][1])
-      this.coefsMatrix.set(this.pointCount + i, 0, 0)
-      this.coefsMatrix.set(this.pointCount + i, 1, 1)
-      this.coefsMatrix.set(this.pointCount + i, 2, this.sourcePoints[i][1])
-      this.coefsMatrix.set(this.pointCount + i, 3, this.sourcePoints[i][0])
+      this.coefsArrayMatrices[0][i][0] = 1
+      this.coefsArrayMatrices[0][i][1] = 0
+      this.coefsArrayMatrices[0][i][2] = this.sourcePoints[i][0]
+      this.coefsArrayMatrices[0][i][3] = -this.sourcePoints[i][1]
+      this.coefsArrayMatrices[1][i][0] = 0
+      this.coefsArrayMatrices[1][i][1] = 1
+      this.coefsArrayMatrices[1][i][2] = this.sourcePoints[i][1]
+      this.coefsArrayMatrices[1][i][3] = this.sourcePoints[i][0]
     }
   }
 
+  /**
+   * Solve the x and y components jointly.
+   *
+   * This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
+   * for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
+   * See https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
+   *
+   * This will result weightsArray shared by both components: [t_x, t_y, m, n]
+   */
   solve() {
-    // Compute helmert weights by solving the linear system of equations for each component
-    // Will result in a Matrix([[t_x], [t_y], [m], [n]])
-    const pseudoInverseCoefsMatrix = pseudoInverse(this.coefsMatrix)
+    const coefsMatrix = new Matrix([
+      ...this.coefsArrayMatrices[0],
+      ...this.coefsArrayMatrices[1]
+    ])
+    const destinationPointsMatrix = Matrix.columnVector([
+      ...this.destinationPointsArrays[0],
+      ...this.destinationPointsArrays[1]
+    ])
 
-    this.weightsJointMatrix = pseudoInverseCoefsMatrix.mmul(
-      this.destinationPointsJointMatrix
-    )
+    const pseudoInverseCoefsMatrix = pseudoInverse(coefsMatrix)
 
-    this.weightsJoint = this.weightsJointMatrix.to1DArray()
+    const weightsMatrix = pseudoInverseCoefsMatrix.mmul(destinationPointsMatrix)
 
-    this.weights = [
-      this.weightsJoint.slice(0, this.pointCount),
-      this.weightsJoint.slice(this.pointCount)
-    ]
+    this.weightsArray = weightsMatrix.to1DArray()
+    this.weightsArrays = [this.weightsArray, this.weightsArray]
   }
 
   getMeasures(): HelmertMeasures {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weightsJoint) {
+    if (!this.weightsArray) {
       throw new Error('Helmert weights not computed')
     }
 
     const measures: Partial<HelmertMeasures> = {}
 
     measures.scale = Math.sqrt(
-      this.weightsJoint[2] ** 2 + this.weightsJoint[3] ** 2
+      this.weightsArray[2] ** 2 + this.weightsArray[3] ** 2
     )
-    measures.rotation = Math.atan2(this.weightsJoint[3], this.weightsJoint[2])
-    measures.translation = [this.weightsJoint[0], this.weightsJoint[1]]
+    measures.rotation = Math.atan2(this.weightsArray[3], this.weightsArray[2])
+    measures.translation = [this.weightsArray[0], this.weightsArray[1]]
 
     return measures as HelmertMeasures
   }
 
-  // Evaluate the transformation function at a new point
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weightsJoint) {
+    if (!this.weightsArray) {
       throw new Error('Helmert weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPoint: Point = [
-      this.weightsJoint[0] +
-        this.weightsJoint[2] * newSourcePoint[0] -
-        this.weightsJoint[3] * newSourcePoint[1],
-      this.weightsJoint[1] +
-        this.weightsJoint[2] * newSourcePoint[1] +
-        this.weightsJoint[3] * newSourcePoint[0]
+      this.weightsArray[0] +
+        this.weightsArray[2] * newSourcePoint[0] -
+        this.weightsArray[3] * newSourcePoint[1],
+      this.weightsArray[1] +
+        this.weightsArray[2] * newSourcePoint[1] +
+        this.weightsArray[3] * newSourcePoint[0]
     ]
-    // Alternatively, using derived helmert weights
+    // Alternatively, using derived helmert measures
     // this.translation[0] +
     //   this.scale * Math.cos(rotation) * newSourcePoint[0] -
     //   this.scale * Math.sin(rotation) * newSourcePoint[1],
@@ -123,39 +129,35 @@ export class Helmert extends BaseLinearWeightsTransformation {
     return newDestinationPoint
   }
 
-  // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weightsJoint) {
+    if (!this.weightsArray) {
       throw new Error('Helmert weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerX: Point = [
-      this.weightsJoint[2],
-      this.weightsJoint[3]
+      this.weightsArray[2],
+      this.weightsArray[3]
     ]
 
     return newDestinationPointPartDerX
   }
 
-  // Evaluate the transformation function's partial derivative to y at a new point
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weightsJoint) {
+    if (!this.weightsArray) {
       throw new Error('Helmert weights not computed')
     }
 
-    // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerY: Point = [
-      -this.weightsJoint[3],
-      this.weightsJoint[2]
+      -this.weightsArray[3],
+      this.weightsArray[2]
     ]
 
     return newDestinationPointPartDerY

@@ -1059,28 +1059,20 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 * `BaseLinearWeightsTransformation`
 
-### `Helmert#coefsMatrix`
+### `Helmert#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `Helmert#destinationPointsJointMatrix`
+### `Helmert#destinationPointsArrays`
 
 ###### Type
 
 ```ts
-Matrix
-```
-
-### `Helmert#destinationPointsMatrices`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
+[Array<number>, Array<number>]
 ```
 
 ### `Helmert#evaluateFunction(newSourcePoint)`
@@ -1125,6 +1117,14 @@ There are no parameters.
 
 ### `Helmert#solve()`
 
+Solve the x and y components jointly.
+
+This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
+for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
+See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
+
+This will result weightsArray shared by both components: \[t\_x, t\_y, m, n]
+
 ###### Parameters
 
 There are no parameters.
@@ -1133,15 +1133,7 @@ There are no parameters.
 
 `void`.
 
-### `Helmert#weights?`
-
-###### Type
-
-```ts
-[Array<number>, Array<number>]
-```
-
-### `Helmert#weightsJoint?`
+### `Helmert#weightsArray?`
 
 ###### Type
 
@@ -1149,20 +1141,12 @@ There are no parameters.
 Array<number>
 ```
 
-### `Helmert#weightsJointMatrix?`
+### `Helmert#weightsArrays?`
 
 ###### Type
 
 ```ts
-Matrix
-```
-
-### `Helmert#weightsMatrices?`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
+[Array<number>, Array<number>]
 ```
 
 ### `KernelFunction`
@@ -1203,12 +1187,12 @@ Matrix
 
 * `BasePolynomialTransformation`
 
-### `Polynomial1#coefsMatrix`
+### `Polynomial1#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
 ### `Polynomial1#evaluateFunction(newSourcePoint)`
@@ -1251,22 +1235,6 @@ There are no parameters.
 
 `{translation: Point; rotation: number; scales: Point; shears: Point}`.
 
-### `Polynomial1#weights?`
-
-###### Type
-
-```ts
-[Array<number>, Array<number>]
-```
-
-### `Polynomial1#weightsMatrices?`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
-```
-
 ### `new Polynomial2(sourcePoints, destinationPoints)`
 
 ###### Parameters
@@ -1282,12 +1250,12 @@ There are no parameters.
 
 * `BasePolynomialTransformation`
 
-### `Polynomial2#coefsMatrix`
+### `Polynomial2#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
 ### `Polynomial2#evaluateFunction(newSourcePoint)`
@@ -1320,22 +1288,6 @@ Matrix
 
 `[number, number]`.
 
-### `Polynomial2#weights?`
-
-###### Type
-
-```ts
-[Array<number>, Array<number>]
-```
-
-### `Polynomial2#weightsMatrices?`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
-```
-
 ### `new Polynomial3(sourcePoints, destinationPoints)`
 
 ###### Parameters
@@ -1351,12 +1303,12 @@ Matrix
 
 * `BasePolynomialTransformation`
 
-### `Polynomial3#coefsMatrix`
+### `Polynomial3#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
 ### `Polynomial3#evaluateFunction(newSourcePoint)`
@@ -1389,22 +1341,6 @@ Matrix
 
 `[number, number]`.
 
-### `Polynomial3#weights?`
-
-###### Type
-
-```ts
-[Array<number>, Array<number>]
-```
-
-### `Polynomial3#weightsMatrices?`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
-```
-
 ### `ProjectionFunction`
 
 ###### Type
@@ -1428,12 +1364,12 @@ Matrix
 
 * `BaseTransformation`
 
-### `Projective#coefsMatrix`
+### `Projective#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
 ### `Projective#evaluateFunction(newSourcePoint)`
@@ -1468,6 +1404,15 @@ Matrix
 
 ### `Projective#solve()`
 
+Solve the x and y components jointly.
+
+This uses a singular value decomposition to compute the last (i.e. 9th) 'right singular vector',
+i.e. the one with the smallest singular value, wich holds the weights for the solution.
+Note that for a set of gcps that exactly follow a projective transformations,
+the singular value is null and this vector spans the null-space.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
 ###### Parameters
 
 There are no parameters.
@@ -1476,20 +1421,12 @@ There are no parameters.
 
 `void`.
 
-### `Projective#weights?`
+### `Projective#weightsArrays?`
 
 ###### Type
 
 ```ts
 Array<Array<number>>
-```
-
-### `Projective#weightsMatrix?`
-
-###### Type
-
-```ts
-Matrix
 ```
 
 ### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, epsilon)`
@@ -1510,7 +1447,7 @@ Matrix
 
 * `BaseLinearWeightsTransformation`
 
-### `RBF#affineWeights?`
+### `RBF#affineWeightsArrays?`
 
 ###### Type
 
@@ -1518,20 +1455,20 @@ Matrix
 [Array<number>, Array<number>]
 ```
 
-### `RBF#coefsMatrix`
+### `RBF#coefsArrayMatrices`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `RBF#destinationPointsMatrices`
+### `RBF#destinationPointsArrays`
 
 ###### Type
 
 ```ts
-[Matrix, Matrix]
+[Array<number>, Array<number>]
 ```
 
 ### `RBF#epsilon?`
@@ -1588,7 +1525,7 @@ number
 (point0: Point, point1: Point) => number
 ```
 
-### `RBF#rbfWeights?`
+### `RBF#rbfWeightsArrays?`
 
 ###### Type
 
@@ -1598,6 +1535,14 @@ number
 
 ### `RBF#solve()`
 
+Solve the x and y components separately.
+
+This uses the exact inverse to compute (for each component, using the same coefs for both)
+the exact solution for the system of linear equations
+which is (in general) invertable to an exact solution.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
 ###### Parameters
 
 There are no parameters.
@@ -1606,20 +1551,12 @@ There are no parameters.
 
 `void`.
 
-### `RBF#weights?`
+### `RBF#weightsArrays?`
 
 ###### Type
 
 ```ts
 [Array<number>, Array<number>]
-```
-
-### `RBF#weightsMatrices?`
-
-###### Type
-
-```ts
-[Matrix, Matrix]
 ```
 
 ### `RefinementOptions`
@@ -1700,6 +1637,10 @@ SplitGcpLineInfo & {
 
 ### `Straight#solve()`
 
+Solve the x and y components jointly.
+
+This computes the corrensponing Helmert transform and get the scale from it.
+
 ###### Parameters
 
 There are no parameters.
@@ -1708,7 +1649,7 @@ There are no parameters.
 
 `void`.
 
-### `Straight#weights?`
+### `Straight#weightsArrays?`
 
 ###### Type
 

@@ -8,6 +8,16 @@ MIT
 
 ## API
 
+### `arrayMatrixDimensions(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`[number, number]`.
+
 ### `arrayRepeated(array, isEqualObject)`
 
 ###### Parameters
@@ -1278,6 +1288,30 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 `{type: 'MultiPolygon'; coordinates: Point[][][]}`.
 
+### `newArrayMatrix(rows, cols, value)`
+
+Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as a ml-matrix Matrix
+
+###### Parameters
+
+* `rows` (`number`)
+* `cols` (`number`)
+* `value?` (`T | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
+### `newBlockArrayMatrix(blocks)`
+
+###### Parameters
+
+* `blocks` (`Array<Array<Array<Array<T>>>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `pixelToIntArrayIndex(pixel, size, channels, flipY)`
 
 ###### Parameters
@@ -1619,6 +1653,18 @@ Example for square rectangles '\*' and '+':
 
 `Generator<SvgGeometry, void, unknown>`.
 
+### `subArrayMatrix(arrayMatrix, rows, cols)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rows` (`Array<number>`)
+* `cols` (`Array<number>`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `subSetArray(arr1, arr2)`
 
 ###### Parameters
@@ -1697,6 +1743,16 @@ Return angle alpha made at point A by points B and C
 ###### Returns
 
 `Array<Point>`.
+
+### `transposeArrayMatrix(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `triangleAngles(triangle)`
 

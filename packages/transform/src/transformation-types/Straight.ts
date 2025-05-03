@@ -5,7 +5,7 @@ import { BaseTransformation } from './BaseTransformation.js'
 import type { Point } from '@allmaps/types'
 
 export class Straight extends BaseTransformation {
-  weights?: {
+  weightsArrays?: {
     scale: number
     sourcePointsCenter: Point
     destinationPointsCenter: Point
@@ -16,8 +16,11 @@ export class Straight extends BaseTransformation {
     super(sourcePoints, destinationPoints, 'straight', 2)
   }
 
+  /** Solve the x and y components jointly.
+   *
+   * This computes the corrensponing Helmert transform and get the scale from it.
+   */
   solve() {
-    // Compute the corrensponing Helmert transform and get the scale from it
     const helmertTransformation = new Helmert(
       this.sourcePoints,
       this.destinationPoints
@@ -37,7 +40,7 @@ export class Straight extends BaseTransformation {
       (coord, i) => coord - sourcePointsCenter[i] * scale
     ) as Point
 
-    this.weights = {
+    this.weightsArrays = {
       scale,
       sourcePointsCenter,
       destinationPointsCenter,
@@ -47,17 +50,19 @@ export class Straight extends BaseTransformation {
 
   // Evaluate the transformation function at a new point
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
     const newDestinationPoint: Point = [
-      this.weights.translation[0] + this.weights.scale * newSourcePoint[0],
-      this.weights.translation[1] + this.weights.scale * newSourcePoint[1]
+      this.weightsArrays.translation[0] +
+        this.weightsArrays.scale * newSourcePoint[0],
+      this.weightsArrays.translation[1] +
+        this.weightsArrays.scale * newSourcePoint[1]
     ]
 
     return newDestinationPoint
@@ -65,30 +70,30 @@ export class Straight extends BaseTransformation {
 
   // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
-    const newDestinationPointPartDerX: Point = [this.weights.scale, 0]
+    const newDestinationPointPartDerX: Point = [this.weightsArrays.scale, 0]
 
     return newDestinationPointPartDerX
   }
 
   // Evaluate the transformation function's partial derivative to y at a new point
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       this.solve()
     }
 
-    if (!this.weights) {
+    if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
 
-    const newDestinationPointPartDerY: Point = [0, this.weights.scale]
+    const newDestinationPointPartDerY: Point = [0, this.weightsArrays.scale]
 
     return newDestinationPointPartDerY
   }
