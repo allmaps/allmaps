@@ -69,6 +69,17 @@ export abstract class BaseTransformation {
   abstract solve(): void
 
   /**
+   * Set weights.
+   *
+   * The weights might be obtained in other ways then through solving
+   * (e.g. through solving multiple transformation together when staping).
+   * This function can be used to set weights computed elsewhere.
+   */
+  setWeightsArrays(weightsArrays: object): void {
+    this.weightsArrays = weightsArrays
+  }
+
+  /**
    * Evaluate the transformation function at a new point
    *
    * @param newSourcePoint - a source point
