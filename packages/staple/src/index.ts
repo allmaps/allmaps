@@ -1,1 +1,1 @@
-export { StapledTransformation } from './StapledTransformation.js'
+export { Stapler } from './Stapler.js'

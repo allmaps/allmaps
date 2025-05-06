@@ -9,10 +9,10 @@ const transformations: TransformationType[] = [
   'polynomial1',
   // 'polynomial2',
   // 'polynomial3',
-  'thinPlateSpline'
+  'thinPlateSpline',
   // 'helmert',
   // 'straight',
-  // 'projective'
+  'projective'
 ]
 
 const DEFAULT_TRANSFORMATION_INDEX = 0
