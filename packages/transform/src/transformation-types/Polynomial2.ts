@@ -19,21 +19,22 @@ export class Polynomial2 extends BasePolynomialTransformation {
     // for order = 2
     // 1 x0 y0 x0^2 y0^2 x0*y0
     // ...
-    const coefsArrayArray = newArrayMatrix(
-      this.pointCount,
-      this.pointCountMinimum,
-      0
-    )
-    for (let i = 0; i < this.pointCount; i++) {
-      coefsArrayArray[i][0] = 1
-      coefsArrayArray[i][1] = this.sourcePoints[i][0]
-      coefsArrayArray[i][2] = this.sourcePoints[i][1]
-      coefsArrayArray[i][3] = this.sourcePoints[i][0] ** 2
-      coefsArrayArray[i][4] = this.sourcePoints[i][1] ** 2
-      coefsArrayArray[i][5] = this.sourcePoints[i][0] * this.sourcePoints[i][1]
-    }
+    this.coefsArrayMatrices = this.getPolynomialCoefsArrayMatrices()
+  }
 
-    this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
+  getSourcePointCoefsArray(sourcePoint: Point): number[] {
+    return Polynomial2.getPolynomial2SourcePointCoefsArray(sourcePoint)
+  }
+
+  static getPolynomial2SourcePointCoefsArray(sourcePoint: Point): number[] {
+    return [
+      1,
+      sourcePoint[0],
+      sourcePoint[1],
+      sourcePoint[0] ** 2,
+      sourcePoint[1] ** 2,
+      sourcePoint[0] * sourcePoint[1]
+    ]
   }
 
   // Evaluate the transformation function at a new point

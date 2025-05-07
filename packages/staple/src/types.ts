@@ -1,6 +1,10 @@
 import type { Point } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { BaseTransformation } from '@allmaps/transform'
+
+// TODO: remove when implemented
+export type GeoreferencedMapWithRcps = GeoreferencedMap & {
+  rcps?: Rcp[]
+}
 
 // Resource Controle Point
 export type Rcp = {
@@ -8,18 +12,8 @@ export type Rcp = {
   resource: Point
 }
 
-// TODO: remove when implemented
-export type GeoreferencedMapWithRcps = GeoreferencedMap & {
-  rcps?: Rcp[]
-}
-
 export type Staple = {
   id: string
+  mapId: string
   source: Point
-  transformation: BaseTransformation
-}
-
-export type Staples = {
-  staple0: Staple
-  staple1: Staple
 }

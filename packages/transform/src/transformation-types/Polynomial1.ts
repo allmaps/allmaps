@@ -24,18 +24,15 @@ export class Polynomial1 extends BasePolynomialTransformation {
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    const coefsArrayArray = newArrayMatrix(
-      this.pointCount,
-      this.pointCountMinimum,
-      0
-    )
-    for (let i = 0; i < this.pointCount; i++) {
-      coefsArrayArray[i][0] = 1
-      coefsArrayArray[i][1] = this.sourcePoints[i][0]
-      coefsArrayArray[i][2] = this.sourcePoints[i][1]
-    }
+    this.coefsArrayMatrices = this.getPolynomialCoefsArrayMatrices()
+  }
 
-    this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
+  getSourcePointCoefsArray(sourcePoint: Point): number[] {
+    return Polynomial1.getPolynomial1SourcePointCoefsArray(sourcePoint)
+  }
+
+  static getPolynomial1SourcePointCoefsArray(sourcePoint: Point): number[] {
+    return [1, sourcePoint[0], sourcePoint[1]]
   }
 
   getMeasures(): Polynomial1Measures {

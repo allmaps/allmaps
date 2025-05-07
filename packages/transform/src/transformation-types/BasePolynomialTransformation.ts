@@ -1,5 +1,7 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
+import { newArrayMatrix, pasteArrayMatrix } from '@allmaps/stdlib'
+
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
 import type { Point } from '@allmaps/types'
@@ -42,6 +44,21 @@ export abstract class BasePolynomialTransformation extends BaseLinearWeightsTran
       this.destinationPoints.map((value) => value[0]),
       this.destinationPoints.map((value) => value[1])
     ]
+  }
+
+  getPolynomialCoefsArrayMatrices(): [number[][], number[][]] {
+    let coefsArrayArray = newArrayMatrix(
+      this.pointCount,
+      this.pointCountMinimum,
+      0
+    )
+    for (let i = 0; i < this.pointCount; i++) {
+      coefsArrayArray = pasteArrayMatrix(coefsArrayArray, i, 0, [
+        this.getSourcePointCoefsArray(this.sourcePoints[i])
+      ])
+    }
+
+    return [coefsArrayArray, coefsArrayArray]
   }
 
   /**

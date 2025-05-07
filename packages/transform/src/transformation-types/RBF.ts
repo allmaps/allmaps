@@ -3,9 +3,11 @@ import { Matrix, inverse } from 'ml-matrix'
 import {
   newArrayMatrix,
   newBlockArrayMatrix,
+  pasteArrayMatrix,
   transposeArrayMatrix
 } from '@allmaps/stdlib'
 
+import { Polynomial1 } from './Polynomial1.js'
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
@@ -99,11 +101,11 @@ export class RBF extends BaseLinearWeightsTransformation {
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    const affineCoefsArrayArray = newArrayMatrix(this.pointCount, 3, 0)
+    let affineCoefsArrayArray = newArrayMatrix(this.pointCount, 3, 0)
     for (let i = 0; i < this.pointCount; i++) {
-      affineCoefsArrayArray[i][0] = 1
-      affineCoefsArrayArray[i][1] = this.sourcePoints[i][0]
-      affineCoefsArrayArray[i][2] = this.sourcePoints[i][1]
+      affineCoefsArrayArray = pasteArrayMatrix(affineCoefsArrayArray, i, 0, [
+        Polynomial1.getPolynomial1SourcePointCoefsArray(this.sourcePoints[i])
+      ])
     }
 
     // Construct 3x3 zerosArrayArray
@@ -117,6 +119,30 @@ export class RBF extends BaseLinearWeightsTransformation {
     ])
 
     this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
+  }
+
+  getSourcePointCoefsArray(sourcePoint: Point): number[] {
+    return [
+      ...this.getRbfKernelSourcePointCoefsArray(sourcePoint),
+      ...Polynomial1.getPolynomial1SourcePointCoefsArray(sourcePoint)
+    ]
+  }
+
+  getRbfKernelSourcePointCoefsArray(sourcePoint: Point): number[] {
+    const kernelSourcePointCoefsArray: number[] = []
+
+    for (let i = 0; i < this.pointCount; i++) {
+      kernelSourcePointCoefsArray.push(
+        this.kernelFunction(
+          this.normFunction(this.sourcePoints[i], sourcePoint),
+          {
+            epsilon: this.epsilon
+          }
+        )
+      )
+    }
+
+    return kernelSourcePointCoefsArray
   }
 
   /**

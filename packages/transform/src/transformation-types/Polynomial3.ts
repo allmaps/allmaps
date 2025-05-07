@@ -19,27 +19,26 @@ export class Polynomial3 extends BasePolynomialTransformation {
     // for order = 3
     // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
     // ...
-    const coefsArrayArray = newArrayMatrix(
-      this.pointCount,
-      this.pointCountMinimum,
-      0
-    )
-    for (let i = 0; i < this.pointCount; i++) {
-      coefsArrayArray[i][0] = 1
-      coefsArrayArray[i][1] = this.sourcePoints[i][0]
-      coefsArrayArray[i][2] = this.sourcePoints[i][1]
-      coefsArrayArray[i][3] = this.sourcePoints[i][0] ** 2
-      coefsArrayArray[i][4] = this.sourcePoints[i][1] ** 2
-      coefsArrayArray[i][5] = this.sourcePoints[i][0] * this.sourcePoints[i][1]
-      coefsArrayArray[i][6] = this.sourcePoints[i][0] ** 3
-      coefsArrayArray[i][7] = this.sourcePoints[i][1] ** 3
-      coefsArrayArray[i][8] =
-        this.sourcePoints[i][0] ** 2 * this.sourcePoints[i][1]
-      coefsArrayArray[i][9] =
-        this.sourcePoints[i][0] * this.sourcePoints[i][1] ** 2
-    }
+    this.coefsArrayMatrices = this.getPolynomialCoefsArrayMatrices()
+  }
 
-    this.coefsArrayMatrices = [coefsArrayArray, coefsArrayArray]
+  getSourcePointCoefsArray(sourcePoint: Point): number[] {
+    return Polynomial3.getPolynomial3SourcePointCoefsArray(sourcePoint)
+  }
+
+  static getPolynomial3SourcePointCoefsArray(sourcePoint: Point): number[] {
+    return [
+      1,
+      sourcePoint[0],
+      sourcePoint[1],
+      sourcePoint[0] ** 2,
+      sourcePoint[1] ** 2,
+      sourcePoint[0] * sourcePoint[1],
+      sourcePoint[0] ** 3,
+      sourcePoint[1] ** 3,
+      sourcePoint[0] ** 2 * sourcePoint[1],
+      sourcePoint[0] * sourcePoint[1] ** 2
+    ]
   }
 
   // Evaluate the transformation function at a new point

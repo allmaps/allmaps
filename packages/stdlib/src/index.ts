@@ -170,6 +170,9 @@ export {
   arrayMatrixDimensions,
   subArrayMatrix,
   transposeArrayMatrix,
+  pasteArrayMatrix,
+  sliceArrayMatrix,
+  shallowCopyArrayMatrix,
   newBlockArrayMatrix
 } from './matrix.js'
 

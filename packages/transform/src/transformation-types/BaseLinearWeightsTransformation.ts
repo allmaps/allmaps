@@ -33,4 +33,6 @@ export abstract class BaseLinearWeightsTransformation extends BaseTransformation
   ) {
     super(sourcePoints, destinationPoints, type, pointCountMinimum)
   }
+
+  abstract getSourcePointCoefsArray(sourcePoint: Point): number[]
 }

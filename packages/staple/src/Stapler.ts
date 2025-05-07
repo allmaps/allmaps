@@ -1,67 +1,84 @@
 import { GcpTransformer } from '@allmaps/transform'
 
-import type { TransformationType } from '@allmaps/transform'
+import type { BaseTransformation, TransformationType } from '@allmaps/transform'
 
-import type { GeoreferencedMapWithRcps, Staple, Staples } from './types'
+import type { GeoreferencedMapWithRcps, Staple } from './types'
+
+const separatelySolvedTransformationTypes: TransformationType[] = [
+  'polynomial',
+  'polynomial1',
+  'polynomial2',
+  'polynomial3',
+  'thinPlateSpline'
+]
+
+// const jointlySolvedTransformationTypes: TransformationType[] = ['helmert']
 
 export class Stapler {
-  staples: Staples[]
-
+  georeferencedMaps: GeoreferencedMapWithRcps[]
   type: TransformationType
+
+  transformationsByMapId: Map<string, BaseTransformation>
+  staplesById: Map<string, Staple[]>
 
   /**
    * Create a StapledTransformation
    */ constructor(
-    staples: Staples[],
+    georeferencedMaps: GeoreferencedMapWithRcps[],
     type: TransformationType = 'thinPlateSpline'
   ) {
-    this.staples = staples
+    this.georeferencedMaps = georeferencedMaps
     this.type = type
 
-    // Check type baselinearweightstransformation
-  }
-
-  static fromGeoreferencedMaps(
-    georeferencedMaps: GeoreferencedMapWithRcps[],
-    type?: TransformationType
-  ): Stapler {
-    const staplesById = new Map<string, Staple[]>()
+    this.transformationsByMapId = new Map()
+    this.staplesById = new Map()
 
     for (const georeferencedMap of georeferencedMaps) {
+      // Neglect georeferenced maps with no staple points
       if (!georeferencedMap.rcps) {
         continue
       }
+      // Note: since we cannot await in a constructor,
+      // we can't compute a missing mapId here using generateChecksum()
+      // and we throw if undefined
+      const mapId = georeferencedMap.id
+      if (!mapId) {
+        throw new Error('Map ID is undefined')
+      }
+      // Note: we assume 'toGeo' transformation
+      const transformation =
+        GcpTransformer.fromGeoreferencedMap(
+          georeferencedMap
+        ).getToGeoTransformation()
+      if (!separatelySolvedTransformationTypes.includes(transformation.type)) {
+        throw new Error(
+          `Transformation type ${transformation.type} unsupported`
+        )
+      }
+      this.transformationsByMapId.set(mapId, transformation)
       georeferencedMap.rcps.forEach((rcp) => {
         // TODO: check if ok to assume forward transformation
         // TODO: pass transformation type but don't overwrite if undefined
-        if (!staplesById.has(rcp.id)) {
-          staplesById.set(rcp.id, [])
+        if (!this.staplesById.has(rcp.id)) {
+          this.staplesById.set(rcp.id, [])
         }
-        staplesById.get(rcp.id)?.push({
+        this.staplesById.get(rcp.id)?.push({
           id: rcp.id,
-          source: rcp.resource,
-          transformation:
-            GcpTransformer.fromGeoreferencedMap(
-              georeferencedMap
-            ).getToGeoTransformation()
+          mapId,
+          source: rcp.resource
         })
       })
     }
-
     // TODO: deal with length > 2
     // Then we should take mapId into account, and add it for every two mapId's
-    staplesById.forEach((mapStaple, index) => {
-      if (mapStaple.length !== 2) staplesById.delete(index)
+    this.staplesById.forEach((staples) => {
+      if (staples.length !== 2) {
+        throw new Error('There can only be two staples by staple ID')
+      }
     })
 
-    const staples: Staples[] = []
-    Array.from(staplesById.values()).forEach((mapStaples) =>
-      staples.push({
-        staple0: mapStaples[0],
-        staple1: mapStaples[1]
-      })
-    )
-
-    return new Stapler(staples, type)
+    // for (const [mapId, transformation] of transformationsByMapId.entries()) {
+    // }
+    // const coefsArrayMatrix = newArrayMatrix(0, 0)
   }
 }

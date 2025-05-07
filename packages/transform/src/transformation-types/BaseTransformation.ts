@@ -18,7 +18,7 @@ export abstract class BaseTransformation {
 
   abstract weightsArrays?: object
 
-  type: string
+  type: TransformationType
 
   pointCount: number
   pointCountMinimum: number
