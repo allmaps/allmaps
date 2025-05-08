@@ -1,5 +1,3 @@
-import { newArrayMatrix } from '@allmaps/stdlib'
-
 import { BasePolynomialTransformation } from './BasePolynomialTransformation.js'
 
 import type { Point } from '@allmaps/types'
@@ -10,12 +8,8 @@ import type { Polynomial1Measures } from '../shared/types.js'
  * 2D First-order Polynomial transformation
  *
  * This transformation is a composition of a translation, rotation, scaling and shearing.
- *
- * For this transformations, the system of equations is solved for x and y separately.
  */
 export class Polynomial1 extends BasePolynomialTransformation {
-  coefsArrayMatrices: [number[][], number[][]]
-
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 1)
 
@@ -24,13 +18,21 @@ export class Polynomial1 extends BasePolynomialTransformation {
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    this.coefsArrayMatrices = this.getPolynomialCoefsArrayMatrices()
   }
 
   getSourcePointCoefsArray(sourcePoint: Point): number[] {
     return Polynomial1.getPolynomial1SourcePointCoefsArray(sourcePoint)
   }
 
+  /**
+   * Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
+   * 1 x0 y0
+   * 1 x1 y1
+   * 1 x2 y2
+   * ...
+   *
+   * @param sourcePoint
+   */
   static getPolynomial1SourcePointCoefsArray(sourcePoint: Point): number[] {
     return [1, sourcePoint[0], sourcePoint[1]]
   }

@@ -1,17 +1,24 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import { newArrayMatrix, pasteArrayMatrix } from '@allmaps/stdlib'
+import {
+  arrayMatrixDimensions,
+  newArrayMatrix,
+  pasteArrayMatrix
+} from '@allmaps/stdlib'
 
-import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
+import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
 
 import type { Point } from '@allmaps/types'
 
 import type { TransformationType } from '../shared/types.js'
 
-export abstract class BasePolynomialTransformation extends BaseLinearWeightsTransformation {
-  order: number
+export abstract class BasePolynomialTransformation extends BaseIndependentLinearWeightsTransformation {
+  coefsArrayMatrices: [number[][], number[][]]
+  coefsArrayMatrix: number[][]
+  coefsArrayMatricesDimensions: [[number, number], [number, number]]
+  coefsArrayMatrixDimensions: [number, number]
 
-  destinationPointsArrays: [number[], number[]]
+  order: number
 
   weightsArrays?: [number[], number[]]
 
@@ -40,13 +47,24 @@ export abstract class BasePolynomialTransformation extends BaseLinearWeightsTran
       )
     }
 
-    this.destinationPointsArrays = [
+    this.coefsArrayMatrices = this.getCoefsArrayMatrices()
+    this.coefsArrayMatrix = this.coefsArrayMatrices[0]
+    this.coefsArrayMatricesDimensions = this.coefsArrayMatrices.map(
+      (coefsArrayMatrix) => arrayMatrixDimensions(coefsArrayMatrix)
+    ) as [[number, number], [number, number]]
+    this.coefsArrayMatrixDimensions = arrayMatrixDimensions(
+      this.coefsArrayMatrix
+    )
+  }
+
+  getDestinationPointsArrays(): [number[], number[]] {
+    return [
       this.destinationPoints.map((value) => value[0]),
       this.destinationPoints.map((value) => value[1])
     ]
   }
 
-  getPolynomialCoefsArrayMatrices(): [number[][], number[][]] {
+  getCoefsArrayMatrix(): number[][] {
     let coefsArrayArray = newArrayMatrix(
       this.pointCount,
       this.pointCountMinimum,
@@ -58,11 +76,11 @@ export abstract class BasePolynomialTransformation extends BaseLinearWeightsTran
       ])
     }
 
-    return [coefsArrayArray, coefsArrayArray]
+    return coefsArrayArray
   }
 
   /**
-   * Solve the x and y components separately.
+   * Solve the x and y components independently.
    *
    * This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
    * a 'best fit' (least squares) approximate solution for the system of linear equations

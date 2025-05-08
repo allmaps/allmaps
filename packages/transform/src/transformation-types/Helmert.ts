@@ -1,6 +1,10 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
-import { newArrayMatrix } from '@allmaps/stdlib'
+import {
+  newArrayMatrix,
+  pasteArrayMatrix,
+  arrayMatrixDimensions
+} from '@allmaps/stdlib'
 
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
@@ -16,9 +20,8 @@ import type { HelmertMeasures } from '../shared/types.js'
  * For this transformations, the system of equations is solved for x and y jointly.
  */
 export class Helmert extends BaseLinearWeightsTransformation {
-  destinationPointsArrays: [number[], number[]]
-
   coefsArrayMatrices: [number[][], number[][]]
+  coefsArrayMatricesDimensions: [[number, number], [number, number]]
 
   weightsArray?: number[]
   weightsArrays?: [number[], number[]]
@@ -26,32 +29,53 @@ export class Helmert extends BaseLinearWeightsTransformation {
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 'helmert', 2)
 
-    this.destinationPointsArrays = [
+    this.coefsArrayMatrices = this.getCoefsArrayMatrices()
+    this.coefsArrayMatricesDimensions = this.coefsArrayMatrices.map(
+      (coefsArrayMatrix) => arrayMatrixDimensions(coefsArrayMatrix)
+    ) as [[number, number], [number, number]]
+  }
+
+  getDestinationPointsArrays(): [number[], number[]] {
+    return [
       this.destinationPoints.map((value) => value[0]),
       this.destinationPoints.map((value) => value[1])
     ]
+  }
 
-    // Construct two 2Nx4 coefsArrayMatrices
-    // 1 0 x0 -y0
-    // 1 0 x1 -y1
-    // ...
-    // 0 1 y0 x0
-    // 0 1 y1 x1
-    // ...
-    this.coefsArrayMatrices = [
-      newArrayMatrix(this.pointCount, 4, 0),
-      newArrayMatrix(this.pointCount, 4, 0)
-    ]
+  getCoefsArrayMatrices(): [number[][], number[][]] {
+    let coefsArrayMatrix0 = newArrayMatrix(this.pointCount, 4, 0)
+    let coefsArrayMatrix1 = newArrayMatrix(this.pointCount, 4, 0)
     for (let i = 0; i < this.pointCount; i++) {
-      this.coefsArrayMatrices[0][i][0] = 1
-      this.coefsArrayMatrices[0][i][1] = 0
-      this.coefsArrayMatrices[0][i][2] = this.sourcePoints[i][0]
-      this.coefsArrayMatrices[0][i][3] = -this.sourcePoints[i][1]
-      this.coefsArrayMatrices[1][i][0] = 0
-      this.coefsArrayMatrices[1][i][1] = 1
-      this.coefsArrayMatrices[1][i][2] = this.sourcePoints[i][1]
-      this.coefsArrayMatrices[1][i][3] = this.sourcePoints[i][0]
+      const sourcePointCoefsArrays = this.getSourcePointCoefsArrays(
+        this.sourcePoints[i]
+      )
+      coefsArrayMatrix0 = pasteArrayMatrix(coefsArrayMatrix0, i, 0, [
+        sourcePointCoefsArrays[0]
+      ])
+      coefsArrayMatrix1 = pasteArrayMatrix(coefsArrayMatrix1, i, 0, [
+        sourcePointCoefsArrays[1]
+      ])
     }
+
+    return [coefsArrayMatrix0, coefsArrayMatrix1]
+  }
+
+  /**
+   * Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
+   * 1 0 x0 -y0
+   * 1 0 x1 -y1
+   * ...
+   * 0 1 y0 x0
+   * 0 1 y1 x1
+   * ...
+   *
+   * @param sourcePoint
+   */
+  getSourcePointCoefsArrays(sourcePoint: Point): [number[], number[]] {
+    return [
+      [1, 0, sourcePoint[0], -sourcePoint[1]],
+      [0, 1, sourcePoint[1], sourcePoint[0]]
+    ]
   }
 
   /**

@@ -7,24 +7,14 @@ import type { TransformationType } from '../shared/types.js'
 /**
  * Base class for transformation that are a linear combination of weights.
  *
- * For some of these transformations, the system of equations is solved for x and y jointly using the 'joint' properties
- * For other, the system of equations is solved for x and y separately, and the obtained weights can be used for both.
+ * In general, the system of equations for x and y are dependent on each other, and they are thus solved jointly.
+ * For transformations where the system of equations for x and y are independent and can hence be solved separately, a dedicated class exists.
  */
 export abstract class BaseLinearWeightsTransformation extends BaseTransformation {
-  abstract destinationPointsArrays: [number[], number[]]
-
-  abstract coefsArrayMatrices: [number[][], number[][]]
+  destinationPointsArrays: [number[], number[]]
 
   abstract weightsArrays?: [number[], number[]]
 
-  /**
-   * Create a transformation
-   *
-   * @param sourcePoints - The source points
-   * @param destinationPoints - The destination points
-   * @param type - The transformation type
-   * @param pointCountMinimum - The minimum number of points for the transformation type
-   */
   constructor(
     sourcePoints: Point[],
     destinationPoints: Point[],
@@ -32,7 +22,13 @@ export abstract class BaseLinearWeightsTransformation extends BaseTransformation
     pointCountMinimum: number
   ) {
     super(sourcePoints, destinationPoints, type, pointCountMinimum)
+
+    this.destinationPointsArrays = this.getDestinationPointsArrays()
   }
 
-  abstract getSourcePointCoefsArray(sourcePoint: Point): number[]
+  abstract getDestinationPointsArrays(): [number[], number[]]
+
+  abstract getCoefsArrayMatrices(): [number[][], number[][]]
+
+  abstract getSourcePointCoefsArrays(sourcePoint: Point): [number[], number[]]
 }

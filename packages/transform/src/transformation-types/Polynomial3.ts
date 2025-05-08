@@ -1,31 +1,26 @@
-import { newArrayMatrix } from '@allmaps/stdlib'
-
 import { BasePolynomialTransformation } from './BasePolynomialTransformation.js'
 
 import type { Point } from '@allmaps/types'
 
 /**
  * 2D Third-order Polynomial transformation
- *
- * For this transformations, the system of equations is solved for x and y separately.
  */
 export class Polynomial3 extends BasePolynomialTransformation {
-  coefsArrayMatrices: [number[][], number[][]]
-
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 3)
-
-    // Construct Nx3 coefsArrayArray
-    // for order = 3
-    // 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
-    // ...
-    this.coefsArrayMatrices = this.getPolynomialCoefsArrayMatrices()
   }
 
   getSourcePointCoefsArray(sourcePoint: Point): number[] {
     return Polynomial3.getPolynomial3SourcePointCoefsArray(sourcePoint)
   }
 
+  /**
+   * Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
+   * 1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0*y0^2
+   * ...
+   *
+   * @param sourcePoint
+   */
   static getPolynomial3SourcePointCoefsArray(sourcePoint: Point): number[] {
     return [
       1,

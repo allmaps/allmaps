@@ -1,24 +1,21 @@
-import { GcpTransformer } from '@allmaps/transform'
-
-import type { BaseTransformation, TransformationType } from '@allmaps/transform'
+import { newArrayMatrix, pasteArrayMatrix } from '@allmaps/stdlib'
+import {
+  GcpTransformer,
+  BaseIndependentLinearWeightsTransformation,
+  TransformationType
+} from '@allmaps/transform'
 
 import type { GeoreferencedMapWithRcps, Staple } from './types'
-
-const separatelySolvedTransformationTypes: TransformationType[] = [
-  'polynomial',
-  'polynomial1',
-  'polynomial2',
-  'polynomial3',
-  'thinPlateSpline'
-]
-
-// const jointlySolvedTransformationTypes: TransformationType[] = ['helmert']
 
 export class Stapler {
   georeferencedMaps: GeoreferencedMapWithRcps[]
   type: TransformationType
 
-  transformationsByMapId: Map<string, BaseTransformation>
+  transformationsByMapId: Map<
+    string,
+    BaseIndependentLinearWeightsTransformation
+  >
+  dimensionsByMapId: Map<string, [number, number]>
   staplesById: Map<string, Staple[]>
 
   /**
@@ -31,6 +28,7 @@ export class Stapler {
     this.type = type
 
     this.transformationsByMapId = new Map()
+    this.dimensionsByMapId = new Map()
     this.staplesById = new Map()
 
     for (const georeferencedMap of georeferencedMaps) {
@@ -50,12 +48,16 @@ export class Stapler {
         GcpTransformer.fromGeoreferencedMap(
           georeferencedMap
         ).getToGeoTransformation()
-      if (!separatelySolvedTransformationTypes.includes(transformation.type)) {
+      if (
+        !(transformation instanceof BaseIndependentLinearWeightsTransformation)
+      ) {
         throw new Error(
           `Transformation type ${transformation.type} unsupported`
         )
       }
+
       this.transformationsByMapId.set(mapId, transformation)
+
       georeferencedMap.rcps.forEach((rcp) => {
         // TODO: check if ok to assume forward transformation
         // TODO: pass transformation type but don't overwrite if undefined
@@ -77,8 +79,36 @@ export class Stapler {
       }
     })
 
-    // for (const [mapId, transformation] of transformationsByMapId.entries()) {
+    for (const [
+      mapId,
+      transformation
+    ] of this.transformationsByMapId.entries()) {
+      this.dimensionsByMapId.set(
+        mapId,
+        transformation.coefsArrayMatrixDimensions
+      )
+    }
+
+    const dimensions = Array.from(this.dimensionsByMapId.values()).reduce(
+      ([accumulatingRows, accumulatingCols], [rows, cols]) => [
+        accumulatingRows + rows,
+        accumulatingCols + cols
+      ],
+      [0, 0]
+    )
+
+    let coefsArrayMatrix = newArrayMatrix(...dimensions)
+
+    // for (const [
+    //   mapId,
+    //   transformation
+    // ] of this.transformationsByMapId.entries()) {
+    //   coefsArrayMatrix = pasteArrayMatrix(
+    //     coefsArrayMatrix,
+    //     x,
+    //     y,
+    //     transformation.coefsArrayMatrix
+    //   )
     // }
-    // const coefsArrayMatrix = newArrayMatrix(0, 0)
   }
 }
