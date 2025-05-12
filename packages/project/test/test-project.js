@@ -1,33 +1,21 @@
 import { describe, it } from 'mocha'
 
-import { expectToBeCloseToArrayArray } from '../../stdlib/test/helper-functions.js'
+import {
+  expectToBeCloseToArray,
+  expectToBeCloseToArrayArray
+} from '../../stdlib/test/helper-functions.js'
 
 import { GcpTransformer } from '../../transform/dist/index.js'
-import { ProjectedGcpTransformer } from '../dist/index.js'
+import { ProjectedGcpTransformer, proj4 } from '../dist/index.js'
 
 import { gcps6 } from './input/gcps-test.js'
-
-const epsg4326 = {
-  name: 'EPSG:4326',
-  definition: 'EPSG:4326'
-}
-
-const epsg3857 = {
-  name: 'EPSG:3857',
-  definition: 'EPSG:3857'
-}
-
-const epsg31370 = {
-  name: 'EPSG:31370',
-  definition:
-    '+proj=lcc +lat_0=90 +lon_0=4.36748666666667 +lat_1=51.1666672333333 +lat_2=49.8333339 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs'
-}
-
-const epsg28992 = {
-  name: 'EPSG:28992',
-  definition:
-    '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.4171,50.3319,465.5524,1.9342,-1.6677,9.1019,4.0725 +units=m +no_defs +type=crs'
-}
+import {
+  epsg28992,
+  epsg31370,
+  epsg31370projjson,
+  epsg3857,
+  epsg4326
+} from './input/projections-test.js'
 
 describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and projection', async () => {
   const transformerOptions = {
@@ -335,6 +323,53 @@ describe('Allow to modify the requested projection in a transform function', asy
       projectedTransformer31370.transformToGeo(resourceLineString, {
         projection: epsg4326
       })
+    )
+  })
+})
+
+describe('Support PROJJSON projections', async () => {
+  it(`should give the same result as a proj4-string`, () => {
+    expectToBeCloseToArray(
+      proj4(epsg31370.definition, [4, 51]),
+      proj4(epsg31370projjson.definition, [4, 51])
+    )
+  })
+
+  const transformerOptions = {
+    minOffsetRatio: 0.001,
+    maxDepth: 1,
+    internalProjection: epsg31370,
+    projection: epsg31370
+  }
+  const projectedTransformer = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const transformerOptionsProjjson = {
+    minOffsetRatio: 0.001,
+    maxDepth: 1,
+    internalProjection: epsg31370projjson,
+    projection: epsg31370projjson
+  }
+  const projectedTransformerProjjson = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptionsProjjson
+  )
+  const resourceLineString = [
+    [3655, 2212],
+    [2325, 3134],
+    [3972, 325],
+    [3451, 2876],
+    [2067, 920],
+    [622, 941]
+  ]
+
+  it(`should transform the lineString to EPSG:31370 projection in the same way with a proj4-string and a PROJJSON object`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformerProjjson.transformToGeo(resourceLineString)
     )
   })
 })

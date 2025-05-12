@@ -1304,8 +1304,8 @@ importers:
         specifier: workspace:^
         version: link:../transform
       proj4:
-        specifier: ^2.15.0
-        version: 2.15.0
+        specifier: ^2.16.0
+        version: 2.16.2
     devDependencies:
       '@allmaps/annotation':
         specifier: workspace:^
@@ -8736,6 +8736,10 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
+  /geographiclib-geodesic@2.1.1:
+    resolution: {integrity: sha512-lkd8EUkPSByobWu9BPMHTdYA5AUZxOa8McmUNtBE9KrvUJEvSADnN6gTDmhXbi6NzdA16LtWLpSxLE/lIIRhyA==}
+    dev: false
+
   /geojson-vt@4.0.2:
     resolution: {integrity: sha512-AV9ROqlNqoZEIJGfm1ncNjEXfkz2hdFlZf0qkVfmkwdKa8vj7H16YUOT81rJw1rdFhyEDlN2Tds91p/glzbl5A==}
     dev: false
@@ -13524,11 +13528,12 @@ packages:
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dev: true
 
-  /proj4@2.15.0:
-    resolution: {integrity: sha512-LqCNEcPdI03BrCHxPLj29vsd5afsm+0sV1H/O3nTDKrv8/LA01ea1z4QADDMjUqxSXWnrmmQDjqFm1J/uZ5RLw==}
+  /proj4@2.16.2:
+    resolution: {integrity: sha512-1IcYz7wG1kDpPEJSeBy+0v29wW3mhbqUgRReenvhjgHlGjFA9cA72nGWnikUUS/ggq3y/TcShWzR41sikFSrlQ==}
     dependencies:
+      geographiclib-geodesic: 2.1.1
       mgrs: 1.0.0
-      wkt-parser: 1.4.0
+      wkt-parser: 1.5.1
     dev: false
 
   /promise-all-reject-late@1.0.1:
@@ -16626,8 +16631,8 @@ packages:
       string-width: 7.2.0
     dev: false
 
-  /wkt-parser@1.4.0:
-    resolution: {integrity: sha512-qpwO7Ihds/YYDTi1aADFTI1Sm9YC/tTe3SHD24EeIlZxy7Ik6a1b4HOz7jAi0xdUAw487duqpo8OGu+Tf4nwlQ==}
+  /wkt-parser@1.5.1:
+    resolution: {integrity: sha512-o78jtCrTSs+qT3s9GMfrpRZHCze/fzNbAV2+rUEAjWPP08te0oPoyASrdtOHcAdEPMgSn8atjnlnAqmCvuAqSA==}
     dev: false
 
   /word-wrap@1.2.5:
