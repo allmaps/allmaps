@@ -70,16 +70,26 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
 
   /**
    * Get the forward transformation. Create if it doesn't exist yet.
+   *
+   * If a transformation type is specified that differs from the transformer's type
+   * the transformation is computed but not stored as a property.
+   *
+   * @param type - The transformation type, if different then the transformer's type.
    */
-  getForwardTransformation(): BaseTransformation {
-    return super.getForwardTransformationInternal()
+  getForwardTransformation(type?: TransformationType): BaseTransformation {
+    return super.getForwardTransformationInternal(type)
   }
 
   /**
    * Get the backward transformation. Create if it doesn't exist yet.
+   *
+   * If a transformation type is specified that differs from the transformer's type
+   * the transformation is computed but not stored as a property.
+   *
+   * @param type - The transformation type, if different then the transformer's type.
    */
-  getBackwardTransformation(): BaseTransformation {
-    return super.getBackwardTransformationInternal()
+  getBackwardTransformation(type?: TransformationType): BaseTransformation {
+    return super.getBackwardTransformationInternal(type)
   }
 
   /**

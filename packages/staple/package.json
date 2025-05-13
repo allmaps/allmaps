@@ -32,6 +32,7 @@
     "@allmaps/transform": "workspace:^"
   },
   "devDependencies": {
+    "@allmaps/id": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@allmaps/annotation": "workspace:^",
     "@types/eslint": "^8.56.0",
@@ -39,6 +40,7 @@
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",
     "chai-shallow-deep-equal": "^1.4.6",
+    "chai-as-promised": "^8.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",

@@ -168,6 +168,7 @@ export { getFullResourceMask } from './masks.js'
 export {
   newArrayMatrix,
   arrayMatrixDimensions,
+  multiplyArrayMatrix,
   subArrayMatrix,
   transposeArrayMatrix,
   pasteArrayMatrix,

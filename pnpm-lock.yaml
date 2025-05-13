@@ -1505,6 +1505,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../id
       '@allmaps/types':
         specifier: workspace:^
         version: link:../types
@@ -1520,6 +1523,9 @@ importers:
       chai:
         specifier: ^4.3.6
         version: 4.5.0
+      chai-as-promised:
+        specifier: ^8.0.0
+        version: 8.0.1(chai@4.5.0)
       chai-shallow-deep-equal:
         specifier: ^1.4.6
         version: 1.4.6(chai@4.5.0)
@@ -7009,6 +7015,15 @@ packages:
   /ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
+  /chai-as-promised@8.0.1(chai@4.5.0):
+    resolution: {integrity: sha512-OIEJtOL8xxJSH8JJWbIoRjybbzR52iFuDHuF8eb+nTPD6tgXLjRqsgnUGqQfFODxYvq5QdirT0pN9dZ0+Gz6rA==}
+    peerDependencies:
+      chai: '>= 2.1.2 < 6'
+    dependencies:
+      chai: 4.5.0
+      check-error: 2.1.1
+    dev: true
+
   /chai-roughly@1.0.0:
     resolution: {integrity: sha512-lCV6EsBpMVFKhPXUrO/Ps4ZZW+esi16lB3kAsKFC1kc0qgTdOSd9qlDgOvG0e07wYysTT+FfHbStvH5oF11xRQ==}
     dependencies:
@@ -7077,6 +7092,11 @@ packages:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
     dependencies:
       get-func-name: 2.0.2
+    dev: true
+
+  /check-error@2.1.1:
+    resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
+    engines: {node: '>= 16'}
     dev: true
 
   /chokidar@3.6.0:

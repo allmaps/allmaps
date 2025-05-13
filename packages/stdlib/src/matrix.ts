@@ -69,6 +69,22 @@ export function subArrayMatrix<T>(
   return result
 }
 
+// Pointwise multiplication. For Matrix multiplication, see ml-matrix
+export function multiplyArrayMatrix(
+  arrayMatrix: number[][],
+  factor: number
+): number[][] {
+  const dimensions = arrayMatrixDimensions(arrayMatrix)
+  const result = newArrayMatrix<number>(...dimensions)
+
+  for (let i = 0; i < dimensions[0]; i++) {
+    for (let j = 0; j < dimensions[1]; j++) {
+      result[i][j] = factor * arrayMatrix[i][j]
+    }
+  }
+  return result
+}
+
 // Pastes a arrayMatrix inside an arrayMatrix at a specific location.
 // Returns a copy with the pasted subArray.
 export function pasteArrayMatrix<T>(

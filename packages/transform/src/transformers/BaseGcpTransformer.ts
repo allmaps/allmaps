@@ -128,28 +128,64 @@ export abstract class BaseGcpTransformer {
 
   /**
    * Get the forward transformation. Create if it doesn't exist yet.
+   *
+   * If a transformation type is specified that differs from the transformer's type
+   * the transformation is computed but not stored as a property.
+   *
+   * @param type - The transformation type, if different then the transformer's type.
    */
-  protected getForwardTransformationInternal(): BaseTransformation {
-    if (!this.forwardTransformation) {
-      this.forwardTransformation = this.createTransformation(
+  protected getForwardTransformationInternal(
+    type?: TransformationType
+  ): BaseTransformation {
+    const differentType = type && type != this.type
+
+    let forwardTransformation
+    if (this.forwardTransformation && !differentType) {
+      forwardTransformation = this.forwardTransformation
+    } else {
+      forwardTransformation = this.createTransformation(
         this.sourcePointsInternal,
-        this.destinationPointsInternal
+        this.destinationPointsInternal,
+        type
       )
     }
-    return this.forwardTransformation
+
+    if (!differentType) {
+      this.forwardTransformation = forwardTransformation
+    }
+
+    return forwardTransformation
   }
 
   /**
    * Get the backward transformation. Create if it doesn't exist yet.
+   *
+   * If a transformation type is specified that differs from the transformer's type
+   * the transformation is computed but not stored as a property.
+   *
+   * @param type - The transformation type, if different then the transformer's type.
    */
-  protected getBackwardTransformationInternal(): BaseTransformation {
-    if (!this.backwardTransformation) {
-      this.backwardTransformation = this.createTransformation(
+  protected getBackwardTransformationInternal(
+    type?: TransformationType
+  ): BaseTransformation {
+    const differentType = type && type != this.type
+
+    let backwardTransformation
+    if (this.backwardTransformation && !differentType) {
+      backwardTransformation = this.backwardTransformation
+    } else {
+      backwardTransformation = this.createTransformation(
+        this.sourcePointsInternal,
         this.destinationPointsInternal,
-        this.sourcePointsInternal
+        type
       )
     }
-    return this.backwardTransformation
+
+    if (!differentType) {
+      this.backwardTransformation = backwardTransformation
+    }
+
+    return backwardTransformation
   }
 
   /**
@@ -166,21 +202,24 @@ export abstract class BaseGcpTransformer {
    */
   private createTransformation(
     sourcePoints: Point[],
-    destinationPoints: Point[]
+    destinationPoints: Point[],
+    type?: TransformationType
   ): BaseTransformation {
-    if (this.type === 'straight') {
+    type = type || this.type
+
+    if (type === 'straight') {
       return new Straight(sourcePoints, destinationPoints)
-    } else if (this.type === 'helmert') {
+    } else if (type === 'helmert') {
       return new Helmert(sourcePoints, destinationPoints)
-    } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
+    } else if (type === 'polynomial1' || type === 'polynomial') {
       return new Polynomial1(sourcePoints, destinationPoints)
-    } else if (this.type === 'polynomial2') {
+    } else if (type === 'polynomial2') {
       return new Polynomial2(sourcePoints, destinationPoints)
-    } else if (this.type === 'polynomial3') {
+    } else if (type === 'polynomial3') {
       return new Polynomial3(sourcePoints, destinationPoints)
-    } else if (this.type === 'projective') {
+    } else if (type === 'projective') {
       return new Projective(sourcePoints, destinationPoints)
-    } else if (this.type === 'thinPlateSpline') {
+    } else if (type === 'thinPlateSpline') {
       return new RBF(
         sourcePoints,
         destinationPoints,
@@ -188,7 +227,7 @@ export abstract class BaseGcpTransformer {
         euclideanNorm
       )
     } else {
-      throw new Error(`Unsupported transformation type: ${this.type}`)
+      throw new Error(`Unsupported transformation type: ${type}`)
     }
   }
 

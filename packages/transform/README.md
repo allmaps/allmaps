@@ -1161,13 +1161,17 @@ Use with caution, especially for options that have effects in the constructor.
 Array<Gcp>
 ```
 
-### `GcpTransformer#getToGeoTransformation()`
+### `GcpTransformer#getToGeoTransformation(type)`
 
 Get the forward transformation. Create if it doesn't exist yet.
 
+If a transformation type is specified that differs from the transformer's type
+the transformation is computed but not stored as a property.
+
 ###### Parameters
 
-There are no parameters.
+* `type?` (`TransformationType | undefined`)
+  * The transformation type, if different then the transformer's type.
 
 ###### Returns
 
@@ -1198,13 +1202,17 @@ Returned in the length of the shortest piece, measured in resource coordinates.
 
 Resolution of the toGeo transformation in resource space (`number | undefined`).
 
-### `GcpTransformer#getToResourceTransformation()`
+### `GcpTransformer#getToResourceTransformation(type)`
 
 Get the backward transformation. Create if it doesn't exist yet.
 
+If a transformation type is specified that differs from the transformer's type
+the transformation is computed but not stored as a property.
+
 ###### Parameters
 
-There are no parameters.
+* `type?` (`TransformationType | undefined`)
+  * The transformation type, if different then the transformer's type.
 
 ###### Returns
 
@@ -1424,13 +1432,17 @@ Create a GeneralGcpTransformer
 Array<GeneralGcp>
 ```
 
-### `GeneralGcpTransformer#getBackwardTransformation()`
+### `GeneralGcpTransformer#getBackwardTransformation(type)`
 
 Get the backward transformation. Create if it doesn't exist yet.
 
+If a transformation type is specified that differs from the transformer's type
+the transformation is computed but not stored as a property.
+
 ###### Parameters
 
-There are no parameters.
+* `type?` (`TransformationType | undefined`)
+  * The transformation type, if different then the transformer's type.
 
 ###### Returns
 
@@ -1461,13 +1473,17 @@ Returned in the length of the shortest piece, measured in destination coordinate
 
 Resolution of the backward transformation in destination space (`number | undefined`).
 
-### `GeneralGcpTransformer#getForwardTransformation()`
+### `GeneralGcpTransformer#getForwardTransformation(type)`
 
 Get the forward transformation. Create if it doesn't exist yet.
 
+If a transformation type is specified that differs from the transformer's type
+the transformation is computed but not stored as a property.
+
 ###### Parameters
 
-There are no parameters.
+* `type?` (`TransformationType | undefined`)
+  * The transformation type, if different then the transformer's type.
 
 ###### Returns
 
