@@ -1,7 +1,7 @@
 import { Matrix, inverse } from 'ml-matrix'
 
 import {
-  arrayMatrixDimensions,
+  arrayMatrixSize,
   newArrayMatrix,
   newBlockArrayMatrix,
   pasteArrayMatrix,
@@ -13,7 +13,7 @@ import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLin
 
 import type { KernelFunction, NormFunction } from '../shared/types.js'
 
-import type { Point } from '@allmaps/types'
+import type { Point, Size } from '@allmaps/types'
 
 /**
  * 2D Radial Basis Functions transformation
@@ -28,8 +28,8 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
 
   coefsArrayMatrices: [number[][], number[][]]
   coefsArrayMatrix: number[][]
-  coefsArrayMatricesDimensions: [[number, number], [number, number]]
-  coefsArrayMatrixDimensions: [number, number]
+  coefsArrayMatricesSize: [Size, Size]
+  coefsArrayMatrixSize: Size
 
   weightsArrays?: [number[], number[]]
   rbfWeightsArrays?: [number[], number[]]
@@ -54,12 +54,10 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     // which are only defined after super()
     this.coefsArrayMatrices = this.getCoefsArrayMatrices()
     this.coefsArrayMatrix = this.coefsArrayMatrices[0]
-    this.coefsArrayMatricesDimensions = this.coefsArrayMatrices.map(
-      (coefsArrayMatrix) => arrayMatrixDimensions(coefsArrayMatrix)
+    this.coefsArrayMatricesSize = this.coefsArrayMatrices.map(
+      (coefsArrayMatrix) => arrayMatrixSize(coefsArrayMatrix)
     ) as [[number, number], [number, number]]
-    this.coefsArrayMatrixDimensions = arrayMatrixDimensions(
-      this.coefsArrayMatrix
-    )
+    this.coefsArrayMatrixSize = arrayMatrixSize(this.coefsArrayMatrix)
   }
 
   getDestinationPointsArrays(): [number[], number[]] {

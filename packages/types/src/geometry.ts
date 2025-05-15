@@ -78,6 +78,7 @@ export type Bbox = [number, number, number, number]
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
  * Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
+ * Alternatively, two numbers indicating the dimensions of a matrix: rows, cols (which is a different handedness!)
  */
 export type Size = [number, number]
 

@@ -1,22 +1,22 @@
 import { Matrix, pseudoInverse } from 'ml-matrix'
 
 import {
-  arrayMatrixDimensions,
+  arrayMatrixSize,
   newArrayMatrix,
   pasteArrayMatrix
 } from '@allmaps/stdlib'
 
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
 
-import type { Point } from '@allmaps/types'
+import type { Point, Size } from '@allmaps/types'
 
 import type { TransformationType } from '../shared/types.js'
 
 export abstract class BasePolynomialTransformation extends BaseIndependentLinearWeightsTransformation {
   coefsArrayMatrices: [number[][], number[][]]
   coefsArrayMatrix: number[][]
-  coefsArrayMatricesDimensions: [[number, number], [number, number]]
-  coefsArrayMatrixDimensions: [number, number]
+  coefsArrayMatricesSize: [Size, Size]
+  coefsArrayMatrixSize: Size
 
   order: number
 
@@ -49,12 +49,10 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
 
     this.coefsArrayMatrices = this.getCoefsArrayMatrices()
     this.coefsArrayMatrix = this.coefsArrayMatrices[0]
-    this.coefsArrayMatricesDimensions = this.coefsArrayMatrices.map(
-      (coefsArrayMatrix) => arrayMatrixDimensions(coefsArrayMatrix)
+    this.coefsArrayMatricesSize = this.coefsArrayMatrices.map(
+      (coefsArrayMatrix) => arrayMatrixSize(coefsArrayMatrix)
     ) as [[number, number], [number, number]]
-    this.coefsArrayMatrixDimensions = arrayMatrixDimensions(
-      this.coefsArrayMatrix
-    )
+    this.coefsArrayMatrixSize = arrayMatrixSize(this.coefsArrayMatrix)
   }
 
   getDestinationPointsArrays(): [number[], number[]] {

@@ -1,6 +1,6 @@
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
-import type { Point } from '@allmaps/types'
+import type { Point, Size } from '@allmaps/types'
 
 import type { TransformationType } from '../shared/types.js'
 
@@ -11,8 +11,8 @@ import type { TransformationType } from '../shared/types.js'
 export abstract class BaseIndependentLinearWeightsTransformation extends BaseLinearWeightsTransformation {
   abstract coefsArrayMatrices: [number[][], number[][]]
   abstract coefsArrayMatrix: number[][]
-  abstract coefsArrayMatricesDimensions: [[number, number], [number, number]]
-  abstract coefsArrayMatrixDimensions: [number, number]
+  abstract coefsArrayMatricesSize: [Size, Size]
+  abstract coefsArrayMatrixSize: Size
 
   constructor(
     sourcePoints: Point[],

@@ -31,19 +31,20 @@ const georeferencedMap2 = readJSONFile(
   path.join(inputDir, 'georeferenced-map-diemer-meer-2.json')
 )
 
-const georeferencedMap3 = readJSONFile(
-  path.join(inputDir, 'georeferenced-map-diemer-meer-3.json')
-)
+// const georeferencedMap3 = readJSONFile(
+//   path.join(inputDir, 'georeferenced-map-diemer-meer-3.json')
+// )
 
 describe('Filter out the correct staples', () => {
-  it(`should not find any staples in the maps by default`, async () => {
-    const stapledtransformation =
-      await StapledTransformation.fromGeoreferencedMaps([
-        georeferencedMap0,
-        georeferencedMap1
-      ])
-
-    expect(stapledtransformation.staples.length).to.equal(0)
+  it(`should throw when there are not any maps with staples`, async () => {
+    return expect(
+      Promise.resolve(
+        StapledTransformation.fromGeoreferencedMaps([
+          georeferencedMap0,
+          georeferencedMap1
+        ])
+      )
+    ).to.eventually.be.rejected
   })
 })
 
@@ -93,7 +94,7 @@ describe('Filter out the correct staples', () => {
 })
 
 describe('Coefs matrix for two maps', () => {
-  it(`should build the correct coefs matrix`, async () => {
+  it(`should build the correct destination points arrays`, async () => {
     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
     const stapledtransformation =
@@ -102,7 +103,32 @@ describe('Coefs matrix for two maps', () => {
         { type: 'polynomial' }
       )
 
-    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
+    const destinationPointsArrays =
+      stapledtransformation.destinationPointsArrays
+
+    const result = [
+      [4.9405887, 4.9560178, 4.9470578, 4.9405376, 4.9272429, 4.9421303, 0],
+      [
+        52.3579862, 52.3571296, 52.3519005, 52.3475742, 52.3403572, 52.3374577,
+        0
+      ]
+    ]
+
+    expectToBeCloseToArrayArray(destinationPointsArrays, result)
+  })
+})
+
+describe('Coefs matrix for two maps', () => {
+  it(`should build the correct coefs array matrix`, async () => {
+    georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
+    georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps(
+        [georeferencedMap0, georeferencedMap1],
+        { type: 'polynomial' }
+      )
+
+    const coefsArrayMatrix = stapledtransformation.coefsArrayMatrix
 
     const result = [
       [1, 4346, -2550, 0, 0, 0],
@@ -134,9 +160,9 @@ describe('Process transformation type', () => {
         { type: 'polynomial' }
       )
 
-    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
+    const coefsArrayMatrix = stapledtransformation.coefsArrayMatrix
     const polynomialCoefsArrayMatrix =
-      polynomialStapledTransformation.getCoefsArrayMatrix()
+      polynomialStapledTransformation.coefsArrayMatrix
 
     const result = [
       [
@@ -204,7 +230,7 @@ describe('Coefs matrix for more then two maps', () => {
         { type: 'polynomial' }
       )
 
-    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
+    const coefsArrayMatrix = stapledtransformation.coefsArrayMatrix
 
     const result = [
       [1, 4346, -2550, 0, 0, 0, 0, 0, 0],

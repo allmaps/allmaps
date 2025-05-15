@@ -1501,6 +1501,9 @@ importers:
       '@allmaps/transform':
         specifier: workspace:^
         version: link:../transform
+      ml-matrix:
+        specifier: ^6.12.0
+        version: 6.12.1
     devDependencies:
       '@allmaps/annotation':
         specifier: workspace:^
@@ -4996,7 +4999,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.20.8(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.19)
+      '@sveltejs/kit': 2.20.8(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.28.2)(vite@5.4.19)
     dev: true
 
   /@sveltejs/kit@2.20.8(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.19):

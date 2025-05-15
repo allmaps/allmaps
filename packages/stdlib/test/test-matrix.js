@@ -21,7 +21,7 @@ describe('newBlockArrayMatrix', async () => {
     [block1, block3],
     [block2, block4]
   ]
-  it(`should merge the blocks to a new array matrix if the dimensions line up`, () => {
+  it(`should merge the blocks to a new array matrix if the sizes line up`, () => {
     expectToBeCloseToArrayArray(newBlockArrayMatrix(blocks), [
       [1, 2, 5],
       [3, 4, 6],
@@ -29,7 +29,7 @@ describe('newBlockArrayMatrix', async () => {
     ])
   })
 
-  it(`should throw if the dimensions don't line up`, () => {
+  it(`should throw if the sizes don't line up`, () => {
     expect(() => newBlockArrayMatrix(wrongBlocks)).to.throw()
   })
 })

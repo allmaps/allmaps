@@ -1,5 +1,7 @@
 import { isEqualArray } from './main.js'
 
+import type { Size } from '@allmaps/types'
+
 /**
  * Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as a ml-matrix Matrix
  */
@@ -14,7 +16,7 @@ export function newArrayMatrix<T = number>(
   return Array.from(Array(rows), (_) => Array(cols).fill(value)) as T[][]
 }
 
-export function arrayMatrixDimensions<T>(arrayMatrix: T[][]): [number, number] {
+export function arrayMatrixSize<T>(arrayMatrix: T[][]): Size {
   if (arrayMatrix.length === 0) {
     throw new Error('ArrayMatrix may not be empty, but rows are empty')
   }
@@ -58,11 +60,11 @@ export function subArrayMatrix<T>(
   rows: number[],
   cols: number[]
 ): T[][] {
-  const dimensions = [rows.length, cols.length] as [number, number]
-  const result = newArrayMatrix<T>(...dimensions)
+  const size = [rows.length, cols.length] as Size
+  const result = newArrayMatrix<T>(...size)
 
-  for (let i = 0; i < dimensions[0]; i++) {
-    for (let j = 0; j < dimensions[1]; j++) {
+  for (let i = 0; i < size[0]; i++) {
+    for (let j = 0; j < size[1]; j++) {
       result[i][j] = arrayMatrix[rows[i]][cols[j]]
     }
   }
@@ -74,11 +76,11 @@ export function multiplyArrayMatrix(
   arrayMatrix: number[][],
   factor: number
 ): number[][] {
-  const dimensions = arrayMatrixDimensions(arrayMatrix)
-  const result = newArrayMatrix<number>(...dimensions)
+  const size = arrayMatrixSize(arrayMatrix)
+  const result = newArrayMatrix<number>(...size)
 
-  for (let i = 0; i < dimensions[0]; i++) {
-    for (let j = 0; j < dimensions[1]; j++) {
+  for (let i = 0; i < size[0]; i++) {
+    for (let j = 0; j < size[1]; j++) {
       result[i][j] = factor * arrayMatrix[i][j]
     }
   }
@@ -93,11 +95,11 @@ export function pasteArrayMatrix<T>(
   colsStart: number,
   subArrayMatrix: T[][]
 ): T[][] {
-  const subDimensions = arrayMatrixDimensions(subArrayMatrix)
+  const subSize = arrayMatrixSize(subArrayMatrix)
   const result = shallowCopyArrayMatrix(arrayMatrix)
 
-  for (let i = 0; i < subDimensions[0]; i++) {
-    for (let j = 0; j < subDimensions[1]; j++) {
+  for (let i = 0; i < subSize[0]; i++) {
+    for (let j = 0; j < subSize[1]; j++) {
       result[rowsStart + i][colsStart + j] = subArrayMatrix[i][j]
     }
   }
@@ -115,12 +117,12 @@ export function newBlockArrayMatrix<T = number>(
   blocks: T[][][][],
   emptyValue: T = 0 as T
 ): T[][] {
-  const dimensions = arrayMatrixDimensions(blocks)
-  const dimensionsArrayMatrix = blocks.map((row) =>
-    row.map((block) => arrayMatrixDimensions(block))
+  const size = arrayMatrixSize(blocks)
+  const sizesArrayMatrix = blocks.map((row) =>
+    row.map((block) => arrayMatrixSize(block))
   )
 
-  const rowsArrayMatrix = dimensionsArrayMatrix.map((row) =>
+  const rowsArrayMatrix = sizesArrayMatrix.map((row) =>
     row.map((dims) => dims[0])
   )
   const transposedRowsArrayMatrix = transposeArrayMatrix(rowsArrayMatrix)
@@ -142,7 +144,7 @@ export function newBlockArrayMatrix<T = number>(
   })
   const rowsCumulative = sum
 
-  const colsArrayMatrix = dimensionsArrayMatrix.map((row) =>
+  const colsArrayMatrix = sizesArrayMatrix.map((row) =>
     row.map((dims) => dims[1])
   )
   const colsArray = colsArrayMatrix[0]
@@ -161,8 +163,8 @@ export function newBlockArrayMatrix<T = number>(
 
   let result = newArrayMatrix<T>(rowsCumulative, colsCumulative, emptyValue)
 
-  for (let i = 0; i < dimensions[0]; i++) {
-    for (let j = 0; j < dimensions[1]; j++) {
+  for (let i = 0; i < size[0]; i++) {
+    for (let j = 0; j < size[1]; j++) {
       result = pasteArrayMatrix(
         result,
         rowsTrailingCumulativeArray[i],

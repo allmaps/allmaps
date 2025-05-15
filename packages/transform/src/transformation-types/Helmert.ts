@@ -3,12 +3,12 @@ import { Matrix, pseudoInverse } from 'ml-matrix'
 import {
   newArrayMatrix,
   pasteArrayMatrix,
-  arrayMatrixDimensions
+  arrayMatrixSize
 } from '@allmaps/stdlib'
 
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
 
-import type { Point } from '@allmaps/types'
+import type { Point, Size } from '@allmaps/types'
 
 import type { HelmertMeasures } from '../shared/types.js'
 
@@ -21,7 +21,7 @@ import type { HelmertMeasures } from '../shared/types.js'
  */
 export class Helmert extends BaseLinearWeightsTransformation {
   coefsArrayMatrices: [number[][], number[][]]
-  coefsArrayMatricesDimensions: [[number, number], [number, number]]
+  coefsArrayMatricesSize: [Size, Size]
 
   weightsArray?: number[]
   weightsArrays?: [number[], number[]]
@@ -30,8 +30,8 @@ export class Helmert extends BaseLinearWeightsTransformation {
     super(sourcePoints, destinationPoints, 'helmert', 2)
 
     this.coefsArrayMatrices = this.getCoefsArrayMatrices()
-    this.coefsArrayMatricesDimensions = this.coefsArrayMatrices.map(
-      (coefsArrayMatrix) => arrayMatrixDimensions(coefsArrayMatrix)
+    this.coefsArrayMatricesSize = this.coefsArrayMatrices.map(
+      (coefsArrayMatrix) => arrayMatrixSize(coefsArrayMatrix)
     ) as [[number, number], [number, number]]
   }
 

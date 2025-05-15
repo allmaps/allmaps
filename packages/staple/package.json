@@ -29,18 +29,19 @@
   ],
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/transform": "workspace:^"
+    "@allmaps/transform": "workspace:^",
+    "ml-matrix": "^6.12.0"
   },
   "devDependencies": {
+    "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "@allmaps/annotation": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",
-    "chai-shallow-deep-equal": "^1.4.6",
     "chai-as-promised": "^8.0.0",
+    "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
