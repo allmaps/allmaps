@@ -1,5 +1,6 @@
 import { generateChecksum } from '@allmaps/id'
 import {
+  groupBy,
   mergeOptions,
   multiplyArrayMatrix,
   newArrayMatrix,
@@ -12,68 +13,56 @@ import {
 
 import type {
   GeoreferencedMapWithRcps,
+  StaplePointWithId,
   Staple,
-  StapleDuo,
-  StaplerFromGeoreferencedMapsOptions
+  StapledTransformationFromGeoreferencedMapsOptions
 } from './types'
 
-const defaultStaplerFromGeoreferencedMapsOptions: StaplerFromGeoreferencedMapsOptions =
+const defaultStapledTransformationFromGeoreferencedMapsOptions: StapledTransformationFromGeoreferencedMapsOptions =
   {
     direction: 'toGeo',
     type: 'thinPlateSpline'
   }
 
-export class Stapler {
-  transformationsByMapId: Map<
-    string,
-    BaseIndependentLinearWeightsTransformation
-  >
-  stapleDuosById: Map<string, StapleDuo>
+export class StapledTransformation {
+  transformationsById: Map<string, BaseIndependentLinearWeightsTransformation>
+  staples: Staple[]
 
   /**
-   * Create a Stapler
+   * Create a Stapled Transformation
    */ constructor(
-    transformationsByMapId: Map<
+    transformationsById: Map<
       string,
       BaseIndependentLinearWeightsTransformation
     >,
-    stapleDuosById: Map<string, StapleDuo>
+    staples: Staple[]
   ) {
-    this.transformationsByMapId = transformationsByMapId
-    this.stapleDuosById = stapleDuosById
+    this.transformationsById = transformationsById
+    this.staples = staples
   }
 
   getCoefsArrayMatrix(): number[][] {
     let dimensions: [number, number] = [0, 0]
-    this.transformationsByMapId.forEach((transformation) => {
+    this.transformationsById.forEach((transformation) => {
       dimensions = [
         dimensions[0] + transformation.coefsArrayMatrixDimensions[0],
         dimensions[1] + transformation.coefsArrayMatrixDimensions[1]
       ]
     })
-    dimensions = [dimensions[0] + this.stapleDuosById.size, dimensions[1]]
+    dimensions = [dimensions[0] + this.staples.length, dimensions[1]]
 
     let coefsArrayMatrix = newArrayMatrix(...dimensions)
 
     let trailingCumulativeDimensions: [number, number] = [0, 0]
-    let trailingCumulativeDimensionsByMapId = new Map<
-      string,
-      [number, number]
-    >()
+    let trailingCumulativeDimensionsById = new Map<string, [number, number]>()
 
-    for (const [
-      mapId,
-      transformation
-    ] of this.transformationsByMapId.entries()) {
+    for (const [id, transformation] of this.transformationsById.entries()) {
       coefsArrayMatrix = pasteArrayMatrix(
         coefsArrayMatrix,
         ...trailingCumulativeDimensions,
         transformation.coefsArrayMatrix
       )
-      trailingCumulativeDimensionsByMapId.set(
-        mapId,
-        trailingCumulativeDimensions
-      )
+      trailingCumulativeDimensionsById.set(id, trailingCumulativeDimensions)
       trailingCumulativeDimensions = [
         trailingCumulativeDimensions[0] +
           transformation.coefsArrayMatrixDimensions[0],
@@ -82,25 +71,29 @@ export class Stapler {
       ]
     }
 
-    for (const stapleDuo of this.stapleDuosById.values()) {
-      const stapleSourcePointCoefsArray0 = this.transformationsByMapId
-        .get(stapleDuo.staple0.mapId)
-        ?.getSourcePointCoefsArray(stapleDuo.staple0.source)
-      const stapleSourcePointCoefsArray1 = this.transformationsByMapId
-        .get(stapleDuo.staple1.mapId)
-        ?.getSourcePointCoefsArray(stapleDuo.staple1.source)
+    for (const staple of this.staples) {
+      const stapleSourcePointCoefsArray0 = this.transformationsById
+        .get(staple[0].transformationId)
+        ?.getSourcePointCoefsArray(staple[0].source)
+      const stapleSourcePointCoefsArray1 = this.transformationsById
+        .get(staple[1].transformationId)
+        ?.getSourcePointCoefsArray(staple[1].source)
       if (!stapleSourcePointCoefsArray0 || !stapleSourcePointCoefsArray1) {
         throw new Error('Staple source point coefs array missing')
       }
       const trailingCumulativeDimensions0 =
-        trailingCumulativeDimensionsByMapId.get(stapleDuo.staple0.mapId)
+        trailingCumulativeDimensionsById.get(staple[0].transformationId)
       const trailingCumulativeDimensions1 =
-        trailingCumulativeDimensionsByMapId.get(stapleDuo.staple1.mapId)
+        trailingCumulativeDimensionsById.get(staple[1].transformationId)
       if (!trailingCumulativeDimensions0) {
-        throw new Error('trailingCumulativeDimensions not found for mapId')
+        throw new Error(
+          'trailingCumulativeDimensions not found for transformationId'
+        )
       }
       if (!trailingCumulativeDimensions1) {
-        throw new Error('trailingCumulativeDimensions not found for mapId')
+        throw new Error(
+          'trailingCumulativeDimensions not found for transformationId'
+        )
       }
       coefsArrayMatrix = pasteArrayMatrix(
         coefsArrayMatrix,
@@ -125,16 +118,18 @@ export class Stapler {
 
   static async fromGeoreferencedMaps(
     georeferencedMaps: GeoreferencedMapWithRcps[],
-    options?: Partial<StaplerFromGeoreferencedMapsOptions>
-  ): Promise<Stapler> {
-    options = mergeOptions(defaultStaplerFromGeoreferencedMapsOptions, options)
+    options?: Partial<StapledTransformationFromGeoreferencedMapsOptions>
+  ): Promise<StapledTransformation> {
+    options = mergeOptions(
+      defaultStapledTransformationFromGeoreferencedMapsOptions,
+      options
+    )
 
-    const transformationsByMapId = new Map<
+    const transformationsById = new Map<
       string,
       BaseIndependentLinearWeightsTransformation
     >()
-    const staplesById = new Map<string, Staple[]>()
-    const stapleDuosById = new Map<string, StapleDuo>()
+    const staplePoints: StaplePointWithId[] = []
 
     for (const georeferencedMap of georeferencedMaps) {
       // Neglect georeferenced maps with no staple points
@@ -161,30 +156,26 @@ export class Stapler {
         )
       }
 
-      transformationsByMapId.set(mapId, transformation)
+      transformationsById.set(mapId, transformation)
 
       georeferencedMap.rcps.forEach((rcp) => {
-        if (!staplesById.has(rcp.id)) {
-          staplesById.set(rcp.id, [])
-        }
-        staplesById.get(rcp.id)?.push({
+        staplePoints.push({
           id: rcp.id,
-          mapId,
+          transformationId: mapId,
           source: rcp.resource
         })
       })
     }
 
-    staplesById.forEach((staples) => {
-      if (staples.length !== 2) {
-        throw new Error('There must be exactly two staples by staple ID')
+    const staples = Object.values(groupBy(staplePoints, (i) => i.id)).filter(
+      (staplePoints) => {
+        if (staplePoints.length > 2) {
+          throw new Error('There can not be more then two staple points per Id')
+        }
+        return staplePoints.length === 2
       }
-    })
+    ) as [StaplePointWithId, StaplePointWithId][] as Staple[]
 
-    for (const [id, staples] of staplesById.entries()) {
-      stapleDuosById.set(id, { staple0: staples[0], staple1: staples[1] })
-    }
-
-    return new Stapler(transformationsByMapId, stapleDuosById)
+    return new StapledTransformation(transformationsById, staples)
   }
 }

@@ -155,6 +155,7 @@ export {
 
 export {
   degreesToRadians,
+  groupBy,
   isEqualArray,
   arrayRepeated,
   subSetArray,

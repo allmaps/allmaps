@@ -7,7 +7,7 @@ import eventually from 'chai-as-promised'
 
 import { expectToBeCloseToArrayArray } from '../../stdlib/test/helper-functions.js'
 
-import { Stapler } from '../dist/Stapler.js'
+import { StapledTransformation } from '../dist/StapledTransformation.js'
 
 // import { Matrix } from '../../transform/node_modules/ml-matrix/matrix.js'
 
@@ -37,24 +37,26 @@ const georeferencedMap3 = readJSONFile(
 
 describe('Filter out the correct staples', () => {
   it(`should not find any staples in the maps by default`, async () => {
-    const stapler = await Stapler.fromGeoreferencedMaps([
-      georeferencedMap0,
-      georeferencedMap1
-    ])
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps([
+        georeferencedMap0,
+        georeferencedMap1
+      ])
 
-    expect(stapler.stapleDuosById.size).to.equal(0)
+    expect(stapledtransformation.staples.length).to.equal(0)
   })
 })
 
 describe('Stop on staples that occure only once', () => {
-  it(`should throw when less then two staples by staple ID`, async () => {
+  it(`should not consider staples that occure only once`, async () => {
     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps([
+        georeferencedMap0,
+        georeferencedMap1
+      ])
 
-    return expect(
-      Promise.resolve(
-        Stapler.fromGeoreferencedMaps([georeferencedMap0, georeferencedMap1])
-      )
-    ).to.eventually.be.rejected
+    expect(stapledtransformation.staples.length).to.equal(0)
   })
 })
 
@@ -66,7 +68,7 @@ describe('Stop when more then two staple by staple ID', () => {
 
     return expect(
       Promise.resolve(
-        Stapler.fromGeoreferencedMaps([
+        StapledTransformation.fromGeoreferencedMaps([
           georeferencedMap0,
           georeferencedMap1,
           georeferencedMap2
@@ -80,12 +82,13 @@ describe('Filter out the correct staples', () => {
   it(`should recognise staples with the same id`, async () => {
     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
-    const stapler = await Stapler.fromGeoreferencedMaps([
-      georeferencedMap0,
-      georeferencedMap1
-    ])
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps([
+        georeferencedMap0,
+        georeferencedMap1
+      ])
 
-    expect(stapler.stapleDuosById.size).to.equal(1)
+    expect(stapledtransformation.staples.length).to.equal(1)
   })
 })
 
@@ -93,12 +96,13 @@ describe('Coefs matrix for two maps', () => {
   it(`should build the correct coefs matrix`, async () => {
     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
-    const stapler = await Stapler.fromGeoreferencedMaps(
-      [georeferencedMap0, georeferencedMap1],
-      { type: 'polynomial' }
-    )
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps(
+        [georeferencedMap0, georeferencedMap1],
+        { type: 'polynomial' }
+      )
 
-    const coefsArrayMatrix = stapler.getCoefsArrayMatrix()
+    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
 
     const result = [
       [1, 4346, -2550, 0, 0, 0],
@@ -119,17 +123,20 @@ describe('Process transformation type', () => {
     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 
-    const stapler = await Stapler.fromGeoreferencedMaps([
-      georeferencedMap0,
-      georeferencedMap1
-    ])
-    const polynomialStapler = await Stapler.fromGeoreferencedMaps(
-      [georeferencedMap0, georeferencedMap1],
-      { type: 'polynomial' }
-    )
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps([
+        georeferencedMap0,
+        georeferencedMap1
+      ])
+    const polynomialStapledTransformation =
+      await StapledTransformation.fromGeoreferencedMaps(
+        [georeferencedMap0, georeferencedMap1],
+        { type: 'polynomial' }
+      )
 
-    const coefsArrayMatrix = stapler.getCoefsArrayMatrix()
-    const polynomialCoefsArrayMatrix = polynomialStapler.getCoefsArrayMatrix()
+    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
+    const polynomialCoefsArrayMatrix =
+      polynomialStapledTransformation.getCoefsArrayMatrix()
 
     const result = [
       [
@@ -191,12 +198,13 @@ describe('Coefs matrix for more then two maps', () => {
     ]
     georeferencedMap2.rcps = [{ id: '2', resource: [7, 8] }]
 
-    const stapler = await Stapler.fromGeoreferencedMaps(
-      [georeferencedMap0, georeferencedMap1, georeferencedMap2],
-      { type: 'polynomial' }
-    )
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps(
+        [georeferencedMap0, georeferencedMap1, georeferencedMap2],
+        { type: 'polynomial' }
+      )
 
-    const coefsArrayMatrix = stapler.getCoefsArrayMatrix()
+    const coefsArrayMatrix = stapledtransformation.getCoefsArrayMatrix()
 
     const result = [
       [1, 4346, -2550, 0, 0, 0, 0, 0, 0],

@@ -2,6 +2,19 @@ export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
 }
 
+// Define vanilla groupBy function, since official one is only baseline 2024
+// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
+// Vanilla code from https://stackoverflow.com/a/62765924/2386673
+export function groupBy<T, K extends keyof any>(arr: T[], key: (i: T) => K) {
+  return arr.reduce(
+    (groups, item) => {
+      ;(groups[key(item)] ||= []).push(item)
+      return groups
+    },
+    {} as Record<K, T[]>
+  )
+}
+
 // Note: this checks equality of the object
 // which is only a good idea for primitive types (string, number), not JSON objects
 export function isEqualArray<T>(

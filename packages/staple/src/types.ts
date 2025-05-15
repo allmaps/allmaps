@@ -13,18 +13,18 @@ export type Rcp = {
   resource: Point
 }
 
-export type Staple = {
-  id: string
-  mapId: string
+export type StaplePoint = {
+  transformationId: string
   source: Point
 }
 
-export type StapleDuo = {
-  staple0: Staple
-  staple1: Staple
-}
+export type StaplePointWithId = {
+  id: string
+} & StaplePoint
 
-export type StaplerFromGeoreferencedMapsOptions = {
+export type Staple = [StaplePoint, StaplePoint]
+
+export type StapledTransformationFromGeoreferencedMapsOptions = {
   direction: 'toGeo' | 'toResource'
   type: TransformationType
 }
