@@ -225,8 +225,10 @@ export class WarpedMap extends EventTarget {
     // TODO: read internal projection and projection from georeferenced map
     const georeferencedMapInput = {
       transformationType: georeferencedMap.transformation
-        ?.type as TransformationType
+        ?.type as TransformationType,
+      internalProjection: georeferencedMap.resourceCrs
     }
+
     const defaultAndMapOptions = mergeOptionsUnlessUndefined(
       DEFAULT_WARPED_MAP_OPTIONS,
       georeferencedMapInput

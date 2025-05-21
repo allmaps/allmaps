@@ -6,6 +6,7 @@ import {
   PartOfSchema,
   PointGeometrySchema,
   TransformationSchema,
+  ProjectionSchema,
   ContextSchema
 } from '../shared.js'
 
@@ -86,6 +87,7 @@ export const FeaturePropertiesSchema = z.object({
 export const BodySchema = z.object({
   type: z.literal('FeatureCollection'),
   transformation: TransformationSchema.optional(),
+  resourceCrs: ProjectionSchema.optional(),
   features: z.array(
     z.object({
       type: z.literal('Feature'),

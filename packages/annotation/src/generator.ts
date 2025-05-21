@@ -22,7 +22,8 @@ import type {
   Target,
   Source,
   PartOf,
-  ResourceType
+  ResourceType,
+  Projection
 } from './types.js'
 
 function generateSvgSelector(
@@ -148,9 +149,15 @@ function generateGeoreferenceAnnotation(
     selector: generateSvgSelector(georeferencedMap)
   }
 
+  let resourceCrs: Projection | undefined
+  if ('resourceCrs' in georeferencedMap) {
+    resourceCrs = georeferencedMap.resourceCrs
+  }
+
   const body = {
     type: 'FeatureCollection' as const,
     transformation: georeferencedMap.transformation,
+    resourceCrs,
     features: georeferencedMap.gcps.map((gcp) => generateFeature(gcp))
   }
 

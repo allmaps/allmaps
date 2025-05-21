@@ -112,6 +112,11 @@ export const TransformationSchema = z
     }
   })
 
+export const ProjectionSchema = z.object({
+  name: z.string().optional(),
+  definition: z.union([z.string(), z.unknown()])
+})
+
 export const ContextSchema = z.union([
   z.string().url().array(),
   z.string().url()
