@@ -146,7 +146,7 @@ export class MapsState extends MapsEventTarget {
 
   #connectToImageId(imageId: string) {
     if (this.#doc) {
-      this.#doc.off('op', this.#handleRemoteOperation.bind(this))
+      this.#doc.off('op', this.#handleOperation.bind(this))
 
       this.#doc.destroy(() => {
         this.#setDoc(imageId)
@@ -163,7 +163,7 @@ export class MapsState extends MapsEventTarget {
     this.#doc = this.#connection.get('images', allmapsImageId)
 
     this.#doc.subscribe(this.#handleSnapshot.bind(this))
-    this.#doc.on('op', this.#handleRemoteOperation.bind(this))
+    this.#doc.on('op', this.#handleOperation.bind(this))
   }
 
   #handleSnapshot(err: ShareDBError) {
@@ -220,7 +220,10 @@ export class MapsState extends MapsEventTarget {
     }
   }
 
-  #handleRemoteOperation(op: unknown) {
+  #handleOperation(op: unknown) {
+    // Function also passes 2nd parameter localOperation: boolean
+    // I think we don't need to use it.
+
     if (op && this.#doc) {
       this.#maps = this.#doc.data
 
@@ -435,7 +438,7 @@ export class MapsState extends MapsEventTarget {
 
   disconnect() {
     if (this.#doc) {
-      this.#doc.removeListener('op', this.#handleRemoteOperation.bind(this))
+      this.#doc.removeListener('op', this.#handleOperation.bind(this))
       this.#doc.destroy()
     }
 

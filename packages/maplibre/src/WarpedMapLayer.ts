@@ -18,7 +18,13 @@ import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 import type { WarpedMapLayerOptions } from '@allmaps/render'
-import type { Rectangle, Ring, ImageInformations, Point } from '@allmaps/types'
+import type {
+  Rectangle,
+  Ring,
+  ImageInformations,
+  Point,
+  Gcp
+} from '@allmaps/types'
 
 export type MapLibreWarpedMapLayerOptions = WarpedMapLayerOptions
 
@@ -276,6 +282,18 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
+   * Sets the GCOs of a single map
+   * @param mapId - ID of the map
+   * @param gcps - new GCPs
+   */
+  setMapGcps(mapId: string, gcps: Gcp[]) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapGcps(gcps, mapId)
+    this.map?.triggerRepaint()
+  }
+
+  /**
    * Sets the transformation type of multiple maps
    * @param mapIds - IDs of the maps
    * @param transformation - new transformation type
@@ -293,6 +311,18 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
+   * Sets the transformation type of a single map
+   * @param mapId - ID of the map
+   * @param transformation - new transformation type
+   */
+  setMapTransformationType(mapId: string, transformation: TransformationType) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapTransformationType(transformation, mapId)
+    this.map?.triggerRepaint()
+  }
+
+  /**
    * Sets the distortion measure of multiple maps
    * @param mapIds - IDs of the maps
    * @param distortionMeasure - new transformation type
@@ -306,6 +336,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
       mapIds
     })
+    this.map?.triggerRepaint()
+  }
+
+  removeGeoreferencedMapById(mapId: string) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
     this.map?.triggerRepaint()
   }
 

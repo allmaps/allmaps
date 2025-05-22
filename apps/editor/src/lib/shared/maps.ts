@@ -276,3 +276,7 @@ export function toGeoreferencedMap(dbMap: DbMap): GeoreferencedMap {
 export function toGeoreferencedMaps(dbMaps: DbMap[]): GeoreferencedMap[] {
   return dbMaps.map(toGeoreferencedMap)
 }
+
+export function getSortedGcps(gcps: DbGcp3[]) {
+  return gcps.toSorted((gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0))
+}

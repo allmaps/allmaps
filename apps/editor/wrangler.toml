@@ -1,0 +1,9 @@
+name = "editor"
+main = ".svelte-kit/cloudflare/_worker.js"
+compatibility_date = "2025-01-01"
+
+assets = { directory = ".svelte-kit/cloudflare",  binding = "ASSETS" }
+#observability = { enabled = "true" }
+
+[env.dev]
+name = "editor-next"
