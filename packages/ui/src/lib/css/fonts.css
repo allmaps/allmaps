@@ -41,8 +41,9 @@
   --geograph-ss03: 'ss03' on;
   --geograph-tnum: 'tnum' off;
 
-  font-feature-settings: var(--geograph-ss01), var(--geograph-ss02),
-    var(--geograph-ss03), var(--geograph-tnum);
+  font-feature-settings:
+    var(--geograph-ss01), var(--geograph-ss02), var(--geograph-ss03),
+    var(--geograph-tnum);
 }
 
 /*
