@@ -17,12 +17,14 @@
     "precommit": "pnpm run types && pnpm run test && pnpm run lint && pnpm run documentation",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "version-prerelease": "lerna version prerelease",
+    "publish-beta": "lerna publish from-git --dist-tag beta"
   },
   "devDependencies": {
-    "husky": "^8",
-    "lerna": "^8",
-    "nx": "^14.3.6"
+    "@lerna-lite/cli": "^4.1.2",
+    "@lerna-lite/publish": "^4.1.2",
+    "husky": "^8"
   },
   "engines": {
     "node": ">=22.6.0"

@@ -1,15 +1,15 @@
 {
-  "packages": ["packages/*", "apps/*"],
+  "packages": ["packages/*", "apps/*", "workers/*"],
   "npmClientArgs": ["--no-lockfile"],
   "version": "independent",
   "command": {
     "version": {
       "ignoreChanges": ["*.md"],
-      "npmClient": "npm",
+      "npmClient": "pnpm",
       "message": "chore(release): publish"
     },
     "publish": {
-      "npmClient": "npm"
+      "npmClient": "pnpm"
     }
   }
 }
