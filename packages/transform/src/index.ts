@@ -19,8 +19,6 @@ export {
   defaultGcpTransformOptions
 } from './shared/transform-functions.js'
 
-// export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
-
 export type {
   GeneralGcp,
   Distortions,
