@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.32",
+  "version": "1.0.0-beta.33",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -50,9 +50,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/project": "workspace:^",
     "maplibre-gl": "^4.5.0"
   },
   "devDependencies": {

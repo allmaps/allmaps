@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/project",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "contributors": [
     {
       "name": "Manuel Claeys Bouuaert",
@@ -39,8 +39,8 @@
     "proj4": "^2.15.0"
   },
   "devDependencies": {
-    "@allmaps/types": "workspace:^",
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@types/proj4": "^2.5.6",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

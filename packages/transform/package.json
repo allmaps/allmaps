@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.43",
+  "version": "1.0.0-beta.44",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -39,8 +39,8 @@
     "ml-matrix": "^6.12.0"
   },
   "devDependencies": {
-    "@allmaps/types": "workspace:^",
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

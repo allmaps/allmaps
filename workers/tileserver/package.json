@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.69",
+  "version": "1.0.0-beta.70",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -29,8 +29,8 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
-    "@allmaps/render": "workspace:^",
     "@allmaps/project": "workspace:^",
+    "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
