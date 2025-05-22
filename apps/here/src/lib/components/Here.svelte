@@ -3,10 +3,12 @@
 
   import Feature from 'ol/Feature.js'
   import OLMap from 'ol/Map.js'
-  import Point from 'ol/geom/Point.js'
+  import OLPoint from 'ol/geom/Point.js'
+  import LineString from 'ol/geom/LineString.js'
   import View from 'ol/View.js'
   import Icon from 'ol/style/Icon.js'
   import Style from 'ol/style/Style.js'
+  import Stroke from 'ol/style/Stroke.js'
   import VectorSource from 'ol/source/Vector.js'
   import IIIF from 'ol/source/IIIF.js'
   import IIIFInfo from 'ol/format/IIIFInfo.js'
@@ -16,117 +18,153 @@
   import 'ol/ol.css'
 
   import { GcpTransformer } from '@allmaps/transform'
+  import { pink } from '@allmaps/tailwind'
 
-  import { geolocationPositionToGeojsonFeature } from '$lib/shared/position.js'
+  import { positionToGeoJsonFeature } from '$lib/shared/position.js'
 
-  import { position } from '$lib/shared/stores/geolocation.js'
-  import {
-    selectedMapWithImageInfo,
-    bearing
-  } from '$lib/shared/stores/selected-map.js'
-  import { rotation } from '$lib/shared/stores/rotation.js'
-  import {
-    orientationAlpha,
-    hasOrientation
-  } from '$lib/shared/stores/orientation.js'
-  import { compassMode } from '$lib/shared/stores/compass-mode.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { getSensorsState } from '$lib/state/sensors.svelte.js'
+  import { getCompassState } from '$lib/state/compass.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import Controls from '$lib/components/Controls.svelte'
+  import DotsPattern from '$lib/components/DotsPattern.svelte'
 
-  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
+  import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type { GeojsonLineString, Point } from '@allmaps/types'
 
-  import HereIcon from '$lib/shared/images/here.svg?raw'
-  import HereOrientationIcon from '$lib/shared/images/here-orientation.svg?raw'
-  import { flipY, geojsonGeometryToGeometry } from '@allmaps/stdlib'
+  import type { MapWithImageInfo } from '$lib/shared/types.js'
 
-  let mounted = false
-  let lastSelectedMapId: string | undefined = undefined
+  import HereIcon from '$lib/images/here.svg?raw'
+  import HereOrientationIcon from '$lib/images/here-orientation.svg?raw'
+  import Pin from '$lib/images/pin.svg?raw'
+  import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
-  let transformer: GcpTransformer
+  const mapsState = getMapsState()
+  const imageInfoState = getImageInfoState()
+  const sensorsState = getSensorsState()
+  const compassState = getCompassState()
+  const uiState = getUiState()
 
-  let ol: HTMLElement
-  let olMap: OLMap
+  let mounted = $state(false)
+  let lastSelectedMapId = $state<string>()
+
+  type FeatureIconSvg = {
+    svg: string
+  }
+
+  type Props = {
+    selectedMapId: string
+    geojsonRoute?: GeojsonLineString
+    from?: Point
+  }
+
+  let { selectedMapId, geojsonRoute, from }: Props = $props()
+
+  let ol = $state.raw<HTMLElement>()
+  let olMap = $state.raw<OLMap>()
+  let map = $state.raw<GeoreferencedMap>()
+  let transformer = $state.raw<GcpTransformer>()
+
+  let positionImageCoordinates = $derived.by<Point | undefined>(() => {
+    if (sensorsState.position && transformer) {
+      const feature = positionToGeoJsonFeature(sensorsState.position)
+      const imageCoordinates = transformer.transformToResource(
+        feature.geometry.coordinates
+      )
+      return [imageCoordinates[0], -imageCoordinates[1]]
+    }
+  })
+
+  let fromImageCoordinates = $derived.by<Point | undefined>(() => {
+    if (from && transformer) {
+      const imageCoordinates = transformer.transformToResource([
+        from[1],
+        from[0]
+      ])
+      return [imageCoordinates[0], -imageCoordinates[1]]
+    }
+  })
+
   const tileLayer = new TileLayer()
-  const positionFeature: Feature = new Feature()
+  const positionFeature = new Feature()
+  const fromFeature = new Feature({})
+  const geojsonFeature = new Feature()
 
-  let dragging = false
+  geojsonFeature.setStyle([
+    new Style({
+      stroke: new Stroke({
+        color: 'white',
+        width: 4
+      })
+    }),
+    new Style({
+      stroke: new Stroke({
+        color: pink,
+        width: 3
+      })
+    })
+  ])
 
-  $: {
-    updatePosition($position)
-  }
+  let dragging = $state(false)
 
-  $: {
-    if ($compassMode !== 'custom') {
-      dragging = false
-    }
-
-    if ($compassMode === 'image') {
-      setRotation(0)
-    } else if ($compassMode === 'north') {
-      setRotation(-$bearing)
-    } else if ($compassMode === 'follow-orientation' && $orientationAlpha) {
-      setRotation($bearing + $orientationAlpha)
-    }
-  }
-
-  $: {
-    if (olMap) {
-      if ($hasOrientation) {
-        setFeatureImage(HereOrientationIcon)
-      } else {
-        setFeatureImage(HereIcon)
-      }
-    }
-  }
-
-  $: {
-    if ($orientationAlpha) {
-      if (positionFeature) {
-        const style = positionFeature.getStyle() as Style
-        const image = style?.getImage()
-        image?.setRotation($orientationAlpha * (Math.PI / 180) + $bearing)
-        positionFeature.changed()
-      }
-    }
-  }
-
-  $: {
-    if (
-      $selectedMapWithImageInfo &&
-      $selectedMapWithImageInfo.map.id !== lastSelectedMapId
-    ) {
-      update($selectedMapWithImageInfo)
-    }
-  }
-
-  function setRotation(rotation: number) {
+  function setResourceRotation(rotationRad: number) {
     if (olMap) {
       olMap.getView().animate({
-        rotation: rotation * (Math.PI / 180),
+        rotation: rotationRad,
         duration: 100
       })
     }
   }
 
-  // eslint-disable-next-line no-undef
-  function updatePosition(geolocationPosition: GeolocationPosition) {
-    if (geolocationPosition && transformer) {
-      const geoPosition = geojsonGeometryToGeometry(
-        geolocationPositionToGeojsonFeature(geolocationPosition).geometry
-      )
-      if (positionFeature) {
-        const resourcePosition = transformer.transformToResource(geoPosition)
-        positionFeature.setGeometry(new Point(flipY(resourcePosition)))
+  function rotateFeatureStyleImage(
+    feature: Feature,
+    style: Style,
+    rotationRad: number
+  ) {
+    const image = style?.getImage()
+    image?.setRotation(rotationRad)
+    feature.changed()
+  }
+
+  function setPinRotation(rotationRad: number) {
+    if (positionFeature) {
+      const styleLike = positionFeature.getStyle()
+
+      // here-orientation.svg is pointing east.
+      // Substract 90 degrees to rotate it to north.
+      const pinRotationRad = rotationRad - Math.PI / 2
+
+      if (Array.isArray(styleLike)) {
+        styleLike.map((style) =>
+          rotateFeatureStyleImage(positionFeature, style, pinRotationRad)
+        )
+      } else if (styleLike && 'getImage' in styleLike) {
+        rotateFeatureStyleImage(positionFeature, styleLike, pinRotationRad)
       }
     }
   }
 
-  function update(mapWithImageInfo: {
-    map: GeoreferencedMap
-    imageInfo: ImageInformationResponse
-  }) {
-    if (!mounted) {
+  function updatePositionFeature(imageCoordinates?: Point) {
+    if (map && imageCoordinates) {
+      showPositionFeature()
+
+      positionFeature.setGeometry(new OLPoint(imageCoordinates))
+    }
+  }
+
+  function updateFromFeature(imageCoordinates?: Point) {
+    if (imageCoordinates) {
+      fromFeature.setGeometry(new OLPoint(imageCoordinates))
+    }
+  }
+
+  function update(mapWithImageInfo: MapWithImageInfo) {
+    lastSelectedMapId = mapWithImageInfo.mapId
+
+    if (!mounted || !olMap) {
       return
     }
 
@@ -135,10 +173,16 @@
 
     transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
-    const options = new IIIFInfo(imageInfo).getTileSourceOptions()
-    if (options) {
-      options.zDirection = -1
+    const options = new IIIFInfo(
+      imageInfo as ImageInformationResponse
+    ).getTileSourceOptions()
+
+    if (!options) {
+      return
     }
+
+    options.zDirection = -1
+
     const iiifTileSource = new IIIF(options)
     tileLayer.setSource(iiifTileSource)
 
@@ -155,47 +199,96 @@
 
       view.fit(tileGrid.getExtent())
 
+      if (geojsonRoute) {
+        const projectedGeojsonRoute = transformer.transformToResource(
+          geojsonRoute.coordinates
+        )
+        geojsonFeature.setGeometry(
+          new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
+        )
+      }
+
       olMap.on('pointerdrag', () => {
         dragging = true
       })
 
       view.on('change:rotation', () => {
         if (dragging) {
-          $compassMode = 'custom'
-          $rotation = view.getRotation() * (180 / Math.PI) + $bearing
+          compassState.compassMode = 'custom'
+          compassState.customRotation =
+            view.getRotation() * (180 / Math.PI) +
+            compassState.selectedMapBearing
         }
       })
     }
 
-    updatePosition($position)
+    updatePositionFeature(positionImageCoordinates)
+    updateFromFeature(fromImageCoordinates)
 
     lastSelectedMapId = georeferencedMap.id
   }
 
-  function setFeatureImage(svg: string) {
-    positionFeature.setStyle(
-      new Style({
-        image: new Icon({
-          opacity: 1,
-          rotateWithView: true,
-          width: 30,
-          height: 30,
-          src: 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
-        })
-      })
+  function setPositionFeatureImage(svg: string) {
+    setFeatureImage(positionFeature, [
+      {
+        rotateWithView: true,
+        width: 40,
+        height: 40,
+        svg
+      }
+    ])
+  }
+
+  function setFeatureImage(
+    feature: Feature,
+    icons: (FeatureIconOptions & FeatureIconSvg)[]
+  ) {
+    feature.setStyle(
+      icons.map(
+        (icon) =>
+          new Style({
+            image: new Icon({
+              ...icon,
+              // Important! SVG's width, height and viewbox must be set!
+              src: `data:image/svg+xml;utf8,${encodeURIComponent(icon.svg)}`
+            })
+          })
+      )
     )
   }
 
-  onMount(() => {
-    if ($hasOrientation) {
-      setFeatureImage(HereOrientationIcon)
+  // function hidePositionFeature() {
+  //   positionFeature.setStyle()
+  // }
+
+  function showPositionFeature() {
+    if (sensorsState.hasOrientation) {
+      setPositionFeatureImage(HereOrientationIcon)
     } else {
-      setFeatureImage(HereIcon)
+      setPositionFeatureImage(HereIcon)
     }
+  }
+
+  onMount(async () => {
+    showPositionFeature()
+
+    setFeatureImage(fromFeature, [
+      {
+        height: 20,
+        displacement: [30, 0],
+        svg: PinShadow
+      },
+      {
+        width: 40,
+        displacement: [0, 34],
+        rotation: 0.2,
+        svg: Pin
+      }
+    ])
 
     const vectorLayer = new VectorLayer({
       source: new VectorSource({
-        features: [positionFeature]
+        features: [geojsonFeature, positionFeature, fromFeature]
       })
     })
 
@@ -205,16 +298,111 @@
       controls: []
     })
 
+    olMap.on('postrender', () => {
+      if (olMap && fromImageCoordinates) {
+        const fromScreenCoordinates =
+          olMap.getPixelFromCoordinate(fromImageCoordinates)
+
+        uiState.fromScreenCoordinates = [
+          Math.round(fromScreenCoordinates[0]),
+          Math.round(fromScreenCoordinates[1])
+        ]
+      }
+
+      if (olMap && positionImageCoordinates) {
+        const positionScreenCoordinates = olMap.getPixelFromCoordinate(
+          positionImageCoordinates
+        )
+
+        uiState.positionScreenCoordinates = [
+          Math.round(positionScreenCoordinates[0]),
+          Math.round(positionScreenCoordinates[1])
+        ]
+      }
+    })
+
     mounted = true
 
-    if ($selectedMapWithImageInfo) {
-      update($selectedMapWithImageInfo)
+    const map = await mapsState.fetchMapFromMapId(selectedMapId)
+    if (map) {
+      imageInfoState.fetchImageInfo(map.resource.id)
+    }
+  })
+
+  $effect(() => {
+    updatePositionFeature(positionImageCoordinates)
+  })
+
+  $effect(() => {
+    if (compassState.compassMode !== 'custom') {
+      dragging = false
+    }
+
+    if (compassState.compassMode === 'image') {
+      setResourceRotation(0)
+    } else if (compassState.compassMode === 'north') {
+      setResourceRotation(-compassState.selectedMapBearing * (Math.PI / 180))
+    } else if (
+      compassState.compassMode === 'follow-orientation' &&
+      sensorsState.orientationAlpha
+    ) {
+      setResourceRotation(
+        (sensorsState.orientationAlpha + compassState.selectedMapBearing + 45) *
+          (Math.PI / 180)
+      )
+
+      setPinRotation(
+        sensorsState.orientationAlpha * (Math.PI / 180)
+        // (360 -
+        //   (sensorsState.orientationAlpha +
+        //     compassState.selectedMapBearing +
+        //     45)) *
+        //   (Math.PI / 180)
+      )
+    }
+  })
+
+  $effect(() => {
+    if (olMap) {
+      if (sensorsState.hasOrientation) {
+        setPositionFeatureImage(HereOrientationIcon)
+      } else {
+        setPositionFeatureImage(HereIcon)
+      }
+    }
+  })
+
+  $effect(() => {
+    updateFromFeature(fromImageCoordinates)
+  })
+
+  $effect(() => {
+    if (
+      sensorsState.orientationAlpha !== undefined &&
+      compassState.compassMode !== 'follow-orientation'
+    ) {
+      setPinRotation(
+        (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
+          (Math.PI / 180)
+      )
+    } else if (compassState.compassMode === 'follow-orientation') {
+      // setPinRotation(
+      //   (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
+      //     (Math.PI / 180)
+      // )
+    }
+  })
+
+  $effect(() => {
+    if (mounted) {
+      const mapWithImageInfo = mapsState.getMapWithImageInfo(selectedMapId)
+      if (mapWithImageInfo && lastSelectedMapId !== mapWithImageInfo.mapId) {
+        update(mapWithImageInfo)
+      }
     }
   })
 </script>
 
-<div bind:this={ol} class="w-full h-full" />
-
-<div class="absolute z-50 bottom-0 w-full p-2">
-  <Controls />
-</div>
+<DotsPattern color={pink} opacity={0.5}>
+  <div bind:this={ol} class="w-full h-full"></div>
+</DotsPattern>

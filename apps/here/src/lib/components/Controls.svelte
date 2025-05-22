@@ -1,41 +1,48 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { page } from '$app/state'
   import { goto } from '$app/navigation'
 
-  import { mapsWithImageInfo } from '$lib/shared/stores/maps-with-image-info.js'
-  import { previousMapId, nextMapId } from '$lib/shared/stores/selected-map.js'
+  import {
+    CaretLeft as CaretLeftIcon,
+    CaretRight as CaretRightIcon,
+    GpsFix as GpsFixIcon
+  } from 'phosphor-svelte'
 
   import { NorthArrow } from '@allmaps/ui'
 
-  import { orientation } from '$lib/shared/stores/orientation.js'
-  import {
-    compassMode,
-    nextCompassMode
-  } from '$lib/shared/stores/compass-mode.js'
-  import { rotation } from '$lib/shared/stores/rotation.js'
-  import { bearing } from '$lib/shared/stores/selected-map.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getCompassState } from '$lib/state/compass.svelte.js'
 
-  const hasMaps = $mapsWithImageInfo.length > 0
+  import { createRouteUrl } from '$lib/shared/router.js'
+  import { getAllmapsId } from '$lib/shared/ids.js'
 
-  $: {
-    if ($compassMode === 'image') {
-      $rotation = $bearing
-    } else if ($compassMode === 'north') {
-      $rotation = 0
-    } else if ($compassMode === 'follow-orientation' && $orientation?.alpha) {
-      $rotation = -$orientation?.alpha
-    }
+  import type { Snippet } from 'svelte'
+
+  type Props = {
+    selectedMapId: string
+    children?: Snippet
   }
 
+  let { selectedMapId, children }: Props = $props()
+
+  const mapsState = getMapsState()
+  const compassState = getCompassState()
+
+  const hasMaps = $derived(mapsState.mapsWithImageInfo.length > 1)
+
+  let previousMapId = $derived(mapsState.getPreviousMapId(selectedMapId))
+  let nextMapId = $derived(mapsState.getNextMapId(selectedMapId))
+
   function handleNorthArrowClick() {
-    nextCompassMode()
+    compassState.nextCompassMode()
   }
 
   function handleKeyup(event: KeyboardEvent) {
-    if (event.code === 'BracketLeft' && $previousMapId !== undefined) {
-      goto(`/?url=${$previousMapId}`)
-    } else if (event.code === 'BracketRight' && $nextMapId !== undefined) {
-      goto(`/?url=${$nextMapId}`)
+    if (event.code === 'BracketLeft' && previousMapId) {
+      goto(createRouteUrl(page, getAllmapsId(previousMapId)))
+    } else if (event.code === 'BracketRight' && nextMapId) {
+      goto(createRouteUrl(page, getAllmapsId(nextMapId)))
     }
   }
 
@@ -48,38 +55,53 @@
   })
 </script>
 
-<div class="w-full grid grid-cols-[1fr,min-content,1fr] pointer-events-none">
-  <div></div>
+<div class="w-full grid grid-cols-[1fr_max-content_1fr] items-center gap-2">
+  {#if hasMaps && previousMapId && nextMapId}
+    <div
+      class="bg-white shadow text-center self-center inline-grid grid-cols-2 rounded-md place-self-start pointer-events-auto"
+    >
+      <a
+        href={createRouteUrl(page, getAllmapsId(previousMapId))}
+        role="button"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
+        ><CaretLeftIcon size="16" weight="bold" /></a
+      >
+      <a
+        href={createRouteUrl(page, getAllmapsId(nextMapId))}
+        role="button"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
+        ><CaretRightIcon size="16" weight="bold" /></a
+      >
+    </div>
+  {:else}
+    <a
+      href="/"
+      role="button"
+      class="place-self-start self-center px-2 py-2 text-sm font-medium bg-white rounded-lg
+      focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
+      flex flex-row items-center gap-1"
+    >
+      <GpsFixIcon size="20" weight="bold" />
+      <span>More maps</span></a
+    >
+    <!-- TODO:
+     Add dropdown with options:
+      - "Find more maps around your location"
+      - "Find more maps around shared location"
+      - "Find more maps around both locations"
+      -->
+  {/if}
 
-  <div class="inline-flex rounded-md self-end shadow-sm pointer-events-auto">
-    {#if hasMaps}
-      <a
-        href="/?url={$previousMapId}"
-        role="button"
-        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
-        >Previous</a
-      >
-
-      <a
-        href="/?url={$nextMapId}"
-        role="button"
-        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
-        >Next</a
-      >
-    {:else}
-      <a
-        href="/"
-        role="button"
-        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-pink-500"
-        >Show maps around current location</a
-      >
-    {/if}
-  </div>
+  {#if children}
+    {@render children()}
+  {:else}
+    <div class="contents"></div>
+  {/if}
 
   <div class="pointer-events-auto place-self-end">
     <NorthArrow
-      rotation={$rotation}
-      followOrientation={$compassMode === 'follow-orientation'}
+      rotation={compassState.rotation}
+      followOrientation={compassState.compassMode === 'follow-orientation'}
       on:click={handleNorthArrowClick}
     />
   </div>
