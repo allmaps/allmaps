@@ -1,44 +1,85 @@
-import { AutoRouter, error, cors, json } from 'itty-router'
+import { AutoRouter, error, cors, json, IRequestStrict } from 'itty-router'
 
-import { optionsFromQuery } from './options.js'
-// import { generateImage } from './image.js'
-import { generateCard } from './card.js'
-import { match, put, headers } from './cache.js'
+import { optionsFromQuery } from './shared/options.js'
+import { match, put, headers } from './shared/cache.js'
+import { toJpgImageResponse } from './shared/jpg-response.js'
+
+import type { CFArgs, Env } from './shared/types.js'
+
+import type { Size } from '@allmaps/types'
+
+// Cards
+
+// Warped Map:
+import { generateWarpedMapCard } from './cards/warped-map.js'
+
+// Apps:
+import { generateEditorCard } from './cards/editor.js'
+import { generateHereCard } from './cards/here.js'
+import { generateLatestCard } from './cards/latest.js'
+import { generateViewerCard } from './cards/viewer.js'
 
 const { preflight, corsify } = cors()
 
-const router = AutoRouter({
+const router = AutoRouter<IRequestStrict, CFArgs>({
   before: [preflight],
   finally: [corsify, headers, put]
 })
 
-type Env = {
-  USE_CACHE: boolean
-  API_BASE_URL: string
-}
+const ogImageSize: Size = [1200, 630]
 
-const width = 1200
-const height = 600
+router.get('/apps/latest.png', (req, env) => {
+  return generateLatestCard(req, env, ogImageSize)
+})
 
-// router.get('/maps/:mapId.png', (req, env) => {
-//   const mapId = req.params?.mapId
-//   return generateImage(mapId, [width, height])
-// })
+router.get('/apps/latest.jpg', async (req, env) => {
+  return toJpgImageResponse(await generateLatestCard(req, env, ogImageSize))
+})
 
-router.get('/maps/:mapId.png', (req) => {
+router.get('/apps/editor/maps/:imageId.png', (req, env) => {
+  const imageId = req.params?.imageId
+  const options = optionsFromQuery(req)
+
+  return generateEditorCard(req, env, imageId, ogImageSize, options)
+})
+
+router.get('/apps/viewer/maps/:imageId.png', (req, env) => {
+  const imageId = req.params?.imageId
+  const options = optionsFromQuery(req)
+
+  return generateViewerCard(req, env, imageId, ogImageSize, options)
+})
+
+router.get('/apps/here/maps/:mapId.png', (req, env) => {
   const mapId = req.params?.mapId
   const options = optionsFromQuery(req)
 
-  return generateCard(mapId, [width, height], options)
+  return generateHereCard(req, env, mapId, ogImageSize, options)
+})
+
+router.get('/apps/here/maps/:mapId.jpg', async (req, env) => {
+  const mapId = req.params?.mapId
+  const options = optionsFromQuery(req)
+
+  return toJpgImageResponse(
+    await generateHereCard(req, env, mapId, ogImageSize, options)
+  )
+})
+
+router.get('/maps/:mapId.png', (req, env) => {
+  const mapId = req.params?.mapId
+  const options = optionsFromQuery(req)
+
+  return generateWarpedMapCard(req, env, mapId, ogImageSize, options)
 })
 
 router.get('/', () => json({ name: 'Allmaps Preview' }))
 
 export default {
-  fetch: async (request: Request, env, ctx) => {
+  fetch: async (request: Request, env: Env) => {
     return (
       (env.USE_CACHE && (await match(request.url))) ||
-      router.fetch(request, env, ctx).catch(error)
+      router.fetch(request, env).catch(error)
     )
   }
-} satisfies ExportedHandler<Env>
+} // satisfies ExportedHandler<Env>
