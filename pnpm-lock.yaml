@@ -10,10 +10,13 @@ importers:
     devDependencies:
       '@lerna-lite/cli':
         specifier: ^4.1.2
-        version: 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/version@4.1.2)
+        version: 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)(@lerna-lite/version@4.1.2)
       '@lerna-lite/publish':
         specifier: ^4.1.2
-        version: 4.1.2
+        version: 4.1.2(@lerna-lite/run@4.1.2)
+      '@lerna-lite/run':
+        specifier: ^4.1.2
+        version: 4.1.2(@lerna-lite/publish@4.1.2)
       husky:
         specifier: ^8
         version: 8.0.3
@@ -3795,7 +3798,7 @@ packages:
       robust-predicates: 3.0.2
     dev: false
 
-  /@lerna-lite/cli@4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/version@4.1.2):
+  /@lerna-lite/cli@4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)(@lerna-lite/version@4.1.2):
     resolution: {integrity: sha512-Pf3tlXxVCro5x+6eEFtnlYTnIB3Bl/EAjNmcaTQOKURWTycc+/qhZb66Cj6qtwObfy4faYAlpYMbl5IEhW+BPQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
@@ -3823,8 +3826,9 @@ packages:
       '@lerna-lite/core': 4.1.2
       '@lerna-lite/init': 4.1.2
       '@lerna-lite/npmlog': 4.1.2
-      '@lerna-lite/publish': 4.1.2
-      '@lerna-lite/version': 4.1.2(@lerna-lite/publish@4.1.2)
+      '@lerna-lite/publish': 4.1.2(@lerna-lite/run@4.1.2)
+      '@lerna-lite/run': 4.1.2(@lerna-lite/publish@4.1.2)
+      '@lerna-lite/version': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)
       dedent: 1.6.0
       dotenv: 16.5.0
       import-local: 3.2.0
@@ -3907,14 +3911,29 @@ packages:
       wide-align: 1.1.5
     dev: true
 
-  /@lerna-lite/publish@4.1.2:
+  /@lerna-lite/profiler@4.1.2:
+    resolution: {integrity: sha512-4RXhknTI1gUlospJ4bNPI2I0jpgxeF3hxYqzOA8PApTOokeAFjYA5wwJyxUHvrfsdh2ncqQ5MiAFmJFMYC248g==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+    dependencies:
+      '@lerna-lite/core': 4.1.2
+      '@lerna-lite/npmlog': 4.1.2
+      fs-extra: 11.3.0
+      upath: 2.0.1
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - typescript
+    dev: true
+
+  /@lerna-lite/publish@4.1.2(@lerna-lite/run@4.1.2):
     resolution: {integrity: sha512-i8G2NYFjnOaGH/iDU+JFIyZAiP9QQ8x4m1fSW30EICPVVqIBMaJOTtiXyJRUveUM8rHBvNi5K2yaWDr5MkGj4A==}
     engines: {node: ^20.17.0 || >=22.9.0}
     dependencies:
-      '@lerna-lite/cli': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/version@4.1.2)
+      '@lerna-lite/cli': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)(@lerna-lite/version@4.1.2)
       '@lerna-lite/core': 4.1.2
       '@lerna-lite/npmlog': 4.1.2
-      '@lerna-lite/version': 4.1.2(@lerna-lite/publish@4.1.2)
+      '@lerna-lite/version': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)
       '@npmcli/arborist': 9.1.1
       '@npmcli/package-json': 6.2.0
       byte-size: 9.0.1
@@ -3949,11 +3968,34 @@ packages:
       - typescript
     dev: true
 
-  /@lerna-lite/version@4.1.2(@lerna-lite/publish@4.1.2):
+  /@lerna-lite/run@4.1.2(@lerna-lite/publish@4.1.2):
+    resolution: {integrity: sha512-Gj8Km9CnkhnXZTr7Z3ORDtHSGVoPAdbTUuK8lKMDJ/Ebn5/B/aTdFGvRynbRYSVtN5OhsGpCFkVfs0J1OSR7cw==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+    dependencies:
+      '@lerna-lite/cli': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)(@lerna-lite/version@4.1.2)
+      '@lerna-lite/core': 4.1.2
+      '@lerna-lite/npmlog': 4.1.2
+      '@lerna-lite/profiler': 4.1.2
+      fs-extra: 11.3.0
+      p-map: 7.0.3
+      tinyrainbow: 2.0.0
+    transitivePeerDependencies:
+      - '@lerna-lite/exec'
+      - '@lerna-lite/list'
+      - '@lerna-lite/publish'
+      - '@lerna-lite/version'
+      - '@lerna-lite/watch'
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - typescript
+    dev: true
+
+  /@lerna-lite/version@4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2):
     resolution: {integrity: sha512-KURfcTdWEWv0k+3xxnByXP7GM7udQyJZcPOnLUzw1Hs8YkpxFalXUcQsPNmj45q2jq/IfBWno0I6944nGuvc+A==}
     engines: {node: ^20.17.0 || >=22.9.0}
     dependencies:
-      '@lerna-lite/cli': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/version@4.1.2)
+      '@lerna-lite/cli': 4.1.2(@lerna-lite/publish@4.1.2)(@lerna-lite/run@4.1.2)(@lerna-lite/version@4.1.2)
       '@lerna-lite/core': 4.1.2
       '@lerna-lite/npmlog': 4.1.2
       '@octokit/plugin-enterprise-rest': 6.0.1
@@ -14850,6 +14892,11 @@ packages:
   /universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
+    dev: true
+
+  /upath@2.0.1:
+    resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
+    engines: {node: '>=4'}
     dev: true
 
   /update-browserslist-db@1.1.3(browserslist@4.24.4):
