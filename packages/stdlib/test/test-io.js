@@ -15,7 +15,8 @@ import {
   isGeojsonPoint,
   isGeojsonLineString,
   isGeojsonPolygon,
-  geojsonPolygonToPolygon
+  geojsonPolygonToPolygon,
+  geojsonGeometryToGeometry
 } from '../dist/geojson.js'
 
 import {
@@ -23,6 +24,7 @@ import {
   geojsonPointGeo,
   lineStringGeo,
   geojsonLineStringGeo,
+  geojsonLineStringGeoMultipleCoordinates,
   ringGeo,
   ringGeoClosed,
   polygonGeo,
@@ -149,8 +151,10 @@ describe('isGeojsonLineString()', async () => {
   it(`should return false on Geojson Point`, () => {
     expect(isGeojsonLineString(geojsonPointGeo)).to.be.false
   })
-  it(`should return true on Geojson LineString`, () => {
+  it(`should return true on Geojson LineString, even with multiple coordinates`, () => {
     expect(isGeojsonLineString(geojsonLineStringGeo)).to.be.true
+    expect(isGeojsonLineString(geojsonLineStringGeoMultipleCoordinates)).to.be
+      .true
   })
   it(`should return false on Geojson Polygon`, () => {
     expect(isGeojsonLineString(geojsonPolygonGeo)).to.be.false
@@ -221,5 +225,13 @@ describe('geojsonPolygonToPolygon()', async () => {
 describe('polygonToGeojsonPolygon()', async () => {
   it(`should respect Geojson spec`, () => {
     expect(polygonToGeojsonPolygon(polygonGeo)).to.deep.equal(geojsonPolygonGeo)
+  })
+})
+
+describe('geojsonGeometryToGeometry()', async () => {
+  it(`should allow for geojson geometry input with more then two coordinates`, () => {
+    expect(
+      geojsonGeometryToGeometry(geojsonLineStringGeoMultipleCoordinates)
+    ).to.deep.equal(lineStringGeo)
   })
 })

@@ -251,7 +251,7 @@ MIT
 
 ###### Returns
 
-`{type: 'MultiLineString'; coordinates: Point[][]}`.
+`{type: 'MultiLineString'; coordinates: number[][][]}`.
 
 ### `contractGeojsonPointsToGeojsonMultiPoint(geojsonPoints)`
 
@@ -261,7 +261,7 @@ MIT
 
 ###### Returns
 
-`{type: 'MultiPoint'; coordinates: Point[]}`.
+`{type: 'MultiPoint'; coordinates: number[][]}`.
 
 ### `contractGeojsonPolygonsToGeojsonMultiPolygon(geojsonPolygons)`
 
@@ -271,7 +271,7 @@ MIT
 
 ###### Returns
 
-`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
+`{type: 'MultiPolygon'; coordinates: number[][][][]}`.
 
 ### `convexHull(points)`
 
@@ -339,7 +339,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiLineString` (`{type: 'MultiLineString'; coordinates: Point[][]}`)
+* `geojsonMultiLineString` (`{type: 'MultiLineString'; coordinates: number[][][]}`)
 
 ###### Returns
 
@@ -349,7 +349,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiPoint` (`{type: 'MultiPoint'; coordinates: Point[]}`)
+* `geojsonMultiPoint` (`{type: 'MultiPoint'; coordinates: number[][]}`)
 
 ###### Returns
 
@@ -359,7 +359,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiPolygon` (`{type: 'MultiPolygon'; coordinates: Point[][][]}`)
+* `geojsonMultiPolygon` (`{type: 'MultiPolygon'; coordinates: number[][][][]}`)
 
 ###### Returns
 
@@ -509,7 +509,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonPoint` (`{type: 'Point'; coordinates: Point}`)
+* `geojsonPoint` (`{type: 'Point'; coordinates: number[]}`)
 
 ###### Returns
 
@@ -534,7 +534,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonLineString` (`{type: 'LineString'; coordinates: Point[]}`)
+* `geojsonLineString` (`{type: 'LineString'; coordinates: number[][]}`)
 
 ###### Returns
 
@@ -544,7 +544,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiLineString` (`{type: 'MultiLineString'; coordinates: Point[][]}`)
+* `geojsonMultiLineString` (`{type: 'MultiLineString'; coordinates: number[][][]}`)
 
 ###### Returns
 
@@ -554,7 +554,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiPoint` (`{type: 'MultiPoint'; coordinates: Point[]}`)
+* `geojsonMultiPoint` (`{type: 'MultiPoint'; coordinates: number[][]}`)
 
 ###### Returns
 
@@ -564,7 +564,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonMultiPolygon` (`{type: 'MultiPolygon'; coordinates: Point[][][]}`)
+* `geojsonMultiPolygon` (`{type: 'MultiPolygon'; coordinates: number[][][][]}`)
 * `close` (`boolean | undefined`)
 
 ###### Returns
@@ -575,7 +575,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonPoint` (`{type: 'Point'; coordinates: Point}`)
+* `geojsonPoint` (`{type: 'Point'; coordinates: number[]}`)
 
 ###### Returns
 
@@ -585,7 +585,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonPolygon` (`{type: 'Polygon'; coordinates: Point[][]}`)
+* `geojsonPolygon` (`{type: 'Polygon'; coordinates: number[][][]}`)
 * `close` (`boolean | undefined`)
 
 ###### Returns
@@ -596,7 +596,7 @@ MIT
 
 ###### Parameters
 
-* `geojsonPolygon` (`{type: 'Polygon'; coordinates: Point[][]}`)
+* `geojsonPolygon` (`{type: 'Polygon'; coordinates: number[][][]}`)
 * `close` (`boolean | undefined`)
 
 ###### Returns
@@ -622,7 +622,7 @@ MIT
 
 ###### Returns
 
-`{type: 'Point'; coordinates: Point}`.
+`{type: 'Point'; coordinates: number[]}`.
 
 ### `geometryToSvgGeometry(point)`
 
@@ -1135,7 +1135,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'LineString'; coordinates: Point[]}`.
+`{type: 'LineString'; coordinates: number[][]}`.
 
 ### `lineStringToLines(lineString)`
 
@@ -1265,7 +1265,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'MultiLineString'; coordinates: Point[][]}`.
+`{type: 'MultiLineString'; coordinates: number[][][]}`.
 
 ### `multiPointToGeojsonMultiPoint(multiPoint)`
 
@@ -1275,7 +1275,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'MultiPoint'; coordinates: Point[]}`.
+`{type: 'MultiPoint'; coordinates: number[][]}`.
 
 ### `multiPolygonToGeojsonMultiPolygon(multiPolygon, close)`
 
@@ -1286,7 +1286,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'MultiPolygon'; coordinates: Point[][][]}`.
+`{type: 'MultiPolygon'; coordinates: number[][][][]}`.
 
 ### `pixelToIntArrayIndex(pixel, size, channels, flipY)`
 
@@ -1320,7 +1320,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'Point'; coordinates: Point}`.
+`{type: 'Point'; coordinates: number[]}`.
 
 ### `pointToPixel(point, translate)`
 
@@ -1364,7 +1364,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Returns
 
-`{type: 'Polygon'; coordinates: Point[][]}`.
+`{type: 'Polygon'; coordinates: number[][][]}`.
 
 ### `prolongedLinesIntersectionPoint(line0, line1)`
 
@@ -1431,7 +1431,7 @@ HEX string, e (`string`).g. '#0033ffff'
 
 ###### Returns
 
-`{type: 'Polygon'; coordinates: Point[][]}`.
+`{type: 'Polygon'; coordinates: number[][][]}`.
 
 ### `rms(from, to)`
 
