@@ -1,16 +1,26 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
-  import { afterNavigate } from '$app/navigation'
+  import { onMount } from 'svelte'
+
+  import { Loading } from '@allmaps/ui'
+  import { pink } from '@allmaps/tailwind'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
-  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getErrorState } from '$lib/state/error.svelte.js'
   import { setCompassState } from '$lib/state/compass.svelte.js'
+  import { setResourceTransformerState } from '$lib/state/resource-transformer.svelte.js'
+  import { setIiifState } from '$lib/state/iiif.svelte.js'
 
   import Header from '$lib/components/Header.svelte'
+  import Info from '$lib/components/Info.svelte'
+  import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import Here from '$lib/components/Here.svelte'
 
+  import type { Snippet } from 'svelte'
+
   import type { LayoutProps } from './$types.js'
+
+  let timeout = $state(false)
 
   interface Props {
     children?: Snippet
@@ -18,14 +28,32 @@
 
   let { data, children }: LayoutProps & Props = $props()
 
+  const sensorsState = getSensorsState()
+  const errorState = getErrorState()
+  const resourceTransformerState = setResourceTransformerState(
+    sensorsState,
+    data.selectedMapWithImageInfo.map
+  )
   const compassState = setCompassState(
-    getSensorsState(),
-    getMapsState(),
-    data.selectedMapId
+    sensorsState,
+    data.selectedMapWithImageInfo.map
+  )
+  const iiifState = setIiifState(data.selectedMapWithImageInfo.map)
+
+  $effect.pre(() => {
+    compassState.map = data.selectedMapWithImageInfo.map
+    resourceTransformerState.map = data.selectedMapWithImageInfo.map
+    iiifState.map = data.selectedMapWithImageInfo.map
+  })
+
+  let positionOrTimeout = $derived(
+    sensorsState.position !== undefined || timeout
   )
 
-  afterNavigate(() => {
-    compassState.selectedMapId = data.selectedMapId
+  onMount(() => {
+    window.setTimeout(() => {
+      timeout = true
+    }, 500)
   })
 </script>
 
@@ -34,15 +62,27 @@
     class="absolute top-0 z-10 w-full h-full flex flex-col pointer-events-none"
   >
     <div class="contents pointer-events-auto">
-      <Header appName="Here" />
+      <Header appName="Here">
+        {#if data.selectedMapWithImageInfo && data.selectedMapWithImageInfo.map}
+          <Info map={data.selectedMapWithImageInfo.map} />
+        {/if}
+      </Header>
     </div>
     {@render children?.()}
   </div>
-  <div class="relative w-full h-full flex flex-col bg-pink-100">
-    <Here
-      selectedMapId={data.selectedMapId}
-      geojsonRoute={data.geojsonRoute}
-      from={data.from}
-    />
-  </div>
+  <DotsPattern color={pink} opacity={0.5}>
+    {#if positionOrTimeout}
+      <Here
+        mapWithImageInfo={data.selectedMapWithImageInfo}
+        geojsonRoute={data.geojsonRoute}
+        from={data.from}
+      />
+    {:else}
+      <div class="h-full flex items-center justify-center">
+        <div class="bg-white p-2 rounded-xl drop-shadow-sm">
+          <Loading />
+        </div>
+      </div>
+    {/if}
+  </DotsPattern>
 </div>

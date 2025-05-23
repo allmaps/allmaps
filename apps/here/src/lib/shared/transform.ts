@@ -7,6 +7,8 @@ export function toResourceCoordinates(
   position: GeolocationPosition
 ) {
   const geometry = positionToGeoJsonPoint(position)
-  const resourceCoordinates = transformer.transformBackward(geometry)
+  const resourceCoordinates = transformer.transformToResource(
+    geometry.coordinates
+  )
   return resourceCoordinates
 }

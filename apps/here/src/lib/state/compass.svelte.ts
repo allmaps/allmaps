@@ -2,8 +2,9 @@ import { setContext, getContext } from 'svelte'
 
 import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
 
+import type { GeoreferencedMap } from '@allmaps/annotation'
+
 import type { SensorsState } from '$lib/state/sensors.svelte.js'
-import type { MapsState } from '$lib/state/maps.svelte.js'
 
 import type { CompassMode } from '$lib/shared/types.ts'
 
@@ -11,12 +12,28 @@ const COMPASS_KEY = Symbol('compass')
 
 export class CompassState {
   #sensorsState: SensorsState
-  #mapsState: MapsState
-  #selectedMapId = $state<string>()
+
+  #map = $state.raw<GeoreferencedMap>()
+
+  #compassMode = $state<CompassMode>('image')
 
   #customRotation = $state(0)
+
+  #selectedMapBearing = $derived.by(() => {
+    if (this.#map) {
+      try {
+        return computeGeoreferencedMapBearing(this.#map)
+      } catch (err) {
+        console.error('Error computing map bearing:', err)
+      }
+    }
+  })
+
   #rotation = $derived.by(() => {
-    if (this.#compassMode === 'image') {
+    if (
+      this.#compassMode === 'image' &&
+      this.selectedMapBearing !== undefined
+    ) {
       return this.#selectedMapBearing
     } else if (this.#compassMode === 'north') {
       return 0
@@ -31,36 +48,21 @@ export class CompassState {
     } else if (this.#compassMode === 'custom') {
       return this.#customRotation
     }
+
+    return undefined
   })
 
-  #compassMode = $state<CompassMode>('image')
-
-  #selectedMapBearing = $derived.by(() => {
-    if (this.#selectedMapId) {
-      const mapWithImageInfo = this.#mapsState.getMapWithImageInfo(
-        this.#selectedMapId
-      )
-
-      if (mapWithImageInfo) {
-        return computeGeoreferencedMapBearing(mapWithImageInfo.map)
-      }
-    }
-
-    return 0
-  })
-
-  constructor(
-    sensorsState: SensorsState,
-    mapsState: MapsState,
-    selectedMapId: string
-  ) {
+  constructor(sensorsState: SensorsState, map?: GeoreferencedMap) {
     this.#sensorsState = sensorsState
-    this.#mapsState = mapsState
-    this.#selectedMapId = selectedMapId
+    this.#map = map
   }
 
-  set selectedMapId(selectedMapId: string) {
-    this.#selectedMapId = selectedMapId
+  set map(map: GeoreferencedMap | undefined) {
+    this.#map = map
+  }
+
+  get map() {
+    return this.#map
   }
 
   get rotation() {
@@ -100,13 +102,9 @@ export class CompassState {
 
 export function setCompassState(
   sensorsState: SensorsState,
-  mapsState: MapsState,
-  selectedMapId: string
+  map?: GeoreferencedMap
 ) {
-  return setContext(
-    COMPASS_KEY,
-    new CompassState(sensorsState, mapsState, selectedMapId)
-  )
+  return setContext(COMPASS_KEY, new CompassState(sensorsState, map))
 }
 
 export function getCompassState() {

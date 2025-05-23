@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { page } from '$app/state'
 
   import Feature from 'ol/Feature.js'
   import OLMap from 'ol/Map.js'
@@ -15,24 +16,17 @@
   import TileLayer from 'ol/layer/Tile.js'
   import VectorLayer from 'ol/layer/Vector.js'
 
-  import 'ol/ol.css'
-
-  import { GcpTransformer } from '@allmaps/transform'
   import { pink } from '@allmaps/tailwind'
 
-  import { positionToGeoJsonFeature } from '$lib/shared/position.js'
-
-  import { getMapsState } from '$lib/state/maps.svelte.js'
-  import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
-
-  import DotsPattern from '$lib/components/DotsPattern.svelte'
+  import { getResourceTransformerState } from '$lib/state/resource-transformer.svelte.js'
 
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
   import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
-  import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type TileGrid from 'ol/tilegrid/TileGrid.js'
+
   import type { GeojsonLineString, Point } from '@allmaps/types'
 
   import type { MapWithImageInfo } from '$lib/shared/types.js'
@@ -42,48 +36,49 @@
   import Pin from '$lib/images/pin.svg?raw'
   import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
-  const mapsState = getMapsState()
-  const imageInfoState = getImageInfoState()
+  import 'ol/ol.css'
+
   const sensorsState = getSensorsState()
   const compassState = getCompassState()
   const uiState = getUiState()
+  const resourceTransformerState = getResourceTransformerState()
 
   let mounted = $state(false)
-  let lastSelectedMapId = $state<string>()
+  let currentMapId = $state<string>()
+
+  let showFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
 
   type FeatureIconSvg = {
     svg: string
   }
 
   type Props = {
-    selectedMapId: string
+    mapWithImageInfo: MapWithImageInfo
     geojsonRoute?: GeojsonLineString
     from?: Point
   }
 
-  let { selectedMapId, geojsonRoute, from }: Props = $props()
+  let { mapWithImageInfo, geojsonRoute, from }: Props = $props()
 
   let ol = $state.raw<HTMLElement>()
   let olMap = $state.raw<OLMap>()
-  let map = $state.raw<GeoreferencedMap>()
-  let transformer = $state.raw<GcpTransformer>()
 
   let positionImageCoordinates = $derived.by<Point | undefined>(() => {
-    if (sensorsState.position && transformer) {
-      const feature = positionToGeoJsonFeature(sensorsState.position)
-      const imageCoordinates = transformer.transformToResource(
-        feature.geometry.coordinates
-      )
-      return [imageCoordinates[0], -imageCoordinates[1]]
+    if (resourceTransformerState.resourcePosition) {
+      return [
+        resourceTransformerState.resourcePosition[0],
+        -resourceTransformerState.resourcePosition[1]
+      ]
     }
   })
 
   let fromImageCoordinates = $derived.by<Point | undefined>(() => {
-    if (from && transformer) {
-      const imageCoordinates = transformer.transformToResource([
-        from[1],
-        from[0]
-      ])
+    if (from && resourceTransformerState.transformer) {
+      const imageCoordinates =
+        resourceTransformerState.transformer.transformToResource([
+          from[1],
+          from[0]
+        ])
       return [imageCoordinates[0], -imageCoordinates[1]]
     }
   })
@@ -148,7 +143,7 @@
   }
 
   function updatePositionFeature(imageCoordinates?: Point) {
-    if (map && imageCoordinates) {
+    if (imageCoordinates) {
       showPositionFeature()
 
       positionFeature.setGeometry(new OLPoint(imageCoordinates))
@@ -156,22 +151,38 @@
   }
 
   function updateFromFeature(imageCoordinates?: Point) {
-    if (imageCoordinates) {
+    if (showFrom && imageCoordinates) {
+      setFeatureImage(fromFeature, [
+        {
+          height: 20,
+          displacement: [30, 0],
+          svg: PinShadow
+        },
+        {
+          width: 40,
+          displacement: [0, 34],
+          rotation: 0.2,
+          svg: Pin
+        }
+      ])
       fromFeature.setGeometry(new OLPoint(imageCoordinates))
+    } else {
+      fromFeature.setStyle(undefined)
     }
   }
 
-  function update(mapWithImageInfo: MapWithImageInfo) {
-    lastSelectedMapId = mapWithImageInfo.mapId
+  function centerViewAroundPoint(view: View, tileGrid: TileGrid, point: Point) {
+    view.setCenter([point[0], point[1]])
+    view.setRotation(0)
+    view.setZoom((tileGrid.getMinZoom() + tileGrid.getMaxZoom()) * 0.75)
+  }
 
+  function updateImage(mapWithImageInfo: MapWithImageInfo) {
     if (!mounted || !olMap) {
       return
     }
 
-    const georeferencedMap = mapWithImageInfo.map
     const imageInfo = mapWithImageInfo.imageInfo
-
-    transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
     const options = new IIIFInfo(
       imageInfo as ImageInformationResponse
@@ -197,12 +208,24 @@
 
       olMap.setView(view)
 
-      view.fit(tileGrid.getExtent())
+      if (fromImageCoordinates) {
+        centerViewAroundPoint(view, tileGrid, fromImageCoordinates)
+      } else if (
+        resourceTransformerState.resourcePositionInsideResource &&
+        positionImageCoordinates
+      ) {
+        centerViewAroundPoint(view, tileGrid, positionImageCoordinates)
+      } else {
+        view.fit(tileGrid.getExtent(), {
+          padding: [10, 10, 10, 10]
+        })
+      }
 
-      if (geojsonRoute) {
-        const projectedGeojsonRoute = transformer.transformToResource(
-          geojsonRoute.coordinates
-        )
+      if (geojsonRoute && resourceTransformerState.transformer) {
+        const projectedGeojsonRoute =
+          resourceTransformerState.transformer.transformToResource(
+            geojsonRoute.coordinates
+          )
         geojsonFeature.setGeometry(
           new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
         )
@@ -217,7 +240,7 @@
           compassState.compassMode = 'custom'
           compassState.customRotation =
             view.getRotation() * (180 / Math.PI) +
-            compassState.selectedMapBearing
+            (compassState.selectedMapBearing || 0)
         }
       })
     }
@@ -225,7 +248,7 @@
     updatePositionFeature(positionImageCoordinates)
     updateFromFeature(fromImageCoordinates)
 
-    lastSelectedMapId = georeferencedMap.id
+    currentMapId = mapWithImageInfo.map.id
   }
 
   function setPositionFeatureImage(svg: string) {
@@ -269,22 +292,22 @@
     }
   }
 
-  onMount(async () => {
+  onMount(() => {
     showPositionFeature()
 
-    setFeatureImage(fromFeature, [
-      {
-        height: 20,
-        displacement: [30, 0],
-        svg: PinShadow
-      },
-      {
-        width: 40,
-        displacement: [0, 34],
-        rotation: 0.2,
-        svg: Pin
-      }
-    ])
+    // setFeatureImage(fromFeature, [
+    //   {
+    //     height: 20,
+    //     displacement: [30, 0],
+    //     svg: PinShadow
+    //   },
+    //   {
+    //     width: 40,
+    //     displacement: [0, 34],
+    //     rotation: 0.2,
+    //     svg: Pin
+    //   }
+    // ])
 
     const vectorLayer = new VectorLayer({
       source: new VectorSource({
@@ -314,19 +337,18 @@
           positionImageCoordinates
         )
 
-        uiState.positionScreenCoordinates = [
-          Math.round(positionScreenCoordinates[0]),
-          Math.round(positionScreenCoordinates[1])
-        ]
+        // Somehow, positionScreenCoordinates is null sometimes, (maybe only
+        // during the component is being unmounted?)
+        if (positionScreenCoordinates) {
+          uiState.positionScreenCoordinates = [
+            Math.round(positionScreenCoordinates[0]),
+            Math.round(positionScreenCoordinates[1])
+          ]
+        }
       }
     })
 
     mounted = true
-
-    const map = await mapsState.fetchMapFromMapId(selectedMapId)
-    if (map) {
-      imageInfoState.fetchImageInfo(map.resource.id)
-    }
   })
 
   $effect(() => {
@@ -395,14 +417,11 @@
 
   $effect(() => {
     if (mounted) {
-      const mapWithImageInfo = mapsState.getMapWithImageInfo(selectedMapId)
-      if (mapWithImageInfo && lastSelectedMapId !== mapWithImageInfo.mapId) {
-        update(mapWithImageInfo)
+      if (mapWithImageInfo && currentMapId !== mapWithImageInfo.mapId) {
+        updateImage(mapWithImageInfo)
       }
     }
   })
 </script>
 
-<DotsPattern color={pink} opacity={0.5}>
-  <div bind:this={ol} class="w-full h-full"></div>
-</DotsPattern>
+<div bind:this={ol} class="w-full h-full"></div>

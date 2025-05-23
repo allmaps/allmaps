@@ -12,6 +12,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { SensorsState } from '$lib/state/sensors.svelte.js'
 import type { ImageInfoState } from '$lib/state/image-info.svelte.js'
+import type { ErrorState } from '$lib/state/error.svelte.js'
 
 import type { MapWithImageInfo } from '$lib/shared/types.ts'
 
@@ -25,6 +26,9 @@ const MAPS_KEY = Symbol('maps')
 export class MapsState {
   #sensorsState: SensorsState
   #imageInfoState: ImageInfoState
+  #errorState: ErrorState
+
+  #loading = $state(false)
 
   #lastPosition = $state<GeolocationPosition>()
 
@@ -57,9 +61,14 @@ export class MapsState {
     return mapsWithImageInfo
   })
 
-  constructor(sensorsState: SensorsState, imageInfoState: ImageInfoState) {
+  constructor(
+    sensorsState: SensorsState,
+    imageInfoState: ImageInfoState,
+    errorState: ErrorState
+  ) {
     this.#sensorsState = sensorsState
     this.#imageInfoState = imageInfoState
+    this.#errorState = errorState
 
     $effect(() => {
       const newPosition = this.#sensorsState.position
@@ -84,7 +93,10 @@ export class MapsState {
         }
       }
 
-      this.fetchMapsFromCoordinates(newPosition)
+      this.fetchMapsFromCoordinates(newPosition).catch(
+        (err) => (errorState.error = err)
+      )
+
       this.#lastPosition = newPosition
     })
   }
@@ -97,11 +109,13 @@ export class MapsState {
     }
   }
 
-  #mapExists(mapId: string) {
-    return this.#maps.has(mapId)
-  }
+  // #mapExists(mapId: string) {
+  //   return this.#maps.has(mapId)
+  // }
 
   async fetchMapsFromCoordinates(position: GeolocationPosition) {
+    this.#loading = true
+
     const {
       coords: { latitude, longitude }
     } = position
@@ -118,28 +132,33 @@ export class MapsState {
       maps.map((map) => [this.#getMapId(map), map])
     )
 
+    this.#loading = false
     this.#lastPosition = position
   }
 
-  async fetchMapFromMapId(mapId: string) {
-    if (!mapId) {
-      return
-    }
+  // async fetchMapFromMapId(mapId: string) {
+  //   if (!mapId) {
+  //     return
+  //   }
 
-    // If the map is already loaded, do nothing
-    if (!this.#mapExists(mapId)) {
-      const annotations = await fetchJson(mapId)
-      const maps = parseAnnotation(annotations)
+  //   // If the map is already loaded, do nothing
+  //   if (!this.#mapExists(mapId)) {
+  //     try {
+  //       const annotations = await fetchJson(mapId)
+  //       const maps = parseAnnotation(annotations)
 
-      this.#mapsFromUrl = new SvelteMap(
-        maps.map((map) => [this.#getMapId(map), map])
-      )
+  //       this.#mapsFromUrl = new SvelteMap(
+  //         maps.map((map) => [this.#getMapId(map), map])
+  //       )
 
-      return maps[0]
-    } else {
-      return this.#maps.get(mapId)
-    }
-  }
+  //       return maps[0]
+  //     } catch (error) {
+  //       this.#errorState.error = error
+  //     }
+  //   } else {
+  //     return this.#maps.get(mapId)
+  //   }
+  // }
 
   get mapsFromCoordinates() {
     return this.#mapsFromCoordinates
@@ -184,13 +203,21 @@ export class MapsState {
       (mapWithImageInfo) => mapWithImageInfo.mapId === mapId
     )
   }
+
+  get loading() {
+    return this.#loading
+  }
 }
 
 export function setMapsState(
   sensorsState: SensorsState,
-  imageInfoState: ImageInfoState
+  imageInfoState: ImageInfoState,
+  errorState: ErrorState
 ) {
-  return setContext(MAPS_KEY, new MapsState(sensorsState, imageInfoState))
+  return setContext(
+    MAPS_KEY,
+    new MapsState(sensorsState, imageInfoState, errorState)
+  )
 }
 
 export function getMapsState() {

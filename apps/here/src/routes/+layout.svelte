@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { page } from '$app/state'
-  import { afterNavigate } from '$app/navigation'
+  import { onNavigate, afterNavigate } from '$app/navigation'
 
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
@@ -18,15 +18,17 @@
 
   import type { LayoutProps } from './$types.js'
 
+  import Error from '$lib/components/Error.svelte'
+
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
-  const sensorState = setSensorsState(errorState)
+  const sensorsState = setSensorsState(errorState)
   const urlState = setUrlState(page.url, errorState)
 
-  setMapsState(sensorState, imageInfoState)
+  setMapsState(sensorsState, imageInfoState, errorState)
   setUiState()
 
   interface Props {
@@ -39,8 +41,19 @@
     urlState.updateUrl(page.url)
   })
 
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve()
+        await navigation.complete
+      })
+    })
+  })
+
   onDestroy(() => {
-    sensorState.destroy()
+    sensorsState.destroy()
   })
 </script>
 
@@ -74,15 +87,10 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="absolute w-full h-full flex flex-col">
-  <main class="relative h-full overflow-auto">
-    {#if errorState.error}
-      <div class="h-full flex flex-col gap-2 items-center justify-center">
-        <!-- Error: {errorState.error?.message} -->
-        ERROR!
-      </div>
-    {:else}
-      {@render children?.()}
-    {/if}
-  </main>
-</div>
+<main class="absolute w-full h-full flex flex-col">
+  {#if errorState.error}
+    <Error />
+  {:else}
+    {@render children?.()}
+  {/if}
+</main>

@@ -19,9 +19,13 @@ const defaultTruncateOptions: TruncateOptions = {
  * @returns The truncated text with ellipsis, or original text if no truncation needed
  */
 export function truncate(
-  text: string,
+  text?: string,
   options?: Partial<TruncateOptions>
 ): string {
+  if (!text) {
+    return ''
+  }
+
   const { maxLength, toNearestSpace, maxNearestSpaceRatio } = {
     ...defaultTruncateOptions,
     ...options

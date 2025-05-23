@@ -39,17 +39,17 @@ export class SensorsState {
 
     this.#abortController = new AbortController()
 
-    if (browser && 'geolocation' in navigator) {
-      this.#watchId = navigator.geolocation.watchPosition(
-        this.#handlePosition.bind(this),
-        this.#handleError.bind(this),
-        positionOptions
-      )
-    } else {
-      this.#errorState.error = new Error('Geolocation API is not available')
-    }
-
     if (browser) {
+      if ('geolocation' in navigator) {
+        this.#watchId = navigator.geolocation.watchPosition(
+          this.#handlePosition.bind(this),
+          this.#handleError.bind(this),
+          positionOptions
+        )
+      } else {
+        this.#errorState.error = new Error('Geolocation API is not available')
+      }
+
       if (window.DeviceOrientationEvent) {
         window.addEventListener(
           'deviceorientationabsolute',

@@ -2,22 +2,15 @@
   import { fade } from 'svelte/transition'
 
   import { goto } from '$app/navigation'
-  import { page } from '$app/state'
 
   import { Dialog } from 'bits-ui'
 
-  import {
-    X as XIcon,
-    Copy as CopyIcon,
-    Check as CheckIcon,
-    ShareNetwork as ShareNetworkIcon
-  } from 'phosphor-svelte'
+  import { X as XIcon, ShareNetwork as ShareNetworkIcon } from 'phosphor-svelte'
 
   import { Loading } from '@allmaps/ui'
 
-  import Colors from '$lib/components/Colors.svelte'
-
-  import { createRouteUrl } from '$lib/shared/router.js'
+  import CopyButton from '$lib/components/CopyButton.svelte'
+  // import Colors from '$lib/components/Colors.svelte'
 
   import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
@@ -29,15 +22,13 @@
 
   let open = $state(true)
   let imageLoaded = $state(false)
-  let copying = $state(false)
-
-  let copyTimeout: number | undefined
+  let imageError = $state(false)
 
   let postcardUrl = $derived(
-    createRouteUrl(page, `${page.url.pathname}/../postcard`, {
-      from: data.from?.join(',')
-    })
+    `https://next.here.allmaps.org/maps/${data.allmapsMapId}/postcard?from=${data.from?.join(',')}`
   )
+
+  let postcardText = $derived(`Look where I am! ${postcardUrl}`)
 
   $effect(() => {
     if (!open) {
@@ -50,19 +41,7 @@
   }
 
   function handleImageError() {
-    // TODO: handle image error
-  }
-
-  function handleCopy() {
-    const absolutePostcardUrl = `https://next.here.allmaps.org/maps/${data.allmapsMapId}/postcard?from=${data.from?.join(',')}`
-    navigator.clipboard.writeText(absolutePostcardUrl)
-
-    copying = true
-
-    window.clearTimeout(copyTimeout)
-    copyTimeout = window.setTimeout(() => {
-      copying = false
-    }, 2000)
+    imageError = true
   }
 
   // TODO:
@@ -107,33 +86,64 @@
           class="w-full relative"
           style="aspect-ratio: {OG_IMAGE_SIZE.width / OG_IMAGE_SIZE.height}"
         >
-          <img
-            onload={handleImageLoad}
-            onerror={handleImageError}
-            alt="Preview"
-            class="rounded-md overflow-hidden"
-            src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from?.join(
-              ','
-            )}"
-          />
-          {#if !imageLoaded}
+          {#if imageError}
             <div
-              out:fade
-              class="w-full h-full absolute bg-white
-                top-0 left-0 flex items-center justify-center"
+              class="bg-red w-full h-full flex items-center justify-center rounded-lg text-white"
             >
-              <Loading />
+              <div>Error loading preview image. This map cannot be shared.</div>
             </div>
+          {:else}
+            <img
+              onload={handleImageLoad}
+              onerror={handleImageError}
+              alt="Preview"
+              class="rounded-md overflow-hidden"
+              src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from?.join(
+                ','
+              )}"
+            />
+            {#if !imageLoaded}
+              <div
+                out:fade
+                class="w-full h-full absolute border-2 border-gray/50 rounded-lg
+                top-0 left-0 flex items-center justify-center"
+              >
+                <Loading />
+              </div>
+            {/if}
           {/if}
         </div>
 
-        <div class="p-2 text-center">
-          Copy link to send your location on this map to your friends!
+        <div
+          class="p-4 field-sizing-content resize-none bg-pink/10 rounded-lg
+          italic wrap-break-word
+          before:content-['“'] after:content-['”']"
+        >
+          {@html postcardText}
         </div>
 
-        <div class="flex flex-row gap-2 items-center justify-between">
-          <Colors />
-          <button
+        <div class="text-center text-sm">
+          Copy the text or URL to send this map with your location to your
+          friends using apps like Signal, WhatsApp, Slack, or Bluesky.
+        </div>
+
+        <div class="flex flex-row gap-2 items-center justify-end">
+          <!-- <Colors /> -->
+
+          <CopyButton
+            text={postcardUrl}
+            label="Copy URL"
+            class="disabled:cursor-not-allowed disabled:text-gray
+              active:translate-[1px] hover:translate-[0.5px]
+              hover:bg-gray/20 select-none
+              text-sm
+              cursor-pointer transition-all px-4 py-2 rounded-lg
+              flex flex-row gap-2 items-center"
+            disabled={!imageLoaded}
+          />
+          <CopyButton
+            text={postcardText}
+            label="Copy text"
             class="disabled:cursor-not-allowed disabled:bg-green/50 bg-green
               active:translate-[1px] hover:translate-[0.5px]
               hover:bg-green/80 select-none
@@ -141,18 +151,8 @@
               cursor-pointer transition-all px-4 py-2 rounded-lg
               flex flex-row gap-2 items-center"
             disabled={!imageLoaded}
-            onclick={handleCopy}
-          >
-            {#if copying}
-              <CheckIcon class="size-5" />
-            {:else}
-              <CopyIcon class="size-5" />
-            {/if}
-            Copy link</button
-          >
+          />
         </div>
-
-        <a class="underline bg-orange" href={postcardUrl}>Preview URL</a>
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>

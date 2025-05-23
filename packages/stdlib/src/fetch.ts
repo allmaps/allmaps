@@ -14,7 +14,18 @@ export async function fetchUrl(
   }
 
   if (!response.ok) {
-    throw new Error(response.statusText)
+    const json = await response.json()
+    if (json && json.error) {
+      throw new Error(json.error)
+    } else if (response.statusText) {
+      throw new Error(response.statusText)
+    } else if (response.status === 404) {
+      throw new Error(`Not found: ${input} (404)`)
+    } else if (response.status === 500) {
+      throw new Error('Internal server error (500)')
+    } else {
+      throw new Error(`Failed to fetch: ${input} (${response.status})`)
+    }
   }
 
   return response

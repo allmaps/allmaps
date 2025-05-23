@@ -4,6 +4,7 @@ const ERROR_KEY = Symbol('error')
 
 export class ErrorState {
   #error = $state<Error>()
+  #transformerError = $state<Error>()
   #geolocationPositionError = $state<GeolocationPositionError>()
 
   set error(error: unknown) {
@@ -22,12 +23,35 @@ export class ErrorState {
     return this.#error
   }
 
+  set transformerError(error: unknown) {
+    if (error) {
+      if (error instanceof Error) {
+        this.#transformerError = error
+      } else {
+        this.#transformerError = new Error('Unknown error')
+      }
+    } else {
+      this.#transformerError = undefined
+    }
+  }
+
+  get transformerError() {
+    return this.#transformerError
+  }
+
   set geolocationPositionError(error: GeolocationPositionError | undefined) {
     this.#geolocationPositionError = error
   }
 
   get geolocationPositionError() {
     return this.#geolocationPositionError
+  }
+
+  get userHasDeniedGeolocation() {
+    return this.#geolocationPositionError &&
+      this.#geolocationPositionError.code === 1
+      ? true
+      : false
   }
 }
 

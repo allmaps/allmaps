@@ -9,6 +9,8 @@ export class UiState {
   #fromScreenCoordinates = $state<Point | undefined>()
   #positionScreenCoordinates = $state<Point | undefined>()
 
+  #followPosition = $state(false)
+
   get color() {
     return this.#color
   }
@@ -30,6 +32,14 @@ export class UiState {
 
   set positionScreenCoordinates(coordinates: Point) {
     this.#positionScreenCoordinates = coordinates
+  }
+
+  get followPosition() {
+    return this.#followPosition
+  }
+
+  set followPosition(follow: boolean) {
+    this.#followPosition = follow
   }
 }
 

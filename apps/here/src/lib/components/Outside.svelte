@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { scale } from 'svelte/transition'
-
   import { getUiState } from '$lib/state/ui.svelte.js'
 
   import { pointOnPolygon, lineBearing } from '$lib/shared/outside.js'
@@ -15,7 +13,7 @@
   let height = $state(0)
 
   const padding = 30
-  const controlsHeight = 56
+  const controlsHeight = 75
 
   let headerSize = [167 + 8 + 8, 32 + 8 + 8]
   let polygon = $derived<Ring>([
@@ -27,13 +25,23 @@
     [padding, height - padding - controlsHeight]
   ])
 
-  let fromOutsideViewport = $derived.by(() => {
+  // If the ?from= query param is set, we use that as the starting point
+  // Otherwise we use the center of the screen
+  let fromScreenCoordinates = $derived.by(() => {
     if (uiState.fromScreenCoordinates) {
+      return uiState.fromScreenCoordinates
+    } else {
+      return [width / 2, height / 2]
+    }
+  })
+
+  let fromOutsideViewport = $derived.by(() => {
+    if (fromScreenCoordinates) {
       return (
-        uiState.fromScreenCoordinates[0] < 0 ||
-        uiState.fromScreenCoordinates[1] < 0 ||
-        uiState.fromScreenCoordinates[0] > width ||
-        uiState.fromScreenCoordinates[1] > height
+        fromScreenCoordinates[0] < 0 ||
+        fromScreenCoordinates[1] < 0 ||
+        fromScreenCoordinates[0] > width ||
+        fromScreenCoordinates[1] > height
       )
     }
     return true
@@ -53,9 +61,9 @@
   })
 
   let point = $derived.by(() => {
-    if (uiState.fromScreenCoordinates && uiState.positionScreenCoordinates) {
+    if (fromScreenCoordinates && uiState.positionScreenCoordinates) {
       return pointOnPolygon(
-        [uiState.fromScreenCoordinates[0], uiState.fromScreenCoordinates[1]],
+        [fromScreenCoordinates[0], fromScreenCoordinates[1]],
         [
           uiState.positionScreenCoordinates[0],
           uiState.positionScreenCoordinates[1]
@@ -66,9 +74,9 @@
   })
 
   let bearing = $derived.by(() => {
-    if (uiState.fromScreenCoordinates && uiState.positionScreenCoordinates) {
+    if (fromScreenCoordinates && uiState.positionScreenCoordinates) {
       return lineBearing(
-        [uiState.fromScreenCoordinates[0], uiState.fromScreenCoordinates[1]],
+        [fromScreenCoordinates[0], fromScreenCoordinates[1]],
         [
           uiState.positionScreenCoordinates[0],
           uiState.positionScreenCoordinates[1]
@@ -80,7 +88,7 @@
   })
 </script>
 
-<div class="w-full h-full">
+<div class="w-full h-full -z-10">
   <svg
     bind:clientWidth={width}
     bind:clientHeight={height}
@@ -88,14 +96,14 @@
     viewBox={`0 0 ${width} ${height}`}
   >
     {#if !fromOutsideViewport && positionOutsideViewport && point}
+      <!-- transition:scale={{ duration: 300, delay: 100, start: 0 }} -->
       <image
         class="transform-border"
-        transition:scale={{ duration: 300, delay: 100, start: 0 }}
         x={point[0]}
         y={point[1]}
         href={OutsideImage}
         transform-origin="center"
-        transform="translate(-25 -25) rotate({bearing}, 0, 0)"
+        style="transform: translate(-25px) rotate({Math.round(bearing)}deg);"
         height="50"
         width="50"
       />

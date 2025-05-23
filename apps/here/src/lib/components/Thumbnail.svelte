@@ -69,12 +69,13 @@
 
   let resourceRouteCoordinates = $derived.by(() => {
     if (geojsonRoute && resourceSize && svgSize) {
-      const polyline = transformer.transformGeojsonToSvg(geojsonRoute)
-      if (polyline.type === 'polyline') {
-        return polyline.coordinates.map((point) =>
-          svgCoordinates(resourceSize, svgSize, point)
-        )
-      }
+      const resourceLineString = transformer.transformToResource(
+        geojsonRoute.coordinates
+      )
+
+      return resourceLineString.map((point) =>
+        svgCoordinates(resourceSize, svgSize, point)
+      )
     }
   })
 
@@ -118,7 +119,7 @@
   <li class="bg-white/40 p-2 rounded-md">
     <a
       bind:clientWidth={width}
-      class="aspect-square inline-block w-full h-full relative"
+      class="aspect-square inline-block w-full relative"
       href={createRouteUrl(page, allmapsId)}
     >
       <Thumbnail
@@ -136,24 +137,23 @@
             height="{svgSize[1]}%"
             viewBox="0 0 {svgSize[0]} {svgSize[1]}"
           >
+            {#if resourceRouteCoordinates}
+              <polyline
+                points={polylinePoints}
+                fill="none"
+                stroke="white"
+                stroke-width="1.0"
+              />
+              <polyline
+                points={polylinePoints}
+                fill="none"
+                stroke={pink}
+                stroke-width="0.6"
+              />
+            {/if}
             <g
               class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
             >
-              {#if resourceRouteCoordinates}
-                <polyline
-                  points={polylinePoints}
-                  fill="none"
-                  stroke="white"
-                  stroke-width="1.0"
-                />
-                <polyline
-                  points={polylinePoints}
-                  fill="none"
-                  stroke={pink}
-                  stroke-width="0.6"
-                />
-              {/if}
-
               <circle
                 cx={svgPositionCoordinates[0]}
                 cy={svgPositionCoordinates[1]}
@@ -198,10 +198,10 @@
           {/if}
         </div>
       {/if}
-      <div class="text-center text-blue-900 text-xs">
-        {label ? truncate(parseLanguageString(label, 'en')) : ``}
-        {label ? truncate(parseLanguageString(label2, 'en')) : ``}
-      </div>
     </a>
+    <div class="text-center text-blue-900 text-xs">
+      {label ? truncate(parseLanguageString(label, 'en')) : ``}
+      {label ? truncate(parseLanguageString(label2, 'en')) : ``}
+    </div>
   </li>
 {/if}

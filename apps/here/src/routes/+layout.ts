@@ -4,7 +4,7 @@ import type { GeojsonLineString, Point } from '@allmaps/types'
 
 import type { LayoutLoad } from './$types.js'
 
-export const load: LayoutLoad = async ({ url, params }) => {
+export const load: LayoutLoad = async ({ url, params, fetch }) => {
   let geojsonRoute: GeojsonLineString | undefined
   let from: Point | undefined
   let color: string | undefined
