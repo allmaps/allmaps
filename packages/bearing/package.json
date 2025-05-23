@@ -38,8 +38,8 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/transform": "workspace:^",
     "@turf/bearing": "^7.2.0"
   },
   "devDependencies": {

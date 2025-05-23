@@ -314,15 +314,15 @@ importers:
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
-      '@allmaps/transform':
-        specifier: workspace:^
-        version: link:../../packages/transform
       '@allmaps/types':
         specifier: workspace:^
         version: link:../../packages/types
@@ -411,9 +411,6 @@ importers:
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
-      '@allmaps/transform':
-        specifier: workspace:^
-        version: link:../../packages/transform
       '@allmaps/ui':
         specifier: workspace:^
         version: link:../../packages/ui
@@ -569,15 +566,15 @@ importers:
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
-      '@allmaps/transform':
-        specifier: workspace:^
-        version: link:../../packages/transform
       '@allmaps/types':
         specifier: workspace:^
         version: link:../../packages/types
@@ -983,12 +980,12 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib
-      '@allmaps/transform':
-        specifier: workspace:^
-        version: link:../transform
       '@turf/bearing':
         specifier: ^7.2.0
         version: 7.2.0
