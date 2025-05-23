@@ -50,9 +50,9 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
-    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/transform": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "@turf/rewind": "^7.2.0",

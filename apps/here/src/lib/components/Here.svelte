@@ -15,7 +15,7 @@
 
   import 'ol/ol.css'
 
-  import { GcpTransformer } from '@allmaps/transform'
+  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
   import { geolocationPositionToGeojsonFeature } from '$lib/shared/position.js'
 
@@ -43,7 +43,7 @@
   let mounted = false
   let lastSelectedMapId: string | undefined = undefined
 
-  let transformer: GcpTransformer
+  let projectedTransformer: ProjectedGcpTransformer
 
   let ol: HTMLElement
   let olMap: OLMap
@@ -111,12 +111,13 @@
 
   // eslint-disable-next-line no-undef
   function updatePosition(geolocationPosition: GeolocationPosition) {
-    if (geolocationPosition && transformer) {
+    if (geolocationPosition && projectedTransformer) {
       const geoPosition = geojsonGeometryToGeometry(
         geolocationPositionToGeojsonFeature(geolocationPosition).geometry
       )
       if (positionFeature) {
-        const resourcePosition = transformer.transformToResource(geoPosition)
+        const resourcePosition =
+          projectedTransformer.transformToResource(geoPosition)
         positionFeature.setGeometry(new Point(flipY(resourcePosition)))
       }
     }
@@ -133,7 +134,12 @@
     const georeferencedMap = mapWithImageInfo.map
     const imageInfo = mapWithImageInfo.imageInfo
 
-    transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+    projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
+      georeferencedMap,
+      {
+        projection: lonLatProjection
+      }
+    )
 
     const options = new IIIFInfo(imageInfo).getTileSourceOptions()
     if (options) {

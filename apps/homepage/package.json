@@ -46,7 +46,6 @@
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
-    "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "@astrojs/check": "^0.9.3",
     "@astrojs/starlight": "^0.29.0",

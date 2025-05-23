@@ -2,7 +2,7 @@ import turfRewind from '@turf/rewind'
 import { geoProjection, geoPath } from 'd3-geo'
 
 import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
-import { GcpTransformer } from '@allmaps/transform'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
 import type { Polygon as GeojsonPolygon } from 'geojson'
 
@@ -19,9 +19,12 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
   if (map.gcps.length >= 3) {
     if (map.resourceMask.length >= 3) {
       try {
-        const transformer = GcpTransformer.fromGeoreferencedMap(map)
+        const projectedTransformer =
+          ProjectedGcpTransformer.fromGeoreferencedMap(map, {
+            projection: lonLatProjection
+          })
 
-        let polygon = transformer.transformToGeo([map.resourceMask])
+        let polygon = projectedTransformer.transformToGeo([map.resourceMask])
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of
