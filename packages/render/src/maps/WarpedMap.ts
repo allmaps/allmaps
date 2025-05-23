@@ -222,20 +222,19 @@ export class WarpedMap extends EventTarget {
     // This way a warped map list's current
     // transformation and projection can overwrite those of the map
 
-    // TODO: read internal projection and projection from georeferenced map
     const georeferencedMapInput = {
       transformationType: georeferencedMap.transformation
         ?.type as TransformationType,
       internalProjection: georeferencedMap.resourceCrs
     }
 
-    const defaultAndMapOptions = mergeOptionsUnlessUndefined(
-      DEFAULT_WARPED_MAP_OPTIONS,
-      georeferencedMapInput
-    )
-    const warpedMapOptions = mergeOptions(
-      defaultAndMapOptions,
+    const mapAndConstructorOptions = mergeOptions(
+      georeferencedMapInput,
       partialWarpedMapOptions
+    )
+    const warpedMapOptions = mergeOptionsUnlessUndefined(
+      DEFAULT_WARPED_MAP_OPTIONS,
+      mapAndConstructorOptions
     )
 
     this.projectedTransformerCache = new Map()

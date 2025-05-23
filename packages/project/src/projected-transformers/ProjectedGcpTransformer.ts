@@ -1,12 +1,17 @@
 import proj4 from 'proj4'
 
-import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
+import {
+  mergeOptions,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions
+} from '@allmaps/stdlib'
 import {
   GcpAndDistortions,
   GcpTransformer,
   GcpTransformerOptions,
   ProjectionFunction,
-  TransformationType
+  TransformationType,
+  TransformationTypeInputs
 } from '@allmaps/transform'
 
 import {
@@ -87,7 +92,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     type: TransformationType = 'polynomial',
     partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
   ) {
-    const projectedGcpTransformerOptions = mergeOptions(
+    const projectedGcpTransformerOptions = mergeOptionsUnlessUndefined(
       defaultProjectedTransformerOptions,
       partialProjectedGcpTransformerOptions
     )
@@ -340,20 +345,23 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * Create a Projected GCP Transformer from a Georeferenced Map
    *
    * @param georeferencedMap - A Georeferenced Map
-   * @param partialProjectedGcpTransformerOptions - Projected GCP Transformer Options
+   * @param options - Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
    * @returns A Projected GCP Transformer
    */
   static fromGeoreferencedMap(
     georeferencedMap: GeoreferencedMap,
-    partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
+    options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
   ): ProjectedGcpTransformer {
-    // TODO: read and pass projection from georeferencedMap
-    // TODO: add to readme, similar to transform readme
+    const georeferencedMapInput = {
+      transformationType: georeferencedMap.transformation?.type,
+      internalProjection: georeferencedMap.resourceCrs
+    }
+    options = mergeOptions(georeferencedMapInput, options)
 
     return new ProjectedGcpTransformer(
       georeferencedMap.gcps,
-      georeferencedMap.transformation?.type,
-      partialProjectedGcpTransformerOptions
+      options.transformationType,
+      options
     )
   }
 }
