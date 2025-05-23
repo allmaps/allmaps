@@ -1,1 +1,3 @@
-// Reexport your entry components here
+import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
+
+export { ProjectionPicker }

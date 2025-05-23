@@ -69,6 +69,16 @@ MIT
 
 `[Point, Point, Point, Point]`.
 
+### `bboxToResolution(bbox)`
+
+###### Parameters
+
+* `bbox` (`[number, number, number, number]`)
+
+###### Returns
+
+`number`.
+
 ### `bboxToSize(bbox)`
 
 ###### Parameters

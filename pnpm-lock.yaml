@@ -1029,9 +1029,21 @@ importers:
 
   packages/components:
     dependencies:
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
       bits-ui:
         specifier: ^1.5.3
         version: 1.5.3(svelte@5.25.9)
+      flatbush:
+        specifier: ^4.4.0
+        version: 4.4.0
+      fuse.js:
+        specifier: ^7.1.0
+        version: 7.1.0
       phosphor-svelte:
         specifier: ^2.0.1
         version: 2.0.1(svelte@5.25.9)
@@ -1057,6 +1069,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.1.7(vite@6.3.5)
+      '@types/flatbush':
+        specifier: ^4.2.2
+        version: 4.2.2
       eslint:
         specifier: ^9.18.0
         version: 9.24.0
@@ -5242,7 +5257,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.20.4(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.25.9)(vite@5.4.17)
+      '@sveltejs/kit': 2.20.4(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.17)
     dev: true
 
   /@sveltejs/kit@2.20.4(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.17):
@@ -5998,6 +6013,13 @@ packages:
 
   /@types/extend@3.0.4:
     resolution: {integrity: sha512-ArMouDUTJEz1SQRpFsT2rIw7DeqICFv5aaVzLSIYMYQSLcwcGOfT3VyglQs/p7K3F7fT4zxr0NWxYZIdifD6dA==}
+    dev: true
+
+  /@types/flatbush@4.2.2:
+    resolution: {integrity: sha512-MqfHQCcALbBBa0mL8h2SxRxK8Yn0vHeBoqJqEvkqQFXfPEvB6fanCs4dI3ENgr4tKZ2mK6nRYcCX4yXnTYE/eQ==}
+    deprecated: This is a stub types definition. flatbush provides its own type definitions, so you do not need this installed.
+    dependencies:
+      flatbush: 4.4.0
     dev: true
 
   /@types/geojson-vt@3.2.5:
@@ -9177,6 +9199,15 @@ packages:
     hasBin: true
     dev: true
 
+  /flatbush@4.4.0:
+    resolution: {integrity: sha512-cf6G+sfy/+/FLH7Ls1URQ5GCRlXgwgqUZiEsMNrMZqb3Us3EkKmzUlKbnyoBy/4wI4oLJ+8cyCQoKJIVm92Fmg==}
+    dependencies:
+      flatqueue: 2.0.3
+
+  /flatqueue@2.0.3:
+    resolution: {integrity: sha512-RZCWZNkmxzUOh8jqEcEGZCycb3B8KAfpPwg3H//cURasunYxsg1eIvE+QDSjX+ZPHTIVfINfK1aLTrVKKO0i4g==}
+    engines: {node: '>= 12.17.0'}
+
   /flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
@@ -9286,6 +9317,11 @@ packages:
 
   /function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
+
+  /fuse.js@7.1.0:
+    resolution: {integrity: sha512-trLf4SzuuUxfusZADLINj+dE8clK1frKdmqiJNb1Es75fmI5oY6X2mxLVUciLLjxqw/xr72Dhy+lER6dGd02FQ==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gauge@4.0.4:
     resolution: {integrity: sha512-f9m+BEN5jkg6a0fZjleidjN51VE1X+mPFQ2DJ0uv1V39oCLCbsGe6yjbBnp7eK7z/+GAon99a3nHuqbuuthyPg==}

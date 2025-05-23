@@ -11,5 +11,8 @@
     "strict": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
-  }
+  },"references": [
+    { "path": "../stdlib" },
+    { "path": "../types" }
+  ],
 }
