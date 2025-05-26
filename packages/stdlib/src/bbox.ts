@@ -166,6 +166,10 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
+export function bboxToResolution(bbox: Bbox): number {
+  return sizeToResolution(bboxToSize(bbox))
+}
+
 // Approximate results for quadrilaterals, exact for rectangles (e.g. coming from bboxes).
 // A more precise result would require a minimal-covering-rectangle algorithm
 // Or computing and comparing rectangle surfaces

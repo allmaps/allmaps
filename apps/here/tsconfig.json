@@ -13,7 +13,7 @@
     "strict": true
   },
   "references": [
-    { "path": "../../packages/transform" },
+    { "path": "../../packages/project" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/iiif-parser" },
