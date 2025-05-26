@@ -1,7 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state'
   import { fade } from 'svelte/transition'
-
-  import { goto } from '$app/navigation'
 
   import { Dialog } from 'bits-ui'
 
@@ -11,6 +10,9 @@
 
   import CopyButton from '$lib/components/CopyButton.svelte'
   // import Colors from '$lib/components/Colors.svelte'
+
+  import { getAllmapsId } from '$lib/shared/ids.js'
+  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
   import { PUBLIC_PREVIEW_URL } from '$env/static/public'
 
@@ -25,14 +27,16 @@
   let imageError = $state(false)
 
   let postcardUrl = $derived(
-    `https://next.here.allmaps.org/maps/${data.allmapsMapId}/postcard?from=${data.from?.join(',')}`
+    `https://next.here.allmaps.org/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
   )
 
   let postcardText = $derived(`Look where I am! ${postcardUrl}`)
 
   $effect(() => {
     if (!open) {
-      goto('./')
+      gotoRoute(
+        createRouteUrl(page, `${getAllmapsId(data.mapId)}`, { from: null })
+      )
     }
   })
 
@@ -98,14 +102,14 @@
               onerror={handleImageError}
               alt="Preview"
               class="rounded-md overflow-hidden"
-              src="{PUBLIC_PREVIEW_URL}/maps/{data.allmapsMapId}.jpg?from={data.from?.join(
-                ','
-              )}"
+              src="{PUBLIC_PREVIEW_URL}/{getAllmapsId(
+                data.mapId
+              )}.jpg?from={data.from?.join(',')}"
             />
             {#if !imageLoaded}
               <div
                 out:fade
-                class="w-full h-full absolute border-2 border-gray/50 rounded-lg
+                class="w-full h-full absolute border-2 bg-white border-gray/50 rounded-lg
                 top-0 left-0 flex items-center justify-center"
               >
                 <Loading />

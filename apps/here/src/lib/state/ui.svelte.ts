@@ -1,8 +1,32 @@
 import { setContext, getContext } from 'svelte'
 
-import type { Point } from '@allmaps/types'
+import type { Point, Size } from '@allmaps/types'
 
 const URL_KEY = Symbol('url')
+
+type RowSizes = {
+  left: Size
+  center: Size
+  right: Size
+}
+
+type ElementSizes = {
+  top: RowSizes
+  bottom: RowSizes
+}
+
+const defaultElementSizes: ElementSizes = {
+  top: {
+    left: [0, 0],
+    center: [0, 0],
+    right: [0, 0]
+  },
+  bottom: {
+    left: [0, 0],
+    center: [0, 0],
+    right: [0, 0]
+  }
+}
 
 export class UiState {
   #color = $state('pink')
@@ -10,6 +34,8 @@ export class UiState {
   #positionScreenCoordinates = $state<Point | undefined>()
 
   #followPosition = $state(false)
+
+  #elementSizes = $state<ElementSizes>(defaultElementSizes)
 
   get color() {
     return this.#color
@@ -40,6 +66,14 @@ export class UiState {
 
   set followPosition(follow: boolean) {
     this.#followPosition = follow
+  }
+
+  get elementSizes() {
+    return this.#elementSizes
+  }
+
+  set elementSizes(sizes: ElementSizes) {
+    this.#elementSizes = sizes
   }
 }
 

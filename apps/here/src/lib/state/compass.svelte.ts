@@ -2,9 +2,8 @@ import { setContext, getContext } from 'svelte'
 
 import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
-
 import type { SensorsState } from '$lib/state/sensors.svelte.js'
+import type { MapState } from '$lib/state/map.svelte.js'
 
 import type { CompassMode } from '$lib/shared/types.ts'
 
@@ -12,17 +11,16 @@ const COMPASS_KEY = Symbol('compass')
 
 export class CompassState {
   #sensorsState: SensorsState
-
-  #map = $state.raw<GeoreferencedMap>()
+  #mapState: MapState
 
   #compassMode = $state<CompassMode>('image')
 
   #customRotation = $state(0)
 
   #selectedMapBearing = $derived.by(() => {
-    if (this.#map) {
+    if (this.#mapState && this.#mapState.map) {
       try {
-        return computeGeoreferencedMapBearing(this.#map)
+        return computeGeoreferencedMapBearing(this.#mapState.map)
       } catch (err) {
         console.error('Error computing map bearing:', err)
       }
@@ -52,17 +50,9 @@ export class CompassState {
     return undefined
   })
 
-  constructor(sensorsState: SensorsState, map?: GeoreferencedMap) {
+  constructor(sensorsState: SensorsState, mapState: MapState) {
     this.#sensorsState = sensorsState
-    this.#map = map
-  }
-
-  set map(map: GeoreferencedMap | undefined) {
-    this.#map = map
-  }
-
-  get map() {
-    return this.#map
+    this.#mapState = mapState
   }
 
   get rotation() {
@@ -102,9 +92,9 @@ export class CompassState {
 
 export function setCompassState(
   sensorsState: SensorsState,
-  map?: GeoreferencedMap
+  mapState: MapState
 ) {
-  return setContext(COMPASS_KEY, new CompassState(sensorsState, map))
+  return setContext(COMPASS_KEY, new CompassState(sensorsState, mapState))
 }
 
 export function getCompassState() {

@@ -6,22 +6,27 @@ import { fetchJson } from '@allmaps/stdlib'
 
 import { findManifests } from '$lib/shared/iiif.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { MapState } from '$lib/state/map.svelte.js'
 
 const IIIF_KEY = Symbol('iiif')
 
 export class IiifState {
-  #map = $state.raw<GeoreferencedMap>()
+  #mapState: MapState
 
-  #manifestItems = $derived(
-    this.#map ? findManifests(this.#map.resource.partOf) : []
-  )
+  #manifestItems = $derived.by(() => {
+    if (this.#mapState && this.#mapState.map) {
+      return findManifests(this.#mapState.map.resource.partOf)
+    }
+
+    return []
+  })
+
   #manifestIds = $derived(this.#manifestItems.map((item) => item.id))
 
   #parsedManifests = $state<SvelteMap<string, Manifest>>(new SvelteMap())
 
-  constructor(map?: GeoreferencedMap) {
-    this.#map = map
+  constructor(mapState: MapState) {
+    this.#mapState = mapState
   }
 
   async fetchParsedManifest(manifestId: string) {
@@ -37,25 +42,21 @@ export class IiifState {
     return parsedManifest
   }
 
-  set map(map: GeoreferencedMap | undefined) {
-    this.#map = map
-    this.#parsedManifests = new SvelteMap()
-  }
-
-  get map() {
-    return this.#map
-  }
+  // set map(map: GeoreferencedMap | undefined) {
+  //   this.#map = map
+  //   this.#parsedManifests = new SvelteMap()
+  // }
 
   get manifestIds() {
     return this.#manifestIds
   }
 }
 
-export function setIiifState(map?: GeoreferencedMap) {
-  return setContext(IIIF_KEY, new IiifState(map))
+export function setIiifState(mapState: MapState) {
+  return setContext(IIIF_KEY, new IiifState(mapState))
 }
 
-export function getUiState() {
+export function getIiifState() {
   const iiifState = getContext<ReturnType<typeof setIiifState>>(IIIF_KEY)
 
   if (!iiifState) {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition'
+
   import { getUiState } from '$lib/state/ui.svelte.js'
 
   import { pointOnPolygon, lineBearing } from '$lib/shared/outside.js'
@@ -12,17 +14,82 @@
   let width = $state(0)
   let height = $state(0)
 
-  const padding = 30
-  const controlsHeight = 75
+  const outsideImageSize = 50
 
-  let headerSize = [167 + 8 + 8, 32 + 8 + 8]
+  const padding = outsideImageSize / 2 + 10
+  const elementGap = 8
+
   let polygon = $derived<Ring>([
-    [padding, headerSize[1] + padding],
-    [headerSize[0] + padding, headerSize[1] + padding],
-    [headerSize[0] + padding, padding],
+    // Start at right side of logo in the top left corner:
+    [padding + uiState.elementSizes.top.left[0], padding],
+
+    // Go around the Info button:
+    [width / 2 - uiState.elementSizes.top.center[0] / 2 - padding, padding],
+    [
+      width / 2 - uiState.elementSizes.top.center[0] / 2 - padding,
+      uiState.elementSizes.top.center[1] + padding + elementGap
+    ],
+    [
+      width / 2 + uiState.elementSizes.top.center[0] / 2 + padding,
+      uiState.elementSizes.top.center[1] + padding + elementGap
+    ],
+    [width / 2 + uiState.elementSizes.top.center[0] / 2 + padding, padding],
+
+    // To the top right side of the screen:
     [width - padding, padding],
-    [width - padding, height - padding - controlsHeight],
-    [padding, height - padding - controlsHeight]
+
+    // Around the north arrow:
+    [
+      width - padding,
+      height - uiState.elementSizes.bottom.right[1] - padding - elementGap
+    ],
+    [
+      width - uiState.elementSizes.bottom.right[0] - padding - elementGap,
+      height - uiState.elementSizes.bottom.right[1] - padding - elementGap
+    ],
+    [
+      width - uiState.elementSizes.bottom.right[0] - padding - elementGap,
+      height - padding
+    ],
+
+    // Around the middle button:
+    [
+      width / 2 + uiState.elementSizes.bottom.center[0] / 2 + padding,
+      height - padding
+    ],
+    [
+      width / 2 + uiState.elementSizes.bottom.center[0] / 2 + padding,
+      height - uiState.elementSizes.bottom.center[1] - padding - elementGap
+    ],
+    [
+      width / 2 - uiState.elementSizes.bottom.center[0] / 2 - padding,
+      height - uiState.elementSizes.bottom.center[1] - padding - elementGap
+    ],
+    [
+      width / 2 - uiState.elementSizes.bottom.center[0] / 2 - padding,
+      height - padding
+    ],
+
+    // Around the More maps button:
+    [
+      uiState.elementSizes.bottom.left[0] + padding + elementGap,
+      height - padding
+    ],
+    [
+      uiState.elementSizes.bottom.left[0] + padding + elementGap,
+      height - uiState.elementSizes.bottom.left[1] - padding - elementGap
+    ],
+    [
+      padding,
+      height - uiState.elementSizes.bottom.left[1] - padding - elementGap
+    ],
+
+    // And finally back to the left side of the screen, underneath the logo:
+    [padding, uiState.elementSizes.top.left[1] + padding + elementGap],
+    [
+      padding + uiState.elementSizes.top.left[0],
+      uiState.elementSizes.top.left[1] + padding + elementGap
+    ]
   ])
 
   // If the ?from= query param is set, we use that as the starting point
@@ -96,16 +163,17 @@
     viewBox={`0 0 ${width} ${height}`}
   >
     {#if !fromOutsideViewport && positionOutsideViewport && point}
-      <!-- transition:scale={{ duration: 300, delay: 100, start: 0 }} -->
       <image
-        class="transform-border"
+        transition:scale={{ duration: 300, delay: 100, start: 0 }}
+        class="transform-border transition-all duration-[50ms] ease-linear"
         x={point[0]}
         y={point[1]}
         href={OutsideImage}
         transform-origin="center"
-        style="transform: translate(-25px) rotate({Math.round(bearing)}deg);"
-        height="50"
-        width="50"
+        style="transform: translate(-{outsideImageSize /
+          2}px, -{outsideImageSize / 2}px) rotate({Math.round(bearing)}deg);"
+        height={outsideImageSize}
+        width={outsideImageSize}
       />
     {/if}
   </svg>

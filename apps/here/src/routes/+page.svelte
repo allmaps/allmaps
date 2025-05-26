@@ -14,6 +14,7 @@
   import DotsPattern from '$lib/components/DotsPattern.svelte'
   import Footer from '$lib/components/Footer.svelte'
   import GeolocationError from '$lib/components/GeolocationError.svelte'
+  import Route from '$lib/components/Route.svelte'
 
   import type { PageProps } from './$types.js'
 
@@ -61,7 +62,7 @@
   </section>
 </div>
 
-<section class="bg-blue-200 shrink-0 grow p-2">
+<section class="bg-blue-200 shrink-0 grow">
   <DotsPattern color={blue}>
     {#if waitingForPosition || mapsState.loading}
       <div class="h-full flex items-center justify-center">
@@ -72,7 +73,7 @@
     {:else if mapsState.maps.size > 0}
       <div>
         <section
-          class="px-3 py-6
+          class="px-3 py-6 flex flex-col gap-6
          overflow-hidden max-w-4xl w-full m-auto"
         >
           <Collection>
@@ -80,6 +81,8 @@
               <Thumbnail {mapId} {map} geojsonRoute={data.geojsonRoute} />
             {/each}
           </Collection>
+
+          <Route geojsonRoute={data.geojsonRoute} />
         </section>
         <Footer />
       </div>

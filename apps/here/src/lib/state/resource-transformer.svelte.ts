@@ -2,26 +2,24 @@ import { setContext, getContext } from 'svelte'
 
 import { GcpTransformer } from '@allmaps/transform'
 
-import { SensorsState } from '$lib/state/sensors.svelte.js'
-
 import { toResourceCoordinates } from '$lib/shared/transform.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { SensorsState } from '$lib/state/sensors.svelte.js'
+import type { MapState } from '$lib/state/map.svelte.js'
 
 const URL_KEY = Symbol('resource-transformer')
 
 export class ResourceTransformerState {
   #sensorsState: SensorsState
-
-  #map = $state.raw<GeoreferencedMap>()
+  #mapState: MapState
 
   #transformer: GcpTransformer | undefined = $derived.by(() => {
-    if (this.#map) {
+    if (this.#mapState && this.#mapState.map) {
       try {
         // TODO: only create transformer if map is changed
         return new GcpTransformer(
-          this.#map.gcps,
-          this.#map.transformation?.type
+          this.#mapState.map.gcps,
+          this.#mapState.map.transformation?.type
         )
       } catch (err) {
         console.error('Error creating transformer:', err)
@@ -38,9 +36,9 @@ export class ResourceTransformerState {
     }
   })
 
-  constructor(sensorsState: SensorsState, map?: GeoreferencedMap) {
+  constructor(sensorsState: SensorsState, mapState: MapState) {
     this.#sensorsState = sensorsState
-    this.#map = map
+    this.#mapState = mapState
   }
 
   get transformer() {
@@ -51,27 +49,19 @@ export class ResourceTransformerState {
     return this.#resourcePosition
   }
 
-  get map() {
-    return this.#map
-  }
-
-  set map(map: GeoreferencedMap | undefined) {
-    this.#map = map
-  }
-
   get resourcePositionInsideResource() {
     if (
       this.#resourcePosition &&
-      this.#map?.resource.width &&
-      this.#map?.resource.height
+      this.#mapState.map?.resource.width &&
+      this.#mapState.map?.resource.height
     ) {
       const [x, y] = this.#resourcePosition
 
       if (
         x < 0 ||
         y < 0 ||
-        x > this.#map.resource.width ||
-        y > this.#map.resource.height
+        x > this.#mapState.map.resource.width ||
+        y > this.#mapState.map.resource.height
       ) {
         return false
       }
@@ -85,9 +75,12 @@ export class ResourceTransformerState {
 
 export function setResourceTransformerState(
   sensorsState: SensorsState,
-  map?: GeoreferencedMap
+  mapState: MapState
 ) {
-  return setContext(URL_KEY, new ResourceTransformerState(sensorsState, map))
+  return setContext(
+    URL_KEY,
+    new ResourceTransformerState(sensorsState, mapState)
+  )
 }
 
 export function getResourceTransformerState() {

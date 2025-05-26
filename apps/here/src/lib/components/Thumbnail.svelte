@@ -4,7 +4,7 @@
 
   import { Thumbnail } from '@allmaps/ui'
   import { GcpTransformer } from '@allmaps/transform'
-  import { pink } from '@allmaps/tailwind'
+  import { pink, red } from '@allmaps/tailwind'
 
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
@@ -20,12 +20,14 @@
   import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
-  import type { GeojsonLineString, Size } from '@allmaps/types'
+  import type { Size } from '@allmaps/types'
+
+  import type { GeojsonRoute } from '$lib/shared/types.js'
 
   type Props = {
     mapId: string
     map: GeoreferencedMap
-    geojsonRoute?: GeojsonLineString
+    geojsonRoute?: GeojsonRoute
   }
 
   let { mapId, map, geojsonRoute }: Props = $props()
@@ -68,9 +70,9 @@
   )
 
   let resourceRouteCoordinates = $derived.by(() => {
-    if (geojsonRoute && resourceSize && svgSize) {
+    if (geojsonRoute && geojsonRoute.route && resourceSize && svgSize) {
       const resourceLineString = transformer.transformToResource(
-        geojsonRoute.coordinates
+        geojsonRoute.route.coordinates
       )
 
       return resourceLineString.map((point) =>
@@ -147,7 +149,7 @@
               <polyline
                 points={polylinePoints}
                 fill="none"
-                stroke={pink}
+                stroke={red}
                 stroke-width="0.6"
               />
             {/if}

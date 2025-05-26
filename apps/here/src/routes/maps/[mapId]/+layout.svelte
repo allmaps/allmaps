@@ -5,10 +5,10 @@
   import { pink } from '@allmaps/tailwind'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
-  import { getErrorState } from '$lib/state/error.svelte.js'
   import { setCompassState } from '$lib/state/compass.svelte.js'
   import { setResourceTransformerState } from '$lib/state/resource-transformer.svelte.js'
   import { setIiifState } from '$lib/state/iiif.svelte.js'
+  import { setMapState } from '$lib/state/map.svelte.js'
 
   import Header from '$lib/components/Header.svelte'
   import Info from '$lib/components/Info.svelte'
@@ -29,21 +29,14 @@
   let { data, children }: LayoutProps & Props = $props()
 
   const sensorsState = getSensorsState()
-  const errorState = getErrorState()
-  const resourceTransformerState = setResourceTransformerState(
-    sensorsState,
-    data.selectedMapWithImageInfo.map
-  )
-  const compassState = setCompassState(
-    sensorsState,
-    data.selectedMapWithImageInfo.map
-  )
-  const iiifState = setIiifState(data.selectedMapWithImageInfo.map)
+  const mapState = setMapState(data.selectedMapWithImageInfo.map)
+
+  setIiifState(mapState)
+  setResourceTransformerState(sensorsState, mapState)
+  setCompassState(sensorsState, mapState)
 
   $effect.pre(() => {
-    compassState.map = data.selectedMapWithImageInfo.map
-    resourceTransformerState.map = data.selectedMapWithImageInfo.map
-    iiifState.map = data.selectedMapWithImageInfo.map
+    mapState.map = data.selectedMapWithImageInfo.map
   })
 
   let positionOrTimeout = $derived(

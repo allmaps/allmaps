@@ -32,13 +32,13 @@
   <Outside />
 
   <div class="z-50 bottom-0 w-full p-2 pointer-events-none">
-    <Controls selectedMapId={data.selectedMapId}>
+    <Controls mapId={data.mapId}>
       {#if distance && distance > 100}
         <!-- <Popover
           >{#snippet button()} -->
         <div
           class="bg-pink border-white border-3 text-white text-sm rounded-full
-          px-3 py-1 place-self-end shadow-lg flex flex-row items-center gap-1"
+          px-3 py-1 shadow-lg flex flex-row items-center gap-1"
         >
           <span class="border-white border-3 rounded-full size-3 inline-block"
           ></span>
@@ -57,7 +57,7 @@
       {:else if errorState.geolocationPositionError}
         <div
           class="bg-red border-white border-3 text-white text-sm rounded-full
-          px-3 py-1 place-self-end shadow-lg flex flex-row items-center gap-1"
+          px-3 py-1 shadow-lg flex flex-row items-center gap-1"
         >
           Enable location services in your browser to see your location
         </div>

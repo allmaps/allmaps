@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
-
   import { ArrowSquareOut as ArrowSquareOutIcon } from 'phosphor-svelte'
+
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import Popover from '$lib/components/Popover.svelte'
 
@@ -20,6 +20,8 @@
   }
 
   let { map: propMap }: Props = $props()
+
+  const uiState = getUiState()
 
   // Somehow, directly using map sometimes results in a map is undefined error
   // This happens when switching between layouts
@@ -88,6 +90,8 @@
   <Popover>
     {#snippet button()}
       <div
+        bind:clientWidth={uiState.elementSizes.top.center[0]}
+        bind:clientHeight={uiState.elementSizes.top.center[1]}
         class="max-w-lg min-w-0 truncate shadow hover:shadow-lg inset-shadow-none hover:inset-shadow-sm
       transition-shadow duration-1000 bg-white rounded-md px-3 py-2 cursor-pointer text-xs"
       >
@@ -96,10 +100,7 @@
     {/snippet}
     {#snippet contents()}
       {#if map}
-        <div
-          transition:fade
-          class="bg-white rounded p-2 shadow flex flex-col gap-2"
-        >
+        <div class="bg-white rounded p-2 shadow flex flex-col gap-2">
           <input class="w-full" readonly value={map.id} />
 
           <!-- annotation URL -->

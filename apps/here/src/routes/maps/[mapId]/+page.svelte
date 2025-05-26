@@ -29,7 +29,7 @@
   <Outside />
 
   <div class="absolute z-50 bottom-0 w-full p-2 pointer-events-none">
-    <Controls selectedMapId={data.selectedMapId}>
+    <Controls mapId={data.mapId}>
       {#if sensorsState.position}
         <div class="place-self-end pointer-events-auto">
           {#if resourceTransformerState.resourcePositionInsideResource}
@@ -37,13 +37,9 @@
               class="bg-green hover:bg-green-400 text-white font-bold
                 rounded-lg px-4 py-2 flex gap-2
                 shadow hover:shadow-2xl transition-all"
-              href={createRouteUrl(
-                page,
-                `${getAllmapsId(data.selectedMapId)}/share`,
-                {
-                  from: getFrom(sensorsState.position)
-                }
-              )}
+              href={createRouteUrl(page, `${getAllmapsId(data.mapId)}/share`, {
+                from: getFrom(sensorsState.position)
+              })}
             >
               <ShareNetworkIcon size="24" />
               <span>Share <span class="hidden sm:inline">this map</span></span>

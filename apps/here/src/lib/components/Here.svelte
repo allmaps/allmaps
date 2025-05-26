@@ -10,13 +10,19 @@
   import Icon from 'ol/style/Icon.js'
   import Style from 'ol/style/Style.js'
   import Stroke from 'ol/style/Stroke.js'
+  import Fill from 'ol/style/Fill.js'
+  import CircleStyle from 'ol/style/Circle.js'
   import VectorSource from 'ol/source/Vector.js'
   import IIIF from 'ol/source/IIIF.js'
   import IIIFInfo from 'ol/format/IIIFInfo.js'
   import TileLayer from 'ol/layer/Tile.js'
   import VectorLayer from 'ol/layer/Vector.js'
 
-  import { pink } from '@allmaps/tailwind'
+  import { Dialog } from 'bits-ui'
+  import { X as XIcon } from 'phosphor-svelte'
+
+  import { red } from '@allmaps/tailwind'
+  import { isGeojsonPoint } from '@allmaps/stdlib'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
@@ -26,10 +32,11 @@
   import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
   import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
   import type TileGrid from 'ol/tilegrid/TileGrid.js'
+  import type { MapBrowserEvent } from 'ol'
 
-  import type { GeojsonLineString, Point } from '@allmaps/types'
+  import type { Point } from '@allmaps/types'
 
-  import type { MapWithImageInfo } from '$lib/shared/types.js'
+  import type { MapWithImageInfo, GeojsonRoute } from '$lib/shared/types.js'
 
   import HereIcon from '$lib/images/here.svg?raw'
   import HereOrientationIcon from '$lib/images/here-orientation.svg?raw'
@@ -52,9 +59,16 @@
     svg: string
   }
 
+  type PopoverContents = {
+    title?: string
+    image?: string
+    url?: string
+    description?: string
+  }
+
   type Props = {
     mapWithImageInfo: MapWithImageInfo
-    geojsonRoute?: GeojsonLineString
+    geojsonRoute?: GeojsonRoute
     from?: Point
   }
 
@@ -62,6 +76,12 @@
 
   let ol = $state.raw<HTMLElement>()
   let olMap = $state.raw<OLMap>()
+
+  let popoverContents = $state<PopoverContents>()
+
+  let geojsonRouteLayer: VectorLayer
+  let geojsonMarkersLayer: VectorLayer
+  let positionLayer: VectorLayer
 
   let positionImageCoordinates = $derived.by<Point | undefined>(() => {
     if (resourceTransformerState.resourcePosition) {
@@ -86,18 +106,18 @@
   const tileLayer = new TileLayer()
   const positionFeature = new Feature()
   const fromFeature = new Feature({})
-  const geojsonFeature = new Feature()
+  const geojsonRouteFeature = new Feature()
 
-  geojsonFeature.setStyle([
+  geojsonRouteFeature.setStyle([
     new Style({
       stroke: new Stroke({
         color: 'white',
-        width: 4
+        width: 5
       })
     }),
     new Style({
       stroke: new Stroke({
-        color: pink,
+        color: red,
         width: 3
       })
     })
@@ -178,6 +198,8 @@
   }
 
   function updateImage(mapWithImageInfo: MapWithImageInfo) {
+    geojsonMarkersLayer.getSource()?.clear()
+
     if (!mounted || !olMap) {
       return
     }
@@ -221,14 +243,72 @@
         })
       }
 
-      if (geojsonRoute && resourceTransformerState.transformer) {
-        const projectedGeojsonRoute =
-          resourceTransformerState.transformer.transformToResource(
-            geojsonRoute.coordinates
-          )
-        geojsonFeature.setGeometry(
+      if (
+        geojsonRoute &&
+        geojsonRoute.route &&
+        resourceTransformerState.transformer
+      ) {
+        const transformer = resourceTransformerState.transformer
+
+        const projectedGeojsonRoute = transformer.transformToResource(
+          geojsonRoute.route.coordinates
+        )
+        geojsonRouteFeature.setGeometry(
           new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
         )
+
+        const geojsonMarkerFeatures = geojsonRoute.markers.map((marker) => {
+          if (isGeojsonPoint(marker.geometry)) {
+            const projectedPoint = transformer.transformToResource(
+              marker.geometry.coordinates
+            )
+
+            let title: string | undefined
+            let image: string | undefined
+            let url: string | undefined
+            let description: string | undefined
+
+            if (marker.properties && typeof marker.properties === 'object') {
+              if (
+                'title' in marker.properties &&
+                typeof marker.properties.title === 'string'
+              ) {
+                title = marker.properties.title
+              }
+
+              if (
+                'image' in marker.properties &&
+                typeof marker.properties.image === 'string'
+              ) {
+                image = marker.properties.image
+              }
+
+              if (
+                'description' in marker.properties &&
+                typeof marker.properties.description === 'string'
+              ) {
+                description = marker.properties.description
+              }
+
+              if (
+                'url' in marker.properties &&
+                typeof marker.properties.url === 'string'
+              ) {
+                url = marker.properties.url
+              }
+            }
+
+            return new Feature({
+              geometry: new OLPoint([projectedPoint[0], -projectedPoint[1]]),
+              title,
+              image,
+              url,
+              description
+            })
+          }
+        })
+
+        geojsonMarkersLayer.getSource()?.addFeatures(geojsonMarkerFeatures)
       }
 
       olMap.on('pointerdrag', () => {
@@ -280,6 +360,10 @@
     )
   }
 
+  function closeMarkerDialog() {
+    popoverContents = undefined
+  }
+
   // function hidePositionFeature() {
   //   positionFeature.setStyle()
   // }
@@ -309,14 +393,53 @@
     //   }
     // ])
 
-    const vectorLayer = new VectorLayer({
+    geojsonRouteLayer = new VectorLayer({
       source: new VectorSource({
-        features: [geojsonFeature, positionFeature, fromFeature]
+        features: [geojsonRouteFeature]
+      })
+    })
+
+    geojsonMarkersLayer = new VectorLayer({
+      source: new VectorSource({
+        features: []
+      }),
+      style: [
+        new Style({
+          image: new CircleStyle({
+            radius: 9,
+            fill: new Fill({
+              color: 'white'
+            })
+          })
+        }),
+        new Style({
+          image: new CircleStyle({
+            radius: 6,
+            fill: new Fill({
+              color: 'white'
+            }),
+            stroke: new Stroke({
+              color: red,
+              width: 4
+            })
+          })
+        })
+      ]
+    })
+
+    positionLayer = new VectorLayer({
+      source: new VectorSource({
+        features: [positionFeature, fromFeature]
       })
     })
 
     olMap = new OLMap({
-      layers: [tileLayer, vectorLayer],
+      layers: [
+        tileLayer,
+        geojsonRouteLayer,
+        geojsonMarkersLayer,
+        positionLayer
+      ],
       target: ol,
       controls: []
     })
@@ -348,6 +471,41 @@
       }
     })
 
+    olMap.on('click', (event: MapBrowserEvent<UIEvent>) => {
+      if (olMap) {
+        const features = olMap.getFeaturesAtPixel(event.pixel, {
+          layerFilter: (layer) => layer === geojsonMarkersLayer,
+          hitTolerance: 10
+        })
+
+        const feature = features[0]
+
+        if (feature) {
+          popoverContents = {
+            title: feature.get('title'),
+            image: feature.get('image'),
+            url: feature.get('url'),
+            description: feature.get('description')
+          }
+        } else {
+          closeMarkerDialog()
+        }
+      }
+    })
+
+    olMap.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
+      if (olMap) {
+        const hit = olMap.hasFeatureAtPixel(event.pixel, {
+          layerFilter: (layer) => layer === geojsonMarkersLayer,
+          hitTolerance: 10
+        })
+        olMap.getTargetElement().style.cursor = hit ? 'pointer' : ''
+      }
+    })
+
+    // Close the marker popover when the map is moved
+    olMap.on('movestart', closeMarkerDialog)
+
     mounted = true
   })
 
@@ -362,11 +520,15 @@
 
     if (compassState.compassMode === 'image') {
       setResourceRotation(0)
-    } else if (compassState.compassMode === 'north') {
+    } else if (
+      compassState.compassMode === 'north' &&
+      compassState.selectedMapBearing !== undefined
+    ) {
       setResourceRotation(-compassState.selectedMapBearing * (Math.PI / 180))
     } else if (
       compassState.compassMode === 'follow-orientation' &&
-      sensorsState.orientationAlpha
+      sensorsState.orientationAlpha &&
+      compassState.selectedMapBearing !== undefined
     ) {
       setResourceRotation(
         (sensorsState.orientationAlpha + compassState.selectedMapBearing + 45) *
@@ -401,7 +563,8 @@
   $effect(() => {
     if (
       sensorsState.orientationAlpha !== undefined &&
-      compassState.compassMode !== 'follow-orientation'
+      compassState.compassMode !== 'follow-orientation' &&
+      compassState.selectedMapBearing !== undefined
     ) {
       setPinRotation(
         (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
@@ -425,3 +588,72 @@
 </script>
 
 <div bind:this={ol} class="w-full h-full"></div>
+
+{#snippet image(src: string, alt?: string)}
+  <img
+    class="w-full object-contain rounded-md"
+    {src}
+    alt={alt || 'Marker image'}
+  />
+{/snippet}
+
+<Dialog.Root
+  bind:open={
+    () => popoverContents !== undefined,
+    (open) => {
+      if (!open) {
+        closeMarkerDialog()
+      }
+    }
+  }
+>
+  <Dialog.Portal>
+    {#if popoverContents}
+      <Dialog.Overlay
+        class="h-full
+        fixed inset-0 z-50 bg-black/80"
+      />
+
+      <Dialog.Content
+        class="w-full h-full p-5 sm:p-10 md:p-20 lg:p-30 fixed z-100 flex items-center justify-center pointer-events-none!"
+      >
+        <div
+          class="bg-white max-w-md max-h-full
+            rounded shadow-lg p-4 overflow-auto flex flex-col gap-4 pointer-events-auto"
+        >
+          <Dialog.Title class="w-full flex gap-2 justify-between items-center">
+            <div class="flex flex-row gap-2 items-center">
+              {#if popoverContents.title}
+                <Dialog.Title class="text-lg font-semibold"
+                  >{popoverContents.title}</Dialog.Title
+                >
+              {/if}
+            </div>
+
+            <Dialog.Close
+              class="cursor-pointer justify-self-end p-2 rounded-full hover:bg-gray/10 transition-colors"
+            >
+              <div>
+                <XIcon class="size-6" />
+                <span class="sr-only">Close</span>
+              </div>
+            </Dialog.Close>
+          </Dialog.Title>
+
+          {#if popoverContents.image}
+            {#if popoverContents.url}
+              <a href={popoverContents.url}
+                >{@render image(popoverContents.image)}</a
+              >
+            {:else}
+              {@render image(popoverContents.image)}
+            {/if}
+          {/if}
+          {#if popoverContents.description}
+            <p class="text-sm">{popoverContents.description}</p>
+          {/if}
+        </div>
+      </Dialog.Content>
+    {/if}
+  </Dialog.Portal>
+</Dialog.Root>

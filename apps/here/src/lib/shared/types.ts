@@ -1,4 +1,5 @@
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { GeojsonLineString, GeojsonFeature } from '@allmaps/types'
 
 export type CompassMode = 'image' | 'north' | 'follow-orientation' | 'custom'
 
@@ -31,3 +32,10 @@ export type FetchedImageInfo =
 export type ParamKey = 'geojson' | 'color' | 'from'
 
 export type Params = { [key in ParamKey]?: string | null }
+
+export type GeojsonRoute = {
+  url: string
+  error?: string
+  route?: GeojsonLineString
+  markers: GeojsonFeature[]
+}

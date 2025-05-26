@@ -7,20 +7,21 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { LayoutLoad } from './$types.js'
 
-export const load: LayoutLoad = async ({ parent, fetch }) => {
-  const { selectedMapId } = await parent()
+export const load: LayoutLoad = async ({ params, fetch }) => {
+  const { mapId: allmapsMapId } = params
+
+  const mapId = `https://annotations.allmaps.org/maps/${allmapsMapId}`
 
   let map: GeoreferencedMap
   let imageInfo: unknown
 
   try {
-    const annotation = await fetchJson(selectedMapId, undefined, fetch)
+    const annotation = await fetchJson(mapId, undefined, fetch)
     const maps = parseAnnotation(annotation)
     map = maps[0]
   } catch (err) {
     error(404, {
-      message: 'Map not found',
-      url: selectedMapId
+      message: 'Map not found'
     })
   }
 
@@ -30,14 +31,14 @@ export const load: LayoutLoad = async ({ parent, fetch }) => {
     imageInfo = await fetchImageInfo(imageId, undefined, fetch)
   } catch (err) {
     error(404, {
-      message: 'Failed to fetch IIIF Image',
-      url: `${imageId}/info.json`
+      message: 'Failed to fetch IIIF Image'
     })
   }
 
   return {
+    mapId,
     selectedMapWithImageInfo: {
-      mapId: selectedMapId,
+      mapId,
       map,
       imageInfo
     }

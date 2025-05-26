@@ -5,10 +5,5 @@ declare global {
       cf: CfProperties
       ctx: ExecutionContext
     }
-
-    interface Error {
-      description?: string
-      url?: string
-    }
   }
 }

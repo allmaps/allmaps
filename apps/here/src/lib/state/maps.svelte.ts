@@ -26,7 +26,6 @@ const MAPS_KEY = Symbol('maps')
 export class MapsState {
   #sensorsState: SensorsState
   #imageInfoState: ImageInfoState
-  #errorState: ErrorState
 
   #loading = $state(false)
 
@@ -68,7 +67,6 @@ export class MapsState {
   ) {
     this.#sensorsState = sensorsState
     this.#imageInfoState = imageInfoState
-    this.#errorState = errorState
 
     $effect(() => {
       const newPosition = this.#sensorsState.position
@@ -109,10 +107,6 @@ export class MapsState {
     }
   }
 
-  // #mapExists(mapId: string) {
-  //   return this.#maps.has(mapId)
-  // }
-
   async fetchMapsFromCoordinates(position: GeolocationPosition) {
     this.#loading = true
 
@@ -135,30 +129,6 @@ export class MapsState {
     this.#loading = false
     this.#lastPosition = position
   }
-
-  // async fetchMapFromMapId(mapId: string) {
-  //   if (!mapId) {
-  //     return
-  //   }
-
-  //   // If the map is already loaded, do nothing
-  //   if (!this.#mapExists(mapId)) {
-  //     try {
-  //       const annotations = await fetchJson(mapId)
-  //       const maps = parseAnnotation(annotations)
-
-  //       this.#mapsFromUrl = new SvelteMap(
-  //         maps.map((map) => [this.#getMapId(map), map])
-  //       )
-
-  //       return maps[0]
-  //     } catch (error) {
-  //       this.#errorState.error = error
-  //     }
-  //   } else {
-  //     return this.#maps.get(mapId)
-  //   }
-  // }
 
   get mapsFromCoordinates() {
     return this.#mapsFromCoordinates

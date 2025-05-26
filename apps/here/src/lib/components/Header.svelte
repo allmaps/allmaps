@@ -3,6 +3,8 @@
 
   import { Logo } from '@allmaps/ui'
 
+  import { getUiState } from '$lib/state/ui.svelte.js'
+
   import { createRouteUrl } from '$lib/shared/router.js'
 
   import type { Snippet } from 'svelte'
@@ -13,13 +15,20 @@
   }
 
   let { children, appName }: Props = $props()
+
+  const uiState = getUiState()
 </script>
 
 <header class="p-1 md:p-2">
   <nav
     class="mx-auto flex md:grid md:grid-cols-[1fr_max-content_1fr] justify-between items-center gap-3 @container"
   >
-    <a href={createRouteUrl(page, '/')} class="flex gap-2 no-underline">
+    <a
+      href={createRouteUrl(page, '/')}
+      class="flex gap-2 no-underline justify-self-start"
+      bind:clientWidth={uiState.elementSizes.top.left[0]}
+      bind:clientHeight={uiState.elementSizes.top.left[1]}
+    >
       <div class="w-8 inline">
         <Logo />
       </div>

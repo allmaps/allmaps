@@ -13,8 +13,17 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
  */
 
 export function computeGeoreferencedMapBearing(map: GeoreferencedMap) {
-  // Using polynomial transformation, not map transformation type, since faster and accurate enough
-  const transformer = new GcpTransformer(map.gcps, 'polynomial')
+  let transformer: GcpTransformer
+
+  if (map.gcps.length < 2) {
+    // Not enough points for polynomial transformation
+    throw new Error('Not enough GCPs to compute bearing')
+  } else if (map.gcps.length === 2) {
+    transformer = new GcpTransformer(map.gcps, 'helmert')
+  } else {
+    // Using polynomial transformation, not map transformation type, since faster and accurate enough
+    transformer = new GcpTransformer(map.gcps, 'polynomial')
+  }
 
   const bbox = computeBbox(map.resourceMask)
 
