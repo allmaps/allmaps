@@ -182,7 +182,7 @@ Two ways two rectangles (or shapes in general) can overlap: (`'cover' | 'contain
 
 ###### Fields
 
-* `coordinates` (`Array<Point>`)
+* `coordinates` (`Array<Array<number>>`)
 * `type` (`'LineString'`)
 
 ### `GeojsonMultiGeometry`
@@ -197,35 +197,35 @@ GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon
 
 ###### Fields
 
-* `coordinates` (`Array<Array<Point>>`)
+* `coordinates` (`Array<Array<Array<number>>>`)
 * `type` (`'MultiLineString'`)
 
 ### `GeojsonMultiPoint`
 
 ###### Fields
 
-* `coordinates` (`Array<Point>`)
+* `coordinates` (`Array<Array<number>>`)
 * `type` (`'MultiPoint'`)
 
 ### `GeojsonMultiPolygon`
 
 ###### Fields
 
-* `coordinates` (`Array<Array<Array<Point>>>`)
+* `coordinates` (`Array<Array<Array<Array<number>>>>`)
 * `type` (`'MultiPolygon'`)
 
 ### `GeojsonPoint`
 
 ###### Fields
 
-* `coordinates` (`[number, number]`)
+* `coordinates` (`Array<number>`)
 * `type` (`'Point'`)
 
 ### `GeojsonPolygon`
 
 ###### Fields
 
-* `coordinates` (`Array<Array<Point>>`)
+* `coordinates` (`Array<Array<Array<number>>>`)
 * `type` (`'Polygon'`)
 
 ### `Geometry`
