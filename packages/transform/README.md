@@ -614,6 +614,12 @@ MIT
 Gcp & Partial<Distortions>
 ```
 
+### `GcpInputs`
+
+###### Fields
+
+* `gcps` (`Array<Gcp>`)
+
 ### `GcpTransformOptions`
 
 ###### Type
@@ -866,7 +872,7 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 
 ###### Returns
 
-`{type: 'Point'; coordinates: Point}`.
+`{type: 'Point'; coordinates: number[]}`.
 
 ### `GcpTransformerOptions`
 
@@ -1552,11 +1558,10 @@ Transformation type.
   | 'thinPlateSpline'
 ```
 
-### `TransformerInputs`
+### `TransformationTypeInputs`
 
 ###### Fields
 
-* `gcps` (`Array<Gcp>`)
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -1565,6 +1570,14 @@ Transformation type.
     | 'polynomial3'
     | 'projective'
     | 'thinPlateSpline'`)
+
+### `TransformerInputs`
+
+###### Type
+
+```ts
+GcpInputs & TransformationTypeInputs
+```
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 

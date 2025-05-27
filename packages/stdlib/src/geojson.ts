@@ -1,10 +1,4 @@
 import {
-  isPoint,
-  isLineString,
-  isPolygon,
-  isMultiPoint,
-  isMultiLineString,
-  isMultiPolygon,
   conformLineString,
   conformRing,
   conformPolygon,
@@ -37,6 +31,48 @@ import type {
 
 // Assert
 
+function isGeojsonPointCoordinates(input: unknown): input is number[] {
+  return (
+    Array.isArray(input) &&
+    input.length >= 2 &&
+    input.every((item) => typeof item === 'number')
+  )
+}
+
+export function isGeojsonLineStringCoordinates(
+  input: unknown
+): input is LineString {
+  return Array.isArray(input) && input.every(isGeojsonPointCoordinates)
+}
+
+export function isGeojsonRingCoordinates(input: unknown): input is number[][] {
+  return Array.isArray(input) && input.every(isGeojsonPointCoordinates)
+}
+
+export function isGeojsonPolygonCoordinates(
+  input: unknown
+): input is number[][][] {
+  return Array.isArray(input) && input.every(isGeojsonRingCoordinates)
+}
+
+export function isGeojsonMultiPointCoordinates(
+  input: unknown
+): input is MultiPoint {
+  return Array.isArray(input) && input.every(isGeojsonPointCoordinates)
+}
+
+export function isGeojsonMultiLineStringCoordinates(
+  input: unknown
+): input is MultiLineString {
+  return Array.isArray(input) && input.every(isGeojsonLineStringCoordinates)
+}
+
+export function isGeojsonMultiPolygonCoordinates(
+  input: unknown
+): input is MultiPolygon {
+  return Array.isArray(input) && input.every(isGeojsonPolygonCoordinates)
+}
+
 export function isGeojsonPoint(input: unknown): input is GeojsonPoint {
   return (
     typeof input === 'object' &&
@@ -44,7 +80,7 @@ export function isGeojsonPoint(input: unknown): input is GeojsonPoint {
     'type' in input &&
     input.type === 'Point' &&
     'coordinates' in input &&
-    isPoint(input.coordinates)
+    isGeojsonPointCoordinates(input.coordinates)
   )
 }
 
@@ -57,7 +93,7 @@ export function isGeojsonLineString(
     'type' in input &&
     input.type === 'LineString' &&
     'coordinates' in input &&
-    isLineString(input.coordinates)
+    isGeojsonLineStringCoordinates(input.coordinates)
   )
 }
 
@@ -69,7 +105,7 @@ export function isGeojsonPolygon(input: unknown): input is GeojsonPolygon {
     input.type === 'Polygon' &&
     'coordinates' in input &&
     Array.isArray(input.coordinates) &&
-    isPolygon(input.coordinates)
+    isGeojsonPolygonCoordinates(input.coordinates)
   )
 }
 
@@ -82,7 +118,7 @@ export function isGeojsonMultiPoint(
     'type' in input &&
     input.type === 'MultiPoint' &&
     'coordinates' in input &&
-    isMultiPoint(input.coordinates)
+    isGeojsonMultiPointCoordinates(input.coordinates)
   )
 }
 
@@ -95,7 +131,7 @@ export function isGeojsonMultiLineString(
     'type' in input &&
     input.type === 'MultiLineString' &&
     'coordinates' in input &&
-    isMultiLineString(input.coordinates)
+    isGeojsonMultiLineStringCoordinates(input.coordinates)
   )
 }
 
@@ -109,7 +145,7 @@ export function isGeojsonMultiPolygon(
     input.type === 'MultiPolygon' &&
     'coordinates' in input &&
     Array.isArray(input.coordinates) &&
-    isMultiPolygon(input.coordinates)
+    isGeojsonMultiPolygonCoordinates(input.coordinates)
   )
 }
 
@@ -150,22 +186,32 @@ export function isGeojsonMultiGeometry(
 
 // Convert to Geometry
 
+// Note: GeoJSON points can have more then two coordiantes
+function geojsonPointCoordinatesToPoint(
+  geojsonPointCoordinates: number[]
+): Point {
+  return geojsonPointCoordinates.slice(0, 2) as Point
+}
+
 export function geojsonPointToPoint(geojsonPoint: GeojsonPoint): Point {
-  return geojsonPoint.coordinates
+  return geojsonPointCoordinatesToPoint(geojsonPoint.coordinates)
 }
 
 export function geojsonLineStringToLineString(
   geojsonLineString: GeojsonLineString
 ): LineString {
-  return conformLineString(geojsonLineString.coordinates)
+  return conformLineString(
+    geojsonLineString.coordinates.map(geojsonPointCoordinatesToPoint)
+  )
 }
 
 export function geojsonPolygonToRing(
   geojsonPolygon: GeojsonPolygon,
   close = false
 ): Ring {
-  let outerRing = geojsonPolygon.coordinates[0]
-  outerRing = conformRing(outerRing)
+  const outerRing = conformRing(
+    geojsonPolygon.coordinates[0].map(geojsonPointCoordinatesToPoint)
+  )
   return close ? [...outerRing, outerRing[0]] : outerRing
 }
 
@@ -173,29 +219,39 @@ export function geojsonPolygonToPolygon(
   geojsonPolygon: GeojsonPolygon,
   close = false
 ): Polygon {
-  let polygon = geojsonPolygon.coordinates
-  polygon = conformPolygon(polygon)
+  const polygon = conformPolygon(
+    geojsonPolygon.coordinates.map((ring) =>
+      ring.map(geojsonPointCoordinatesToPoint)
+    )
+  )
   return close ? polygon.map((ring) => [...ring, ring[0]]) : polygon
 }
 
 export function geojsonMultiPointToMultiPoint(
   geojsonMultiPoint: GeojsonMultiPoint
 ): MultiPoint {
-  return geojsonMultiPoint.coordinates
+  return geojsonMultiPoint.coordinates.map(geojsonPointCoordinatesToPoint)
 }
 
 export function geojsonMultiLineStringToMultiLineString(
   geojsonMultiLineString: GeojsonMultiLineString
 ): MultiLineString {
-  return conformMultiLineString(geojsonMultiLineString.coordinates)
+  return conformMultiLineString(
+    geojsonMultiLineString.coordinates.map((l) =>
+      l.map(geojsonPointCoordinatesToPoint)
+    )
+  )
 }
 
 export function geojsonMultiPolygonToMultiPolygon(
   geojsonMultiPolygon: GeojsonMultiPolygon,
   close = false
 ): MultiPolygon {
-  let multipolygon = geojsonMultiPolygon.coordinates
-  multipolygon = conformMultiPolygon(multipolygon)
+  const multipolygon = conformMultiPolygon(
+    geojsonMultiPolygon.coordinates.map((p) =>
+      p.map((l) => l.map(geojsonPointCoordinatesToPoint))
+    )
+  )
   return close
     ? multipolygon.map((polygon) => polygon.map((ring) => [...ring, ring[0]]))
     : multipolygon

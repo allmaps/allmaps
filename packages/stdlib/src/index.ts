@@ -23,6 +23,7 @@ export {
   geometryToDiameter,
   bboxToCenter,
   bboxToSize,
+  bboxToResolution,
   rectangleToSize,
   convexHull,
   sizesToScale,
