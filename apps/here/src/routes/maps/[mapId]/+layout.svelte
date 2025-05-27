@@ -50,7 +50,7 @@
     sensorsState.position !== undefined || timeout
   )
 
-  let title = $derived(`${data.title} | Allmaps Here`)
+  let title = $derived(`${data.title} / Allmaps Here`)
 
   onMount(() => {
     window.setTimeout(() => {

@@ -31,7 +31,7 @@
     children?: Snippet
   }
 
-  let { data, children }: LayoutProps & Props = $props()
+  let { children }: LayoutProps & Props = $props()
 
   afterNavigate(() => {
     urlState.updateUrl(page.url)

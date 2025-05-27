@@ -38,7 +38,7 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
   }
 
   const labels = getMapLabels(map)
-  const title = formatLabels(labels, 46 - ' | Allmaps Here'.length)
+  const title = formatLabels(labels, 46 - ' / Allmaps Here'.length)
 
   return {
     mapId,

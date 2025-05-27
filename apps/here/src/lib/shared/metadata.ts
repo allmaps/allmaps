@@ -77,5 +77,5 @@ export function formatLabels(labels: string[], maxLength = 64): string {
         toNearestSpace: true
       })
     )
-    .join(' | ')
+    .join(' / ')
 }
