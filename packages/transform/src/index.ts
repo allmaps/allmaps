@@ -36,6 +36,8 @@ export type {
   SplitGcpLinePointInfo,
   SplitGcpLineInfo,
   TransformationType,
+  GcpInputs,
+  TransformationTypeInputs,
   TransformerInputs,
   GeneralGcpTransformerOptions,
   GcpTransformerOptions,

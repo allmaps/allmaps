@@ -37,11 +37,14 @@ export type TransformationType =
   | 'projective'
   | 'thinPlateSpline'
 
-// Stored here as object to facilitate parsing in CLI
-export type TransformerInputs = {
+// Stored here as object to facilitate parsing in CLI and elsewhere
+export type GcpInputs = {
   gcps: Gcp[]
+}
+export type TransformationTypeInputs = {
   transformationType: TransformationType
 }
+export type TransformerInputs = GcpInputs & TransformationTypeInputs
 
 export type HelmertMeasures = {
   translation: Point

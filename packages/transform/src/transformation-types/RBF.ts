@@ -166,6 +166,13 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     return kernelSourcePointCoefsArray
   }
 
+  setWeightsArrays(weightsArrays: object, epsilon?: number): void {
+    if (epsilon) {
+      this.epsilon = epsilon
+    }
+    super.setWeightsArrays(weightsArrays)
+  }
+
   /**
    * Solve the x and y components independently.
    *
@@ -192,6 +199,14 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     this.weightsArrays = weightsMatrices.map((matrix) =>
       matrix.to1DArray()
     ) as [number[], number[]]
+
+    this.processWeightsArrays()
+  }
+
+  processWeightsArrays() {
+    if (!this.weightsArrays) {
+      throw new Error('Weights not computed')
+    }
 
     this.rbfWeightsArrays = this.weightsArrays.map((array) =>
       array.slice(0, this.pointCount)

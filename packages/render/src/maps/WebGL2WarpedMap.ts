@@ -64,11 +64,11 @@ const defaultRenderPointLayerOptions = {
 }
 
 const defaultWebgl2WarpedMapOptions = {
-  renderGcps: false,
+  renderGcps: true,
   renderGcpsColor: blue,
-  renderTransformedGcps: false,
+  renderTransformedGcps: true,
   renderTransformedGcpsColor: pink,
-  renderVectors: false,
+  renderVectors: true,
   renderMask: false,
   renderMaskSize: 8,
   renderMaskColor: pink,

@@ -77,6 +77,11 @@ export abstract class BaseTransformation {
    */
   setWeightsArrays(weightsArrays: object): void {
     this.weightsArrays = weightsArrays
+    this.processWeightsArrays()
+  }
+
+  processWeightsArrays(): void {
+    return
   }
 
   /**
@@ -85,7 +90,7 @@ export abstract class BaseTransformation {
    * @param newSourcePoint - a source point
    * @returns the source point, transformed to destination space
    */
-  abstract evaluateFunction(_newSourcePoint: Point): Point
+  abstract evaluateFunction(newSourcePoint: Point): Point
 
   /**
    * Evaluate the transformation function's partial derivative to x at a new point
@@ -93,7 +98,7 @@ export abstract class BaseTransformation {
    * @param newSourcePoint - a source point
    * @returns the x and y component of the partial derivative to x at the source point
    */
-  abstract evaluatePartialDerivativeX(_newSourcePoint: Point): Point
+  abstract evaluatePartialDerivativeX(newSourcePoint: Point): Point
 
   /**
    * Evaluate the transformation function's partial derivative to y at a new point
@@ -101,7 +106,7 @@ export abstract class BaseTransformation {
    * @param newSourcePoint - a source point
    * @returns the x and y component of the partial derivative to y at the source point
    */
-  abstract evaluatePartialDerivativeY(_newSourcePoint: Point): Point
+  abstract evaluatePartialDerivativeY(newSourcePoint: Point): Point
 
   /**
    * Get the destination-transformed source points.
@@ -149,5 +154,26 @@ export abstract class BaseTransformation {
       )
     }
     return this.rmse
+  }
+
+  /**
+   * Deep clone a transformation.
+   *
+   * @returns Deep cloned transformation
+   */
+  deepClone() {
+    return Object.assign(
+      Object.create(Object.getPrototypeOf(this)),
+      this
+    ) as BaseTransformation
+  }
+
+  /**
+   * Shallow clone a transformation.
+   *
+   * @returns Shallow cloned transformation
+   */
+  shallowClone() {
+    return Object.assign({}, this) as BaseTransformation
   }
 }

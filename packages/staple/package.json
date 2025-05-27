@@ -30,6 +30,7 @@
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "ml-matrix": "^6.12.0"
   },
   "devDependencies": {

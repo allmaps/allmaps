@@ -6,7 +6,8 @@ import {
   GcpTransformer,
   GcpTransformerOptions,
   ProjectionFunction,
-  TransformationType
+  TransformationType,
+  TransformationTypeInputs
 } from '@allmaps/transform'
 
 import {
@@ -176,7 +177,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     // They have already been converted to the internal projection
     // in the GCP Transformer constructor
 
-    this._setTransformerOptions(partialGcpTransformerOptions)
+    this.setTransformerOptionsInternal(partialGcpTransformerOptions)
 
     this.projection = projection
 
@@ -340,20 +341,25 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * Create a Projected GCP Transformer from a Georeferenced Map
    *
    * @param georeferencedMap - A Georeferenced Map
-   * @param partialProjectedGcpTransformerOptions - Projected GCP Transformer Options
+   * @param options - Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
    * @returns A Projected GCP Transformer
    */
   static fromGeoreferencedMap(
     georeferencedMap: GeoreferencedMap,
-    partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
+    options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
   ): ProjectedGcpTransformer {
     // TODO: read and pass projection from georeferencedMap
     // TODO: add to readme, similar to transform readme
 
+    const georeferencedMapInput = {
+      transformationType: georeferencedMap.transformation?.type
+    }
+    options = mergeOptions(georeferencedMapInput, options)
+
     return new ProjectedGcpTransformer(
       georeferencedMap.gcps,
-      georeferencedMap.transformation?.type,
-      partialProjectedGcpTransformerOptions
+      options.transformationType,
+      options
     )
   }
 }
