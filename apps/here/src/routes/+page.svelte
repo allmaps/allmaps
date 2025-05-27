@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { page } from '$app/state'
 
   import { blue } from '@allmaps/tailwind'
 
@@ -37,6 +38,25 @@
     }, 5000)
   })
 </script>
+
+<svelte:head>
+  <title>Allmaps Here</title>
+  <meta name="title" content="Allmaps Here" />
+  <meta property="og:title" content="Look where I am on this map!" />
+  <meta
+    name="description"
+    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
+  />
+  <meta
+    property="og:description"
+    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
+  />
+
+  <meta property="og:url" content={page.url.href} />
+  <meta property="og:site_name" content="Allmaps Here" />
+  <meta property="og:locale" content="en" />
+  <meta property="og:type" content="website" />
+</svelte:head>
 
 <div class="flex flex-col items-center gap-4">
   <div

@@ -19,13 +19,14 @@
   const uiState = getUiState()
 </script>
 
-<header class="p-1 md:p-2">
+<header class="p-1 md:p-2 pointer-events-none">
   <nav
-    class="mx-auto flex md:grid md:grid-cols-[1fr_max-content_1fr] justify-between items-center gap-3 @container"
+    class="mx-auto flex md:grid md:grid-cols-[1fr_max-content_1fr] justify-between items-center gap-3
+    @container"
   >
     <a
       href={createRouteUrl(page, '/')}
-      class="flex gap-2 no-underline justify-self-start"
+      class="flex gap-2 no-underline justify-self-start pointer-events-auto"
       bind:clientWidth={uiState.elementSizes.top.left[0]}
       bind:clientHeight={uiState.elementSizes.top.left[1]}
     >
@@ -37,7 +38,7 @@
         <span class="font-light">{appName}</span>
       </h1>
     </a>
-    <div class="flex min-w-0">
+    <div class="flex min-w-0 pointer-events-auto">
       {@render children?.()}
     </div>
     <div class="hidden md:contents"></div>

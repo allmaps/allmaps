@@ -18,9 +18,6 @@
   import TileLayer from 'ol/layer/Tile.js'
   import VectorLayer from 'ol/layer/Vector.js'
 
-  import { Dialog } from 'bits-ui'
-  import { X as XIcon } from 'phosphor-svelte'
-
   import { red } from '@allmaps/tailwind'
   import { isGeojsonPoint } from '@allmaps/stdlib'
 
@@ -36,7 +33,13 @@
 
   import type { Point } from '@allmaps/types'
 
-  import type { MapWithImageInfo, GeojsonRoute } from '$lib/shared/types.js'
+  import type {
+    MapWithImageInfo,
+    GeojsonRoute,
+    PopoverContents
+  } from '$lib/shared/types.js'
+
+  import MarkerPopover from '$lib/components/MarkerPopover.svelte'
 
   import HereIcon from '$lib/images/here.svg?raw'
   import HereOrientationIcon from '$lib/images/here-orientation.svg?raw'
@@ -57,13 +60,6 @@
 
   type FeatureIconSvg = {
     svg: string
-  }
-
-  type PopoverContents = {
-    title?: string
-    image?: string
-    url?: string
-    description?: string
   }
 
   type Props = {
@@ -471,7 +467,7 @@
       }
     })
 
-    olMap.on('click', (event: MapBrowserEvent<UIEvent>) => {
+    olMap.on('click', (event: MapBrowserEvent) => {
       if (olMap) {
         const features = olMap.getFeaturesAtPixel(event.pixel, {
           layerFilter: (layer) => layer === geojsonMarkersLayer,
@@ -493,7 +489,7 @@
       }
     })
 
-    olMap.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
+    olMap.on('pointermove', (event: MapBrowserEvent) => {
       if (olMap) {
         const hit = olMap.hasFeatureAtPixel(event.pixel, {
           layerFilter: (layer) => layer === geojsonMarkersLayer,
@@ -589,71 +585,4 @@
 
 <div bind:this={ol} class="w-full h-full"></div>
 
-{#snippet image(src: string, alt?: string)}
-  <img
-    class="w-full object-contain rounded-md"
-    {src}
-    alt={alt || 'Marker image'}
-  />
-{/snippet}
-
-<Dialog.Root
-  bind:open={
-    () => popoverContents !== undefined,
-    (open) => {
-      if (!open) {
-        closeMarkerDialog()
-      }
-    }
-  }
->
-  <Dialog.Portal>
-    {#if popoverContents}
-      <Dialog.Overlay
-        class="h-full
-        fixed inset-0 z-50 bg-black/80"
-      />
-
-      <Dialog.Content
-        class="w-full h-full p-5 sm:p-10 md:p-20 lg:p-30 fixed z-100 flex items-center justify-center pointer-events-none!"
-      >
-        <div
-          class="bg-white max-w-md max-h-full
-            rounded shadow-lg p-4 overflow-auto flex flex-col gap-4 pointer-events-auto"
-        >
-          <Dialog.Title class="w-full flex gap-2 justify-between items-center">
-            <div class="flex flex-row gap-2 items-center">
-              {#if popoverContents.title}
-                <Dialog.Title class="text-lg font-semibold"
-                  >{popoverContents.title}</Dialog.Title
-                >
-              {/if}
-            </div>
-
-            <Dialog.Close
-              class="cursor-pointer justify-self-end p-2 rounded-full hover:bg-gray/10 transition-colors"
-            >
-              <div>
-                <XIcon class="size-6" />
-                <span class="sr-only">Close</span>
-              </div>
-            </Dialog.Close>
-          </Dialog.Title>
-
-          {#if popoverContents.image}
-            {#if popoverContents.url}
-              <a href={popoverContents.url}
-                >{@render image(popoverContents.image)}</a
-              >
-            {:else}
-              {@render image(popoverContents.image)}
-            {/if}
-          {/if}
-          {#if popoverContents.description}
-            <p class="text-sm">{popoverContents.description}</p>
-          {/if}
-        </div>
-      </Dialog.Content>
-    {/if}
-  </Dialog.Portal>
-</Dialog.Root>
+<MarkerPopover {popoverContents} />

@@ -39,3 +39,10 @@ export type GeojsonRoute = {
   route?: GeojsonLineString
   markers: GeojsonFeature[]
 }
+
+export type PopoverContents = {
+  title?: string
+  image?: string
+  url?: string
+  description?: string
+}

@@ -109,8 +109,6 @@ export const load: LayoutLoad = async ({ url, fetch }) => {
       route,
       markers
     }
-
-    console.log('geojsonRoute', geojsonRoute)
   }
 
   if (fromParam) {

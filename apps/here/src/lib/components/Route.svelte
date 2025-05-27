@@ -40,7 +40,13 @@
   )
 
   let length = $derived(
-    geojsonRoute?.route ? turfLength(geojsonRoute?.route) : 0
+    geojsonRoute?.route
+      ? turfLength({
+          type: 'Feature',
+          properties: {},
+          geometry: geojsonRoute?.route
+        })
+      : 0
   )
 </script>
 
@@ -87,7 +93,7 @@
       onclick={handleLoadGeojson}>Load GeoJSON</button
     >
   </div>
-  <p class="text-sm">
+  <p class="text-xs text-center">
     The GeoJSON file must be a FeatureCollection with Point and LineString
     Features, or a single LineString Feature.
   </p>

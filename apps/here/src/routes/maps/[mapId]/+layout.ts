@@ -3,6 +3,8 @@ import { error } from '@sveltejs/kit'
 import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
+import { getMapLabels, formatLabels } from '$lib/shared/metadata.js'
+
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { LayoutLoad } from './$types.js'
@@ -35,8 +37,13 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
     })
   }
 
+  const labels = getMapLabels(map)
+  const title = formatLabels(labels, 46 - ' | Allmaps Here'.length)
+
   return {
     mapId,
+    labels,
+    title,
     selectedMapWithImageInfo: {
       mapId,
       map,

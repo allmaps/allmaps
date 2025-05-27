@@ -5,13 +5,7 @@
 
   import Popover from '$lib/components/Popover.svelte'
 
-  import { truncate } from '$lib/shared/strings.js'
-
-  import {
-    findCanvases,
-    findManifests,
-    labelFromPartOfItem
-  } from '$lib/shared/iiif.js'
+  import { getMapLabels, formatLabels } from '$lib/shared/metadata.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -33,57 +27,9 @@
     }
   })
 
-  const manifests = $derived(map ? findManifests(map.resource.partOf) : [])
-  const canvases = $derived(map ? findCanvases(map.resource.partOf) : [])
-
-  const firstCanvasWithManifestLabel = $derived.by(() =>
-    canvases
-      .map((canvas) => ({
-        canvas,
-        label: labelFromPartOfItem(canvas),
-        manifests: findManifests(canvas.partOf)
-          .map((manifest) => ({
-            manifest,
-            label: labelFromPartOfItem(manifest)
-          }))
-          .filter((manifest) => manifest.label)
-      }))
-      .find((canvas) => canvas.label && canvas.manifests.length > 0)
-  )
-
-  const firstCanvasLabel = $derived.by(() =>
-    canvases
-      .map((canvas) => ({
-        canvas,
-        label: labelFromPartOfItem(canvas)
-      }))
-      .find((canvas) => canvas.label)
-  )
-  const firstManifestLabel = $derived.by(() =>
-    manifests
-      .map((manifest) => ({
-        manifest,
-        label: labelFromPartOfItem(manifest)
-      }))
-      .find((manifest) => manifest.label)
-  )
-
-  let labels = $derived.by(() => {
-    if (firstCanvasWithManifestLabel) {
-      const canvasLabel = firstCanvasWithManifestLabel.label
-      const manifestLabel = firstCanvasWithManifestLabel.manifests[0].label
-
-      return [canvasLabel, manifestLabel]
-    } else if (firstCanvasLabel) {
-      return [firstCanvasLabel.label]
-    } else if (firstManifestLabel) {
-      return [firstManifestLabel.label]
-    } else if (map?.resource.id) {
-      return [`Map from ${new URL(map.resource.id).host}`]
-    }
-  })
-
-  let title = $derived(labels?.map((label) => truncate(label)).join(' / '))
+  // TODO: get labels and title from layout data!
+  let labels = $derived(map ? getMapLabels(map) : [])
+  let title = $derived(formatLabels(labels))
 </script>
 
 {#if title}
