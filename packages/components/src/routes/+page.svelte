@@ -20,8 +20,6 @@
   const searchProjectionsWithFuse = createSearchProjectionsWithFuse(projections)
   const suggestProjectionsWithFlatbush =
     createSuggestProjectionsWithFlatbush(projections)
-
-  $inspect(selectedProjection)
 </script>
 
 <main class="container mx-auto p-4 space-y-8">
