@@ -13,7 +13,8 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
  */
 
 export function computeGeoreferencedMapBearing(map: GeoreferencedMap) {
-  // Using polynomial transformation, not map transformation type, since faster and accurate enough
+  // Using polynomial transformation, not map transformation type,
+  // since faster when many gcps and accurate enough
   const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
     map,
     { transformationType: 'polynomial', projection: lonLatProjection }

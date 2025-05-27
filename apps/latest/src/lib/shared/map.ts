@@ -32,8 +32,11 @@ export function getDisplayMap(
   if (map.gcps.length >= 2) {
     if (map.resourceMask.length >= 3) {
       try {
+        // Using polynomial transformation, not map transformation type,
+        // since faster when many gcps and accurate enough
         const projectedTransformer =
           ProjectedGcpTransformer.fromGeoreferencedMap(map, {
+            transformationType: 'polynomial',
             projection: lonLatProjection
           })
 
