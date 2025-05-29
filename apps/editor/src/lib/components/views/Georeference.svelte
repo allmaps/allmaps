@@ -623,8 +623,6 @@
       const existingGcp = gcpFromGcpId(existingGcpId)
       draw.removeFeatures([newGcpId])
 
-      console.log(newGcp, existingGcp)
-
       addGcp({
         id: existingGcpId,
         index: Math.max(newGcp.index || 0, existingGcp.index || 0),
@@ -636,7 +634,7 @@
     const gcp = gcpFromGcpId(gcpId)
     if (mapsState.activeMap) {
       const mapId = mapsState.activeMap.id
-      console.log('active map', mapsState.activeMap, mapId)
+
       if (linkWithExistingGcp) {
         mapsState.replaceGcp({ mapId, gcp })
       } else {
