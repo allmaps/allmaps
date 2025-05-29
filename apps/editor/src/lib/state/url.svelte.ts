@@ -3,6 +3,8 @@ import { SvelteURL } from 'svelte/reactivity'
 
 import { ErrorState } from '$lib/state/error.svelte'
 
+import type { Bbox } from '@allmaps/types'
+
 import type { ParamKey } from '$lib/types/shared.js'
 
 const URL_KEY = Symbol('url')
@@ -30,9 +32,15 @@ export class UrlState {
     this.#getParam('background-georeference-annotation-url')
   )
 
-  #bbox = $derived(
-    this.#bboxParam?.split(',').map((value) => parseFloat(value))
-  )
+  #bbox = $derived.by<Bbox | undefined>(() => {
+    const bbox = this.#bboxParam
+      ?.split(',')
+      .map((value: string) => parseFloat(value))
+
+    if (bbox && bbox.length === 4) {
+      return bbox as Bbox
+    }
+  })
 
   constructor(url: URL, errorState: ErrorState) {
     this.#url = new SvelteURL(url)

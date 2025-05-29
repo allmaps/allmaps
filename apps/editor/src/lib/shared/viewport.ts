@@ -1,6 +1,14 @@
-// import { isGeojsonGeometry, computeBbox } from '@allmaps/stdlib'
+import { isGeojsonGeometry, computeBbox } from '@allmaps/stdlib'
+
+import { LngLat } from 'maplibre-gl'
+
+import type { Map as MapLibreMap } from 'maplibre-gl'
+
+import type { Bbox } from '@allmaps/types'
 
 import type { Viewport } from '$lib/types/shared.js'
+
+import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
 type Viewports = {
   state: Viewport
@@ -9,46 +17,33 @@ type Viewports = {
   data: Viewport
 }
 
-// export function getExtentViewport(
-//   view: View,
-//   extent: Extent
-// ): Viewport | undefined {
-//   const resolution = view.getResolutionForExtent(extent)
-//   const zoom = view.getZoomForResolution(resolution)
-//   const center = getCenter(extent)
+export function getNavPlaceViewport(
+  map: MapLibreMap,
+  navPlace?: object
+): Viewport | undefined {
+  if (isGeojsonGeometry(navPlace)) {
+    const bbox = computeBbox(navPlace)
+    return getBboxViewport(map, bbox)
+  }
+}
 
-//   if (zoom) {
-//     return {
-//       center,
-//       zoom,
-//       rotation: 0
-//     }
-//   }
-// }
-
-// export function getNavPlaceViewport(
-//   view: View,
-//   navPlace?: object
-// ): Viewport | undefined {
-//   if (isGeojsonGeometry(navPlace)) {
-//     const bbox = computeBbox(navPlace)
-//     return getBboxViewport(view, bbox)
-//   }
-// }
-
-// export function getBboxViewport(
-//   view: View,
-//   bbox?: number[]
-// ): Viewport | undefined {
-//   if (bbox) {
-//     const extent = [
-//       ...fromLonLat([bbox[0], bbox[1]]),
-//       ...fromLonLat([bbox[2], bbox[3]])
-//     ]
-
-//     return getExtentViewport(view, extent)
-//   }
-// }
+export function getBboxViewport(
+  map: MapLibreMap,
+  bbox?: Bbox
+): Viewport | undefined {
+  if (bbox) {
+    const camera = map.cameraForBounds(bbox, {
+      padding: MAPLIBRE_PADDING
+    })
+    if (camera && camera.center && camera.zoom) {
+      return {
+        center: LngLat.convert(camera.center).toArray(),
+        zoom: camera.zoom,
+        bearing: 0
+      }
+    }
+  }
+}
 
 function isViewport(viewport: Viewport | undefined): viewport is Viewport {
   return viewport !== undefined

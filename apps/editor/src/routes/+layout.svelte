@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import { afterNavigate } from '$app/navigation'
+  import { onNavigate, afterNavigate } from '$app/navigation'
 
   import { createRouteUrl, gotoRoute, getRouteId } from '$lib/shared/router.js'
 
@@ -69,11 +69,6 @@
       return
     }
 
-    // keyPressHandler: function (event) {
-    //     const tagName = event.target.tagName.toLowerCase()
-    //     if (tagName === 'input' || tagName === 'textarea') {
-    //       return
-    //     }
     if (event.key === '[') {
       const previousImageId = sourceState.getPreviousActiveImageId()
 
@@ -94,6 +89,17 @@
       gotoRoute(createRouteUrl(page, 'results'))
     }
   }
+
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve()
+        await navigation.complete
+      })
+    })
+  })
 
   afterNavigate(() => {
     urlState.updateUrl(page.url)
