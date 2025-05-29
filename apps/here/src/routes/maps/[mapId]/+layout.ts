@@ -30,7 +30,18 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
   const imageId = map.resource.id
 
   try {
-    imageInfo = await fetchImageInfo(imageId, undefined, fetch)
+    const response = await fetch(`${imageId}/info.json`)
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch image info: ${imageId}/info.json`,
+        response.statusText,
+        response.status
+      )
+      const text = await response.text()
+      console.error(text)
+      throw new Error(`Failed to fetch image info: ${response.statusText}`)
+    }
+    imageInfo = await response.json()
   } catch (err) {
     error(404, {
       message: 'Failed to fetch IIIF Image'
