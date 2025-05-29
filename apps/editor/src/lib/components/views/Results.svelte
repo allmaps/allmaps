@@ -75,7 +75,6 @@
     currentActiveMapId = mapsState.activeMapId
 
     const geoViewport = getGeoViewport()
-    console.log('geoViewport', geoViewport)
 
     if (geoViewport) {
       geoMap.flyTo({
@@ -256,7 +255,6 @@
       const mapId = getFullMapId(event.detail.mapId)
       // warpedMapLayer.bringMapsToFront([mapId])
       const warpedMap = warpedMapLayer.getWarpedMap(mapId)
-      console.log('clicked', mapId, warpedMap)
       if (warpedMap && geoMap) {
         geoMap.fitBounds(warpedMap.projectedGeoMaskBbox, {
           duration: 200,
