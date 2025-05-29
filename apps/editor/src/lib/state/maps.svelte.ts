@@ -31,7 +31,6 @@ import type { ErrorState } from '$lib/state/error.svelte'
 
 import type { Point } from '$lib/types/shared.js'
 import type {
-  DbMap,
   DbMaps,
   DbGcp3,
   DbMap3,
@@ -64,7 +63,7 @@ export class MapsState extends MapsEventTarget {
   #connecting = false
   #connected = $state(false)
 
-  #connectedImageId: string | undefined
+  #connectedImageId = $state<string>()
   #imageId: string | undefined
 
   #sourceState: SourceState
@@ -393,7 +392,7 @@ export class MapsState extends MapsEventTarget {
     return false
   }
 
-  getMapById(mapId: string): DbMap | undefined {
+  getMapById(mapId: string): DbMap3 | undefined {
     if (this.#maps) {
       return this.#maps[mapId]
     }

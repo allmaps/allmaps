@@ -15,7 +15,5 @@ export function transformResourceMaskToGeo(map: DbMap) {
 
   const transformer = new GcpTransformer(gcps, transformation)
 
-  return transformer.transformToGeo(resourceMask, {
-    maxDepth: 6
-  })
+  return transformer.transformToGeo(resourceMask)
 }

@@ -1,4 +1,8 @@
-import { generateAnnotation } from '@allmaps/annotation'
+import { computeBbox } from '@allmaps/stdlib'
+import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 
 export function makeFakeStraightAnnotation(
   imageUri: string,
@@ -24,6 +28,7 @@ export function makeFakeStraightAnnotation(
         [width, height],
         [width, 0]
       ],
+      transformation: { type: 'straight' },
       gcps: [
         {
           resource: [0, 0],
@@ -42,4 +47,15 @@ export function makeFakeStraightAnnotation(
   ]
 
   return generateAnnotation(georeferencedMap)
+}
+export function computeTransformedAnnotationBbox(
+  annotation: Annotation | AnnotationPage
+) {
+  const maps = parseAnnotation(annotation)
+  const map = maps[0]
+
+  const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+
+  const geoMask = transformer.transformToGeo([map.resourceMask])
+  return computeBbox(geoMask)
 }

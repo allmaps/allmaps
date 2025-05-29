@@ -7,38 +7,35 @@
 
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
-  import type { Point } from '@allmaps/types'
+  import type { Viewport } from '$lib/types/shared.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
   let geoMapContainer: HTMLDivElement
 
   type Props = {
+    initialViewport?: Viewport
     terrain?: boolean
-    center?: Point
-    zoom?: number
-    bearing?: number
+
     geoMap?: Map
   }
 
   let {
+    initialViewport,
     terrain = true,
-    center,
-    zoom,
-    bearing,
     geoMap = $bindable<Map | undefined>()
   }: Props = $props()
 
-  const defaultView = {
+  const defaultViewport = {
     center: [0, 0],
-    zoom: 7,
+    zoom: 1,
     bearing: 0
   }
 
-  const view = {
-    center: center || defaultView.center,
-    zoom: zoom || defaultView.zoom,
-    bearing: bearing || defaultView.bearing
+  const viewport = {
+    center: initialViewport?.center || defaultViewport.center,
+    zoom: initialViewport?.zoom || defaultViewport.zoom,
+    bearing: initialViewport?.bearing || defaultViewport.bearing
   }
 
   onMount(() => {
@@ -49,7 +46,7 @@
       container: geoMapContainer,
       // @ts-expect-error incorrect MapLibre types
       style: basemapStyle('en'),
-      ...view,
+      ...viewport,
       maxPitch: 0,
       hash: false,
       attributionControl: false,

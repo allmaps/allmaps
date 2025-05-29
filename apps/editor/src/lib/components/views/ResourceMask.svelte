@@ -23,7 +23,11 @@
   import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
-  import { idStrategy, ensureStringId } from '$lib/shared/terra-draw.js'
+  import {
+    idStrategy,
+    ensureStringId,
+    clearFeatures
+  } from '$lib/shared/terra-draw.js'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
   import type { LngLatBoundsLike } from 'maplibre-gl'
@@ -54,21 +58,27 @@
 
   let resourceMap = $state.raw<MapLibreMap>()
   let transformer = $state.raw<GcpTransformer>()
-  let bounds = $state.raw<LngLatBoundsLike>()
+  let warpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
   let polygonMode: TerraDrawPolygonMode | undefined
   let resourceDraw: TerraDraw | undefined
 
   let resourceMapReady = $state(false)
 
-  let mapsInitialized = $state(false)
   let isDrawing = $state(false)
+  let currentlyDrawingMapId = $state<string>()
   let canFinishDrawing = $state(true)
 
-  let currentMapsImageId = $state<string>()
   let currentDisplayImageId = $state<string>()
 
   let activeMapId = $state<string>()
+
+  const resourceViewport = $derived(
+    viewportsState.getViewport({
+      imageId: mapsState.connectedImageId,
+      view: 'mask'
+    })
+  )
 
   function handleLastClickedItem(event: ClickedItemEvent) {
     if (resourceDraw && event.detail.type === 'map') {
@@ -79,6 +89,8 @@
       if (resourceFeature) {
         // @ts-expect-error incompatible types
         const bbox = computeBbox(resourceFeature.geometry)
+
+        makeResourceMaskFeatureActive(event.detail.mapId, true)
 
         resourceMap?.fitBounds(bbox, {
           duration: 200,
@@ -170,6 +182,21 @@
     }
   }
 
+  function resourcePointBelongsToActiveMap(
+    pointId?: string | number,
+    featureId?: string | number
+  ) {
+    if (pointId && featureId) {
+      const feature = resourceDraw?.getSnapshotFeature(featureId)
+
+      if (feature && Array.isArray(feature.properties.coordinatePointIds)) {
+        return feature.properties.coordinatePointIds.includes(pointId)
+      }
+    }
+
+    return false
+  }
+
   function getPolygonFeature(
     resourceDraw: TerraDraw,
     terraDrawId: string | number
@@ -184,17 +211,14 @@
   function initializeMaps(
     transformer: GcpTransformer,
     resourceDraw: TerraDraw,
+    imageId: string,
     maps: DbMap3[]
   ) {
-    mapsInitialized = false
-
-    resourceDraw.clear()
+    clearFeatures(resourceDraw)
     maps.forEach((map) => addFeature(transformer, resourceDraw, map))
 
-    currentMapsImageId = mapsState.connectedImageId
-
     const resourceViewport = viewportsState.getViewport({
-      imageId: currentMapsImageId,
+      imageId,
       view: 'mask'
     })
 
@@ -204,14 +228,14 @@
         duration: 0,
         padding: MAPLIBRE_PADDING
       })
-    } else if (bounds) {
-      resourceMap?.fitBounds(bounds, {
+    } else if (warpedMapLayerBounds) {
+      resourceMap?.fitBounds(warpedMapLayerBounds, {
         duration: 0,
         padding: MAPLIBRE_PADDING
       })
     }
 
-    mapsInitialized = true
+    currentDisplayImageId = imageId
   }
 
   function replaceFeatureFromState(mapId: string) {
@@ -224,7 +248,6 @@
 
     if (map && transformer) {
       resourceDraw.removeFeatures([mapId])
-
       addFeature(transformer, resourceDraw, map)
     }
   }
@@ -238,20 +261,27 @@
       const hasApiOrigin = context && context.origin === 'api'
 
       if (type === 'update') {
-        const mapId = ensureStringId(ids[0])
+        const id = ensureStringId(ids[0])
+        if (id === currentlyDrawingMapId) {
+        }
 
-        if (mapId) {
-          makeResourceMaskFeatureActive(mapId)
+        if (id && resourceDraw && getPolygonFeature(resourceDraw, id)) {
+          makeResourceMaskFeatureActive(id)
         }
       } else if (type === 'create') {
-        const mapId = ids[0]
-        const feature = resourceDraw?.getSnapshotFeature(mapId)
+        const id = ensureStringId(ids[0])
 
-        if (!hasApiOrigin) {
+        if (
+          !hasApiOrigin &&
+          resourceDraw &&
+          getPolygonFeature(resourceDraw, id)
+        ) {
+          currentlyDrawingMapId = id
           isDrawing = true
         }
       } else if (type === 'delete') {
         if (!hasApiOrigin) {
+          currentlyDrawingMapId = undefined
           isDrawing = false
         }
       }
@@ -365,6 +395,7 @@
     const feature = getPolygonFeature(resourceDraw, id)
 
     if (feature) {
+      currentlyDrawingMapId = undefined
       isDrawing = false
 
       if (context.action === 'edit') {
@@ -440,22 +471,22 @@
 
         outlineColor: pink as `#${string}`,
         outlineWidth: ({ id }: { id?: number | string }) =>
-          activeMapId === id ? 5 : 2,
+          activeMapId === id ? 5 : 3.5,
+
         editedPointWidth: 4,
         editedPointColor: '#ffffff' as `#${string}`,
         editedPointOutlineWidth: 3,
         editedPointOutlineColor: pink,
 
         coordinatePointWidth: ({ id }: { id?: number | string }) =>
-          activeMapId === id ? 3 : 2,
+          resourcePointBelongsToActiveMap(id, activeMapId) ? 3 : 0,
         coordinatePointColor: '#ffffff' as `#${string}`,
-        coordinatePointOutlineWidth: ({ id }: { id?: number | string }) =>
-          activeMapId === id ? 4 : 3,
+        coordinatePointOutlineWidth: 4.5,
         coordinatePointOutlineColor: pink,
 
-        closingPointWidth: 3,
+        closingPointWidth: 4,
         closingPointColor: '#ffffff' as `#${string}`,
-        closingPointOutlineWidth: 4,
+        closingPointOutlineWidth: 3,
         closingPointOutlineColor: pink
       }
     }
@@ -494,9 +525,15 @@
       transformer &&
       resourceDraw &&
       mapsState.connected === true &&
-      mapsState.connectedImageId !== currentMapsImageId
+      mapsState.connectedImageId &&
+      mapsState.connectedImageId !== currentDisplayImageId
     ) {
-      initializeMaps(transformer, resourceDraw, mapsState.maps)
+      initializeMaps(
+        transformer,
+        resourceDraw,
+        mapsState.connectedImageId,
+        mapsState.maps
+      )
     }
   })
 
@@ -544,29 +581,39 @@
 </script>
 
 <div class="relative w-full h-full">
-  <!-- initialBounds -->
-  <Resource bind:resourceMap bind:transformer bind:bounds />
+  {#if mapsState.connectedImageId}
+    <Resource
+      bind:resourceMap
+      bind:transformer
+      bind:warpedMapLayerBounds
+      initialViewport={resourceViewport}
+    />
+  {/if}
   {#if isDrawing}
     <div
-      transition:fade={{ duration: 50 }}
-      class="absolute top-16 w-full flex justify-center gap-2"
+      class="absolute top-16 w-full flex items-center justify-center pointer-events-none"
     >
-      <button
-        onclick={abortDrawing}
-        class="bg-red z-50 p-2 rounded-md text-sm flex items-center gap-1"
+      <div
+        transition:fade={{ duration: 50 }}
+        class="p-1 rounded-lg bg-white flex gap-2 shadow pointer-events-auto"
       >
-        <XIcon class="size-4" weight="bold" />
-        <span>Cancel</span>
-      </button>
+        <button
+          onclick={abortDrawing}
+          class="bg-red z-50 p-2 rounded-md text-sm flex items-center gap-1"
+        >
+          <XIcon class="size-4" weight="bold" />
+          <span>Cancel</span>
+        </button>
 
-      <button
-        onclick={finishDrawing}
-        disabled={!canFinishDrawing}
-        class="bg-green z-50 p-2 rounded-md text-sm flex items-center gap-1 transition-opacity disabled:opacity-50"
-      >
-        <CheckIcon class="size-4" weight="bold" />
-        <span>Finish</span>
-      </button>
+        <button
+          onclick={finishDrawing}
+          disabled={!canFinishDrawing}
+          class="bg-green z-50 p-2 rounded-md text-sm flex items-center gap-1 transition-opacity disabled:opacity-50"
+        >
+          <CheckIcon class="size-4" weight="bold" />
+          <span>Finish</span>
+        </button>
+      </div>
     </div>
   {/if}
 </div>

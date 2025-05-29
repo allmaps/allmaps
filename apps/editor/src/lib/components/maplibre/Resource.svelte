@@ -1,21 +1,28 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onDestroy } from 'svelte'
 
-  import { Map } from 'maplibre-gl'
+  import { Map as MapLibreMap } from 'maplibre-gl'
 
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { Image } from '@allmaps/iiif-parser'
+  import { parseAnnotation } from '@allmaps/annotation'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
-  import { makeFakeStraightAnnotation } from '$lib/shared/resource-annotation.js'
+  import {
+    makeFakeStraightAnnotation,
+    computeTransformedAnnotationBbox
+  } from '$lib/shared/annotation.js'
 
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
-  import type { GcpTransformer } from '@allmaps/transform'
+  import { GcpTransformer } from '@allmaps/transform'
+  import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 
   import type { Viewport } from '$lib/types/shared.js'
+
+  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -23,8 +30,8 @@
     version: 8 as const,
     sources: {},
     layers: [],
-    glyphs:
-      'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf'
+    glyphs: 'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf'
+    // 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf'
   }
 
   const sourceState = getSourceState()
@@ -32,105 +39,112 @@
 
   let resourceMapContainer: HTMLDivElement
   let warpedMapLayer: WarpedMapLayer | undefined
-  let mapId: string | undefined
 
-  let width = $state<number>()
-  let height = $state<number>()
-  let currentDisplayImageId = $state<string>()
+  let straightAnnotation = $state.raw<Annotation | AnnotationPage>()
+
+  let bbox = $derived(
+    straightAnnotation && computeTransformedAnnotationBbox(straightAnnotation)
+  )
 
   let mapLoaded = $state(false)
 
   type Props = {
     initialViewport?: Viewport
-    resourceMap?: Map
+    resourceMap?: MapLibreMap
     transformer?: GcpTransformer
-    bounds?: LngLatBoundsLike
+    warpedMapLayerBounds?: LngLatBoundsLike
   }
 
   let {
     initialViewport,
-    resourceMap = $bindable<Map | undefined>(),
+    resourceMap = $bindable<MapLibreMap | undefined>(),
     transformer = $bindable<GcpTransformer | undefined>(),
-    bounds = $bindable<LngLatBoundsLike | undefined>()
+    warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
   }: Props = $props()
 
-  async function updateImage(imageId: string) {
-    if (!warpedMapLayer || !resourceMap) {
+  async function makeStraightAnnotation(imageId: string) {
+    const imageInfo = await imageInfoState.fetchImageInfo(imageId)
+    const parsedImage = Image.parse(imageInfo)
+
+    const width = parsedImage.width
+    const height = parsedImage.height
+
+    straightAnnotation = makeFakeStraightAnnotation(imageId, width, height)
+  }
+
+  async function updateMap(annotation: Annotation | AnnotationPage) {
+    if (!warpedMapLayer) {
       return
     }
 
     warpedMapLayer.clear()
 
-    const imageInfo = await imageInfoState.fetchImageInfo(imageId)
-    const parsedImage = Image.parse(imageInfo)
+    await warpedMapLayer.addGeoreferenceAnnotation(annotation)
 
-    width = parsedImage.width
-    height = parsedImage.height
+    // TODO: get transformer from warpedMapLayer's WarpedMapList
+    const maps = parseAnnotation(annotation)
+    const map = maps[0]
+    transformer = new GcpTransformer(map.gcps, map.transformation?.type)
 
-    const straightAnnotation = makeFakeStraightAnnotation(
-      imageId,
-      width,
-      height
-    )
-
-    const results =
-      await warpedMapLayer.addGeoreferenceAnnotation(straightAnnotation)
-
-    if (typeof results[0] === 'string') {
-      mapId = results[0]
-    }
-
-    const warpedMapList = warpedMapLayer.getWarpedMapList()
-
-    if (mapId) {
-      const warpedMap = warpedMapList.getWarpedMap(mapId)
-      transformer = warpedMap?.transformer
-    }
-
-    bounds = warpedMapLayer.getBounds()
-
-    currentDisplayImageId = imageId
+    warpedMapLayerBounds = warpedMapLayer.getBounds()
   }
 
-  onMount(() => {
-    const newResourceMap = new Map({
-      container: resourceMapContainer,
-      style: emptyMapStyle,
-      minZoom: 7,
-      maxZoom: 18,
-      center: [0, 0],
-      zoom: 2,
-      ...initialViewport,
-      maxPitch: 0,
-      hash: false,
-      attributionControl: false,
-      canvasContextAttributes: {
-        preserveDrawingBuffer: true
+  $effect(() => {
+    if (sourceState.activeImageId) {
+      makeStraightAnnotation(sourceState.activeImageId)
+    }
+  })
+
+  $effect(() => {
+    if (straightAnnotation && !mapLoaded) {
+      const newResourceMap = new MapLibreMap({
+        container: resourceMapContainer,
+        style: emptyMapStyle,
+        minZoom: 7,
+        maxZoom: 18,
+        ...initialViewport,
+        maxPitch: 0,
+        hash: false,
+        attributionControl: false,
+        canvasContextAttributes: {
+          preserveDrawingBuffer: true
+        }
+      })
+
+      if (!initialViewport && bbox) {
+        const camera = newResourceMap.cameraForBounds(bbox, {
+          padding: MAPLIBRE_PADDING
+        })
+
+        if (camera && camera.center && camera.zoom) {
+          newResourceMap.setZoom(camera.zoom)
+          newResourceMap.setCenter(camera.center)
+        }
       }
-    })
 
-    warpedMapLayer = new WarpedMapLayer()
+      warpedMapLayer = new WarpedMapLayer()
 
-    newResourceMap.once('style.load', () => {
-      // @ts-expect-error "as const" is missing for WarpedMapLayer type
-      newResourceMap.addLayer(warpedMapLayer)
+      newResourceMap.once('style.load', () => {
+        // @ts-expect-error "as const" is missing for WarpedMapLayer type
+        newResourceMap.addLayer(warpedMapLayer)
 
-      mapLoaded = true
-      resourceMap = newResourceMap
-    })
+        mapLoaded = true
+        resourceMap = newResourceMap
 
-    $effect(() => {
-      if (mapLoaded && sourceState.activeImageId) {
-        updateImage(sourceState.activeImageId)
-      }
-    })
+        if (straightAnnotation) {
+          updateMap(straightAnnotation)
+        }
+      })
+    } else if (straightAnnotation) {
+      updateMap(straightAnnotation)
+    }
+  })
 
-    return () => {
-      if (warpedMapLayer) {
-        warpedMapLayer.clear()
-        resourceMap?.remove()
-        warpedMapLayer = undefined
-      }
+  onDestroy(() => {
+    if (warpedMapLayer) {
+      warpedMapLayer.clear()
+      resourceMap?.remove()
+      warpedMapLayer = undefined
     }
   })
 </script>

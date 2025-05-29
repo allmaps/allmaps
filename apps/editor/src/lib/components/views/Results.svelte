@@ -5,11 +5,8 @@
 
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
-  import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
-  import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
   import { getScopeState } from '$lib/state/scope.svelte.js'
 
@@ -19,12 +16,7 @@
     toGeoreferencedMap,
     getFullMapId
   } from '$lib/shared/maps.js'
-  import {
-    // getExtentViewport,
-    // getNavPlaceViewport,
-    // getBboxViewport,
-    sortGeoViewports
-  } from '$lib/shared/viewport.js'
+  import { sortGeoViewports } from '$lib/shared/viewport.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
   import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
@@ -58,16 +50,18 @@
 
   let geoMapReady = $state(false)
 
-  // let currentImageId = $state<string>()
   let currentActiveMapId = $state<string>()
 
-  const sourceState = getSourceState()
   const mapsState = getMapsState()
-  const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
-  const urlState = getUrlState()
   const viewportsState = getViewportsState()
   const scopeState = getScopeState()
+
+  const geoViewport = $derived(
+    viewportsState.getViewport({
+      view: 'results'
+    })
+  )
 
   async function setGeoreferenceAnnotation(
     annotation: Annotation | AnnotationPage
@@ -81,22 +75,24 @@
     currentActiveMapId = mapsState.activeMapId
 
     const geoViewport = getGeoViewport()
+    console.log('geoViewport', geoViewport)
 
     if (geoViewport) {
-      geoMap.setZoom(geoViewport.zoom)
-      geoMap.setCenter(geoViewport.center)
-      geoMap.setBearing(geoViewport.bearing)
+      geoMap.flyTo({
+        ...geoViewport,
+        duration: 0,
+        padding: MAPLIBRE_PADDING
+      })
     } else {
       const bounds = warpedMapLayer.getBounds()
 
       if (bounds) {
         geoMap.fitBounds(bounds, {
+          duration: 0,
           padding: MAPLIBRE_PADDING
         })
       }
     }
-
-    // currentImageId = mapsState.connectedImageId
   }
 
   async function addMap(map: GeoreferencedMap) {
@@ -272,16 +268,6 @@
 
   $effect(() => {
     if (geoMap) {
-      // const geoTileSource = new XYZ({
-      //   url: uiState.basemapPreset.url,
-      //   attributions: uiState.basemapPreset.attribution,
-      //   maxZoom: 19
-      // })
-
-      // geoTileLayer = new TileLayer({
-      //   source: geoTileSource
-      // })
-
       warpedMapLayer = new WarpedMapLayer()
 
       // @ts-expect-error MapLibre types are incompatible
@@ -292,12 +278,7 @@
   })
 
   $effect(() => {
-    if (
-      geoMapReady &&
-      mapsState.connected === true &&
-      //     // mapsState.connectedImageId !== currentImageId &&
-      scopeState.annotation
-    ) {
+    if (geoMapReady && mapsState.connected === true && scopeState.annotation) {
       setGeoreferenceAnnotation(scopeState.annotation)
     }
   })
@@ -392,4 +373,4 @@
   })
 </script>
 
-<Geo bind:geoMap />
+<Geo bind:geoMap initialViewport={geoViewport} />
