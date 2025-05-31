@@ -109,6 +109,8 @@ export function parseTransformationType(
     transformationType = 'polynomial3'
   } else if (options.transformationType === 'thinPlateSpline') {
     transformationType = options.transformationType
+  } else if (options.transformationType === 'linear') {
+    transformationType = options.transformationType
   } else if (options.transformationType === 'helmert') {
     transformationType = options.transformationType
   } else if (options.transformationType === 'projective') {

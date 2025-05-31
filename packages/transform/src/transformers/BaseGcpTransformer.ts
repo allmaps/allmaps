@@ -21,7 +21,7 @@ import { Polynomial3 } from '../transformation-types/Polynomial3.js'
 import { Projective } from '../transformation-types/Projective.js'
 import { RBF } from '../transformation-types/RBF.js'
 
-import { thinPlateKernel } from '../shared/kernel-functions.js'
+import { linearKernel, thinPlateKernel } from '../shared/kernel-functions.js'
 import { euclideanNorm } from '../shared/norm-functions.js'
 
 import {
@@ -185,7 +185,16 @@ export abstract class BaseGcpTransformer {
         sourcePoints,
         destinationPoints,
         thinPlateKernel,
-        euclideanNorm
+        euclideanNorm,
+        'thinPlateSpline'
+      )
+    } else if (this.type === 'linear') {
+      return new RBF(
+        sourcePoints,
+        destinationPoints,
+        linearKernel,
+        euclideanNorm,
+        'linear'
       )
     } else {
       throw new Error(`Unsupported transformation type: ${this.type}`)

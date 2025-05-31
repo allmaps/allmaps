@@ -10,6 +10,7 @@ const transformations: TransformationType[] = [
   // 'polynomial2',
   // 'polynomial3',
   'thinPlateSpline'
+  // 'linear',
   // 'helmert',
   // 'straight',
   // 'projective'

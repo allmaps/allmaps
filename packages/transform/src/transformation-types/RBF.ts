@@ -11,7 +11,11 @@ import {
 import { Polynomial1 } from './Polynomial1.js'
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
 
-import type { KernelFunction, NormFunction } from '../shared/types.js'
+import type {
+  KernelFunction,
+  NormFunction,
+  TransformationType
+} from '../shared/types.js'
 
 import type { Point, Size } from '@allmaps/types'
 
@@ -40,9 +44,10 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     destinationPoints: Point[],
     kernelFunction: KernelFunction,
     normFunction: NormFunction,
+    type: TransformationType,
     epsilon?: number
   ) {
-    super(sourcePoints, destinationPoints, 'thinPlateSpline', 3)
+    super(sourcePoints, destinationPoints, type, 3)
 
     this.kernelFunction = kernelFunction
     this.normFunction = normFunction

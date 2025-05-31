@@ -36,6 +36,7 @@ export type TransformationType =
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 
 // Stored here as object to facilitate parsing in CLI and elsewhere
 export type GcpInputs = {
