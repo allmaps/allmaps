@@ -1,6 +1,5 @@
 import Matrix, { pseudoInverse } from 'ml-matrix'
 
-import { generateChecksum } from '@allmaps/id'
 import {
   arrayMatrixSize,
   flipY,
@@ -307,6 +306,7 @@ export class StapledTransformation {
           transformationIds[transformationIds.indexOf(transformationId) + 1]
         const nextTrailingCumulativeCoefsArrayMatrixSize =
           this.trailingCumulativeCoefsArrayMatrixSizeById.get(nextId)
+        // Note: the coefs array matrix's cols correspond to the weights arrays rows
         const startRows = trailingCumulativeCoefsArrayMatrixSize[1]
         const endRows = nextTrailingCumulativeCoefsArrayMatrixSize
           ? nextTrailingCumulativeCoefsArrayMatrixSize[1]
@@ -444,15 +444,15 @@ export class StapledTransformation {
    *
    * @param georeferencedMaps - Georeferenced Maps
    * @param options - Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
-   * @returns {Promise<StapledTransformation>}
+   * @returns {StapledTransformation}
    */
-  static async fromGeoreferencedMaps(
+  static fromGeoreferencedMaps(
     georeferencedMaps: GeoreferencedMapWithRcps[],
     options?: Partial<
       ProjectedGcpTransformerOptions &
         StapledTransformationFromGeoreferencedMapOptions
     >
-  ): Promise<StapledTransformation> {
+  ): StapledTransformation {
     options = mergeOptions(
       defaultStapledTransformationFromGeoreferencedMapOptions,
       options
@@ -477,10 +477,10 @@ export class StapledTransformation {
         continue
       }
 
-      const mapId =
-        georeferencedMap.id || (await generateChecksum(georeferencedMap))
-      // TODO: check if it is ok to assign mapId, so we can use it later
-      georeferencedMap.id = mapId
+      const mapId = georeferencedMap.id
+      if (!mapId) {
+        throw new Error('Georeferenced map has no mapId.')
+      }
       georeferencedMapsById.set(mapId, georeferencedMap)
 
       const projectedGcpTransformer =

@@ -44,7 +44,7 @@ const georeferencedMap3 = readJSONFile(
 const rcps3 = [{ id: 'center', resource: [465, 257] }]
 
 // describe('Filter out the correct staples', () => {
-//   it(`should throw when there are not any maps with staples`, async () => {
+//   it(`should throw when there are not any maps with staples`,  () => {
 //     return expect(
 //       Promise.resolve(
 //         StapledTransformation.fromGeoreferencedMaps([
@@ -57,10 +57,10 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Stop on staples that occure only once', () => {
-//   it(`should not consider staples that occure only once`, async () => {
+//   it(`should not consider staples that occure only once`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps([
+//        StapledTransformation.fromGeoreferencedMaps([
 //         georeferencedMap0,
 //         georeferencedMap1
 //       ])
@@ -70,7 +70,7 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Stop when more then two staple by staple ID', () => {
-//   it(`should throw when more then two staples by staple ID`, async () => {
+//   it(`should throw when more then two staples by staple ID`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 //     georeferencedMap2.rcps = [{ id: '1', resource: [5, 6] }]
@@ -88,11 +88,11 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Filter out the correct staples', () => {
-//   it(`should recognise staples with the same id`, async () => {
+//   it(`should recognise staples with the same id`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps([
+//        StapledTransformation.fromGeoreferencedMaps([
 //         georeferencedMap0,
 //         georeferencedMap1
 //       ])
@@ -102,11 +102,11 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Coefs matrix for two maps', () => {
-//   it(`should build the correct destination points arrays`, async () => {
+//   it(`should build the correct destination points arrays`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap0, georeferencedMap1],
 //         { type: 'polynomial' }
 //       )
@@ -127,11 +127,11 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Coefs matrix for two maps', () => {
-//   it(`should build the correct coefs array matrix`, async () => {
+//   it(`should build the correct coefs array matrix`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap0, georeferencedMap1],
 //         { type: 'polynomial' }
 //       )
@@ -153,17 +153,17 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Process transformation type', () => {
-//   it(`should create create a different coefs matrix depending on the transformation type`, async () => {
+//   it(`should create create a different coefs matrix depending on the transformation type`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [{ id: '1', resource: [3, 4] }]
 
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps([
+//        StapledTransformation.fromGeoreferencedMaps([
 //         georeferencedMap0,
 //         georeferencedMap1
 //       ])
 //     const polynomialStapledTransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap0, georeferencedMap1],
 //         { type: 'polynomial' }
 //       )
@@ -224,7 +224,7 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 // describe('Coefs matrix for more then two maps', () => {
-//   it(`should build the right coefs matrix`, async () => {
+//   it(`should build the right coefs matrix`,  () => {
 //     georeferencedMap0.rcps = [{ id: '1', resource: [1, 2] }]
 //     georeferencedMap1.rcps = [
 //       { id: '1', resource: [3, 4] },
@@ -233,7 +233,7 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 //     georeferencedMap2.rcps = [{ id: '2', resource: [7, 8] }]
 
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap0, georeferencedMap1, georeferencedMap2],
 //         { type: 'polynomial' }
 //       )
@@ -259,23 +259,22 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 // })
 
 describe('Solve two maps stapled together and evaluate points', () => {
-  it(`should return maps with extra gcps`, async () => {
+  it(`should return maps with extra gcps`, () => {
     georeferencedMap0.rcps = rcps0
     georeferencedMap1.rcps = rcps1
     georeferencedMap2.rcps = rcps2
     georeferencedMap3.rcps = rcps3
-    const stapledtransformation =
-      await StapledTransformation.fromGeoreferencedMaps(
-        [
-          georeferencedMap0,
-          georeferencedMap1,
-          georeferencedMap2,
-          georeferencedMap3
-        ],
-        {
-          transformationType: 'polynomial'
-        }
-      )
+    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      {
+        transformationType: 'polynomial'
+      }
+    )
     const results = stapledtransformation.toGeoreferencedMaps()
 
     // console.log(
@@ -311,7 +310,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
 })
 
 // describe('Compare to observable', () => {
-//   it(`should return the same`, async () => {
+//   it(`should return the same`,  () => {
 //     const gridSize = 200
 
 //     georeferencedMap0.gcps = [
@@ -363,7 +362,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
 //       }
 //     ]
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap0, georeferencedMap1],
 //         {
 //           type: 'thinPlateSpline',
@@ -392,7 +391,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
 // })
 
 // describe('Solve two maps stapled together and evaluate points', () => {
-//   it(`should return maps with extra gcps`, async () => {
+//   it(`should return maps with extra gcps`,  () => {
 //     const georeferencedMap1 = {
 //       '@context': 'https://schemas.allmaps.org/map/2/context.json',
 //       type: 'GeoreferencedMap',
@@ -515,7 +514,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
 //     georeferencedMap1.rcps = rcps1
 //     georeferencedMap2.rcps = rcps2
 //     const stapledtransformation =
-//       await StapledTransformation.fromGeoreferencedMaps(
+//        StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap1, georeferencedMap2],
 //         {
 //           differentHandedness: false,

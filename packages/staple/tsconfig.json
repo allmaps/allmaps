@@ -5,6 +5,6 @@
     "outDir": "./dist",
     "paths": {}
   },
-  "references": [{ "path": "../id" },{ "path": "../project" },{ "path": "../transform" }, { "path": "../types" }, { "path": "../stdlib" }],
+  "references": [{ "path": "../project" },{ "path": "../transform" }, { "path": "../types" }, { "path": "../stdlib" }],
   "include": ["./src/**/*"]
 }
