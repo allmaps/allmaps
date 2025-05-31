@@ -1,6 +1,20 @@
 import type { Point } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { ProjectedGcpTransformer } from '@allmaps/project'
+import type { TransformationTypeInputs } from '@allmaps/transform'
+
+export type StapledTransformationFromGeoreferencedMapOptions =
+  TransformationTypeInputs & {
+    useMapTransformationTypes: boolean
+    cloneTransformations: boolean
+  }
+
+export type StapledTransformationOptions =
+  StapledTransformationFromGeoreferencedMapOptions & {
+    averageDestinationPoints: boolean
+    georeferencedMapsById?: Map<string, GeoreferencedMap>
+    projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>
+  }
 
 // TODO: remove when implemented
 export type GeoreferencedMapWithRcps = GeoreferencedMap & {
@@ -21,8 +35,3 @@ export type StaplePoint = {
 }
 
 export type Staple = [StaplePoint, StaplePoint]
-
-export type StapledTransformationOptions = {
-  georeferencedMaps: GeoreferencedMap[]
-  projectedGcpTransformers: ProjectedGcpTransformer[]
-}

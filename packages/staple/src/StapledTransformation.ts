@@ -12,6 +12,10 @@ import {
   sliceArrayMatrix
 } from '@allmaps/stdlib'
 import { BaseIndependentLinearWeightsTransformation } from '@allmaps/transform'
+import {
+  ProjectedGcpTransformer,
+  ProjectedGcpTransformerOptions
+} from '@allmaps/project'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point, Size } from '@allmaps/types'
@@ -19,35 +23,29 @@ import type { Point, Size } from '@allmaps/types'
 import type {
   GeoreferencedMapWithRcps,
   Staple,
+  StapledTransformationFromGeoreferencedMapOptions,
   StapledTransformationOptions,
   StaplePoint
 } from './types'
-import { TransformationTypeInputs } from 'packages/transform/src/shared/types'
-import {
-  ProjectedGcpTransformer,
-  ProjectedGcpTransformerOptions
-} from '@allmaps/project'
 
-type StapledTransformationFromGeoreferencedMapOptions =
-  TransformationTypeInputs & {
-    useMapTransformationTypes: boolean
-  }
-
-const defaultStapledTransformationFromGeoreferencedMapOptions: Partial<StapledTransformationFromGeoreferencedMapOptions> =
+const defaultStapledTransformationFromGeoreferencedMapOptions: StapledTransformationFromGeoreferencedMapOptions =
   {
-    transformationType: 'thinPlateSpline',
-    useMapTransformationTypes: false
+    transformationType: 'polynomial',
+    useMapTransformationTypes: false,
+    cloneTransformations: true
   }
+
+const defaultStapledTransformationOptions: StapledTransformationOptions = {
+  ...defaultStapledTransformationFromGeoreferencedMapOptions,
+  averageDestinationPoints: true
+}
 
 export class StapledTransformation {
   transformationsById: Map<string, BaseIndependentLinearWeightsTransformation>
-  clonedTransformationsById: Map<
-    string,
-    BaseIndependentLinearWeightsTransformation
-  >
   staples: Staple[]
-
   options?: StapledTransformationOptions
+
+  staplePointsById: StaplePoint[][]
 
   destinationPointsArrays: [number[], number[]]
 
@@ -68,19 +66,46 @@ export class StapledTransformation {
       BaseIndependentLinearWeightsTransformation
     >,
     staples: Staple[],
-    options?: StapledTransformationOptions
+    options?: Partial<StapledTransformationOptions>
   ) {
+    this.options = mergeOptions(defaultStapledTransformationOptions, options)
     this.transformationsById = transformationsById
-    this.clonedTransformationsById = new Map()
+    if (this.options.cloneTransformations) {
+      const clonedTransformationsById = new Map<
+        string,
+        BaseIndependentLinearWeightsTransformation
+      >()
+      Array.from(this.transformationsById).forEach(([id, transformation]) =>
+        clonedTransformationsById.set(
+          id,
+          transformation.deepClone() as typeof transformation
+        )
+      )
+      this.transformationsById = clonedTransformationsById
+    }
     this.staples = staples
-    this.options = options
 
     if (this.transformationsById.size === 0) {
-      throw new Error('No transformations found')
+      throw new Error('No transformations found.')
     }
     if (this.staples.length === 0) {
-      throw new Error('No staples found')
+      throw new Error('No staples found.')
     }
+
+    // Get staplePoints from staples.
+    // When there were more then two staple points with the same transformationId
+    // only keep one staplepoint per transformationId (=mapId).
+    // (This happens when duo's where created, see fromGeoreferencedMap())
+    this.staplePointsById = Object.values(
+      groupBy(this.staples.flat(), (staplePoint) => staplePoint.id)
+    ).map((staplePointsForId) =>
+      staplePointsForId.filter(
+        (staplePoint, index) =>
+          staplePointsForId.findIndex(
+            (s) => s.transformationId === staplePoint.transformationId
+          ) === index
+      )
+    )
 
     this.destinationPointsArrays = this.getDestinationPointsArrays()
 
@@ -120,6 +145,10 @@ export class StapledTransformation {
   }
 
   getCoefsArrayMatrix(): number[][] {
+    // Create a coefs matrix from the transformations coefs matrices and the staples
+    // as explained here: https://observablehq.com/d/0ff83cf201ebbf04
+
+    // Create an empty coefs matrix of the right size
     // TODO: replace by .values().reduce() when reduce on iterator when becomes baseline
     let size: [number, number] = [0, 0]
     this.transformationsById.forEach((transformation) => {
@@ -129,18 +158,22 @@ export class StapledTransformation {
       ]
     })
     size = [size[0] + this.staples.length, size[1]]
-
     let coefsArrayMatrix = newArrayMatrix(...size)
 
+    // Add each transformation's coefs matrices as a block of a diagonal block-matrix
+    // while keeping track of their locations
     let trailingCumulativeCoefsArrayMatrixSize: Size = [0, 0]
-    for (const [id, transformation] of this.transformationsById.entries()) {
+    for (const [
+      transformationId,
+      transformation
+    ] of this.transformationsById.entries()) {
       coefsArrayMatrix = pasteArrayMatrix(
         coefsArrayMatrix,
         ...trailingCumulativeCoefsArrayMatrixSize,
         transformation.coefsArrayMatrix
       )
       this.trailingCumulativeCoefsArrayMatrixSizeById.set(
-        id,
+        transformationId,
         trailingCumulativeCoefsArrayMatrixSize
       )
       trailingCumulativeCoefsArrayMatrixSize = [
@@ -151,16 +184,31 @@ export class StapledTransformation {
       ]
     }
 
+    // Add each staple as a row with the source point coefs arrays
+    // for both of it's transformations, in their corresponding column locations
     for (const staple of this.staples) {
-      const stapleSourcePointCoefsArray0 = this.transformationsById
-        .get(staple[0].transformationId)
-        ?.getSourcePointCoefsArray(staple[0].source)
-      const stapleSourcePointCoefsArray1 = this.transformationsById
-        .get(staple[1].transformationId)
-        ?.getSourcePointCoefsArray(staple[1].source)
-      if (!stapleSourcePointCoefsArray0 || !stapleSourcePointCoefsArray1) {
-        throw new Error('Staple source point coefs array missing')
+      const transformation0 = this.transformationsById.get(
+        staple[0].transformationId
+      )
+      const transformation1 = this.transformationsById.get(
+        staple[1].transformationId
+      )
+      if (!transformation0) {
+        throw new Error(
+          `Transformation not found for transformationId ${staple[0].transformationId}.`
+        )
       }
+      if (!transformation1) {
+        throw new Error(
+          `Transformation not found for transformationId ${staple[1].transformationId}.`
+        )
+      }
+
+      const stapleSourcePointCoefsArray0 =
+        transformation0?.getSourcePointCoefsArray(staple[0].source)
+      const stapleSourcePointCoefsArray1 =
+        transformation1?.getSourcePointCoefsArray(staple[1].source)
+
       const trailingCumulativeCoefsArrayMatrixSize0 =
         this.trailingCumulativeCoefsArrayMatrixSizeById.get(
           staple[0].transformationId
@@ -171,14 +219,15 @@ export class StapledTransformation {
         )
       if (!trailingCumulativeCoefsArrayMatrixSize0) {
         throw new Error(
-          'trailingCumulativeCoefsArrayMatrixSize not found for transformationId'
+          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${staple[0].transformationId}.`
         )
       }
       if (!trailingCumulativeCoefsArrayMatrixSize1) {
         throw new Error(
-          'trailingCumulativeCoefsArrayMatrixSize not found for transformationId'
+          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${staple[1].transformationId}.`
         )
       }
+
       coefsArrayMatrix = pasteArrayMatrix(
         coefsArrayMatrix,
         trailingCumulativeCoefsArrayMatrixSize[0],
@@ -239,16 +288,29 @@ export class StapledTransformation {
       throw new Error('Weights not computed')
     }
     const weightsArrays = this.weightsArrays
-    const trailingCumulativeCoefsArrayMatrixSizes = Array.from(
-      this.trailingCumulativeCoefsArrayMatrixSizeById.values()
-    )
+
+    // For each transformation, identify which part of the weights corresponds to it,
+    // and set these weights on the transformation
+    // such that they will be used when evaluating the transformation
     Array.from(this.transformationsById.entries()).forEach(
-      ([id, transformation], index) => {
-        const startRows = trailingCumulativeCoefsArrayMatrixSizes[index][0]
-        const endRows =
-          index + 1 < trailingCumulativeCoefsArrayMatrixSizes.length
-            ? trailingCumulativeCoefsArrayMatrixSizes[index + 1][0]
-            : undefined
+      ([transformationId, transformation]) => {
+        const trailingCumulativeCoefsArrayMatrixSize =
+          this.trailingCumulativeCoefsArrayMatrixSizeById.get(transformationId)
+        if (!trailingCumulativeCoefsArrayMatrixSize) {
+          throw new Error(
+            `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${transformationId}.`
+          )
+        }
+
+        const transformationIds = Array.from(this.transformationsById.keys())
+        const nextId =
+          transformationIds[transformationIds.indexOf(transformationId) + 1]
+        const nextTrailingCumulativeCoefsArrayMatrixSize =
+          this.trailingCumulativeCoefsArrayMatrixSizeById.get(nextId)
+        const startRows = trailingCumulativeCoefsArrayMatrixSize[1]
+        const endRows = nextTrailingCumulativeCoefsArrayMatrixSize
+          ? nextTrailingCumulativeCoefsArrayMatrixSize[1]
+          : undefined
 
         const weightsArraysForId = sliceArrayMatrix(
           weightsArrays,
@@ -257,12 +319,9 @@ export class StapledTransformation {
           2,
           endRows
         ) as [number[], number[]]
-        this.weightsArraysById?.set(id, weightsArraysForId)
+        this.weightsArraysById?.set(transformationId, weightsArraysForId)
 
-        const clonedTransformation =
-          transformation.deepClone() as typeof transformation
-        clonedTransformation.setWeightsArrays(weightsArraysForId)
-        this.clonedTransformationsById.set(id, clonedTransformation)
+        transformation.setWeightsArrays(weightsArraysForId)
       }
     )
   }
@@ -272,22 +331,41 @@ export class StapledTransformation {
       this.solve()
     }
 
-    const clonedTransformation = this.clonedTransformationsById.get(id)
-    if (!clonedTransformation) {
-      throw new Error('cloned transformation not found')
+    const transformation = this.transformationsById.get(id)
+    if (!transformation) {
+      throw new Error(`Transformation not found for transformationId ${id}.`)
     }
-    return clonedTransformation.evaluateFunction(newSourcePoint)
+
+    return transformation.evaluateFunction(newSourcePoint)
   }
 
   evaluateAll() {
-    this.staples.forEach((staple) =>
-      staple.forEach((staplePoint) => {
+    // Evaluate every staplePoint
+    this.staplePointsById.forEach((staplePointsForId) =>
+      staplePointsForId.forEach((staplePoint) => {
         staplePoint.destination = this.evaluateFunction(
           staplePoint.source,
           staplePoint.transformationId
         )
       })
     )
+
+    // Average out the destination values
+    if (this.options?.averageDestinationPoints) {
+      this.staplePointsById.forEach((staplePointsForId) => {
+        const meanDestination = staplePointsForId
+          .map((staplePoint) => staplePoint.destination as Point)
+          .reduce(
+            (a, c, _i, array) => {
+              return [a[0] + c[0] / array.length, a[1] + c[1] / array.length]
+            },
+            [0, 0]
+          )
+        staplePointsForId.forEach((staplePoint) => {
+          staplePoint.destination = meanDestination
+        })
+      })
+    }
   }
 
   /**
@@ -299,10 +377,11 @@ export class StapledTransformation {
    * @returns {GeoreferencedMap[]}
    */
   toGeoreferencedMaps(): GeoreferencedMap[] {
-    const georeferencedMaps = this.options?.georeferencedMaps
-    const projectedGcpTransformers = this.options?.projectedGcpTransformers
+    const georeferencedMapsById = this.options?.georeferencedMapsById
+    const projectedGcpTransformersById =
+      this.options?.projectedGcpTransformersById
 
-    if (!georeferencedMaps || !projectedGcpTransformers) {
+    if (!georeferencedMapsById || !projectedGcpTransformersById) {
       throw new Error(
         'No Georeferenced Maps or GCP Transformers found. Create a Stapler from GeoreferencedMaps to be able to recreate those.'
       )
@@ -311,55 +390,47 @@ export class StapledTransformation {
     this.evaluateAll()
 
     // For every evaluated staplePoint, add a GCP to it's respective Georeferenced Map.
-    //
-    // When there were more then two staple points with the same id, and duo's where created,
-    // only add one staplepoint per mapId = transformationId.
-    // We do this by filtering out repeated mapId's in the staplePointsById
-
-    let staplePointsById = Object.values(
-      groupBy(this.staples.flat(), (staplePoint) => staplePoint.id)
-    )
-    staplePointsById.map((staplePointsForId) =>
-      staplePointsForId
-        .filter(
-          (staplePoint, index) =>
-            staplePointsForId.findIndex(
-              (s) => s.transformationId === staplePoint.transformationId
-            ) === index
-        )
-        .forEach((staplePoint) => {
-          const mapId = staplePoint.transformationId
-          georeferencedMaps.forEach((georeferencedMap, index) => {
-            if (georeferencedMap.id == mapId) {
-              // TODO: process projection here!
-
-              const projectedGcpTransformer = projectedGcpTransformers[index]
-              const transformerOptions =
-                projectedGcpTransformer.getTransformerOptions()
-
-              let source = transformerOptions.differentHandedness
-                ? flipY(staplePoint.source)
-                : staplePoint.source
-              let destination = this.evaluateFunction(
-                staplePoint.source,
-                staplePoint.transformationId
+    this.staplePointsById.map((staplePointsForId) =>
+      staplePointsForId.forEach((staplePoint) => {
+        Array.from(georeferencedMapsById.entries()).forEach(
+          ([mapId, georeferencedMap]) => {
+            const projectedGcpTransformer = projectedGcpTransformersById.get(
+              staplePoint.transformationId
+            )
+            if (!projectedGcpTransformer) {
+              throw new Error(
+                `projectedGcpTransformer not found for transformationId ${staplePoint.transformationId}.`
               )
-              destination = transformerOptions.postForward(destination)
-              destination =
-                projectedGcpTransformer.projectionToLatLon(destination)
+            }
 
-              console.log(staplePoint.source, source, destination)
+            // Same process from {source, destination} to {resource, geo}
+            // as in BaseGcpTransformer's transformPointForwardInternal()
 
+            const transformerOptions =
+              projectedGcpTransformer.getTransformerOptions()
+
+            let source = transformerOptions.differentHandedness
+              ? flipY(staplePoint.source)
+              : staplePoint.source
+
+            let destination = transformerOptions.postForward(
+              staplePoint.destination as Point
+            )
+            destination =
+              projectedGcpTransformer.projectionToLatLon(destination)
+
+            if (mapId == staplePoint.transformationId) {
               georeferencedMap.gcps.push({
                 resource: source,
                 geo: destination as Point
               })
             }
-          })
-        })
+          }
+        )
+      })
     )
 
-    return georeferencedMaps
+    return Array.from(georeferencedMapsById.values())
   }
 
   /**
@@ -389,12 +460,16 @@ export class StapledTransformation {
     if (options?.useMapTransformationTypes) {
       delete options.transformationType
     }
+    const georeferencedMapsById = new Map<string, GeoreferencedMap>()
+    const projectedGcpTransformersById = new Map<
+      string,
+      ProjectedGcpTransformer
+    >()
     const transformationsById = new Map<
       string,
       BaseIndependentLinearWeightsTransformation
     >()
     const staplePoints: StaplePoint[] = []
-    const projectedGcpTransformers: ProjectedGcpTransformer[] = []
 
     for (const georeferencedMap of georeferencedMaps) {
       // Neglect georeferenced maps with no staple points
@@ -406,17 +481,18 @@ export class StapledTransformation {
         georeferencedMap.id || (await generateChecksum(georeferencedMap))
       // TODO: check if it is ok to assign mapId, so we can use it later
       georeferencedMap.id = mapId
+      georeferencedMapsById.set(mapId, georeferencedMap)
 
       const projectedGcpTransformer =
         ProjectedGcpTransformer.fromGeoreferencedMap(georeferencedMap, options)
-      projectedGcpTransformers.push(projectedGcpTransformer)
+      projectedGcpTransformersById.set(mapId, projectedGcpTransformer)
 
       const transformation = projectedGcpTransformer.getToGeoTransformation()
       if (
         !(transformation instanceof BaseIndependentLinearWeightsTransformation)
       ) {
         throw new Error(
-          `Transformation type ${transformation.type} unsupported`
+          `Transformation type ${transformation.type} unsupported.`
         )
       }
       transformationsById.set(mapId, transformation)
@@ -468,8 +544,8 @@ export class StapledTransformation {
       .flat(1)
 
     return new StapledTransformation(transformationsById, staples, {
-      georeferencedMaps,
-      projectedGcpTransformers
+      georeferencedMapsById,
+      projectedGcpTransformersById
     })
   }
 }

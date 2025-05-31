@@ -258,16 +258,269 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 //   })
 // })
 
+describe('Solve two maps stapled together and evaluate points', () => {
+  it(`should return maps with extra gcps`, async () => {
+    georeferencedMap0.rcps = rcps0
+    georeferencedMap1.rcps = rcps1
+    georeferencedMap2.rcps = rcps2
+    georeferencedMap3.rcps = rcps3
+    const stapledtransformation =
+      await StapledTransformation.fromGeoreferencedMaps(
+        [
+          georeferencedMap0,
+          georeferencedMap1,
+          georeferencedMap2,
+          georeferencedMap3
+        ],
+        {
+          transformationType: 'polynomial'
+        }
+      )
+    const results = stapledtransformation.toGeoreferencedMaps()
+
+    // console.log(
+    //   JSON.stringify(generateAnnotation(results))
+    //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(results[0])))}`
+    // )
+    // console.log(
+    //   results.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
+    // )
+
+    expect(results[0].gcps.length).to.equal(4)
+    expect(results[1].gcps.length).to.equal(4)
+    expect(results[2].gcps.length).to.equal(4)
+    expect(results[3].gcps.length).to.equal(4)
+
+    expectToBeCloseToArray(
+      results[0].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      results[1].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      results[2].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      results[3].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+  })
+})
+
+// describe('Compare to observable', () => {
+//   it(`should return the same`, async () => {
+//     const gridSize = 200
+
+//     georeferencedMap0.gcps = [
+//       {
+//         resource: [gridSize * 0.2, gridSize * 0.1],
+//         geo: [gridSize * 0.1, gridSize * 0.1]
+//       },
+//       {
+//         resource: [gridSize * 0.8, gridSize * 0.1],
+//         geo: [gridSize * 0.4, gridSize * 0.1]
+//       },
+//       {
+//         resource: [gridSize * 0.8, gridSize * 0.7],
+//         geo: [gridSize * 0.4, gridSize * 0.4]
+//       },
+//       {
+//         resource: [gridSize * 0.2, gridSize * 0.7],
+//         geo: [gridSize * 0.1, gridSize * 0.4]
+//       }
+//     ]
+//     georeferencedMap1.gcps = [
+//       {
+//         resource: [gridSize * 0.2, gridSize * 0.3],
+//         geo: [gridSize * 0.1, gridSize * 0.6]
+//       },
+//       {
+//         resource: [gridSize * 0.8, gridSize * 0.3],
+//         geo: [gridSize * 0.4, gridSize * 0.6]
+//       },
+//       {
+//         resource: [gridSize * 0.8, gridSize * 0.9],
+//         geo: [gridSize * 0.4, gridSize * 0.9]
+//       },
+//       {
+//         resource: [gridSize * 0.2, gridSize * 0.9],
+//         geo: [gridSize * 0.1, gridSize * 0.9]
+//       }
+//     ]
+//     georeferencedMap0.rcps = [
+//       {
+//         id: '0',
+//         resource: [gridSize * 0.5, gridSize * 0.9]
+//       }
+//     ]
+//     georeferencedMap1.rcps = [
+//       {
+//         id: '0',
+//         resource: [gridSize * 0.5, gridSize * 0.1]
+//       }
+//     ]
+//     const stapledtransformation =
+//       await StapledTransformation.fromGeoreferencedMaps(
+//         [georeferencedMap0, georeferencedMap1],
+//         {
+//           type: 'thinPlateSpline',
+//           differentHandedness: false,
+//           internalProjection: {
+//             definition: 'EPSG:4326'
+//           },
+//           projection: {
+//             definition: 'EPSG:4326'
+//           }
+//         }
+//       )
+//     const results = stapledtransformation.toGeoreferencedMaps()
+
+//     expect(results[0].gcps.length).to.equal(5)
+//     expect(results[1].gcps.length).to.equal(5)
+
+//     // console.log(new Matrix(stapledtransformation.destinationPointsArrays))
+//     // console.log(new Matrix(stapledtransformation.coefsArrayMatrix))
+//     // console.log(new Matrix(stapledtransformation.weightsArrays))
+//     // console.log(results[0].gcps, results[1].gcps)
+
+//     expectToBeCloseToArray(results[0].gcps[4].geo, [50, 100])
+//     expectToBeCloseToArray(results[1].gcps[4].geo, [50, 100])
+//   })
+// })
+
 // describe('Solve two maps stapled together and evaluate points', () => {
 //   it(`should return maps with extra gcps`, async () => {
-//     georeferencedMap0.rcps = rcps0
+//     const georeferencedMap1 = {
+//       '@context': 'https://schemas.allmaps.org/map/2/context.json',
+//       type: 'GeoreferencedMap',
+//       id: 'https://annotations.allmaps.org/maps/8b639501c40f2178',
+//       created: '2025-02-17T21:59:56.485Z',
+//       modified: '2025-02-17T21:59:56.485Z',
+//       resource: {
+//         id: 'https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-1',
+//         width: 5434,
+//         height: 10536,
+//         type: 'ImageService2',
+//         partOf: [
+//           {
+//             id: 'https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-1',
+//             type: 'Canvas',
+//             partOf: [
+//               {
+//                 id: 'https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json',
+//                 type: 'Manifest',
+//                 label: {
+//                   en: ['Plattegrond van Rotterdam in 10 bladen (1895-1897)']
+//                 }
+//               }
+//             ]
+//           }
+//         ]
+//       },
+//       gcps: [
+//         {
+//           resource: [3478, 6315],
+//           geo: [4.4305768, 51.9133267]
+//         },
+//         {
+//           resource: [5306, 5332],
+//           geo: [4.4404524, 51.9184028]
+//         },
+//         {
+//           resource: [4560, 5703],
+//           geo: [4.4363765, 51.9164375]
+//         },
+//         {
+//           resource: [4371, 6758],
+//           geo: [4.4365357, 51.9123644]
+//         }
+//       ],
+//       resourceMask: [
+//         [199, 10340],
+//         [194, 312],
+//         [5333, 293],
+//         [5356, 10330]
+//       ],
+//       transformation: {
+//         type: 'polynomial',
+//         options: {
+//           order: 1
+//         }
+//       }
+//     }
+//     const rcps1 = [{ id: 'test', resource: [5333, 293] }]
+//     const georeferencedMap2 = {
+//       '@context': 'https://schemas.allmaps.org/map/2/context.json',
+//       type: 'GeoreferencedMap',
+//       id: 'https://annotations.allmaps.org/maps/a27f86193c1eb9b5',
+//       created: '2025-02-22T18:35:54.565Z',
+//       modified: '2025-02-22T18:35:54.565Z',
+//       resource: {
+//         id: 'https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-2',
+//         width: 5410,
+//         height: 10476,
+//         type: 'ImageService2',
+//         partOf: [
+//           {
+//             id: 'https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-2',
+//             type: 'Canvas',
+//             partOf: [
+//               {
+//                 id: 'https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json',
+//                 type: 'Manifest',
+//                 label: {
+//                   en: ['Plattegrond van Rotterdam in 10 bladen (1895-1897)']
+//                 }
+//               }
+//             ]
+//           }
+//         ]
+//       },
+//       gcps: [
+//         {
+//           resource: [4772, 9966],
+//           geo: [4.4745659, 51.9043149]
+//         },
+//         {
+//           resource: [5322, 533],
+//           geo: [4.4670337, 51.9400327]
+//         },
+//         {
+//           resource: [4666, 9112],
+//           geo: [4.4729223, 51.9075223]
+//         },
+//         {
+//           resource: [90, 1444],
+//           geo: [4.4358105, 51.9327759]
+//         }
+//       ],
+//       resourceMask: [
+//         [87, 254],
+//         [5335, 235],
+//         [5343, 10288],
+//         [66, 10295]
+//       ],
+//       transformation: {
+//         type: 'polynomial',
+//         options: {
+//           order: 1
+//         }
+//       }
+//     }
+//     const rcps2 = [{ id: 'test', resource: [87, 254] }]
+
 //     georeferencedMap1.rcps = rcps1
 //     georeferencedMap2.rcps = rcps2
-//     georeferencedMap3.rcps = rcps3
 //     const stapledtransformation =
 //       await StapledTransformation.fromGeoreferencedMaps(
 //         [georeferencedMap1, georeferencedMap2],
-//         { transformationType: 'thinPlateSpline' }
+//         {
+//           differentHandedness: false,
+//           transformationType: 'thinPlateSpline'
+//         }
 //       )
 //     const results = stapledtransformation.toGeoreferencedMaps()
 
@@ -278,91 +531,5 @@ const rcps3 = [{ id: 'center', resource: [465, 257] }]
 //     console.log(
 //       results.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
 //     )
-
-//     // expect(results[0].gcps.length).to.equal(4)
-//     // expect(results[1].gcps.length).to.equal(4)
-//     // expect(results[2].gcps.length).to.equal(4)
-//     // expect(results[3].gcps.length).to.equal(4)
 //   })
 // })
-
-describe('Compare to observable', () => {
-  it(`should return the same`, async () => {
-    const gridSize = 200
-
-    georeferencedMap0.gcps = [
-      {
-        resource: [gridSize * 0.2, gridSize * 0.1],
-        geo: [gridSize * 0.1, gridSize * 0.1]
-      },
-      {
-        resource: [gridSize * 0.8, gridSize * 0.1],
-        geo: [gridSize * 0.4, gridSize * 0.1]
-      },
-      {
-        resource: [gridSize * 0.8, gridSize * 0.7],
-        geo: [gridSize * 0.4, gridSize * 0.4]
-      },
-      {
-        resource: [gridSize * 0.2, gridSize * 0.7],
-        geo: [gridSize * 0.1, gridSize * 0.4]
-      }
-    ]
-    georeferencedMap1.gcps = [
-      {
-        resource: [gridSize * 0.2, gridSize * 0.3],
-        geo: [gridSize * 0.1, gridSize * 0.6]
-      },
-      {
-        resource: [gridSize * 0.8, gridSize * 0.3],
-        geo: [gridSize * 0.4, gridSize * 0.6]
-      },
-      {
-        resource: [gridSize * 0.8, gridSize * 0.9],
-        geo: [gridSize * 0.4, gridSize * 0.9]
-      },
-      {
-        resource: [gridSize * 0.2, gridSize * 0.9],
-        geo: [gridSize * 0.1, gridSize * 0.9]
-      }
-    ]
-    georeferencedMap0.rcps = [
-      {
-        id: '0',
-        resource: [gridSize * 0.5, gridSize * 0.9]
-      }
-    ]
-    georeferencedMap1.rcps = [
-      {
-        id: '0',
-        resource: [gridSize * 0.5, gridSize * 0.1]
-      }
-    ]
-    const stapledtransformation =
-      await StapledTransformation.fromGeoreferencedMaps(
-        [georeferencedMap0, georeferencedMap1],
-        {
-          type: 'thinPlateSpline',
-          differentHandedness: false,
-          internalProjection: {
-            definition: 'EPSG:4326'
-          },
-          projection: {
-            definition: 'EPSG:4326'
-          }
-        }
-      )
-    const results = stapledtransformation.toGeoreferencedMaps()
-
-    expect(results[0].gcps.length).to.equal(5)
-    expect(results[1].gcps.length).to.equal(5)
-
-    // console.log(new Matrix(stapledtransformation.destinationPointsArrays))
-    // console.log(new Matrix(stapledtransformation.coefsArrayMatrix))
-    // console.log(new Matrix(stapledtransformation.weightsArrays))
-    // console.log(results[0].gcps, results[1].gcps)
-
-    expectToBeCloseToArray(results[0].gcps[4].geo, [50, 100])
-    expectToBeCloseToArray(results[1].gcps[4].geo, [50, 100])
-  })
-})
