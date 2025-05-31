@@ -1,5 +1,3 @@
-import Matrix, { pseudoInverse } from 'ml-matrix'
-
 import {
   arrayMatrixSize,
   flipY,
@@ -15,6 +13,8 @@ import {
   ProjectedGcpTransformer,
   ProjectedGcpTransformerOptions
 } from '@allmaps/project'
+
+import { solveIndependentlyPseudoInverse } from '@allmaps/transform'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point, Size } from '@allmaps/types'
@@ -250,36 +250,12 @@ export class StapledTransformation {
 
   // TODO: implement solveing jointly and switch based on transformations
   solve() {
-    this.solveIndependently()
+    this.weightsArrays = solveIndependentlyPseudoInverse(
+      this.coefsArrayMatrix,
+      this.destinationPointsArrays
+    )
+
     this.processWeightsArrays()
-  }
-
-  /**
-   * Solve the x and y components independently.
-   *
-   * This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
-   * a 'best fit' (least squares) approximate solution for the system of linear equations
-   * which is (in general) over-defined and hence lacks an exact solution.
-   *
-   * See https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-   */
-  solveIndependently() {
-    const coefsMatrix = new Matrix(this.coefsArrayMatrices[0])
-    const destinationPointsMatrices = [
-      Matrix.columnVector(this.destinationPointsArrays[0]),
-      Matrix.columnVector(this.destinationPointsArrays[1])
-    ]
-
-    const pseudoInverseCoefsMatrix = pseudoInverse(coefsMatrix)
-
-    const weightsMatrices = [
-      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[1])
-    ] as [Matrix, Matrix]
-
-    this.weightsArrays = weightsMatrices.map((matrix) =>
-      matrix.to1DArray()
-    ) as [number[], number[]]
   }
 
   processWeightsArrays() {
@@ -500,6 +476,10 @@ export class StapledTransformation {
       georeferencedMap.rcps.forEach((rcp) => {
         const transformerOptions =
           projectedGcpTransformer.getTransformerOptions()
+
+        // Same process from {resource, geo} to {source, destination}
+        // as in BaseGcpTransformer's constructor
+
         let source = transformerOptions.differentHandedness
           ? flipY(rcp.resource)
           : rcp.resource

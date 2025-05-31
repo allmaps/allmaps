@@ -25,6 +25,13 @@ export {
   defaultGcpTransformOptions
 } from './shared/transform-functions.js'
 
+export {
+  solveIndependentlyInverse,
+  solveIndependentlyPseudoInverse,
+  solveJointlyPseudoInverse,
+  solveJointlySvd
+} from './shared/solve-functions.js'
+
 // export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
 
 export type {

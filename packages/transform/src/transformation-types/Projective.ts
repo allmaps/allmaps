@@ -1,8 +1,7 @@
-import { Matrix, SingularValueDecomposition } from 'ml-matrix'
-
 import { newArrayMatrix } from '@allmaps/stdlib'
 
 import { BaseTransformation } from './BaseTransformation.js'
+import { solveJointlySvd } from '../shared/solve-functions.js'
 
 import type { Point } from '@allmaps/types'
 
@@ -63,33 +62,11 @@ export class Projective extends BaseTransformation {
     }
   }
 
-  /**
-   * Solve the x and y components jointly.
-   *
-   * This uses a singular value decomposition to compute the last (i.e. 9th) 'right singular vector',
-   * i.e. the one with the smallest singular value, wich holds the weights for the solution.
-   * Note that for a set of gcps that exactly follow a projective transformations,
-   * the singular value is null and this vector spans the null-space.
-   *
-   * This wil result in a weights array for each component with rbf weights and affine weights.
-   */
   solve() {
-    // Joint coefs in the same order as in the paper
-    // (Otherwise the weights may differ in sign, even though this should not affect the result)
-    const coefsMatrix = []
-    for (let i = 0; i < this.pointCount; i++) {
-      coefsMatrix.push(this.coefsArrayMatrices[0][i])
-      coefsMatrix.push(this.coefsArrayMatrices[1][i])
-    }
-
-    const svdCoefsMatrix = new SingularValueDecomposition(coefsMatrix)
-
-    const weightsMatrix = Matrix.from1DArray(
-      3,
-      3,
-      svdCoefsMatrix.rightSingularVectors.getColumn(8)
-    ).transpose()
-    this.weightsArrays = weightsMatrix.to2DArray()
+    this.weightsArrays = solveJointlySvd(
+      this.coefsArrayMatrices,
+      this.pointCount
+    )
   }
 
   evaluateFunction(newSourcePoint: Point): Point {

@@ -1,5 +1,3 @@
-import { Matrix, pseudoInverse } from 'ml-matrix'
-
 import {
   newArrayMatrix,
   pasteArrayMatrix,
@@ -7,6 +5,7 @@ import {
 } from '@allmaps/stdlib'
 
 import { BaseLinearWeightsTransformation } from './BaseLinearWeightsTransformation.js'
+import { solveJointlyPseudoInverse } from '../shared/solve-functions.js'
 
 import type { Point, Size } from '@allmaps/types'
 
@@ -78,30 +77,11 @@ export class Helmert extends BaseLinearWeightsTransformation {
     ]
   }
 
-  /**
-   * Solve the x and y components jointly.
-   *
-   * This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
-   * for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
-   * See https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-   *
-   * This will result weightsArray shared by both components: [t_x, t_y, m, n]
-   */
   solve() {
-    const coefsMatrix = new Matrix([
-      ...this.coefsArrayMatrices[0],
-      ...this.coefsArrayMatrices[1]
-    ])
-    const destinationPointsMatrix = Matrix.columnVector([
-      ...this.destinationPointsArrays[0],
-      ...this.destinationPointsArrays[1]
-    ])
-
-    const pseudoInverseCoefsMatrix = pseudoInverse(coefsMatrix)
-
-    const weightsMatrix = pseudoInverseCoefsMatrix.mmul(destinationPointsMatrix)
-
-    this.weightsArray = weightsMatrix.to1DArray()
+    this.weightsArray = solveJointlyPseudoInverse(
+      this.coefsArrayMatrices,
+      this.destinationPointsArrays
+    )
     this.weightsArrays = [this.weightsArray, this.weightsArray]
   }
 

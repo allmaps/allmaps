@@ -1,5 +1,3 @@
-import { Matrix, inverse } from 'ml-matrix'
-
 import {
   arrayMatrixSize,
   newArrayMatrix,
@@ -10,6 +8,7 @@ import {
 
 import { Polynomial1 } from './Polynomial1.js'
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
+import { solveIndependentlyInverse } from '../shared/solve-functions.js'
 
 import type {
   KernelFunction,
@@ -188,22 +187,10 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
    * This wil result in a weights array for each component with rbf weights and affine weights.
    */
   solve() {
-    const coefsMatrix = new Matrix(this.coefsArrayMatrix)
-    const destinationPointsMatrices = [
-      Matrix.columnVector(this.destinationPointsArrays[0]),
-      Matrix.columnVector(this.destinationPointsArrays[1])
-    ]
-
-    const inverseCoefsMatrix = inverse(coefsMatrix)
-
-    const weightsMatrices = [
-      inverseCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      inverseCoefsMatrix.mmul(destinationPointsMatrices[1])
-    ] as [Matrix, Matrix]
-
-    this.weightsArrays = weightsMatrices.map((matrix) =>
-      matrix.to1DArray()
-    ) as [number[], number[]]
+    this.weightsArrays = solveIndependentlyInverse(
+      this.coefsArrayMatrix,
+      this.destinationPointsArrays
+    )
 
     this.processWeightsArrays()
   }

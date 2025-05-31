@@ -1,5 +1,3 @@
-import { Matrix, pseudoInverse } from 'ml-matrix'
-
 import {
   arrayMatrixSize,
   newArrayMatrix,
@@ -7,6 +5,7 @@ import {
 } from '@allmaps/stdlib'
 
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
+import { solveIndependentlyPseudoInverse } from '../shared/solve-functions.js'
 
 import type { Point, Size } from '@allmaps/types'
 
@@ -77,36 +76,10 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
     return coefsArrayArray
   }
 
-  /**
-   * Solve the x and y components independently.
-   *
-   * This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
-   * a 'best fit' (least squares) approximate solution for the system of linear equations
-   * which is (in general) over-defined and hence lacks an exact solution.
-   *
-   * See https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
-   *
-   * This wil result in a weights array for each component:
-   * For order = 1: this.weight = [[a0_x, ax_x, ay_x], [a0_y, ax_y, ay_y]]
-   * For order = 2: ... (similar, following the same order as in coefsArrayMatrix)
-   * For order = 3: ... (similar, following the same order as in coefsArrayMatrix)
-   */
   solve() {
-    const coefsMatrix = new Matrix(this.coefsArrayMatrices[0])
-    const destinationPointsMatrices = [
-      Matrix.columnVector(this.destinationPointsArrays[0]),
-      Matrix.columnVector(this.destinationPointsArrays[1])
-    ]
-
-    const pseudoInverseCoefsMatrix = pseudoInverse(coefsMatrix)
-
-    const weightsMatrices = [
-      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[0]),
-      pseudoInverseCoefsMatrix.mmul(destinationPointsMatrices[1])
-    ] as [Matrix, Matrix]
-
-    this.weightsArrays = weightsMatrices.map((matrix) =>
-      matrix.to1DArray()
-    ) as [number[], number[]]
+    this.weightsArrays = solveIndependentlyPseudoInverse(
+      this.coefsArrayMatrix,
+      this.destinationPointsArrays
+    )
   }
 }
