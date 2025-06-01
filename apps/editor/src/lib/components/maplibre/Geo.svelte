@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
 
   import { Map, addProtocol } from 'maplibre-gl'
   import maplibregl from 'maplibre-gl'
@@ -63,6 +63,10 @@
     newGeoMap.once('load', () => {
       geoMap = newGeoMap
     })
+  })
+
+  onDestroy(() => {
+    geoMap?.remove()
   })
 </script>
 
