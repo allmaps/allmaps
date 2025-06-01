@@ -7,6 +7,15 @@ export const idStrategy = {
   getId: () => generateRandomId()
 }
 
+export const pointerEvents = {
+  rightClick: true,
+  contextMenu: true,
+  onDragStart: true,
+  onDrag: true,
+  onDragEnd: true,
+  leftClick: true
+}
+
 export function ensureStringId(id: string | number | undefined): string {
   if (typeof id === 'string') {
     return id
