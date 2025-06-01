@@ -4,3 +4,5 @@ export const MAPLIBRE_PADDING = {
   bottom: 30 + 40 + 20,
   right: 10 + 20
 }
+
+export const TERRA_DRAW_COORDINATE_PRECISION = 32

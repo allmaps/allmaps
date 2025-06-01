@@ -37,15 +37,18 @@
     createMapWithFullImageResourceMask,
     getSortedGcps
   } from '$lib/shared/maps.js'
-  import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
   import {
     idStrategy,
+    pointerEvents,
     ensureStringId,
     clearFeatures
   } from '$lib/shared/terra-draw.js'
-  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
+  import {
+    MAPLIBRE_PADDING,
+    TERRA_DRAW_COORDINATE_PRECISION
+  } from '$lib/shared/constants.js'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
 
@@ -309,12 +312,10 @@
       throw new Error('Resource mask is must have 3 or more vertices')
     }
 
-    const geoCoordinates = transformer
-      .transformToGeo([...resourceMask, resourceMask[0]])
-      .map((point) =>
-        // TODO: talk with James and turn this off!
-        point.map((number) => roundWithDecimals(number, 9))
-      )
+    const geoCoordinates = transformer.transformToGeo([
+      ...resourceMask,
+      resourceMask[0]
+    ])
 
     return {
       type: 'Feature' as const,
@@ -331,16 +332,12 @@
   }
 
   function getGeoMaskFeature(map: DbMap3) {
-    const roundedGeoMask = transformResourceMaskToGeo(map).map(
-      (point) =>
-        // TODO: talk with James and turn this off!
-        point.map((number) => roundWithDecimals(number, 9)) as Point
-    )
+    const geoMask = transformResourceMaskToGeo(map)
 
     return {
       type: 'Feature' as const,
       id: map.id,
-      geometry: polygonToGeojsonPolygon([roundedGeoMask]),
+      geometry: polygonToGeojsonPolygon([geoMask]),
       properties: {
         mode: 'polygon',
         index: map.index || 0
@@ -667,13 +664,7 @@
     const resourcePoint = getGcpResourcePoint(gcp)
     if (resourcePoint) {
       const resourceCoordinates = transformer.transformToGeo(resourcePoint)
-
-      const roundedResourceCoordinates: Point = [
-        roundWithDecimals(resourceCoordinates[0], 9),
-        roundWithDecimals(resourceCoordinates[1], 9)
-      ]
-
-      return createGcpFeature(gcp.id, roundedResourceCoordinates, gcp.index)
+      return createGcpFeature(gcp.id, resourceCoordinates, gcp.index)
     }
   }
 
@@ -792,6 +783,7 @@
   function getPointDrawOptions() {
     return {
       editable: true,
+      pointerEvents,
       styles: {
         pointColor: pink,
         pointOutlineWidth: ({ id }: { id?: number | string }) =>
@@ -888,7 +880,8 @@
 
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
-          map: resourceMap
+          map: resourceMap,
+          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
         }),
         modes: [resourcePolygonMode, resourcePointMode],
         idStrategy
@@ -912,7 +905,8 @@
 
       geoDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
-          map: geoMap
+          map: geoMap,
+          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
         }),
         modes: [geoPolygonMode, geoPointMode],
         idStrategy

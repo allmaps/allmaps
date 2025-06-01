@@ -1,4 +1,1 @@
 v23.11
-
-# The .nvmrc file is the only way I can get building Allmaps Editor
-# on Cloudflare Workers to work, with the right version of Node.js.

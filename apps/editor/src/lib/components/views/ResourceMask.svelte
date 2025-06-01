@@ -20,11 +20,11 @@
   import { generateId } from '$lib/shared/id.js'
   import { polygonDifference } from '$lib/shared/geometry.js'
   import { getResourceMask } from '$lib/shared/maps.js'
-  import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
   import {
     idStrategy,
+    pointerEvents,
     ensureStringId,
     clearFeatures
   } from '$lib/shared/terra-draw.js'
@@ -47,7 +47,10 @@
     ClickedItemEvent
   } from '$lib/types/events.js'
 
-  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
+  import {
+    MAPLIBRE_PADDING,
+    TERRA_DRAW_COORDINATE_PRECISION
+  } from '$lib/shared/constants.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -145,11 +148,10 @@
       throw new Error('Resource mask is must have 3 or more vertices')
     }
 
-    const geoCoordinates = transformer
-      .transformToGeo([...resourceMask, resourceMask[0]])
-      .map((coordinate) =>
-        coordinate.map((number) => roundWithDecimals(number, 9))
-      )
+    const geoCoordinates = transformer.transformToGeo([
+      ...resourceMask,
+      resourceMask[0]
+    ])
 
     return {
       type: 'Feature' as const,
@@ -464,6 +466,7 @@
     return {
       editable: true,
       showCoordinatePoints: true,
+      pointerEvents,
       styles: {
         fillColor: '#ffffff' as `#${string}`,
         fillOpacity: ({ id }: { id?: number | string }) =>
@@ -498,7 +501,8 @@
 
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
-          map: resourceMap
+          map: resourceMap,
+          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
         }),
         modes: [polygonMode],
         idStrategy
