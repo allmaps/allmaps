@@ -154,11 +154,11 @@ importers:
         specifier: ^1.11.1
         version: 1.24.2
       terra-draw:
-        specifier: ^1.5.0
-        version: 1.5.0
+        specifier: ^1.6.2
+        version: 1.6.2
       terra-draw-maplibre-gl-adapter:
         specifier: ^1.1.0
-        version: 1.1.0(maplibre-gl@5.5.0)(terra-draw@1.5.0)
+        version: 1.1.0(maplibre-gl@5.5.0)(terra-draw@1.6.2)
       zod:
         specifier: ^3.22.4
         version: 3.24.0
@@ -14778,18 +14778,18 @@ packages:
       yallist: 5.0.0
     dev: true
 
-  /terra-draw-maplibre-gl-adapter@1.1.0(maplibre-gl@5.5.0)(terra-draw@1.5.0):
+  /terra-draw-maplibre-gl-adapter@1.1.0(maplibre-gl@5.5.0)(terra-draw@1.6.2):
     resolution: {integrity: sha512-o9k0Ndk7Q/KfxpFeG7vq8YC+n1NxAHs4cCt+jqio36h4IbQvQ2O4kawcgAzrSqq6+MCBtNhsImwsvWZ+w+l3vw==}
     peerDependencies:
       maplibre-gl: '>=4'
       terra-draw: ^1.0.0
     dependencies:
       maplibre-gl: 5.5.0
-      terra-draw: 1.5.0
+      terra-draw: 1.6.2
     dev: false
 
-  /terra-draw@1.5.0:
-    resolution: {integrity: sha512-agyCfNXzy0xn3UutntC8j1RoWXbNBi9D+RJe0g4Ih6l85iJQRc58tVtBnBoxdkSH6kb2/96UfhhA0/rjYw8NnQ==}
+  /terra-draw@1.6.2:
+    resolution: {integrity: sha512-U5vHQ8CPOM52cHcHUrCewuQnmaUWRXF2g3UJV2IDLyVtzeOBbkBXl2ZNXD4AhA3roEDwYi5wZ5ZbB6pKuC62Kw==}
     dev: false
 
   /text-table@0.2.0:
