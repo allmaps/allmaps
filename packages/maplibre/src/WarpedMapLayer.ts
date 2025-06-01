@@ -792,6 +792,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
     )
 
     this.renderer.addEventListener(
+      WarpedMapEventType.CHANGED,
+      this.triggerRepaintAndPassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
       this.render.bind(this)
     )
@@ -809,6 +814,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
       this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.triggerRepaintAndPassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
@@ -856,6 +866,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
     )
 
     this.renderer.removeEventListener(
+      WarpedMapEventType.CHANGED,
+      this.triggerRepaintAndPassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
       this.render.bind(this)
     )
@@ -873,6 +888,11 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.tileCache.removeEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
       this.passWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.triggerRepaintAndPassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.removeEventListener(
@@ -904,6 +924,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
       WarpedMapEventType.CLEARED,
       this.render.bind(this)
     )
+  }
+
+  private triggerRepaintAndPassWarpedMapEvent(event: Event) {
+    if (this.map) {
+      this.map.triggerRepaint()
+    }
+    this.passWarpedMapEvent(event)
   }
 
   private passWarpedMapEvent(event: Event) {
