@@ -92,9 +92,12 @@
         >
           {#if imageError}
             <div
-              class="bg-red w-full h-full flex items-center justify-center rounded-lg text-white"
+              class="bg-red w-full h-full p-4
+                flex items-center justify-center rounded-lg text-white"
             >
-              <div>Error loading preview image. This map cannot be shared.</div>
+              <div class="text-center">
+                Error loading preview image. This map cannot be shared.
+              </div>
             </div>
           {:else}
             <img
