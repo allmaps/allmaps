@@ -41,13 +41,13 @@ const defaultStapledTransformationFromGeoreferencedMapOptions: StapledTransforma
     deepClone: true,
     evaluateStaplePoints: true,
     evaluateSingleStaplePoints: false,
-    removeExistingGcps: false,
-    evaluateGcps: false
+    evaluateGcps: false,
+    removeExistingGcps: false
   }
 
 const defaultStapledTransformationOptions: StapledTransformationOptions = {
   ...defaultStapledTransformationFromGeoreferencedMapOptions,
-  averageOutStaplePoints: true
+  averageOut: true
 }
 
 export class StapledTransformation {
@@ -365,10 +365,7 @@ export class StapledTransformation {
     })
 
     // Average out the destination values of the staplePoints
-    if (
-      this.options?.averageOutStaplePoints &&
-      this.options?.evaluateStaplePoints
-    ) {
+    if (this.options?.averageOut && this.options?.evaluateStaplePoints) {
       this.staplePointsById.forEach((staplePointsForId) => {
         const meanDestination = staplePointsForId
           .map((staplePoint) => staplePoint.destination as Point)

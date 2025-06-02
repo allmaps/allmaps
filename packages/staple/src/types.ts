@@ -5,6 +5,10 @@ import type { TransformationTypeInputs } from '@allmaps/transform'
 
 export type StapledTransformationFromGeoreferencedMapOptions =
   TransformationTypeInputs & {
+    georeferencedMapsById?: Map<string, GeoreferencedMap>
+    projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>
+    gcpSourcePoints?: SourcePoint[]
+    extraSourcePoints?: SourcePoint[]
     useMapTransformationTypes: boolean
     deepClone: boolean
     evaluateStaplePoints: boolean
@@ -15,11 +19,7 @@ export type StapledTransformationFromGeoreferencedMapOptions =
 
 export type StapledTransformationOptions =
   StapledTransformationFromGeoreferencedMapOptions & {
-    georeferencedMapsById?: Map<string, GeoreferencedMap>
-    projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>
-    gcpSourcePoints?: SourcePoint[]
-    extraSourcePoints?: SourcePoint[]
-    averageOutStaplePoints: boolean
+    averageOut: boolean
   }
 
 // Resource Control Point

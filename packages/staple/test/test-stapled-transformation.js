@@ -269,32 +269,32 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //         transformationType: 'polynomial'
   //       }
   //     )
-  //     const results = stapledtransformation.toGeoreferencedMaps()
+  //     const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
   //     // console.log(
-  //     //   JSON.stringify(generateAnnotation(results))
-  //     //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(results[0])))}`
+  //     //   JSON.stringify(generateAnnotation(resultinggeoreferencedmaps))
+  //     //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultinggeoreferencedmaps[0])))}`
   //     // )
   //     // console.log(
-  //     //   results.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
+  //     //   resultinggeoreferencedmaps.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
   //     // )
-  //     expect(results[0].gcps.length).to.equal(4)
-  //     expect(results[1].gcps.length).to.equal(4)
-  //     expect(results[2].gcps.length).to.equal(4)
-  //     expect(results[3].gcps.length).to.equal(4)
+  //     expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
+  //     expect(resultinggeoreferencedmaps[1].gcps.length).to.equal(4)
+  //     expect(resultinggeoreferencedmaps[2].gcps.length).to.equal(4)
+  //     expect(resultinggeoreferencedmaps[3].gcps.length).to.equal(4)
   //     expectToBeCloseToArray(
-  //       results[0].gcps[3].geo,
+  //       resultinggeoreferencedmaps[0].gcps[3].geo,
   //       [4.941781094220815, 52.34760910486503]
   //     )
   //     expectToBeCloseToArray(
-  //       results[1].gcps[3].geo,
+  //       resultinggeoreferencedmaps[1].gcps[3].geo,
   //       [4.941781094220815, 52.34760910486503]
   //     )
   //     expectToBeCloseToArray(
-  //       results[2].gcps[3].geo,
+  //       resultinggeoreferencedmaps[2].gcps[3].geo,
   //       [4.941781094220815, 52.34760910486503]
   //     )
   //     expectToBeCloseToArray(
-  //       results[3].gcps[3].geo,
+  //       resultinggeoreferencedmaps[3].gcps[3].geo,
   //       [4.941781094220815, 52.34760910486503]
   //     )
   //   })
@@ -312,10 +312,10 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       averageOutStaplePoints: false
   //     }
   //   )
-  //   const results = stapledtransformation.toGeoreferencedMaps()
-  //   expect(results[0].gcps.length).to.equal(4)
+  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
   //   expectToBeCloseToArray(
-  //     results[0].gcps[3].geo,
+  //     resultinggeoreferencedmaps[0].gcps[3].geo,
   //     [4.941802674315016, 52.34761267868184]
   //   )
   // })
@@ -333,10 +333,10 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       evaluateSingleStaplePoints: true
   //     }
   //   )
-  //   const results = stapledtransformation.toGeoreferencedMaps()
-  //   expect(results[0].gcps.length).to.equal(5)
+  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
   //   expectToBeCloseToArray(
-  //     results[0].gcps[4].geo,
+  //     resultinggeoreferencedmaps[0].gcps[4].geo,
   //     [4.947168483334695, 52.348177872139445]
   //   )
   // })
@@ -354,10 +354,10 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       evaluateGcps: true
   //     }
   //   )
-  //   const results = stapledtransformation.toGeoreferencedMaps()
-  //   expect(results[0].gcps.length).to.equal(4)
+  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
   //   expectToBeCloseToArray(
-  //     results[0].gcps[0].geo,
+  //     resultinggeoreferencedmaps[0].gcps[0].geo,
   //     [4.940600532043473, 52.35798815901273]
   //   )
   // })
@@ -375,10 +375,10 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       removeExistingGcps: true
   //     }
   //   )
-  //   const results = stapledtransformation.toGeoreferencedMaps()
-  //   expect(results[0].gcps.length).to.equal(1)
+  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(1)
   //   expectToBeCloseToArray(
-  //     results[0].gcps[0].geo,
+  //     resultinggeoreferencedmaps[0].gcps[0].geo,
   //     [4.941781094220815, 52.34760910486503]
   //   )
   // })
@@ -397,10 +397,10 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       evaluateGcps: true
   //     }
   //   )
-  //   const results = stapledtransformation.toGeoreferencedMaps()
-  //   expect(results[0].gcps.length).to.equal(3)
+  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(3)
   //   expectToBeCloseToArray(
-  //     results[0].gcps[0].geo,
+  //     resultinggeoreferencedmaps[0].gcps[0].geo,
   //     [4.940600532043473, 52.35798815901273]
   //   )
   // })
@@ -474,17 +474,18 @@ describe('Compare to observable', () => {
         }
       }
     )
-    const results = stapledtransformation.toGeoreferencedMaps()
+    const resultinggeoreferencedmaps =
+      stapledtransformation.toGeoreferencedMaps()
 
-    expect(results[0].gcps.length).to.equal(5)
-    expect(results[1].gcps.length).to.equal(5)
+    expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
+    expect(resultinggeoreferencedmaps[1].gcps.length).to.equal(5)
 
     // console.log(new Matrix(stapledtransformation.destinationPointsArrays))
     // console.log(new Matrix(stapledtransformation.coefsArrayMatrix))
     // console.log(new Matrix(stapledtransformation.weightsArrays))
-    // console.log(results[0].gcps, results[1].gcps)
+    // console.log(resultinggeoreferencedmaps[0].gcps, resultinggeoreferencedmaps[1].gcps)
 
-    expectToBeCloseToArray(results[0].gcps[4].geo, [50, 100])
-    expectToBeCloseToArray(results[1].gcps[4].geo, [50, 100])
+    expectToBeCloseToArray(resultinggeoreferencedmaps[0].gcps[4].geo, [50, 100])
+    expectToBeCloseToArray(resultinggeoreferencedmaps[1].gcps[4].geo, [50, 100])
   })
 })
