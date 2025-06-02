@@ -31,7 +31,7 @@ import type {
 export function isPoint(input: unknown): input is Point {
   return (
     Array.isArray(input) &&
-    input.length === 2 &&
+    input.length >= 2 &&
     typeof input[0] === 'number' &&
     typeof input[1] === 'number'
   )

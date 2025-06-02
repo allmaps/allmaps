@@ -1,81 +1,129 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { fade } from 'svelte/transition'
+  import { page } from '$app/state'
 
-  import { Header, Loading, URLInput, paramStore } from '@allmaps/ui'
+  import { blue } from '@allmaps/tailwind'
 
-  import { Navigation } from '@allmaps/ui/kit'
+  import { Loading, Collection } from '@allmaps/ui'
 
-  import {
-    maps,
-    loadMapsFromCoordinates,
-    loadMapsFromUrl
-  } from '$lib/shared/stores/maps.js'
-  import { error } from '$lib/shared/stores/error.js'
-  import { position } from '$lib/shared/stores/geolocation.js'
-  import {
-    selectedMapId,
-    selectedMapWithImageInfo
-  } from '$lib/shared/stores/selected-map.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getSensorsState } from '$lib/state/sensors.svelte.js'
+  import { getErrorState } from '$lib/state/error.svelte.js'
 
-  import Here from '$lib/components/Here.svelte'
-  import NearbyMaps from '$lib/components/NearbyMaps.svelte'
+  import Title from '$lib/components/Title.svelte'
+  import Thumbnail from '$lib/components/Thumbnail.svelte'
+  import DotsPattern from '$lib/components/DotsPattern.svelte'
+  import Footer from '$lib/components/Footer.svelte'
+  import GeolocationError from '$lib/components/GeolocationError.svelte'
+  import Route from '$lib/components/Route.svelte'
 
-  // eslint-disable-next-line no-undef
-  async function handleGeolocation(position: GeolocationPosition) {
-    loadMapsFromCoordinates(position.coords.latitude, position.coords.longitude)
-  }
+  import type { PageProps } from './$types.js'
 
-  $: {
-    if ($position) {
-      try {
-        handleGeolocation($position)
-      } catch (err) {
-        if (err instanceof Error) {
-          $error = err
-        } else {
-          $error = new Error('Unknown error')
-        }
-      }
-    }
-  }
+  let { data }: PageProps = $props()
 
-  onMount(async () => {
-    paramStore.subscribe(async (value) => {
-      if (!value) {
-        $selectedMapId = undefined
-      } else {
-        if (value.type === 'url' && value.url) {
-          loadMapsFromUrl(value.url)
-          $selectedMapId = value.url
-        }
-      }
-    })
+  const mapsState = getMapsState()
+  const sensorsState = getSensorsState()
+  const errorState = getErrorState()
+
+  let waitingForPositionTimeout = $state(false)
+  let waitingForPosition = $derived(
+    !sensorsState.position &&
+      !errorState.geolocationPositionError &&
+      !waitingForPositionTimeout
+  )
+
+  onMount(() => {
+    window.setTimeout(() => {
+      waitingForPositionTimeout = true
+    }, 5000)
   })
 </script>
 
-<Navigation />
-<div class="absolute w-full h-full flex flex-col">
-  <Header appName="Here">
-    {#if $selectedMapId}
-      <URLInput />
-    {/if}
-  </Header>
-  <main class="relative h-full overflow-auto">
-    {#if $selectedMapWithImageInfo}
-      <Here />
-    {:else if $maps.size > 0}
-      <section class="p-3" transition:fade={{ duration: 120 }}>
-        <NearbyMaps />
-      </section>
-    {:else if $error}
-      <div class="h-full flex flex-col gap-2 items-center justify-center">
-        Error: {$error.message}
+<svelte:head>
+  <title>Allmaps Here</title>
+  <meta name="title" content="Allmaps Here" />
+  <meta property="og:title" content="Look where I am on this map!" />
+  <meta
+    name="description"
+    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
+  />
+  <meta
+    property="og:description"
+    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
+  />
+
+  <meta property="og:url" content={page.url.href} />
+  <meta property="og:site_name" content="Allmaps Here" />
+  <meta property="og:locale" content="en" />
+  <meta property="og:type" content="website" />
+</svelte:head>
+
+<div class="flex flex-col items-center gap-4">
+  <div
+    class="absolute -z-10 top-0 w-full h-full overflow-hidden flex justify-center items-center"
+  >
+    <div
+      id="pins"
+      class="bg-no-repeat w-3xl min-w-2xl h-full
+      bg-size-[80%] sm:bg-size-[100%]
+      bg-position-[center_40px] sm:bg-position-[center_0px]
+      transition-all"
+    ></div>
+  </div>
+  <section
+    class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center my-2 sm:my-6"
+  >
+    <div class="max-w-md w-full flex flex-col gap-6 items-center">
+      <Title name="Here" />
+      <p class="text-black text-center max-w-xs">
+        Find historic maps around your current GPS location.
+      </p>
+    </div>
+  </section>
+</div>
+
+<section class="bg-blue-200 shrink-0 grow">
+  <DotsPattern color={blue}>
+    {#if waitingForPosition || mapsState.loading}
+      <div class="h-full flex items-center justify-center">
+        <div class="bg-white p-2 rounded-xl drop-shadow-sm">
+          <Loading />
+        </div>
+      </div>
+    {:else if mapsState.maps.size > 0}
+      <div>
+        <section
+          class="px-3 py-6 flex flex-col gap-6
+         overflow-hidden max-w-4xl w-full m-auto"
+        >
+          <Collection>
+            {#each mapsState.mapsFromCoordinates as [mapId, map] (mapId)}
+              <Thumbnail {mapId} {map} geojsonRoute={data.geojsonRoute} />
+            {/each}
+          </Collection>
+
+          <Route geojsonRoute={data.geojsonRoute} />
+        </section>
+        <Footer />
+      </div>
+    {:else if errorState.geolocationPositionError}
+      <div class="h-full flex items-center justify-center">
+        <GeolocationError />
       </div>
     {:else}
       <div class="h-full flex items-center justify-center">
-        <Loading />
+        <div
+          class="bg-white px-3 py-2 rounded-xl drop-shadow-sm max-w-xs text-center"
+        >
+          No maps found around your location
+        </div>
       </div>
     {/if}
-  </main>
-</div>
+  </DotsPattern>
+</section>
+
+<style scoped>
+  #pins {
+    background-image: url('$lib/images/pins.svg');
+  }
+</style>
