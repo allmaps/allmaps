@@ -6,29 +6,38 @@ import type { TransformationTypeInputs } from '@allmaps/transform'
 export type StapledTransformationFromGeoreferencedMapOptions =
   TransformationTypeInputs & {
     useMapTransformationTypes: boolean
-    cloneTransformations: boolean
+    deepClone: boolean
+    evaluateStaplePoints: boolean
+    evaluateSingleStaplePoints: boolean
+    evaluateGcps: boolean
+    removeExistingGcps: boolean
   }
 
 export type StapledTransformationOptions =
   StapledTransformationFromGeoreferencedMapOptions & {
-    averageDestinationPoints: boolean
     georeferencedMapsById?: Map<string, GeoreferencedMap>
     projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>
+    gcpSourcePoints?: SourcePoint[]
+    extraSourcePoints?: SourcePoint[]
+    averageOutStaplePoints: boolean
   }
-
-// TODO: remove when implemented
-export type GeoreferencedMapWithRcps = GeoreferencedMap & {
-  rcps?: Rcp[]
-}
 
 // Resource Control Point
 export type Rcp = {
+  type: 'rcp'
   id: string
+  mapId: string
   resource: Point
 }
 
 export type StaplePoint = {
   id: string
+  transformationId: string
+  source: Point
+  destination?: Point
+}
+
+export type SourcePoint = {
   transformationId: string
   source: Point
   destination?: Point

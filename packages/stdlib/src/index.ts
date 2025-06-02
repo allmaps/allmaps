@@ -161,7 +161,9 @@ export {
   subSetArray,
   equalSet,
   maxOfNumberOrUndefined,
-  isValidHttpUrl
+  isValidHttpUrl,
+  deepClone,
+  shallowClone
 } from './main.js'
 
 export { getFullResourceMask } from './masks.js'

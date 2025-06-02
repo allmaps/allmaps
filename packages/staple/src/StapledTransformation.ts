@@ -1,6 +1,5 @@
 import {
   arrayMatrixSize,
-  flipY,
   groupBy,
   mergeOptions,
   multiplyArrayMatrix,
@@ -8,19 +7,27 @@ import {
   pasteArrayMatrix,
   sliceArrayMatrix
 } from '@allmaps/stdlib'
-import { BaseIndependentLinearWeightsTransformation } from '@allmaps/transform'
+import {
+  BaseIndependentLinearWeightsTransformation,
+  solveIndependentlyPseudoInverse
+} from '@allmaps/transform'
 import {
   ProjectedGcpTransformer,
   ProjectedGcpTransformerOptions
 } from '@allmaps/project'
 
-import { solveIndependentlyPseudoInverse } from '@allmaps/transform'
+import {
+  deepCloneMap,
+  resourceToSource,
+  sourceDestinationToResourceGeo
+} from './helpert-functions.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point, Size } from '@allmaps/types'
 
 import type {
-  GeoreferencedMapWithRcps,
+  SourcePoint,
+  Rcp,
   Staple,
   StapledTransformationFromGeoreferencedMapOptions,
   StapledTransformationOptions,
@@ -31,12 +38,16 @@ const defaultStapledTransformationFromGeoreferencedMapOptions: StapledTransforma
   {
     transformationType: 'polynomial',
     useMapTransformationTypes: false,
-    cloneTransformations: true
+    deepClone: true,
+    evaluateStaplePoints: true,
+    evaluateSingleStaplePoints: false,
+    removeExistingGcps: false,
+    evaluateGcps: false
   }
 
 const defaultStapledTransformationOptions: StapledTransformationOptions = {
   ...defaultStapledTransformationFromGeoreferencedMapOptions,
-  averageDestinationPoints: true
+  averageOutStaplePoints: true
 }
 
 export class StapledTransformation {
@@ -69,18 +80,15 @@ export class StapledTransformation {
   ) {
     this.options = mergeOptions(defaultStapledTransformationOptions, options)
     this.transformationsById = transformationsById
-    if (this.options.cloneTransformations) {
-      const clonedTransformationsById = new Map<
-        string,
-        BaseIndependentLinearWeightsTransformation
-      >()
-      Array.from(this.transformationsById).forEach(([id, transformation]) =>
-        clonedTransformationsById.set(
-          id,
-          transformation.deepClone() as typeof transformation
-        )
-      )
-      this.transformationsById = clonedTransformationsById
+    if (this.options.deepClone) {
+      this.transformationsById = deepCloneMap(this.transformationsById)
+      this.options.georeferencedMapsById = this.options.georeferencedMapsById
+        ? deepCloneMap(this.options.georeferencedMapsById)
+        : undefined
+      this.options.projectedGcpTransformersById = this.options
+        .projectedGcpTransformersById
+        ? deepCloneMap(this.options.projectedGcpTransformersById)
+        : undefined
     }
     this.staples = staples
 
@@ -315,19 +323,52 @@ export class StapledTransformation {
     return transformation.evaluateFunction(newSourcePoint)
   }
 
-  evaluateAll() {
-    // Evaluate every staplePoint
-    this.staplePointsById.forEach((staplePointsForId) =>
-      staplePointsForId.forEach((staplePoint) => {
-        staplePoint.destination = this.evaluateFunction(
-          staplePoint.source,
-          staplePoint.transformationId
-        )
-      })
-    )
+  /**
+   * Create Georeferenced Maps from this Stapler.
+   * This will solve the stapler, evaluate all staples and add the resulting coordinates as GCPs.
+   *
+   * This only works of this Stapler has been created from Georeferenced Maps.
+   *
+   * @returns {GeoreferencedMap[]}
+   */
+  toGeoreferencedMaps(): GeoreferencedMap[] {
+    const georeferencedMapsById = this.options?.georeferencedMapsById
+    const projectedGcpTransformersById =
+      this.options?.projectedGcpTransformersById
+    const extraSourcePoints = this.options?.extraSourcePoints
+    const gcpSourcePoints = this.options?.gcpSourcePoints
 
-    // Average out the destination values
-    if (this.options?.averageDestinationPoints) {
+    if (!georeferencedMapsById || !projectedGcpTransformersById) {
+      throw new Error(
+        'No Georeferenced Maps or GCP Transformers found. Create a Stapler from GeoreferencedMaps to be able to recreate those.'
+      )
+    }
+
+    // Gather all points to evaluate: staplePoints and extra sourcePoints
+    const sourcePointsForEvaluation: SourcePoint[] = []
+    if (gcpSourcePoints) {
+      sourcePointsForEvaluation.push(...gcpSourcePoints)
+    }
+    if (this.options?.evaluateStaplePoints) {
+      sourcePointsForEvaluation.push(...this.staplePointsById.flat())
+    }
+    if (extraSourcePoints) {
+      sourcePointsForEvaluation.push(...extraSourcePoints)
+    }
+
+    // Evaluate all points to evaluate
+    sourcePointsForEvaluation.forEach((sourcePoint) => {
+      sourcePoint.destination = this.evaluateFunction(
+        sourcePoint.source,
+        sourcePoint.transformationId
+      )
+    })
+
+    // Average out the destination values of the staplePoints
+    if (
+      this.options?.averageOutStaplePoints &&
+      this.options?.evaluateStaplePoints
+    ) {
       this.staplePointsById.forEach((staplePointsForId) => {
         const meanDestination = staplePointsForId
           .map((staplePoint) => staplePoint.destination as Point)
@@ -342,69 +383,44 @@ export class StapledTransformation {
         })
       })
     }
-  }
 
-  /**
-   * Create Georeferenced Maps from this Stapler.
-   * This will solve the stapler, evaluate all staples and add the resulting coordinates as GCPs.
-   *
-   * This only works of this Stapler has been created from Georeferenced Maps.
-   *
-   * @returns {GeoreferencedMap[]}
-   */
-  toGeoreferencedMaps(): GeoreferencedMap[] {
-    const georeferencedMapsById = this.options?.georeferencedMapsById
-    const projectedGcpTransformersById =
-      this.options?.projectedGcpTransformersById
-
-    if (!georeferencedMapsById || !projectedGcpTransformersById) {
-      throw new Error(
-        'No Georeferenced Maps or GCP Transformers found. Create a Stapler from GeoreferencedMaps to be able to recreate those.'
-      )
+    // Remove existing GCPs if specified or overwriting
+    if (this.options?.removeExistingGcps || this.options?.evaluateGcps) {
+      for (const georeferencedMap of georeferencedMapsById.values()) {
+        georeferencedMap.gcps = []
+      }
     }
 
-    this.evaluateAll()
-
-    // For every evaluated staplePoint, add a GCP to it's respective Georeferenced Map.
-    this.staplePointsById.map((staplePointsForId) =>
-      staplePointsForId.forEach((staplePoint) => {
-        Array.from(georeferencedMapsById.entries()).forEach(
-          ([mapId, georeferencedMap]) => {
-            const projectedGcpTransformer = projectedGcpTransformersById.get(
-              staplePoint.transformationId
-            )
-            if (!projectedGcpTransformer) {
-              throw new Error(
-                `projectedGcpTransformer not found for transformationId ${staplePoint.transformationId}.`
-              )
-            }
-
-            // Same process from {source, destination} to {resource, geo}
-            // as in BaseGcpTransformer's transformPointForwardInternal()
-
-            const transformerOptions =
-              projectedGcpTransformer.getTransformerOptions()
-
-            let source = transformerOptions.differentHandedness
-              ? flipY(staplePoint.source)
-              : staplePoint.source
-
-            let destination = transformerOptions.postForward(
-              staplePoint.destination as Point
-            )
-            destination =
-              projectedGcpTransformer.projectionToLatLon(destination)
-
-            if (mapId == staplePoint.transformationId) {
-              georeferencedMap.gcps.push({
-                resource: source,
-                geo: destination as Point
-              })
-            }
-          }
+    // For every evaluated point, add a GCP to it's respective Georeferenced Map.
+    sourcePointsForEvaluation.forEach((evaluationPoint) => {
+      const projectedGcpTransformer = projectedGcpTransformersById.get(
+        evaluationPoint.transformationId
+      )
+      if (!projectedGcpTransformer) {
+        throw new Error(
+          `projectedGcpTransformer not found for transformationId ${evaluationPoint.transformationId}.`
         )
-      })
-    )
+      }
+
+      const transformerOptions = projectedGcpTransformer.getTransformerOptions()
+
+      const { resource, geo } = sourceDestinationToResourceGeo(
+        evaluationPoint as { source: Point; destination: Point },
+        transformerOptions,
+        projectedGcpTransformer
+      )
+
+      Array.from(georeferencedMapsById.entries()).forEach(
+        ([mapId, georeferencedMap]) => {
+          if (mapId == evaluationPoint.transformationId) {
+            georeferencedMap.gcps.push({
+              resource,
+              geo
+            })
+          }
+        }
+      )
+    })
 
     return Array.from(georeferencedMapsById.values())
   }
@@ -423,7 +439,8 @@ export class StapledTransformation {
    * @returns {StapledTransformation}
    */
   static fromGeoreferencedMaps(
-    georeferencedMaps: GeoreferencedMapWithRcps[],
+    georeferencedMaps: GeoreferencedMap[],
+    rcps: Rcp[],
     options?: Partial<
       ProjectedGcpTransformerOptions &
         StapledTransformationFromGeoreferencedMapOptions
@@ -446,13 +463,11 @@ export class StapledTransformation {
       BaseIndependentLinearWeightsTransformation
     >()
     const staplePoints: StaplePoint[] = []
+    const gcpSourcePoints: SourcePoint[] = []
+    const extraSourcePoints: SourcePoint[] = []
 
+    // Per GeoreferencedMap, set option objects and collect staple points from rcps
     for (const georeferencedMap of georeferencedMaps) {
-      // Neglect georeferenced maps with no staple points
-      if (!georeferencedMap.rcps) {
-        continue
-      }
-
       const mapId = georeferencedMap.id
       if (!mapId) {
         throw new Error('Georeferenced map has no mapId.')
@@ -473,28 +488,33 @@ export class StapledTransformation {
       }
       transformationsById.set(mapId, transformation)
 
-      georeferencedMap.rcps.forEach((rcp) => {
-        const transformerOptions =
-          projectedGcpTransformer.getTransformerOptions()
+      const transformerOptions = projectedGcpTransformer.getTransformerOptions()
 
-        // Same process from {resource, geo} to {source, destination}
-        // as in BaseGcpTransformer's constructor
-
-        let source = transformerOptions.differentHandedness
-          ? flipY(rcp.resource)
-          : rcp.resource
-        source = transformerOptions.preForward(source)
-
-        staplePoints.push({
-          id: rcp.id,
-          transformationId: mapId,
-          source
+      rcps
+        .filter((rcp) => rcp.mapId == mapId)
+        .forEach((rcp) => {
+          const { source } = resourceToSource(rcp, transformerOptions)
+          staplePoints.push({
+            id: rcp.id,
+            transformationId: mapId,
+            source
+          })
         })
-      })
+
+      if (options.evaluateGcps) {
+        georeferencedMap.gcps.forEach((gcp) => {
+          const { source } = resourceToSource(gcp, transformerOptions)
+          gcpSourcePoints.push({
+            transformationId: mapId,
+            source
+          })
+        })
+      }
     }
 
-    // Create staples, by id.
+    // From StaplePoints to Staples
     //
+    // Create staples, by id.
     // When there are more then two staple points with the same id, create duo's:
     // E.g.: if staplePoint0, staplePoint1, staplesPoint2 and staplePoint3 have id 'foo'
     // and staplePoint4 and staplesPoint5 have id 'bar', then create the following staples:
@@ -522,10 +542,21 @@ export class StapledTransformation {
         }, [] as Staple[])
       )
       .flat(1)
+    const singleStaplePoints = staplePointsById
+      .filter((staplePointsForId) => staplePointsForId.length == 1)
+      .flat(1)
 
-    return new StapledTransformation(transformationsById, staples, {
+    if (options.evaluateSingleStaplePoints) {
+      extraSourcePoints.push(...singleStaplePoints)
+    }
+
+    options = mergeOptions(options, {
       georeferencedMapsById,
-      projectedGcpTransformersById
+      projectedGcpTransformersById,
+      gcpSourcePoints,
+      extraSourcePoints
     })
+
+    return new StapledTransformation(transformationsById, staples, options)
   }
 }

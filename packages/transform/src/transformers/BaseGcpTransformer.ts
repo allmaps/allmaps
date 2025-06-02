@@ -665,28 +665,4 @@ export abstract class BaseGcpTransformer {
       )
     })
   }
-
-  /**
-   * Deep clone a transformer.
-   *
-   * This can be useful when setting an options (e.g. a projection)
-   * but wanting to keep a version of the the transformer with the previous option.
-   *
-   * @returns Deep cloned transformer
-   */
-  deepClone() {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
-  }
-
-  /**
-   * Shallow clone a transformer.
-   *
-   * This can be useful when setting an options (e.g. a projection)
-   * but wanting to keep a version of the the transformer with the previous option.
-   *
-   * @returns Shallow cloned transformer
-   */
-  shallowClone() {
-    return Object.assign({}, this)
-  }
 }

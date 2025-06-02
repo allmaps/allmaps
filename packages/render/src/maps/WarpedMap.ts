@@ -17,7 +17,8 @@ import {
   sizeToRectangle,
   mergePartialOptions,
   mergeOptionsUnlessUndefined,
-  mergeOptions
+  mergeOptions,
+  deepClone
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -592,7 +593,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
+    this.projectedPreviousTransformer = deepClone(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
   }
@@ -607,7 +608,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
+    this.projectedPreviousTransformer = deepClone(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints.map((point, index) => {
         return mixPoints(

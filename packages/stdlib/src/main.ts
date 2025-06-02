@@ -144,3 +144,14 @@ export function isValidHttpUrl(string: string) {
 
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
+
+export function deepClone<T>(object: T): T {
+  return Object.assign(
+    Object.create(Object.getPrototypeOf(object)),
+    object
+  ) as T
+}
+
+export function shallowClone<T>(object: T): T {
+  return Object.assign({}, object) as T
+}

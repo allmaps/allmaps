@@ -155,25 +155,4 @@ export abstract class BaseTransformation {
     }
     return this.rmse
   }
-
-  /**
-   * Deep clone a transformation.
-   *
-   * @returns Deep cloned transformation
-   */
-  deepClone() {
-    return Object.assign(
-      Object.create(Object.getPrototypeOf(this)),
-      this
-    ) as BaseTransformation
-  }
-
-  /**
-   * Shallow clone a transformation.
-   *
-   * @returns Shallow cloned transformation
-   */
-  shallowClone() {
-    return Object.assign({}, this) as BaseTransformation
-  }
 }
