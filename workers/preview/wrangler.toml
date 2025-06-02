@@ -1,11 +1,16 @@
 name = "preview"
 main = "src/index.ts"
-compatibility_date = "2024-05-24"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat_v2"]
+
+assets = { directory = "public",  binding = "ASSETS" }
 
 [vars]
 USE_CACHE=true
 API_BASE_URL="https://api.allmaps.org"
+
+[env.dev]
+name = "preview-next"
 
 [env.dev.vars]
 USE_CACHE=false
