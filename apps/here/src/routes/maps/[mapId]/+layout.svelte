@@ -52,6 +52,8 @@
 
   let title = $derived(`${data.title} / Allmaps Here`)
 
+  let showHereFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
+
   onMount(() => {
     window.setTimeout(() => {
       timeout = true
@@ -107,7 +109,7 @@
       <Here
         mapWithImageInfo={data.selectedMapWithImageInfo}
         geojsonRoute={data.geojsonRoute}
-        from={data.from}
+        from={showHereFrom ? data.from : undefined}
       />
     {:else}
       <div class="h-full flex items-center justify-center">
