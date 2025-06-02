@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.69",
+  "version": "1.0.0-beta.71",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -8,7 +8,7 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "main": "./dist/worker.es.js",
+  "main": "./src/index.ts",
   "type": "module",
   "repository": {
     "type": "git",
@@ -26,13 +26,14 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
-    "@allmaps/id": "^1.0.0-beta.32",
-    "@allmaps/iiif-parser": "^1.0.0-beta.42",
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/vitest-pool-workers": "^0.1.0",
     "@cloudflare/workers-types": "^4.20240320.1",

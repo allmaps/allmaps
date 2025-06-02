@@ -2,17 +2,21 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
     "skipLibCheck": true,
     "target": "ES2022",
     "lib": ["ES2022"],
     "rootDir": "./src",
-    "outDir": "./dist",
-    "types": ["@cloudflare/workers-types"]
+    "outDir": "./dist"
   },
   "references": [
     { "path": "../../packages/render" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/tailwind" }
   ],
   "include": ["./src/**/*"],
   "exclude": ["test"]

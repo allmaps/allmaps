@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { GcpTransformer } from '../dist/index.js'
 
-import { generalGcps10 } from '../test/input/gcps-test.js'
+import { gcps10 } from '../test/input/gcps-test.js'
 
 let start, ops
 
@@ -10,47 +10,54 @@ function logBenchmarkCreateGcpTransformer(input, type) {
   ops = 0
   while (Date.now() - start < 1000) {
     const transformer = new GcpTransformer(input, type)
-    transformer.transformToGeo([100, 100])
+    transformer.getToGeoTransformation()
     ops++
   }
   console.log(
-    Math.round((ops * 1000) / (Date.now() - start)) +
-      ' ops/s to create ' +
-      type +
-      ' transformer with ' +
-      input.length +
-      ' points (and transform 1 point)'
+    '| ' + type + ' | ' + Math.round((ops * 1000) / (Date.now() - start)) + ' |'
   )
 }
 
-logBenchmarkCreateGcpTransformer(generalGcps10, 'helmert')
-logBenchmarkCreateGcpTransformer(generalGcps10, 'polynomial1')
-logBenchmarkCreateGcpTransformer(generalGcps10, 'polynomial2')
-logBenchmarkCreateGcpTransformer(generalGcps10, 'polynomial3')
-logBenchmarkCreateGcpTransformer(generalGcps10, 'thinPlateSpline')
-logBenchmarkCreateGcpTransformer(generalGcps10, 'projective')
+console.log(
+  'To create a transformer (with ' +
+    gcps10.length +
+    " points) and compute its 'toGeo' transformation:\n"
+)
+console.log('| Type              | Ops/s  |')
+console.log('|-------------------|--------|')
+logBenchmarkCreateGcpTransformer(gcps10, 'helmert')
+logBenchmarkCreateGcpTransformer(gcps10, 'polynomial1')
+logBenchmarkCreateGcpTransformer(gcps10, 'polynomial2')
+logBenchmarkCreateGcpTransformer(gcps10, 'polynomial3')
+logBenchmarkCreateGcpTransformer(gcps10, 'thinPlateSpline')
+logBenchmarkCreateGcpTransformer(gcps10, 'projective')
 
 function logBenchmarkUseGcpTransformer(input, type) {
   start = Date.now()
   ops = 0
   const transformer = new GcpTransformer(input, type)
+  transformer.getToGeoTransformation()
   while (Date.now() - start < 1000) {
     transformer.transformToGeo([100, 100])
     ops++
   }
   console.log(
-    Math.round((ops * 1000) / (Date.now() - start)) +
-      ' ops/s to use ' +
-      type +
-      ' transformer made with with ' +
-      input.length +
-      ' points'
+    '| ' + type + ' | ' + Math.round((ops * 1000) / (Date.now() - start)) + ' |'
   )
 }
 
-logBenchmarkUseGcpTransformer(generalGcps10, 'helmert')
-logBenchmarkUseGcpTransformer(generalGcps10, 'polynomial1')
-logBenchmarkUseGcpTransformer(generalGcps10, 'polynomial2')
-logBenchmarkUseGcpTransformer(generalGcps10, 'polynomial3')
-logBenchmarkUseGcpTransformer(generalGcps10, 'thinPlateSpline')
-logBenchmarkUseGcpTransformer(generalGcps10, 'projective')
+console.log('\n')
+
+console.log(
+  'To use a transformer (with ' +
+    gcps10.length +
+    " points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':\n"
+)
+console.log('| Type              | Ops/s  |')
+console.log('|-------------------|--------|')
+logBenchmarkUseGcpTransformer(gcps10, 'helmert')
+logBenchmarkUseGcpTransformer(gcps10, 'polynomial1')
+logBenchmarkUseGcpTransformer(gcps10, 'polynomial2')
+logBenchmarkUseGcpTransformer(gcps10, 'polynomial3')
+logBenchmarkUseGcpTransformer(gcps10, 'thinPlateSpline')
+logBenchmarkUseGcpTransformer(gcps10, 'projective')

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/bearing",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.4",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -36,6 +36,12 @@
     "format": "prettier --write src test"
   },
   "license": "MIT",
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@turf/bearing": "^7.2.0"
+  },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
@@ -47,11 +53,5 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0"
-  },
-  "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@turf/bearing": "^7.2.0"
   }
 }

@@ -3,6 +3,7 @@ import { throttle } from 'lodash-es'
 import {
   hexToFractionalRgb,
   maxOfNumberOrUndefined,
+  mergeOptions,
   squaredDistance
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
@@ -59,10 +60,12 @@ const THROTTLE_CHANGED_OPTIONS = {
   trailing: true
 }
 
-const DEBUG = false // TODO: set using options
-export const RENDER_MAPS = true // TODO: set using options
-export const RENDER_LINES = false // TODO: set using options
-export const RENDER_POINTS = false // TODO: set using options
+const defaultWebgl2RendererOptions = {
+  debugMaps: false,
+  renderMaps: true,
+  renderLines: true,
+  renderPoints: true
+}
 
 const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
@@ -79,6 +82,9 @@ export class WebGL2Renderer
   implements Renderer
 {
   gl: WebGL2RenderingContext
+
+  partialWebgl2RendererOptions: Partial<WebGL2RendererOptions>
+
   mapProgram: WebGLProgram
   linesProgram: WebGLProgram
   pointsProgram: WebGLProgram
@@ -91,7 +97,7 @@ export class WebGL2Renderer
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
-  transformationTransitionStart: number | undefined
+  transformaterTransitionStart: number | undefined
   animationProgress = 0
 
   disableRender = false
@@ -165,6 +171,12 @@ export class WebGL2Renderer
     )
 
     this.gl = gl
+
+    this.partialWebgl2RendererOptions = mergeOptions(
+      defaultWebgl2RendererOptions,
+      options
+    )
+
     this.mapProgram = mapProgram
     this.linesProgram = linesProgram
     this.pointsProgram = pointsProgram
@@ -358,6 +370,21 @@ export class WebGL2Renderer
     if (webgl2WarpedMap) {
       return webgl2WarpedMap.renderOptions.removeColorOptions
     }
+  }
+
+  /**
+   * Set the WebGL2 Renderer options
+   *
+   * @param partialWebgl2RendererOptions - Options
+   */
+  setOptions(
+    partialWebgl2RendererOptions?: Partial<WebGL2RendererOptions>
+  ): void {
+    this.partialWebgl2RendererOptions = mergeOptions(
+      this.partialWebgl2RendererOptions,
+      partialWebgl2RendererOptions
+    )
+    super.setOptions(partialWebgl2RendererOptions)
   }
 
   /**
@@ -652,25 +679,34 @@ export class WebGL2Renderer
     const { mapsEnteringViewport, mapsLeavingViewport } =
       super.updateMapsForViewport(tiles)
 
-    for (const mapId of mapsEnteringViewport) {
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (!webgl2WarpedMap) {
-        break
-      }
-
-      if (!this.viewport) {
-        break
-      }
-
-      webgl2WarpedMap.updateVertexBuffers(
-        this.viewport.projectedGeoToClipTransform
-      )
-    }
+    this.updateVertexBuffers(mapsEnteringViewport)
 
     return { mapsEnteringViewport, mapsLeavingViewport }
   }
 
+  protected resetPrevious(mapIds?: string[]) {
+    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps({ mapIds })
+    for (const webgl2WarpedMap of webgl2WarpedMaps) {
+      webgl2WarpedMap.resetPrevious()
+    }
+  }
+
+  protected updateVertexBuffers(mapIds?: string[]) {
+    if (!this.viewport) {
+      return
+    }
+
+    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps({ mapIds })
+    for (const webgl2WarpedMap of webgl2WarpedMaps) {
+      webgl2WarpedMap.updateVertexBuffers(
+        this.viewport.projectedGeoToClipTransform,
+        this.partialWebgl2RendererOptions
+      )
+    }
+  }
+
   private prepareRenderInternal(): void {
+    this.assureProjection()
     this.requestFetchableTiles()
   }
 
@@ -683,7 +719,7 @@ export class WebGL2Renderer
     // > since this function is called (possibly multiple times) during startup, without changes to the viewport
     // Returns false in other cases
 
-    // TODO: this could be a problem if the viewport is quickly and continously moved
+    // TODO: this could be a problem if the viewport is quickly and continuously moved
     // within the tolerance during initial loading.
     // Possible solution: adding a 'allrendered' event and listening to it.
 
@@ -734,13 +770,13 @@ export class WebGL2Renderer
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    if (RENDER_MAPS) {
+    if (this.partialWebgl2RendererOptions.renderMaps) {
       this.renderMapsInternal()
     }
-    if (RENDER_LINES) {
+    if (this.partialWebgl2RendererOptions.renderLines) {
       this.renderLinesInternal()
     }
-    if (RENDER_POINTS) {
+    if (this.partialWebgl2RendererOptions.renderPoints) {
       this.renderPointsInternal()
     }
   }
@@ -832,7 +868,10 @@ export class WebGL2Renderer
 
     // Debug
     const debugLocation = gl.getUniformLocation(program, 'u_debug')
-    gl.uniform1f(debugLocation, DEBUG ? 1 : 0)
+    gl.uniform1f(
+      debugLocation,
+      this.partialWebgl2RendererOptions.debugMaps ? 1 : 0
+    )
 
     // Animation progress
     const animationProgressLocation = gl.getUniformLocation(
@@ -1166,68 +1205,53 @@ export class WebGL2Renderer
     )
   }
 
-  private startTransformationTransition(mapIds: string[]) {
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
-      if (!this.viewport) {
-        break
-      }
-
-      webgl2WarpedMap.updateVertexBuffers(
-        this.viewport.projectedGeoToClipTransform
-      )
-    }
+  private startTransformaterTransition(mapIds: string[]) {
+    this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
       cancelAnimationFrame(this.lastAnimationFrameRequestId)
     }
 
     this.animating = true
-    this.transformationTransitionStart = undefined
+    this.transformaterTransitionStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
-      ((now: number) => this.transformationTransitionFrame(now, mapIds)).bind(
-        this
-      )
+      ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(this)
     )
   }
 
-  private transformationTransitionFrame(now: number, mapIds: string[]) {
-    if (!this.transformationTransitionStart) {
-      this.transformationTransitionStart = now
+  private transformerTransitionFrame(now: number, mapIds: string[]) {
+    if (!this.transformaterTransitionStart) {
+      this.transformaterTransitionStart = now
     }
 
-    if (now - this.transformationTransitionStart < ANIMATION_DURATION) {
+    if (now - this.transformaterTransitionStart < ANIMATION_DURATION) {
       // Animation is ongoing
       // animationProgress goes from 0 to 1 throughout animation
       this.animationProgress =
-        (now - this.transformationTransitionStart) / ANIMATION_DURATION
+        (now - this.transformaterTransitionStart) / ANIMATION_DURATION
 
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.transformationTransitionFrame(now, mapIds)).bind(
+        ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(
           this
         )
       )
     } else {
       // Animation ended
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
-        webgl2WarpedMap.resetPrevious()
-
-        if (!this.viewport) {
-          break
-        }
-
-        webgl2WarpedMap.updateVertexBuffers(
-          this.viewport.projectedGeoToClipTransform
-        )
-      }
-
-      this.animating = false
-      this.animationProgress = 0
-      this.transformationTransitionStart = undefined
-
-      this.changed()
+      this.finishTransition(mapIds)
     }
+  }
+
+  private finishTransition(mapIds: string[]) {
+    this.resetPrevious(mapIds)
+    this.updateVertexBuffers(mapIds)
+
+    this.animating = false
+    this.animationProgress = 0
+    this.transformaterTransitionStart = undefined
+
+    this.changed()
   }
 
   private changed() {
@@ -1295,7 +1319,9 @@ export class WebGL2Renderer
   protected preChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps(mapIds)) {
+      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+        mapIds
+      })) {
         if (this.animating) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
@@ -1303,25 +1329,57 @@ export class WebGL2Renderer
     }
   }
 
+  protected optionsChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      this.finishTransition(mapIds)
+    }
+    this.changed()
+  }
+
+  protected gcpsChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      this.finishTransition(mapIds)
+    }
+    this.changed()
+  }
+
+  protected resourceMaskChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      this.finishTransition(mapIds)
+    }
+    this.changed()
+  }
+
   protected transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformationTransition(mapIds)
+      this.startTransformaterTransition(mapIds)
     }
   }
 
   protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformationTransition(mapIds)
+      this.startTransformaterTransition(mapIds)
     }
   }
 
-  protected gcpsChanged(event: Event) {
+  protected internalProjectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
-      this.startTransformationTransition([mapId])
+      const mapIds = event.data as string[]
+      this.startTransformaterTransition(mapIds)
     }
+  }
+
+  protected projectionChanged(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      const mapIds = event.data as string[]
+      this.finishTransition(mapIds)
+    }
+    this.changed()
   }
 
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {

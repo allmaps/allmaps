@@ -271,7 +271,7 @@ export function getTilesAtScaleFactor(
   validTile: (tile: Tile) => boolean = (_tile: Tile) => true
 ) {
   const tileZoomLevel = parsedImage.tileZoomLevels.find(
-    (tileZoomLevel) => tileZoomLevel.scaleFactor == scaleFactor
+    (tileZoomLevel) => tileZoomLevel.scaleFactor === scaleFactor
   )
   const imageSize = [parsedImage.width, parsedImage.height] as Size
 
@@ -309,9 +309,9 @@ export function equalTileByRowColumnScaleFactor(
   tile1: Tile
 ): boolean {
   return (
-    tile0.column == tile1.column &&
-    tile0.row == tile1.row &&
-    tile0.tileZoomLevel.scaleFactor == tile1.tileZoomLevel.scaleFactor
+    tile0.column === tile1.column &&
+    tile0.row === tile1.row &&
+    tile0.tileZoomLevel.scaleFactor === tile1.tileZoomLevel.scaleFactor
   )
 }
 
@@ -504,7 +504,7 @@ export function getTilesAtOtherScaleFactors(
       tilesAtOtherScaleFactors.push(tileAtLowerScaleFactor)
     }
   }
-  if (tilesAtOtherScaleFactors.length == 0) {
+  if (tilesAtOtherScaleFactors.length === 0) {
     const tileAtHigherScaleFactor = recursivelyGetTilesAtHigherScaleFactor(
       tile,
       parsedImage,
@@ -534,7 +534,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
         .map((tileZoomLevel) => tileZoomLevel.scaleFactor)
         .reduce((a, c) => a + c, 0) -
         scaleFactor ||
-    log2ScaleFactorDiff == 0
+    log2ScaleFactorDiff === 0
   ) {
     return undefined
   }
@@ -565,7 +565,7 @@ export function recursivelyGetTilesAtLowerScaleFactor(
   validTile?: (tile: Tile) => boolean
 ): (Tile | undefined)[] {
   const lowerScaleFactor = 2 ** (Math.log2(scaleFactor) - 1)
-  if (lowerScaleFactor <= 0 || log2ScaleFactorDiff == 0) {
+  if (lowerScaleFactor <= 0 || log2ScaleFactorDiff === 0) {
     return []
   }
   const tilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
@@ -580,7 +580,7 @@ export function recursivelyGetTilesAtLowerScaleFactor(
     lowerScaleFactor,
     (_tile) => true
   )
-  if (tilesAtLowerScaleFactor.length == allTilesAtLowerScaleFactor.length) {
+  if (tilesAtLowerScaleFactor.length === allTilesAtLowerScaleFactor.length) {
     return tilesAtLowerScaleFactor
   } else {
     return [
@@ -610,7 +610,7 @@ export function getTileAtHigherScaleFactor(
       validTile
     )
 
-  if (tilesCoveringTileAtHigherScaleFactor.length == 0) {
+  if (tilesCoveringTileAtHigherScaleFactor.length === 0) {
     return undefined
   }
 
@@ -694,8 +694,8 @@ export function shouldPruneTile(
   // Prune if the tileZoomLevelForViewport or resourceViewportRingBboxForViewport are undefined
   // (this only happens if the map is too small to render)
   if (
-    mapPruneInfo.resourceViewportRingBboxForViewport == undefined ||
-    mapPruneInfo.tileZoomLevelForViewport == undefined
+    mapPruneInfo.resourceViewportRingBboxForViewport === undefined ||
+    mapPruneInfo.tileZoomLevelForViewport === undefined
   ) {
     return true
   }

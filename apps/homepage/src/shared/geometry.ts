@@ -1,9 +1,10 @@
 import turfRewind from '@turf/rewind'
 import { geoProjection, geoPath } from 'd3-geo'
 
-import { GcpTransformer } from '@allmaps/transform'
+import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
-import type { Polygon } from 'geojson'
+import type { Polygon as GeojsonPolygon } from 'geojson'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -14,24 +15,23 @@ const mercator = geoProjection((x, y) => [
 
 const path = geoPath().projection(mercator)
 
-export function getPolygon(map: GeoreferencedMap) {
+export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
   if (map.gcps.length >= 3) {
     if (map.resourceMask.length >= 3) {
       try {
-        const transformer = new GcpTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
+        const projectedTransformer =
+          ProjectedGcpTransformer.fromGeoreferencedMap(map, {
+            projection: lonLatProjection
+          })
 
-        const polygon = transformer.transformForwardAsGeojson([
-          map.resourceMask
-        ])
+        let polygon = projectedTransformer.transformToGeo([map.resourceMask])
+        const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of
         // the GoeJSON spec: https://github.com/d3/d3-geo
-        turfRewind(polygon, { mutate: true, reverse: true })
+        turfRewind(geojsonPolygon, { mutate: true, reverse: true })
 
-        return polygon
+        return geojsonPolygon
       } catch (err) {
         let message = 'Unknown error'
         if (err instanceof Error) {
@@ -47,13 +47,16 @@ export function getPolygon(map: GeoreferencedMap) {
   }
 }
 
-export function geometryToPath(polygon: Polygon, scaleTo: number) {
+export function geometryToPath(
+  geojsonPolygon: GeojsonPolygon,
+  scaleTo: number
+) {
   const width = scaleTo
   const height = scaleTo
 
   mercator.scale(1).translate([0, 0])
 
-  const bounds = path.bounds(polygon)
+  const bounds = path.bounds(geojsonPolygon)
   const scale =
     1 /
     Math.max(
@@ -68,7 +71,7 @@ export function geometryToPath(polygon: Polygon, scaleTo: number) {
 
   mercator.scale(scale).translate(translate)
 
-  const d = path(polygon)
+  const d = path(geojsonPolygon)
 
   const containsNaN = d && d.indexOf('NaN') > -1
 

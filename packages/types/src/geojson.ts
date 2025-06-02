@@ -1,33 +1,31 @@
-import type { Point } from './geometry'
-
 export type GeojsonPoint = {
   type: 'Point'
-  coordinates: Point
+  coordinates: number[]
 }
 
 export type GeojsonLineString = {
   type: 'LineString'
-  coordinates: Point[]
+  coordinates: number[][]
 }
 
 export type GeojsonPolygon = {
   type: 'Polygon'
-  coordinates: Point[][]
+  coordinates: number[][][]
 }
 
 export type GeojsonMultiPoint = {
   type: 'MultiPoint'
-  coordinates: Point[]
+  coordinates: number[][]
 }
 
 export type GeojsonMultiLineString = {
   type: 'MultiLineString'
-  coordinates: Point[][]
+  coordinates: number[][][]
 }
 
 export type GeojsonMultiPolygon = {
   type: 'MultiPolygon'
-  coordinates: Point[][][]
+  coordinates: number[][][][]
 }
 
 // Consider using @types/geojson!
@@ -35,6 +33,11 @@ export type GeojsonGeometry =
   | GeojsonPoint
   | GeojsonLineString
   | GeojsonPolygon
+  | GeojsonMultiPoint
+  | GeojsonMultiLineString
+  | GeojsonMultiPolygon
+
+export type GeojsonMultiGeometry =
   | GeojsonMultiPoint
   | GeojsonMultiLineString
   | GeojsonMultiPolygon

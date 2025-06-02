@@ -77,6 +77,12 @@
       (mode === 'cover' && parsedImage.width < parsedImage.height)}
     {@const columnPercentages = getColumnPercentages(imageRequest, tilesWidth)}
 
+    <!-- style:left={!orientationPortrait
+        ? getLeftStyle(tilesWidth, tilesHeight)
+        : ''}
+      style:top={orientationPortrait
+        ? getTopStyle(tilesWidth, tilesHeight)
+        : ''} -->
     <div
       class="relative grid"
       class:w-full={orientationPortrait}
@@ -85,12 +91,9 @@
         .map((percentage) => `${percentage}%`)
         .join(' ')}
       style:aspect-ratio="{tilesWidth} / {tilesHeight}"
-      style:left={!orientationPortrait
-        ? getLeftStyle(tilesWidth, tilesHeight)
-        : ''}
-      style:top={orientationPortrait
-        ? getTopStyle(tilesWidth, tilesHeight)
-        : ''}
+      style:left={mode === 'cover' ? getLeftStyle(tilesWidth, tilesHeight) : ''}
+      style:top={mode === 'contain' ? getTopStyle(tilesWidth, tilesHeight) : ''}
+      style:height="{(borderBoxHeight / borderBoxWidth) * 100}%"
     >
       {#each imageRequest as row, rowIndex}
         {#each row as tile, columnIndex}

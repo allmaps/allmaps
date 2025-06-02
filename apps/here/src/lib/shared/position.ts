@@ -1,13 +1,17 @@
-export function positionToGeoJson(position: GeolocationPosition) {
+import { computeDistance } from '$lib/shared/distance.js'
+import { coordinatesToGeoJsonPoint } from '$lib/shared/geojson.js'
+
+export function positionToGeoJsonPoint(position: GeolocationPosition) {
+  return coordinatesToGeoJsonPoint([
+    position.coords.longitude,
+    position.coords.latitude
+  ])
+}
+
+export function positionToGeoJsonFeature(position: GeolocationPosition) {
   return {
     type: 'Feature' as const,
-    geometry: {
-      type: 'Point' as const,
-      coordinates: [position.coords.longitude, position.coords.latitude] as [
-        number,
-        number
-      ]
-    },
+    geometry: positionToGeoJsonPoint(position),
     properties: {
       accuracy: position.coords.accuracy,
       altitude: position.coords.altitude,
@@ -17,4 +21,14 @@ export function positionToGeoJson(position: GeolocationPosition) {
       timestamp: position.timestamp
     }
   }
+}
+
+export function computePositionDistance(
+  position1: GeolocationPosition,
+  position2: GeolocationPosition
+) {
+  return computeDistance(
+    positionToGeoJsonPoint(position1),
+    positionToGeoJsonPoint(position2)
+  )
 }

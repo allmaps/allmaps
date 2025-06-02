@@ -32,7 +32,7 @@ The render module accomplishes this task with the following classes:
 
 During a `CanvasRenderer` or `IntArrayRenderer` render call, a map undergoes the following steps from Georeference Annotation to the canvas:
 
-* For each viewport pixel, from its viewport coordinates its projectedGeo coordinates is obtained and transformed to its corresponding resource coordinates, i.e. it's location in the IIIF image.
+* For each viewport pixel, from its viewport coordinates its projected geospatial coordinates are obtained and transformed to its corresponding resource coordinates, i.e. it's location in the IIIF image.
 * We find the tile on which this point is located, and express the resource coordinates in local tile coordinates.
 * We set the color of this pixel from the colors of the four tile pixels surrounding the tile point, through a bilinear interpolation.
 
@@ -175,25 +175,30 @@ new Viewport(
   viewportSize, // Your viewport size, as [width, height]
   projectedGeoCenter, // Your center, in geo coordinates
   projectedGeoPerViewportScale, // Your geo-per-viewport scale
-  rotation, // Your rotation
-  devicePixelRatio // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
+  {
+    rotation, // Your rotation
+    devicePixelRatio, // Your device pixel ratio, e.g. window.devicePixelRatio or just 1
+    projection // Your projection (of the above projected geospatial coordinates), as compatible with Proj4js
+  }
 )
 ```
 
 Using one of the following static methods:
 
 * `Viewport.fromSizeAndMaps()`
-* `Viewport.fromSizeAndPolygon()`
+* `Viewport.fromSizeAndGeoPolygon()`
+* `Viewport.fromSizeAndProjectedGeoPolygon()`
 * `Viewport.fromScaleAndMaps()`
-* `Viewport.fromScaleAndPolygon()`
+* `Viewport.fromScaleAndGeoPolygon()`
+* `Viewport.fromScaleAndProjectedGeoPolygon()`
 
 For example, to derive a Viewport from a size and maps:
 
 ```js
 const viewport = Viewport.fromSizeAndMaps(
   viewportSize, // Your viewport size, as [width, height]
-  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
-  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio, fit and zoom.
+  warpedMapList, // Your WarpedMapList, e.g. `renderer.warpedMapList`
+  partialExtendedViewportOptions // Your extended viewport options, including viewport options (rotation, devicePixelRatio and projection (used both to retrieve the extent of the maps and for the viewport itself)), a zoom; a fit; and WarpedMapList selection options like mapIds or `onlyVisible`
 )
 ```
 
@@ -202,8 +207,8 @@ Or, to derive a Viewport from a scale and maps:
 ```js
 const viewport = Viewport.fromScaleAndMaps(
   projectedGeoPerViewportScale, // Your scale
-  maps, // Your WarpedMapList, e.g. `renderer.warpedMapList`, or an array of WarpedMaps, e.g. selected from your WarpedMapList using mapIds, e.g. `renderer.warpedMapList.getWarpedMaps(mapIds)`
-  viewportOptions // Your viewportOptions, including rotation, devicePixelRatio and zoom (fit is ignored here).
+  warpedMapList, // Your WarpedMapList, e.g. `renderer.warpedMapList`
+  partialExtendedViewportOptions // Your extended viewport options, including viewport options (rotation, devicePixelRatio and projection (used both to retrieve the extent of the maps and for the viewport itself)), a zoom; and WarpedMapList selection options like mapIds or `onlyVisible`
 )
 
 // In this case, resize your canvas to the computed viewport
@@ -266,13 +271,34 @@ There are no parameters.
 
 `void`.
 
+### `TriangulatedWarpedMap#clearProjectedTriangulationCaches()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#clearResourceTriangulationCaches()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `TriangulatedWarpedMap#mixPreviousAndNew(t)`
 
-Mix the previous and new points and values.
+Mix previous transform properties with new ones (when changing an ongoing transformer transition).
 
 ###### Parameters
 
 * `t` (`number`)
+  * animation progress
 
 ###### Returns
 
@@ -320,12 +346,12 @@ Array<never>
 }
 ```
 
-### `TriangulatedWarpedMap#projectedGcpTriangulationByTransformationTypeAndResourceResolution`
+### `TriangulatedWarpedMap#projectedGcpTriangulationCache`
 
 ###### Type
 
 ```ts
-Map<TransformationType, Map<number, GcpTriangulation>>
+Map<number, Map<TransformationType, Map<Projection, GcpTriangulation>>>
 ```
 
 ### `TriangulatedWarpedMap#projectedGeoPreviousTrianglePoints`
@@ -362,7 +388,7 @@ Array<never>
 
 ### `TriangulatedWarpedMap#resetPrevious()`
 
-Reset the previous points and values.
+Reset previous transform properties to new ones (when completing a transformer transitions).
 
 ###### Parameters
 
@@ -380,18 +406,6 @@ There are no parameters.
 number | undefined
 ```
 
-### `TriangulatedWarpedMap#resourceToResourceProjectedGeoDistortions(resourcePoint, transformer, referenceScale)`
-
-###### Parameters
-
-* `resourcePoint` (`[number, number]`)
-* `transformer` (`GcpTransformer`)
-* `referenceScale?` (`number | undefined`)
-
-###### Returns
-
-`Gcp & {distortions: Map<DistortionMeasure, number>; distortion: number}`.
-
 ### `TriangulatedWarpedMap#resourceTrianglePoints`
 
 ###### Type
@@ -400,13 +414,74 @@ number | undefined
 Array<never>
 ```
 
+### `TriangulatedWarpedMap#resourceTriangulationCache`
+
+###### Type
+
+```ts
+Map<number, TriangulationToUnique>
+```
+
+### `TriangulatedWarpedMap#setDistortionMeasure(distortionMeasure)`
+
+Set the distortionMeasure
+
+###### Parameters
+
+* `distortionMeasure?` (`DistortionMeasure | undefined`)
+  * the disortion measure
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setGcps(gcps)`
+
+Update the ground control points loaded from a georeferenced map to new ground control points.
+
+###### Parameters
+
+* `gcps` (`Array<Gcp>`)
+  * the new ground control points
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setInternalProjection(projection)`
+
+Set the internal projection
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+  * the internal projection
+
+###### Returns
+
+`void`.
+
+### `TriangulatedWarpedMap#setProjection(projection)`
+
+Set the projection
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+  * the projection
+
+###### Returns
+
+`void`.
+
 ### `TriangulatedWarpedMap#setResourceMask(resourceMask)`
 
-Update the resourceMask.
+Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
 * `resourceMask` (`Array<Point>`)
+  * the new mask
 
 ###### Returns
 
@@ -428,22 +503,11 @@ Array<never>
 0
 ```
 
-### `TriangulatedWarpedMap#updateDistortionProperties()`
+### `TriangulatedWarpedMap#updateProjectedTransformerProperties()`
 
 ###### Parameters
 
 There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `TriangulatedWarpedMap#updateTransformerProperties(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
 
 ###### Returns
 
@@ -487,7 +551,7 @@ There are no parameters.
 
 `void`.
 
-### `new Viewport(viewportSize, projectedGeoCenter, projectedGeoPerViewportScale, rotation, devicePixelRatio)`
+### `new Viewport(viewportSize, projectedGeoCenter, projectedGeoPerViewportScale, partialViewportOptions)`
 
 Creates a new Viewport
 
@@ -496,13 +560,10 @@ Creates a new Viewport
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
 * `projectedGeoCenter` (`[number, number]`)
-  * Center point of the viewport, in projected coordinates.
+  * Center point of the viewport, in projected geospatial coordinates.
 * `projectedGeoPerViewportScale` (`number`)
   * Scale of the viewport, in projection coordinates per viewport pixel.
-* `rotation` (`number | undefined`)
-  * Rotation of the viewport with respect to the projected geo coordinate system. Positive values rotate the viewport positively (i.e. counter-clockwise) w.r.t. the map in projected geo coordinates. This is equivalent to rotating the map negatively (i.e. clockwise) within the viewport.
-* `devicePixelRatio` (`number | undefined`)
-  * The devicePixelRatio of the viewport.
+* `partialViewportOptions?` (`Partial<ViewportOptions> | undefined`)
 
 ###### Returns
 
@@ -590,7 +651,7 @@ There are no parameters.
 
 ### `Viewport#computeProjectedGeoRectangle(viewportSize, projectedGeoPerViewportScale, rotation, projectedGeoCenter)`
 
-Returns a rectangle in projected geo coordinates
+Returns a rectangle in projected geospatial coordinates
 
 The rectangle is the result of a horizontal rectangle in Viewport space of size 'viewportSize',
 scaled using projectedGeoPerViewportScale, centered,
@@ -745,6 +806,14 @@ number
 [number, number, number, number, number, number]
 ```
 
+### `Viewport#projection`
+
+###### Type
+
+```ts
+{name?: string; definition: ProjectionDefinition}
+```
+
 ### `Viewport#rotation`
 
 ###### Type
@@ -801,85 +870,136 @@ number
 [number, number, number, number, number, number]
 ```
 
-### `Viewport.fromScaleAndMaps(projectedGeoPerViewportScale, maps, viewportOptions)`
+### `Viewport.fromScaleAndGeoPolygon(projectedGeoPerViewportScale, geoPolygon, partialExtendedViewportOptions)`
+
+Static method that creates a Viewport from a scale and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
+
+Note: the scale is still in *projected* geospatial per viewport pixel!
+
+###### Parameters
+
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+* `geoPolygon` (`Array<Array<Point>>`)
+  * A polygon in geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions     >
+    | undefined`)
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromScaleAndMaps(projectedGeoPerViewportScale, warpedMapList, partialExtendedViewportOptions)`
 
 Static method that creates a Viewport from a scale and maps.
 
+Optionally specify a projection, to be used both when obtaining the extent of selected warped maps in projected geospatial coordinates, as well as when create a viewport
+
 ###### Parameters
 
 * `projectedGeoPerViewportScale` (`number`)
-  * Scale of the viewport, in projected coordinates per viewport pixel.
-* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
-  * A WarpedMapList or an array of WarpedMaps.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
-  * Optional viewport options. Fit is ignored.
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
+* `warpedMapList` (`WarpedMapList<W>`)
+  * A WarpedMapList.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          SelectionOptions     >
+    | undefined`)
+  * Optional viewport options.
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromScaleAndPolygon(projectedGeoPolygon, projectedGeoPerViewportScale, viewportOptions)`
+### `Viewport.fromScaleAndProjectedGeoPolygon(projectedGeoPerViewportScale, projectedGeoPolygon, partialExtendedViewportOptions)`
 
-Static method that creates a Viewport from a scale and a polygon.
+Static method that creates a Viewport from a scale and a polygon in projected geospatial coordinates.
 
 ###### Parameters
 
+* `projectedGeoPerViewportScale` (`number`)
+  * Scale of the viewport, in projected geospatial coordinates per viewport pixel.
 * `projectedGeoPolygon` (`Array<Array<Point>>`)
   * A polygon in projected geospatial coordinates.
-* `projectedGeoPerViewportScale` (`number`)
-  * Scale of the viewport, in projected geo coordinates per viewport pixel.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
-  * Optional viewport options. Fit is ignored.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions     >
+    | undefined`)
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromSizeAndMaps(viewportSize, maps, viewportOptions)`
+### `Viewport.fromSizeAndGeoPolygon(viewportSize, geoPolygon, partialExtendedViewportOptions)`
+
+Static method that creates a Viewport from a size and a polygon in geospatial coordinates, i.e. lon-lat `EPSG:4326`.
+
+###### Parameters
+
+* `viewportSize` (`[number, number]`)
+  * Size of the viewport in viewport pixels, as \[width, height].
+* `geoPolygon` (`Array<Array<Point>>`)
+  * A polygon in geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions     >
+    | undefined`)
+  * Optional viewport options
+
+###### Returns
+
+A new Viewport object (`Viewport`).
+
+### `Viewport.fromSizeAndMaps(viewportSize, warpedMapList, partialExtendedViewportOptions)`
 
 Static method that creates a Viewport from a size and maps.
 
+Optionally specify a projection, to be used both when obtaining the extent of selected warped maps in projected geospatial coordinates, as well as when create a viewport
+
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
-* `maps` (`WarpedMapList<W> | Array<WarpedMap>`)
-  * A WarpedMapList or an array of WarpedMaps.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+* `warpedMapList` (`WarpedMapList<W>`)
+  * A WarpedMapList.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions &
+          SelectionOptions     >
+    | undefined`)
   * Optional viewport options
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.fromSizeAndPolygon(viewportSize, projectedGeoPolygon, viewportOptions)`
+### `Viewport.fromSizeAndProjectedGeoPolygon(viewportSize, projectedGeoPolygon, partialExtendedViewportOptions)`
 
-Static method that creates a Viewport from a size and a polygon.
+Static method that creates a Viewport from a size and a polygon in projected geospatial coordinates.
 
 ###### Parameters
 
 * `viewportSize` (`[number, number]`)
   * Size of the viewport in viewport pixels, as \[width, height].
 * `projectedGeoPolygon` (`Array<Array<Point>>`)
-  * A polygon in projected geo coordinates.
-* `viewportOptions?` (`Partial<ViewportOptions> | undefined`)
+  * A polygon in projected geospatial coordinates.
+* `partialExtendedViewportOptions?` (`  | Partial<
+        {rotation: number; devicePixelRatio: number} & ProjectionOptions &
+          ZoomOptions &
+          FitOptions     >
+    | undefined`)
   * Optional viewport options
 
 ###### Returns
 
 A new Viewport object (`Viewport`).
 
-### `Viewport.mapsToProjectedGeoConvexHull(maps)`
-
-###### Parameters
-
-* `maps` (`Array<WarpedMap> | WarpedMapList<W>`)
-
-###### Returns
-
-`Array<Point>`.
-
-### `new WarpedMap(mapId, georeferencedMap, options)`
+### `new WarpedMap(mapId, georeferencedMap, partialWarpedMapOptions)`
 
 Creates an instance of WarpedMap.
 
@@ -889,7 +1009,7 @@ Creates an instance of WarpedMap.
   * ID of the map
 * `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
+* `partialWarpedMapOptions?` (`Partial<WarpedMapOptions> | undefined`)
   * options
 
 ###### Returns
@@ -908,17 +1028,15 @@ Creates an instance of WarpedMap.
 AbortController
 ```
 
+### `WarpedMap#applyMask`
+
+###### Type
+
+```ts
+boolean
+```
+
 ### `WarpedMap#clearProjectedTransformerCaches()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#clearTransformerCaches()`
 
 ###### Parameters
 
@@ -978,7 +1096,7 @@ Array<Gcp>
 ###### Type
 
 ```ts
-{type: 'Polygon'; coordinates: Point[][]}
+Array<Point>
 ```
 
 ### `WarpedMap#geoFullMaskBbox`
@@ -1002,7 +1120,7 @@ Array<Gcp>
 ###### Type
 
 ```ts
-{type: 'Polygon'; coordinates: Point[][]}
+Array<Point>
 ```
 
 ### `WarpedMap#geoMaskBbox`
@@ -1037,6 +1155,34 @@ Array<Point>
 { type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
 ```
 
+### `WarpedMap#getProjectedTransformer(transformationType, partialProjectedGcpTransformerOptions)`
+
+Get a projected transformer of the given transformation type.
+
+Uses cashed projected transformers by transformation type,
+and only computes a new projected transformer if none found.
+
+Returns a projected transformer in the current projection,
+even if the cached transformer was computed in a different projection.
+
+Default settings apply for the options.
+
+###### Parameters
+
+* `transformationType` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'`)
+* `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
+
+###### Returns
+
+A projected transformer (`ProjectedGcpTransformer`).
+
 ### `WarpedMap#getReferenceScale()`
 
 Get the reference scaling from the forward transformation of the projected Helmert transformer
@@ -1048,6 +1194,16 @@ There are no parameters.
 ###### Returns
 
 `number`.
+
+### `WarpedMap#getResourceFullMask()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Point, Point, Point, Point]`.
 
 ### `WarpedMap#getResourceToCanvasScale(viewport)`
 
@@ -1173,6 +1329,14 @@ There are no parameters.
 Map<string, unknown>
 ```
 
+### `WarpedMap#internalProjection`
+
+###### Type
+
+```ts
+{name?: string; definition: ProjectionDefinition}
+```
+
 ### `WarpedMap#loadImageInfo()`
 
 Fetch and parse the image info, and generate the image ID
@@ -1203,11 +1367,12 @@ string
 
 ### `WarpedMap#mixPreviousAndNew(t)`
 
-Mix the properties of the previous and new transformationType.
+Mix previous transform properties with new ones (when changing an ongoing transformer transition).
 
 ###### Parameters
 
 * `t` (`number`)
+  * animation progress
 
 ###### Returns
 
@@ -1259,6 +1424,14 @@ Image
 
 ```ts
 'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
+```
+
+### `WarpedMap#previousInternalProjection`
+
+###### Type
+
+```ts
+{name?: string; definition: ProjectionDefinition}
 ```
 
 ### `WarpedMap#previousTransformationType`
@@ -1377,7 +1550,7 @@ Array<Point>
 ###### Type
 
 ```ts
-GcpTransformer
+ProjectedGcpTransformer
 ```
 
 ### `WarpedMap#projectedTransformer`
@@ -1385,15 +1558,23 @@ GcpTransformer
 ###### Type
 
 ```ts
-GcpTransformer
+ProjectedGcpTransformer
 ```
 
-### `WarpedMap#projectedTransformerByTransformationType`
+### `WarpedMap#projectedTransformerCache`
 
 ###### Type
 
 ```ts
-Map<TransformationType, GcpTransformer>
+Map<TransformationType, ProjectedGcpTransformer>
+```
+
+### `WarpedMap#projection`
+
+###### Type
+
+```ts
+{name?: string; definition: ProjectionDefinition}
 ```
 
 ### `WarpedMap#resetForViewport()`
@@ -1410,7 +1591,7 @@ There are no parameters.
 
 ### `WarpedMap#resetPrevious()`
 
-Reset the properties of the previous and new transformationType.
+Reset previous transform properties to new ones (when completing a transformer transitions).
 
 ###### Parameters
 
@@ -1535,11 +1716,24 @@ Set tiles for the current viewport
 
 ### `WarpedMap#setGcps(gcps)`
 
-Update the Ground Controle Points loaded from a georeferenced map to new Ground Controle Points.
+Update the ground control points loaded from a georeferenced map to new ground control points.
 
 ###### Parameters
 
 * `gcps` (`Array<Gcp>`)
+
+###### Returns
+
+`void`.
+
+### `WarpedMap#setInternalProjection(projection)`
+
+Set the internal projection
+
+###### Parameters
+
+* `projection?` (`Projection | undefined`)
+  * the internal projection
 
 ###### Returns
 
@@ -1582,6 +1776,19 @@ Set projectedGeoBufferedViewportRectangle for the current viewport
 
 `void`.
 
+### `WarpedMap#setProjection(projection)`
+
+Set the projection
+
+###### Parameters
+
+* `projection?` (`Projection | undefined`)
+  * the projection
+
+###### Returns
+
+`void`.
+
 ### `WarpedMap#setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection)`
 
 Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the current viewport
@@ -1608,7 +1815,7 @@ Set resourceBufferedViewportRing for the current viewport
 
 ### `WarpedMap#setResourceMask(resourceMask)`
 
-Update the resourceMask loaded from a georeferenced map to a new mask.
+Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
@@ -1681,32 +1888,6 @@ Set the transformationType
   | 'thinPlateSpline'
 ```
 
-### `WarpedMap#transformer`
-
-###### Type
-
-```ts
-GcpTransformer
-```
-
-### `WarpedMap#transformerByTransformationType`
-
-###### Type
-
-```ts
-Map<TransformationType, GcpTransformer>
-```
-
-### `WarpedMap#updateDistortionProperties()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
 ### `WarpedMap#updateFullGeoMask()`
 
 ###### Parameters
@@ -1737,6 +1918,16 @@ There are no parameters.
 
 `void`.
 
+### `WarpedMap#updateGeoMaskProperties()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `WarpedMap#updateProjectedFullGeoMask()`
 
 ###### Parameters
@@ -1757,7 +1948,7 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMap#updateProjectedGeoTransformedResourcePoints()`
+### `WarpedMap#updateProjectedGeoMaskProperties()`
 
 ###### Parameters
 
@@ -1767,12 +1958,21 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMap#updateProjectedTransformer(clearCache, useCache)`
+### `WarpedMap#updateProjectedTransformer()`
 
 ###### Parameters
 
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `WarpedMap#updateProjectedTransformerProperties()`
+
+###### Parameters
+
+There are no parameters.
 
 ###### Returns
 
@@ -1803,28 +2003,6 @@ There are no parameters.
 ###### Parameters
 
 There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#updateTransformer(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
-
-###### Returns
-
-`void`.
-
-### `WarpedMap#updateTransformerProperties(clearCache, useCache)`
-
-###### Parameters
-
-* `clearCache` (`boolean | undefined`)
-* `useCache` (`boolean | undefined`)
 
 ###### Returns
 
@@ -1866,13 +2044,12 @@ unknown
 ###### Type
 
 ```ts
-WarpedMapListOptions &
-  WarpedMapOptions & {imageInformations: ImageInformations; fetchFn: FetchFn}
+{ renderMaps: boolean; renderLines: boolean; renderPoints: boolean; debugMaps: boolean; } & SpecificWebGL2WarpedMapOptions & WarpedMapOptions & { ...; }
 ```
 
-### `new WarpedMapList(warpedMapFactory, options)`
+### `new WarpedMapList(warpedMapFactory, partialWarpedMapListOptions)`
 
-Creates an instance of a WarpedMapList.
+Creates an instance of a WarpedMapList
 
 ###### Parameters
 
@@ -1882,7 +2059,7 @@ Creates an instance of a WarpedMapList.
     options?: Partial<WarpedMapOptions>
   ) => W`)
   * Factory function for creating WarpedMap objects
-* `options?` (`Partial<WarpedMapListOptions> | undefined`)
+* `partialWarpedMapListOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * Options
 
 ###### Returns
@@ -1993,70 +2170,24 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#fetchFn?`
+### `WarpedMapList#getMapIds(partialSelectionOptions)`
 
-###### Type
+Get mapIds for selected maps
 
-```ts
-(
-  input: Request | string | URL,
-  init?: RequestInit
-) => Promise<Response>
-```
-
-### `WarpedMapList#getBbox(mapIds)`
-
-Return the bounding box of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
-
-Returns undefined if the list is empty.
+Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
 
 ###### Parameters
 
-* `mapIds?` (`Iterable<string> | undefined`)
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
-`Bbox | undefined`.
-
-### `WarpedMapList#getCenter()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Point | undefined`.
-
-### `WarpedMapList#getConvexHull(mapIds)`
-
-Return the convex hull of all visible maps in this list, in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
-
-Returns undefined if the list is empty.
-
-###### Parameters
-
-* `mapIds?` (`Iterable<string> | undefined`)
-
-###### Returns
-
-`Ring | undefined`.
-
-### `WarpedMapList#getMapIds()`
-
-Returns mapIds for the maps in this list.
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Iterable<string>`.
+mapIds (`Iterable<string>`).
 
 ### `WarpedMapList#getMapZIndex(mapId)`
 
-Returns the z-index of a map.
+Get the z-index for a specific map
 
 ###### Parameters
 
@@ -2066,17 +2197,50 @@ Returns the z-index of a map.
 
 `number | undefined`.
 
-### `WarpedMapList#getMapsByGeoBbox(geoBbox)`
+### `WarpedMapList#getMapsBbox(partialSelectionAndProjectionOptions)`
 
-Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
+Get the bounding box of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
 
 ###### Parameters
 
-* `geoBbox` (`[number, number, number, number]`)
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
 
 ###### Returns
 
-`Iterable<string>`.
+The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Bbox | undefined`).
+
+### `WarpedMapList#getMapsCenter(partialSelectionAndProjectionOptions)`
+
+Get the center of the bounding box of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+###### Parameters
+
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+
+###### Returns
+
+The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Point | undefined`).
+
+### `WarpedMapList#getMapsConvexHull(partialSelectionAndProjectionOptions)`
+
+Get the convex hull of the maps in this list
+
+Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+###### Parameters
+
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+
+###### Returns
+
+The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Ring | undefined`).
 
 ### `WarpedMapList#getOrComputeMapId(georeferencedMap)`
 
@@ -2088,68 +2252,43 @@ Returns mapIds of the maps whose geoBbox overlaps with the specified geoBbox.
 
 `Promise<string>`.
 
-### `WarpedMapList#getProjectedBbox(mapIds)`
-
-Return the bounding box of all visible maps in this list, in projected geospatial coordinates
-
-Returns undefined if the list is empty.
+### `WarpedMapList#getProjectedGeoMaskPoints(partialSelectionAndProjectionOptions)`
 
 ###### Parameters
 
-* `mapIds?` (`Iterable<string> | undefined`)
+* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
 
 ###### Returns
 
-`Bbox | undefined`.
-
-### `WarpedMapList#getProjectedCenter()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Point | undefined`.
-
-### `WarpedMapList#getProjectedConvexHull(mapIds)`
-
-Return the convex hull of all visible maps in this list, in projected geospatial coordinates
-
-Returns undefined if the list is empty.
-
-###### Parameters
-
-* `mapIds?` (`Iterable<string> | undefined`)
-
-###### Returns
-
-`Ring | undefined`.
+`Array<Point>`.
 
 ### `WarpedMapList#getWarpedMap(mapId)`
 
-Returns the WarpedMap object in this list of map specified by its ID.
+Get the WarpedMap instance for a specific map
 
 ###### Parameters
 
 * `mapId` (`string`)
+  * Map ID of the requested WarpedMap instance
 
 ###### Returns
 
-`W | undefined`.
+WarpedMap instance, or undefined (`W | undefined`).
 
-### `WarpedMapList#getWarpedMaps()`
+### `WarpedMapList#getWarpedMaps(partialSelectionOptions)`
 
-Returns WarpedMap objects of the maps in this list.
-Optionally specify mapIds whose WarpedMap objects are requested.
+Get the WarpedMap instances for selected maps
+
+Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
 
 ###### Parameters
 
-There are no parameters.
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
-`Iterable<W>`.
+WarpedMap instances (`Iterable<W>`).
 
 ### `WarpedMapList#hideMaps(mapIds)`
 
@@ -2174,12 +2313,21 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#imageInformations?`
+### `WarpedMapList#partialWarpedMapListOptions`
 
 ###### Type
 
 ```ts
-Map<string, unknown>
+{
+  createRTree?: boolean | undefined
+  fetchFn?: FetchFn | undefined
+  imageInformations?: ImageInformations | undefined
+  visible?: boolean | undefined
+  applyMask?: boolean | undefined
+  transformationType?: TransformationType | undefined
+  internalProjection?: Projection | undefined
+  projection?: Projection | undefined
+}
 ```
 
 ### `WarpedMapList#removeEventListenersFromWarpedMap(warpedMap)`
@@ -2306,44 +2454,87 @@ Sets the object that caches image information
 
 `void`.
 
-### `WarpedMapList#setMapGcps(mapId, gcps)`
+### `WarpedMapList#setMapDistortionMeasure(distortionMeasure, mapId)`
 
-Sets the GCPs for a specified map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `gcps` (`Array<Gcp>`)
-  * new GCPs
-
-###### Returns
-
-`void`.
-
-### `WarpedMapList#setMapResourceMask(mapId, resourceMask)`
-
-Sets the resource mask for a specified map
+Sets the distortionMeasure for a specific map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `resourceMask` (`Array<Point>`)
-  * the new resource mask
-
-###### Returns
-
-`void`.
-
-### `WarpedMapList#setMapTransformationType(mapId, transformationType)`
-
-Sets the transformation type of a single map
-
-###### Parameters
-
+* `distortionMeasure` (`DistortionMeasure | undefined`)
+  * the distortion measure
 * `mapId` (`string`)
   * the ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapGcps(gcps, mapId)`
+
+Sets the GCPs for a specific map
+
+###### Parameters
+
+* `gcps` (`Array<Gcp>`)
+  * new GCPs
+* `mapId` (`string`)
+  * ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapInternalProjection(projection, mapId)`
+
+Sets the internal projection for a specific map
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+  * the internal projection
+* `mapId` (`string`)
+  * the ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapProjection(projection, mapId)`
+
+Sets the projection for a specific map
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+  * the projection
+* `mapId` (`string`)
+  * the ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapResourceMask(resourceMask, mapId)`
+
+Sets the resource mask for a specific map
+
+###### Parameters
+
+* `resourceMask` (`Array<Point>`)
+  * the new resource mask
+* `mapId` (`string`)
+  * ID of the map
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapTransformationType(transformationType, mapId)`
+
+Sets the transformation type for a specific map
+
+###### Parameters
+
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -2353,34 +2544,64 @@ Sets the transformation type of a single map
     | 'projective'
     | 'thinPlateSpline'`)
   * the new transformation type
+* `mapId` (`string`)
+  * the ID of the map
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsDistortionMeasure(mapIds, distortionMeasure)`
+### `WarpedMapList#setMapsDistortionMeasure(distortionMeasure, partialSelectionOptions)`
 
-Sets the distortion measure of specified maps
+Sets the distortion measure for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
 * `distortionMeasure?` (`DistortionMeasure | undefined`)
   * the distortion measure
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsTransformationType(mapIds, transformationType)`
+### `WarpedMapList#setMapsInternalProjection(projection, partialSelectionOptions)`
 
-Sets the transformation type of specified maps
+Sets the internal projection for selected maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * the IDs of the maps
+* `projection` (`Projection | undefined`)
+  * the internal projection
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapsProjection(projection, partialSelectionOptions)`
+
+Sets the projection for selected maps
+
+###### Parameters
+
+* `projection` (`Projection | undefined`)
+  * the projection
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setMapsTransformationType(transformationType, partialSelectionOptions)`
+
+Sets the transformation type for selected maps
+
+###### Parameters
+
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -2390,6 +2611,21 @@ Sets the transformation type of specified maps
     | 'projective'
     | 'thinPlateSpline'`)
   * the new transformation type
+* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  * Selection options (e.g. mapIds), defaults to all visible maps
+
+###### Returns
+
+`void`.
+
+### `WarpedMapList#setOptions(partialWarpedMapListOptions)`
+
+Set the Warped Map List options
+
+###### Parameters
+
+* `partialWarpedMapListOptions?` (`Partial<WarpedMapListOptions> | undefined`)
+  * Options
 
 ###### Returns
 
@@ -2407,14 +2643,6 @@ Changes the visibility of the specified maps to `true`
 ###### Returns
 
 `void`.
-
-### `WarpedMapList#transformation?`
-
-###### Type
-
-```ts
-{type: TransformationType; options?: unknown}
-```
 
 ### `WarpedMapList#warpedMapFactory`
 
@@ -2461,7 +2689,7 @@ There are no parameters.
 * `getImageData` (`(data: Uint8ClampedArray) => D`)
 * `getImageDataValue` (`(data: D, index: number) => number`)
 * `getImageDataSize` (`(data: D) => Size`)
-* `options?` (`Partial<RendererOptions> | undefined`)
+* `options?` (`Partial<BaseRendererOptions> | undefined`)
 
 ###### Returns
 
@@ -2506,7 +2734,7 @@ Render the map for a given viewport.
 ###### Parameters
 
 * `canvas` (`HTMLCanvasElement`)
-* `options?` (`Partial<RendererOptions> | undefined`)
+* `options?` (`Partial<BaseRendererOptions> | undefined`)
 
 ###### Returns
 
@@ -2577,7 +2805,7 @@ Creates an instance of WebGL2Renderer.
 
 * `gl` (`WebGL2RenderingContext`)
   * WebGL 2 rendering context
-* `options?` (`Partial<RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
   * options
 
 ###### Returns
@@ -2698,6 +2926,16 @@ false
 ###### Parameters
 
 * `event` (`Event`)
+
+###### Returns
+
+`void`.
+
+### `WebGL2Renderer#finishTransition(mapIds)`
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
 
 ###### Returns
 
@@ -2868,6 +3106,16 @@ WebGL2RenderingContext
 
 `void`.
 
+### `WebGL2Renderer#internalProjectionChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
+
+###### Returns
+
+`void`.
+
 ### `WebGL2Renderer#lastAnimationFrameRequestId`
 
 ###### Type
@@ -2920,6 +3168,24 @@ WebGLProgram
 DEFAULT_OPACITY
 ```
 
+### `WebGL2Renderer#optionsChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
+
+###### Returns
+
+`void`.
+
+### `WebGL2Renderer#partialWebgl2RendererOptions`
+
+###### Type
+
+```ts
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; debugMaps?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 30 more ...; createRTree?: boolean | undefined; }
+```
+
 ### `WebGL2Renderer#pointsProgram`
 
 ###### Type
@@ -2955,6 +3221,16 @@ There are no parameters.
 ```ts
 Viewport | undefined
 ```
+
+### `WebGL2Renderer#projectionChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
+
+###### Returns
+
+`void`.
 
 ### `WebGL2Renderer#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)`
 
@@ -3131,6 +3407,16 @@ There are no parameters.
 
 `void`.
 
+### `WebGL2Renderer#resetPrevious(mapIds)`
+
+###### Parameters
+
+* `mapIds?` (`Array<string> | undefined`)
+
+###### Returns
+
+`void`.
+
 ### `WebGL2Renderer#resetRemoveColorOptions()`
 
 Reset the remove color options of the renderer
@@ -3150,6 +3436,16 @@ Reset the satuation of the renderer
 ###### Parameters
 
 There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `WebGL2Renderer#resourceMaskChanged(event)`
+
+###### Parameters
+
+* `event` (`Event`)
 
 ###### Returns
 
@@ -3342,6 +3638,19 @@ Set the opacity of the renderer
 
 `void`.
 
+### `WebGL2Renderer#setOptions(partialWebgl2RendererOptions)`
+
+Set the WebGL2 Renderer options
+
+###### Parameters
+
+* `partialWebgl2RendererOptions?` (`Partial<WebGL2RendererOptions> | undefined`)
+  * Options
+
+###### Returns
+
+`void`.
+
 ### `WebGL2Renderer#setPointsProgramMapUniforms(webgl2WarpedMap)`
 
 ###### Parameters
@@ -3413,7 +3722,7 @@ There are no parameters.
 
 `boolean`.
 
-### `WebGL2Renderer#startTransformationTransition(mapIds)`
+### `WebGL2Renderer#startTransformaterTransition(mapIds)`
 
 ###### Parameters
 
@@ -3439,6 +3748,14 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
+### `WebGL2Renderer#transformaterTransitionStart`
+
+###### Type
+
+```ts
+number | undefined
+```
+
 ### `WebGL2Renderer#transformationChanged(event)`
 
 ###### Parameters
@@ -3449,7 +3766,7 @@ DebouncedFunc<() => void>
 
 `void`.
 
-### `WebGL2Renderer#transformationTransitionFrame(now, mapIds)`
+### `WebGL2Renderer#transformerTransitionFrame(now, mapIds)`
 
 ###### Parameters
 
@@ -3460,14 +3777,6 @@ DebouncedFunc<() => void>
 
 `void`.
 
-### `WebGL2Renderer#transformationTransitionStart`
-
-###### Type
-
-```ts
-number | undefined
-```
-
 ### `WebGL2Renderer#updateMapsForViewport(tiles)`
 
 ###### Parameters
@@ -3477,6 +3786,16 @@ number | undefined
 ###### Returns
 
 `{mapsEnteringViewport: string[]; mapsLeavingViewport: string[]}`.
+
+### `WebGL2Renderer#updateVertexBuffers(mapIds)`
+
+###### Parameters
+
+* `mapIds?` (`Array<string> | undefined`)
+
+###### Returns
+
+`void`.
 
 ### `WebGL2Renderer#warpedMapAdded(event)`
 
@@ -3504,7 +3823,7 @@ Creates an instance of WebGL2WarpedMap.
   * WebGL program for map
 * `linesProgram` (`WebGLProgram`)
 * `pointsProgram` (`WebGLProgram`)
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
+* `options?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
   * WarpedMapOptions
 
 ###### Returns
@@ -3852,7 +4171,7 @@ There are no parameters.
 
 `Promise<void>`.
 
-### `WebGL2WarpedMap#updateVertexBuffers(projectedGeoToClipTransform)`
+### `WebGL2WarpedMap#updateVertexBuffers(projectedGeoToClipTransform, partialWebgl2RendererOptions)`
 
 Update the vertex buffers of this warped map
 
@@ -3860,6 +4179,7 @@ Update the vertex buffers of this warped map
 
 * `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
   * Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+* `partialWebgl2RendererOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; debugMaps?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 30 more ...; createRTree?: boolean | undefined; }`)
 
 ###### Returns
 
@@ -3895,984 +4215,10 @@ Update the vertex buffers of this warped map
 
 `void`.
 
-# <<<<<<< HEAD
-
-### computeProjectedGeoRectangle
-
-Returns a rotated rectangle in projected geo coordinates
-
-#### Parameters
-
-* `e` &#x20;
-* `t` &#x20;
-* `o` &#x20;
-* `r` &#x20;
-
-### fromWarpedMapList
-
-Static method creates that creates a Viewport from a WarpedMapList
-
-#### Parameters
-
-* `canvas` (`HTMLCanvasElement`)
-* `options?` (`Partial<RendererOptions> | undefined`)
-
-###### Returns
-
-`CanvasRenderer`.
-
-###### Extends
-
-* `BaseRenderer`
-* `Renderer`
-
-### `CanvasRenderer#canvas`
+### `WebGL2WarpedMap#webgl2WarpedMapOptions`
 
 ###### Type
 
 ```ts
-HTMLCanvasElement
+{ renderGcps: boolean; renderGcpsSize?: number; renderGcpsColor?: string; renderGcpsBorderSize?: number; renderGcpsBorderColor?: string; renderTransformedGcps: boolean; renderTransformedGcpsSize?: number; ... 17 more ...; renderFullMaskBorderColor?: string; }
 ```
-
-### `CanvasRenderer#context`
-
-###### Type
-
-```ts
-CanvasRenderingContext2D
-```
-
-### `CanvasRenderer#getTileImageData(data, index)`
-
-###### Parameters
-
-* `data` (`ImageData`)
-* `index` (`number`)
-
-###### Returns
-
-`number`.
-
-### `CanvasRenderer#getTileSize(data)`
-
-###### Parameters
-
-* `data` (`ImageData`)
-
-###### Returns
-
-`[number, number]`.
-
-### `CanvasRenderer#render()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Promise<void>`.
-
-### `new WebGL2Renderer(gl, options)`
-
-Creates an instance of WebGL2Renderer.
-
-###### Parameters
-
-* `gl` (`WebGL2RenderingContext`)
-  * WebGL 2 rendering context
-* `options?` (`Partial<RendererOptions> | undefined`)
-  * options
-
-###### Returns
-
-`WebGL2Renderer`.
-
-###### Extends
-
-* `BaseRenderer`
-* `Renderer`
-
-### `WebGL2Renderer#addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)`
-
-###### Parameters
-
-* `webgl2WarpedMap` (`WebGL2WarpedMap`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#animating`
-
-###### Type
-
-```ts
-false
-```
-
-### `WebGL2Renderer#animationProgress`
-
-###### Type
-
-```ts
-0
-```
-
-### `WebGL2Renderer#cancelThrottledFunctions()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#changed()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#clear()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#clearMap(mapId)`
-
-###### Parameters
-
-* `mapId` (`string`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#contextLost()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#contextRestored()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#destroy()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#disableRender`
-
-###### Type
-
-```ts
-false
-```
-
-### `WebGL2Renderer#distortionChanged(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#gcpsChanged(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#getColorizeOptions()`
-
-Get the colorize options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Partial<Partial<{color: Color}>> | undefined`.
-
-### `WebGL2Renderer#getGridOptions()`
-
-Get the grid options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`Partial<Partial<{enabled: boolean}>> | undefined`.
-
-### `WebGL2Renderer#getMapColorizeOptions(mapId)`
-
-Get the colorize options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-Colorize options (`Partial<Partial<{color: Color}>> | undefined`).
-
-### `WebGL2Renderer#getMapGridOptions(mapId)`
-
-Get the grid options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`Partial<Partial<{enabled: boolean}>> | undefined`.
-
-### `WebGL2Renderer#getMapOpacity(mapId)`
-
-Get the opacity of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`number | undefined`.
-
-### `WebGL2Renderer#getMapRemoveColorOptions(mapId)`
-
-Get the remove color options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`  | Partial<Partial<{color: Color; threshold: number; hardness: number}>>
-  | undefined`.
-
-### `WebGL2Renderer#getMapSaturation(mapId)`
-
-Get the saturation of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`number | undefined`.
-
-### `WebGL2Renderer#getOpacity()`
-
-Get the opacity of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`number | undefined`.
-
-### `WebGL2Renderer#getRemoveColorOptions()`
-
-Get the remove color options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`  | Partial<Partial<{color: Color; threshold: number; hardness: number}>>
-  | undefined`.
-
-### `WebGL2Renderer#getSaturation()`
-
-Get the saturation of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`number`.
-
-### `WebGL2Renderer#gl`
-
-###### Type
-
-```ts
-WebGL2RenderingContext
-```
-
-### `WebGL2Renderer#imageInfoLoaded(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#initializeWebGL(gl)`
-
-###### Parameters
-
-* `gl` (`WebGL2RenderingContext`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#lastAnimationFrameRequestId`
-
-###### Type
-
-```ts
-number | undefined
-```
-
-### `WebGL2Renderer#linesProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2Renderer#mapProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2Renderer#mapTileLoaded(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#mapTileRemoved(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#opacity`
-
-###### Type
-
-```ts
-DEFAULT_OPACITY
-```
-
-### `WebGL2Renderer#pointsProgram`
-
-###### Type
-
-```ts
-WebGLProgram
-```
-
-### `WebGL2Renderer#preChange(event)`
-
-###### Parameters
-
-* `event` (`Event`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#prepareRenderInternal()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#previousSignificantViewport`
-
-###### Type
-
-```ts
-Viewport | undefined
-```
-
-### `WebGL2Renderer#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)`
-
-###### Parameters
-
-* `webgl2WarpedMap` (`WebGL2WarpedMap`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#render(viewport)`
-
-Render the map for a given viewport
-
-###### Parameters
-
-* `viewport` (`Viewport`)
-  * the current viewport
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#renderInternal()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#renderLinesInternal()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#renderMapsInternal()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#renderOptions`
-
-###### Type
-
-```ts
-any
-```
-
-### `WebGL2Renderer#renderPointsInternal()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetColorizeOptions()`
-
-Reset the colorize options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetGridOptions()`
-
-Reset the grid options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetMapColorizeOptions(mapId)`
-
-Reset the colorize options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetMapGridOptions(mapId)`
-
-Reset the grid options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetMapOpacity(mapId)`
-
-Rreset the opacity of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetMapRemoveColorOptions(mapId)`
-
-Reset the remove color options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetMapSaturation(mapId)`
-
-Reset the saturation of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetOpacity()`
-
-Reset the opacity of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetRemoveColorOptions()`
-
-Reset the remove color options of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#resetSaturation()`
-
-Reset the satuation of the renderer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#saturation`
-
-###### Type
-
-```ts
-DEFAULT_SATURATION
-```
-
-### `WebGL2Renderer#setColorizeOptions(colorizeOptions)`
-
-Set the colorize options of the renderer
-
-###### Parameters
-
-* `colorizeOptions` (`{color?: Color | undefined}`)
-  * the colorize options to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setGridOptions(gridOptions)`
-
-Set the grid options of the renderer
-
-###### Parameters
-
-* `gridOptions` (`{enabled?: boolean | undefined}`)
-  * the grid options to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setLinesProgramMapUniforms(webgl2WarpedMap)`
-
-###### Parameters
-
-* `webgl2WarpedMap` (`WebGL2WarpedMap`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setLinesProgramUniforms()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapColorizeOptions(mapId, colorizeOptions)`
-
-Set the colorize options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `colorizeOptions` (`{color?: Color | undefined}`)
-  * the colorize options to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapGridOptions(mapId, gridOptions)`
-
-Set the grid options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `gridOptions` (`{enabled?: boolean | undefined}`)
-  * the grid options to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapOpacity(mapId, opacity)`
-
-Set the opacity of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `opacity` (`number`)
-  * opacity to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapProgramMapUniforms(webgl2WarpedMap)`
-
-###### Parameters
-
-* `webgl2WarpedMap` (`WebGL2WarpedMap`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapProgramRenderOptionsUniforms(layerRenderOptions, mapRenderOptions)`
-
-###### Parameters
-
-* `layerRenderOptions` (`{
-    removeColorOptions?: RemoveColorOptions | undefined
-    colorizeOptions?: ColorizeOptions | undefined
-    gridOptions?: GridOptions | undefined
-  }`)
-* `mapRenderOptions` (`{
-    removeColorOptions?: RemoveColorOptions | undefined
-    colorizeOptions?: ColorizeOptions | undefined
-    gridOptions?: GridOptions | undefined
-  }`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapProgramUniforms()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapRemoveColorOptions(mapId, removeColorOptions)`
-
-Set the remove color options of a map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `removeColorOptions` (`{
-    color?: Color | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-  * the 'remove color options' to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setMapSaturation(mapId, saturation)`
-
-Set the saturation of a map
-
-0 - grayscale, 1 - original colors
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `saturation` (`number`)
-  * the saturation to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setOpacity(opacity)`
-
-Set the opacity of the renderer
-
-###### Parameters
-
-* `opacity` (`number`)
-  * opacity to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setPointsProgramMapUniforms(webgl2WarpedMap)`
-
-###### Parameters
-
-* `webgl2WarpedMap` (`WebGL2WarpedMap`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setPointsProgramUniforms()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setRemoveColorOptions(removeColorOptions)`
-
-Set the remove color options of the renderer
-
-###### Parameters
-
-* `removeColorOptions` (`{
-    color?: Color | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#setSaturation(saturation)`
-
-Set the saturation of the renderer
-
-0 - grayscale, 1 - original colors
-
-###### Parameters
-
-* `saturation` (`number`)
-  * the satuation to set
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#shouldAnticipateInteraction()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`boolean`.
-
-### `WebGL2Renderer#shouldRequestFetchableTiles()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`boolean`.
-
-### `WebGL2Renderer#startTransformationTransition(mapIds)`
-
-###### Parameters
-
-* `mapIds` (`Array<string>`)
-
-###### Returns
-
-`void`.
-
-### `WebGL2Renderer#throttledChanged`
-
-###### Type
-
-```ts
-DebouncedFunc<() => void>
-```
-
-### `WebGL2Renderer#throttledPrepareRenderInternal`
-
-###### Type
-
-```ts
-DebouncedFunc<() => void>
-```
-
-### `WebGL2Renderer#transformationChanged(event)`
-
-###### Parameters
-
-* `t` &#x20;
-* `mapId` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** ID of the map
-
-### render
-
-Render the map for a given viewport.
-
-If no viewport is specified the current viewport is rerendered.
-If no current viewport is known, a viewport is deduced based on the WarpedMapList and canvas width and hight.
-
-#### Parameters
-
-* `t` &#x20;
-* `viewport` **Viewport?** the viewport to render
-
-### fetch
-
-Fetch the tile and create its ImageData using a WebWorker.
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
-
-# Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
-
-> > > > > > > b384ff6a (Improve static functions for viewport creation)
-
-Fetch the tile and create its ImageData using a WebWorker.
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;
-
-Fetch the tile and create its ImageData using a WebWorker.
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<void>**&#x20;

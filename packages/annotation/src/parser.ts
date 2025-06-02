@@ -20,7 +20,8 @@ import {
   GCP2,
   PartOf,
   FeatureProperties,
-  ResourceType
+  ResourceType,
+  Projection
 } from './types.js'
 
 function parseResource(annotation: AnnotationAllVersions): Resource {
@@ -152,6 +153,11 @@ function parseResourceMask(annotation: AnnotationAllVersions): ResourceMask {
 function getGeoreferencedMap(
   annotation: AnnotationAllVersions
 ): GeoreferencedMap2 {
+  let resourceCrs: Projection | undefined
+  if ('resourceCrs' in annotation.body) {
+    resourceCrs = annotation.body.resourceCrs
+  }
+
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
@@ -160,7 +166,8 @@ function getGeoreferencedMap(
     resource: parseResource(annotation),
     gcps: parseGcps(annotation),
     resourceMask: parseResourceMask(annotation),
-    transformation: annotation.body.transformation
+    transformation: annotation.body.transformation,
+    resourceCrs
   }
 }
 

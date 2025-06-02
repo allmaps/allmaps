@@ -1,53 +1,48 @@
 import { Command } from '@commander-js/extra-typings'
 
+import { geojsonGeometriesToGeojsonFeatureCollection } from '@allmaps/stdlib'
+import { GcpTransformer } from '@allmaps/transform'
+
 import { parseJsonInput, printString } from '../../lib/io.js'
-import { parseTransformOptions } from '../../lib/parse.js'
-import { getTransformerFromOptions } from '../../lib/transformer.js'
+import { addAnnotationOptions, addTransformOptions } from '../../lib/options.js'
 import {
-  addAnnotationOptions,
-  addCoordinateTransformOptions
-} from '../../lib/options.js'
-import { isGeojsonGeometry, svgGeometriesToSvgString } from '@allmaps/stdlib'
+  parseTransformerInputs,
+  parseTransformOptions
+} from '../../lib/parse.js'
+
+import type { GeojsonGeometry } from '@allmaps/types/geojson.js'
 
 export function geojson() {
-  const command = addCoordinateTransformOptions(
+  const command = addTransformOptions(
     addAnnotationOptions(
       new Command('geojson')
         .argument('[files...]')
         .summary('transform GeoJSON to SVG')
         .description(
-          'Transform GeoJSON to SVG using a transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
+          'Transform GeoJSON to SVG using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.'
         )
     )
   )
 
   return command.action(async (files, options) => {
-    const transformOptions = parseTransformOptions(options)
-    const transformer = getTransformerFromOptions(options)
+    const { gcps, transformationType } = parseTransformerInputs(options)
+    const partialTransformOptions = parseTransformOptions(options)
 
-    if (options.inverse) {
-      throw new Error('Inverse transformation not supported for this command')
-    }
+    const transformer = new GcpTransformer(
+      gcps,
+      transformationType,
+      partialTransformOptions
+    )
 
-    const geojsonGeometries = await parseJsonInput(files)
+    const geojsonGeometries = (await parseJsonInput(files)) as GeojsonGeometry[]
+    const geojsonFeatureCollection =
+      geojsonGeometriesToGeojsonFeatureCollection(geojsonGeometries)
 
-    // TODO: consider to use transformGeojsonFeatureCollectionToSvgString()
-    const svgGeometries = []
-    for (const geojsonGeometry of geojsonGeometries) {
-      if (isGeojsonGeometry(geojsonGeometry)) {
-        const svgGeometry = transformer.transformGeojsonToSvg(
-          geojsonGeometry,
-          transformOptions
-        )
-        svgGeometries.push(svgGeometry)
-      } else {
-        throw new Error(
-          'Unsupported input. Only GeoJSON Points, LineStrings and Polygons are supported.'
-        )
-      }
-    }
+    const svg = GcpTransformer.transformGeojsonFeatureCollectionToSvgString(
+      transformer,
+      geojsonFeatureCollection
+    )
 
-    const svg = svgGeometriesToSvgString(svgGeometries)
     printString(svg)
   })
 }

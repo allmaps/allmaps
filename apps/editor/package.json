@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/editor",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.4",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -24,7 +24,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/types": "workspace:^",
     "@sveltejs/adapter-static": "^3.0.0",
     "@sveltejs/kit": "^2.16.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
@@ -50,14 +50,14 @@
   },
   "type": "module",
   "dependencies": {
-    "@allmaps/annotation": "^1.0.0-beta.32",
-    "@allmaps/id": "^1.0.0-beta.32",
-    "@allmaps/iiif-parser": "^1.0.0-beta.42",
-    "@allmaps/openlayers": "^1.0.0-beta.75",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/tailwind": "^1.0.0-beta.16",
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/ui": "^1.0.0-beta.34",
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/openlayers": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "@tailwindcss/typography": "^0.5.9",
     "bits-ui": "^1.3.10",
     "lodash-es": "^4.17.21",

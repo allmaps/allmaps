@@ -66,7 +66,7 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
 }
 
 export function combineBboxes(...bboxes: Bbox[]): Bbox | undefined {
-  if (bboxes.length == 0) {
+  if (bboxes.length === 0) {
     return undefined
   }
 
@@ -112,7 +112,7 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
 // Ratio 2 adds half the current width (or height) both left and right of the current (width or height)
 // so the total width (or height) goes * 2 and the total surface goes * 4
 export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
-  if (ratio == 0) {
+  if (ratio === 0) {
     return bbox
   }
   const size = bboxToSize(bbox)
@@ -166,6 +166,10 @@ export function bboxToSize(bbox: Bbox): Size {
   return [bbox[2] - bbox[0], bbox[3] - bbox[1]]
 }
 
+export function bboxToResolution(bbox: Bbox): number {
+  return sizeToResolution(bboxToSize(bbox))
+}
+
 // Approximate results for quadrilaterals, exact for rectangles (e.g. coming from bboxes).
 // A more precise result would require a minimal-covering-rectangle algorithm
 // Or computing and comparing rectangle surfaces
@@ -183,7 +187,7 @@ export function rectangleToSize(rectangle: Rectangle): Size {
 // Convex hull
 
 export function convexHull(points: Point[]): Ring | undefined {
-  if (points.length == 0) {
+  if (points.length === 0) {
     return undefined
   }
 
@@ -225,10 +229,9 @@ export function convexHull(points: Point[]): Ring | undefined {
  *                ....
  *
  * @export
- * @param {Size} size0 - first size
- * @param {Size} size1 - second size
- * @param {?Fit} [fit] - fit
- * @returns {number}
+ * @param size0 - first size
+ * @param size1 - second size
+ * @param fit - fit
  */
 export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
   if (!fit) {

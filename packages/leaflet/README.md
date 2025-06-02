@@ -141,7 +141,7 @@ MIT
 ###### Type
 
 ```ts
-WarpedMapListOptions & WarpedMapOptions & { imageInformations: ImageInformations; fetchFn: FetchFn; } & { opacity: number; ... 4 more ...; imageInformations?: ImageInformations; }
+{ renderMaps: boolean; renderLines: boolean; renderPoints: boolean; debugMaps: boolean; } & SpecificWebGL2WarpedMapOptions & WarpedMapOptions & { ...; } & { ...; }
 ```
 
 ### `new WarpedMapEvent(type, data)`
@@ -980,6 +980,19 @@ Sets the opacity of the layer
 ###### Returns
 
 `this`.
+
+### `WarpedMapLayer#setOptions(options)`
+
+Sets the options
+
+###### Parameters
+
+* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
+  * Options
+
+###### Returns
+
+`void`.
 
 ### `WarpedMapLayer#setRemoveColor(options)`
 

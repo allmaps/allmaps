@@ -36,7 +36,12 @@
   onMount(() => {
     files.forEach((file, index) => {
       const url = `${baseUrl}${file.filename}`
-      fetch(url, { method: 'HEAD' }).then((response) => {
+      fetch(url, {
+        method: 'HEAD',
+        headers: {
+          'Accept-Encoding': 'identity'
+        }
+      }).then((response) => {
         if (response.ok) {
           const contentLength = response.headers.get('Content-Length')
           files[index].size = Number(contentLength)

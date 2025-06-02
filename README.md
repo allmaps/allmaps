@@ -197,17 +197,11 @@ pnpm test
 Create prerelease versions:
 
 ```sh
-lerna version prerelease
+pnpm run version-prerelease
 ```
 
 Publish beta versions to npm:
 
 ```sh
-lerna publish from-git --dist-tag beta
-```
-
-Promoting unchanged pre-release versions:
-
-```sh
-lerna version --conventional-commits --conventional-graduate
+pnpm run publish-beta
 ```

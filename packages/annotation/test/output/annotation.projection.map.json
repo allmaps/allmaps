@@ -1,0 +1,51 @@
+[
+  {
+    "@context": "https://schemas.allmaps.org/map/2/context.json",
+    "type": "GeoreferencedMap",
+    "id": "https://annotations.allmaps.org/maps/393a52e3e3882bc6",
+    "created": "2025-02-21T18:04:04.534Z",
+    "modified": "2025-02-21T18:04:04.534Z",
+    "resource": {
+      "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~354185~90121323",
+      "width": 9147,
+      "height": 6661,
+      "type": "ImageService2"
+    },
+    "gcps": [
+      {
+        "resource": [5645, 2302],
+        "geo": [30.3088374, 59.9265149]
+      },
+      {
+        "resource": [6753, 5804],
+        "geo": [34.5756332, 35.6739821]
+      },
+      {
+        "resource": [1785, 4343],
+        "geo": [-9.288174, 43.0615478]
+      }
+    ],
+    "resourceMask": [
+      [1563, 2173],
+      [1516, 5959],
+      [7899, 6044],
+      [7915, 667],
+      [3338, 622],
+      [3322, 1744],
+      [3285, 1927],
+      [3197, 2073],
+      [3065, 2147],
+      [2926, 2174]
+    ],
+    "transformation": {
+      "type": "polynomial",
+      "options": {
+        "order": 1
+      }
+    },
+    "resourceCrs": {
+      "name": "Bonne",
+      "definition": "+proj=bonne +lat_1=60 +lon_0=0 +x_0=0 +y_0=0 +R=6371000 +units=m +no_defs +type=crs"
+    }
+  }
+]

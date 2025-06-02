@@ -1,36 +1,43 @@
-export { GcpTransformer } from './transformer.js'
+export { GcpTransformer } from './transformers/GcpTransformer.js'
+export { GeneralGcpTransformer } from './transformers/GeneralGcpTransformer.js'
 
-export { Transformation } from './transformation.js'
-
-export { Helmert } from './transformation-types/helmert.js'
-export { Polynomial } from './transformation-types/polynomial.js'
-export { Projective } from './transformation-types/projective.js'
-export { RBF } from './transformation-types/radial-basis-function.js'
-export { Straight } from './transformation-types/straight.js'
+export { Helmert } from './transformation-types/Helmert.js'
+export { Polynomial } from './transformation-types/Polynomial.js'
+export { Projective } from './transformation-types/Projective.js'
+export { RBF } from './transformation-types/RBF.js'
+export { Straight } from './transformation-types/Straight.js'
 
 export {
   supportedDistortionMeasures,
   computeDistortionsFromPartialDerivatives
-} from './distortion.js'
+} from './shared/distortion.js'
 
 export {
-  //   defaultTransformOptions,
-  getForwardTransformResolution
-  //   getBackwardTransformResolution
-} from './shared/transform-helper-functions.js'
-
-// export { defaultRefinementOptions } from './shared/refinement-helper-functions.js'
+  defaultGeneralGcpTransformerOptions,
+  defaultGcpTransformerOptions,
+  defaultGeneralGcpTransformOptions,
+  defaultGcpTransformOptions
+} from './shared/transform-functions.js'
 
 export type {
   GeneralGcp,
+  Distortions,
+  GeneralGcpAndDistortions,
+  GcpAndDistortions,
   RefinementOptions,
   SplitGcpLinePointInfo,
   SplitGcpLineInfo,
   TransformationType,
-  TransformOptions,
+  GcpInputs,
+  TransformationTypeInputs,
+  TransformerInputs,
+  GeneralGcpTransformerOptions,
+  GcpTransformerOptions,
+  GeneralGcpTransformOptions,
+  GcpTransformOptions,
   KernelFunction,
   KernelFunctionOptions,
   NormFunction,
-  EvaluationType,
-  DistortionMeasure
+  DistortionMeasure,
+  ProjectionFunction
 } from './shared/types.js'

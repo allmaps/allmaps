@@ -1,9 +1,16 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { TransformOptions, TransformationType } from '@allmaps/transform'
-import type { Gcp } from '@allmaps/types'
 import { readFromFile, parseJsonFromFile } from './io.js'
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+import type {
+  TransformationType,
+  TransformerInputs,
+  GcpTransformerOptions,
+  GcpTransformOptions
+} from '@allmaps/transform'
+import type { Gcp } from '@allmaps/types'
+import { InverseOptions } from '@allmaps/transform/shared/types.js'
 
 export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   if (options.annotation) {
@@ -20,11 +27,34 @@ export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   throw new Error('No Georeference Annotation supplied')
 }
 
+export function parseAnnotationValidateMap(
+  jsonValue: unknown
+): GeoreferencedMap[] | GeoreferencedMap {
+  if (
+    jsonValue &&
+    typeof jsonValue === 'object' &&
+    'type' in jsonValue &&
+    (jsonValue.type === 'Annotation' || jsonValue.type === 'AnnotationPage')
+  ) {
+    return parseAnnotation(jsonValue)
+  } else {
+    return validateGeoreferencedMap(jsonValue)
+  }
+}
+
+export function parseAnnotationsValidateMaps(
+  jsonValues: unknown[]
+): GeoreferencedMap[] {
+  const maps = jsonValues.map(parseAnnotationValidateMap).flat()
+
+  return maps
+}
+
 export function parseGcps(
-  options: { gcps?: string; annotation?: string },
+  options: { gcps?: string },
   map?: GeoreferencedMap
 ): Gcp[] {
-  let gcps
+  let gcps: Gcp[]
   if (options.gcps) {
     gcps = parseGcpsFromFile(options.gcps)
   } else if (map) {
@@ -54,25 +84,10 @@ export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
   return parseCoordinatesArrayArray(readFromFile(file))
 }
 
-export function parseCoordinatesArrayArray(
-  coordinatesString: string
-): number[][] {
-  // String from mutliline file where each line contains multiple coordinates separated by whitespace
-  return coordinatesString
-    .trim()
-    .split('\n')
-    .map((coordinatesLineString) =>
-      coordinatesLineString
-        .split(/\s+/)
-        .map((coordinateString) => Number(coordinateString.trim()))
-    )
-}
-
 export function parseTransformationType(
   options: {
-    annotation?: string
-    transformationType: string
-    polynomialOrder: number
+    transformationType?: string
+    polynomialOrder?: number
   },
   map?: GeoreferencedMap
 ): TransformationType {
@@ -98,8 +113,8 @@ export function parseTransformationType(
     transformationType = options.transformationType
   } else if (options.transformationType === 'projective') {
     transformationType = options.transformationType
-  } else if (options.annotation && map?.transformation?.type) {
-    transformationType = map.transformation?.type
+  } else if (map && map.transformation) {
+    transformationType = map.transformation.type
   } else {
     transformationType = 'polynomial'
   }
@@ -107,57 +122,103 @@ export function parseTransformationType(
   return transformationType
 }
 
-export function parseAnnotationValidateMap(
-  jsonValue: unknown
-): GeoreferencedMap[] | GeoreferencedMap {
-  if (
-    jsonValue &&
-    typeof jsonValue === 'object' &&
-    'type' in jsonValue &&
-    (jsonValue.type === 'Annotation' || jsonValue.type === 'AnnotationPage')
-  ) {
-    return parseAnnotation(jsonValue)
-  } else {
-    return validateGeoreferencedMap(jsonValue)
+export function parseTransformerInputs(
+  options: Partial<{
+    annotation: string
+    gcps: string
+    transformationType: string
+    polynomialOrder: number
+  }>
+): TransformerInputs {
+  let map: GeoreferencedMap | undefined
+
+  try {
+    map = parseMap(options)
+  } catch {
+    // If no map is found, try parsing GCPs from options instead of a map
   }
-}
 
-export function parseAnnotationsValidateMaps(
-  jsonValues: unknown[]
-): GeoreferencedMap[] {
-  const maps = jsonValues.map(parseAnnotationValidateMap).flat()
+  const gcps = parseGcps(options, map)
+  const transformationType = parseTransformationType(options, map)
 
-  return maps
+  return { gcps, transformationType }
 }
 
 export function parseTransformOptions(options: {
   minOffsetRatio?: number
+  minOffsetDistance?: number
+  minLineDistance?: number
   maxDepth?: number
-  destinationIsGeographic?: boolean
-  sourceIsGeographic?: boolean
-}): Partial<TransformOptions> {
-  const transformOptions: Partial<TransformOptions> = {}
+  geoIsGeographic?: boolean
+}): Partial<GcpTransformOptions> {
+  const transformOptions: Partial<GcpTransformOptions> = {}
 
   if (options && typeof options === 'object') {
-    if ('minOffsetRatio' in options && options.minOffsetRatio) {
-      transformOptions.minOffsetRatio = Number(options.minOffsetRatio)
-    }
-
     if ('maxDepth' in options && options.maxDepth) {
       transformOptions.maxDepth = Math.round(Number(options.maxDepth))
     }
 
-    if (
-      'destinationIsGeographic' in options &&
-      options.destinationIsGeographic
-    ) {
-      transformOptions.destinationIsGeographic = options.destinationIsGeographic
+    if ('minOffsetRatio' in options && options.minOffsetRatio) {
+      transformOptions.minOffsetRatio = Number(options.minOffsetRatio)
     }
 
-    if ('sourceIsGeographic' in options && options.sourceIsGeographic) {
-      transformOptions.sourceIsGeographic = options.sourceIsGeographic
+    if ('minOffsetDistance' in options && options.minOffsetDistance) {
+      transformOptions.minOffsetDistance = Number(options.minOffsetDistance)
+    }
+
+    if ('minLineDistance' in options && options.minLineDistance) {
+      transformOptions.minLineDistance = Number(options.minLineDistance)
+    }
+
+    if ('geoIsGeographic' in options && options.geoIsGeographic) {
+      transformOptions.geoIsGeographic = options.geoIsGeographic
     }
   }
 
+  // Note: distortionMeasures and referenceScale not supported, since this would require output processing function
+  // Note: Conversion options, i.e. isMultiGeometry, not supported
+
   return transformOptions
+}
+
+export function parseTransformerOptions(options: {
+  differentHandedness?: boolean
+}): Partial<GcpTransformerOptions> {
+  const transformerOptions: Partial<GcpTransformerOptions> = {}
+
+  if (options && typeof options === 'object') {
+    if ('differentHandedness' in options && options.differentHandedness) {
+      transformerOptions.differentHandedness = options.differentHandedness
+    }
+  }
+
+  // Note: Project functions postToGeo and preToResource not supported
+
+  return transformerOptions
+}
+
+export function parseInverseOptions(options: {
+  inverse?: boolean
+}): Partial<InverseOptions> {
+  const transformOptions: Partial<InverseOptions> = {}
+
+  if ('inverse' in options && options.inverse) {
+    transformOptions.inverse = options.inverse
+  }
+
+  return transformOptions
+}
+
+export function parseCoordinatesArrayArray(
+  coordinatesString: string
+): number[][] {
+  // String from mutliline file where each line contains multiple coordinates separated by whitespace
+  return coordinatesString
+    .trim()
+    .split('\n')
+    .map((coordinatesLineString) =>
+      coordinatesLineString
+        .split(/\s+/)
+        .map((coordinateString) => Number(coordinateString.trim()))
+    )
 }

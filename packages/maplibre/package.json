@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.32",
+  "version": "1.0.0-beta.34",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -50,13 +50,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
     "maplibre-gl": "^4.5.0"
   },
   "devDependencies": {
-    "@allmaps/transform": "^1.0.0-beta.43",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

@@ -17,18 +17,18 @@
     "precommit": "pnpm run types && pnpm run test && pnpm run lint && pnpm run documentation",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "version-prerelease": "lerna version prerelease",
+    "publish-beta": "lerna publish from-git --dist-tag beta"
   },
   "devDependencies": {
-    "husky": "^8.0.3",
-    "lerna": "^7.0.0",
-    "nx": "^14.3.6"
+    "@lerna-lite/cli": "^4.1.2",
+    "@lerna-lite/publish": "^4.1.2",
+    "@lerna-lite/run": "^4.1.2",
+    "husky": "^8"
   },
   "engines": {
     "node": ">=22.6.0"
   },
-  "packageManager": "pnpm@8.10.0+sha512.9c2cb83f2b6cf6a25d8c58300bf99197c7ef3be84cf3e766f29054b40b83b42f8aaba6fcc314a9ecf27c00f7ce80a757bb4c608800e7adbe2d29dc5c7056f5be",
-  "dependencies": {
-    "packages": "link:/Users/bdon/workspace/allmaps/allmaps/packages"
-  }
+  "packageManager": "pnpm@8.10.0+sha512.9c2cb83f2b6cf6a25d8c58300bf99197c7ef3be84cf3e766f29054b40b83b42f8aaba6fcc314a9ecf27c00f7ce80a757bb4c608800e7adbe2d29dc5c7056f5be"
 }

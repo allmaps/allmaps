@@ -22,13 +22,19 @@
       // Example: 'https://annotations.allmaps.org/maps/37af8588be44c256'
 
       const annotation = await fetch(
-          'https://annotations.allmaps.org/images/9f888622a47479cc'
+          'https://annotations.allmaps.org/images/9f888622a47479cc', // Forum Romanum
+          // "https://annotations.allmaps.org/images/f6033bee94f7763e" // Europe
         ).then((response) => response.json())
 
       let projectedGeoPerViewportScale
       const ratio = window.devicePixelRatio || 1
       const rotation = 0
       const zoom = 1
+
+      const mercatorProjection = { definition: 'EPSG:3857'}
+      const bonneProjection = { definition: '+proj=bonne +lat_1=60 +lon_0=0 +x_0=0 +y_0=0 +R=6371000 +units=m +no_defs +type=crs'}
+
+      const projection = mercatorProjection
 
       async function renderCanvasRendererViewportFromSizeAndMaps() {
         const width = 600
@@ -45,14 +51,17 @@
 
         await renderer.addGeoreferenceAnnotation(annotation)
 
+        // renderer.warpedMapList.setMapsInternalProjection(bonneProjection)
+
         const viewport = Viewport.fromSizeAndMaps(
           [width, height],
           renderer.warpedMapList,
           {
             fit: 'contain',
-            rotation: rotation,
+            rotation,
             devicePixelRatio: ratio,
-            zoom: zoom
+            zoom,
+            projection,
           }
         )
 
@@ -73,15 +82,18 @@
         await renderer.addGeoreferenceAnnotation(annotation)
 
         const mapId = Array.from(renderer.warpedMapList.getMapIds())[0]
-        console.log(mapId)
+
+        // renderer.warpedMapList.setMapsInternalProjection(bonneProjection)
 
         const viewport = Viewport.fromScaleAndMaps(
           projectedGeoPerViewportScale,
-          renderer.warpedMapList.getWarpedMaps([mapId]),
+          renderer.warpedMapList,
           {
-            rotation: rotation,
+            rotation,
             devicePixelRatio: ratio,
-            zoom: zoom
+            zoom,
+            mapIds: [mapId],
+            projection
           }
         )
 

@@ -29,15 +29,19 @@ import {
 import {
   ImageServiceSchema,
   ResourceMaskSchema,
-  PartOfSchema
+  PartOfSchema,
+  ProjectionSchema,
+  PartOfItemSchema
 } from './schemas/shared.js'
 
 export type ImageService = z.infer<typeof ImageServiceSchema>
 export type ResourceMask = z.infer<typeof ResourceMaskSchema>
 export type PartOf = z.infer<typeof PartOfSchema>
+export type PartOfItem = z.infer<typeof PartOfItemSchema>
 export type ResourceType = z.infer<typeof ResourceTypeSchema>
 export type Target = z.infer<typeof TargetSchema>
 export type Source = z.infer<typeof SourceSchema>
+export type Projection = z.infer<typeof ProjectionSchema>
 
 export type GeoreferencedMap1 = z.infer<typeof GeoreferencedMap1Schema>
 export type GeoreferencedMaps1 = z.infer<typeof GeoreferencedMaps1Schema>

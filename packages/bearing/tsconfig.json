@@ -6,9 +6,9 @@
     "paths": {}
   },
   "references": [
-    { "path": "../transform" },
     { "path": "../annotation" },
-    { "path": "../stdlib" }
+    { "path": "../stdlib" },
+    { "path": "../project" },
   ],
   "include": ["./src/**/*"]
 }

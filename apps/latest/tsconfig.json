@@ -12,8 +12,9 @@
     "strict": true
   },
   "references": [
-    { "path": "../../packages/transform" },
     { "path": "../../packages/annotation" },
+    { "path": "../../packages/project" },
+    { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/types" },
     { "path": "../../packages/id" }

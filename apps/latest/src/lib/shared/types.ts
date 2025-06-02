@@ -1,4 +1,4 @@
-import type { Polygon } from 'geojson'
+import type { Polygon as GeojsonPolygon } from 'geojson'
 
 export type Urls = {
   annotation?: string
@@ -13,7 +13,7 @@ export type Properties = {
 }
 
 export type DisplayMap = {
-  polygon: Polygon
+  polygon: GeojsonPolygon
   hostname: string
   timeAgo?: string
   properties: Properties

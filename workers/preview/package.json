@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/preview",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.11",
   "description": "Allmaps Preview",
   "private": true,
   "author": {
@@ -8,7 +8,7 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "main": "./dist/worker.es.js",
+  "main": "./src/index.ts",
   "type": "module",
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js preview) --env dev",
+    "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "test": "vitest run --passWithNoTests",
     "types": "tsc --noEmit",
@@ -26,25 +27,42 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@allmaps/render": "^1.0.0-beta.70",
-    "@allmaps/stdlib": "^1.0.0-beta.33",
-    "@allmaps/types": "^1.0.0-beta.17",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/types": "workspace:^",
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/transform": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
+    "@cloudflare/pages-plugin-vercel-og": "^0.1.2",
     "@cloudflare/vitest-pool-workers": "^0.1.0",
-    "@cloudflare/workers-types": "^4.20240320.1",
+    "@turf/rewind": "^7.2.0",
+    "@types/d3-geo": "^3.1.0",
     "@types/eslint": "^8.56.0",
+    "@types/geojson": "^7946.0.14",
+    "@types/node": "^18.14.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/tinycolor2": "^1.4.3",
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "autoprefixer": "^10.4.21",
+    "d3-geo": "^3.1.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "itty-router": "^5.0.16",
     "jpeg-js": "^0.4.4",
     "prettier": "^3.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.7.0",
     "upng-js": "^2.1.0",
     "vitest": "1.3.0",
-    "workers-og": "^0.0.24",
-    "wrangler": "^3.57.2"
+    "wrangler": "^4.3.0"
+  },
+  "dependencies": {
+    "tinycolor2": "^1.6.0"
   }
 }
