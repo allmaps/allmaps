@@ -11,7 +11,8 @@ import { pink } from '@allmaps/tailwind'
 import { cachedFetch } from '../shared/fetch.js'
 import { getLocalFont } from '../shared/fonts.js'
 import { loadImage } from '../shared/image.js'
-import { computeCrop } from '../shared/crop.js'
+import { computeCrop, computeMaxSize } from '../shared/crop.js'
+import { arrayBufferToBase64 } from '../shared/base64.js'
 
 import { Pin } from '../components/Pin.js'
 import { Dots } from '../components/Dots.js'
@@ -88,9 +89,11 @@ export async function generateHereCard(
   )
   const parsedImage = Image.parse(image)
 
-  const bbox = computeBbox(parsedMap.resourceMask)
+  if (!parsedImage.supportsAnyRegionAndSize) {
+    throw new Error('IIIF Level 0 images are not supported')
+  }
 
-  // TODO: check if parsedImage.supportsAnyRegionAndSize
+  const bbox = computeBbox(parsedMap.resourceMask)
 
   const targetPoint: Point = [
     cardResourceSize[0] / 2,
@@ -105,10 +108,25 @@ export async function generateHereCard(
     targetPoint
   )
 
+  const maxSize = computeMaxSize(crop.size, {
+    maxArea: parsedImage.maxArea,
+    maxWidth: parsedImage.maxWidth,
+    maxHeight: parsedImage.maxHeight
+  })
+
   const imageUrl = parsedImage.getImageUrl({
     region: crop.region,
-    size: crop.size
+    size: maxSize
   })
+
+  const imageResponse = await cachedFetch(imageUrl)
+  if (!imageResponse.ok) {
+    throw new Error('Failed to load IIIF Image')
+  }
+
+  const imageArrayBuffer = await imageResponse.arrayBuffer()
+  const base64Image = arrayBufferToBase64(imageArrayBuffer)
+  const imageSource = `data:image/jpeg;base64,${base64Image}`
 
   const pinLeft = crop.coordinates[0] - pinWidth / 2
   const pinTop = crop.coordinates[1] - pinHeight
@@ -130,8 +148,8 @@ export async function generateHereCard(
         justifyContent: 'center',
         position: 'relative',
         padding: `${padding}px`,
-        height: '100vh',
         width: '100vw',
+        height: '100vh',
         background: tinycolor(color).lighten(20).toString()
       }}
     >
@@ -158,7 +176,7 @@ export async function generateHereCard(
         }}
       >
         <img
-          src={imageUrl}
+          src={imageSource}
           width={cardResourceSize[0]}
           height={cardResourceSize[1]}
           style={{ position: 'absolute', top: 0, borderRadius: '16px' }}

@@ -1,5 +1,12 @@
 import type { Bbox, Size, Point } from '@allmaps/types'
 
+type MaxSize ={
+maxArea?: number
+  maxWidth?: number
+  maxHeight?:number
+}
+
+
 export function computeCrop(
   cropSize: Size,
   imageSize: Size,
@@ -67,5 +74,41 @@ export function computeCrop(
       height: Math.round(cropHeight)
     },
     coordinates: [croppedX, croppedY]
+  }
+}
+
+export function computeMaxSize(size: {width: number, height: number}, maxSize: MaxSize) {
+  const { width, height } = size
+  const { maxArea, maxWidth, maxHeight } = maxSize
+
+  // If no constraints are provided, return the original size
+  if (!maxArea && !maxWidth && !maxHeight) {
+    return { width, height }
+  }
+
+  let scale = 1
+
+  // Check if the image exceeds the maximum area
+  if (maxArea && width * height > maxArea) {
+    const areaScale = Math.sqrt(maxArea / (width * height))
+    scale = Math.min(scale, areaScale)
+  }
+
+  // Check if the width exceeds the maximum width
+  if (maxWidth && width > maxWidth) {
+    const widthScale = maxWidth / width
+    scale = Math.min(scale, widthScale)
+  }
+
+  // Check if the height exceeds the maximum height
+  if (maxHeight && height > maxHeight) {
+    const heightScale = maxHeight / height
+    scale = Math.min(scale, heightScale)
+  }
+
+  // Apply the scale factor to the dimensions
+  return {
+    width: Math.round(width * scale),
+    height: Math.round(height * scale)
   }
 }
