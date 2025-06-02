@@ -1,12 +1,10 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
-  import { page } from '$app/state'
-  import { onNavigate, afterNavigate } from '$app/navigation'
+  import { onNavigate } from '$app/navigation'
 
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
-  import { setUrlState } from '$lib/state/url.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
 
@@ -22,7 +20,6 @@
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
   const sensorsState = setSensorsState(errorState)
-  const urlState = setUrlState(page.url, errorState)
 
   setMapsState(sensorsState, imageInfoState, errorState)
   setUiState()
@@ -31,10 +28,10 @@
     children?: Snippet
   }
 
-  let { children }: LayoutProps & Props = $props()
+  let { data, children }: LayoutProps & Props = $props()
 
-  afterNavigate(() => {
-    urlState.updateUrl(page.url)
+  $effect.pre(() => {
+    sensorsState.position = data.position
   })
 
   onNavigate((navigation) => {

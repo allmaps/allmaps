@@ -4,6 +4,8 @@ import { browser } from '$app/environment'
 
 import { throttle } from 'lodash-es'
 
+import type { Point } from '@allmaps/types'
+
 import type { ErrorState } from '$lib/state/error.svelte.ts'
 
 import type { Orientation } from '$lib/shared/types.ts'
@@ -22,6 +24,7 @@ export class SensorsState {
   #watchId: number | undefined
 
   #position = $state<GeolocationPosition>()
+  #positionOverride = $state<Point>()
 
   #orientation = $state<Orientation>()
   #hasOrientation = $derived(
@@ -78,8 +81,29 @@ export class SensorsState {
     }
   }
 
-  get position() {
-    return this.#position
+  get position(): GeolocationPosition | undefined {
+    if (this.#positionOverride) {
+      return {
+        coords: {
+          longitude: this.#positionOverride[0],
+          latitude: this.#positionOverride[1],
+          accuracy: 0,
+          altitude: 0,
+          altitudeAccuracy: 0,
+          heading: 0,
+          speed: 0,
+          toJSON: () => {}
+        },
+        timestamp: Date.now(),
+        toJSON: () => {}
+      }
+    } else {
+      return this.#position
+    }
+  }
+
+  set position(position: Point | undefined) {
+    this.#positionOverride = position
   }
 
   get orientation() {

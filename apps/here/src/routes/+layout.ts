@@ -10,10 +10,12 @@ export const load: LayoutLoad = async ({ url, fetch }) => {
   let geojsonRoute: GeojsonRoute | undefined
   let from: Point | undefined
   let color: string | undefined
+  let position: Point | undefined
 
   const geojsonParam = url.searchParams.get('geojson') || undefined
   const fromParam = url.searchParams.get('from') || undefined
   const colorParam = url.searchParams.get('color') || undefined
+  const positionParam = url.searchParams.get('position') || undefined
 
   if (geojsonParam) {
     let response: Response | undefined
@@ -121,7 +123,7 @@ export const load: LayoutLoad = async ({ url, fetch }) => {
         throw new Error()
       }
     } catch {
-      console.warn('From not valid, should be lat,lon')
+      console.warn('From parameter not valid, should be lat,lon')
     }
   }
 
@@ -141,9 +143,26 @@ export const load: LayoutLoad = async ({ url, fetch }) => {
     }
   }
 
+  if (positionParam) {
+    try {
+      const parsedPosition = positionParam.split(',').map((c) => parseFloat(c))
+
+      if (
+        parsedPosition.length === 2 &&
+        !isNaN(parsedPosition[0]) &&
+        !isNaN(parsedPosition[1])
+      ) {
+        position = [parsedPosition[0], parsedPosition[1]]
+      }
+    } catch {
+      console.warn('position parameter not valid, should be lat,lon')
+    }
+  }
+
   return {
     geojsonRoute,
     from,
-    color
+    color,
+    position
   }
 }

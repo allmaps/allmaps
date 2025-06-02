@@ -22,12 +22,12 @@
   let { data }: PageProps = $props()
 
   const mapsState = getMapsState()
-  const sensorState = getSensorsState()
+  const sensorsState = getSensorsState()
   const errorState = getErrorState()
 
   let waitingForPositionTimeout = $state(false)
   let waitingForPosition = $derived(
-    !sensorState.position &&
+    !sensorsState.position &&
       !errorState.geolocationPositionError &&
       !waitingForPositionTimeout
   )
