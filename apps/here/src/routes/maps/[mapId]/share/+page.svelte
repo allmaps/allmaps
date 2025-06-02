@@ -72,7 +72,9 @@
           <div class="flex flex-row gap-2 items-center">
             <ShareNetworkIcon size="24" />
             <span class="text-lg font-semibold"
-              >Share your location on this map</span
+              >Share your location <span class="hidden sm:inline"
+                >on this map</span
+              ></span
             >
           </div>
 
