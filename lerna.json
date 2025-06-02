@@ -1,6 +1,8 @@
 {
+  "$schema": "node_modules/@lerna-lite/cli/schemas/lerna-schema.json",
   "packages": ["packages/*", "apps/*", "workers/*"],
   "npmClientArgs": ["--no-lockfile"],
+  "npmClient": "pnpm",
   "version": "independent",
   "command": {
     "version": {
