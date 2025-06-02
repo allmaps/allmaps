@@ -40,6 +40,16 @@ export const geojsonLineStringGeo = {
     [4.420666790347598, 51.959985351835975]
   ]
 }
+export const geojsonLineStringGeoMultipleCoordinates = {
+  type: 'LineString',
+  coordinates: [
+    [4.388957777030093, 51.959084191571606, 0],
+    [4.392938913951547, 51.94062947962427, 0],
+    [4.425874493300959, 51.94172557475595, 0],
+    [4.4230497784967655, 51.950815146974556, 0],
+    [4.420666790347598, 51.959985351835975, 0]
+  ]
+}
 
 export const ringResource = [
   [1000, 1000],

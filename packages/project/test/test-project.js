@@ -29,39 +29,7 @@ const epsg28992 = {
     '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.4171,50.3319,465.5524,1.9342,-1.6677,9.1019,4.0725 +units=m +no_defs +type=crs'
 }
 
-describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and projection', async () => {
-  const transformerOptions = {
-    minOffsetRatio: 0.01,
-    maxDepth: 1,
-    internalProjection: epsg4326,
-    projection: epsg4326
-  }
-  const transformer = new GcpTransformer(
-    gcps6,
-    'thinPlateSpline',
-    transformerOptions
-  )
-  const projectedTransformer = new ProjectedGcpTransformer(
-    gcps6,
-    'thinPlateSpline',
-    transformerOptions
-  )
-  const resourceLineString = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-
-  it(`should give the same result as an unprojected transformer`, () => {
-    expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
-      transformer.transformToGeo(resourceLineString)
-    )
-  })
-})
-
-describe('Projected Transform LineString Forward To LineString with default EPSG:3857 internal projection and projection', async () => {
+describe('Projected Transform LineString Forward To LineString with default EPSG:3857 internal projection and projection', () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1
@@ -95,7 +63,7 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with default EPSG:3857 internal projection and projection', async () => {
+describe('Projected Transform LineString Forward To LineString with default EPSG:3857 internal projection and projection', () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1
@@ -135,7 +103,7 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and default EPSG:3857 projection', async () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and default EPSG:3857 projection', () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
@@ -177,7 +145,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:31370 projection', async () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:31370 projection', () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
@@ -219,7 +187,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:28992 projection', async () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:31370 internal projection and EPSG:28992 projection', () => {
   const transformerOptions = {
     minOffsetRatio: 0.001,
     maxDepth: 1,
@@ -261,7 +229,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
   })
 })
 
-describe('Allow to change a projection of a transformer', async () => {
+describe('Allow to change a projection of a transformer', () => {
   const projectedTransformer4326 = new ProjectedGcpTransformer(
     gcps6,
     'thinPlateSpline',
@@ -300,7 +268,7 @@ describe('Allow to change a projection of a transformer', async () => {
   })
 })
 
-describe('Allow to modify the requested projection in a transform function', async () => {
+describe('Allow to modify the requested projection in a transform function', () => {
   const projectedTransformer4326 = new ProjectedGcpTransformer(
     gcps6,
     'thinPlateSpline',
@@ -335,6 +303,38 @@ describe('Allow to modify the requested projection in a transform function', asy
       projectedTransformer31370.transformToGeo(resourceLineString, {
         projection: epsg4326
       })
+    )
+  })
+})
+
+describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and projection', () => {
+  const transformerOptions = {
+    minOffsetRatio: 0.01,
+    maxDepth: 1,
+    internalProjection: epsg4326,
+    projection: epsg4326
+  }
+  const transformer = new GcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const projectedTransformer = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const resourceLineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+
+  it(`should give the same result as an unprojected transformer`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer.transformToGeo(resourceLineString),
+      transformer.transformToGeo(resourceLineString)
     )
   })
 })

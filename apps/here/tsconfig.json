@@ -13,6 +13,7 @@
     "strict": true
   },
   "references": [
+    { "path": "../../packages/project" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },

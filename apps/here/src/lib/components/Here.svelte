@@ -20,6 +20,7 @@
 
   import { red } from '@allmaps/tailwind'
   import { isGeojsonPoint } from '@allmaps/stdlib'
+  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
@@ -98,6 +99,7 @@
       return [imageCoordinates[0], -imageCoordinates[1]]
     }
   })
+  let projectedTransformer: ProjectedGcpTransformer
 
   const tileLayer = new TileLayer()
   const positionFeature = new Feature()
@@ -205,6 +207,13 @@
     const options = new IIIFInfo(
       imageInfo as ImageInformationResponse
     ).getTileSourceOptions()
+
+    projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
+      mapWithImageInfo.map,
+      {
+        projection: lonLatProjection
+      }
+    )
 
     if (!options) {
       return
