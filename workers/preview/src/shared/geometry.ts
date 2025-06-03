@@ -1,5 +1,6 @@
 import { geoProjection, geoPath } from 'd3-geo'
 import turfRewind from '@turf/rewind'
+import { polygonToGeojsonPolygon } from '@allmaps/stdlib'
 
 import { GcpTransformer } from '@allmaps/transform'
 
@@ -58,9 +59,9 @@ export function getTransformedPolygon(map: GeoreferencedMap) {
           map.transformation?.type
         )
 
-        const polygon = transformer.transformForwardAsGeojson([
-          map.resourceMask
-        ])
+        const polygon = polygonToGeojsonPolygon(
+          transformer.transformToGeo([map.resourceMask])
+        )
 
         // d3-geo requires the opposite polygon winding order of
         // the GoeJSON spec: https://github.com/d3/d3-geo
