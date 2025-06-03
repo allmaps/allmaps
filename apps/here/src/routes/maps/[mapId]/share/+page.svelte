@@ -27,7 +27,7 @@
   let imageError = $state(false)
 
   let postcardUrl = $derived(
-    `https://next.here.allmaps.org/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
+    `${page.url.origin}/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
   )
 
   let postcardText = $derived(`Look where I am! ${postcardUrl}`)
