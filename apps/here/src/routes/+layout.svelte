@@ -2,6 +2,8 @@
   import { onDestroy } from 'svelte'
   import { onNavigate } from '$app/navigation'
 
+  import { Stats } from '@allmaps/ui'
+
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
@@ -50,6 +52,7 @@
   })
 </script>
 
+<Stats />
 <main class="absolute w-full h-full flex flex-col">
   {#if errorState.error}
     <Error />
