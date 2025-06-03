@@ -53,17 +53,22 @@
           <!-- metadata -->
 
           <div class="flex gap-2">
-            <a
-              class="flex gap-1 items-center bg-orange px-2 py-1 rounded-lg"
-              href="https://viewer.allmaps.org/?url={map.id}"
-            >
-              <ArrowSquareOutIcon size="16" weight="bold" />
-              Allmaps Viewer
-            </a>
+            {#if map.id}
+              <a
+                class="flex gap-1 items-center bg-orange px-2 py-1 rounded-lg"
+                href="https://viewer.allmaps.org/?url={encodeURIComponent(
+                  map.id
+                )}"
+              >
+                <ArrowSquareOutIcon size="16" weight="bold" />
+                Allmaps Viewer
+              </a>
+            {/if}
             <a
               class="flex gap-1 items-center bg-yellow px-2 py-1 rounded-lg"
-              href="https://editor.allmaps.org/images?url={map.resource
-                .id}/info.json"
+              href="https://editor.allmaps.org/images?url={encodeURIComponent(
+                `${map.resource.id}/info.json`
+              )}"
             >
               <ArrowSquareOutIcon size="16" weight="bold" />
               Allmaps Editor
