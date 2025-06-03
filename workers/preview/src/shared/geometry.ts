@@ -51,33 +51,34 @@ export function geometryToPath(polygon: Polygon, size: Size) {
 }
 
 export function getTransformedPolygon(map: GeoreferencedMap) {
-  if (map.gcps.length >= 2) {
-    if (map.resourceMask.length >= 3) {
-      try {
-        const transformer = new GcpTransformer(
-          map.gcps,
-          map.transformation?.type
-        )
+  let transformer: GcpTransformer
 
-        const polygon = polygonToGeojsonPolygon(
-          transformer.transformToGeo([map.resourceMask])
-        )
-
-        // d3-geo requires the opposite polygon winding order of
-        // the GoeJSON spec: https://github.com/d3/d3-geo
-        turfRewind(polygon, { mutate: true, reverse: true })
-        return polygon
-      } catch (err) {
-        let message = 'Unknown error'
-        if (err instanceof Error) {
-          message = err.message
-        }
-        throw new Error(message)
-      }
+  if (map.resourceMask.length >= 3) {
+    if (map.gcps.length < 2) {
+      throw new Error('map should have 2 or more gcps')
+    } else if (map.gcps.length === 2) {
+      transformer = new GcpTransformer(map.gcps, 'helmert')
     } else {
-      throw new Error('resource mask should have more than 2 points')
+      transformer = new GcpTransformer(map.gcps, 'polynomial')
+    }
+
+    try {
+      const polygon = polygonToGeojsonPolygon(
+        transformer.transformToGeo([map.resourceMask])
+      )
+
+      // d3-geo requires the opposite polygon winding order of
+      // the GoeJSON spec: https://github.com/d3/d3-geo
+      turfRewind(polygon, { mutate: true, reverse: true })
+      return polygon
+    } catch (err) {
+      let message = 'Unknown error'
+      if (err instanceof Error) {
+        message = err.message
+      }
+      throw new Error(message)
     }
   } else {
-    throw new Error('map should have 2 or more gcps')
+    throw new Error('resource mask should have more than 2 points')
   }
 }
