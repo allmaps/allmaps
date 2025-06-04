@@ -16,6 +16,8 @@
 
   import Error from '$lib/components/Error.svelte'
 
+  import { PUBLIC_STATS_WEBSITE_ID } from '$env/static/public'
+
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
@@ -52,7 +54,7 @@
   })
 </script>
 
-<Stats />
+<Stats statsWebsiteId={PUBLIC_STATS_WEBSITE_ID} />
 <main class="absolute w-full h-full flex flex-col">
   {#if errorState.error}
     <Error />
