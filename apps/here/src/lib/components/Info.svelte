@@ -3,7 +3,7 @@
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import Popover from '$lib/components/Popover.svelte'
+  // import Popover from '$lib/components/Popover.svelte'
 
   import { getMapLabels, formatLabels } from '$lib/shared/metadata.js'
 
@@ -33,25 +33,25 @@
 </script>
 
 {#if title}
-  <Popover>
-    {#snippet button()}
-      <div
-        bind:clientWidth={uiState.elementSizes.top.center[0]}
-        bind:clientHeight={uiState.elementSizes.top.center[1]}
-        class="max-w-lg min-w-0 truncate shadow hover:shadow-lg inset-shadow-none hover:inset-shadow-sm
-      transition-shadow duration-1000 bg-white rounded-md px-3 py-2 cursor-pointer text-xs"
-      >
-        {title}
-      </div>
-    {/snippet}
+  <!-- <Popover>
+    {#snippet button()} -->
+
+  <!-- class="max-w-lg min-w-0 truncate shadow hover:shadow-lg inset-shadow-none hover:inset-shadow-sm
+      transition-shadow duration-1000 bg-white rounded-md px-3 py-2 cursor-pointer text-xs" -->
+
+  <div
+    bind:clientWidth={uiState.elementSizes.top.center[0]}
+    bind:clientHeight={uiState.elementSizes.top.center[1]}
+    class="max-w-lg min-w-0 truncate shadow inset-shadow-none
+      transition-shadow duration-1000 bg-white rounded-md px-3 py-2 text-xs"
+  >
+    {title}
+  </div>
+  <!-- {/snippet}
     {#snippet contents()}
       {#if map}
         <div class="bg-white rounded p-2 shadow flex flex-col gap-2">
           <input class="w-full" readonly value={map.id} />
-
-          <!-- annotation URL -->
-          <!-- metadata -->
-
           <div class="flex gap-2">
             {#if map.id}
               <a
@@ -77,5 +77,5 @@
         </div>
       {/if}
     {/snippet}
-  </Popover>
+  </Popover> -->
 {/if}
