@@ -3,22 +3,22 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { ProjectedGcpTransformer } from '@allmaps/project'
 import type { TransformationTypeInputs } from '@allmaps/transform'
 
-export type StapledTransformationFromGeoreferencedMapOptions =
+export type AttachedTransformationFromGeoreferencedMapOptions =
   TransformationTypeInputs & {
     georeferencedMapsById?: Map<string, GeoreferencedMap>
     projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>
-    gcpSourcePoints?: SourcePoint[]
-    extraSourcePoints?: SourcePoint[]
+    gcpSourcePoints?: Sp[]
+    extraSourcePoints?: Sp[]
     useMapTransformationTypes: boolean
     deepClone: boolean
-    evaluateStaplePoints: boolean
-    evaluateSingleStaplePoints: boolean
+    evaluateAttachmentSourceControlPoints: boolean
+    evaluateSingleSourceControlPoints: boolean
     evaluateGcps: boolean
     removeExistingGcps: boolean
   }
 
-export type StapledTransformationOptions =
-  StapledTransformationFromGeoreferencedMapOptions & {
+export type AttachedTransformationOptions =
+  AttachedTransformationFromGeoreferencedMapOptions & {
     averageOut: boolean
   }
 
@@ -30,17 +30,19 @@ export type Rcp = {
   resource: Point
 }
 
-export type StaplePoint = {
+// Source Control Point
+export type Scp = {
   id: string
   transformationId: string
   source: Point
   destination?: Point
 }
 
-export type SourcePoint = {
+export type Attachment = [Scp, Scp]
+
+// Source Point
+export type Sp = {
   transformationId: string
   source: Point
   destination?: Point
 }
-
-export type Staple = [StaplePoint, StaplePoint]

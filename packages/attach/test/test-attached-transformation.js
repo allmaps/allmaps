@@ -8,18 +8,11 @@ import {
   expectToBeCloseToArrayArray,
   expectToBeCloseToArray
 } from '../../stdlib/test/helper-functions.js'
-import {
-  rcps0,
-  rcps0Extra,
-  rcps1,
-  rcps2,
-  rcps3,
-  rcps11
-} from './test/input/rcps.js'
+import { rcps0, rcps0Extra, rcps1, rcps2, rcps3, rcps11 } from './input/rcps.js'
 
-import { StapledTransformation } from '../dist/StapledTransformation.js'
+import { AttachedTransformation } from '../dist/AttachedTransformation.js'
 
-import { generateAnnotation } from '../../annotation/dist/index.js'
+import { generateAnnotation } from '@allmaps/annotation'
 
 export const inputDir = './test/input'
 
@@ -40,10 +33,10 @@ const georeferencedMap3 = readJSONFile(
   path.join(inputDir, 'georeferenced-map-diemer-meer-3.json')
 )
 
-describe('Create staples from RCPs', () => {
+describe('Create attachments from RCPs', () => {
   it(`should throw when there are no RCPs corresponding to any map`, () => {
     expect(() =>
-      StapledTransformation.fromGeoreferencedMaps(
+      AttachedTransformation.fromGeoreferencedMaps(
         [georeferencedMap0, georeferencedMap1],
         [...rcps2]
       )
@@ -52,7 +45,7 @@ describe('Create staples from RCPs', () => {
 
   it(`should throw when there are no RCPs that occure at least two times`, () => {
     expect(() =>
-      StapledTransformation.fromGeoreferencedMaps(
+      AttachedTransformation.fromGeoreferencedMaps(
         [georeferencedMap0, georeferencedMap1],
         [...rcps0]
       )
@@ -60,27 +53,27 @@ describe('Create staples from RCPs', () => {
   })
 
   it(`should create a stape when two RCPs with the same id`, () => {
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1],
       [...rcps0, ...rcps1]
     )
 
-    expect(stapledtransformation.staples.length).to.equal(1)
+    expect(attachedtransformation.attachments.length).to.equal(1)
   })
 
   it(`should create multiple stapes when more then two RCPs with the same id`, () => {
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1, georeferencedMap2],
       [...rcps0, ...rcps1, ...rcps2]
     )
 
-    expect(stapledtransformation.staples.length).to.equal(4)
+    expect(attachedtransformation.attachments.length).to.equal(4)
   })
 })
 
 describe('Coefs matrix for two maps', () => {
   it(`should build the correct destination points arrays`, () => {
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1],
       rcps11,
       { transformationType: 'polynomial' }
@@ -98,7 +91,7 @@ describe('Coefs matrix for two maps', () => {
     ]
 
     expectToBeCloseToArrayArray(
-      stapledtransformation.destinationPointsArrays,
+      attachedtransformation.destinationPointsArrays,
       resultDestinationPointsArrays
     )
 
@@ -113,7 +106,7 @@ describe('Coefs matrix for two maps', () => {
     ]
 
     expectToBeCloseToArrayArray(
-      stapledtransformation.coefsArrayMatrix,
+      attachedtransformation.coefsArrayMatrix,
       resultCoefsArrayMatrix
     )
   })
@@ -121,13 +114,13 @@ describe('Coefs matrix for two maps', () => {
 
 describe('Process transformation type', () => {
   it(`should create create a different coefs matrix depending on the transformation type`, () => {
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1],
       rcps11,
       { transformationType: 'thinPlateSpline' }
     )
-    const polynomialStapledTransformation =
-      StapledTransformation.fromGeoreferencedMaps(
+    const polynomialAttachedTransformation =
+      AttachedTransformation.fromGeoreferencedMaps(
         [georeferencedMap0, georeferencedMap1],
         rcps11,
         { transformationType: 'polynomial' }
@@ -181,11 +174,11 @@ describe('Process transformation type', () => {
     ]
 
     expectToBeCloseToArrayArray(
-      stapledtransformation.coefsArrayMatrix,
+      attachedtransformation.coefsArrayMatrix,
       resultThinPlateSplineCoefsArrayMatrix
     )
     expectToBeCloseToArrayArray(
-      polynomialStapledTransformation.coefsArrayMatrix,
+      polynomialAttachedTransformation.coefsArrayMatrix,
       polynomialResult
     )
   })
@@ -193,7 +186,7 @@ describe('Process transformation type', () => {
 
 describe('Coefs matrix for more then two maps', () => {
   it(`should build the right coefs matrix`, () => {
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1, georeferencedMap2],
       rcps11,
       { transformationType: 'polynomial' }
@@ -214,15 +207,15 @@ describe('Coefs matrix for more then two maps', () => {
     ]
 
     expectToBeCloseToArrayArray(
-      stapledtransformation.coefsArrayMatrix,
+      attachedtransformation.coefsArrayMatrix,
       resultCoefsArrayMatrix
     )
   })
 })
 
-describe('Solve two maps stapled together and evaluate points', () => {
+describe('Solve two maps attached together and evaluate points', () => {
   // it(`should return maps with extra gcps`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -235,7 +228,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
-  //     stapledtransformation.toGeoreferencedMaps()
+  //     attachedtransformation.toGeoreferencedMaps()
   //   // console.log(
   //   //   JSON.stringify(generateAnnotation(resultinggeoreferencedmaps))
   //   //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultinggeoreferencedmaps[0])))}`
@@ -264,8 +257,8 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     [4.941781094220815, 52.34760910486503]
   //   )
   // })
-  // it(`should have an option to not average out staple points`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  // it(`should have an option to not average out attachments`, () => {
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -279,7 +272,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
-  //     stapledtransformation.toGeoreferencedMaps()
+  //     attachedtransformation.toGeoreferencedMaps()
   //   console.log(resultinggeoreferencedmaps[0].gcps)
   //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
   //   expectToBeCloseToArray(
@@ -287,8 +280,8 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     [4.941802674315016, 52.34761267868184]
   //   )
   // })
-  // it(`should have an option to evaluate single staplepoints`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  // it(`should have an option to evaluate source points`, () => {
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -298,11 +291,11 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     [...rcps11, ...rcps0Extra],
   //     {
   //       transformationType: 'polynomial',
-  //       evaluateSingleStaplePoints: true
+  //       evaluateSingleSourceControlPoints: true
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
-  //     stapledtransformation.toGeoreferencedMaps()
+  //     attachedtransformation.toGeoreferencedMaps()
   //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
   //   expectToBeCloseToArray(
   //     resultinggeoreferencedmaps[0].gcps[4].geo,
@@ -310,7 +303,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //   )
   // })
   // it(`should have an option to re-evaluate gcps`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -324,7 +317,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
-  //     stapledtransformation.toGeoreferencedMaps()
+  //     attachedtransformation.toGeoreferencedMaps()
   //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
   //   expectToBeCloseToArray(
   //     resultinggeoreferencedmaps[0].gcps[0].geo,
@@ -332,7 +325,7 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //   )
   // })
   // it(`should have an option to remove existing gcps`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -345,15 +338,15 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //       removeExistingGcps: true
   //     }
   //   )
-  //   const resultinggeoreferencedmaps = stapledtransformation.toGeoreferencedMaps()
+  //   const resultinggeoreferencedmaps = attachedtransformation.toGeoreferencedMaps()
   //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(1)
   //   expectToBeCloseToArray(
   //     resultinggeoreferencedmaps[0].gcps[0].geo,
   //     [4.941781094220815, 52.34760910486503]
   //   )
   // })
-  // it(`should have an option to evaluate staplepoints`, () => {
-  //   const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+  // it(`should have an option to evaluate attachment source control points`, () => {
+  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
   //     [
   //       georeferencedMap0,
   //       georeferencedMap1,
@@ -363,12 +356,11 @@ describe('Solve two maps stapled together and evaluate points', () => {
   //     rcps11,
   //     {
   //       transformationType: 'polynomial',
-  //       evaluateStaplePoints: false,
-  //       evaluateGcps: true
+  //       evaluateAttachmentSourceControlPoints: false
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
-  //     stapledtransformation.toGeoreferencedMaps()
+  //     attachedtransformation.toGeoreferencedMaps()
   //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(3)
   //   expectToBeCloseToArray(
   //     resultinggeoreferencedmaps[0].gcps[0].geo,
@@ -431,7 +423,7 @@ describe('Compare to observable', () => {
         resource: [gridSize * 0.5, gridSize * 0.1]
       }
     ]
-    const stapledtransformation = StapledTransformation.fromGeoreferencedMaps(
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
       [georeferencedMap0, georeferencedMap1],
       rcps,
       {
@@ -446,14 +438,14 @@ describe('Compare to observable', () => {
       }
     )
     const resultinggeoreferencedmaps =
-      stapledtransformation.toGeoreferencedMaps()
+      attachedtransformation.toGeoreferencedMaps()
 
     expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
     expect(resultinggeoreferencedmaps[1].gcps.length).to.equal(5)
 
-    // console.log(new Matrix(stapledtransformation.destinationPointsArrays))
-    // console.log(new Matrix(stapledtransformation.coefsArrayMatrix))
-    // console.log(new Matrix(stapledtransformation.weightsArrays))
+    // console.log(new Matrix(attachedtransformation.destinationPointsArrays))
+    // console.log(new Matrix(attachedtransformation.coefsArrayMatrix))
+    // console.log(new Matrix(attachedtransformation.weightsArrays))
     // console.log(resultinggeoreferencedmaps[0].gcps, resultinggeoreferencedmaps[1].gcps)
 
     expectToBeCloseToArray(resultinggeoreferencedmaps[0].gcps[4].geo, [50, 100])

@@ -1,5 +1,5 @@
 {
-  "name": "@allmaps/staple",
+  "name": "@allmaps/attach",
   "version": "1.0.0-beta.43",
   "contributors": [
     {
@@ -8,7 +8,7 @@
       "url": "https://manuelclaeysbouuaert.be"
     }
   ],
-  "description": "Stapling maps together while transforming them",
+  "description": "Attaching maps together while transforming them",
   "type": "module",
   "exports": "./dist/index.js",
   "files": [
@@ -20,7 +20,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/staple"
+    "directory": "packages/attach"
   },
   "homepage": "https://allmaps.org",
   "keywords": [

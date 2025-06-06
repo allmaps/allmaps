@@ -24,7 +24,7 @@ export const rcps0 = [
     resource: [4779, 261]
   }
 ]
-const rcps0Extra = [
+export const rcps0Extra = [
   {
     type: 'rcp',
     id: 'extra',

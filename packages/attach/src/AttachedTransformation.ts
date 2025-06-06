@@ -26,36 +26,36 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point, Size } from '@allmaps/types'
 
 import type {
-  SourcePoint,
+  Sp,
   Rcp,
-  Staple,
-  StapledTransformationFromGeoreferencedMapOptions,
-  StapledTransformationOptions,
-  StaplePoint
-} from './types'
+  Attachment,
+  AttachedTransformationFromGeoreferencedMapOptions,
+  AttachedTransformationOptions,
+  Scp
+} from './types.js'
 
-const defaultStapledTransformationFromGeoreferencedMapOptions: StapledTransformationFromGeoreferencedMapOptions =
+const defaultAttachedTransformationFromGeoreferencedMapOptions: AttachedTransformationFromGeoreferencedMapOptions =
   {
     transformationType: 'polynomial',
     useMapTransformationTypes: false,
     deepClone: true,
-    evaluateStaplePoints: true,
-    evaluateSingleStaplePoints: false,
+    evaluateAttachmentSourceControlPoints: true,
+    evaluateSingleSourceControlPoints: false,
     evaluateGcps: false,
     removeExistingGcps: false
   }
 
-const defaultStapledTransformationOptions: StapledTransformationOptions = {
-  ...defaultStapledTransformationFromGeoreferencedMapOptions,
+const defaultAttachedTransformationOptions: AttachedTransformationOptions = {
+  ...defaultAttachedTransformationFromGeoreferencedMapOptions,
   averageOut: true
 }
 
-export class StapledTransformation {
+export class AttachedTransformation {
   transformationsById: Map<string, BaseIndependentLinearWeightsTransformation>
-  staples: Staple[]
-  options?: StapledTransformationOptions
+  attachments: Attachment[]
+  options?: AttachedTransformationOptions
 
-  staplePointsById: StaplePoint[][]
+  ScpsById: Scp[][]
 
   destinationPointsArrays: [number[], number[]]
 
@@ -69,16 +69,16 @@ export class StapledTransformation {
   weightsArraysById?: Map<string, [number[], number[]]>
 
   /**
-   * Create a Stapled Transformation
+   * Create a Attached Transformation
    */ constructor(
     transformationsById: Map<
       string,
       BaseIndependentLinearWeightsTransformation
     >,
-    staples: Staple[],
-    options?: Partial<StapledTransformationOptions>
+    attachments: Attachment[],
+    options?: Partial<AttachedTransformationOptions>
   ) {
-    this.options = mergeOptions(defaultStapledTransformationOptions, options)
+    this.options = mergeOptions(defaultAttachedTransformationOptions, options)
     this.transformationsById = transformationsById
     if (this.options.deepClone) {
       this.transformationsById = deepCloneMap(this.transformationsById)
@@ -90,26 +90,27 @@ export class StapledTransformation {
         ? deepCloneMap(this.options.projectedGcpTransformersById)
         : undefined
     }
-    this.staples = staples
+    this.attachments = attachments
 
     if (this.transformationsById.size === 0) {
       throw new Error('No transformations found.')
     }
-    if (this.staples.length === 0) {
-      throw new Error('No staples found.')
+    if (this.attachments.length === 0) {
+      throw new Error('No attachment found.')
     }
 
-    // Get staplePoints from staples.
-    // When there were more then two staple points with the same transformationId
-    // only keep one staplepoint per transformationId (=mapId).
-    // (This happens when duo's where created, see fromGeoreferencedMap())
-    this.staplePointsById = Object.values(
-      groupBy(this.staples.flat(), (staplePoint) => staplePoint.id)
-    ).map((staplePointsForId) =>
-      staplePointsForId.filter(
-        (staplePoint, index) =>
-          staplePointsForId.findIndex(
-            (s) => s.transformationId === staplePoint.transformationId
+    // Get Source Control Points from attachments.
+    // When there were more then two Source Control Points with the same transformationId
+    // and hence attachedment where created
+    // for pairs of those Source Control Points (see fromGeoreferencedMap())
+    // only keep one Source Control Point per transformationId (=mapId).
+    this.ScpsById = Object.values(
+      groupBy(this.attachments.flat(), (Scp) => Scp.id)
+    ).map((scpsForId) =>
+      scpsForId.filter(
+        (scp, index) =>
+          scpsForId.findIndex(
+            (s) => s.transformationId === scp.transformationId
           ) === index
       )
     )
@@ -140,8 +141,8 @@ export class StapledTransformation {
         ...transformationDestinationPointsArrays[1]
       )
     })
-    destinationPointsArrays[0].push(...Array(this.staples.length).fill(0))
-    destinationPointsArrays[1].push(...Array(this.staples.length).fill(0))
+    destinationPointsArrays[0].push(...Array(this.attachments.length).fill(0))
+    destinationPointsArrays[1].push(...Array(this.attachments.length).fill(0))
 
     return destinationPointsArrays
   }
@@ -152,7 +153,8 @@ export class StapledTransformation {
   }
 
   getCoefsArrayMatrix(): number[][] {
-    // Create a coefs matrix from the transformations coefs matrices and the staples
+    // Create a coefs matrix from the transformations coefs matrices
+    // and the attachements
     // as explained here: https://observablehq.com/d/0ff83cf201ebbf04
 
     // Create an empty coefs matrix of the right size
@@ -164,7 +166,7 @@ export class StapledTransformation {
         size[1] + transformation.coefsArrayMatrixSize[1]
       ]
     })
-    size = [size[0] + this.staples.length, size[1]]
+    size = [size[0] + this.attachments.length, size[1]]
     let coefsArrayMatrix = newArrayMatrix(...size)
 
     // Add each transformation's coefs matrices as a block of a diagonal block-matrix
@@ -191,47 +193,47 @@ export class StapledTransformation {
       ]
     }
 
-    // Add each staple as a row with the source point coefs arrays
+    // Add each attachment as a row with the source point coefs arrays
     // for both of it's transformations, in their corresponding column locations
-    for (const staple of this.staples) {
+    for (const attachment of this.attachments) {
       const transformation0 = this.transformationsById.get(
-        staple[0].transformationId
+        attachment[0].transformationId
       )
       const transformation1 = this.transformationsById.get(
-        staple[1].transformationId
+        attachment[1].transformationId
       )
       if (!transformation0) {
         throw new Error(
-          `Transformation not found for transformationId ${staple[0].transformationId}.`
+          `Transformation not found for transformationId ${attachment[0].transformationId}.`
         )
       }
       if (!transformation1) {
         throw new Error(
-          `Transformation not found for transformationId ${staple[1].transformationId}.`
+          `Transformation not found for transformationId ${attachment[1].transformationId}.`
         )
       }
 
-      const stapleSourcePointCoefsArray0 =
-        transformation0?.getSourcePointCoefsArray(staple[0].source)
-      const stapleSourcePointCoefsArray1 =
-        transformation1?.getSourcePointCoefsArray(staple[1].source)
+      const attachementSourcePointCoefsArray0 =
+        transformation0?.getSourcePointCoefsArray(attachment[0].source)
+      const attachementSourcePointCoefsArray1 =
+        transformation1?.getSourcePointCoefsArray(attachment[1].source)
 
       const trailingCumulativeCoefsArrayMatrixSize0 =
         this.trailingCumulativeCoefsArrayMatrixSizeById.get(
-          staple[0].transformationId
+          attachment[0].transformationId
         )
       const trailingCumulativeCoefsArrayMatrixSize1 =
         this.trailingCumulativeCoefsArrayMatrixSizeById.get(
-          staple[1].transformationId
+          attachment[1].transformationId
         )
       if (!trailingCumulativeCoefsArrayMatrixSize0) {
         throw new Error(
-          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${staple[0].transformationId}.`
+          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${attachment[0].transformationId}.`
         )
       }
       if (!trailingCumulativeCoefsArrayMatrixSize1) {
         throw new Error(
-          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${staple[1].transformationId}.`
+          `trailingCumulativeCoefsArrayMatrixSize not found for transformationId ${attachment[1].transformationId}.`
         )
       }
 
@@ -239,13 +241,13 @@ export class StapledTransformation {
         coefsArrayMatrix,
         trailingCumulativeCoefsArrayMatrixSize[0],
         trailingCumulativeCoefsArrayMatrixSize0[1],
-        [stapleSourcePointCoefsArray0]
+        [attachementSourcePointCoefsArray0]
       )
       coefsArrayMatrix = pasteArrayMatrix(
         coefsArrayMatrix,
         trailingCumulativeCoefsArrayMatrixSize[0],
         trailingCumulativeCoefsArrayMatrixSize1[1],
-        multiplyArrayMatrix([stapleSourcePointCoefsArray1], -1)
+        multiplyArrayMatrix([attachementSourcePointCoefsArray1], -1)
       )
       trailingCumulativeCoefsArrayMatrixSize = [
         trailingCumulativeCoefsArrayMatrixSize[0] + 1,
@@ -324,10 +326,13 @@ export class StapledTransformation {
   }
 
   /**
-   * Create Georeferenced Maps from this Stapler.
-   * This will solve the stapler, evaluate all staples and add the resulting coordinates as GCPs.
+   * Create Georeferenced Maps from this Attached Transformation.
+   * This will solve the Attached Transformation,
+   * evaluate all attachements (in all source control points),
+   * infere GCPs from them,
+   * and add them to the original Georeferenced Maps.
    *
-   * This only works of this Stapler has been created from Georeferenced Maps.
+   * This only works if this AttachedTransformation has been created from Georeferenced Maps.
    *
    * @returns {GeoreferencedMap[]}
    */
@@ -340,43 +345,46 @@ export class StapledTransformation {
 
     if (!georeferencedMapsById || !projectedGcpTransformersById) {
       throw new Error(
-        'No Georeferenced Maps or GCP Transformers found. Create a Stapler from GeoreferencedMaps to be able to recreate those.'
+        'No Georeferenced Maps or GCP Transformers found. Create an Attached Transfromation from GeoreferencedMaps to be able to recreate those.'
       )
     }
 
-    // Gather all points to evaluate: staplePoints and extra sourcePoints
-    const sourcePointsForEvaluation: SourcePoint[] = []
+    // Gather all points to evaluate: sourceControlPoints and extra sourcePoints
+    const spForEvaluation: Sp[] = []
     if (gcpSourcePoints) {
-      sourcePointsForEvaluation.push(...gcpSourcePoints)
+      spForEvaluation.push(...gcpSourcePoints)
     }
-    if (this.options?.evaluateStaplePoints) {
-      sourcePointsForEvaluation.push(...this.staplePointsById.flat())
+    if (this.options?.evaluateAttachmentSourceControlPoints) {
+      spForEvaluation.push(...this.ScpsById.flat())
     }
     if (extraSourcePoints) {
-      sourcePointsForEvaluation.push(...extraSourcePoints)
+      spForEvaluation.push(...extraSourcePoints)
     }
 
     // Evaluate all points to evaluate
-    sourcePointsForEvaluation.forEach((sourcePoint) => {
+    spForEvaluation.forEach((sourcePoint) => {
       sourcePoint.destination = this.evaluateFunction(
         sourcePoint.source,
         sourcePoint.transformationId
       )
     })
 
-    // Average out the destination values of the staplePoints
-    if (this.options?.averageOut && this.options?.evaluateStaplePoints) {
-      this.staplePointsById.forEach((staplePointsForId) => {
-        const meanDestination = staplePointsForId
-          .map((staplePoint) => staplePoint.destination as Point)
+    // Average out the destination values of the Source Control Points
+    if (
+      this.options?.averageOut &&
+      this.options?.evaluateAttachmentSourceControlPoints
+    ) {
+      this.ScpsById.forEach((scpsForId) => {
+        const meanDestination = scpsForId
+          .map((scp) => scp.destination as Point)
           .reduce(
             (a, c, _i, array) => {
               return [a[0] + c[0] / array.length, a[1] + c[1] / array.length]
             },
             [0, 0]
           )
-        staplePointsForId.forEach((staplePoint) => {
-          staplePoint.destination = meanDestination
+        scpsForId.forEach((scp) => {
+          scp.destination = meanDestination
         })
       })
     }
@@ -389,7 +397,7 @@ export class StapledTransformation {
     }
 
     // For every evaluated point, add a GCP to it's respective Georeferenced Map.
-    sourcePointsForEvaluation.forEach((evaluationPoint) => {
+    spForEvaluation.forEach((evaluationPoint) => {
       const projectedGcpTransformer = projectedGcpTransformersById.get(
         evaluationPoint.transformationId
       )
@@ -423,28 +431,28 @@ export class StapledTransformation {
   }
 
   /**
-   * Create a StapledTransformation from Georeferenced Maps
+   * Create a AttachedTransformation from Georeferenced Maps
    *
    * By default, a Projected GCP Transformer is created for each Georeferenced Map,
-   * and from it a Thin Plate Spline transformation is created and passed to the StapledTransformation.
+   * and from it a Thin Plate Spline transformation is created and passed to the AttachedTransformation.
    *
    * Use the options to specify another transformation type for all maps,
    * or specifically set the option 'useMapTransformationTypes' to true to use the type defined in the Georeferenced Map.
    *
    * @param georeferencedMaps - Georeferenced Maps
    * @param options - Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
-   * @returns {StapledTransformation}
+   * @returns {AttachedTransformation}
    */
   static fromGeoreferencedMaps(
     georeferencedMaps: GeoreferencedMap[],
     rcps: Rcp[],
     options?: Partial<
       ProjectedGcpTransformerOptions &
-        StapledTransformationFromGeoreferencedMapOptions
+        AttachedTransformationFromGeoreferencedMapOptions
     >
-  ): StapledTransformation {
+  ): AttachedTransformation {
     options = mergeOptions(
-      defaultStapledTransformationFromGeoreferencedMapOptions,
+      defaultAttachedTransformationFromGeoreferencedMapOptions,
       options
     )
     if (options?.useMapTransformationTypes) {
@@ -459,11 +467,11 @@ export class StapledTransformation {
       string,
       BaseIndependentLinearWeightsTransformation
     >()
-    const staplePoints: StaplePoint[] = []
-    const gcpSourcePoints: SourcePoint[] = []
-    const extraSourcePoints: SourcePoint[] = []
+    const scps: Scp[] = []
+    const gcpSps: Sp[] = []
+    const extraSps: Sp[] = []
 
-    // Per GeoreferencedMap, set option objects and collect staple points from rcps
+    // Per GeoreferencedMap, set option objects and collect Source Control Points from Resource Control Points
     for (const georeferencedMap of georeferencedMaps) {
       const mapId = georeferencedMap.id
       if (!mapId) {
@@ -491,7 +499,7 @@ export class StapledTransformation {
         .filter((rcp) => rcp.mapId == mapId)
         .forEach((rcp) => {
           const { source } = resourceToSource(rcp, transformerOptions)
-          staplePoints.push({
+          scps.push({
             id: rcp.id,
             transformationId: mapId,
             source
@@ -501,7 +509,7 @@ export class StapledTransformation {
       if (options.evaluateGcps) {
         georeferencedMap.gcps.forEach((gcp) => {
           const { source } = resourceToSource(gcp, transformerOptions)
-          gcpSourcePoints.push({
+          gcpSps.push({
             transformationId: mapId,
             source
           })
@@ -509,51 +517,45 @@ export class StapledTransformation {
       }
     }
 
-    // From StaplePoints to Staples
+    // From Source Control Points to Attachments
     //
-    // Create staples, by id.
-    // When there are more then two staple points with the same id, create duo's:
-    // E.g.: if staplePoint0, staplePoint1, staplesPoint2 and staplePoint3 have id 'foo'
-    // and staplePoint4 and staplesPoint5 have id 'bar', then create the following staples:
+    // Create attachments, by id.
+    // When there are more then two source control points with the same id, create an attachment in pairs:
+    // E.g.: if scp0, scp1, scp2 and scp3 have id 'foo'
+    // and scp4 and scp5 have id 'bar', then create the following attachments:
     //
-    // [staplesPoint0, staplePoint1]
-    // [staplesPoint0, staplePoint2]
-    // [staplesPoint0, staplePoint3]
+    // [scp0, scp1]
+    // [scp0, scp2]
+    // [scp0, scp3]
     //
-    // [staplesPoint4, staplePoint5]
+    // [scp4, scp5]
     //
-    const staplePointsById = Object.values(
-      groupBy(staplePoints, (staplePoint) => staplePoint.id)
-    )
-    const staples = staplePointsById
-      .map((staplePointsForId) =>
-        staplePointsForId.reduce(function (
-          staplesForId,
-          staplePointForId,
-          index
-        ) {
+    const scpsById = Object.values(groupBy(scps, (scp) => scp.id))
+    const attachments = scpsById
+      .map((scpsForId) =>
+        scpsForId.reduce((attachmentsForId, scpForId, index) => {
           if (index >= 1) {
-            staplesForId.push([staplePointsForId[0], staplePointForId])
+            attachmentsForId.push([scpsForId[0], scpForId])
           }
-          return staplesForId
-        }, [] as Staple[])
+          return attachmentsForId
+        }, [] as Attachment[])
       )
       .flat(1)
-    const singleStaplePoints = staplePointsById
-      .filter((staplePointsForId) => staplePointsForId.length == 1)
+    const singleScps = scpsById
+      .filter((scpsForId) => scpsForId.length == 1)
       .flat(1)
 
-    if (options.evaluateSingleStaplePoints) {
-      extraSourcePoints.push(...singleStaplePoints)
+    if (options.evaluateSingleSourceControlPoints) {
+      extraSps.push(...singleScps)
     }
 
     options = mergeOptions(options, {
       georeferencedMapsById,
       projectedGcpTransformersById,
-      gcpSourcePoints,
-      extraSourcePoints
+      gcpSourcePoints: gcpSps,
+      extraSourcePoints: extraSps
     })
 
-    return new StapledTransformation(transformationsById, staples, options)
+    return new AttachedTransformation(transformationsById, attachments, options)
   }
 }
