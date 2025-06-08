@@ -27,6 +27,7 @@ export class MapsState {
   #sensorsState: SensorsState
   #imageInfoState: ImageInfoState
 
+  #fetchCount = $state(0)
   #loading = $state(false)
 
   #lastPosition = $state<GeolocationPosition>()
@@ -126,6 +127,7 @@ export class MapsState {
       maps.map((map) => [this.#getMapId(map), map])
     )
 
+    this.#fetchCount += 1
     this.#loading = false
     this.#lastPosition = position
   }
@@ -176,6 +178,10 @@ export class MapsState {
 
   get loading() {
     return this.#loading
+  }
+
+  get fetchCount() {
+    return this.#fetchCount
   }
 }
 
