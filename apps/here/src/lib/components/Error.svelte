@@ -44,7 +44,9 @@
     </div>
   </div>
   <DotsPattern color={red} opacity={0.5}>
-    <div class="h-full flex flex-col gap-2 items-center justify-center">
+    <div
+      class="h-full p-2 sm:p-4 flex flex-col gap-2 items-center justify-center"
+    >
       <div class="max-w-md flex flex-col gap-6 items-center justify-center">
         <MapMonster
           color="red"
