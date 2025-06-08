@@ -84,7 +84,7 @@
 
 <section class="bg-blue-200 shrink-0 grow">
   <DotsPattern color={blue}>
-    {#if waitingForPosition || mapsState.loading}
+    {#if waitingForPosition || mapsState.fetchCount === 0}
       <div class="h-full flex items-center justify-center">
         <div class="bg-white p-2 rounded-xl drop-shadow-sm">
           <Loading />

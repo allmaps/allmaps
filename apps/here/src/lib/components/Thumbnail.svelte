@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { page } from '$app/state'
+  import { page, navigating } from '$app/state'
 
   import { Thumbnail } from '@allmaps/ui'
   import { GcpTransformer } from '@allmaps/transform'
@@ -107,6 +107,10 @@
   let labels = $derived(map ? getMapLabels(map) : [])
   let title = $derived(formatLabels(labels))
 
+  let navigatingToThisMap = $derived(
+    `maps/${navigating.to?.params?.mapId}` === allmapsId
+  )
+
   onMount(() => {
     $effect(() => {
       imageInfoState.fetchImageInfo(map.resource.id)
@@ -123,12 +127,14 @@
       class="aspect-square inline-block w-full relative"
       href={createRouteUrl(page, allmapsId)}
     >
-      <Thumbnail
-        imageInfo={fetchedImageInfo.imageInfo}
-        mode="contain"
-        width={width * devicePixelRatio}
-        height={width * devicePixelRatio}
-      />
+      <div class={{ 'animate-pulse': navigatingToThisMap }}>
+        <Thumbnail
+          imageInfo={fetchedImageInfo.imageInfo}
+          mode="contain"
+          width={width * devicePixelRatio}
+          height={width * devicePixelRatio}
+        />
+      </div>
       {#if svgSize && svgPositionCoordinates}
         <div
           class="group absolute top-0 w-full h-full flex items-center justify-center"
