@@ -1,5 +1,5 @@
 import { ProjectedGcpTransformer } from '@allmaps/project'
-import { deepClone, flipY } from '@allmaps/stdlib'
+import { flipY } from '@allmaps/stdlib'
 import { GeneralGcpTransformerOptions } from '@allmaps/transform'
 
 import type { Point } from '@allmaps/types'
@@ -32,12 +32,4 @@ export function sourceDestinationToResourceGeo(
   destination = projectedGcpTransformer.projectionToLatLon(destination)
 
   return { resource: source, geo: destination }
-}
-
-export function deepCloneMap<K, V>(inputMap: Map<K, V>): Map<K, V> {
-  const deepClonedMap = new Map(inputMap)
-  Array.from(deepClonedMap).forEach(([key, value]) =>
-    deepClonedMap.set(key, deepClone(value))
-  )
-  return deepClonedMap
 }

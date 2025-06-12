@@ -10,7 +10,7 @@ export type AttachedTransformationFromGeoreferencedMapOptions =
     gcpSourcePoints?: Sp[]
     extraSourcePoints?: Sp[]
     useMapTransformationTypes: boolean
-    deepClone: boolean
+    clone: boolean
     evaluateAttachmentScps: boolean
     evaluateSingleScps: boolean
     evaluateGcps: boolean

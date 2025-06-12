@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es'
+
 import {
   arrayMatrixSize,
   groupBy,
@@ -17,7 +19,6 @@ import {
 } from '@allmaps/project'
 
 import {
-  deepCloneMap,
   resourceToSource,
   sourceDestinationToResourceGeo
 } from './helpert-functions.js'
@@ -38,7 +39,7 @@ const defaultAttachedTransformationFromGeoreferencedMapOptions: AttachedTransfor
   {
     transformationType: 'polynomial',
     useMapTransformationTypes: false,
-    deepClone: true,
+    clone: true,
     evaluateAttachmentScps: true,
     evaluateSingleScps: false,
     evaluateGcps: false,
@@ -80,14 +81,14 @@ export class AttachedTransformation {
   ) {
     this.options = mergeOptions(defaultAttachedTransformationOptions, options)
     this.transformationsById = transformationsById
-    if (this.options.deepClone) {
-      this.transformationsById = deepCloneMap(this.transformationsById)
+    if (this.options.clone) {
+      this.transformationsById = cloneDeep(this.transformationsById)
       this.options.georeferencedMapsById = this.options.georeferencedMapsById
-        ? deepCloneMap(this.options.georeferencedMapsById)
+        ? cloneDeep(this.options.georeferencedMapsById)
         : undefined
       this.options.projectedGcpTransformersById = this.options
         .projectedGcpTransformersById
-        ? deepCloneMap(this.options.projectedGcpTransformersById)
+        ? cloneDeep(this.options.projectedGcpTransformersById)
         : undefined
     }
     this.attachments = attachments

@@ -110,7 +110,7 @@ The following options are available for Attached transformations from Georeferen
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
 | `transformationType`     | TransformationType to use when building the attached transformation coefficient matrix. This overrules the map's TransformationType, unless `useMapTransformationTypes` is `true`. | `TransformationType`             | `'polynomial'`
 | `useMapTransformationTypes`     | Let `transformationType` overrule the map's TransformationType. | `boolean`             | `false`
-| `deepClone`     | Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects. | `boolean`             | `true`
+| `clone`     | Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects. | `boolean`             | `true`
 | `evaluateAttachmentScps`     | For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `true`
 | `evaluateSingleScps`     | For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `false`
 | `evaluateGcps`     | For existing GCPs, re-evaluate them using the solved attached transformation. | `boolean`             | `false`
@@ -346,6 +346,30 @@ or specifically set the option 'useMapTransformationTypes' to true to use the ty
 
 `AttachedTransformation`.
 
+### `AttachedTransformationFromGeoreferencedMapOptions`
+
+###### Type
+
+```ts
+TransformationTypeInputs & { georeferencedMapsById?: Map<string, GeoreferencedMap>; projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>; ... 7 more ...; removeExistingGcps: boolean; }
+```
+
+### `AttachedTransformationOptions`
+
+###### Type
+
+```ts
+TransformationTypeInputs & { georeferencedMapsById?: Map<string, GeoreferencedMap>; projectedGcpTransformersById?: Map<string, ProjectedGcpTransformer>; ... 7 more ...; removeExistingGcps: boolean; } & { ...; }
+```
+
+### `Attachment`
+
+###### Type
+
+```ts
+[Scp, Scp]
+```
+
 ### `Rcp`
 
 ###### Fields
@@ -354,3 +378,26 @@ or specifically set the option 'useMapTransformationTypes' to true to use the ty
 * `mapId` (`string`)
 * `resource` (`[number, number]`)
 * `type` (`'rcp'`)
+
+### `RcpsInput`
+
+###### Fields
+
+* `rcps` (`Array<Rcp>`)
+
+### `Scp`
+
+###### Fields
+
+* `destination?` (`[number, number]`)
+* `id` (`string`)
+* `source` (`[number, number]`)
+* `transformationId` (`string`)
+
+### `Sp`
+
+###### Fields
+
+* `destination?` (`[number, number]`)
+* `source` (`[number, number]`)
+* `transformationId` (`string`)

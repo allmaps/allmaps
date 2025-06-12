@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es'
+
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import {
@@ -17,8 +19,7 @@ import {
   sizeToRectangle,
   mergePartialOptions,
   mergeOptionsUnlessUndefined,
-  mergeOptions,
-  deepClone
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { applyTransform } from '../shared/matrix.js'
@@ -593,7 +594,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = deepClone(this.projectedTransformer)
+    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
   }
@@ -608,7 +609,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = deepClone(this.projectedTransformer)
+    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints.map((point, index) => {
         return mixPoints(

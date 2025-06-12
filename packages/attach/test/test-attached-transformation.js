@@ -228,159 +228,159 @@ describe('Coefs matrix for more then two maps', () => {
 })
 
 describe('Solve two maps attached together and evaluate points', () => {
-  // it(`should return maps with extra gcps`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     rcps11,
-  //     {
-  //       transformationType: 'polynomial'
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps =
-  //     attachedtransformation.toGeoreferencedMaps()
-  //   // console.log(
-  //   //   JSON.stringify(generateAnnotation(resultinggeoreferencedmaps))
-  //   //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultinggeoreferencedmaps[0])))}`
-  //   // )
-  //   // console.log(
-  //   //   resultinggeoreferencedmaps.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
-  //   // )
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
-  //   expect(resultinggeoreferencedmaps[1].gcps.length).to.equal(4)
-  //   expect(resultinggeoreferencedmaps[2].gcps.length).to.equal(4)
-  //   expect(resultinggeoreferencedmaps[3].gcps.length).to.equal(4)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[3].geo,
-  //     [4.941781094220815, 52.34760910486503]
-  //   )
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[1].gcps[3].geo,
-  //     [4.941781094220815, 52.34760910486503]
-  //   )
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[2].gcps[3].geo,
-  //     [4.941781094220815, 52.34760910486503]
-  //   )
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[3].gcps[3].geo,
-  //     [4.941781094220815, 52.34760910486503]
-  //   )
-  // })
-  // it(`should have an option to not average out attachments`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     rcps11,
-  //     {
-  //       transformationType: 'polynomial',
-  //       averageOut: false
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps =
-  //     attachedtransformation.toGeoreferencedMaps()
-  //   console.log(resultinggeoreferencedmaps[0].gcps)
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[3].geo,
-  //     [4.941802674315016, 52.34761267868184]
-  //   )
-  // })
-  // it(`should have an option to evaluate source points`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     [...rcps11, ...rcps0Extra],
-  //     {
-  //       transformationType: 'polynomial',
-  //       evaluateSingleScps: true
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps =
-  //     attachedtransformation.toGeoreferencedMaps()
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[4].geo,
-  //     [4.947168483334695, 52.348177872139445]
-  //   )
-  // })
-  // it(`should have an option to re-evaluate gcps`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     rcps11,
-  //     {
-  //       transformationType: 'polynomial',
-  //       evaluateGcps: true
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps =
-  //     attachedtransformation.toGeoreferencedMaps()
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(4)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[0].geo,
-  //     [4.940600532043473, 52.35798815901273]
-  //   )
-  // })
-  // it(`should have an option to remove existing gcps`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     rcps11,
-  //     {
-  //       transformationType: 'polynomial',
-  //       removeExistingGcps: true
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps = attachedtransformation.toGeoreferencedMaps()
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(1)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[0].geo,
-  //     [4.941781094220815, 52.34760910486503]
-  //   )
-  // })
-  // it(`should have an option to evaluate attachment source control points`, () => {
-  //   const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
-  //     [
-  //       georeferencedMap0,
-  //       georeferencedMap1,
-  //       georeferencedMap2,
-  //       georeferencedMap3
-  //     ],
-  //     rcps11,
-  //     {
-  //       transformationType: 'polynomial',
-  //       evaluateAttachmentScps: false
-  //     }
-  //   )
-  //   const resultinggeoreferencedmaps =
-  //     attachedtransformation.toGeoreferencedMaps()
-  //   expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(3)
-  //   expectToBeCloseToArray(
-  //     resultinggeoreferencedmaps[0].gcps[0].geo,
-  //     [4.940600532043473, 52.35798815901273]
-  //   )
-  // })
+  it(`should return maps with extra gcps`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps11,
+      {
+        transformationType: 'polynomial'
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    // console.log(
+    //   JSON.stringify(generateAnnotation(resultingGeoreferencedMaps))
+    //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps[0])))}`
+    // )
+    // console.log(
+    //   resultingGeoreferencedMaps.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
+    // )
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(4)
+    expect(resultingGeoreferencedMaps[1].gcps.length).to.equal(4)
+    expect(resultingGeoreferencedMaps[2].gcps.length).to.equal(4)
+    expect(resultingGeoreferencedMaps[3].gcps.length).to.equal(4)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[1].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[2].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[3].gcps[3].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+  })
+  it(`should have an option to not average out attachments`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps11,
+      {
+        transformationType: 'polynomial',
+        averageOut: false
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(4)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[3].geo,
+      [4.941802674315016, 52.34761267868184]
+    )
+  })
+  it(`should have an option to evaluate source points`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      [...rcps11, ...rcps0Extra],
+      {
+        transformationType: 'polynomial',
+        evaluateSingleScps: true
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(5)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[4].geo,
+      [4.947168483334695, 52.348177872139445]
+    )
+  })
+  it(`should have an option to re-evaluate gcps`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps11,
+      {
+        transformationType: 'polynomial',
+        evaluateGcps: true
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(4)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[0].geo,
+      [4.940600532043473, 52.35798815901273]
+    )
+  })
+  it(`should have an option to remove existing gcps`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps11,
+      {
+        transformationType: 'polynomial',
+        removeExistingGcps: true
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(1)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[0].geo,
+      [4.941781094220815, 52.34760910486503]
+    )
+  })
+  it(`should have an option to evaluate attachment source control points`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps11,
+      {
+        transformationType: 'polynomial',
+        evaluateAttachmentScps: false
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(3)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[0].geo,
+      [4.9405887, 52.3579862]
+    )
+  })
 })
 
 describe('Compare to observable', () => {
@@ -451,18 +451,18 @@ describe('Compare to observable', () => {
         }
       }
     )
-    const resultinggeoreferencedmaps =
+    const resultingGeoreferencedMaps =
       attachedtransformation.toGeoreferencedMaps()
 
-    expect(resultinggeoreferencedmaps[0].gcps.length).to.equal(5)
-    expect(resultinggeoreferencedmaps[1].gcps.length).to.equal(5)
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(5)
+    expect(resultingGeoreferencedMaps[1].gcps.length).to.equal(5)
 
     // console.log(new Matrix(attachedtransformation.destinationPointsArrays))
     // console.log(new Matrix(attachedtransformation.coefsArrayMatrix))
     // console.log(new Matrix(attachedtransformation.weightsArrays))
-    // console.log(resultinggeoreferencedmaps[0].gcps, resultinggeoreferencedmaps[1].gcps)
+    // console.log(resultingGeoreferencedMaps[0].gcps, resultingGeoreferencedMaps[1].gcps)
 
-    expectToBeCloseToArray(resultinggeoreferencedmaps[0].gcps[4].geo, [50, 100])
-    expectToBeCloseToArray(resultinggeoreferencedmaps[1].gcps[4].geo, [50, 100])
+    expectToBeCloseToArray(resultingGeoreferencedMaps[0].gcps[4].geo, [50, 100])
+    expectToBeCloseToArray(resultingGeoreferencedMaps[1].gcps[4].geo, [50, 100])
   })
 })

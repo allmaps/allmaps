@@ -28,9 +28,11 @@
     "map"
   ],
   "dependencies": {
+    "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
-    "@allmaps/project": "workspace:^",
+    "@types/lodash-es": "^4.17.12",
+    "lodash-es": "^4.17.21",
     "ml-matrix": "^6.12.0"
   },
   "devDependencies": {

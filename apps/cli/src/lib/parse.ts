@@ -241,7 +241,7 @@ export function parseAttachInputs(
     transformationType: string
     averageOut: boolean
     useMapTransformationTypes: boolean
-    deepClone: boolean
+    clone: boolean
     evaluateAttachmentScps: boolean
     evaluateSingleScps: boolean
     evaluateGcps: boolean
@@ -271,8 +271,8 @@ export function parseAttachInputs(
       attachedTransformationOptions.useMapTransformationTypes =
         options.useMapTransformationTypes
     }
-    if ('deepClone' in options && options.deepClone) {
-      attachedTransformationOptions.deepClone = options.deepClone
+    if ('clone' in options && options.clone) {
+      attachedTransformationOptions.clone = options.clone
     }
     if ('evaluateAttachmentScps' in options && options.evaluateAttachmentScps) {
       attachedTransformationOptions.evaluateAttachmentScps =
