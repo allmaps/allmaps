@@ -8,6 +8,7 @@
     "outDir": "./dist"
   },
   "references": [
+    { "path": "../../packages/attach" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/id" },
     { "path": "../../packages/types" },

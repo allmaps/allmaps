@@ -3,6 +3,7 @@
 import { Command, CommanderError } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
+import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
@@ -18,6 +19,7 @@ const program = new Command()
   .name('allmaps')
   .exitOverride()
   .addCommand(annotation())
+  .addCommand(attach())
   .addCommand(transform())
   .addCommand(iiif())
   .addCommand(id())

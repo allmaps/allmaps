@@ -8,7 +8,15 @@ import {
   expectToBeCloseToArrayArray,
   expectToBeCloseToArray
 } from '../../stdlib/test/helper-functions.js'
-import { rcps0, rcps0Extra, rcps1, rcps2, rcps3, rcps11 } from './input/rcps.js'
+import {
+  rcps0,
+  rcps0Extra,
+  rcps1,
+  rcps2,
+  rcps3,
+  rcps11,
+  rcps
+} from './input/rcps.js'
 
 import { AttachedTransformation } from '../dist/AttachedTransformation.js'
 
@@ -34,6 +42,12 @@ const georeferencedMap3 = readJSONFile(
 )
 
 describe('Create attachments from RCPs', () => {
+  it(`should throw when less then two maps`, () => {
+    expect(() =>
+      AttachedTransformation.fromGeoreferencedMaps([georeferencedMap0], rcps)
+    ).to.throw()
+  })
+
   it(`should throw when there are no RCPs corresponding to any map`, () => {
     expect(() =>
       AttachedTransformation.fromGeoreferencedMaps(
@@ -291,7 +305,7 @@ describe('Solve two maps attached together and evaluate points', () => {
   //     [...rcps11, ...rcps0Extra],
   //     {
   //       transformationType: 'polynomial',
-  //       evaluateSingleSourceControlPoints: true
+  //       evaluateSingleScps: true
   //     }
   //   )
   //   const resultinggeoreferencedmaps =
@@ -356,7 +370,7 @@ describe('Solve two maps attached together and evaluate points', () => {
   //     rcps11,
   //     {
   //       transformationType: 'polynomial',
-  //       evaluateAttachmentSourceControlPoints: false
+  //       evaluateAttachmentScps: false
   //     }
   //   )
   //   const resultinggeoreferencedmaps =

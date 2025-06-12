@@ -39,8 +39,8 @@ const defaultAttachedTransformationFromGeoreferencedMapOptions: AttachedTransfor
     transformationType: 'polynomial',
     useMapTransformationTypes: false,
     deepClone: true,
-    evaluateAttachmentSourceControlPoints: true,
-    evaluateSingleSourceControlPoints: false,
+    evaluateAttachmentScps: true,
+    evaluateSingleScps: false,
     evaluateGcps: false,
     removeExistingGcps: false
   }
@@ -354,7 +354,7 @@ export class AttachedTransformation {
     if (gcpSourcePoints) {
       spForEvaluation.push(...gcpSourcePoints)
     }
-    if (this.options?.evaluateAttachmentSourceControlPoints) {
+    if (this.options?.evaluateAttachmentScps) {
       spForEvaluation.push(...this.ScpsById.flat())
     }
     if (extraSourcePoints) {
@@ -370,10 +370,7 @@ export class AttachedTransformation {
     })
 
     // Average out the destination values of the Source Control Points
-    if (
-      this.options?.averageOut &&
-      this.options?.evaluateAttachmentSourceControlPoints
-    ) {
+    if (this.options?.averageOut && this.options?.evaluateAttachmentScps) {
       this.ScpsById.forEach((scpsForId) => {
         const meanDestination = scpsForId
           .map((scp) => scp.destination as Point)
@@ -471,6 +468,10 @@ export class AttachedTransformation {
     const gcpSps: Sp[] = []
     const extraSps: Sp[] = []
 
+    if (georeferencedMaps.length < 2) {
+      throw new Error('Attach at least two maps.')
+    }
+
     // Per GeoreferencedMap, set option objects and collect Source Control Points from Resource Control Points
     for (const georeferencedMap of georeferencedMaps) {
       const mapId = georeferencedMap.id
@@ -545,7 +546,7 @@ export class AttachedTransformation {
       .filter((scpsForId) => scpsForId.length == 1)
       .flat(1)
 
-    if (options.evaluateSingleSourceControlPoints) {
+    if (options.evaluateSingleScps) {
       extraSps.push(...singleScps)
     }
 

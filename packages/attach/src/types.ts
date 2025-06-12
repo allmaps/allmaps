@@ -11,8 +11,8 @@ export type AttachedTransformationFromGeoreferencedMapOptions =
     extraSourcePoints?: Sp[]
     useMapTransformationTypes: boolean
     deepClone: boolean
-    evaluateAttachmentSourceControlPoints: boolean
-    evaluateSingleSourceControlPoints: boolean
+    evaluateAttachmentScps: boolean
+    evaluateSingleScps: boolean
     evaluateGcps: boolean
     removeExistingGcps: boolean
   }
@@ -28,6 +28,10 @@ export type Rcp = {
   id: string
   mapId: string
   resource: Point
+}
+
+export type RcpsInput = {
+  rcps: Rcp[]
 }
 
 // Source Control Point

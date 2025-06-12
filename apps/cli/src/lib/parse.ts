@@ -1,5 +1,8 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
+import { InverseOptions } from '@allmaps/transform/shared/types.js'
+import { isPoint } from '@allmaps/stdlib'
+
 import { readFromFile, parseJsonFromFile } from './io.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -7,10 +10,15 @@ import type {
   TransformationType,
   TransformerInputs,
   GcpTransformerOptions,
-  GcpTransformOptions
+  GcpTransformOptions,
+  TransformationTypeInputs
 } from '@allmaps/transform'
 import type { Gcp } from '@allmaps/types'
-import { InverseOptions } from '@allmaps/transform/shared/types.js'
+import type {
+  Rcp,
+  AttachedTransformationOptions,
+  RcpsInput
+} from '@allmaps/attach'
 
 export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   if (options.annotation) {
@@ -84,13 +92,13 @@ export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
   return parseCoordinatesArrayArray(readFromFile(file))
 }
 
-export function parseTransformationType(
+export function parseTransformationTypeInputs(
   options: {
     transformationType?: string
     polynomialOrder?: number
   },
   map?: GeoreferencedMap
-): TransformationType {
+): TransformationTypeInputs {
   let transformationType: TransformationType
   if (
     options.transformationType === 'polynomial' &&
@@ -121,7 +129,7 @@ export function parseTransformationType(
     transformationType = 'polynomial'
   }
 
-  return transformationType
+  return { transformationType }
 }
 
 export function parseTransformerInputs(
@@ -141,7 +149,7 @@ export function parseTransformerInputs(
   }
 
   const gcps = parseGcps(options, map)
-  const transformationType = parseTransformationType(options, map)
+  const { transformationType } = parseTransformationTypeInputs(options, map)
 
   return { gcps, transformationType }
 }
@@ -197,6 +205,93 @@ export function parseTransformerOptions(options: {
   // Note: Project functions postToGeo and preToResource not supported
 
   return transformerOptions
+}
+
+export function parseRcps(options: { rcps?: string }): Rcp[] {
+  if (options.rcps) {
+    const rcps = parseJsonFromFile(options.rcps)
+
+    if (
+      Array.isArray(rcps) &&
+      rcps.every(
+        (rcp) =>
+          typeof rcp === 'object' &&
+          'type' in rcp &&
+          rcp.type === 'rcp' &&
+          'id' in rcp &&
+          typeof rcp.id == 'string' &&
+          'mapId' in rcp &&
+          typeof rcp.mapId == 'string' &&
+          'resource' in rcp &&
+          isPoint(rcp.resource)
+      )
+    ) {
+      return rcps as Rcp[]
+    } else {
+      throw new Error('RCPs must be of the correct type')
+    }
+  }
+
+  throw new Error('No RCPs supplied')
+}
+
+export function parseAttachInputs(
+  options: Partial<{
+    rcps: string
+    transformationType: string
+    averageOut: boolean
+    useMapTransformationTypes: boolean
+    deepClone: boolean
+    evaluateAttachmentScps: boolean
+    evaluateSingleScps: boolean
+    evaluateGcps: boolean
+    removeExistingGcps: boolean
+  }>
+): RcpsInput &
+  TransformationTypeInputs &
+  Partial<AttachedTransformationOptions> {
+  const rcps = parseRcps(options)
+  const { transformationType } = parseTransformationTypeInputs(options)
+
+  const attachedTransformationOptions: RcpsInput &
+    TransformationTypeInputs &
+    Partial<AttachedTransformationOptions> = {
+    rcps,
+    transformationType
+  }
+
+  if (options && typeof options === 'object') {
+    if ('averageOut' in options && options.averageOut) {
+      attachedTransformationOptions.averageOut = options.averageOut
+    }
+    if (
+      'useMapTransformationTypes' in options &&
+      options.useMapTransformationTypes
+    ) {
+      attachedTransformationOptions.useMapTransformationTypes =
+        options.useMapTransformationTypes
+    }
+    if ('deepClone' in options && options.deepClone) {
+      attachedTransformationOptions.deepClone = options.deepClone
+    }
+    if ('evaluateAttachmentScps' in options && options.evaluateAttachmentScps) {
+      attachedTransformationOptions.evaluateAttachmentScps =
+        options.evaluateAttachmentScps
+    }
+    if ('evaluateSingleScps' in options && options.evaluateSingleScps) {
+      attachedTransformationOptions.evaluateSingleScps =
+        options.evaluateSingleScps
+    }
+    if ('evaluateGcps' in options && options.evaluateGcps) {
+      attachedTransformationOptions.evaluateGcps = options.evaluateGcps
+    }
+    if ('removeExistingGcps' in options && options.removeExistingGcps) {
+      attachedTransformationOptions.removeExistingGcps =
+        options.removeExistingGcps
+    }
+  }
+
+  return attachedTransformationOptions
 }
 
 export function parseInverseOptions(options: {

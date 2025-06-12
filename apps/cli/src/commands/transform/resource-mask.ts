@@ -11,7 +11,7 @@ import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
   parseAnnotationsValidateMaps,
   parseGcps,
-  parseTransformationType,
+  parseTransformationTypeInputs,
   parseTransformOptions
 } from '../../lib/parse.js'
 import { addTransformOptions } from '../../lib/options.js'
@@ -36,7 +36,10 @@ export function resourceMask() {
     for (const map of maps) {
       // Note: adding "&& {}" to make typescript happy
       const gcps = parseGcps(options && {}, map)
-      const transformationType = parseTransformationType(options && {}, map)
+      const { transformationType } = parseTransformationTypeInputs(
+        options && {},
+        map
+      )
 
       const transformer = new GcpTransformer(
         gcps,

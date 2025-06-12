@@ -28,6 +28,14 @@ allmaps --help
 allmaps <command> --help
 ```
 
+## Development
+
+In local development, run the compiled code using `node` when testing the `allmaps` command:
+
+```bash
+node ./dist/index.js
+```
+
 ### Input and output
 
 Most CLI commands accept one or more files as input. You can supply these files in two ways:

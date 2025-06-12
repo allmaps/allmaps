@@ -43,6 +43,7 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/attach": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/stdlib": "workspace:^",

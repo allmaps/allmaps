@@ -109,10 +109,10 @@ The following options are available for Attached transformations from Georeferen
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
 | `transformationType`     | TransformationType to use when building the attached transformation coefficient matrix. This overrules the map's TransformationType, unless `useMapTransformationTypes` is `true`. | `TransformationType`             | `'polynomial'`
-| `useMapTransformationTypes`     | Let `transformationType` overrule the map's TransformationType. | `TransformationType`             | `false`
+| `useMapTransformationTypes`     | Let `transformationType` overrule the map's TransformationType. | `boolean`             | `false`
 | `deepClone`     | Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects. | `boolean`             | `true`
-| `evaluateAttachmentSourceControlPoints`     | For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `true`
-| `evaluateSingleSourceControlPoints`     | For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `false`
+| `evaluateAttachmentScps`     | For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `true`
+| `evaluateSingleScps`     | For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map. | `boolean`             | `false`
 | `evaluateGcps`     | For existing GCPs, re-evaluate them using the solved attached transformation. | `boolean`             | `false`
 | `removeExistingGcps`     | Remove existing GCPs. | `boolean`             | `false`
 
@@ -345,3 +345,12 @@ or specifically set the option 'useMapTransformationTypes' to true to use the ty
 ###### Returns
 
 `AttachedTransformation`.
+
+### `Rcp`
+
+###### Fields
+
+* `id` (`string`)
+* `mapId` (`string`)
+* `resource` (`[number, number]`)
+* `type` (`'rcp'`)

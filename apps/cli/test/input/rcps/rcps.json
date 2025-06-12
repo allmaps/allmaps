@@ -1,0 +1,26 @@
+[
+  {
+    "type": "rcp",
+    "id": "1,1",
+    "mapId": "https://annotations.allmaps.org/maps/83d44a0b956681b0",
+    "resource": [4779, 261]
+  },
+  {
+    "type": "rcp",
+    "id": "1,1",
+    "mapId": "https://annotations.allmaps.org/maps/3b72f58c723da9c4",
+    "resource": [414, 3597]
+  },
+  {
+    "type": "rcp",
+    "id": "1,1",
+    "mapId": "https://annotations.allmaps.org/maps/bb4029969eeff948",
+    "resource": [4780, 3608]
+  },
+  {
+    "type": "rcp",
+    "id": "1,1",
+    "mapId": "https://annotations.allmaps.org/maps/5cf13f6681d355e3",
+    "resource": [465, 257]
+  }
+]

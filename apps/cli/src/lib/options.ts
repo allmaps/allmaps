@@ -26,23 +26,32 @@ export function addTransformationOptions<
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
 >(command: Command<Args, Opts, GlobalOpts>) {
-  return command
-    .option(
-      '-g, --gcps <filename>',
-      'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
-    )
-    .option(
-      '-t, --transformation-type <type>',
-      'Transformation type. One of "helmert", "polynomial", "thinPlateSpline", "projective". ' +
-        'This takes precedence over the transformation type from the Georeference Annotation',
-      'polynomial'
-    )
-    .option(
-      '-o, --polynomial-order <order>',
-      'Order of polynomial transformation. Either 1, 2 or 3.',
-      parseInt,
-      1
-    )
+  return addTransformationTypeOptions(
+    command
+      .option(
+        '-g, --gcps <filename>',
+        'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
+      )
+      .option(
+        '-o, --polynomial-order <order>',
+        'Order of polynomial transformation. Either 1, 2 or 3.',
+        parseInt,
+        1
+      )
+  )
+}
+
+export function addTransformationTypeOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command.option(
+    '-t, --transformation-type <type>',
+    'Transformation type. One of "helmert", "polynomial", "thinPlateSpline", "projective". ' +
+      'This takes precedence over the transformation type from the Georeference Annotation',
+    'polynomial'
+  )
 }
 
 export function addTransformOptions<
@@ -137,4 +146,47 @@ export function addParseIiifOptions<
       'Maximum recursion depth for fetching IIIF resources',
       parseInt
     )
+}
+
+export function addAttachOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command
+    .option(
+      '-r, --rcps <filename>',
+      'Resource Control Points, used to infer the attachments'
+    )
+    .option(
+      '--average-out',
+      "Average out the resulting geo coordinates for each id. For inexact transformations (like 'polynomial') the geo coordinates will in general not be equal. This forces them be equal. For exact transformation types (like 'thinPlateSpline') the geo coordinates will be (quasi) identical making this averaging not (strictly) necessary. Note: the averaging happens in projected geo coordinates.",
+      true
+    )
+    .option(
+      '--use-map-transformation-types',
+      "Let transformationType overrule the map's TransformationType.",
+      false
+    )
+    .option(
+      '--deep-clone',
+      "Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects.",
+      true
+    )
+    .option(
+      '--evaluate-attachment-scps',
+      'For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map.',
+      true
+    )
+    .option(
+      '--evaluate-single-scps',
+      'For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map.',
+      false
+    )
+    .option(
+      '--evaluate-gcps',
+      'For existing GCPs, re-evaluate them using the solved attached transformation.',
+      false
+    )
+    .option('--remove-existing-gcps', 'Remove existing GCPs.', false)
 }

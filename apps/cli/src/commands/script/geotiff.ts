@@ -15,7 +15,7 @@ import { parseJsonInput, printString } from '../../lib/io.js'
 import {
   parseAnnotationsValidateMaps,
   parseTransformOptions,
-  parseTransformationType,
+  parseTransformationTypeInputs,
   parseGcps
 } from '../../lib/parse.js'
 import { getMapId } from '../../lib/map.js'
@@ -82,7 +82,7 @@ export function geotiff() {
       const imageId = await generateId(map.resource.id)
 
       const gcps = parseGcps(options, map)
-      const transformationType = parseTransformationType(options, map)
+      const { transformationType } = parseTransformationTypeInputs(options, map)
 
       const basename = `${imageId}_${mapId}`
 

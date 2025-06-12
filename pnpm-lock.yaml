@@ -29,6 +29,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../../packages/annotation
+      '@allmaps/attach':
+        specifier: workspace:^
+        version: link:../../packages/attach
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
@@ -934,6 +937,64 @@ importers:
       zod-validation-error:
         specifier: ^3.4.0
         version: 3.4.0(zod@3.24.3)
+
+  packages/attach:
+    dependencies:
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../project
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../transform
+      ml-matrix:
+        specifier: ^6.12.0
+        version: 6.12.1
+    devDependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../annotation
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.8.3)
+      chai:
+        specifier: ^4.3.6
+        version: 4.5.0
+      chai-shallow-deep-equal:
+        specifier: ^1.4.6
+        version: 1.4.6(chai@4.5.0)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.1)
+      mocha:
+        specifier: ^10.8.2
+        version: 10.8.2
+      prettier:
+        specifier: ^3.4.2
+        version: 3.5.3
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: ^5.7.0
+        version: 5.8.3
 
   packages/basemap:
     dependencies:
@@ -6957,15 +7018,6 @@ packages:
   /ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
-  /chai-as-promised@8.0.1(chai@4.5.0):
-    resolution: {integrity: sha512-OIEJtOL8xxJSH8JJWbIoRjybbzR52iFuDHuF8eb+nTPD6tgXLjRqsgnUGqQfFODxYvq5QdirT0pN9dZ0+Gz6rA==}
-    peerDependencies:
-      chai: '>= 2.1.2 < 6'
-    dependencies:
-      chai: 4.5.0
-      check-error: 2.1.1
-    dev: true
-
   /chai-roughly@1.0.0:
     resolution: {integrity: sha512-lCV6EsBpMVFKhPXUrO/Ps4ZZW+esi16lB3kAsKFC1kc0qgTdOSd9qlDgOvG0e07wYysTT+FfHbStvH5oF11xRQ==}
     dependencies:
@@ -7034,11 +7086,6 @@ packages:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
     dependencies:
       get-func-name: 2.0.2
-    dev: true
-
-  /check-error@2.1.1:
-    resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
-    engines: {node: '>= 16'}
     dev: true
 
   /chokidar@3.6.0:
