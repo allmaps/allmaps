@@ -83,6 +83,67 @@ allmaps annotation image-ids [files...]
 
 For all the commands above, the input files can be either Georeference Annotations or parsed Georeference Annotations
 
+### Parse and generate IIIF resources
+
+Show help:
+
+```bash
+allmaps iiif --help
+```
+
+Parse IIIF resources and output them in the format used internally by Allmaps:
+
+```bash
+allmaps iiif parse [files...]
+```
+
+Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
+
+```bash
+allmaps manifest -d <id> [files...]
+```
+
+The ID of the IIIF Manifest can be supplied with the `--id` option.
+
+Output the IDs of the IIIF Images in the input files:
+
+```bash
+allmaps iiif image-ids [files...]
+```
+
+### Generate Allmaps IDs
+
+Allmaps CLI can generate Allmaps IDs for input strings.
+
+Show help:
+
+```bash
+allmaps id --help
+```
+
+Generate the Allmaps ID for a IIIF Manifest URL:
+
+```bash
+allmaps id https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/
+```
+
+Using the same URL, but using standard input:
+
+```bash
+echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
+```
+
+### Fetch IIIF images
+
+Fetches the full-size image using a given IIIF Image ID:
+
+```bash
+allmaps fetch full-image "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:7h14cx32p"
+```
+
+> [!NOTE]
+> Not all IIIF image servers allow downloading full-sized images. This command does not yet take the image's `maxWidth`, `maxHeight` and `maxArea` properties into account.
+
 ### Transform resource coordinates to geospatial coordinates (and vice versa)
 
 Show help:
@@ -211,8 +272,8 @@ allmaps transform resource-mask path/to/myAnnotation.json path/to/myAnnotation2.
 All the commands above accept the following options for specifying the transformations:
 
 | Option                                           | Description                                                                                                                                                                    | Default      |
-| :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
-| `-i, --inverse`                                  | Compute toResource ("inverse") transformation                                                                                                                                    |              |
+|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
+| `-i, --inverse`                                  | Compute toResource ("inverse") transformation                                                                                                                                  |              |
 | `-g, --gcps <filename>`                          | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
 | `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
 | `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
@@ -220,71 +281,44 @@ All the commands above accept the following options for specifying the transform
 All the commands above (except `point`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
 
 | Option                            | Description                                                                                   | Default                                                 |
-| :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+|:----------------------------------|:----------------------------------------------------------------------------------------------|:--------------------------------------------------------|
 | `-d, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints) depth | `0` (i.e. no midpoints by default!)                     |
 | `-p, --min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
-| `--geo-is-geographic`     | Use geographic distances and midpoints for lon-lat geo points                         | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
 
-### Parse and generate IIIF resources
-
-Show help:
-
-```bash
-allmaps iiif --help
-```
-
-Parse IIIF resources and output them in the format used internally by Allmaps:
-
-```bash
-allmaps iiif parse [files...]
-```
-
-Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
-
-```bash
-allmaps manifest -d <id> [files...]
-```
-
-The ID of the IIIF Manifest can be supplied with the `--id` option.
-
-Output the IDs of the IIIF Images in the input files:
-
-```bash
-allmaps iiif image-ids [files...]
-```
-
-### Generate Allmaps IDs
-
-Allmaps CLI can generate Allmaps IDs for input strings.
+### Attach Georeference Annotations
 
 Show help:
 
 ```bash
-allmaps id --help
+allmaps attach --help
 ```
 
-Generate the Allmaps ID for a IIIF Manifest URL:
+Attach Georeference Annotations using Resource Control Points to infer new Ground Control Points that bring the maps together.
+
+This command parses Georeference Annotations to Georeferenced Maps and then follows the steps described in [@allmaps/attach](../../packages/attach/):
+- It reads the provided Resource Control Points
+- When it finds pairs of Resource Control Points with identical `id`, it creates an 'Attachment' of a pair of Georeferenced Maps
+- It creates and solves the attached transformation build from the respective map transformations
+- It infers new Ground Control Points at the Resource Control Points using the resulting transformations
 
 ```bash
-allmaps id https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/
+allmaps attach -r path/to/myRcps.json path/to/myAnnotation.json path/to/myAnnotation2.json
 ```
 
-Using the same URL, but using standard input:
+This commands takes RCPs as mandatory option and further more accepts the same options for specifying the attachment as used in the package:
 
-```bash
-echo https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/ | allmaps id
-```
+| Option                            | Description                                                                                   | Default                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+`-r, --rcps <filename>` | Resource Control Points, used to infer the attachments' |
+`--average-out` | "Average out the resulting geo coordinates for each id. For inexact transformations (like `polynomial`) the geo coordinates will in general not be equal. This forces them be equal. For exact transformation types (like 'thinPlateSpline') the geo coordinates will be (quasi) identical making this averaging not (strictly) necessary. Note: the averaging happens in projected geo coordinates." | true
+`--use-map-transformation-types`| "Let transformationType overrule the map's TransformationType."| false
+`--deep-clone`| "Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects."| true
+`--evaluate-attachment-scps`| 'For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'| true
+`--evaluate-single-scps`| 'For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'| false
+`--evaluate-gcps`| 'For existing GCPs, re-evaluate them using the solved attached transformation.'| false
+`--remove-existing-gcps`| 'Remove existing GCPs.'| false
 
-### Fetch IIIF images
-
-Fetches the full-size image using a given IIIF Image ID:
-
-```bash
-allmaps fetch full-image "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:7h14cx32p"
-```
-
-> [!NOTE]
-> Not all IIIF image servers allow downloading full-sized images. This command does not yet take the image's `maxWidth`, `maxHeight` and `maxArea` properties into account.
 
 ### Generate Bash scripts
 
@@ -336,7 +370,7 @@ By default, the Bash script generated with the `allmaps script geotiff` command 
 For example, the Georeference Annotation https://annotations.allmaps.org/images/0b9aef31f14cb5bf contains a single georeferenced map from the following IIIF Image:
 
 | IIIF Image ID                                                          | Allmaps ID of IIIF Image ID | Expected filename      |
-| :--------------------------------------------------------------------- | :-------------------------- | :--------------------- |
+|:-----------------------------------------------------------------------|:----------------------------|:-----------------------|
 | `https://iiif-server.lib.uchicago.edu/ark:61001/b2mx3j80nk1f/00000001` | `0b9aef31f14cb5bf`          | `0b9aef31f14cb5bf.jpg` |
 
 You can use Allmaps CLI to extract all IIIF Image IDs from a Georeference Annotation:

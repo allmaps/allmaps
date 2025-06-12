@@ -244,8 +244,8 @@ describe('Solve two maps attached together and evaluate points', () => {
     const resultingGeoreferencedMaps =
       attachedtransformation.toGeoreferencedMaps()
     // console.log(
-    //   JSON.stringify(generateAnnotation(resultingGeoreferencedMaps))
-    //   // `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps[0])))}`
+    //   JSON.stringify(generateAnnotation(resultingGeoreferencedMaps)),
+    //   `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps[0])))}`
     // )
     // console.log(
     //   resultingGeoreferencedMaps.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
