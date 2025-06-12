@@ -22,7 +22,7 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import { applyTransform } from '../shared/matrix.js'
+import { applyHomogeneousTransform } from '../shared/homogeneousTransform.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { WarpedMapOptions } from '../shared/types.js'
@@ -276,7 +276,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportMask(viewport: Viewport): Ring {
     return this.projectedGeoMask.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     })
   }
 
@@ -298,7 +301,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportMaskRectangle(viewport: Viewport): Rectangle {
     return this.projectedGeoMaskRectangle.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     }) as Rectangle
   }
 
@@ -310,7 +316,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportFullMask(viewport: Viewport): Ring {
     return this.projectedGeoFullMask.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     })
   }
 
@@ -332,7 +341,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportFullMaskRectangle(viewport: Viewport): Rectangle {
     return this.projectedGeoFullMaskRectangle.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     }) as Rectangle
   }
 

@@ -5,6 +5,7 @@ export function degreesToRadians(degrees: number) {
 // Define vanilla groupBy function, since official one is only baseline 2024
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 // Vanilla code from https://stackoverflow.com/a/62765924/2386673
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function groupBy<T, K extends keyof any>(arr: T[], key: (i: T) => K) {
   return arr.reduce(
     (groups, item) => {

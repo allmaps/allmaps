@@ -8,19 +8,11 @@ import {
   expectToBeCloseToArrayArray,
   expectToBeCloseToArray
 } from '../../stdlib/test/helper-functions.js'
-import {
-  rcps0,
-  rcps0Extra,
-  rcps1,
-  rcps2,
-  rcps3,
-  rcps11,
-  rcps
-} from './input/rcps.js'
+import { rcps0, rcps0Extra, rcps1, rcps2, rcps11, rcps } from './input/rcps.js'
 
 import { AttachedTransformation } from '../dist/AttachedTransformation.js'
 
-import { generateAnnotation } from '@allmaps/annotation'
+// import { generateAnnotation } from '@allmaps/annotation'
 
 export const inputDir = './test/input'
 

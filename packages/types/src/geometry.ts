@@ -92,8 +92,30 @@ export type Size = [number, number]
  */
 export type Fit = 'cover' | 'contain'
 
-// TODO: change name to something like 'helmert transformation signature'
-export type Transform = [number, number, number, number, number, number]
+/**
+ * Weights array of a 2D Homogeneous Transform Matrix
+ *
+ * These coefficients are used in the same order in multiple places
+ * - CSS Transform defined by a 2D matrix. Use `toString()` before using this as input for a CSS `matrix()` function.
+ * - WebGL 2D transform matrices.
+ * - OpenLayers' transform class.
+ *
+ * See: https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
+ * See: https://openlayers.org/en/latest/apidoc/module-ol_transform.html
+ *
+ * Note: The weights array of a Polynomial1 Transformation has a different order. See the corresponding conversion functions.
+ *
+ * @export
+ * @typedef {HomogeneousTransform}
+ */
+export type HomogeneousTransform = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+]
 
 export type Matrix4 = [
   number,

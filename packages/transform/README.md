@@ -602,7 +602,8 @@ MIT
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
 * `pointCountMinimum` (`number`)
 
 ###### Returns
@@ -621,12 +622,12 @@ MIT
 [Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `BaseIndependentLinearWeightsTransformation#coefsArrayMatricesDimensions`
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatricesSize`
 
 ###### Type
 
 ```ts
-[[number, number], [number, number]]
+[Size, Size]
 ```
 
 ### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrix`
@@ -637,7 +638,7 @@ MIT
 Array<Array<number>>
 ```
 
-### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrixDimensions`
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrixSize`
 
 ###### Type
 
@@ -698,7 +699,8 @@ There are no parameters.
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
 * `pointCountMinimum` (`number`)
 
 ###### Returns
@@ -779,12 +781,12 @@ There are no parameters.
 [Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `BasePolynomialTransformation#coefsArrayMatricesDimensions`
+### `BasePolynomialTransformation#coefsArrayMatricesSize`
 
 ###### Type
 
 ```ts
-[[number, number], [number, number]]
+[Size, Size]
 ```
 
 ### `BasePolynomialTransformation#coefsArrayMatrix`
@@ -795,7 +797,7 @@ There are no parameters.
 Array<Array<number>>
 ```
 
-### `BasePolynomialTransformation#coefsArrayMatrixDimensions`
+### `BasePolynomialTransformation#coefsArrayMatrixSize`
 
 ###### Type
 
@@ -833,19 +835,6 @@ number
 
 ### `BasePolynomialTransformation#solve()`
 
-Solve the x and y components independently.
-
-This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
-a 'best fit' (least squares) approximate solution for the system of linear equations
-which is (in general) over-defined and hence lacks an exact solution.
-
-See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
-
-This wil result in a weights array for each component:
-For order = 1: this.weight = \[\[a0\_x, ax\_x, ay\_x], \[a0\_y, ax\_y, ay\_y]]
-For order = 2: ... (similar, following the same order as in coefsArrayMatrix)
-For order = 3: ... (similar, following the same order as in coefsArrayMatrix)
-
 ###### Parameters
 
 There are no parameters.
@@ -879,7 +868,8 @@ Create a transformation
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
   * The transformation type
 * `pointCountMinimum` (`number`)
   * The minimum number of points for the transformation type
@@ -912,37 +902,40 @@ Array<Point>
 Array<number>
 ```
 
-### `BaseTransformation#evaluateFunction(_newSourcePoint)`
+### `BaseTransformation#evaluateFunction(newSourcePoint)`
 
 Evaluate the transformation function at a new point
 
 ###### Parameters
 
-* `_newSourcePoint` (`[number, number]`)
+* `newSourcePoint` (`[number, number]`)
+  * a source point
 
 ###### Returns
 
 the source point, transformed to destination space (`[number, number]`).
 
-### `BaseTransformation#evaluatePartialDerivativeX(_newSourcePoint)`
+### `BaseTransformation#evaluatePartialDerivativeX(newSourcePoint)`
 
 Evaluate the transformation function's partial derivative to x at a new point
 
 ###### Parameters
 
-* `_newSourcePoint` (`[number, number]`)
+* `newSourcePoint` (`[number, number]`)
+  * a source point
 
 ###### Returns
 
 the x and y component of the partial derivative to x at the source point (`[number, number]`).
 
-### `BaseTransformation#evaluatePartialDerivativeY(_newSourcePoint)`
+### `BaseTransformation#evaluatePartialDerivativeY(newSourcePoint)`
 
 Evaluate the transformation function's partial derivative to y at a new point
 
 ###### Parameters
 
-* `_newSourcePoint` (`[number, number]`)
+* `newSourcePoint` (`[number, number]`)
+  * a source point
 
 ###### Returns
 
@@ -1006,6 +999,16 @@ number
 number
 ```
 
+### `BaseTransformation#processWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `BaseTransformation#rmse?`
 
 ###### Type
@@ -1065,6 +1068,7 @@ Array<Point>
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 ```
 
 ### `BaseTransformation#weightsArrays?`
@@ -1099,6 +1103,12 @@ object
 ```ts
 Gcp & Partial<Distortions>
 ```
+
+### `GcpInputs`
+
+###### Fields
+
+* `gcps` (`Array<Gcp>`)
 
 ### `GcpTransformOptions`
 
@@ -1139,20 +1149,6 @@ Create a GcpTransformer
 
 * `BaseGcpTransformer`
 
-### `GcpTransformer#_setTransformerOptions(partialGcpTransformerOptions)`
-
-Set the transformer options.
-
-Use with caution, especially for options that have effects in the constructor.
-
-###### Parameters
-
-* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
-
-###### Returns
-
-`void`.
-
 ### `GcpTransformer#gcps`
 
 ###### Type
@@ -1161,17 +1157,13 @@ Use with caution, especially for options that have effects in the constructor.
 Array<Gcp>
 ```
 
-### `GcpTransformer#getToGeoTransformation(type)`
+### `GcpTransformer#getToGeoTransformation()`
 
 Get the forward transformation. Create if it doesn't exist yet.
 
-If a transformation type is specified that differs from the transformer's type
-the transformation is computed but not stored as a property.
-
 ###### Parameters
 
-* `type?` (`TransformationType | undefined`)
-  * The transformation type, if different then the transformer's type.
+There are no parameters.
 
 ###### Returns
 
@@ -1202,17 +1194,13 @@ Returned in the length of the shortest piece, measured in resource coordinates.
 
 Resolution of the toGeo transformation in resource space (`number | undefined`).
 
-### `GcpTransformer#getToResourceTransformation(type)`
+### `GcpTransformer#getToResourceTransformation()`
 
 Get the backward transformation. Create if it doesn't exist yet.
 
-If a transformation type is specified that differs from the transformer's type
-the transformation is computed but not stored as a property.
-
 ###### Parameters
 
-* `type?` (`TransformationType | undefined`)
-  * The transformation type, if different then the transformer's type.
+There are no parameters.
 
 ###### Returns
 
@@ -1243,6 +1231,32 @@ Returned in the length of the shortest piece, measured in geo coordinates.
 
 Resolution of the toResource transformation in geo space (`number | undefined`).
 
+### `GcpTransformer#getTransformerOptions()`
+
+Get the transformer options.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; ... 5 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions`.
+
+### `GcpTransformer#setTransformerOptionsInternal(partialGcpTransformerOptions)`
+
+Set the transformer options.
+
+Use with caution, especially for options that have effects in the constructor.
+
+###### Parameters
+
+* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
+
+###### Returns
+
+`void`.
+
 ### `GcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
@@ -1267,7 +1281,7 @@ Resolution of the toResource transformation in geo space (`number | undefined`).
 
 `P`.
 
-### `GcpTransformer.fromGeoreferencedMap(georeferencedMap, partialGcpTransformerOptions)`
+### `GcpTransformer.fromGeoreferencedMap(georeferencedMap, options)`
 
 Create a Projected GCP Transformer from a Georeferenced Map
 
@@ -1275,8 +1289,8 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 * `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * A Georeferenced Map
-* `partialGcpTransformerOptions?` (`Partial<GcpTransformerOptions> | undefined`)
-  * Projected GCP Transformer Options
+* `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
+  * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
 
 ###### Returns
 
@@ -1432,17 +1446,13 @@ Create a GeneralGcpTransformer
 Array<GeneralGcp>
 ```
 
-### `GeneralGcpTransformer#getBackwardTransformation(type)`
+### `GeneralGcpTransformer#getBackwardTransformation()`
 
 Get the backward transformation. Create if it doesn't exist yet.
 
-If a transformation type is specified that differs from the transformer's type
-the transformation is computed but not stored as a property.
-
 ###### Parameters
 
-* `type?` (`TransformationType | undefined`)
-  * The transformation type, if different then the transformer's type.
+There are no parameters.
 
 ###### Returns
 
@@ -1473,17 +1483,13 @@ Returned in the length of the shortest piece, measured in destination coordinate
 
 Resolution of the backward transformation in destination space (`number | undefined`).
 
-### `GeneralGcpTransformer#getForwardTransformation(type)`
+### `GeneralGcpTransformer#getForwardTransformation()`
 
 Get the forward transformation. Create if it doesn't exist yet.
 
-If a transformation type is specified that differs from the transformer's type
-the transformation is computed but not stored as a property.
-
 ###### Parameters
 
-* `type?` (`TransformationType | undefined`)
-  * The transformation type, if different then the transformer's type.
+There are no parameters.
 
 ###### Returns
 
@@ -1569,12 +1575,12 @@ Resolution of the forward transformation in source space (`number | undefined`).
 [Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `Helmert#coefsArrayMatricesDimensions`
+### `Helmert#coefsArrayMatricesSize`
 
 ###### Type
 
 ```ts
-[[number, number], [number, number]]
+[Size, Size]
 ```
 
 ### `Helmert#evaluateFunction(newSourcePoint)`
@@ -1656,14 +1662,6 @@ Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
 `[Array<number>, Array<number>]`.
 
 ### `Helmert#solve()`
-
-Solve the x and y components jointly.
-
-This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
-for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
-See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
-
-This will result weightsArray shared by both components: \[t\_x, t\_y, m, n]
 
 ###### Parameters
 
@@ -1994,15 +1992,6 @@ Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
 
 ### `Projective#solve()`
 
-Solve the x and y components jointly.
-
-This uses a singular value decomposition to compute the last (i.e. 9th) 'right singular vector',
-i.e. the one with the smallest singular value, wich holds the weights for the solution.
-Note that for a set of gcps that exactly follow a projective transformations,
-the singular value is null and this vector spans the null-space.
-
-This wil result in a weights array for each component with rbf weights and affine weights.
-
 ###### Parameters
 
 There are no parameters.
@@ -2019,7 +2008,7 @@ There are no parameters.
 Array<Array<number>>
 ```
 
-### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, epsilon)`
+### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, type, epsilon)`
 
 ###### Parameters
 
@@ -2027,6 +2016,15 @@ Array<Array<number>>
 * `destinationPoints` (`Array<Point>`)
 * `kernelFunction` (`(r: number, options: KernelFunctionOptions) => number`)
 * `normFunction` (`(point0: Point, point1: Point) => number`)
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'
+    | 'linear'`)
 * `epsilon?` (`number | undefined`)
 
 ###### Returns
@@ -2053,12 +2051,12 @@ Array<Array<number>>
 [Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `RBF#coefsArrayMatricesDimensions`
+### `RBF#coefsArrayMatricesSize`
 
 ###### Type
 
 ```ts
-[[number, number], [number, number]]
+[Size, Size]
 ```
 
 ### `RBF#coefsArrayMatrix`
@@ -2069,7 +2067,7 @@ Array<Array<number>>
 Array<Array<number>>
 ```
 
-### `RBF#coefsArrayMatrixDimensions`
+### `RBF#coefsArrayMatrixSize`
 
 ###### Type
 
@@ -2175,6 +2173,16 @@ The coefsArray has a 1xN kernel part and a 1x3 affine part.
 (point0: Point, point1: Point) => number
 ```
 
+### `RBF#processWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
 ### `RBF#rbfWeightsArrays?`
 
 ###### Type
@@ -2182,6 +2190,17 @@ The coefsArray has a 1xN kernel part and a 1x3 affine part.
 ```ts
 [Array<number>, Array<number>]
 ```
+
+### `RBF#setWeightsArrays(weightsArrays, epsilon)`
+
+###### Parameters
+
+* `weightsArrays` (`object`)
+* `epsilon?` (`number | undefined`)
+
+###### Returns
+
+`void`.
 
 ### `RBF#solve()`
 
@@ -2327,13 +2346,13 @@ Transformation type.
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 ```
 
-### `TransformerInputs`
+### `TransformationTypeInputs`
 
 ###### Fields
 
-* `gcps` (`Array<Gcp>`)
 * `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
@@ -2341,7 +2360,16 @@ Transformation type.
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
+
+### `TransformerInputs`
+
+###### Type
+
+```ts
+GcpInputs & TransformationTypeInputs
+```
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 
@@ -2385,6 +2413,88 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 ###### Fields
 
 * `differentHandedness` (`false`)
+
+### `solveIndependentlyInverse(coefsArrayMatrix, destinationPointsArrays)`
+
+Solve the x and y components independently using exact inverse.
+
+This uses the exact inverse to compute (for each component, using the same coefs for both)
+the exact solution for the system of linear equations
+which is (in general) invertable to an exact solution.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
+###### Parameters
+
+* `coefsArrayMatrix` (`Array<Array<number>>`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `solveIndependentlyPseudoInverse(coefsArrayMatrix, destinationPointsArrays)`
+
+Solve the x and y components independently using PseudoInverse.
+
+This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
+a 'best fit' (least squares) approximate solution for the system of linear equations
+which is (in general) over-defined and hence lacks an exact solution.
+
+See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
+
+This wil result in a weights array for each component:
+For order = 1: this.weight = \[\[a0\_x, ax\_x, ay\_x], \[a0\_y, ax\_y, ay\_y]]
+For order = 2: ... (similar, following the same order as in coefsArrayMatrix)
+For order = 3: ... (similar, following the same order as in coefsArrayMatrix)
+
+###### Parameters
+
+* `coefsArrayMatrix` (`Array<Array<number>>`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `solveJointlyPseudoInverse(coefsArrayMatrices, destinationPointsArrays)`
+
+Solve the x and y components jointly using PseudoInverse.
+
+This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
+for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
+See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
+
+This will result weightsArray shared by both components: \[t\_x, t\_y, m, n]
+
+###### Parameters
+
+* `coefsArrayMatrices` (`[Array<Array<number>>, Array<Array<number>>]`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `solveJointlySvd(coefsArrayMatrices, pointCount)`
+
+Solve the x and y components jointly using singular value decomposition.
+
+This uses a singular value decomposition to compute the last (i.e. 9th) 'right singular vector',
+i.e. the one with the smallest singular value, wich holds the weights for the solution.
+Note that for a set of gcps that exactly follow a projective transformations,
+the singular value is null and this vector spans the null-space.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
+###### Parameters
+
+* `coefsArrayMatrices` (`[Array<Array<number>>, Array<Array<number>>]`)
+* `pointCount` (`number`)
+
+###### Returns
+
+`Array<Array<number>>`.
 
 ### `supportedDistortionMeasures`
 

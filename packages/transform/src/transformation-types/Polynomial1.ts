@@ -1,6 +1,6 @@
 import { BasePolynomialTransformation } from './BasePolynomialTransformation.js'
 
-import type { Point } from '@allmaps/types'
+import type { HomogeneousTransform, Point } from '@allmaps/types'
 
 import type { Polynomial1Measures } from '../shared/types.js'
 
@@ -29,6 +29,37 @@ export class Polynomial1 extends BasePolynomialTransformation {
    */
   static getPolynomial1SourcePointCoefsArray(sourcePoint: Point): number[] {
     return [1, sourcePoint[0], sourcePoint[1]]
+  }
+
+  getHomogeneousTransform(): HomogeneousTransform | undefined {
+    if (!this.weightsArrays) {
+      return undefined
+    }
+    return [
+      this.weightsArrays[0][1],
+      this.weightsArrays[1][1],
+      this.weightsArrays[0][2],
+      this.weightsArrays[1][2],
+      this.weightsArrays[0][0],
+      this.weightsArrays[1][0]
+    ]
+  }
+
+  setWeightsArraysFromHomogeneousTransform(
+    homogeneousTransform: HomogeneousTransform
+  ): void {
+    this.weightsArrays = [
+      [
+        homogeneousTransform[4],
+        homogeneousTransform[0],
+        homogeneousTransform[2]
+      ],
+      [
+        homogeneousTransform[5],
+        homogeneousTransform[1],
+        homogeneousTransform[3]
+      ]
+    ]
   }
 
   getMeasures(): Polynomial1Measures {
