@@ -311,13 +311,13 @@ This commands takes RCPs as mandatory option and further more accepts the same o
 | Option                            | Description                                                                                   | Default                                                 |
 | :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
 `-r, --rcps <filename>` | Resource Control Points, used to infer the attachments' |
-`--average-out` | "Average out the resulting geo coordinates for each id. For inexact transformations (like `polynomial`) the geo coordinates will in general not be equal. This forces them be equal. For exact transformation types (like 'thinPlateSpline') the geo coordinates will be (quasi) identical making this averaging not (strictly) necessary. Note: the averaging happens in projected geo coordinates." | true
-`--use-map-transformation-types`| "Let transformationType overrule the map's TransformationType."| false
-`--deep-clone`| "Deep Clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects."| true
-`--evaluate-attachment-scps`| 'For both Source Control Points of an attachment, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'| true
-`--evaluate-single-scps`| 'For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'| false
-`--evaluate-gcps`| 'For existing GCPs, re-evaluate them using the solved attached transformation.'| false
-`--remove-existing-gcps`| 'Remove existing GCPs.'| false
+`--no-average-out` | "Don't average out the resulting geo coordinates for each id. For inexact transformations (like `polynomial`) the geo coordinates will in general not be equal. This forces them be equal. For exact transformation types (like 'thinPlateSpline') the geo coordinates will be (quasi) identical making this averaging not (strictly) necessary. Note: the averaging happens in projected geo coordinates." |
+`--use-map-transformation-types`| "Let transformationType overrule the map's TransformationType."|
+`--no-clone`| "Don't clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects."|
+`--no-evaluate-attachment-scps`| 'For both Source Control Points of an attachment, don't evaluate them using the solved attached transformation to create a GCP on the corresponding map.'|
+`--evaluate-single-scps`| 'For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'|
+`--evaluate-gcps`| 'For existing GCPs, re-evaluate them using the solved attached transformation.'|
+`--remove-existing-gcps`| 'Remove existing GCPs.'|
 
 
 ### Generate Bash scripts

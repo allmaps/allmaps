@@ -12,7 +12,7 @@ import { rcps0, rcps0Extra, rcps1, rcps2, rcps11, rcps } from './input/rcps.js'
 
 import { AttachedTransformation } from '../dist/AttachedTransformation.js'
 
-// import { generateAnnotation } from '@allmaps/annotation'
+import { generateAnnotation } from '@allmaps/annotation'
 
 export const inputDir = './test/input'
 
@@ -235,8 +235,8 @@ describe('Solve two maps attached together and evaluate points', () => {
     )
     const resultingGeoreferencedMaps =
       attachedtransformation.toGeoreferencedMaps()
+    // console.log(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps)))
     // console.log(
-    //   JSON.stringify(generateAnnotation(resultingGeoreferencedMaps)),
     //   `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps[0])))}`
     // )
     // console.log(
@@ -349,6 +349,35 @@ describe('Solve two maps attached together and evaluate points', () => {
     expectToBeCloseToArray(
       resultingGeoreferencedMaps[0].gcps[0].geo,
       [4.941781094220815, 52.34760910486503]
+    )
+  })
+  it(`should have an option to remove existing gcps and work with multiple annotations`, () => {
+    const attachedtransformation = AttachedTransformation.fromGeoreferencedMaps(
+      [
+        georeferencedMap0,
+        georeferencedMap1,
+        georeferencedMap2,
+        georeferencedMap3
+      ],
+      rcps,
+      {
+        transformationType: 'polynomial',
+        removeExistingGcps: true
+      }
+    )
+    const resultingGeoreferencedMaps =
+      attachedtransformation.toGeoreferencedMaps()
+    // console.log(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps)))
+    // console.log(
+    //   `https://viewer.allmaps.org/?data=${encodeURIComponent(JSON.stringify(generateAnnotation(resultingGeoreferencedMaps[0])))}`
+    // )
+    // console.log(
+    //   resultingGeoreferencedMaps.map((georeferencedMap) => georeferencedMap.gcps).flat(1)
+    // )
+    expect(resultingGeoreferencedMaps[0].gcps.length).to.equal(3)
+    expectToBeCloseToArray(
+      resultingGeoreferencedMaps[0].gcps[0].geo,
+      [4.97032167771464, 52.352531044771375]
     )
   })
   it(`should have an option to evaluate attachment source control points`, () => {

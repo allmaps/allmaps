@@ -261,8 +261,8 @@ export function parseAttachInputs(
   }
 
   if (options && typeof options === 'object') {
-    if ('averageOut' in options && options.averageOut) {
-      attachedTransformationOptions.averageOut = options.averageOut
+    if ('noAverageOut' in options && options.noAverageOut) {
+      attachedTransformationOptions.averageOut = !options.noAverageOut
     }
     if (
       'useMapTransformationTypes' in options &&
@@ -271,12 +271,15 @@ export function parseAttachInputs(
       attachedTransformationOptions.useMapTransformationTypes =
         options.useMapTransformationTypes
     }
-    if ('clone' in options && options.clone) {
-      attachedTransformationOptions.clone = options.clone
+    if ('noClone' in options && options.noClone) {
+      attachedTransformationOptions.clone = !options.noClone
     }
-    if ('evaluateAttachmentScps' in options && options.evaluateAttachmentScps) {
+    if (
+      'noEvaluateAttachmentScps' in options &&
+      options.noEvaluateAttachmentScps
+    ) {
       attachedTransformationOptions.evaluateAttachmentScps =
-        options.evaluateAttachmentScps
+        !options.noEvaluateAttachmentScps
     }
     if ('evaluateSingleScps' in options && options.evaluateSingleScps) {
       attachedTransformationOptions.evaluateSingleScps =
