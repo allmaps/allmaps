@@ -10,6 +10,22 @@ import type { MapState } from '$lib/state/map.svelte.js'
 
 const IIIF_KEY = Symbol('iiif')
 
+type ManifestResult = {
+  state: 'success'
+  manifest: Manifest
+}
+
+type ErrorResult = {
+  state: 'error'
+  error: Error
+}
+
+type FetchingResult = {
+  state: 'fetching'
+}
+
+type FetchResult = FetchingResult | ManifestResult | ErrorResult
+
 export class IiifState {
   #mapState: MapState
 
@@ -23,32 +39,73 @@ export class IiifState {
 
   #manifestIds = $derived(this.#manifestItems.map((item) => item.id))
 
-  #parsedManifests = $state<SvelteMap<string, Manifest>>(new SvelteMap())
+  #fetchedManifests = $state<SvelteMap<string, FetchResult>>(new SvelteMap())
+  #fetchedManifestCount = $state(0)
+
+  #parsedManifests = $derived(
+    new SvelteMap(
+      [...this.#fetchedManifests.entries()]
+        .filter(
+          (entry): entry is [string, ManifestResult] =>
+            entry[1].state === 'success'
+        )
+        .map(([manifestId, fetchResult]) => [manifestId, fetchResult.manifest])
+    )
+  )
 
   constructor(mapState: MapState) {
     this.#mapState = mapState
   }
 
-  async fetchParsedManifest(manifestId: string) {
-    if (this.#parsedManifests.has(manifestId)) {
-      return this.#parsedManifests.get(manifestId)
+  async #fetchParsedManifest(manifestId: string) {
+    if (this.#fetchedManifests.has(manifestId)) {
+      return
     }
 
-    const manifest = await fetchJson(manifestId)
-    const parsedManifest = Manifest.parse(manifest)
+    this.#fetchedManifests.set(manifestId, {
+      state: 'fetching'
+    })
 
-    this.#parsedManifests.set(manifestId, parsedManifest)
+    try {
+      const manifest = await fetchJson(manifestId)
+      const parsedManifest = Manifest.parse(manifest)
 
-    return parsedManifest
+      this.#fetchedManifests.set(manifestId, {
+        state: 'success',
+        manifest: parsedManifest
+      })
+    } catch (err) {
+      this.#fetchedManifests.set(manifestId, {
+        state: 'error',
+        error: err instanceof Error ? err : new Error(String(err))
+      })
+    } finally {
+      this.#fetchedManifestCount++
+    }
   }
 
-  // set map(map: GeoreferencedMap | undefined) {
-  //   this.#map = map
-  //   this.#parsedManifests = new SvelteMap()
-  // }
+  fetchManifest(manifestId: string) {
+    if (!this.#fetchedManifests.has(manifestId)) {
+      this.#fetchParsedManifest(manifestId)
+    }
+  }
+
+  getParsedManifest(manifestId: string) {
+    return this.#parsedManifests.get(manifestId)
+  }
 
   get manifestIds() {
     return this.#manifestIds
+  }
+
+  get manifestNotFetchedCount() {
+    return this.#manifestIds.length - this.#fetchedManifestCount
+  }
+
+  get hasLoadingManifests() {
+    return [...this.#fetchedManifests.values()].some(
+      (result) => result.state === 'fetching'
+    )
   }
 }
 
