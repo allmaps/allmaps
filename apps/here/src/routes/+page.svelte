@@ -102,7 +102,9 @@
             {/each}
           </Collection>
 
-          <Route geojsonRoute={data.geojsonRoute} />
+          <div class="place-self-center">
+            <Route geojsonRoute={data.geojsonRoute} />
+          </div>
         </section>
         <Footer />
       </div>
