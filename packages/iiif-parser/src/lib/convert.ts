@@ -172,7 +172,7 @@ export function parseVersion2Attribution(
     if (typeof attribution === 'string') {
       return {
         label: {
-          none: ['attribution']
+          none: ['Attribution']
         },
         value: {
           none: [attribution]
@@ -184,7 +184,7 @@ export function parseVersion2Attribution(
       if (value) {
         return {
           label: {
-            none: ['attribution']
+            none: ['Attribution']
           },
           value
         }
