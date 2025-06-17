@@ -287,11 +287,14 @@ All the commands above accept the following options for specifying the Projected
 |:----------------------------------|:----------------------------------------------------------------------------------------------|:--------------------------------------------------------|
 | `-m, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints). | `0` (i.e. no midpoints by default!)                     |
 | `--min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
-| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
-| `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
+| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `Infinity`                                                     |
+| `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `Infinity`                                                     |
 | `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
-| `--projection <proj4string>`   | The geographic projection rendered in the viewport.                                                                                                                         | `'EPSG:3857'`          |
+| `--projection <proj4string>`   | The geographic projection of the output.                                                                                                                         | `'EPSG:4326'`          |
 | `--no-different-handedness`   | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.)                                                                                                                         |          |
+
+> [!NOTE]
+> Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
 
 Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of it's Projected GCP Transformer: 'toResource' instead of 'toGeo'.
 

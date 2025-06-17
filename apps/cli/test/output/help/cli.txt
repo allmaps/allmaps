@@ -7,7 +7,7 @@ Options:
 
 Commands:
   annotation                   parse and generate Georeference Annotations
-  attach [options] [files...]  attaches Georeference Annotations
+  attach [options] [files...]  attaches maps
   transform                    transform resource coordinates to geospatial
                                coordinates and vice versa
   iiif                         parse and generate IIIF resources

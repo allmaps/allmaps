@@ -80,7 +80,7 @@ export function addProjectedGcpTransformOptions<
     .option(
       '--projection <proj4string>',
       `The geographic projection rendered in the viewport.`,
-      'EPSG:3857'
+      'EPSG:4326'
     )
 }
 

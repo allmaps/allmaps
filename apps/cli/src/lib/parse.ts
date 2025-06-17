@@ -25,13 +25,16 @@ import {
   Projection
 } from '@allmaps/project'
 
+const mustContainOneMapMessage =
+  'Annotation must contain exactly 1 georeferenced map'
+
 export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   if (options.annotation) {
     const annotation = parseJsonFromFile(options.annotation)
     const mapOrMaps = parseAnnotationValidateMap(annotation)
 
     if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
-      throw new Error('Annotation must contain exactly 1 georeferenced map')
+      throw new Error(mustContainOneMapMessage)
     }
     const map = Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
     return map
@@ -173,7 +176,10 @@ export function parseProjectedGcpTransformerInputOptions(
 
   try {
     map = parseMap(options)
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message == mustContainOneMapMessage) {
+      throw error
+    }
     // If no map is found, try parsing GCPs from options instead of a map
   }
 
