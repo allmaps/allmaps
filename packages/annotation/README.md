@@ -157,8 +157,8 @@ const annotation = generateAnnotation(map)
 
 ### `parseAnnotation(annotation)`
 
-Parses a Georeference Annotation or an AnnotationPage
-containing multiple Georeference Annotations and returns an array of maps.
+Parses a Georeference Annotation or an AnnotationPage AnnotationPage
+containing multiple Georeference Annotations and returns an array of Georeferenced Maps.
 
 ###### Parameters
 

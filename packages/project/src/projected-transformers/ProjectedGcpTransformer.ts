@@ -16,7 +16,7 @@ import {
   Projection
 } from '../shared/types.js'
 import {
-  defaultProjectedTransformerOptions,
+  defaultProjectedGcpTransformerOptions,
   lonLatProjection
 } from '../shared/project-functions.js'
 
@@ -89,7 +89,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
   ) {
     const projectedGcpTransformerOptions = mergeOptions(
-      defaultProjectedTransformerOptions,
+      defaultProjectedGcpTransformerOptions,
       partialProjectedGcpTransformerOptions
     )
 

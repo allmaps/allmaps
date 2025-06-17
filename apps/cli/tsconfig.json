@@ -13,6 +13,7 @@
     { "path": "../../packages/id" },
     { "path": "../../packages/types" },
     { "path": "../../packages/transform" },
+    { "path": "../../packages/project" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/annotation" }
   ],

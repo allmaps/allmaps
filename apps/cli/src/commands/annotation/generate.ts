@@ -10,7 +10,7 @@ export function generate() {
     .argument('[files...]')
     .summary('generate Georeference Annotation')
     .description(
-      "Generate a single Georeference Annotation from input files of Allmaps' internal format ('Georeferenced Maps')"
+      "Generate a single Georeference Annotation from json files containing Georeferenced Maps - Allmaps' internal 'map' format"
     )
     .action(async (files) => {
       const jsonValues = await parseJsonInput(files)

@@ -28,9 +28,9 @@ allmaps --help
 allmaps <command> --help
 ```
 
-## Development
+### Development
 
-In local development, run the compiled code using `node` when testing the `allmaps` command:
+In local development, run the compiled code using a JavaScript runtime like `node`. The equivalent of the `allmaps` command is then:
 
 ```bash
 node ./dist/index.js
@@ -40,14 +40,19 @@ node ./dist/index.js
 
 Most CLI commands accept one or more files as input. You can supply these files in two ways:
 
-- Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`.
-- Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI.
+- Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`: `allmaps annotation generate path/to/my-georeferenced-map.json`
+- Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI: `cat path/to/my-georeferenced-map.json | allmaps annotation generate`
 
 Commands that require SVG input only accept one file, commands that require JSON or points input accept multiple files.
 
-Output can be stored by redirecting stdout using: `allmaps <command> <options> [files ...] > outputFile.json`
+> [!NOTE]
+> The `allmaps parse` and `allmaps generate` commands (see below) parse [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/) to and generate them from the data format called a **'Georeferenced Map'**. This is the format Allmaps uses internally to describe a map (See [@allmaps/annotation](../../packages/annotation/)).
+>
+> For all CLI commands where the input in one or more Georeference Annotations, the input can also be Georeferenced Maps!
 
-If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georeference Annotation to your clipboard: `allmaps <command> <options> [files ...] | pbcopy`
+Output can be stored by redirecting stdout using: `allmaps annotation generate path/to/my-georeferenced-map.json > my-georeferenced-annotation.json`
+
+If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georeferenced Map to your clipboard: `allmaps annotation generate path/to/my-georeferenced-map.json | pbcopy`
 
 ### Parse and generate Georeference Annotations
 
@@ -57,13 +62,13 @@ Show help:
 allmaps annotation --help
 ```
 
-Generate Georeference Annotations from input files:
+Generate a single Georeference Annotation from json files containing Georeferenced Maps:
 
 ```bash
 allmaps annotation generate [files...]
 ```
 
-Parse input files and output them in parsed Georeference Annotations (the format used internally by Allmaps):
+Parse and validate Georeference Annotations to Georeferenced Maps:
 
 ```bash
 allmaps annotation parse [files...]
@@ -80,8 +85,6 @@ Output the IDs of the IIIF Images in the input files:
 ```bash
 allmaps annotation image-ids [files...]
 ```
-
-For all the commands above, the input files can be either Georeference Annotations or parsed Georeference Annotations
 
 ### Parse and generate IIIF resources
 
@@ -154,7 +157,7 @@ allmaps transform --help
 
 #### Transform coordinates
 
-Transform coordinates from input files 'to geo' (or 'to resource') using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation. It's also possible to supply the GCPs and transformation type separately.
+Transforms coordinates from input files 'toGeo' or 'toResource' using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation (or parameters).
 
 Input files with coordinates are expected to contain one coordinate on each line, formatted as pairs of coordinates in decimal form separated by spaces:
 
@@ -166,13 +169,11 @@ For this specific command, if no input files are supplied in the a prompt will s
 
 This command was inspired by [gdaltransform](https://gdal.org/programs/gdaltransform.html).
 
-**Examples:**
-
 ```bash
 allmaps transform svg -a <filename> [files...]
 ```
 
-For example, with a file `/path/to/coordinates.txt` that contains two coordinates:
+For example, with a file `path/to/coordinates.txt` that contains two coordinates:
 
 ```
 100 100
@@ -182,7 +183,7 @@ For example, with a file `/path/to/coordinates.txt` that contains two coordinate
 You can use the command as follows:
 
 ```bash
-allmaps transform coordinates -a /path/to/annotation.json /path/to/coordinates.txt
+allmaps transform coordinates -a path/to/annotation.json path/to/coordinates.txt
 ```
 
 This will output:
@@ -195,13 +196,13 @@ This will output:
 You can also pipe the input and store the output:
 
 ```bash
-cat /path/to/coordinates.txt | allmaps transform coordinates -a /path/to/annotation.json \
-  > /path/to/transformed-coordinates.txt
+cat path/to/coordinates.txt | allmaps transform coordinates -a path/to/annotation.json \
+  > path/to/transformed-coordinates.txt
 ```
 
 Or transform using a specific set of GCPs and specified transformation type, instead of reading those from a Georeference Annotation:
 
-With a file `/path/to/gcps.txt` that contains four GCPs:
+With a file `path/to/gcps.txt` that contains four GCPs:
 
 ```
 3899 6412 9.9301538 53.5814021
@@ -214,79 +215,92 @@ With a file `/path/to/gcps.txt` that contains four GCPs:
 This is done with the following command:
 
 ```bash
-allmaps transform coordinates -g /path/to/gcps.txt -t thinPlateSpline /path/to/coordinates.txt
+allmaps transform coordinates -g path/to/gcps.txt -t thinPlateSpline path/to/coordinates.txt
 ```
 
 #### Transform SVG
 
-Transform SVG to GeoJSON Geometry using a a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
-
-**Examples:**
+Transform SVG to GeoJSON Geometry using a a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation. You can also supply the GCPs and transformation type separately.
 
 ```bash
 allmaps transform svg -a <filename> [files...]
 ```
 
 ```bash
-allmaps transform svg -a /path/to/annotation.json /path/to/svg.svg
+allmaps transform svg -a path/to/annotation.json path/to/svg.svg
 ```
 
 ```bash
-allmaps transform svg -g /path/to/gcps.txt -t thinPlateSpline /path/to/svg.svg
+allmaps transform svg -g path/to/gcps.txt -t thinPlateSpline path/to/svg.svg
 ```
 
 #### Transform GeoJSON
 
-Transform GeoJSON Geometry to SVG using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation or separately.
-
-**Examples:**
+Transform GeoJSON Geometry to SVG using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation or separately.
 
 ```bash
 allmaps transform geojson -a <filename> [files...]
 ```
 
 ```bash
-allmaps transform geojson -a /path/to/annotation.json path/to/myGeoJSON.geosjon
+allmaps transform geojson -a path/to/annotation.json path/to/my-geojson.geosjon
 ```
 
 ```bash
-allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline /path/to/myGeoJSON.geosjon
+allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline path/to/my-geojson.geosjon
 ```
 
 #### Transform Resource Mask
 
-Transform SVG resource masks of input Georeference Annotations to GeoJSO Polygon using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.
+Transform SVG resource masks of input Georeference Annotations to GeoJSON Polygon using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation itself.
 
-This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG.
-
-**Examples:**
+This is a faster alternative for `transform svg` where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG.
 
 ```bash
 allmaps transform resource-mask [files...]
 ```
 
 ```bash
-allmaps transform resource-mask path/to/myAnnotation.json path/to/myAnnotation2.json
+allmaps transform resource-mask path/to/my-annotation.json path/to/my-annotation2.json
 ```
 
-All the commands above accept the following options for specifying the transformations:
+#### Options
+
+All the commands above take an annotation input using a parameter (except `resource-mask`, where annotations are passed via stdin).
 
 | Option                                           | Description                                                                                                                                                                    | Default      |
 |:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-i, --inverse`                                  | Compute toResource ("inverse") transformation                                                                                                                                  |              |
-| `-g, --gcps <filename>`                          | Filename of GCPs. This overwrites the GCPs in the annotation argument if such is also used.                                                                                    |              |
-| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `projective`. This overwrites the transformation type in the annotation argument if such is also used. | `polynomial` |
-| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
+| `-a, --annotation <filename>`                    | Filename of Georeference Annotation (or Georeferenced Map).                                                                                                                    |              |
 
-All the commands above (except `point`) accept the following options for transforming lines or polygons in a more granular way (see [@allmaps/transform](../../apps/transform/) for more details):
+All the commands above accept the following options for specifying the Projected GCP Transformer:
+
+| Option                                           | Description                                                                                                                                                                    | Default      |
+|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
+| `-g, --gcps <filename>`                          | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
+| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map) | `polynomial` |
+| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
+| `--internal-projection <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |
+
+All the commands above accept the following options for specifying the Projected GCP Transformer, for example the way it transforms lines or polygons using midpoints (see [@allmaps/transform](../../packages/transform/) and [@allmaps/project](../../packages/project/) for more details):
 
 | Option                            | Description                                                                                   | Default                                                 |
 |:----------------------------------|:----------------------------------------------------------------------------------------------|:--------------------------------------------------------|
-| `-d, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints) depth | `0` (i.e. no midpoints by default!)                     |
-| `-p, --min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
+| `-m, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints). | `0` (i.e. no midpoints by default!)                     |
+| `--min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
+| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `0`                                                     |
+| `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
 | `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--projection <proj4string>`   | The geographic projection rendered in the viewport.                                                                                                                         | `'EPSG:3857'`          |
+| `--no-different-handedness`   | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.)                                                                                                                         |          |
 
-### Attach Georeference Annotations
+Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of it's Projected GCP Transformer: 'toResource' instead of 'toGeo'.
+
+| Option          | Description                                   | Default |
+|:----------------|:----------------------------------------------|:--------|
+| `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation.  |         |
+
+
+### Attach maps
 
 Show help:
 
@@ -294,17 +308,19 @@ Show help:
 allmaps attach --help
 ```
 
-Attach Georeference Annotations using Resource Control Points to infer new Ground Control Points that bring the maps together.
+Attach maps using Resource Control Points to infer new Ground Control Points that bring the maps together.
 
-This command parses Georeference Annotations to Georeferenced Maps and then follows the steps described in [@allmaps/attach](../../packages/attach/):
+This takes Georeference Annotations (or Georeferenced Maps) as input, and for this input follows the steps described in [@allmaps/attach](../../packages/attach/):
 - It reads the provided Resource Control Points
 - When it finds pairs of Resource Control Points with identical `id`, it creates an 'Attachment' of a pair of Georeferenced Maps
 - It creates and solves the attached transformation build from the respective map transformations
 - It infers new Ground Control Points at the Resource Control Points using the resulting transformations
 
 ```bash
-allmaps attach -r path/to/myRcps.json path/to/myAnnotation.json path/to/myAnnotation2.json
+allmaps attach -r path/to/my-rcps.json path/to/my-annotation.json path/to/my-annotation2.json
 ```
+
+#### Options
 
 This commands takes RCPs as mandatory option and further more accepts the same options for specifying the attachment as used in the package:
 
@@ -404,14 +420,14 @@ You can override the default behavior by supplying a JSON file that maps IIIF Im
 
 ```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps script geotiff --image-filenames-file /path/to/image-filenames.json
+  allmaps script geotiff --image-filenames-file path/to/image-filenames.json
 ```
 
-The file `/path/to/image-filenames.json` should contain a JSON object with IIIF Image IDs as keys and local image filenames as values:
+The file `path/to/image-filenames.json` should contain a JSON object with IIIF Image IDs as keys and local image filenames as values:
 
 ```json
 {
-  "https://iiif-server.lib.uchicago.edu/ark:61001/b2mx3j80nk1f/00000001": "/path/to/image1.jpg"
+  "https://iiif-server.lib.uchicago.edu/ark:61001/b2mx3j80nk1f/00000001": "path/to/image1.jpg"
 }
 ```
 

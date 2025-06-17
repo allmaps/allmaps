@@ -300,7 +300,7 @@ When creating a transformer, 'transformer options' can be specified. Apart from 
 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
-| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
+| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. Should be true if the handedness differs between the source and destination coordinate spaces. This makes a difference for specific transformation types like the Helmert transform. (Flipping will not alter the axis orientation of the output (use the 'return type function' for this)). | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
 
 #### Handedness
 
@@ -1104,12 +1104,6 @@ object
 Gcp & Partial<Distortions>
 ```
 
-### `GcpInputs`
-
-###### Fields
-
-* `gcps` (`Array<Gcp>`)
-
 ### `GcpTransformOptions`
 
 ###### Type
@@ -1376,6 +1370,14 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 
 `{type: 'Point'; coordinates: Point}`.
 
+### `GcpTransformerInputs`
+
+###### Type
+
+```ts
+GcpsInputs & TransformationTypeInputs
+```
+
 ### `GcpTransformerOptions`
 
 ###### Type
@@ -1393,6 +1395,12 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
   preToResource: ProjectionFunction
 } & MultiGeometryOptions
 ```
+
+### `GcpsInputs`
+
+###### Fields
+
+* `gcps` (`Array<Gcp>`)
 
 ### `GeneralGcp`
 
@@ -1687,6 +1695,12 @@ Array<number>
 [Array<number>, Array<number>]
 ```
 
+### `InverseOptions`
+
+###### Fields
+
+* `inverse` (`boolean`)
+
 ### `KernelFunction`
 
 ###### Type
@@ -1755,6 +1769,16 @@ Array<number>
 
 `[number, number]`.
 
+### `Polynomial1#getHomogeneousTransform()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`HomogeneousTransform | undefined`.
+
 ### `Polynomial1#getMeasures()`
 
 ###### Parameters
@@ -1774,6 +1798,16 @@ There are no parameters.
 ###### Returns
 
 `Array<number>`.
+
+### `Polynomial1#setWeightsArraysFromHomogeneousTransform(homogeneousTransform)`
+
+###### Parameters
+
+* `homogeneousTransform` (`[number, number, number, number, number, number]`)
+
+###### Returns
+
+`void`.
 
 ### `Polynomial1.getPolynomial1SourcePointCoefsArray(sourcePoint)`
 
@@ -2362,14 +2396,6 @@ Transformation type.
     | 'projective'
     | 'thinPlateSpline'
     | 'linear'`)
-
-### `TransformerInputs`
-
-###### Type
-
-```ts
-GcpInputs & TransformationTypeInputs
-```
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 

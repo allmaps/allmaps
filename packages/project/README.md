@@ -314,7 +314,7 @@ An extra 'transform option' is available for Projected GCP Transformers:
 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
-| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `in a way compatible with [Proj4js](https://github.com/proj4js/proj4js).`
+| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `EPSG:3857`
 
 As with a GCP Transformer, passing this transform option during the transformer's construction here it the default when using the transform methods.
 
@@ -367,6 +367,12 @@ To use a projected transformer (with 10 points, and its 'toGeo' transformation a
 MIT
 
 ## API
+
+### `InternalProjectionInputs`
+
+###### Fields
+
+* `internalProjection?` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `ProjectedGcpTransformOptions`
 
@@ -519,6 +525,14 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
 
+### `ProjectedGcpTransformerInputs`
+
+###### Type
+
+```ts
+GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
+```
+
 ### `ProjectedGcpTransformerOptions`
 
 ###### Type
@@ -533,6 +547,19 @@ A Projected GCP Transformer (`ProjectedGcpTransformer`).
 
 * `definition` (`string`)
 * `name?` (`string`)
+
+### `defaultProjectedGcpTransformOptions`
+
+###### Fields
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+### `defaultProjectedGcpTransformerOptions`
+
+###### Fields
+
+* `internalProjection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `isEqualProjection(projection0, projection1)`
 

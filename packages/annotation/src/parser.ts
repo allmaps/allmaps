@@ -165,8 +165,8 @@ function getGeoreferencedMap(
 }
 
 /**
- * Parses a {@link Annotation Georeference Annotation} or an {@link AnnotationPage AnnotationPage}
- * containing multiple Georeference Annotations and returns an array of {@link Map maps}.
+ * Parses a Georeference Annotation or an AnnotationPage AnnotationPage
+ * containing multiple Georeference Annotations and returns an array of Georeferenced Maps.
  * @param {Annotation | AnnotationPage} annotation - Georeference Annotation or AnnotationPage containing multiple Georeference Annotations
  * @returns {Map[]} Array of maps
  * @example

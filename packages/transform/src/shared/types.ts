@@ -39,13 +39,13 @@ export type TransformationType =
   | 'linear'
 
 // Stored here as object to facilitate parsing in CLI and elsewhere
-export type GcpInputs = {
+export type GcpsInputs = {
   gcps: Gcp[]
 }
 export type TransformationTypeInputs = {
   transformationType: TransformationType
 }
-export type TransformerInputs = GcpInputs & TransformationTypeInputs
+export type GcpTransformerInputs = GcpsInputs & TransformationTypeInputs
 
 export type HelmertMeasures = {
   translation: Point

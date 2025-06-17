@@ -38,6 +38,9 @@ importers:
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
@@ -5005,7 +5008,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.20.8(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.28.2)(vite@5.4.19)
+      '@sveltejs/kit': 2.20.8(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.19)
     dev: true
 
   /@sveltejs/kit@2.20.8(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.19)(vite@5.4.19):
