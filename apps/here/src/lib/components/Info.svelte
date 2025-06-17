@@ -102,14 +102,13 @@
     {/snippet}
     {#snippet contents()}
       {#if map}
+        <!-- TODO: move contents to grid cell in layout so max-h is no longer needed -->
         <div
           class="bg-white rounded-lg shadow-lg max-w-2xl max-h-[calc(100vh-120px)] overflow-auto"
         >
           <!-- Loading indicator for manifests -->
           {#if hasLoadingManifests}
-            <div
-              class="p-4 bg-yellow/10 border-b border-gray-200 flex items-center gap-2"
-            >
+            <div class="p-4 border-b border-gray-200 flex items-center gap-2">
               <img src={SmallLoading} alt="Loading" class="w-4 h-4" />
               <span class="text-sm text-gray-600">Loading metadata…</span>
             </div>
@@ -282,7 +281,7 @@
               </p>
               <a
                 class="group inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 ease-out relative
-                place-self-center overflow-hidden border border-gray-300 hover:border-gray-400"
+                place-self-end overflow-hidden border border-gray-300 hover:border-gray-400"
                 href={viewerUrl}
               >
                 <div
@@ -305,7 +304,7 @@
             </p>
             <a
               class="group inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 ease-out relative
-              place-self-center overflow-hidden border border-gray-300 hover:border-gray-400"
+              place-self-end overflow-hidden border border-gray-300 hover:border-gray-400"
               href={editorUrl}
             >
               <div
