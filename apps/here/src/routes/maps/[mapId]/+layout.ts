@@ -31,6 +31,18 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 
   try {
     imageInfo = await fetchImageInfo(imageId, undefined, fetch)
+
+    if (
+      imageInfo &&
+      typeof imageInfo === 'object' &&
+      '@id' in imageInfo &&
+      typeof imageInfo['@id'] === 'string' &&
+      imageInfo['@id'].startsWith('https, https://')
+    ) {
+      // This is a workaround for a bug in OCLC's contentDM service,
+      // they should fix this, until then, do this:
+      imageInfo['@id'] = imageInfo['@id'].replace('https, https://', 'https://')
+    }
   } catch (err) {
     error(404, {
       message: 'Failed to fetch IIIF Image'
