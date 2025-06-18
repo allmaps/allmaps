@@ -173,10 +173,10 @@ function generateGeoreferenceAnnotation(
 }
 
 /**
- * Generates a {@link Annotation Georeference Annotation} from a single {@link Map map} or
- * an {@link AnnotationPage AnnotationPage} containing multiple Georeference Annotations from an array of {@link Map maps}.
+ * Generates a Georeference Annotation from a single Georeferenced Map or
+ * an Annotation Page containing multiple Georeference Annotations from an array of Georeferenced Maps.
  * @param mapOrMaps - Single Georeferenced Map, or an array of Georeferenced Maps
- * @returns Georeference Annotation
+ * @returns Georeference Annotation or Annotation Page
  * @example
  * ```js
  * import fs from 'fs'
