@@ -4,7 +4,7 @@ import {
   findManifests,
   labelFromPartOfItem
 } from '$lib/shared/iiif.js'
-import { organizationNameFromImageServiceDomain } from '$lib/shared/organizations.js'
+import { organizationNameFromImageServiceUrl } from '$lib/shared/organizations.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -76,8 +76,9 @@ export function getMapLabels(map: GeoreferencedMap): string[] {
     labels = [firstManifestLabel.label]
   } else if (map?.resource.id) {
     const imageServiceDomain = new URL(map.resource.id).host
-    const organizationName =
-      organizationNameFromImageServiceDomain(imageServiceDomain)
+    const organizationName = organizationNameFromImageServiceUrl(
+      map.resource.id
+    )
     if (organizationName) {
       labels = [`Map from ${organizationName}`]
     } else {
