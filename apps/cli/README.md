@@ -74,7 +74,7 @@ Commands that require SVG input only accept one file, commands that require JSON
 
 > [!NOTE]
 > In Allmaps, maps can be defined in two ways:
-> - As a **Georeference Annotation**: the official [spec](https://preview.iiif.io/api/georef/extension/georef/) that is part of the IIIF Framework. Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#2-resource-type-overview)).
+> - As a **Georeference Annotation**: the official [spec](https://iiif.io/api/georef/extension/georef/) that is part of the IIIF Framework. Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#2-resource-type-overview)).
 > - As a **Georeferenced Map**: the format Allmaps uses internally to describe a map (see [@allmaps/annotation](../../packages/annotation/)).
 >
 > In the CLI (and elsewhere in Allmaps) we often use 'Annotation' to denote either Georeference Annotation or an Annotation Page containing Georeference Annotations.
