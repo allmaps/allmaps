@@ -314,7 +314,7 @@ An extra 'transform option' is available for Projected GCP Transformers:
 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
 |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
-| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `in a way compatible with [Proj4js](https://github.com/proj4js/proj4js).`
+| `projection`     | The geographic projection rendered in the viewport. | `Projection`             | WebMercator `EPSG:3857`
 
 As with a GCP Transformer, passing this transform option during the transformer's construction here it the default when using the transform methods.
 
@@ -368,6 +368,12 @@ MIT
 
 ## API
 
+### `InternalProjectionInputs`
+
+###### Fields
+
+* `internalProjection?` (`{name?: string; definition: ProjectionDefinition}`)
+
 ### `ProjectedGcpTransformOptions`
 
 ###### Type
@@ -407,6 +413,14 @@ Create a ProjectedGcpTransformer
 
 * `GcpTransformer`
 
+### `ProjectedGcpTransformer#interalProjectedGcps`
+
+###### Type
+
+```ts
+Array<Gcp>
+```
+
 ### `ProjectedGcpTransformer#internalProjection`
 
 ###### Type
@@ -429,6 +443,14 @@ Create a ProjectedGcpTransformer
 
 ```ts
 (point: Point) => Point
+```
+
+### `ProjectedGcpTransformer#projectedGcps`
+
+###### Type
+
+```ts
+Array<Gcp>
 ```
 
 ### `ProjectedGcpTransformer#projection`
@@ -510,7 +532,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
   * Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
@@ -518,6 +540,14 @@ Create a Projected GCP Transformer from a Georeferenced Map
 ###### Returns
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
+
+### `ProjectedGcpTransformerInputs`
+
+###### Type
+
+```ts
+GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
+```
 
 ### `ProjectedGcpTransformerOptions`
 
@@ -533,6 +563,19 @@ A Projected GCP Transformer (`ProjectedGcpTransformer`).
 
 * `definition` (`string`)
 * `name?` (`string`)
+
+### `defaultProjectedGcpTransformOptions`
+
+###### Fields
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+### `defaultProjectedGcpTransformerOptions`
+
+###### Fields
+
+* `internalProjection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `isEqualProjection(projection0, projection1)`
 

@@ -26,12 +26,18 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../../packages/annotation
+      '@allmaps/attach':
+        specifier: workspace:^
+        version: link:../../packages/attach
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
@@ -965,6 +971,70 @@ importers:
         specifier: ^3.4.0
         version: 3.4.1(zod@3.25.48)
 
+  packages/attach:
+    dependencies:
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../project
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../transform
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      ml-matrix:
+        specifier: ^6.12.0
+        version: 6.12.1
+    devDependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../annotation
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.8.3)
+      chai:
+        specifier: ^4.3.6
+        version: 4.5.0
+      chai-shallow-deep-equal:
+        specifier: ^1.4.6
+        version: 1.4.6(chai@4.5.0)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.1)
+      mocha:
+        specifier: ^10.8.2
+        version: 10.8.2
+      prettier:
+        specifier: ^3.4.2
+        version: 3.5.3
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: ^5.7.0
+        version: 5.8.3
+
   packages/basemap:
     dependencies:
       '@protomaps/basemaps':
@@ -1422,7 +1492,7 @@ importers:
         specifier: workspace:^
         version: link:../transform
       proj4:
-        specifier: ^2.15.0
+        specifier: ^2.16.0
         version: 2.17.0
     devDependencies:
       '@allmaps/annotation':
@@ -6234,11 +6304,9 @@ packages:
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
     dependencies:
       '@types/lodash': 4.17.17
-    dev: true
 
   /@types/lodash@4.17.17:
     resolution: {integrity: sha512-RRVJ+J3J+WmyOTqnz3PiBLA501eKwXl2noseKOrNo/6+XEHjTAxO4xHvxQB6QuNm+s4WRbn6rSiap8+EA+ykFQ==}
-    dev: true
 
   /@types/mapbox__point-geometry@0.1.4:
     resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
@@ -11168,7 +11236,7 @@ packages:
     engines: {node: '>= 8'}
 
   /mgrs@1.0.0:
-    resolution: {integrity: sha1-+5FYjnjJACVnI5XLQLJffNatGCk=}
+    resolution: {integrity: sha512-awNbTOqCxK1DBGjalK3xqWIstBZgN6fxsMSiXLs9/spqWkF2pAhb2rrYCFSsr1/tT7PhcDGjZndG8SWYn0byYA==}
     dev: false
 
   /micromark-core-commonmark@1.1.0:

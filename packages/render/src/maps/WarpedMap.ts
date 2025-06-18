@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es'
+
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import {
@@ -20,7 +22,7 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import { applyTransform } from '../shared/matrix.js'
+import { applyHomogeneousTransform } from '../shared/homogeneousTransform.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { WarpedMapOptions } from '../shared/types.js'
@@ -275,7 +277,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportMask(viewport: Viewport): Ring {
     return this.projectedGeoMask.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     })
   }
 
@@ -297,7 +302,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportMaskRectangle(viewport: Viewport): Rectangle {
     return this.projectedGeoMaskRectangle.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     }) as Rectangle
   }
 
@@ -309,7 +317,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportFullMask(viewport: Viewport): Ring {
     return this.projectedGeoFullMask.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     })
   }
 
@@ -331,7 +342,10 @@ export class WarpedMap extends EventTarget {
    */
   getViewportFullMaskRectangle(viewport: Viewport): Rectangle {
     return this.projectedGeoFullMaskRectangle.map((point) => {
-      return applyTransform(viewport.projectedGeoToViewportTransform, point)
+      return applyHomogeneousTransform(
+        viewport.projectedGeoToViewportHomogeneousTransform,
+        point
+      )
     }) as Rectangle
   }
 
@@ -367,7 +381,8 @@ export class WarpedMap extends EventTarget {
     const projectedHelmertTransformer = this.getProjectedTransformer('helmert')
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
-    return toProjectedGeoHelmertTransformation.scale as number
+    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
+    return helmertMeasures.scale as number
   }
 
   /**
@@ -592,7 +607,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
+    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
   }
@@ -607,7 +622,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = this.projectedTransformer.deepClone()
+    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints.map((point, index) => {
         return mixPoints(

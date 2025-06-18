@@ -176,11 +176,11 @@ describe('Thin plate spline transformation', async () => {
 describe('Thin plate spline transformation distortion', async () => {
   const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
   const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
-  const referenceScale = toGeoHelmertTransformation.scale
+  const referenceScale = toGeoHelmertTransformation.getMeasures().scale
 
   const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
   const resourcePoint = [1000, 1000]
-  const distortion = -0.2140907145956012
+  const distortion = -0.21409071451286568
 
   it(`should be able to compute distortion`, () => {
     expect(

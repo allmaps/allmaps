@@ -96,7 +96,7 @@ GeoreferencedMap2GCPSchema
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 6 more ...; transformation?: { ...; } | undefined; }
+{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 7 more ...; resourceCrs?: { ...; } | undefined; }
 ```
 
 ### `GeoreferencedMapSchema`
@@ -113,6 +113,26 @@ GeoreferencedMap2Schema
 
 ```ts
 GeoreferencedMaps2Schema
+```
+
+### `PartOf`
+
+###### Type
+
+```ts
+Array<PartOfItem> | undefined
+```
+
+### `PartOfItem`
+
+###### Type
+
+```ts
+{
+  type: string
+  id: string
+  label?: Record<string, Array<string | number | boolean>> | undefined
+} & {partOf?: PartOfItem[]}
 ```
 
 ### `ResourceSchema`
@@ -157,8 +177,8 @@ const annotation = generateAnnotation(map)
 
 ### `parseAnnotation(annotation)`
 
-Parses a Georeference Annotation or an AnnotationPage
-containing multiple Georeference Annotations and returns an array of maps.
+Parses a Georeference Annotation or an AnnotationPage AnnotationPage
+containing multiple Georeference Annotations and returns an array of Georeferenced Maps.
 
 ###### Parameters
 
@@ -167,7 +187,7 @@ containing multiple Georeference Annotations and returns an array of maps.
 
 ###### Returns
 
-Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 6 more ...; transformation?: { ...; } | undefined; }>`).
+Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 7 more ...; resourceCrs?: { ...; } | undefined; }>`).
 
 ###### Examples
 
@@ -197,4 +217,4 @@ const maps = parseAnnotation(annotation)
 
 ###### Returns
 
-`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 6 more ...; transformation?: { ...; } | undefined; } | Array<{ type: "GeoreferencedMap"; re...`.
+`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; }; ... 7 more ...; resourceCrs?: { ...; } | undefined; } | Array<{ type: "GeoreferencedMap"; resou...`.
