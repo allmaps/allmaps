@@ -19,7 +19,9 @@ import { Dots } from '../components/Dots.js'
 
 import type { IRequestStrict } from 'itty-router'
 
-import type { QueryOptions, Env } from '../shared/types.js'
+import type { ImageRequest } from '@allmaps/iiif-parser'
+
+import type { QueryOptions, Env, Crop } from '../shared/types.js'
 
 import type { Size, Point } from '@allmaps/types'
 
@@ -28,6 +30,87 @@ const padding = 40
 const pinSize = [182.4, 315]
 const pinShadowSize = [825, 260]
 const stampSize = [300.8, 147.4]
+
+async function getImageSource(imageUrl: string): Promise<string> {
+  const imageResponse = await cachedFetch(imageUrl)
+  if (!imageResponse.ok) {
+    throw new Error('Failed to load IIIF Image')
+  }
+
+  const imageArrayBuffer = await imageResponse.arrayBuffer()
+  const base64Image = arrayBufferToBase64(imageArrayBuffer)
+  const imageSource = `data:image/jpeg;base64,${base64Image}`
+  return imageSource
+}
+
+async function renderTiledImage(
+  parsedImage: Image,
+  crop: Crop,
+  tiles: ImageRequest[][],
+  scaleFactor: number,
+  scale: number
+) {
+  // TODO: something's not completely right for this image:
+  // http://localhost:5514/apps/here/maps/8596ac3d0e4cba98.jpg?from=52.36745,4.925613
+
+  const firstTile = tiles[0][0]
+  const firstTileWidth = firstTile.size?.width || 0
+  const firstTileHeight = firstTile.size?.height || 0
+
+  const firstTileOriginalWidth = firstTileWidth * scaleFactor
+  const firstTileOriginalHeight = firstTileHeight * scaleFactor
+
+  const scaledTileWidth = firstTileWidth * scale
+  const scaledTileHeight = firstTileHeight * scale
+
+  const offsetLeft =
+    ((crop.region.x % firstTileOriginalWidth) / scaleFactor) * scale
+  const offsetTop =
+    ((crop.region.y % firstTileOriginalHeight) / scaleFactor) * scale
+
+  let imageSources: string[][] = []
+  for (const row of tiles) {
+    const imageRow: string[] = []
+    for (const tile of row) {
+      const imageUrl = parsedImage.getImageUrl(tile)
+      const imageSource = await getImageSource(imageUrl)
+      imageRow.push(imageSource)
+    }
+    imageSources.push(imageRow)
+  }
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        top: 0,
+        position: 'absolute',
+        overflow: 'hidden',
+        borderRadius: '16px'
+      }}
+    >
+      {imageSources.map((row, rowIndex) =>
+        row.map((imageSource, columnIndex) => (
+          <img
+            key={`${rowIndex}-${columnIndex}`}
+            style={{
+              position: 'absolute',
+              left: `${scaledTileWidth * columnIndex - offsetLeft}px`,
+              top: `${scaledTileHeight * rowIndex - offsetTop}px`,
+              width: `${scaledTileWidth}px`
+              // Turn this on when debugging tiles:
+              // filter: `hue-rotate(${Math.random() * 360}deg)`
+            }}
+            src={imageSource}
+            alt={`Thumbnail for ${parsedImage.uri} (${rowIndex}, ${columnIndex})`}
+          />
+        ))
+      )}
+    </div>
+  )
+}
 
 export async function generateHereCard(
   req: IRequestStrict,
@@ -55,7 +138,7 @@ export async function generateHereCard(
     Math.round(size[1] - 2 * padding)
   ]
 
-  const stampWidth = 200
+  const stampWidth = 275
 
   const pinWidth = 120
   const pinHeight = (pinSize[1] / pinSize[0]) * pinWidth
@@ -89,10 +172,6 @@ export async function generateHereCard(
   )
   const parsedImage = Image.parse(image)
 
-  if (!parsedImage.supportsAnyRegionAndSize) {
-    throw new Error('IIIF Level 0 images are not supported')
-  }
-
   const bbox = computeBbox(parsedMap.resourceMask)
 
   const targetPoint: Point = [
@@ -114,19 +193,67 @@ export async function generateHereCard(
     maxHeight: parsedImage.maxHeight
   })
 
-  const imageUrl = parsedImage.getImageUrl({
-    region: crop.region,
-    size: maxSize
-  })
+  let imageSource: string | undefined
+  let scale = 1
+  let scaleFactor = 1
+  let tiles: ImageRequest[][] = []
 
-  const imageResponse = await cachedFetch(imageUrl)
-  if (!imageResponse.ok) {
-    throw new Error('Failed to load IIIF Image')
+  if (parsedImage.supportsAnyRegionAndSize) {
+    const imageUrl = parsedImage.getImageUrl({
+      region: crop.region,
+      size: maxSize
+    })
+    imageSource = await getImageSource(imageUrl)
+  } else {
+    const { tileZoomLevels } = parsedImage
+    const bestScaleFactor = crop.region.width / crop.size.width
+    const bestZoomLevel = tileZoomLevels.reduce((prev, curr) => {
+      // Find the zoom level with the closest scale factor to bestScaleFactor,
+      // without being larger
+      const prevDiff = Math.abs(prev.scaleFactor - bestScaleFactor)
+      const currDiff = Math.abs(curr.scaleFactor - bestScaleFactor)
+      return curr.scaleFactor <= bestScaleFactor && currDiff < prevDiff
+        ? curr
+        : prev
+    })
+
+    scale = bestZoomLevel.scaleFactor / bestScaleFactor
+    scaleFactor = bestZoomLevel.scaleFactor
+
+    const neededRegion = crop.region
+
+    for (let row = 0; row < bestZoomLevel.rows; row++) {
+      let tilesRow: ImageRequest[] = []
+
+      for (let column = 0; column < bestZoomLevel.columns; column++) {
+        const tileRegion = {
+          x: column * bestZoomLevel.originalWidth,
+          y: row * bestZoomLevel.originalHeight,
+          width: bestZoomLevel.originalWidth,
+          height: bestZoomLevel.originalHeight
+        }
+
+        // Check if tileRegion overlaps with neededRegion
+        if (
+          tileRegion.x < neededRegion.x + neededRegion.width &&
+          tileRegion.x + tileRegion.width > neededRegion.x &&
+          tileRegion.y < neededRegion.y + neededRegion.height &&
+          tileRegion.y + tileRegion.height > neededRegion.y
+        ) {
+          const imageRequest = parsedImage.getTileImageRequest(
+            bestZoomLevel,
+            column,
+            row
+          )
+          tilesRow.push(imageRequest)
+        }
+      }
+
+      if (tilesRow.length > 0) {
+        tiles.push(tilesRow)
+      }
+    }
   }
-
-  const imageArrayBuffer = await imageResponse.arrayBuffer()
-  const base64Image = arrayBufferToBase64(imageArrayBuffer)
-  const imageSource = `data:image/jpeg;base64,${base64Image}`
 
   const pinLeft = crop.coordinates[0] - pinWidth / 2
   const pinTop = crop.coordinates[1] - pinHeight
@@ -175,12 +302,16 @@ export async function generateHereCard(
           height: '100%'
         }}
       >
-        <img
-          src={imageSource}
-          width={cardResourceSize[0]}
-          height={cardResourceSize[1]}
-          style={{ position: 'absolute', top: 0, borderRadius: '16px' }}
-        />
+        {imageSource ? (
+          <img
+            src={imageSource}
+            width={cardResourceSize[0]}
+            height={cardResourceSize[1]}
+            style={{ position: 'absolute', top: 0, borderRadius: '16px' }}
+          />
+        ) : (
+          await renderTiledImage(parsedImage, crop, tiles, scaleFactor, scale)
+        )}
 
         <img
           src={pinShadow}
