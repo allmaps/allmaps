@@ -3067,7 +3067,7 @@
   ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["Provided by the Library of Congress"]

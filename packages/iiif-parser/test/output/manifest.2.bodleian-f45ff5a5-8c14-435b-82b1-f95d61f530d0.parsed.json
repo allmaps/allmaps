@@ -194,9 +194,18 @@
     }
   ],
   "navDate": "1789-01-01T00:00:00.000Z",
+  "rendering": [
+    {
+      "format": "text/html",
+      "id": "https://digital.bodleian.ox.ac.uk/objects/f45ff5a5-8c14-435b-82b1-f95d61f530d0/",
+      "label": {
+        "none": ["View on Digital Bodleian"]
+      }
+    }
+  ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": [

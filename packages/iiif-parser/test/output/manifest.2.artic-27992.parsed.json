@@ -48,9 +48,18 @@
       }
     }
   ],
+  "rendering": [
+    {
+      "format": "text/html",
+      "id": "http://www.artic.edu/artworks/27992",
+      "label": {
+        "none": ["Full record"]
+      }
+    }
+  ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["Digital image courtesy of the Art Institute of Chicago."]

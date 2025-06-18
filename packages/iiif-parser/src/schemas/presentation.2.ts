@@ -44,6 +44,17 @@ export const Thumbnail2Schema = z
   .union([ThumbnailItem2Schema.array(), ThumbnailItem2Schema])
   .transform(ensureArray)
 
+export const RenderingItem2Schema = z.object({
+  '@id': z.string().url(),
+  '@type': z.string().optional(),
+  label: Value2Schema.optional(),
+  format: z.string().optional()
+})
+
+export const Rendering2Schema = z
+  .union([RenderingItem2Schema.array(), RenderingItem2Schema])
+  .transform(ensureArray)
+
 const ValidLanguageValue2Schema = z
   .union([
     z.object({ '@value': Value2Schema, '@language': z.string().optional() }),
@@ -117,6 +128,7 @@ export const Canvas2Schema = z.object({
   related: Related2Schema.optional(),
   attribution: Attribution2Schema.optional(),
   thumbnail: Thumbnail2Schema.optional(),
+  rendering: Rendering2Schema.optional(),
   metadata: Metadata2Schema.optional(),
   navDate: NavDateSchema.optional(),
   navPlace: NavPlaceSchema.optional()
@@ -135,6 +147,7 @@ export const Manifest2Schema = z.object({
   metadata: Metadata2Schema.optional(),
   related: Related2Schema.optional(),
   attribution: Attribution2Schema.optional(),
+  rendering: Rendering2Schema.optional(),
   thumbnail: Thumbnail2Schema.optional(),
   navDate: NavDateSchema.optional(),
   navPlace: NavPlaceSchema.optional()
@@ -162,6 +175,7 @@ export type Collection2 = {
   related?: z.infer<typeof Related2Schema>
   attribution?: z.infer<typeof Attribution2Schema>
   thumbnail?: z.infer<typeof Thumbnail2Schema>
+  rendering?: z.infer<typeof Rendering2Schema>
   navDate?: z.infer<typeof NavDateSchema>
   navPlace?: z.infer<typeof NavPlaceSchema>
 }
@@ -197,6 +211,7 @@ export const Collection2Schema: z.ZodType<Collection2> = z.lazy(() =>
     related: Related2Schema.optional(),
     attribution: Attribution2Schema.optional(),
     thumbnail: Thumbnail2Schema.optional(),
+    rendering: Rendering2Schema.optional(),
     navDate: NavDateSchema.optional(),
     navPlace: NavPlaceSchema.optional()
   })

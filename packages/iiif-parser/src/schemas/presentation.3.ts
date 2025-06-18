@@ -27,6 +27,17 @@ export const HomepageItem3Schema = z.object({
   language: z.union([z.string(), z.array(z.string())]).optional()
 })
 
+export const Rendering3ItemSchema = z.object({
+  id: z.string().url(),
+  type: z.string().optional(),
+  label: LanguageValue3Schema,
+  format: z.string().optional()
+})
+
+export const Rendering3Schema = z
+  .union([Rendering3ItemSchema.array(), Rendering3ItemSchema])
+  .transform(ensureArray)
+
 export const Homepage3Schema = z
   .union([HomepageItem3Schema.array(), HomepageItem3Schema])
   .transform(ensureArray)
@@ -124,6 +135,7 @@ export const Canvas3Schema = z.object({
   navPlace: NavPlaceSchema.optional(),
   homepage: Homepage3Schema.optional(),
   thumbnail: Thumbnail3Schema.optional(),
+  rendering: Rendering3Schema.optional(),
   seeAlso: SeeAlso3Schema.optional(),
   summary: Summary3Schema.optional(),
   requiredStatement: RequiredStatement3Schema.optional(),
@@ -141,6 +153,7 @@ export const Manifest3Schema = z.object({
   navPlace: NavPlaceSchema.optional(),
   homepage: Homepage3Schema.optional(),
   thumbnail: Thumbnail3Schema.optional(),
+  rendering: Rendering3Schema.optional(),
   seeAlso: SeeAlso3Schema.optional(),
   summary: Summary3Schema.optional(),
   requiredStatement: RequiredStatement3Schema.optional(),
@@ -166,6 +179,7 @@ export type Collection3 = {
   navPlace?: z.infer<typeof NavPlaceSchema>
   homepage?: z.infer<typeof Homepage3Schema>
   thumbnail?: z.infer<typeof Thumbnail3Schema>
+  rendering?: z.infer<typeof Rendering3Schema>
   seeAlso?: z.infer<typeof SeeAlso3Schema>
   summary?: z.infer<typeof Summary3Schema>
   requiredStatement?: z.infer<typeof RequiredStatement3Schema>
@@ -203,6 +217,7 @@ export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
     navPlace: NavPlaceSchema.optional(),
     homepage: Homepage3Schema.optional(),
     thumbnail: Thumbnail3Schema.optional(),
+    rendering: Rendering3Schema.optional(),
     seeAlso: SeeAlso3Schema.optional(),
     summary: Summary3Schema.optional(),
     requiredStatement: RequiredStatement3Schema.optional(),

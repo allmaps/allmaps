@@ -137,7 +137,7 @@
   "uri": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:130206/manifest",
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["Leiden University Libraries"]
