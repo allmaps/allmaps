@@ -26,7 +26,8 @@ import type {
   Summary,
   RequiredStatement,
   Annotations,
-  Homepage
+  Homepage,
+  Rendering
 } from '../lib/types.js'
 
 import {
@@ -36,6 +37,7 @@ import {
   parseVersion3Metadata,
   parseVersion2Attribution,
   parseVersion2Thumbnail,
+  parseVersion2Rendering,
   parseVersion2Related
 } from '../lib/convert.js'
 
@@ -132,6 +134,7 @@ export class Collection extends EmbeddedCollection {
   navPlace?: NavPlace
   homepage?: Homepage
   thumbnail?: Thumbnail
+  rendering?: Rendering
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
@@ -155,6 +158,7 @@ export class Collection extends EmbeddedCollection {
         parsedCollection.attribution
       )
       this.thumbnail = parseVersion2Thumbnail(parsedCollection.thumbnail)
+      this.rendering = parseVersion2Rendering(parsedCollection.rendering)
       this.homepage = parseVersion2Related(parsedCollection.related)
 
       const manifests =
@@ -191,6 +195,7 @@ export class Collection extends EmbeddedCollection {
       this.navPlace = parsedCollection.navPlace
       this.homepage = parsedCollection.homepage
       this.thumbnail = parsedCollection.thumbnail
+      this.rendering = parsedCollection.rendering
       this.seeAlso = parsedCollection.seeAlso
       this.summary = parsedCollection.summary
       this.requiredStatement = parsedCollection.requiredStatement

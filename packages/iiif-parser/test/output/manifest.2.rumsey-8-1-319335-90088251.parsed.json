@@ -352,7 +352,7 @@
   ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["David Rumsey Historical Map Collection"]

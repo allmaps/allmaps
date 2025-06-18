@@ -15,9 +15,18 @@
       }
     }
   ],
+  "rendering": [
+    {
+      "format": "application/pdf",
+      "id": "https://collections.library.yale.edu/pdfs/15826830.pdf",
+      "label": {
+        "none": ["Download as PDF"]
+      }
+    }
+  ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["Yale University Library"]

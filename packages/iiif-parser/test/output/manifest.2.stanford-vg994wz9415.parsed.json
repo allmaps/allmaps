@@ -170,6 +170,15 @@
       "label": {
         "none": ["Image 1"]
       },
+      "rendering": [
+        {
+          "format": "image/jp2",
+          "id": "https://stacks.stanford.edu/file/vg994wz9415/vg994wz9415_0001.jp2",
+          "label": {
+            "none": ["Original source file (19.1 MB)"]
+          }
+        }
+      ],
       "height": 9607,
       "width": 11091,
       "image": {
@@ -187,7 +196,7 @@
   "majorVersion": 2,
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": [
