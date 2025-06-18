@@ -73,9 +73,13 @@ Most CLI commands accept one or more files as input. You can supply these files 
 Commands that require SVG input only accept one file, commands that require JSON or points input accept multiple files.
 
 > [!NOTE]
-> The `allmaps parse` and `allmaps generate` commands (see below) parse [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/) to and generate them from the data format called a **'Georeferenced Map'**. This is the format Allmaps uses internally to describe a map (See [@allmaps/annotation](../../packages/annotation/)).
+> In Allmaps, maps can be defined in two ways:
+> - As a **Georeference Annotation**: the official [spec](https://preview.iiif.io/api/georef/extension/georef/) that is part of the IIIF Framework. Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#2-resource-type-overview)).
+> - As a **Georeferenced Map**: the format Allmaps uses internally to describe a map (see [@allmaps/annotation](../../packages/annotation/)).
 >
-> For all CLI commands where the input in one or more Georeference Annotations, the input can also be Georeferenced Maps!
+> In the CLI (and elsewhere in Allmaps) we often use 'Annotation' to denote either Georeference Annotation or an Annotation Page containing Georeference Annotations.
+>
+> For convenience, for all CLI commands where the input in one or more Georeference Annotations, the input can also be Georeferenced Maps, and vice versa!
 
 Output can be stored by redirecting stdout using: `allmaps annotation generate path/to/my-georeferenced-map.json > my-georeferenced-annotation.json`
 
@@ -102,6 +106,11 @@ Parse and validate Georeference Annotations to Georeferenced Maps:
 ```bash
 allmaps annotation parse [files...]
 ```
+
+> [!TIP]
+> Since the `generate` and `parse` commands can take both Georeference Annotations and Georeferenced Maps as input, you can also use these commands to 'join' or 'merge' multiple maps together:
+>
+> For example: passing multiple Annotations (or Annotation Pages) to `allmaps generate` (instead of Georeferenced Maps as intended) will generate a Georeferenced Annotation Page containing all input maps!
 
 Convert the resource mask from the input files to SVG polygons:
 
