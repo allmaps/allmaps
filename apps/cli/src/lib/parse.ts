@@ -28,6 +28,12 @@ import {
 const mustContainOneMapMessage =
   'Annotation must contain exactly 1 georeferenced map'
 
+export type LaunchOptions = {
+  localhost: boolean
+  next: boolean
+  dev: boolean
+}
+
 export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   if (options.annotation) {
     const annotation = parseJsonFromFile(options.annotation)
@@ -395,4 +401,24 @@ export function parseCoordinatesArrayArray(
         .split(/\s+/)
         .map((coordinateString) => Number(coordinateString.trim()))
     )
+}
+
+export function parseLaunchInputs(
+  options: Partial<LaunchOptions>
+): Partial<LaunchOptions> {
+  const partialLaunchOptions: Partial<LaunchOptions> = {}
+
+  if (options && typeof options === 'object') {
+    if ('localhost' in options && options.localhost) {
+      partialLaunchOptions.localhost = options.localhost
+    }
+    if ('next' in options && options.next) {
+      partialLaunchOptions.next = options.next
+    }
+    if ('dev' in options && options.dev) {
+      partialLaunchOptions.dev = options.dev
+    }
+  }
+
+  return partialLaunchOptions
 }

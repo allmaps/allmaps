@@ -7,6 +7,7 @@ import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
+import { launch } from './commands/launch.js'
 import { id } from './commands/id.js'
 import { iiif } from './commands/iiif.js'
 import { transform } from './commands/transform.js'
@@ -20,11 +21,12 @@ const program = new Command()
   .exitOverride()
   .addCommand(annotation())
   .addCommand(attach())
-  .addCommand(transform())
+  .addCommand(fetch())
   .addCommand(iiif())
   .addCommand(id())
-  .addCommand(fetch())
+  .addCommand(launch())
   .addCommand(script())
+  .addCommand(transform())
   .configureHelp({
     helpWidth: fixedWidth ? 80 : undefined
   })

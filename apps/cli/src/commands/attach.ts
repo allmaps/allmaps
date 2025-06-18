@@ -14,7 +14,7 @@ export function attach() {
   const command = addAttachOptions(
     new Command('attach')
       .argument('[files...]')
-      .summary('attaches maps')
+      .summary('attach maps')
       .description(
         "Attaches input maps using attachments, solves the attached transformation jointly and outputs the input's Georeferenced Annotations with additional GCPs."
       )

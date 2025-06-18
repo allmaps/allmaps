@@ -2,6 +2,33 @@
 
 Command-line interface for [Allmaps](https://allmaps.org/).
 
+A developer tool to help you create, manipulate and use (files with) Georeferenced Annotations directly from the command line.
+
+Here's the output of `allmaps --help` to give you an idea of what you can do with it:
+
+```sh
+Allmaps CLI
+
+Usage: allmaps [options] [command]
+
+Options:
+  -h, --help                   display help for command
+
+Commands:
+  annotation                   parse and generate Georeference Annotations
+  attach [options] [files...]  attach maps
+  fetch                        fetche IIIF images
+  iiif                         parse and generate IIIF resources
+  id [urls...]                 generate Allmaps IDs from input URLs
+  launch                       launch maps in Allmaps Viewer or other tools
+  script                       generate Bash scripts
+  transform                    transform resource coordinates to geospatial
+                               coordinates and vice versa
+  help [command]               display help for command
+
+For more details about Allmaps, see https://allmaps.org
+```
+
 ## Installation
 
 Use npm to install Allmaps CLI globally:
@@ -53,6 +80,8 @@ Commands that require SVG input only accept one file, commands that require JSON
 Output can be stored by redirecting stdout using: `allmaps annotation generate path/to/my-georeferenced-map.json > my-georeferenced-annotation.json`
 
 If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georeferenced Map to your clipboard: `allmaps annotation generate path/to/my-georeferenced-map.json | pbcopy`
+
+## Commands
 
 ### Parse and generate Georeference Annotations
 

@@ -51,6 +51,7 @@
     "@allmaps/transform": "workspace:^",
     "@commander-js/extra-typings": "^13.0.0",
     "commander": "^13.0.0",
+    "open": "^10.1.2",
     "stream-json": "^1.9.1",
     "zod-validation-error": "^3.4.0"
   },
