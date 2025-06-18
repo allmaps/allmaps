@@ -25,3 +25,17 @@ export type Color = {
   g: number
   b: number
 }
+
+export type Crop = {
+  size: {
+    width: number
+    height: number
+  }
+  region: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+  coordinates: number[]
+}

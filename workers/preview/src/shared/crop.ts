@@ -1,11 +1,12 @@
 import type { Bbox, Size, Point } from '@allmaps/types'
 
-type MaxSize ={
-maxArea?: number
-  maxWidth?: number
-  maxHeight?:number
-}
+import type { Crop } from './types.js'
 
+type MaxSize = {
+  maxArea?: number
+  maxWidth?: number
+  maxHeight?: number
+}
 
 export function computeCrop(
   cropSize: Size,
@@ -14,7 +15,7 @@ export function computeCrop(
   bbox: Bbox,
   targetPoint?: Point,
   desiredScale?: number
-) {
+): Crop {
   const x = resourceCoordinates[0]
   const y = resourceCoordinates[1]
 
@@ -77,7 +78,10 @@ export function computeCrop(
   }
 }
 
-export function computeMaxSize(size: {width: number, height: number}, maxSize: MaxSize) {
+export function computeMaxSize(
+  size: { width: number; height: number },
+  maxSize: MaxSize
+) {
   const { width, height } = size
   const { maxArea, maxWidth, maxHeight } = maxSize
 
