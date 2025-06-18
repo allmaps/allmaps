@@ -208,6 +208,15 @@
       "label": {
         "none": ["PUmap_28146"]
       },
+      "rendering": [
+        {
+          "format": "image/tiff",
+          "id": "https://figgy.princeton.edu/downloads/eaaa0dde-64d9-4dae-b905-c73322b592bf/file/e99b9f83-4705-4945-a90d-23fa1714ca42",
+          "label": {
+            "none": ["Download the original file"]
+          }
+        }
+      ],
       "image": {
         "embedded": true,
         "supportsAnyRegionAndSize": true,
@@ -221,6 +230,12 @@
   ],
   "uri": "https://figgy.princeton.edu/concern/scanned_maps/fa4fb452-5f1d-42ab-a471-53afc176c948/manifest",
   "majorVersion": 2,
+  "rendering": [
+    {
+      "format": "text/html",
+      "id": "http://arks.princeton.edu/ark:/88435/w6634614q"
+    }
+  ],
   "thumbnail": [
     {
       "id": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file/full/!200,150/0/default.jpg"

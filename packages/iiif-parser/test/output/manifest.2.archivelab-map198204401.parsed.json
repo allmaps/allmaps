@@ -79,7 +79,7 @@
   ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["The Internet Archive"]

@@ -160,7 +160,7 @@
                         {#each manifest.homepage as homepage}
                           <a
                             href={homepage.id}
-                            class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline"
+                            class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline break-all"
                           >
                             <LinkIcon size="14" />
                             {homepage.label
@@ -247,14 +247,35 @@
                         {#each manifest.seeAlso as seeAlso}
                           <a
                             href={seeAlso.id}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline"
                           >
                             <LinkIcon size="14" />
                             {seeAlso.format
                               ? `${seeAlso.format} resource`
                               : 'External resource'}
+                            <ArrowSquareOutIcon size="12" />
+                          </a>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+
+                  <!-- Rendering links -->
+                  {#if manifest.rendering && manifest.rendering.length > 0}
+                    <div class="mb-3">
+                      <h5 class="text-sm font-medium text-gray-700 mb-2">
+                        Other versions
+                      </h5>
+                      <div class="inline-flex flex-wrap gap-2">
+                        {#each manifest.rendering as rendering}
+                          <a
+                            href={rendering.id}
+                            class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                          >
+                            <LinkIcon size="14" />
+                            {rendering.label
+                              ? parseLanguageString(rendering.label, 'en')
+                              : `${rendering.format} resource`}
                             <ArrowSquareOutIcon size="12" />
                           </a>
                         {/each}
@@ -332,11 +353,18 @@
               >
             </div>
             <div class="text-sm text-gray-600 flex items-center gap-2">
-              <input
+              <!-- <input
                 class="w-full mt-1 p-2 text-xs bg-gray-50 border border-gray-200 rounded text-gray-700 font-mono"
+                tabindex="-1"
                 readonly
+                inert
                 value={map.id}
-              />
+              /> -->
+              <div
+                class="w-full mt-1 p-2 text-xs bg-gray-50 border border-gray-200 rounded text-gray-700 font-mono"
+              >
+                {map.id}
+              </div>
             </div>
             <p class="text-xs text-gray-600 leading-relaxed text-center">
               Copy the URL of the Georeference Annotation to use it in other

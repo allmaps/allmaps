@@ -23,6 +23,40 @@
         "height": 4181,
         "majorVersion": 2
       },
+      "rendering": [
+        {
+          "format": "application/pdf",
+          "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/files/images/Die_Churfuerstlich_Brandenburgisch_nun_Koeniglich_Preussische_Residenz_Statt_0001.tif/full.pdf",
+          "label": {
+            "none": ["PDF"]
+          },
+          "type": "dcTypes:Image"
+        },
+        {
+          "format": "text/html",
+          "id": "https://digital.zlb.de/viewer/image/34231622/1/",
+          "label": {
+            "none": ["Goobi viewer"]
+          },
+          "type": "dcTypes:InteractiveResource"
+        },
+        {
+          "format": "text/plain",
+          "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/files/plaintext/Die_Churfuerstlich_Brandenburgisch_nun_Koeniglich_Preussische_Residenz_Statt_0001.txt",
+          "label": {
+            "none": ["Fulltext"]
+          },
+          "type": "dcTypes:Text"
+        },
+        {
+          "format": "text/xml",
+          "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/files/alto/Die_Churfuerstlich_Brandenburgisch_nun_Koeniglich_Preussische_Residenz_Statt_0001.xml",
+          "label": {
+            "none": ["ALTO"]
+          },
+          "type": "dcTypes:Text"
+        }
+      ],
       "label": {
         "none": [" - "]
       },
@@ -353,9 +387,43 @@
       "type": "dcTypes:Image"
     }
   ],
+  "rendering": [
+    {
+      "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/pdf/",
+      "type": "dcTypes:Image",
+      "label": {
+        "none": ["PDF"]
+      },
+      "format": "application/pdf"
+    },
+    {
+      "id": "https://digital.zlb.de/viewer/image/34231622/1/LOG_0000/",
+      "type": "dcTypes:InteractiveResource",
+      "label": {
+        "none": ["Goobi viewer"]
+      },
+      "format": "text/html"
+    },
+    {
+      "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/plaintext/",
+      "type": "dcTypes:Text",
+      "label": {
+        "none": ["Fulltext"]
+      },
+      "format": "text/plain"
+    },
+    {
+      "id": "https://digital.zlb.de/viewer/api/v1/records/34231622/alto/",
+      "type": "dcTypes:Text",
+      "label": {
+        "none": ["ALTO"]
+      },
+      "format": "text/xml"
+    }
+  ],
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": ["Goobi viewer"]

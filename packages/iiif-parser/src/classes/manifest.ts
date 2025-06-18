@@ -19,6 +19,7 @@ import {
   parseVersion3Metadata,
   parseVersion2Attribution,
   parseVersion2Thumbnail,
+  parseVersion2Rendering,
   parseVersion2Related
 } from '../lib/convert.js'
 
@@ -34,7 +35,8 @@ import type {
   Summary,
   RequiredStatement,
   Annotations,
-  Homepage
+  Homepage,
+  Rendering
 } from '../lib/types.js'
 
 type ManifestType = z.infer<typeof ManifestSchema>
@@ -98,6 +100,7 @@ export class Manifest extends EmbeddedManifest {
   navPlace?: NavPlace
   homepage?: Homepage
   thumbnail?: Thumbnail
+  rendering?: Rendering
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
@@ -125,6 +128,7 @@ export class Manifest extends EmbeddedManifest {
         parsedManifest.attribution
       )
       this.thumbnail = parseVersion2Thumbnail(parsedManifest.thumbnail)
+      this.rendering = parseVersion2Rendering(parsedManifest.rendering)
       this.homepage = parseVersion2Related(parsedManifest.related)
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
@@ -138,6 +142,7 @@ export class Manifest extends EmbeddedManifest {
       this.navPlace = parsedManifest.navPlace
       this.homepage = parsedManifest.homepage
       this.thumbnail = parsedManifest.thumbnail
+      this.rendering = parsedManifest.rendering
       this.seeAlso = parsedManifest.seeAlso
       this.summary = parsedManifest.summary
       this.requiredStatement = parsedManifest.requiredStatement
