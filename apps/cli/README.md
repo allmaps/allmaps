@@ -343,27 +343,23 @@ This commands takes RCPs as mandatory option and further more accepts the same o
 
 #### Dezoomify
 
-Generate a Bash script that uses [dezoomify-rs](https://dezoomify-rs.ophir.dev/) to download full-size IIIF images from their IIIF Image IDs:
+Generate a Bash script that uses [`dezoomify-rs`](https://dezoomify-rs.ophir.dev/) to download full-size IIIF images from their IIIF Image IDs:
 
 ```bash
 allmaps script dezoomify "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~344467~90112435"
 ```
 
-You can use dezoomify-rs when the IIIF server does not allow downloading full-size images directly.
+You can use `dezoomify-rs` as an alternative to [`allmaps fetch full-image`](#fetch-iiif-images) when the IIIF server does not allow downloading full-size images directly.
 
-#### Create GeoTIFFs using GDAL
-
-Generate a Bash script that uses [GDAL](https://gdal.org/index.html) to convert one or more downloaded full-size IIIF images to [Cloud Optimized GeoTIFFs](https://www.cogeo.org/) using a given Georeference Annotation:
+You can find the IIIF Image IDs from an annotation first using [`allmaps annotation image-ids`](#parse-and-generate-georeference-annotations):
 
 ```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps script geotiff
+  allmaps annotation image-ids | \
+  allmaps script dezoomify
 ```
 
-> [!NOTE]
-> The generated Bash script expects the full-size images to be available on the local file system. You can download these images manually or use the [`allmaps fetch full-image`](#fetch-iiif-images) command.
-
-You can run the generated scripts by saving them to a file:
+You can then run the generated scripts by saving them to a file:
 
 ```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
@@ -382,9 +378,58 @@ curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
   bash
 ```
 
+
+#### Create GeoTIFFs using GDAL
+
+Generate a Bash script that uses [GDAL](https://gdal.org/index.html) to convert one or more downloaded full-size IIIF images to [Cloud Optimized GeoTIFFs](https://www.cogeo.org/) using a given Georeference Annotation:
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps script geotiff
+```
+
+The generated Bash script expects the full-size images to be available on the local file system with the correct name (see below). You can download these images manually or use the [`allmaps fetch full-image`](#fetch-iiif-images) or [`allmaps script dezoomify`](#dezoomify) command, and pipe to Bash to execute the command:
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps annotation image-ids | \
+  allmaps fetch full-image
+
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps script geotiff | \
+  bash
+```
+
+Or
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps annotation image-ids | \
+  allmaps script dezoomify | \
+  bash
+
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps script geotiff | \
+  bash
+```
+
+> [!NOTE]
+> GeoTIFFs are generated in `'EPSG:3857'` by default due to the default value of `--projection`. Hence, it has the same default projection value as the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), and doesn't follow the `'EPSG:4326'` default projection used in [`allmaps transform`](#transform-resource-coordinates-to-geospatial-coordinates-and-vice-versa).
+>
+> The default `--internal-projection` is `'EPSG:3857'`.
+
+You can use the parameters to specify another 'internal projection' (to take the map's (known or guessed) projection into account when transforming) or 'projection' (to generate GeoTIFFs in that projection). See [@allmaps/project](../../packages/project/) for more information about projections.
+
+```bash
+curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
+  allmaps script geotiff --internal-projection "+proj=lcc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +type=crs" | \
+  bash
+```
+
+
 #### Specifying image filenames
 
-By default, the Bash script generated with the `allmaps script geotiff` command computes the Allmaps IDs for all the IIIF Image IDs in the Georeference Annotation and looks for JPGs with the naming convention `<allmaps-id-from-image-id.jpg` in the current directory.
+By default, the Bash script generated with the `allmaps script geotiff` command computes the Allmaps IDs for all the IIIF Image IDs in the Georeference Annotation and looks for JPGs with the naming convention `<allmaps-id-from-image-id>.jpg` in the current directory.
 
 For example, the Georeference Annotation https://annotations.allmaps.org/images/0b9aef31f14cb5bf contains a single georeferenced map from the following IIIF Image:
 

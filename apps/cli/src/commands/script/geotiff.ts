@@ -6,10 +6,13 @@ import path from 'path'
 import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import { generateId } from '@allmaps/id'
 import {
+  bboxToRectangle,
+  bboxToSize,
+  computeBbox,
   geometryToGeojsonGeometry,
-  mergeOptions,
   mergeOptionsUnlessUndefined,
-  mergePartialOptions
+  mergePartialOptions,
+  rectanglesToScale
 } from '@allmaps/stdlib'
 
 import {
@@ -31,6 +34,8 @@ import {
   gdalwarp,
   gdalbuildvrt
 } from '../../lib/gdal.js'
+
+import type { Rectangle, Size } from '@allmaps/types'
 
 export function geotiff() {
   const command = addProjectedGcpTransformerOptions(
@@ -60,7 +65,8 @@ export function geotiff() {
               'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
             ).conflicts('source-dir')
           )
-      )
+      ),
+      { projectionDefinition: 'EPSG:3857' } // Note: different default projection for geotiff!
     )
   )
 
@@ -102,40 +108,80 @@ export function geotiff() {
       const { gcps, transformationType, internalProjection } =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
 
+      const projectedGcpTransformerOptions = mergeOptionsUnlessUndefined(
+        mergePartialOptions(
+          partialProjectedGcpTransformerOptions,
+          partialProjectedGcpTransformOptions
+        ),
+        { internalProjection }
+      )
+
       const projectedTransformer = new ProjectedGcpTransformer(
         gcps,
         transformationType,
-        mergeOptionsUnlessUndefined(
-          mergePartialOptions(
-            partialProjectedGcpTransformerOptions,
-            partialProjectedGcpTransformOptions
-          ),
-          { internalProjection }
-        )
+        projectedGcpTransformerOptions
       )
 
-      const geoPolygon = projectedTransformer.transformToGeo(
-        [map.resourceMask],
-        mergeOptions(partialProjectedGcpTransformOptions, {
-          projection: lonLatProjection
-        })
+      const geoMask = projectedTransformer.transformToGeo(map.resourceMask, {
+        projection: lonLatProjection,
+        maxDepth: 6
+      })
+      const geojsonMaskPolygon = geometryToGeojsonGeometry([geoMask])
+
+      if (!map.resource.width || !map.resource.height) {
+        throw new Error('Map size not specified')
+      }
+      const resourceFullMaskSize: Size = [
+        map.resource.width,
+        map.resource.height
+      ]
+      const resourceMaskBbox = computeBbox(map.resourceMask)
+      const resourceMaskRectangle = bboxToRectangle(resourceMaskBbox)
+      const projectedGeoMaskRectangle = projectedTransformer.transformToGeo(
+        resourceMaskRectangle
+      ) as Rectangle
+      const resourceToProjectedGeoScale = rectanglesToScale(
+        resourceMaskRectangle,
+        projectedGeoMaskRectangle
       )
-      const geojsonPolygon = geometryToGeojsonGeometry(geoPolygon)
+
+      const projectedGeoMask = projectedTransformer.transformToGeo(
+        map.resourceMask
+      )
+
+      const projectedGeoMaskBboxSize: Size = bboxToSize(
+        computeBbox(projectedGeoMask)
+      )
+
+      const size: Size = [
+        Math.round(projectedGeoMaskBboxSize[0] * resourceToProjectedGeoScale),
+        Math.round(projectedGeoMaskBboxSize[1] * resourceToProjectedGeoScale)
+      ]
 
       const gdalwarpScript = gdalwarp(
         imageFilename,
         basename,
         options.outputDir,
-        gcps, // TODO: check if these should be projected?
-        geojsonPolygon,
+        gcps.map(({ resource, geo }) => ({
+          resource,
+          geo: projectedTransformer.projectionToInternalProjection(
+            projectedTransformer.lonLatToProjection(geo)
+          )
+        })),
+        geojsonMaskPolygon,
         transformationType,
-        partialProjectedGcpTransformOptions.projection?.definition ??
-          'EPSG:3857', // TODO: check if this should be projection of internal projection
-        Number(options.jpgQuality)
+        projectedGcpTransformerOptions.internalProjection?.definition,
+        projectedGcpTransformerOptions.projection?.definition,
+        Number(options.jpgQuality),
+        size
       )
 
       gdalwarpScripts.push(
-        checkImageExistsAndCorrectSize(imageFilename, basename, map),
+        checkImageExistsAndCorrectSize(
+          imageFilename,
+          basename,
+          resourceFullMaskSize
+        ),
         gdalwarpScript
       )
 

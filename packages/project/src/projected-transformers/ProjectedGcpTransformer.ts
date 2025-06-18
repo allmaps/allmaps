@@ -131,6 +131,22 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     this.projectionToLatLon = projectionToLatLon
   }
 
+  // Note: this is different from generalGcpsInternal from the BaseTransformer,
+  // which also includes a possible handedness flip
+  public get interalProjectedGcps(): Gcp[] {
+    return this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.projectionToInternalProjection(this.lonLatToProjection(geo))
+    }))
+  }
+
+  public get projectedGcps(): Gcp[] {
+    return this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.lonLatToProjection(geo)
+    }))
+  }
+
   /**
    * Set the projection.
    *

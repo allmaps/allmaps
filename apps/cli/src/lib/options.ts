@@ -51,7 +51,12 @@ export function addProjectedGcpTransformOptions<
   Args extends unknown[] = [],
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
->(command: Command<Args, Opts, GlobalOpts>) {
+>(
+  command: Command<Args, Opts, GlobalOpts>,
+  defaultOptions: { projectionDefinition: string } = {
+    projectionDefinition: 'EPSG:4326'
+  }
+) {
   return command
     .option(
       '-m, --max-depth <number>',
@@ -80,7 +85,7 @@ export function addProjectedGcpTransformOptions<
     .option(
       '--projection <proj4string>',
       `The geographic projection rendered in the viewport.`,
-      'EPSG:4326'
+      defaultOptions.projectionDefinition
     )
 }
 
