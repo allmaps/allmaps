@@ -91,10 +91,10 @@
         </div>
       </div>
     {:else if mapsState.maps.size > 0}
-      <div>
+      <div class="h-full flex flex-col">
         <section
-          class="px-3 py-6 flex flex-col gap-6
-         overflow-hidden max-w-4xl w-full m-auto"
+          class="h-full px-3 py-6 flex flex-col gap-6 justify-between
+            overflow-hidden max-w-4xl w-full m-auto"
         >
           <Collection>
             {#each mapsState.mapsFromCoordinates as [mapId, map] (mapId)}
