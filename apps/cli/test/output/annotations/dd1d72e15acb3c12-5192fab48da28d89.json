@@ -1,0 +1,240 @@
+{
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "https://annotations.allmaps.org/maps/dd1d72e15acb3c12",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2024-09-11T14:50:35.864Z",
+      "modified": "2024-09-11T14:50:35.864Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://images.memorix.nl/rce/iiif/53c6fb59-9728-f575-aeac-993ed7cfafd2",
+          "type": "ImageService2",
+          "height": 7926,
+          "width": 12168,
+          "partOf": [
+            {
+              "id": "https://sammeltassen.nl/iiif-manifests/rce/minuutplan-baarle.json/canvas/23",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://sammeltassen.nl/iiif-manifests/rce/minuutplan-baarle@v2.json",
+                  "type": "Manifest",
+                  "label": {
+                    "en": [
+                      "Kadastrale kaart 1811-1832: minuutplan Baarle Nassau"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"12168\" height=\"7926\"><polygon points=\"2416,128 2741,388 3306,1106 3329,1300 4234,1334 4686,1233 5041,1202 5750,1320 5867,1376 6443,1510 6593,1545 6859,1532 7106,1542 7243,1544 7615,1578 7755,1535 7954,1588 8079,1652 8537,1910 8651,1975 8994,1827 9230,1656 9660,1398 10149,1171 10510,1067 10678,1027 11286,787 11903,452 11924,529 11862,577 11784,721 11575,1108 11449,1366 11214,1792 11038,2201 10934,2471 10787,2763 10538,3133 10311,3422 10033,3798 9959,3943 9820,4268 9672,4664 9536,5059 9496,5228 9385,5386 9217,5674 9050,5909 8879,6038 8545,6281 8075,6545 7722,6642 7173,6773 7035,6824 6781,6968 6108,7253 5519,7508 5321,7560 5242,7621 5081,7702 4867,7777 4809,7787 4633,7598 4504,7511 4206,7343 4022,7179 3824,6982 3559,6715 3412,6549 3297,6469 3112,6349 2961,6319 2820,6314 2531,6300 2358,6334 2235,6391 2117,6445 1988,6541 1825,6447 1668,6307 1661,6227 1751,6041 1624,5219 1600,4932 1518,4243 1475,3667 1456,3200 1487,3013 1557,2880 1621,2674 1646,2477 1693,2348 1676,2185 1698,2026 1645,1833 1643,1692 1503,1150 1961,968 2039,908 2267,471 2368,296\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [5576, 3199]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9306739, 51.4424251]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1746, 6124]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9256867, 51.4336034]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [10490, 3168]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9434257, 51.4473749]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4672, 1259]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.925176, 51.4446371]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4851, 7794]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.936421377264439, 51.43411900279052]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [3605, 6728]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.931449326553805, 51.43456445651497]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [9043, 5903]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.944194570452126, 51.44143915966132]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "https://annotations.allmaps.org/maps/5192fab48da28d89",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-04-29T12:49:18.838Z",
+      "modified": "2025-04-29T12:49:18.838Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://images.memorix.nl/rce/iiif/41d3d8c9-6ccd-89cd-3762-e717bc87d97e",
+          "type": "ImageService2",
+          "height": 7896,
+          "width": 12378,
+          "partOf": [
+            {
+              "id": "https://sammeltassen.nl/iiif-manifests/rce/minuutplan-baarle.json/canvas/31",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://sammeltassen.nl/iiif-manifests/rce/minuutplan-baarle@v2.json",
+                  "type": "Manifest",
+                  "label": {
+                    "en": [
+                      "Kadastrale kaart 1811-1832: minuutplan Baarle Nassau"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"12378\" height=\"7896\"><polygon points=\"4098,800 4435,1229 4673,1480 4875,1593 5072,1743 5252,1953 5726,1779 7561,1158 8491,1003 9098,716 9589,412 9712,568 9806,1239 9672,1767 9716,1863 9975,2099 10322,2847 10301,3053 9972,3899 9725,4605 9697,5144 9414,5912 9498,7527 5574,6893 5511,7195 5214,7163 4917,7264 4508,7238 1876,7383 2394,6019 2257,5688 2289,5034 2153,4473 2088,3435 2113,3039 2303,2718 2961,2321 3178,1764 3757,1354\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [6549, 3539]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9423595, 51.4334076]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [7576, 4301]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9463164, 51.4333644]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [10068, 3540]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9510688, 51.4373818]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [5247, 1971]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.936421377264439, 51.43411900279052]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4091, 798]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.931449326553805, 51.43456445651497]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [9565, 454]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.944194570452126, 51.44143915966132]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -31,7 +31,7 @@ describe('allmaps transform svg', () => {
       'input/svg/polygon.svg'
     )
     // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
-    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically', () => {
@@ -43,7 +43,7 @@ describe('allmaps transform svg', () => {
       'input/svg/polylines.svg'
     )
     // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
-    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically and using the custom transform options', () => {

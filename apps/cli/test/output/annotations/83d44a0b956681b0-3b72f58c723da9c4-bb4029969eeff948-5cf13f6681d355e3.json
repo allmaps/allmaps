@@ -1,0 +1,366 @@
+{
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "https://annotations.allmaps.org/maps/83d44a0b956681b0",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-04-14T07:51:38.539Z",
+      "modified": "2025-04-14T07:51:38.539Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://dlc.services/iiif-img/7/4/32a1daa1-6ff5-46a4-a0a2-ae94ef3a92fa",
+          "type": "ImageService2",
+          "height": 3949,
+          "width": 5208,
+          "partOf": [
+            {
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=581",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            },
+            {
+              "id": "https://dlc.services/iiif-img/7/4/32a1daa1-6ff5-46a4-a0a2-ae94ef3a92fa/canvas/c/3",
+              "type": "Canvas",
+              "label": {
+                "none": ["Canvas 3"]
+              },
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5208\" height=\"3949\"><polygon points=\"512,299 486,3644 4811,3656 4779,261\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [512, 299]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.97032167771464, 52.352531044771375]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4811, 3656]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.935556349521389, 52.36210155701703]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4779, 261]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9417609671249405, 52.34760385375825]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "https://annotations.allmaps.org/maps/3b72f58c723da9c4",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-04-14T07:42:29.344Z",
+      "modified": "2025-04-14T07:42:29.344Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://dlc.services/iiif-img/7/4/12ac942b-9b13-4080-a276-e0ca73243ea8",
+          "type": "ImageService2",
+          "height": 4003,
+          "width": 5328,
+          "partOf": [
+            {
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=580",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            },
+            {
+              "id": "https://dlc.services/iiif-img/7/4/12ac942b-9b13-4080-a276-e0ca73243ea8/canvas/c/2",
+              "type": "Canvas",
+              "label": {
+                "none": ["Canvas 2"]
+              },
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5328\" height=\"4003\"><polygon points=\"434,329 414,3597 4791,3584 4772,335\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [414, 3597]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9417609671249405, 52.34760385375825]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [434, 329]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.947694791032933, 52.33443690782316]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4791, 3584]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9111822943835675, 52.34277438041752]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "https://annotations.allmaps.org/maps/bb4029969eeff948",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-04-14T07:41:57.484Z",
+      "modified": "2025-04-14T07:41:57.484Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://dlc.services/iiif-img/7/4/e76da87d-0c22-4e59-b161-4119b1d87deb",
+          "type": "ImageService2",
+          "height": 3959,
+          "width": 5288,
+          "partOf": [
+            {
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=579",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            },
+            {
+              "id": "https://dlc.services/iiif-img/7/4/e76da87d-0c22-4e59-b161-4119b1d87deb/canvas/c/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["Canvas 1"]
+              },
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5288\" height=\"3959\"><polygon points=\"553,389 566,3653 4780,3608 4799,395\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [566, 3653]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.97032167771464, 52.352531044771375]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4780, 3608]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9417609671249405, 52.34760385375825]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4799, 395]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.947694791032933, 52.33443690782316]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "https://annotations.allmaps.org/maps/5cf13f6681d355e3",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-04-14T07:41:42.443Z",
+      "modified": "2025-04-14T07:41:42.443Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "https://dlc.services/iiif-img/7/4/26174d19-1d4f-4dcb-9920-4c1692c18fe0",
+          "type": "ImageService2",
+          "height": 3994,
+          "width": 5240,
+          "partOf": [
+            {
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=582",
+              "type": "Canvas",
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            },
+            {
+              "id": "https://dlc.services/iiif-img/7/4/26174d19-1d4f-4dcb-9920-4c1692c18fe0/canvas/c/4",
+              "type": "Canvas",
+              "label": {
+                "none": ["Canvas 4"]
+              },
+              "partOf": [
+                {
+                  "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+                  "type": "Manifest"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"5240\" height=\"3994\"><polygon points=\"465,257 427,3666 4832,3672 4832,264\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [427, 3666]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.935556349521389, 52.36210155701703]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [465, 257]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9417609671249405, 52.34760385375825]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [4832, 264]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.9111822943835675, 52.34277438041752]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

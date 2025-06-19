@@ -36,15 +36,32 @@ export type TransformationType =
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 
 // Stored here as object to facilitate parsing in CLI and elsewhere
-export type GcpInputs = {
+export type GcpsInputs = {
   gcps: Gcp[]
 }
 export type TransformationTypeInputs = {
   transformationType: TransformationType
 }
-export type TransformerInputs = GcpInputs & TransformationTypeInputs
+export type GcpTransformerInputs = GcpsInputs & TransformationTypeInputs
+
+export type HelmertMeasures = {
+  translation: Point
+  rotation: number
+  scale: number
+}
+export type Polynomial1Measures = {
+  translation: Point
+  rotation: number
+  scales: Point
+  shears: Point
+}
+export type TransformationTypeMeasures =
+  | HelmertMeasures
+  | Polynomial1Measures
+  | object
 
 // Stored here as object to facilitate parsing in CLI
 export type InverseOptions = {

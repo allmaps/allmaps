@@ -33,17 +33,18 @@ export const webMercatorProjection: Projection = {
   definition: webMercatorEquivalentDefinitions[0]
 }
 
-export const defaultProjectedTransformerOptions: ProjectedGcpTransformerOptions =
+export const defaultProjectedGcpTransformerOptions: ProjectedGcpTransformerOptions =
   {
     internalProjection: webMercatorProjection,
     projection: webMercatorProjection,
     ...defaultGcpTransformerOptions
   }
 
-export const defaultProjectedTransformOptions: ProjectedGcpTransformOptions = {
-  projection: webMercatorProjection,
-  ...defaultGcpTransformerOptions
-}
+export const defaultProjectedGcpTransformOptions: ProjectedGcpTransformOptions =
+  {
+    projection: webMercatorProjection,
+    ...defaultGcpTransformerOptions
+  }
 
 const lonLatProjectionToWebMecatorProjectionConverter = proj4(
   lonLatProjection.definition,

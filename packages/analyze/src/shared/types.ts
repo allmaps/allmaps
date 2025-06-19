@@ -1,4 +1,8 @@
 import { DistortionMeasure } from '@allmaps/transform'
+import {
+  HelmertMeasures,
+  Polynomial1Measures
+} from '@allmaps/transform/shared/types'
 import { Point } from '@allmaps/types'
 
 /**
@@ -44,17 +48,10 @@ export type Measures = {
   resourceRelativeErrors: number[]
 
   helmertRmse: number
-  helmertParameters: number[]
-  helmertScale: number
-  helmertRotation: number
-  helmertTranslation: Point
+  helmertMeasures: HelmertMeasures
 
-  polynomialRmse: number
-  polynomialParameters: [number[], number[]]
-  polynomialScale?: Point
-  polynomialRotation?: number
-  polynomialShear?: Point
-  polynomialTranslation?: Point
+  polynomial1Rmse: number
+  polynomial1Measures: Polynomial1Measures
 }
 
 /**

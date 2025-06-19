@@ -20,7 +20,7 @@ import {
   Projection
 } from '../shared/types.js'
 import {
-  defaultProjectedTransformerOptions,
+  defaultProjectedGcpTransformerOptions,
   lonLatProjection
 } from '../shared/project-functions.js'
 
@@ -93,7 +93,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
   ) {
     const projectedGcpTransformerOptions = mergeOptionsUnlessUndefined(
-      defaultProjectedTransformerOptions,
+      defaultProjectedGcpTransformerOptions,
       partialProjectedGcpTransformerOptions
     )
 
@@ -133,6 +133,22 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     this.projectionToInternalProjection = preToResource
     this.lonLatToProjection = lonLatToProjection
     this.projectionToLatLon = projectionToLatLon
+  }
+
+  // Note: this is different from generalGcpsInternal from the BaseTransformer,
+  // which also includes a possible handedness flip
+  public get interalProjectedGcps(): Gcp[] {
+    return this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.projectionToInternalProjection(this.lonLatToProjection(geo))
+    }))
+  }
+
+  public get projectedGcps(): Gcp[] {
+    return this.gcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.lonLatToProjection(geo)
+    }))
   }
 
   /**
@@ -181,7 +197,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     // They have already been converted to the internal projection
     // in the GCP Transformer constructor
 
-    this._setTransformerOptions(partialGcpTransformerOptions)
+    this.setTransformerOptionsInternal(partialGcpTransformerOptions)
 
     this.projection = projection
 

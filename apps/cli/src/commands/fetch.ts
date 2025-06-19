@@ -4,7 +4,7 @@ import { fullImage } from './fetch/full-image.js'
 
 export function fetch() {
   return new Command('fetch')
-    .summary('fetches IIIF images')
-    .description(`Fetches IIIF images`)
+    .summary('fetche IIIF images')
+    .description(`Fetche IIIF images`)
     .addCommand(fullImage())
 }

@@ -7,6 +7,8 @@ export { ProjectedGcpTransformer } from './projected-transformers/ProjectedGcpTr
 export {
   lonLatProjection,
   webMercatorProjection,
+  defaultProjectedGcpTransformerOptions,
+  defaultProjectedGcpTransformOptions,
   lonLatToWebMercator,
   webMercatorToLonLat,
   isEqualProjection
@@ -15,5 +17,7 @@ export {
 export {
   Projection,
   ProjectedGcpTransformOptions,
-  ProjectedGcpTransformerOptions
+  ProjectedGcpTransformerOptions,
+  InternalProjectionInputs,
+  ProjectedGcpTransformerInputs
 } from './shared/types.js'

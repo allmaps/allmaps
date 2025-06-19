@@ -12,7 +12,10 @@ import {
   tileToTileOriginPoint,
   clipTilePointToTile
 } from './tiles.js'
-import { applyTransform, invertTransform } from './matrix.js'
+import {
+  applyHomogeneousTransform,
+  invertHomogeneousTransform
+} from './homogeneousTransform.js'
 
 import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { Viewport } from '../viewport/Viewport.js'
@@ -54,8 +57,8 @@ export async function renderToIntArray<W extends WarpedMap, D>(
     }
 
     const cachedTiles = tileCache.getMapCachedTiles(warpedMap.mapId)
-    const canvasToProjectedGeoTransform = invertTransform(
-      viewport.projectedGeoToCanvasTransform
+    const canvasToProjectedGeoHomogeneousTransform = invertHomogeneousTransform(
+      viewport.projectedGeoToCanvasHomogeneousTransform
     )
 
     // Step through all viewport pixels and set their color
@@ -73,8 +76,8 @@ export async function renderToIntArray<W extends WarpedMap, D>(
         const canvasPixel = [canvasPixelX, canvasPixelY] as Point
 
         // Get resourcePoint corresponding to this canvasPixel
-        const projectedGeoPoint = applyTransform(
-          canvasToProjectedGeoTransform,
+        const projectedGeoPoint = applyHomogeneousTransform(
+          canvasToProjectedGeoHomogeneousTransform,
           canvasPixel
         )
         const resourcePoint =

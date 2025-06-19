@@ -2,8 +2,7 @@ import path from 'path'
 
 import { checkCommand } from './bash.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { GeojsonPolygon, Gcp } from '@allmaps/types'
+import type { GeojsonPolygon, Gcp, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
@@ -24,7 +23,7 @@ ${checkCommand('jq', jqNotFoundMessage)}`.trim()
 export function checkImageExistsAndCorrectSize(
   imageFilename: string,
   basename: string,
-  map: GeoreferencedMap
+  resourceSize: Size
 ) {
   return `
 if ! [ -f ${imageFilename} ]; then
@@ -33,8 +32,8 @@ if ! [ -f ${imageFilename} ]; then
   exit 1
 fi
 
-required_width_${basename}=${map.resource.width}
-required_height_${basename}=${map.resource.height}
+required_width_${basename}=${resourceSize[0]}
+required_height_${basename}=${resourceSize[1]}
 
 width_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[0]') )
 height_${basename}=( $(gdalinfo -json  ${imageFilename} | jq '.size[1]') )
@@ -55,11 +54,13 @@ export function gdalwarp(
   imageFilename: string,
   basename: string,
   outputDir: string,
-  gcps: Gcp[],
-  geoMask: GeojsonPolygon,
+  internalProjectedGcps: Gcp[],
+  geojsonMaskPolygon: GeojsonPolygon,
   transformationType: TransformationType,
-  crs: string,
-  jpgQuality: number
+  internalProjectionDefinition: string = 'EPSG:3857',
+  projectionDefinition: string = 'EPSG:3857',
+  jpgQuality: number,
+  size: Size
 ) {
   // See also: https://blog.cleverelephant.ca/2015/02/geotiff-compression-for-dummies.html
 
@@ -92,20 +93,23 @@ export function gdalwarp(
   return `${transformationMessage ? `echo "${transformationMessage}"` : ''}
 
 gdal_translate -of vrt \\
-  -a_srs EPSG:4326 \\
-  ${gcps
+  -a_srs "${internalProjectionDefinition}" \\
+  ${internalProjectedGcps
     .map((gcp) => `-gcp ${gcp.resource.join(' ')} ${gcp.geo.join(' ')}`)
     .join(' \\\n')} \\
   ${imageFilename} \\
   ${vrtFilename}
 
-echo '${JSON.stringify(geoMask)}' > ${geojsonFilename}
+echo '${JSON.stringify(geojsonMaskPolygon)}' > ${geojsonFilename}
 
 gdalwarp \\
   -of COG -co COMPRESS=JPEG -co QUALITY=${jpgQuality} \\
   -dstalpha -overwrite \\
-  -cutline ${geojsonFilename} -crop_to_cutline \\
-  -t_srs "${crs}" \\
+  -r cubic \\
+  -cutline ${geojsonFilename} -crop_to_cutline -cutline_srs "EPSG:4326" \\
+  -s_srs "${internalProjectionDefinition}" \\
+  -t_srs "${projectionDefinition}" \\
+  -ts ${size[0]} ${size[1]} \\
   ${transformationArguments} \\
   ${vrtFilename} \\
   ${geotiffFilename}`.trim()

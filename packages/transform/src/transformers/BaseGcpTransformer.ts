@@ -15,11 +15,13 @@ import { BaseTransformation } from '../transformation-types/BaseTransformation.j
 
 import { Straight } from '../transformation-types/Straight.js'
 import { Helmert } from '../transformation-types/Helmert.js'
-import { Polynomial } from '../transformation-types/Polynomial.js'
+import { Polynomial1 } from '../transformation-types/Polynomial1.js'
+import { Polynomial2 } from '../transformation-types/Polynomial2.js'
+import { Polynomial3 } from '../transformation-types/Polynomial3.js'
 import { Projective } from '../transformation-types/Projective.js'
 import { RBF } from '../transformation-types/RBF.js'
 
-import { thinPlateKernel } from '../shared/kernel-functions.js'
+import { linearKernel, thinPlateKernel } from '../shared/kernel-functions.js'
 import { euclideanNorm } from '../shared/norm-functions.js'
 
 import {
@@ -129,7 +131,7 @@ export abstract class BaseGcpTransformer {
    */
   protected getForwardTransformationInternal(): BaseTransformation {
     if (!this.forwardTransformation) {
-      this.forwardTransformation = this.computeTransformation(
+      this.forwardTransformation = this.createTransformation(
         this.sourcePointsInternal,
         this.destinationPointsInternal
       )
@@ -142,7 +144,7 @@ export abstract class BaseGcpTransformer {
    */
   protected getBackwardTransformationInternal(): BaseTransformation {
     if (!this.backwardTransformation) {
-      this.backwardTransformation = this.computeTransformation(
+      this.backwardTransformation = this.createTransformation(
         this.destinationPointsInternal,
         this.sourcePointsInternal
       )
@@ -151,7 +153,7 @@ export abstract class BaseGcpTransformer {
   }
 
   /**
-   * Compute the (forward or backward) transformation.
+   * Create the (forward or backward) transformation.
    *
    * Results in forward transformation if source and destination points are entered as such.
    * Results in backward if source points are entered for destination points and vice versa.
@@ -162,7 +164,7 @@ export abstract class BaseGcpTransformer {
    * @param destinationPoints - destination points
    * @returns Transformation
    */
-  private computeTransformation(
+  private createTransformation(
     sourcePoints: Point[],
     destinationPoints: Point[]
   ): BaseTransformation {
@@ -171,11 +173,11 @@ export abstract class BaseGcpTransformer {
     } else if (this.type === 'helmert') {
       return new Helmert(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial1' || this.type === 'polynomial') {
-      return new Polynomial(sourcePoints, destinationPoints)
+      return new Polynomial1(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial2') {
-      return new Polynomial(sourcePoints, destinationPoints, 2)
+      return new Polynomial2(sourcePoints, destinationPoints)
     } else if (this.type === 'polynomial3') {
-      return new Polynomial(sourcePoints, destinationPoints, 3)
+      return new Polynomial3(sourcePoints, destinationPoints)
     } else if (this.type === 'projective') {
       return new Projective(sourcePoints, destinationPoints)
     } else if (this.type === 'thinPlateSpline') {
@@ -183,7 +185,16 @@ export abstract class BaseGcpTransformer {
         sourcePoints,
         destinationPoints,
         thinPlateKernel,
-        euclideanNorm
+        euclideanNorm,
+        'thinPlateSpline'
+      )
+    } else if (this.type === 'linear') {
+      return new RBF(
+        sourcePoints,
+        destinationPoints,
+        linearKernel,
+        euclideanNorm,
+        'linear'
       )
     } else {
       throw new Error(`Unsupported transformation type: ${this.type}`)
@@ -653,29 +664,5 @@ export abstract class BaseGcpTransformer {
         generalGcpToP
       )
     })
-  }
-
-  /**
-   * Deep clone a transformer.
-   *
-   * This can be useful when setting an options (e.g. a projection)
-   * but wanting to keep a version of the the transformer with the previous option.
-   *
-   * @returns Deep cloned transformer
-   */
-  deepClone() {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
-  }
-
-  /**
-   * Shallow clone a transformer.
-   *
-   * This can be useful when setting an options (e.g. a projection)
-   * but wanting to keep a version of the the transformer with the previous option.
-   *
-   * @returns Shallow cloned transformer
-   */
-  shallowClone() {
-    return Object.assign({}, this)
   }
 }

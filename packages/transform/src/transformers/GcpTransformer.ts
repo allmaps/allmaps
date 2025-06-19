@@ -58,7 +58,8 @@ import type {
   GcpAndDistortions,
   TransformationType,
   GcpTransformerOptions,
-  GcpTransformOptions
+  GcpTransformOptions,
+  TransformationTypeInputs
 } from '../shared/types.js'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -187,11 +188,18 @@ export class GcpTransformer extends BaseGcpTransformer {
   }
 
   /**
+   * Get the transformer options.
+   */
+  getTransformerOptions() {
+    return this.transformerOptions
+  }
+
+  /**
    * Set the transformer options.
    *
    * Use with caution, especially for options that have effects in the constructor.
    */
-  protected _setTransformerOptions(
+  protected setTransformerOptionsInternal(
     partialGcpTransformerOptions: Partial<GcpTransformerOptions>
   ) {
     this.transformerOptions = mergeOptions(
@@ -485,17 +493,17 @@ export class GcpTransformer extends BaseGcpTransformer {
    * Create a Projected GCP Transformer from a Georeferenced Map
    *
    * @param georeferencedMap - A Georeferenced Map
-   * @param partialGcpTransformerOptions - Projected GCP Transformer Options
+   * @param options - Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
    * @returns A Projected GCP Transformer
    */
   static fromGeoreferencedMap(
     georeferencedMap: GeoreferencedMap,
-    partialGcpTransformerOptions?: Partial<GcpTransformerOptions>
+    options?: Partial<GcpTransformerOptions & TransformationTypeInputs>
   ): GcpTransformer {
     return new GcpTransformer(
       georeferencedMap.gcps,
-      georeferencedMap.transformation?.type,
-      partialGcpTransformerOptions
+      options?.transformationType || georeferencedMap.transformation?.type,
+      options
     )
   }
 }

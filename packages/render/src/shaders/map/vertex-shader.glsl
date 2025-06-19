@@ -4,7 +4,7 @@ precision highp float;
 
 #include ../helpers.frag;
 
-uniform mat4 u_renderTransform;
+uniform mat4 u_renderHomogeneousTransform;
 uniform float u_animationProgress;
 
 in vec2 a_resourceTrianglePoint;
@@ -28,7 +28,7 @@ void main() {
   // Variables that start with gl_ are special global variables
   // gl_Position stores the vertex (or 'point') positions (or 'coordinates') in clip coordinates (which go from -1 to 1.)
 
-  gl_Position = u_renderTransform * vec4(clipTrianglePoint, 0.0f, 1.0f);
+  gl_Position = u_renderHomogeneousTransform * vec4(clipTrianglePoint, 0.0f, 1.0f);
 
   // Pass attributes as varyings to fragment shader
   v_resourceTrianglePoint = a_resourceTrianglePoint;

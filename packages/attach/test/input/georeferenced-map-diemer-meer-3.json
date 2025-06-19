@@ -1,0 +1,48 @@
+{
+  "@context": "https://schemas.allmaps.org/map/2/context.json",
+  "type": "GeoreferencedMap",
+  "id": "https://annotations.allmaps.org/maps/5cf13f6681d355e3",
+  "created": "2025-04-14T07:41:42.443Z",
+  "modified": "2025-04-14T07:41:42.443Z",
+  "resource": {
+    "id": "https://dlc.services/iiif-img/7/4/26174d19-1d4f-4dcb-9920-4c1692c18fe0",
+    "height": 3994,
+    "width": 5240,
+    "type": "ImageService2",
+    "partOf": [
+      {
+        "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=582",
+        "type": "Canvas",
+        "partOf": [
+          {
+            "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+            "type": "Manifest"
+          }
+        ]
+      },
+      {
+        "id": "https://dlc.services/iiif-img/7/4/26174d19-1d4f-4dcb-9920-4c1692c18fe0/canvas/c/4",
+        "type": "Canvas",
+        "label": { "none": ["Canvas 4"] },
+        "partOf": [
+          {
+            "id": "https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14",
+            "type": "Manifest"
+          }
+        ]
+      }
+    ]
+  },
+  "gcps": [
+    { "resource": [1801, 2421], "geo": [4.9282778, 52.3552603] },
+    { "resource": [1146, 1267], "geo": [4.9351719, 52.3509039] },
+    { "resource": [4222, 1445], "geo": [4.9131247, 52.3485689] }
+  ],
+  "resourceMask": [
+    [465, 257],
+    [427, 3666],
+    [4832, 3672],
+    [4832, 264]
+  ],
+  "transformation": { "type": "polynomial", "options": { "order": 1 } }
+}

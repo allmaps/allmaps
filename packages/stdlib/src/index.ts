@@ -156,6 +156,7 @@ export {
 
 export {
   degreesToRadians,
+  groupBy,
   isEqualArray,
   arrayRepeated,
   subSetArray,
@@ -165,6 +166,18 @@ export {
 } from './main.js'
 
 export { getFullResourceMask } from './masks.js'
+
+export {
+  newArrayMatrix,
+  arrayMatrixSize,
+  multiplyArrayMatrix,
+  subArrayMatrix,
+  transposeArrayMatrix,
+  pasteArrayMatrix,
+  sliceArrayMatrix,
+  shallowCopyArrayMatrix,
+  newBlockArrayMatrix
+} from './matrix.js'
 
 export {
   mergeOptions,

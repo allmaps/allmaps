@@ -3,20 +3,29 @@ import { Command, Option } from '@commander-js/extra-typings'
 import fs from 'fs'
 import path from 'path'
 
-import { GcpTransformer } from '@allmaps/transform'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import { generateId } from '@allmaps/id'
-import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
+import {
+  bboxToRectangle,
+  bboxToSize,
+  computeBbox,
+  geometryToGeojsonGeometry,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions,
+  rectanglesToScale
+} from '@allmaps/stdlib'
 
 import {
-  addTransformationOptions,
-  addTransformOptions
+  addProjectedGcpTransformerInputOptions,
+  addProjectedGcpTransformerOptions,
+  addProjectedGcpTransformOptions
 } from '../../lib/options.js'
 import { parseJsonInput, printString } from '../../lib/io.js'
 import {
   parseAnnotationsValidateMaps,
-  parseTransformOptions,
-  parseTransformationType,
-  parseGcps
+  parseProjectedGcpTransformOptions,
+  parseProjectedGcpTransformerOptions,
+  parseProjectedGcpTransformerInputOptionsAndMap
 } from '../../lib/parse.js'
 import { getMapId } from '../../lib/map.js'
 import {
@@ -26,45 +35,48 @@ import {
   gdalbuildvrt
 } from '../../lib/gdal.js'
 
+import type { Rectangle, Size } from '@allmaps/types'
+
 export function geotiff() {
-  const command = addTransformationOptions(
-    addTransformOptions(
-      new Command('geotiff')
-        .argument('[files...]')
-        .summary('generate a Bash script to create a Cloud Optimized GeoTIFF')
-        .description(
-          'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one or more Georeference Annotations'
-        )
-        .option(
-          '-s, --source-dir <dir>',
-          'Directory containing source images',
-          '.'
-        )
-        .option('-d, --output-dir <dir>', 'Output directory', '.')
-        .option(
-          '-c, --crs <string>',
-          'Coordinate reference system',
-          'EPSG:3857'
-        )
-        .option(
-          '-q, --jpg-quality <number>',
-          'JPG compression quality',
-          parseInt,
-          75
-        )
-        .addOption(
-          new Option(
-            '--image-filenames-file <filename>',
-            'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
-          ).conflicts('source-dir')
-        )
+  const command = addProjectedGcpTransformerOptions(
+    addProjectedGcpTransformOptions(
+      addProjectedGcpTransformerInputOptions(
+        new Command('geotiff')
+          .argument('[files...]')
+          .summary('generate a Bash script to create a Cloud Optimized GeoTIFF')
+          .description(
+            'Generates a Bash script that runs GDAL to create a Cloud Optimized GeoTIFF from one or more Georeference Annotations'
+          )
+          .option(
+            '-s, --source-dir <dir>',
+            'Directory containing source images',
+            '.'
+          )
+          .option('-d, --output-dir <dir>', 'Output directory', '.')
+          .option(
+            '-q, --jpg-quality <number>',
+            'JPG compression quality',
+            parseInt,
+            75
+          )
+          .addOption(
+            new Option(
+              '--image-filenames-file <filename>',
+              'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
+            ).conflicts('source-dir')
+          )
+      ),
+      { projectionDefinition: 'EPSG:3857' } // Note: different default projection for geotiff!
     )
   )
 
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
-    const partialTransformOptions = parseTransformOptions(options)
+    const partialProjectedGcpTransformerOptions =
+      parseProjectedGcpTransformerOptions(options)
+    const partialProjectedGcpTransformOptions =
+      parseProjectedGcpTransformOptions(options)
 
     const basenames: string[] = []
     const gdalwarpScripts: string[] = []
@@ -81,9 +93,6 @@ export function geotiff() {
       const mapId = await getMapId(map)
       const imageId = await generateId(map.resource.id)
 
-      const gcps = parseGcps(options, map)
-      const transformationType = parseTransformationType(options, map)
-
       const basename = `${imageId}_${mapId}`
 
       let imageFilename: string
@@ -96,26 +105,83 @@ export function geotiff() {
         imageFilename = path.join(options.sourceDir, `${imageId}.jpg`)
       }
 
-      const transformer = new GcpTransformer(gcps, transformationType)
-      const polygon = transformer.transformToGeo(
-        [map.resourceMask],
-        partialTransformOptions
+      const { gcps, transformationType, internalProjection } =
+        parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+
+      const projectedGcpTransformerOptions = mergeOptionsUnlessUndefined(
+        mergePartialOptions(
+          partialProjectedGcpTransformerOptions,
+          partialProjectedGcpTransformOptions
+        ),
+        { internalProjection }
       )
-      const geojsonPolygon = geometryToGeojsonGeometry(polygon)
+
+      const projectedTransformer = new ProjectedGcpTransformer(
+        gcps,
+        transformationType,
+        projectedGcpTransformerOptions
+      )
+
+      const geoMask = projectedTransformer.transformToGeo(map.resourceMask, {
+        projection: lonLatProjection,
+        maxDepth: 6
+      })
+      const geojsonMaskPolygon = geometryToGeojsonGeometry([geoMask])
+
+      if (!map.resource.width || !map.resource.height) {
+        throw new Error('Map size not specified')
+      }
+      const resourceFullMaskSize: Size = [
+        map.resource.width,
+        map.resource.height
+      ]
+      const resourceMaskBbox = computeBbox(map.resourceMask)
+      const resourceMaskRectangle = bboxToRectangle(resourceMaskBbox)
+      const projectedGeoMaskRectangle = projectedTransformer.transformToGeo(
+        resourceMaskRectangle
+      ) as Rectangle
+      const resourceToProjectedGeoScale = rectanglesToScale(
+        resourceMaskRectangle,
+        projectedGeoMaskRectangle
+      )
+
+      const projectedGeoMask = projectedTransformer.transformToGeo(
+        map.resourceMask
+      )
+
+      const projectedGeoMaskBboxSize: Size = bboxToSize(
+        computeBbox(projectedGeoMask)
+      )
+
+      const size: Size = [
+        Math.round(projectedGeoMaskBboxSize[0] * resourceToProjectedGeoScale),
+        Math.round(projectedGeoMaskBboxSize[1] * resourceToProjectedGeoScale)
+      ]
 
       const gdalwarpScript = gdalwarp(
         imageFilename,
         basename,
         options.outputDir,
-        gcps,
-        geojsonPolygon,
+        gcps.map(({ resource, geo }) => ({
+          resource,
+          geo: projectedTransformer.projectionToInternalProjection(
+            projectedTransformer.lonLatToProjection(geo)
+          )
+        })),
+        geojsonMaskPolygon,
         transformationType,
-        options.crs,
-        Number(options.jpgQuality)
+        projectedGcpTransformerOptions.internalProjection?.definition,
+        projectedGcpTransformerOptions.projection?.definition,
+        Number(options.jpgQuality),
+        size
       )
 
       gdalwarpScripts.push(
-        checkImageExistsAndCorrectSize(imageFilename, basename, map),
+        checkImageExistsAndCorrectSize(
+          imageFilename,
+          basename,
+          resourceFullMaskSize
+        ),
         gdalwarpScript
       )
 

@@ -48,7 +48,7 @@ export type {
   Bbox,
   Size,
   Fit,
-  Transform,
+  HomogeneousTransform,
   Matrix4
 } from './geometry.js'
 

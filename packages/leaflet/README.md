@@ -961,7 +961,8 @@ Sets the transformation type of multiple maps
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
   * new transformation type
 
 ###### Returns

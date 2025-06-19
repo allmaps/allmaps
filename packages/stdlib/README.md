@@ -8,6 +8,16 @@ MIT
 
 ## API
 
+### `arrayMatrixSize(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`[number, number]`.
+
 ### `arrayRepeated(array, isEqualObject)`
 
 ###### Parameters
@@ -733,6 +743,17 @@ MIT
 
 `T`.
 
+### `groupBy(arr, key)`
+
+###### Parameters
+
+* `arr` (`Array<T>`)
+* `key` (`(i: T) => K`)
+
+###### Returns
+
+`{[P in K]: Array<T>}`.
+
 ### `hexToFractionalOpaqueRgba(hex)`
 
 Convert hex to fractional RGBA, and sets the transparency to 1
@@ -1163,7 +1184,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -1287,6 +1308,55 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `{type: 'MultiPolygon'; coordinates: number[][][][]}`.
+
+### `multiplyArrayMatrix(arrayMatrix, factor)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<number>>`)
+* `factor` (`number`)
+
+###### Returns
+
+`Array<Array<number>>`.
+
+### `newArrayMatrix(rows, cols, value)`
+
+Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as a ml-matrix Matrix
+
+###### Parameters
+
+* `rows` (`number`)
+* `cols` (`number`)
+* `value` (`T | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
+### `newBlockArrayMatrix(blocks, emptyValue)`
+
+###### Parameters
+
+* `blocks` (`Array<Array<Array<Array<T>>>>`)
+* `emptyValue` (`T | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
+### `pasteArrayMatrix(arrayMatrix, rowsStart, colsStart, subArrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rowsStart` (`number`)
+* `colsStart` (`number`)
+* `subArrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `pixelToIntArrayIndex(pixel, size, channels, flipY)`
 
@@ -1505,6 +1575,16 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `[number, number]`.
 
+### `shallowCopyArrayMatrix(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `sizeToBbox(size)`
 
 ###### Parameters
@@ -1597,6 +1677,20 @@ Example for square rectangles '\*' and '+':
 
 `number`.
 
+### `sliceArrayMatrix(arrayMatrix, rowsStart, colsStart, rowsEnd, colsEnd)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rowsStart` (`number`)
+* `colsStart` (`number`)
+* `rowsEnd?` (`number | undefined`)
+* `colsEnd?` (`number | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `squaredDistance(from)`
 
 ###### Parameters
@@ -1628,6 +1722,18 @@ Example for square rectangles '\*' and '+':
 ###### Returns
 
 `Generator<SvgGeometry, void, unknown>`.
+
+### `subArrayMatrix(arrayMatrix, rows, cols)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rows` (`Array<number>`)
+* `cols` (`Array<number>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `subSetArray(arr1, arr2)`
 
@@ -1707,6 +1813,16 @@ Return angle alpha made at point A by points B and C
 ###### Returns
 
 `Array<Point>`.
+
+### `transposeArrayMatrix(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `triangleAngles(triangle)`
 
