@@ -9,6 +9,7 @@
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
   import { setMapsState } from '$lib/state/maps.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
+  import { setGeocodeState } from '$lib/state/geocode.svelte.js'
 
   import type { Snippet } from 'svelte'
 
@@ -21,18 +22,19 @@
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
+  type Props = {
+    children?: Snippet
+  }
+
+  let { data, children }: LayoutProps & Props = $props()
+
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
   const sensorsState = setSensorsState(errorState)
 
   setMapsState(sensorsState, imageInfoState, errorState)
   setUiState()
-
-  interface Props {
-    children?: Snippet
-  }
-
-  let { data, children }: LayoutProps & Props = $props()
+  setGeocodeState(data.geocodeEarthKey)
 
   $effect.pre(() => {
     sensorsState.position = data.position

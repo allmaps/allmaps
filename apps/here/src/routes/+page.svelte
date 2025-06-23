@@ -6,6 +6,8 @@
 
   import { Loading, Collection } from '@allmaps/ui'
 
+  import { getTitle, getDescription } from '$lib/shared/head.js'
+
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getErrorState } from '$lib/state/error.svelte.js'
@@ -18,6 +20,8 @@
   import Route from '$lib/components/Route.svelte'
 
   import type { PageProps } from './$types.js'
+
+  import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   let { data }: PageProps = $props()
 
@@ -42,15 +46,13 @@
 <svelte:head>
   <title>Allmaps Here</title>
   <meta name="title" content="Allmaps Here" />
-  <meta property="og:title" content="Look where I am on this map!" />
-  <meta
-    name="description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
-  <meta
-    property="og:description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
+  <meta property="og:title" content={getTitle()} />
+  <meta name="description" content={getDescription()} />
+  <meta property="og:description" content={getDescription()} />
+
+  <meta property="og:image" content="{page.url.href}/allmaps-here.jpg" />
+  <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+  <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
 
   <meta property="og:url" content={page.url.href} />
   <meta property="og:site_name" content="Allmaps Here" />

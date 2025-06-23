@@ -56,14 +56,15 @@
 </script>
 
 <div
-  class="bg-linear-to-tr from-blue-300 to-blue-500 p-4 shadow hover:shadow-md transition-shadow rounded-lg w-fit"
+  class="flex flex-col items-center rounded-lg w-fit
+    bg-linear-to-tr from-blue-300 to-blue-500 p-4 shadow hover:shadow-md transition-shadow"
 >
   <button
     onclick={() => (open = !open)}
     class="cursor-pointer flex flex-row items-center justify-center gap-2"
   >
     <p class="text-center text-gray-800">
-      Allmaps Here can display GeoJSON routes on historic maps.
+      Load a GeoJSON file to display a route on these historic maps
     </p>
     <CaretCircleDownIcon
       size="24"

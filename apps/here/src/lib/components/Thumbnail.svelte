@@ -121,7 +121,7 @@
 <svelte:body bind:clientWidth={bodyClientWidth} />
 
 {#if fetchedImageInfo && fetchedImageInfo.state === 'success'}
-  <li class="bg-white/40 p-2 rounded-md">
+  <li class="flex flex-col gap-3 bg-white/40 p-2 rounded-md">
     <a
       bind:clientWidth={width}
       class="aspect-square inline-block w-full relative"
