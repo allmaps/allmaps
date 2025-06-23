@@ -19,6 +19,8 @@ import type { MapWithImageInfo } from '$lib/shared/types.ts'
 const THRESHOLD_TIMESTAMP = 5000 // 5 seconds in milliseconds
 const THRESHOLD_DISTANCE = 10 // 10 meters
 
+const MAX_AREA = 500_000_000_000
+
 const NEARBY_MAPS_COUNT = 40
 
 const MAPS_KEY = Symbol('maps')
@@ -118,7 +120,7 @@ export class MapsState {
     const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
       latitude,
       longitude
-    ].join(',')}`
+    ].join(',')}&maxarea=${MAX_AREA}`
 
     const annotations = await fetchJson(url)
     const maps = parseAnnotation(annotations)

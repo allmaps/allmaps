@@ -26,28 +26,16 @@
   }
 
   let { map }: Props = $props()
-  // let { map: propMap }: Props = $props()
 
   const uiState = getUiState()
   const iiifState = getIiifState()
 
   let open = $state(false)
 
-  // Somehow, directly using map sometimes results in a map is undefined error
-  // This happens when switching between layouts
-  // This solves it. Maybe a bug in Svelte? Or I'm doing something wrong?
-  // let map = $state.raw<GeoreferencedMap>()
-  // $effect.pre(() => {
-  //   if (propMap) {
-  //     map = propMap
-  //   }
-  // })
-
   // TODO: get labels and title from layout data!
   let labels = $derived(map ? getMapLabels(map) : [])
   let title = $derived(formatLabels(labels))
 
-  // Trigger fetching of manifests when manifestIds change
   $effect(() => {
     if (open) {
       iiifState.manifestIds.forEach((id) => {
@@ -104,7 +92,7 @@
       {#if map}
         <!-- TODO: move contents to grid cell in layout so max-h is no longer needed -->
         <div
-          class="bg-white rounded-lg shadow-lg max-w-2xl max-h-[calc(100vh-120px)] overflow-auto"
+          class="bg-white rounded-lg shadow-lg max-w-2xl max-h-[calc(100vh-150px)] overflow-auto"
         >
           <!-- Loading indicator for manifests -->
           {#if hasLoadingManifests}
