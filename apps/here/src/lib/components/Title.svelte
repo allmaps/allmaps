@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Logo } from '@allmaps/ui'
 
-  interface Props {
+  type Props = {
     name: string
   }
 

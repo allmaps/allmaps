@@ -14,7 +14,15 @@
       "label": {
         "none": ["Image 1"]
       },
-
+      "rendering": [
+        {
+          "format": "image/jp2",
+          "id": "https://stacks.stanford.edu/file/tc010rc2373/PaloAlto3.jp2",
+          "label": {
+            "none": ["Original source file (9.58 MB)"]
+          }
+        }
+      ],
       "type": "canvas",
       "uri": "https://purl.stanford.edu/tc010rc2373/iiif/canvas/http://cocina.sul.stanford.edu/fileSet/6d94cdea-64f9-406b-b9d8-1d3df6bc2d6b",
       "width": 6710
@@ -271,7 +279,7 @@
   "type": "manifest",
   "requiredStatement": {
     "label": {
-      "none": ["attribution"]
+      "none": ["Attribution"]
     },
     "value": {
       "none": [

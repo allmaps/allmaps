@@ -4,7 +4,7 @@ import { SvelteMap } from 'svelte/reactivity'
 import { Manifest } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 
-import { findManifests } from '$lib/shared/iiif.js'
+import { findManifests, findYearFromMetadata } from '$lib/shared/iiif.js'
 
 import type { MapState } from '$lib/state/map.svelte.js'
 
@@ -53,6 +53,47 @@ export class IiifState {
     )
   )
 
+  #year = $derived.by(() => {
+    const years = [...this.#parsedManifests.values()]
+      .map((manifest) => {
+        const canvasYears = manifest.canvases
+          .map((canvas) => ({
+            year: findYearFromMetadata(canvas.metadata),
+            navDate: canvas.navDate
+          }))
+          .filter(({ year, navDate }) => year || navDate)
+
+        return {
+          year: findYearFromMetadata(manifest.metadata),
+          canvasYears,
+          navDate: manifest.navDate
+        }
+      })
+      .filter(
+        ({ year, navDate, canvasYears }) =>
+          year || navDate || canvasYears.length
+      )
+
+    if (years.length > 0) {
+      const year = years[0]
+
+      if (year.navDate) {
+        return year.navDate.getFullYear
+      } else if (year.year) {
+        return year.year
+      } else if (year.canvasYears.length > 0) {
+        // TODO: only use current canvas
+        const firstCanvasYear = year.canvasYears[0]
+
+        if (firstCanvasYear.navDate) {
+          return firstCanvasYear.navDate.getFullYear()
+        } else if (firstCanvasYear.year) {
+          return firstCanvasYear.year
+        }
+      }
+    }
+  })
+
   constructor(mapState: MapState) {
     this.#mapState = mapState
   }
@@ -94,6 +135,10 @@ export class IiifState {
     return this.#parsedManifests.get(manifestId)
   }
 
+  get parsedManifests() {
+    return [...this.#parsedManifests.values()]
+  }
+
   get manifestIds() {
     return this.#manifestIds
   }
@@ -106,6 +151,10 @@ export class IiifState {
     return [...this.#fetchedManifests.values()].some(
       (result) => result.state === 'fetching'
     )
+  }
+
+  get year() {
+    return this.#year
   }
 }
 

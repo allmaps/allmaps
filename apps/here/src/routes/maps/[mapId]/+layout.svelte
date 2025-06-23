@@ -6,6 +6,7 @@
   import { pink } from '@allmaps/tailwind'
 
   import { getAllmapsId } from '$lib/shared/ids.js'
+  import { getTitle, getDescription } from '$lib/shared/head.js'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { setCompassState } from '$lib/state/compass.svelte.js'
@@ -29,7 +30,7 @@
 
   let timeout = $state(false)
 
-  interface Props {
+  type Props = {
     children?: Snippet
   }
 
@@ -64,15 +65,9 @@
 <svelte:head>
   <title>{title}</title>
   <meta name="title" content={title} />
-  <meta property="og:title" content="Look where I am on this map!" />
-  <meta
-    name="description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
-  <meta
-    property="og:description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
+  <meta property="og:title" content={getTitle()} />
+  <meta name="description" content={getDescription()} />
+  <meta property="og:description" content={getDescription()} />
 
   {#if data.mapId && data.from}
     <meta

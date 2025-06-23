@@ -11,6 +11,9 @@
   import CopyButton from '$lib/components/CopyButton.svelte'
   // import Colors from '$lib/components/Colors.svelte'
 
+  import { getIiifState } from '$lib/state/iiif.svelte.js'
+  import { getGeocodeState } from '$lib/state/geocode.svelte.js'
+
   import { getAllmapsId } from '$lib/shared/ids.js'
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
@@ -22,15 +25,35 @@
 
   let { data }: PageProps = $props()
 
+  const iiifState = getIiifState()
+  const geocodeState = getGeocodeState()
+
   let open = $state(true)
   let imageLoaded = $state(false)
   let imageError = $state(false)
 
+  let locality = $derived(geocodeState.getReverseGeocode(data.from))
+  let year = $derived(iiifState.year)
+
   let postcardUrl = $derived(
-    `${page.url.origin}/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
+    `${page.url.origin}/&ZeroWidthSpace;${getAllmapsId(data.mapId)}/&ZeroWidthSpace;postcard?from=${data.from?.join(',')}`
   )
 
-  let postcardText = $derived(`Look where I am! ${postcardUrl}`)
+  let postcardText = $derived(
+    `Look where I am on this map${locality ? ` of ${locality}` : ''}${year ? ` from ${year}` : ''}! ${postcardUrl} Where are you?`
+  )
+
+  $effect(() => {
+    iiifState.manifestIds.forEach((id) => {
+      iiifState.fetchManifest(id)
+    })
+  })
+
+  $effect(() => {
+    if (data.from) {
+      geocodeState.fetchReverseGeocode(data.from)
+    }
+  })
 
   $effect(() => {
     if (!open) {
@@ -125,7 +148,7 @@
 
         <div
           class="p-4 field-sizing-content resize-none bg-pink/10 rounded-lg
-          italic wrap-break-word
+          italic wrap-break-word inset-shadow
           before:content-['“'] after:content-['”']"
         >
           {@html postcardText}
