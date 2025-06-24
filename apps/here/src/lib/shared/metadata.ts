@@ -89,9 +89,21 @@ export function getMapLabels(map: GeoreferencedMap): string[] {
   return labels
 }
 
+function isValidLabel(label: string): boolean {
+  const trimmedLabel = label.trim()
+
+  if (!trimmedLabel) {
+    return false
+  } else if (label.trim() === '-') {
+    return false
+  }
+
+  return true
+}
+
 export function formatLabels(labels: string[], maxLength = 64): string {
-  const truncatedLabels = labels.map((label) =>
-    truncate(label, {
+  const truncatedLabels = labels.filter(isValidLabel).map((label) =>
+    truncate(label.trim(), {
       maxLength: maxLength / labels.length,
       toNearestSpace: true
     })
