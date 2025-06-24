@@ -9,7 +9,7 @@ export async function toJpgImageResponse(
   const pngArrayBuffer = await pngImageResponse.arrayBuffer()
   const decodedImage = decodePng(pngArrayBuffer)
 
-  const jpgArrayBuffer = encodeJpg(decodedImage, 65)
+  const jpgArrayBuffer = encodeJpg(decodedImage, 40)
   return new Response(jpgArrayBuffer.data, {
     headers: {
       'Content-Type': 'image/jpeg'
