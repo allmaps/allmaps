@@ -89,20 +89,21 @@ export function findYearFromMetadata(metadata?: Metadata) {
         }
 
         if (possibleYears.length > 0) {
-          allPossibleYears.push({
-            value,
-            years: possibleYears.toSorted((a, b) => a - b)
-          })
+          allPossibleYears.push(
+            ...possibleYears.map((year) => ({ value, year }))
+          )
         }
       }
     }
 
-    const possibleYearsWithShortestLabel = allPossibleYears.sort(
-      (a, b) => String(a.value).length - String(b.value).length
-    )[0]
+    // TODO: don't just use the earliest year, also take label length into account
+    // Like so: (a, b) => String(a.value).length - String(b.value).length
+    // When years occur in very long labels like descriptions, these years can refer
+    // to other things than the map itself.
+    const earliestYear = allPossibleYears.sort((a, b) => a.year - b.year)[0]
 
-    if (possibleYearsWithShortestLabel) {
-      return possibleYearsWithShortestLabel.years[0]
+    if (earliestYear) {
+      return earliestYear.year
     }
   }
 }
