@@ -65,6 +65,18 @@ export function labelFromPartOfItem(item: PartOfItem) {
     return parseLanguageString(item.label)
   }
 }
+// Don't just use the earliest year, also take label length into account
+// When years occur in very long labels like descriptions, these years can refer
+// to other things than the map itself.
+function scorePossibleYear({ value, year }: { value: string; year: number }) {
+  const weightYear = 1
+  const weightLabelLength = 10
+
+  const score =
+    (year - YEAR_MIN) * weightYear + value.length * weightLabelLength
+
+  return score
+}
 
 export function findYearFromMetadata(metadata?: Metadata) {
   if (metadata) {
@@ -90,17 +102,20 @@ export function findYearFromMetadata(metadata?: Metadata) {
 
         if (possibleYears.length > 0) {
           allPossibleYears.push(
-            ...possibleYears.map((year) => ({ value, year }))
+            ...possibleYears.map((year) => ({ value: String(value), year }))
           )
         }
       }
     }
 
-    // TODO: don't just use the earliest year, also take label length into account
-    // Like so: (a, b) => String(a.value).length - String(b.value).length
-    // When years occur in very long labels like descriptions, these years can refer
-    // to other things than the map itself.
-    const earliestYear = allPossibleYears.sort((a, b) => a.year - b.year)[0]
+    const sortedYears = allPossibleYears
+      .map((possibleYear) => ({
+        ...possibleYear,
+        score: scorePossibleYear(possibleYear)
+      }))
+      .sort((a, b) => a.score - b.score)
+
+    const earliestYear = sortedYears[0]
 
     if (earliestYear) {
       return earliestYear.year
