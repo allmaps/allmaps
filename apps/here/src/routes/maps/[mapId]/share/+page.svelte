@@ -17,7 +17,7 @@
   import { getAllmapsId } from '$lib/shared/ids.js'
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { env } from '$env/dynamic/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
@@ -130,7 +130,7 @@
               onerror={handleImageError}
               alt="Preview"
               class="rounded-md overflow-hidden"
-              src="{PUBLIC_PREVIEW_URL}/{getAllmapsId(
+              src="{env.PUBLIC_PREVIEW_URL}/{getAllmapsId(
                 data.mapId
               )}.jpg?from={data.from?.join(',')}"
             />
