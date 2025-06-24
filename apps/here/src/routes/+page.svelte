@@ -36,6 +36,10 @@
       !waitingForPositionTimeout
   )
 
+  let waitingForFetch = $derived(
+    mapsState.fetchCount === 0 && !waitingForPositionTimeout
+  )
+
   onMount(() => {
     window.setTimeout(() => {
       waitingForPositionTimeout = true
@@ -86,7 +90,7 @@
 
 <section class="bg-blue-200 shrink-0 grow">
   <DotsPattern color={blue}>
-    {#if waitingForPosition || mapsState.fetchCount === 0}
+    {#if waitingForPosition || waitingForFetch}
       <div class="h-full flex items-center justify-center">
         <div class="bg-white p-2 rounded-xl drop-shadow-sm">
           <Loading />
@@ -111,15 +115,20 @@
         <Footer />
       </div>
     {:else if errorState.geolocationPositionError}
-      <div class="h-full flex items-center justify-center">
+      <div class="h-full flex items-center justify-center p-2">
         <GeolocationError />
       </div>
     {:else}
-      <div class="h-full flex items-center justify-center">
+      <div class="h-full flex items-center justify-center p-2">
         <div
-          class="bg-white px-3 py-2 rounded-xl drop-shadow-sm max-w-xs text-center"
+          class="bg-white px-3 py-2 rounded-xl drop-shadow-sm max-w-xs text-center space-y-2"
         >
-          No maps found around your location
+          <p>No maps found around your location.</p>
+          <p class="text-gray-700 italic">
+            You can use <a class="underline" href="https://editor.allmaps.org/"
+              >Allmaps Editor</a
+            > to georeference maps and add them to Allmaps.
+          </p>
         </div>
       </div>
     {/if}
