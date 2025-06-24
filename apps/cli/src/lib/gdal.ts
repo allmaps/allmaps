@@ -26,7 +26,7 @@ export function checkImageExistsAndCorrectSize(
   resourceSize: Size
 ) {
   return `
-if ! [ -f ${imageFilename} ]; then
+if ! [ -f "${imageFilename}" ]; then
   echo "Image file does not exist: ${imageFilename}"
   echo "This script expects a full-size source images for each georeferenced map it processes. See the README for more information."
   exit 1
@@ -35,8 +35,8 @@ fi
 required_width_${basename}=${resourceSize[0]}
 required_height_${basename}=${resourceSize[1]}
 
-width_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[0]') )
-height_${basename}=( $(gdalinfo -json  ${imageFilename} | jq '.size[1]') )
+width_${basename}=( $(gdalinfo -json "${imageFilename}" | jq '.size[0]') )
+height_${basename}=( $(gdalinfo -json  "${imageFilename}" | jq '.size[1]') )
 
 if [ "$width_${basename}" -eq "$required_width_${basename}" ] &&
    [ "$height_${basename}" -eq "$required_height_${basename}" ]; then
@@ -97,22 +97,22 @@ gdal_translate -of vrt \\
   ${internalProjectedGcps
     .map((gcp) => `-gcp ${gcp.resource.join(' ')} ${gcp.geo.join(' ')}`)
     .join(' \\\n')} \\
-  ${imageFilename} \\
-  ${vrtFilename}
+  "${imageFilename}" \\
+  "${vrtFilename}"
 
-echo '${JSON.stringify(geojsonMaskPolygon)}' > ${geojsonFilename}
+echo '${JSON.stringify(geojsonMaskPolygon)}' > "${geojsonFilename}"
 
 gdalwarp \\
   -of COG -co COMPRESS=JPEG -co QUALITY=${jpgQuality} \\
   -dstalpha -overwrite \\
   -r cubic \\
-  -cutline ${geojsonFilename} -crop_to_cutline -cutline_srs "EPSG:4326" \\
+  -cutline "${geojsonFilename}" -crop_to_cutline -cutline_srs "EPSG:4326" \\
   -s_srs "${internalProjectionDefinition}" \\
   -t_srs "${projectionDefinition}" \\
   -ts ${size[0]} ${size[1]} \\
   ${transformationArguments} \\
-  ${vrtFilename} \\
-  ${geotiffFilename}`.trim()
+  "${vrtFilename}" \\
+  "${geotiffFilename}"`.trim()
 }
 
 export function gdalbuildvrt(
@@ -123,7 +123,7 @@ export function gdalbuildvrt(
   const vrtFilename = path.join(outputDir, outputVrt)
 
   return `
-gdalbuildvrt ${vrtFilename} \\
+gdalbuildvrt "${vrtFilename}" \\
   ${inputTiffs.map((tiff) => path.join(outputDir, tiff)).join(' ')}`.trim()
 }
 
