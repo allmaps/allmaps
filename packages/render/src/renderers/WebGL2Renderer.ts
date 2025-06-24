@@ -1,4 +1,5 @@
 import { throttle } from 'lodash-es'
+import * as Comlink from 'comlink'
 
 import {
   hexToFractionalRgb,
@@ -38,6 +39,8 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
+
+import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
 import type {
   Renderer,
@@ -81,6 +84,8 @@ export class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageData>
   implements Renderer
 {
+  #worker: Worker
+
   gl: WebGL2RenderingContext
 
   partialWebgl2RendererOptions: Partial<WebGL2RendererOptions>
@@ -164,12 +169,22 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
+    // Note: Could this become obsolete in the future
+    // once we can pull bytes directly from Blob?
+    // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
+    const worker = new Worker(
+      new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
+    )
+
+    const wrappedWorker = Comlink.wrap<FetchAndGetImageDataWorkerType>(worker)
+
     super(
-      CacheableWorkerImageDataTile.createFactory(),
+      CacheableWorkerImageDataTile.createFactory(wrappedWorker),
       createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
       options
     )
 
+    this.#worker = worker
     this.gl = gl
 
     this.partialWebgl2RendererOptions = mergeOptions(
@@ -668,6 +683,8 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.mapProgram)
     this.gl.deleteProgram(this.linesProgram)
     this.gl.deleteProgram(this.pointsProgram)
+
+    this.#worker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
