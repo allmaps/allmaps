@@ -50,7 +50,7 @@
   <meta name="description" content={getDescription()} />
   <meta property="og:description" content={getDescription()} />
 
-  <meta property="og:image" content="{page.url.href}/allmaps-here.jpg" />
+  <meta property="og:image" content="{page.url.href}allmaps-here.jpg" />
   <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
   <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
 
