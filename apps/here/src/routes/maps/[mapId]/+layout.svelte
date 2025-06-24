@@ -55,6 +55,14 @@
 
   let showHereFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
 
+  let ogImageUrl = $derived(
+    data.from &&
+      data.mapId &&
+      `${env.PUBLIC_PREVIEW_URL}/${getAllmapsId(
+        data.mapId
+      )}.jpg?from=${data.from.join(',')}`
+  )
+
   onMount(() => {
     window.setTimeout(() => {
       timeout = true
@@ -70,12 +78,8 @@
   <meta property="og:description" content={getDescription()} />
 
   {#if data.mapId && data.from}
-    <meta
-      property="og:image"
-      content="{env.PUBLIC_PREVIEW_URL}/{getAllmapsId(
-        data.mapId
-      )}.jpg?from={data.from.join(',')}"
-    />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:secure_url" content={ogImageUrl} />
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
   {/if}
