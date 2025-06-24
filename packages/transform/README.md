@@ -2336,7 +2336,7 @@ SplitGcpLineInfo & {
 
 Solve the x and y components jointly.
 
-This computes the corrensponing Helmert transform and get the scale from it.
+This computes the corresponding Helmert transform and get the scale from it.
 
 ###### Parameters
 

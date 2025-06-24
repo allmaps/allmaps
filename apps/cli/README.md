@@ -2,11 +2,11 @@
 
 Command-line interface for [Allmaps](https://allmaps.org/).
 
-A developer tool to help you create, manipulate and use (files with) Georeferenced Annotations directly from the command line.
+A tool to help you create, manipulate and use (files with) Georeference Annotations directly from the command-line.
 
 Here's the output of `allmaps --help` to give you an idea of what you can do with it:
 
-```sh
+```txt
 Allmaps CLI
 
 Usage: allmaps [options] [command]
@@ -17,7 +17,7 @@ Options:
 Commands:
   annotation                   parse and generate Georeference Annotations
   attach [options] [files...]  attach maps
-  fetch                        fetche IIIF images
+  fetch                        fetch IIIF images
   iiif                         parse and generate IIIF resources
   id [urls...]                 generate Allmaps IDs from input URLs
   open                         open maps in Allmaps Viewer
@@ -77,7 +77,7 @@ Commands that require SVG input only accept one file, commands that require JSON
 > - As a **Georeference Annotation**: the official [spec](https://iiif.io/api/georef/extension/georef/) that is part of the IIIF Framework. Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#2-resource-type-overview)).
 > - As a **Georeferenced Map**: the format Allmaps uses internally to describe a map (see [@allmaps/annotation](../../packages/annotation/)).
 >
-> In the CLI (and elsewhere in Allmaps) we often use 'Annotation' to denote either Georeference Annotation or an Annotation Page containing Georeference Annotations.
+> In the CLI (and elsewhere in Allmaps) we often use *Annotation* to denote either *Georeference Annotation* or an *Annotation Page* containing Georeference Annotations.
 >
 > For convenience, for all CLI commands where the input in one or more Georeference Annotations, the input can also be Georeferenced Maps, and vice versa!
 
@@ -97,7 +97,7 @@ Show help:
 allmaps annotation --help
 ```
 
-Generate a single Georeference Annotation from json files containing Georeferenced Maps:
+Generate a single Georeference Annotation from JSON files containing Georeferenced Maps:
 
 ```bash
 allmaps annotation generate [files...]
@@ -197,7 +197,7 @@ allmaps transform --help
 
 #### Transform coordinates
 
-Transforms coordinates from input files 'toGeo' or 'toResource' using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation (or parameters).
+Transforms coordinates from input files from geospatial coordinates to resource coordinates with the `toGeo()` function of a Projected GCP Transformer and vice versa with the `toResource()` function. The used transformer is built from the GCPs, transformation type and internal projection specified in a Georeference Annotation (or parameters).
 
 Input files with coordinates are expected to contain one coordinate on each line, formatted as pairs of coordinates in decimal form separated by spaces:
 
@@ -283,11 +283,11 @@ allmaps transform geojson -a <filename> [files...]
 ```
 
 ```bash
-allmaps transform geojson -a path/to/annotation.json path/to/my-geojson.geosjon
+allmaps transform geojson -a path/to/annotation.json path/to/my-geojson.geojson
 ```
 
 ```bash
-allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline path/to/my-geojson.geosjon
+allmaps transform geojson -g path/to/gcps.txt -t thinPlateSpline path/to/my-geojson.geojson
 ```
 
 #### Transform Resource Mask
@@ -336,7 +336,7 @@ All the commands above accept the following options for specifying the Projected
 > [!NOTE]
 > Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
 
-Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of it's Projected GCP Transformer: 'toResource' instead of 'toGeo'.
+Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of its Projected GCP Transformer: 'toResource' instead of 'toGeo'.
 
 | Option          | Description                                   | Default |
 |:----------------|:----------------------------------------------|:--------|
@@ -372,7 +372,6 @@ This commands takes RCPs as mandatory option and further more accepts the same o
 `-r, --rcps <filename>` | Resource Control Points, used to infer the attachments' |
 `--no-average-out` | "Don't average out the resulting geo coordinates for each id. For inexact transformations (like `polynomial`) the geo coordinates will in general not be equal. This forces them be equal. For exact transformation types (like 'thinPlateSpline') the geo coordinates will be (quasi) identical making this averaging not (strictly) necessary. Note: the averaging happens in projected geo coordinates." |
 `--use-map-transformation-types`| "Let transformationType overrule the map's TransformationType."|
-`--no-clone`| "Don't clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects."|
 `--no-evaluate-attachment-scps`| 'For both Source Control Points of an attachment, don't evaluate them using the solved attached transformation to create a GCP on the corresponding map.'|
 `--evaluate-single-scps`| 'For Source Control Points without a matching pair, evaluate them using the solved attached transformation and create a GCP on the corresponding map.'|
 `--evaluate-gcps`| 'For existing GCPs, re-evaluate them using the solved attached transformation.'|
@@ -380,6 +379,8 @@ This commands takes RCPs as mandatory option and further more accepts the same o
 
 
 ### Generate Bash scripts
+
+Helps you use Allmaps with other CLI tools by generating useful Bash scripts. These scripts can be executed with Bash as generated, or used as a starting point to adapt to your custom needs.
 
 #### Dezoomify
 

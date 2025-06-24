@@ -8,7 +8,7 @@ Options:
 Commands:
   annotation                   parse and generate Georeference Annotations
   attach [options] [files...]  attach maps
-  fetch                        fetche IIIF images
+  fetch                        fetch IIIF images
   iiif                         parse and generate IIIF resources
   id [urls...]                 generate Allmaps IDs from input URLs
   open                         open maps in Allmaps Viewer

@@ -164,10 +164,6 @@ export function addAttachOptions<
       "Let transformationType overrule the map's TransformationType."
     )
     .option(
-      '--no-clone',
-      "Don't clone the map and it's transformer and transformations before returning the results. This prevents from overriding object properties like GCPs on the input objects."
-    )
-    .option(
       '--no-evaluate-attachment-scps',
       "For both Source Control Points of an attachment, don't evaluate them using the solved attached transformation to create a GCP on the corresponding map."
     )
@@ -180,4 +176,6 @@ export function addAttachOptions<
       'For existing GCPs, re-evaluate them using the solved attached transformation.'
     )
     .option('--remove-existing-gcps', 'Remove existing GCPs.')
+
+  // Note: no 'clone' option, not applicable in CLI.
 }

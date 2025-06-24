@@ -46,7 +46,6 @@ Browser:
 </script>
 ```
 
-
 ## Usage
 
 ```js

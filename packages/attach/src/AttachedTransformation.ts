@@ -101,8 +101,8 @@ export class AttachedTransformation {
     }
 
     // Get Source Control Points from attachments.
-    // When there were more then two Source Control Points with the same transformationId
-    // and hence attachedment where created
+    // When there were more than two Source Control Points with the same transformationId
+    // and hence attachements where created
     // for pairs of those Source Control Points (see fromGeoreferencedMap())
     // only keep one Source Control Point per transformationId (=mapId).
     this.ScpsById = Object.values(
@@ -195,7 +195,7 @@ export class AttachedTransformation {
     }
 
     // Add each attachment as a row with the source point coefs arrays
-    // for both of it's transformations, in their corresponding column locations
+    // for both of its transformations, in their corresponding column locations
     for (const attachment of this.attachments) {
       const transformation0 = this.transformationsById.get(
         attachment[0].transformationId
@@ -330,7 +330,7 @@ export class AttachedTransformation {
    * Create Georeferenced Maps from this Attached Transformation.
    * This will solve the Attached Transformation,
    * evaluate all attachements (in all source control points),
-   * infere GCPs from them,
+   * infer GCPs from them,
    * and add them to the original Georeferenced Maps.
    *
    * This only works if this AttachedTransformation has been created from Georeferenced Maps.
@@ -394,7 +394,7 @@ export class AttachedTransformation {
       }
     }
 
-    // For every evaluated point, add a GCP to it's respective Georeferenced Map.
+    // For every evaluated point, add a GCP to its respective Georeferenced Map.
     spForEvaluation.forEach((evaluationPoint) => {
       const projectedGcpTransformer = projectedGcpTransformersById.get(
         evaluationPoint.transformationId
@@ -522,7 +522,7 @@ export class AttachedTransformation {
     // From Source Control Points to Attachments
     //
     // Create attachments, by id.
-    // When there are more then two source control points with the same id, create an attachment in pairs:
+    // When there are more than two source control points with the same id, create an attachment in pairs:
     // E.g.: if scp0, scp1, scp2 and scp3 have id 'foo'
     // and scp4 and scp5 have id 'bar', then create the following attachments:
     //

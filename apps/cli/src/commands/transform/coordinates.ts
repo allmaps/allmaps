@@ -33,7 +33,7 @@ export function coordinates() {
             .argument('[files...]')
             .summary("transform coordinates 'toGeo' (or 'toResource')")
             .description(
-              `Transforms coordinates from input files 'toGeo' or 'toResource' using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation (or parameters).
+              `Transforms coordinates from input files from geospatial coordinates to resource coordinates with the toGeo() function of a Projected GCP Transformer and vice versa with the toResource() function. The used transformer is built from the GCPs, transformation type and internal projection specified in a Georeference Annotation (or parameters).
 
 Coordinates files are expected to contain one coordinate (x, y) on each line, separated by a space, e.g.:
 
