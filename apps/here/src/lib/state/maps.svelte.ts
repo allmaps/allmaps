@@ -4,7 +4,7 @@ import { SvelteMap } from 'svelte/reactivity'
 import { fetchJson } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
-import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
+import { env } from '$env/dynamic/public'
 
 import { computePositionDistance } from '$lib/shared/position.js'
 
@@ -117,7 +117,7 @@ export class MapsState {
       coords: { latitude, longitude }
     } = position
 
-    const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
+    const url = `${env.PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
       latitude,
       longitude
     ].join(',')}&maxarea=${MAX_AREA}`

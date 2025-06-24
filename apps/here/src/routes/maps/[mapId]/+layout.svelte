@@ -24,7 +24,7 @@
 
   import type { LayoutProps } from './$types.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { PUBLIC_PREVIEW_URL } from '$env/dynamic/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
