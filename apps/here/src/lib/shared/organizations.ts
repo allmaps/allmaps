@@ -18,9 +18,9 @@ const organisationsByDomain: Record<string, string> = {
   'http://images.memorix.nl/ams/': 'Stadsarchief Amsterdam',
   'https://stadsarchiefamsterdam.memorix.io': 'Stadsarchief Amsterdam',
   'https://stacks.stanford.edu': 'Stanford University Libraries',
-  // 'https://images.memorix.nl/sad/': '',
   'https://images.memorix.nl/ranh/': 'Het Noord-Hollands Archief',
-  'https://images.memorix.nl/rce/': 'Rijksdienst voor het Cultureel Erfgoed'
+  'https://images.memorix.nl/rce/': 'Rijksdienst voor het Cultureel Erfgoed',
+  'https://images.memorix.nl/nai': 'Het Nieuwe Instituut'
 }
 
 export function organizationNameFromImageServiceUrl(url: string) {

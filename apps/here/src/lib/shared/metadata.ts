@@ -90,14 +90,16 @@ export function getMapLabels(map: GeoreferencedMap): string[] {
 }
 
 export function formatLabels(labels: string[], maxLength = 64): string {
-  return labels
-    .map((label) =>
-      truncate(label, {
-        maxLength: maxLength / labels.length,
-        toNearestSpace: true
-      })
-    )
-    .join(' / ')
+  const truncatedLabels = labels.map((label) =>
+    truncate(label, {
+      maxLength: maxLength / labels.length,
+      toNearestSpace: true
+    })
+  )
+
+  const uniqLabels = [...new Set(truncatedLabels)]
+
+  return uniqLabels.join(' / ')
 }
 
 function formatTimeAgo(dateStr?: string) {
