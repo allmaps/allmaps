@@ -116,7 +116,7 @@ export function parseTransformationTypeInputOptions(
   let transformationType: TransformationType
   if (
     options.transformationType === 'polynomial' &&
-    options.polynomialOrder === 1
+    (options.polynomialOrder === 1 || options.polynomialOrder === undefined)
   ) {
     transformationType = 'polynomial1'
   } else if (

@@ -31,14 +31,12 @@ export function addProjectedGcpTransformerInputOptions<
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +
-        'This takes precedence over the transformation type from the Georeference Annotation',
-      'polynomial'
+        'This takes precedence over the transformation type from the Georeference Annotation'
     )
     .option(
       '-o, --polynomial-order <order>',
       'Order of polynomial transformation. Either 1, 2 or 3.',
-      parseInt,
-      1
+      parseInt
     )
     .option(
       '--internal-projection <proj4string>',
