@@ -24,7 +24,7 @@
 
   import type { LayoutProps } from './$types.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/dynamic/public'
+  import { env } from '$env/dynamic/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
@@ -72,7 +72,7 @@
   {#if data.mapId && data.from}
     <meta
       property="og:image"
-      content="{PUBLIC_PREVIEW_URL}/{getAllmapsId(
+      content="{env.PUBLIC_PREVIEW_URL}/{getAllmapsId(
         data.mapId
       )}.jpg?from={data.from.join(',')}"
     />
