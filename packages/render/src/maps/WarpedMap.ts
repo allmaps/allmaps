@@ -22,7 +22,7 @@ import {
   mergeOptions
 } from '@allmaps/stdlib'
 
-import { applyHomogeneousTransform } from '../shared/homogeneousTransform.js'
+import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { WarpedMapOptions } from '../shared/types.js'

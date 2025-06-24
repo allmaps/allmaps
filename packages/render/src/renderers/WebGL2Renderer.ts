@@ -24,7 +24,7 @@ import {
   multiplyHomogeneousTransform,
   invertHomogeneousTransform,
   homogeneousTransformToMatrix4
-} from '../shared/homogeneousTransform.js'
+} from '../shared/homogeneous-transform.js'
 import { createShader, createProgram } from '../shared/webgl2.js'
 import { Viewport } from '../viewport/Viewport.js'
 

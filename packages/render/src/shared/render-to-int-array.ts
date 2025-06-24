@@ -15,7 +15,7 @@ import {
 import {
   applyHomogeneousTransform,
   invertHomogeneousTransform
-} from './homogeneousTransform.js'
+} from './homogeneous-transform.js'
 
 import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { Viewport } from '../viewport/Viewport.js'

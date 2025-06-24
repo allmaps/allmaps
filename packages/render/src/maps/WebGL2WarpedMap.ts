@@ -24,7 +24,7 @@ import {
   applyHomogeneousTransform,
   createHomogeneousTransform,
   invertHomogeneousTransform
-} from '../shared/homogeneousTransform.js'
+} from '../shared/homogeneous-transform.js'
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
 

@@ -28,7 +28,7 @@ import {
   composeHomogeneousTransform,
   applyHomogeneousTransform,
   invertHomogeneousTransform
-} from '../shared/homogeneousTransform.js'
+} from '../shared/homogeneous-transform.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
 
 import type {
