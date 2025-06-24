@@ -181,14 +181,3 @@ export function addAttachOptions<
     )
     .option('--remove-existing-gcps', 'Remove existing GCPs.')
 }
-
-export function addLaunchOptions<
-  Args extends unknown[] = [],
-  Opts extends OptionValues = Record<string, unknown>,
-  GlobalOpts extends OptionValues = Record<string, unknown>
->(command: Command<Args, Opts, GlobalOpts>) {
-  return command
-    .option('-l, --localhost', 'Open localhost version')
-    .option('-n, --next', 'Open next version')
-    .option('-d, --dev', 'Open development version')
-}

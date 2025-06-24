@@ -11,7 +11,7 @@ Commands:
   fetch                        fetche IIIF images
   iiif                         parse and generate IIIF resources
   id [urls...]                 generate Allmaps IDs from input URLs
-  launch                       launch maps in Allmaps Viewer or other tools
+  open                         open maps in Allmaps Viewer
   script                       generate Bash scripts
   transform                    transform resource coordinates to geospatial
                                coordinates and vice versa

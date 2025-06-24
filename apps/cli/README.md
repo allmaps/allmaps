@@ -20,7 +20,7 @@ Commands:
   fetch                        fetche IIIF images
   iiif                         parse and generate IIIF resources
   id [urls...]                 generate Allmaps IDs from input URLs
-  launch                       launch maps in Allmaps Viewer or other tools
+  open                         open maps in Allmaps Viewer
   script                       generate Bash scripts
   transform                    transform resource coordinates to geospatial
                                coordinates and vice versa
@@ -84,6 +84,8 @@ Commands that require SVG input only accept one file, commands that require JSON
 Output can be stored by redirecting stdout using: `allmaps annotation generate path/to/my-georeferenced-map.json > my-georeferenced-annotation.json`
 
 If you're running MacOS, you can use [pbcopy](https://osxdaily.com/2007/03/05/manipulating-the-clipboard-from-the-command-line/) to copy the generated Georeferenced Map to your clipboard: `allmaps annotation generate path/to/my-georeferenced-map.json | pbcopy`
+
+Alternatively you can use the `open` command to open a resulting annotation in Allmaps Viewer: `allmaps annotation generate path/to/my-georeferenced-map.json | allmaps open viewer`
 
 ## Commands
 

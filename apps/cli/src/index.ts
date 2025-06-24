@@ -7,7 +7,7 @@ import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
-import { launch } from './commands/launch.js'
+import { open } from './commands/open.js'
 import { id } from './commands/id.js'
 import { iiif } from './commands/iiif.js'
 import { transform } from './commands/transform.js'
@@ -24,7 +24,7 @@ const program = new Command()
   .addCommand(fetch())
   .addCommand(iiif())
   .addCommand(id())
-  .addCommand(launch())
+  .addCommand(open())
   .addCommand(script())
   .addCommand(transform())
   .configureHelp({
