@@ -21,7 +21,7 @@ import {
 import {
   resourceToSource,
   sourceDestinationToResourceGeo
-} from './helpert-functions.js'
+} from './helper-functions.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point, Size } from '@allmaps/types'
