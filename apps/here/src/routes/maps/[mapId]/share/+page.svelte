@@ -36,12 +36,19 @@
   let year = $derived(iiifState.year)
 
   let postcardUrl = $derived(
+    `${page.url.origin}/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
+  )
+
+  let displayPostcardUrl = $derived(
     `${page.url.origin}/&ZeroWidthSpace;${getAllmapsId(data.mapId)}/&ZeroWidthSpace;postcard?from=${data.from?.join(',')}`
   )
 
-  let postcardText = $derived(
-    `Look where I am on this map${locality ? ` of ${locality}` : ''}${year ? ` from ${year}` : ''}! ${postcardUrl} Where are you?`
-  )
+  let postcardText = $derived(getPostcardText(postcardUrl))
+  let displayPostcardText = $derived(getPostcardText(displayPostcardUrl))
+
+  function getPostcardText(postcardUrl: string) {
+    return `Look where I am on this map${locality ? ` of ${locality}` : ''}${year ? ` from ${year}` : ''}! ${postcardUrl} Where are you?`
+  }
 
   $effect(() => {
     iiifState.manifestIds.forEach((id) => {
@@ -151,7 +158,7 @@
           italic wrap-break-word inset-shadow
           before:content-['“'] after:content-['”']"
         >
-          {@html postcardText}
+          {@html displayPostcardText}
         </div>
 
         <div class="text-center text-sm">
