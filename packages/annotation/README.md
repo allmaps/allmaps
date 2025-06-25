@@ -14,7 +14,7 @@ A Georeference Annotation contains the following data:
 * A polygonal resource mask that defines the cartographic part of the image.
 * A list of ground control points (GCPs) that define the mapping between resource coordinates and geospatial coordinates.
 
-Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#2-resource-type-overview)).
+Multiple maps can be defined in an **Annotation Page** (see [spec](https://iiif.io/api/presentation/3.0/#overview-annotationpage)).
 
 Allmaps offers apps and packages for working with Georeference Annotations. [Allmaps Viewer](../../apps/viewer/) can [for example](https://viewer.allmaps.org/#data=data%3Atext%2Fx-url%2Chttps%3A%2F%2Fraw.githubusercontent.com%2Fallmaps%2Fannotation%2Fdevelop%2Fexamples%2Fannotation.example.json) warp IIIF maps in the browser, just by loading a Georeference Annotation.
 
