@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { afterNavigate } from '$app/navigation'
 
   import { Collection, Thumbnail } from '@allmaps/ui'
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
@@ -19,18 +20,31 @@
 
   let itemWidth = $state(0)
 
-  function handleImageClick(event: Event, imageId: string) {
-    gotoRoute(createRouteUrl(page, 'images', { image: imageId }))
+  let beforeTimeoutActiveImageId = $state<string>()
+  let justClicked = $state(false)
+  let clickTimer = $state<number>()
+
+  function handleImageClick(event: MouseEvent, imageId: string) {
     event.preventDefault()
+    window.clearTimeout(clickTimer)
+
+    beforeTimeoutActiveImageId = imageId
+    clickTimer = window.setTimeout(
+      () => gotoRoute(createRouteUrl(page, 'images', { image: imageId })),
+      600
+    )
   }
 
-  function handleImageDblclick(event: Event, imageId: string) {
+  function handleImageDoubleClick(imageId: string) {
+    window.clearTimeout(clickTimer)
     gotoRoute(createRouteUrl(page, 'mask', { image: imageId }))
-    event.preventDefault()
   }
 
   function isActive(imageId: string) {
-    return imageId === sourceState.activeImageId
+    return (
+      (!beforeTimeoutActiveImageId && imageId === sourceState.activeImageId) ||
+      imageId === beforeTimeoutActiveImageId
+    )
   }
 
   async function fetchImageInfo(url: string) {
@@ -40,6 +54,8 @@
 
     return imageInfo
   }
+
+  afterNavigate(() => (beforeTimeoutActiveImageId = undefined))
 </script>
 
 <div class="max-w-(--breakpoint-lg) m-auto p-4">
@@ -54,9 +70,9 @@
         >
           <a
             class="flex flex-col gap-2"
-            onclick={(event) => handleImageClick(event, image.uri)}
-            ondblclick={(event) => handleImageDblclick(event, image.uri)}
             href={createRouteUrl(page, 'mask', { image: image.uri })}
+            onclick={(event) => handleImageClick(event, image.uri)}
+            ondblclick={(event) => handleImageDoubleClick(image.uri)}
           >
             <div class="relative aspect-square">
               {#await fetchImageInfo(image.uri)}
