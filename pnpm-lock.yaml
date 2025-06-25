@@ -133,8 +133,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       maplibre-gl:
-        specifier: ^5.5.0
-        version: 5.5.0
+        specifier: ^5.6.0
+        version: 5.6.0
       ot-json1:
         specifier: ^1.0.2
         version: 1.0.2
@@ -154,11 +154,11 @@ importers:
         specifier: ^1.11.1
         version: 1.24.2
       terra-draw:
-        specifier: ^1.6.3
-        version: 1.6.3
+        specifier: ^1.9.0
+        version: 1.9.0
       terra-draw-maplibre-gl-adapter:
-        specifier: ^1.1.0
-        version: 1.1.0(maplibre-gl@5.5.0)(terra-draw@1.6.3)
+        specifier: ^1.1.1
+        version: 1.1.1(maplibre-gl@5.6.0)(terra-draw@1.9.0)
       zod:
         specifier: ^3.22.4
         version: 3.24.0
@@ -10453,8 +10453,8 @@ packages:
       vt-pbf: 3.1.3
     dev: false
 
-  /maplibre-gl@5.5.0:
-    resolution: {integrity: sha512-p8AOPuzzqn1ZA9gcXxKw0IED715we/2Owa/YUr6PANmgMvNMe/JG+V/C1hRra43Wm62Biz+Aa8AgbOLJimA8tA==}
+  /maplibre-gl@5.6.0:
+    resolution: {integrity: sha512-7TuHMozUC4rlIp08bSsxCixFn18P24otrlZU/7UGCO5RufFTJadFzauTrvBHr9FB67MbJ6nvFXEftGd0bUl4Iw==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
@@ -14778,18 +14778,18 @@ packages:
       yallist: 5.0.0
     dev: true
 
-  /terra-draw-maplibre-gl-adapter@1.1.0(maplibre-gl@5.5.0)(terra-draw@1.6.3):
-    resolution: {integrity: sha512-o9k0Ndk7Q/KfxpFeG7vq8YC+n1NxAHs4cCt+jqio36h4IbQvQ2O4kawcgAzrSqq6+MCBtNhsImwsvWZ+w+l3vw==}
+  /terra-draw-maplibre-gl-adapter@1.1.1(maplibre-gl@5.6.0)(terra-draw@1.9.0):
+    resolution: {integrity: sha512-PkrhUO2sVuc8dviOzzfKyEAuToEKcy1UWOQ/EtdNXx+dPAw8WuCXOhXJpf+M1yi02z+v6mRMq/7h8sRs2fBeng==}
     peerDependencies:
       maplibre-gl: '>=4'
       terra-draw: ^1.0.0
     dependencies:
-      maplibre-gl: 5.5.0
-      terra-draw: 1.6.3
+      maplibre-gl: 5.6.0
+      terra-draw: 1.9.0
     dev: false
 
-  /terra-draw@1.6.3:
-    resolution: {integrity: sha512-k7OZ8INI2UoWNYPCHziUHwRHTGYXyoZ/8mOn/rzNhtvuJmR+HGQI4Lar9FDYHKl8ihu/8Jm53cooU3/7ShuZzQ==}
+  /terra-draw@1.9.0:
+    resolution: {integrity: sha512-lOMKO2fv/Z3U189NfKOZRMdJLtDdASdTQApEG9fwGKWaHpfvmOfu9zHpy/5jg59g5EqvaZaAJbyWmHzTWV42yQ==}
     dev: false
 
   /text-table@0.2.0:
