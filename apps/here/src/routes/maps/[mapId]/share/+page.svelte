@@ -179,7 +179,7 @@
           using apps like Signal, Slack, or Bluesky.
         </div>
 
-        <div class="flex flex-row gap-2 items-center justify-end">
+        <div class="flex flex-row gap-2 items-center justify-end self-end">
           <!-- <Colors /> -->
 
           <CopyButton
