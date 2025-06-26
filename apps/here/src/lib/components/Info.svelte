@@ -2,7 +2,8 @@
   import {
     ArrowSquareOut as ArrowSquareOutIcon,
     Calendar as CalendarIcon,
-    Link as LinkIcon
+    Link as LinkIcon,
+    Info as InfoIcon
   } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
@@ -66,6 +67,9 @@
       )
   )
 
+  // TODO: use https://github.com/nfrasser/linkifyjs
+  // to parse links in manifest labels and descriptions
+
   // Format navigation date helper
   function formatNavDate(navDate?: Date): string {
     if (!navDate) return ''
@@ -83,17 +87,18 @@
       <div
         bind:clientWidth={uiState.elementSizes.top.center[0]}
         bind:clientHeight={uiState.elementSizes.top.center[1]}
-        class="max-w-lg min-w-0 truncate shadow hover:shadow-lg transition-shadow duration-100 bg-white rounded-md px-3 py-2 cursor-pointer text-xs"
+        class="max-w-xl min-w-0 truncate shadow hover:shadow-lg transition-shadow duration-100
+          bg-white rounded-full px-2 py-1.5 cursor-pointer text-sm text-green font-medium leading-tight
+            flex gap-2 items-center"
       >
-        {title}
+        <span class="pl-1">{title}</span>
+        <InfoIcon class="size-6" weight="bold" />
       </div>
     {/snippet}
     {#snippet contents()}
       {#if map}
         <!-- TODO: move contents to grid cell in layout so max-h is no longer needed -->
-        <div
-          class="bg-white rounded-lg shadow-lg max-w-2xl max-h-[calc(100vh-150px)] overflow-auto"
-        >
+        <div class=" max-h-[calc(100vh-150px)] overflow-auto">
           <!-- Loading indicator for manifests -->
           {#if hasLoadingManifests}
             <div class="p-4 border-b border-gray-200 flex items-center gap-2">

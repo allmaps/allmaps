@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state'
 
-  import { ShareNetwork as ShareNetworkIcon } from 'phosphor-svelte'
+  import { Envelope as EnvelopeIcon } from 'phosphor-svelte'
 
   import Controls from '$lib/components/Controls.svelte'
 
@@ -34,14 +34,15 @@
         <div class="place-self-end pointer-events-auto">
           {#if resourceTransformerState.resourcePositionInsideResource}
             <a
-              class="bg-green hover:bg-green-400 text-white font-bold
+              class="bg-green text-white hover:bg-green-100 hover:text-green
+                font-medium border-white border-2
                 rounded-lg px-4 py-2 flex gap-2
                 shadow hover:shadow-2xl transition-all"
               href={createRouteUrl(page, `${getAllmapsId(data.mapId)}/share`, {
                 from: getFrom(sensorsState.position)
               })}
             >
-              <ShareNetworkIcon size="24" />
+              <EnvelopeIcon size="24" />
               <span>Share <span class="hidden sm:inline">this map</span></span>
             </a>
           {:else}

@@ -82,10 +82,16 @@
   <section
     class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center my-2 sm:my-6"
   >
-    <div class="max-w-md w-full flex flex-col gap-6 items-center">
-      <Title name="Here" />
-      <p class="text-black text-center max-w-xs">
-        Find historic maps around your current GPS location.
+    <div class="max-w-md w-full flex flex-col gap-2 items-center text-center">
+      <div class="mb-4">
+        <Title name="Here" />
+      </div>
+      <h2 class="text-lg font-bold">
+        Find historic maps around your current location
+      </h2>
+      <p class="text-black max-w-md">
+        Drop a pin on any map and send a digital postcard to share your location
+        with a friend!
       </p>
     </div>
   </section>
@@ -111,9 +117,11 @@
             {/each}
           </Collection>
 
-          <div class="place-self-center">
-            <Route geojsonRoute={data.geojsonRoute} />
-          </div>
+          {#if mapsState.mapsWithImageInfo.length}
+            <div class="place-self-center">
+              <Route geojsonRoute={data.geojsonRoute} />
+            </div>
+          {/if}
         </section>
         <Footer />
       </div>
