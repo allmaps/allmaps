@@ -3,5 +3,5 @@ export function getTitle() {
 }
 
 export function getDescription() {
-  return 'Allmaps Here shows your current GPS location on historic maps'
+  return 'Find historic maps around your current location'
 }

@@ -5,8 +5,8 @@
   import { goto } from '$app/navigation'
 
   import {
-    CaretLeft as CaretLeftIcon,
-    CaretRight as CaretRightIcon,
+    ArrowLeft as ArrowLeftIcon,
+    ArrowRight as ArrowRightIcon,
     SquaresFour as SquaresFourIcon
   } from 'phosphor-svelte'
 
@@ -79,13 +79,13 @@
         href={createRouteUrl(page, getAllmapsId(previousMapId))}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 focus:z-10 focus:ring-2 focus:ring-pink-500"
-        ><CaretLeftIcon size="16" weight="bold" /></a
+        ><ArrowLeftIcon size="16" weight="bold" /></a
       >
       <a
         href={createRouteUrl(page, getAllmapsId(nextMapId))}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
-        ><CaretRightIcon size="16" weight="bold" /></a
+        ><ArrowRightIcon size="16" weight="bold" /></a
       >
     </div>
   {:else}

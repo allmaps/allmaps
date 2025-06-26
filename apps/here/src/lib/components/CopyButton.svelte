@@ -1,14 +1,25 @@
 <script lang="ts">
-  import { Copy as CopyIcon, Check as CheckIcon } from 'phosphor-svelte'
+  import {
+    Copy as CopyIcon,
+    Link as LinkIcon,
+    Check as CheckIcon
+  } from 'phosphor-svelte'
 
   type Props = {
     text: string
+    link?: boolean
     label: string
     class?: string
     disabled?: boolean
   }
 
-  let { text, label, class: className, disabled = false }: Props = $props()
+  let {
+    text,
+    label,
+    class: className,
+    link = false,
+    disabled = false
+  }: Props = $props()
 
   let copying = $state(false)
 
@@ -29,6 +40,8 @@
 <button class={className} {disabled} onclick={handleCopy}>
   {#if copying}
     <CheckIcon class="size-5" />
+  {:else if link}
+    <LinkIcon class="size-5" />
   {:else}
     <CopyIcon class="size-5" />
   {/if}
