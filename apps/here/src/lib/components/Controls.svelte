@@ -7,7 +7,7 @@
   import {
     ArrowLeft as ArrowLeftIcon,
     ArrowRight as ArrowRightIcon,
-    SquaresFour as SquaresFourIcon
+    GpsFix as GpsFixIcon
   } from 'phosphor-svelte'
 
   import { NorthArrow } from '@allmaps/ui'
@@ -58,7 +58,7 @@
   })
 </script>
 
-<div class="w-full grid grid-cols-[1fr_max-content_1fr] items-center gap-2">
+<div class="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2">
   {#if hasMaps && previousMapId && nextMapId}
     <div
       bind:clientWidth={uiState.elementSizes.bottom.left[0]}
@@ -72,8 +72,8 @@
       focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
       flex flex-row items-center gap-1"
       >
-        <SquaresFourIcon size="20" weight="bold" />
-        <span class="hidden sm:inline">More maps</span></a
+        <GpsFixIcon size="20" weight="bold" />
+        <span>Maps</span></a
       >
       <a
         href={createRouteUrl(page, getAllmapsId(previousMapId))}
@@ -98,8 +98,8 @@
       focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
       flex flex-row items-center gap-1"
     >
-      <SquaresFourIcon size="20" weight="bold" />
-      <span class="hidden sm:inline">More maps</span></a
+      <GpsFixIcon size="20" weight="bold" />
+      <span>Maps</span></a
     >
   {/if}
 

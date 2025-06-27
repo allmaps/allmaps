@@ -124,7 +124,7 @@
   <li class="flex flex-col gap-3 bg-white/50 p-2 rounded-lg">
     <a
       bind:clientWidth={width}
-      class="aspect-square inline-block w-full relative"
+      class="aspect-square inline-block w-full relative text-transparent"
       href={createRouteUrl(page, allmapsId)}
     >
       <div class={{ 'animate-pulse': navigatingToThisMap }}>
@@ -206,7 +206,7 @@
         </div>
       {/if}
     </a>
-    <div class="text-center text-blue-600 leading-snug text-xs">
+    <div class="text-center text-blue-700 leading-snug text-xs">
       {title}
     </div>
   </li>
