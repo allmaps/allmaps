@@ -11,7 +11,7 @@ import {
   bboxToDiameter,
   isPoint
 } from '@allmaps/stdlib'
-import { Helmert, Polynomial } from '@allmaps/transform'
+import { Helmert, Polynomial1 } from '@allmaps/transform'
 import {
   AnalysisOptions,
   AnalysisItem,
@@ -314,9 +314,9 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
-        measures.polynomialShear &&
-        (measures.polynomialShear[0] > MAX_SHEAR ||
-          measures.polynomialShear[1] > MAX_SHEAR)
+        measures.polynomial1Measures &&
+        (measures.polynomial1Measures.shears[0] > MAX_SHEAR ||
+          measures.polynomial1Measures.shears[1] > MAX_SHEAR)
       ) {
         this.warnings.push({
           mapId: this.mapId,
@@ -528,16 +528,11 @@ export class Analyzer {
     const projectedPolynomialTransformer =
       this.warpedMap.getProjectedTransformer('polynomial')
     const toProjectedGeoPolynomialTransformation =
-      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
+      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial1
 
-    const polynomialRmse = toProjectedGeoPolynomialTransformation.rmse
-    const polynomialParameters =
-      toProjectedGeoPolynomialTransformation.polynomialParameters
-    const polynomialScale = toProjectedGeoPolynomialTransformation.scale
-    const polynomialRotation = toProjectedGeoPolynomialTransformation.rotation
-    const polynomialShear = toProjectedGeoPolynomialTransformation.shear
-    const polynomialTranslation =
-      toProjectedGeoPolynomialTransformation.translation
+    const polynomial1Rmse = toProjectedGeoPolynomialTransformation.getRmse()
+    const polynomial1Measures =
+      toProjectedGeoPolynomialTransformation.getMeasures()
 
     // Helmert
     const projectedHelmertTransformer =
@@ -545,47 +540,36 @@ export class Analyzer {
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    const helmertRmse = toProjectedGeoHelmertTransformation.rmse
-    const helmertParameters =
-      toProjectedGeoHelmertTransformation.helmertParameters
-    const helmertScale = toProjectedGeoHelmertTransformation.scale
-    const helmertRotation = toProjectedGeoHelmertTransformation.rotation
-    const helmertTranslation = toProjectedGeoHelmertTransformation.translation
+    const helmertRmse = toProjectedGeoHelmertTransformation.getRmse()
+    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
     const toProjectedGeoTransformation =
       projectedTransformer.getToGeoTransformation()
-    const rmse = toProjectedGeoTransformation.rmse
-    const destinationErrors = toProjectedGeoTransformation.errors
+    const rmse = toProjectedGeoTransformation.getRmse()
+    const destinationErrors = toProjectedGeoTransformation.getErrors()
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    const resourceErrors = toProjectedGeoTransformation.errors.map(
-      (error) => error / toProjectedGeoHelmertTransformation.scale
-    )
+    const resourceErrors = toProjectedGeoTransformation
+      .getErrors()
+      .map((error) => error / helmertMeasures.scale)
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
     const resourceMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.resourceMaskBbox
     )
-    const resourceRelativeErrors = toProjectedGeoTransformation.errors.map(
-      (error) =>
-        error /
-        (toProjectedGeoHelmertTransformation.scale * resourceMaskBboxDiameter)
-    )
+    const resourceRelativeErrors = toProjectedGeoTransformation
+      .getErrors()
+      .map(
+        (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
+      )
 
     this.measures = {
       mapId: this.mapId,
-      polynomialRmse,
-      polynomialParameters,
-      polynomialScale,
-      polynomialRotation,
-      polynomialShear,
-      polynomialTranslation,
+      polynomial1Rmse,
+      polynomial1Measures,
       helmertRmse,
-      helmertParameters,
-      helmertScale,
-      helmertRotation,
-      helmertTranslation,
+      helmertMeasures,
       rmse,
       destinationErrors,
       resourceErrors,

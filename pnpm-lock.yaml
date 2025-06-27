@@ -26,12 +26,18 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../../packages/annotation
+      '@allmaps/attach':
+        specifier: workspace:^
+        version: link:../../packages/attach
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
@@ -44,6 +50,9 @@ importers:
       commander:
         specifier: ^13.0.0
         version: 13.1.0
+      open:
+        specifier: ^10.1.2
+        version: 10.1.2
       stream-json:
         specifier: ^1.9.1
         version: 1.9.1
@@ -964,6 +973,70 @@ importers:
       zod-validation-error:
         specifier: ^3.4.0
         version: 3.4.1(zod@3.25.48)
+
+  packages/attach:
+    dependencies:
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../project
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../transform
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      ml-matrix:
+        specifier: ^6.12.0
+        version: 6.12.1
+    devDependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../annotation
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.8.3)
+      chai:
+        specifier: ^4.3.6
+        version: 4.5.0
+      chai-shallow-deep-equal:
+        specifier: ^1.4.6
+        version: 1.4.6(chai@4.5.0)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.1)
+      mocha:
+        specifier: ^10.8.2
+        version: 10.8.2
+      prettier:
+        specifier: ^3.4.2
+        version: 3.5.3
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: ^5.7.0
+        version: 5.8.3
 
   packages/basemap:
     dependencies:
@@ -5491,7 +5564,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.21.1(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19)
+      '@sveltejs/kit': 2.21.1(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.33.13)(vite@5.4.19)
     dev: true
 
   /@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19):
@@ -6231,11 +6304,9 @@ packages:
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
     dependencies:
       '@types/lodash': 4.17.17
-    dev: true
 
   /@types/lodash@4.17.17:
     resolution: {integrity: sha512-RRVJ+J3J+WmyOTqnz3PiBLA501eKwXl2noseKOrNo/6+XEHjTAxO4xHvxQB6QuNm+s4WRbn6rSiap8+EA+ykFQ==}
-    dev: true
 
   /@types/mapbox__point-geometry@0.1.4:
     resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
@@ -7481,6 +7552,13 @@ packages:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
     dev: true
 
+  /bundle-name@4.1.0:
+    resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
+    engines: {node: '>=18'}
+    dependencies:
+      run-applescript: 7.0.0
+    dev: false
+
   /byte-size@9.0.1:
     resolution: {integrity: sha512-YLe9x3rabBrcI0cueCdLS2l5ONUKywcRpTs02B8KP9/Cimhj7o3ZccGrPnRvcbyHMbb7W79/3MUJl7iGgTXKEw==}
     engines: {node: '>=12.17'}
@@ -8092,11 +8170,29 @@ packages:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
     engines: {node: '>=0.10.0'}
 
+  /default-browser-id@5.0.0:
+    resolution: {integrity: sha512-A6p/pu/6fyBcA1TRz/GqWYPViplrftcW2gZC9q79ngNCKAeR/X3gcEdXQHl4KNXV+3wgIJ1CPkJQ3IHM6lcsyA==}
+    engines: {node: '>=18'}
+    dev: false
+
+  /default-browser@5.2.1:
+    resolution: {integrity: sha512-WY/3TUME0x3KPYdRRxEJJvXRHV4PyPoUsxtZa78lwItwRQRHhd2U9xOscaT/YTf8uCXIAjeJOFBVEh/7FtD8Xg==}
+    engines: {node: '>=18'}
+    dependencies:
+      bundle-name: 4.1.0
+      default-browser-id: 5.0.0
+    dev: false
+
   /defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==}
     dependencies:
       clone: 1.0.4
     dev: true
+
+  /define-lazy-prop@3.0.0:
+    resolution: {integrity: sha512-N+MeXYoqr3pOgn8xfyRPREN7gHakLYjhsHhWGT3fWAiL4IkAt0iDw14QiiEm2bE30c5XX5q0FtAA3CK5f9/BUg==}
+    engines: {node: '>=12'}
+    dev: false
 
   /defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
@@ -11157,7 +11253,7 @@ packages:
     engines: {node: '>= 8'}
 
   /mgrs@1.0.0:
-    resolution: {integrity: sha1-+5FYjnjJACVnI5XLQLJffNatGCk=}
+    resolution: {integrity: sha512-awNbTOqCxK1DBGjalK3xqWIstBZgN6fxsMSiXLs9/spqWkF2pAhb2rrYCFSsr1/tT7PhcDGjZndG8SWYn0byYA==}
     dev: false
 
   /micromark-core-commonmark@1.1.0:
@@ -12469,6 +12565,16 @@ packages:
       emoji-regex-xs: 1.0.0
       regex: 5.1.1
       regex-recursion: 5.1.1
+    dev: false
+
+  /open@10.1.2:
+    resolution: {integrity: sha512-cxN6aIDPz6rm8hbebcP7vrQNhvRcveZoJU72Y7vskh4oIm+BZwBECnx5nTmrlres1Qapvx27Qo1Auukpf8PKXw==}
+    engines: {node: '>=18'}
+    dependencies:
+      default-browser: 5.2.1
+      define-lazy-prop: 3.0.0
+      is-inside-container: 1.0.0
+      is-wsl: 3.1.0
     dev: false
 
   /optionator@0.9.4:
@@ -14066,6 +14172,11 @@ packages:
       '@rollup/rollup-win32-ia32-msvc': 4.41.1
       '@rollup/rollup-win32-x64-msvc': 4.41.1
       fsevents: 2.3.3
+
+  /run-applescript@7.0.0:
+    resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
+    engines: {node: '>=18'}
+    dev: false
 
   /run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}

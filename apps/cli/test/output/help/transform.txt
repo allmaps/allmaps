@@ -11,8 +11,8 @@ Commands:
   svg [options] [files...]            transform SVG to GeoJSON
   geojson [options] [files...]        transform GeoJSON to SVG
   resource-mask [options] [files...]  transform resource masks to GeoJSON
-  coordinates [options] [files...]    transform coordinates toGeo (or
-                                      toResource)
+  coordinates [options] [files...]    transform coordinates 'toGeo' (or
+                                      'toResource')
   help [command]                      display help for command
 
 For more details about Allmaps, see https://allmaps.org

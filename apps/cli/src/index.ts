@@ -3,9 +3,11 @@
 import { Command, CommanderError } from '@commander-js/extra-typings'
 import { fromZodError } from 'zod-validation-error'
 
+import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
+import { open } from './commands/open.js'
 import { id } from './commands/id.js'
 import { iiif } from './commands/iiif.js'
 import { transform } from './commands/transform.js'
@@ -18,11 +20,13 @@ const program = new Command()
   .name('allmaps')
   .exitOverride()
   .addCommand(annotation())
-  .addCommand(transform())
+  .addCommand(attach())
+  .addCommand(fetch())
   .addCommand(iiif())
   .addCommand(id())
-  .addCommand(fetch())
+  .addCommand(open())
   .addCommand(script())
+  .addCommand(transform())
   .configureHelp({
     helpWidth: fixedWidth ? 80 : undefined
   })

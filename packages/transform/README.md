@@ -292,9 +292,9 @@ The following transformation types are supported.
 
 When creating a transformer, 'transformer options' can be specified. Apart from the options below, any 'transform options' (e.g. `maxDepth`) specified when creating a transformer will become the default options, used when calling a transform method.
 
-| Option                | Description                                                                                                                                                                                                                                                                                                                                                               | Type      | Default                                                         |
-| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------- | :-------------------------------------------------------------- |
-| `differentHandedness` | Whether one of the axes should be flipped (internally) while computing the transformation parameters. This will not alter the axis orientation of the output (see the 'return type function' for this). Should be true if the handedness differs between the source and destination, and makes a difference for specific transformation types like the Helmert transform. | `boolean` | `false` for General GCP Transformer, `true` for GCP Transformer |
+| Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
+|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. Should be true if the handedness differs between the source and destination coordinate spaces. This makes a difference for specific transformation types like the Helmert transform. (Flipping will not alter the axis orientation of the output (use the 'return type function' for this)). | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
 
 #### Handedness
 
@@ -446,7 +446,7 @@ const gcps6 = ... // See above
 // Obtain the referenceScale
 const helmertTransformer = new GcpTransformer(gcps6, 'helmert')
 const toGeoHelmertTransformation = helmertTransformer.getToGeoTransformation()
-const referenceScale = toGeoHelmertTransformation.scale
+const referenceScale = toGeoHelmertTransformation.getMeasures().scale
 
 const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
 const resourcePoint = [1000, 1000]
@@ -558,30 +558,520 @@ This benchmark can be run with `pnpm run bench`. For more information, see [`./b
 To create a transformer (with 10 points) and compute its 'toGeo' transformation:
 
 | Type            | Ops/s  |
-| --------------- | ------ |
-| helmert         | 77764  |
-| polynomial1     | 143934 |
-| polynomial2     | 76941  |
-| polynomial3     | 31864  |
-| thinPlateSpline | 25613  |
-| projective      | 31041  |
+|-----------------|--------|
+| helmert         | 68455  |
+| polynomial1     | 117899 |
+| polynomial2     | 68981  |
+| polynomial3     | 30239  |
+| thinPlateSpline | 32927  |
+| projective      | 28530  |
 
 To use a transformer (with 10 points, and its 'toGeo' transformation already computed) and transform a point 'toGeo':
 
 | Type            | Ops/s    |
-| --------------- | -------- |
-| helmert         | 18566272 |
-| polynomial1     | 16074983 |
-| polynomial2     | 16063110 |
-| polynomial3     | 3743246  |
-| thinPlateSpline | 2946500  |
-| projective      | 16319792 |
+|-----------------|----------|
+| helmert         | 17049083 |
+| polynomial1     | 17568448 |
+| polynomial2     | 17007445 |
+| polynomial3     | 3774792  |
+| thinPlateSpline | 2933006  |
+| projective      | 16462262 |
 
 ## License
 
 MIT
 
 ## API
+
+### `new BaseIndependentLinearWeightsTransformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'
+    | 'linear'`)
+* `pointCountMinimum` (`number`)
+
+###### Returns
+
+`BaseIndependentLinearWeightsTransformation`.
+
+###### Extends
+
+* `BaseLinearWeightsTransformation`
+
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrices`
+
+###### Type
+
+```ts
+[Array<Array<number>>, Array<Array<number>>]
+```
+
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatricesSize`
+
+###### Type
+
+```ts
+[Size, Size]
+```
+
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrix`
+
+###### Type
+
+```ts
+Array<Array<number>>
+```
+
+### `BaseIndependentLinearWeightsTransformation#coefsArrayMatrixSize`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `BaseIndependentLinearWeightsTransformation#getCoefsArrayMatrices()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<Array<number>>, Array<Array<number>>]`.
+
+### `BaseIndependentLinearWeightsTransformation#getCoefsArrayMatrix()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Array<number>>`.
+
+### `BaseIndependentLinearWeightsTransformation#getSourcePointCoefsArray(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `BaseIndependentLinearWeightsTransformation#getSourcePointCoefsArrays(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `new BaseLinearWeightsTransformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'
+    | 'linear'`)
+* `pointCountMinimum` (`number`)
+
+###### Returns
+
+`BaseLinearWeightsTransformation`.
+
+###### Extends
+
+* `BaseTransformation`
+
+### `BaseLinearWeightsTransformation#destinationPointsArrays`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `BaseLinearWeightsTransformation#getCoefsArrayMatrices()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<Array<number>>, Array<Array<number>>]`.
+
+### `BaseLinearWeightsTransformation#getDestinationPointsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `BaseLinearWeightsTransformation#getSourcePointCoefsArrays(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `BaseLinearWeightsTransformation#weightsArrays?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `new BasePolynomialTransformation(sourcePoints, destinationPoints, order)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+* `order?` (`number | undefined`)
+
+###### Returns
+
+`BasePolynomialTransformation`.
+
+###### Extends
+
+* `BaseIndependentLinearWeightsTransformation`
+
+### `BasePolynomialTransformation#coefsArrayMatrices`
+
+###### Type
+
+```ts
+[Array<Array<number>>, Array<Array<number>>]
+```
+
+### `BasePolynomialTransformation#coefsArrayMatricesSize`
+
+###### Type
+
+```ts
+[Size, Size]
+```
+
+### `BasePolynomialTransformation#coefsArrayMatrix`
+
+###### Type
+
+```ts
+Array<Array<number>>
+```
+
+### `BasePolynomialTransformation#coefsArrayMatrixSize`
+
+###### Type
+
+```ts
+[number, number]
+```
+
+### `BasePolynomialTransformation#getCoefsArrayMatrix()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Array<number>>`.
+
+### `BasePolynomialTransformation#getDestinationPointsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `BasePolynomialTransformation#order`
+
+###### Type
+
+```ts
+number
+```
+
+### `BasePolynomialTransformation#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `BasePolynomialTransformation#weightsArrays?`
+
+###### Type
+
+```ts
+[Array<number>, Array<number>]
+```
+
+### `new BaseTransformation(sourcePoints, destinationPoints, type, pointCountMinimum)`
+
+Create a transformation
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+  * The source points
+* `destinationPoints` (`Array<Point>`)
+  * The destination points
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'
+    | 'linear'`)
+  * The transformation type
+* `pointCountMinimum` (`number`)
+  * The minimum number of points for the transformation type
+
+###### Returns
+
+`BaseTransformation`.
+
+### `BaseTransformation#destinationPoints`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `BaseTransformation#destinationTransformedSourcePoints?`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `BaseTransformation#errors?`
+
+###### Type
+
+```ts
+Array<number>
+```
+
+### `BaseTransformation#evaluateFunction(newSourcePoint)`
+
+Evaluate the transformation function at a new point
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+  * a source point
+
+###### Returns
+
+the source point, transformed to destination space (`[number, number]`).
+
+### `BaseTransformation#evaluatePartialDerivativeX(newSourcePoint)`
+
+Evaluate the transformation function's partial derivative to x at a new point
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+  * a source point
+
+###### Returns
+
+the x and y component of the partial derivative to x at the source point (`[number, number]`).
+
+### `BaseTransformation#evaluatePartialDerivativeY(newSourcePoint)`
+
+Evaluate the transformation function's partial derivative to y at a new point
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+  * a source point
+
+###### Returns
+
+the x and y component of the partial derivative to y at the source point (`[number, number]`).
+
+### `BaseTransformation#getDestinationTransformedSourcePoints()`
+
+Get the destination-transformed source points.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+source points, transformed to destination domain (`Array<Point>`).
+
+### `BaseTransformation#getErrors()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<number>`.
+
+### `BaseTransformation#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`object | HelmertMeasures | Polynomial1Measures`.
+
+### `BaseTransformation#getRmse()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`number`.
+
+### `BaseTransformation#pointCount`
+
+###### Type
+
+```ts
+number
+```
+
+### `BaseTransformation#pointCountMinimum`
+
+###### Type
+
+```ts
+number
+```
+
+### `BaseTransformation#processWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `BaseTransformation#rmse?`
+
+###### Type
+
+```ts
+number
+```
+
+### `BaseTransformation#setWeightsArrays(weightsArrays)`
+
+Set weights.
+
+The weights might be obtained in other ways then through solving
+(e.g. through solving multiple transformation together when staping).
+This function can be used to set weights computed elsewhere.
+
+###### Parameters
+
+* `weightsArrays` (`object`)
+
+###### Returns
+
+`void`.
+
+### `BaseTransformation#solve()`
+
+Note: since (writing to and) reading from matrices is expensive,
+we convert to and convert from ml-matrix Matrix types in this function,
+in order not to use them in the evaluate functions.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `BaseTransformation#sourcePoints`
+
+###### Type
+
+```ts
+Array<Point>
+```
+
+### `BaseTransformation#type`
+
+###### Type
+
+```ts
+  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'projective'
+  | 'thinPlateSpline'
+  | 'linear'
+```
+
+### `BaseTransformation#weightsArrays?`
+
+###### Type
+
+```ts
+object
+```
 
 ### `DistortionMeasure`
 
@@ -607,12 +1097,6 @@ MIT
 ```ts
 Gcp & Partial<Distortions>
 ```
-
-### `GcpInputs`
-
-###### Fields
-
-* `gcps` (`Array<Gcp>`)
 
 ### `GcpTransformOptions`
 
@@ -652,20 +1136,6 @@ Create a GcpTransformer
 ###### Extends
 
 * `BaseGcpTransformer`
-
-### `GcpTransformer#_setTransformerOptions(partialGcpTransformerOptions)`
-
-Set the transformer options.
-
-Use with caution, especially for options that have effects in the constructor.
-
-###### Parameters
-
-* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
-
-###### Returns
-
-`void`.
 
 ### `GcpTransformer#gcps`
 
@@ -749,6 +1219,32 @@ Returned in the length of the shortest piece, measured in geo coordinates.
 
 Resolution of the toResource transformation in geo space (`number | undefined`).
 
+### `GcpTransformer#getTransformerOptions()`
+
+Get the transformer options.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; ... 5 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions`.
+
+### `GcpTransformer#setTransformerOptionsInternal(partialGcpTransformerOptions)`
+
+Set the transformer options.
+
+Use with caution, especially for options that have effects in the constructor.
+
+###### Parameters
+
+* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
+
+###### Returns
+
+`void`.
+
 ### `GcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
@@ -773,16 +1269,16 @@ Resolution of the toResource transformation in geo space (`number | undefined`).
 
 `P`.
 
-### `GcpTransformer.fromGeoreferencedMap(georeferencedMap, partialGcpTransformerOptions)`
+### `GcpTransformer.fromGeoreferencedMap(georeferencedMap, options)`
 
 Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * A Georeferenced Map
-* `partialGcpTransformerOptions?` (`Partial<GcpTransformerOptions> | undefined`)
-  * Projected GCP Transformer Options
+* `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
+  * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
 
 ###### Returns
 
@@ -868,6 +1364,14 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
 
 `{type: 'Point'; coordinates: number[]}`.
 
+### `GcpTransformerInputs`
+
+###### Type
+
+```ts
+GcpsInputs & TransformationTypeInputs
+```
+
 ### `GcpTransformerOptions`
 
 ###### Type
@@ -885,6 +1389,12 @@ Input SVG string transformed to geo space, as a GeoJSON FeatureCollection (`{typ
   preToResource: ProjectionFunction
 } & MultiGeometryOptions
 ```
+
+### `GcpsInputs`
+
+###### Fields
+
+* `gcps` (`Array<Gcp>`)
 
 ### `GeneralGcp`
 
@@ -1057,7 +1567,23 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 ###### Extends
 
-* `BaseTransformation`
+* `BaseLinearWeightsTransformation`
+
+### `Helmert#coefsArrayMatrices`
+
+###### Type
+
+```ts
+[Array<Array<number>>, Array<Array<number>>]
+```
+
+### `Helmert#coefsArrayMatricesSize`
+
+###### Type
+
+```ts
+[Size, Size]
+```
 
 ### `Helmert#evaluateFunction(newSourcePoint)`
 
@@ -1089,7 +1615,65 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 `[number, number]`.
 
-### `Helmert#helmertParameters`
+### `Helmert#getCoefsArrayMatrices()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<Array<number>>, Array<Array<number>>]`.
+
+### `Helmert#getDestinationPointsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `Helmert#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{translation: Point; rotation: number; scale: number}`.
+
+### `Helmert#getSourcePointCoefsArrays(sourcePoint)`
+
+Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
+1 0 x0 -y0
+1 0 x1 -y1
+...
+0 1 y0 x0
+0 1 y1 x1
+...
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `Helmert#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Helmert#weightsArray?`
 
 ###### Type
 
@@ -1097,37 +1681,19 @@ Resolution of the forward transformation in source space (`number | undefined`).
 Array<number>
 ```
 
-### `Helmert#helmertParametersMatrix`
+### `Helmert#weightsArrays?`
 
 ###### Type
 
 ```ts
-Matrix
+[Array<number>, Array<number>]
 ```
 
-### `Helmert#rotation`
+### `InverseOptions`
 
-###### Type
+###### Fields
 
-```ts
-number
-```
-
-### `Helmert#scale`
-
-###### Type
-
-```ts
-number
-```
-
-### `Helmert#translation`
-
-###### Type
-
-```ts
-[number, number]
-```
+* `inverse` (`boolean`)
 
 ### `KernelFunction`
 
@@ -1152,33 +1718,22 @@ number
 (point0: Point, point1: Point) => number
 ```
 
-### `new Polynomial(sourcePoints, destinationPoints, order)`
+### `new Polynomial1(sourcePoints, destinationPoints)`
 
 ###### Parameters
 
 * `sourcePoints` (`Array<Point>`)
 * `destinationPoints` (`Array<Point>`)
-* `order?` (`number | undefined`)
 
 ###### Returns
 
-`Polynomial`.
+`Polynomial1`.
 
 ###### Extends
 
-* `BaseTransformation`
+* `BasePolynomialTransformation`
 
-### `Polynomial#evaluateFunction(newSourcePoint)`
-
-###### Parameters
-
-* `newSourcePoint` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `Polynomial#evaluatePartialDerivativeX(newSourcePoint)`
+### `Polynomial1#evaluateFunction(newSourcePoint)`
 
 ###### Parameters
 
@@ -1188,7 +1743,98 @@ number
 
 `[number, number]`.
 
-### `Polynomial#evaluatePartialDerivativeY(newSourcePoint)`
+### `Polynomial1#evaluatePartialDerivativeX(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial1#evaluatePartialDerivativeY(_newSourcePoint)`
+
+###### Parameters
+
+* `_newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial1#getHomogeneousTransform()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`HomogeneousTransform | undefined`.
+
+### `Polynomial1#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{translation: Point; rotation: number; scales: Point; shears: Point}`.
+
+### `Polynomial1#getSourcePointCoefsArray(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `Polynomial1#setWeightsArraysFromHomogeneousTransform(homogeneousTransform)`
+
+###### Parameters
+
+* `homogeneousTransform` (`[number, number, number, number, number, number]`)
+
+###### Returns
+
+`void`.
+
+### `Polynomial1.getPolynomial1SourcePointCoefsArray(sourcePoint)`
+
+Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
+1 x0 y0
+1 x1 y1
+1 x2 y2
+...
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `new Polynomial2(sourcePoints, destinationPoints)`
+
+###### Parameters
+
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Polynomial2`.
+
+###### Extends
+
+* `BasePolynomialTransformation`
+
+### `Polynomial2#evaluateFunction(newSourcePoint)`
 
 ###### Parameters
 
@@ -1198,69 +1844,118 @@ number
 
 `[number, number]`.
 
-### `Polynomial#order`
+### `Polynomial2#evaluatePartialDerivativeX(newSourcePoint)`
 
-###### Type
+###### Parameters
 
-```ts
-number
-```
+* `newSourcePoint` (`[number, number]`)
 
-### `Polynomial#pointCountMinimum`
+###### Returns
 
-###### Type
+`[number, number]`.
 
-```ts
-number
-```
+### `Polynomial2#evaluatePartialDerivativeY(newSourcePoint)`
 
-### `Polynomial#polynomialParameters`
+###### Parameters
 
-###### Type
+* `newSourcePoint` (`[number, number]`)
 
-```ts
-[Array<number>, Array<number>]
-```
+###### Returns
 
-### `Polynomial#polynomialParametersMatrices`
+`[number, number]`.
 
-###### Type
+### `Polynomial2#getSourcePointCoefsArray(sourcePoint)`
 
-```ts
-[Matrix, Matrix]
-```
+###### Parameters
 
-### `Polynomial#rotation?`
+* `sourcePoint` (`[number, number]`)
 
-###### Type
+###### Returns
 
-```ts
-number
-```
+`Array<number>`.
 
-### `Polynomial#scale?`
+### `Polynomial2.getPolynomial2SourcePointCoefsArray(sourcePoint)`
 
-###### Type
+Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
+1 x0 y0 x0^2 y0^2 x0\*y0
+...
 
-```ts
-[number, number]
-```
+###### Parameters
 
-### `Polynomial#shear?`
+* `sourcePoint` (`[number, number]`)
 
-###### Type
+###### Returns
 
-```ts
-[number, number]
-```
+`Array<number>`.
 
-### `Polynomial#translation?`
+### `new Polynomial3(sourcePoints, destinationPoints)`
 
-###### Type
+###### Parameters
 
-```ts
-[number, number]
-```
+* `sourcePoints` (`Array<Point>`)
+* `destinationPoints` (`Array<Point>`)
+
+###### Returns
+
+`Polynomial3`.
+
+###### Extends
+
+* `BasePolynomialTransformation`
+
+### `Polynomial3#evaluateFunction(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#evaluatePartialDerivativeX(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#evaluatePartialDerivativeY(newSourcePoint)`
+
+###### Parameters
+
+* `newSourcePoint` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `Polynomial3#getSourcePointCoefsArray(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `Polynomial3.getPolynomial3SourcePointCoefsArray(sourcePoint)`
+
+Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
+1 x0 y0 x0^2 y0^2 x0*y0 x0^3 y0^3 x0^2*y0 x0\*y0^2
+...
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
 
 ### `ProjectionFunction`
 
@@ -1284,6 +1979,14 @@ number
 ###### Extends
 
 * `BaseTransformation`
+
+### `Projective#coefsArrayMatrices`
+
+###### Type
+
+```ts
+[Array<Array<number>>, Array<Array<number>>]
+```
 
 ### `Projective#evaluateFunction(newSourcePoint)`
 
@@ -1315,7 +2018,17 @@ number
 
 `[number, number]`.
 
-### `Projective#projectiveParameters`
+### `Projective#solve()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Projective#weightsArrays?`
 
 ###### Type
 
@@ -1323,15 +2036,7 @@ number
 Array<Array<number>>
 ```
 
-### `Projective#projectiveParametersMatrix`
-
-###### Type
-
-```ts
-Matrix
-```
-
-### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, epsilon)`
+### `new RBF(sourcePoints, destinationPoints, kernelFunction, normFunction, type, epsilon)`
 
 ###### Parameters
 
@@ -1339,6 +2044,15 @@ Matrix
 * `destinationPoints` (`Array<Point>`)
 * `kernelFunction` (`(r: number, options: KernelFunctionOptions) => number`)
 * `normFunction` (`(point0: Point, point1: Point) => number`)
+* `type` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'projective'
+    | 'thinPlateSpline'
+    | 'linear'`)
 * `epsilon?` (`number | undefined`)
 
 ###### Returns
@@ -1347,14 +2061,46 @@ Matrix
 
 ###### Extends
 
-* `BaseTransformation`
+* `BaseIndependentLinearWeightsTransformation`
 
-### `RBF#affineWeights`
+### `RBF#affineWeightsArrays?`
 
 ###### Type
 
 ```ts
 [Array<number>, Array<number>]
+```
+
+### `RBF#coefsArrayMatrices`
+
+###### Type
+
+```ts
+[Array<Array<number>>, Array<Array<number>>]
+```
+
+### `RBF#coefsArrayMatricesSize`
+
+###### Type
+
+```ts
+[Size, Size]
+```
+
+### `RBF#coefsArrayMatrix`
+
+###### Type
+
+```ts
+Array<Array<number>>
+```
+
+### `RBF#coefsArrayMatrixSize`
+
+###### Type
+
+```ts
+[number, number]
 ```
 
 ### `RBF#epsilon?`
@@ -1395,6 +2141,50 @@ number
 
 `[number, number]`.
 
+### `RBF#getCoefsArrayMatrix()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Array<number>>`.
+
+### `RBF#getDestinationPointsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `RBF#getRbfKernelSourcePointCoefsArray(sourcePoint)`
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `RBF#getSourcePointCoefsArray(sourcePoint)`
+
+Get 1x(N+3) coefsArray, populating the (N+3)x(N+3) coefsArrayMatrix
+
+The coefsArray has a 1xN kernel part and a 1x3 affine part.
+
+###### Parameters
+
+* `sourcePoint` (`[number, number]`)
+
+###### Returns
+
+`Array<number>`.
+
 ### `RBF#kernelFunction`
 
 ###### Type
@@ -1411,7 +2201,17 @@ number
 (point0: Point, point1: Point) => number
 ```
 
-### `RBF#rbfWeights`
+### `RBF#processWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `RBF#rbfWeightsArrays?`
 
 ###### Type
 
@@ -1419,12 +2219,41 @@ number
 [Array<number>, Array<number>]
 ```
 
-### `RBF#weightsMatrices`
+### `RBF#setWeightsArrays(weightsArrays, epsilon)`
+
+###### Parameters
+
+* `weightsArrays` (`object`)
+* `epsilon?` (`number | undefined`)
+
+###### Returns
+
+`void`.
+
+### `RBF#solve()`
+
+Solve the x and y components independently.
+
+This uses the exact inverse to compute (for each component, using the same coefs for both)
+the exact solution for the system of linear equations
+which is (in general) invertable to an exact solution.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `RBF#weightsArrays?`
 
 ###### Type
 
 ```ts
-[Matrix, Matrix]
+[Array<number>, Array<number>]
 ```
 
 ### `RefinementOptions`
@@ -1473,14 +2302,6 @@ SplitGcpLineInfo & {
 
 * `BaseTransformation`
 
-### `Straight#destinationPointsCenter`
-
-###### Type
-
-```ts
-[number, number]
-```
-
 ### `Straight#evaluateFunction(newSourcePoint)`
 
 ###### Parameters
@@ -1511,28 +2332,31 @@ SplitGcpLineInfo & {
 
 `[number, number]`.
 
-### `Straight#scale?`
+### `Straight#solve()`
+
+Solve the x and y components jointly.
+
+This computes the corresponding Helmert transform and get the scale from it.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `Straight#weightsArrays?`
 
 ###### Type
 
 ```ts
-number
-```
-
-### `Straight#sourcePointsCenter`
-
-###### Type
-
-```ts
-[number, number]
-```
-
-### `Straight#translation?`
-
-###### Type
-
-```ts
-[number, number]
+{
+  scale: number
+  sourcePointsCenter: Point
+  destinationPointsCenter: Point
+  translation: Point
+}
 ```
 
 ### `TransformationType`
@@ -1550,6 +2374,7 @@ Transformation type.
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 ```
 
 ### `TransformationTypeInputs`
@@ -1563,15 +2388,8 @@ Transformation type.
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
-
-### `TransformerInputs`
-
-###### Type
-
-```ts
-GcpInputs & TransformationTypeInputs
-```
+    | 'thinPlateSpline'
+    | 'linear'`)
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
 
@@ -1615,6 +2433,88 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 ###### Fields
 
 * `differentHandedness` (`false`)
+
+### `solveIndependentlyInverse(coefsArrayMatrix, destinationPointsArrays)`
+
+Solve the x and y components independently using exact inverse.
+
+This uses the exact inverse to compute (for each component, using the same coefs for both)
+the exact solution for the system of linear equations
+which is (in general) invertable to an exact solution.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
+###### Parameters
+
+* `coefsArrayMatrix` (`Array<Array<number>>`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `solveIndependentlyPseudoInverse(coefsArrayMatrix, destinationPointsArrays)`
+
+Solve the x and y components independently using PseudoInverse.
+
+This uses the 'Pseudo Inverse' to compute (for each component, using the same coefs for both)
+a 'best fit' (least squares) approximate solution for the system of linear equations
+which is (in general) over-defined and hence lacks an exact solution.
+
+See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
+
+This wil result in a weights array for each component:
+For order = 1: this.weight = \[\[a0\_x, ax\_x, ay\_x], \[a0\_y, ax\_y, ay\_y]]
+For order = 2: ... (similar, following the same order as in coefsArrayMatrix)
+For order = 3: ... (similar, following the same order as in coefsArrayMatrix)
+
+###### Parameters
+
+* `coefsArrayMatrix` (`Array<Array<number>>`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `solveJointlyPseudoInverse(coefsArrayMatrices, destinationPointsArrays)`
+
+Solve the x and y components jointly using PseudoInverse.
+
+This uses the 'Pseudo Inverse' to compute a 'best fit' (least squares) approximate solution
+for the system of linear equations, which is (in general) over-defined and hence lacks an exact solution.
+See <https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse>
+
+This will result weightsArray shared by both components: \[t\_x, t\_y, m, n]
+
+###### Parameters
+
+* `coefsArrayMatrices` (`[Array<Array<number>>, Array<Array<number>>]`)
+* `destinationPointsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`Array<number>`.
+
+### `solveJointlySvd(coefsArrayMatrices, pointCount)`
+
+Solve the x and y components jointly using singular value decomposition.
+
+This uses a singular value decomposition to compute the last (i.e. 9th) 'right singular vector',
+i.e. the one with the smallest singular value, wich holds the weights for the solution.
+Note that for a set of gcps that exactly follow a projective transformations,
+the singular value is null and this vector spans the null-space.
+
+This wil result in a weights array for each component with rbf weights and affine weights.
+
+###### Parameters
+
+* `coefsArrayMatrices` (`[Array<Array<number>>, Array<Array<number>>]`)
+* `pointCount` (`number`)
+
+###### Returns
+
+`Array<Array<number>>`.
 
 ### `supportedDistortionMeasures`
 

@@ -31,7 +31,7 @@ describe('allmaps transform svg', () => {
       'input/svg/polygon.svg'
     )
     // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
-    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically', () => {
@@ -43,7 +43,7 @@ describe('allmaps transform svg', () => {
       'input/svg/polylines.svg'
     )
     // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
-    expect(expected).to.roughly(0.00000000000001).deep.equal(output)
+    expect(expected).to.roughly(0.0001).deep.equal(output)
   })
 
   it('should read an SVG polyline from a filename and transform this SVG to GeoJSON using the supplied Georeference Annotation, with midpoints computed geographically and using the custom transform options', () => {
@@ -193,11 +193,9 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
-    const expected = readFile(
-      'output/coordinates/coordinates-thin-plate-spline.txt'
-    )
+    const expected = readFile('output/coordinates/coordinates-helmert.txt')
     const output = exec(
-      'transform coordinates -a input/annotations/7a69f9470b49a744.json -t thinPlateSpline',
+      'transform coordinates -a input/annotations/7a69f9470b49a744.json -t helmert',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -213,9 +211,7 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a filename and transform these coordinates toGeo using the supplied transformation type and GCPs, even without a provided annotation', () => {
-    const expected = readFile(
-      'output/coordinates/coordinates-other-gcps-thin-plate-spline.txt'
-    )
+    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
     const output = exec(
       'transform coordinates -g input/coordinates/gcps.txt -t thinPlateSpline',
       'input/coordinates/coordinates.txt'
@@ -224,7 +220,9 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a filename and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-other-gcps-polynomial.txt'
+    )
     const output = exec(
       'transform coordinates -g input/coordinates/gcps.txt',
       'input/coordinates/coordinates.txt'

@@ -21,17 +21,17 @@ import {
 import { TriangulatedWarpedMap } from './TriangulatedWarpedMap.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
-  applyTransform,
-  createTransform,
-  invertTransform
-} from '../shared/matrix.js'
+  applyHomogeneousTransform,
+  createHomogeneousTransform,
+  invertHomogeneousTransform
+} from '../shared/homogeneous-transform.js'
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { Image } from '@allmaps/iiif-parser'
-import type { Line, Point, Tile, Transform } from '@allmaps/types'
+import type { Line, Point, Tile, HomogeneousTransform } from '@allmaps/types'
 
 import type {
   LineLayer,
@@ -145,14 +145,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
-  // About renderTransform and InvertedRenderTransform:
-  // renderTransform is the product of:
+  // About renderHomogeneousTransform and InvertedRenderHomogeneousTransform:
+  // renderHomogeneousTransform is the product of:
   // - the viewport's projectedGeoToClipTransform (projected geo coordinates -> clip coordinates)
-  // - the saved invertedRenderTransform (projected clip coordinates -> geo coordinates)
+  // - the saved invertedRenderHomogeneousTransform (projected clip coordinates -> geo coordinates)
   // since updateVertexBuffers ('where to draw triangles') run with possibly a different Viewport then renderInternal ('drawing the triangles'), a difference caused by throttling, there needs to be an adjustment.
-  // this adjustment is minimal: indeed, since invertedRenderTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
-  // this renderTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
-  invertedRenderTransform: Transform
+  // this adjustment is minimal: indeed, since invertedRenderHomogeneousTransform is set as the inverse of the viewport's projectedGeoToClipTransform in updateVertexBuffers()
+  // this renderHomogeneousTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
+  invertedRenderHomogeneousTransform: HomogeneousTransform
 
   private throttledUpdateTextures: DebouncedFunc<typeof this.updateTextures>
 
@@ -188,7 +188,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl = gl
     this.initializeWebGL(mapProgram, linesProgram, pointsProgram)
 
-    this.invertedRenderTransform = createTransform()
+    this.invertedRenderHomogeneousTransform = createHomogeneousTransform()
 
     this.throttledUpdateTextures = throttle(
       this.updateTextures.bind(this),
@@ -219,22 +219,24 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Update the vertex buffers of this warped map
    *
-   * @param projectedGeoToClipTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+   * @param projectedGeoToClipHomogeneousTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
    */
   updateVertexBuffers(
-    projectedGeoToClipTransform: Transform,
+    projectedGeoToClipHomogeneousTransform: HomogeneousTransform,
     partialWebgl2RendererOptions: Partial<WebGL2RendererOptions>
   ) {
-    this.invertedRenderTransform = invertTransform(projectedGeoToClipTransform)
+    this.invertedRenderHomogeneousTransform = invertHomogeneousTransform(
+      projectedGeoToClipHomogeneousTransform
+    )
 
     if (partialWebgl2RendererOptions.renderMaps) {
-      this.updateVertexBuffersMap(projectedGeoToClipTransform)
+      this.updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
     }
     if (partialWebgl2RendererOptions.renderLines) {
-      this.updateVertexBuffersLines(projectedGeoToClipTransform)
+      this.updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)
     }
     if (partialWebgl2RendererOptions.renderPoints) {
-      this.updateVertexBuffersPoints(projectedGeoToClipTransform)
+      this.updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)
     }
   }
 
@@ -376,7 +378,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
   }
 
-  private updateVertexBuffersMap(projectedGeoToClipTransform: Transform) {
+  private updateVertexBuffersMap(
+    projectedGeoToClipHomogeneousTransform: HomogeneousTransform
+  ) {
     if (!this.mapVao) {
       return
     }
@@ -398,7 +402,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const clipPreviousTrianglePoints =
       this.projectedGeoPreviousTrianglePoints.map((point) =>
-        applyTransform(projectedGeoToClipTransform, point)
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
       )
     createBuffer(
       gl,
@@ -409,7 +413,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
-      applyTransform(projectedGeoToClipTransform, point)
+      applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
     )
     createBuffer(
       gl,
@@ -455,7 +459,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private updateVertexBuffersLines(projectedGeoToClipTransform: Transform) {
+  private updateVertexBuffersLines(
+    projectedGeoToClipHomogeneousTransform: HomogeneousTransform
+  ) {
     if (!this.linesVao) {
       return
     }
@@ -481,7 +487,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[1]
       ])
       .flat()
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,
@@ -505,7 +513,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[0]
       ])
       .flat()
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,
@@ -531,7 +541,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[1]
       ])
       .flat()
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,
@@ -557,7 +569,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoLine[0]
       ])
       .flat()
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,
@@ -678,7 +692,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private updateVertexBuffersPoints(projectedGeoToClipTransform: Transform) {
+  private updateVertexBuffersPoints(
+    projectedGeoToClipHomogeneousTransform: HomogeneousTransform
+  ) {
     if (!this.pointsVao) {
       return
     }
@@ -695,7 +711,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           accumulator.concat(pointLayer.projectedGeoPoints),
         []
       )
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,
@@ -713,7 +731,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           ),
         []
       )
-      .map((point) => applyTransform(projectedGeoToClipTransform, point))
+      .map((point) =>
+        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+      )
     createBuffer(
       gl,
       program,

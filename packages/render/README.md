@@ -609,7 +609,7 @@ number
 [number, number]
 ```
 
-### `Viewport#composeProjectedGeoToCanvasTransform()`
+### `Viewport#composeProjectedGeoToCanvasHomogeneousTransform()`
 
 ###### Parameters
 
@@ -619,7 +619,7 @@ There are no parameters.
 
 `[number, number, number, number, number, number]`.
 
-### `Viewport#composeProjectedGeoToClipTransform()`
+### `Viewport#composeProjectedGeoToClipHomogeneousTransform()`
 
 ###### Parameters
 
@@ -629,7 +629,7 @@ There are no parameters.
 
 `[number, number, number, number, number, number]`.
 
-### `Viewport#composeProjectedGeoToViewportTransform()`
+### `Viewport#composeProjectedGeoToViewportHomogeneousTransform()`
 
 ###### Parameters
 
@@ -639,7 +639,7 @@ There are no parameters.
 
 `[number, number, number, number, number, number]`.
 
-### `Viewport#composeViewportToClipTransform()`
+### `Viewport#composeViewportToClipHomogeneousTransform()`
 
 ###### Parameters
 
@@ -782,7 +782,7 @@ number
 [number, number]
 ```
 
-### `Viewport#projectedGeoToCanvasTransform`
+### `Viewport#projectedGeoToCanvasHomogeneousTransform`
 
 ###### Type
 
@@ -790,7 +790,7 @@ number
 [number, number, number, number, number, number]
 ```
 
-### `Viewport#projectedGeoToClipTransform`
+### `Viewport#projectedGeoToClipHomogeneousTransform`
 
 ###### Type
 
@@ -798,7 +798,7 @@ number
 [number, number, number, number, number, number]
 ```
 
-### `Viewport#projectedGeoToViewportTransform`
+### `Viewport#projectedGeoToViewportHomogeneousTransform`
 
 ###### Type
 
@@ -862,7 +862,7 @@ number
 [number, number]
 ```
 
-### `Viewport#viewportToClipTransform`
+### `Viewport#viewportToClipHomogeneousTransform`
 
 ###### Type
 
@@ -1176,7 +1176,8 @@ Default settings apply for the options.
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
 * `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
 
 ###### Returns
@@ -1447,6 +1448,7 @@ Image
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 ```
 
 ### `WarpedMap#projectedGcps`
@@ -1851,7 +1853,8 @@ Set the transformationType
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
 
 ###### Returns
 
@@ -1886,6 +1889,7 @@ Set the transformationType
   | 'polynomial3'
   | 'projective'
   | 'thinPlateSpline'
+  | 'linear'
 ```
 
 ### `WarpedMap#updateFullGeoMask()`
@@ -2542,7 +2546,8 @@ Sets the transformation type for a specific map
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
   * the new transformation type
 * `mapId` (`string`)
   * the ID of the map
@@ -2609,7 +2614,8 @@ Sets the transformation type for selected maps
     | 'polynomial2'
     | 'polynomial3'
     | 'projective'
-    | 'thinPlateSpline'`)
+    | 'thinPlateSpline'
+    | 'linear'`)
   * the new transformation type
 * `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
   * Selection options (e.g. mapIds), defaults to all visible maps
@@ -3969,7 +3975,7 @@ string
 
 `void`.
 
-### `WebGL2WarpedMap#invertedRenderTransform`
+### `WebGL2WarpedMap#invertedRenderHomogeneousTransform`
 
 ###### Type
 
@@ -4171,13 +4177,13 @@ There are no parameters.
 
 `Promise<void>`.
 
-### `WebGL2WarpedMap#updateVertexBuffers(projectedGeoToClipTransform, partialWebgl2RendererOptions)`
+### `WebGL2WarpedMap#updateVertexBuffers(projectedGeoToClipHomogeneousTransform, partialWebgl2RendererOptions)`
 
 Update the vertex buffers of this warped map
 
 ###### Parameters
 
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
+* `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
   * Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
 * `partialWebgl2RendererOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; debugMaps?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 30 more ...; createRTree?: boolean | undefined; }`)
 
@@ -4185,31 +4191,31 @@ Update the vertex buffers of this warped map
 
 `void`.
 
-### `WebGL2WarpedMap#updateVertexBuffersLines(projectedGeoToClipTransform)`
+### `WebGL2WarpedMap#updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)`
 
 ###### Parameters
 
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
+* `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
 
 ###### Returns
 
 `void`.
 
-### `WebGL2WarpedMap#updateVertexBuffersMap(projectedGeoToClipTransform)`
+### `WebGL2WarpedMap#updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)`
 
 ###### Parameters
 
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
+* `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
 
 ###### Returns
 
 `void`.
 
-### `WebGL2WarpedMap#updateVertexBuffersPoints(projectedGeoToClipTransform)`
+### `WebGL2WarpedMap#updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)`
 
 ###### Parameters
 
-* `projectedGeoToClipTransform` (`[number, number, number, number, number, number]`)
+* `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
 
 ###### Returns
 
